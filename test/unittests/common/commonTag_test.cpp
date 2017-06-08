@@ -31,7 +31,7 @@
 
 /* ****************************************************************************
 *
-* startTag - 
+* startTag -
 */
 TEST(commonTag, startTag)
 {
@@ -52,7 +52,7 @@ TEST(commonTag, startTag)
 
 /* ****************************************************************************
 *
-* endTag - 
+* endTag -
 */
 TEST(commonTag, endTag)
 {
@@ -67,7 +67,7 @@ TEST(commonTag, endTag)
 
 /* ****************************************************************************
 *
-* valueTag - 
+* valueTag -
 */
 TEST(commonTag, valueTag)
 {

@@ -34,7 +34,7 @@
 
 /* ****************************************************************************
 *
-* EMPTY_JSON - 
+* EMPTY_JSON -
 */
 #define EMPTY_JSON "{\n}\n"
 
@@ -42,7 +42,7 @@
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 *
 */
 TEST(DiscoverContextAvailabilityResponse, render)
@@ -67,7 +67,7 @@ TEST(DiscoverContextAvailabilityResponse, render)
 
 /* ****************************************************************************
 *
-* jsonRender - 
+* jsonRender -
 *
 * NOTE
 *   - providingApplication is MANDATORY inside ContextRegistration
@@ -101,7 +101,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   EntityId*                             eidP;
   ContextRegistrationAttribute*         attrP;
   Metadata*                             mdP;
-  
+
   utInit();
 
   // 1. One contextRegistrationResponse - no errorCode inside ContextRegistrationResponse
@@ -139,7 +139,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   // No release here - the data stays - to be used in the following test scenario
 
 
-  
+
   // 3. Two contextRegistrationResponses - one with errorCode and one without errorCode
   //    We're reusing the ContextRegistrationResponse from test 2 (it has StatusCode set
   crrP  = new ContextRegistrationResponse();
@@ -165,12 +165,12 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   crrP->contextRegistration.entityIdVector.push_back(eidP);
   crrP->contextRegistration.providingApplication.set("http://tid.test.com/unitTest4");
   dcarP->responseVector.push_back(crrP);
-  
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename4)) << "Error getting test data from '" << filename4 << "'";
   rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   // No release here - the data stays - to be used in the following test scenario
-  
+
 
   // 5.  ContextRegistration: Two entityIds inside entityIdVector
   eidP  = new EntityId("E05", "EType", "false");
@@ -196,7 +196,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   crrP->contextRegistration.contextRegistrationAttributeVector.push_back(attrP);
   crrP->contextRegistration.providingApplication.set("http://tid.test.com/unitTest6");
   dcarP->responseVector.push_back(crrP);
-  
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename6)) << "Error getting test data from '" << filename6 << "'";
   rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
@@ -224,7 +224,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   // 8.  ContextRegistration: one metadata in registrationMetadataVector
   crrP  = new ContextRegistrationResponse();
   mdP = new Metadata("M1", "string", "test 8");
-  
+
   crrP->contextRegistration.registrationMetadataVector.push_back(mdP);
   crrP->contextRegistration.providingApplication.set("http://tid.test.com/unitTest8");
   dcarP->responseVector.push_back(crrP);

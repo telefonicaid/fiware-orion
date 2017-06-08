@@ -39,13 +39,13 @@
 
 /* ****************************************************************************
 *
-* render_json - 
+* render_json -
 */
 TEST(ContextAttributeResponseVector, render_json)
 {
   ContextAttributeResponseVector  carV;
   ContextAttribute                ca("caName", "caType", "caValue");
-  ContextAttributeResponse        car;  
+  ContextAttributeResponse        car;
   std::string                     out;
   const char*                     outfile = "ngsi10.contextResponseList.render.invalid.json";
 
@@ -67,13 +67,13 @@ TEST(ContextAttributeResponseVector, render_json)
 
 /* ****************************************************************************
 *
-* check_json - 
+* check_json -
 */
 TEST(ContextAttributeResponseVector, check_json)
 {
   ContextAttributeResponseVector  carV;
   ContextAttribute                ca("caName", "caType", "caValue");
-  ContextAttributeResponse        car;  
+  ContextAttributeResponse        car;
   std::string                     out;
   const char*                     outfile1 = "ngsi10.contextAttributeResponse.check1.valid.json";
   const char*                     outfile2 = "ngsi10.contextAttributeResponse.check2.valid.json";
@@ -120,7 +120,7 @@ TEST(ContextAttributeResponseVector, present)
 
 /* ****************************************************************************
 *
-* getAndSize - 
+* getAndSize -
 */
 TEST(ContextAttributeResponseVector, getAndSize)
 {

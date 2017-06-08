@@ -34,7 +34,7 @@
 
 /* ****************************************************************************
 *
-* render_json - 
+* render_json -
 */
 TEST(UpdateContextAttributeRequest, render_json)
 {
@@ -61,7 +61,7 @@ TEST(UpdateContextAttributeRequest, render_json)
 
 /* ****************************************************************************
 *
-* check_json - 
+* check_json -
 */
 TEST(UpdateContextAttributeRequest, check_json)
 {
@@ -81,7 +81,7 @@ TEST(UpdateContextAttributeRequest, check_json)
   out = ucar.check(V1, "PRE Error");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  
+
   // 2. empty contextValue
   out = ucar.check(V1, "");
   EXPECT_STREQ("OK", out.c_str());
@@ -120,7 +120,7 @@ TEST(UpdateContextAttributeRequest, present)
 
 /* ****************************************************************************
 *
-* release - 
+* release -
 */
 TEST(UpdateContextAttributeRequest, release)
 {

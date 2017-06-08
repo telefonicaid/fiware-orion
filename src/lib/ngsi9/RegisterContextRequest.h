@@ -1,5 +1,5 @@
-#ifndef REGISTER_CONTEXT_REQUEST_H
-#define REGISTER_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_NGSI9_REGISTERCONTEXTREQUEST_H_
+#define SRC_LIB_NGSI9_REGISTERCONTEXTREQUEST_H_
 
 /*
 *
@@ -54,4 +54,4 @@ typedef struct RegisterContextRequest
   void          fill(RegisterProviderRequest& rpr, const std::string& entityId, const std::string& entityType, const std::string& attributeName);
 } RegisterContextRequest;
 
-#endif
+#endif  // SRC_LIB_NGSI9_REGISTERCONTEXTREQUEST_H_

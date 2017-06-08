@@ -1,5 +1,5 @@
-#ifndef NOTIFY_CONTEXT_AVAILABILITYRESPONSE_H
-#define NOTIFY_CONTEXT_AVAILABILITYRESPONSE_H
+#ifndef SRC_LIB_NGSI9_NOTIFYCONTEXTAVAILABILITYRESPONSE_H_
+#define SRC_LIB_NGSI9_NOTIFYCONTEXTAVAILABILITYRESPONSE_H_
 
 /*
 *
@@ -48,4 +48,4 @@ typedef struct NotifyContextAvailabilityResponse
   void          release(void);
 } NotifyContextAvailabilityResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI9_NOTIFYCONTEXTAVAILABILITYRESPONSE_H_

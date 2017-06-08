@@ -37,7 +37,7 @@
 
 /* ****************************************************************************
 *
-* render_json - 
+* render_json -
 */
 TEST(ContextAttributeResponse, render_json)
 {
@@ -48,7 +48,7 @@ TEST(ContextAttributeResponse, render_json)
   utInit();
 
   car.contextAttributeVector.push_back(&ca);
-  car.statusCode.fill(SccOk, "OK"); 
+  car.statusCode.fill(SccOk, "OK");
 
   out = car.render(V1, false, ContextEntityAttributes);
 
@@ -59,7 +59,7 @@ TEST(ContextAttributeResponse, render_json)
 
 /* ****************************************************************************
 *
-* check_json - 
+* check_json -
 */
 TEST(ContextAttributeResponse, check_json)
 {
@@ -73,7 +73,7 @@ TEST(ContextAttributeResponse, check_json)
 
   // 1. OK
   car.contextAttributeVector.push_back(&ca);
-  car.statusCode.fill(SccOk, "OK"); 
+  car.statusCode.fill(SccOk, "OK");
 
   out = car.check(V1, false, UpdateContextAttribute, "");
   EXPECT_STREQ("OK", out.c_str());
@@ -88,7 +88,7 @@ TEST(ContextAttributeResponse, check_json)
   // 3. Bad ContextAttribute
   ContextAttribute          ca2("", "caType", "caValue");
   car.contextAttributeVector.push_back(&ca2);
-  
+
   LM_M(("car.contextAttributeVector.size: %d - calling ContextAttributeResponse::check", car.contextAttributeVector.size()));
   out = car.check(V1, false, UpdateContextAttribute, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";

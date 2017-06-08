@@ -74,7 +74,7 @@ std::string EntityTypeResponse::check
   ApiVersion          apiVersion,
   bool                asJsonObject,
   bool                asJsonOut,
-  bool                collapsed,  
+  bool                collapsed,
   const std::string&  predetectedError
 )
 {
@@ -83,7 +83,7 @@ std::string EntityTypeResponse::check
   if (predetectedError != "")
   {
     statusCode.fill(SccBadRequest, predetectedError);
-  }  
+  }
   else if ((res = entityType.check(apiVersion, predetectedError)) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
@@ -137,7 +137,7 @@ std::string EntityTypeResponse::toJson(void)
 
   out += "{";
   out += entityType.contextAttributeVector.toJsonTypes();
-  out += "}";  
+  out += "}";
 
   out += "," + JSON_STR("count") + ":" + countV;
   out += "}";

@@ -30,11 +30,11 @@
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 TEST(ErrorCode, render)
 {
-  ErrorCode    e1; 
+  ErrorCode    e1;
   std::string  out;
   const char*  outfile1 = "ngsi.errorCode.render1.middle.json";
 
@@ -51,7 +51,7 @@ TEST(ErrorCode, render)
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 */
 TEST(ErrorCode, check)
 {

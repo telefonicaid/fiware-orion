@@ -1,5 +1,5 @@
-#ifndef UPDATE_CONTEXT_REQUEST_H
-#define UPDATE_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_NGSI10_UPDATECONTEXTREQUEST_H_
+#define SRC_LIB_NGSI10_UPDATECONTEXTREQUEST_H_
 
 /*
 *
@@ -97,4 +97,4 @@ typedef struct UpdateContextRequest
   void         fill(Entities* entities, const std::string& _updateActionType);
 } UpdateContextRequest;
 
-#endif
+#endif  // SRC_LIB_NGSI10_UPDATECONTEXTREQUEST_H_

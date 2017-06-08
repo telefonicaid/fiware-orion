@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_COMMON_ERRORMESSAGES_H
-#define SRC_LIB_COMMON_ERRORMESSAGES_H
+#ifndef SRC_LIB_COMMON_ERRORMESSAGES_H_
+#define SRC_LIB_COMMON_ERRORMESSAGES_H_
 
 /*
 *
@@ -82,4 +82,4 @@
 
 #define ERROR_DESC_BAD_VERB                           "method not allowed"
 
-#endif // SRC_LIB_COMMON_ERRORMESSAGES_H
+#endif  // SRC_LIB_COMMON_ERRORMESSAGES_H_

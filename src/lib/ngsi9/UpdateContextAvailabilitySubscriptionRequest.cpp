@@ -36,7 +36,7 @@
 
 /* ****************************************************************************
 *
-* Constructor - 
+* Constructor -
 */
 UpdateContextAvailabilitySubscriptionRequest::UpdateContextAvailabilitySubscriptionRequest()
 {
@@ -47,7 +47,7 @@ UpdateContextAvailabilitySubscriptionRequest::UpdateContextAvailabilitySubscript
 
 /* ****************************************************************************
 *
-* UpdateContextAvailabilitySubscriptionRequest::render - 
+* UpdateContextAvailabilitySubscriptionRequest::render -
 */
 std::string UpdateContextAvailabilitySubscriptionRequest::render(void)
 {  
@@ -77,7 +77,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::render(void)
 
 /* ****************************************************************************
 *
-* UpdateContextAvailabilitySubscriptionRequest::present - 
+* UpdateContextAvailabilitySubscriptionRequest::present -
 */
 void UpdateContextAvailabilitySubscriptionRequest::present(const std::string& indent)
 {
@@ -92,7 +92,7 @@ void UpdateContextAvailabilitySubscriptionRequest::present(const std::string& in
 
 /* ****************************************************************************
 *
-* UpdateContextAvailabilitySubscriptionRequest::check - 
+* UpdateContextAvailabilitySubscriptionRequest::check -
 */
 std::string UpdateContextAvailabilitySubscriptionRequest::check(const std::string& predetectedError, int counter)
 {
@@ -123,7 +123,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::check(const std::strin
 
 /* ****************************************************************************
 *
-* UpdateContextAvailabilitySubscriptionRequest::release - 
+* UpdateContextAvailabilitySubscriptionRequest::release -
 */
 void UpdateContextAvailabilitySubscriptionRequest::release(void)
 {

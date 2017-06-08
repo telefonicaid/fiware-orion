@@ -1,5 +1,5 @@
-#ifndef NOTIFY_CONTEXT_REQUEST_H
-#define NOTIFY_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_NGSI10_NOTIFYCONTEXTREQUEST_H_
+#define SRC_LIB_NGSI10_NOTIFYCONTEXTREQUEST_H_
 
 /*
 *
@@ -56,4 +56,4 @@ typedef struct NotifyContextRequest
   NotifyContextRequest* clone(void);
 } NotifyContextRequest;
 
-#endif
+#endif  // SRC_LIB_NGSI10_NOTIFYCONTEXTREQUEST_H_

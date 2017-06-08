@@ -37,7 +37,7 @@
 
 /* ****************************************************************************
 *
-* render_json - 
+* render_json -
 */
 TEST(UpdateContextElementRequest, render_json)
 {
@@ -64,7 +64,7 @@ TEST(UpdateContextElementRequest, render_json)
 
 /* ****************************************************************************
 *
-* check_json - 
+* check_json -
 */
 TEST(UpdateContextElementRequest, check_json)
 {
@@ -123,7 +123,7 @@ TEST(UpdateContextElementRequest, present)
 
 /* ****************************************************************************
 *
-* release - 
+* release -
 */
 TEST(UpdateContextElementRequest, release)
 {
@@ -132,7 +132,7 @@ TEST(UpdateContextElementRequest, release)
 
   ucer.attributeDomainName.set("ADN");
   ucer.contextAttributeVector.push_back(caP);
-  
+
   ASSERT_EQ(1, ucer.contextAttributeVector.size());
 
   ucer.release();

@@ -1,5 +1,5 @@
-#ifndef SENDERTHREAD_H
-#define SENDERTHREAD_H
+#ifndef SRC_LIB_NGSINOTIFY_SENDERTHREAD_H_
+#define SRC_LIB_NGSINOTIFY_SENDERTHREAD_H_
 
 /* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 *
@@ -73,4 +73,4 @@ typedef struct SenderThreadParams
 */
 extern void* startSenderThread(void* paramsV);
 
-#endif
+#endif  // SRC_LIB_NGSINOTIFY_SENDERTHREAD_H_

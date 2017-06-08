@@ -38,7 +38,7 @@
 
 /* ****************************************************************************
 *
-* getAllContextEntities - 
+* getAllContextEntities -
 *
 * GET /v1/contextEntities
 *
@@ -85,7 +85,7 @@ std::string getAllContextEntities
 
   // 02. Fill in QueryContextRequest
   parseDataP->qcr.res.fill(".*", typeName, "true", typeInfo, "");
-  
+
 
   // 03. Call standard op postQueryContext
   answer = postQueryContext(ciP, components, compV, parseDataP);

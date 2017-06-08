@@ -39,7 +39,7 @@
 
 /* ****************************************************************************
 *
-* postUpdateContextSubscription - 
+* postUpdateContextSubscription -
 */
 std::string postUpdateContextSubscription
 (
@@ -52,10 +52,10 @@ std::string postUpdateContextSubscription
   UpdateContextSubscriptionResponse  ucsr;
   std::string                        answer;
 
-  ucsr.subscribeError.subscriptionId = parseDataP->ucsr.res.subscriptionId;  
+  ucsr.subscribeError.subscriptionId = parseDataP->ucsr.res.subscriptionId;
 
   TIMED_MONGO(ciP->httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
-                                                                   &ucsr,                                                                   
+                                                                   &ucsr,
                                                                    ciP->tenant,
                                                                    ciP->httpHeaders.xauthToken,
                                                                    ciP->servicePathV,

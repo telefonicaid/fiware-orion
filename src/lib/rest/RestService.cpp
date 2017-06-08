@@ -53,7 +53,7 @@
 
 /* ****************************************************************************
 *
-* delayedRelease - 
+* delayedRelease -
 */
 static void delayedRelease(JsonDelayedRelease* releaseP)
 {
@@ -92,7 +92,7 @@ static void delayedRelease(JsonDelayedRelease* releaseP)
 
 /* ****************************************************************************
 *
-* payloadParse - 
+* payloadParse -
 */
 std::string payloadParse
 (
@@ -147,7 +147,7 @@ std::string payloadParse
 
 /* ****************************************************************************
 *
-* tenantCheck - 
+* tenantCheck -
 *
 * This function used to be 'static', but as it is now used by MetricsMgr::serviceValid
 * it has been mede 'extern'.
@@ -192,7 +192,7 @@ std::string tenantCheck(const std::string& tenant)
 
 /* ****************************************************************************
 *
-* commonFilters - 
+* commonFilters -
 */
 static void commonFilters
 (
@@ -279,7 +279,7 @@ static void commonFilters
 
 /* ****************************************************************************
 *
-* scopeFilter - 
+* scopeFilter -
 */
 static void scopeFilter
 (
@@ -336,7 +336,7 @@ static void scopeFilter
 
 /* ****************************************************************************
 *
-* filterRelease - 
+* filterRelease -
 */
 static void filterRelease(ParseData* parseDataP, RequestType request)
 {
@@ -359,7 +359,7 @@ static void filterRelease(ParseData* parseDataP, RequestType request)
 
 /* ****************************************************************************
 *
-* compCheck - 
+* compCheck -
 */
 static bool compCheck(int components, const std::vector<std::string>& compV)
 {
@@ -377,7 +377,7 @@ static bool compCheck(int components, const std::vector<std::string>& compV)
 
 /* ****************************************************************************
 *
-* compErrorDetect - 
+* compErrorDetect -
 */
 static bool compErrorDetect
 (
@@ -387,7 +387,7 @@ static bool compErrorDetect
   OrionError*                      oeP
 )
 {
-  std::string  details; 
+  std::string  details;
 
   if ((apiVersion == V2) && (compV[1] == "entities"))
   {
@@ -435,7 +435,7 @@ static bool compErrorDetect
     oeP->fill(SccBadRequest, details);
     return true;  // means: this was an error, make the broker stop this request
   }
-  
+
   return false;  // No special error detected, let the broker continue with the request to detect the error later on
 }
 
@@ -600,7 +600,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       }
 
       compV.clear();
-        
+
       return response;
     }
 
@@ -622,7 +622,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
 
-    filterRelease(&parseData, serviceV[ix].request);   
+    filterRelease(&parseData, serviceV[ix].request);
 
     if (jsonReqP != NULL)
     {

@@ -67,7 +67,7 @@ static char* jsonPayloadClean(const char* payload)
 
 /* ****************************************************************************
 *
-* forwardsPending - 
+* forwardsPending -
 */
 static bool forwardsPending(UpdateContextResponse* upcrsP)
 {
@@ -78,11 +78,11 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
     for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
     {
       ContextAttribute* aP  = cerP->contextElement.contextAttributeVector[aIx];
-      
+
       if (aP->providingApplication.get() != "")
       {
         return true;
-      }      
+      }
     }
   }
 
@@ -93,7 +93,7 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 
 /* ****************************************************************************
 *
-* updateForward - 
+* updateForward -
 *
 * An entity/attribute has been found on some context provider.
 * We need to forward the update request to the context provider, indicated in upcrsP->contextProvider
@@ -256,8 +256,8 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   //
   // NOTE
   // When coming from a convenience operation, such as GET /v1/contextEntities/EID/attributes/attrName,
-  // the verb/method in ciP is GET. However, the parsing function expects a POST, as if it came from a 
-  // POST /v1/updateContext. 
+  // the verb/method in ciP is GET. However, the parsing function expects a POST, as if it came from a
+  // POST /v1/updateContext.
   // So, here we change the verb/method for POST.
   //
   ParseData parseData;
@@ -298,7 +298,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
     upcrsP->errorCode.fill(SccContextElementNotFound);
   }
 
-  
+
   //
   // 7. Freeing memory
   //
@@ -310,7 +310,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
 /* ****************************************************************************
 *
-* foundAndNotFoundAttributeSeparation - 
+* foundAndNotFoundAttributeSeparation -
 *
 * Examine the response from mongo to find out what has really happened ...
 *
@@ -370,7 +370,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
       cerP->statusCode.fill(SccOk);
 
       //
-      // And, pushing to NotFound-vector 
+      // And, pushing to NotFound-vector
       //
       notFoundV.push_back(notFoundCerP);
 
@@ -429,7 +429,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     }
   }
 
-  
+
   //
   // Add entityId::id to details if Not Found and only one element in response.
   // And, if 0 elements in response, take entityId::id from the request.
@@ -446,7 +446,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     }
   }
 }
-  
+
 
 
 /* ****************************************************************************
@@ -535,7 +535,7 @@ std::string postUpdateContext
   //
   upcrsP->errorCode.fill(SccOk);
   attributesToNotFound(upcrP);
-  
+
   HttpStatusCode httpStatusCode;
   TIMED_MONGO(httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->httpHeaders.correlator, ciP->apiVersion, ngsiV2Flavour));
 
@@ -596,7 +596,7 @@ std::string postUpdateContext
   //
   // 05. Forwards necessary - sort parts in outgoing requestV
   //     requestV is a vector of UpdateContextRequests and each Context Provider
-  //     will have a slot in the vector. 
+  //     will have a slot in the vector.
   //     When a ContextElementResponse is found in the output from mongoUpdateContext, a
   //     UpdateContextRequest is to be found/created and inside that UpdateContextRequest
   //     a ContextElement for the Entity of the ContextElementResponse.
@@ -623,7 +623,7 @@ std::string postUpdateContext
       for (unsigned int aIx = 0; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
       {
         ContextAttribute* aP = cerP->contextElement.contextAttributeVector[aIx];
-        
+
         //
         // 0. If the attribute is 'not-found' - just add the attribute to the outgoing response
         //

@@ -1,5 +1,5 @@
-#ifndef REGISTER_CONTEXT_RESPONSE_H
-#define REGISTER_CONTEXT_RESPONSE_H
+#ifndef SRC_LIB_NGSI9_REGISTERCONTEXTRESPONSE_H_
+#define SRC_LIB_NGSI9_REGISTERCONTEXTRESPONSE_H_
 
 /*
 *
@@ -56,4 +56,4 @@ typedef struct RegisterContextResponse
   void        release(void);
 } RegisterContextResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI9_REGISTERCONTEXTRESPONSE_H_

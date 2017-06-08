@@ -107,8 +107,8 @@ std::string EntityTypeVectorResponse::check
 */
 void EntityTypeVectorResponse::present(const std::string& indent)
 {
-  LM_T(LmtPresent,("%s%d items in EntityTypeVectorResponse:\n", 
-		  indent.c_str(), 
+  LM_T(LmtPresent,("%s%d items in EntityTypeVectorResponse:\n",
+		  indent.c_str(),
 		  entityTypeVector.size()));
 
   entityTypeVector.present(indent + "  ");
@@ -130,7 +130,7 @@ void EntityTypeVectorResponse::release(void)
 
 /* ****************************************************************************
 *
-* EntityTypeVectorResponse::toJson - 
+* EntityTypeVectorResponse::toJson -
 */
 std::string EntityTypeVectorResponse::toJson(bool values)
 {

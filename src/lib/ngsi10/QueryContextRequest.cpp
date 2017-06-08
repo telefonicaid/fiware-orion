@@ -82,7 +82,7 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
   contextProvider = _contextProvider;
 
   entityIdVector.push_back(new EntityId(eP));
-  
+
   attributeList.clone(_attributeList);
 
   restrictions = 0;
@@ -92,7 +92,7 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 
 /* ****************************************************************************
 *
-* QueryContextRequest::render - 
+* QueryContextRequest::render -
 */
 std::string QueryContextRequest::render(void)
 {
@@ -115,7 +115,7 @@ std::string QueryContextRequest::render(void)
 
 /* ****************************************************************************
 *
-* QueryContextRequest::check - 
+* QueryContextRequest::check -
 */
 std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError)
 {
@@ -145,7 +145,7 @@ std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject,
 
 /* ****************************************************************************
 *
-* QueryContextRequest::present - 
+* QueryContextRequest::present -
 */
 void QueryContextRequest::present(const std::string& indent)
 {
@@ -158,7 +158,7 @@ void QueryContextRequest::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* QueryContextRequest::release - 
+* QueryContextRequest::release -
 */
 void QueryContextRequest::release(void)
 {
@@ -170,7 +170,7 @@ void QueryContextRequest::release(void)
 
 /* ****************************************************************************
 *
-* QueryContextRequest::fill - 
+* QueryContextRequest::fill -
 */
 void QueryContextRequest::fill(const std::string& entityId, const std::string& entityType, const std::string& attributeName)
 {
@@ -188,7 +188,7 @@ void QueryContextRequest::fill(const std::string& entityId, const std::string& e
 
 /* ****************************************************************************
 *
-* QueryContextRequest::fill - 
+* QueryContextRequest::fill -
 */
 void QueryContextRequest::fill
 (
@@ -208,7 +208,7 @@ void QueryContextRequest::fill
     Scope* scopeP = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
 
     scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
-      
+
     restriction.scopeVector.push_back(scopeP);
   }
 
@@ -222,10 +222,10 @@ void QueryContextRequest::fill
 
 /* ****************************************************************************
 *
-* QueryContextRequest::fill - 
+* QueryContextRequest::fill -
 *
 * NOTE
-* If the incoming bqP->entities.vec is empty, then one almighty entity::id is 
+* If the incoming bqP->entities.vec is empty, then one almighty entity::id is
 * added to the QueryContextRequest::entityIdVector, namely, idPattern .* with empty type,
 * matching ALL entities.
 *

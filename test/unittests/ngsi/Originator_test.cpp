@@ -60,7 +60,7 @@ TEST(Originator, check)
 
 /* ****************************************************************************
 *
-* isEmptSetAndGet - 
+* isEmptSetAndGet -
 */
 TEST(Originator, isEmptySetAndGet)
 {
@@ -83,12 +83,12 @@ TEST(Originator, isEmptySetAndGet)
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 TEST(Originator, render)
 {
   Originator   originator;
-  std::string  out;  
+  std::string  out;
   const char*  outfile1 = "ngsi.originator.render.middle.json";
 
   utInit();
@@ -130,7 +130,7 @@ TEST(Originator, present)
 
 /* ****************************************************************************
 *
-* c_str - 
+* c_str -
 */
 TEST(Originator, c_str)
 {

@@ -36,7 +36,7 @@
 
 /* ****************************************************************************
 *
-* json_ok - 
+* json_ok -
 */
 TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
 {
@@ -69,7 +69,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   out = ucasP->check("predetected error", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
-  
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   ucasP->duration.set("eeeee");
   out = ucasP->check("", 0);
@@ -82,7 +82,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
 
 /* ****************************************************************************
 *
-* json_invalidIsPattern - 
+* json_invalidIsPattern -
 */
 TEST(UpdateContextAvailabilitySubscriptionRequest, json_invalidIsPattern)
 {
@@ -109,7 +109,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_invalidIsPattern)
 
 /* ****************************************************************************
 *
-* response - 
+* response -
 *
 */
 TEST(UpdateContextAvailabilitySubscriptionRequest, response)
@@ -118,7 +118,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, response)
   StatusCode                                     ec(SccBadRequest, "Detail");
   UpdateContextAvailabilitySubscriptionResponse  ucas2(ec);
   std::string                                    out;
-  
+
   utInit();
 
   EXPECT_EQ(ucas2.errorCode.code, SccBadRequest);
@@ -127,6 +127,6 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, response)
 
   out = ucas.check("");
   EXPECT_EQ("OK", out);
-  
+
   utExit();
 }

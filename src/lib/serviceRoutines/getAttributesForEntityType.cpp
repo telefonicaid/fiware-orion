@@ -69,7 +69,7 @@ std::string getAttributesForEntityType
   //
   // NOTE
   //   The second to last parameter for mongoAttributesForEntityType 'bool noAttrDetail' is always
-  //   set to true (meaning to skip the attribute detail) for NGSIv1 requests. 
+  //   set to true (meaning to skip the attribute detail) for NGSIv1 requests.
   //   The parameter is only used for NGSIv2.
   //
   TIMED_MONGO(mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam, true, ciP->apiVersion));

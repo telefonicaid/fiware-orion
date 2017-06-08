@@ -87,7 +87,7 @@ static unsigned int              mhdConnectionTimeout  = 0;
 
 /* ****************************************************************************
 *
-* correlatorGenerate - 
+* correlatorGenerate -
 */
 static void correlatorGenerate(char* buffer)
 {
@@ -101,7 +101,7 @@ static void correlatorGenerate(char* buffer)
 
 /* ****************************************************************************
 *
-* uriArgumentGet - 
+* uriArgumentGet -
 */
 static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val)
 {
@@ -279,7 +279,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 
 /* ****************************************************************************
 *
-* mimeTypeSelect - 
+* mimeTypeSelect -
 */
 static MimeType mimeTypeSelect(ConnectionInfo* ciP)
 {
@@ -300,7 +300,7 @@ static MimeType mimeTypeSelect(ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
-* acceptItemParse - 
+* acceptItemParse -
 */
 static bool acceptItemParse(ConnectionInfo* ciP, char* value)
 {
@@ -334,8 +334,8 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
   // So, if the media-range is anything else, it is rejected immediately and not put in the list
   //
   if ((strcmp(cP, "*/*")              != 0) &&
-      (strcmp(cP, "application/*")    != 0) && 
-      (strcmp(cP, "application/json") != 0) && 
+      (strcmp(cP, "application/*")    != 0) &&
+      (strcmp(cP, "application/json") != 0) &&
       (strcmp(cP, "text/*")           != 0) &&
       (strcmp(cP, "text/plain")       != 0))
   {
@@ -388,7 +388,7 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
     delete acceptHeaderP;
     return false;
   }
-  
+
   // Pass '=' and check for Number
   ++rest;
   // Zero-out ';' if present
@@ -431,7 +431,7 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
 
 /* ****************************************************************************
 *
-* acceptParse - 
+* acceptParse -
 */
 static void acceptParse(ConnectionInfo* ciP, const char* value)
 {
@@ -489,7 +489,7 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
 
 /* ****************************************************************************
 *
-* httpHeaderGet - 
+* httpHeaderGet -
 */
 static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* value)
 {
@@ -554,7 +554,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 
 /* ****************************************************************************
 *
-* serve - 
+* serve -
 */
 static void serve(ConnectionInfo* ciP)
 {
@@ -592,7 +592,7 @@ static void requestCompleted
   {
     clock_gettime(CLOCK_REALTIME, &reqEndTime);
     clock_difftime(&reqEndTime, &ciP->reqStartTime, &threadLastTimeStat.reqTime);
-  }  
+  }
 
   //
   // Statistics
@@ -647,8 +647,8 @@ static void requestCompleted
 
     if (gettimeofday(&end, NULL) == 0)
     {
-      unsigned long long elapsed = 
-        (end.tv_sec  - ciP->transactionStart.tv_sec) * 1000000 + 
+      unsigned long long elapsed =
+        (end.tv_sec  - ciP->transactionStart.tv_sec) * 1000000 +
         (end.tv_usec - ciP->transactionStart.tv_usec);
 
       metricsMgr.add(ciP->httpHeaders.tenant, spath, _METRIC_TOTAL_SERVICE_TIME, elapsed);
@@ -741,7 +741,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
       continue;
     }
 
-    const char* comp = compV[ix].c_str();      
+    const char* comp = compV[ix].c_str();
 
     for (unsigned int cIx = 0; cIx < strlen(comp); ++cIx)
     {
@@ -761,7 +761,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 
 /* ****************************************************************************
 *
-* removeTrailingSlash - 
+* removeTrailingSlash -
 */
 static char* removeTrailingSlash(std::string path)
 {
@@ -802,13 +802,13 @@ void firstServicePath(const char* servicePath, char* servicePath0, int servicePa
 
 /* ****************************************************************************
 *
-* servicePathSplit - 
+* servicePathSplit -
 */
 int servicePathSplit(ConnectionInfo* ciP)
 {
 #if 0
   //
-  // Special case: empty service-path 
+  // Special case: empty service-path
   //
   // FIXME P4: We're not sure what this 'fix' really fixes.
   //           Must implement a functest to reproduce this situation.
@@ -866,7 +866,7 @@ int servicePathSplit(ConnectionInfo* ciP)
     ciP->servicePathV[ix] = removeTrailingSlash(stripped);
 
     //
-    // This was previously an LM_T trace, but we have "promoted" it to INFO due to 
+    // This was previously an LM_T trace, but we have "promoted" it to INFO due to
     // it is needed to check logs in a .test case (case 0392 service_path_http_header.test)
     //
     LM_I(("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
@@ -915,7 +915,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   //
   // Five cases:
   //   1. If there is no payload, the Content-Type is not interesting
-  //   2. Payload present but no Content-Type 
+  //   2. Payload present but no Content-Type
   //   3. Content-Type present but not supported
   //   4. API version 2 and not 'application/json' || text/plain
   //
@@ -999,7 +999,7 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
 
 /* ****************************************************************************
 *
-* apiVersionGet - 
+* apiVersionGet -
 *
 * This function returns the version of the API for the incoming message,
 * based on the URL according to:
@@ -1049,7 +1049,7 @@ static ApiVersion apiVersionGet(const char* path)
 
 /* ****************************************************************************
 *
-* acceptHeadersAcceptable - 
+* acceptHeadersAcceptable -
 *
 * URI paths ending with '/value' accept both text/plain and application/json.
 * All other requests accept only application/json.
@@ -1058,7 +1058,7 @@ static ApiVersion apiVersionGet(const char* path)
 * are OK to work with for the broker.
 * The media type to be used is selected later, depending on the request.
 * Actually, all requests except those ending in '/value' will use application/json.
-* 
+*
 */
 static bool acceptHeadersAcceptable(ConnectionInfo* ciP, bool* textAcceptedP)
 {
@@ -1119,7 +1119,7 @@ static bool acceptHeadersAcceptable(ConnectionInfo* ciP, bool* textAcceptedP)
 
 /* ****************************************************************************
 *
-* connectionTreat - 
+* connectionTreat -
 *
 * This is the MHD_AccessHandlerCallback function for MHD_start_daemon
 * This function returns:
@@ -1169,7 +1169,7 @@ static int connectionTreat
 
     //
     // First thing to do on a new connection, set correlator to N/A.
-    // After reading HTTP headers, the correlator id either changes due to encountering a 
+    // After reading HTTP headers, the correlator id either changes due to encountering a
     // Fiware-Correlator HTTP Header, or, if no HTTP header with Fiware-Correlator is found,
     // a new correlator is generated.
     //
@@ -1253,11 +1253,11 @@ static int connectionTreat
     //
     // FIXME P1: We might not want to do all these assignments, they are not used in all requests ...
     //           Once we *really* look to scratch some efficiency, this change should be made.
-    //     
+    //
     ciP->uriParam[URI_PARAM_PAGINATION_OFFSET]  = DEFAULT_PAGINATION_OFFSET;
     ciP->uriParam[URI_PARAM_PAGINATION_LIMIT]   = DEFAULT_PAGINATION_LIMIT;
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
-    
+
     // Note we need to get API version before MHD_get_connection_values() as the later
     // function may result in an error after processing Accept headers (and the
     // render for the error depends on API version)
@@ -1337,7 +1337,7 @@ static int connectionTreat
     //
     // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
     // just silently "eat" the entire message.
-    // 
+    //
     // The problem occurs when the broker is lied to and there aren't ciP->httpHeaders.contentLength
     // bytes to read.
     // When this happens, MHD blocks until it times out (MHD_OPTION_CONNECTION_TIMEOUT defaults to 5 seconds),
@@ -1378,7 +1378,7 @@ static int connectionTreat
     // Copy the chunk
     LM_T(LmtPartialPayload, ("Got %d of payload of %d bytes", dataLen, ciP->httpHeaders.contentLength));
     memcpy(&ciP->payload[ciP->payloadSize], upload_data, dataLen);
-    
+
     // Add to the size of the accumulated read buffer
     ciP->payloadSize += *upload_data_size;
 
@@ -1392,8 +1392,8 @@ static int connectionTreat
 
   //
   // 3. Finally, serve the request (unless an error has occurred)
-  // 
-  // URL and headers checks are delayed to the "third" MHD call, as no 
+  //
+  // URL and headers checks are delayed to the "third" MHD call, as no
   // errors can be sent before all the request has been read
   //
   if (urlCheck(ciP, ciP->url) == false)
@@ -1428,7 +1428,7 @@ static int connectionTreat
     alarmMgr.badInput(clientIp, "error in URI parameters");
     restReply(ciP, ciP->answer);
     return MHD_YES;
-  }  
+  }
 
   //
   // Here, if the incoming request was too big, return error about it
@@ -1530,8 +1530,8 @@ static int connectionTreat
   // - Old log requests  (URL contains '/log/')
   // - New log requests  (URL is exactly '/admin/log')
   //
-  if (((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) && 
-      (ciP->httpHeaders.contentLength == 0) && 
+  if (((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) &&
+      (ciP->httpHeaders.contentLength == 0) &&
       ((strncasecmp(ciP->url.c_str(), "/log/", 5) != 0) && (strncasecmp(ciP->url.c_str(), "/admin/log", 10) != 0)))
   {
     std::string errorMsg = restErrorReplyGet(ciP, "", url, SccContentLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request");
@@ -1556,7 +1556,7 @@ static int connectionTreat
 
 /* ****************************************************************************
 *
-* restStart - 
+* restStart -
 *
 * NOTE, according to MHD documentation, thread pool (MHD_OPTION_THREAD_POOL_SIZE) cannot be used
 * is conjunction with MHD_USE_THREAD_PER_CONNECTION.
@@ -1605,7 +1605,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
 
   if ((ipVersion == IPV4) || (ipVersion == IPDUAL))
-  { 
+  {
     memset(&sad, 0, sizeof(sad));
     if (inet_pton(AF_INET, bindIp, &(sad.sin_addr.s_addr)) != 1)
     {
@@ -1657,10 +1657,10 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     {
       mhdStartError = false;
     }
-  }  
+  }
 
   if ((ipVersion == IPV6) || (ipVersion == IPDUAL))
-  { 
+  {
     memset(&sad_v6, 0, sizeof(sad_v6));
     if (inet_pton(AF_INET6, bindIPv6, &(sad_v6.sin6_addr.s6_addr)) != 1)
     {
@@ -1727,7 +1727,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
 /* ****************************************************************************
 *
-* restInit - 
+* restInit -
 *
 * FIXME P5: add vector of the accepted content-types, instead of the bool
 *           See Issue #256
@@ -1757,7 +1757,7 @@ void restInit
   port             = _port;
   restServiceV     = _restServiceV;
   ipVersionUsed    = _ipVersion;
-  serveFunction    = (_serveFunction != NULL)? _serveFunction : serve;  
+  serveFunction    = (_serveFunction != NULL)? _serveFunction : serve;
   multitenant      = _multitenant;
   connMemory       = _connectionMemory;
   maxConns         = _maxConnections;

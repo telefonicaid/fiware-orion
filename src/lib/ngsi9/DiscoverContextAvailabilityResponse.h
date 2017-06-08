@@ -1,5 +1,5 @@
-#ifndef DISCOVER_CONTEXT_AVAILABILITY_RESPONSE_H
-#define DISCOVER_CONTEXT_AVAILABILITY_RESPONSE_H
+#ifndef SRC_LIB_NGSI9_DISCOVERCONTEXTAVAILABILITYRESPONSE_H_
+#define SRC_LIB_NGSI9_DISCOVERCONTEXTAVAILABILITYRESPONSE_H_
 
 /*
 *
@@ -51,4 +51,4 @@ typedef struct DiscoverContextAvailabilityResponse
   void         release(void);
 } DiscoverContextAvailabilityResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI9_DISCOVERCONTEXTAVAILABILITYRESPONSE_H_

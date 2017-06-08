@@ -33,14 +33,14 @@
 
 /* ****************************************************************************
 *
-* ok - 
+* ok -
 */
 TEST(AttributeList, ok)
 {
   AttributeList  al;
   std::string    out;
   const char*    outfile1 = "ngsi.attributeList.ok.middle.json";
-  
+
   utInit();
 
   out = al.render(false);

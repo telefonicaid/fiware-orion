@@ -47,7 +47,7 @@
 
 /* ****************************************************************************
 *
-* TAG_ADD - 
+* TAG_ADD -
 */
 #define TAG_ADD_COUNTER(tag, counter) valueTag(indent2, tag, counter + 1, ciP->outtrue)
 #define TAG_ADD_STRING(tag, value)  valueTag(indent2, tag, value, ciP->outtrue)
@@ -57,7 +57,7 @@
 
 /* ****************************************************************************
 *
-* resetStatistics - 
+* resetStatistics -
 */
 static void resetStatistics(void)
 {
@@ -167,7 +167,7 @@ std::string renderCounterStats(void)
 {
   JsonHelper js;
 
-  // FIXME: try to chose names closer to the ones used in API URLs  
+  // FIXME: try to chose names closer to the ones used in API URLs
   renderUsedCounter(&js, "jsonRequests",                              noOfJsonRequests);
   renderUsedCounter(&js, "registrations",                             noOfRegistrations);
   renderUsedCounter(&js, "registrationUpdates",                       noOfRegistrationUpdates);
@@ -238,7 +238,7 @@ std::string renderCounterStats(void)
 
 /* ****************************************************************************
 *
-* renderSemWaitStats - 
+* renderSemWaitStats -
 */
 std::string renderSemWaitStats(void)
 {
@@ -283,7 +283,7 @@ std::string renderNotifQueueStats(void)
 
 /* ****************************************************************************
 *
-* statisticsTreat - 
+* statisticsTreat -
 */
 std::string statisticsTreat
 (

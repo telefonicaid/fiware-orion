@@ -57,8 +57,8 @@
 Notifier::~Notifier (void)
 {
   // FIXME: This destructor is needed to avoid warning message.
-  // Compilation fails when a warning occurs, and it is enabled 
-  // compilation option -Werror "warnings being treated as errors" 
+  // Compilation fails when a warning occurs, and it is enabled
+  // compilation option -Werror "warnings being treated as errors"
   LM_T(LmtNotImplemented, ("Notifier destructor is not implemented"));
 }
 
@@ -177,7 +177,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
     params->protocol         = protocol;
     params->verb             = "POST";
     params->tenant           = tenant;
-    params->resource         = uriPath;   
+    params->resource         = uriPath;
     params->content_type     = content_type;
     params->content          = payload;
     params->mimeType         = JSON;

@@ -1,5 +1,5 @@
-#ifndef UNSUBSCRIBE_CONTEXT_RESPONSE_H
-#define UNSUBSCRIBE_CONTEXT_RESPONSE_H
+#ifndef SRC_LIB_NGSI10_UNSUBSCRIBECONTEXTRESPONSE_H_
+#define SRC_LIB_NGSI10_UNSUBSCRIBECONTEXTRESPONSE_H_
 
 /*
 *
@@ -53,4 +53,4 @@ typedef struct UnsubscribeContextResponse
   void            release(void);
 } UnsubscribeContextResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI10_UNSUBSCRIBECONTEXTRESPONSE_H_

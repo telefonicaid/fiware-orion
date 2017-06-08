@@ -36,7 +36,7 @@
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse - 
+* DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse -
 */
 DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse()
 {
@@ -56,7 +56,7 @@ DiscoverContextAvailabilityResponse::~DiscoverContextAvailabilityResponse()
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse - 
+* DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse -
 */
 DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse(StatusCode& _errorCode)
 {
@@ -68,7 +68,7 @@ DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse(StatusC
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityResponse::render - 
+* DiscoverContextAvailabilityResponse::render -
 */
 std::string DiscoverContextAvailabilityResponse::render(void)
 {
@@ -108,7 +108,7 @@ std::string DiscoverContextAvailabilityResponse::render(void)
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityResponse::release - 
+* DiscoverContextAvailabilityResponse::release -
 */
 void DiscoverContextAvailabilityResponse::release(void)
 {

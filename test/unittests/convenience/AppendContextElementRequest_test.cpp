@@ -37,7 +37,7 @@
 
 /* ****************************************************************************
 *
-* render_json - 
+* render_json -
 */
 TEST(AppendContextElementRequest, render_json)
 {
@@ -64,7 +64,7 @@ TEST(AppendContextElementRequest, render_json)
 
 /* ****************************************************************************
 *
-* check_json - 
+* check_json -
 */
 TEST(AppendContextElementRequest, check_json)
 {
@@ -87,11 +87,11 @@ TEST(AppendContextElementRequest, check_json)
    EXPECT_STREQ("OK", out.c_str());
 
 
-   // 2. Predetected error 
+   // 2. Predetected error
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
    out = acer.check(V1, false, AppendContextElement, "Error is predetected");
    EXPECT_STREQ(expectedBuf, out.c_str());
-   
+
 
    // 3. bad ContextAttribute
    ContextAttribute  ca2("", "caType", "121");

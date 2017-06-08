@@ -38,7 +38,7 @@
 
 /* ****************************************************************************
 *
-* postUpdateContextAvailabilitySubscription - 
+* postUpdateContextAvailabilitySubscription -
 */
 std::string postUpdateContextAvailabilitySubscription
 (
@@ -51,7 +51,7 @@ std::string postUpdateContextAvailabilitySubscription
   UpdateContextAvailabilitySubscriptionResponse  ucas;
   std::string                                    answer;
 
-  ucas.subscriptionId = parseDataP->ucas.res.subscriptionId;  
+  ucas.subscriptionId = parseDataP->ucas.res.subscriptionId;
 
   TIMED_MONGO(ciP->httpStatusCode = mongoUpdateContextAvailabilitySubscription(&parseDataP->ucas.res,
                                                                                &ucas,

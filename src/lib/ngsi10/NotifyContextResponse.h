@@ -1,5 +1,5 @@
-#ifndef NOTIFY_CONTEXT_RESPONSE_H
-#define NOTIFY_CONTEXT_RESPONSE_H
+#ifndef SRC_LIB_NGSI10_NOTIFYCONTEXTRESPONSE_H_
+#define SRC_LIB_NGSI10_NOTIFYCONTEXTRESPONSE_H_
 
 /*
 *
@@ -49,4 +49,4 @@ typedef struct NotifyContextResponse
   void          release(void);
 } NotifyContextResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI10_NOTIFYCONTEXTRESPONSE_H_

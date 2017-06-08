@@ -40,7 +40,7 @@
 
 /* ****************************************************************************
 *
-* RegisterContextRequest::render - 
+* RegisterContextRequest::render -
 */
 std::string RegisterContextRequest::render(void)
 {
@@ -66,7 +66,7 @@ std::string RegisterContextRequest::render(void)
 
 /* ****************************************************************************
 *
-* RegisterContextRequest::check - 
+* RegisterContextRequest::check -
 */
 std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::string& predetectedError, int counter)
 {
@@ -84,8 +84,8 @@ std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::stri
     response.errorCode.fill(SccBadRequest, "Empty Context Registration List");
   } 
   else if (((res = contextRegistrationVector.check(apiVersion, RegisterContext, predetectedError, counter)) != "OK") ||
-           ((res = duration.check()) != "OK") ||
-           ((res = registrationId.check()) != "OK"))
+           ((res = duration.check())                                                                        != "OK") ||
+           ((res = registrationId.check())                                                                  != "OK"))
   {
     alarmMgr.badInput(clientIp, res);
     response.errorCode.fill(SccBadRequest, res);
@@ -102,7 +102,7 @@ std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::stri
 
 /* ****************************************************************************
 *
-* RegisterContextRequest::release - 
+* RegisterContextRequest::release -
 */
 void RegisterContextRequest::release(void)
 {
@@ -115,7 +115,7 @@ void RegisterContextRequest::release(void)
 
 /* ****************************************************************************
 *
-* RegisterContextRequest::fill - 
+* RegisterContextRequest::fill -
 */
 void RegisterContextRequest::fill(RegisterProviderRequest& rpr, const std::string& entityId, const std::string& entityType, const std::string& attributeName)
 {

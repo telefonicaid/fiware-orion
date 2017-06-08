@@ -56,7 +56,7 @@ TEST(RestrictionString, check)
 
 /* ****************************************************************************
 *
-* isEmptSetAndGet - 
+* isEmptSetAndGet -
 */
 TEST(RestrictionString, isEmptySetAndGet)
 {
@@ -79,12 +79,12 @@ TEST(RestrictionString, isEmptySetAndGet)
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 TEST(RestrictionString, render)
 {
   RestrictionString   restrictionString;
-  std::string         out;  
+  std::string         out;
   const char*         outfile1 = "ngsi.restrictionString.render.middle.json";
 
   utInit();
@@ -126,7 +126,7 @@ TEST(RestrictionString, present)
 
 /* ****************************************************************************
 *
-* c_str - 
+* c_str -
 */
 TEST(RestrictionString, c_str)
 {

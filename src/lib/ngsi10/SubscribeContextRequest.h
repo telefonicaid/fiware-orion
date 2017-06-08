@@ -1,5 +1,5 @@
-#ifndef SUBSCRIBE_CONTEXT_REQUEST_H
-#define SUBSCRIBE_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_NGSI10_SUBSCRIBECONTEXTREQUEST_H_
+#define SRC_LIB_NGSI10_SUBSCRIBECONTEXTREQUEST_H_
 
 /*
 *
@@ -53,7 +53,7 @@ typedef struct SubscribeContextRequest
   Duration               duration;               // Optional
   Restriction            restriction;            // Optional
   NotifyConditionVector  notifyConditionVector;  // Optional
-  Throttling             throttling;             // Optional  
+  Throttling             throttling;             // Optional
 
   /* The number of restrictions */
   int                    restrictions;
@@ -68,4 +68,4 @@ typedef struct SubscribeContextRequest
   void         fill(EntityTypeInfo typeInfo);
 } SubscribeContextRequest;
 
-#endif
+#endif  // SRC_LIB_NGSI10_SUBSCRIBECONTEXTREQUEST_H_

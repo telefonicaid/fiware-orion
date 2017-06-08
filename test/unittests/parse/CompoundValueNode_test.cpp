@@ -34,7 +34,7 @@
 
 /* ****************************************************************************
 *
-* tree - 
+* tree -
 */
 TEST(CompoundValueNode, tree)
 {
@@ -77,7 +77,7 @@ TEST(CompoundValueNode, tree)
 
 /* ****************************************************************************
 *
-* typeName - 
+* typeName -
 */
 TEST(CompoundValueNode, typeName)
 {
@@ -126,7 +126,7 @@ TEST(CompoundValueNode, vectorInvalidAndOk)
   EXPECT_STREQ("OK", tree->error.c_str());
 
   std::string rendered;
-  
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
   rendered = tree->render(V1);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
@@ -172,7 +172,7 @@ TEST(CompoundValueNode, structInvalidAndOk)
   EXPECT_STREQ("OK", tree->error.c_str());
 
   std::string rendered;
-  
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
   rendered = tree->render(V1);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
