@@ -383,7 +383,6 @@ void mongoGetSubscription
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
-  unsigned int n = 0;
   if (moreSafe(cursor))
   {
     BSONObj r;
@@ -396,7 +395,7 @@ void mongoGetSubscription
       *oe = OrionError(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
       return;
     }
-    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", n, r.toString().c_str()));
+    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
     setNewSubscriptionId(sub, r);
     setDescription(sub, r);

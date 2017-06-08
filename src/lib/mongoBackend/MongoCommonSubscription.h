@@ -69,7 +69,7 @@ extern void setThrottling(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder
 *
 * setServicePath -
 */
-extern void setServicePath(std::string servicePath, mongo::BSONObjBuilder* b);
+extern void setServicePath(const std::string& servicePath, mongo::BSONObjBuilder* b);
 
 
 

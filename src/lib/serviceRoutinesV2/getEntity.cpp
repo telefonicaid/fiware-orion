@@ -67,7 +67,6 @@ std::string getEntity
 {
   std::string entityId        = compV[2];
   std::string type            = ciP->uriParam[URI_PARAM_TYPE];
-  std::string metadataFilter  = ciP->uriParam[URI_PARAM_METADATA];
 
   if (entityId == "")
   {
