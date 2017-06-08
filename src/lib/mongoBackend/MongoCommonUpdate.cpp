@@ -2082,7 +2082,7 @@ static bool processSubscriptions
     /* Send notification */
     LM_T(LmtSubCache, ("NOT ignored: %s", tSubP->cacheSubId.c_str()));
 
-    bool  notificationSent = false;
+    bool  notificationSent;
 
     notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
                                                                 tSubP->attrL,

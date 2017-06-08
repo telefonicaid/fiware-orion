@@ -114,14 +114,15 @@ static bool getGeoJson
   ApiVersion               apiVersion
 )
 {
-  double               aLat;
-  double               aLong;
   std::vector<double>  coordLat;
   std::vector<double>  coordLong;
   BSONArrayBuilder     ba;
 
   if ((apiVersion == V1) || (caP->type == GEO_POINT))
   {
+    double  aLat;
+    double  aLong;
+
     if (!string2coords(caP->stringValue, aLat, aLong))
     {
       *errDetail = "geo coordinates format error [see Orion user manual]: " + caP->stringValue;
