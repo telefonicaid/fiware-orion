@@ -24,6 +24,7 @@
 */
 #include <string>
 #include <vector>
+#include <map>
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
@@ -34,7 +35,7 @@
 
 /* ****************************************************************************
 *
-* Entities::Entities - 
+* Entities::Entities -
 */
 Entities::Entities()
 {
@@ -45,7 +46,7 @@ Entities::Entities()
 
 /* ****************************************************************************
 *
-* Entities::~Entities - 
+* Entities::~Entities -
 */
 Entities::~Entities()
 {
@@ -56,7 +57,7 @@ Entities::~Entities()
 
 /* ****************************************************************************
 *
-* Entities::render - 
+* Entities::render -
 *
 */
 std::string Entities::render
@@ -66,13 +67,13 @@ std::string Entities::render
 )
 {
   return vec.render(uriParamOptions, uriParam);
-} 
+}
 
 
 
 /* ****************************************************************************
 *
-* Entities::check - 
+* Entities::check -
 *
 * NOTE
 *   The 'check' method is normally only used to check that incoming payload is correct.
@@ -87,13 +88,11 @@ std::string Entities::check(ApiVersion apiVersion, RequestType requestType)
 
 /* ****************************************************************************
 *
-* Entities::present - 
+* Entities::present -
 */
 void Entities::present(const std::string& indent)
 {
-  LM_T(LmtPresent, ("%s%d Entities:", 
-		    indent.c_str(), 
-		    vec.size()));
+  LM_T(LmtPresent, ("%s%d Entities:", indent.c_str(), vec.size()));
   vec.present(indent + "  ");
 }
 
@@ -101,7 +100,7 @@ void Entities::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* Entities::release - 
+* Entities::release -
 */
 void Entities::release(void)
 {
@@ -112,10 +111,10 @@ void Entities::release(void)
 
 /* ****************************************************************************
 *
-* Entities::fill - 
+* Entities::fill -
 *
 * NOTE
-*   The errorCode field from qcrsP is not used at all if errorCode::code equals SccOk. 
+*   The errorCode field from qcrsP is not used at all if errorCode::code equals SccOk.
 *   This means that e.g. the "Count:" in errorCode::details (from v1 logic) will not be
 *   present in the Entities for v2 (that number is in the HTTP header Fiware-Total-Count for v2).
 *   Other values for "details" are lost as well, if errorCode::code equals SccOk.

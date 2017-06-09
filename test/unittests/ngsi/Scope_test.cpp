@@ -33,7 +33,7 @@
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 TEST(Scope, render)
 {
@@ -69,7 +69,7 @@ TEST(Scope, check)
   std::string  expected1 = "Empty type in restriction scope";
   std::string  expected2 = "Empty value in restriction scope";
   std::string  expected3 = "OK";
-  
+
   utInit();
 
   checked = scope.check(RegisterContext, "", "", 0);

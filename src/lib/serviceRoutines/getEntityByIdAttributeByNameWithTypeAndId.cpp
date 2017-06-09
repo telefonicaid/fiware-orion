@@ -116,7 +116,7 @@ std::string getEntityByIdAttributeByNameWithTypeAndId
     parseDataP->dcar.res.fill(entityId, entityType, typeInfo, attributeName);
 
 
-    // 04. Call standard operation 
+    // 04. Call standard operation
     answer = postDiscoverContextAvailability(ciP, components, compV, parseDataP);
   }
 

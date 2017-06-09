@@ -37,8 +37,6 @@
 */
 int main(int argC, char* argV[])
 {
-  char* fName = "main";
-
   paConfig("prefix", "P2_");
   paConfig("log to file", "/tmp/");
   paConfig("msgs to stdout", (void*) FALSE);

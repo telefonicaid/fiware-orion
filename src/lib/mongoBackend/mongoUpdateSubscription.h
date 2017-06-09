@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_MONGOBACKEND_MONGOUPDATESUBSCRIPION_H
-#define SRC_LIB_MONGOBACKEND_MONGOUPDATESUBSCRIPION_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOUPDATESUBSCRIPTION_H_
+#define SRC_LIB_MONGOBACKEND_MONGOUPDATESUBSCRIPTION_H_
 
 /*
 *
@@ -25,8 +25,6 @@
 *
 * Author: Fermin Galan
 */
-
-#include <map>
 #include <string>
 #include <vector>
 
@@ -54,4 +52,4 @@ extern std::string mongoUpdateSubscription
   const std::string&                   fiwareCorrelator
 );
 
-#endif // SRC_LIB_MONGOBACKEND_MONGOUPDATESUBSCRIPION_H
+#endif  // SRC_LIB_MONGOBACKEND_MONGOUPDATESUBSCRIPTION_H_

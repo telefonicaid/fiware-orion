@@ -22,25 +22,29 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/putIndividualContextEntityAttributes.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
-#include "unittest.h"
+#include "unittests/unittest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs - 
+* rs -
 */
-static RestService rs[] = 
+#define ICEA IndividualContextEntityAttributes
+#define IR   InvalidRequest
+static RestService rs[] =
 {
-  { "PUT",    IndividualContextEntityAttributes,     4, { "ngsi10", "contextEntities", "*", "attributes"       }, "", putIndividualContextEntityAttributes      },
-  { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
-  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "PUT", ICEA, 4, { "ngsi10", "contextEntities", "*", "attributes" }, "", putIndividualContextEntityAttributes },
+  { "*",   IR,   0, { "*", "*", "*", "*", "*", "*"                   }, "", badRequest                           },
+  { "",    IR,   0, {                                                }, "", NULL                                 }
 };
 
 
@@ -58,8 +62,13 @@ TEST(putIndividualContextEntityAttributes, notFound)
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf,
+                                   sizeof(testBuf),
+                                   infile)) << "Error getting test data from '" << infile << "'";
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf,
+                                   sizeof(expectedBuf),
+                                   outfile)) << "Error getting test data from '" << outfile << "'";
 
   ci.outMimeType    = JSON;
   ci.inMimeType     = JSON;

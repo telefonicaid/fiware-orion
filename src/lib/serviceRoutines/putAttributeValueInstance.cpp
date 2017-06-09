@@ -43,7 +43,7 @@
 
 /* ****************************************************************************
 *
-* putAttributeValueInstance - 
+* putAttributeValueInstance -
 *
 * PUT /v1/contextEntities/{entity::id}/attributes/{attribute::name}/{metaID}
 * PUT /ngsi10/contextEntities/{entity::id}/attributes/{attribute::name}/{metaID}
@@ -86,7 +86,7 @@ std::string putAttributeValueInstance
   if ((mP != NULL) && (mP->stringValue != metaID))
   {
     std::string details = "unmatching metadata ID value URI/payload: /" + metaID + "/ vs /" + mP->stringValue + "/";
-    
+
     response.fill(SccBadRequest, details);
 
     TIMED_RENDER(answer = response.render("", false, false));

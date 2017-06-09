@@ -37,7 +37,7 @@
 
 /* ****************************************************************************
 *
-* render_json - 
+* render_json -
 */
 TEST(AppendContextElementRequest, render_json)
 {
@@ -51,7 +51,7 @@ TEST(AppendContextElementRequest, render_json)
 
    acer.attributeDomainName.set("ADN");
    acer.contextAttributeVector.push_back(&ca);
-   
+
    out = acer.render(V1, false, UpdateContext, "");
 
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -64,7 +64,7 @@ TEST(AppendContextElementRequest, render_json)
 
 /* ****************************************************************************
 *
-* check_json - 
+* check_json -
 */
 TEST(AppendContextElementRequest, check_json)
 {
@@ -87,18 +87,18 @@ TEST(AppendContextElementRequest, check_json)
    EXPECT_STREQ("OK", out.c_str());
 
 
-   // 2. Predetected error 
+   // 2. Predetected error
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
    out = acer.check(V1, false, AppendContextElement, "", "Error is predetected");
    EXPECT_STREQ(expectedBuf, out.c_str());
-   
+
 
    // 3. bad ContextAttribute
    ContextAttribute  ca2("", "caType", "121");
 
    acer.contextAttributeVector.push_back(&ca2);
    out = acer.check(V1, false, AppendContextElement, "", "");
-   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";   
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
    ca2.name = "ca2Name";
 
@@ -108,7 +108,7 @@ TEST(AppendContextElementRequest, check_json)
 
    acer.domainMetadataVector.push_back(&md2);
    out = acer.check(V1, false, AppendContextElement, "", "");
-   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";   
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
 
 

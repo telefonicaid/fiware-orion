@@ -22,9 +22,10 @@
 *
 * Author: Fermin Galan
 */
-
 #include "apiTypesV2/EntityVector.h"
-#include "unittest.h"
+#include "unittests/unittest.h"
+
+
 
 /* ****************************************************************************
 *
@@ -49,6 +50,7 @@ TEST(EntityVector, present)
 
   utExit();
 }
+
 
 
 /* ****************************************************************************

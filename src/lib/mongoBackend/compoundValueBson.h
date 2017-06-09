@@ -37,7 +37,7 @@
 *
 * compoundValueBson (for objects) -
 */
-extern void compoundValueBson(std::vector<orion::CompoundValueNode*> children, mongo::BSONObjBuilder& b);
+extern void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, mongo::BSONObjBuilder& b);
 
 
 
@@ -45,6 +45,6 @@ extern void compoundValueBson(std::vector<orion::CompoundValueNode*> children, m
 *
 * compoundValueBson (for arrays) -
 */
-extern void compoundValueBson(std::vector<orion::CompoundValueNode*> children, mongo::BSONArrayBuilder& b);
+extern void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, mongo::BSONArrayBuilder& b);
 
 #endif  // SRC_LIB_MONGOBACKEND_COMPOUNDVALUEBSON_H_

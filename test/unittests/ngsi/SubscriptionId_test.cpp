@@ -33,7 +33,7 @@
 
 /* ****************************************************************************
 *
-* constructors - 
+* constructors -
 */
 TEST(SubscriptionId, constructors)
 {
@@ -52,7 +52,7 @@ TEST(SubscriptionId, constructors)
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 */
 TEST(SubscriptionId, check)
 {
@@ -80,7 +80,7 @@ TEST(SubscriptionId, check)
 
 /* ****************************************************************************
 *
-* setGetAndIsEmpty - 
+* setGetAndIsEmpty -
 */
 TEST(SubscriptionId, setGetAndIsEmpty)
 {
@@ -136,7 +136,7 @@ TEST(SubscriptionId, render)
   utInit();
 
   sId.set("012345012345012345012345");
-  
+
   out = sId.render(UnsubscribeContext, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());

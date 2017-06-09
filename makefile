@@ -68,17 +68,6 @@ all: prepare_release release
 
 di: install_debug
 
-#
-# The 'dix' build target must only be used when fiddling with style_check.
-# It is necessary to be able to check that style_check modifications don't 
-# break the compilation.
-#
-# FIXME: As soon as all the source code is incorporated into style_check, this
-#        build target (dix) must be removed.
-#
-dix: prepare_debug
-	cd BUILD_DEBUG && make -j$(CPU_COUNT)
-
 compile_info:
 	./scripts/build/compileInfo.sh
 
@@ -103,16 +92,10 @@ prepare_unit_test: compile_info
 	cd BUILD_UNITTEST && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=True -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 	@echo '------------------------------- prepare_unit_test ended ---------------------------------'
 
-
-style_check_included_in_make_steps:
-	./scripts/style_check_in_makefile.sh
-	rm LINT LINT_ERRORS
-
-
 release: prepare_release
 	cd BUILD_RELEASE && make -j$(CPU_COUNT)
 
-debug: style_check_included_in_make_steps prepare_debug
+debug: prepare_debug
 	cd BUILD_DEBUG && make -j$(CPU_COUNT)
 
 # Requires root access, i.e. use 'sudo make install' to install
@@ -274,6 +257,11 @@ clean:
 	rm -rf BUILD_DEBUG
 	rm -rf BUILD_COVERAGE
 	rm -rf BUILD_UNITTEST
+
+style:
+	./scripts/style_check_in_makefile.sh
+	rm LINT LINT_ERRORS
+
 
 style_check:
 	@scripts/style_check.sh

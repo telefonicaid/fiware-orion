@@ -22,9 +22,10 @@
 *
 * Author: Fermin Galan
 */
-
 #include "orionTypes/EntityTypeVector.h"
-#include "unittest.h"
+#include "unittests/unittest.h"
+
+
 
 /* ****************************************************************************
 *
@@ -42,6 +43,8 @@ TEST(EntityTypeVector, present)
 
   utExit();
 }
+
+
 
 /* ****************************************************************************
 *

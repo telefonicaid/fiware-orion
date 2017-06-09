@@ -22,7 +22,9 @@
 *
 * Author: Fermin Galan
 */
-#include "unittest.h"
+#include <string>
+
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -33,9 +35,29 @@
 #include "orionTypes/EntityTypeVectorResponse.h"
 #include "orionTypes/EntityTypeResponse.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/unittest.h"
 
-extern void setMongoConnectionForUnitTest(DBClientBase*);
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::BSONElement;
+using mongo::OID;
+using mongo::DBException;
+using mongo::BSONObjBuilder;
+using mongo::BSONNULL;
+using ::testing::Throw;
+using ::testing::_;
+
+
+
+extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+
 
 
 /* ****************************************************************************
@@ -85,8 +107,8 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * This function is called before every test, to populate some information in the
 * entities collection.
 */
-static void prepareDatabase(void) {
-
+static void prepareDatabase(void)
+{
   /* Set database */
   setupDatabase();
 
@@ -104,58 +126,46 @@ static void prepareDatabase(void) {
    * - Type Lamp:
    *     Lamp1: battery, status
    *
-   * (*) Diferent type in the attribute
+   * (*) Different type in the attribute
    */
 
   BSONObj en1 = BSON("_id" << BSON("id" << "Car1" << "type" << "Car") <<
                      "attrNames" << BSON_ARRAY("pos" << "temp" << "plate") <<
                      "attrs" << BSON(
-                        "pos"   << BSON("type" << "pos_T" << "value" << "1") <<
-                        "temp"  << BSON("type" << "temp_T" << "value" << "2") <<
-                        "plate" << BSON("type" << "plate_T" << "value" << "3")
-                        )
-                    );
+                       "pos"   << BSON("type" << "pos_T" << "value" << "1") <<
+                       "temp"  << BSON("type" << "temp_T" << "value" << "2") <<
+                       "plate" << BSON("type" << "plate_T" << "value" << "3")));
 
   BSONObj en2 = BSON("_id" << BSON("id" << "Car2" << "type" << "Car") <<
                      "attrNames" << BSON_ARRAY("pos" << "plate" << "fuel") <<
                      "attrs" << BSON(
-                        "pos"   << BSON("type" << "pos_T" << "value" << "4") <<
-                        "plate" << BSON("type" << "plate_T2" << "value" << "5") <<
-                        "fuel"  << BSON("type" << "fuel_T" << "value" << "6")
-                        )
-                    );
+                       "pos"   << BSON("type" << "pos_T" << "value" << "4") <<
+                       "plate" << BSON("type" << "plate_T2" << "value" << "5") <<
+                       "fuel"  << BSON("type" << "fuel_T" << "value" << "6")));
 
   BSONObj en3 = BSON("_id" << BSON("id" << "Car3" << "type" << "Car") <<
                      "attrNames" << BSON_ARRAY("pos" << "colour") <<
                      "attrs" << BSON(
-                        "pos"    << BSON("type" << "pos_T" << "value" << "7") <<
-                        "colour" << BSON("type" << "colour_T" << "value" << "8")
-                        )
-                    );
+                       "pos"    << BSON("type" << "pos_T" << "value" << "7") <<
+                       "colour" << BSON("type" << "colour_T" << "value" << "8")));
 
   BSONObj en4 = BSON("_id" << BSON("id" << "Room1" << "type" << "Room") <<
                      "attrNames" << BSON_ARRAY("pos" << "temp") <<
                      "attrs" << BSON(
-                        "pos"  << BSON("type" << "pos_T" << "value" << "9") <<
-                        "temp" << BSON("type" << "temp_T" << "value" << "10")
-                        )
-                    );
+                       "pos"  << BSON("type" << "pos_T" << "value" << "9") <<
+                       "temp" << BSON("type" << "temp_T" << "value" << "10")));
 
   BSONObj en5 = BSON("_id" << BSON("id" << "Room2" << "type" << "Room") <<
                      "attrNames" << BSON_ARRAY("pos" << "humidity") <<
                      "attrs" << BSON(
-                        "pos"      << BSON("type" << "pos_T" << "value" << "11") <<
-                        "humidity" << BSON("type" << "humidity_T" << "value" << "12")
-                        )
-                    );
+                       "pos"      << BSON("type" << "pos_T" << "value" << "11") <<
+                       "humidity" << BSON("type" << "humidity_T" << "value" << "12")));
 
   BSONObj en6 = BSON("_id" << BSON("id" << "Lamp1" << "type" << "Lamp") <<
                      "attrNames" << BSON_ARRAY("battery" << "status") <<
                      "attrs" << BSON(
-                        "battery" << BSON("type" << "battery_T" << "value" << "13") <<
-                        "status"  << BSON("type" << "status_T" << "value" << "14")
-                        )
-                    );
+                       "battery" << BSON("type" << "battery_T" << "value" << "13") <<
+                       "status"  << BSON("type" << "status_T" << "value" << "14")));
 
 
   connection->insert(ENTITIES_COLL, en1);
@@ -164,10 +174,15 @@ static void prepareDatabase(void) {
   connection->insert(ENTITIES_COLL, en4);
   connection->insert(ENTITIES_COLL, en5);
   connection->insert(ENTITIES_COLL, en6);
-
 }
 
-ContextAttribute* getAttr(ContextAttributeVector& caV, std::string name, std::string type = "")
+
+
+/* ****************************************************************************
+*
+* getAttr -
+*/
+ContextAttribute* getAttr(ContextAttributeVector& caV, const std::string& name, const std::string& type = "")
 {
   for (unsigned int ix = 0; ix < caV.size() ; ix++)
   {
@@ -824,7 +839,7 @@ TEST(mongoQueryTypes, queryAllPaginationNonExistingOverlap)
     EXPECT_EQ("pos_T", ca->type);
     EXPECT_EQ("", ca->stringValue);
     EXPECT_EQ(NULL, ca->compoundValueP);
-    EXPECT_EQ(0, ca->metadataVector.size());    
+    EXPECT_EQ(0, ca->metadataVector.size());
 
     utExit();
 }
@@ -875,7 +890,7 @@ TEST(mongoQueryTypes, queryAllDbException)
   /* Prepare mock */
   const DBException e = DBException("boom!!", 33);
   DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-  ON_CALL(*connectionMock, runCommand(_,_,_,_))
+  ON_CALL(*connectionMock, runCommand(_, _, _, _))
       .WillByDefault(Throw(e));
 
   utInit();
@@ -888,23 +903,29 @@ TEST(mongoQueryTypes, queryAllDbException)
   ms = mongoEntityTypes(&res, "", servicePathVector, uriParams, V1, NULL, false);
 
   /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms); 
+  EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("Database Error (collection: utest "
-            "- runCommand(): { aggregate: \"entities\", pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $project: { attrNames: { $cond: [ { $eq: [ \"$attrNames\", [] ] }, [ null ], \"$attrNames\" ] } } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $sort: { _id: 1 } } ] } "
+            "- runCommand(): { aggregate: \"entities\", "
+            "pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, "
+            "{ $project: { _id: 1, attrNames: 1 } }, "
+            "{ $project: { attrNames: { $cond: [ { $eq: [ \"$attrNames\", [] ] }, [ null ], \"$attrNames\" ] } } }, "
+            "{ $unwind: \"$attrNames\" }, "
+            "{ $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $sort: { _id: 1 } } ] } "
             "- exception: boom!!)", res.statusCode.details);
-  EXPECT_EQ(0,res.entityTypeVector.size());
+  EXPECT_EQ(0, res.entityTypeVector.size());
 
   /* Restore real DB connection */
   setMongoConnectionForUnitTest(connectionDb);
 
   /* Release mock */
-  delete connectionMock;  
+  delete connectionMock;
 
   utExit();
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -913,13 +934,13 @@ TEST(mongoQueryTypes, queryAllDbException)
 */
 TEST(mongoQueryTypes, queryAllGenericException)
 {
-  HttpStatusCode         ms;
-  EntityTypeVectorResponse    res;
+  HttpStatusCode            ms;
+  EntityTypeVectorResponse  res;
 
   /* Prepare mock */
   const std::exception e;
   DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-  ON_CALL(*connectionMock, runCommand(_,_,_,_))
+  ON_CALL(*connectionMock, runCommand(_, _, _, _))
       .WillByDefault(Throw(e));
 
   utInit();
@@ -937,9 +958,16 @@ TEST(mongoQueryTypes, queryAllGenericException)
   EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("Database Error (collection: utest "
-            "- runCommand(): { aggregate: \"entities\", pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $project: { attrNames: { $cond: [ { $eq: [ \"$attrNames\", [] ] }, [ null ], \"$attrNames\" ] } } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $sort: { _id: 1 } } ] } "
+            "- runCommand(): { aggregate: \"entities\", "
+            "pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, "
+            "{ $project: { _id: 1, attrNames: 1 } }, "
+            "{ $project: { attrNames: { $cond: [ { $eq: [ \"$attrNames\", [] ] }, "
+            "[ null ], \"$attrNames\" ] } } }, "
+            "{ $unwind: \"$attrNames\" }, "
+            "{ $group: { _id: \"$_id.type\", "
+            "attrs: { $addToSet: \"$attrNames\" } } }, { $sort: { _id: 1 } } ] } "
             "- exception: std::exception)", res.statusCode.details);
-  EXPECT_EQ(0,res.entityTypeVector.size());
+  EXPECT_EQ(0, res.entityTypeVector.size());
 
   /* Restore real DB connection */
   setMongoConnectionForUnitTest(connectionDb);
@@ -948,8 +976,9 @@ TEST(mongoQueryTypes, queryAllGenericException)
   delete connectionMock;
 
   utExit();
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -1415,7 +1444,7 @@ TEST(mongoQueryTypes, queryGivenTypeDbException)
   /* Prepare mock */
   const DBException e = DBException("boom!!", 33);
   DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-  ON_CALL(*connectionMock, runCommand(_,_,_,_))
+  ON_CALL(*connectionMock, runCommand(_, _, _, _))
       .WillByDefault(Throw(e));
 
   utInit();
@@ -1433,15 +1462,19 @@ TEST(mongoQueryTypes, queryGivenTypeDbException)
   EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("Database Error (collection: utest "
-            "- runCommand(): { aggregate: \"entities\", pipeline: [ { $match: { _id.type: \"Car\", _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$attrs\" } }, { $sort: { _id: 1 } } ] } "
+            "- runCommand(): { aggregate: \"entities\", "
+            "pipeline: [ { $match: { _id.type: \"Car\", _id.servicePath: { $in: [ /^/.*/, null ] } } }, "
+            "{ $project: { _id: 1, attrNames: 1 } }, { $unwind: \"$attrNames\" }, "
+            "{ $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, "
+            "{ $unwind: \"$attrs\" }, { $group: { _id: \"$attrs\" } }, { $sort: { _id: 1 } } ] } "
             "- exception: boom!!)", res.statusCode.details);
-  EXPECT_EQ(0,res.entityType.contextAttributeVector.size());
+  EXPECT_EQ(0, res.entityType.contextAttributeVector.size());
 
   /* Restore real DB connection */
   setMongoConnectionForUnitTest(connectionDb);
 
   /* Release mock */
-  delete connectionMock;  
+  delete connectionMock;
 
   utExit();
 }
@@ -1459,7 +1492,7 @@ TEST(mongoQueryTypes, queryGivenTypeGenericException)
   /* Prepare mock */
   const std::exception e;
   DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-  ON_CALL(*connectionMock, runCommand(_,_,_,_))
+  ON_CALL(*connectionMock, runCommand(_, _, _, _))
       .WillByDefault(Throw(e));
 
   utInit();
@@ -1477,15 +1510,22 @@ TEST(mongoQueryTypes, queryGivenTypeGenericException)
   EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("Database Error (collection: utest "
-            "- runCommand(): { aggregate: \"entities\", pipeline: [ { $match: { _id.type: \"Car\", _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$attrs\" } }, { $sort: { _id: 1 } } ] } "
+            "- runCommand(): { aggregate: \"entities\", "
+            "pipeline: [ { $match: { _id.type: \"Car\", "
+            "_id.servicePath: { $in: [ /^/.*/, null ] } } }, "
+            "{ $project: { _id: 1, attrNames: 1 } }, "
+            "{ $unwind: \"$attrNames\" }, "
+            "{ $group: { _id: \"$_id.type\", "
+            "attrs: { $addToSet: \"$attrNames\" } } }, "
+            "{ $unwind: \"$attrs\" }, { $group: { _id: \"$attrs\" } }, { $sort: { _id: 1 } } ] } "
             "- exception: std::exception)", res.statusCode.details);
-  EXPECT_EQ(0,res.entityType.contextAttributeVector.size());
+  EXPECT_EQ(0, res.entityType.contextAttributeVector.size());
 
   /* Restore real DB connection */
   setMongoConnectionForUnitTest(connectionDb);
 
   /* Release mock */
-  delete connectionMock; 
+  delete connectionMock;
 
   utExit();
 }

@@ -36,7 +36,7 @@
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse - 
+* DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse -
 */
 DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse()
 {
@@ -56,7 +56,7 @@ DiscoverContextAvailabilityResponse::~DiscoverContextAvailabilityResponse()
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse - 
+* DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse -
 */
 DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse(StatusCode& _errorCode)
 {
@@ -68,7 +68,7 @@ DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse(StatusC
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityResponse::render - 
+* DiscoverContextAvailabilityResponse::render -
 */
 std::string DiscoverContextAvailabilityResponse::render(const std::string& indent)
 {
@@ -80,7 +80,7 @@ std::string DiscoverContextAvailabilityResponse::render(const std::string& inden
   // no JSON commas necessary
   //
   out += startTag(indent);
-  
+
   if (responseVector.size() > 0)
   {
     bool commaNeeded = (errorCode.code != SccNone);
@@ -108,7 +108,7 @@ std::string DiscoverContextAvailabilityResponse::render(const std::string& inden
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityResponse::release - 
+* DiscoverContextAvailabilityResponse::release -
 */
 void DiscoverContextAvailabilityResponse::release(void)
 {

@@ -25,15 +25,14 @@
 *
 * Author: Ken Zangelin
 */
+#include <regex.h>
+
 #include <string>
 #include <vector>
-#include <regex.h>
 
 #include "mongo/client/dbclient.h"
 #include "common/RenderFormat.h"
 #include "rest/StringFilter.h"
-
-using namespace mongo;
 
 
 
@@ -41,7 +40,7 @@ using namespace mongo;
 *
 * mongoSubCacheItemInsert - 
 */
-extern int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub);
+extern int mongoSubCacheItemInsert(const char* tenant, const mongo::BSONObj& sub);
 
 
 
@@ -51,23 +50,23 @@ extern int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub);
 */
 extern int mongoSubCacheItemInsert
 (
-  const char*         tenant,
-  const BSONObj&      sub,
-  const char*         subscriptionId,
-  const char*         servicePath,
-  int                 lastNotificationTime,
-  int                 lastFailure,
-  int                 lastSuccess,
-  long long           expirationTime,
-  const std::string&  status,
-  const std::string&  q,
-  const std::string&  mq,
-  const std::string&  geometry,
-  const std::string&  coords,
-  const std::string&  georel,
-  StringFilter*       stringFilterP,
-  StringFilter*       mdStringFilterP,
-  RenderFormat        renderFormat
+  const char*            tenant,
+  const mongo::BSONObj&  sub,
+  const char*            subscriptionId,
+  const char*            servicePath,
+  int                    lastNotificationTime,
+  int                    lastFailure,
+  int                    lastSuccess,
+  long long              expirationTime,
+  const std::string&     status,
+  const std::string&     q,
+  const std::string&     mq,
+  const std::string&     geometry,
+  const std::string&     coords,
+  const std::string&     georel,
+  StringFilter*          stringFilterP,
+  StringFilter*          mdStringFilterP,
+  RenderFormat           renderFormat
 );
 
 

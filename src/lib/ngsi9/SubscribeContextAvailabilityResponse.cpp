@@ -34,7 +34,7 @@
 
 /* ****************************************************************************
 *
-* SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse - 
+* SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse -
 */
 SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse() : errorCode("errorCode")
 {
@@ -55,7 +55,7 @@ SubscribeContextAvailabilityResponse::~SubscribeContextAvailabilityResponse()
 
 /* ****************************************************************************
 *
-* SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse - 
+* SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse -
 */
 SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(const std::string& _subscriptionId, const std::string& _duration) : errorCode("errorCode")
 {
@@ -67,7 +67,7 @@ SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(const
 
 /* ****************************************************************************
 *
-* SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse - 
+* SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse -
 */
 SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(const std::string& _subscriptionId, StatusCode& _errorCode) : errorCode("errorCode")
 {
@@ -80,7 +80,7 @@ SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(const
 
 /* ****************************************************************************
 *
-* SubscribeContextAvailabilityResponse::render - 
+* SubscribeContextAvailabilityResponse::render -
 */
 std::string SubscribeContextAvailabilityResponse::render(const std::string& indent)
 {
@@ -97,6 +97,6 @@ std::string SubscribeContextAvailabilityResponse::render(const std::string& inde
      out += errorCode.render(indent + "  ", false);
 
   out += endTag(indent);
-  
+
   return out;
-}  
+}

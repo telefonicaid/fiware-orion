@@ -29,8 +29,8 @@
 #include "common/errorMessages.h"
 #include "common/RenderFormat.h"
 #include "common/string.h"
-#include "apiTypesV2/Attribute.h"
 #include "ngsi10/QueryContextResponse.h"
+#include "apiTypesV2/Attribute.h"
 
 
 
@@ -60,7 +60,12 @@ std::string Attribute::render
 
     if (requestType == EntityAttributeValueRequest)
     {
-      out = pcontextAttribute->toJsonAsValue(apiVersion, acceptedTextPlain, acceptedJson, outFormatSelection, outMimeTypeP, scP);
+      out = pcontextAttribute->toJsonAsValue(apiVersion,
+                                             acceptedTextPlain,
+                                             acceptedJson,
+                                             outFormatSelection,
+                                             outMimeTypeP,
+                                             scP);
     }
     else
     {
@@ -72,7 +77,10 @@ std::string Attribute::render
       }
 
       out = "{";
-      out += pcontextAttribute->toJson(true, renderFormat, metadataFilter, requestType);  // param 1 'true' as it is the last and only element
+
+      // First parameter (isLastElement) is 'true' as it is the last and only element
+      out += pcontextAttribute->toJson(true, renderFormat, metadataFilter, requestType);
+
       out += "}";
     }
 
@@ -112,7 +120,7 @@ void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
     //
     oe.fill(qcrsP->errorCode.code, qcrsP->errorCode.details, qcrsP->errorCode.reasonPhrase);
   }
-  else if (qcrsP->contextElementResponseVector.size() > 1) // qcrsP->errorCode.code == SccOk
+  else if (qcrsP->contextElementResponseVector.size() > 1)  // qcrsP->errorCode.code == SccOk
   {
     //
     // If there are more than one entity, we return an error
@@ -123,11 +131,14 @@ void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
   {
     pcontextAttribute = NULL;
     // Look for the attribute by name
-    for (std::size_t i = 0; i < qcrsP->contextElementResponseVector[0]->contextElement.contextAttributeVector.size(); ++i)
+
+    ContextElementResponse* cerP = qcrsP->contextElementResponseVector[0];
+
+    for (std::size_t i = 0; i < cerP->contextElement.contextAttributeVector.size(); ++i)
     {
-      if (qcrsP->contextElementResponseVector[0]->contextElement.contextAttributeVector[i]->name == attrName)
+      if (cerP->contextElement.contextAttributeVector[i]->name == attrName)
       {
-        pcontextAttribute = qcrsP->contextElementResponseVector[0]->contextElement.contextAttributeVector[i];
+        pcontextAttribute = cerP->contextElement.contextAttributeVector[i];
         break;
       }
     }

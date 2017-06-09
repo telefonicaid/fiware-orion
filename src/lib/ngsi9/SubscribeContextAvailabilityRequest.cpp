@@ -50,7 +50,7 @@ SubscribeContextAvailabilityRequest::SubscribeContextAvailabilityRequest()
 
 /* ****************************************************************************
 *
-* SubscribeContextAvailabilityRequest::render - 
+* SubscribeContextAvailabilityRequest::render -
 */
 std::string SubscribeContextAvailabilityRequest::render(const std::string& indent)
 {
@@ -76,7 +76,7 @@ std::string SubscribeContextAvailabilityRequest::render(const std::string& inden
 
 /* ****************************************************************************
 *
-* SubscribeContextAvailabilityRequest::check - 
+* SubscribeContextAvailabilityRequest::check -
 */
 std::string SubscribeContextAvailabilityRequest::check(const std::string& indent, const std::string& predetectedError, int counter)
 {
@@ -105,7 +105,7 @@ std::string SubscribeContextAvailabilityRequest::check(const std::string& indent
 
 /* ****************************************************************************
 *
-* SubscribeContextAvailabilityRequest::release - 
+* SubscribeContextAvailabilityRequest::release -
 */
 void SubscribeContextAvailabilityRequest::release(void)
 {
@@ -118,7 +118,7 @@ void SubscribeContextAvailabilityRequest::release(void)
 
 /* ****************************************************************************
 *
-* SubscribeContextAvailabilityRequest::present - 
+* SubscribeContextAvailabilityRequest::present -
 */
 void SubscribeContextAvailabilityRequest::present(const std::string& indent)
 {
@@ -126,14 +126,14 @@ void SubscribeContextAvailabilityRequest::present(const std::string& indent)
    attributeList.present(indent);
    reference.present(indent);
    duration.present(indent);
-   restriction.present(indent);   
+   restriction.present(indent);
 }
 
 
 
 /* ****************************************************************************
 *
-* SubscribeContextAvailabilityRequest::fill - 
+* SubscribeContextAvailabilityRequest::fill -
 */
 void SubscribeContextAvailabilityRequest::fill(EntityTypeInfo typeInfo)
 {
@@ -142,7 +142,7 @@ void SubscribeContextAvailabilityRequest::fill(EntityTypeInfo typeInfo)
     Scope* scopeP = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
 
     scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
-      
+
     restriction.scopeVector.push_back(scopeP);
   }
 }

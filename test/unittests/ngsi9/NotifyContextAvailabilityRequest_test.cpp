@@ -35,7 +35,7 @@
 
 /* ****************************************************************************
 *
-* ok_json - 
+* ok_json -
 */
 TEST(NotifyContextAvailabilityRequest, ok_json)
 {
@@ -65,7 +65,7 @@ TEST(NotifyContextAvailabilityRequest, ok_json)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ncarP->release();
-  
+
   utExit();
 }
 
@@ -73,7 +73,7 @@ TEST(NotifyContextAvailabilityRequest, ok_json)
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 *
 */
 TEST(NotifyContextAvailabilityRequest, check)
@@ -85,7 +85,7 @@ TEST(NotifyContextAvailabilityRequest, check)
 
   out = ncr.check(V1, "", "", 0);
   EXPECT_EQ("OK", out);
-   
+
   utExit();
 }
 
@@ -93,7 +93,7 @@ TEST(NotifyContextAvailabilityRequest, check)
 
 /* ****************************************************************************
 *
-* json_render - 
+* json_render -
 */
 TEST(NotifyContextAvailabilityRequest, json_render)
 {
@@ -128,9 +128,9 @@ TEST(NotifyContextAvailabilityRequest, json_render)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
   rendered = ncarP->render("");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
-  
 
-  
+
+
   // Test 2. contextRegistrationResponseVector with TWO contextRegistrationResponse instances
   Metadata*                     mdP   = new Metadata("M01", "MType", "123");
   ContextRegistrationAttribute* craP  = new ContextRegistrationAttribute("CRA1", "CType", "false");
@@ -145,10 +145,10 @@ TEST(NotifyContextAvailabilityRequest, json_render)
   crrP->contextRegistration.registrationMetadataVector.push_back(mdP);
 
   crrP->contextRegistration.providingApplication.set("http://www.tid.es/NotifyContextAvailabilityRequestTest2");
-  
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
   rendered = ncarP->render("");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
-  
+
   utExit();
 }

@@ -1,5 +1,5 @@
-#ifndef SUBSCRIBE_CONTEXT_RESPONSE_H
-#define SUBSCRIBE_CONTEXT_RESPONSE_H
+#ifndef SRC_LIB_NGSI10_SUBSCRIBECONTEXTRESPONSE_H_
+#define SRC_LIB_NGSI10_SUBSCRIBECONTEXTRESPONSE_H_
 
 /*
 *
@@ -49,4 +49,4 @@ typedef struct SubscribeContextResponse
   std::string render(const std::string& indent);
 } SubscribeContextResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI10_SUBSCRIBECONTEXTRESPONSE_H_

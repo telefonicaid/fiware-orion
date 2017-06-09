@@ -1,5 +1,5 @@
-#ifndef MONGO_REGISTER_CONTEXT_H
-#define MONGO_REGISTER_CONTEXT_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOREGISTERCONTEXT_H_
+#define SRC_LIB_MONGOBACKEND_MONGOREGISTERCONTEXT_H_
 
 /*
 *
@@ -28,6 +28,7 @@
 #include <string>
 #include <map>
 
+#include "rest/HttpStatusCode.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
 
@@ -47,4 +48,4 @@ extern HttpStatusCode mongoRegisterContext
   const std::string&                   servicePath      = ""
 );
 
-#endif
+#endif  // SRC_LIB_MONGOBACKEND_MONGOREGISTERCONTEXT_H_

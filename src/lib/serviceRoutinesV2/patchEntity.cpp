@@ -80,7 +80,7 @@ std::string patchEntity
 
   // 01. Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, "UPDATE");
-  
+
 
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);

@@ -75,7 +75,13 @@ std::string getEntityAllTypes
   }
   else  // default
   {
-    TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP, noAttrDetail));
+    TIMED_MONGO(mongoEntityTypes(&response,
+                                 ciP->tenant,
+                                 ciP->servicePathV,
+                                 ciP->uriParam,
+                                 ciP->apiVersion,
+                                 totalTypesP,
+                                 noAttrDetail));
   }
   TIMED_RENDER(answer = response.toJson(ciP->uriParamOptions[OPT_VALUES]));
 
@@ -83,7 +89,7 @@ std::string getEntityAllTypes
   {
     char cVec[64];
 
-    snprintf(cVec, sizeof(cVec), "%d", totalTypes);
+    snprintf(cVec, sizeof(cVec), "%u", totalTypes);
     ciP->httpHeader.push_back("Fiware-Total-Count");
     ciP->httpHeaderValue.push_back(cVec);
   }

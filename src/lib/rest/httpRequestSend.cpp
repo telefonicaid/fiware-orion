@@ -56,7 +56,7 @@
 
 /* ****************************************************************************
 *
-* defaultTimeout - 
+* defaultTimeout -
 */
 static long defaultTimeout = DEFAULT_TIMEOUT;
 
@@ -64,7 +64,7 @@ static long defaultTimeout = DEFAULT_TIMEOUT;
 
 /* ****************************************************************************
 *
-* httpRequestInit - 
+* httpRequestInit -
 */
 void httpRequestInit(long defaultTimeoutInMilliseconds)
 {
@@ -76,7 +76,7 @@ void httpRequestInit(long defaultTimeoutInMilliseconds)
 
 
 
-/* **************************************************************************** 
+/* ****************************************************************************
 *
 * See [1] for a discussion on how curl_multi is to be used. Libcurl does not seem
 * to provide a way to do asynchronous HTTP transactions in the way we intended
@@ -121,7 +121,7 @@ size_t writeMemoryCallback(void* contents, size_t size, size_t nmemb, void* user
 
 /* ****************************************************************************
 *
-* curlVersionGet - 
+* curlVersionGet -
 */
 static char* curlVersionGet(char* buf, int bufLen)
 {
@@ -494,10 +494,10 @@ int httpRequestSendWithCurl
     if (!usedExtraHeaders[headerNameLowerCase])
     {
       std::string header = it->first + ": " + it->second;
-      
+
       headers = curl_slist_append(headers, header.c_str());
       outgoingMsgSize += header.size();
-    }  
+    }
   }
 
 
@@ -557,12 +557,12 @@ int httpRequestSendWithCurl
   curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
 
   //
-  // Timeout 
+  // Timeout
   //
   // The parameter timeoutInMilliseconds holds the timeout time in milliseconds.
   // If the timeout time requested is 0, then no timeuot is used.
   //
-  if (timeoutInMilliseconds != 0) 
+  if (timeoutInMilliseconds != 0)
   {
     curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeoutInMilliseconds);
   }
@@ -571,7 +571,7 @@ int httpRequestSendWithCurl
   //
   // Synchronous HTTP request
   //
-  // This was previously an LM_T trace, but we have "promoted" it to INFO due to it is needed 
+  // This was previously an LM_T trace, but we have "promoted" it to INFO due to it is needed
   // to check logs in a .test case (case 000 notification_different_sizes.test)
   //
   LM_I(("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
@@ -582,7 +582,7 @@ int httpRequestSendWithCurl
     //
     // NOTE: This log line is used by the functional tests in cases/880_timeout_for_forward_and_notifications/
     //       So, this line should not be removed/altered, at least not without also modifying the functests.
-    //    
+    //
     alarmMgr.notificationError(url, "(curl_easy_perform failed: " + std::string(curl_easy_strerror(res)) + ")");
     *outP = "notification failure";
 
@@ -622,7 +622,7 @@ int httpRequestSendWithCurl
 
 /* ****************************************************************************
 *
-* httpRequestSend - 
+* httpRequestSend -
 *
 * RETURN VALUES
 *   httpRequestSend returns 0 on success and a negative number on failure:

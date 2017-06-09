@@ -1,5 +1,5 @@
-#ifndef QUERY_CONTEXT_REQUEST_H
-#define QUERY_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_NGSI10_QUERYCONTEXTREQUEST_H_
+#define SRC_LIB_NGSI10_QUERYCONTEXTREQUEST_H_
 
 /*
 *
@@ -75,4 +75,4 @@ typedef struct QueryContextRequest
 
 } QueryContextRequest;
 
-#endif
+#endif  // SRC_LIB_NGSI10_QUERYCONTEXTREQUEST_H_

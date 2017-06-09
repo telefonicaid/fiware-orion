@@ -37,9 +37,9 @@
 */
 std::string parseAttributeList
 (
-  ConnectionInfo*                    ciP,
-  const Value::ConstMemberIterator&  iter,
-  AttributeList*                     aP
+  ConnectionInfo*                               ciP,
+  const rapidjson::Value::ConstMemberIterator&  iter,
+  AttributeList*                                aP
 )
 {
   std::string type = jsonParseTypeNames[iter->value.GetType()];
@@ -49,9 +49,8 @@ std::string parseAttributeList
     return "the field /attributes/ must be a JSON array";
   }
 
-  for (Value::ConstValueIterator iter2 = iter->value.Begin(); iter2 != iter->value.End(); ++iter2)
+  for (rapidjson::Value::ConstValueIterator iter2 = iter->value.Begin(); iter2 != iter->value.End(); ++iter2)
   {
-    std::string  r;
     std::string  val;
 
     type = jsonParseTypeNames[iter2->GetType()];

@@ -1,5 +1,5 @@
-#ifndef SUBSCRIBE_CONTEXT_AVAILABILITY_REQUEST_H
-#define SUBSCRIBE_CONTEXT_AVAILABILITY_REQUEST_H
+#ifndef SRC_LIB_NGSI9_SUBSCRIBECONTEXTAVAILABILITYREQUEST_H_
+#define SRC_LIB_NGSI9_SUBSCRIBECONTEXTAVAILABILITYREQUEST_H_
 
 /*
 *
@@ -72,4 +72,4 @@ typedef struct SubscribeContextAvailabilityRequest
   void         fill(EntityTypeInfo typeInfo);
 } SubscribeContextAvailabilityRequest;
 
-#endif
+#endif  // SRC_LIB_NGSI9_SUBSCRIBECONTEXTAVAILABILITYREQUEST_H_

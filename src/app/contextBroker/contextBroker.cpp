@@ -35,7 +35,7 @@
 *   -cert: path to a file containing a certificate describing the server in human readable tokens
 *
 * These files are generated before starting the broker:
-* 
+*
 * o private key:
 *     % openssl genrsa -out server.key 1024
 *
@@ -376,14 +376,14 @@ PaArgument paArgs[] =
 
   { "-httpTimeout",   &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
   { "-reqTimeout",    &reqTimeout,   "REQ_TIMEOUT",    PaLong,   PaOpt,  0,          0,     PaNL,  REQ_TMO_DESC       },
-  { "-reqMutexPolicy",reqMutexPolicy,"MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },  
+  { "-reqMutexPolicy",reqMutexPolicy,"MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },
   { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
 
   { "-corsOrigin",       allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "",          PaNL,  PaNL,     ALLOWED_ORIGIN_DESC    },
   { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,           0,     UINT_MAX, CPR_FORWARD_LIMIT_DESC },
   { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 60,             0,     3600,     SUB_CACHE_IVAL_DESC    },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
-  { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     1024,     CONN_MEMORY_DESC       },  
+  { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     1024,     CONN_MEMORY_DESC       },
   { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, 1020,           1,     PaNL,     MAX_CONN_DESC          },
   { "-reqPoolSize",      &reqPoolSize,      "TRQ_POOL_SIZE",     PaUInt,   PaOpt, 0,              0,     1024,     REQ_POOL_SIZE          },
 
@@ -413,9 +413,9 @@ PaArgument paArgs[] =
 
 /* ****************************************************************************
 *
-* validLogLevels - to pass to parseArgs library for validation of --logLevel 
+* validLogLevels - to pass to parseArgs library for validation of --logLevel
 */
-static const char* validLogLevels[] = 
+static const char* validLogLevels[] =
 {
   "NONE",
   "FATAL",
@@ -1075,7 +1075,7 @@ static const char* validLogLevels[] =
 
 
 /* *****************************************************************************
-*  
+*
 * log requests
 * The documentation (Installation and Admin Guide) says /log/trace ...
 * ... and to maintain backward compatibility we keep supporting /log/traceLevel too
@@ -1290,7 +1290,7 @@ void daemonize(void)
   }
 
   // We have to call this after a fork, see: http://api.mongodb.org/cplusplus/2.2.2/classmongo_1_1_o_i_d.html
-  OID::justForked();
+  mongo::OID::justForked();
 }
 
 
@@ -1346,7 +1346,7 @@ void exitFunc(void)
   }
 
 #ifdef DEBUG
-  // Take mongo req-sem ?  
+  // Take mongo req-sem ?
   LM_T(LmtSubCache, ("try-taking req semaphore"));
   reqSemTryToTake();
   LM_T(LmtSubCache, ("calling subCacheDestroy"));
@@ -1368,7 +1368,7 @@ void exitFunc(void)
 
 /* ****************************************************************************
 *
-* description - 
+* description -
 */
 const char* description =
   "\n"
@@ -1503,7 +1503,7 @@ static void rushParse(char* rush, std::string* rushHostP, uint16_t* rushPortP)
 
 /* ****************************************************************************
 *
-* policyGet - 
+* policyGet -
 */
 static SemOpType policyGet(std::string mutexPolicy)
 {
@@ -1669,6 +1669,8 @@ int main(int argC, char* argV[])
     paUsage();
     exit(1);
   }
+
+  paCleanup();
 
 #ifdef DEBUG_develenv
   //

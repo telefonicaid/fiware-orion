@@ -22,7 +22,9 @@
 *
 * Author: Fermin Galan
 */
-#include "unittest.h"
+#include <string>
+
+#include "unittests/unittest.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -37,7 +39,20 @@
 
 #include "mongo/client/dbclient.h"
 
-extern void setMongoConnectionForUnitTest(DBClientBase*);
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+
+
+
+extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+
+
 
 /* ****************************************************************************
 *
@@ -96,8 +111,8 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * This function is called before every test, to populate some information in the
 * entities collection.
 */
-static void prepareDatabase(bool extraEntities = false) {
-
+static void prepareDatabase(bool extraEntities = false)
+{
   /* Set database */
   setupDatabase();
 
@@ -139,68 +154,52 @@ static void prepareDatabase(bool extraEntities = false) {
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("S" << "N" << "D") <<
                      "attrs" << BSON(
-                        "S" << BSON("type" << "T" << "value" << "running") <<
-                        "N" << BSON("type" << "T" << "value" << 26.5) <<
-                        "D" << BSON("type" << "T" << "value" << "")
-                        )
-                    );
+                       "S" << BSON("type" << "T" << "value" << "running") <<
+                       "N" << BSON("type" << "T" << "value" << 26.5) <<
+                       "D" << BSON("type" << "T" << "value" << "")));
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("S" << "N" << "D") <<
                      "attrs" << BSON(
-                        "S" << BSON("type" << "T" << "value" << "running") <<
-                        "N" << BSON("type" << "T" << "value" << 27) <<
-                        "D" << BSON("type" << "T" << "value" << "")
-                        )
-                    );
+                       "S" << BSON("type" << "T" << "value" << "running") <<
+                       "N" << BSON("type" << "T" << "value" << 27) <<
+                       "D" << BSON("type" << "T" << "value" << "")));
 
   BSONObj en3 = BSON("_id" << BSON("id" << "E3" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("S" << "N" << "D") <<
                      "attrs" << BSON(
-                        "S" << BSON("type" << "T" << "value" << "shutdown") <<
-                        "N" << BSON("type" << "T" << "value" << 31) <<
-                        "D" << BSON("type" << "T" << "value" << "")
-                        )
-                    );
+                       "S" << BSON("type" << "T" << "value" << "shutdown") <<
+                       "N" << BSON("type" << "T" << "value" << 31) <<
+                       "D" << BSON("type" << "T" << "value" << "")));
 
   BSONObj en4 = BSON("_id" << BSON("id" << "E4" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("S" << "N" << "D") <<
                      "attrs" << BSON(
-                        "S" << BSON("type" << "T" << "value" << "error") <<
-                        "N" << BSON("type" << "T" << "value" << 17.8) <<
-                        "D" << BSON("type" << "T" << "value" << "")
-                        )
-                    );
+                       "S" << BSON("type" << "T" << "value" << "error") <<
+                       "N" << BSON("type" << "T" << "value" << 17.8) <<
+                       "D" << BSON("type" << "T" << "value" << "")));
 
   BSONObj en5 = BSON("_id" << BSON("id" << "E5" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("S" << "N" << "D") <<
                      "attrs" << BSON(
-                        "S" << BSON("type" << "T" << "value" << "shutdown") <<
-                        "N" << BSON("type" << "T" << "value" << 24) <<
-                        "D" << BSON("type" << "T" << "value" << "")
-                        )
-                    );
+                       "S" << BSON("type" << "T" << "value" << "shutdown") <<
+                       "N" << BSON("type" << "T" << "value" << 24) <<
+                       "D" << BSON("type" << "T" << "value" << "")));
 
   BSONObj c1 = BSON("_id" << BSON("id" << "C1" << "type" << "T") <<
-                     "attrNames" << BSON_ARRAY("colour") <<
-                     "attrs" << BSON(
-                        "colour" << BSON("type" << "T" << "value" << "black,white")
-                        )
-                    );
+                    "attrNames" << BSON_ARRAY("colour") <<
+                    "attrs" << BSON(
+                      "colour" << BSON("type" << "T" << "value" << "black,white")));
 
   BSONObj c2 = BSON("_id" << BSON("id" << "C2" << "type" << "T") <<
-                     "attrNames" << BSON_ARRAY("colour") <<
-                     "attrs" << BSON(
-                        "colour" << BSON("type" << "T" << "value" << "red,blue")
-                        )
-                    );
+                    "attrNames" << BSON_ARRAY("colour") <<
+                    "attrs" << BSON(
+                      "colour" << BSON("type" << "T" << "value" << "red,blue")));
 
   BSONObj c3 = BSON("_id" << BSON("id" << "C3" << "type" << "T") <<
-                     "attrNames" << BSON_ARRAY("colour") <<
-                     "attrs" << BSON(
-                        "colour" << BSON("type" << "T" << "value" << "black, white")
-                        )
-                    );
+                    "attrNames" << BSON_ARRAY("colour") <<
+                    "attrs" << BSON(
+                      "colour" << BSON("type" << "T" << "value" << "black, white")));
 
   connection->insert(ENTITIES_COLL, en1);
   connection->insert(ENTITIES_COLL, en2);
@@ -228,31 +227,25 @@ static void prepareDatabase(bool extraEntities = false) {
     BSONObj en6 = BSON("_id" << BSON("id" << "E6" << "type" << "T") <<
                        "attrNames" << BSON_ARRAY("S" << "N") <<
                        "attrs" << BSON(
-                          "N" << BSON("type" << "T" << "value" << 26.5)
-                          )
-                      );
+                         "N" << BSON("type" << "T" << "value" << 26.5)));
 
     BSONObj en7 = BSON("_id" << BSON("id" << "E7" << "type" << "") <<
                        "attrNames" << BSON_ARRAY("S" << "N") <<
                        "attrs" << BSON(
-                          "N" << BSON("type" << "T" << "value" << 27)
-                          )
-                      );
+                         "N" << BSON("type" << "T" << "value" << 27)));
 
     BSONObj en8 = BSON("_id" << BSON("id" << "E8") <<
                        "attrNames" << BSON_ARRAY("S" << "N") <<
                        "attrs" << BSON(
-                          "N" << BSON("type" << "T" << "value" << 27)
-                          )
-                      );
+                         "N" << BSON("type" << "T" << "value" << 27)));
 
     connection->insert(ENTITIES_COLL, en6);
     connection->insert(ENTITIES_COLL, en7);
     connection->insert(ENTITIES_COLL, en8);
-
   }
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -1050,7 +1043,7 @@ TEST(mongoQueryContextRequest_filters, DISABLED_outsideRange_d)
 TEST(mongoQueryContextRequest_filters, withAttribute)
 {
   utInit();
-  
+
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;

@@ -1,5 +1,5 @@
-#ifndef MONGO_NOTIFYCONTEXT_AVAILABILITY_H
-#define MONGO_NOTIFYCONTEXT_AVAILABILITY_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGONOTIFYCONTEXTAVAILABILITY_H_
+#define SRC_LIB_MONGOBACKEND_MONGONOTIFYCONTEXTAVAILABILITY_H_
 
 /*
 *
@@ -25,11 +25,14 @@
 *
 * Author: Fermín Galán
 */
-
+#include <string>
+#include <vector>
 #include <map>
 
 #include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "ngsi9/NotifyContextAvailabilityResponse.h"
+
+
 
 /* ****************************************************************************
 *
@@ -45,4 +48,4 @@ extern HttpStatusCode mongoNotifyContextAvailability
   const std::string&                   servicePath      = ""
 );
 
-#endif
+#endif  // SRC_LIB_MONGOBACKEND_MONGONOTIFYCONTEXTAVAILABILITY_H_

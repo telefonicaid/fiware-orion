@@ -48,7 +48,7 @@ DiscoverContextAvailabilityRequest::DiscoverContextAvailabilityRequest()
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityRequest::release - 
+* DiscoverContextAvailabilityRequest::release -
 */
 void DiscoverContextAvailabilityRequest::release(void)
 {
@@ -61,7 +61,7 @@ void DiscoverContextAvailabilityRequest::release(void)
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityRequest::check - 
+* DiscoverContextAvailabilityRequest::check -
 */
 std::string DiscoverContextAvailabilityRequest::check(const std::string& indent, const std::string& predetectedError)
 {
@@ -92,7 +92,7 @@ std::string DiscoverContextAvailabilityRequest::check(const std::string& indent,
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityRequest::present - 
+* DiscoverContextAvailabilityRequest::present -
 */
 void DiscoverContextAvailabilityRequest::present(const std::string& indent)
 {
@@ -105,7 +105,7 @@ void DiscoverContextAvailabilityRequest::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityRequest::fill - 
+* DiscoverContextAvailabilityRequest::fill -
 */
 void DiscoverContextAvailabilityRequest::fill
 (
@@ -128,7 +128,7 @@ void DiscoverContextAvailabilityRequest::fill
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityRequest::fill - 
+* DiscoverContextAvailabilityRequest::fill -
 */
 void DiscoverContextAvailabilityRequest::fill(const std::string& entityId, const std::string& entityType)
 {
@@ -141,7 +141,7 @@ void DiscoverContextAvailabilityRequest::fill(const std::string& entityId, const
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityRequest::fill - 
+* DiscoverContextAvailabilityRequest::fill -
 */
 void DiscoverContextAvailabilityRequest::fill
 (
@@ -160,7 +160,7 @@ void DiscoverContextAvailabilityRequest::fill
     Scope* scopeP = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
 
     scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
-      
+
     restriction.scopeVector.push_back(scopeP);
   }
 

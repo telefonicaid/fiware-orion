@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "gtest/gtest.h"
 
 #include "serviceRoutines/badVerbGetPostOnly.h"
@@ -31,23 +33,23 @@
 
 /* ****************************************************************************
 *
-* rs - 
+* rs -
 */
-static RestService rs[] = 
+static RestService rs[] =
 {
-  { "*",      ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                      }, "", badVerbGetPostOnly                        },
-  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "*", ContextEntitiesByEntityId, 3, { "ngsi9", "contextEntities", "*" }, "", badVerbGetPostOnly },
+  { "",  InvalidRequest,            0, {                                 }, "", NULL               }
 };
 
 
 
 /* ****************************************************************************
 *
-* ok - 
+* ok -
 */
 TEST(badVerbGetPostOnly, ok)
 {
-  ConnectionInfo ci("/ngsi9/contextEntities/aaa",  "PUT", "1.1");
+  ConnectionInfo  ci("/ngsi9/contextEntities/aaa",  "PUT", "1.1");
   std::string     expected = "";  // no payload for bad verb, only http headers to indicate the error
   std::string     out;
 

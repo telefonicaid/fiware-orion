@@ -33,7 +33,7 @@
 
 /* ****************************************************************************
 *
-* jsonRender - 
+* jsonRender -
 */
 TEST(UpdateContextSubscriptionResponse, json_render)
 {
@@ -100,7 +100,7 @@ TEST(UpdateContextSubscriptionResponse, json_render)
   // 5.
   ucsrP->subscribeResponse.throttling.set("");
   ucsrP->subscribeResponse.duration.set("PT1H");
-  
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename5)) << "Error getting test data from '" << filename5 << "'";
   out = ucsrP->render("");
   EXPECT_STREQ(expectedBuf, out.c_str());

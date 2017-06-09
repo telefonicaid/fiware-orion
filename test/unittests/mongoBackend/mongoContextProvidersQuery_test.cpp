@@ -22,20 +22,38 @@
 *
 * Author: Fermin Galan
 */
-#include "unittest.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/unittest.h"
 
-extern void setMongoConnectionForUnitTest(DBClientBase*);
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::BSONElement;
+using mongo::OID;
+using mongo::DBException;
+using mongo::BSONObjBuilder;
+using mongo::BSONNULL;
+
+
+
+extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+
+
 
 /* ****************************************************************************
 *
@@ -96,7 +114,6 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 */
 static void prepareDatabase(void)
 {
-
   /* Set database */
   setupDatabase();
 
@@ -118,85 +135,64 @@ static void prepareDatabase(void)
 
   BSONObj cr1 = BSON("providingApplication" << "http://cr1.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T1") <<
-                         BSON("id" << "E2" << "type" << "T2") <<
-                         BSON("id" << "E3" << "type" << "T3")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T1") <<
+                       BSON("id" << "E2" << "type" << "T2") <<
+                       BSON("id" << "E3" << "type" << "T3")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                         BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                         BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                         )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
+                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
+                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
+
   BSONObj cr2 = BSON("providingApplication" << "http://cr2.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T1")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T1")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                         BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
+                       BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")));
+
   BSONObj cr3 = BSON("providingApplication" << "http://cr3.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E2" << "type" << "T2")
-                         ) <<
+                       BSON("id" << "E2" << "type" << "T2")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                         BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                         )
-                     );
+                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
+                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
 
   BSONObj cr4 = BSON("providingApplication" << "http://cr4.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T1bis")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T1bis")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A1" << "type" << "TA1bis" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1bis" << "isDomain" << "false")));
 
   BSONObj cr5 = BSON("providingApplication" << "http://cr5.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1")
-                         ) <<
+                       BSON("id" << "E1")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")
-                         )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
 
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
-  BSONObj reg1 = BSON(
-              "_id" << OID("51307b66f481db11bf860001") <<
-              "expiration" << 1879048191 <<
-              "contextRegistration" << BSON_ARRAY(cr1 << cr2)
-              );
+  BSONObj reg1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr1 << cr2));
 
-  BSONObj reg2 = BSON(
-              "_id" << OID("51307b66f481db11bf860002") <<
-              "expiration" << 1879048191 <<
-              "contextRegistration" << BSON_ARRAY(cr3)
-              );
+  BSONObj reg2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr3));
 
-  BSONObj reg3 = BSON(
-              "_id" << OID("51307b66f481db11bf860003") <<
-              "expiration" << 1879048191 <<
-              "contextRegistration" << BSON_ARRAY(cr4)
-              );
+  BSONObj reg3 = BSON("_id" << OID("51307b66f481db11bf860003") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr4));
 
-  BSONObj reg4 = BSON(
-              "_id" << OID("51307b66f481db11bf860004") <<
-              "expiration" << 1879048191 <<
-              "contextRegistration" << BSON_ARRAY(cr5)
-              );
+  BSONObj reg4 = BSON("_id" << OID("51307b66f481db11bf860004") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr5));
 
   connection->insert(REGISTRATIONS_COLL, reg1);
   connection->insert(REGISTRATIONS_COLL, reg2);
   connection->insert(REGISTRATIONS_COLL, reg3);
   connection->insert(REGISTRATIONS_COLL, reg4);
-
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -207,7 +203,6 @@ static void prepareDatabase(void)
 */
 static void prepareDatabasePatternTrue(void)
 {
-
   /* Set database */
   setupDatabase();
 
@@ -229,87 +224,68 @@ static void prepareDatabasePatternTrue(void)
 
   BSONObj cr1 = BSON("providingApplication" << "http://cr1.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T") <<
-                         BSON("id" << "E2" << "type" << "T") <<
-                         BSON("id" << "E3" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T") <<
+                       BSON("id" << "E2" << "type" << "T") <<
+                       BSON("id" << "E3" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                         BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                         BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                         )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
+                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
+                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
+
   BSONObj cr2 = BSON("providingApplication" << "http://cr2.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                         BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
+                       BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")));
+
   BSONObj cr3 = BSON("providingApplication" << "http://cr3.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E2" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E2" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                         BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                         )
-                     );
+                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
+                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
 
   BSONObj cr4 = BSON("providingApplication" << "http://cr4.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E2" << "type" << "Tbis")
-                         ) <<
+                       BSON("id" << "E2" << "type" << "Tbis")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A2" << "type" << "TA2bis" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A2" << "type" << "TA2bis" << "isDomain" << "false")));
 
   BSONObj cr5 = BSON("providingApplication" << "http://cr5.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E3")
-                         ) <<
+                       BSON("id" << "E3")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false")));
 
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
-  BSONObj reg1 = BSON(
-              "_id" << "ff37" <<
-              "expiration" << 1879048191 <<
-              "subscriptions" << BSONArray() <<
-              "contextRegistration" << BSON_ARRAY(cr1 << cr2)
-              );
+  BSONObj reg1 = BSON("_id" << "ff37" <<
+                      "expiration" << 1879048191 <<
+                      "subscriptions" << BSONArray() <<
+                      "contextRegistration" << BSON_ARRAY(cr1 << cr2));
 
-  BSONObj reg2 = BSON(
-              "_id" << "ff48" <<
-              "expiration" << 1879048191 <<
-              "subscriptions" << BSONArray() <<
-              "contextRegistration" << BSON_ARRAY(cr3)
-              );
+  BSONObj reg2 = BSON("_id" << "ff48" <<
+                      "expiration" << 1879048191 <<
+                      "subscriptions" << BSONArray() <<
+                      "contextRegistration" << BSON_ARRAY(cr3));
 
-  BSONObj reg3 = BSON(
-              "_id" << "ff80" <<
-              "expiration" << 1879048191 <<
-              "subscriptions" << BSONArray() <<
-              "contextRegistration" << BSON_ARRAY(cr4)
-              );
+  BSONObj reg3 = BSON("_id" << "ff80" <<
+                      "expiration" << 1879048191 <<
+                      "subscriptions" << BSONArray() <<
+                      "contextRegistration" << BSON_ARRAY(cr4));
 
-  BSONObj reg4 = BSON(
-              "_id" << "ff90" <<
-              "expiration" << 1879048191 <<
-              "subscriptions" << BSONArray() <<
-              "contextRegistration" << BSON_ARRAY(cr5)
-              );
+  BSONObj reg4 = BSON("_id" << "ff90" <<
+                      "expiration" << 1879048191 <<
+                      "subscriptions" << BSONArray() <<
+                      "contextRegistration" << BSON_ARRAY(cr5));
 
   connection->insert(REGISTRATIONS_COLL, reg1);
   connection->insert(REGISTRATIONS_COLL, reg2);
   connection->insert(REGISTRATIONS_COLL, reg3);
   connection->insert(REGISTRATIONS_COLL, reg4);
 }
+
+
 
 /* ****************************************************************************
 *
@@ -318,7 +294,6 @@ static void prepareDatabasePatternTrue(void)
 */
 static void prepareDatabaseSeveralCprs1(bool addGenericRegistry)
 {
-
   /* Set database */
   setupDatabase();
 
@@ -338,95 +313,73 @@ static void prepareDatabaseSeveralCprs1(bool addGenericRegistry)
    *
    */
 
-  BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<                     
+  BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("A1") <<
                      "attrs" << BSON(
-                        "A1" << BSON("type" << "T" << "value" << "1")
-                        )
-                    );
+                       "A1" << BSON("type" << "T" << "value" << "1")));
 
   BSONObj cr1 = BSON("providingApplication" << "http://cpr1.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A2" << "type" << "T" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A2" << "type" << "T" << "isDomain" << "false")));
+
   BSONObj cr2 = BSON("providingApplication" << "http://cpr2.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A3" << "type" << "T" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A3" << "type" << "T" << "isDomain" << "false")));
+
   BSONObj cr3 = BSON("providingApplication" << "http://cpr1.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A4" << "type" << "T" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A4" << "type" << "T" << "isDomain" << "false")));
+
   BSONObj cr4 = BSON("providingApplication" << "http://cpr2.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A5" << "type" << "T" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A5" << "type" << "T" << "isDomain" << "false")));
 
   BSONObj cr5 = BSON("providingApplication" << "http://cpr3.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T")
-                         ) /*<<
-                     "attrs" << BSON_ARRAY*/
-                     );
+                       BSON("id" << "E1" << "type" << "T")) /* << "attrs" << BSON_ARRAY*/);
 
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
-  BSONObj reg1 = BSON(
-              "_id" << OID("51307b66f481db11bf860001") <<
-              "expiration" << 1879048191 <<
-              "contextRegistration" << BSON_ARRAY(cr1)
-              );
+  BSONObj reg1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr1));
 
-  BSONObj reg2 = BSON(
-              "_id" << OID("51307b66f481db11bf860002") <<
-              "expiration" << 1879048191 <<
-              "contextRegistration" << BSON_ARRAY(cr2)
-              );
+  BSONObj reg2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr2));
 
-  BSONObj reg3 = BSON(
-              "_id" << OID("51307b66f481db11bf860003") <<
-              "expiration" << 1879048191 <<
-              "contextRegistration" << BSON_ARRAY(cr3)
-              );
+  BSONObj reg3 = BSON("_id" << OID("51307b66f481db11bf860003") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr3));
 
-  BSONObj reg4 = BSON(
-              "_id" << OID("51307b66f481db11bf860004") <<
-              "expiration" << 1879048191 <<
-              "contextRegistration" << BSON_ARRAY(cr4)
-              );
+  BSONObj reg4 = BSON("_id" << OID("51307b66f481db11bf860004") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr4));
 
-  BSONObj reg5 = BSON(
-              "_id" << OID("51307b66f481db11bf860005") <<
-              "expiration" << 1879048191 <<
-              "contextRegistration" << BSON_ARRAY(cr5)
-              );
+  BSONObj reg5 = BSON("_id" << OID("51307b66f481db11bf860005") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr5));
 
   connection->insert(ENTITIES_COLL, en1);
   connection->insert(REGISTRATIONS_COLL, reg1);
   connection->insert(REGISTRATIONS_COLL, reg2);
   connection->insert(REGISTRATIONS_COLL, reg3);
   connection->insert(REGISTRATIONS_COLL, reg4);
+
   if (addGenericRegistry)
   {
     connection->insert(REGISTRATIONS_COLL, reg5);
   }
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -435,7 +388,6 @@ static void prepareDatabaseSeveralCprs1(bool addGenericRegistry)
 */
 static void prepareDatabaseSeveralCprs2(void)
 {
-
   /* Set database */
   setupDatabase();
 
@@ -459,88 +411,65 @@ static void prepareDatabaseSeveralCprs2(void)
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("A1") <<
                      "attrs" << BSON(
-                        "A1" << BSON("type" << "T" << "value" << "1")
-                        )
-                    );
+                       "A1" << BSON("type" << "T" << "value" << "1")));
 
   BSONObj cr1 = BSON("providingApplication" << "http://cpr1.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A1" << "type" << "T" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A1" << "type" << "T" << "isDomain" << "false")));
+
   BSONObj cr2 = BSON("providingApplication" << "http://cpr1.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A2" << "type" << "T" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A2" << "type" << "T" << "isDomain" << "false")));
+
   BSONObj cr3 = BSON("providingApplication" << "http://cpr2.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A3" << "type" << "T" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A3" << "type" << "T" << "isDomain" << "false")));
+
   BSONObj cr4 = BSON("providingApplication" << "http://cpr2.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T")
-                         ) <<
-                     "attrs" << BSONArray()
-                     );
+                       BSON("id" << "E1" << "type" << "T")) <<
+                     "attrs" << BSONArray());
 
   BSONObj cr5 = BSON("providingApplication" << "http://cpr3.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T")
-                         ) /*<<
-                     "attrs" << BSON_ARRAY()*/
-                     );
+                       BSON("id" << "E1" << "type" << "T")) /* << "attrs" << BSON_ARRAY()*/ );
 
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
-  /*BSONObjBuilder reg1 = BSON(
-              "_id" << OID("51307b66f481db11bf860001") <<
-              "expiration" << 1879048191 <<
-              "contextRegistration" << BSON_ARRAY(cr1)
-              );*/
+  /*
+  BSONObjBuilder reg1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
+                               "expiration" << 1879048191 <<
+                               "contextRegistration" << BSON_ARRAY(cr1)); */
+
   BSONObjBuilder reg1;
-  reg1.appendElements(BSON(
-                        "_id" << OID("51307b66f481db11bf860001") <<
-                        "expiration" << 1879048191 <<
-                        "contextRegistration" << BSON_ARRAY(cr1)
-                        ));
+  reg1.appendElements(BSON("_id" << OID("51307b66f481db11bf860001") <<
+                           "expiration" << 1879048191 <<
+                           "contextRegistration" << BSON_ARRAY(cr1)));
 
   BSONObjBuilder reg2;
-  reg2.appendElements(BSON(
-                        "_id" << OID("51307b66f481db11bf860002") <<
-                        "expiration" << 1879048191 <<
-                        "contextRegistration" << BSON_ARRAY(cr2)
-                        ));
+  reg2.appendElements(BSON("_id" << OID("51307b66f481db11bf860002") <<
+                           "expiration" << 1879048191 <<
+                           "contextRegistration" << BSON_ARRAY(cr2)));
 
   BSONObjBuilder reg3;
-  reg3.appendElements(BSON(
-                        "_id" << OID("51307b66f481db11bf860003") <<
-                        "expiration" << 1879048191 <<
-                        "contextRegistration" << BSON_ARRAY(cr3)
-                        ));
+  reg3.appendElements(BSON("_id" << OID("51307b66f481db11bf860003") <<
+                           "expiration" << 1879048191 <<
+                           "contextRegistration" << BSON_ARRAY(cr3)));
 
   BSONObjBuilder reg4;
-  reg4.appendElements(BSON(
-                        "_id" << OID("51307b66f481db11bf860004") <<
-                        "expiration" << 1879048191 <<
-                        "contextRegistration" << BSON_ARRAY(cr4)
-                        ));
+  reg4.appendElements(BSON("_id" << OID("51307b66f481db11bf860004") <<
+                           "expiration" << 1879048191 <<
+                           "contextRegistration" << BSON_ARRAY(cr4)));
 
   BSONObjBuilder reg5;
-  reg5.appendElements(BSON(
-                        "_id" << OID("51307b66f481db11bf860005") <<
-                        "expiration" << 1879048191 <<
-                        "contextRegistration" << BSON_ARRAY(cr5)
-                        ));
+  reg5.appendElements(BSON("_id" << OID("51307b66f481db11bf860005") <<
+                           "expiration" << 1879048191 <<
+                           "contextRegistration" << BSON_ARRAY(cr5)));
 
   connection->insert(ENTITIES_COLL, en1);
   connection->insert(REGISTRATIONS_COLL, reg1.obj());
@@ -548,8 +477,9 @@ static void prepareDatabaseSeveralCprs2(void)
   connection->insert(REGISTRATIONS_COLL, reg3.obj());
   connection->insert(REGISTRATIONS_COLL, reg4.obj());
   connection->insert(REGISTRATIONS_COLL, reg5.obj());
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -557,7 +487,6 @@ static void prepareDatabaseSeveralCprs2(void)
 *
 * Query:  E3 - <null>
 * Result: E3 - (A1, A2, A3) - http://cr1.com
-*
 */
 TEST(mongoContextProvidersQueryRequest, noPatternAttrsAll)
 {
@@ -2267,7 +2196,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs3)
   /* Context Element response # 1 */
   EXPECT_EQ("E1", RES_CER(0).entityId.id);
   EXPECT_EQ("T", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);  
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
   ASSERT_EQ(2, RES_CER(0).providingApplicationList.size());
   EXPECT_EQ("http://cpr2.com", RES_CER(0).providingApplicationList[0].get());
   EXPECT_EQ(JSON, RES_CER(0).providingApplicationList[0].getMimeType());

@@ -40,15 +40,15 @@
 */
 class BatchUpdate
 {
-public:
+ public:
   UpdateActionType  updateActionType;   // Mandatory
   Entities          entities;           // Mandatory
 
   BatchUpdate();
   ~BatchUpdate();
 
-  void           present(const std::string& indent);
-  void           release(void);
+  void              present(const std::string& indent);
+  void              release(void);
 };
 
 #endif  // SRC_LIB_APITYPESV2_BATCHUPDATE_H_

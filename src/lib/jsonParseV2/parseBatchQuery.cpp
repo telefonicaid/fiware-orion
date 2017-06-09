@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "rapidjson/document.h"
 
 #include "common/errorMessages.h"
@@ -29,23 +31,21 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
-#include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseEntityVector.h"
 #include "jsonParseV2/parseAttributeList.h"
 #include "jsonParseV2/parseScopeVector.h"
-
-using namespace rapidjson;
+#include "jsonParseV2/parseBatchQuery.h"
 
 
 
 /* ****************************************************************************
 *
-* parseBatchQuery - 
+* parseBatchQuery -
 */
 std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 {
-  Document    document;
-  OrionError  oe;
+  rapidjson::Document    document;
+  OrionError             oe;
 
   document.Parse(ciP->payload);
 
@@ -83,20 +83,21 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
     return oe.toJson();
   }
 
-  for (Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
+  for (rapidjson::Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
   {
     std::string name   = iter->name.GetString();
-    std::string type   = jsonParseTypeNames[iter->value.GetType()];
 
     if (name == "entities")
     {
-      std::string r = parseEntityVector(ciP, iter, &bqrP->entities, false);  // param 4: attributes are NOT allowed in payload
+      // param 4 to parseEntityVector(): attributes are NOT allowed in payload
+      std::string r = parseEntityVector(ciP, iter, &bqrP->entities, false);
 
       if (r != "OK")
       {
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
+
         return oe.toJson();
       }
     }
@@ -109,6 +110,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
+
         return oe.toJson();
       }
     }
@@ -121,6 +123,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
+
         return oe.toJson();
       }
     }
@@ -130,16 +133,18 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       std::string r = parseAttributeList(ciP, iter, &bqrP->metadataV);
 
       if (r != "OK")
-      {        
+      {
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
+
         return oe.toJson();
       }
     }
     else
     {
-      std::string  description = std::string("Unrecognized field in JSON payload: /") + name + "/";      
+      std::string  description = std::string("Unrecognized field in JSON payload: /") + name + "/";
+
       alarmMgr.badInput(clientIp, description);
       oe.fill(SccBadRequest, description, "BadRequest");
       ciP->httpStatusCode = SccBadRequest;

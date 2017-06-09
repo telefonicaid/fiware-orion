@@ -33,7 +33,7 @@
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 TEST(NotifyConditionVector, render)
 {
@@ -41,7 +41,7 @@ TEST(NotifyConditionVector, render)
   NotifyConditionVector  ncV;
   std::string            out;
   const char*            outfile1 = "ngsi.notifyConditionVector.render.middle.json";
-  
+
   utInit();
 
   out = ncV.render("", false);
@@ -66,7 +66,7 @@ TEST(NotifyConditionVector, render)
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 */
 TEST(NotifyConditionVector, check)
 {
@@ -75,7 +75,7 @@ TEST(NotifyConditionVector, check)
   std::string            checked;
   std::string            expected2 = "invalid notify condition type: /Type/";
   std::string            expected3 = "empty type for NotifyCondition";
-  
+
   utInit();
 
   checked = ncV.check(RegisterContext, "", "", 0);
@@ -104,7 +104,7 @@ TEST(NotifyConditionVector, present)
 {
   NotifyCondition        nc;
   NotifyConditionVector  ncV;
-  
+
   utInit();
 
   nc.type = "Type";
@@ -119,7 +119,7 @@ TEST(NotifyConditionVector, present)
 
 /* ****************************************************************************
 *
-* get - 
+* get -
 */
 TEST(NotifyConditionVector, get)
 {

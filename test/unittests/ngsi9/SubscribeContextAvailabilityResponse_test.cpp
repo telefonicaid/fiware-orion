@@ -34,7 +34,7 @@
 
 /* ****************************************************************************
 *
-* constructors - 
+* constructors -
 */
 TEST(SubscribeContextAvailabilityResponse, constructors)
 {
@@ -60,7 +60,7 @@ TEST(SubscribeContextAvailabilityResponse, constructors)
 
 /* ****************************************************************************
 *
-* jsonRender - 
+* jsonRender -
 *
 * subscriptionId: MANDATORY
 * duration:       Optional
@@ -86,7 +86,7 @@ TEST(SubscribeContextAvailabilityResponse, jsonRender)
   rendered = scarP->render("");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
-  
+
   // 2. +subscriptionId -duration +errorCode
   scarP->errorCode.fill(SccBadRequest);
 

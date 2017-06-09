@@ -65,23 +65,22 @@ std::string getEntity
   ParseData*                 parseDataP
 )
 {
-   std::string entityId        = compV[2];
-   std::string type            = ciP->uriParam[URI_PARAM_TYPE];
-   std::string metadataFilter  = ciP->uriParam[URI_PARAM_METADATA];
+  std::string entityId        = compV[2];
+  std::string type            = ciP->uriParam[URI_PARAM_TYPE];
 
-   if (entityId == "")
-   {
-     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID, ERROR_BAD_REQUEST);
-     ciP->httpStatusCode = oe.code;
-     return oe.toJson();
-   }
+  if (entityId == "")
+  {
+    OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID, ERROR_BAD_REQUEST);
+    ciP->httpStatusCode = oe.code;
+    return oe.toJson();
+  }
 
-   if (forbiddenIdChars(ciP->apiVersion, entityId.c_str(), NULL))
-   {
-     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
-     ciP->httpStatusCode = oe.code;
-     return oe.toJson();
-   }
+  if (forbiddenIdChars(ciP->apiVersion, entityId.c_str(), NULL))
+  {
+    OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
+    ciP->httpStatusCode = oe.code;
+    return oe.toJson();
+  }
 
   // Fill in QueryContextRequest
   parseDataP->qcr.res.fill(entityId, type, "false", EntityTypeEmptyOrNotEmpty, "");
@@ -106,13 +105,13 @@ std::string getEntity
 
   if (parseDataP->qcrs.res.errorCode.code == SccOk && parseDataP->qcrs.res.contextElementResponseVector.size() > 1)
   {
-      // No problem found, but we expect only one entity
-      ciP->httpStatusCode = SccConflict;
+    // No problem found, but we expect only one entity
+    ciP->httpStatusCode = SccConflict;
   }
   else
   {
-      // the same of the wrapped operation
-      ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
+    // the same of the wrapped operation
+    ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
   }
 
   // 04. Cleanup and return result

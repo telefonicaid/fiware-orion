@@ -22,22 +22,38 @@
 *
 * Author: Fermin Galan
 */
+#include <string>
+#include <vector>
+#include <utility>
+
 #include "gtest/gtest.h"
-#include "testInit.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoCreateSubscription.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/testInit.h"
+#include "unittests/commonMocks.h"
+#include "unittests/unittest.h"
 
-#include "commonMocks.h"
-#include "unittest.h"
 
-using namespace ngsiv2;
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONElement;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::OID;
+using ngsiv2::Subscription;
+using ngsiv2::EntID;
+
+
 
 /* ****************************************************************************
 *
@@ -77,7 +93,7 @@ TEST(mongoCreateSubscriptions, createSubscriptionNotCustomOK)
   /* Invoke the function in mongoBackend library */
   std::string result = mongoCreateSubscription(sub, &oe, "", servicePathVector, "", "");
 
-  /* Check response is as expected */  
+  /* Check response is as expected */
   EXPECT_EQ(SccNone, oe.code);
   EXPECT_EQ("", oe.reasonPhrase);
   EXPECT_EQ("", oe.details);

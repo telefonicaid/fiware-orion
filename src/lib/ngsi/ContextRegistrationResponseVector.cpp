@@ -124,7 +124,7 @@ ContextRegistrationResponse*  ContextRegistrationResponseVector::operator[] (uns
 *
 * ContextRegistrationResponseVector::size -
 */
-unsigned int ContextRegistrationResponseVector::size(void)
+unsigned int ContextRegistrationResponseVector::size(void) const
 {
   return vec.size();
 }

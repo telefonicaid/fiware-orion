@@ -38,7 +38,7 @@
 
 /* ****************************************************************************
 *
-* RestServiceHandler - 
+* RestServiceHandler -
 */
 typedef std::string (*RestServiceHandler)(ConnectionInfo* ciP, int compononts, std::vector<std::string>& compV);
 
@@ -46,7 +46,7 @@ typedef std::string (*RestServiceHandler)(ConnectionInfo* ciP, int compononts, s
 
 /* ****************************************************************************
 *
-* RestService - 
+* RestService -
 */
 typedef std::string (*RestTreat)(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* reqDataP);
 typedef struct RestService
@@ -63,7 +63,7 @@ typedef struct RestService
 
 /* ****************************************************************************
 *
-* restService - 
+* restService -
 */
 extern std::string restService(ConnectionInfo* ciP, RestService* serviceV);
 
@@ -71,13 +71,13 @@ extern std::string restService(ConnectionInfo* ciP, RestService* serviceV);
 
 /* ****************************************************************************
 *
-* payloadParse - 
+* payloadParse -
 */
 extern std::string payloadParse
 (
   ConnectionInfo*            ciP,
   ParseData*                 parseDataP,
-  RestService*               service,  
+  RestService*               service,
   JsonRequest**              jsonPP,
   JsonDelayedRelease*        jsonReleaseP,
   std::vector<std::string>&  compV
@@ -87,7 +87,7 @@ extern std::string payloadParse
 
 /* ****************************************************************************
 *
-* tenantCheck - 
+* tenantCheck -
 */
 extern std::string tenantCheck(const std::string& tenant);
 

@@ -33,7 +33,7 @@
 
 /* ****************************************************************************
 *
-* Check - 
+* Check -
 */
 TEST(ContextElement, check)
 {
@@ -53,7 +53,7 @@ TEST(ContextElement, check)
   ceP->contextAttributeVector.push_back(aP);
   EXPECT_EQ(ceP->check(V1, UpdateContext, "", "", 0), "missing attribute name");
   aP->name = "name";
-  
+
   Metadata* mP = new Metadata();
   mP->name  = "";
   mP->stringValue = "V";

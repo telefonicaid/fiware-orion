@@ -25,6 +25,8 @@
 *
 * Author: Orion dev team
 */
+#include <string>
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/Request.h"
 #include "jsonParseV2/jsonRequestTreat.h"

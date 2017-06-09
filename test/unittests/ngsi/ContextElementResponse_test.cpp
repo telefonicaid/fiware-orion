@@ -33,13 +33,13 @@
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 */
 TEST(ContextElementResponse, check)
 {
    ContextElementResponse  cer;
    std::string             out;
-   
+
    utInit();
 
    out = cer.check(V1, UpdateContext, "", "", 0);
@@ -63,7 +63,7 @@ TEST(ContextElementResponse, check)
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 TEST(ContextElementResponse, render)
 {
@@ -89,7 +89,7 @@ TEST(ContextElementResponse, render)
 
 /* ****************************************************************************
 *
-* present - 
+* present -
 */
 TEST(ContextElementResponse, present)
 {
