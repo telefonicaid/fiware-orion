@@ -1,0 +1,399 @@
+This "document" shows the service routine for each REST request that Orion supports.
+In the graph, you can clearly see which service routines call other service routines and
+finally the function of mongoBackend (if any) where the request ends up.
+
+
+API V2:
+====================================================================================================
+  GET     /v2                                                                     entryPointsTreat
+  *       /v2                                                                     badVerbGetOnly
+
+  GET     /v2/entities                                                            getEntities -----------------------------------------------> postQueryContext  -------------------------------------------> mongoQueryContext
+  POST    /v2/entities                                                            postEntities ----------------------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  *       /v2/entities                                                            badVerbGetPostOnly
+
+  GET     /v2/entities/{EID}                                                      getEntity             -------------------------------------> postQueryContext  -------------------------------------------> mongoQueryContext
+  DELETE  /v2/entities/{EID}                                                      deleteEntity ----------------------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  *       /v2/entities/{EID}                                                      badVerbGetDeleteOnly
+
+  GET     /v2/entities/{EID}/attrs                                                getEntity -------------------------------------------------> postQueryContext  -------------------------------------------> mongoQueryContext
+  POST    /v2/entities/{EID}/attrs                                                postEntity ------------------------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  PUT     /v2/entities/{EID}/attrs                                                putEntity -------------------------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  PATCH   /v2/entities/{EID}/attrs                                                patchEntity -----------------------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  *       /v2/entities/{EID}/attrs                                                badVerbAllNotDelete
+
+  GET     /v2/entities/{EID}/attrs/{ATTRNAME}/value                               getEntityAttributeValue -----------------------------------> postQueryContext  -------------------------------------------> mongoQueryContext
+  PUT     /v2/entities/{EID}/attrs/{ATTRNAME}/value                               putEntityAttributeValue -----------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  *       /v2/entities/{EID}/attrs/{ATTRNAME}/value                               badVerbGetPutOnly
+
+  GET     /v2/entities/{EID}/attrs/{ATTRNAME}                                     getEntityAttribute ----------------------------------------> postQueryContext  -------------------------------------------> mongoQueryContext
+  PUT     /v2/entities/{EID}/attrs/{ATTRNAME}                                     putEntityAttribute ----------------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  DELETE  /v2/entities/{EID}/attrs/{ATTRNAME}                                     deleteEntity ----------------------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  *       /v2/entities/{EID}/attrs/{ATTRNAME}                                     badVerbGetPutDeleteOnly
+
+  GET     /v2/types/{ETYPE}                                                       getEntityType ------------------------------------------------------------------------------------------------------------> mongoAttributesForEntityType
+  *       /v2/types/{ETYPE}                                                       badVerbGetOnly
+
+  GET     /v2/types                                                               getEntityAllTypes --------------------------------------------------------------------------------------------------------> mongoEntityTypesValues/mongoEntityTypes
+  *       /v2/types                                                               badVerbGetOnly
+
+  GET     /v2/subscriptions                                                       getAllSubscriptions ------------------------------------------------------------------------------------------------------> mongoListSubscriptions
+  POST    /v2/subscriptions                                                       postSubscriptions --------------------------------------------------------------------------------------------------------> mongoCreateSubscription
+  *       /v2/subscriptions                                                       badVerbGetPostOnly
+
+  GET     /v2/subscriptions/{SUBID}                                               getSubscription ----------------------------------------------------------------------------------------------------------> mongoGetSubscription
+  DELETE  /v2/subscriptions/{SUBID}                                               deleteSubscription -------------------------------------------------------------------------------------------------------> mongoUnsubscribeContext
+  PATCH   /v2/subscriptions/{SUBID}                                               patchSubscription --------------------------------------------------------------------------------------------------------> mongoUpdateSubscription
+  *       /v2/subscriptions/{SUBID}                                               badVerbGetDeletePatchOnly
+
+  POST    /v2/op/query                                                            postBatchQuery --------------------------------------------> postQueryContext  -------------------------------------------> mongoQueryContext
+  *       /v2/op/query                                                            badVerbPostOnly
+
+  POST    /v2/op/update                                                           postBatchUpdate -------------------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  *       /v2/op/update                                                           badVerbPostOnly
+
+
+V0 STANDARD REGISTRY REQUESTS:
+====================================================================================================
+  POST    /ngsi9/registerContext                                                  postRegisterContext ------------------------------------------------------------------------------------------------------> mongoRegisterContext
+  *       /ngsi9/registerContext                                                  badVerbPostOnly
+
+  POST    /ngsi9/discoverContextAvailability                                      postDiscoverContextAvailability ------------------------------------------------------------------------------------------> mongoDiscoverContextAvailability
+  *       /ngsi9/discoverContextAvailability                                      badVerbPostOnly
+
+  POST    /ngsi9/subscribeContextAvailability                                     postSubscribeContextAvailability -----------------------------------------------------------------------------------------> mongoSubscribeContextAvailability
+  *       /ngsi9/subscribeContextAvailability                                     badVerbPostOnly
+
+  POST    /ngsi9/unsubscribeContextAvailability                                   postUnsubscribeContextAvailability ---------------------------------------------------------------------------------------> mongoUnsubscribeContextAvailability
+  *       /ngsi9/unsubscribeContextAvailability                                   badVerbPostOnly
+
+  POST    /ngsi9/updateContextAvailabilitySubscription                            postUpdateContextAvailabilitySubscription --------------------------------------------------------------------------------> mongoUpdateContextAvailabilitySubscription
+  *       /ngsi9/updateContextAvailabilitySubscription                            badVerbPostOnly
+
+  POST    /ngsi9/notifyContextAvailability                                        postNotifyContextAvailability --------------------------------------------------------------------------------------------> mongoNotifyContextAvailability
+  *       /ngsi9/notifyContextAvailability                                        badVerbPostOnly
+
+
+V1 STANDARD REGISTRY REQUESTS:
+====================================================================================================
+  POST    /v1/registerContext                                                     postRegisterContext ------------------------------------------------------------------------------------------------------> mongoRegisterContext
+  *       /v1/registerContext                                                     badVerbPostOnly
+
+  POST    /v1/discoverContextAvailability                                         postDiscoverContextAvailability ------------------------------------------------------------------------------------------> mongoDiscoverContextAvailability
+  *       /v1/discoverContextAvailability                                         badVerbPostOnly
+
+  POST    /v1/subscribeContextAvailability                                        postSubscribeContextAvailability -----------------------------------------------------------------------------------------> mongoSubscribeContextAvailability
+  *       /v1/subscribeContextAvailability                                        badVerbPostOnly
+
+  POST    /v1/unsubscribeContextAvailability                                      postUnsubscribeContextAvailability ---------------------------------------------------------------------------------------> mongoUnsubscribeContextAvailability
+  *       /v1/unsubscribeContextAvailability                                      badVerbPostOnly
+
+  POST    /v1/updateContextAvailabilitySubscription                               postUpdateContextAvailabilitySubscription --------------------------------------------------------------------------------> mongoUpdateContextAvailabilitySubscription
+  *       /v1/updateContextAvailabilitySubscription                               badVerbPostOnly
+
+  POST    /v1/notifyContextAvailability                                           postNotifyContextAvailability --------------------------------------------------------------------------------------------> mongoNotifyContextAvailability
+  *       /v1/notifyContextAvailability                                           badVerbPostOnly
+
+
+V0 STANDARD REQUESTS:
+====================================================================================================
+  POST   /ngsi10/updateContext                                                    postUpdateContext --------------------------------------------------------------------------------------------------------> mongoUpdateContext
+  *      /ngsi10/updateContext                                                    badVerbPostOnly
+
+  POST   /ngsi10/queryContext                                                     postQueryContext ---------------------------------------------------------------------------------------------------------> mongoQueryContext
+  *      /ngsi10/queryContext                                                     badVerbPostOnly
+
+  POST   /ngsi10/subscribeContext                                                 postSubscribeContext -----------------------------------------------------------------------------------------------------> mongoSubscribeContext
+  *      /ngsi10/subscribeContext                                                 badVerbPostOnly
+
+  POST   /ngsi10/unsubscribeContext                                               postUnsubscribeContext ---------------------------------------------------------------------------------------------------> mongoUnsubscribeContext
+  *      /ngsi10/unsubscribeContext                                               badVerbPostOnly
+
+  POST   /ngsi10/updateContextSubscription                                        postUpdateContextSubscription --------------------------------------------------------------------------------------------> mongoUpdateContextSubscription
+  *      /ngsi10/updateContextSubscription                                        badVerbPostOnly
+
+  POST   /ngsi10/notifyContext                                                    postNotifyContext --------------------------------------------------------------------------------------------------------> mongoNotifyContext
+  *      /ngsi10/notifyContext                                                    badVerbPostOnly
+
+
+V1 STANDARD REQUESTS:
+====================================================================================================
+  POST   /v1/updateContext                                                        postUpdateContext --------------------------------------------------------------------------------------------------------> mongoUpdateContext
+  *      /v1/updateContext                                                        badVerbPostOnly
+
+  POST   /v1/queryContext                                                         postQueryContext ---------------------------------------------------------------------------------------------------------> mongoQueryContext
+  *      /v1/queryContext                                                         badVerbPostOnly
+
+  POST   /v1/subscribeContext                                                     postSubscribeContext -----------------------------------------------------------------------------------------------------> mongoSubscribeContext
+  *      /v1/subscribeContext                                                     badVerbPostOnly
+
+  POST   /v1/unsubscribeContext                                                   postUnsubscribeContext ---------------------------------------------------------------------------------------------------> mongoUnsubscribeContext
+  *      /v1/unsubscribeContext                                                   badVerbPostOnly
+
+  POST   /v1/updateContextSubscription                                            postUpdateContextSubscription --------------------------------------------------------------------------------------------> mongoUpdateContextSubscription
+  *      /v1/updateContextSubscription                                            badVerbPostOnly
+
+  POST   /v1/notifyContext                                                        postNotifyContext --------------------------------------------------------------------------------------------------------> mongoNotifyContext
+  *      /v1/notifyContext                                                        badVerbPostOnly
+
+
+V0 REGISTRY CONVENIENCE OPERATIONS:
+====================================================================================================
+  GET     /ngsi9/contextEntities/{EID}                                            getContextEntitiesByEntityId ------------------------------> postDiscoverContextAvailability -----------------------------> mongoDiscoverContextAvailability
+  POST    /ngsi9/contextEntities/{EID}                                            postContextEntitiesByEntityId -----------------------------> postRegisterContext -----------------------------------------> mongoRegisterContext
+  *       /ngsi9/contextEntities/{EID}                                            badVerbGetPostOnly
+
+  GET     /ngsi9/contextEntities/{EID}/attributes                                 getContextEntityAttributes --------------------------------> postDiscoverContextAvailability -----------------------------> mongoDiscoverContextAvailability
+  POST    /ngsi9/contextEntities/{EID}/attributes                                 postContextEntityAttributes -------------------------------> postRegisterContext -----------------------------------------> mongoRegisterContext
+  *       /ngsi9/contextEntities/{EID}/attributes                                 badVerbGetPostOnly
+
+  GET     /ngsi9/contextEntities/{EID}/attributes/{ATTRNAME}                      getEntityByIdAttributeByName ------------------------------> postDiscoverContextAvailability -----------------------------> mongoDiscoverContextAvailability
+  POST    /ngsi9/contextEntities/{EID}/attributes/{ATTRNAME}                      postEntityByIdAttributeByName -----------------------------> postRegisterContext -----------------------------------------> mongoRegisterContext
+  *       /ngsi9/contextEntities/{EID}/attributes/{ATTRNAME}                      badVerbGetPostOnly
+
+  GET     /ngsi9/contextEntityTypes/{ETYPE}                                       getContextEntityTypes -------------------------------------> postDiscoverContextAvailability -----------------------------> mongoDiscoverContextAvailability
+  POST    /ngsi9/contextEntityTypes/{ETYPE}                                       postContextEntityTypes ------------------------------------> postRegisterContext -----------------------------------------> mongoRegisterContext
+  *       /ngsi9/contextEntityTypes/{ETYPE}                                       badVerbGetPostOnly
+
+  GET     /ngsi9/contextEntityTypes/{ETYPE}/attributes                            getContextEntityTypes -------------------------------------> postDiscoverContextAvailability -----------------------------> mongoDiscoverContextAvailability
+  POST    /ngsi9/contextEntityTypes/{ETYPE}/attributes                            postContextEntityTypes ------------------------------------> postRegisterContext -----------------------------------------> mongoRegisterContext
+  *       /ngsi9/contextEntityTypes/{ETYPE}/attributes                            badVerbGetPostOnly
+
+  GET     /ngsi9/contextEntityTypes/{ETYPE}/attributes/{ATTRNAME}                 getContextEntityTypeAttribute -----------------------------> postDiscoverContextAvailability -----------------------------> mongoDiscoverContextAvailability
+  POST    /ngsi9/contextEntityTypes/{ETYPE}/attributes/{ATTRNAME}                 postContextEntityTypeAttribute ----------------------------> postRegisterContext -----------------------------------------> mongoRegisterContext
+  *       /ngsi9/contextEntityTypes/{ETYPE}/attributes/{ATTRNAME}                 badVerbGetPostOnly
+
+  POST    /ngsi9/contextAvailabilitySubscriptions                                 postSubscribeContextAvailabilityConvOp  -------------------> postSubscribeContextAvailability ----------------------------> mongoSubscribeContextAvailability
+  *       /ngsi9/contextAvailabilitySubscriptions                                 badVerbPostOnly
+
+  PUT     /ngsi9/contextAvailabilitySubscriptions/{SUBID}                         putAvailabilitySubscriptionConvOp -------------------------> postUpdateContextAvailabilitySubscription -------------------> mongoUpdateContextAvailabilitySubscription
+  DELETE  /ngsi9/contextAvailabilitySubscriptions/{SUBID}                         deleteAvailabilitySubscriptionConvOp ----------------------> postUnsubscribeContextAvailability --------------------------> mongoUnsubscribeContextAvailability
+  *       /ngsi9/contextAvailabilitySubscriptions/{SUBID}                         badVerbPutDeleteOnly
+
+
+V1 REGISTRY CONVENIENCE OPERATIONS:
+====================================================================================================
+  GET     /v1/registry/contextEntities/{EID}                                      getContextEntitiesByEntityId ------------------------------> postDiscoverContextAvailability -----------------------------> mongoDiscoverContextAvailability
+  POST    /v1/registry/contextEntities/{EID}                                      postContextEntitiesByEntityId -----------------------------> postRegisterContext -----------------------------------------> mongoRegisterContext
+  *       /v1/registry/contextEntities/{EID}                                      badVerbGetPostOnly
+
+  GET     /v1/registry/contextEntities/{EID}/attributes                           getContextEntityAttributes --------------------------------> postDiscoverContextAvailability -----------------------------> mongoDiscoverContextAvailability
+  POST    /v1/registry/contextEntities/{EID}/attributes                           postContextEntityAttributes -------------------------------> postRegisterContext -----------------------------------------> mongoRegisterContext
+  *       /v1/registry/contextEntities/{EID}/attributes                           badVerbGetPostOnly
+
+  GET     /v1/registry/contextEntities/{EID}/attributes/{ATTRNAME}                getEntityByIdAttributeByName ------------------------------> postDiscoverContextAvailability -----------------------------> mongoDiscoverContextAvailability
+  POST    /v1/registry/contextEntities/{EID}/attributes/{ATTRNAME}                postEntityByIdAttributeByName -----------------------------> postRegisterContext -----------------------------------------> mongoRegisterContext
+  *       /v1/registry/contextEntities/{EID}/attributes/{ATTRNAME}                badVerbGetPostOnly
+
+  GET     /v1/registry/contextEntityTypes/{ETYPE}                                 getContextEntityTypes -------------------------------------> postDiscoverContextAvailability -----------------------------> mongoDiscoverContextAvailability
+  POST    /v1/registry/contextEntityTypes/{ETYPE}                                 postContextEntityTypes ------------------------------------> postRegisterContext -----------------------------------------> mongoRegisterContext
+  *       /v1/registry/contextEntityTypes/{ETYPE}                                 badVerbGetPostOnly
+
+  GET     /v1/registry/contextEntityTypes/{ETYPE}/attributes                      getContextEntityTypes -------------------------------------> postDiscoverContextAvailability -----------------------------> mongoDiscoverContextAvailability
+  POST    /v1/registry/contextEntityTypes/{ETYPE}/attributes                      postContextEntityTypes ------------------------------------> postRegisterContext -----------------------------------------> mongoRegisterContext
+  *       /v1/registry/contextEntityTypes/{ETYPE}/attributes                      badVerbGetPostOnly
+
+  GET     /v1/registry/contextEntityTypes/{ETYPE}/attributes/{ATTRNAME}           getContextEntityTypeAttribute -----------------------------> postDiscoverContextAvailability -----------------------------> mongoDiscoverContextAvailability
+  POST    /v1/registry/contextEntityTypes/{ETYPE}/attributes/{ATTRNAME}           postContextEntityTypeAttribute ----------------------------> postRegisterContext -----------------------------------------> mongoRegisterContext
+  *       /v1/registry/contextEntityTypes/{ETYPE}/attributes/{ATTRNAME}           badVerbGetPostOnly
+
+  POST    /v1/registry/contextAvailabilitySubscriptions                           postSubscribeContextAvailabilityConvOp  -------------------> postSubscribeContextAvailability ----------------------------> mongoSubscribeContextAvailability
+  *       /v1/registry/contextAvailabilitySubscriptions                           badVerbPostOnly
+
+  PUT     /v1/registry/contextAvailabilitySubscriptions/{SUBID}                   putAvailabilitySubscriptionConvOp -------------------------> postUpdateContextAvailabilitySubscription -------------------> mongoUpdateContextAvailabilitySubscription
+  DELETE  /v1/registry/contextAvailabilitySubscriptions/{SUBID}                   deleteAvailabilitySubscriptionConvOp ----------------------> postUnsubscribeContextAvailability --------------------------> mongoUnsubscribeContextAvailability
+  *       /v1/registry/contextAvailabilitySubscriptions/{SUBID}                   badVerbPutDeleteOnly
+
+
+V0 CONVENIENCE OPERATIONS:
+====================================================================================================
+  GET     /ngsi10/contextEntities/{EID}                                           getIndividualContextEntity --------------------------------> postQueryContext --------------------------------------------> mongoQueryContext
+  PUT     /ngsi10/contextEntities/{EID}                                           putIndividualContextEntity --------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  POST    /ngsi10/contextEntities/{EID}                                           postIndividualContextEntity -------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  DELETE  /ngsi10/contextEntities/{EID}                                           deleteIndividualContextEntity -----------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  *       /ngsi10/contextEntities/{EID}                                           badVerbAllFour
+
+  GET     /ngsi10/contextEntities/{EID}/attributes                                getIndividualContextEntity --------------------------------> postQueryContext --------------------------------------------> mongoQueryContext
+  PUT     /ngsi10/contextEntities/{EID}/attributes                                putIndividualContextEntity --------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  POST    /ngsi10/contextEntities/{EID}/attributes                                postIndividualContextEntity -------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  DELETE  /ngsi10/contextEntities/{EID}/attributes                                deleteIndividualContextEntity -----------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  *       /ngsi10/contextEntities/{EID}/attributes                                badVerbAllFour
+
+  GET     /ngsi10/contextEntities/{EID}/attributes/{ATTRNAME}                     getIndividualContextEntityAttribute -----------------------> postQueryContext --------------------------------------------> mongoQueryContext
+  PUT     /ngsi10/contextEntities/{EID}/attributes/{ATTRNAME}                     putIndividualContextEntityAttribute -----------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  POST    /ngsi10/contextEntities/{EID}/attributes/{ATTRNAME}                     postIndividualContextEntityAttribute ----------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  DELETE  /ngsi10/contextEntities/{EID}/attributes/{ATTRNAME}                     deleteIndividualContextEntityAttribute --------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  *       /ngsi10/contextEntities/{EID}/attributes/{ATTRNAME}                     badVerbAllFour
+
+  GET     /ngsi10/contextEntities/{EID}/attributes/{ATTRNAME}/{ID}                getAttributeValueInstance ---------------------------------> postQueryContext --------------------------------------------> mongoQueryContext
+  PUT     /ngsi10/contextEntities/{EID}/attributes/{ATTRNAME}/{ID}                putAttributeValueInstance ---------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  DELETE  /ngsi10/contextEntities/{EID}/attributes/{ATTRNAME}/{ID}                deleteAttributeValueInstance ------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  *       /ngsi10/contextEntities/{EID}/attributes/{ATTRNAME}/{ID}                badVerbGetPutDeleteOnly
+
+  GET     /ngsi10/contextEntityTypes/{ETYPE}                                      getNgsi10ContextEntityTypes -------------------------------> postQueryContext --------------------------------------------> mongoQueryContext
+  *       /ngsi10/contextEntityTypes/{ETYPE}                                      badVerbGetOnly
+
+  GET     /ngsi10/contextEntityTypes/{ETYPE}/attributes                           getNgsi10ContextEntityTypes -------------------------------> postQueryContext --------------------------------------------> mongoQueryContext
+  *       /ngsi10/contextEntityTypes/{ETYPE}/attributes                           badVerbGetOnlyy
+
+  GET     /ngsi10/contextEntityTypes/{ETYPE}/attributes/{ATTRNAME}                getNgsi10ContextEntityTypesAttribute ----------------------> postQueryContext --------------------------------------------> mongoQueryContext
+  *       /ngsi10/contextEntityTypes/{ETYPE}/attributes/{ATTRNAME}                badVerbGetOnly
+
+  POST    /ngsi10/contextSubscriptions                                            postSubscribeContextConvOp --------------------------------> postSubscribeContext ----------------------------------------> mongoSubscribeContext
+  *       /ngsi10/contextSubscriptions                                            badVerbPostOnly
+
+  PUT     /ngsi10/contextSubscriptions/{SUBID}                                    putSubscriptionConvOp -------------------------------------> postUpdateContextSubscription -------------------------------> mongoUpdateContextSubscription
+  DELETE  /ngsi10/contextSubscriptions/{SUBID}                                    deleteSubscriptionConvOp ----------------------------------> postUnsubscribeContext --------------------------------------> mongoUnsubscribeContext
+  *       /ngsi10/contextSubscriptions/{SUBID}                                    badVerbPutDeleteOnly
+
+
+V1 CONVENIENCE OPERATIONS:
+====================================================================================================
+  GET     /v1/contextEntities/{EID}                                               getIndividualContextEntity --------------------------------> postQueryContext --------------------------------------------> mongoQueryContext
+  PUT     /v1/contextEntities/{EID}                                               putIndividualContextEntity --------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  POST    /v1/contextEntities/{EID}                                               postIndividualContextEntity -------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  DELETE  /v1/contextEntities/{EID}                                               deleteIndividualContextEntity -----------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  *       /v1/contextEntities/{EID}                                               badVerbAllFour
+
+  GET     /v1/contextEntities/{EID}/attributes                                    getIndividualContextEntity --------------------------------> postQueryContext --------------------------------------------> mongoQueryContext
+  PUT     /v1/contextEntities/{EID}/attributes                                    putIndividualContextEntity --------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  POST    /v1/contextEntities/{EID}/attributes                                    postIndividualContextEntity -------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  DELETE  /v1/contextEntities/{EID}/attributes                                    deleteIndividualContextEntity -----------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  *       /v1/contextEntities/{EID}/attributes                                    badVerbAllFour
+
+  GET     /v1/contextEntities/{EID}/attributes/{ATTRNAME}                         getIndividualContextEntityAttribute -----------------------> postQueryContext --------------------------------------------> mongoQueryContext
+  PUT     /v1/contextEntities/{EID}/attributes/{ATTRNAME}                         putIndividualContextEntityAttribute -----------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  POST    /v1/contextEntities/{EID}/attributes/{ATTRNAME}                         postIndividualContextEntityAttribute ----------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  DELETE  /v1/contextEntities/{EID}/attributes/{ATTRNAME}                         deleteIndividualContextEntityAttribute --------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  *       /v1/contextEntities/{EID}/attributes/{ATTRNAME}                         badVerbAllFour
+
+  GET     /v1/contextEntities/{EID}/attributes/{ATTRNAME}/{ID}                    getAttributeValueInstance ---------------------------------> postQueryContext --------------------------------------------> mongoQueryContext
+  PUT     /v1/contextEntities/{EID}/attributes/{ATTRNAME}/{ID}                    putAttributeValueInstance ---------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  DELETE  /v1/contextEntities/{EID}/attributes/{ATTRNAME}/{ID}                    deleteAttributeValueInstance ------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  *       /v1/contextEntities/{EID}/attributes/{ATTRNAME}/{ID}                    badVerbGetPutDeleteOnly
+
+  GET     /v1/contextEntityTypes/{ETYPE}                                          getNgsi10ContextEntityTypes -------------------------------> postQueryContext --------------------------------------------> mongoQueryContext
+  *       /v1/contextEntityTypes/{ETYPE}                                          badVerbGetOnly
+
+  GET     /v1/contextEntityTypes/{ETYPE}/attributes                               getNgsi10ContextEntityTypes -------------------------------> postQueryContext --------------------------------------------> mongoQueryContext
+  *       /v1/contextEntityTypes/{ETYPE}/attributes                               badVerbGetOnlyy
+
+  GET     /v1/contextEntityTypes/{ETYPE}/attributes/{ATTRNAME}                    getNgsi10ContextEntityTypesAttribute ----------------------> postQueryContext --------------------------------------------> mongoQueryContext
+  *       /v1/contextEntityTypes/{ETYPE}/attributes/{ATTRNAME}                    badVerbGetOnly
+
+  POST    /v1/contextSubscriptions                                                postSubscribeContextConvOp --------------------------------> postSubscribeContext ----------------------------------------> mongoSubscribeContext
+  *       /v1/contextSubscriptions                                                badVerbPostOnly
+
+  PUT     /v1/contextSubscriptions/{SUBID}                                        putSubscriptionConvOp -------------------------------------> postUpdateContextSubscription -------------------------------> mongoUpdateContextSubscription
+  DELETE  /v1/contextSubscriptions/{SUBID}                                        deleteSubscriptionConvOp ----------------------------------> postUnsubscribeContext --------------------------------------> mongoUnsubscribeContext
+  *       /v1/contextSubscriptions/{SUBID}                                        badVerbPutDeleteOnly
+
+
+TID CONVENIENCE OPERATIONS:
+====================================================================================================
+  GET     /v1/contextTypes                                                        getEntityTypes -----------------------------------------------------------------------------------------------------------> mongoEntityTypes
+  *       /v1/contextTypes                                                        badVerbGetOnly
+
+  GET     /v1/contextTypes/{ETYPE}                                                getAttributesForEntityType  ----------------------------------------------------------------------------------------------> mongoAttributesForEntityType
+  *       /v1/contextTypes/{ETYPE}                                                badVerbGetOnly
+
+  GET     /v1/contextEntities                                                     getAllContextEntities       -------------------------------> postQueryContext --------------------------------------------> mongoQueryContext
+  POST    /v1/contextEntities                                                     postIndividualContextEntity -------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  *       /v1/contextEntities                                                     badVerbGetPostOnly
+
+  GET     /v1/contextEntities/type/{ETYPE}/id/{EID}                               getAllEntitiesWithTypeAndId -------------------------------> postQueryContext --------------------------------------------> mongoQueryContext
+  POST    /v1/contextEntities/type/{ETYPE}/id/{EID}                               postAllEntitiesWithTypeAndId ------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  PUT     /v1/contextEntities/type/{ETYPE}/id/{EID}                               putAllEntitiesWithTypeAndId -------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  DELETE  /v1/contextEntities/type/{ETYPE}/id/{EID}                               deleteAllEntitiesWithTypeAndId ----------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  *       /v1/contextEntities/type/{ETYPE}/id/{EID}                               badVerbAllFour
+
+  GET    /v1/contextEntities/type/{ETYPE}/id/{EID}/attributes/{ATTRNAME}          getIndividualContextEntityAttributeWithTypeAndId    -------> postQueryContext --------------------------------------------> mongoQueryContext
+  POST   /v1/contextEntities/type/{ETYPE}/id/{EID}/attributes/{ATTRNAME}          postIndividualContextEntityAttributeWithTypeAndId   -------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  PUT    /v1/contextEntities/type/{ETYPE}/id/{EID}/attributes/{ATTRNAME}          putIndividualContextEntityAttributeWithTypeAndId    -------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  DELETE /v1/contextEntities/type/{ETYPE}/id/{EID}/attributes/{ATTRNAME}          deleteIndividualContextEntityAttributeWithTypeAndId -------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  *      /v1/contextEntities/type/{ETYPE}/id/{EID}/attributes/{ATTRNAME}          badVerbAllFour
+
+  GET    /v1/contextEntities/type/{ETYPE}/id/{EID}/attributes/{ATTRNAME}/{ID}     getAttributeValueInstanceWithTypeAndId    -----------------> postQueryContext --------------------------------------------> mongoQueryContext
+  POST   /v1/contextEntities/type/{ETYPE}/id/{EID}/attributes/{ATTRNAME}/{ID}     postAttributeValueInstanceWithTypeAndId   -----------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  PUT    /v1/contextEntities/type/{ETYPE}/id/{EID}/attributes/{ATTRNAME}/{ID}     putAttributeValueInstanceWithTypeAndId    -----------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  DELETE /v1/contextEntities/type/{ETYPE}/id/{EID}/attributes/{ATTRNAME}/{ID}     deleteAttributeValueInstanceWithTypeAndId -----------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  *      /v1/contextEntities/type/{ETYPE}/id/{EID}/attributes/{ATTRNAME}/{ID}     badVerbAllFour
+
+  GET    /v1/registry/contextEntities/type/{ETYPE}/id/{ID}                        getContextEntitiesByEntityIdAndType       -----------------> postDiscoverContextAvailability -----------------------------> mongoDiscoverContextAvailability
+  POST   /v1/registry/contextEntities/type/{ETYPE}/id/{ID}                        postContextEntitiesByEntityIdAndType      -----------------> postRegisterContext -----------------------------------------> mongoRegisterContext
+  *      /v1/registry/contextEntities/type/{ETYPE}/id/{ID}                        badVerbGetPostOnly
+
+  GET    /v1/registry/contextEntities/type/{ETYPE}/id/{ID}/attributes/{ATTRNAME}  getEntityByIdAttributeByNameWithTypeAndId  ----------------> postDiscoverContextAvailability -----------------------------> mongoDiscoverContextAvailability
+  POST   /v1/registry/contextEntities/type/{ETYPE}/id/{ID}/attributes/{ATTRNAME}  postEntityByIdAttributeByNameWithTypeAndId ----------------> postRegisterContext -----------------------------------------> mongoRegisterContext
+  *      /v1/registry/contextEntities/type/{ETYPE}/id/{ID}/attributes/{ATTRNAME}  badVerbGetPostOnly
+
+
+MISC REQUESTS:
+====================================================================================================
+  GET     /log/trace                                                              logTraceTreat
+  DELETE  /log/trace                                                              logTraceTreat
+  *       /log/trace                                                              badVerbGetDeleteOnly
+
+  PUT     /log/trace/{TRACELEVEL}                                                 logTraceTreat
+  DELETE  /log/trace/{TRACELEVEL}                                                 logTraceTreat
+  *       /log/trace/{TRACELEVEL}                                                 badVerbPutDeleteOnly
+
+  GET     /log/traceLevel                                                         logTraceTreat
+  DELETE  /log/traceLevel                                                         logTraceTreat
+  *       /log/traceLevel                                                         badVerbGetDeleteOnly
+
+  PUT     /log/traceLevel/{TRACELEVEL}                                            logTraceTreat
+  DELETE  /log/traceLevel/{TRACELEVEL}                                            logTraceTreat
+  *       /log/traceLevel/{TRACELEVEL}                                            badVerbPutDeleteOnly
+
+  GET     /v1/admin/log/trace                                                     logTraceTreat
+  DELETE  /v1/admin/log/trace                                                     logTraceTreat
+  *       /v1/admin/log/trace                                                     badVerbGetDeleteOnly
+
+  PUT     /v1/admin/log/trace/{TRACELEVEL}                                        logTraceTreat
+  DELETE  /v1/admin/log/trace/{TRACELEVEL}                                        logTraceTreat
+  *       /v1/admin/log/trace/{TRACELEVEL}                                        badVerbPutDeleteOnly
+
+  GET     /v1/admin/log/traceLevel                                                logTraceTreat
+  DELETE  /v1/admin/log/traceLevel                                                logTraceTreat
+  *       /v1/admin/log/traceLevel                                                badVerbGetDeleteOnly
+
+  PUT     /v1/admin/log/traceLevel/{TRACELEVEL}                                   logTraceTreat
+  DELETE  /v1/admin/log/traceLevel/{TRACELEVEL}                                   logTraceTreat
+  *       /v1/admin/log/traceLevel/{TRACELEVEL}                                   badVerbPutDeleteOnly
+
+  GET     /statistics                                                             statisticsTreat
+  DELETE  /statistics                                                             statisticsTreat
+  *       /statistics                                                             badVerbGetDeleteOnly
+
+  GET     /v1/admin/statistics                                                    statisticsTreat
+  DELETE  /v1/admin/statistics                                                    statisticsTreat
+  *       /v1/admin/statistics                                                    badVerbGetDeleteOnly
+
+  GET     /cache/statistics                                                       statisticsCacheTreat
+  DELETE  /cache/statistics                                                       statisticsCacheTreat
+  *       /cache/statistics                                                       badVerbGetDeleteOnly
+
+  GET     /v1/admin/cache/statistics                                              statisticsCacheTreat
+  DELETE  /v1/admin/cache/statistics                                              statisticsCacheTreat
+  *       /v1/admin/cache/statistics                                              badVerbGetDeleteOnly
+
+  GET     /version                                                                versionTreat
+  *       /version                                                                badVerbGetOnly
+
+  PUT     /admin/log                                                              changeLogLevel
+  GET     /admin/log                                                              getLogLevel
+  *       /admin/log                                                              badVerbPutOnly
+
+  GET     /admin/sem                                                              semStateTreat
+  *       /admin/sem                                                              badVerbGetOnly
+
+  GET     /admin/metrics                                                          getMetrics
+  DELETE  /admin/metrics                                                          deleteMetrics
+  *       /admin/metrics                                                          badVerbGetDeleteOnly
+
+  *       /ngsi9/{ANYTHING}                                                       badNgsi9Request
+
+  *       /ngsi10/{ANYTHING}                                                      badNgsi10Request
+
+  *       {ANYTHING}                                                              badRequest
