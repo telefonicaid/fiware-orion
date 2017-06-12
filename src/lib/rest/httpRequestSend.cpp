@@ -163,19 +163,28 @@ static void httpHeaderAdd
 {
   std::string  h = headerString;
 
-  std::map<std::string, std::string>::const_iterator it;
-  it = extraHeaders.find(headerName);
-  if (it == extraHeaders.end())  // headerName NOT found in extraHeaders, use headerString
+  // Fiware-Correlator and Ngsiv2-AttrsFormat cannot be overwritten, so we don't
+  // search in extraHeaders in these cases
+  if ((headerName == "Fiware-Correlator") || (headerName == "Ngsiv2-AttrsFormat"))
   {
     h = headerString;
   }
   else
   {
-    h = headerName + ": " + it->second;
+    std::map<std::string, std::string>::const_iterator it;
+    it = extraHeaders.find(headerName);
+    if (it == extraHeaders.end())  // headerName NOT found in extraHeaders, use headerString
+    {
+      h = headerString;
+    }
+    else
+    {
+      h = headerName + ": " + it->second;
 
-    std::string headerNameLowerCase = headerName;
-    std::transform(headerNameLowerCase.begin(), headerNameLowerCase.end(), headerNameLowerCase.begin(), ::tolower);
-    usedExtraHeaders[headerNameLowerCase.c_str()] = true;
+      std::string headerNameLowerCase = headerName;
+      std::transform(headerNameLowerCase.begin(), headerNameLowerCase.end(), headerNameLowerCase.begin(), ::tolower);
+      usedExtraHeaders[headerNameLowerCase.c_str()] = true;
+    }
   }
 
   *headersP           = curl_slist_append(*headersP, h.c_str());
@@ -490,6 +499,12 @@ int httpRequestSendWithCurl
   {
     std::string headerNameLowerCase = it->first;
     transform(headerNameLowerCase.begin(), headerNameLowerCase.end(), headerNameLowerCase.begin(), ::tolower);
+
+    // Ngsiv2-AttrsFormat and Fiware-Correlator cannot be overwritten
+    if ((headerNameLowerCase == "ngsiv2-attrsformat") || (headerNameLowerCase == "fiware-correlator"))
+    {
+      continue;
+    }
 
     if (!usedExtraHeaders[headerNameLowerCase])
     {

@@ -50,7 +50,8 @@ HttpStatusCode mongoNotifyContext
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               fiwareCorrelator
+  const std::string&               fiwareCorrelator,
+  const std::string&               ngsiV2AttrsFormat
 )
 {
   bool reqSemTaken;
@@ -64,7 +65,7 @@ HttpStatusCode mongoNotifyContext
     std::map<std::string, std::string>  uriParams;  // Unused, necessary for processContextElement()
     ContextElement*                     ceP = &requestP->contextElementResponseVector[ix]->contextElement;
 
-    processContextElement(ceP, &ucr, "append", tenant, servicePathV, uriParams, xauthToken, fiwareCorrelator);
+    processContextElement(ceP, &ucr, "append", tenant, servicePathV, uriParams, xauthToken, fiwareCorrelator, ngsiV2AttrsFormat);
   }
 
   reqSemGive(__FUNCTION__, "ngsi10 notification", reqSemTaken);

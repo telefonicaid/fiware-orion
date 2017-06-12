@@ -80,6 +80,9 @@ Fields:
         location in the attrs array
     -   **coords**: a GeoJSON representing the location of the entity. See
         below for more details.
+-   **lastCorrelator**: value of the `Fiware-Correlator` header in the last
+    update request on the entity. Used by the self-notification loop protection
+    logic.
 
 Regarding `location.coords` in can use several formats:
 
@@ -171,7 +174,8 @@ Example document:
            "type": "Point",
            "coordinates": [ -3.691944, 40.418889 ]
        }
-   }
+   },
+   "lastCorrelator" : "aa01d6c6-4f7e-11e7-8059-000c29173617"
  }
 ```
 [Top](#top)

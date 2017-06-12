@@ -76,6 +76,7 @@
 #define ENT_LOCATION                 "location"
 #define ENT_LOCATION_ATTRNAME        "attrName"
 #define ENT_LOCATION_COORDS          "coords"
+#define ENT_LAST_CORRELATOR          "lastCorrelator"
 
 #define CSUB_DESCRIPTION             "description"
 #define CSUB_EXPIRATION              "expiration"

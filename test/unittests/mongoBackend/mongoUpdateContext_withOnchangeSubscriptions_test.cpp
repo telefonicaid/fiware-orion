@@ -399,7 +399,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -418,7 +418,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -473,7 +473,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -492,7 +492,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -542,7 +542,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -561,7 +561,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -618,7 +618,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -628,7 +628,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
                                                         MatchHttpInfo(&httpInfo2),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -647,7 +647,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -712,7 +712,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -722,7 +722,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
                                                         MatchHttpInfo(&httpInfo2),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -741,7 +741,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -803,7 +803,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -813,7 +813,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
                                                         MatchHttpInfo(&httpInfo2),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -833,7 +833,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -892,7 +892,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -912,7 +912,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -969,7 +969,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -988,7 +988,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1040,7 +1040,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -1059,7 +1059,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1113,7 +1113,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -1132,7 +1132,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1188,7 +1188,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -1207,7 +1207,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1259,7 +1259,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -1278,7 +1278,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1332,7 +1332,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchDisjoint)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -1351,7 +1351,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchDisjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1405,7 +1405,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatchDisjoint)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -1424,7 +1424,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatchDisjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1478,7 +1478,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -1497,7 +1497,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1536,7 +1536,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateNoMatch)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -1555,7 +1555,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1594,7 +1594,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendNoMatch)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -1613,7 +1613,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1651,7 +1651,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -1670,7 +1670,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1708,7 +1708,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchWithoutChang
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -1727,7 +1727,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchWithoutChang
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1780,7 +1780,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -1801,7 +1801,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1857,7 +1857,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMixMatchNoMatch)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -1878,7 +1878,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMixMatchNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1930,7 +1930,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -1951,7 +1951,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2006,7 +2006,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notifica
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -2027,7 +2027,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notifica
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2085,7 +2085,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notifica
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -2106,7 +2106,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notifica
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2159,7 +2159,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notifica
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -2178,7 +2178,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notifica
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2232,7 +2232,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatch)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -2252,7 +2252,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2308,7 +2308,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatch)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -2327,7 +2327,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2379,7 +2379,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -2398,7 +2398,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2452,7 +2452,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchDisjoint)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -2471,7 +2471,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchDisjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2526,7 +2526,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatchDisjoint)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -2545,7 +2545,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatchDisjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2599,7 +2599,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -2618,7 +2618,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2657,7 +2657,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateNoMatch)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -2676,7 +2676,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2714,7 +2714,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendNoMatch)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -2733,7 +2733,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2771,7 +2771,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -2790,7 +2790,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2828,7 +2828,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchWithoutChang
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -2847,7 +2847,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchWithoutChang
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2900,7 +2900,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMixMatchNoMatch)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -2921,7 +2921,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMixMatchNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2977,7 +2977,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMixMatchNoMatch)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -2998,7 +2998,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMixMatchNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3050,7 +3050,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -3071,7 +3071,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3125,7 +3125,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notifica
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -3146,7 +3146,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notifica
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3203,7 +3203,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notifica
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -3224,7 +3224,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notifica
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3277,7 +3277,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
                                                         MatchHttpInfo(&httpInfo),
                                                         "",
                                                         "",
-                                                        "no correlator",
+                                                        "",
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         metadataFilter,
@@ -3296,7 +3296,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3358,7 +3358,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbQueryFail)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
