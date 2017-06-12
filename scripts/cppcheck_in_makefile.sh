@@ -41,7 +41,7 @@ function cpp_check
 {
   dir=$1
   echo "cppcheck $dir"
-  cppcheck --error-exitcode=42 -j 8 --enable=all -I src/lib -I test/ -I test/unittests $dir > /dev/null 2> /tmp/cppcheck.log
+  cppcheck -ULM_OFF --error-exitcode=42 -j 8 --enable=all -I src/lib -I test/ -I test/unittests $dir > /dev/null 2> /tmp/cppcheck.log
   if [ "$?" != 0 ]
   then
     echo cppcheck errors in $dir:
