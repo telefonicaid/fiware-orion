@@ -35,13 +35,23 @@ fi
 
 # -----------------------------------------------------------------------------
 #
-# cpp_check
+# cpp_check - cppcheck a directory
+#
+# NOTE
+#   cppcheck checks the source code for a number of combinations of defines.
+#   When checking with LM_OFF, all LM macros are nullified, like this:
+#     #ifdef LM_OFF
+#     #define #define LM_E(s)
+#     #endif
+#  So, variables used only in log macros become unused and cppcheck gives a warning about this.
+#  This kind of warnings are not interesting and luckily they can be avoided by adding the option
+#  -ULM_OFF to cppcheck
 #
 function cpp_check
 {
   dir=$1
   echo "cppcheck $dir"
-  cppcheck --error-exitcode=42 -j 8 --enable=all -I src/lib -I test/ -I test/unittests $dir > /dev/null 2> /tmp/cppcheck.log
+  cppcheck -ULM_OFF --error-exitcode=42 -j 8 --enable=all -I src/lib -I test/ -I test/unittests $dir > /dev/null 2> /tmp/cppcheck.log
   if [ "$?" != 0 ]
   then
     echo cppcheck errors in $dir:
