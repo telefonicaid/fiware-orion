@@ -7,7 +7,7 @@
 * [HTTP server tuning](#http-server-tuning)
 * [Thread pool considerations](#thread-pool-considerations)
 * [Identifying bootlenecks looking at semWait statistics](#identifying-bootlenecks-looking-at-semwait-statistics)
-* [Log impact in performance](#log-impact-in-performance)
+* [Log impact on performance](#log-impact-on-performance)
 * [Mutex policy impact on performance](#mutex-policy-impact-on-performance)
 * [Outgoing HTTP connections timeout](#outgoing-http-connections-timeout)
 * [Subscription cache](#subscription-cache)
@@ -24,7 +24,7 @@ From a performance point of view, it is recommended to use MongoDB 3.0/3.2 with 
 in update-intensive scenarios.
 
 In addition, take into account the following information from the official MongoDB documentation, as it may have
-impact in performance:
+impact on performance:
 
 * Check that ulimit settings in your system are ok. MongoDB provides [the following recomendations](https://docs.mongodb.org/manual/reference/ulimit)
   As described in that document, in RHEL/CentOS you have to create a /etc/security/limits.d/99-mongodb-nproc.conf file,
@@ -200,14 +200,14 @@ information that can be used to detect potential bottlenecks.
 * **request**. An abnormally high value in this metric means that threads wait too much before entering
   the internal logic module that processes the request. In that case, consider to use the "none" policy
   (note that the value of this metric is always 0 if "none" policy is used). Have a look at
-  [the section on mutex policy](#mutex-policy-impact-in-performance).
+  [the section on mutex policy](#mutex-policy-impact-on-performance).
 
 Other metrics (timeStat, transaction and subCache) are for internal low-level semaphores. These metrics
 are mainly for Orion developers, to help to identify bugs in the code. Their values shouldn't be too high.
 
 [Top](#top)
 
-## Log impact in performance
+## Log impact on performance
 
 [Logs](logs.md) can have a severe impact on performance. Thus, in high level scenarios, it is recommended to use `-logLevel`
 ERROR or WARN. We have found in some situations that the saving between `-logLevel WARN` and `-logLevel INFO`
