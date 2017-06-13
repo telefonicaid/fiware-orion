@@ -8,8 +8,8 @@
 * [Orion thread model and its implications](#orion-thread-model-and-its-implications)
 * [File descriptors sizing](#file-descriptors-sizing)
 * [Identifying bottlenecks looking at semWait statistics](#identifying-bottlenecks-looking-at-semwait-statistics)
-* [Log impact on performance](#log-impact-in-performance)
-* [Metrics impact on performance](#metrics-impact-in-performance)
+* [Log impact on performance](#log-impact-on-performance)
+* [Metrics impact on performance](#metrics-impact-on-performance)
 * [Mutex policy impact on performance](#mutex-policy-impact-on-performance)
 * [Outgoing HTTP connections timeout](#outgoing-http-connections-timeout)
 * [Subscription cache](#subscription-cache)
@@ -258,7 +258,7 @@ information that can be used to detect potential bottlenecks.
 * **request**. An abnormally high value in this metric means that threads wait too much before entering
   the internal logic module that processes the request. In that case, consider to use the "none" policy
   (note that the value of this metric is always 0 if "none" policy is used). Have a look at
-  [the section on mutex policy](#mutex-policy-impact-in-performance).
+  [the section on mutex policy](#mutex-policy-impact-on-performance).
 
 Other metrics (timeStat, transaction and subCache) are for internal low-level semaphores. These metrics
 are mainly for Orion developers, to help to identify bugs in the code. Their values shouldn't be too high.
