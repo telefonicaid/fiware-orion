@@ -118,7 +118,7 @@ The list of available options is the following:
 -   **-corsOrigin <domain>**. Configures CORS for GET requests,
     specifing the allowed origin (use `__ALL` for `*`).
 -   **-reqMutexPolicy <all|none|write|read>**. Specifies the internal
-    mutex policy. See [performance tuning](perf_tuning.md#mutex-policy-impact-in-performance) documentation
+    mutex policy. See [performance tuning](perf_tuning.md#mutex-policy-impact-on-performance) documentation
     for details.
 -   **-subCacheIval**. Interval in seconds between calls to subscription cache refresh. A zero
     value means "no refresh". Default value is 60 seconds, apt for mono-CB deployments (see more details on 
