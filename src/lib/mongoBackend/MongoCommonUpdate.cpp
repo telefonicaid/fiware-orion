@@ -3262,8 +3262,8 @@ static void updateEntity
   notifyCerP->contextElement.entityId.creDate = r.hasField(ENT_CREATION_DATE)     ? getIntOrLongFieldAsLongF(r, ENT_CREATION_DATE)     : -1;
   notifyCerP->contextElement.entityId.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getIntOrLongFieldAsLongF(r, ENT_MODIFICATION_DATE) : -1;
 
-  // The logic to detect notification loops is to check that the correlator in the request is the last one seen for the entity and
-  // the request was sent due to a custom notification
+  // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
+  // in addition, the request was sent due to a custom notification
   bool loopDetected = false;
   if ((ngsiV2AttrsFormat == "custom") && (r.hasField(ENT_LAST_CORRELATOR)))
   {
