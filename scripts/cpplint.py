@@ -2243,16 +2243,21 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, class_state,
   #               rule with 80 chars was good. Today ... we have Full HD displays 
   #               and scrollbars.
   #               Splitting lines in various lines sometimes make the code hard to read.
-  #               
+  #
+  # Changed by KZ - removing the rule of 150 chars max per line
+  #                 Why?  Well, if readibility gains with longer lines, let's use longer lines!
   #
   if (not line.startswith('#include') and not is_header_guard and
       not Match(r'^\s*//.*http(s?)://\S*$', line) and
       not Match(r'^// \$Id:.*#[0-9]+ \$$', line)):
     line_width = GetLineWidth(line)
-    if line_width > 150:
-      error(filename, linenum, 'whitespace/line_length', 4,
-            'Lines should very rarely be longer than 150 characters')
-    elif line_width > 120:
+
+#    if line_width > 150:
+#      error(filename, linenum, 'whitespace/line_length', 4,
+#            'Lines should very rarely be longer than 150 characters')
+#    elif line_width > 120:
+#
+    if line_width > 120:
       error(filename, linenum, 'whitespace/line_length', 2,
             'Lines should be <= 120 characters long')
 
