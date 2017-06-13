@@ -3264,7 +3264,11 @@ static void updateEntity
 
   // The logic to detect notification loops is to check that the correlator in the request is the last one seen for the entity and
   // the request was sent due to a custom notification
-  bool loopDetected = r.hasField(ENT_LAST_CORRELATOR) ? fiwareCorrelator == getStringFieldF(r, ENT_LAST_CORRELATOR) && ngsiV2AttrsFormat == "custom" : false;
+  bool loopDetected = false;
+  if ((ngsiV2AttrsFormat == "custom") && (r.hasField(ENT_LAST_CORRELATOR)))
+  {
+    loopDetected = (getStringFieldF(r, ENT_LAST_CORRELATOR) == fiwareCorrelator);
+  }
 
   if (!processContextAttributeVector(ceP,
                                      action,
