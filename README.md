@@ -1,4 +1,4 @@
-#<a name="top"></a>Orion Context Broker
+# <a name="top"></a>Orion Context Broker
 
 <!-- Documentation badge line is processed by release.sh. Thus, if the structure of the URL changes,
      release.sh needs to be changed also -->
@@ -153,6 +153,7 @@ Please have a look to the section [on building the source code](doc/manuals/admi
 * [Installation and administration](doc/manuals/admin/README.md)
 * Container-based deployment
   * [Docker](docker/README.md)
+* [Development Manual](doc/manuals/devel/README.md)
 * [Sample code contributions](doc/manuals/code_contributions.md)
 * [Contribution guidelines](doc/manuals/contribution_guidelines.md), especially important if you plan to contribute with code
   to Orion Context Broker
