@@ -242,6 +242,9 @@ void macroSubstitute(std::string* to, const std::string& from, const ContextElem
           *to = "";
           return;
         }
+
+        // Clearing non-used bytes
+        memset(&toP[toIx], 0, toLen - toIx);
       }
 
       //
@@ -271,13 +274,15 @@ void macroSubstitute(std::string* to, const std::string& from, const ContextElem
       {
         toP    = (char*) realloc(toP, toLen + CHUNK_SIZE);
         toLen += CHUNK_SIZE;
-
         if (toP == NULL)
         {
           LM_E(("Runtime Error (out of memory)"));
           *to = "";
           return;
         }
+
+        // Clearing non-used bytes
+        memset(&toP[toIx], 0, toLen - toIx);
       }
 
       //
