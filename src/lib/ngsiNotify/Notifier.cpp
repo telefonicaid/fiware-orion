@@ -234,11 +234,9 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     }
     else
     {
-      bool b = macroSubstitute(&payload, httpInfo.payload, ce);
-
-      if (b == false)
+      if (macroSubstitute(&payload, httpInfo.payload, ce) == false)
       {
-        LM_E(("Bad Input (not sending NotifyContextRequest: payload too large)"));
+        LM_W(("Bad Input (not sending NotifyContextRequest: payload too large)"));
         return paramsV;  // empty vector
       }
 

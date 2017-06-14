@@ -108,7 +108,7 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
 * out-buffer is not big enough, it is realloced with another CHUNK_SIZE.
 *
 * 1024 is set as CHUNK_SIZE and hopefully for most substitutions it will be enough with ONE allocation.
-* Allocation a is very costly operation ...
+* Allocation is a very costly operation ...
 * This function could be a lot faster is we took the first 1024 bytes from the stack instead of using calloc.
 * However, the function gets a little more complicated like that as the first realloc would have to be a normal malloc and a memcpy.
 *
