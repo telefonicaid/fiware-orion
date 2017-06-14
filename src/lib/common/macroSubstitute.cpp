@@ -123,7 +123,22 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
 #define CHUNK_SIZE 1024
 bool macroSubstitute(std::string* to, const std::string& from, const ContextElement& ce)
 {
+  //
   // Initial size check: is the string to convert too big?
+  //
+  // If the string to convert is bigger than the maximum allowed buffer size (MAX_DYN_MSG_SIZE),
+  // then there is an important probability that the resulting string after substitution is also > MAX_DYN_MSG_SIZE.
+  //
+  // This check avoids to copy 8MB to later only throw it away and return an error
+  // That is the advantage.
+  //
+  // There is an inconvenience as well.
+  //
+  // The inconvenience is for buffers that are larger before substitution than they are after substitution.
+  // Those buffers aren't let through this check, and end up in an error.
+  //
+  // We assume that this second case is more than rare
+  //
   if (from.size() > MAX_DYN_MSG_SIZE)
   {
     *to = "";
