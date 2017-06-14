@@ -93,23 +93,22 @@ void Restriction::present(const std::string& indent)
 *
 * Restriction::render -
 */
-std::string Restriction::render(const std::string& indent, int restrictions, bool comma)
+void Restriction::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  int restrictions
+)
 {
-  std::string  tag = "restriction";
-  std::string  out = "";
-  bool         scopeVectorRendered = scopeVector.size() != 0;
-
   if (restrictions == 0)
   {
-    return "";
+    return;
   }
 
-  out += startTag(indent, tag);
-  out += attributeExpression.render(indent + "  ", scopeVectorRendered);
-  out += scopeVector.render(indent + "  ", false);
-  out += endTag(indent, comma);
-
-  return out;
+  writer.Key("restriction");
+  writer.StartObject();
+  attributeExpression.render(writer);
+  scopeVector.render(writer);
+  writer.EndObject();
 }
 
 

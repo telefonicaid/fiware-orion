@@ -45,15 +45,6 @@
 
 
 
-/* ****************************************************************************
-*
-* TAG_ADD -
-*/
-#define TAG_ADD_COUNTER(tag, counter) valueTag(indent2, tag, counter + 1, ciP->outtrue)
-#define TAG_ADD_STRING(tag, value)  valueTag(indent2, tag, value, ciP->outtrue)
-#define TAG_ADD_INTEGER(tag, value, comma)  valueTag(indent2, tag, value, ciP->outMimeType, comma)
-
-
 
 /* ****************************************************************************
 *

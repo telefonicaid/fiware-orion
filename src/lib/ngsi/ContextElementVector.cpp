@@ -49,32 +49,23 @@ void ContextElementVector::push_back(ContextElement* item)
 *
 * ContextElementVector::render -
 */
-std::string ContextElementVector::render
+void ContextElementVector::render
 (
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
   ApiVersion          apiVersion,
   bool                asJsonObject,
-  RequestType         requestType,
-  const std::string&  indent,
-  bool                comma
+  RequestType         requestType
 )
 {
-  std::string  out = "";
-
-  if (vec.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag(indent, "contextElements", true);
+  writer.Key("contextElements");
+  writer.StartArray();
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(apiVersion, asJsonObject, requestType, indent + "  ", ix != vec.size() - 1);
+    vec[ix]->render(writer, apiVersion, asJsonObject, requestType);
   }
 
-  out += endTag(indent, comma, true);
-
-  return out;
+  writer.EndArray();
 }
 
 

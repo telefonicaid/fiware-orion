@@ -91,7 +91,6 @@ SET (SOURCES
     common/commonFormat_test.cpp
     common/commonGlobals_test.cpp
     common/commonString_test.cpp
-    common/commonTag_test.cpp
     common/commonSem_test.cpp
     common/commonStatistics_test.cpp
     common/commonWsStrip_test.cpp

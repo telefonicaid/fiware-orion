@@ -115,7 +115,10 @@ void Notifier::sendNotifyContextAvailabilityRequest
 )
 {
     /* Render NotifyContextAvailabilityRequest */
-    std::string payload = ncar->render("");
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    ncar->render(writer);
+    std::string payload = sb.GetString();
 
     /* Parse URL */
     std::string  host;
@@ -459,7 +462,10 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     std::string payloadString;
     if (renderFormat == NGSI_V1_LEGACY)
     {
-      payloadString = ncrP->render(ci.apiVersion, ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON, "");
+      rapidjson::StringBuffer sb;
+      rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+      ncrP->render(writer, ci.apiVersion, ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON);
+      payloadString = sb.GetString();
     }
     else
     {

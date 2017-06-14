@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -76,7 +79,6 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
   std::string     attributeName         = compV[7];
   EntityTypeInfo  typeInfo              = EntityTypeEmptyOrNotEmpty;
   std::string     typeNameFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
-  std::string     answer;
   StatusCode      response;
 
   // 01. Get values from URL (+ entityId::type, exist, !exist)
@@ -95,15 +97,21 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
   {
     alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
     response.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    TIMED_RENDER(answer = response.render("", false, false));
-    return answer;
+    rapidjson::StringBuffer out;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+    writer.SetIndent(' ', 2);
+    TIMED_RENDER(response.render(writer, false));
+    return out.GetString();
   }
   else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
   {
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
     response.fill(SccBadRequest, "non-matching entity::types in URL");
-    TIMED_RENDER(answer = response.render("", false, false));
-    return answer;
+    rapidjson::StringBuffer out;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+    writer.SetIndent(' ', 2);
+    TIMED_RENDER(response.render(writer, false));
+    return out.GetString();
   }
 
 
@@ -120,9 +128,12 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
 
 
   // 06. Cleanup and return result
-  TIMED_RENDER(answer = response.render("", false, false));
+  rapidjson::StringBuffer out;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+  writer.SetIndent(' ', 2);
+  TIMED_RENDER(response.render(writer, false));
 
   parseDataP->upcr.res.release();
 
-  return answer;
+  return out.GetString();
 }

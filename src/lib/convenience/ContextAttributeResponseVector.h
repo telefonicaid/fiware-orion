@@ -28,6 +28,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "convenience/ContextAttributeResponse.h"
 #include "rest/ConnectionInfo.h"
 
@@ -41,10 +44,10 @@ typedef struct ContextAttributeResponseVector
 {
   std::vector<ContextAttributeResponse*>  vec;
 
-  std::string                render(ApiVersion          apiVersion,
+  void                       render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+                                    ApiVersion          apiVersion,
                                     bool                asJsonObject,
-                                    RequestType         request,
-                                    const std::string&  indent);
+                                    RequestType         request);
   void                       present(std::string indent);
   void                       push_back(ContextAttributeResponse* item);
   unsigned int               size(void);

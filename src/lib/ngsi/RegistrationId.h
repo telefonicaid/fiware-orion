@@ -27,6 +27,9 @@
 */
 #include <string>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/Request.h"
 
 
@@ -42,7 +45,7 @@ typedef struct RegistrationId
   void          set(const std::string& value);
   std::string   get(void) const;
   bool          isEmpty(void);
-  std::string   render(RequestType requestType, const std::string& indent, bool comma = false);
+  void          render(rapidjson::Writer<rapidjson::StringBuffer>& writer, RequestType requestType);
   void          present(const std::string& indent);
   void          release(void);
 

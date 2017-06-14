@@ -27,6 +27,9 @@
 */
 #include <string>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/Duration.h"
 #include "ngsi/Throttling.h"
@@ -45,7 +48,7 @@ typedef struct SubscribeResponse
 
   SubscribeResponse();
 
-  std::string render(const std::string& indent, bool comma = false);
+  void render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 } SubscribeResponse;
 
 #endif  // SRC_LIB_NGSI_SUBSCRIBERESPONSE_H_

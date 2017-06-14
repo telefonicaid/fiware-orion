@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 
@@ -43,25 +45,21 @@
 *
 * EntityTypeResponse::render -
 */
-std::string EntityTypeResponse::render
+void EntityTypeResponse::render
 (
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
   ApiVersion          apiVersion,
   bool                asJsonObject,
   bool                asJsonOut,
-  bool                collapsed,
-  const std::string&  indent
+  bool                collapsed
 )
 {
-  std::string out = "";
+  writer.StartObject();
 
-  out += startTag(indent);
+  entityType.render(writer, apiVersion, asJsonObject, asJsonOut, collapsed, true);
+  statusCode.render(writer);
 
-  out += entityType.render(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", true, true);
-  out += statusCode.render(indent + "  ");
-
-  out += endTag(indent);
-
-  return out;
+  writer.EndObject();
 }
 
 
@@ -93,7 +91,12 @@ std::string EntityTypeResponse::check
   else
     return "OK";
 
-  return render(apiVersion, asJsonObject, asJsonOut, collapsed, "");
+  rapidjson::StringBuffer s;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+  writer.SetIndent(' ', 2);
+  render(writer, apiVersion, asJsonObject, asJsonOut, collapsed);
+
+  return s.GetString();
 }
 
 
@@ -127,21 +130,17 @@ void EntityTypeResponse::release(void)
 *
 * EntityTypeResponse::toJson -
 */
-std::string EntityTypeResponse::toJson(void)
+void EntityTypeResponse::toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
-  std::string  out = "{";
-  char         countV[STRING_SIZE_FOR_INT];
+  writer.StartObject();
 
-  snprintf(countV, sizeof(countV), "%lld", entityType.count);
+  writer.Key("attrs");
+  writer.StartObject();
+  entityType.contextAttributeVector.toJsonTypes(writer);
+  writer.EndObject();
 
-  out += JSON_STR("attrs") + ":";
+  writer.Key("count");
+  writer.Uint(entityType.count);
 
-  out += "{";
-  out += entityType.contextAttributeVector.toJsonTypes();
-  out += "}";
-
-  out += "," + JSON_STR("count") + ":" + countV;
-  out += "}";
-
-  return out;
+  writer.EndObject();
 }

@@ -386,18 +386,20 @@ int Scope::fill
 *
 * Scope::render -
 */
-std::string Scope::render(const std::string& indent, bool notLastInVector)
+void Scope::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string out      = "";
-  const char* tTag     = "type";
-  const char* vTag     = "value";
+  writer.StartObject();
 
-  out += startTag(indent);
-  out += valueTag(indent + "  ", tTag, type, true);
-  out += valueTag(indent + "  ", vTag, value);
-  out += endTag(indent, notLastInVector);
+  writer.Key("type");
+  writer.String(type.c_str());
 
-  return out;
+  writer.Key("value");
+  writer.String(value.c_str());
+
+  writer.EndObject();
 }
 
 

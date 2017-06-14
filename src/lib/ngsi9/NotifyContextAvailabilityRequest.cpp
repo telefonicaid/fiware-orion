@@ -24,6 +24,8 @@
 */
 #include <string>
 
+#include "rapidjson/prettywriter.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/Request.h"
@@ -46,22 +48,15 @@ NotifyContextAvailabilityRequest::NotifyContextAvailabilityRequest()
 *
 * NotifyContextAvailabilityRequest::render -
 */
-std::string NotifyContextAvailabilityRequest::render(const std::string& indent)
+void NotifyContextAvailabilityRequest::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string out = "";
-
-  //
-  // Note on JSON commas:
-  //  Both subscriptionId and contextRegistrationResponseVector are MANDATORY.
-  //  Always comma for subscriptionId.
-  //  With an empty contextRegistrationResponseVector there would be no notification
-  //
-  out += startTag(indent);
-  out += subscriptionId.render(NotifyContextAvailability, indent + "  ", true);
-  out += contextRegistrationResponseVector.render(indent  + "  ", false);
-  out += endTag(indent);
-
-  return out;
+  writer.StartObject();
+  subscriptionId.render(writer, NotifyContextAvailability);
+  contextRegistrationResponseVector.render(writer);
+  writer.EndObject();
 }
 
 
@@ -89,7 +84,11 @@ std::string NotifyContextAvailabilityRequest::check(ApiVersion apiVersion, const
     return "OK";
   }
 
-  return response.render(indent);
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
+  response.render(writer);
+  return sb.GetString();
 }
 
 

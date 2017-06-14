@@ -26,6 +26,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -40,33 +43,24 @@
 *
 * ContextElementResponseVector::render -
 */
-std::string ContextElementResponseVector::render
+void ContextElementResponseVector::render
 (
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
   ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
-  const std::string&  indent,
-  bool                comma,
   bool                omitAttributeValues
 )
 {
-  std::string out = "";
-
-  if (vec.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag(indent, "contextResponses", true);
+  writer.Key("contextResponses");
+  writer.StartArray();
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(apiVersion, asJsonObject, requestType, indent + "  ", ix < (vec.size() - 1), omitAttributeValues);
+    vec[ix]->render(writer, apiVersion, asJsonObject, requestType, omitAttributeValues);
   }
 
-  out += endTag(indent, comma, true);
-
-  return out;
+  writer.EndArray();
 }
 
 
@@ -75,29 +69,30 @@ std::string ContextElementResponseVector::render
 *
 * ContextElementResponseVector::toJson - 
 */
-std::string ContextElementResponseVector::toJson
+void ContextElementResponseVector::toJson
 (
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   const std::vector<std::string>&  metadataFilter,
   bool                             blacklist
 )
 {
-  std::string out;
-
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += (renderFormat == NGSI_V2_VALUES)? "[": "{";
-    out += vec[ix]->toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
-    out += (renderFormat == NGSI_V2_VALUES)? "]": "}";
-
-    if (ix != vec.size() - 1)
+    if (renderFormat == NGSI_V2_VALUES)
     {
-      out += ",";
+      writer.StartArray();
+      vec[ix]->toJson(writer, renderFormat, attrsFilter, metadataFilter, blacklist);
+      writer.EndArray();
+    }
+    else
+    {
+      writer.StartObject();
+      vec[ix]->toJson(writer, renderFormat, attrsFilter, metadataFilter, blacklist);
+      writer.EndObject();
     }
   }
-
-  return out;
 }
 
 

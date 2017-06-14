@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -53,8 +56,10 @@ std::string postNotifyContext
 )
 {
   NotifyContextResponse  ncr;
-  std::string            answer;
 
+  rapidjson::StringBuffer out;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+  writer.SetIndent(' ', 2);
   TIMED_MONGO(ciP->httpStatusCode = mongoNotifyContext(&parseDataP->ncr.res,
                                                        &ncr,
                                                        ciP->tenant,
@@ -62,7 +67,7 @@ std::string postNotifyContext
                                                        ciP->servicePathV,
                                                        ciP->httpHeaders.correlator,
                                                        ciP->httpHeaders.ngsiv2AttrsFormat));
-  TIMED_RENDER(answer = ncr.render(""));
+  TIMED_RENDER(ncr.render(writer));
 
-  return answer;
+  return out.GetString();
 }

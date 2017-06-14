@@ -24,6 +24,8 @@
 */
 #include <string>
 
+#include "rapidjson/prettywriter.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/AttributeList.h"
@@ -52,24 +54,18 @@ SubscribeContextAvailabilityRequest::SubscribeContextAvailabilityRequest()
 *
 * SubscribeContextAvailabilityRequest::render -
 */
-std::string SubscribeContextAvailabilityRequest::render(const std::string& indent)
+void SubscribeContextAvailabilityRequest::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string out                      = "";
-  std::string indent2                  = indent + "  ";
-  bool        commaAfterEntityIdVector = (restrictions > 0) || !duration.isEmpty() || !reference.isEmpty() || (attributeList.size() != 0);
-  bool        commaAfterAttributeList  = (restrictions > 0) || !duration.isEmpty() || !reference.isEmpty();
-  bool        commaAfterReference      = (restrictions > 0) || !duration.isEmpty();
-  bool        commaAfterDuration       = restrictions > 0;
-
-  out += startTag(indent);
-  out += entityIdVector.render(indent2, commaAfterEntityIdVector);
-  out += attributeList.render(indent2, commaAfterAttributeList);
-  out += reference.render(indent2, commaAfterReference);
-  out += duration.render(indent2, commaAfterDuration);
-  out += restriction.render(indent2);
-  out += endTag(indent);
-
-  return out;
+  writer.StartObject();
+  entityIdVector.render(writer);
+  attributeList.render(writer);
+  reference.render(writer);
+  duration.render(writer);
+  restriction.render(writer);
+  writer.EndObject();
 }
 
 
@@ -98,7 +94,11 @@ std::string SubscribeContextAvailabilityRequest::check(const std::string& indent
   else
     return "OK";
 
-  return response.render(indent);
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
+  response.render(writer);
+  return sb.GetString();
 }
 
 

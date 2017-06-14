@@ -63,22 +63,21 @@ UpdateContextSubscriptionResponse::~UpdateContextSubscriptionResponse() {
 *
 * UpdateContextSubscriptionResponse::render - 
 */
-std::string UpdateContextSubscriptionResponse::render(const std::string& indent)
+void UpdateContextSubscriptionResponse::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string out  = "";
-
-  out += startTag(indent);
+  writer.StartObject();
 
   if (subscribeError.errorCode.code == SccNone)
   {
-    out += subscribeResponse.render(indent + "  ", false);
+    subscribeResponse.render(writer);
   }
   else
   {
-    out += subscribeError.render(UpdateContextSubscription, indent + "  ", false);
+    subscribeError.render(writer, UpdateContextSubscription);
   }
 
-  out += endTag(indent);
-
-  return out;
+  writer.EndObject();
 }

@@ -63,23 +63,20 @@ NotifyCondition::NotifyCondition(NotifyCondition* ncP)
 *
 * NotifyCondition::render -
 */
-std::string NotifyCondition::render(const std::string& indent, bool notLastInVector)
+void NotifyCondition::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string out = "";
+  writer.StartObject();
 
-  bool condValueListRendered   = condValueList.size() != 0;
-  bool restrictionRendered     = restriction.get() != "";
-  bool commaAfterRestriction   = false;  // last element
-  bool commaAfterCondValueList = restrictionRendered;
-  bool commaAfterType          = condValueListRendered || restrictionRendered;
+  writer.Key("type");
+  writer.String(type.c_str());
 
-  out += startTag(indent);
-  out += valueTag(indent + "  ", "type", type, commaAfterType);
-  out += condValueList.render(indent + "  ",   commaAfterCondValueList);
-  out += restriction.render(  indent + "  ",   commaAfterRestriction);
-  out += endTag(indent);
+  condValueList.render(writer);
+  restriction.render(writer);
 
-  return out;
+  writer.EndObject();
 }
 
 

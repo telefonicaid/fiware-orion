@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -71,7 +74,6 @@ std::string putIndividualContextEntityAttributeWithTypeAndId
   std::string     attributeName           = compV[7];
   std::string     entityTypeFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
   EntityTypeInfo  typeInfo                = EntityTypeEmptyOrNotEmpty;
-  std::string     answer;
   StatusCode      response;
 
   // 01. Get values from URL (entityId::type, esist, !exist)
@@ -115,11 +117,14 @@ std::string putIndividualContextEntityAttributeWithTypeAndId
 
 
   // 06. Cleanup and return result
-  TIMED_RENDER(answer = response.render("", false, false));
+  rapidjson::StringBuffer out;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+  writer.SetIndent(' ', 2);
+  TIMED_RENDER(response.render(writer, false));
 
   parseDataP->upcar.res.release();
   parseDataP->upcrs.res.release();
   parseDataP->upcr.res.release();
 
-  return answer;
+  return out.GetString();
 }

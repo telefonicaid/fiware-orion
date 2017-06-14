@@ -44,29 +44,21 @@
 *
 * EntityVector::render -
 */
-std::string EntityVector::render
+void EntityVector::render
 (
-  std::map<std::string, bool>&         uriParamOptions,
-  std::map<std::string, std::string>&  uriParam
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  std::map<std::string, bool>&                uriParamOptions,
+  std::map<std::string, std::string>&         uriParam
 )
 {
-  if (vec.size() == 0)
-  {
-    return "[]";
-  }
-
-  std::string out;
-
-  out += "[";
+  writer.StartArray();
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(uriParamOptions, uriParam, ix != vec.size() - 1);
+    vec[ix]->render(writer, uriParamOptions, uriParam);
   }
 
-  out += "]";
-
-  return out;
+  writer.EndArray();
 }
 
 

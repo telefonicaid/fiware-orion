@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 
@@ -80,32 +82,33 @@ UpdateContextResponse::~UpdateContextResponse()
 *
 * UpdateContextResponse::render -
 */
-std::string UpdateContextResponse::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
+void UpdateContextResponse::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  ApiVersion apiVersion,
+  bool asJsonObject
+)
 {
-  std::string out = "";
-
-  out += startTag(indent);
+  writer.StartObject();
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(indent + "  ");
+    errorCode.render(writer);
   }
   else
   {
     if (contextElementResponseVector.size() == 0)
     {
       errorCode.fill(SccContextElementNotFound, errorCode.details);
-      out += errorCode.render(indent + "  ");
+      errorCode.render(writer);
     }
     else
     {
-      out += contextElementResponseVector.render(apiVersion, asJsonObject, RtUpdateContextResponse, indent + "  ", false);
+      contextElementResponseVector.render(writer, apiVersion, asJsonObject, RtUpdateContextResponse);
     }
   }
 
-  out += endTag(indent);
-
-  return out;
+  writer.EndObject();
 }
 
 
@@ -138,7 +141,11 @@ std::string UpdateContextResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, indent);
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
+  render(writer, apiVersion, asJsonObject);
+  return sb.GetString();
 }
 
 

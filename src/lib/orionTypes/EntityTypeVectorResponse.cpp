@@ -26,6 +26,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 
@@ -42,29 +45,25 @@
 *
 * EntityTypeVectorResponse::render -
 */
-std::string EntityTypeVectorResponse::render
+void EntityTypeVectorResponse::render
 (
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
   ApiVersion          apiVersion,
   bool                asJsonObject,
   bool                asJsonOut,
-  bool                collapsed,
-  const std::string&  indent
+  bool                collapsed
 )
 {
-  std::string out  = "";
-
-  out += startTag(indent);
+  writer.StartObject();
 
   if (entityTypeVector.size() > 0)
   {
-    out += entityTypeVector.render(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", true);
+    entityTypeVector.render(writer, apiVersion, asJsonObject, asJsonOut, collapsed);
   }
 
-  out += statusCode.render(indent + "  ");
+  statusCode.render(writer);
 
-  out += endTag(indent);
-
-  return out;
+  writer.EndObject();
 }
 
 
@@ -97,7 +96,12 @@ std::string EntityTypeVectorResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, asJsonOut, collapsed, "");
+  rapidjson::StringBuffer s;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+  writer.SetIndent(' ', 2);
+  render(writer, apiVersion, asJsonObject, asJsonOut, collapsed);
+
+  return s.GetString();
 }
 
 
@@ -133,29 +137,25 @@ void EntityTypeVectorResponse::release(void)
 *
 * EntityTypeVectorResponse::toJson -
 */
-std::string EntityTypeVectorResponse::toJson(bool values)
+void EntityTypeVectorResponse::toJson
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  bool values
+)
 {
-  std::string  out = "[";
+  writer.StartArray();
 
   for (unsigned int ix = 0; ix < entityTypeVector.vec.size(); ++ix)
   {
     if (values)
     {
-      out += JSON_STR(entityTypeVector.vec[ix]->type);
+      writer.String(entityTypeVector.vec[ix]->type.c_str());
     }
     else  // default
     {
-      out += entityTypeVector.vec[ix]->toJson(true);
+      entityTypeVector.vec[ix]->toJson(writer);
     }
-
-    if (ix != entityTypeVector.vec.size() - 1)
-    {
-      out += ",";
-    }
-
   }
 
-  out += "]";
-
-  return out;
+  writer.EndArray();
 }

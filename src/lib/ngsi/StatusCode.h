@@ -27,6 +27,9 @@
 */
 #include <string>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/Request.h"
 #include "rest/HttpStatusCode.h"
 
@@ -56,7 +59,7 @@ typedef struct StatusCode
   StatusCode(const std::string& _keyName);
   StatusCode(HttpStatusCode _code, const std::string& _details, const std::string& _keyName = "statusCode");
 
-  std::string  render(const std::string& indent, bool comma = false, bool showKey = true);
+  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer, bool showKey = true);
   std::string  toJson(bool isLastElement);
   void         fill(HttpStatusCode _code, const std::string& _details = "");
   void         fill(StatusCode* scP);

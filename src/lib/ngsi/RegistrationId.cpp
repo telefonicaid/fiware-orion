@@ -116,7 +116,11 @@ void RegistrationId::present(const std::string& indent)
 *
 * RegistrationId::render -
 */
-std::string RegistrationId::render(RequestType requestType, const std::string& indent, bool comma)
+void RegistrationId::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  RequestType requestType
+)
 {
   if (string == "")
   {
@@ -127,11 +131,12 @@ std::string RegistrationId::render(RequestType requestType, const std::string& i
     }
     else
     {
-      return "";
+      return;
     }
   }
 
-  return valueTag(indent, "registrationId", string, comma);
+  writer.Key("registrationId");
+  writer.String(string.c_str());
 }
 
 

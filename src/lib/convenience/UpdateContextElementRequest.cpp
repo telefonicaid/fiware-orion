@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/AttributeDomainName.h"
@@ -39,16 +41,20 @@
 *
 * render - 
 */
-std::string UpdateContextElementRequest::render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, std::string indent)
+void UpdateContextElementRequest::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  ApiVersion apiVersion,
+  bool asJsonObject,
+  RequestType requestType
+)
 {
-  std::string out = "";
+  writer.StartObject();
 
-  out += startTag(indent);
-  out += attributeDomainName.render(indent + "  ", true);
-  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType, indent + "  ");
-  out += endTag(indent);
+  attributeDomainName.render(writer);
+  contextAttributeVector.render(writer, apiVersion, asJsonObject, requestType);
 
-  return out;
+  writer.EndObject();
 }
 
 
@@ -92,7 +98,11 @@ std::string UpdateContextElementRequest::check
     return "OK";
   }
 
-  return response.render(apiVersion, asJsonObject, requestType, indent);
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
+  response.render(writer, apiVersion, asJsonObject, requestType);
+  return sb.GetString();
 }
 
 

@@ -65,25 +65,25 @@ void AttributeList::fill(const std::string& commaSeparatedList)
 *
 * render - 
 */
-std::string AttributeList::render(const std::string& indent, bool comma)
+void AttributeList::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string  out = "";
-
   if (attributeV.size() == 0)
   {
-    return "";
+    return;
   }
 
-  out += startTag(indent, "attributes", true);
+  writer.Key("attributes");
+  writer.StartObject();
 
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
   {
-    out += valueTag(indent + "  ", "attribute", attributeV[ix], ix != attributeV.size() - 1, true);
+    writer.String(attributeV[ix].c_str());
   }
 
-  out += endTag(indent, comma, true);
-
-  return out;
+  writer.EndObject();
 }
 
 

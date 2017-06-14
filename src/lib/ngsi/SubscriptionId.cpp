@@ -149,7 +149,11 @@ void SubscriptionId::present(const std::string& indent)
 *
 * SubscriptionId::render -
 */
-std::string SubscriptionId::render(RequestType container, const std::string& indent, bool comma)
+void SubscriptionId::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  RequestType container
+)
 {
   std::string xString = string;
 
@@ -171,11 +175,12 @@ std::string SubscriptionId::render(RequestType container, const std::string& ind
     }
     else
     {
-      return "";  // subscriptionId is Optional
+      return;  // subscriptionId is Optional
     }
   }
 
-  return valueTag(indent, "subscriptionId", xString, comma);
+  writer.Key("subscriptionId");
+  writer.String(xString.c_str());
 }
 
 

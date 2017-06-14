@@ -39,23 +39,18 @@
 *
 * ContextRegistrationAttributeVector::render -
 */
-std::string ContextRegistrationAttributeVector::render(const std::string& indent, bool comma)
+void ContextRegistrationAttributeVector::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string out = "";
-
-  if (vec.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag(indent, "attributes", true);
+  writer.Key("attributes");
+  writer.StartArray();
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);
+    vec[ix]->render(writer);
   }
-  out += endTag(indent, comma, true);
-
-  return out;
+  writer.EndArray();
 }
 
 

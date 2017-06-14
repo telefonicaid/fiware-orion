@@ -108,14 +108,18 @@ void Originator::present(const std::string& indent)
 *
 * Originator::render -
 */
-std::string Originator::render(const std::string& indent, bool comma)
+void Originator::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
   if (string == "")
   {
-    return "";
+    return;
   }
 
-  return valueTag(indent, "originator", string, comma);
+  writer.Key("originator");
+  writer.String(string.c_str());
 }
 
 

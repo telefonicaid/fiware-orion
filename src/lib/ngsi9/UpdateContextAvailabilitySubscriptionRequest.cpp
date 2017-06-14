@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/Request.h"
@@ -49,28 +51,17 @@ UpdateContextAvailabilitySubscriptionRequest::UpdateContextAvailabilitySubscript
 *
 * UpdateContextAvailabilitySubscriptionRequest::render -
 */
-std::string UpdateContextAvailabilitySubscriptionRequest::render(const std::string& indent)
+void UpdateContextAvailabilitySubscriptionRequest::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string   out                      = "";
-  bool          subscriptionRendered     = subscriptionId.rendered(UpdateContextAvailabilitySubscription);
-  bool          restrictionRendered      = restrictions != 0;
-  bool          durationRendered         = duration.get() != "";
-  bool          attributeListRendered    = attributeList.size() != 0;
-  bool          commaAfterSubscriptionId = false; // last element
-  bool          commaAfterRestriction    = subscriptionRendered;
-  bool          commaAfterDuration       = restrictionRendered || subscriptionRendered;
-  bool          commaAfterAttributeList  = durationRendered || restrictionRendered || subscriptionRendered;
-  bool          commaAfterEntityIdVector = attributeListRendered || durationRendered || restrictionRendered || subscriptionRendered;
-
-  out += startTag(indent);
-  out += entityIdVector.render(indent + "  ", commaAfterEntityIdVector);
-  out += attributeList.render( indent + "  ", commaAfterAttributeList);
-  out += duration.render(      indent + "  ", commaAfterDuration);
-  out += restriction.render(   indent + "  ", restrictions, commaAfterRestriction);
-  out += subscriptionId.render(UpdateContextAvailabilitySubscription, indent + "  ", commaAfterSubscriptionId);
-  out += endTag(indent);
-
-  return out;
+  writer.StartObject();
+  entityIdVector.render(writer);
+  attributeList.render(writer);
+  duration.render(writer);
+  restriction.render(writer);
+  subscriptionId.render(writer, UpdateContextAvailabilitySubscription);
 }
 
 
@@ -116,7 +107,11 @@ std::string UpdateContextAvailabilitySubscriptionRequest::check(const std::strin
   else
     return "OK";
 
-  return response.render(indent, counter);
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
+  response.render(writer);
+  return sb.GetString();
 }
 
 

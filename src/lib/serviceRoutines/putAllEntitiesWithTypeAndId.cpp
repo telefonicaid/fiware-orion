@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -76,7 +79,6 @@ extern std::string putAllEntitiesWithTypeAndId
   std::string                   entityId              = compV[5];
   EntityTypeInfo                typeInfo              = EntityTypeEmptyOrNotEmpty;
   std::string                   typeNameFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
-  std::string                   answer;
   UpdateContextElementResponse  response;
 
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
@@ -101,15 +103,21 @@ extern std::string putAllEntitiesWithTypeAndId
   {
     alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, AllEntitiesWithTypeAndId, ""));
-    return answer;
+    rapidjson::StringBuffer out;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+    writer.SetIndent(' ', 2);
+    TIMED_RENDER(response.render(writer, ciP->apiVersion, asJsonObject, AllEntitiesWithTypeAndId));
+    return out.GetString();
   }
   else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
   {
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
-    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, AllEntitiesWithTypeAndId, ""));
-    return answer;
+    rapidjson::StringBuffer out;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+    writer.SetIndent(' ', 2);
+    TIMED_RENDER(response.render(writer, ciP->apiVersion, asJsonObject, AllEntitiesWithTypeAndId));
+    return out.GetString();
   }
 
 
@@ -126,10 +134,13 @@ extern std::string putAllEntitiesWithTypeAndId
 
 
   // 06. Cleanup and return result
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
+  rapidjson::StringBuffer out;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+  writer.SetIndent(' ', 2);
+  TIMED_RENDER(response.render(writer, ciP->apiVersion, asJsonObject, IndividualContextEntity));
 
   parseDataP->upcr.res.release();
   response.release();
 
-  return answer;
+  return out.GetString();
 }

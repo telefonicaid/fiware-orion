@@ -349,8 +349,6 @@ style_check test/unittests/serviceRoutines
 #
 # o unittests/main_UnitTest.cpp                                              (haderding/remove_ngsiv1_indent: 1 variable)
 #
-# o unittests/common/commonTag_test.cpp                                      (haderding/remove_ngsiv1_indent: 24 lineas)
-#
 # o unittests/convenience/AppendContextElementRequest_test.cpp               (haderding/remove_ngsiv1_indent: 1 render(), 4 check())
 # o unittests/convenience/AppendContextElementResponse_test.cpp              (haderding/remove_ngsiv1_indent: 2 render(), 3 check())
 # o unittests/convenience/ContextAttributeResponseVector_test.cpp            (haderding/remove_ngsiv1_indent: 2 render(), 3 check())

@@ -27,6 +27,9 @@
 */
 #include <string>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/Duration.h"
 #include "ngsi/StatusCode.h"
@@ -48,7 +51,7 @@ typedef struct SubscribeContextAvailabilityResponse
   SubscribeContextAvailabilityResponse(const std::string& _subscriptionId, const std::string& _duration);
   SubscribeContextAvailabilityResponse(const std::string& _subscriptionId, StatusCode& _errorCode);
 
-   std::string render(const std::string& indent);
+  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 } SubscribeContextAvailabilityResponse;
 
 #endif  // SRC_LIB_NGSI9_SUBSCRIBECONTEXTAVAILABILITYRESPONSE_H_

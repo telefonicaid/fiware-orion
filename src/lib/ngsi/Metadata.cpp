@@ -25,6 +25,9 @@
 #include <stdio.h>
 #include <string>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -225,62 +228,23 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 *
 * Metadata::render -
 */
-std::string Metadata::render(const std::string& indent, bool comma)
+void Metadata::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string out     = "";
-  std::string xValue  = toStringValue();
+  writer.StartObject();
 
-  out += startTag(indent);
-  out += valueTag(indent + "  ", "name", name, true);
-  out += valueTag(indent + "  ", "type", type, true);
+  writer.Key("name");
+  writer.String(name.c_str());
 
-  if (valueType == orion::ValueTypeString)
-  {
-    out += valueTag(indent + "  ", "value", xValue, false);
-  }
-  else if (valueType == orion::ValueTypeNumber)
-  {
-    out += indent + "  " + JSON_STR("value") + ": " + xValue;
-  }
-  else if (valueType == orion::ValueTypeBoolean)
-  {
-    out += indent + "  " + JSON_STR("value") + ": " + xValue;
-  }
-  else if (valueType == orion::ValueTypeNone)
-  {
-    out += indent + "  " + JSON_STR("value") + ": " + xValue; 
-  }
-  else if (valueType == orion::ValueTypeObject)
-  {
-    std::string part;
+  writer.Key("type");
+  writer.String(name.c_str());
 
-    if (compoundValueP->isObject())
-    {
-      //
-      // Note in this case we don't add the "value" key, the toJson()
-      // method does it for toplevel compound (a bit crazy... this deserves a FIXME mark)
-      // FIXME P4: modify/simplify the rendering of compound values. Too many if/else ...
-      //
-      compoundValueP->renderName = true;
-      compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
-      part = compoundValueP->toJson(true, false);
-    }
-    else if (compoundValueP->isVector())
-    {
-      compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
-      part = JSON_STR("value") + ": [" + compoundValueP->toJson(true, false) + "]";
-    }    
+  writer.Key("value");
+  toStringValue(writer);
 
-    out += part;
-  }
-  else
-  {
-    out += indent + "  " + JSON_STR("value") + ": " + JSON_STR("unknown json type");
-  }
-
-  out += endTag(indent, comma);
-
-  return out;
+  writer.EndObject();
 }
 
 
@@ -416,40 +380,41 @@ void Metadata::fill(const struct Metadata& md)
 *
 * toStringValue -
 */
-std::string Metadata::toStringValue(void) const
+void Metadata::toStringValue(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+) const
 {
   switch (valueType)
   {
   case orion::ValueTypeString:
-    return stringValue;
+    writer.String(stringValue.c_str());
     break;
-
   case orion::ValueTypeNumber:
     if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
     {
-      return JSON_STR(isodate2str(numberValue));
+      writer.String(isodate2str(numberValue).c_str());
     }
     else // regular number
     {
-      return toString(numberValue);
-    }    
+      writer.String(toString(numberValue).c_str());
+    }
     break;
-
   case orion::ValueTypeBoolean:
-    return boolValue ? "true" : "false";
+    writer.Bool(boolValue);
     break;
-
   case orion::ValueTypeNone:
-    return "null";
+    writer.Null();
     break;
-
+  case orion::ValueTypeObject:
+    if ((compoundValueP->isObject()) || (compoundValueP->isVector()))
+    {
+      compoundValueP->toJson(writer);
+    }
+    break;
   default:
-    return "<unknown type>";
-    break;
+    LM_E(("Runtime Error (invalid value type for metadata %s)", name.c_str()));
+    writer.String(stringValue.c_str());
   }
-
-  // Added to avoid warning when compiling with -fstack-check -fstack-protector
-  return "";
 }
 
 
@@ -458,11 +423,13 @@ std::string Metadata::toStringValue(void) const
 *
 * toJson - 
 */
-std::string Metadata::toJson(bool isLastElement)
+void Metadata::toJson
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string  out;
-
-  out = JSON_STR(name) + ":{";
+  writer.Key(name.c_str());
+  writer.StartObject();
 
   /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
   std::string defType = defaultType(valueType);
@@ -472,57 +439,19 @@ std::string Metadata::toJson(bool isLastElement)
     defType = defaultType(orion::ValueTypeVector);
   }
 
-  out += (type != "")? JSON_VALUE("type", type) : JSON_VALUE("type", defType);
-  out += ",";
-
-  if (valueType == orion::ValueTypeString)
+  writer.Key("type");
+  if (type != "")
   {
-    out += JSON_VALUE("value", stringValue);
-  }
-  else if (valueType == orion::ValueTypeNumber)
-  {
-    std::string effectiveValue;
-
-    if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
-    {
-      effectiveValue = JSON_STR(isodate2str(numberValue));
-    }
-    else // regular number
-    {
-      effectiveValue = toString(numberValue);
-    }
-    out += JSON_VALUE_NUMBER("value", effectiveValue);
-  }
-  else if (valueType == orion::ValueTypeBoolean)
-  {
-    out += JSON_VALUE_BOOL("value", boolValue);
-  }
-  else if (valueType == orion::ValueTypeNone)
-  {
-    out += JSON_STR("value") + ":null";
-  }
-  else if (valueType == orion::ValueTypeObject)
-  {
-    if ((compoundValueP->isObject()) || (compoundValueP->isVector()))
-    {
-      compoundValueP->renderName = true;
-      out += compoundValueP->toJson(isLastElement, false);
-    }
+      writer.String(type.c_str());
   }
   else
   {
-    LM_E(("Runtime Error (invalid value type for metadata %s)", name.c_str()));
-    out += JSON_VALUE("value", stringValue);
+      writer.String(defType.c_str());
   }
 
-  out += "}";
-
-  if (!isLastElement)
-  {
-    out += ",";
-  }
-
-  return out;
+  writer.Key("value");
+  toStringValue(writer);
+  writer.EndObject();
 }
 
 

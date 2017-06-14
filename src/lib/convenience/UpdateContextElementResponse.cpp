@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+
 #include "logMsg/traceLevels.h"
 #include "common/tag.h"
 #include "convenience/ContextAttributeResponse.h"
@@ -50,30 +52,26 @@ UpdateContextElementResponse::UpdateContextElementResponse()
 *
 * render -
 */
-std::string UpdateContextElementResponse::render
+void UpdateContextElementResponse::render
 (
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
   ApiVersion          apiVersion,
   bool                asJsonObject,
-  RequestType         requestType,
-  const std::string&  indent
+  RequestType         requestType
 )
 {
-  std::string out = "";
-
-  out += startTag(indent);
+  writer.StartObject();
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(indent + "  ");
+    errorCode.render(writer);
   }
   else
   {
-    out += contextAttributeResponseVector.render(apiVersion, asJsonObject, requestType, indent + "  ");
+    contextAttributeResponseVector.render(writer, apiVersion, asJsonObject, requestType);
   }
 
-  out += endTag(indent);
-
-  return out;
+  writer.EndObject();
 }
 
 
@@ -106,7 +104,11 @@ std::string UpdateContextElementResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, requestType, indent);
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
+  render(writer, apiVersion, asJsonObject, requestType);
+  return sb.GetString();
 }
 
 

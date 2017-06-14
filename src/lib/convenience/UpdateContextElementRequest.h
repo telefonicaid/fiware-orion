@@ -28,6 +28,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "rest/ConnectionInfo.h"
@@ -44,7 +47,10 @@ typedef struct UpdateContextElementRequest
   ContextAttributeVector     contextAttributeVector;     // Optional
   MetadataVector             domainMetadataVector;       // Optional
 
-  std::string  render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, std::string indent);
+  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+                      ApiVersion apiVersion,
+                      bool asJsonObject,
+                      RequestType requestType);
   void         present(std::string indent);
   void         release(void);
   std::string  check(ApiVersion          apiVersion,

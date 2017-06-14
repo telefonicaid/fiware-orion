@@ -112,14 +112,13 @@ void AttributeDomainName::present(const std::string& indent)
 *
 * AttributeDomainName::render - 
 */
-std::string AttributeDomainName::render(const std::string& indent, bool comma)
+void AttributeDomainName::render(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
-  if (string == "")
+  if (string != "")
   {
-    return "";
+    writer.Key("attributeDomainName");
+    writer.String(string.c_str());
   }
-
-  return valueTag(indent, "attributeDomainName", string, comma);
 }
 
 

@@ -24,6 +24,9 @@
 */
 #include <string>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/logMsg.h"
 
 #include "common/MimeType.h"
@@ -183,77 +186,80 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, co
 {
    std::string   tag = tagGet(request);
    StatusCode    errorCode(code, details, "errorCode");
-   std::string   reply;
+
+   rapidjson::StringBuffer sb;
+   rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+   writer.SetIndent(' ', 2);
 
    ciP->httpStatusCode = SccOk;
 
    if (tag == "registerContextResponse")
    {
       RegisterContextResponse rcr("000000000000000000000000", errorCode);
-      reply =  rcr.render(indent);
+      rcr.render(writer);
    }
    else if (tag == "discoverContextAvailabilityResponse")
    {
       DiscoverContextAvailabilityResponse dcar(errorCode);
-      reply =  dcar.render(indent);
+      dcar.render(writer);
    }
    else if (tag == "subscribeContextAvailabilityResponse")
    {
       SubscribeContextAvailabilityResponse scar("000000000000000000000000", errorCode);
-      reply =  scar.render(indent);
+      scar.render(writer);
    }
    else if (tag == "updateContextAvailabilitySubscriptionResponse")
    {
       UpdateContextAvailabilitySubscriptionResponse ucas(errorCode);
-      reply =  ucas.render(indent, 0);
+      ucas.render(writer);
    }
    else if (tag == "unsubscribeContextAvailabilityResponse")
    {
       UnsubscribeContextAvailabilityResponse ucar(errorCode);
-      reply =  ucar.render(indent);
+      ucar.render(writer);
    }
    else if (tag == "notifyContextAvailabilityResponse")
    {
       NotifyContextAvailabilityResponse ncar(errorCode);
-      reply =  ncar.render(indent);
+      ncar.render(writer);
    }
 
    else if (tag == "queryContextResponse")
    {
       QueryContextResponse qcr(errorCode);
       bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-      reply =  qcr.render(ciP->apiVersion, asJsonObject, indent);
+      qcr.render(writer, ciP->apiVersion, asJsonObject);
    }
    else if (tag == "subscribeContextResponse")
    {
       SubscribeContextResponse scr(errorCode);
-      reply =  scr.render(indent);
+      scr.render(writer);
    }
    else if (tag == "updateContextSubscriptionResponse")
    {
       UpdateContextSubscriptionResponse ucsr(errorCode);
-      reply =  ucsr.render(indent);
+      ucsr.render(writer);
    }
    else if (tag == "unsubscribeContextResponse")
    {
       UnsubscribeContextResponse uncr(errorCode);
-      reply =  uncr.render(indent);
+      uncr.render(writer);
    }
    else if (tag == "updateContextResponse")
    {
       UpdateContextResponse ucr(errorCode);
       bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-      reply = ucr.render(ciP->apiVersion, asJsonObject, indent);
+      ucr.render(writer, ciP->apiVersion, asJsonObject);
    }
    else if (tag == "notifyContextResponse")
    {
       NotifyContextResponse ncr(errorCode);
-      reply =  ncr.render(indent);
+      ncr.render(writer);
    }
    else if (tag == "StatusCode")
    {
-     StatusCode sc(code, details);
-     reply = sc.render(indent);
+      StatusCode sc(code, details);
+      sc.render(writer);
    }
    else
    {
@@ -262,8 +268,8 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, co
       LM_T(LmtRest, ("Unknown tag: '%s', request == '%s'", tag.c_str(), request.c_str()));
 
       ciP->httpStatusCode = oe.code;
-      reply = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      return oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
    }
 
-   return reply;
+   return sb.GetString();
 }

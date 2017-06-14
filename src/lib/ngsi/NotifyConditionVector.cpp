@@ -49,23 +49,23 @@ NotifyConditionVector::NotifyConditionVector()
 *
 * NotifyConditionVector::render -
 */
-std::string NotifyConditionVector::render(const std::string& indent, bool comma)
+void NotifyConditionVector::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string out = "";
-
   if (vec.size() == 0)
   {
-    return "";
+    return;
   }
 
-  out += startTag(indent, "notifyConditions", true);
+  writer.Key("notifyConditions");
+  writer.StartArray();
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);
+    vec[ix]->render(writer);
   }
-  out += endTag(indent, comma, true);
-
-  return out;
+  writer.EndArray();
 }
 
 

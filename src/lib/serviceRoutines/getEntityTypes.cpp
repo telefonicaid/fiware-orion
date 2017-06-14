@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -79,14 +81,16 @@ std::string getEntityTypes
   //
   TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP, true));
 
-  std::string rendered;
-  TIMED_RENDER(rendered = response.render(ciP->apiVersion,
-                                          asJsonObject,
-                                          ciP->outMimeType == JSON,
-                                          ciP->uriParam[URI_PARAM_COLLAPSE] == "true",
-                                          ""));
+  rapidjson::StringBuffer out;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+  writer.SetIndent(' ', 2);
+  TIMED_RENDER(response.render(writer,
+                               ciP->apiVersion,
+                               asJsonObject,
+                               ciP->outMimeType == JSON,
+                               ciP->uriParam[URI_PARAM_COLLAPSE] == "true"));
 
   response.release();
 
-  return rendered;
+  return out.GetString();
 }

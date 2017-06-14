@@ -28,6 +28,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
 #include "orionTypes/EntityTypeVector.h"
@@ -44,11 +47,11 @@ class EntityTypeVectorResponse
   EntityTypeVector  entityTypeVector;
   StatusCode        statusCode;
 
-  std::string       render(ApiVersion          apiVersion,
+  void              render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+                           ApiVersion          apiVersion,
                            bool                asJsonObject,
                            bool                asJsonOut,
-                           bool                collapsed,
-                           const std::string&  indent);
+                           bool                collapsed);
   std::string       check(ApiVersion          apiVersion,
                           bool                asJsonObject,
                           bool                asJsonOut,
@@ -56,7 +59,8 @@ class EntityTypeVectorResponse
                           const std::string&  predetectedError);
   void              present(const std::string& indent);
   void              release(void);
-  std::string       toJson(bool values);
+  void              toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer, bool values);
+
 };
 
 #endif  // SRC_LIB_ORIONTYPES_ENTITYTYPEVECTORRESPONSE_H_

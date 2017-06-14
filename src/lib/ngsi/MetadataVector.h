@@ -28,6 +28,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "common/globals.h"
 
 #include "ngsi/Metadata.h"
@@ -45,8 +48,8 @@ public:
 
   MetadataVector(void);
 
-  std::string     render(const std::string& indent, bool comma = false);
-  std::string     toJson(bool                             isLastElement,
+  void            render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void            toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
                          const std::vector<std::string>&  metadataFilter);
   std::string     check(ApiVersion apiVersion);
 

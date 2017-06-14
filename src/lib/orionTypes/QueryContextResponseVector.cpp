@@ -124,10 +124,16 @@ void QueryContextResponseVector::present(void)
 *
 * QueryContextResponseVector::render -
 */
-std::string QueryContextResponseVector::render(ApiVersion apiVersion, bool asJsonObject, bool details, const std::string& detailsString)
+void QueryContextResponseVector::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  ApiVersion apiVersion,
+  bool asJsonObject,
+  bool details,
+  const std::string& detailsString
+)
 {
   QueryContextResponse* responseP = new QueryContextResponse();
-  std::string           answer;
 
   //
   // Here we have a vector of QueryContextResponse.
@@ -232,11 +238,9 @@ std::string QueryContextResponseVector::render(ApiVersion apiVersion, bool asJso
     }
   }
 
-  answer = responseP->render(apiVersion, asJsonObject, "");
+  responseP->render(writer, apiVersion, asJsonObject);
   responseP->release();
   delete responseP;
-
-  return answer;
 }
 
 

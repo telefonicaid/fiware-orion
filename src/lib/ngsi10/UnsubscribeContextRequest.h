@@ -27,6 +27,9 @@
 */
 #include <string>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/SubscriptionId.h"
 
 
@@ -39,7 +42,7 @@ typedef struct UnsubscribeContextRequest
 {
   SubscriptionId  subscriptionId;    // Mandatory
 
-  std::string     render(const std::string& indent);
+  void            render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   std::string     check(const std::string& indent, const std::string& predetectedError, int counter);
   void            present(const std::string& indent);
   void            release(void);

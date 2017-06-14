@@ -116,14 +116,18 @@ void UpdateActionType::present(const std::string& indent)
 *
 * UpdateActionType::render - 
 */
-std::string UpdateActionType::render(const std::string& indent, bool comma)
+void UpdateActionType::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
   if (string == "")
   {
-    return "";
+    return;
   }
 
-  return valueTag(indent, "updateAction", string, comma);
+  writer.Key("updateAction");
+  writer.String(string.c_str());
 }
 
 

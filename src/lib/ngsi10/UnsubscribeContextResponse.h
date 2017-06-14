@@ -27,6 +27,9 @@
 */
 #include <string>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/StatusCode.h"
 
@@ -49,7 +52,7 @@ typedef struct UnsubscribeContextResponse
   UnsubscribeContextResponse(StatusCode& statusCode);
   ~UnsubscribeContextResponse();
 
-  std::string     render(const std::string& indent);
+  void            render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void            release(void);
 } UnsubscribeContextResponse;
 

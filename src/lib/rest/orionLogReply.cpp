@@ -24,7 +24,9 @@
 */
 #include <string>
 
-#include "common/tag.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "rest/ConnectionInfo.h"
 #include "rest/restReply.h"
 
@@ -36,11 +38,17 @@
 */
 std::string orionLogReply(ConnectionInfo* ciP, const std::string& what, const std::string& value)
 {
-   std::string out = "";
+   rapidjson::StringBuffer sb;
+   rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
 
-   out += '{';
-   out += valueTag(" ", what, value);
-   out += '}';
+   writer.StartObject();
+
+   writer.Key(what.c_str());
+   writer.String(value.c_str());
+
+   writer.EndObject();
+
+   std::string out = sb.GetString();
 
    ciP->httpStatusCode = SccOk;
    restReply(ciP, out);

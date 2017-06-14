@@ -148,14 +148,18 @@ void ProvidingApplication::present(const std::string& indent)
 *
 * ProvidingApplication::render -
 */
-std::string ProvidingApplication::render(const std::string& indent, bool comma)
+void ProvidingApplication::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
   if (string == "")
   {
-    return "";
+    return;
   }
 
-  return valueTag(indent, "providingApplication", string, comma);
+  writer.Key("providingApplication");
+  writer.String(string.c_str());
 }
 
 

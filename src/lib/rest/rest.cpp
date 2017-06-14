@@ -32,6 +32,9 @@
 #include <string>
 #include <map>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -121,8 +124,15 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     }
     else if (ciP->apiVersion == ADMIN_API)
     {
+      rapidjson::StringBuffer sb;
+      rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+      writer.StartObject();
+      writer.Key("error");
+      writer.String(errorString.c_str());
+      writer.EndObject();
+
       ciP->httpStatusCode = SccBadRequest;
-      ciP->answer         = "{" + JSON_STR("error") + ":" + JSON_STR(errorString) + "}";
+      ciP->answer         = sb.GetString();
     }
 
     return MHD_YES;

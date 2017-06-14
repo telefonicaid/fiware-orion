@@ -162,19 +162,15 @@ void Duration::present(const std::string& indent)
 *
 * Duration::render -
 */
-std::string Duration::render(const std::string& indent, bool comma)
+void Duration::render(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
-  if (string == "")
+  if (string == "" || !valid)
   {
-    return "";
+    return;
   }
 
-  if (valid == false)
-  {
-    return "";
-  }
-
-  return valueTag(indent, "duration", string, comma);
+  writer.Key("duration");
+  writer.String(string.c_str());
 }
 
 

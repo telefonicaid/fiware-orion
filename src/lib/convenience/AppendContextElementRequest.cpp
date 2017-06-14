@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+
 #include "common/tag.h"
 #include "convenience/AppendContextElementRequest.h"
 #include "convenience/AppendContextElementResponse.h"
@@ -49,23 +51,24 @@ AppendContextElementRequest::AppendContextElementRequest()
 *
 * render - 
 */
-std::string AppendContextElementRequest::render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, std::string indent)
+void AppendContextElementRequest::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  ApiVersion apiVersion,
+  bool asJsonObject,
+  RequestType requestType
+)
 {
-  std::string out = "";
-
-  out += startTag(indent);
-
+  writer.StartObject();
   if (entity.id != "")
   {
-    out += entity.render(indent + "  ");
+    entity.render(writer);
   }
 
-  out += attributeDomainName.render(indent + "  ", true);
-  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType, indent + "  ");
-  out += domainMetadataVector.render(indent + "  ");
-  out += endTag(indent);
-
-  return out;
+  attributeDomainName.render(writer);
+  contextAttributeVector.render(writer, apiVersion, asJsonObject, requestType);
+  domainMetadataVector.render(writer);
+  writer.EndObject();
 }
 
 
@@ -112,7 +115,11 @@ std::string AppendContextElementRequest::check
     return "OK";
   }
 
-  return response.render(apiVersion, asJsonObject, requestType, indent);
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
+  response.render(writer, apiVersion, asJsonObject, requestType);
+  return sb.GetString();
 }
 
 

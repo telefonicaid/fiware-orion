@@ -70,38 +70,31 @@ DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse(StatusC
 *
 * DiscoverContextAvailabilityResponse::render -
 */
-std::string DiscoverContextAvailabilityResponse::render(const std::string& indent)
+void DiscoverContextAvailabilityResponse::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string  out = "";
-
-  //
-  // JSON commas:
-  // Exactly ONE of responseVector|errorCode is included in the discovery response so,
-  // no JSON commas necessary
-  //
-  out += startTag(indent);
+  writer.StartObject();
 
   if (responseVector.size() > 0)
   {
-    bool commaNeeded = (errorCode.code != SccNone);
-    out += responseVector.render(indent + "  ", commaNeeded);
+    responseVector.render(writer);
   }
 
   if (errorCode.code != SccNone)
   {
-    out += errorCode.render(indent + "  ", false);
+    errorCode.render(writer);
   }
 
   /* Safety check: neither errorCode nor CER vector was filled by mongoBackend */
   if (errorCode.code == SccNone && responseVector.size() == 0)
   {
       errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
-      out += errorCode.render(indent + "  ");
+      errorCode.render(writer);
   }
 
-  out += endTag(indent);
-
-  return out;
+  writer.EndObject();
 }
 
 

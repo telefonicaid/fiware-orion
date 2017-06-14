@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/reader.h"
+
 #include "common/tag.h"
 #include "common/errorMessages.h"
 #include "common/RenderFormat.h"
@@ -38,8 +40,9 @@
 *
 * Attribute::render -
 */
-std::string Attribute::render
+void Attribute::render
 (
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
   ApiVersion          apiVersion,          // in parameter (pass-through)
   bool                acceptedTextPlain,   // in parameter (pass-through)
   bool                acceptedJson,        // in parameter (pass-through)
@@ -48,24 +51,24 @@ std::string Attribute::render
   HttpStatusCode*     scP,                 // out parameter (pass-through)
   bool                keyValues,           // in parameter
   const std::string&  metadataList,        // in parameter
-  RequestType         requestType,         // in parameter
-  bool                comma                // in parameter
+  RequestType         requestType          // in parameter
 )
 {
   RenderFormat  renderFormat = (keyValues == true)? NGSI_V2_KEYVALUES : NGSI_V2_NORMALIZED;
 
   if (pcontextAttribute)
   {
-    std::string out;
-
     if (requestType == EntityAttributeValueRequest)
     {
-      out = pcontextAttribute->toJsonAsValue(apiVersion,
-                                             acceptedTextPlain,
-                                             acceptedJson,
-                                             outFormatSelection,
-                                             outMimeTypeP,
-                                             scP);
+      std::string json = pcontextAttribute->toJsonAsValue(apiVersion,
+                                                         acceptedTextPlain,
+                                                         acceptedJson,
+                                                         outFormatSelection,
+                                                         outMimeTypeP,
+                                                         scP);
+      rapidjson::Reader reader;
+      rapidjson::StringStream ss(json.c_str());
+      reader.Parse(ss, writer);
     }
     else
     {
@@ -76,24 +79,15 @@ std::string Attribute::render
         stringSplit(metadataList, ',', metadataFilter);
       }
 
-      out = "{";
+      writer.StartObject();
 
-      // First parameter (isLastElement) is 'true' as it is the last and only element
-      out += pcontextAttribute->toJson(true, renderFormat, metadataFilter, requestType);
+      pcontextAttribute->toJson(writer, renderFormat, metadataFilter, requestType);
 
-      out += "}";
+      writer.EndObject();
     }
-
-
-    if (comma)
-    {
-      out += ",";
-    }
-
-    return out;
   }
 
-  return oe.toJson();
+  oe.toJson(&writer);
 }
 
 

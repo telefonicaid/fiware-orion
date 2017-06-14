@@ -67,25 +67,25 @@ ContextRegistrationAttribute::ContextRegistrationAttribute
 *
 * ContextRegistrationAttribute::render -
 */
-std::string ContextRegistrationAttribute::render(const std::string& indent, bool comma)
+void ContextRegistrationAttribute::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string out = "";
+  writer.StartObject();
 
-  //
-  // About JSON commas:
-  // The field isDomain is mandatory, so all field before that will
-  // have the comma set to true for the render methods.
-  // The only doubt here is whether isDomain should have the comma or not,
-  // that depends on whether the metadataVector is empty or not.
-  //
-  out += startTag(indent);
-  out += valueTag(indent + "  ", "name",     name, true);
-  out += valueTag(indent + "  ", "type",     type, true);
-  out += valueTag(indent + "  ", "isDomain", isDomain, metadataVector.size() != 0);
-  out += metadataVector.render(indent + "  ");
-  out += endTag(indent, comma);
+  writer.Key("name");
+  writer.String(name.c_str());
 
-  return out;
+  writer.Key("type");
+  writer.String(type.c_str());
+
+  writer.Key("isDomain");
+  writer.String(isDomain.c_str());
+
+  metadataVector.render(writer);
+
+  writer.EndObject();
 }
 
 

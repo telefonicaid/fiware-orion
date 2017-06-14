@@ -28,6 +28,9 @@
 
 #include <string>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
 
@@ -44,7 +47,7 @@ typedef struct NotifyContextResponse
   NotifyContextResponse();
   NotifyContextResponse(StatusCode& sc);
 
-  std::string   render(const std::string& indent);
+  void          render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void          present(const std::string& indent);
   void          release(void);
 } NotifyContextResponse;

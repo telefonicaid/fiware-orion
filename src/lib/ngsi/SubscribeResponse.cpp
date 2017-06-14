@@ -44,18 +44,14 @@ SubscribeResponse::SubscribeResponse()
 *
 * SubscribeResponse::render - 
 */
-std::string SubscribeResponse::render(const std::string& indent, bool comma)
+void SubscribeResponse::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string  out                 = "";
-  std::string  tag                 = "subscribeResponse";
-  bool         durationRendered    = !duration.isEmpty();
-  bool         throttlingRendered  = !throttling.isEmpty();
-
-  out += startTag(indent, tag);
-  out += subscriptionId.render(RtSubscribeResponse, indent + "  ", durationRendered || throttlingRendered);
-  out += duration.render(indent + "  ", throttlingRendered);
-  out += throttling.render(indent + "  ", false);
-  out += endTag(indent, comma);
-
-  return out;
+  writer.StartObject();
+  subscriptionId.render(writer, RtSubscribeResponse);
+  duration.render(writer);
+  throttling.render(writer);
+  writer.EndObject();
 }

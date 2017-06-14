@@ -28,6 +28,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/MetadataVector.h"
 #include "parse/CompoundValueNode.h"
 
@@ -49,7 +52,8 @@ typedef struct UpdateContextAttributeRequest
   orion::CompoundValueNode*  compoundValueP;
 
   UpdateContextAttributeRequest();
-  std::string  render(ApiVersion apiVersion, std::string indent);
+  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+                      ApiVersion apiVersion);
   std::string  check(ApiVersion apiVersion, std::string indent, const std::string& preError);
   void         present(std::string indent);
   void         release();

@@ -66,16 +66,15 @@ UnsubscribeContextResponse::~UnsubscribeContextResponse()
 *
 * UnsubscribeContextResponse::render - 
 */
-std::string UnsubscribeContextResponse::render(const std::string& indent)
+void UnsubscribeContextResponse::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string out = "";
-
-  out += startTag(indent);
-  out += subscriptionId.render(RtUnsubscribeContextResponse, indent + "  ", true);
-  out += statusCode.render(indent + "  ", false);
-  out += endTag(indent);
-
-  return out;
+  writer.StartObject();
+  subscriptionId.render(writer, RtUnsubscribeContextResponse);
+  statusCode.render(writer);
+  writer.EndObject();
 }
 
 

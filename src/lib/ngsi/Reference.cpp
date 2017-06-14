@@ -128,14 +128,18 @@ void Reference::present(const std::string& indent)
 *
 * Reference::render -
 */
-std::string Reference::render(const std::string& indent, bool comma)
+void Reference::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
   if (string == "")
   {
-    return "";
+    return;
   }
 
-  return valueTag(indent, "reference", string, comma);
+  writer.Key("reference");
+  writer.String(string.c_str());
 }
 
 

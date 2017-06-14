@@ -28,6 +28,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/Request.h"
 #include "ngsi/AttributeExpression.h"
 #include "ngsi/ScopeVector.h"
@@ -43,7 +46,7 @@ typedef struct Restriction
   AttributeExpression  attributeExpression;   // Optional (FI-WARE changes - MANDATORY in OMA spec)
   ScopeVector          scopeVector;           // Optional
 
-  std::string   render(const std::string& indent, int restrictions = 1, bool comma = false);
+  void          render(rapidjson::Writer<rapidjson::StringBuffer>& writer, int restrictions = 1);
   void          present(const std::string& indent);
   void          release();
   void          fill(Restriction* rP);

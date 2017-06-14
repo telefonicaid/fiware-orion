@@ -49,25 +49,24 @@ void ContextRegistrationResponseVector::push_back(ContextRegistrationResponse* i
 *
 * ContextRegistrationResponseVector::render -
 */
-std::string ContextRegistrationResponseVector::render(const std::string& indent, bool comma)
+void ContextRegistrationResponseVector::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string  out = "";
-
   if (vec.size() == 0)
   {
-    return "";
+    return;
   }
 
-  out += startTag(indent, "contextRegistrationResponses", true);
+  writer.Key("contextRegistrationResponses");
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-     out += vec[ix]->render(indent + "  ", (ix != vec.size() - 1));
+    vec[ix]->render(writer);
   }
 
-  out += endTag(indent, comma, true);
-
-  return out;
+  writer.EndObject();
 }
 
 

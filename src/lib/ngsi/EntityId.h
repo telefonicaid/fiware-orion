@@ -28,6 +28,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/Request.h"
 
 
@@ -64,14 +67,12 @@ class EntityId
   bool         equal(EntityId* eP);
   bool         isPatternIsTrue(void);
 
-  std::string  render(const std::string&  indent,
-                      bool                comma      = false,
-                      bool                isInVector = false);
+  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 
   std::string  check(RequestType          requestType,
                      const std::string&   indent);
 
-  std::string  toJson(void) const;
+  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer) const;
 };
 
 #endif  // SRC_LIB_NGSI_ENTITYID_H_

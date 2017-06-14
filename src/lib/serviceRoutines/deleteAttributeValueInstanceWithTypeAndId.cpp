@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/logMsg.h"
 
 #include "common/statistics.h"
@@ -70,7 +73,6 @@ std::string deleteAttributeValueInstanceWithTypeAndId
 )
 {
   StatusCode              response;
-  std::string             answer;
   std::string             entityTypeFromUriParam;
   std::string             entityTypeFromPath = compV[3];
   std::string             entityId           = compV[5];
@@ -89,9 +91,12 @@ std::string deleteAttributeValueInstanceWithTypeAndId
 
     response.fill(SccBadRequest, "non-matching entity::types in URL");
 
-    TIMED_RENDER(answer = response.render("", false, false));
+    rapidjson::StringBuffer out;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+    writer.SetIndent(' ', 2);
+    TIMED_RENDER(response.render(writer, false));
 
-    return answer;
+    return out.GetString();
   }
 
 
@@ -108,9 +113,12 @@ std::string deleteAttributeValueInstanceWithTypeAndId
 
 
   // 06. Cleanup and return result
-  TIMED_RENDER(answer = response.render("", false, false));
+  rapidjson::StringBuffer out;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+  writer.SetIndent(' ', 2);
+  TIMED_RENDER(response.render(writer, false));
   response.release();
   parseDataP->upcr.res.release();
 
-  return answer;
+  return out.GetString();
 }

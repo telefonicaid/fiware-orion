@@ -38,29 +38,26 @@
 *
 * ContextAttributeResponseVector::render - 
 */
-std::string ContextAttributeResponseVector::render
+void ContextAttributeResponseVector::render
 (
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
   ApiVersion          apiVersion,
   bool                asJsonObject,
-  RequestType         request,
-  const std::string&  indent)
+  RequestType         request
+)
 {
-  std::string out = "";
-  std::string key = "contextResponses";
-
   if (vec.size() == 0)
   {
-    return "";
+    return;
   }
 
-  out += startTag(indent, key, true);
+  writer.Key("contextResponses");
+  writer.StartArray();
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(apiVersion, asJsonObject, request, indent + "  ");
+    vec[ix]->render(writer, apiVersion, asJsonObject, request);
   }
-  out += endTag(indent, false, true);
-
-  return out;
+  writer.EndObject();
 }
 
 

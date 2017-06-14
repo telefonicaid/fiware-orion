@@ -132,12 +132,16 @@ void Throttling::present(const std::string& indent)
 *
 * Throttling::render -
 */
-std::string Throttling::render(const std::string& indent, bool comma)
+void Throttling::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
   if (string == "")
   {
-    return "";
+    return;
   }
 
-  return valueTag(indent, "throttling", string, comma);
+  writer.Key("throttling");
+  writer.String(string.c_str());
 }

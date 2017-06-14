@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -78,8 +81,9 @@ std::string versionTreat
   ParseData*                 parseDataP
 )
 {
-  std::string out     = "";
-  std::string indent  = "";
+  rapidjson::StringBuffer out;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+  writer.SetIndent(' ', 2);
 
 #ifdef UNIT_TEST
   std::string uptime = "0 d, 0 h, 0 m, 0 s";
@@ -87,17 +91,31 @@ std::string versionTreat
   std::string uptime = parsedUptime(getTimer()->getCurrentTime() - startTime);
 #endif
 
-  out += "{\n";
-  out += startTag(indent, "orion");
-  out += valueTag(indent + "  ", "version",       versionString,   true);
-  out += valueTag(indent + "  ", "uptime",        uptime,          true);
-  out += valueTag(indent + "  ", "git_hash",      GIT_HASH,        true);
-  out += valueTag(indent + "  ", "compile_time",  COMPILE_TIME,    true);
-  out += valueTag(indent + "  ", "compiled_by",   COMPILED_BY,     true);
-  out += valueTag(indent + "  ", "compiled_in",   COMPILED_IN,     false);
-  out += endTag(indent, false, false);
-  out += "}\n";
+  writer.StartObject();
+  writer.Key("orion");
+  writer.StartObject();
+
+  writer.Key("version");
+  writer.String(versionString);
+
+  writer.Key("uptime");
+  writer.String(uptime.c_str());
+
+  writer.Key("git_hash");
+  writer.String(GIT_HASH);
+
+  writer.Key("compile_time");
+  writer.String(COMPILE_TIME);
+
+  writer.Key("compiled_by");
+  writer.String(COMPILED_BY);
+
+  writer.Key("compiled_in");
+  writer.String(COMPILED_IN);
+
+  writer.EndObject();
+  writer.EndObject();
 
   ciP->httpStatusCode = SccOk;
-  return out;
+  return out.GetString();
 }

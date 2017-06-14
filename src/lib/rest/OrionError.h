@@ -27,6 +27,9 @@
 */
 #include <string>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "common/globals.h"
 
 #include "ngsi/StatusCode.h"
@@ -51,7 +54,7 @@ public:
 
   std::string  smartRender(ApiVersion apiVersion);
   std::string  setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpStatusCode* scP);
-  std::string  toJson(void);
+  std::string  toJson(rapidjson::Writer<rapidjson::StringBuffer>* writer = NULL);
   std::string  render(void);
   void         fill(HttpStatusCode _code, const std::string& _details,  const std::string& _reasonPhrase = "");
 

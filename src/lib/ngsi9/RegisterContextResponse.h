@@ -27,6 +27,9 @@
 */
 #include <string>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/StatusCode.h"
 #include "ngsi/RegistrationId.h"
 #include "ngsi/Duration.h"
@@ -50,7 +53,7 @@ typedef struct RegisterContextResponse
   RegisterContextResponse(const std::string& _registrationId, const std::string& _duration);
   RegisterContextResponse(const std::string& _registrationId, StatusCode& _errorCode);
 
-  std::string render(const std::string& indent);
+  void        render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   std::string check(const std::string& indent, const std::string& predetectedError, int counter);
   void        present(const std::string& indent);
   void        release(void);

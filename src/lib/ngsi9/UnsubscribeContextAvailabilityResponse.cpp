@@ -74,16 +74,15 @@ UnsubscribeContextAvailabilityResponse::~UnsubscribeContextAvailabilityResponse(
 *
 * UnsubscribeContextAvailabilityResponse::render - 
 */
-std::string UnsubscribeContextAvailabilityResponse::render(const std::string& indent)
+void UnsubscribeContextAvailabilityResponse::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string out = "";
+  writer.StartObject();
 
-  out += startTag(indent);
+  subscriptionId.render(writer, RtUnsubscribeContextAvailabilityResponse);
+  statusCode.render(writer);
 
-  out += subscriptionId.render(RtUnsubscribeContextAvailabilityResponse, indent + "  ", true);  // always json comma - statusCode is mandatory
-  out += statusCode.render(indent + "  ");
-
-  out += endTag(indent);
-
-  return out;
+  writer.EndObject();
 }

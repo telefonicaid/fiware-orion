@@ -65,18 +65,15 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
     {
       if (vec[ix]->compoundValueP)
       {
-        if (vec[ix]->compoundValueP->valueType == orion::ValueTypeVector)
-        {
-          *valueP = "[" + vec[ix]->compoundValueP->toJson(true) + "]";
-        }
-        else if (vec[ix]->compoundValueP->valueType == orion::ValueTypeObject)
-        {
-          *valueP = "{" + vec[ix]->compoundValueP->toJson(true) + "}";
-        }
-        else
+        if (vec[ix]->compoundValueP->valueType == orion::ValueTypeObject && vec[ix]->compoundValueP->valueType != orion::ValueTypeVector)
         {
           LM_E(("Runtime Error (attribute is of object type but its compound is of invalid type)"));
           *valueP = "";
+        } else {
+          rapidjson::StringBuffer out;
+          rapidjson::Writer<rapidjson::StringBuffer> writer(out);
+          vec[ix]->compoundValueP->toJson(writer);
+          *valueP = out.GetString();
         }
       }
       else

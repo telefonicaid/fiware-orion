@@ -29,6 +29,9 @@
 #include <vector>
 #include <cstdlib>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/ContextAttribute.h"
 #include "rest/OrionError.h"
@@ -54,7 +57,8 @@ class Attribute
   OrionError         oe;                    // Optional - mandatory if not 200-OK
 
   Attribute(): pcontextAttribute(0) {}
-  std::string  render(ApiVersion          apiVersion,
+  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+                      ApiVersion          apiVersion,
                       bool                acceptedTextPlain,
                       bool                acceptedJson,
                       MimeType            outFormatSelection,
@@ -62,8 +66,7 @@ class Attribute
                       HttpStatusCode*     scP,
                       bool                keyValues,
                       const std::string&  metadataList,
-                      RequestType         requestType,
-                      bool                comma = false);
+                      RequestType         requestType);
   void         fill(QueryContextResponse* qcrsP, std::string attrName);
 };
 

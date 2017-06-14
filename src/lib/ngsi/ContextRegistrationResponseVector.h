@@ -28,6 +28,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/ContextRegistrationResponse.h"
 
 
@@ -42,7 +45,7 @@ typedef struct ContextRegistrationResponseVector
 
   void                          push_back(ContextRegistrationResponse* item);
   unsigned int                  size(void) const;
-  std::string                   render(const std::string& indent, bool comma = false);
+  void                          render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void                          present(const std::string& indent);
   void                          release(void);
 

@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/errorMessages.h"
@@ -67,6 +70,9 @@ std::string getEntityAttributeValue
   Attribute    attribute;
   std::string  answer;
   std::string  type       = ciP->uriParam["type"];
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
 
   if (forbiddenIdChars(ciP->apiVersion,  compV[2].c_str(), NULL) ||
       (forbiddenIdChars(ciP->apiVersion, compV[4].c_str(), NULL)))
@@ -105,31 +111,24 @@ std::string getEntityAttributeValue
       // Do not use attribute name, change to 'value'
       attribute.pcontextAttribute->name = "value";
 
-      TIMED_RENDER(answer = attribute.render(ciP->apiVersion,
-                                             ciP->httpHeaders.accepted("text/plain"),
-                                             ciP->httpHeaders.accepted("application/json"),
-                                             ciP->httpHeaders.outformatSelect(),
-                                             &(ciP->outMimeType),
-                                             &(ciP->httpStatusCode),
-                                             ciP->uriParamOptions[OPT_KEY_VALUES],
-                                             ciP->uriParam[URI_PARAM_METADATA],
-                                             EntityAttributeValueRequest,
-                                             false));
+      TIMED_RENDER(attribute.render(writer,
+                                    ciP->apiVersion,
+                                    ciP->httpHeaders.accepted("text/plain"),
+                                    ciP->httpHeaders.accepted("application/json"),
+                                    ciP->httpHeaders.outformatSelect(),
+                                    &(ciP->outMimeType),
+                                    &(ciP->httpStatusCode),
+                                    ciP->uriParamOptions[OPT_KEY_VALUES],
+                                    ciP->uriParam[URI_PARAM_METADATA],
+                                    EntityAttributeValueRequest));
+      answer = sb.GetString();
     }
     else
     {
       if (attribute.pcontextAttribute->compoundValueP != NULL)
       {
-        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->render(ciP->apiVersion, ""));
-
-        if (attribute.pcontextAttribute->compoundValueP->isObject())
-        {
-          answer = "{" + answer + "}";
-        }
-        else if (attribute.pcontextAttribute->compoundValueP->isVector())
-        {
-          answer = "[" + answer + "]";
-        }
+        TIMED_RENDER(attribute.pcontextAttribute->compoundValueP->render(writer));
+        answer = sb.GetString();
       }
       else
       {

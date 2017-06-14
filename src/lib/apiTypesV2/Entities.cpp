@@ -60,13 +60,14 @@ Entities::~Entities()
 * Entities::render -
 *
 */
-std::string Entities::render
+void Entities::render
 (
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
   std::map<std::string, bool>&         uriParamOptions,
   std::map<std::string, std::string>&  uriParam
 )
 {
-  return vec.render(uriParamOptions, uriParam);
+  return vec.render(writer, uriParamOptions, uriParam);
 }
 
 

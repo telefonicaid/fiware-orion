@@ -27,6 +27,9 @@
 */
 #include <string>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/ContextAttributeVector.h"
 
 
@@ -46,16 +49,15 @@ class EntityType
   explicit EntityType(std::string _type);
 
   std::string   check(ApiVersion apiVersion, const std::string& predetectedError);
-  std::string   render(ApiVersion          apiVersion,
+  void          render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+                       ApiVersion          apiVersion,
                        bool                asJsonObject,
                        bool                asJsonOut,
                        bool                collapsed,
-                       const std::string&  indent,
-                       bool                comma = false,
                        bool                typeNameBefore = false);
   void          present(const std::string& indent);
   void          release(void);
-  std::string   toJson(bool includeType = false);
+  void          toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer, bool includeType = false);
 };
 
 #endif  // SRC_LIB_ORIONTYPES_ENTITYTYPE_H_

@@ -26,6 +26,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -50,24 +53,18 @@ MetadataVector::MetadataVector(void)
 *
 * MetadataVector::render -
 */
-std::string MetadataVector::render(const std::string& indent, bool comma)
+void MetadataVector::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string out = "";
-
-  if (vec.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag(indent, "metadatas", true);
+  writer.Key("metadatas");
+  writer.StartObject();
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);
+    vec[ix]->render(writer);
   }
-  out += endTag(indent, comma, true);
-
-
-  return out;
+  writer.EndObject();
 }
 
 
@@ -101,27 +98,14 @@ bool MetadataVector::matchFilter(const std::string& mdName, const std::vector<st
 * If anybody needs a metadata named 'value' or 'type', then API v1
 * will have to be used to retreive that information.
 */
-std::string MetadataVector::toJson(bool isLastElement, const std::vector<std::string>& metadataFilter)
+void MetadataVector::toJson(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  const std::vector<std::string>& metadataFilter
+)
 {
-  if (vec.size() == 0)
-  {
-    return "";
-  }
+  writer.Key("metadata");
+  writer.StartObject();
 
-
-  //
-  // Pass 1 - count the total number of metadatas valid for rendering.
-  //
-  // Metadatas named 'value' or 'type' are not rendered.
-  // This gives us a small problem in the logic here, about knowing whether the
-  // comma should be rendered or not.
-  //
-  // To fix this problem we need to do two passes over the vector, the first pass to
-  // count the number of valid metadatas and the second to do the work.
-  // In the second pass, if the number of rendered metadatas "so far" is less than the total
-  // number of valid metadatas, then the comma must be rendered.
-  //
-  int validMetadatas = 0;
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     if ((vec[ix]->name == "value") || (vec[ix]->name == "type") || !(matchFilter(vec[ix]->name, metadataFilter)))
@@ -129,32 +113,10 @@ std::string MetadataVector::toJson(bool isLastElement, const std::vector<std::st
       continue;
     }
 
-    ++validMetadatas;
+    vec[ix]->toJson(writer);
   }
 
-
-  //
-  // And this is pass 2, where the real work is done.
-  //
-  std::string  out;
-  int          renderedMetadatas = 0;
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    if ((vec[ix]->name == "value") || (vec[ix]->name == "type") || !(matchFilter(vec[ix]->name, metadataFilter)))
-    {
-      continue;
-    }
-
-    ++renderedMetadatas;
-    out += vec[ix]->toJson(renderedMetadatas == validMetadatas);
-  }
-
-  if (!isLastElement)
-  {
-    out += ",";
-  }
-
-  return out;
+  writer.EndObject();
 }
 
 

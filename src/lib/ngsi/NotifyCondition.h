@@ -27,6 +27,9 @@
 */
 #include <string>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/Request.h"
 #include "ngsi/RestrictionString.h"
 #include "ngsi/ConditionValueList.h"
@@ -48,7 +51,7 @@ typedef struct NotifyCondition
   NotifyCondition();
   NotifyCondition(NotifyCondition* ncP);
 
-  std::string   render(const std::string& indent, bool notLastInVector);
+  void          render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void          present(const std::string& indent, int ix);
   void          release(void);
 

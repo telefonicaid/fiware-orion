@@ -51,25 +51,22 @@ ContextRegistration::ContextRegistration()
 *
 * ContextRegistration::render -
 */
-std::string ContextRegistration::render(const std::string& indent, bool comma, bool isInVector)
+void ContextRegistration::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  bool isInVector
+)
 {
-  std::string out = "";
-
-  //
-  // About JSON commas;
-  // As providingApplication is MANDATORY and it is the last item in ContextRegistration,
-  // the problem with the JSON commas disappear. All fields will have 'comma set to true'.
-  // All, except providingApplication of course :-)
-  //
-
-  out += startTag(indent, !isInVector? "contextRegistration" : "");
-  out += entityIdVector.render(indent + "  ", true);
-  out += contextRegistrationAttributeVector.render(indent + "  ", true);
-  out += registrationMetadataVector.render(indent + "  ", true);
-  out += providingApplication.render(indent + "  ", false);
-  out += endTag(indent, comma);
-
-  return out;
+  if (!isInVector)
+  {
+    writer.Key("contextRegistration");
+  }
+  writer.StartObject();
+  entityIdVector.render(writer);
+  contextRegistrationAttributeVector.render(writer);
+  registrationMetadataVector.render(writer);
+  providingApplication.render(writer);
+  writer.EndObject();
 }
 
 

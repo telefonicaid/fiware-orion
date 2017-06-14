@@ -29,6 +29,9 @@
 #include <iostream>
 #include <sstream>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/ContextRegistrationResponseVector.h"
 #include "ngsi/StatusCode.h"
 
@@ -47,7 +50,7 @@ typedef struct DiscoverContextAvailabilityResponse
   ~DiscoverContextAvailabilityResponse();
   DiscoverContextAvailabilityResponse(StatusCode& _errorCode);
 
-  std::string  render(const std::string& indent);
+  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void         release();
 } DiscoverContextAvailabilityResponse;
 

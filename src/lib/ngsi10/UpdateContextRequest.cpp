@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <string>
 
+#include "rapidjson/prettywriter.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -66,19 +68,17 @@ UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, 
 *
 * UpdateContextRequest::render -
 */
-std::string UpdateContextRequest::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
+void UpdateContextRequest::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  ApiVersion apiVersion,
+  bool asJsonObject
+)
 {
-  std::string  out = "";
-
-  // JSON commas:
-  // Both fields are MANDATORY, so, comma after "contextElementVector"
-  //
-  out += startTag(indent);
-  out += contextElementVector.render(apiVersion, asJsonObject, UpdateContext, indent + "  ", true);
-  out += updateActionType.render(indent + "  ", false);
-  out += endTag(indent, false);
-
-  return out;
+  writer.StartObject();
+  contextElementVector.render(writer, apiVersion, asJsonObject, UpdateContext);
+  updateActionType.render(writer);
+  writer.EndObject();
 }
 
 
@@ -91,18 +91,23 @@ std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject
 {
   std::string            res;
   UpdateContextResponse  response;
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
 
   if (predetectedError != "")
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
-    return response.render(apiVersion, asJsonObject, indent);
+    response.render(writer, apiVersion, asJsonObject);
+    return sb.GetString();
   }
 
   if (((res = contextElementVector.check(apiVersion, UpdateContext, indent, predetectedError, counter)) != "OK") ||
       ((res = updateActionType.check()) != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
-    return response.render(apiVersion, asJsonObject, indent);
+    response.render(writer, apiVersion, asJsonObject);
+    return sb.GetString();
   }
 
   return "OK";

@@ -46,23 +46,20 @@ ContextRegistrationResponse::ContextRegistrationResponse()
 *
 * ContextRegistrationResponse::render -
 */
-std::string ContextRegistrationResponse::render(const std::string& indent, bool comma)
+void ContextRegistrationResponse::render(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string  out               = "";
-  bool         errorCodeRendered = errorCode.code != SccNone;
+  writer.StartObject();
 
-  out += startTag(indent);
+  contextRegistration.render(writer, false);
 
-  out += contextRegistration.render(indent + "  ", errorCodeRendered, false);
-
-  if (errorCodeRendered)
+  if (errorCode.code != SccNone)
   {
-    out += errorCode.render(indent + "  ", false);
+    errorCode.render(writer);
   }
 
-  out += endTag(indent, comma);
-
-  return out;
+  writer.EndObject();
 }
 
 

@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -98,7 +101,11 @@ std::string postBatchQuery
   {
     entities.fill(&parseDataP->qcrs.res);
 
-    TIMED_RENDER(answer = entities.render(ciP->uriParamOptions, ciP->uriParam));
+    rapidjson::StringBuffer sb;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+    writer.SetIndent(' ', 2);
+    TIMED_RENDER(entities.render(writer, ciP->uriParamOptions, ciP->uriParam));
+    answer = sb.GetString();
   }
 
   // 04. Cleanup and return result

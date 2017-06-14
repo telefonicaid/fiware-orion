@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/string.h"
@@ -100,8 +103,9 @@ std::string getEntity
 
   entity.fill(&parseDataP->qcrs.res);
 
-  std::string answer;
-  TIMED_RENDER(answer = entity.render(ciP->uriParamOptions, ciP->uriParam, false));
+  rapidjson::StringBuffer answer;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(answer);
+  TIMED_RENDER(entity.render(writer, ciP->uriParamOptions, ciP->uriParam));
 
   if (parseDataP->qcrs.res.errorCode.code == SccOk && parseDataP->qcrs.res.contextElementResponseVector.size() > 1)
   {
@@ -118,5 +122,5 @@ std::string getEntity
   entity.release();
   parseDataP->qcr.res.release();
 
-  return answer;
+  return answer.GetString();
 }

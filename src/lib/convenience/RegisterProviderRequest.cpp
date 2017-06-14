@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -57,25 +59,19 @@ RegisterProviderRequest::RegisterProviderRequest()
 *
 * RegisterProviderRequest::render - 
 */
-std::string RegisterProviderRequest::render(std::string indent)
+void RegisterProviderRequest::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string  out                            = "";
-  bool         durationRendered               = duration.get() != "";
-  bool         providingApplicationRendered   = providingApplication.get() != "";
-  bool         registrationIdRendered         = registrationId.get() != "";
-  bool         commaAfterRegistrationId       = false;    // Last element
-  bool         commaAfterProvidingApplication = registrationIdRendered;
-  bool         commaAfterDuration             = commaAfterProvidingApplication || providingApplicationRendered;
-  bool         commaAfterMetadataVector       = commaAfterDuration || durationRendered;
+  writer.StartObject();
 
-  out += startTag(indent);
-  out += metadataVector.render(      indent + "  ", commaAfterMetadataVector);
-  out += duration.render(            indent + "  ", commaAfterDuration);
-  out += providingApplication.render(indent + "  ", commaAfterProvidingApplication);
-  out += registrationId.render(RegisterContext, indent + "  ", commaAfterRegistrationId);
-  out += endTag(indent, false);
+  metadataVector.render(writer);
+  duration.render(writer);
+  providingApplication.render(writer);
+  registrationId.render(writer, RegisterContext);
 
-  return out;
+  writer.EndObject();
 }
 
 
@@ -114,7 +110,11 @@ std::string RegisterProviderRequest::check
   std::string details = std::string("RegisterProviderRequest Error: '") + res + "'";
   alarmMgr.badInput(clientIp, details);
 
-  return response.render(indent);
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
+  response.render(writer);
+  return sb.GetString();
 }
 
 

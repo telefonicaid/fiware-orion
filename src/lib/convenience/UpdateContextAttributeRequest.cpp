@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -53,37 +55,31 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 *
 * render - 
 */
-std::string UpdateContextAttributeRequest::render(ApiVersion apiVersion, std::string indent)
+void UpdateContextAttributeRequest::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  ApiVersion apiVersion
+)
 {
-  std::string out = "";
-  std::string indent2 = indent + "  ";
-  bool        commaAfterContextValue = metadataVector.size() != 0;
+  writer.StartObject();
 
-  out += startTag(indent);
-  out += valueTag(indent2, "type", type, true);
+  writer.Key("type");
+  writer.String(type.c_str());
 
   if (compoundValueP == NULL)
   {
-    out += valueTag(indent2, "contextValue", contextValue, true);
+    writer.Key("contextValue");
+    writer.String(contextValue.c_str());
   }
   else
   {
-    bool isCompoundVector = false;
-
-    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::ValueTypeVector))
-    {
-      isCompoundVector = true;
-    }
-
-    out += startTag(indent + "  ", "value", isCompoundVector);
-    out += compoundValueP->render(apiVersion, indent + "    ");
-    out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
+    writer.Key("value");
+    compoundValueP->render(writer);
   }
 
-  out += metadataVector.render(indent2);
-  out += endTag(indent);
+  metadataVector.render(writer);
 
-  return out;
+  writer.EndObject();
 }
 
 
@@ -117,11 +113,14 @@ std::string UpdateContextAttributeRequest::check
     return "OK";
   }
 
-  std::string out = response.render(indent);
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
+  writer.StartObject();
+  response.render(writer);
+  writer.EndObject();
 
-  out = "{\n" + out + "}\n";
-
-  return out;
+  return sb.GetString();
 }
 
 

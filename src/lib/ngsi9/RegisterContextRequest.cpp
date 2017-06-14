@@ -24,6 +24,8 @@
 */
 #include <string>
 
+#include "rapidjson/prettywriter.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -42,24 +44,16 @@
 *
 * RegisterContextRequest::render -
 */
-std::string RegisterContextRequest::render(const std::string& indent)
+void RegisterContextRequest::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string  out                                 = "";
-  bool         durationRendered                    = duration.get() != "";
-  bool         registrationIdRendered              = registrationId.get() != "";
-  bool         commaAfterRegistrationId            = false; // Last element
-  bool         commaAfterDuration                  = registrationIdRendered;
-  bool         commaAfterContextRegistrationVector = registrationIdRendered || durationRendered;
-
-  out += startTag(indent);
-
-  out += contextRegistrationVector.render(      indent + "  ", commaAfterContextRegistrationVector);
-  out += duration.render(                       indent + "  ", commaAfterDuration);
-  out += registrationId.render(RegisterContext, indent + "  ", commaAfterRegistrationId);
-
-  out += endTag(indent, false);
-
-  return out;
+  writer.StartObject();
+  contextRegistrationVector.render(writer);
+  duration.render(writer);
+  registrationId.render(writer, RegisterContext);
+  writer.EndObject();
 }
 
 
@@ -95,7 +89,11 @@ std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::stri
     return "OK";
   }
 
-  return response.render(indent);
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
+  response.render(writer);
+  return sb.GetString();
 }
 
 

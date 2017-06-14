@@ -24,6 +24,8 @@
 */
 #include <string>
 
+#include "rapidjson/prettywriter.h"
+
 #include "logMsg/logMsg.h"
 #include "common/globals.h"
 #include "common/tag.h"
@@ -94,21 +96,16 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 *
 * QueryContextRequest::render -
 */
-std::string QueryContextRequest::render(const std::string& indent)
+void QueryContextRequest::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string   out                      = "";
-  bool          attributeListRendered    = attributeList.size() != 0;
-  bool          restrictionRendered      = restrictions != 0;
-  bool          commaAfterAttributeList  = restrictionRendered;
-  bool          commaAfterEntityIdVector = attributeListRendered || restrictionRendered;
-
-  out += startTag(indent);
-  out += entityIdVector.render(indent + "  ", commaAfterEntityIdVector);
-  out += attributeList.render( indent + "  ", commaAfterAttributeList);
-  out += restriction.render(   indent + "  ", restrictions, false);
-  out += endTag(indent);
-
-  return out;
+  writer.StartObject();
+  entityIdVector.render(writer);
+  attributeList.render(writer);
+  restriction.render(writer);
+  writer.EndObject();
 }
 
 
@@ -138,7 +135,11 @@ std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject,
     return "OK";
   }
 
-  return response.render(apiVersion, asJsonObject, indent);
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
+  response.render(writer, apiVersion, asJsonObject);
+  return sb.GetString();
 }
 
 

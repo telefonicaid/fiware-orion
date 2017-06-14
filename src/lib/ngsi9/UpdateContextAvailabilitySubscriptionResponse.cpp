@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 #include "common/globals.h"
@@ -72,23 +74,22 @@ UpdateContextAvailabilitySubscriptionResponse::~UpdateContextAvailabilitySubscri
 *
 * UpdateContextAvailabilitySubscriptionResponse::render - 
 */
-std::string UpdateContextAvailabilitySubscriptionResponse::render(const std::string& indent, int counter)
+void UpdateContextAvailabilitySubscriptionResponse::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string  out                = "";
-  bool         durationRendered   = !duration.isEmpty();
-  bool         errorCodeRendered  = (errorCode.code != SccNone);
+  writer.StartObject();
 
-  out += startTag(indent);
+  subscriptionId.render(writer, RtUpdateContextAvailabilitySubscriptionResponse);
+  duration.render(writer);
 
-  out += subscriptionId.render(RtUpdateContextAvailabilitySubscriptionResponse, indent + "  ", errorCodeRendered || durationRendered);
-  out += duration.render(      indent + "  ", errorCodeRendered);
+  if (errorCode.code != SccNone)
+  {
+     errorCode.render(writer);
+  }
 
-  if (errorCodeRendered)
-     out += errorCode.render(indent + "  ", false);
-
-  out += endTag(indent);
-
-  return out;
+  writer.EndObject();
 }
 
 /* ****************************************************************************
@@ -111,5 +112,9 @@ std::string UpdateContextAvailabilitySubscriptionResponse::check(const std::stri
   else
     return "OK";
 
-  return render(indent, counter);
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
+  render(writer);
+  return sb.GetString();
 }

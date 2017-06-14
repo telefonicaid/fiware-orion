@@ -24,6 +24,9 @@
 */
 #include <string>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -322,24 +325,19 @@ ContextElementResponse::ContextElementResponse(ContextElement* ceP, bool useDefa
 *
 * ContextElementResponse::render - 
 */
-std::string ContextElementResponse::render
+void ContextElementResponse::render
 (
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
   ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
-  const std::string&  indent,
-  bool                comma,
   bool                omitAttributeValues
 )
 {
-  std::string out = "";
-
-  out += startTag(indent);
-  out += contextElement.render(apiVersion, asJsonObject, requestType, indent + "  ", true, omitAttributeValues);
-  out += statusCode.render(indent + "  ", false);
-  out += endTag(indent, comma, false);
-
-  return out;
+  writer.StartObject();
+  contextElement.render(writer, apiVersion, asJsonObject, requestType, omitAttributeValues);
+  statusCode.render(writer);
+  writer.EndObject();
 }
 
 
@@ -348,19 +346,16 @@ std::string ContextElementResponse::render
 *
 * ContextElementResponse::toJson - 
 */
-std::string ContextElementResponse::toJson
+void ContextElementResponse::toJson
 (
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   const std::vector<std::string>&  metadataFilter,
   bool                             blacklist
 )
 {
-  std::string out;
-
-  out = contextElement.toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
-
-  return out;
+  contextElement.toJson(writer, renderFormat, attrsFilter, metadataFilter, blacklist);
 }
 
 

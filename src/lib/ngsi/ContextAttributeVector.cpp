@@ -73,7 +73,10 @@ static std::string addedLookup(const std::vector<std::string>& added, std::strin
 *
 * ContextAttributeVector::toJsonTypes -
 */
-std::string ContextAttributeVector::toJsonTypes(void)
+void ContextAttributeVector::toJsonTypes
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
   // Pass 1 - get per-attribute types
   std::map<std::string, std::map<std::string, int> > perAttrTypes;
@@ -85,8 +88,6 @@ std::string ContextAttributeVector::toJsonTypes(void)
   }
 
   // Pass 2 - generate JSON
-  std::string out;
-
   std::map<std::string, std::map<std::string, int> >::iterator it;
   unsigned int                                                 ix;
   for (it = perAttrTypes.begin(), ix = 0; it != perAttrTypes.end(); ++it, ++ix)
@@ -94,7 +95,10 @@ std::string ContextAttributeVector::toJsonTypes(void)
     std::string                 attrName  = it->first;
     std::map<std::string, int>  attrTypes = it->second;
 
-    out += JSON_STR(attrName) + ":{" + JSON_STR("types") + ":[";
+    writer.Key(attrName.c_str());
+    writer.StartObject();
+    writer.Key("types");
+    writer.StartArray();
 
     std::map<std::string, int>::iterator jt;
     unsigned int                         jx;
@@ -113,24 +117,13 @@ std::string ContextAttributeVector::toJsonTypes(void)
       //
       if ((type != "") || (attrTypes.size() != 1))
       {
-        out += JSON_STR(type);
-      }
-
-      if (jx != attrTypes.size() - 1)
-      {
-        out += ",";
+        writer.String(type.c_str());
       }
     }
 
-    out += "]}";
-
-    if (ix != perAttrTypes.size() - 1)
-    {
-      out += ",";
-    }
+    writer.EndArray();
+    writer.EndObject();
   }
-
-  return out;
 }
 
 
@@ -146,8 +139,9 @@ std::string ContextAttributeVector::toJsonTypes(void)
 * If anybody needs an attribute named 'id' or 'type', then API v1
 * will have to be used to retrieve that information.
 */
-std::string ContextAttributeVector::toJson
+void ContextAttributeVector::toJson
 (
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   const std::vector<std::string>&  metadataFilter,
@@ -156,12 +150,9 @@ std::string ContextAttributeVector::toJson
 {
   if (vec.size() == 0)
   {
-    return "";
+    return;
   }
 
-
-  //
-  // Pass 1 - count the total number of attributes valid for rendering.
   //
   // Attributes named 'id' or 'type' are not rendered.
   // This gives us a small problem in the logic here, about knowing whether the
@@ -172,62 +163,8 @@ std::string ContextAttributeVector::toJson
   // In the second pass, if the number of rendered attributes "so far" is less than the total
   // number of valid attributes, then the comma must be rendered.
   //
-  int validAttributes = 0;
+
   std::map<std::string, bool>  uniqueMap;
-  if ((attrsFilter.size() == 0) || (std::find(attrsFilter.begin(), attrsFilter.end(), ALL_ATTRS) != attrsFilter.end()))
-  {
-    for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    {
-      if ((vec[ix]->name == "id") || (vec[ix]->name == "type"))
-      {
-        continue;
-      }
-
-      if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
-      {
-        if (uniqueMap[vec[ix]->stringValue] == true)
-        {
-          continue;
-        }
-      }
-
-      ++validAttributes;
-
-      if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
-      {
-        uniqueMap[vec[ix]->stringValue] = true;
-      }
-    }
-  }
-  else if (!blacklist)
-  {
-    for (std::vector<std::string>::const_iterator it = attrsFilter.begin(); it != attrsFilter.end(); ++it)
-    {
-      if (lookup(*it) != NULL)
-      {
-        ++validAttributes;
-      }
-    }
-  }
-  else // attrsFilter is black list
-  {
-    for (unsigned ix = 0; ix < vec.size(); ++ix)
-    {
-      if (std::find(attrsFilter.begin(), attrsFilter.end(), vec[ix]->name) == attrsFilter.end())
-      {
-         ++validAttributes;
-      }
-    }
-  }
-
-  //
-  // Pass 2 - do the work, helped by the value of 'validAttributes'.
-  //
-  std::string  out;
-  int          renderedAttributes = 0;
-
-  uniqueMap.clear();
-
   if (attrsFilter.size() == 0 || (std::find(attrsFilter.begin(), attrsFilter.end(), ALL_ATTRS) != attrsFilter.end()))
   {
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
@@ -237,8 +174,6 @@ std::string ContextAttributeVector::toJson
         continue;
       }
 
-      ++renderedAttributes;
-
       if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
         if (uniqueMap[vec[ix]->stringValue] == true)
@@ -247,7 +182,7 @@ std::string ContextAttributeVector::toJson
         }
       }
 
-      out += vec[ix]->toJson(renderedAttributes == validAttributes, renderFormat, metadataFilter);
+      vec[ix]->toJson(writer, renderFormat, metadataFilter);
 
       if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
@@ -262,8 +197,7 @@ std::string ContextAttributeVector::toJson
       ContextAttribute* caP = lookup(*it);
       if (caP != NULL)
       {
-        ++renderedAttributes;
-        out += caP->toJson(renderedAttributes == validAttributes, renderFormat, metadataFilter);
+        caP->toJson(writer, renderFormat, metadataFilter);
       }
     }
   }
@@ -273,13 +207,10 @@ std::string ContextAttributeVector::toJson
     {
       if (std::find(attrsFilter.begin(), attrsFilter.end(), vec[ix]->name) == attrsFilter.end())
       {
-        ++renderedAttributes;
-        out += vec[ix]->toJson(renderedAttributes == validAttributes, renderFormat, metadataFilter);
+        vec[ix]->toJson(writer, renderFormat, metadataFilter);
       }
     }
   }
-
-  return out;
 }
 
 
@@ -288,22 +219,19 @@ std::string ContextAttributeVector::toJson
 *
 * ContextAttributeVector::render - 
 */
-std::string ContextAttributeVector::render
+void ContextAttributeVector::render
 (
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
   ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         request,
-  const std::string&  indent,
-  bool                comma,
   bool                omitValue,
   bool                attrsAsName
 )
 {
-  std::string out = "";
-
   if (vec.size() == 0)
   {
-    return "";
+    return;
   }
 
   //
@@ -336,40 +264,44 @@ std::string ContextAttributeVector::render
     }
 
     // 2. Now it's time to render
-    // Note that in the case of attribute as name, we have to use a vector, thus using
-    // attrsAsName variable as value for isVector parameter
-    out += startTag(indent, "attributes", attrsAsName);
-    for (unsigned int ix = 0; ix < vec.size(); ++ix)
+    // Note that in the case of attribute as name, we have to use a vector
+    writer.Key("attributes");
+    if (attrsAsName)
     {
-      if (attrsAsName)
+      writer.StartArray();
+      for (unsigned int ix = 0; ix < vec.size(); ++ix)
       {
-        out += vec[ix]->renderAsNameString(indent + "  ", ix != vec.size() - 1);
+        vec[ix]->renderAsNameString(writer);
       }
-      else
-      {
-        out += vec[ix]->render(apiVersion, asJsonObject, request, indent + "  ", ix != vec.size() - 1, omitValue);
-      }
+      writer.EndArray();
     }
-    out += endTag(indent, comma, attrsAsName);
+    else
+    {
+      writer.StartObject();
+      for (unsigned int ix = 0; ix < vec.size(); ++ix)
+      {
+        vec[ix]->render(writer, apiVersion, asJsonObject, request, omitValue);
+      }
+      writer.EndObject();
+    }
   }
   else
   {
-    out += startTag(indent, "attributes", true);
+    writer.Key("attributes");
+    writer.StartArray();
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       if (attrsAsName)
       {
-        out += vec[ix]->renderAsNameString(indent + "  ", ix != vec.size() - 1);
+        vec[ix]->renderAsNameString(writer);
       }
       else
       {
-        out += vec[ix]->render(apiVersion, asJsonObject, request, indent + "  ", ix != vec.size() - 1, omitValue);
+        vec[ix]->render(writer, apiVersion, asJsonObject, request, omitValue);
       }
     }
-    out += endTag(indent, comma, true);
+    writer.EndArray();
   }
-
-  return out;
 }
 
 

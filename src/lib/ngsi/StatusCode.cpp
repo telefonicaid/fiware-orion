@@ -87,38 +87,35 @@ StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const 
 *
 * StatusCode::render -
 */
-std::string StatusCode::render(const std::string& indent, bool comma, bool showKey)
+void StatusCode::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  bool showKey
+)
 {
-  std::string  out  = "";
-
-  if (strstr(details.c_str(), "\"") != NULL)
-  {
-    int    len  = details.length() * 2;
-    char*  s    = (char*) calloc(1, len + 1);
-
-    strReplace(s, len, details.c_str(), "\"", "\\\"");
-    details = s;
-    free(s);
-  }
-
   if (code == SccNone)
   {
     fill(SccReceiverInternalError, "");
     details += " - ZERO code set to 500";
   }
 
-  out += startTag(indent, showKey? keyName : "");
-  out += valueTag(indent + "  ", "code", code, true);
-  out += valueTag(indent + "  ", "reasonPhrase", reasonPhrase, details != "");
+  if (showKey) {
+      writer.Key(keyName.c_str());
+  }
+  writer.StartObject();
+
+  writer.Key("code");
+  writer.Uint(code);
+  writer.Key("reasonPhrase");
+  writer.String(reasonPhrase.c_str());
 
   if (details != "")
   {
-    out += valueTag(indent + "  ", "details", details, false);
+    writer.Key("details");
+    writer.String(details.c_str());
   }
 
-  out += endTag(indent, comma);
-
-  return out;
+  writer.EndObject();
 }
 
 

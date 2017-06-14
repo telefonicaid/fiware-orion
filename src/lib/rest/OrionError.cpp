@@ -25,6 +25,9 @@
 #include <stdio.h>
 #include <string>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "common/tag.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
@@ -123,9 +126,23 @@ std::string OrionError::setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpS
 *
 * OrionError::toJson -
 */
-std::string OrionError::toJson(void)
+std::string OrionError::toJson(rapidjson::Writer<rapidjson::StringBuffer>* writer)
 {
-  return "{" + JSON_STR("error") + ":" + JSON_STR(reasonPhrase) + "," + JSON_STR("description") + ":" + JSON_STR(details) + "}";
+  rapidjson::StringBuffer sb;
+  if (writer == NULL) {
+      rapidjson::PrettyWriter<rapidjson::StringBuffer> pwriter(sb);
+      pwriter.SetIndent(' ', 2);
+      writer = &pwriter;
+  }
+
+  writer->StartObject();
+  writer->Key("error");
+  writer->String(reasonPhrase.c_str());
+  writer->Key("description");
+  writer->String(details.c_str());
+  writer->EndObject();
+
+  return sb.GetString();
 }
 
 
@@ -137,26 +154,32 @@ std::string OrionError::toJson(void)
 */
 std::string OrionError::render(void)
 {
-  std::string  out           = "{\n";
-  std::string  indent        = "  ";
+  rapidjson::StringBuffer out;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+  writer.SetIndent(' ', 2);
 
   //
   // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here
   //
-  out += startTag(indent, "orionError", false);
-  out += valueTag(indent + "  ", "code",          code,         true);
-  out += valueTag(indent + "  ", "reasonPhrase",  reasonPhrase, details != "");
+  writer.StartObject();
+
+  writer.Key("orionError");
+  writer.StartObject();
+  writer.Key("code");
+  writer.Uint(code);
+  writer.Key("reasonPhrase");
+  writer.String(reasonPhrase.c_str());
 
   if (details != "")
   {
-    out += valueTag(indent + "  ", "details",       details);
+    writer.Key("details");
+    writer.String(details.c_str());
   }
 
-  out += endTag(indent);
+  writer.EndObject();
+  writer.EndObject();
 
-  out += "}\n";
-
-  return out;
+  return out.GetString();
 }
 
 

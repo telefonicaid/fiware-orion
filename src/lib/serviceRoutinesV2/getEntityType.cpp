@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/errorMessages.h"
@@ -87,7 +90,11 @@ std::string getEntityType
   }
   else
   {
-    TIMED_RENDER(answer = response.toJson());
+    rapidjson::StringBuffer sb;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+    writer.SetIndent(' ', 2);
+    TIMED_RENDER(response.toJson(writer));
+    answer = sb.GetString();
   }
 
   response.release();

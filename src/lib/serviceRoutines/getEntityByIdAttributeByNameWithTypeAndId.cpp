@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -101,14 +104,22 @@ std::string getEntityByIdAttributeByNameWithTypeAndId
     parseDataP->dcars.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
 
-    TIMED_RENDER(answer = parseDataP->dcars.res.render(""));
+    rapidjson::StringBuffer out;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+    writer.SetIndent(' ', 2);
+    TIMED_RENDER(parseDataP->dcars.res.render(writer));
+    answer = out.GetString();
   }
   else if ((entityTypeFromUriParam != entityType) && (entityTypeFromUriParam != ""))
   {
     parseDataP->dcars.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
 
-    TIMED_RENDER(answer = parseDataP->dcars.res.render(""));
+    rapidjson::StringBuffer out;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+    writer.SetIndent(' ', 2);
+    TIMED_RENDER(parseDataP->dcars.res.render(writer));
+    answer = out.GetString();
   }
   else
   {
@@ -117,6 +128,9 @@ std::string getEntityByIdAttributeByNameWithTypeAndId
 
 
     // 04. Call standard operation
+    rapidjson::StringBuffer out;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+    writer.SetIndent(' ', 2);
     answer = postDiscoverContextAvailability(ciP, components, compV, parseDataP);
   }
 

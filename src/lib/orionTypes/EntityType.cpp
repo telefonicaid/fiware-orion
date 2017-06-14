@@ -26,6 +26,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 
@@ -67,42 +70,35 @@ EntityType::EntityType(std::string _type): type(_type), count(0)
 *
 * 'typeNameBefore' is set to TRUE when called from EntityTypeResponse
 */
-std::string EntityType::render
+void EntityType::render
 (
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
   ApiVersion          apiVersion,
   bool                asJsonObject,
   bool                asJsonOut,
   bool                collapsed,
-  const std::string&  indent,
-  bool                comma,
   bool                typeNameBefore
 )
 {
-  std::string  out = "";
-
   if (typeNameBefore && asJsonOut)
   {
-    out += valueTag(indent  + "  ", "name", type, true);
-    out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, indent + "  ", true, true, true);
+    writer.Key("name");
+    writer.String(type.c_str());
+    contextAttributeVector.render(writer, apiVersion, asJsonObject, EntityTypes, true, true);
   }
   else
   {
-    out += startTag(indent);
+    writer.StartObject();
 
-    if (collapsed || contextAttributeVector.size() == 0)
+    writer.Key("name");
+    writer.String(type.c_str());
+    if (!collapsed && contextAttributeVector.size() != 0)
     {
-      out += valueTag(indent  + "  ", "name", type, false);
-    }
-    else
-    {
-      out += valueTag(indent  + "  ", "name", type, true);
-      out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, indent + "  ", false, true, true);
+      contextAttributeVector.render(writer, apiVersion, asJsonObject, EntityTypes, true, true);
     }
 
-    out += endTag(indent, comma, false);
+    writer.EndObject();
   }
-
-  return out;
 }
 
 
@@ -154,26 +150,27 @@ void EntityType::release(void)
 *
 * EntityType::toJson -
 */
-std::string EntityType::toJson(bool includeType)
+void EntityType::toJson
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  bool includeType
+)
 {
-  std::string  out = "{";
-  char         countV[STRING_SIZE_FOR_INT];
-
-  snprintf(countV, sizeof(countV), "%lld", count);
+  writer.StartObject();
 
   if (includeType)
   {
-    out += JSON_VALUE("type", type) + ",";
+    writer.Key("type");
+    writer.String(type.c_str());
   }
 
-  out += JSON_STR("attrs") + ":";
+  writer.Key("attrs");
+  writer.StartObject();
+  contextAttributeVector.toJsonTypes(writer);
+  writer.EndObject();
 
-  out += "{";
-  out += contextAttributeVector.toJsonTypes();
-  out += "}";
+  writer.Key("count");
+  writer.Uint(count);
 
-  out += "," + JSON_STR("count") + ":" + countV;
-  out += "}";
-
-  return out;
+  writer.EndObject();
 }

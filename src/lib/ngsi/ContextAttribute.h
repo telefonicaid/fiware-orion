@@ -28,6 +28,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "common/RenderFormat.h"
 #include "common/globals.h"
 #include "orionTypes/OrionValueType.h"
@@ -92,15 +95,18 @@ public:
   std::string  getId() const;
   std::string  getLocation(ApiVersion apiVersion = V1) const;
 
-  std::string  render(ApiVersion          apiVersion,
+  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+                      ApiVersion          apiVersion,
                       bool                asJsonObject,
                       RequestType         request,
-                      const std::string&  indent,
-                      bool                comma = false,
                       bool                omitValue = false);
-  std::string  renderAsJsonObject(ApiVersion apiVersion, RequestType request, const std::string& indent, bool comma, bool omitValue = false);
-  std::string  renderAsNameString(const std::string& indent, bool comma = false);
-  std::string  toJson(bool                             isLastElement,
+  void         renderAsJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+                                  ApiVersion  apiVersion,
+                                  RequestType request,
+                                  bool        asJsonObject,
+                                  bool        omitValue = false);
+  void         renderAsNameString(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
                       RenderFormat                     renderFormat,
                       const std::vector<std::string>&  metadataFilter,
                       RequestType                      requestType = NoRequest);

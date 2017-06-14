@@ -62,22 +62,21 @@ SubscribeContextResponse::SubscribeContextResponse(StatusCode& errorCode)
 *
 * SubscribeContextResponse::render - 
 */
-std::string SubscribeContextResponse::render(const std::string& indent)
+void SubscribeContextResponse::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string out     = "";
-
-  out += startTag(indent);
+  writer.StartObject();
 
   if (subscribeError.errorCode.code == SccNone)
   {
-    out += subscribeResponse.render(indent + "  ", false);
+    subscribeResponse.render(writer);
   }
   else
   {
-    out += subscribeError.render(SubscribeContext, indent + "  ", false);
+    subscribeError.render(writer, SubscribeContext);
   }
 
-  out += endTag(indent, false);
-
-  return out;
+  writer.EndObject();
 }

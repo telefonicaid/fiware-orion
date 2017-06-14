@@ -62,17 +62,16 @@ NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse(StatusCode&
 *
 * NotifyContextAvailabilityResponse::render -
 */
-std::string NotifyContextAvailabilityResponse::render(const std::string& indent)
+void NotifyContextAvailabilityResponse::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string out = "";
-
   responseCode.keyNameSet("responseCode");
 
-  out += startTag(indent);
-  out += responseCode.render(indent + "  ");
-  out += endTag(indent);
-
-  return out;
+  writer.StartObject();
+  responseCode.render(writer);
+  writer.EndObject();
 }
 
 

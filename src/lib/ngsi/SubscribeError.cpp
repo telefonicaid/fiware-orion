@@ -46,11 +46,14 @@ SubscribeError::SubscribeError()
 *
 * SubscribeError::render -
 */
-std::string SubscribeError::render(RequestType requestType, const std::string& indent, bool comma)
+void SubscribeError::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  RequestType requestType
+)
 {
-  std::string out = "";
-
-  out += startTag(indent, "subscribeError", false);
+  writer.Key("subscribeError");
+  writer.StartObject();
 
   // subscriptionId is Mandatory if part of updateContextSubscriptionResponse
   // errorCode is Mandatory so, the JSON comma is always TRUE
@@ -64,20 +67,17 @@ std::string SubscribeError::render(RequestType requestType, const std::string& i
     {
       subscriptionId.set("000000000000000000000000");
     }
-    out += subscriptionId.render(requestType, indent + "  ", true);
+    subscriptionId.render(writer, requestType);
   }
   else if ((requestType          == SubscribeContext)           &&
            (subscriptionId.get() != "000000000000000000000000") &&
            (subscriptionId.get() != ""))
   {
-    out += subscriptionId.render(requestType, indent + "  ", true);
+    subscriptionId.render(writer, requestType);
   }
 
-  out += errorCode.render(indent + "  ");
-
-  out += endTag(indent, comma);
-
-  return out;
+  errorCode.render(writer);
+  writer.EndObject();
 }
 
 

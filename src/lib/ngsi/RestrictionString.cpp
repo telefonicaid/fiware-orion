@@ -108,14 +108,18 @@ void RestrictionString::present(const std::string& indent)
 *
 * RestrictionString::render -
 */
-std::string RestrictionString::render(const std::string& indent, bool comma)
+void RestrictionString::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
   if (string == "")
   {
-    return "";
+    return;
   }
 
-  return valueTag(indent, "restriction", string, comma);
+  writer.Key("restriction");
+  writer.String(string.c_str());
 }
 
 

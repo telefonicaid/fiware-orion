@@ -24,6 +24,8 @@
 */
 #include <string>
 
+#include "rapidjson/prettywriter.h"
+
 #include "logMsg/logMsg.h"
 
 #include "ngsi/StatusCode.h"
@@ -85,7 +87,11 @@ std::string DiscoverContextAvailabilityRequest::check(const std::string& indent,
   else
     return "OK";
 
-  return response.render(indent);
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
+  response.render(writer);
+  return sb.GetString();
 }
 
 

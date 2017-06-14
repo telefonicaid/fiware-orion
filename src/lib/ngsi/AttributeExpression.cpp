@@ -110,14 +110,13 @@ void AttributeExpression::present(const std::string& indent)
 *
 * AttributeExpression::render - 
 */
-std::string AttributeExpression::render(const std::string& indent, bool comma)
+void AttributeExpression::render(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
-  if (string == "")
+  if (string != "")
   {
-    return "";
+    writer.Key("attributeExpression");
+    writer.String(string.c_str());
   }
-
-  return valueTag(indent, "attributeExpression", string, comma);
 }
 
 

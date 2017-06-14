@@ -24,6 +24,8 @@
 */
 #include <string>
 
+#include "rapidjson/prettywriter.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/RenderFormat.h"
@@ -38,24 +40,20 @@
 *
 * NotifyContextRequest::render -
 */
-std::string NotifyContextRequest::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
+void NotifyContextRequest::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  ApiVersion apiVersion,
+  bool asJsonObject
+)
 {
-  std::string  out                                  = "";
-  bool         contextElementResponseVectorRendered = contextElementResponseVector.size() != 0;
+  writer.StartObject();
 
-  //
-  // Note on JSON commas:
-  //   subscriptionId and originator are MANDATORY.
-  //   The only doubt here if whether originator should end in a comma.
-  //   This doubt is taken care of by the variable 'contextElementResponseVectorRendered'
-  //
-  out += startTag(indent);
-  out += subscriptionId.render(NotifyContext, indent + "  ", true);
-  out += originator.render(indent  + "  ", contextElementResponseVectorRendered);
-  out += contextElementResponseVector.render(apiVersion, asJsonObject, NotifyContext, indent  + "  ", false);
-  out += endTag(indent);
+  subscriptionId.render(writer, NotifyContext);
+  originator.render(writer);
+  contextElementResponseVector.render(writer, apiVersion, asJsonObject, NotifyContext);
 
-  return out;
+  writer.EndObject();
 }
 
 
@@ -80,19 +78,20 @@ std::string NotifyContextRequest::toJson
     return oe.toJson();
   }
 
-  std::string out;
+  rapidjson::StringBuffer sb;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
 
-  out += "{";
-  out += JSON_STR("subscriptionId") + ":";
-  out += JSON_STR(subscriptionId.get());
-  out += ",";
-  out += JSON_STR("data") + ":[";
+  writer.StartObject();
+  writer.Key("subscriptionId");
+  writer.String(subscriptionId.get().c_str());
+  writer.Key("data");
+  writer.StartArray();
 
-  out += contextElementResponseVector.toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
-  out += "]";
-  out += "}";
+  contextElementResponseVector.toJson(writer, renderFormat, attrsFilter, metadataFilter, blacklist);
+  writer.EndArray();
+  writer.EndObject();
 
-  return out;
+  return sb.GetString();
 }
 
 
@@ -121,7 +120,11 @@ std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string
     return "OK";
   }
 
-  return response.render(indent);
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
+  response.render(writer);
+  return sb.GetString();
 }
 
 

@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+
 #include "logMsg/logMsg.h"
 
 #include "common/tag.h"
@@ -42,22 +44,18 @@
 *
 * render - 
 */
-std::string ContextAttributeResponse::render
+void ContextAttributeResponse::render
 (
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
   ApiVersion          apiVersion,
   bool                asJsonObject,
-  RequestType         request,
-  const std::string&  indent
+  RequestType         request
 )
 {
-  std::string out = "";
-
-  out += startTag(indent);
-  out += contextAttributeVector.render(apiVersion, asJsonObject, request, indent + "  ", true);
-  out += statusCode.render(indent + "  ");
-  out += endTag(indent);
-
-  return out;
+  writer.StartObject();
+  contextAttributeVector.render(writer, apiVersion, asJsonObject, request);
+  statusCode.render(writer);
+  writer.EndObject();
 }
 
 
@@ -101,7 +99,11 @@ std::string ContextAttributeResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, requestType, indent);
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
+  render(writer, apiVersion, asJsonObject, requestType);
+  return sb.GetString();
 }
 
 

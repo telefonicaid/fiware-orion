@@ -24,6 +24,8 @@
 */
 #include <string>
 
+#include "rapidjson/prettywriter.h"
+
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 
@@ -94,21 +96,30 @@ QueryContextResponse::~QueryContextResponse()
 *
 * QueryContextResponse::render -
 */
-std::string QueryContextResponse::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
+void QueryContextResponse::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  ApiVersion apiVersion,
+  bool asJsonObject
+)
 {
-  std::string  out               = "";
-  bool         errorCodeRendered = false;
+  writer.StartObject();
+
+  if (contextElementResponseVector.size() > 0)
+  {
+    contextElementResponseVector.render(writer, apiVersion, asJsonObject, QueryContext);
+  }
 
   //
-  // 01. Decide whether errorCode should be rendered
+  // Decide whether errorCode should be rendered
   //
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    errorCodeRendered = true;
+    errorCode.render(writer);
   }
   else if (contextElementResponseVector.size() == 0)
   {
-    errorCodeRendered = true;
+    errorCode.render(writer);
   }
   else if (errorCode.details != "")
   {
@@ -117,28 +128,11 @@ std::string QueryContextResponse::render(ApiVersion apiVersion, bool asJsonObjec
       errorCode.code = SccOk;
     }
 
-    errorCodeRendered = true;
+    errorCode.render(writer);
   }
 
-
   //
-  // 02. render
-  //
-  out += startTag(indent);
-
-  if (contextElementResponseVector.size() > 0)
-  {
-    out += contextElementResponseVector.render(apiVersion, asJsonObject, QueryContext, indent + "  ", errorCodeRendered);
-  }
-
-  if (errorCodeRendered == true)
-  {
-    out += errorCode.render(indent + "  ");
-  }
-
-
-  //
-  // 03. Safety Check
+  // Safety Check
   //
   // If neither errorCode nor CER vector was filled by mongoBackend, then we
   // report a special kind of error.
@@ -147,12 +141,10 @@ std::string QueryContextResponse::render(ApiVersion apiVersion, bool asJsonObjec
   {
     LM_W(("Internal Error (Both error-code and response vector empty)"));
     errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
-    out += errorCode.render(indent + "  ");
+    errorCode.render(writer);
   }
 
-  out += endTag(indent);
-
-  return out;
+  writer.EndObject();
 }
 
 
@@ -179,7 +171,11 @@ std::string QueryContextResponse::check(ApiVersion apiVersion, bool asJsonObject
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, indent);
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
+  render(writer, apiVersion, asJsonObject);
+  return sb.GetString();
 }
 
 

@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -53,10 +56,12 @@ std::string postDiscoverContextAvailability
 )
 {
   DiscoverContextAvailabilityResponse*  dcarP = &parseDataP->dcars.res;
-  std::string                           answer;
 
+  rapidjson::StringBuffer out;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+  writer.SetIndent(' ', 2);
   TIMED_MONGO(ciP->httpStatusCode = mongoDiscoverContextAvailability(&parseDataP->dcar.res, dcarP, ciP->tenant, ciP->uriParam, ciP->servicePathV));
-  TIMED_RENDER(answer = dcarP->render(""));
+  TIMED_RENDER(dcarP->render(writer));
 
-  return answer;
+  return out.GetString();
 }

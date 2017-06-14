@@ -24,6 +24,8 @@
 */
 #include <string>
 
+#include "rapidjson/prettywriter.h"
+
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 #include "common/globals.h"
@@ -99,28 +101,27 @@ RegisterContextResponse::RegisterContextResponse(const std::string& _registratio
 *
 * RegisterContextResponse::render - 
 */
-std::string RegisterContextResponse::render(const std::string& indent)
+void RegisterContextResponse::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string  out = "";
-  bool         errorCodeRendered = (errorCode.code != SccNone) && (errorCode.code != SccOk);
+  bool error = (errorCode.code != SccNone) && (errorCode.code != SccOk); 
+  writer.StartObject();
 
-  out += startTag(indent);
-
-  if (!errorCodeRendered)
+  if (!error)
   {
-    out += duration.render(indent + "  ", true);
+    duration.render(writer);
   }
 
-  out += registrationId.render(RegisterResponse, indent + "  ", errorCodeRendered);
+  registrationId.render(writer, RegisterResponse);
 
-  if (errorCodeRendered)
+  if (error)
   {
-    out += errorCode.render(indent + "  ");
+    errorCode.render(writer);
   }
 
-  out += endTag(indent);
-
-  return out;
+  writer.EndObject();
 }
 
 
@@ -146,7 +147,11 @@ std::string RegisterContextResponse::check(const std::string& indent, const std:
   else
     return "OK";
 
-  return response.render(indent);
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
+  response.render(writer);
+  return sb.GetString();
 }
 
 

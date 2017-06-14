@@ -28,6 +28,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
@@ -51,10 +54,10 @@ typedef struct ContextAttributeResponse
   ContextAttributeVector     contextAttributeVector;     // Mandatory
   StatusCode                 statusCode;                 // Mandatory
 
-  std::string render(ApiVersion          apiVersion,
+  void        render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+                     ApiVersion          apiVersion,
                      bool                asJsonObject,
-                     RequestType         request,
-                     const std::string&  indent);
+                     RequestType         request);
   void        present(std::string indent);
   void        release(void);
   std::string check(ApiVersion          apiVersion,

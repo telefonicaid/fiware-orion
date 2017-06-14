@@ -82,21 +82,21 @@ SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(const
 *
 * SubscribeContextAvailabilityResponse::render -
 */
-std::string SubscribeContextAvailabilityResponse::render(const std::string& indent)
+void SubscribeContextAvailabilityResponse::render
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string  out                = "";
-  bool         durationRendered   = !duration.isEmpty();
-  bool         errorCodeRendered  = (errorCode.code != SccNone);
 
-  out += startTag(indent);
+  writer.StartObject();
 
-  out += subscriptionId.render(RtSubscribeContextAvailabilityResponse, indent + "  ", durationRendered || errorCodeRendered);
-  out += duration.render(indent + "  ", errorCodeRendered);
+  subscriptionId.render(writer, RtSubscribeContextAvailabilityResponse);
+  duration.render(writer);
 
-  if (errorCodeRendered)
-     out += errorCode.render(indent + "  ", false);
+  if (errorCode.code != SccNone)
+  {
+     errorCode.render(writer);
+  }
 
-  out += endTag(indent);
-
-  return out;
+  writer.EndObject();
 }

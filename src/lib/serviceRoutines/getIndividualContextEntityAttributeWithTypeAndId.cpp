@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -73,7 +76,6 @@ std::string getIndividualContextEntityAttributeWithTypeAndId
   ParseData*                 parseDataP
 )
 {
-  std::string               answer;
   std::string               entityType              = compV[3];
   std::string               entityId                = compV[5];
   std::string               attributeName           = compV[7];
@@ -135,12 +137,15 @@ std::string getIndividualContextEntityAttributeWithTypeAndId
 
 
   // 07. Cleanup and return result
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, RtContextAttributeResponse, ""));
+  rapidjson::StringBuffer out;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+  writer.SetIndent(' ', 2);
+  TIMED_RENDER(response.render(writer, ciP->apiVersion, asJsonObject, RtContextAttributeResponse));
 
 
   parseDataP->qcr.res.release();
   parseDataP->qcrs.res.release();
   response.release();
 
-  return answer;
+  return out.GetString();
 }

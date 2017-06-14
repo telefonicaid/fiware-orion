@@ -29,6 +29,9 @@
 #include <vector>
 #include <map>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "apiTypesV2/EntityVector.h"
 #include "rest/OrionError.h"
 
@@ -55,7 +58,8 @@ class Entities
   Entities();
   ~Entities();
 
-  std::string  render(std::map<std::string, bool>&         uriParamOptions,
+  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+                      std::map<std::string, bool>&         uriParamOptions,
                       std::map<std::string, std::string>&  uriParam);
 
   std::string  check(ApiVersion apiVersion, RequestType requestType);

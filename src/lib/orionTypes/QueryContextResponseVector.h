@@ -28,6 +28,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi10/QueryContextResponse.h"
 
 
@@ -44,7 +47,7 @@ typedef struct QueryContextResponseVector
   void                   push_back(QueryContextResponse* item);
   void                   release(void);
   void                   present(void);
-  std::string            render(ApiVersion apiVersion, bool asJsonObject, bool details, const std::string& detailsString);
+  void                   render(rapidjson::Writer<rapidjson::StringBuffer>& writer, ApiVersion apiVersion, bool asJsonObject, bool details, const std::string& detailsString);
   void                   populate(QueryContextResponse* responseP);
 
   QueryContextResponse*  operator[](unsigned int ix) const;

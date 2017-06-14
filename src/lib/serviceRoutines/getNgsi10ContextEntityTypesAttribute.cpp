@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -98,18 +101,24 @@ std::string getNgsi10ContextEntityTypesAttribute
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
 
-    TIMED_RENDER(answer = parseDataP->qcrs.res.render(ciP->apiVersion, asJsonObject, ""));
+    rapidjson::StringBuffer out;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+    writer.SetIndent(' ', 2);
+    TIMED_RENDER(parseDataP->qcrs.res.render(writer, ciP->apiVersion, asJsonObject));
     parseDataP->qcr.res.release();
-    return answer;
+    return out.GetString(); 
   }
   else if ((typeNameFromUriParam != typeName) && (typeNameFromUriParam != ""))
   {
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
 
-    TIMED_RENDER(answer = parseDataP->qcrs.res.render(ciP->apiVersion, asJsonObject, ""));
+    rapidjson::StringBuffer out;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+    writer.SetIndent(' ', 2);
+    TIMED_RENDER(parseDataP->qcrs.res.render(writer, ciP->apiVersion, asJsonObject));
     parseDataP->qcr.res.release();
-    return answer;
+    return out.GetString(); 
   }
 
 
@@ -118,6 +127,9 @@ std::string getNgsi10ContextEntityTypesAttribute
 
 
   // 04. Call standard operation postQueryContext (that renders the QueryContextResponse)
+  rapidjson::StringBuffer out;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+  writer.SetIndent(' ', 2);
   answer = postQueryContext(ciP, components, compV, parseDataP);
 
 
@@ -126,7 +138,11 @@ std::string getNgsi10ContextEntityTypesAttribute
   {
     parseDataP->qcrs.res.errorCode.details = "entityId::type/attribute::name pair not found";
 
-    TIMED_RENDER(answer = parseDataP->qcrs.res.render(ciP->apiVersion, asJsonObject, ""));
+    rapidjson::StringBuffer out;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+    writer.SetIndent(' ', 2);
+    TIMED_RENDER(parseDataP->qcrs.res.render(writer, ciP->apiVersion, asJsonObject));
+    answer = out.GetString();
   }
 
 

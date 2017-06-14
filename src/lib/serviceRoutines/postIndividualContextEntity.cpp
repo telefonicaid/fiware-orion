@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -95,8 +98,9 @@ std::string postIndividualContextEntity
   std::string                   entityTypeFromPayload = reqP->entity.type;
   std::string                   entityTypeFromURL     = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
   std::string                   entityType;
-  std::string                   answer;
-  std::string                   out;
+  rapidjson::StringBuffer out;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
+  writer.SetIndent(' ', 2);
 
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
 
@@ -112,8 +116,8 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
-    return out;
+    TIMED_RENDER(response.render(writer, ciP->apiVersion, asJsonObject, IndividualContextEntity));
+    return out.GetString();
   }
   entityId = (entityIdFromPayload != "")? entityIdFromPayload : entityIdFromURL;
 
@@ -125,8 +129,8 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
-    return out;
+    TIMED_RENDER(response.render(writer, ciP->apiVersion, asJsonObject, IndividualContextEntity));
+    return out.GetString();
   }
   entityType = (entityTypeFromPayload != "")? entityTypeFromPayload :entityTypeFromURL;
 
@@ -139,8 +143,8 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
-    return out;
+    TIMED_RENDER(response.render(writer, ciP->apiVersion, asJsonObject, IndividualContextEntity));
+    return out.GetString();
   }
 
   // 01.04. Entity::id must be present, somewhere ...
@@ -151,8 +155,8 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
-    return out;
+    TIMED_RENDER(response.render(writer, ciP->apiVersion, asJsonObject, IndividualContextEntity));
+    return out.GetString();
   }
 
   // Now, forward Entity to response
@@ -173,10 +177,10 @@ std::string postIndividualContextEntity
   response.fill(&parseDataP->upcrs.res);
 
   // 05. Cleanup and return result
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
+  TIMED_RENDER(response.render(writer, ciP->apiVersion, asJsonObject, IndividualContextEntity));
 
   response.release();
   parseDataP->upcr.res.release();
 
-  return answer;
+  return out.GetString();
 }
