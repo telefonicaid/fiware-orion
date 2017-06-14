@@ -95,9 +95,9 @@ TEST(commonMacroSubstitute, withRealloc)
 
 /* ****************************************************************************
 *
-* bufferTooBigInitially - max size of the substituted buffer is 8Mb (MAX_DYN_MSG_SIZE)
+* bufferTooBigInitially - max size of the substituted buffer is 8MB (MAX_DYN_MSG_SIZE)
 *
-* This unit test provokes a buffer size > 8Mb to see the error returned
+* This unit test provokes a buffer size > 8MB to see the error returned
 */
 TEST(commonMacroSubstitute, bufferTooBigInitially)
 {
@@ -127,11 +127,11 @@ TEST(commonMacroSubstitute, bufferTooBigInitially)
 
 /* ****************************************************************************
 *
-* bufferTooBigAfterSubstitution - max size of the substituted buffer is 8Mb (MAX_DYN_MSG_SIZE)
+* bufferTooBigAfterSubstitution - max size of the substituted buffer is 8MB (MAX_DYN_MSG_SIZE)
 *
-* This unit test provokes a buffer size > 8Mb to see the error returned.
-* However, unlike 'bufferTooBigInitially', this test has an incoming buffer < 8Mb but
-* as the buffer grows as substitutions are made, the resulting buffer is > 8Mb and an
+* This unit test provokes a buffer size > 8MB to see the error returned.
+* However, unlike 'bufferTooBigInitially', this test has an incoming buffer < 8MB but
+* as the buffer grows as substitutions are made, the resulting buffer is > 8MB and an
 * error should be returned
 */
 TEST(commonMacroSubstitute, bufferTooBigAfterSubstitution)
@@ -142,14 +142,14 @@ TEST(commonMacroSubstitute, bufferTooBigAfterSubstitution)
 
   ce.contextAttributeVector.push_back(caP);
 
-  char* base = (char*) malloc(MAX_DYN_MSG_SIZE + 2 - 16);  // -16 so that '${id}/${type}' fits inside 8Mb
+  char* base = (char*) malloc(MAX_DYN_MSG_SIZE + 2 - 16);  // -16 so that '${id}/${type}' fits inside 8MB
                                                            // but 'EntityId000001/EntityType000001' does not
 
   memset(base, 'a', MAX_DYN_MSG_SIZE + 2 - 16);
   base[MAX_DYN_MSG_SIZE + 2 - 16] = 0;
 
-  std::string s1      = std::string(base) + "${id}/${type}";                   // < 8Mb
-  //          correct = std::string(base) + "EntityId000001/EntityType000001"; // > 8Mb after substitutions
+  std::string s1      = std::string(base) + "${id}/${type}";                   // < 8MB
+  //          correct = std::string(base) + "EntityId000001/EntityType000001"; // > 8MB after substitutions
   std::string result;
 
   b = macroSubstitute(&result, s1, ce);
