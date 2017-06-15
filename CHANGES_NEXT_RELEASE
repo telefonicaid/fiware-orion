@@ -1,4 +1,4 @@
-- Add: self-notification loop protection, based on Fiware-Correlator and Ngsiv2-AttrsFormat headers and lastCorrelator field at DB (#2936)
+- Add: self-notification loop protection, based on Fiware-Correlator and Ngsiv2-AttrsFormat headers and lastCorrelator field at DB (#2937)
 - Add: Fiware-Correlator and NgsiV2-AttrsFormat headers cannot be overwritten by the custom notification logic (#2937)
 - Hardening: Mongo driver migrated to legacy-1.1.2 (several bugfixes in the legacy-1.0.7 to legacy-1.1.2 delta)
 - Hardening: Several changes in argument passing in mongoBackend library to avoid passing entire objects on the stack, from "X x" to "const X& x"
