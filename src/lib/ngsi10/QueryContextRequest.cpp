@@ -93,17 +93,40 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 
 /* ****************************************************************************
 *
-* QueryContextRequest::render -
+* QueryContextRequest:: render -
 */
-void QueryContextRequest::render
+std::string QueryContextRequest::render
+(
+  int indent
+)
+{
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+  toJson(writer);
+
+  return sb.GetString();
+}
+
+
+/* ****************************************************************************
+*
+* QueryContextRequest::toJson -
+*/
+void QueryContextRequest::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )
 {
   writer.StartObject();
-  entityIdVector.render(writer);
-  attributeList.render(writer);
-  restriction.render(writer);
+  entityIdVector.toJson(writer);
+  attributeList.toJson(writer);
+  restriction.toJson(writer);
   writer.EndObject();
 }
 
@@ -134,11 +157,7 @@ std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject,
     return "OK";
   }
 
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
-  response.render(writer, apiVersion, asJsonObject);
-  return sb.GetString();
+  return response.render(apiVersion, asJsonObject);
 }
 
 

@@ -57,16 +57,13 @@ class Attribute
   OrionError         oe;                    // Optional - mandatory if not 200-OK
 
   Attribute(): pcontextAttribute(0) {}
-  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                      ApiVersion          apiVersion,
-                      bool                acceptedTextPlain,
-                      bool                acceptedJson,
+  std::string  render(ApiVersion          apiVersion,
                       MimeType            outFormatSelection,
-                      MimeType*           outMimeTypeP,
                       HttpStatusCode*     scP,
                       bool                keyValues,
                       const std::string&  metadataList,
-                      RequestType         requestType);
+                      RequestType         requestType,
+                      int                 indent = -1);
   void         fill(QueryContextResponse* qcrsP, std::string attrName);
 };
 

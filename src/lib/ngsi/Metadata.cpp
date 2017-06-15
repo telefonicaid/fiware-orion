@@ -225,9 +225,9 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 
 /* ****************************************************************************
 *
-* Metadata::render -
+* Metadata::toJsonV1 -
 */
-void Metadata::render
+void Metadata::toJsonV1
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )

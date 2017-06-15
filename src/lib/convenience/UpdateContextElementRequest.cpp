@@ -40,7 +40,33 @@
 *
 * render - 
 */
-void UpdateContextElementRequest::render
+std::string UpdateContextElementRequest::render
+(
+  ApiVersion  apiVersion,
+  bool        asJsonObject,
+  RequestType requestType,
+  int         indent
+)
+{
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+  toJson(writer, apiVersion, asJsonObject, requestType);
+
+  return sb.GetString();
+}
+
+
+/* ****************************************************************************
+*
+* toJson - 
+*/
+void UpdateContextElementRequest::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer,
   ApiVersion apiVersion,
@@ -50,8 +76,8 @@ void UpdateContextElementRequest::render
 {
   writer.StartObject();
 
-  attributeDomainName.render(writer);
-  contextAttributeVector.render(writer, apiVersion, asJsonObject, requestType);
+  attributeDomainName.toJson(writer);
+  contextAttributeVector.toJsonV1(writer, asJsonObject, requestType);
 
   writer.EndObject();
 }
@@ -97,11 +123,7 @@ std::string UpdateContextElementRequest::check
     return "OK";
   }
 
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
-  response.render(writer, apiVersion, asJsonObject, requestType);
-  return sb.GetString();
+  return response.render(apiVersion, asJsonObject, requestType);
 }
 
 

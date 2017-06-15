@@ -61,10 +61,10 @@ typedef struct UpdateContextElementResponse
 
   UpdateContextElementResponse();
 
-  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                      ApiVersion          apiVersion,
-                      bool                asJsonObject,
-                      RequestType         requestType);
+  std::string  render(ApiVersion  apiVersion,
+                      bool        asJsonObject,
+                      RequestType requestType,
+                      int         indent = -1);
   void         present(const std::string&  indent);
   void         release();
   std::string  check(ApiVersion          apiVersion,

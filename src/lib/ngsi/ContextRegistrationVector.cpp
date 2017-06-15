@@ -46,9 +46,9 @@ void ContextRegistrationVector::push_back(ContextRegistration* item)
 
 /* ****************************************************************************
 *
-* ContextRegistrationVector::render -
+* ContextRegistrationVector::toJson -
 */
-void ContextRegistrationVector::render
+void ContextRegistrationVector::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )
@@ -63,7 +63,7 @@ void ContextRegistrationVector::render
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->render(writer, true);
+    vec[ix]->toJson(writer, true);
   }
 
   writer.EndArray();

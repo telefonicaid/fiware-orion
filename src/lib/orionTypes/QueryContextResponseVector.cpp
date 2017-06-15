@@ -26,6 +26,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -123,15 +126,24 @@ void QueryContextResponseVector::present(void)
 *
 * QueryContextResponseVector::render -
 */
-void QueryContextResponseVector::render
+std::string QueryContextResponseVector::render
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  ApiVersion apiVersion,
-  bool asJsonObject,
-  bool details,
-  const std::string& detailsString
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
+  bool                details,
+  const std::string&  detailsString,
+  int                 indent
 )
 {
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+
   QueryContextResponse* responseP = new QueryContextResponse();
 
   //
@@ -237,9 +249,11 @@ void QueryContextResponseVector::render
     }
   }
 
-  responseP->render(writer, apiVersion, asJsonObject);
+  responseP->toJson(writer, apiVersion, asJsonObject);
   responseP->release();
   delete responseP;
+
+  return sb.GetString();
 }
 
 

@@ -61,7 +61,7 @@ EntityType::EntityType(std::string _type): type(_type), count(0)
 
 /* ****************************************************************************
 *
-* EntityType::render -
+* EntityType::toJsonV1 -
 *
 * This method is used by:
 *   o EntityTypeVector
@@ -69,7 +69,7 @@ EntityType::EntityType(std::string _type): type(_type), count(0)
 *
 * 'typeNameBefore' is set to TRUE when called from EntityTypeResponse
 */
-void EntityType::render
+void EntityType::toJsonV1
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer,
   ApiVersion          apiVersion,
@@ -83,7 +83,7 @@ void EntityType::render
   {
     writer.Key("name");
     writer.String(type.c_str());
-    contextAttributeVector.render(writer, apiVersion, asJsonObject, EntityTypes, true, true);
+    contextAttributeVector.toJsonV1(writer, asJsonObject, EntityTypes, true, true);
   }
   else
   {
@@ -93,7 +93,7 @@ void EntityType::render
     writer.String(type.c_str());
     if (!collapsed && contextAttributeVector.size() != 0)
     {
-      contextAttributeVector.render(writer, apiVersion, asJsonObject, EntityTypes, true, true);
+      contextAttributeVector.toJsonV1(writer, asJsonObject, EntityTypes, true, true);
     }
 
     writer.EndObject();

@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -79,6 +76,7 @@ std::string deleteAllEntitiesWithTypeAndId
   std::string     entityId              = compV[5];
   EntityTypeInfo  typeInfo              = EntityTypeEmptyOrNotEmpty;
   std::string     typeNameFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string     answer;
   StatusCode      response;
 
   // 01. Get values from URL (+ entityId::type, exist, !exist)
@@ -99,12 +97,9 @@ std::string deleteAllEntitiesWithTypeAndId
 
     response.fill(SccBadRequest, "entity::type cannot be empty for this request");
 
-    rapidjson::StringBuffer out;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-    writer.SetIndent(' ', 2);
-    TIMED_RENDER(response.render(writer, false));
+    TIMED_RENDER(answer = response.render());
 
-    return out.GetString();
+    return answer;
   }
   else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
   {
@@ -112,12 +107,9 @@ std::string deleteAllEntitiesWithTypeAndId
 
     response.fill(SccBadRequest, "non-matching entity::types in URL");
 
-    rapidjson::StringBuffer out;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-    writer.SetIndent(' ', 2);
-    TIMED_RENDER(response.render(writer, false));
+    TIMED_RENDER(answer = response.render());
 
-    return out.GetString();
+    return answer;
   }
 
 
@@ -134,13 +126,10 @@ std::string deleteAllEntitiesWithTypeAndId
 
 
   // 06. Cleanup and return result
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
-  TIMED_RENDER(response.render(writer, false));
+  TIMED_RENDER(answer = response.render());
 
   parseDataP->upcr.res.release();
   response.release();
 
-  return out.GetString();
+  return answer;
 }

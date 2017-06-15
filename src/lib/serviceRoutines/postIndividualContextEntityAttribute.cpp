@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -93,11 +90,7 @@ std::string postIndividualContextEntityAttribute
 
 
   // 4. Cleanup and return result
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
-  TIMED_RENDER(response.render(writer, false));
-  answer = out.GetString();
+  TIMED_RENDER(answer = response.render());
 
   response.release();
   parseDataP->upcr.res.release();

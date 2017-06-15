@@ -42,27 +42,61 @@
 
 /* ****************************************************************************
 *
-* EntityTypeVectorResponse::render -
+* EntityTypeVectorResponse::renderV1 -
 */
-void EntityTypeVectorResponse::render
+std::string EntityTypeVectorResponse::renderV1
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  bool                asJsonOut,
-  bool                collapsed
+  bool                                         asJsonObject,
+  bool                                         asJsonOut,
+  bool                                         collapsed,
+  int                                          indent
 )
 {
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
   writer.StartObject();
 
   if (entityTypeVector.size() > 0)
   {
-    entityTypeVector.render(writer, apiVersion, asJsonObject, asJsonOut, collapsed);
+    entityTypeVector.toJsonV1(writer, asJsonObject, asJsonOut, collapsed);
   }
 
-  statusCode.render(writer);
+  statusCode.toJsonV1(writer);
 
   writer.EndObject();
+
+  return sb.GetString();
+}
+
+
+
+/* ****************************************************************************
+*
+* EntityTypeVectorResponse::render -
+*/
+std::string EntityTypeVectorResponse::render
+(
+  bool                                         values,
+  int                                          indent
+)
+{
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+  entityTypeVector.toJson(writer, values);
+
+  return sb.GetString();
 }
 
 
@@ -95,12 +129,7 @@ std::string EntityTypeVectorResponse::check
     return "OK";
   }
 
-  rapidjson::StringBuffer s;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
-  writer.SetIndent(' ', 2);
-  render(writer, apiVersion, asJsonObject, asJsonOut, collapsed);
-
-  return s.GetString();
+  return renderV1(asJsonObject, asJsonOut, collapsed);
 }
 
 
@@ -129,32 +158,4 @@ void EntityTypeVectorResponse::release(void)
 {
   entityTypeVector.release();
   statusCode.release();
-}
-
-
-/* ****************************************************************************
-*
-* EntityTypeVectorResponse::toJson -
-*/
-void EntityTypeVectorResponse::toJson
-(
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  bool values
-)
-{
-  writer.StartArray();
-
-  for (unsigned int ix = 0; ix < entityTypeVector.vec.size(); ++ix)
-  {
-    if (values)
-    {
-      writer.String(entityTypeVector.vec[ix]->type.c_str());
-    }
-    else  // default
-    {
-      entityTypeVector.vec[ix]->toJson(writer);
-    }
-  }
-
-  writer.EndArray();
 }

@@ -30,7 +30,6 @@
 #include "logMsg/logMsg.h"
 #include "common/globals.h"
 #include "ngsi/StatusCode.h"
-#include "ngsi/StatusCode.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
 
@@ -100,27 +99,38 @@ RegisterContextResponse::RegisterContextResponse(const std::string& _registratio
 *
 * RegisterContextResponse::render - 
 */
-void RegisterContextResponse::render
+std::string RegisterContextResponse::render
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  int indent
 )
 {
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+
   bool error = (errorCode.code != SccNone) && (errorCode.code != SccOk); 
   writer.StartObject();
 
   if (!error)
   {
-    duration.render(writer);
+    duration.toJson(writer);
   }
 
-  registrationId.render(writer, RegisterResponse);
+  registrationId.toJson(writer, RegisterResponse);
 
   if (error)
   {
-    errorCode.render(writer);
+    errorCode.toJsonV1(writer);
   }
 
   writer.EndObject();
+
+  return sb.GetString();
 }
 
 
@@ -146,11 +156,7 @@ std::string RegisterContextResponse::check(const std::string& indent, const std:
   else
     return "OK";
 
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
-  response.render(writer);
-  return sb.GetString();
+  return response.render();
 }
 
 

@@ -25,6 +25,8 @@
 #include <string>
 
 #include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 
 #include "common/globals.h"
 #include "common/RenderFormat.h"
@@ -37,36 +39,47 @@
 
 /* ****************************************************************************
 *
-* NotifyContextRequest::render -
+* NotifyContextRequest::renderV1 -
 */
-void NotifyContextRequest::render
+std::string NotifyContextRequest::renderV1
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  ApiVersion apiVersion,
-  bool asJsonObject
+  bool       asJsonObject,
+  int        indent
 )
 {
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+
   writer.StartObject();
 
-  subscriptionId.render(writer, NotifyContext);
-  originator.render(writer);
-  contextElementResponseVector.render(writer, apiVersion, asJsonObject, NotifyContext);
+  subscriptionId.toJson(writer, NotifyContext);
+  originator.toJson(writer);
+  contextElementResponseVector.toJsonV1(writer, asJsonObject, NotifyContext);
 
   writer.EndObject();
+
+  return sb.GetString();
 }
 
 
 
 /* ****************************************************************************
 *
-* NotifyContextRequest::toJson -
+* NotifyContextRequest::render -
 */
-std::string NotifyContextRequest::toJson
+std::string NotifyContextRequest::render
 (
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   const std::vector<std::string>&  metadataFilter,
-  bool                             blacklist
+  bool                             blacklist,
+  int                              indent
 )
 {
   if ((renderFormat != NGSI_V2_NORMALIZED) && (renderFormat != NGSI_V2_KEYVALUES) && (renderFormat != NGSI_V2_VALUES))
@@ -74,7 +87,7 @@ std::string NotifyContextRequest::toJson
     OrionError oe(SccBadRequest, "Invalid notification format");
     alarmMgr.badInput(clientIp, "Invalid notification format");
 
-    return oe.toJson();
+    return oe.renderV1();
   }
 
   rapidjson::StringBuffer sb;
@@ -119,11 +132,7 @@ std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string
     return "OK";
   }
 
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
-  response.render(writer);
-  return sb.GetString();
+  return response.render();
 }
 
 

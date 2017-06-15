@@ -24,6 +24,8 @@
 */
 #include <string>
 
+#include "rapidjson/prettywriter.h"
+
 #include "ngsi/StatusCode.h"
 #include "ngsi/ContextRegistrationResponse.h"
 #include "ngsi/Request.h"
@@ -45,22 +47,43 @@ ContextRegistrationResponse::ContextRegistrationResponse()
 *
 * ContextRegistrationResponse::render -
 */
-void ContextRegistrationResponse::render(
+std::string ContextRegistrationResponse::render(
+  int indent
+)
+{
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+  toJson(writer);
+
+  return sb.GetString();
+}
+
+
+/* ****************************************************************************
+*
+* ContextRegistrationResponse::toJson -
+*/
+void ContextRegistrationResponse::toJson(
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )
 {
   writer.StartObject();
 
-  contextRegistration.render(writer, false);
+  contextRegistration.toJson(writer, false);
 
   if (errorCode.code != SccNone)
   {
-    errorCode.render(writer);
+    errorCode.toJsonV1(writer);
   }
 
   writer.EndObject();
 }
-
 
 
 /* ****************************************************************************

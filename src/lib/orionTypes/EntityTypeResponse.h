@@ -47,12 +47,17 @@ class EntityTypeResponse
   EntityType    entityType;
   StatusCode    statusCode;
 
-  void          render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  std::string   render(ApiVersion          apiVersion,
+                       bool                asJsonObject,
+                       bool                asJsonOut,
+                       bool                collapsed,
+                       int                 indent = -1);
+  void          toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
                        ApiVersion          apiVersion,
                        bool                asJsonObject,
                        bool                asJsonOut,
                        bool                collapsed);
-  void          toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+
   std::string   check(ApiVersion          apiVersion,
                       bool                asJsonObject,
                       bool                asJsonOut,

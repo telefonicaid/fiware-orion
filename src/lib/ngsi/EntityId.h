@@ -67,12 +67,12 @@ class EntityId
   bool         equal(EntityId* eP);
   bool         isPatternIsTrue(void);
 
-  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void         toJsonV1(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer) const;
 
   std::string  check(RequestType          requestType,
                      const std::string&   indent);
 
-  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer) const;
 };
 
 #endif  // SRC_LIB_NGSI_ENTITYID_H_

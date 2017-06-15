@@ -24,6 +24,9 @@
 */
 #include <string>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 #include "ngsi/StatusCode.h"
@@ -65,15 +68,26 @@ UnsubscribeContextResponse::~UnsubscribeContextResponse()
 *
 * UnsubscribeContextResponse::render - 
 */
-void UnsubscribeContextResponse::render
+std::string UnsubscribeContextResponse::render
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  int indent
 )
 {
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+
   writer.StartObject();
-  subscriptionId.render(writer, RtUnsubscribeContextResponse);
-  statusCode.render(writer);
+  subscriptionId.toJson(writer, RtUnsubscribeContextResponse);
+  statusCode.toJsonV1(writer);
   writer.EndObject();
+
+  return sb.GetString();
 }
 
 

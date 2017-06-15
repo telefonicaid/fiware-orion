@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/errorMessages.h"
@@ -71,7 +68,7 @@ std::string getEntityType
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_TYPE, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
-    return oe.toJson();
+    return oe.render();
   }
 
   TIMED_MONGO(mongoAttributesForEntityType(entityTypeName,
@@ -85,16 +82,12 @@ std::string getEntityType
   if (response.entityType.count == 0)
   {
     OrionError oe(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY_TYPE, ERROR_NOT_FOUND);
-    TIMED_RENDER(answer = oe.toJson());
+    TIMED_RENDER(answer = oe.render());
     ciP->httpStatusCode = oe.code;
   }
   else
   {
-    rapidjson::StringBuffer sb;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-    writer.SetIndent(' ', 2);
-    TIMED_RENDER(response.toJson(writer));
-    answer = sb.GetString();
+    TIMED_RENDER(answer = response.render(V2, false, false, false));
   }
 
   response.release();

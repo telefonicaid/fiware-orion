@@ -62,9 +62,9 @@ void AttributeList::fill(const std::string& commaSeparatedList)
 
 /* ****************************************************************************
 *
-* render - 
+* toJson - 
 */
-void AttributeList::render
+void AttributeList::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )

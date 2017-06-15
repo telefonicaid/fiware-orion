@@ -51,7 +51,7 @@ typedef struct RegisterProviderRequest
 
   RegisterProviderRequest();
 
-  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  std::string  render(int indent = -1);
   std::string  check(ApiVersion apiVersion, RequestType requestType, std::string indent, const std::string& preError);
   void         present(std::string indent);
   void         release();

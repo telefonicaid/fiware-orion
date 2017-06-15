@@ -129,9 +129,9 @@ void Throttling::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* Throttling::render -
+* Throttling::toJson -
 */
-void Throttling::render
+void Throttling::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )

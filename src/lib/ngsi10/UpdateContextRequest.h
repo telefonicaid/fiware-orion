@@ -28,9 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "ngsi/ContextElementVector.h"
 #include "ngsi/UpdateActionType.h"
 #include "apiTypesV2/Entity.h"
@@ -62,9 +59,9 @@ typedef struct UpdateContextRequest
   UpdateContextRequest();
   UpdateContextRequest(const std::string& _contextProvider, EntityId* eP);
 
-  void               render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                            ApiVersion apiVersion,
-                            bool asJsonObject);
+  std::string        render(ApiVersion apiVersion,
+                            bool       asJsonObject,
+                            int        indent = -1);
   std::string        check(ApiVersion apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError, int counter);
   void               release(void);
   ContextAttribute*  attributeLookup(EntityId* eP, const std::string& attributeName);

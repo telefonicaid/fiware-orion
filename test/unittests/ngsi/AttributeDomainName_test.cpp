@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -50,16 +53,27 @@ TEST(AttributeDomainName, ok)
   EXPECT_STREQ("ADN", adn.get().c_str());
   EXPECT_STREQ("ADN", adn.c_str());
 
-  out = adn.render("");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+    writer.SetIndent(' ', 2);
+    adn.toJson(writer);
+
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+    EXPECT_STREQ(expectedBuf, sb.GetString());
+  }
 
   // Just to exercise the code
   adn.present("");
   adn.set("");
   adn.present("");
-  out = adn.render("");
-  EXPECT_STREQ("", out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+    writer.SetIndent(' ', 2);
+    adn.toJson(writer);
+    EXPECT_STREQ("", sb.GetString());
+  }
 
   utExit();
 }

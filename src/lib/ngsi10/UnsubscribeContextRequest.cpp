@@ -25,6 +25,7 @@
 #include <string>
 
 #include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
 
 #include "common/globals.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
@@ -36,14 +37,24 @@
 *
 * UnsubscribeContextRequest::render - 
 */
-void UnsubscribeContextRequest::render
+std::string UnsubscribeContextRequest::render
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  int indent
 )
 {
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
   writer.StartObject();
-  subscriptionId.render(writer, UnsubscribeContext);
+  subscriptionId.toJson(writer, UnsubscribeContext);
   writer.EndObject();
+
+  return sb.GetString();
 }
 
 
@@ -60,11 +71,7 @@ std::string UnsubscribeContextRequest::check(const std::string& indent, const st
   if ((res = subscriptionId.check(SubscribeContext, indent, predetectedError, counter)) != "OK")
   {
      response.statusCode.fill(SccBadRequest, std::string("Invalid Subscription Id: /") + subscriptionId.get() + "/: " + res);
-     rapidjson::StringBuffer sb;
-     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-     writer.SetIndent(' ', 2);
-     response.render(writer);
-     return sb.GetString();
+     return response.render();
   }
 
   return "OK";

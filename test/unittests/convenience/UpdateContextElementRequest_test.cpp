@@ -54,7 +54,7 @@ TEST(UpdateContextElementRequest, render_json)
   ucer.attributeDomainName.set("ADN");
   ucer.contextAttributeVector.push_back(&ca);
 
-  out = ucer.render(V1, false, UpdateContext, "");
+  out = ucer.render(V1, false, UpdateContext);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

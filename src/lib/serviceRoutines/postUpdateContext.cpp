@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -110,9 +107,6 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   std::string      protocol;
   int              port;
   std::string      prefix;
-  rapidjson::StringBuffer payload;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(payload);
-  writer.SetIndent(' ', 2);
 
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
 
@@ -138,14 +132,15 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   // 2. Render the string of the request we want to forward
   //
   MimeType     outMimeType = ciP->outMimeType;
+  std::string  payload;
   char*        cleanPayload;
 
   ciP->outMimeType  = JSON;
 
-  TIMED_RENDER(upcrP->render(writer, ciP->apiVersion, asJsonObject));
+  TIMED_RENDER(payload = upcrP->render(ciP->apiVersion, asJsonObject));
 
   ciP->outMimeType  = outMimeType;
-  cleanPayload      = (char*) payload.GetString();
+  cleanPayload      = (char*) payload.c_str();
 
   //
   // 3. Send the request to the Context Provider (and await the reply)
@@ -447,9 +442,7 @@ std::string postUpdateContext
 {
   UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
   UpdateContextRequest*   upcrP  = &parseDataP->upcr.res;
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
+  std::string             answer;
 
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
 
@@ -466,9 +459,9 @@ std::string postUpdateContext
     upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
     alarmMgr.badInput(clientIp, "more than one service path for an update request");
 
-    TIMED_RENDER(upcrsP->render(writer, ciP->apiVersion, asJsonObject));
+    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject));
     upcrP->release();
-    return out.GetString();
+    return answer;
   }
   else if (ciP->servicePathV[0] == "")
   {
@@ -480,10 +473,10 @@ std::string postUpdateContext
   {
     upcrsP->errorCode.fill(SccBadRequest, res);
 
-    TIMED_RENDER(upcrsP->render(writer, ciP->apiVersion, asJsonObject));
+    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject));
 
     upcrP->release();
-    return out.GetString();
+    return answer;
   }
 
 
@@ -522,10 +515,10 @@ std::string postUpdateContext
   bool forwarding = forwardsPending(upcrsP);
   if (forwarding == false)
   {
-    TIMED_RENDER(upcrsP->render(writer, ciP->apiVersion, asJsonObject));
+    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject));
 
     upcrP->release();
-    return out.GetString();
+    return answer;
   }
 
 
@@ -735,7 +728,7 @@ std::string postUpdateContext
   {
     // Note that v2 case doesn't use an actual response (so no need to waste time rendering it).
     // We render in the v1 case only
-    TIMED_RENDER(response.render(writer, ciP->apiVersion, asJsonObject));
+    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject));
   }
 
   //
@@ -747,5 +740,5 @@ std::string postUpdateContext
   upcrsP->fill(&response);
   response.release();
 
-  return out.GetString();
+  return answer;
 }

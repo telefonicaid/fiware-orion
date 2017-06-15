@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <string>
 
+#include "rapidjson/prettywriter.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -48,21 +50,45 @@ void ContextRegistrationResponseVector::push_back(ContextRegistrationResponse* i
 *
 * ContextRegistrationResponseVector::render -
 */
-void ContextRegistrationResponseVector::render
+std::string ContextRegistrationResponseVector::render
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  int indent
 )
 {
   if (vec.size() == 0)
   {
-    return;
+    return "";
   }
 
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+  toJson(writer);
+
+  return sb.GetString();
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextRegistrationResponseVector::toJson -
+*/
+void ContextRegistrationResponseVector::toJson
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
+{
   writer.Key("contextRegistrationResponses");
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->render(writer);
+    vec[ix]->toJson(writer);
   }
 
   writer.EndObject();

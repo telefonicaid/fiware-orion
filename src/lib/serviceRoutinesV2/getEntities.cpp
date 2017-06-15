@@ -99,7 +99,7 @@ std::string getEntities
   {
     OrionError oe(SccBadRequest, "Incompatible parameters: id, IdPattern", "BadRequest");
 
-    TIMED_RENDER(answer = oe.toJson());
+    TIMED_RENDER(answer = oe.render());
     ciP->httpStatusCode = oe.code;
     return answer;
   }
@@ -136,7 +136,7 @@ std::string getEntities
   {
     OrionError oe(SccBadRequest, "Incompatible parameters: type, typePattern", "BadRequest");
 
-    TIMED_RENDER(answer = oe.toJson());
+    TIMED_RENDER(answer = oe.render());
     ciP->httpStatusCode = oe.code;
     return answer;
   }
@@ -148,7 +148,7 @@ std::string getEntities
   {
     OrionError oe(SccBadRequest, "Invalid query: URI param /coords/ used without /geometry/", "BadRequest");
 
-    TIMED_RENDER(out = oe.toJson());
+    TIMED_RENDER(out = oe.render());
     ciP->httpStatusCode = oe.code;
     return out;
   }
@@ -156,7 +156,7 @@ std::string getEntities
   {
     OrionError oe(SccBadRequest, "Invalid query: URI param /geometry/ used without /coords/", "BadRequest");
 
-    TIMED_RENDER(out = oe.toJson());
+    TIMED_RENDER(out = oe.render());
     ciP->httpStatusCode = oe.code;
     return out;
   }
@@ -165,7 +165,7 @@ std::string getEntities
   {
     OrionError oe(SccBadRequest, "Invalid query: URI param /georel/ used without /geometry/", "BadRequest");
 
-    TIMED_RENDER(out = oe.toJson());
+    TIMED_RENDER(out = oe.render());
     ciP->httpStatusCode = oe.code;
     return out;
   }
@@ -187,7 +187,7 @@ std::string getEntities
     {
       OrionError oe(SccBadRequest, std::string("Invalid query: ") + errorString, "BadRequest");
 
-      TIMED_RENDER(out = oe.toJson());
+      TIMED_RENDER(out = oe.render());
       ciP->httpStatusCode = oe.code;
 
       scopeP->release();
@@ -221,7 +221,7 @@ std::string getEntities
       scopeP->release();
       delete scopeP;
 
-      TIMED_RENDER(out = oe.toJson());
+      TIMED_RENDER(out = oe.render());
       ciP->httpStatusCode = oe.code;
       return out;
     }
@@ -250,7 +250,7 @@ std::string getEntities
       scopeP->release();
       delete scopeP;
 
-      TIMED_RENDER(out = oe.toJson());
+      TIMED_RENDER(out = oe.render());
       ciP->httpStatusCode = oe.code;
       return out;
     }
@@ -318,16 +318,12 @@ std::string getEntities
 
     if (entities.oe.code != SccNone)
     {
-      TIMED_RENDER(answer = entities.oe.toJson());
+      TIMED_RENDER(answer = entities.oe.render());
       ciP->httpStatusCode = entities.oe.code;
     }
     else
     {
-      rapidjson::StringBuffer sb;
-      rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-      writer.SetIndent(' ', 2);
-      TIMED_RENDER(entities.render(writer, ciP->uriParamOptions, ciP->uriParam));
-      answer = sb.GetString();
+      TIMED_RENDER(answer = entities.render(ciP->uriParamOptions, ciP->uriParam));
       ciP->httpStatusCode = SccOk;
     }
   }

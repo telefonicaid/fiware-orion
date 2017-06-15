@@ -74,10 +74,10 @@ typedef struct AppendContextElementResponse
 
   AppendContextElementResponse();
 
-  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                      ApiVersion          apiVersion,
-                      bool                asJsonObject,
-                      RequestType         requestType);
+  std::string  render(ApiVersion  apiVersion,
+                      bool        asJsonObject,
+                      RequestType requestType,
+                      int         indent = -1);
   void         present(void);
   void         release(void);
   std::string  check(ApiVersion          apiVersion,

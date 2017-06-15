@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -53,12 +50,10 @@ std::string postUpdateContextSubscription
 )
 {
   UpdateContextSubscriptionResponse  ucsr;
+  std::string                        answer;
 
   ucsr.subscribeError.subscriptionId = parseDataP->ucsr.res.subscriptionId;
 
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
   TIMED_MONGO(ciP->httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
                                                                    &ucsr,
                                                                    ciP->tenant,
@@ -66,7 +61,7 @@ std::string postUpdateContextSubscription
                                                                    ciP->servicePathV,
                                                                    ciP->httpHeaders.correlator));
 
-  TIMED_RENDER(ucsr.render(writer));
+  TIMED_RENDER(answer = ucsr.render());
 
-  return out.GetString();
+  return answer;
 }

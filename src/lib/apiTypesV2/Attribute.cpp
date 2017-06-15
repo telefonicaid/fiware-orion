@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/reader.h"
+#include "rapidjson/prettywriter.h"
 
 #include "common/errorMessages.h"
 #include "common/RenderFormat.h"
@@ -39,18 +39,15 @@
 *
 * Attribute::render -
 */
-void Attribute::render
+std::string Attribute::render
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  ApiVersion          apiVersion,          // in parameter (pass-through)
-  bool                acceptedTextPlain,   // in parameter (pass-through)
-  bool                acceptedJson,        // in parameter (pass-through)
-  MimeType            outFormatSelection,  // in parameter (pass-through)
-  MimeType*           outMimeTypeP,        // out parameter (pass-through)
-  HttpStatusCode*     scP,                 // out parameter (pass-through)
-  bool                keyValues,           // in parameter
-  const std::string&  metadataList,        // in parameter
-  RequestType         requestType          // in parameter
+  ApiVersion          apiVersion,
+  MimeType            outFormatSelection,
+  HttpStatusCode*     scP,
+  bool                keyValues,
+  const std::string&  metadataList,
+  RequestType         requestType,
+  int                 indent
 )
 {
   RenderFormat  renderFormat = (keyValues == true)? NGSI_V2_KEYVALUES : NGSI_V2_NORMALIZED;
@@ -59,18 +56,20 @@ void Attribute::render
   {
     if (requestType == EntityAttributeValueRequest)
     {
-      std::string json = pcontextAttribute->toJsonAsValue(apiVersion,
-                                                         acceptedTextPlain,
-                                                         acceptedJson,
-                                                         outFormatSelection,
-                                                         outMimeTypeP,
-                                                         scP);
-      rapidjson::Reader reader;
-      rapidjson::StringStream ss(json.c_str());
-      reader.Parse(ss, writer);
+      return pcontextAttribute->renderAsValue(apiVersion,
+                                              outFormatSelection,
+                                              scP,
+                                              indent);
     }
     else
     {
+      rapidjson::StringBuffer sb;
+      rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+      if (indent < 0)
+      {
+        indent = DEFAULT_JSON_INDENT;
+      }
+
       std::vector<std::string> metadataFilter;
 
       if (metadataList != "")
@@ -83,13 +82,13 @@ void Attribute::render
       pcontextAttribute->toJson(writer, renderFormat, metadataFilter, requestType);
 
       writer.EndObject();
+
+      return sb.GetString();
     }
   }
 
-  oe.toJson(&writer);
+  return oe.renderV1();
 }
-
-
 
 
 /* ****************************************************************************

@@ -28,9 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/Duration.h"
 #include "ngsi/StatusCode.h"
@@ -52,7 +49,7 @@ typedef struct UpdateContextAvailabilitySubscriptionResponse
   UpdateContextAvailabilitySubscriptionResponse(StatusCode& _errorCode);
   ~UpdateContextAvailabilitySubscriptionResponse();
 
-  void        render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  std::string render(int indent = -1);
   std::string check(const std::string& indent, const std::string& predetectedError, int counter);
 } UpdateContextAvailabilitySubscriptionResponse;
 

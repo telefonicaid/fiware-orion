@@ -47,7 +47,11 @@ typedef struct UpdateContextElementRequest
   ContextAttributeVector     contextAttributeVector;     // Optional
   MetadataVector             domainMetadataVector;       // Optional
 
-  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  std::string  render(ApiVersion  apiVersion,
+                      bool        asJsonObject,
+                      RequestType requestType,
+                      int         indent = -1);
+  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
                       ApiVersion apiVersion,
                       bool asJsonObject,
                       RequestType requestType);

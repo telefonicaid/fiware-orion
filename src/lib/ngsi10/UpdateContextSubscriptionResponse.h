@@ -27,9 +27,6 @@
 */
 #include <string>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "ngsi/SubscribeResponse.h"
 #include "ngsi/SubscribeError.h"
 #include "ngsi/StatusCode.h"
@@ -49,7 +46,7 @@ typedef struct UpdateContextSubscriptionResponse
   UpdateContextSubscriptionResponse(StatusCode& errorCode);
   ~UpdateContextSubscriptionResponse();
 
-  void        render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  std::string render(int indent = -1);
 } UpdateContextSubscriptionResponse;
 
 #endif  // SRC_LIB_NGSI10_UPDATECONTEXTSUBSCRIPTIONRESPONSE_H_

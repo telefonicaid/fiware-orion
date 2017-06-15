@@ -40,16 +40,23 @@ TEST(ContextElementVector, render)
 {
   ContextElement*       ceP = new ContextElement();
   EntityId              eId("E_ID", "E_TYPE");
-  std::string           rendered;
   ContextElementVector  ceV;
 
-  rendered = ceV.render(V1, false, UpdateContextElement, "", false);
-  EXPECT_STREQ("", rendered.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    ceV.toJson(writer, V1, false, UpdateContextElement);
+    EXPECT_STREQ("", sb.GetString());
+  }
 
   ceP->entityId = eId;
   ceV.push_back(ceP);
 
-  rendered = ceV.render(V1, false, UpdateContextElement, "", false);
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    ceV.toJson(writer, V1, false, UpdateContextElement);
+  }
 
   ceV.release();
 }

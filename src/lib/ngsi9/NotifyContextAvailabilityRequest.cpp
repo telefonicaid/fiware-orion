@@ -25,6 +25,7 @@
 #include <string>
 
 #include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
 
 #include "common/globals.h"
 #include "ngsi/Request.h"
@@ -47,15 +48,26 @@ NotifyContextAvailabilityRequest::NotifyContextAvailabilityRequest()
 *
 * NotifyContextAvailabilityRequest::render -
 */
-void NotifyContextAvailabilityRequest::render
+std::string NotifyContextAvailabilityRequest::render
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  int indent
 )
 {
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+
   writer.StartObject();
-  subscriptionId.render(writer, NotifyContextAvailability);
-  contextRegistrationResponseVector.render(writer);
+  subscriptionId.toJson(writer, NotifyContextAvailability);
+  contextRegistrationResponseVector.toJson(writer);
   writer.EndObject();
+
+  return sb.GetString();
 }
 
 
@@ -83,11 +95,7 @@ std::string NotifyContextAvailabilityRequest::check(ApiVersion apiVersion, const
     return "OK";
   }
 
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
-  response.render(writer);
-  return sb.GetString();
+  return response.render();
 }
 
 

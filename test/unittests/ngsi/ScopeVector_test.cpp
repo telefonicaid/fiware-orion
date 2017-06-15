@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/Scope.h"
 #include "ngsi/ScopeVector.h"
 
@@ -38,16 +41,24 @@ TEST(ScopeVector, renderAndRelease)
 {
   Scope*         s = new Scope("Type", "Value");
   ScopeVector    sV;
-  std::string    out;
 
   utInit();
 
-  out = sV.render("", false);
-  EXPECT_STREQ("", out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    sV.toJson(writer);
+    EXPECT_STREQ("", sb.GetString());
+  }
 
   sV.push_back(s);
 
-  out = sV.render("", false);
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+    writer.SetIndent(' ', 2);
+    sV.toJson(writer);
+  }
 
   EXPECT_EQ(sV.size(), 1);
   sV.release();

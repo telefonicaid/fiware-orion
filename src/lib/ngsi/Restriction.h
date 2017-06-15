@@ -46,7 +46,7 @@ typedef struct Restriction
   AttributeExpression  attributeExpression;   // Optional (FI-WARE changes - MANDATORY in OMA spec)
   ScopeVector          scopeVector;           // Optional
 
-  void          render(rapidjson::Writer<rapidjson::StringBuffer>& writer, int restrictions = 1);
+  void          toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer, int restrictions = 1);
   void          present(const std::string& indent);
   void          release();
   void          fill(Restriction* rP);

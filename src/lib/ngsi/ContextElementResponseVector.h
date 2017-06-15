@@ -44,11 +44,10 @@ typedef struct ContextElementResponseVector
 {
   std::vector<ContextElementResponse*>  vec;
 
-  void                     render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                                  ApiVersion          apiVersion,
-                                  bool                asJsonObject,
-                                  RequestType         requestType,
-                                  bool                omitAttributeValues = false);
+  void                     toJsonV1(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+                                    bool                asJsonObject,
+                                    RequestType         requestType,
+                                    bool                omitAttributeValues = false);
 
   void                     toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
                                   RenderFormat                     renderFormat,

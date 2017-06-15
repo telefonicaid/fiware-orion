@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -79,6 +76,7 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
   std::string     attributeName         = compV[7];
   EntityTypeInfo  typeInfo              = EntityTypeEmptyOrNotEmpty;
   std::string     typeNameFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string     answer;
   StatusCode      response;
 
   // 01. Get values from URL (+ entityId::type, exist, !exist)
@@ -97,21 +95,15 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
   {
     alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
     response.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    rapidjson::StringBuffer out;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-    writer.SetIndent(' ', 2);
-    TIMED_RENDER(response.render(writer, false));
-    return out.GetString();
+    TIMED_RENDER(answer = response.render());
+    return answer;
   }
   else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
   {
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
     response.fill(SccBadRequest, "non-matching entity::types in URL");
-    rapidjson::StringBuffer out;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-    writer.SetIndent(' ', 2);
-    TIMED_RENDER(response.render(writer, false));
-    return out.GetString();
+    TIMED_RENDER(answer = response.render());
+    return answer;
   }
 
 
@@ -128,12 +120,9 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
 
 
   // 06. Cleanup and return result
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
-  TIMED_RENDER(response.render(writer, false));
+  TIMED_RENDER(answer = response.render());
 
   parseDataP->upcr.res.release();
 
-  return out.GetString();
+  return answer;
 }

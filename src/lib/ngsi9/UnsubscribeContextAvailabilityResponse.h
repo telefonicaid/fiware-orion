@@ -49,7 +49,7 @@ typedef struct UnsubscribeContextAvailabilityResponse
   UnsubscribeContextAvailabilityResponse(SubscriptionId _subscriptionId);
   ~UnsubscribeContextAvailabilityResponse();
 
-  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  std::string  render(int indent = -1);
 } UnsubscribeContextAvailabilityResponse;
 
 #endif  // SRC_LIB_NGSI9_UNSUBSCRIBECONTEXTAVAILABILITYRESPONSE_H_

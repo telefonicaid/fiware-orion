@@ -119,7 +119,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     {
       OrionError error(SccBadRequest, errorString);
       ciP->httpStatusCode = error.code;
-      ciP->answer         = error.smartRender(ciP->apiVersion);
+      ciP->answer         = error.render(ciP->apiVersion);
     }
     else if (ciP->apiVersion == ADMIN_API)
     {
@@ -147,7 +147,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       {
         OrionError error(SccBadRequest, std::string("Bad pagination offset: /") + value + "/ [must be a decimal number]");
         ciP->httpStatusCode = error.code;
-        ciP->answer         = error.smartRender(ciP->apiVersion);
+        ciP->answer         = error.render(ciP->apiVersion);
         return MHD_YES;
       }
 
@@ -164,7 +164,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       {
         OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [must be a decimal number]");
         ciP->httpStatusCode = error.code;
-        ciP->answer         = error.smartRender(ciP->apiVersion);
+        ciP->answer         = error.render(ciP->apiVersion);
         return MHD_YES;
       }
 
@@ -176,14 +176,14 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     {
       OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [max: " + MAX_PAGINATION_LIMIT + "]");
       ciP->httpStatusCode = error.code;
-      ciP->answer         = error.smartRender(ciP->apiVersion);
+      ciP->answer         = error.render(ciP->apiVersion);
       return MHD_YES;
     }
     else if (limit == 0)
     {
       OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [a value of ZERO is unacceptable]");
       ciP->httpStatusCode = error.code;
-      ciP->answer         = error.smartRender(ciP->apiVersion);
+      ciP->answer         = error.render(ciP->apiVersion);
       return MHD_YES;
     }
   }
@@ -193,7 +193,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     {
       OrionError error(SccBadRequest, std::string("Bad value for /details/: /") + value + "/ [accepted: /on/, /ON/, /off/, /OFF/. Default is /off/]");
       ciP->httpStatusCode = error.code;
-      ciP->answer         = error.smartRender(ciP->apiVersion);
+      ciP->answer         = error.render(ciP->apiVersion);
       return MHD_YES;
     }
   }
@@ -215,7 +215,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     {
       OrionError error(SccBadRequest, "Invalid value for URI param /options/");
       ciP->httpStatusCode = error.code;
-      ciP->answer         = error.smartRender(ciP->apiVersion);
+      ciP->answer         = error.render(ciP->apiVersion);
     }
   }
   else if (key == URI_PARAM_TYPE)
@@ -278,7 +278,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 
     alarmMgr.badInput(clientIp, details);
     ciP->httpStatusCode = error.code;
-    ciP->answer         = error.smartRender(ciP->apiVersion);
+    ciP->answer         = error.render(ciP->apiVersion);
   }
 
   return MHD_YES;
@@ -490,7 +490,7 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
   {
     OrionError oe(ciP->httpStatusCode, ciP->acceptHeaderError);
 
-    ciP->answer = oe.smartRender(ciP->apiVersion);
+    ciP->answer = oe.render(ciP->apiVersion);
   }
 }
 
@@ -989,7 +989,7 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
   {
     OrionError error(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI);
     ciP->httpStatusCode = error.code;
-    ciP->answer         = error.smartRender(ciP->apiVersion);
+    ciP->answer         = error.render(ciP->apiVersion);
     return false;
   }
 
@@ -1302,7 +1302,7 @@ static int connectionTreat
       OrionError oe(SccRequestEntityTooLarge, details);
 
       ciP->httpStatusCode = oe.code;
-      restReply(ciP, oe.smartRender(ciP->apiVersion));
+      restReply(ciP, oe.render(ciP->apiVersion));
       return MHD_YES;
     }
 
@@ -1465,7 +1465,7 @@ static int connectionTreat
 
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, ciP->acceptHeaderError);
-    restReply(ciP, oe.smartRender(ciP->apiVersion));
+    restReply(ciP, oe.render(ciP->apiVersion));
     return MHD_YES;
   }
 
@@ -1489,7 +1489,7 @@ static int connectionTreat
 
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, oe.details);
-    restReply(ciP, oe.smartRender(ciP->apiVersion));
+    restReply(ciP, oe.render(ciP->apiVersion));
     return MHD_YES;
   }
 
@@ -1515,7 +1515,7 @@ static int connectionTreat
 
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, oe.details);
-    restReply(ciP, oe.smartRender(ciP->apiVersion));
+    restReply(ciP, oe.render(ciP->apiVersion));
     return MHD_YES;
   }
 
@@ -1530,7 +1530,7 @@ static int connectionTreat
 
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, details);
-    restReply(ciP, oe.smartRender(ciP->apiVersion));
+    restReply(ciP, oe.render(ciP->apiVersion));
     return MHD_YES;
   }
 

@@ -45,7 +45,7 @@ typedef struct NotifyConditionVector
 
   NotifyConditionVector();
 
-  void              render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void              toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void              present(const std::string& indent);
   void              push_back(NotifyCondition* item);
   unsigned int      size(void) const;

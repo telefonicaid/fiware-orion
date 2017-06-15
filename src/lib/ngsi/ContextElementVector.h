@@ -45,7 +45,7 @@ typedef struct ContextElementVector
 
   void             push_back(ContextElement* item);
   unsigned int     size(void);
-  void             render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  void             toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
                           ApiVersion apiVersion,
                           bool asJsonObject,
                           RequestType requestType);

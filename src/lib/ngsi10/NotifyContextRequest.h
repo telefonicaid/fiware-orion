@@ -27,9 +27,6 @@
 */
 #include <string>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "common/RenderFormat.h"
 #include "ngsi/Request.h"
 #include "ngsi/SubscriptionId.h"
@@ -48,13 +45,13 @@ typedef struct NotifyContextRequest
   Originator                    originator;                    // Mandatory
   ContextElementResponseVector  contextElementResponseVector;  // Optional
 
-  void          render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                       ApiVersion apiVersion,
-                       bool asJsonObject);
-  std::string   toJson(RenderFormat                     renderFormat,
+  std::string   renderV1(bool       asJsonObject,
+                         int        indent = -1);
+  std::string   render(RenderFormat                     renderFormat,
                        const std::vector<std::string>&  attrsFilter,
                        const std::vector<std::string>&  metadataFilter,
-                       bool                             blacklist = false);
+                       bool                             blacklist = false,
+                       int                              indent = -1);
   std::string   check(ApiVersion apiVersion, const std::string& indent, const std::string& predetectedError);
   void          present(const std::string& indent);
   void          release(void);

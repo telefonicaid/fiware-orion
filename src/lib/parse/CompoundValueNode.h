@@ -163,7 +163,6 @@ class CompoundValueNode
   CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, bool _value);
   std::string         check(void);
   std::string         finish(void);
-  void                render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void                toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 
   void                shortShow(const std::string& indent);

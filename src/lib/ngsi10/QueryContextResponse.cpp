@@ -95,18 +95,43 @@ QueryContextResponse::~QueryContextResponse()
 *
 * QueryContextResponse::render -
 */
-void QueryContextResponse::render
+std::string QueryContextResponse::render
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
   ApiVersion apiVersion,
-  bool asJsonObject
+  bool       asJsonObject,
+  int        indent
+)
+{
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+  toJson(writer, apiVersion, asJsonObject);
+
+  return sb.GetString();
+}
+
+
+/* ****************************************************************************
+*
+* QueryContextResponse::toJson -
+*/
+void QueryContextResponse::toJson
+(
+  rapidjson::Writer<rapidjson::StringBuffer>&  writer,
+  ApiVersion                                   apiVersion,
+  bool                                         asJsonObject
 )
 {
   writer.StartObject();
 
   if (contextElementResponseVector.size() > 0)
   {
-    contextElementResponseVector.render(writer, apiVersion, asJsonObject, QueryContext);
+    contextElementResponseVector.toJsonV1(writer, asJsonObject, QueryContext);
   }
 
   //
@@ -114,11 +139,11 @@ void QueryContextResponse::render
   //
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    errorCode.render(writer);
+    errorCode.toJsonV1(writer);
   }
   else if (contextElementResponseVector.size() == 0)
   {
-    errorCode.render(writer);
+    errorCode.toJsonV1(writer);
   }
   else if (errorCode.details != "")
   {
@@ -127,7 +152,7 @@ void QueryContextResponse::render
       errorCode.code = SccOk;
     }
 
-    errorCode.render(writer);
+    errorCode.toJsonV1(writer);
   }
 
   //
@@ -140,7 +165,7 @@ void QueryContextResponse::render
   {
     LM_W(("Internal Error (Both error-code and response vector empty)"));
     errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
-    errorCode.render(writer);
+    errorCode.toJsonV1(writer);
   }
 
   writer.EndObject();
@@ -170,11 +195,7 @@ std::string QueryContextResponse::check(ApiVersion apiVersion, bool asJsonObject
     return "OK";
   }
 
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
-  render(writer, apiVersion, asJsonObject);
-  return sb.GetString();
+  return render(apiVersion, asJsonObject);
 }
 
 

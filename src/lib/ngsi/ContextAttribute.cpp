@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <string>
 
+#include "rapidjson/prettywriter.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -482,9 +484,9 @@ std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
 
 /* ****************************************************************************
 *
-* renderAsJsonObject - 
+* toJsonObject - 
 */
-void ContextAttribute::renderAsJsonObject
+void ContextAttribute::toJsonObject
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer,
   ApiVersion          apiVersion,
@@ -544,12 +546,12 @@ void ContextAttribute::renderAsJsonObject
   else
   {
     writer.Key("value");
-    compoundValueP->render(writer);
+    compoundValueP->toJson(writer);
   }
 
   if (apiVersion != V2 || !omitValue)
   {
-    metadataVector.render(writer);
+    metadataVector.toJsonV1(writer);
   }
 
   writer.EndObject();
@@ -557,9 +559,9 @@ void ContextAttribute::renderAsJsonObject
 
 /* ****************************************************************************
 *
-* renderAsNameString -
+* toJsonString -
 */
-void ContextAttribute::renderAsNameString
+void ContextAttribute::toJsonString
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )
@@ -569,18 +571,17 @@ void ContextAttribute::renderAsNameString
 
 /* ****************************************************************************
 *
-* render - 
+* toJson - 
 */
-void ContextAttribute::render
+void ContextAttribute::toJsonV1
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         request,
   bool                omitValue
 )
 {
-  return renderAsJsonObject(writer, apiVersion, request, omitValue);
+  return toJsonObject(writer, V1, request, omitValue);
 }
 
 
@@ -601,18 +602,6 @@ void ContextAttribute::toJson
   RequestType                      requestType
 )
 {
-  // Add special metadata representing attribute dates
-  if ((creDate != 0) && (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_DATECREATED) != metadataFilter.end()))
-  {
-    Metadata* mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, creDate);
-    metadataVector.push_back(mdP);
-  }
-  if ((modDate != 0) && (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_DATEMODIFIED) != metadataFilter.end()))
-  {
-    Metadata* mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, modDate);
-    metadataVector.push_back(mdP);
-  }
-
   if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_KEYVALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
   {
     if (renderFormat == NGSI_V2_KEYVALUES)
@@ -650,6 +639,18 @@ void ContextAttribute::toJson
   }
   else  // Render mode: normalized 
   {
+    // Add special metadata representing attribute dates
+    if ((creDate != 0) && (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_DATECREATED) != metadataFilter.end()))
+    {
+      Metadata* mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, creDate);
+      metadataVector.push_back(mdP);
+    }
+    if ((modDate != 0) && (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_DATEMODIFIED) != metadataFilter.end()))
+    {
+      Metadata* mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, modDate);
+      metadataVector.push_back(mdP);
+    }
+
     if (requestType != EntityAttributeResponse)
     {
       writer.Key(name.c_str());
@@ -732,99 +733,82 @@ void ContextAttribute::toJson
 }
 
 
+void ContextAttribute::toJsonAsValue
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
+{
+  switch (valueType)
+  {
+  case orion::ValueTypeString:
+    writer.String(stringValue.c_str());
+    break;
+
+  case orion::ValueTypeNumber:
+    if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
+    {
+      writer.String(isodate2str(numberValue).c_str());
+    }
+    else // regular number
+    {
+      writer.Double(numberValue);
+    }
+    break;
+
+  case orion::ValueTypeBoolean:
+    writer.Bool(boolValue);
+    break;
+
+  case orion::ValueTypeNone:
+    writer.Null();
+    break;
+
+  default:
+    if (compoundValueP != NULL) {
+      compoundValueP->toJson(writer);
+    }
+  }
+}
 
 /* ****************************************************************************
 *
-* toJsonAsValue -
+* renderAsValue -
 */
-std::string ContextAttribute::toJsonAsValue
+std::string ContextAttribute::renderAsValue
 (
-  ApiVersion       apiVersion,          // in parameter
-  bool             acceptedTextPlain,   // in parameter
-  bool             acceptedJson,        // in parameter
-  MimeType         outFormatSelection,  // in parameter
-  MimeType*        outMimeTypeP,        // out parameter
-  HttpStatusCode*  scP                  // out parameter
+  ApiVersion       apiVersion,
+  MimeType         outFormatSelection,
+  HttpStatusCode*  scP,
+  int              indent
 )
 {
-  std::string  out;
-
-  if (compoundValueP == NULL)  // Not a compound - text/plain must be accepted
-  {
-    if (acceptedTextPlain)
-    {
-      char buf[64];
-
-      *outMimeTypeP = TEXT;
-
-      switch (valueType)
-      {
-      case orion::ValueTypeString:
-        if (apiVersion == V2)
-        { 
-          out = '"' + stringValue + '"';
-        }
-        else
-        { 
-          out = stringValue;
-        }
-        break;
-
-      case orion::ValueTypeNumber:
-        if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
-        {
-          out = isodate2str(numberValue);
-        }
-        else // regular number
-        {
-          out = toString(numberValue);
-        }
-        break;
-
-      case orion::ValueTypeBoolean:
-        snprintf(buf, sizeof(buf), "%s", boolValue? "true" : "false");
-        out = buf;
-        break;
-
-      case orion::ValueTypeNone:
-        snprintf(buf, sizeof(buf), "%s", "null");
-        out = buf;
-        break;
-
-      default:
-        out = "ERROR";
-        break;
+  switch (outFormatSelection) {
+  case TEXT:
+      // Exception for V1
+      if (valueType == orion::ValueTypeString && apiVersion == V1) {
+         return stringValue;
       }
-    }
-    else
-    {
-      OrionError oe(SccNotAcceptable, "accepted MIME types: text/plain", "NotAcceptable");
-      *scP = SccNotAcceptable;
 
-      out = oe.toJson();
-    }
-  }
-  else if (compoundValueP != NULL)  // Compound: application/json OR text/plain must be accepted
+      // Else treat it as json
+  case JSON:
   {
-    if (!acceptedJson && !acceptedTextPlain)
-    {
+      rapidjson::StringBuffer sb;
+      rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+      if (indent < 0)
+      {
+          indent = DEFAULT_JSON_INDENT;
+      }
+
+      toJsonAsValue(writer);
+      return sb.GetString();
+  }
+  case NOMIMETYPE:
+  default:
       OrionError oe(SccNotAcceptable, "accepted MIME types: application/json, text/plain", "NotAcceptable");
       *scP = SccNotAcceptable;
 
-      out = oe.toJson();
-    }
-    else
-    {
-      *outMimeTypeP = outFormatSelection;
-
-      rapidjson::StringBuffer s;
-      rapidjson::Writer<rapidjson::StringBuffer> writer(s);
-      compoundValueP->toJson(writer);
-      out = s.GetString();
-    }
+      return oe.render(apiVersion);
   }
-
-  return out;
 }
 
 

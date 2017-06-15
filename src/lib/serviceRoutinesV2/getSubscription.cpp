@@ -67,14 +67,14 @@ std::string getSubscription
   {
     oe.fill(SccBadRequest, "Invalid subscription ID: " + err, "BadRequest");
     ciP->httpStatusCode = oe.code;
-    return oe.toJson();
+    return oe.render();
   }
 
   TIMED_MONGO(mongoGetSubscription(&sub, &oe, idSub, ciP->uriParam, ciP->tenant));
 
   if (oe.code != SccOk)
   {
-    TIMED_RENDER(out = oe.toJson());
+    TIMED_RENDER(out = oe.render());
     ciP->httpStatusCode = oe.code;
     return out;
   }

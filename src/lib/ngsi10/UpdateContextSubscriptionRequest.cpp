@@ -25,10 +25,7 @@
 #include <stdio.h>
 #include <string>
 
-#include "rapidjson/prettywriter.h"
-
 #include "common/globals.h"
-#include "ngsi/StatusCode.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/SubscribeContextRequest.h"
@@ -77,11 +74,7 @@ std::string UpdateContextSubscriptionRequest::check(const std::string& indent, c
   else
     return "OK";
 
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
-  response.render(writer);
-  return sb.GetString();
+  return response.render();
 }
 
 

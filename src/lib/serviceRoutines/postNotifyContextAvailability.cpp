@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -59,9 +56,7 @@ std::string postNotifyContextAvailability
 )
 {
   NotifyContextAvailabilityResponse  ncar;
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
+  std::string                        answer;
 
   //
   // If more than ONE service-path is input, an error is returned as response.
@@ -73,9 +68,9 @@ std::string postNotifyContextAvailability
     ncar.responseCode.fill(SccBadRequest, "more than one service path for notification");
     alarmMgr.badInput(clientIp, "more than one service path for a notification");
 
-    TIMED_RENDER(ncar.render(writer));
+    TIMED_RENDER(answer = ncar.render());
 
-    return out.GetString();
+    return answer;
   }
   else if (ciP->servicePathV.size() == 0)
   {
@@ -87,13 +82,13 @@ std::string postNotifyContextAvailability
   {
     ncar.responseCode.fill(SccBadRequest, res);
 
-    TIMED_RENDER(ncar.render(writer));
+    TIMED_RENDER(answer = ncar.render());
 
-    return out.GetString();
+    return answer;
   }
 
   TIMED_MONGO(ciP->httpStatusCode = mongoNotifyContextAvailability(&parseDataP->ncar.res, &ncar, ciP->uriParam, ciP->httpHeaders.correlator, ciP->tenant, ciP->servicePathV[0]));
-  TIMED_RENDER(ncar.render(writer));
+  TIMED_RENDER(answer = ncar.render());
 
-  return out.GetString();
+  return answer;
 }

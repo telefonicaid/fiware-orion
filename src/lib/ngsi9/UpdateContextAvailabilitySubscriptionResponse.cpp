@@ -26,6 +26,8 @@
 #include <vector>
 
 #include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
@@ -73,22 +75,33 @@ UpdateContextAvailabilitySubscriptionResponse::~UpdateContextAvailabilitySubscri
 *
 * UpdateContextAvailabilitySubscriptionResponse::render - 
 */
-void UpdateContextAvailabilitySubscriptionResponse::render
+std::string UpdateContextAvailabilitySubscriptionResponse::render
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  int indent
 )
 {
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+
   writer.StartObject();
 
-  subscriptionId.render(writer, RtUpdateContextAvailabilitySubscriptionResponse);
-  duration.render(writer);
+  subscriptionId.toJson(writer, RtUpdateContextAvailabilitySubscriptionResponse);
+  duration.toJson(writer);
 
   if (errorCode.code != SccNone)
   {
-     errorCode.render(writer);
+     errorCode.toJsonV1(writer);
   }
 
   writer.EndObject();
+
+  return sb.GetString();
 }
 
 /* ****************************************************************************
@@ -111,9 +124,5 @@ std::string UpdateContextAvailabilitySubscriptionResponse::check(const std::stri
   else
     return "OK";
 
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
-  render(writer);
-  return sb.GetString();
+  return render();
 }

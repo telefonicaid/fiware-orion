@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 
 #include "common/statistics.h"
@@ -92,11 +89,7 @@ std::string putAttributeValueInstance
 
     response.fill(SccBadRequest, details);
 
-    rapidjson::StringBuffer out;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-    writer.SetIndent(' ', 2);
-    TIMED_RENDER(response.render(writer, false));
-    answer = out.GetString();
+    TIMED_RENDER(answer = response.render());
 
     parseDataP->upcar.res.release();
 
@@ -116,11 +109,7 @@ std::string putAttributeValueInstance
 
 
   // 05. Render result
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
-  TIMED_RENDER(response.render(writer, false));
-  answer = out.GetString();
+  TIMED_RENDER(answer = response.render());
 
 
   // 06. Cleanup and return result

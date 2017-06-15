@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -52,12 +49,10 @@ std::string postUnsubscribeContext
 )
 {
   UnsubscribeContextResponse  uncr;
+  std::string                 answer;
 
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
   TIMED_MONGO(ciP->httpStatusCode = mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, ciP->tenant));
-  TIMED_RENDER(uncr.render(writer));
+  TIMED_RENDER(answer = uncr.render());
 
-  return out.GetString();
+  return answer;
 }

@@ -32,7 +32,6 @@
 #include "ngsi/Duration.h"
 #include "ngsi/Reference.h"
 #include "ngsi/Restriction.h"
-#include "ngsi/StatusCode.h"
 #include "ngsi/SubscriptionId.h"
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
 #include "ngsi9/SubscribeContextAvailabilityRequest.h"
@@ -53,18 +52,28 @@ SubscribeContextAvailabilityRequest::SubscribeContextAvailabilityRequest()
 *
 * SubscribeContextAvailabilityRequest::render -
 */
-void SubscribeContextAvailabilityRequest::render
+std::string SubscribeContextAvailabilityRequest::render
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  int indent
 )
 {
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
   writer.StartObject();
-  entityIdVector.render(writer);
-  attributeList.render(writer);
-  reference.render(writer);
-  duration.render(writer);
-  restriction.render(writer);
+  entityIdVector.toJson(writer);
+  attributeList.toJson(writer);
+  reference.toJson(writer);
+  duration.toJson(writer);
+  restriction.toJson(writer);
   writer.EndObject();
+
+  return sb.GetString();
 }
 
 
@@ -93,11 +102,7 @@ std::string SubscribeContextAvailabilityRequest::check(const std::string& indent
   else
     return "OK";
 
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
-  response.render(writer);
-  return sb.GetString();
+  return response.render();
 }
 
 

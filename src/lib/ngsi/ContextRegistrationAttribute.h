@@ -51,7 +51,7 @@ typedef struct ContextRegistrationAttribute
 
   ContextRegistrationAttribute();
   ContextRegistrationAttribute(const std::string& _name, const std::string& _type, const std::string& _isDomain = "");
-  void            render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void            toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void            present(int ix, const std::string& indent);
   void            release(void);
 

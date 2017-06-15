@@ -24,6 +24,9 @@
 */
 #include <string>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 #include "ngsi/StatusCode.h"
@@ -62,21 +65,32 @@ UpdateContextSubscriptionResponse::~UpdateContextSubscriptionResponse() {
 *
 * UpdateContextSubscriptionResponse::render - 
 */
-void UpdateContextSubscriptionResponse::render
+std::string UpdateContextSubscriptionResponse::render
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  int indent
 )
 {
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+
   writer.StartObject();
 
   if (subscribeError.errorCode.code == SccNone)
   {
-    subscribeResponse.render(writer);
+    subscribeResponse.toJson(writer);
   }
   else
   {
-    subscribeError.render(writer, UpdateContextSubscription);
+    subscribeError.toJson(writer, UpdateContextSubscription);
   }
 
   writer.EndObject();
+
+  return sb.GetString();
 }

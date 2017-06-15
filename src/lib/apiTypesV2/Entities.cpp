@@ -26,6 +26,8 @@
 #include <vector>
 #include <map>
 
+#include "rapidjson/prettywriter.h"
+
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 #include "ngsi10/QueryContextResponse.h"
@@ -60,17 +62,39 @@ Entities::~Entities()
 * Entities::render -
 *
 */
-void Entities::render
+std::string Entities::render
+(
+  std::map<std::string, bool>&         uriParamOptions,
+  std::map<std::string, std::string>&  uriParam,
+  int                                  indent
+)
+{
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+  toJson(writer, uriParamOptions, uriParam);
+  return sb.GetString();
+}
+
+
+/* ****************************************************************************
+*
+* Entities::toJson -
+*
+*/
+void Entities::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer,
   std::map<std::string, bool>&         uriParamOptions,
   std::map<std::string, std::string>&  uriParam
 )
 {
-  return vec.render(writer, uriParamOptions, uriParam);
+  return vec.toJson(writer, uriParamOptions, uriParam);
 }
-
-
 
 /* ****************************************************************************
 *

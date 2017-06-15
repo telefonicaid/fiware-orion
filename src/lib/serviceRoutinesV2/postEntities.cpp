@@ -87,7 +87,7 @@ std::string postEntities
     eP->release();
 
     std::string out;
-    TIMED_RENDER(out = oe.toJson());
+    TIMED_RENDER(out = oe.render());
     ciP->httpStatusCode = oe.code;
 
     return out;
@@ -107,13 +107,13 @@ std::string postEntities
   std::string  answer = "";
   if (parseDataP->upcrs.res.oe.code != SccNone)
   {
-    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.render());
     ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
   }
   else if (parseDataP->upcrs.res.errorCode.code != SccOk)
   {
     ciP->httpStatusCode = parseDataP->upcrs.res.errorCode.code;
-    TIMED_RENDER(answer = parseDataP->upcrs.res.errorCode.toJson(true));
+    TIMED_RENDER(answer = parseDataP->upcrs.res.errorCode.render());
     ciP->answer         = answer;
   }
   else

@@ -60,12 +60,11 @@ typedef struct ContextAttributeVector
 
   std::string        check(ApiVersion apiVersion, RequestType requestType);
 
-  void               render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                            ApiVersion          apiVersion,
-                            bool                asJsonObject,
-                            RequestType         requestType,
-                            bool                omitValue   = false,
-                            bool                attrsAsName = false);
+  void               toJsonV1(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+                              bool                asJsonObject,
+                              RequestType         requestType,
+                              bool                omitValue   = false,
+                              bool                attrsAsName = false);
 
   void               toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
                             RenderFormat                     renderFormat,

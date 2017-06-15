@@ -24,8 +24,7 @@
 */
 #include <string>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "rapidjson/prettywriter.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -322,20 +321,72 @@ ContextElementResponse::ContextElementResponse(ContextElement* ceP, bool useDefa
 
 /* ****************************************************************************
 *
+* ContextElementResponse::renderV1 - 
+*/
+std::string ContextElementResponse::renderV1
+(
+  bool        asJsonObject,
+  RequestType requestType,
+  bool        omitAttributeValues,
+  int         indent
+)
+{
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+  toJsonV1(writer, asJsonObject, requestType, omitAttributeValues);
+
+  return sb.GetString();
+}
+
+
+/* ****************************************************************************
+*
 * ContextElementResponse::render - 
 */
-void ContextElementResponse::render
+std::string ContextElementResponse::render
+(
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter,
+  const std::vector<std::string>&  metadataFilter,
+  bool                             blacklist,
+  int                              indent
+)
+{
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+  toJson(writer, renderFormat, attrsFilter, metadataFilter, blacklist);
+
+  return sb.GetString();
+}
+
+
+/* ****************************************************************************
+*
+* ContextElementResponse::toJsonV1 - 
+*/
+void ContextElementResponse::toJsonV1
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
   bool                omitAttributeValues
 )
 {
   writer.StartObject();
-  contextElement.render(writer, apiVersion, asJsonObject, requestType, omitAttributeValues);
-  statusCode.render(writer);
+  contextElement.toJsonV1(writer, asJsonObject, requestType, omitAttributeValues);
+  statusCode.toJsonV1(writer);
   writer.EndObject();
 }
 

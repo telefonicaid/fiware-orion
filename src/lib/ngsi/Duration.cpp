@@ -159,9 +159,9 @@ void Duration::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* Duration::render -
+* Duration::toJson -
 */
-void Duration::render(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void Duration::toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
   if (string == "" || !valid)
   {

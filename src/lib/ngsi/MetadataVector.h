@@ -48,7 +48,7 @@ public:
 
   MetadataVector(void);
 
-  void            render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void            toJsonV1(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void            toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
                          const std::vector<std::string>&  metadataFilter);
   std::string     check(ApiVersion apiVersion);

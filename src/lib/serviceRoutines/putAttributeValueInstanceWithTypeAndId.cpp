@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 
 #include "common/statistics.h"
@@ -73,6 +70,7 @@ std::string putAttributeValueInstanceWithTypeAndId
   std::string     attributeName           = compV[7];
   std::string     metaID                  = compV[8];
   std::string     entityTypeFromUriParam;
+  std::string     answer;
   StatusCode      response;
 
 
@@ -86,13 +84,10 @@ std::string putAttributeValueInstanceWithTypeAndId
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
     response.fill(SccBadRequest, "non-matching entity::types in URL");
 
-    rapidjson::StringBuffer out;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-    writer.SetIndent(' ', 2);
-    TIMED_RENDER(response.render(writer, false));
+    TIMED_RENDER(answer = response.render());
 
     parseDataP->upcar.res.release();
-    return out.GetString();
+    return answer;
   }
 
 
@@ -104,13 +99,10 @@ std::string putAttributeValueInstanceWithTypeAndId
     std::string details = "unmatching metadata ID value URI/payload: /" + metaID + "/ vs /" + mP->stringValue + "/";
 
     response.fill(SccBadRequest, details);
-    rapidjson::StringBuffer out;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-    writer.SetIndent(' ', 2);
-    TIMED_RENDER(response.render(writer, false));
+    TIMED_RENDER(answer = response.render());
     parseDataP->upcar.res.release();
 
-    return out.GetString();
+    return answer;
   }
 
 
@@ -127,10 +119,7 @@ std::string putAttributeValueInstanceWithTypeAndId
 
 
   // 07. Render result
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
-  TIMED_RENDER(response.render(writer, false));
+  TIMED_RENDER(answer = response.render());
 
 
   // 08. Cleanup and return result
@@ -139,5 +128,5 @@ std::string putAttributeValueInstanceWithTypeAndId
   parseDataP->upcr.res.release();
   parseDataP->upcrs.res.release();
 
-  return out.GetString();
+  return answer;
 }

@@ -51,11 +51,12 @@ class EntityTypeVector
   unsigned int  size(void);
   void          release(void);
   std::string   check(ApiVersion apiVersion, const std::string& predetectedError);
-  void          render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                       ApiVersion          apiVersion,
-                       bool                asJsonObject,
-                       bool                asJsonOut,
-                       bool                collapsed);
+  void          toJsonV1(rapidjson::Writer<rapidjson::StringBuffer>&  writer,
+                         bool                                         asJsonObject,
+                         bool                                         asJsonOut,
+                         bool                                         collapsed);
+  void          toJson(rapidjson::Writer<rapidjson::StringBuffer>&  writer,
+                       bool                                         values);
 
   EntityType*   operator[] (unsigned int ix) const;
 

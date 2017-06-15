@@ -54,10 +54,10 @@ TEST(DiscoverContextAvailabilityResponse, render)
 
   utInit();
 
-  out = dcar1.render("");
+  out = dcar1.render();
   EXPECT_EQ(SccReceiverInternalError, dcar1.errorCode.code);
 
-  out = dcar2.render("");
+  out = dcar2.render();
   EXPECT_EQ(SccBadRequest, dcar2.errorCode.code);
 
   utExit();
@@ -113,13 +113,13 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   dcarP->responseVector.push_back(crrP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   dcarP->release();
   dcarP->release();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), emptyFilename)) << "Error getting test data from '" << emptyFilename << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   dcarP->release();  // ... otherwise the 500 remains and "pollutes" next tests
   free(dcarP);
@@ -134,7 +134,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   dcarP->responseVector.push_back(crrP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   // No release here - the data stays - to be used in the following test scenario
 
@@ -148,12 +148,12 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   dcarP->responseVector.push_back(crrP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   dcarP->release();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), emptyFilename)) << "Error getting test data from '" << emptyFilename << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   dcarP->release();  // ... otherwise the 500 remains and "pollutes" next tests
 
@@ -167,7 +167,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   dcarP->responseVector.push_back(crrP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename4)) << "Error getting test data from '" << filename4 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   // No release here - the data stays - to be used in the following test scenario
 
@@ -179,12 +179,12 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   crrP->contextRegistration.providingApplication.set("http://tid.test.com/unitTest5");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename5)) << "Error getting test data from '" << filename5 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   dcarP->release();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), emptyFilename)) << "Error getting test data from '" << emptyFilename << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   dcarP->release();  // ... otherwise the 500 remains and "pollutes" next tests
 
@@ -198,7 +198,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   dcarP->responseVector.push_back(crrP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename6)) << "Error getting test data from '" << filename6 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   // No release here - the data stays - to be used in the following test scenario
 
@@ -211,12 +211,12 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   crrP->contextRegistration.providingApplication.set("http://tid.test.com/unitTest7");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename7)) << "Error getting test data from '" << filename7 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   dcarP->release();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), emptyFilename)) << "Error getting test data from '" << emptyFilename << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   dcarP->release();  // ... otherwise the 500 remains and "pollutes" next tests
 
@@ -230,7 +230,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   dcarP->responseVector.push_back(crrP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename8)) << "Error getting test data from '" << filename8 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   // No release here - the data stays - to be used in the following test scenario
 
@@ -243,12 +243,12 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   crrP->contextRegistration.providingApplication.set("http://tid.test.com/unitTest9");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename9)) << "Error getting test data from '" << filename9 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   dcarP->release();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), emptyFilename)) << "Error getting test data from '" << emptyFilename << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   dcarP->release();  // ... otherwise the 500 remains and "pollutes" next tests
 
@@ -260,7 +260,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   dcarP->responseVector.push_back(crrP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename10)) << "Error getting test data from '" << filename10 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   // No release here - the data stays - to be used in the following test scenario
 
@@ -273,12 +273,12 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   crrP->contextRegistration.providingApplication.set("http://tid.test.com/unitTest11");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename11)) << "Error getting test data from '" << filename11 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   dcarP->release();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), emptyFilename)) << "Error getting test data from '" << emptyFilename << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   dcarP->release();  // ... otherwise the 500 remains and "pollutes" next tests
 
@@ -292,7 +292,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   dcarP->responseVector.push_back(crrP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename12)) << "Error getting test data from '" << filename12 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   // No release here - the data stays - to be used in the following test scenario
 
@@ -304,12 +304,12 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   crrP->contextRegistration.registrationMetadataVector.push_back(mdP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename13)) << "Error getting test data from '" << filename13 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   dcarP->release();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), emptyFilename)) << "Error getting test data from '" << emptyFilename << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   dcarP->release();  // ... otherwise the 500 remains and "pollutes" next tests
 
@@ -323,7 +323,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   dcarP->responseVector.push_back(crrP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename14)) << "Error getting test data from '" << filename14 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   // No release here - the data stays - to be used in the following test scenario
 
@@ -336,7 +336,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   crrP->contextRegistration.providingApplication.set("http://tid.test.com/unitTest15");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename15)) << "Error getting test data from '" << filename15 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   // No release here - the data stays - to be used in the following test scenario 17
 
@@ -348,12 +348,12 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   crrP->contextRegistration.providingApplication.set("http://tid.test.com/unitTest17");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename17)) << "Error getting test data from '" << filename17 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   dcarP->release();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), emptyFilename)) << "Error getting test data from '" << emptyFilename << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   dcarP->release();  // ... otherwise the 500 remains and "pollutes" next tests
 
@@ -369,12 +369,12 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   dcarP->responseVector.push_back(crrP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename16)) << "Error getting test data from '" << filename16 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   dcarP->release();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), emptyFilename)) << "Error getting test data from '" << emptyFilename << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   dcarP->release();  // ... otherwise the 500 remains and "pollutes" next tests
 
@@ -383,11 +383,11 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   dcarP->errorCode.fill(SccBadRequest, "DiscoverContextAvailabilityResponse Unit Test 18");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename18)) << "Error getting test data from '" << filename18 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   dcarP->release();
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), emptyFilename)) << "Error getting test data from '" << emptyFilename << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   dcarP->release();  // ... otherwise the 500 remains and "pollutes" next tests
@@ -397,12 +397,12 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   dcarP->errorCode.fill(SccBadRequest);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename19)) << "Error getting test data from '" << filename19 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   dcarP->release();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), emptyFilename)) << "Error getting test data from '" << emptyFilename << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   dcarP->release();  // ... otherwise the 500 remains and "pollutes" next tests
 
@@ -423,12 +423,12 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   dcarP->responseVector.push_back(crrP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename20)) << "Error getting test data from '" << filename20 << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   dcarP->release();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), emptyFilename)) << "Error getting test data from '" << emptyFilename << "'";
-  rendered = dcarP->render("");
+  rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   free(dcarP);

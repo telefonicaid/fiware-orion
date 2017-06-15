@@ -125,9 +125,9 @@ void Reference::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* Reference::render -
+* Reference::toJson -
 */
-void Reference::render
+void Reference::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )

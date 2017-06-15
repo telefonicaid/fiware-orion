@@ -46,9 +46,9 @@ void ContextElementVector::push_back(ContextElement* item)
 
 /* ****************************************************************************
 *
-* ContextElementVector::render -
+* ContextElementVector::toJson -
 */
-void ContextElementVector::render
+void ContextElementVector::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer,
   ApiVersion          apiVersion,
@@ -61,7 +61,7 @@ void ContextElementVector::render
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->render(writer, apiVersion, asJsonObject, requestType);
+    vec[ix]->toJsonV1(writer, asJsonObject, requestType);
   }
 
   writer.EndArray();

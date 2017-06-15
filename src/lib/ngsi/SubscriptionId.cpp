@@ -146,9 +146,9 @@ void SubscriptionId::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* SubscriptionId::render -
+* SubscriptionId::toJson -
 */
-void SubscriptionId::render
+void SubscriptionId::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer,
   RequestType container

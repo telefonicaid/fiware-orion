@@ -102,20 +102,27 @@ TEST(Reference, present)
 TEST(Reference, render)
 {
   Reference    reference;
-  std::string  out;
   const char*  outfile1 = "ngsi.reference.render.middle.json";
 
   utInit();
 
-  reference .set("");
-  out = reference.render("", false);
-  EXPECT_STREQ("", out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    reference .set("");
+    reference.toJson(writer);
+    EXPECT_STREQ("", sb.GetString());
+  }
 
   reference .set("REF");
 
-  out = reference.render("", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    reference.toJson(writer);
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+    EXPECT_STREQ(expectedBuf, sb.GetString());
+  }
 
   utExit();
 }

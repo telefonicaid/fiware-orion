@@ -38,9 +38,9 @@
 
 /* ****************************************************************************
 *
-* ScopeVector::render -
+* ScopeVector::toJson -
 */
-void ScopeVector::render
+void ScopeVector::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )
@@ -54,7 +54,7 @@ void ScopeVector::render
   writer.StartArray();
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-     vec[ix]->render(writer);
+     vec[ix]->toJson(writer);
   }
   writer.EndArray();
 }

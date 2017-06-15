@@ -38,7 +38,6 @@
 TEST(SubscribeError, render)
 {
   SubscribeError  se;
-  std::string     out;
   const char*     outfile1 = "ngsi.subscribeError.render1.middle.json";
   const char*     outfile2 = "ngsi.subscribeError.render2.middle.json";
 
@@ -47,13 +46,21 @@ TEST(SubscribeError, render)
   se.subscriptionId.set("SUB_123");
   se.errorCode.fill(SccBadRequest, "detail");
 
-  out = se.render(RegisterContext, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    se.toJson(writer, RegisterContext);
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+    EXPECT_STREQ(expectedBuf, sb.GetString());
+  }
 
-  out = se.render(SubscribeContext, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    se.toJson(writer, SubscribeContext);
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+    EXPECT_STREQ(expectedBuf, sb.GetString());
+  }
 
   utExit();
 }

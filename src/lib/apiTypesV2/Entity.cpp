@@ -26,8 +26,7 @@
 #include <vector>
 #include <map>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "rapidjson/prettywriter.h"
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
@@ -74,16 +73,40 @@ Entity::~Entity()
 *   o 'keyValues'  (less verbose, only name and values shown for attributes - no type, no metadatas)
 *   o 'values'     (only the values of the attributes are printed, in a vector)
 */
-void Entity::render
+std::string Entity::render
+(
+  std::map<std::string, bool>&         uriParamOptions,
+  std::map<std::string, std::string>&  uriParam,
+  int                                  indent
+)
+{
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+  toJson(writer, uriParamOptions, uriParam);
+  return sb.GetString();
+}
+
+
+/* ****************************************************************************
+*
+* Entity::toJson -
+*
+*/
+void Entity::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  std::map<std::string, bool>&                uriParamOptions,
-  std::map<std::string, std::string>&         uriParam
+  std::map<std::string, bool>&         uriParamOptions,
+  std::map<std::string, std::string>&  uriParam
 )
 {
   if ((oe.details != "") || ((oe.reasonPhrase != "OK") && (oe.reasonPhrase != "")))
   {
-    oe.toJson(&writer);
+    oe.toJson(writer);
   }
 
   RenderFormat  renderFormat = NGSI_V2_NORMALIZED;

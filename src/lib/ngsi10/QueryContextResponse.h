@@ -55,7 +55,10 @@ typedef struct QueryContextResponse
   QueryContextResponse(StatusCode& _errorCode);
   ~QueryContextResponse();
 
-  void                   render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  std::string            render(ApiVersion apiVersion,
+                                bool       asJsonObject,
+                                int        indent = -1);
+  void                   toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
                                 ApiVersion apiVersion,
                                 bool asJsonObject);
   std::string            check(ApiVersion apiVersion, bool asJsonObject, const std::string&  indent, const std::string&  predetectedError);

@@ -48,7 +48,7 @@ typedef struct SubscribeResponse
 
   SubscribeResponse();
 
-  void render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 } SubscribeResponse;
 
 #endif  // SRC_LIB_NGSI_SUBSCRIBERESPONSE_H_

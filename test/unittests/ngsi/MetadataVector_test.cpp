@@ -24,15 +24,18 @@
 */
 #include "ngsi/MetadataVector.h"
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "unittest.h"
 
 
 
 /* ****************************************************************************
 *
-* render -
+* toJsonV1 -
 */
-TEST(MetadataVector, render)
+TEST(MetadataVector, toJsonV1)
 {
   Metadata        m("Name", "Type", "Value");
   Metadata        m2("Name2", "Type2", "Value2");
@@ -45,14 +48,24 @@ TEST(MetadataVector, render)
 
   mV.push_back(&m);
 
-  out = mV.render("");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+    writer.SetIndent(' ', 2);
+    mV.toJsonV1(writer);
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+    EXPECT_STREQ(expectedBuf, sb.GetString());
+  }
 
-  mV.push_back(&m2);
-  out = mV.render("");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+    writer.SetIndent(' ', 2);
+    mV.push_back(&m2);
+    mV.toJsonV1(writer);
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+    EXPECT_STREQ(expectedBuf, sb.GetString());
+  }
 
   utExit();
 }

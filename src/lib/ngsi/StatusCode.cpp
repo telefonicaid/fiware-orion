@@ -27,6 +27,8 @@
 #include <stdlib.h>
 #include <string>
 
+#include "rapidjson/prettywriter.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -81,12 +83,32 @@ StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const 
 }
 
 
-
 /* ****************************************************************************
 *
 * StatusCode::render -
 */
-void StatusCode::render
+std::string StatusCode::render
+(
+  int indent
+)
+{
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+
+  toJsonV1(writer, false);
+
+  return sb.GetString();
+}
+
+/* ****************************************************************************
+*
+* StatusCode::toJsonV1 -
+*/
+void StatusCode::toJsonV1
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer,
   bool showKey
@@ -125,41 +147,20 @@ void StatusCode::render
 *
 * For version 2 of the API, the unnecessary 'reasonPhrase' is removed.
 */
-std::string StatusCode::toJson(bool isLastElement)
+void StatusCode::toJson
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
 {
-  std::string  out  = "";
+  writer.StartObject();
 
-  if (strstr(details.c_str(), "\"") != NULL)
-  {
-    int    len = details.length() * 2;
-    char*  s    = (char*) calloc(1, len + 1);
+  writer.Key("code");
+  writer.Double(code);
 
-    strReplace(s, len, details.c_str(), "\"", "\\\"");
-    details = s;
-    free(s);
-  }
+  writer.Key("details");
+  writer.String(details.c_str());
 
-  char codeV[STRING_SIZE_FOR_INT];
-
-  snprintf(codeV, sizeof(codeV), "%d", code);
-
-  out += "{";
-
-  out += std::string("\"code\":\"") + codeV + "\"";
-  
-  if (details != "")
-  {
-    out += ",\"details\":\"" + details + "\"";
-  }
-
-  out += "}";
-
-  if (!isLastElement)
-  {
-    out += ",";
-  }
-
-  return out;
+  writer.EndObject();
 }
 
 

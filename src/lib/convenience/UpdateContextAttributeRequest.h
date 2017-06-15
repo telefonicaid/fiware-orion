@@ -52,7 +52,9 @@ typedef struct UpdateContextAttributeRequest
   orion::CompoundValueNode*  compoundValueP;
 
   UpdateContextAttributeRequest();
-  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  std::string  render(ApiVersion apiVersion,
+                      int        indent = -1);
+  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
                       ApiVersion apiVersion);
   std::string  check(ApiVersion apiVersion, std::string indent, const std::string& preError);
   void         present(std::string indent);

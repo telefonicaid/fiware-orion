@@ -46,7 +46,7 @@ typedef struct SubscribeError
   StatusCode      errorCode;          // Mandatory
 
   SubscribeError();
-  void        render(rapidjson::Writer<rapidjson::StringBuffer>& writer, RequestType requestType);
+  void        toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer, RequestType requestType);
 
   std::string check(RequestType         requestType,
                     const std::string&  indent,

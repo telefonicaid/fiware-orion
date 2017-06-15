@@ -46,7 +46,7 @@ typedef struct AttributeList
 
   void         fill(const std::vector<std::string>& aVec);
   void         fill(const std::string& commaSeparatedList);
-  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   std::string  toString(void);
   void         present(const std::string& indent);
   void         release(void);

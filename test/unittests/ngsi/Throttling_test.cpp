@@ -89,23 +89,34 @@ TEST(Throttling, check)
 TEST(Throttling, render)
 {
   Throttling   t;
-  std::string  out;
   const char*  outfile1 = "ngsi.throttling.render.middle.json";
 
   utInit();
 
-  t.set("");
-  out = t.render("", false);
-  EXPECT_STREQ("", out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    t.set("");
+    t.toJson(writer);
+    EXPECT_STREQ("", sb.GetString());
+  }
 
-  out = t.render("", false);
-  EXPECT_STREQ("", out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    t.toJson(writer);
+    EXPECT_STREQ("", sb.GetString());
+  }
 
   t.set("PT1S");
 
-  out = t.render("", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    t.toJson(writer);
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+    EXPECT_STREQ(expectedBuf, sb.GetString());
+  }
 
   utExit();
 }

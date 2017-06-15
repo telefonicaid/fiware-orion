@@ -50,9 +50,9 @@ MetadataVector::MetadataVector(void)
 
 /* ****************************************************************************
 *
-* MetadataVector::render -
+* MetadataVector::toJsonV1 -
 */
-void MetadataVector::render
+void MetadataVector::toJsonV1
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )
@@ -61,7 +61,7 @@ void MetadataVector::render
   writer.StartObject();
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->render(writer);
+    vec[ix]->toJsonV1(writer);
   }
   writer.EndObject();
 }

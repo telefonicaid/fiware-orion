@@ -75,11 +75,12 @@ TEST(ContextElement, check)
 
   // render
   const char*     outfile1 = "ngsi.contextelement.check.middle.json";
-  std::string     out;
+  rapidjson::StringBuffer sb;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
 
-  out = ce2P->render(V1, false, UpdateContextElement, "", false);
+  ce2P->toJsonV1(writer, false, UpdateContextElement);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  EXPECT_STREQ(expectedBuf, sb.GetString());
 
   // present
   ce2P->present("", -1);

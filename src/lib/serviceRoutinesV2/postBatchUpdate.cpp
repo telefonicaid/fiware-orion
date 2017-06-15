@@ -79,7 +79,7 @@ std::string postBatchUpdate
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITIES_VECTOR);
     alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITIES_VECTOR);
 
-    TIMED_RENDER(answer = oe.smartRender(V2));
+    TIMED_RENDER(answer = oe.render());
     ciP->httpStatusCode = SccBadRequest;
 
     return answer;
@@ -90,7 +90,7 @@ std::string postBatchUpdate
   // Check potential error
   if (parseDataP->upcrs.res.oe.code != SccNone )
   {
-    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.render());
     ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
   }
   else

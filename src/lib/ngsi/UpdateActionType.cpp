@@ -113,9 +113,9 @@ void UpdateActionType::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* UpdateActionType::render - 
+* UpdateActionType::toJson - 
 */
-void UpdateActionType::render
+void UpdateActionType::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )

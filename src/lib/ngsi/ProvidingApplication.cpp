@@ -145,9 +145,9 @@ void ProvidingApplication::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* ProvidingApplication::render -
+* ProvidingApplication::toJson -
 */
-void ProvidingApplication::render
+void ProvidingApplication::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )

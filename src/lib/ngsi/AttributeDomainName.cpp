@@ -109,9 +109,9 @@ void AttributeDomainName::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* AttributeDomainName::render - 
+* AttributeDomainName::toJson - 
 */
-void AttributeDomainName::render(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void AttributeDomainName::toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
   if (string != "")
   {

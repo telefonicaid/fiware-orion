@@ -27,9 +27,6 @@
 */
 #include <string>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "ngsi/Request.h"
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/ContextRegistrationResponseVector.h"
@@ -46,7 +43,7 @@ typedef struct NotifyContextAvailabilityRequest
 
   NotifyContextAvailabilityRequest();
 
-  void          render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  std::string   render(int indent = -1);
   std::string   check(ApiVersion apiVersion, const std::string& indent, const std::string& predetectedError, int counter);
   void          present(const std::string& indent);
   void          release(void);

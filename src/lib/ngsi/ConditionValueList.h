@@ -44,7 +44,7 @@ typedef struct ConditionValueList
 {
   std::vector<std::string>  vec;
 
-  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void         present(const std::string& indent);
   void         release(void);
   void         push_back(const std::string& attributeName);

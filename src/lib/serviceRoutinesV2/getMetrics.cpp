@@ -60,7 +60,7 @@ std::string getMetrics
     OrionError oe(SccBadRequest, "metrics desactivated");
 
     ciP->httpStatusCode = SccBadRequest;
-    return oe.toJson();
+    return oe.render();
   }
 
   bool         doReset  = (ciP->uriParam["reset"] == "true")? true : false;

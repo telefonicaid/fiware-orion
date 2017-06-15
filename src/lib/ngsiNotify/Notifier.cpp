@@ -115,10 +115,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
 )
 {
     /* Render NotifyContextAvailabilityRequest */
-    rapidjson::StringBuffer sb;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
-    ncar->render(writer);
-    std::string payload = sb.GetString();
+    std::string payload = ncar->render();
 
     /* Parse URL */
     std::string  host;
@@ -236,7 +233,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       cer.contextElement = ce;
       ncr.subscriptionId = subscriptionId;
       ncr.contextElementResponseVector.push_back(&cer);
-      payload  = ncr.toJson(renderFormat, attrsOrder, metadataFilter);
+      payload  = ncr.render(renderFormat, attrsOrder, metadataFilter);
       mimeType = "application/json";
     }
     else
@@ -462,14 +459,11 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     std::string payloadString;
     if (renderFormat == NGSI_V1_LEGACY)
     {
-      rapidjson::StringBuffer sb;
-      rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
-      ncrP->render(writer, ci.apiVersion, ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON);
-      payloadString = sb.GetString();
+      payloadString = ncrP->renderV1(ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON);
     }
     else
     {
-      payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
+      payloadString = ncrP->render(renderFormat, attrsOrder, metadataFilter, blackList);
     }
 
     /* Parse URL */

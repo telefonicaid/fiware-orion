@@ -43,9 +43,9 @@ SubscribeError::SubscribeError()
 
 /* ****************************************************************************
 *
-* SubscribeError::render -
+* SubscribeError::toJson -
 */
-void SubscribeError::render
+void SubscribeError::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer,
   RequestType requestType
@@ -66,16 +66,16 @@ void SubscribeError::render
     {
       subscriptionId.set("000000000000000000000000");
     }
-    subscriptionId.render(writer, requestType);
+    subscriptionId.toJson(writer, requestType);
   }
   else if ((requestType          == SubscribeContext)           &&
            (subscriptionId.get() != "000000000000000000000000") &&
            (subscriptionId.get() != ""))
   {
-    subscriptionId.render(writer, requestType);
+    subscriptionId.toJson(writer, requestType);
   }
 
-  errorCode.render(writer);
+  errorCode.toJsonV1(writer);
   writer.EndObject();
 }
 

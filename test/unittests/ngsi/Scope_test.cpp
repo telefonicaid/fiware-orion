@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include "rapidjson/prettywriter.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -38,14 +40,17 @@
 TEST(Scope, render)
 {
   Scope        scope("Type", "Value");
-  std::string  out;
   const char*  outfile1 = "ngsi.scope.render.middle.json";
 
   utInit();
 
-  out = scope.render("", false);
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  writer.SetIndent(' ', 2);
+
+  scope.toJson(writer);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  EXPECT_STREQ(expectedBuf, sb.GetString());
 
   scope.release();
 

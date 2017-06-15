@@ -43,17 +43,43 @@
 *
 * render - 
 */
-void ContextAttributeResponse::render
+std::string ContextAttributeResponse::render
+(
+  ApiVersion   apiVersion,
+  bool         asJsonObject,
+  RequestType  request,
+  int          indent
+)
+{
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+  toJson(writer, apiVersion, asJsonObject, request);
+
+  return sb.GetString();
+}
+
+
+/* ****************************************************************************
+*
+* toJson - 
+*/
+void ContextAttributeResponse::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         request
+  ApiVersion   apiVersion,
+  bool         asJsonObject,
+  RequestType  request
 )
 {
   writer.StartObject();
-  contextAttributeVector.render(writer, apiVersion, asJsonObject, request);
-  statusCode.render(writer);
+  contextAttributeVector.toJsonV1(writer, asJsonObject, request);
+  statusCode.toJsonV1(writer);
   writer.EndObject();
 }
 
@@ -98,11 +124,7 @@ std::string ContextAttributeResponse::check
     return "OK";
   }
 
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
-  render(writer, apiVersion, asJsonObject, requestType);
-  return sb.GetString();
+  return render(apiVersion, asJsonObject, requestType);
 }
 
 

@@ -38,19 +38,26 @@
 TEST(ProvidingApplication, render)
 {
   ProvidingApplication  pa;
-  std::string           out;
   const char*           outfile1 = "ngsi.providingApplication.render.middle.json";
 
   utInit();
 
-  out = pa.render("", false);
-  EXPECT_STREQ("", out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    pa.toJson(writer);
+    EXPECT_STREQ("", sb.GetString());
+  }
 
   pa.set("PA");
 
-  out = pa.render("", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    pa.toJson(writer);
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+    EXPECT_STREQ(expectedBuf, sb.GetString());
+  }
 
   utExit();
 }

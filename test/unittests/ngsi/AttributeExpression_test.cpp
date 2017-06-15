@@ -46,14 +46,23 @@ TEST(AttributeExpression, ok)
    ae.set("AE");
    EXPECT_STREQ("AE", ae.get().c_str());
 
-   ae.set("");
-   EXPECT_STREQ("", ae.render("", false).c_str());
+   {
+       rapidjson::StringBuffer sb;
+       rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+       ae.set("");
+       ae.toJson(writer);
+       EXPECT_STREQ("", sb.GetString());
+   }
 
    ae.set("AE");
 
-   out = ae.render("", false);
-   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-   EXPECT_STREQ(expectedBuf, out.c_str());
+   {
+       rapidjson::StringBuffer sb;
+       rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+       ae.toJson(writer);
+       EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+       EXPECT_STREQ(expectedBuf, sb.GetString());
+   }
 
    EXPECT_STREQ("AE", ae.c_str());
 

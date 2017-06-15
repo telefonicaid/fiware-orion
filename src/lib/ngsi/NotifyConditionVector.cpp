@@ -46,9 +46,9 @@ NotifyConditionVector::NotifyConditionVector()
 
 /* ****************************************************************************
 *
-* NotifyConditionVector::render -
+* NotifyConditionVector::toJson -
 */
-void NotifyConditionVector::render
+void NotifyConditionVector::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )
@@ -62,7 +62,7 @@ void NotifyConditionVector::render
   writer.StartArray();
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->render(writer);
+    vec[ix]->toJson(writer);
   }
   writer.EndArray();
 }

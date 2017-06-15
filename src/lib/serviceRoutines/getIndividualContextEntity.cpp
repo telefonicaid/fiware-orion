@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -118,11 +115,7 @@ std::string getIndividualContextEntity
 
 
   // 5. Render the ContextElementResponse
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
-  TIMED_RENDER(response.render(writer, ciP->apiVersion, asJsonObject, IndividualContextEntity));
-  answer = out.GetString();
+  TIMED_RENDER(answer = response.renderV1(asJsonObject, IndividualContextEntity));
 
 
   // 6. Cleanup and return result

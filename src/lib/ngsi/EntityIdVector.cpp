@@ -40,9 +40,9 @@
 
 /* ****************************************************************************
 *
-* EntityIdVector::render -
+* EntityIdVector::toJson -
 */
-void EntityIdVector::render
+void EntityIdVector::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )
@@ -56,7 +56,7 @@ void EntityIdVector::render
   writer.StartArray();
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->render(writer);
+    vec[ix]->toJsonV1(writer);
   }
 
   writer.EndArray();

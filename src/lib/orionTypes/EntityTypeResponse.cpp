@@ -44,21 +44,25 @@
 *
 * EntityTypeResponse::render -
 */
-void EntityTypeResponse::render
+std::string EntityTypeResponse::render
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  bool                asJsonOut,
-  bool                collapsed
+  ApiVersion apiVersion,
+  bool       asJsonObject,
+  bool       asJsonOut,
+  bool       collapsed,
+  int        indent
 )
 {
-  writer.StartObject();
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
 
-  entityType.render(writer, apiVersion, asJsonObject, asJsonOut, collapsed, true);
-  statusCode.render(writer);
+  toJson(writer, apiVersion, asJsonObject, asJsonOut, collapsed);
 
-  writer.EndObject();
+  return sb.GetString();
 }
 
 
@@ -90,12 +94,7 @@ std::string EntityTypeResponse::check
   else
     return "OK";
 
-  rapidjson::StringBuffer s;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
-  writer.SetIndent(' ', 2);
-  render(writer, apiVersion, asJsonObject, asJsonOut, collapsed);
-
-  return s.GetString();
+  return render(apiVersion, asJsonObject, asJsonOut, collapsed);
 }
 
 
@@ -129,17 +128,32 @@ void EntityTypeResponse::release(void)
 *
 * EntityTypeResponse::toJson -
 */
-void EntityTypeResponse::toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void EntityTypeResponse::toJson
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
+  bool                asJsonOut,
+  bool                collapsed
+)
 {
   writer.StartObject();
 
-  writer.Key("attrs");
-  writer.StartObject();
-  entityType.contextAttributeVector.toJsonTypes(writer);
-  writer.EndObject();
+  if (apiVersion == V2)
+  {
+    writer.Key("attrs");
+    writer.StartObject();
+    entityType.contextAttributeVector.toJsonTypes(writer);
+    writer.EndObject();
 
-  writer.Key("count");
-  writer.Uint(entityType.count);
+    writer.Key("count");
+    writer.Uint(entityType.count);
+  }
+  else
+  {
+    entityType.toJsonV1(writer, apiVersion, asJsonObject, asJsonOut, collapsed, true);
+    statusCode.toJsonV1(writer);
+  }
 
   writer.EndObject();
 }

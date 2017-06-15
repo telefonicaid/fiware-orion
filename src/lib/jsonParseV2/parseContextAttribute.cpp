@@ -321,7 +321,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
     alarmMgr.badInput(clientIp, "JSON parse error");
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return oe.render();
   }
 
 
@@ -332,7 +332,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
     alarmMgr.badInput(clientIp, "JSON Parse Error");
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return oe.render();
   }
 
   bool         compoundVector = false;
@@ -345,7 +345,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
     alarmMgr.badInput(clientIp, r);
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return oe.render();
   }
 
   if (!caP->typeGiven)

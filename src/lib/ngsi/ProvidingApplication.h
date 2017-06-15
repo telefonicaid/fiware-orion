@@ -50,7 +50,7 @@ typedef struct ProvidingApplication
   std::string   get(void);
   MimeType      getMimeType(void);
   bool          isEmpty(void);
-  void          render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void          toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void          present(const std::string& indent);
   const char*   c_str(void);
   void          release(void);

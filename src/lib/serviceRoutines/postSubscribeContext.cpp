@@ -63,6 +63,7 @@ std::string postSubscribeContext
 )
 {
   SubscribeContextResponse  scr;
+  std::string               answer;
 
   //
   // FIXME P0: Only *one* service path is allowed for subscriptions.
@@ -79,20 +80,14 @@ std::string postSubscribeContext
 
     scr.subscribeError.errorCode.fill(SccBadRequest, "max one service-path allowed for subscriptions");
 
-    rapidjson::StringBuffer out;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-    writer.SetIndent(' ', 2);
-    TIMED_RENDER(scr.render(writer));
-    return out.GetString();
+    TIMED_RENDER(answer = scr.render());
+    return answer;
   }
 
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
   TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->httpHeaders.xauthToken, ciP->servicePathV, ciP->httpHeaders.correlator));
-  TIMED_RENDER(scr.render(writer));
+  TIMED_RENDER(answer = scr.render());
 
   parseDataP->scr.res.release();
 
-  return out.GetString();
+  return answer;
 }

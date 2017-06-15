@@ -71,12 +71,11 @@ ContextElement::ContextElement(const std::string& id, const std::string& type, c
 
 /* ****************************************************************************
 *
-* ContextElement::render - 
+* ContextElement::toJsonV1 - 
 */
-void ContextElement::render
+void ContextElement::toJsonV1
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  ApiVersion apiVersion,
   bool asJsonObject,
   RequestType requestType,
   bool omitAttributeValues
@@ -88,10 +87,10 @@ void ContextElement::render
   }
   writer.StartObject();
 
-  entityId.render(writer);
-  attributeDomainName.render(writer);
-  contextAttributeVector.render(writer, apiVersion, asJsonObject, requestType, omitAttributeValues);
-  domainMetadataVector.render(writer);
+  entityId.toJsonV1(writer);
+  attributeDomainName.toJson(writer);
+  contextAttributeVector.toJsonV1(writer, asJsonObject, requestType, omitAttributeValues);
+  domainMetadataVector.toJsonV1(writer);
 
   writer.EndObject();
 }

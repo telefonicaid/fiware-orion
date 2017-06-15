@@ -51,7 +51,7 @@ typedef struct NotifyCondition
   NotifyCondition();
   NotifyCondition(NotifyCondition* ncP);
 
-  void          render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void          toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void          present(const std::string& indent, int ix);
   void          release(void);
 

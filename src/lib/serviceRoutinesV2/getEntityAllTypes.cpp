@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -61,12 +58,10 @@ std::string getEntityAllTypes
 )
 {
   EntityTypeVectorResponse  response;
+  std::string               answer;
   unsigned int              totalTypes   = 0;
   bool                      noAttrDetail = ciP->uriParamOptions[OPT_NO_ATTR_DETAIL];
   unsigned int*             totalTypesP  = NULL;
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
 
   // NGSIv2 uses options=count to request count
   if (ciP->uriParamOptions[OPT_COUNT])
@@ -88,7 +83,7 @@ std::string getEntityAllTypes
                                  totalTypesP,
                                  noAttrDetail));
   }
-  TIMED_RENDER(response.toJson(writer, ciP->uriParamOptions[OPT_VALUES]));
+  TIMED_RENDER(answer = response.render(ciP->uriParamOptions[OPT_VALUES]));
 
   if (ciP->uriParamOptions[OPT_COUNT])
   {
@@ -100,5 +95,5 @@ std::string getEntityAllTypes
   }
 
   response.release();
-  return sb.GetString();
+  return answer;
 }

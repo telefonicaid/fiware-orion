@@ -31,7 +31,6 @@
 
 #include "common/globals.h"
 #include "alarmMgr/alarmMgr.h"
-#include "ngsi/StatusCode.h"
 #include "ngsi/Duration.h"
 #include "ngsi/ContextRegistrationVector.h"
 #include "ngsi9/RegisterContextResponse.h"
@@ -43,16 +42,27 @@
 *
 * RegisterContextRequest::render -
 */
-void RegisterContextRequest::render
+std::string RegisterContextRequest::render
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  int indent
 )
 {
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+
   writer.StartObject();
-  contextRegistrationVector.render(writer);
-  duration.render(writer);
-  registrationId.render(writer, RegisterContext);
+  contextRegistrationVector.toJson(writer);
+  duration.toJson(writer);
+  registrationId.toJson(writer, RegisterContext);
   writer.EndObject();
+
+  return sb.GetString();
 }
 
 
@@ -88,11 +98,7 @@ std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::stri
     return "OK";
   }
 
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
-  response.render(writer);
-  return sb.GetString();
+  return response.render();
 }
 
 

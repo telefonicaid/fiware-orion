@@ -35,7 +35,6 @@
 #include "alarmMgr/alarmMgr.h"
 
 #include "convenience/RegisterProviderRequest.h"
-#include "ngsi/StatusCode.h"
 #include "ngsi/MetadataVector.h"
 #include "ngsi/Duration.h"
 #include "ngsi/ProvidingApplication.h"
@@ -58,19 +57,30 @@ RegisterProviderRequest::RegisterProviderRequest()
 *
 * RegisterProviderRequest::render - 
 */
-void RegisterProviderRequest::render
+std::string RegisterProviderRequest::render
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  int         indent
 )
 {
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+
   writer.StartObject();
 
-  metadataVector.render(writer);
-  duration.render(writer);
-  providingApplication.render(writer);
-  registrationId.render(writer, RegisterContext);
+  metadataVector.toJsonV1(writer);
+  duration.toJson(writer);
+  providingApplication.toJson(writer);
+  registrationId.toJson(writer, RegisterContext);
 
   writer.EndObject();
+
+  return sb.GetString();
 }
 
 
@@ -109,11 +119,7 @@ std::string RegisterProviderRequest::check
   std::string details = std::string("RegisterProviderRequest Error: '") + res + "'";
   alarmMgr.badInput(clientIp, details);
 
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
-  response.render(writer);
-  return sb.GetString();
+  return response.render();
 }
 
 

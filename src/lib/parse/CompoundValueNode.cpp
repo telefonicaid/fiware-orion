@@ -654,17 +654,6 @@ std::string CompoundValueNode::check(void)
 
 /* ****************************************************************************
 *
-* render -
-*/
-void CompoundValueNode::render(rapidjson::Writer<rapidjson::StringBuffer>& writer)
-{
-  toJson(writer);
-}
-
-
-
-/* ****************************************************************************
-*
 * toJson -
 *
 */

@@ -24,8 +24,6 @@
 */
 #include <string>
 
-#include "rapidjson/prettywriter.h"
-
 #include "ngsi/SubscriptionId.h"
 #include "ngsi9/UnsubscribeContextAvailabilityResponse.h"
 #include "ngsi9/UnsubscribeContextAvailabilityRequest.h"
@@ -74,11 +72,7 @@ std::string UnsubscribeContextAvailabilityRequest::check(const std::string& inde
   else
     return "OK";
 
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
-  response.render(writer);
-  return sb.GetString();
+  return response.render();
 }
 
 

@@ -52,10 +52,11 @@ public:
   OrionError(StatusCode& statusCode);
   OrionError(HttpStatusCode _code, const std::string& _details = "", const std::string& _reasonPhrase = "");
 
-  std::string  smartRender(ApiVersion apiVersion);
   std::string  setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpStatusCode* scP);
-  std::string  toJson(rapidjson::Writer<rapidjson::StringBuffer>* writer = NULL);
-  std::string  render(void);
+  std::string  renderV1(int indent = -1);
+  std::string  render(int indent = -1);
+  std::string  render(ApiVersion apiVersion);
+  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void         fill(HttpStatusCode _code, const std::string& _details,  const std::string& _reasonPhrase = "");
 
 private:

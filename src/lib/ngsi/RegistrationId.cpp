@@ -113,9 +113,9 @@ void RegistrationId::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* RegistrationId::render -
+* RegistrationId::toJson -
 */
-void RegistrationId::render
+void RegistrationId::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer,
   RequestType requestType

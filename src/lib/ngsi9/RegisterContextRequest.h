@@ -50,7 +50,7 @@ typedef struct RegisterContextRequest
 
   std::string                servicePath;                // Not part of payload, just an internal field
 
-  void          render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  std::string   render(int indent = -1);
   std::string   check(ApiVersion apiVersion, const std::string& indent, const std::string& predetectedError, int counter);
   void          present(void);
   void          release(void);

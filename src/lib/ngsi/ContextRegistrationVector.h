@@ -45,7 +45,7 @@ typedef struct ContextRegistrationVector
 
   void                  push_back(ContextRegistration* item);
   unsigned int          size(void);
-  void                  render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void                  toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void                  present(const std::string& indent);
   void                  release(void);
 

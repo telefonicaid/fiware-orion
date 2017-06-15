@@ -105,9 +105,9 @@ void Originator::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* Originator::render -
+* Originator::toJson -
 */
-void Originator::render
+void Originator::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )

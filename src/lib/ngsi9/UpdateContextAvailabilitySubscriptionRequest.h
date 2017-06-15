@@ -57,7 +57,7 @@ typedef struct UpdateContextAvailabilitySubscriptionRequest
 
   UpdateContextAvailabilitySubscriptionRequest();
 
-  void            render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  std::string     render(int indent = -1);
   void            present(const std::string& indent);
   std::string     check(const std::string& indent, const std::string& predetectedError, int counter);
   void            release(void);

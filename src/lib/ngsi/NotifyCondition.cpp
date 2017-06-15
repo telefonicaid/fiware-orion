@@ -60,9 +60,9 @@ NotifyCondition::NotifyCondition(NotifyCondition* ncP)
 
 /* ****************************************************************************
 *
-* NotifyCondition::render -
+* NotifyCondition::toJson -
 */
-void NotifyCondition::render
+void NotifyCondition::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )
@@ -72,8 +72,8 @@ void NotifyCondition::render
   writer.Key("type");
   writer.String(type.c_str());
 
-  condValueList.render(writer);
-  restriction.render(writer);
+  condValueList.toJson(writer);
+  restriction.toJson(writer);
 
   writer.EndObject();
 }

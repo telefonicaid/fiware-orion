@@ -95,27 +95,25 @@ public:
   std::string  getId() const;
   std::string  getLocation(ApiVersion apiVersion = V1) const;
 
-  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                      ApiVersion          apiVersion,
-                      bool                asJsonObject,
-                      RequestType         request,
-                      bool                omitValue = false);
-  void         renderAsJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                                  ApiVersion  apiVersion,
-                                  RequestType request,
-                                  bool        asJsonObject,
-                                  bool        omitValue = false);
-  void         renderAsNameString(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void         toJsonV1(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+                        bool                asJsonObject,
+                        RequestType         request,
+                        bool                omitValue = false);
+  void         toJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+                            ApiVersion  apiVersion,
+                            RequestType request,
+                            bool        asJsonObject,
+                            bool        omitValue = false);
+  void         toJsonString(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
                       RenderFormat                     renderFormat,
                       const std::vector<std::string>&  metadataFilter,
                       RequestType                      requestType = NoRequest);
-  std::string  toJsonAsValue(ApiVersion       apiVersion,
-                             bool             acceptedTextPlain,
-                             bool             acceptedJson,
+  std::string  renderAsValue(ApiVersion       apiVersion,
                              MimeType         outFormatSelection,
-                             MimeType*        outMimeTypeP,
-                             HttpStatusCode*  scP);
+                             HttpStatusCode*  scP,
+                             int              indent = -1);
+  void         toJsonAsValue(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  getName(void);

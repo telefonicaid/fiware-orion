@@ -39,12 +39,13 @@
 TEST(ContextAttributeVector, render)
 {
   ContextAttributeVector  cav;
-  std::string             out;
 
   utInit();
 
-  out = cav.render(V1, false, UpdateContextAttribute, "");
-  EXPECT_STREQ("", out.c_str());
+  rapidjson::StringBuffer sb;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+  cav.toJsonV1(writer, false, UpdateContextAttribute);
+  EXPECT_STREQ("", sb.GetString());
 
   // Just to exercise the code ...
   cav.present("");

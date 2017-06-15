@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -60,6 +57,7 @@ std::string postRegisterContext
 )
 {
   RegisterContextResponse  rcr;
+  std::string              answer;
   RegisterContextRequest*  rcrP = &parseDataP->rcr.res;
 
   //
@@ -93,12 +91,9 @@ std::string postRegisterContext
     alarmMgr.badInput(clientIp, "more than one service path for a registration");
     rcr.errorCode.fill(SccBadRequest, "more than one service path for notification");
 
-    rapidjson::StringBuffer out;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-    writer.SetIndent(' ', 2);
-    TIMED_RENDER(rcr.render(writer));
+    TIMED_RENDER(answer = rcr.render());
 
-    return out.GetString();
+    return answer;
   }
   else if (ciP->servicePathV.size() == 0)
   {
@@ -110,18 +105,12 @@ std::string postRegisterContext
   {
     rcr.errorCode.fill(SccBadRequest, res);
 
-    rapidjson::StringBuffer out;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-    writer.SetIndent(' ', 2);
-    TIMED_RENDER(rcr.render(writer));
-    return out.GetString();
+    TIMED_RENDER(answer = rcr.render());
+    return answer;
   }
 
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
   TIMED_MONGO(ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->uriParam, ciP->httpHeaders.correlator, ciP->tenant, ciP->servicePathV[0]));
-  TIMED_RENDER(rcr.render(writer));
+  TIMED_RENDER(answer = rcr.render());
 
-  return out.GetString();
+  return answer;
 }

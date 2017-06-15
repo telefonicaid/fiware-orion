@@ -35,14 +35,15 @@
 TEST(EntityId, render)
 {
   EntityId     eId;
-  std::string  out;
   const char*  outfile1 = "ngsi.entityId.render.middle.json";
 
   utInit();
 
-  out = eId.render("");
+  rapidjson::StringBuffer sb;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+  eId.toJson(writer);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  EXPECT_STREQ(expectedBuf, sb.GetString());
 
   utExit();
 }

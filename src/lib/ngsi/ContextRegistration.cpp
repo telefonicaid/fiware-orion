@@ -48,9 +48,9 @@ ContextRegistration::ContextRegistration()
 
 /* ****************************************************************************
 *
-* ContextRegistration::render -
+* ContextRegistration::toJson -
 */
-void ContextRegistration::render
+void ContextRegistration::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer,
   bool isInVector
@@ -61,10 +61,10 @@ void ContextRegistration::render
     writer.Key("contextRegistration");
   }
   writer.StartObject();
-  entityIdVector.render(writer);
-  contextRegistrationAttributeVector.render(writer);
-  registrationMetadataVector.render(writer);
-  providingApplication.render(writer);
+  entityIdVector.toJson(writer);
+  contextRegistrationAttributeVector.toJson(writer);
+  registrationMetadataVector.toJsonV1(writer);
+  providingApplication.toJson(writer);
   writer.EndObject();
 }
 

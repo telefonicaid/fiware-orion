@@ -54,7 +54,31 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 *
 * render - 
 */
-void UpdateContextAttributeRequest::render
+std::string UpdateContextAttributeRequest::render
+(
+  ApiVersion apiVersion,
+  int        indent
+)
+{
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+
+  toJson(writer, apiVersion);
+
+  return sb.GetString();
+}
+
+
+
+/* ****************************************************************************
+*
+* toJson - 
+*/
+void UpdateContextAttributeRequest::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer,
   ApiVersion apiVersion
@@ -73,10 +97,10 @@ void UpdateContextAttributeRequest::render
   else
   {
     writer.Key("value");
-    compoundValueP->render(writer);
+    compoundValueP->toJson(writer);
   }
 
-  metadataVector.render(writer);
+  metadataVector.toJsonV1(writer);
 
   writer.EndObject();
 }
@@ -113,10 +137,9 @@ std::string UpdateContextAttributeRequest::check
   }
 
   rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
+  rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
   writer.StartObject();
-  response.render(writer);
+  response.toJson(writer);
   writer.EndObject();
 
   return sb.GetString();

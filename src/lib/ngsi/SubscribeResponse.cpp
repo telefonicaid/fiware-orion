@@ -41,16 +41,16 @@ SubscribeResponse::SubscribeResponse()
 
 /* ****************************************************************************
 *
-* SubscribeResponse::render - 
+* SubscribeResponse::toJson - 
 */
-void SubscribeResponse::render
+void SubscribeResponse::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )
 {
   writer.StartObject();
-  subscriptionId.render(writer, RtSubscribeResponse);
-  duration.render(writer);
-  throttling.render(writer);
+  subscriptionId.toJson(writer, RtSubscribeResponse);
+  duration.toJson(writer);
+  throttling.toJson(writer);
   writer.EndObject();
 }

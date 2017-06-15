@@ -33,19 +33,20 @@
 
 /* ****************************************************************************
 *
-* render - 
+* toJson - 
 */
-TEST(ContextRegistrationAttribute, render)
+TEST(ContextRegistrationAttribute, toJson)
 {
   ContextRegistrationAttribute  cra("name", "type", "false");
-  std::string                   out;
   const char*                   outfile1 = "ngsi.contextRegistrationAttribute.render.middle.json";
 
   utInit();
 
-  out = cra.render("");
+  rapidjson::StringBuffer sb;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+  cra.toJson(writer);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  EXPECT_STREQ(expectedBuf, sb.GetString());
 
   utExit();
 }

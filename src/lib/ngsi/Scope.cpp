@@ -383,9 +383,9 @@ int Scope::fill
 
 /* ****************************************************************************
 *
-* Scope::render -
+* Scope::toJson -
 */
-void Scope::render
+void Scope::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )

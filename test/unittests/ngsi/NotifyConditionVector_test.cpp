@@ -39,25 +39,36 @@ TEST(NotifyConditionVector, render)
 {
   NotifyCondition*       ncP = new NotifyCondition();
   NotifyConditionVector  ncV;
-  std::string            out;
   const char*            outfile1 = "ngsi.notifyConditionVector.render.middle.json";
 
   utInit();
 
-  out = ncV.render("", false);
-  EXPECT_STREQ("", out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    ncV.toJson(writer);
+    EXPECT_STREQ("", sb.GetString());
+  }
 
   ncP->type = "Type";
   ncV.push_back(ncP);
 
-  out = ncV.render("", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    ncV.toJson(writer);
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+    EXPECT_STREQ(expectedBuf, sb.GetString());
+  }
 
   ncV.release();
 
-  out = ncV.render("", false);
-  EXPECT_STREQ("", out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    ncV.toJson(writer);
+    EXPECT_STREQ("", sb.GetString());
+  }
 
   utExit();
 }

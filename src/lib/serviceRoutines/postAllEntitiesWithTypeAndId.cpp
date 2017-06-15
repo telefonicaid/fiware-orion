@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -86,10 +83,8 @@ std::string postAllEntitiesWithTypeAndId
   EntityTypeInfo                typeInfo              = EntityTypeEmptyOrNotEmpty;
   std::string                   typeNameFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
   AppendContextElementRequest*  reqP                  = &parseDataP->acer.res;
+  std::string                   answer;
   AppendContextElementResponse  response;
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
 
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
 
@@ -114,9 +109,9 @@ std::string postAllEntitiesWithTypeAndId
     alarmMgr.badInput(clientIp, "unknown field");
     response.errorCode.fill(SccBadRequest, "invalid payload: unknown fields");
 
-    TIMED_RENDER(response.render(writer, ciP->apiVersion, asJsonObject, IndividualContextEntity));
+    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
 
-    return out.GetString();
+    return answer;
   }
 
 
@@ -128,10 +123,10 @@ std::string postAllEntitiesWithTypeAndId
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     response.entity.fill(entityId, entityType, "false");
 
-    TIMED_RENDER(response.render(writer, ciP->apiVersion, asJsonObject, AllEntitiesWithTypeAndId));
+    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, AllEntitiesWithTypeAndId));
 
     parseDataP->acer.res.release();
-    return out.GetString();
+    return answer;
   }
   else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
   {
@@ -140,10 +135,10 @@ std::string postAllEntitiesWithTypeAndId
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     response.entity.fill(entityId, entityType, "false");
 
-    TIMED_RENDER(response.render(writer, ciP->apiVersion, asJsonObject, AllEntitiesWithTypeAndId));
+    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, AllEntitiesWithTypeAndId));
 
     parseDataP->acer.res.release();
-    return out.GetString();
+    return answer;
   }
 
   // Now, forward Entity to response
@@ -163,10 +158,10 @@ std::string postAllEntitiesWithTypeAndId
 
 
   // 07. Cleanup and return result
-  TIMED_RENDER(response.render(writer, ciP->apiVersion, asJsonObject, IndividualContextEntity));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
 
   parseDataP->upcr.res.release();
   response.release();
 
-  return out.GetString();
+  return answer;
 }

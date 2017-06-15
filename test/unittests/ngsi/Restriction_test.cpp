@@ -83,9 +83,10 @@ TEST(Restriction, present)
 TEST(Restriction, render)
 {
   Restriction  restriction;
-  std::string  rendered;
   std::string  expected = "";
 
-  rendered = restriction.render("", 0, false);
-  EXPECT_STREQ(expected.c_str(), rendered.c_str());
+  rapidjson::StringBuffer sb;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+  restriction.toJson(writer);
+  EXPECT_STREQ(expected.c_str(), sb.GetString());
 }

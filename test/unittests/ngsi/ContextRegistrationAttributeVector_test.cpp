@@ -40,27 +40,42 @@ TEST(ContextRegistrationAttributeVector, render)
   ContextRegistrationAttributeVector crav;
   ContextRegistrationAttribute       cra("name", "type", "false");
   ContextRegistrationAttribute       cra2("name2", "type2", "true");
-  std::string                        out;
   const char*                        outfile1 = "ngsi.contextRegistrationAttributeVector.render1.middle.json";
   const char*                        outfile2 = "ngsi.contextRegistrationAttributeVector.render2.middle.json";
 
   utInit();
 
-  out = crav.render("");
-  EXPECT_STREQ("", out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    crav.toJson(writer);
+    EXPECT_STREQ("", sb.GetString());
+  }
 
-  out = crav.render("");
-  EXPECT_STREQ("", out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    crav.toJson(writer);
+    EXPECT_STREQ("", sb.GetString());
+  }
 
   crav.push_back(&cra);
-  out = crav.render("");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    crav.toJson(writer);
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+    EXPECT_STREQ(expectedBuf, sb.GetString());
+  }
 
   crav.push_back(&cra2);
-  out = crav.render("");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    crav.toJson(writer);
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+    EXPECT_STREQ(expectedBuf, sb.GetString());
+  }
 
   utExit();
 }

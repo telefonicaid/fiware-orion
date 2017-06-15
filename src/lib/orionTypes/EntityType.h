@@ -49,12 +49,12 @@ class EntityType
   explicit EntityType(std::string _type);
 
   std::string   check(ApiVersion apiVersion, const std::string& predetectedError);
-  void          render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                       ApiVersion          apiVersion,
-                       bool                asJsonObject,
-                       bool                asJsonOut,
-                       bool                collapsed,
-                       bool                typeNameBefore = false);
+  void          toJsonV1(rapidjson::Writer<rapidjson::StringBuffer>&  writer,
+                         ApiVersion                                   apiVersion,
+                         bool                                         asJsonObject,
+                         bool                                         asJsonOut,
+                         bool                                         collapsed,
+                         bool                                         typeNameBefore = false);
   void          present(const std::string& indent);
   void          release(void);
   void          toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer, bool includeType = false);

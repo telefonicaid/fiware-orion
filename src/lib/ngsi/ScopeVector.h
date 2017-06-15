@@ -43,7 +43,7 @@ typedef struct ScopeVector
 {
   std::vector<Scope*>  vec;
 
-  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void         present(const std::string& indent);
   void         push_back(Scope* item);
   unsigned int size(void) const;

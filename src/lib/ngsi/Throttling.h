@@ -49,7 +49,7 @@ typedef struct Throttling
   void               set(const std::string& value);
   const std::string  get(void);
   bool               isEmpty(void);
-  void               render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void               toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 
   std::string        check(RequestType requestType,
                            const std::string& indent,

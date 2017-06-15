@@ -49,7 +49,7 @@ typedef struct SubscriptionId
   std::string   get(void) const;
   const char*   c_str(void) const;
   bool          isEmpty(void);
-  void          render(rapidjson::Writer<rapidjson::StringBuffer>& writer, RequestType requestType);
+  void          toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer, RequestType requestType);
   void          present(const std::string& indent);
   void          release(void);
   bool          rendered(RequestType container);

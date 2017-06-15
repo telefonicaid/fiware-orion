@@ -68,11 +68,19 @@ typedef struct ContextElementResponse
                          ApiVersion             apiVersion   = V1);
   ContextElementResponse(ContextElement* ceP, bool useDefaultType = false);
 
-  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                      ApiVersion          apiVersion,
-                      bool                asJsonObject,
-                      RequestType         requestType,
-                      bool                omitAttributeValues = false);
+  std::string  renderV1(bool        asJsonObject,
+                        RequestType requestType,
+                        bool        omitAttributeValues = false,
+                        int         indent = -1);
+  std::string  render(RenderFormat                     renderFormat,
+                      const std::vector<std::string>&  attrsFilter,
+                      const std::vector<std::string>&  metadataFilter,
+                      bool                             blacklist = false,
+                      int                              indent = -1);
+  void         toJsonV1(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+                        bool                asJsonObject,
+                        RequestType         requestType,
+                        bool                omitAttributeValues = false);
   void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
                       RenderFormat                     renderFormat,
                       const std::vector<std::string>&  attrsFilter,

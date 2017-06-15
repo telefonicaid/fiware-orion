@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <string>
 
+#include <boost/lexical_cast.hpp>
+
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 
@@ -88,18 +90,18 @@ void OrionError::fill(HttpStatusCode _code, const std::string& _details, const s
 
 /* ****************************************************************************
 *
-* OrionError::smartRender -
+* OrionError::render -
 */
-std::string OrionError::smartRender(ApiVersion apiVersion)
+std::string OrionError::render(ApiVersion apiVersion)
 {
   if (apiVersion == V1 || apiVersion == NO_VERSION)
   {
-    return render();
+    return renderV1();
   }
   else // admin or v2
   {
     shrinkReasonPhrase();
-    return toJson();
+    return render();
   }
 }
 
@@ -116,30 +118,42 @@ std::string OrionError::setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpS
     *scP = code;
   }
 
-  return smartRender(apiVersion);
+  return render(apiVersion);
 }
-
 
 
 /* ****************************************************************************
 *
 * OrionError::toJson -
 */
-std::string OrionError::toJson(rapidjson::Writer<rapidjson::StringBuffer>* writer)
+void OrionError::toJson
+(
+  rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
+{
+  writer.StartObject();
+  writer.Key("error");
+  writer.String(reasonPhrase.c_str());
+  writer.Key("description");
+  writer.String(details.c_str());
+  writer.EndObject();
+}
+
+/* ****************************************************************************
+*
+* OrionError::render -
+*/
+std::string OrionError::render(int indent)
 {
   rapidjson::StringBuffer sb;
-  if (writer == NULL) {
-      rapidjson::PrettyWriter<rapidjson::StringBuffer> pwriter(sb);
-      pwriter.SetIndent(' ', 2);
-      writer = &pwriter;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
   }
+  writer.SetIndent(' ', indent);
 
-  writer->StartObject();
-  writer->Key("error");
-  writer->String(reasonPhrase.c_str());
-  writer->Key("description");
-  writer->String(details.c_str());
-  writer->EndObject();
+  toJson(writer);
 
   return sb.GetString();
 }
@@ -148,14 +162,18 @@ std::string OrionError::toJson(rapidjson::Writer<rapidjson::StringBuffer>* write
 
 /* ****************************************************************************
 *
-* OrionError::render -
+* OrionError::renderV1 -
 *
 */
-std::string OrionError::render(void)
+std::string OrionError::renderV1(int indent)
 {
   rapidjson::StringBuffer out;
   rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
 
   //
   // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here
@@ -165,7 +183,7 @@ std::string OrionError::render(void)
   writer.Key("orionError");
   writer.StartObject();
   writer.Key("code");
-  writer.Uint(code);
+  writer.String(boost::lexical_cast<std::string>(code).c_str());
   writer.Key("reasonPhrase");
   writer.String(reasonPhrase.c_str());
 
@@ -185,12 +203,12 @@ std::string OrionError::render(void)
 
 /* ****************************************************************************
 *
-* OrionError::render -
+* OrionError::shrinkReasonPhrase -
 *
 * This method removes any whitespace in the reasonPhrase field, i.e.
 * transforms "Not Found" to "NotFound".
 *
-* It is used by smartRender method, in order to prepare to render in API v2 case
+* It is used by render method, in order to prepare to render in API v2 case
 *
 * FIXME P4: The following alternative (more compact) way has been proposed:
 *

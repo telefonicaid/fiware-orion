@@ -44,7 +44,7 @@ TEST(StatusCode, render)
 
   utInit();
 
-  out = sc2.render("");
+  out = sc2.render();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

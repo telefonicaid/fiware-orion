@@ -36,9 +36,9 @@
 
 /* ****************************************************************************
 *
-* render - 
+* toJson - 
 */
-void ConditionValueList::render(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void ConditionValueList::toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
   std::string  out = "";
 

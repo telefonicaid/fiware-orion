@@ -216,12 +216,11 @@ void ContextAttributeVector::toJson
 
 /* ****************************************************************************
 *
-* ContextAttributeVector::render - 
+* ContextAttributeVector::toJsonV1 - 
 */
-void ContextAttributeVector::render
+void ContextAttributeVector::toJsonV1
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         request,
   bool                omitValue,
@@ -270,7 +269,7 @@ void ContextAttributeVector::render
       writer.StartArray();
       for (unsigned int ix = 0; ix < vec.size(); ++ix)
       {
-        vec[ix]->renderAsNameString(writer);
+        vec[ix]->toJsonString(writer);
       }
       writer.EndArray();
     }
@@ -279,7 +278,7 @@ void ContextAttributeVector::render
       writer.StartObject();
       for (unsigned int ix = 0; ix < vec.size(); ++ix)
       {
-        vec[ix]->render(writer, apiVersion, asJsonObject, request, omitValue);
+        vec[ix]->toJsonV1(writer, asJsonObject, request, omitValue);
       }
       writer.EndObject();
     }
@@ -292,11 +291,11 @@ void ContextAttributeVector::render
     {
       if (attrsAsName)
       {
-        vec[ix]->renderAsNameString(writer);
+        vec[ix]->toJsonString(writer);
       }
       else
       {
-        vec[ix]->render(writer, apiVersion, asJsonObject, request, omitValue);
+        vec[ix]->toJsonV1(writer, asJsonObject, request, omitValue);
       }
     }
     writer.EndArray();

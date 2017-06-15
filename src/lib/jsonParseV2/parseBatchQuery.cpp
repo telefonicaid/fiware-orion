@@ -55,7 +55,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return oe.render();
   }
 
   if (!document.IsObject())
@@ -64,7 +64,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return oe.render();
   }
   else if (document.ObjectEmpty())
   {
@@ -72,7 +72,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
     oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return oe.render();
   }
   else if (!document.HasMember("entities") && !document.HasMember("attributes") && !document.HasMember("scopes"))
   {
@@ -80,7 +80,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
     oe.fill(SccBadRequest, "Invalid JSON payload, no relevant fields found", "BadRequest");
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return oe.render();
   }
 
   for (rapidjson::Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
@@ -98,7 +98,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
         oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
 
-        return oe.toJson();
+        return oe.render();
       }
     }
     else if (name == "attributes")
@@ -111,7 +111,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
         oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
 
-        return oe.toJson();
+        return oe.render();
       }
     }
     else if (name == "scopes")
@@ -124,7 +124,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
         oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
 
-        return oe.toJson();
+        return oe.render();
       }
     }
     else if (name == "metadata")
@@ -138,7 +138,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
         oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
 
-        return oe.toJson();
+        return oe.render();
       }
     }
     else
@@ -149,7 +149,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       oe.fill(SccBadRequest, description, "BadRequest");
       ciP->httpStatusCode = SccBadRequest;
 
-      return oe.toJson();
+      return oe.render();
     }
   }
 

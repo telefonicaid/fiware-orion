@@ -54,10 +54,14 @@ typedef struct ContextAttributeResponse
   ContextAttributeVector     contextAttributeVector;     // Mandatory
   StatusCode                 statusCode;                 // Mandatory
 
-  void        render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                     ApiVersion          apiVersion,
-                     bool                asJsonObject,
-                     RequestType         request);
+  std::string render(ApiVersion   apiVersion,
+                     bool         asJsonObject,
+                     RequestType  request,
+                     int          indent = -1);
+  void        toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+                     ApiVersion   apiVersion,
+                     bool         asJsonObject,
+                     RequestType  request);
   void        present(std::string indent);
   void        release(void);
   std::string check(ApiVersion          apiVersion,

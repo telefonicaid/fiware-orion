@@ -64,9 +64,9 @@ ContextRegistrationAttribute::ContextRegistrationAttribute
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttribute::render -
+* ContextRegistrationAttribute::toJson -
 */
-void ContextRegistrationAttribute::render
+void ContextRegistrationAttribute::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )
@@ -82,7 +82,7 @@ void ContextRegistrationAttribute::render
   writer.Key("isDomain");
   writer.String(isDomain.c_str());
 
-  metadataVector.render(writer);
+  metadataVector.toJsonV1(writer);
 
   writer.EndObject();
 }

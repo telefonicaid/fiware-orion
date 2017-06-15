@@ -55,7 +55,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return oe.render();
   }
 
   if (!document.IsObject())
@@ -64,7 +64,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return oe.render();
   }
   else if (document.ObjectEmpty())
   {
@@ -72,7 +72,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
     oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return oe.render();
   }
   else if (!document.HasMember("entities"))
   {
@@ -82,7 +82,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
     oe.fill(SccBadRequest, details, "BadRequest");
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return oe.render();
   }
   else if (!document.HasMember("actionType"))
   {
@@ -92,7 +92,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
     oe.fill(SccBadRequest, details, "BadRequest");
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return oe.render();
   }
 
   for (rapidjson::Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
@@ -109,7 +109,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
-        r = oe.toJson();
+        r = oe.render();
         return r;
       }
     }
@@ -122,7 +122,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
         alarmMgr.badInput(clientIp, err);
         oe.fill(SccBadRequest, err, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
-        return oe.toJson();
+        return oe.render();
       }
     }
     else
@@ -133,7 +133,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
       oe.fill(SccBadRequest, description, "BadRequest");
       ciP->httpStatusCode = SccBadRequest;
 
-      return oe.toJson();
+      return oe.render();
     }
   }
 

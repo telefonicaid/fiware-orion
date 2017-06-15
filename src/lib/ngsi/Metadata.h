@@ -92,7 +92,7 @@ typedef struct Metadata
   Metadata(const std::string& _name, const mongo::BSONObj& mdB);
   ~Metadata();
 
-  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void         toJsonV1(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void         present(const std::string& metadataType, int ix, const std::string& indent);
   void         release(void);

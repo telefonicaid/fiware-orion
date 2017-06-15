@@ -77,10 +77,10 @@ EntityId::EntityId
 
 /* ****************************************************************************
 *
-* EntityId::render -
+* EntityId::toJsonV1 -
 *
 */
-void EntityId::render
+void EntityId::toJsonV1
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )

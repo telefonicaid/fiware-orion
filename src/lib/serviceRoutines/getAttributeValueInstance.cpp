@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 
 #include "common/statistics.h"
@@ -160,15 +157,12 @@ std::string getAttributeValueInstance
 
 
   // 5. Render the ContextAttributeResponse
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
-  TIMED_RENDER(response.render(writer, ciP->apiVersion, asJsonObject, IndividualContextEntityAttribute));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntityAttribute));
 
 
   // 6. Cleanup and return result
   // response.release();
   parseDataP->qcr.res.release();
 
-  return out.GetString();
+  return answer;
 }

@@ -50,24 +50,33 @@ AppendContextElementRequest::AppendContextElementRequest()
 *
 * render - 
 */
-void AppendContextElementRequest::render
+std::string AppendContextElementRequest::render
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
   ApiVersion apiVersion,
   bool asJsonObject,
-  RequestType requestType
+  RequestType requestType,
+  int indent
 )
 {
-  writer.StartObject();
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }  writer.StartObject();
+
+
   if (entity.id != "")
   {
-    entity.render(writer);
+    entity.toJsonV1(writer);
   }
 
-  attributeDomainName.render(writer);
-  contextAttributeVector.render(writer, apiVersion, asJsonObject, requestType);
-  domainMetadataVector.render(writer);
+  attributeDomainName.toJson(writer);
+  contextAttributeVector.toJsonV1(writer, asJsonObject, requestType);
+  domainMetadataVector.toJsonV1(writer);
   writer.EndObject();
+
+  return sb.GetString();
 }
 
 
@@ -114,11 +123,7 @@ std::string AppendContextElementRequest::check
     return "OK";
   }
 
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
-  response.render(writer, apiVersion, asJsonObject, requestType);
-  return sb.GetString();
+  return response.render(apiVersion, asJsonObject, requestType);
 }
 
 

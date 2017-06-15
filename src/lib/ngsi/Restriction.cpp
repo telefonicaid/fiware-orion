@@ -90,9 +90,9 @@ void Restriction::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* Restriction::render -
+* Restriction::toJson -
 */
-void Restriction::render
+void Restriction::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer,
   int restrictions
@@ -105,8 +105,8 @@ void Restriction::render
 
   writer.Key("restriction");
   writer.StartObject();
-  attributeExpression.render(writer);
-  scopeVector.render(writer);
+  attributeExpression.toJson(writer);
+  scopeVector.toJson(writer);
   writer.EndObject();
 }
 

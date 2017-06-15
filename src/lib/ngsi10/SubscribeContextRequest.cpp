@@ -28,7 +28,6 @@
 
 #include "common/globals.h"
 #include "ngsi/Request.h"
-#include "ngsi/StatusCode.h"
 #include "rest/EntityTypeInfo.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi10/SubscribeContextRequest.h"
@@ -62,11 +61,7 @@ std::string SubscribeContextRequest::check(const std::string& indent, const std:
   {
     alarmMgr.badInput(clientIp, res);
     response.subscribeError.errorCode.fill(SccBadRequest, std::string("invalid payload: ") + res);
-    rapidjson::StringBuffer sb;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-    writer.SetIndent(' ', 2);
-    response.render(writer);
-    return sb.GetString();
+    return response.render();
   }
 
   return "OK";

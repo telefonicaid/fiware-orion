@@ -107,9 +107,9 @@ void AttributeExpression::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* AttributeExpression::render - 
+* AttributeExpression::toJson - 
 */
-void AttributeExpression::render(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void AttributeExpression::toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
   if (string != "")
   {

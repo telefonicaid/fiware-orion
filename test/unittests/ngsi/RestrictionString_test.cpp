@@ -87,19 +87,26 @@ TEST(RestrictionString, isEmptySetAndGet)
 TEST(RestrictionString, render)
 {
   RestrictionString   restrictionString;
-  std::string         out;
   const char*         outfile1 = "ngsi.restrictionString.render.middle.json";
 
   utInit();
 
-  out = restrictionString.render("", false);
-  EXPECT_STREQ("", out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    restrictionString.toJson(writer);
+    EXPECT_STREQ("", sb.GetString());
+  }
 
   restrictionString.string = "String";
 
-  out = restrictionString.render("", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    restrictionString.toJson(writer);
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+    EXPECT_STREQ(expectedBuf, sb.GetString());
+  }
 
   utExit();
 }

@@ -43,7 +43,7 @@ typedef struct ContextRegistrationAttributeVector
 {
   std::vector<ContextRegistrationAttribute*>  vec;
 
-  void                             render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void                             toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void                             present(const std::string& indent);
   void                             push_back(ContextRegistrationAttribute* item);
   unsigned int                     size(void);

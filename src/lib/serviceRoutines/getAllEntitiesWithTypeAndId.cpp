@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -79,6 +76,7 @@ std::string getAllEntitiesWithTypeAndId
   ParseData*                 parseDataP
 )
 {
+  std::string             answer;
   std::string             entityType              = compV[3];
   std::string             entityId                = compV[5];
   std::string             entityTypeFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
@@ -138,15 +136,12 @@ std::string getAllEntitiesWithTypeAndId
 
   // 06. Translate QueryContextResponse to ContextElementResponse
   response.fill(&parseDataP->qcrs.res, entityId, entityType);
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
-  TIMED_RENDER(response.render(writer, ciP->apiVersion, asJsonObject, RtContextElementResponse));
+  TIMED_RENDER(answer = response.renderV1(asJsonObject, RtContextElementResponse));
 
   // 07. Cleanup and return result
   parseDataP->qcr.res.release();
   parseDataP->qcrs.res.release();
   response.release();
 
-  return out.GetString();
+  return answer;
 }

@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 
 #include "common/statistics.h"
@@ -80,6 +77,7 @@ std::string getAttributeValueInstanceWithTypeAndId
 )
 {
   ContextAttributeResponse response;
+  std::string              answer;
   std::string              entityTypeFromPath   = compV[3];
   std::string              entityId             = compV[5];
   std::string              attributeName        = compV[7];
@@ -126,14 +124,11 @@ std::string getAttributeValueInstanceWithTypeAndId
     response.fill(&parseDataP->qcrs.res, entityId, entityTypeFromPath, attributeName, metaID);
   }
 
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
-  TIMED_RENDER(response.render(writer, ciP->apiVersion, asJsonObject, AttributeValueInstance));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, AttributeValueInstance));
 
   parseDataP->qcr.res.release();
   parseDataP->qcrs.res.release();
   response.release();
 
-  return out.GetString();
+  return answer;
 }

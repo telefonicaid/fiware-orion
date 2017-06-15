@@ -52,7 +52,7 @@ typedef struct ContextRegistration
   bool                                entityIdVectorPresent;                 // entityIdList present during parsing
 
   ContextRegistration();
-  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer, bool isInVector);
+  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer, bool isInVector);
   void         present(const std::string& indent, int ix);
   void         release();
 

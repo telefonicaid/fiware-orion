@@ -40,12 +40,11 @@
 
 /* ****************************************************************************
 *
-* ContextElementResponseVector::render -
+* ContextElementResponseVector::toJsonV1 -
 */
-void ContextElementResponseVector::render
+void ContextElementResponseVector::toJsonV1
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
   bool                omitAttributeValues
@@ -56,7 +55,7 @@ void ContextElementResponseVector::render
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->render(writer, apiVersion, asJsonObject, requestType, omitAttributeValues);
+    vec[ix]->toJsonV1(writer, asJsonObject, requestType, omitAttributeValues);
   }
 
   writer.EndArray();

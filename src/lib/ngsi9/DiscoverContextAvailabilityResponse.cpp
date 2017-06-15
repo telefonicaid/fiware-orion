@@ -25,6 +25,9 @@
 #include <stdio.h>
 #include <string>
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 #include "common/globals.h"
@@ -69,31 +72,42 @@ DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse(StatusC
 *
 * DiscoverContextAvailabilityResponse::render -
 */
-void DiscoverContextAvailabilityResponse::render
+std::string DiscoverContextAvailabilityResponse::render
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  int indent
 )
 {
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+
   writer.StartObject();
 
   if (responseVector.size() > 0)
   {
-    responseVector.render(writer);
+    responseVector.toJson(writer);
   }
 
   if (errorCode.code != SccNone)
   {
-    errorCode.render(writer);
+    errorCode.toJsonV1(writer);
   }
 
   /* Safety check: neither errorCode nor CER vector was filled by mongoBackend */
   if (errorCode.code == SccNone && responseVector.size() == 0)
   {
       errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
-      errorCode.render(writer);
+      errorCode.toJsonV1(writer);
   }
 
   writer.EndObject();
+
+  return sb.GetString();
 }
 
 

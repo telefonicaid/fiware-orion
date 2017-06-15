@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/mongoCreateSubscription.h"
 #include "ngsi/ParseData.h"
@@ -65,11 +62,7 @@ extern std::string postSubscriptions
     alarmMgr.badInput(clientIp, errMsg);
     scr.subscribeError.errorCode.fill(SccBadRequest, "max one service-path allowed for subscriptions");
 
-    rapidjson::StringBuffer sb;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-    writer.SetIndent(' ', 2);
-    TIMED_RENDER(scr.render(writer));
-    return sb.GetString();
+    TIMED_RENDER(answer = scr.render());
   }
 
   OrionError  beError;
@@ -86,7 +79,7 @@ extern std::string postSubscriptions
   // Check potential error
   if (beError.code != SccNone)
   {
-    TIMED_RENDER(answer = beError.toJson());
+    TIMED_RENDER(answer = beError.render());
     ciP->httpStatusCode = beError.code;
   }
   else

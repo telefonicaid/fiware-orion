@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/statistics.h"
@@ -106,12 +103,10 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   //
   // 2. Render the string of the request we want to forward
   //
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
-  TIMED_RENDER(qcrP->render(writer));
+  std::string  payload;
+  TIMED_RENDER(payload = qcrP->render());
 
-  const char* payload = sb.GetString();
+  char* cleanPayload = (char*) payload.c_str();
 
   //
   // 3. Send the request to the Context Provider (and await the reply)
@@ -125,7 +120,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   std::string     out;
   int             r;
 
-  LM_T(LmtCPrForwardRequestPayload, ("forward queryContext request payload: %s", payload));
+  LM_T(LmtCPrForwardRequestPayload, ("forward queryContext request payload: %s", cleanPayload));
 
   std::map<std::string, std::string> noHeaders;
   r = httpRequestSend(ip,
@@ -163,7 +158,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   std::string  errorMsg;
 
 
-  char* cleanPayload = jsonPayloadClean(out.c_str());
+  cleanPayload = jsonPayloadClean(out.c_str());
 
   if ((cleanPayload == NULL) || (cleanPayload[0] == 0))
   {
@@ -365,13 +360,10 @@ std::string postQueryContext
   //
   if (forwardsPending(qcrsP) == false)
   {
-    rapidjson::StringBuffer out;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-    writer.SetIndent(' ', 2);
-    TIMED_RENDER(qcrsP->render(writer, ciP->apiVersion, asJsonObject));
+    TIMED_RENDER(answer = qcrsP->render(ciP->apiVersion, asJsonObject));
 
     qcrP->release();
-    return out.GetString();
+    return answer;
   }
 
 
@@ -525,10 +517,7 @@ std::string postQueryContext
   std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
   bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
 
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
-  TIMED_RENDER(responseV.render(writer, ciP->apiVersion, asJsonObject, details, qcrsP->errorCode.details));
+  TIMED_RENDER(answer = responseV.render(ciP->apiVersion, asJsonObject, details, qcrsP->errorCode.details));
 
 
   //
@@ -549,5 +538,5 @@ std::string postQueryContext
   requestV.release();
   responseV.release();
 
-  return out.GetString();
+  return answer;
 }

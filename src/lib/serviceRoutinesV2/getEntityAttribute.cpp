@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/errorMessages.h"
@@ -73,7 +70,7 @@ std::string getEntityAttribute
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
-    return oe.toJson();
+    return oe.render();
   }
 
   // 01. Fill in QueryContextRequest
@@ -88,19 +85,14 @@ std::string getEntityAttribute
   // 03. Render entity attribute response
   attribute.fill(&parseDataP->qcrs.res, compV[4]);
 
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
-  TIMED_RENDER(attribute.render(writer,
-                                ciP->apiVersion,
-                                ciP->httpHeaders.accepted("text/plain"),
-                                ciP->httpHeaders.accepted("application/json"),
-                                ciP->httpHeaders.outformatSelect(),
-                                &(ciP->outMimeType),
-                                &(ciP->httpStatusCode),
-                                ciP->uriParamOptions[OPT_KEY_VALUES],
-                                ciP->uriParam[URI_PARAM_METADATA],
-                                EntityAttributeResponse));
+  std::string answer;
+  ciP->outMimeType = ciP->httpHeaders.outformatSelect();
+  TIMED_RENDER(answer = attribute.render(ciP->apiVersion,
+                                         ciP->httpHeaders.outformatSelect(),
+                                         &(ciP->httpStatusCode),
+                                         ciP->uriParamOptions[OPT_KEY_VALUES],
+                                         ciP->uriParam[URI_PARAM_METADATA],
+                                         EntityAttributeResponse));
 
   if (attribute.oe.reasonPhrase == ERROR_TOO_MANY)
   {
@@ -119,6 +111,6 @@ std::string getEntityAttribute
   // 04. Cleanup and return result
   parseDataP->qcr.res.release();
 
-  return sb.GetString();
+  return answer;
 }
 

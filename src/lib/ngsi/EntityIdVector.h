@@ -52,7 +52,7 @@ typedef struct EntityIdVector
 {
   std::vector<EntityId*>  vec;
 
-  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void         present(const std::string& indent);
   void         push_back(EntityId* item);
   bool         push_back_if_absent(EntityId* item);

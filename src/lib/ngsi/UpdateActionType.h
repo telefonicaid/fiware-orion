@@ -45,7 +45,7 @@ typedef struct UpdateActionType
   void          set(const std::string& value);
   std::string   get(void);
   bool          isEmpty(void);
-  void          render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void          toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   void          present(const std::string& indent);
   const char*   c_str(void);
 

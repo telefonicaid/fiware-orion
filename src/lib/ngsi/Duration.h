@@ -56,7 +56,7 @@ class Duration
   void          set(const std::string& value);
   std::string   get(void);
   bool          isEmpty(void);
-  void          render(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void          toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
   int64_t       parse(void);
   void          present(const std::string& indent);
   void          release(void);

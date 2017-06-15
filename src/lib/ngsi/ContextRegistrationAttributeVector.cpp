@@ -36,9 +36,9 @@
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttributeVector::render -
+* ContextRegistrationAttributeVector::toJson -
 */
-void ContextRegistrationAttributeVector::render
+void ContextRegistrationAttributeVector::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )
@@ -47,7 +47,7 @@ void ContextRegistrationAttributeVector::render
   writer.StartArray();
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->render(writer);
+    vec[ix]->toJson(writer);
   }
   writer.EndArray();
 }

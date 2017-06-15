@@ -56,11 +56,10 @@ typedef struct ContextElement
   ContextElement(const std::string& id, const std::string& type, const std::string& isPattern);
   ContextElement(EntityId* eP);
 
-  void         render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                      ApiVersion apiVersion,
-                      bool asJsonObject,
-                      RequestType requestType,
-                      bool omitAttributeValues = false);
+  void         toJsonV1(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+                        bool asJsonObject,
+                        RequestType requestType,
+                        bool omitAttributeValues = false);
   void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
                       RenderFormat                     renderFormat,
                       const std::vector<std::string>&  attrsFilter,

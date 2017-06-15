@@ -47,11 +47,12 @@ class EntityTypeVectorResponse
   EntityTypeVector  entityTypeVector;
   StatusCode        statusCode;
 
-  void              render(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                           ApiVersion          apiVersion,
-                           bool                asJsonObject,
-                           bool                asJsonOut,
-                           bool                collapsed);
+  std::string       renderV1(bool asJsonObject,
+                             bool asJsonOut,
+                             bool collapsed,
+                             int  indent = -1);
+  std::string       render(bool values,
+                           int  indent = -1);
   std::string       check(ApiVersion          apiVersion,
                           bool                asJsonObject,
                           bool                asJsonOut,
@@ -59,7 +60,6 @@ class EntityTypeVectorResponse
                           const std::string&  predetectedError);
   void              present(const std::string& indent);
   void              release(void);
-  void              toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer, bool values);
 
 };
 

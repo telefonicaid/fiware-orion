@@ -130,16 +130,17 @@ TEST(SubscriptionId, present)
 TEST(SubscriptionId, render)
 {
   SubscriptionId  sId;
-  std::string     out;
   const char*     outfile1 = "ngsi.subscriptionId.render2.middle.json";
 
   utInit();
 
   sId.set("012345012345012345012345");
 
-  out = sId.render(UnsubscribeContext, "");
+  rapidjson::StringBuffer sb;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+  sId.toJson(writer, UnsubscribeContext);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  EXPECT_STREQ(expectedBuf, sb.GetString());
 
   sId.release(); // just to exercise the code
 

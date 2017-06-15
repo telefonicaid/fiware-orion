@@ -57,13 +57,14 @@ TEST(NotifyCondition, render)
 {
   NotifyCondition  nc;
   const char*      outfile1 = "ngsi.notifyCondition.render.middle.json";
-  std::string      out;
 
   utInit();
 
-  out = nc.render("", false);
+  rapidjson::StringBuffer sb;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+  nc.toJson(writer);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  EXPECT_STREQ(expectedBuf, sb.GetString());
 
   utExit();
 }

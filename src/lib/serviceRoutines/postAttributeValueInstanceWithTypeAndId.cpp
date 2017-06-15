@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 
 #include "common/statistics.h"
@@ -84,6 +81,7 @@ std::string postAttributeValueInstanceWithTypeAndId
   std::string     metaID                  = compV[8];
   std::string     entityTypeFromUriParam;
   StatusCode      response;
+  std::string     answer;
 
 
   // 01. Get values URI parameters
@@ -97,13 +95,10 @@ std::string postAttributeValueInstanceWithTypeAndId
 
     response.fill(SccBadRequest, "non-matching entity::types in URL");
 
-    rapidjson::StringBuffer out;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-    writer.SetIndent(' ', 2);
-    TIMED_RENDER(response.render(writer, false));
+    TIMED_RENDER(answer = response.render());
 
     parseDataP->upcar.res.release();
-    return out.GetString();
+    return answer;
   }
 
 
@@ -116,14 +111,11 @@ std::string postAttributeValueInstanceWithTypeAndId
 
     response.fill(SccBadRequest, details);
 
-    rapidjson::StringBuffer out;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-    writer.SetIndent(' ', 2);
-    TIMED_RENDER(response.render(writer, false));
+    TIMED_RENDER(answer = response.render());
 
     parseDataP->upcar.res.release();
 
-    return out.GetString();
+    return answer;
   }
 
 
@@ -140,10 +132,7 @@ std::string postAttributeValueInstanceWithTypeAndId
 
 
   // 07. Render result
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
-  TIMED_RENDER(response.render(writer, false));
+  TIMED_RENDER(answer = response.render());
 
 
   // 08. Cleanup and return result
@@ -152,5 +141,5 @@ std::string postAttributeValueInstanceWithTypeAndId
   parseDataP->upcr.res.release();
   parseDataP->upcrs.res.release();
 
-  return out.GetString();
+  return answer;
 }

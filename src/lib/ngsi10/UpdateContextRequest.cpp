@@ -26,6 +26,8 @@
 #include <string>
 
 #include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -67,17 +69,28 @@ UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, 
 *
 * UpdateContextRequest::render -
 */
-void UpdateContextRequest::render
+std::string UpdateContextRequest::render
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
   ApiVersion apiVersion,
-  bool asJsonObject
+  bool       asJsonObject,
+  int        indent
 )
 {
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  writer.SetIndent(' ', indent);
+
+
   writer.StartObject();
-  contextElementVector.render(writer, apiVersion, asJsonObject, UpdateContext);
-  updateActionType.render(writer);
+  contextElementVector.toJson(writer, apiVersion, asJsonObject, UpdateContext);
+  updateActionType.toJson(writer);
   writer.EndObject();
+
+  return sb.GetString();
 }
 
 
@@ -90,23 +103,18 @@ std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject
 {
   std::string            res;
   UpdateContextResponse  response;
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
 
   if (predetectedError != "")
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
-    response.render(writer, apiVersion, asJsonObject);
-    return sb.GetString();
+    return response.render(apiVersion, asJsonObject);
   }
 
   if (((res = contextElementVector.check(apiVersion, UpdateContext, indent, predetectedError, counter)) != "OK") ||
       ((res = updateActionType.check()) != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
-    response.render(writer, apiVersion, asJsonObject);
-    return sb.GetString();
+    return response.render(apiVersion, asJsonObject);
   }
 
   return "OK";

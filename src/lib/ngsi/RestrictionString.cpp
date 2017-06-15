@@ -105,9 +105,9 @@ void RestrictionString::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* RestrictionString::render -
+* RestrictionString::toJson -
 */
-void RestrictionString::render
+void RestrictionString::toJson
 (
   rapidjson::Writer<rapidjson::StringBuffer>& writer
 )
