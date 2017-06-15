@@ -30,7 +30,6 @@
 #include "logMsg/logMsg.h"
 
 #include "common/string.h"
-#include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/HttpStatusCode.h"
 #include "ngsi/StatusCode.h"

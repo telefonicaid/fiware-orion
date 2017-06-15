@@ -30,7 +30,6 @@
 
 #include "common/globals.h"
 #include "ngsi/EntityId.h"
-#include "common/tag.h"
 
 
 

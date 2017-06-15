@@ -28,7 +28,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/tag.h"
 #include "common/globals.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/NotifyContextResponse.h"

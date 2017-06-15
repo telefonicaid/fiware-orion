@@ -23,7 +23,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET (SOURCES
     globals.cpp
     string.cpp
-    tag.cpp
     sem.cpp
     MimeType.cpp
     RenderFormat.cpp

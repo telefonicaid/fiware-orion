@@ -28,7 +28,6 @@
 #include "rapidjson/prettywriter.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "convenience/UpdateContextElementRequest.h"

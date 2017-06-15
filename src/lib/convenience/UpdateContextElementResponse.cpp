@@ -28,7 +28,6 @@
 #include "rapidjson/prettywriter.h"
 
 #include "logMsg/traceLevels.h"
-#include "common/tag.h"
 #include "convenience/ContextAttributeResponse.h"
 #include "convenience/UpdateContextElementResponse.h"
 #include "ngsi/StatusCode.h"

@@ -27,7 +27,6 @@
 
 #include "rapidjson/prettywriter.h"
 
-#include "common/tag.h"
 #include "convenience/AppendContextElementRequest.h"
 #include "convenience/AppendContextElementResponse.h"
 #include "ngsi/AttributeDomainName.h"

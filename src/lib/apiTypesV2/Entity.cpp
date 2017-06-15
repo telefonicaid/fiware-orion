@@ -31,7 +31,6 @@
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
-#include "common/tag.h"
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/errorMessages.h"

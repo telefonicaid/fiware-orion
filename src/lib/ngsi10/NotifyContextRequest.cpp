@@ -27,7 +27,6 @@
 #include "rapidjson/prettywriter.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/RenderFormat.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"

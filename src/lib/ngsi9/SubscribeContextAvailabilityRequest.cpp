@@ -27,7 +27,6 @@
 #include "rapidjson/prettywriter.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/AttributeList.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Duration.h"

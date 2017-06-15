@@ -32,7 +32,6 @@
 
 #include "common/globals.h"
 #include "common/string.h"
-#include "common/tag.h"
 #include "common/limits.h"
 #include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"

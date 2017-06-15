@@ -30,7 +30,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "orionTypes/QueryContextResponseVector.h"
 #include "ngsi/Request.h"
 

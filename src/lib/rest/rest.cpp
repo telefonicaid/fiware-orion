@@ -46,7 +46,6 @@
 #include "common/defaultValues.h"
 #include "common/clockFunctions.h"
 #include "common/statistics.h"
-#include "common/tag.h"
 
 #include "alarmMgr/alarmMgr.h"
 #include "metricsMgr/metricsMgr.h"

@@ -32,7 +32,6 @@
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 
-#include "common/tag.h"
 #include "common/limits.h"
 #include "ngsi/Request.h"
 #include "orionTypes/EntityType.h"

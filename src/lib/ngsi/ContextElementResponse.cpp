@@ -30,7 +30,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/tag.h"
 #include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ContextElementResponse.h"

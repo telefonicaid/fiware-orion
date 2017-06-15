@@ -33,7 +33,6 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
-#include "common/tag.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"

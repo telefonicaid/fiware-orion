@@ -24,7 +24,6 @@
 */
 #include <string>
 
-#include "common/tag.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/ContextRegistrationResponse.h"
 #include "ngsi/Request.h"

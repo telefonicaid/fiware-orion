@@ -28,7 +28,6 @@
 #include "rapidjson/prettywriter.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"

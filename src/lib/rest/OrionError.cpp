@@ -28,7 +28,6 @@
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 
-#include "common/tag.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 

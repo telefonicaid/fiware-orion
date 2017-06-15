@@ -30,7 +30,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ScopeVector.h"

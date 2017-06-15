@@ -29,7 +29,6 @@
 #include "logMsg/logMsg.h"
 #include "common/globals.h"
 #include "common/string.h"
-#include "common/tag.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 
 

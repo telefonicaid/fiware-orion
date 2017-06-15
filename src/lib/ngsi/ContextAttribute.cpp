@@ -30,7 +30,6 @@
 
 #include "common/string.h"
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/limits.h"
 #include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"

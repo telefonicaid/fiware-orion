@@ -27,7 +27,6 @@
 
 #include "rapidjson/reader.h"
 
-#include "common/tag.h"
 #include "common/errorMessages.h"
 #include "common/RenderFormat.h"
 #include "common/string.h"

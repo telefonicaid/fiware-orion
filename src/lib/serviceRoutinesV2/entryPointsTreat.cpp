@@ -33,7 +33,6 @@
 
 #include "common/string.h"
 #include "common/globals.h"
-#include "common/tag.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"

@@ -33,7 +33,6 @@
 
 #include "common/globals.h"
 #include "common/limits.h"
-#include "common/tag.h"
 #include "common/string.h"
 #include "alarmMgr/alarmMgr.h"
 

@@ -29,7 +29,6 @@
 
 #include "common/globals.h"
 #include "common/idCheck.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/RegistrationId.h"
 

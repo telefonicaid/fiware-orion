@@ -27,7 +27,6 @@
 #include "rapidjson/prettywriter.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
 

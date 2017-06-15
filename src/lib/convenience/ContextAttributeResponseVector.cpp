@@ -28,7 +28,6 @@
 
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
-#include "common/tag.h"
 #include "convenience/ContextAttributeResponseVector.h"
 #include "rest/ConnectionInfo.h"
 

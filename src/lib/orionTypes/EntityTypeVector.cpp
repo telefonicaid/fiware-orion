@@ -31,7 +31,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "orionTypes/EntityType.h"
 #include "orionTypes/EntityTypeVector.h"

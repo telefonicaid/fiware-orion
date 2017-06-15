@@ -30,7 +30,6 @@
 
 #include "common/string.h"
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/statistics.h"
 #include "common/sem.h"
 #include "metricsMgr/metricsMgr.h"

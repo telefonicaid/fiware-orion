@@ -32,7 +32,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "convenience/UpdateContextAttributeRequest.h"
 #include "ngsi/StatusCode.h"
 #include "parse/compoundValue.h"

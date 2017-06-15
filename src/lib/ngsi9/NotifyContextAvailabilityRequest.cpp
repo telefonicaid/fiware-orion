@@ -27,7 +27,6 @@
 #include "rapidjson/prettywriter.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "ngsi9/NotifyContextAvailabilityResponse.h"
