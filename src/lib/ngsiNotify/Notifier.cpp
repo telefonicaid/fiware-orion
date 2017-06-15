@@ -339,6 +339,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     params->fiwareCorrelator = fiwareCorrelator;
     params->extraHeaders     = headers;
     params->registration     = false;
+    params->subscriptionId   = subscriptionId.get();
 
     paramsV->push_back(params);
   }
@@ -368,7 +369,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     ConnectionInfo                    ci;
     Verb                              verb    = httpInfo.verb;
     std::vector<SenderThreadParams*>* paramsV = NULL;
-
 
     if ((verb == NOVERB) || (verb == UNKNOWNVERB) || disableCusNotif)
     {

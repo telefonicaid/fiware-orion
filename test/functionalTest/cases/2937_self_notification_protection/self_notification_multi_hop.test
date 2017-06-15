@@ -374,7 +374,7 @@ Date: REGEX(.*)
 11. Wait for a while and check timesSent:1 for all the subscriptions in each CB
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 429
+Content-Length: 469
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -392,6 +392,7 @@ Date: REGEX(.*)
             "url": "http://localhost:REGEX(\d+)/v2/entities/E/attrs"
         },
         "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
         "timesSent": 1
     },
     "status": "active",
@@ -411,7 +412,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 429
+Content-Length: 469
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -429,6 +430,7 @@ Date: REGEX(.*)
             "url": "http://localhost:REGEX(\d+)/v2/entities/E/attrs"
         },
         "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
         "timesSent": 1
     },
     "status": "active",
@@ -448,7 +450,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 429
+Content-Length: 469
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -466,6 +468,7 @@ Date: REGEX(.*)
             "url": "http://localhost:REGEX(\d+)/v2/entities/E/attrs"
         },
         "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
         "timesSent": 1
     },
     "status": "active",
@@ -543,7 +546,6 @@ Date: REGEX(.*)
 
 15. Check the warning about loop detection in the log
 =====================================================
-REGEX(.*) msg=Raising alarm BadInput : intent to update error status of non-existing subscription
 REGEX(.*) msg=Notification loop detected for entity id <E> type <Thing>, skipping subscription triggering
 
 

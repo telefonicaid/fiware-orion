@@ -1,5 +1,4 @@
-﻿
-/*
+﻿/*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 *
@@ -1770,6 +1769,7 @@ static bool processOnChangeConditionForUpdateContext
   // FIXME: we use a proper origin name
   ncr.originator.set("localhost");
 
+  ncr.subscriptionId.set(subId);
   getNotifier()->sendNotifyContextRequest(&ncr,
                                           httpInfo,
                                           tenant,
