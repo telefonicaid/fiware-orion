@@ -221,7 +221,6 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     //
     // 3. Payload
     //
-
     if (httpInfo.payload == "")
     {
       NotifyContextRequest   ncr;
@@ -235,7 +234,12 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     }
     else
     {
-      macroSubstitute(&payload, httpInfo.payload, ce);
+      if (macroSubstitute(&payload, httpInfo.payload, ce) == false)
+      {
+        LM_W(("Bad Input (not sending NotifyContextRequest: payload too large)"));
+        return paramsV;  // empty vector
+      }
+
       char* pload  = curl_unescape(payload.c_str(), payload.length());
       payload      = std::string(pload);
       renderFormat = NGSI_V2_CUSTOM;
@@ -295,7 +299,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     if (!parseUrl(url, host, port, uriPath, protocol))
     {
       LM_E(("Runtime Error (not sending NotifyContextRequest: malformed URL: '%s')", httpInfo.url.c_str()));
-      return paramsV;  //empty vector
+      return paramsV;  // empty vector
     }
 
 

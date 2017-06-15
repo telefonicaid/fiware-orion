@@ -25,11 +25,11 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
+#include "ngsi/ContextElement.h"
 
 #include "common/string.h"
+#include "common/limits.h"
 #include "common/macroSubstitute.h"
-
-#include "ngsi/ContextElement.h"
 
 
 
@@ -108,7 +108,7 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
 * out-buffer is not big enough, it is realloced with another CHUNK_SIZE.
 *
 * 1024 is set as CHUNK_SIZE and hopefully for most substitutions it will be enough with ONE allocation.
-* Allocation is very costly operations ...
+* Allocation is a very costly operation ...
 * This function could be a lot faster is we took the first 1024 bytes from the stack instead of using calloc.
 * However, the function gets a little more complicated like that as the first realloc would have to be a normal malloc and a memcpy.
 *
@@ -121,8 +121,31 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
 *
 */
 #define CHUNK_SIZE 1024
-void macroSubstitute(std::string* to, const std::string& from, const ContextElement& ce)
+bool macroSubstitute(std::string* to, const std::string& from, const ContextElement& ce)
 {
+  //
+  // Initial size check: is the string to convert too big?
+  //
+  // If the string to convert is bigger than the maximum allowed buffer size (MAX_DYN_MSG_SIZE),
+  // then there is an important probability that the resulting string after substitution is also > MAX_DYN_MSG_SIZE.
+  //
+  // This check avoids to copy 8MB to later only throw it away and return an error
+  // That is the advantage.
+  //
+  // There is an inconvenience as well.
+  //
+  // The inconvenience is for buffers that are larger before substitution than they are after substitution.
+  // Those buffers aren't let through this check, and end up in an error.
+  //
+  // We assume that this second case is more than rare
+  //
+  if (from.size() > MAX_DYN_MSG_SIZE)
+  {
+    *to = "";
+    return false;
+  }
+
+
   char*        toP     = (char*) calloc(1, CHUNK_SIZE);
   int          toIx    = 0;
   int          toLen   = CHUNK_SIZE;
@@ -131,7 +154,7 @@ void macroSubstitute(std::string* to, const std::string& from, const ContextElem
   {
     LM_E(("Runtime Error (out of memory)"));
     *to = "";
-    return;
+    return false;
   }
 
   // We need to do a copy, or the fromP processing logic will destroy incoming function argument
@@ -142,7 +165,7 @@ void macroSubstitute(std::string* to, const std::string& from, const ContextElem
   {
     LM_E(("Runtime Error (out of memory)"));
     *to = "";
-    return;
+    return false;
   }
 
   while (*fromP != 0)
@@ -233,6 +256,13 @@ void macroSubstitute(std::string* to, const std::string& from, const ContextElem
       //
       if (toIx + substituteLen >= toLen - 1)
       {
+        // Dynamic size check: would the resulting string be too big?
+        if (toLen + CHUNK_SIZE > MAX_DYN_MSG_SIZE)
+        {
+          *to = "";
+          return false;
+        }
+
         toP    = (char*) realloc(toP, toLen + CHUNK_SIZE);
         toLen += CHUNK_SIZE;
 
@@ -240,8 +270,11 @@ void macroSubstitute(std::string* to, const std::string& from, const ContextElem
         {
           LM_E(("Runtime Error (out of memory)"));
           *to = "";
-          return;
+          return false;
         }
+
+        // Clearing non-used bytes
+        memset(&toP[toIx], 0, toLen - toIx);
       }
 
       //
@@ -264,20 +297,30 @@ void macroSubstitute(std::string* to, const std::string& from, const ContextElem
     else
     {
       //
-      // Room enough?  If not, realloc
-      // See detaild description of the realloc step above
+      // Room enough?  If not, realloc ...
+      //
+      // See detailed description of the realloc step above
       //
       if (toIx >= toLen - 1)
       {
+        // Dynamic size check: would the resulting string be too big?
+        if (toLen + CHUNK_SIZE > MAX_DYN_MSG_SIZE)
+        {
+          *to = "";
+          return false;
+        }
+
         toP    = (char*) realloc(toP, toLen + CHUNK_SIZE);
         toLen += CHUNK_SIZE;
-
         if (toP == NULL)
         {
           LM_E(("Runtime Error (out of memory)"));
           *to = "";
-          return;
+          return false;
         }
+
+        // Clearing non-used bytes
+        memset(&toP[toIx], 0, toLen - toIx);
       }
 
       //
@@ -295,4 +338,6 @@ void macroSubstitute(std::string* to, const std::string& from, const ContextElem
   *to = toP;
   free(toP);
   free(fromToFreeP);
+
+  return true;
 }
