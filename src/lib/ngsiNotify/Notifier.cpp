@@ -236,7 +236,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     {
       if (macroSubstitute(&payload, httpInfo.payload, ce) == false)
       {
-        LM_W(("Bad Input (not sending NotifyContextRequest: payload too large)"));
+        LM_W(("Runtime Error (not sending NotifyContextRequest: payload too large)"));
         return paramsV;  // empty vector
       }
 
@@ -244,7 +244,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       payload      = std::string(pload);
       renderFormat = NGSI_V2_CUSTOM;
       mimeType     = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
-      free(pload);
+      curl_free(pload);
     }
 
 
