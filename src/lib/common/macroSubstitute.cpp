@@ -260,18 +260,24 @@ bool macroSubstitute(std::string* to, const std::string& from, const ContextElem
         if (toLen + CHUNK_SIZE > MAX_DYN_MSG_SIZE)
         {
           *to = "";
+          free(toP);
+          free(fromToFreeP);
           return false;
         }
 
-        toP    = (char*) realloc(toP, toLen + CHUNK_SIZE);
-        toLen += CHUNK_SIZE;
+        char* newTo = (char*) realloc(toP, toLen + CHUNK_SIZE);
 
-        if (toP == NULL)
+        if (newTo == NULL)
         {
           LM_E(("Runtime Error (out of memory)"));
+          free(toP);
+          free(fromToFreeP);
           *to = "";
           return false;
         }
+
+        toP    = newTo;
+        toLen += CHUNK_SIZE;
 
         // Clearing non-used bytes
         memset(&toP[toIx], 0, toLen - toIx);
@@ -307,17 +313,24 @@ bool macroSubstitute(std::string* to, const std::string& from, const ContextElem
         if (toLen + CHUNK_SIZE > MAX_DYN_MSG_SIZE)
         {
           *to = "";
+          free(toP);
+          free(fromToFreeP);
           return false;
         }
 
-        toP    = (char*) realloc(toP, toLen + CHUNK_SIZE);
-        toLen += CHUNK_SIZE;
-        if (toP == NULL)
+        char* newTo = (char*) realloc(toP, toLen + CHUNK_SIZE);
+
+        if (newTo == NULL)
         {
           LM_E(("Runtime Error (out of memory)"));
           *to = "";
+          free(toP);
+          free(fromToFreeP);
           return false;
         }
+
+        toP    = newTo;
+        toLen += CHUNK_SIZE;
 
         // Clearing non-used bytes
         memset(&toP[toIx], 0, toLen - toIx);
