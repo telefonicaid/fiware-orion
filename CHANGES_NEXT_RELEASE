@@ -1,3 +1,5 @@
+- Hardening: subscription cache implementation now uses a hashmap instead of a linked list (#2691)
+- Fix: new csub cache implementation based in hashmap could have fixed the duplicated subscription problem (#2216) in the case the problem was due to fails in the removal step with the old implementation
 - Hardening: Mongo driver migrated to legacy-1.1.2 (several bugfixes in the legacy-1.0.7 to legacy-1.1.2 delta)
 - Hardening: Several changes in argument passing in mongoBackend library to avoid passing entire objects on the stack, from "X x" to "const X& x"
 - Hardening: Several changes in argument passing in mongoBackend library to add 'const' in references to objects that are not altered by the function

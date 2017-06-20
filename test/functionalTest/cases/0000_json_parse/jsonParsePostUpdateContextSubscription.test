@@ -28,8 +28,15 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "1: ***********************************"
-url="/v1/updateContextSubscription"
+
+#
+# 01. Attempt to update a non-existing subscription, see 'subscribeError' of not found
+# 02. Create a subscription
+# 03. Update the subscription from step 02
+#
+
+echo "01. Attempt to update a non-existing subscription, see 'subscribeError' of not found"
+echo "===================================================================================="
 payload='{
   "duration": "P5Y",
   "restriction": {
@@ -58,10 +65,13 @@ payload='{
   ],
   "throttling": "P5Y"
 }'
-orionCurl --url ${url} --payload "${payload}"
+orionCurl --url /v1/updateContextSubscription --payload "${payload}"
+echo
+echo
 
-echo "2: ***********************************"
-url="/v1/subscribeContext"
+
+echo "02. Create a subscription"
+echo "========================="
 payload='{
   "entities": [
     {
@@ -108,11 +118,14 @@ payload='{
   ],
   "throttling": "P5Y"
 }'
-orionCurl --url ${url} --payload "${payload}"
-
+orionCurl --url /v1/subscribeContext --payload "${payload}"
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
+echo
+echo
 
-echo "3: ***********************************"
+
+echo "03. Update the subscription from step 02"
+echo "========================================"
 url="/v1/updateContextSubscription"
 payload='{
   "duration": "P4Y",
@@ -143,10 +156,13 @@ payload='{
   "throttling": "P4Y"
 }'
 orionCurl --url ${url} --payload "${payload}"
+echo
+echo
 
-echo "4: ***********************************"
+
 --REGEXPECT--
-1: ***********************************
+01. Attempt to update a non-existing subscription, see 'subscribeError' of not found
+====================================================================================
 HTTP/1.1 200 OK
 Content-Length: 180
 Content-Type: application/json
@@ -162,7 +178,10 @@ Date: REGEX(.*)
         "subscriptionId": "REGEX([0-9a-f]{24})"
     }
 }
-2: ***********************************
+
+
+02. Create a subscription
+=========================
 HTTP/1.1 200 OK
 Content-Length: 134
 Content-Type: application/json
@@ -176,7 +195,10 @@ Date: REGEX(.*)
         "throttling": "P5Y"
     }
 }
-3: ***********************************
+
+
+03. Update the subscription from step 02
+========================================
 HTTP/1.1 200 OK
 Content-Length: 134
 Content-Type: application/json
@@ -190,7 +212,8 @@ Date: REGEX(.*)
         "throttling": "P4Y"
     }
 }
-4: ***********************************
+
+
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

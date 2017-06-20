@@ -98,9 +98,9 @@ struct CachedSubscription
   std::vector<std::string>    attributes;
   std::vector<std::string>    metadata;
   std::vector<std::string>    notifyConditionV;
-  char*                       tenant;
-  char*                       servicePath;
-  char*                       subscriptionId;
+  std::string                 tenant;
+  std::string                 servicePath;
+  std::string                 subscriptionId;
   int64_t                     throttling;
   int64_t                     expirationTime;
   int64_t                     lastNotificationTime;
@@ -112,7 +112,6 @@ struct CachedSubscription
   ngsiv2::HttpInfo            httpInfo;
   int64_t                     lastFailure;  // timestamp of last notification failure
   int64_t                     lastSuccess;  // timestamp of last successful notification
-  struct CachedSubscription*  next;
 };
 
 
@@ -189,7 +188,7 @@ extern void subCacheEntryPresent(CachedSubscription* cSubP);
 *
 * subCachePresent - 
 */
-extern void subCachePresent(const char* title);
+extern void subCachePresent(const std::string& title);
 
 
 
@@ -199,14 +198,14 @@ extern void subCachePresent(const char* title);
 */
 extern void subCacheItemInsert
 (
-  const char*                        tenant,
-  const char*                        servicePath,
+  const std::string&                 tenant,
+  const std::string&                 servicePath,
   const ngsiv2::HttpInfo&            httpInfo,
   const std::vector<ngsiv2::EntID>&  entities,
   const std::vector<std::string>&    attributes,
   const std::vector<std::string>&    metadata,
   const std::vector<std::string>&    conditionAttrs,
-  const char*                        subscriptionId,
+  const std::string&                 subscriptionId,
   int64_t                            expiration,
   int64_t                            throttling,
   RenderFormat                       renderFormat,
@@ -238,7 +237,7 @@ extern void subCacheItemInsert(CachedSubscription* cSubP);
 *
 * subCacheItemLookup - 
 */
-extern CachedSubscription* subCacheItemLookup(const char* tenant, const char* subscriptionId);
+extern CachedSubscription* subCacheItemLookup(const std::string& tenant, const std::string& subscriptionId);
 
 
 
@@ -272,11 +271,11 @@ extern void subCacheSync(void);
 */
 extern void subCacheMatch
 (
-  const char*                        tenant,
-  const char*                        servicePath,
-  const char*                        entityId,
-  const char*                        entityType,
-  const char*                        attr,
+  const std::string&                 tenant,
+  const std::string&                 servicePath,
+  const std::string&                 entityId,
+  const std::string&                 entityType,
+  const std::string&                 attr,
   std::vector<CachedSubscription*>*  subVecP
 );
 
@@ -288,10 +287,10 @@ extern void subCacheMatch
 */
 extern void subCacheMatch
 (
-  const char*                        tenant,
-  const char*                        servicePath,
-  const char*                        entityId,
-  const char*                        entityType,
+  const std::string&                 tenant,
+  const std::string&                 servicePath,
+  const std::string&                 entityId,
+  const std::string&                 entityType,
   const std::vector<std::string>&    attrV,
   std::vector<CachedSubscription*>*  subVecP
 );
@@ -304,22 +303,23 @@ extern void subCacheMatch
 */
 extern void subCacheStatisticsGet
 (
-  int*   refreshes,
-  int*   inserts,
-  int*   removes,
-  int*   updates,
-  int*   items,
-  char*  list,
-  int    listSize
+  int*          refreshes,
+  int*          inserts,
+  int*          removes,
+  int*          updates,
+  int*          items,
+  std::string*  listP
 );
 
 
 
 /* ****************************************************************************
 *
-* subCacheUpdateStatisticsIncrement - 
+* subCacheStatisticsIncrementUpdates -
+* subCacheStatisticsIncrementRemoves -
 */
-extern void subCacheUpdateStatisticsIncrement(void);
+extern void subCacheStatisticsIncrementUpdates(void);
+extern void subCacheStatisticsIncrementRemoves(void);
 
 
 
@@ -327,7 +327,7 @@ extern void subCacheUpdateStatisticsIncrement(void);
 *
 * subCacheStatisticsReset - 
 */
-extern void subCacheStatisticsReset(const char* by);
+extern void subCacheStatisticsReset(const std::string& by);
 
 
 

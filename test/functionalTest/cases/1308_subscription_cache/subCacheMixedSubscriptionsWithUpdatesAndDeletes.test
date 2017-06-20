@@ -313,7 +313,7 @@ Date: REGEX(.*)
     "inserts": 2,
     "items": 1,
     "refresh": REGEX((0|1|2)),
-    "removes": 1,
+    "removes": 0,
     "updates": 1
 }
 
@@ -348,7 +348,7 @@ Date: REGEX(.*)
     "inserts": 3,
     "items": 2,
     "refresh": REGEX((0|1|2)),
-    "removes": 1,
+    "removes": 0,
     "updates": 1
 }
 
@@ -383,7 +383,7 @@ Date: REGEX(.*)
     "inserts": REGEX((4|7)),
     "items": 3,
     "refresh": REGEX((0|1|2)),
-    "removes": 1,
+    "removes": 0,
     "updates": 1
 }
 
@@ -418,7 +418,7 @@ Date: REGEX(.*)
     "inserts": REGEX((5|8)),
     "items": 3,
     "refresh": REGEX((0|1|2)),
-    "removes": 2,
+    "removes": 0,
     "updates": 2
 }
 
@@ -453,7 +453,7 @@ Date: REGEX(.*)
     "inserts": REGEX((5|8)),
     "items": 2,
     "refresh": REGEX((0|1|2)),
-    "removes": 3,
+    "removes": 1,
     "updates": 2
 }
 
@@ -488,7 +488,7 @@ Date: REGEX(.*)
     "inserts": REGEX((6|9)),
     "items": 2,
     "refresh": REGEX((0|1|2)),
-    "removes": 4,
+    "removes": 1,
     "updates": 3
 }
 
@@ -523,7 +523,7 @@ Date: REGEX(.*)
     "inserts": REGEX((6|9)),
     "items": 1,
     "refresh": REGEX((0|1|2)),
-    "removes": 5,
+    "removes": 2,
     "updates": 3
 }
 

@@ -40,7 +40,7 @@
 *
 * mongoSubCacheItemInsert - 
 */
-extern int mongoSubCacheItemInsert(const char* tenant, const mongo::BSONObj& sub);
+extern int mongoSubCacheItemInsert(const std::string& tenant, const mongo::BSONObj& sub);
 
 
 
@@ -50,10 +50,10 @@ extern int mongoSubCacheItemInsert(const char* tenant, const mongo::BSONObj& sub
 */
 extern int mongoSubCacheItemInsert
 (
-  const char*            tenant,
+  const std::string&     tenant,
   const mongo::BSONObj&  sub,
-  const char*            subscriptionId,
-  const char*            servicePath,
+  const std::string&     subscriptionId,
+  const std::string&     servicePath,
   int                    lastNotificationTime,
   int                    lastFailure,
   int                    lastSuccess,

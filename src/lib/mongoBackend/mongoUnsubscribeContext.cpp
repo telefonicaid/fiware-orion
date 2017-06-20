@@ -156,7 +156,7 @@ HttpStatusCode mongoUnsubscribeContext
 
   cacheSemTake(__FUNCTION__, "Removing subscription from cache");
 
-  CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
+  CachedSubscription* cSubP = subCacheItemLookup(tenant, requestP->subscriptionId.get());
 
   if (cSubP != NULL)
   {
