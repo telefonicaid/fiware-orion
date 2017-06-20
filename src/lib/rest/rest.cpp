@@ -1288,6 +1288,7 @@ static int connectionTreat
       char details[256];
       snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
 
+      alarmMgr.badInput(clientIp, details);
       OrionError oe(SccRequestEntityTooLarge, details);
 
       ciP->httpStatusCode = oe.code;

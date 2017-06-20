@@ -3,3 +3,4 @@
 - Hardening: Several changes in argument passing in mongoBackend library to add 'const' in references to objects that are not altered by the function
 - Fix: bug in parseArg lib that may cause problem printing the error message for wrong CLI usage (#2926)
 - Fix: bug in variable substitution of custom notifications that limited the size of the payload of a custom notification to 1024 bytes (new limit: 8MB)
+- Fix: "request payload too large" (>1MB) as Bad Input alarm (WARN log level)
