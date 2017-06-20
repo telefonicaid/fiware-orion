@@ -3,6 +3,7 @@
 * [Forbidden characters](#forbidden-characters)
 * [Custom payload decoding on notifications](#custom-payload-decoding-on-notifications)
 * [Option to disable custom notifications](#option-to-disable-custom-notifications)
+* [Non-modifiable headers in custom notifications](#non-modifiable-headers-in-custom-notifications)
 * [Limit to attributes for entity location](#limit-to-attributes-for-entity-location)
 * [Legacy attribute format in notifications](#legacy-attribute-format-in-notifications)
 * [Datetime support](#datetime-support)
@@ -48,6 +49,18 @@ In this case:
 
 * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
 * No `${...}` macro substitution is performed.
+
+[Top](#top)
+
+## Non-modifiable headers in custom notifications
+
+The following headers cannot be overwritten in custom notifications:
+
+* `Fiware-Correlator`
+* `Ngsiv2-AttrsFormat`
+
+Any attemp of doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be
+ignored.
 
 [Top](#top)
 

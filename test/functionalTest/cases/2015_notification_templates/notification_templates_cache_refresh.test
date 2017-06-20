@@ -154,7 +154,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 05. GET the subscription
 ========================
 HTTP/1.1 200 OK
-Content-Length: 560
+Content-Length: 600
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -185,6 +185,7 @@ Date: REGEX(.*)
                 "url": "http://127.0.0.1:9997/${NOTIFY_URL}"
             },
             "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
             "timesSent": 1
         },
         "status": "active",

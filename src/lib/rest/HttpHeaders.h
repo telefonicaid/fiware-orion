@@ -87,6 +87,7 @@ typedef struct HttpHeaders
   std::string   xrealIp;
   std::string   xforwardedFor;
   std::string   correlator;
+  std::string   ngsiv2AttrsFormat;
 
   bool          servicePathReceived;
 

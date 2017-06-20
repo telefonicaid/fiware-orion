@@ -44,7 +44,8 @@ extern HttpStatusCode mongoNotifyContext
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               fiwareCorrelator = "no correlator"
+  const std::string&               fiwareCorrelator,
+  const std::string&               ngsiV2AttrsFormat
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGONOTIFYCONTEXT_H_
