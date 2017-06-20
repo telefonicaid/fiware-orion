@@ -32,12 +32,11 @@
 #include "common/macroSubstitute.h"
 
 
-
 /* ****************************************************************************
 *
 * attributeValue - return value of attribute as a string
 */
-static void attributeValue(std::string* valueP, const std::vector<ContextAttribute*>& vec, char* attrName)
+static void attributeValue(std::string* valueP, const std::vector<ContextAttribute*>& vec, const char* attrName)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -104,26 +103,29 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
 *
 * macroSubstitute - 
 *
-* An initial out-buffer of CHUNK_SIZE is allocated, and later on during the substitution if the
-* out-buffer is not big enough, it is realloced with another CHUNK_SIZE.
+* An old version of this function was based in char processing. However, we faced
+* weird crashing problems after fixing that implementation to support >1KB payloads.
 *
-* 1024 is set as CHUNK_SIZE and hopefully for most substitutions it will be enough with ONE allocation.
-* Allocation is a very costly operation ...
-* This function could be a lot faster is we took the first 1024 bytes from the stack instead of using calloc.
-* However, the function gets a little more complicated like that as the first realloc would have to be a normal malloc and a memcpy.
+* We didn't know the actual cause of these problems but after changing the implementation
+* to the current one based on std::string, it seems stable. The most probable causes
+* of the problem were:
 *
-* Variables used:
-*   - toP:     pointer to the beginning of the 'to string' where to add the new characters from the 'from string'
-*   - toIx:    the index of the 'to string', always at the end of the string, where to append characters.
-*              toIx also serves as the running size of the 'to string'
-*   - toLen:   Total size of the 'to string'
-*   - fromP:   pointer to the currently analysed character in the 'from string'
+* 1) The old macroSubstitute() function had some bug managing memory which we weren't able
+*    to find.
+* 2) The old macroSubstitute() function was ok, but the way it managed the memory was in a way
+*    it makes more probable some memory corruption bug in other place, compared with the current
+*    implementation. If this theory is correct, we haven't been able to "raise" the memory corruption
+*    bug with the current implementation.
+*
+* However, the old version is still available at git repository, for the records.
+* It can be found checking out the following commit (the last one before chaning implementation):
+*
+*   commit f8c91bf16e192388824c3786a76b203b83354d13
+*   Date:   Mon Jun 19 16:33:29 2017 +0200
 *
 */
-#define CHUNK_SIZE 1024
 bool macroSubstitute(std::string* to, const std::string& from, const ContextElement& ce)
 {
-  //
   // Initial size check: is the string to convert too big?
   //
   // If the string to convert is bigger than the maximum allowed buffer size (MAX_DYN_MSG_SIZE),
@@ -141,203 +143,104 @@ bool macroSubstitute(std::string* to, const std::string& from, const ContextElem
   //
   if (from.size() > MAX_DYN_MSG_SIZE)
   {
+    LM_W(("Runtime Error (too large initial string, before substitution)"));
     *to = "";
     return false;
   }
 
+  // Look for macros (using a hash map to count how many times each macro appears)
+  std::map<std::string, unsigned int>  macroNames;  // holds all the positions that each sub occur inside 'from'
+  size_t                               macroStart = from.find("${", 0);
 
-  char*        toP     = (char*) calloc(1, CHUNK_SIZE);
-  int          toIx    = 0;
-  int          toLen   = CHUNK_SIZE;
-
-  if (toP == NULL)
+  while (macroStart != std::string::npos)
   {
-    LM_E(("Runtime Error (out of memory)"));
-    *to = "";
-    return false;
-  }
+    size_t macroEnd = from.find("}", macroStart);
 
-  // We need to do a copy, or the fromP processing logic will destroy incoming function argument
-  char*       fromToFreeP = strdup(from.c_str());
-  const char* fromP       = fromToFreeP;
-
-  if (fromP == NULL)
-  {
-    LM_E(("Runtime Error (out of memory)"));
-    *to = "";
-    return false;
-  }
-
-  while (*fromP != 0)
-  {
-    //
-    // If the current position in the 'from string' (fromP), points to the two characters
-    // "${", then (if an ending '}' is found) a variable substitution is to be performed.
-    //
-    // Otherwise, just copy the character in 'from string' to 'to string'.
-    //
-    if ((fromP[0] == '$') && (fromP[1] == '{'))
+    if (macroEnd == std::string::npos)
     {
-      //
-      // varP points to the character after "${", i.e. the first character of the variable name.
-      // E.g. if 'from string' is "${abc}", varP would point to the 'a'
-      //
-      char* varP = (char*) &fromP[2];
+      LM_W(("Runtime Error (macro end not found, syntax error, aborting substitution)"));
+      *to = "";
+      return false;
+    }
 
-      // Set fromP to point to the chatactrer after "${" - the first character of the variable name
-      fromP += 2;
-
-      // Find the closing '}'
-      while ((fromP[0] != 0) && (*fromP != '}'))
-      {
-        ++fromP;
-      }
-
-      // If the 'from string' ends without finding a closing '}', ERROR
-      if (fromP[0] == 0)
-      {
-        break;  // ERROR: non-terminated variable
-      }
-
-      // Terminate the variable name, by replacing the '}' with a ZERO
-      *((char*) fromP) = 0;
-
-      // Then make fromP point to the character AFTER the closing '}'
-      ++fromP;
-
-      // Variable found, get its value
-      char*        substitute    = NULL;
-      int          substituteLen = 0;
-      std::string  value;
-
-      if (strcmp(varP, "id") == 0)
-      {
-        //
-        // ${id} => substitute with ID of the entity
-        //
-        substitute = (char*) ce.entityId.id.c_str();
-      }
-      else if (strcmp(varP, "type") == 0)
-      {
-        //
-        // ${type} => substitute with TYPE of the entity
-        //
-        substitute = (char*) ce.entityId.type.c_str();
-      }
-      else  // attribute
-      {
-        //
-        // Neither ${id} nor ${type} => must be a name of an attribute ( ${ATTR_NAME} )
-        // The value of the attribute ATTR_NAME is extracted by the function attributeValue
-        // The variable 'substitute' is set to point to it
-        //
-        attributeValue(&value, ce.contextAttributeVector.vec, varP);
-        substitute = (char*) value.c_str();
-      }
-
-      //
-      // If substitution found, get its string length
-      // If not found, substituteLen is ZERO already
-      //
-      if (substitute != NULL)
-      {
-        substituteLen = strlen(substitute);
-      }
-
-      //
-      // Room enough?  If not, realloc
-      //   toIx            is the current length of the 'to string'.
-      //   substituteLen   is the length of the value to put in instead of ${XXX}
-      //   toLen           is the TOTAL length of the 'to string'
-      //
-      // So, if toIx + substituteLen is bigger than THE TOTAL LENGTH of the 'to string'
-      // we will have to get more memory before we insert the 'substitute' in the 'to string'
-      // [ The '- 1' is for the zero-termination of the 'in string'.
-      //
-      if (toIx + substituteLen >= toLen - 1)
-      {
-        // Dynamic size check: would the resulting string be too big?
-        if (toLen + CHUNK_SIZE > MAX_DYN_MSG_SIZE)
-        {
-          *to = "";
-          return false;
-        }
-
-        toP    = (char*) realloc(toP, toLen + CHUNK_SIZE);
-        toLen += CHUNK_SIZE;
-
-        if (toP == NULL)
-        {
-          LM_E(("Runtime Error (out of memory)"));
-          *to = "";
-          return false;
-        }
-
-        // Clearing non-used bytes
-        memset(&toP[toIx], 0, toLen - toIx);
-      }
-
-      //
-      // Now, if a substitute was found, append it to 'to string' and add the length of the
-      // substitute to 'toIx', so that toP[toIx] point to the last non-used char of the 'to string'
-      //
-      // If no substitution was found (attribute with that name does not exist), then the ${XXX}
-      // is substituted with NOTHING - it is silently consumed.
-      //
-      if (substitute != NULL)
-      {
-        // Concatenate 'substitute' to toP
-        if (substitute != NULL)
-        {
-          strcat(&toP[toIx], substitute);
-          toIx += substituteLen;
-        }
-      }
+    std::string macroName = from.substr(macroStart + 2, macroEnd - (macroStart + 2));
+    if (macroNames.find(macroName) != macroNames.end())
+    {
+      macroNames[macroName]++;
     }
     else
     {
-      //
-      // Room enough?  If not, realloc ...
-      //
-      // See detailed description of the realloc step above
-      //
-      if (toIx >= toLen - 1)
-      {
-        // Dynamic size check: would the resulting string be too big?
-        if (toLen + CHUNK_SIZE > MAX_DYN_MSG_SIZE)
-        {
-          *to = "";
-          return false;
-        }
+      macroNames[macroName] = 1;
+    }
 
-        toP    = (char*) realloc(toP, toLen + CHUNK_SIZE);
-        toLen += CHUNK_SIZE;
-        if (toP == NULL)
-        {
-          LM_E(("Runtime Error (out of memory)"));
-          *to = "";
-          return false;
-        }
+    macroStart = from.find("${", macroEnd + 1);
+  }
 
-        // Clearing non-used bytes
-        memset(&toP[toIx], 0, toLen - toIx);
-      }
+  // Calculate resulting size (if > MAX_DYN_MSG_SIZE, then reject)
+  unsigned long  toReduce = 0;
+  unsigned long  toAdd    = 0;
 
-      //
-      // Simply copy the char from 'from string' into 'to string'
-      // and step over that char to prepare for the next one.
-      //
-      toP[toIx++] = fromP[0];
-      ++fromP;
+  for (std::map<std::string, unsigned int>::iterator it = macroNames.begin(); it != macroNames.end(); ++it)
+  {
+    std::string   macroName = it->first;
+    unsigned int  times     = it->second;
+
+    // The +3 is due to "${" and "}"
+    toReduce += (macroName.length() + 3) * times;
+
+    if (macroName == "id")
+    {
+      toAdd += ce.entityId.id.length() * times;
+    }
+    else if (macroName == "type")
+    {
+      toAdd += ce.entityId.type.length() * times;
+    }
+    else
+    {
+      std::string value;
+
+      attributeValue(&value, ce.contextAttributeVector.vec, macroName.c_str());
+      toAdd += value.length() * times;
     }
   }
 
-  //
-  // Set the incoming std::string to the value of 'to string' and free the 'to string'
-  //
-  *to = toP;
-  free(toP);
-  free(fromToFreeP);
+  if (from.length() + toAdd - toReduce > MAX_DYN_MSG_SIZE)
+  {
+    LM_W(("Runtime Error (too large final string, after substitution)"));
+    *to = "";
+    return false;
+  }
+
+  // Macro replace
+  *to = from;
+  for (std::map<std::string, unsigned int>::iterator it = macroNames.begin(); it != macroNames.end(); ++it)
+  {
+    std::string macroName = it->first;
+    unsigned int times    = it->second;
+
+    std::string macro = "${" + it->first + "}";
+    std::string value;
+
+    if (macroName == "id")
+    {
+      value = ce.entityId.id;
+    }
+    else if (macroName == "type")
+    {
+      value = ce.entityId.type;
+    }
+    else
+    {
+      attributeValue(&value, ce.contextAttributeVector.vec, macroName.c_str());
+    }
+
+    // We have to do the replace operation as many times as macro occurrences
+    for (unsigned int ix = 0; ix < times; ix++)
+    {
+      to->replace(to->find(macro), macro.length(), value);
+    }
+  }
 
   return true;
 }

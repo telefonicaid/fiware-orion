@@ -6,3 +6,4 @@
 - Fix: bug in parseArg lib that may cause problem printing the error message for wrong CLI usage (#2926)
 - Fix: bug in variable substitution of custom notifications that limited the size of the payload of a custom notification to 1024 bytes (new limit: 8MB)
 - Fix: bug in custom notifications making counters and timestamps not being updated (affected subscription fields: lastSuccess, lastFailure, lastNotifiction, count)
+- Fix: "request payload too large" (>1MB) as Bad Input alarm (WARN log level)
