@@ -148,19 +148,21 @@ bool macroSubstitute(std::string* to, const std::string& from, const ContextElem
     return false;
   }
 
-  // Look for macros (using a has map to count how many times each macro appears)
-  std::map<std::string, unsigned int> macroNames; // holds all the positions that sub occurs within str
+  // Look for macros (using a hash map to count how many times each macro appears)
+  std::map<std::string, unsigned int>  macroNames;  // holds all the positions that each sub occur inside 'from'
+  size_t                               macroStart = from.find("${", 0);
 
-  size_t macroStart = from.find("${", 0);
-  while(macroStart != std::string::npos)
+  while (macroStart != std::string::npos)
   {
     size_t macroEnd = from.find("}", macroStart);
+
     if (macroEnd == std::string::npos)
     {
       LM_W(("Runtime Error (macro end not found, syntax error, aborting substitution)"));
       *to = "";
       return false;
     }
+
     std::string macroName = from.substr(macroStart + 2, macroEnd - (macroStart + 2));
     if (macroNames.find(macroName) != macroNames.end())
     {
@@ -174,9 +176,9 @@ bool macroSubstitute(std::string* to, const std::string& from, const ContextElem
     macroStart = from.find("${", macroEnd + 1);
   }
 
-  // Calculate resulting size (if > MAX_DYN_MSG_SIZE, the reject)
-  unsigned long toReduce = 0;
-  unsigned long toAdd = 0;
+  // Calculate resulting size (if > MAX_DYN_MSG_SIZE, then reject)
+  unsigned long  toReduce = 0;
+  unsigned long  toAdd    = 0;
 
   for (std::map<std::string, unsigned int>::iterator it = macroNames.begin(); it != macroNames.end(); ++it)
   {
@@ -197,6 +199,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const ContextElem
     else
     {
       std::string value;
+
       attributeValue(&value, ce.contextAttributeVector.vec, macroName.c_str());
       toAdd += value.length() * times;
     }
@@ -218,6 +221,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const ContextElem
 
     std::string macro = "${" + it->first + "}";
     std::string value;
+
     if (macroName == "id")
     {
       value = ce.entityId.id;
@@ -231,7 +235,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const ContextElem
       attributeValue(&value, ce.contextAttributeVector.vec, macroName.c_str());
     }
 
-    // We have to do the replace operation as many times as macro occurences
+    // We have to do the replace operation as many times as macro occurrences
     for (unsigned int ix = 0; ix < times; ix++)
     {
       to->replace(to->find(macro), macro.length(), value);
