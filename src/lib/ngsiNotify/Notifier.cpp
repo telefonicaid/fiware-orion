@@ -215,7 +215,11 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     //
     // 2. URL
     //
-    macroSubstitute(&url, httpInfo.url, ce);
+    if (macroSubstitute(&url, httpInfo.url, ce) == false)
+    {
+      // Warning already logged in macroSubstitude()
+      return paramsV;  // empty vector
+    }
 
 
     //
@@ -236,7 +240,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     {
       if (macroSubstitute(&payload, httpInfo.payload, ce) == false)
       {
-        LM_W(("Runtime Error (not sending NotifyContextRequest: payload too large)"));
+        // Warning already logged in macroSubstitude()
         return paramsV;  // empty vector
       }
 
@@ -256,8 +260,12 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       std::string key   = it->first;
       std::string value = it->second;
 
-      macroSubstitute(&key,   it->first, ce);
-      macroSubstitute(&value, it->second, ce);
+      if ((macroSubstitute(&key, it->first, ce) == false) || (macroSubstitute(&value, it->second, ce) == false))
+      {
+        // Warning already logged in macroSubstitude()
+        return paramsV;  // empty vector
+      }
+
       if ((value == "") || (key == ""))
       {
         // To avoid e.g '?a=&b=&c='
@@ -275,8 +283,11 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       std::string key   = it->first;
       std::string value = it->second;
 
-      macroSubstitute(&key,   it->first, ce);
-      macroSubstitute(&value, it->second, ce);
+      if ((macroSubstitute(&key, it->first, ce) == false) || (macroSubstitute(&value, it->second, ce) == false))
+      {
+        // Warning already logged in macroSubstitude()
+        return paramsV;  // empty vector
+      }
 
       if (key == "")
       {

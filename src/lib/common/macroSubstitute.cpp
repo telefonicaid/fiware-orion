@@ -143,6 +143,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const ContextElem
   //
   if (from.size() > MAX_DYN_MSG_SIZE)
   {
+    LM_W(("Runtime Error (too large initial string, before substitution)"));
     *to = "";
     return false;
   }
@@ -156,7 +157,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const ContextElem
     size_t macroEnd = from.find("}", macroStart);
     if (macroEnd == std::string::npos)
     {
-      LM_W(("Macro end not found, syntax error. Aborting substitution"));
+      LM_W(("Runtime Error (macro end not found, syntax error, aborting substitution)"));
       *to = "";
       return false;
     }
@@ -203,6 +204,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const ContextElem
 
   if (from.length() + toAdd - toReduce > MAX_DYN_MSG_SIZE)
   {
+    LM_W(("Runtime Error (too large final string, after substitution)"));
     *to = "";
     return false;
   }
