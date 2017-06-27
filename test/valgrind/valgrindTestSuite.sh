@@ -130,6 +130,7 @@ dbReset ALL
 totalStartTime=$(date +%s.%2N)
 
 
+
 # -----------------------------------------------------------------------------
 #
 # Init file already sourced?
@@ -308,11 +309,11 @@ function brokerStop()
 
 # -----------------------------------------------------------------------------
 #
-# Process valgrind result
+# Extract leak info from valgrind output file
 #
 # It uses as argument the .out file to process
 #
-function processResult()
+function leakInfo()
 {
     filename=$1
     # Get info from valgrind
@@ -346,6 +347,21 @@ function processResult()
     \rm valgrind.leakSummary valgrind.leakSummary2
 
     lost=$(add $definitelyLost1 $indirectlyLost1 $definitelyLost2 $indirectlyLost2)
+}
+
+
+
+# -----------------------------------------------------------------------------
+#
+# Extract error info from valgrind output file
+#
+# It uses as argument the .out file to process
+#
+function memErrorInfo()
+{
+  filename=$1
+  # Get info from valgrind
+  memErrors=$(grep -n "Invalid write of size" $filename | wc -l)
 }
 
 
@@ -428,9 +444,9 @@ function setNumberOfTests()
 
 # -----------------------------------------------------------------------------
 #
-# Failed tests
+# Leak in test?
 #
-function failedTest()
+function leakFound()
 {
   _valgrindFile=$1
   _file=$2
@@ -454,6 +470,25 @@ function failedTest()
 
   failedTests[$testFailures+1]=$okString
 }
+
+
+
+# -----------------------------------------------------------------------------
+#
+# memErrorFound
+#
+function memErrorFound()
+{
+  _valgrindFile=$1
+  _file=$2
+  _memErrors=$3
+
+  echo "FAILED (mem errors: $_memErrors). Check $_valgrindFile for clues"
+
+  memErrorV[$memErrorNo]="_errorList"
+  memErrorNo=$memErrorNo+1
+}
+
 
 
 # -----------------------------------------------------------------------------
@@ -501,13 +536,15 @@ setNumberOfTests
 
 declare -A failedTests
 declare -A harnessErrorV
+declare -A memErrorV
 typeset -i harnessErrors
 typeset -i testNo
 typeset -i testFailures
+typeset -i memErrorNo
 testNo=0;
 testFailures=0
 harnessErrors=0
-
+memErrorNo=0
 
 if [ "$runPure" -eq "1" ] || [ "$leakTest" == "on" ]
 then
@@ -543,6 +580,8 @@ then
     NAME="./$vtest"
     typeset -i lost
     lost=0
+    typeset -i memErrors
+    memErrors=0
 
     if [ "$dryrun" == "off" ]
     then
@@ -575,13 +614,14 @@ then
         mv /tmp/accumulator_$LISTENER_PORT       $vtest.accumulator_$LISTENER_PORT
         mv /tmp/accumulator_$LISTENER2_PORT      $vtest.accumulator_$LISTENER2_PORT
 
-        failText=$(failedTest "$vtest.valgrind.out" $vtest 0 "valgrind" $xTestNo)
+        failText=$(leakFound "$vtest.valgrind.out" $vtest 0 "valgrind" $xTestNo)
       else
         fileCleanup $vtest
 
         typeset -i headEndLine1
         typeset -i headEndLine2
-        processResult ${NAME}.out
+        leakInfo ${NAME}.out
+        memErrorInfo ${NAME}.out
         failText=''
       fi
     else
@@ -590,7 +630,10 @@ then
 
     if [ "$lost" != "0" ]
     then
-      failedTest "test/valgrind/$vtest.*" $vtest $lost "valgrind" $xTestNo
+      leakFound "test/valgrind/$vtest.*" $vtest $lost "valgrind" $xTestNo
+    elif [ "$memErrors" != "" ]
+    then
+      memErrorFound "test/valgrind/$vtest.*" $vtest "$errorLines"
     elif [ "$vTestResult" == 0 ]
     then
       echo $okString "($diffTime seconds)" $failText
@@ -667,7 +710,7 @@ then
     printImplementedString $htest
     typeset -i lost
     lost=0
-
+    memErrors=0
     if [ "$dryrun" == "off" ]
     then
       detailForOkString=''
@@ -703,16 +746,17 @@ then
       typeset -i headEndLine1
       typeset -i headEndLine2
       vMsg processing $directory/$htest.valgrind.out in $(pwd)
-      vMsg "calling processResult"
-      processResult test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
-      vMsg "called processResult"
+      vMsg "calling leakInfo"
+      leakInfo test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
+      memErrorInfo test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
+      vMsg "called leakInfo"
     else
       if [ "$dryLeaks" == "on" ]
       then
         modula3=$(echo $testNo % 30 | bc)
         if [ $modula3 == 0 ]
         then
-            failedTest "$htest.valgrind.out" $htest 1024 $dir $xTestNo
+            leakFound "$htest.valgrind.out" $htest 1024 $dir $xTestNo
         fi
 
         modula4=$(echo $testNo % 40 | bc)
@@ -727,7 +771,10 @@ then
 
     if [ "$lost" != "0" ]
     then
-      failedTest "$htest.valgrind.out" $htest $lost $dir $xTestNo
+      leakFound "$htest.valgrind.out" $htest $lost $dir $xTestNo
+    elif [ "$memErrors" != "0" ]
+    then
+      memErrorFound "$htest.valgrind.out" $htest $memErrors $dir $xTestNo
     else
       echo $okString "($diffTime seconds)" $detailForOkString
     fi
@@ -748,6 +795,25 @@ then
   do
     ix=$ix+1
     echo "  " ${failedTests[$ix]}
+  done
+
+  echo "---------------------------------------"
+  retval=1
+fi
+
+
+if [ $memErrorNo != 0 ]
+then
+  echo
+  echo
+  echo "$memErrorNo memory errors:"
+  typeset -i ix
+  ix=0
+
+  while [ $ix -ne $memErrorNo ]
+  do
+    ix=$ix+1
+    echo "  " ${memErrorV[$ix]}
   done
 
   echo "---------------------------------------"
