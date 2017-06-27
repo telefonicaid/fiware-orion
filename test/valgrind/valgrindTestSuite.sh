@@ -485,7 +485,7 @@ function memErrorFound()
 
   echo "FAILED (mem errors: $_memErrors). Check $_valgrindFile for clues"
 
-  memErrorV[$memErrorNo]="_errorList"
+  memErrorV[$memErrorNo]="$_file shows $_memErrors memory errors"
   memErrorNo=$memErrorNo+1
 }
 
@@ -620,7 +620,11 @@ then
 
         typeset -i headEndLine1
         typeset -i headEndLine2
+
+        lost=0
         leakInfo ${NAME}.out
+
+        memErrors=0
         memErrorInfo ${NAME}.out
         failText=''
       fi
@@ -631,7 +635,7 @@ then
     if [ "$lost" != "0" ]
     then
       leakFound "test/valgrind/$vtest.*" $vtest $lost "valgrind" $xTestNo
-    elif [ "$memErrors" != "" ]
+    elif [ "$memErrors" != "0" ]
     then
       memErrorFound "test/valgrind/$vtest.*" $vtest "$errorLines"
     elif [ "$vTestResult" == 0 ]
@@ -746,10 +750,12 @@ then
       typeset -i headEndLine1
       typeset -i headEndLine2
       vMsg processing $directory/$htest.valgrind.out in $(pwd)
-      vMsg "calling leakInfo"
+
+      lost=0
       leakInfo test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
+
+      memErrors=0
       memErrorInfo test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
-      vMsg "called leakInfo"
     else
       if [ "$dryLeaks" == "on" ]
       then
@@ -806,14 +812,14 @@ if [ $memErrorNo != 0 ]
 then
   echo
   echo
-  echo "$memErrorNo memory errors:"
+  echo "$memErrorNo test cases show memory errors:"
   typeset -i ix
   ix=0
 
   while [ $ix -ne $memErrorNo ]
   do
+    echo "o ${memErrorV[$ix]}"
     ix=$ix+1
-    echo "  " ${memErrorV[$ix]}
   done
 
   echo "---------------------------------------"
