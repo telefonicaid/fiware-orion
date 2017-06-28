@@ -64,14 +64,12 @@ NotifyCondition::NotifyCondition(NotifyCondition* ncP)
 */
 void NotifyCondition::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
   writer.StartObject();
 
-  writer.Key("type");
-  writer.String(type.c_str());
-
+  writer.String("type", type);
   condValueList.toJson(writer);
   restriction.toJson(writer);
 

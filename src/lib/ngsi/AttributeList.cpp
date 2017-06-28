@@ -66,7 +66,7 @@ void AttributeList::fill(const std::string& commaSeparatedList)
 */
 void AttributeList::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
   if (attributeV.size() == 0)
@@ -75,14 +75,7 @@ void AttributeList::toJson
   }
 
   writer.Key("attributes");
-  writer.StartObject();
-
-  for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
-  {
-    writer.String(attributeV[ix].c_str());
-  }
-
-  writer.EndObject();
+  vectorToJson(writer, attributeV);
 }
 
 

@@ -28,8 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/MetadataVector.h"
 #include "parse/CompoundValueNode.h"
@@ -54,7 +53,7 @@ typedef struct UpdateContextAttributeRequest
   UpdateContextAttributeRequest();
   std::string  render(ApiVersion apiVersion,
                       int        indent = -1);
-  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  void         toJson(JsonHelper& writer,
                       ApiVersion apiVersion);
   std::string  check(ApiVersion apiVersion, std::string indent, const std::string& preError);
   void         present(std::string indent);

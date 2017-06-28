@@ -1,13 +1,13 @@
 {
-  "contextRegistrationResponses" : [
+  "contextRegistrationResponses": [
     {
-      "contextRegistration" : {
-        "providingApplication" : "http://tid.test.com/unitTest2"
+      "contextRegistration": {
+        "providingApplication": "http://tid.test.com/unitTest2"
       },
-      "errorCode" : {
-        "code" : "400",
-        "reasonPhrase" : "Bad Request",
-        "details" : "errorCode inside ContextRegistrationResponse"
+      "errorCode": {
+        "code": "400",
+        "reasonPhrase": "Bad Request",
+        "details": "errorCode inside ContextRegistrationResponse"
       }
     }
   ]

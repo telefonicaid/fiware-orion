@@ -1,42 +1,42 @@
 {
-  "subscriptionId" : "012345678901234567890123",
-  "contextRegistrationResponses" : [
+  "subscriptionId": "012345678901234567890123",
+  "contextRegistrationResponses": [
     {
-      "contextRegistration" : {
-        "entities" : [
+      "contextRegistration": {
+        "entities": [
           {
-            "type" : "EType",
-            "isPattern" : "false",
-            "id" : "E02"
+            "type": "EType",
+            "isPattern": "false",
+            "id": "E02"
           }
         ],
-        "providingApplication" : "http://www.tid.es/NotifyContextAvailabilityRequestTest"
+        "providingApplication": "http://www.tid.es/NotifyContextAvailabilityRequestTest"
       }
     },
     {
-      "contextRegistration" : {
-        "entities" : [
+      "contextRegistration": {
+        "entities": [
           {
-            "type" : "EType",
-            "isPattern" : "false",
-            "id" : "E02"
+            "type": "EType",
+            "isPattern": "false",
+            "id": "E02"
           }
         ],
-        "attributes" : [
+        "attributes": [
           {
-            "name" : "CRA1",
-            "type" : "CType",
-            "isDomain" : "false"
+            "name": "CRA1",
+            "type": "CType",
+            "isDomain": "false"
           }
         ],
-        "metadatas" : [
+        "metadatas": [
           {
-            "name" : "M01",
-            "type" : "MType",
-            "value" : "123"
+            "name": "M01",
+            "type": "MType",
+            "value": "123"
           }
         ],
-        "providingApplication" : "http://www.tid.es/NotifyContextAvailabilityRequestTest2"
+        "providingApplication": "http://www.tid.es/NotifyContextAvailabilityRequestTest2"
       }
     }
   ]

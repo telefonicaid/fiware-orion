@@ -28,8 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "common/RenderFormat.h"
 #include "common/globals.h"
@@ -95,17 +94,17 @@ public:
   std::string  getId() const;
   std::string  getLocation(ApiVersion apiVersion = V1) const;
 
-  void         toJsonV1(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  void         toJsonV1(JsonHelper& writer,
                         bool                asJsonObject,
                         RequestType         request,
                         bool                omitValue = false);
-  void         toJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  void         toJsonObject(JsonHelper& writer,
                             ApiVersion  apiVersion,
                             RequestType request,
                             bool        asJsonObject,
                             bool        omitValue = false);
-  void         toJsonString(rapidjson::Writer<rapidjson::StringBuffer>& writer);
-  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  void         toJsonString(JsonHelper& writer);
+  void         toJson(JsonHelper& writer,
                       RenderFormat                     renderFormat,
                       const std::vector<std::string>&  metadataFilter,
                       RequestType                      requestType = NoRequest);
@@ -113,7 +112,7 @@ public:
                              MimeType         outFormatSelection,
                              HttpStatusCode*  scP,
                              int              indent = -1);
-  void         toJsonAsValue(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void         toJsonAsValue(JsonHelper& writer);
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  getName(void);

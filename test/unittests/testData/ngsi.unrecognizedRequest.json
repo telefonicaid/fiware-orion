@@ -1,7 +1,7 @@
 {
-  "orionError" : {
-    "code" : "400",
-    "reasonPhrase" : "Bad Request",
-    "details" : "service not found"
+  "orionError": {
+    "code": "400",
+    "reasonPhrase": "Bad Request",
+    "details": "service not found"
   }
 }

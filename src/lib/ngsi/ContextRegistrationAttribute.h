@@ -28,9 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-
+#include "common/JsonHelper.h"
 #include "common/globals.h"
 
 #include "ngsi/MetadataVector.h"
@@ -51,7 +49,7 @@ typedef struct ContextRegistrationAttribute
 
   ContextRegistrationAttribute();
   ContextRegistrationAttribute(const std::string& _name, const std::string& _type, const std::string& _isDomain = "");
-  void            toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void            toJson(JsonHelper& writer);
   void            present(int ix, const std::string& indent);
   void            release(void);
 

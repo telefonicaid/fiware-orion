@@ -27,8 +27,7 @@
 */
 #include <string>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/Request.h"
 
@@ -45,7 +44,7 @@ typedef struct AttributeDomainName
   void          set(const std::string& value);
   std::string   get(void);
   bool          isEmpty(void);
-  void          toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void          toJson(JsonHelper& writer);
   void          present(const std::string& indent);
   const char*   c_str();
   void          release(void);

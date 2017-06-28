@@ -27,8 +27,7 @@
 */
 #include <string>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "common/MimeType.h"
 #include "ngsi/Request.h"
@@ -50,7 +49,7 @@ typedef struct ProvidingApplication
   std::string   get(void);
   MimeType      getMimeType(void);
   bool          isEmpty(void);
-  void          toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void          toJson(JsonHelper& writer);
   void          present(const std::string& indent);
   const char*   c_str(void);
   void          release(void);

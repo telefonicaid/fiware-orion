@@ -32,7 +32,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/JsonHelper.h"
 #include "rest/rest.h"
 #include "rest/RestService.h"
 #include "metricsMgr/MetricsManager.h"
@@ -329,17 +328,15 @@ void MetricsManager::_reset(void)
 }
 
 
-
 /* ****************************************************************************
 *
-* metricsRender - 
+* metricsToJson - 
 */
-static std::string metricsRender(std::map<std::string, uint64_t>* metricsMap)
+static void metricsToJson(JsonHelper& jh, std::map<std::string, uint64_t>* metricsMap)
 {
   std::map<std::string, uint64_t>::iterator  it;
   uint64_t                                   incomingTransactions = 0;
   uint64_t                                   totalServiceTime     = 0;
-  JsonHelper                                 jh;
 
   for (it = metricsMap->begin();  it != metricsMap->end(); ++it)
   {
@@ -359,21 +356,16 @@ static std::string metricsRender(std::map<std::string, uint64_t>* metricsMap)
     {
       float mValue = (float) totalServiceTime / (float) (incomingTransactions * 1000000);
 
-      jh.addFloat(METRIC_SERVICE_TIME, mValue);
+      jh.Double(METRIC_SERVICE_TIME, mValue);
       totalServiceTime     = 0;
       incomingTransactions = 0;
     }
 
-    if (metric != _METRIC_TOTAL_SERVICE_TIME)
+    if (metric != _METRIC_TOTAL_SERVICE_TIME && value != 0)
     {
-      if (value != 0)
-      {
-        jh.addNumber(metric, value);
-      }
+      jh.Int(metric, value);
     }
   }
-
-  return jh.str();
 }
 
 
@@ -382,7 +374,7 @@ static std::string metricsRender(std::map<std::string, uint64_t>* metricsMap)
 *
 * MetricsManager::_toJson -
 */
-std::string MetricsManager::_toJson(void)
+void MetricsManager::toJson(JsonHelper& writer)
 {
   //
   // Three iterators needed to iterate over the 'triple-map' metrics:
@@ -393,24 +385,27 @@ std::string MetricsManager::_toJson(void)
   std::map<std::string, std::map<std::string, std::map<std::string, uint64_t>*>*>::iterator  serviceIter;
   std::map<std::string, std::map<std::string, uint64_t>*>::iterator                          subServiceIter;
   std::map<std::string, uint64_t>::iterator                                                  metricIter;
-  JsonHelper                                                                                 top;
-  JsonHelper                                                                                 services;
   std::map<std::string, uint64_t>                                                            sum;
   std::map<std::string, std::map<std::string, uint64_t> >                                    subServCrossTenant;
 
+  writer.StartObject();
+
+  writer.StartObject("services");
+
   for (serviceIter = metrics.begin(); serviceIter != metrics.end(); ++serviceIter)
   {
-    JsonHelper                                                subServiceTop;
-    JsonHelper                                                jhSubService;
     std::string                                               service        = serviceIter->first;
     std::map<std::string, std::map<std::string, uint64_t>*>*  servMap        = serviceIter->second;
     std::map<std::string, uint64_t>                           serviceSum;
+    bool emptyTenant = true;
+
+    writer.StartObject(service != "" ? service : DEFAULT_SERVICE_KEY_FOR_METRICS);
 
     for (subServiceIter = servMap->begin(); subServiceIter != servMap->end(); ++subServiceIter)
     {
-      JsonHelper                        jhMetrics;
       std::string                       subService           = subServiceIter->first;
       std::map<std::string, uint64_t>*  metricMap            = subServiceIter->second;
+      bool emptySubService = true;
 
       for (metricIter = metricMap->begin(); metricIter != metricMap->end(); ++metricIter)
       {
@@ -423,30 +418,24 @@ std::string MetricsManager::_toJson(void)
           serviceSum[metric] += value;
           sum[metric]        += value;
           subServCrossTenant[subService][metric] += value;
+          emptySubService = false;
         }
       }
 
-      std::string subServiceString = metricsRender(metricMap);
+      if (!emptySubService) {
+        if (emptyTenant) {
+          // First sub service
+          writer.StartObject("subservs");
+          emptyTenant = false;
+        }
 
-      if (subServiceString != "{}")
-      {
-        if (subService != "")
-        {
-          jhSubService.addRaw(subService, subServiceString);
-        }
-        else
-        {
-          jhSubService.addRaw(ROOT_SUB_SERVICE_KEY_FOR_METRICS, subServiceString);
-        }
+        writer.StartObject(subService != "" ? subService : ROOT_SUB_SERVICE_KEY_FOR_METRICS);
+        metricsToJson(writer, metricMap);
+        writer.EndObject(); // services.<service>.subservs.<subserv>
       }
     }
 
-    std::string subservs = jhSubService.str();
-    subServiceTop.addRaw("subservs", subservs);
-    std::string serviceSumString = metricsRender(&serviceSum);
-
-    if ((subservs == "{}") && (serviceSumString == "{}"))
-    {
+    if (emptyTenant) {
       //
       // Skipping empty tenant
       //
@@ -460,52 +449,42 @@ std::string MetricsManager::_toJson(void)
       continue;
     }
 
-    subServiceTop.addRaw("sum", serviceSumString);
+    writer.EndObject(); // services.<service>.subservs
 
-    if (service != "")
-    {
-      services.addRaw(service, subServiceTop.str());
-    }
-    else
-    {
-      services.addRaw(DEFAULT_SERVICE_KEY_FOR_METRICS, subServiceTop.str());
-    }
+    writer.StartObject("sum");
+    metricsToJson(writer, &serviceSum);
+    writer.EndObject();
+
+    writer.EndObject(); // services.<service>
   }
+
+  writer.EndObject(); // services
 
   //
   // Sum for grand total
   //
-  JsonHelper   lastSum;
-  JsonHelper   jhSubServ;
+  writer.StartObject("sum");
+
+  writer.StartObject("subservs");
 
   std::map<std::string, std::map<std::string, uint64_t> >::iterator  it;
   for (it = subServCrossTenant.begin();  it != subServCrossTenant.end(); ++it)
   {
-    JsonHelper   jhSubServCross;
     std::string  subService = it->first;
-    std::string  subServiceString;
 
-    subServiceString = metricsRender(&it->second);
-
-    if (subService != "")
-    {
-      jhSubServ.addRaw(subService, subServiceString);
-    }
-    else
-    {
-      jhSubServ.addRaw(ROOT_SUB_SERVICE_KEY_FOR_METRICS, subServiceString);
-    }
+    writer.StartObject(subService != "" ? subService : ROOT_SUB_SERVICE_KEY_FOR_METRICS);
+    metricsToJson(writer, &it->second);
+    writer.EndObject();
   }
+  writer.EndObject(); // sum.subservs
 
-  lastSum.addRaw("subservs", jhSubServ.str());
+  writer.StartObject("sum");
+  metricsToJson(writer, &sum);
+  writer.EndObject(); // sum.sum
 
-  std::string  sumString = metricsRender(&sum);
-  lastSum.addRaw("sum", sumString);
+  writer.EndObject(); // sum
 
-  top.addRaw("services", services.str());
-  top.addRaw("sum", lastSum.str());
-
-  return top.str();
+  writer.EndObject();
 }
 
 
@@ -606,9 +585,9 @@ void MetricsManager::reset(void)
 
 /* ****************************************************************************
 *
-* MetricsManager::toJson -
+* MetricsManager::render -
 */
-std::string MetricsManager::toJson(bool doReset)
+std::string MetricsManager::render(bool doReset)
 {
   if (on == false)
   {
@@ -617,7 +596,8 @@ std::string MetricsManager::toJson(bool doReset)
 
   semTake();
 
-  std::string  s = _toJson();
+  JsonHelper writer;
+  toJson(writer);
 
   if (doReset)
   {
@@ -626,5 +606,5 @@ std::string MetricsManager::toJson(bool doReset)
 
   semGive();
 
-  return s;
+  return writer.str();
 }

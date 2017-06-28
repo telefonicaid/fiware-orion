@@ -1,11 +1,11 @@
 {
-  "type" : "TYPE",
-  "contextValue" : "Context Value",
-  "metadatas" : [
+  "type": "TYPE",
+  "contextValue": "Context Value",
+  "metadatas": [
     {
-      "name" : "name",
-      "type" : "type",
-      "value" : "value"
+      "name": "name",
+      "type": "type",
+      "value": "value"
     }
   ]
 }

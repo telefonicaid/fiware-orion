@@ -32,12 +32,10 @@
 #include <string>
 #include <map>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/JsonHelper.h"
 #include "common/limits.h"
 #include "common/string.h"
 #include "common/wsStrip.h"
@@ -123,15 +121,14 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     }
     else if (ciP->apiVersion == ADMIN_API)
     {
-      rapidjson::StringBuffer sb;
-      rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+      JsonHelper writer;
+
       writer.StartObject();
-      writer.Key("error");
-      writer.String(errorString.c_str());
+      writer.String("error", errorString);
       writer.EndObject();
 
       ciP->httpStatusCode = SccBadRequest;
-      ciP->answer         = sb.GetString();
+      ciP->answer         = writer.str();
     }
 
     return MHD_YES;
@@ -859,7 +856,7 @@ int servicePathSplit(ConnectionInfo* ciP)
   if (servicePaths > SERVICE_PATH_MAX_COMPONENTS)
   {
     OrionError e(SccBadRequest, "too many service paths - a maximum of ten service paths is allowed");
-    ciP->answer = e.render();
+    ciP->answer = e.render(ciP->apiVersion);
 
     if (servicePathCopy != NULL)
     {

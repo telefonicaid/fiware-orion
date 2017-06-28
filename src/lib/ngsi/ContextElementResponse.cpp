@@ -24,8 +24,6 @@
 */
 #include <string>
 
-#include "rapidjson/prettywriter.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -331,17 +329,15 @@ std::string ContextElementResponse::renderV1
   int         indent
 )
 {
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
   if (indent < 0)
   {
-    indent = DEFAULT_JSON_INDENT;
+    indent = DEFAULT_JSON_INDENT_V1;
   }
-  writer.SetIndent(' ', indent);
+  JsonHelper writer(indent);
 
   toJsonV1(writer, asJsonObject, requestType, omitAttributeValues);
 
-  return sb.GetString();
+  return writer.str();
 }
 
 
@@ -358,17 +354,11 @@ std::string ContextElementResponse::render
   int                              indent
 )
 {
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  if (indent < 0)
-  {
-    indent = DEFAULT_JSON_INDENT;
-  }
-  writer.SetIndent(' ', indent);
+  JsonHelper writer(indent);
 
   toJson(writer, renderFormat, attrsFilter, metadataFilter, blacklist);
 
-  return sb.GetString();
+  return writer.str();
 }
 
 
@@ -378,10 +368,10 @@ std::string ContextElementResponse::render
 */
 void ContextElementResponse::toJsonV1
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  bool                asJsonObject,
-  RequestType         requestType,
-  bool                omitAttributeValues
+  JsonHelper&  writer,
+  bool         asJsonObject,
+  RequestType  requestType,
+  bool         omitAttributeValues
 )
 {
   writer.StartObject();
@@ -398,7 +388,7 @@ void ContextElementResponse::toJsonV1
 */
 void ContextElementResponse::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper&                      writer,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   const std::vector<std::string>&  metadataFilter,

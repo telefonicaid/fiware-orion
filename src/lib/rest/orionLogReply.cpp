@@ -24,8 +24,7 @@
 */
 #include <string>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "rest/ConnectionInfo.h"
 #include "rest/restReply.h"
@@ -38,17 +37,13 @@
 */
 std::string orionLogReply(ConnectionInfo* ciP, const std::string& what, const std::string& value)
 {
-   rapidjson::StringBuffer sb;
-   rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+   JsonHelper writer;
 
    writer.StartObject();
-
-   writer.Key(what.c_str());
-   writer.String(value.c_str());
-
+   writer.String(what, value);
    writer.EndObject();
 
-   std::string out = sb.GetString();
+   std::string out = writer.str();
 
    ciP->httpStatusCode = SccOk;
    restReply(ciP, out);

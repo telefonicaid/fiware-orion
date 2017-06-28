@@ -24,9 +24,6 @@
 */
 #include <string>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -657,12 +654,12 @@ std::string CompoundValueNode::check(void)
 * toJson -
 *
 */
-void CompoundValueNode::toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void CompoundValueNode::toJson(JsonHelper& writer)
 {
   if (valueType == orion::ValueTypeString)
   {
     LM_T(LmtCompoundValueRender, ("I am a String (%s)", name.c_str()));
-    writer.String(stringValue.c_str());
+    writer.String(stringValue);
   }
   else if (valueType == orion::ValueTypeNumber)
   {

@@ -53,16 +53,15 @@ EntityTypeVector::EntityTypeVector()
 */
 void EntityTypeVector::toJsonV1
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  bool                asJsonObject,
-  bool                asJsonOut,
-  bool                collapsed
+  JsonHelper& writer,
+  bool        asJsonObject,
+  bool        asJsonOut,
+  bool        collapsed
 )
 {
   if (vec.size() > 0)
   {
-    writer.Key("types");
-    writer.StartArray();
+    writer.StartArray("types");
 
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
@@ -79,7 +78,7 @@ void EntityTypeVector::toJsonV1
 */
 void EntityTypeVector::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper& writer,
   bool values
 )
 {
@@ -89,7 +88,7 @@ void EntityTypeVector::toJson
   {
     if (values)
     {
-      writer.String(vec[ix]->type.c_str());
+      writer.String(vec[ix]->type);
     }
     else  // default
     {

@@ -22,9 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "ngsi/Scope.h"
 #include "ngsi/ScopeVector.h"
 
@@ -45,19 +42,18 @@ TEST(ScopeVector, renderAndRelease)
   utInit();
 
   {
-    rapidjson::StringBuffer sb;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    JsonHelper writer(2);
     sV.toJson(writer);
-    EXPECT_STREQ("", sb.GetString());
+    EXPECT_STREQ("", writer.str().c_str());
   }
 
   sV.push_back(s);
 
   {
-    rapidjson::StringBuffer sb;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-    writer.SetIndent(' ', 2);
+    JsonHelper writer(2);
+    writer.StartObject();
     sV.toJson(writer);
+    writer.EndObject();
   }
 
   EXPECT_EQ(sV.size(), 1);

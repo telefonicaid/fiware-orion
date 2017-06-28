@@ -28,8 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "orionTypes/EntityType.h"
 
@@ -51,12 +50,12 @@ class EntityTypeVector
   unsigned int  size(void);
   void          release(void);
   std::string   check(ApiVersion apiVersion, const std::string& predetectedError);
-  void          toJsonV1(rapidjson::Writer<rapidjson::StringBuffer>&  writer,
-                         bool                                         asJsonObject,
-                         bool                                         asJsonOut,
-                         bool                                         collapsed);
-  void          toJson(rapidjson::Writer<rapidjson::StringBuffer>&  writer,
-                       bool                                         values);
+  void          toJsonV1(JsonHelper&  writer,
+                         bool         asJsonObject,
+                         bool         asJsonOut,
+                         bool         collapsed);
+  void          toJson(JsonHelper&  writer,
+                       bool         values);
 
   EntityType*   operator[] (unsigned int ix) const;
 

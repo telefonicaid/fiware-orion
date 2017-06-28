@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -69,13 +66,7 @@ std::string NotifyContextAvailabilityResponse::render
   int indent
 )
 {
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  if (indent < 0)
-  {
-    indent = DEFAULT_JSON_INDENT;
-  }
-  writer.SetIndent(' ', indent);
+  JsonHelper writer(indent);
 
 
   responseCode.keyNameSet("responseCode");
@@ -84,7 +75,7 @@ std::string NotifyContextAvailabilityResponse::render
   responseCode.toJsonV1(writer);
   writer.EndObject();
 
-  return sb.GetString();
+  return writer.str();
 }
 
 

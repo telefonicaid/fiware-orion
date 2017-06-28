@@ -82,21 +82,12 @@ EntityId::EntityId
 */
 void EntityId::toJsonV1
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
-  writer.StartObject();
-
-  writer.Key("type");
-  writer.String(type.c_str());
-
-  writer.Key("isPattern");
-  writer.String(isPattern.c_str());
-
-  writer.Key("id");
-  writer.String(id.c_str());
-
-  writer.EndObject();
+  writer.String("type", type);
+  writer.String("isPattern", isPattern);
+  writer.String("id", id);
 }
 
 
@@ -107,7 +98,7 @@ void EntityId::toJsonV1
 */
 void EntityId::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 ) const
 {
   writer.String("id", id);

@@ -7,7 +7,7 @@
 				"type": "Room",
 				"isPattern": "phalse",
 				"id": "ConferenceRoom",
-        "attributeDomainName" : "ADN",
+        "attributeDomainName": "ADN",
 				"attributes": [
 					{
 						"name": "temperature",

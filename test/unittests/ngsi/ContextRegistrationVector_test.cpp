@@ -44,10 +44,9 @@ TEST(ContextRegistrationVector, render)
 
   utInit();
 
-  rapidjson::StringBuffer sb;
-  rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+  JsonHelper writer(2);
   crv.toJson(writer);
-  EXPECT_STREQ("", sb.GetString());
+  EXPECT_STREQ("", writer.str().c_str());
 
   utExit();
 }

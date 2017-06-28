@@ -50,7 +50,7 @@ void ContextRegistrationVector::push_back(ContextRegistration* item)
 */
 void ContextRegistrationVector::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
   if (vec.size() == 0)
@@ -58,8 +58,7 @@ void ContextRegistrationVector::toJson
     return;
   }
 
-  writer.Key("contextRegistrations");
-  writer.StartArray();
+  writer.StartArray("contextRegistrations");
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

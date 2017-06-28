@@ -150,7 +150,7 @@ void SubscriptionId::present(const std::string& indent)
 */
 void SubscriptionId::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper& writer,
   RequestType container
 )
 {

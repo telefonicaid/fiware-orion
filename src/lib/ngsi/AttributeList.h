@@ -28,8 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/Metadata.h"
 #include "ngsi/Request.h"
@@ -46,7 +45,7 @@ typedef struct AttributeList
 
   void         fill(const std::vector<std::string>& aVec);
   void         fill(const std::string& commaSeparatedList);
-  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void         toJson(JsonHelper& writer);
   std::string  toString(void);
   void         present(const std::string& indent);
   void         release(void);

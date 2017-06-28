@@ -26,9 +26,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 
@@ -71,26 +68,24 @@ EntityType::EntityType(std::string _type): type(_type), count(0)
 */
 void EntityType::toJsonV1
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  bool                asJsonOut,
-  bool                collapsed,
-  bool                typeNameBefore
+  JsonHelper& writer,
+  ApiVersion  apiVersion,
+  bool        asJsonObject,
+  bool        asJsonOut,
+  bool        collapsed,
+  bool        typeNameBefore
 )
 {
   if (typeNameBefore && asJsonOut)
   {
-    writer.Key("name");
-    writer.String(type.c_str());
+    writer.String("name", type);
     contextAttributeVector.toJsonV1(writer, asJsonObject, EntityTypes, true, true);
   }
   else
   {
     writer.StartObject();
 
-    writer.Key("name");
-    writer.String(type.c_str());
+    writer.String("name", type);
     if (!collapsed && contextAttributeVector.size() != 0)
     {
       contextAttributeVector.toJsonV1(writer, asJsonObject, EntityTypes, true, true);
@@ -151,7 +146,7 @@ void EntityType::release(void)
 */
 void EntityType::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper& writer,
   bool includeType
 )
 {
@@ -159,17 +154,14 @@ void EntityType::toJson
 
   if (includeType)
   {
-    writer.Key("type");
-    writer.String(type.c_str());
+    writer.String("type", type);
   }
 
-  writer.Key("attrs");
-  writer.StartObject();
+  writer.StartObject("attrs");
   contextAttributeVector.toJsonTypes(writer);
   writer.EndObject();
 
-  writer.Key("count");
-  writer.Uint(count);
+  writer.Int("count", count);
 
   writer.EndObject();
 }

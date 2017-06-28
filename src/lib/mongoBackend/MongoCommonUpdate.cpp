@@ -49,9 +49,6 @@
 #include "ngsi/Scope.h"
 #include "rest/uriParamNames.h"
 
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/writer.h"
-
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
@@ -674,10 +671,9 @@ static bool contextAttributeCustomMetadataToBson
 
     if (!isNotCustomMetadata(md->name))
     {
-      rapidjson::StringBuffer sb;
-      rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+      JsonHelper writer;
       md->toStringValue(writer);
-      const char* value = sb.GetString();
+      const char* value = writer.str().c_str();
 
       appendMetadata(&mdToAdd, &mdNamesToAdd, md, useDefaultType);
       LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",

@@ -25,8 +25,6 @@
 #include <stdio.h>
 #include <string>
 
-#include "rapidjson/prettywriter.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -60,17 +58,13 @@ std::string ContextRegistrationResponseVector::render
     return "";
   }
 
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  if (indent < 0)
-  {
-    indent = DEFAULT_JSON_INDENT;
-  }
-  writer.SetIndent(' ', indent);
+  JsonHelper writer(indent);
 
+  writer.StartObject();
   toJson(writer);
+  writer.EndObject();
 
-  return sb.GetString();
+  return writer.str();
 }
 
 
@@ -81,17 +75,17 @@ std::string ContextRegistrationResponseVector::render
 */
 void ContextRegistrationResponseVector::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
-  writer.Key("contextRegistrationResponses");
+  writer.StartArray("contextRegistrationResponses");
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     vec[ix]->toJson(writer);
   }
 
-  writer.EndObject();
+  writer.EndArray();
 }
 
 

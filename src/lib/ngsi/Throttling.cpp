@@ -133,14 +133,12 @@ void Throttling::present(const std::string& indent)
 */
 void Throttling::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
-  if (string == "")
+  if (string != "")
   {
-    return;
+    writer.String("throttling", string);
   }
 
-  writer.Key("throttling");
-  writer.String(string.c_str());
 }

@@ -73,10 +73,9 @@ TEST(ContextElementResponseVector, render)
   utInit();
 
   {
-    rapidjson::StringBuffer sb;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    JsonHelper writer(2);
     cerv.toJsonV1(writer, false, UpdateContextElement);
-    EXPECT_STREQ("", sb.GetString());
+    EXPECT_STREQ("", writer.str().c_str());
   }
 
   cer.contextElement.entityId.id         = "ID";

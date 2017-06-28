@@ -24,10 +24,6 @@
 */
 #include <string>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
-
 #include "common/globals.h"
 #include "common/RenderFormat.h"
 #include "ngsi10/NotifyContextRequest.h"
@@ -47,13 +43,11 @@ std::string NotifyContextRequest::renderV1
   int        indent
 )
 {
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  if (indent < 0)
+  if (indent == -1)
   {
-    indent = DEFAULT_JSON_INDENT;
+    indent = DEFAULT_JSON_INDENT_V1;
   }
-  writer.SetIndent(' ', indent);
+  JsonHelper writer(indent);
 
 
   writer.StartObject();
@@ -64,7 +58,7 @@ std::string NotifyContextRequest::renderV1
 
   writer.EndObject();
 
-  return sb.GetString();
+  return writer.str();
 }
 
 
@@ -90,20 +84,18 @@ std::string NotifyContextRequest::render
     return oe.renderV1();
   }
 
-  rapidjson::StringBuffer sb;
-  rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+  JsonHelper writer(indent);
 
   writer.StartObject();
-  writer.Key("subscriptionId");
-  writer.String(subscriptionId.get().c_str());
-  writer.Key("data");
-  writer.StartArray();
 
+  writer.String("subscriptionId", subscriptionId.get());
+  writer.StartArray("data");
   contextElementResponseVector.toJson(writer, renderFormat, attrsFilter, metadataFilter, blacklist);
   writer.EndArray();
+
   writer.EndObject();
 
-  return sb.GetString();
+  return writer.str();
 }
 
 

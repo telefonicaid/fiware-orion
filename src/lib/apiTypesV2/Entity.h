@@ -29,8 +29,7 @@
 #include <vector>
 #include <map>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/ContextAttributeVector.h"
 #include "rest/OrionError.h"
@@ -69,12 +68,12 @@ class Entity
   Entity();
   ~Entity();
 
-  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                      std::map<std::string, bool>&                uriParamOptions,
-                      std::map<std::string, std::string>&         uriParam);
-  std::string  render(std::map<std::string, bool>&                uriParamOptions,
-                      std::map<std::string, std::string>&         uriParam,
-                      int                                         indent = -1);
+  void         toJson(JsonHelper&                          writer,
+                      std::map<std::string, bool>&         uriParamOptions,
+                      std::map<std::string, std::string>&  uriParam);
+  std::string  render(std::map<std::string, bool>&         uriParamOptions,
+                      std::map<std::string, std::string>&  uriParam,
+                      int                                  indent = -1);
 
   std::string  check(ApiVersion apiVersion, RequestType requestType);
   void         present(const std::string& indent);

@@ -28,8 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/ProvidingApplication.h"
@@ -52,7 +51,7 @@ typedef struct ContextRegistration
   bool                                entityIdVectorPresent;                 // entityIdList present during parsing
 
   ContextRegistration();
-  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer, bool isInVector);
+  void         toJson(JsonHelper& writer, bool isInVector);
   void         present(const std::string& indent, int ix);
   void         release();
 

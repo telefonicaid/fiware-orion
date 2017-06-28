@@ -109,7 +109,7 @@ void Originator::present(const std::string& indent)
 */
 void Originator::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
   if (string == "")
@@ -117,8 +117,7 @@ void Originator::toJson
     return;
   }
 
-  writer.Key("originator");
-  writer.String(string.c_str());
+  writer.String("originator", string);
 }
 
 

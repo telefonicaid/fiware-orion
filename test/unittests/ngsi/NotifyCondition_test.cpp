@@ -60,11 +60,10 @@ TEST(NotifyCondition, render)
 
   utInit();
 
-  rapidjson::StringBuffer sb;
-  rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+  JsonHelper writer(2);
   nc.toJson(writer);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, sb.GetString());
+  EXPECT_STREQ(expectedBuf, writer.str().c_str());
 
   utExit();
 }

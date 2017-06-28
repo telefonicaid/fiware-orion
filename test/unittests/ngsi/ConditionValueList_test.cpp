@@ -42,28 +42,29 @@ TEST(ConditionValueList, ok)
   const char*        outfile2 = "ngsi.conditionValueList.ok3.middle.json";
 
   {
-    rapidjson::StringBuffer sb;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    JsonHelper writer(2);
     cvList.toJson(writer);
-    EXPECT_STREQ("", sb.GetString());
+    EXPECT_STREQ("", writer.str().c_str());
   }
 
   cvList.push_back("cv1");
   {
-    rapidjson::StringBuffer sb;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    JsonHelper writer(2);
+    writer.StartObject();
     cvList.toJson(writer);
+    writer.EndObject();
     EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-    EXPECT_STREQ(expectedBuf, sb.GetString());
+    EXPECT_STREQ(expectedBuf, writer.str().c_str());
   }
 
   cvList.push_back("cv2");
   {
-    rapidjson::StringBuffer sb;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    JsonHelper writer(2);
+    writer.StartObject();
     cvList.toJson(writer);
+    writer.EndObject();
     EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-    EXPECT_STREQ(expectedBuf, sb.GetString());
+    EXPECT_STREQ(expectedBuf, writer.str().c_str());
   }
 
   out = cvList.check(SubscribeContext, "", "", 0);

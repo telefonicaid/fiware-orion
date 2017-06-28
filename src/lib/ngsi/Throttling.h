@@ -28,8 +28,7 @@
 #include <stdint.h>
 #include <string>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/Request.h"
 
@@ -49,7 +48,7 @@ typedef struct Throttling
   void               set(const std::string& value);
   const std::string  get(void);
   bool               isEmpty(void);
-  void               toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void               toJson(JsonHelper& writer);
 
   std::string        check(RequestType requestType,
                            const std::string& indent,

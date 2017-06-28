@@ -27,8 +27,7 @@
 */
 #include <string>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "common/RenderFormat.h"
 #include "common/globals.h"
@@ -77,11 +76,11 @@ typedef struct ContextElementResponse
                       const std::vector<std::string>&  metadataFilter,
                       bool                             blacklist = false,
                       int                              indent = -1);
-  void         toJsonV1(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                        bool                asJsonObject,
-                        RequestType         requestType,
-                        bool                omitAttributeValues = false);
-  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  void         toJsonV1(JsonHelper& writer,
+                        bool        asJsonObject,
+                        RequestType requestType,
+                        bool        omitAttributeValues = false);
+  void         toJson(JsonHelper& writer,
                       RenderFormat                     renderFormat,
                       const std::vector<std::string>&  attrsFilter,
                       const std::vector<std::string>&  metadataFilter,

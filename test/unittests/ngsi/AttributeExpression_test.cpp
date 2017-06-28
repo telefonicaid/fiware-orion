@@ -47,21 +47,21 @@ TEST(AttributeExpression, ok)
    EXPECT_STREQ("AE", ae.get().c_str());
 
    {
-       rapidjson::StringBuffer sb;
-       rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+       JsonHelper writer(2);
        ae.set("");
        ae.toJson(writer);
-       EXPECT_STREQ("", sb.GetString());
+       EXPECT_STREQ("", writer.str().c_str());
    }
 
    ae.set("AE");
 
    {
-       rapidjson::StringBuffer sb;
-       rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+       JsonHelper writer(2);
+       writer.StartObject();
        ae.toJson(writer);
+       writer.EndObject();
        EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-       EXPECT_STREQ(expectedBuf, sb.GetString());
+       EXPECT_STREQ(expectedBuf, writer.str().c_str());
    }
 
    EXPECT_STREQ("AE", ae.c_str());

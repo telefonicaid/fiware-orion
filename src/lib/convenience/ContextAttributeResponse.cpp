@@ -25,8 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-
 #include "logMsg/logMsg.h"
 
 #include "alarmMgr/alarmMgr.h"
@@ -51,17 +49,14 @@ std::string ContextAttributeResponse::render
   int          indent
 )
 {
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  if (indent < 0)
-  {
-    indent = DEFAULT_JSON_INDENT;
+  if (indent < 0) {
+      indent = DEFAULT_JSON_INDENT_V1;
   }
-  writer.SetIndent(' ', indent);
+  JsonHelper writer(indent);
 
   toJson(writer, apiVersion, asJsonObject, request);
 
-  return sb.GetString();
+  return writer.str();
 }
 
 
@@ -71,7 +66,7 @@ std::string ContextAttributeResponse::render
 */
 void ContextAttributeResponse::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper&  writer,
   ApiVersion   apiVersion,
   bool         asJsonObject,
   RequestType  request

@@ -27,8 +27,7 @@
 */
 #include <string>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/ContextRegistration.h"
 #include "ngsi/StatusCode.h"
@@ -48,7 +47,7 @@ typedef struct ContextRegistrationResponse
   ContextRegistrationResponse();
 
   std::string  render(int indent = -1);
-  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void         toJson(JsonHelper& writer);
   void         present(const std::string& indent);
   void         release(void);
 

@@ -28,8 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/ContextElement.h"
 
@@ -45,7 +44,7 @@ typedef struct ContextElementVector
 
   void             push_back(ContextElement* item);
   unsigned int     size(void);
-  void             toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  void             toJson(JsonHelper& writer,
                           ApiVersion apiVersion,
                           bool asJsonObject,
                           RequestType requestType);

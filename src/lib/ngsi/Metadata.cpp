@@ -25,9 +25,6 @@
 #include <stdio.h>
 #include <string>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -229,17 +226,13 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 */
 void Metadata::toJsonV1
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
   writer.StartObject();
 
-  writer.Key("name");
-  writer.String(name.c_str());
-
-  writer.Key("type");
-  writer.String(name.c_str());
-
+  writer.String("name", name);
+  writer.String("type", type);
   writer.Key("value");
   toStringValue(writer);
 
@@ -380,22 +373,22 @@ void Metadata::fill(const struct Metadata& md)
 * toStringValue -
 */
 void Metadata::toStringValue(
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 ) const
 {
   switch (valueType)
   {
   case orion::ValueTypeString:
-    writer.String(stringValue.c_str());
+    writer.String(stringValue);
     break;
   case orion::ValueTypeNumber:
     if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
     {
-      writer.String(isodate2str(numberValue).c_str());
+      writer.Date(numberValue);
     }
     else // regular number
     {
-      writer.String(toString(numberValue).c_str());
+      writer.String(toString(numberValue));
     }
     break;
   case orion::ValueTypeBoolean:
@@ -412,7 +405,7 @@ void Metadata::toStringValue(
     break;
   default:
     LM_E(("Runtime Error (invalid value type for metadata %s)", name.c_str()));
-    writer.String(stringValue.c_str());
+    writer.String(stringValue);
   }
 }
 
@@ -424,11 +417,10 @@ void Metadata::toStringValue(
 */
 void Metadata::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
-  writer.Key(name.c_str());
-  writer.StartObject();
+  writer.StartObject(name);
 
   /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
   std::string defType = defaultType(valueType);
@@ -441,11 +433,11 @@ void Metadata::toJson
   writer.Key("type");
   if (type != "")
   {
-      writer.String(type.c_str());
+      writer.String(type);
   }
   else
   {
-      writer.String(defType.c_str());
+      writer.String(defType);
   }
 
   writer.Key("value");

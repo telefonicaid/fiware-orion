@@ -28,8 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/Scope.h"
 
@@ -43,7 +42,7 @@ typedef struct ScopeVector
 {
   std::vector<Scope*>  vec;
 
-  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void         toJson(JsonHelper& writer);
   void         present(const std::string& indent);
   void         push_back(Scope* item);
   unsigned int size(void) const;

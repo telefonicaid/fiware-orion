@@ -46,21 +46,30 @@ TEST(ContextAttributeResponseVector, render_json)
   ContextAttributeResponseVector  carV;
   ContextAttribute                ca("caName", "caType", "caValue");
   ContextAttributeResponse        car;
-  std::string                     out;
   const char*                     outfile = "ngsi10.contextResponseList.render.invalid.json";
 
   // 1. empty vector
-  car.statusCode.fill(SccBadRequest, "Empty Vector");
-  out = carV.render(V1, false, ContextEntityAttributes);
-  EXPECT_STREQ("", out.c_str());
+  {
+    JsonHelper writer(2);
+    car.statusCode.fill(SccBadRequest, "Empty Vector");
+    writer.StartObject();
+    carV.toJson(writer, V1, false, ContextEntityAttributes);
+    writer.EndObject();
+    EXPECT_STREQ("{}", writer.str().c_str());
+  }
 
   // 2. normal case
   car.contextAttributeVector.push_back(&ca);
   carV.push_back(&car);
 
-  out = carV.render(V1, false, ContextEntityAttributes);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    JsonHelper writer(2);
+    writer.StartObject();
+    carV.toJson(writer, V1, false, ContextEntityAttributes);
+    writer.EndObject();
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+    EXPECT_STREQ(expectedBuf, writer.str().c_str());
+  }
 }
 
 

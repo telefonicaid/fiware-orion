@@ -1,21 +1,21 @@
 {
-  "contextResponses" : [
+  "contextResponses": [
     {
-      "contextElement" : {
-        "type" : "EType",
-        "isPattern" : "false",
-        "id" : "E01",
-        "metadatas" : [
+      "contextElement": {
+        "type": "EType",
+        "isPattern": "false",
+        "id": "E01",
+        "metadatas": [
           {
-            "name" : "md1",
-            "type" : "string",
-            "value" : "FIN"
+            "name": "md1",
+            "type": "string",
+            "value": "FIN"
           }
         ]
       },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
+      "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
       }
     }
   ]

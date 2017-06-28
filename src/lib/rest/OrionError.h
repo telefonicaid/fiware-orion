@@ -27,10 +27,8 @@
 */
 #include <string>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "common/globals.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/StatusCode.h"
 #include "rest/HttpStatusCode.h"
@@ -56,7 +54,7 @@ public:
   std::string  renderV1(int indent = -1);
   std::string  render(int indent = -1);
   std::string  render(ApiVersion apiVersion);
-  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void         toJson(JsonHelper& writer);
   void         fill(HttpStatusCode _code, const std::string& _details,  const std::string& _reasonPhrase = "");
 
 private:

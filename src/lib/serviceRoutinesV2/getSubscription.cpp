@@ -79,6 +79,6 @@ std::string getSubscription
     return out;
   }
 
-  TIMED_RENDER(out = sub.toJson());
+  TIMED_RENDER(out = sub.render());
   return out;
 }

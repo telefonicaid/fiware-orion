@@ -1,34 +1,34 @@
 {
-  "contextResponses" : [
+  "contextResponses": [
     {
-      "contextElement" : {
-        "type" : "EType",
-        "isPattern" : "false",
-        "id" : "E01",
-        "attributeDomainName" : "AttrDomain",
-        "attributes" : [
+      "contextElement": {
+        "type": "EType",
+        "isPattern": "false",
+        "id": "E01",
+        "attributeDomainName": "AttrDomain",
+        "attributes": [
           {
-            "name" : "ca9",
-            "type" : "string",
-            "value" : ""
+            "name": "ca9",
+            "type": "string",
+            "value": ""
           },
           {
-            "name" : "ca11",
-            "type" : "string",
-            "value" : ""
+            "name": "ca11",
+            "type": "string",
+            "value": ""
           }
         ],
-        "metadatas" : [
+        "metadatas": [
           {
-            "name" : "md10",
-            "type" : "string",
-            "value" : "FIN10"
+            "name": "md10",
+            "type": "string",
+            "value": "FIN10"
           }
         ]
       },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
+      "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
       }
     }
   ]

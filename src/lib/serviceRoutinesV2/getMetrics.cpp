@@ -64,7 +64,7 @@ std::string getMetrics
   }
 
   bool         doReset  = (ciP->uriParam["reset"] == "true")? true : false;
-  std::string  payload  = metricsMgr.toJson(doReset);
+  std::string  payload  = metricsMgr.render(doReset);
 
   return payload;
 }

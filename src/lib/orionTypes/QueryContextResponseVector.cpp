@@ -26,9 +26,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -135,13 +132,7 @@ std::string QueryContextResponseVector::render
   int                 indent
 )
 {
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  if (indent < 0)
-  {
-    indent = DEFAULT_JSON_INDENT;
-  }
-  writer.SetIndent(' ', indent);
+  JsonHelper writer(indent);
 
 
   QueryContextResponse* responseP = new QueryContextResponse();
@@ -253,7 +244,7 @@ std::string QueryContextResponseVector::render
   responseP->release();
   delete responseP;
 
-  return sb.GetString();
+  return writer.str();
 }
 
 

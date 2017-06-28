@@ -25,8 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-
 #include "common/errorMessages.h"
 #include "common/RenderFormat.h"
 #include "common/string.h"
@@ -63,12 +61,11 @@ std::string Attribute::render
     }
     else
     {
-      rapidjson::StringBuffer sb;
-      rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
       if (indent < 0)
       {
         indent = DEFAULT_JSON_INDENT;
       }
+      JsonHelper writer(indent);
 
       std::vector<std::string> metadataFilter;
 
@@ -83,7 +80,7 @@ std::string Attribute::render
 
       writer.EndObject();
 
-      return sb.GetString();
+      return writer.str();
     }
   }
 

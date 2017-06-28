@@ -1,4 +1,6 @@
-"condValueList" : [
-  "cv1",
-  "cv2"
-]
+{
+  "condValueList": [
+    "cv1",
+    "cv2"
+  ]
+}

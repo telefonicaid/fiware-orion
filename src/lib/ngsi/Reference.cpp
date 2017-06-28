@@ -129,16 +129,13 @@ void Reference::present(const std::string& indent)
 */
 void Reference::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
-  if (string == "")
+  if (string != "")
   {
-    return;
+    writer.String("reference", string);
   }
-
-  writer.Key("reference");
-  writer.String(string.c_str());
 }
 
 

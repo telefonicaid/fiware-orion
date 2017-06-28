@@ -24,8 +24,6 @@
 */
 #include <string>
 
-#include "rapidjson/prettywriter.h"
-
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 
@@ -102,17 +100,15 @@ std::string QueryContextResponse::render
   int        indent
 )
 {
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  if (indent < 0)
+  if (indent == -1)
   {
-    indent = DEFAULT_JSON_INDENT;
+    indent = DEFAULT_JSON_INDENT_V1;
   }
-  writer.SetIndent(' ', indent);
+  JsonHelper writer(indent);
 
   toJson(writer, apiVersion, asJsonObject);
 
-  return sb.GetString();
+  return writer.str();
 }
 
 
@@ -122,9 +118,9 @@ std::string QueryContextResponse::render
 */
 void QueryContextResponse::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>&  writer,
-  ApiVersion                                   apiVersion,
-  bool                                         asJsonObject
+  JsonHelper&  writer,
+  ApiVersion   apiVersion,
+  bool         asJsonObject
 )
 {
   writer.StartObject();

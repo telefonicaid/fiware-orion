@@ -26,8 +26,6 @@
 #include <vector>
 #include <map>
 
-#include "rapidjson/prettywriter.h"
-
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 #include "ngsi10/QueryContextResponse.h"
@@ -69,15 +67,13 @@ std::string Entities::render
   int                                  indent
 )
 {
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
   if (indent < 0)
   {
     indent = DEFAULT_JSON_INDENT;
   }
-  writer.SetIndent(' ', indent);
+  JsonHelper writer(indent);
   toJson(writer, uriParamOptions, uriParam);
-  return sb.GetString();
+  return writer.str();
 }
 
 
@@ -88,7 +84,7 @@ std::string Entities::render
 */
 void Entities::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper&                          writer,
   std::map<std::string, bool>&         uriParamOptions,
   std::map<std::string, std::string>&  uriParam
 )

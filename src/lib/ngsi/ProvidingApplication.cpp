@@ -149,7 +149,7 @@ void ProvidingApplication::present(const std::string& indent)
 */
 void ProvidingApplication::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
   if (string == "")
@@ -157,8 +157,7 @@ void ProvidingApplication::toJson
     return;
   }
 
-  writer.Key("providingApplication");
-  writer.String(string.c_str());
+  writer.String("providingApplication", string);
 }
 
 

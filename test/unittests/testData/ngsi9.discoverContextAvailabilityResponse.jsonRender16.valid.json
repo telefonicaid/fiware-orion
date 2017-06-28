@@ -1,22 +1,22 @@
 {
-  "contextRegistrationResponses" : [
+  "contextRegistrationResponses": [
     {
-      "contextRegistration" : {
-        "entities" : [
+      "contextRegistration": {
+        "entities": [
           {
-            "type" : "EType",
-            "isPattern" : "false",
-            "id" : "E16"
+            "type": "EType",
+            "isPattern": "false",
+            "id": "E16"
           }
         ],
-        "attributes" : [
+        "attributes": [
           {
-            "name" : "Attr16",
-            "type" : "AType",
-            "isDomain" : "true"
+            "name": "Attr16",
+            "type": "AType",
+            "isDomain": "true"
           }
         ],
-        "providingApplication" : "http://tid.test.com/unitTest16"
+        "providingApplication": "http://tid.test.com/unitTest16"
       }
     }
   ]

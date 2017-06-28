@@ -26,8 +26,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
 #include "convenience/ContextAttributeResponseVector.h"
@@ -37,39 +35,14 @@
 
 /* ****************************************************************************
 *
-* ContextAttributeResponseVector::render - 
-*/
-std::string ContextAttributeResponseVector::render
-(
-  ApiVersion  apiVersion,
-  bool        asJsonObject,
-  RequestType request,
-  int         indent
-)
-{
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  if (indent < 0)
-  {
-    indent = DEFAULT_JSON_INDENT;
-  }
-
-  toJson(writer, apiVersion, asJsonObject, request);
-
-  return sb.GetString();
-}
-
-
-/* ****************************************************************************
-*
 * ContextAttributeResponseVector::toJson - 
 */
 void ContextAttributeResponseVector::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         request
+  JsonHelper& writer,
+  ApiVersion  apiVersion,
+  bool        asJsonObject,
+  RequestType request
 )
 {
   if (vec.size() == 0)
@@ -77,13 +50,12 @@ void ContextAttributeResponseVector::toJson
     return;
   }
 
-  writer.Key("contextResponses");
-  writer.StartArray();
+  writer.StartArray("contextResponses");
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     vec[ix]->toJson(writer, apiVersion, asJsonObject, request);
   }
-  writer.EndObject();
+  writer.EndArray();
 }
 
 

@@ -111,12 +111,11 @@ void AttributeDomainName::present(const std::string& indent)
 *
 * AttributeDomainName::toJson - 
 */
-void AttributeDomainName::toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void AttributeDomainName::toJson(JsonHelper& writer)
 {
   if (string != "")
   {
-    writer.Key("attributeDomainName");
-    writer.String(string.c_str());
+    writer.String("attributeDomainName", string);
   }
 }
 

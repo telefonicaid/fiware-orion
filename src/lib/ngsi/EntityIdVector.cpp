@@ -44,7 +44,7 @@
 */
 void EntityIdVector::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
   if (vec.size() == 0)
@@ -52,11 +52,12 @@ void EntityIdVector::toJson
     return;
   }
 
-  writer.Key("entities");
-  writer.StartArray();
+  writer.StartArray("entities");
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
+    writer.StartObject();
     vec[ix]->toJsonV1(writer);
+    writer.EndObject();
   }
 
   writer.EndArray();

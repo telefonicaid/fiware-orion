@@ -52,7 +52,7 @@ ContextRegistration::ContextRegistration()
 */
 void ContextRegistration::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper& writer,
   bool isInVector
 )
 {

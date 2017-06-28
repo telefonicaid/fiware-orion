@@ -70,36 +70,38 @@ HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(NOVERB), custom(fa
 *
 * HttpInfo::toJson -
 */
-std::string HttpInfo::toJson()
+void HttpInfo::toJson(JsonHelper& writer)
 {
-  JsonHelper jh;
+  writer.StartObject();
 
-  jh.addString("url", this->url);
+  writer.String("url", this->url);
 
   if (custom)
   {
     if (this->payload != "")
     {
-      jh.addString("payload", this->payload);
+      writer.String("payload", this->payload);
     }
 
     if (this->verb != NOVERB)
     {
-      jh.addString("method", verbName(this->verb));
+      writer.String("method", verbName(this->verb));
     }
 
     if (qs.size() != 0)
     {
-      jh.addRaw("qs", objectToJson(qs));
+      writer.Key("qs");
+      objectToJson(writer, qs);
     }
 
     if (headers.size() != 0)
     {
-      jh.addRaw("headers", objectToJson(headers));
+      writer.Key("headers");
+      objectToJson(writer, headers);
     }
   }
 
-  return jh.str();
+  writer.EndObject();
 }
 
 

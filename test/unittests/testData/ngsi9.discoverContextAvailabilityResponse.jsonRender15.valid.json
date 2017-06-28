@@ -1,22 +1,22 @@
 {
-  "contextRegistrationResponses" : [
+  "contextRegistrationResponses": [
     {
-      "contextRegistration" : {
-        "entities" : [
+      "contextRegistration": {
+        "entities": [
           {
-            "type" : "EType",
-            "isPattern" : "false",
-            "id" : "E14"
+            "type": "EType",
+            "isPattern": "false",
+            "id": "E14"
           }
         ],
-        "metadatas" : [
+        "metadatas": [
           {
-            "name" : "M15",
-            "type" : "string",
-            "value" : "test 15"
+            "name": "M15",
+            "type": "string",
+            "value": "test 15"
           }
         ],
-        "providingApplication" : "http://tid.test.com/unitTest15"
+        "providingApplication": "http://tid.test.com/unitTest15"
       }
     }
   ]

@@ -26,8 +26,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -60,16 +58,14 @@ std::string UpdateContextAttributeRequest::render
   int        indent
 )
 {
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  if (indent < 0)
-  {
-    indent = DEFAULT_JSON_INDENT;
+  if (indent < 0) {
+    indent = DEFAULT_JSON_INDENT_V1;
   }
+  JsonHelper writer(indent);
 
   toJson(writer, apiVersion);
 
-  return sb.GetString();
+  return writer.str();
 }
 
 
@@ -80,19 +76,17 @@ std::string UpdateContextAttributeRequest::render
 */
 void UpdateContextAttributeRequest::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper& writer,
   ApiVersion apiVersion
 )
 {
   writer.StartObject();
 
-  writer.Key("type");
-  writer.String(type.c_str());
+  writer.String("type", type);
 
   if (compoundValueP == NULL)
   {
-    writer.Key("contextValue");
-    writer.String(contextValue.c_str());
+    writer.String("contextValue", contextValue);
   }
   else
   {
@@ -121,8 +115,6 @@ std::string UpdateContextAttributeRequest::check
   StatusCode       response;
   std::string      res;
 
-  indent = "  ";
-
   if (predetectedError != "")
   {
     response.fill(SccBadRequest, predetectedError);
@@ -136,13 +128,11 @@ std::string UpdateContextAttributeRequest::check
     return "OK";
   }
 
-  rapidjson::StringBuffer sb;
-  rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+  JsonHelper writer(indent.length());
   writer.StartObject();
-  response.toJson(writer);
+  response.toJsonV1(writer);
   writer.EndObject();
-
-  return sb.GetString();
+  return writer.str();
 }
 
 

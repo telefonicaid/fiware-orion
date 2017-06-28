@@ -28,8 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/EntityId.h"
 #include "apiTypesV2/EntityVector.h"
@@ -52,7 +51,7 @@ typedef struct EntityIdVector
 {
   std::vector<EntityId*>  vec;
 
-  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void         toJson(JsonHelper& writer);
   void         present(const std::string& indent);
   void         push_back(EntityId* item);
   bool         push_back_if_absent(EntityId* item);

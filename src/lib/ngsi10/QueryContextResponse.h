@@ -29,8 +29,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/ContextElementResponseVector.h"
 #include "ngsi/StatusCode.h"
@@ -58,7 +57,7 @@ typedef struct QueryContextResponse
   std::string            render(ApiVersion apiVersion,
                                 bool       asJsonObject,
                                 int        indent = -1);
-  void                   toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  void                   toJson(JsonHelper& writer,
                                 ApiVersion apiVersion,
                                 bool asJsonObject);
   std::string            check(ApiVersion apiVersion, bool asJsonObject, const std::string&  indent, const std::string&  predetectedError);

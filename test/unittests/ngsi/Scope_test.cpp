@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rapidjson/prettywriter.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -44,13 +42,10 @@ TEST(Scope, render)
 
   utInit();
 
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
-
+  JsonHelper writer(2);
   scope.toJson(writer);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, sb.GetString());
+  EXPECT_STREQ(expectedBuf, writer.str().c_str());
 
   scope.release();
 

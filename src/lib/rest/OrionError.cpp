@@ -27,9 +27,6 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 
@@ -128,14 +125,12 @@ std::string OrionError::setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpS
 */
 void OrionError::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
   writer.StartObject();
-  writer.Key("error");
-  writer.String(reasonPhrase.c_str());
-  writer.Key("description");
-  writer.String(details.c_str());
+  writer.String("error", reasonPhrase);
+  writer.String("description", details);
   writer.EndObject();
 }
 
@@ -145,17 +140,15 @@ void OrionError::toJson
 */
 std::string OrionError::render(int indent)
 {
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
   if (indent < 0)
   {
     indent = DEFAULT_JSON_INDENT;
   }
-  writer.SetIndent(' ', indent);
+  JsonHelper writer(indent);
 
   toJson(writer);
 
-  return sb.GetString();
+  return writer.str();
 }
 
 
@@ -167,36 +160,30 @@ std::string OrionError::render(int indent)
 */
 std::string OrionError::renderV1(int indent)
 {
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
   if (indent < 0)
   {
-    indent = DEFAULT_JSON_INDENT;
+    indent = DEFAULT_JSON_INDENT_V1;
   }
-  writer.SetIndent(' ', indent);
+  JsonHelper writer(indent);
 
   //
   // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here
   //
   writer.StartObject();
 
-  writer.Key("orionError");
-  writer.StartObject();
-  writer.Key("code");
-  writer.String(boost::lexical_cast<std::string>(code).c_str());
-  writer.Key("reasonPhrase");
-  writer.String(reasonPhrase.c_str());
+  writer.StartObject("orionError");
+  writer.String("code", boost::lexical_cast<std::string>(code));
+  writer.String("reasonPhrase", reasonPhrase);
 
   if (details != "")
   {
-    writer.Key("details");
-    writer.String(details.c_str());
+    writer.String("details", details);
   }
 
   writer.EndObject();
   writer.EndObject();
 
-  return out.GetString();
+  return writer.str();
 }
 
 

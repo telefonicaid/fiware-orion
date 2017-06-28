@@ -94,7 +94,7 @@ void Restriction::present(const std::string& indent)
 */
 void Restriction::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper& writer,
   int restrictions
 )
 {
@@ -103,8 +103,7 @@ void Restriction::toJson
     return;
   }
 
-  writer.Key("restriction");
-  writer.StartObject();
+  writer.StartObject("restriction");
   attributeExpression.toJson(writer);
   scopeVector.toJson(writer);
   writer.EndObject();

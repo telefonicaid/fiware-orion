@@ -1,10 +1,10 @@
 {
-  "attributeDomainName" : "ADN",
-  "attributes" : [
+  "attributeDomainName": "ADN",
+  "attributes": [
     {
-      "name" : "caName",
-      "type" : "caType",
-      "value" : "caValue"
+      "name": "caName",
+      "type": "caType",
+      "value": "caValue"
     }
   ]
 }

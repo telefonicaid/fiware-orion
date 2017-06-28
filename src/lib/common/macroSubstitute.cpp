@@ -70,10 +70,9 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
           LM_E(("Runtime Error (attribute is of object type but its compound is of invalid type)"));
           *valueP = "";
         } else {
-          rapidjson::StringBuffer out;
-          rapidjson::Writer<rapidjson::StringBuffer> writer(out);
+          JsonHelper writer(0);
           vec[ix]->compoundValueP->toJson(writer);
-          *valueP = out.GetString();
+          *valueP = writer.str();
         }
       }
       else

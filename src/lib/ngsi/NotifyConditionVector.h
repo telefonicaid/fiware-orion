@@ -28,8 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/NotifyCondition.h"
 
@@ -45,7 +44,7 @@ typedef struct NotifyConditionVector
 
   NotifyConditionVector();
 
-  void              toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void              toJson(JsonHelper& writer);
   void              present(const std::string& indent);
   void              push_back(NotifyCondition* item);
   unsigned int      size(void) const;

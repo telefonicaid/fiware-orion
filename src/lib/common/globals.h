@@ -36,7 +36,10 @@
 *
 * JSON encoding options
 */
-#define DEFAULT_JSON_INDENT 0
+#define DEFAULT_JSON_INDENT_V1    2
+#define DEFAULT_JSON_INDENT_V2    0
+#define DEFAULT_JSON_INDENT_ADMIN 2
+#define DEFAULT_JSON_INDENT       DEFAULT_JSON_INDENT_V2
 
 /* ****************************************************************************
 *

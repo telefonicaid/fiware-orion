@@ -25,12 +25,10 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/JsonHelper.h"
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/compileInfo.h"
@@ -80,9 +78,7 @@ std::string versionTreat
   ParseData*                 parseDataP
 )
 {
-  rapidjson::StringBuffer out;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(out);
-  writer.SetIndent(' ', 2);
+  JsonHelper writer(2);
 
 #ifdef UNIT_TEST
   std::string uptime = "0 d, 0 h, 0 m, 0 s";
@@ -91,30 +87,18 @@ std::string versionTreat
 #endif
 
   writer.StartObject();
-  writer.Key("orion");
-  writer.StartObject();
 
-  writer.Key("version");
-  writer.String(versionString);
-
-  writer.Key("uptime");
-  writer.String(uptime.c_str());
-
-  writer.Key("git_hash");
-  writer.String(GIT_HASH);
-
-  writer.Key("compile_time");
-  writer.String(COMPILE_TIME);
-
-  writer.Key("compiled_by");
-  writer.String(COMPILED_BY);
-
-  writer.Key("compiled_in");
-  writer.String(COMPILED_IN);
-
+  writer.StartObject("orion");
+  writer.String("version", versionString);
+  writer.String("uptime", uptime);
+  writer.String("git_hash", GIT_HASH);
+  writer.String("compile_time", COMPILE_TIME);
+  writer.String("compiled_by", COMPILED_BY);
+  writer.String("compiled_in", COMPILED_IN);
   writer.EndObject();
+
   writer.EndObject();
 
   ciP->httpStatusCode = SccOk;
-  return out.GetString();
+  return writer.str();
 }

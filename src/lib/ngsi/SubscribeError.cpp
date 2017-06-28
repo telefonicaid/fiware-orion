@@ -47,15 +47,13 @@ SubscribeError::SubscribeError()
 */
 void SubscribeError::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper& writer,
   RequestType requestType
 )
 {
-  writer.Key("subscribeError");
-  writer.StartObject();
+  writer.StartObject("subscribeError");
 
   // subscriptionId is Mandatory if part of updateContextSubscriptionResponse
-  // errorCode is Mandatory so, the JSON comma is always TRUE
   if (requestType == UpdateContextSubscription)
   {
     //

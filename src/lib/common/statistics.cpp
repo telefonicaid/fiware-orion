@@ -25,7 +25,6 @@
 #include "common/statistics.h"
 #include "ngsi/Request.h"
 #include "logMsg/logMsg.h"
-#include "common/JsonHelper.h"
 
 
 
@@ -189,7 +188,7 @@ inline float timeSpecToFloat(const struct timespec& t)
 * xxxRenderTime        - the time that the last render took to render the response
 *
 */
-std::string renderTimingStatistics(void)
+void renderTimingStatistics(JsonHelper& jh)
 {
 
   timeStatSemTake(__FUNCTION__, "putting stats together");
@@ -215,47 +214,49 @@ std::string renderTimingStatistics(void)
   bool last = lastJsonV1ParseTime || lastJsonV2ParseTime || lastMongoBackendTime || lastRenderTime || lastReqTime;
   bool acc  = accJsonV1ParseTime || accJsonV2ParseTime || accMongoBackendTime || accRenderTime || accReqTime;
 
+  jh.StartObject();
+
   if (!acc && !last)
   {
     timeStatSemGive(__FUNCTION__, "no stats to report");
-    return "{}";
+    jh.EndObject();
+    return;
   }
-
-  JsonHelper jh;
 
   if (acc)
   {
-    JsonHelper accJh;
+    jh.StartObject("accumulated");
 
-    if (accJsonV1ParseTime)      accJh.addFloat("jsonV1Parse",      timeSpecToFloat(accTimeStat.jsonV1ParseTime));
-    if (accJsonV2ParseTime)      accJh.addFloat("jsonV2Parse",      timeSpecToFloat(accTimeStat.jsonV2ParseTime));
-    if (accMongoBackendTime)     accJh.addFloat("mongoBackend",     timeSpecToFloat(accTimeStat.mongoBackendTime));
-    if (accMongoReadWaitTime)    accJh.addFloat("mongoReadWait",    timeSpecToFloat(accTimeStat.mongoReadWaitTime));
-    if (accMongoWriteWaitTime)   accJh.addFloat("mongoWriteWait",   timeSpecToFloat(accTimeStat.mongoWriteWaitTime));
-    if (accMongoCommandWaitTime) accJh.addFloat("mongoCommandWait", timeSpecToFloat(accTimeStat.mongoCommandWaitTime));
-    if (accRenderTime)           accJh.addFloat("render",           timeSpecToFloat(accTimeStat.renderTime));
-    if (accReqTime)              accJh.addFloat("total",            timeSpecToFloat(accTimeStat.reqTime));
+    if (accJsonV1ParseTime)      jh.Double("jsonV1Parse",      timeSpecToFloat(accTimeStat.jsonV1ParseTime));
+    if (accJsonV2ParseTime)      jh.Double("jsonV2Parse",      timeSpecToFloat(accTimeStat.jsonV2ParseTime));
+    if (accMongoBackendTime)     jh.Double("mongoBackend",     timeSpecToFloat(accTimeStat.mongoBackendTime));
+    if (accMongoReadWaitTime)    jh.Double("mongoReadWait",    timeSpecToFloat(accTimeStat.mongoReadWaitTime));
+    if (accMongoWriteWaitTime)   jh.Double("mongoWriteWait",   timeSpecToFloat(accTimeStat.mongoWriteWaitTime));
+    if (accMongoCommandWaitTime) jh.Double("mongoCommandWait", timeSpecToFloat(accTimeStat.mongoCommandWaitTime));
+    if (accRenderTime)           jh.Double("render",           timeSpecToFloat(accTimeStat.renderTime));
+    if (accReqTime)              jh.Double("total",            timeSpecToFloat(accTimeStat.reqTime));
 
-    jh.addRaw("accumulated", accJh.str());
+    jh.EndObject();
   }
   if (last)
   {
-    JsonHelper lastJh;
+    jh.StartObject("last");
 
-    if (lastJsonV1ParseTime)      lastJh.addFloat("jsonV1Parse",      timeSpecToFloat(lastTimeStat.jsonV1ParseTime));
-    if (lastJsonV2ParseTime)      lastJh.addFloat("jsonV2Parse",      timeSpecToFloat(lastTimeStat.jsonV2ParseTime));
-    if (lastMongoBackendTime)     lastJh.addFloat("mongoBackend",     timeSpecToFloat(lastTimeStat.mongoBackendTime));
-    if (lastMongoReadWaitTime)    lastJh.addFloat("mongoReadWait",    timeSpecToFloat(lastTimeStat.mongoReadWaitTime));
-    if (lastMongoWriteWaitTime)   lastJh.addFloat("mongoWriteWait",   timeSpecToFloat(lastTimeStat.mongoWriteWaitTime));
-    if (lastMongoCommandWaitTime) lastJh.addFloat("mongoCommandWait", timeSpecToFloat(lastTimeStat.mongoCommandWaitTime));
-    if (lastRenderTime)           lastJh.addFloat("render",           timeSpecToFloat(lastTimeStat.renderTime));
-    if (lastReqTime)              lastJh.addFloat("total",            timeSpecToFloat(lastTimeStat.reqTime));
+    if (lastJsonV1ParseTime)      jh.Double("jsonV1Parse",      timeSpecToFloat(lastTimeStat.jsonV1ParseTime));
+    if (lastJsonV2ParseTime)      jh.Double("jsonV2Parse",      timeSpecToFloat(lastTimeStat.jsonV2ParseTime));
+    if (lastMongoBackendTime)     jh.Double("mongoBackend",     timeSpecToFloat(lastTimeStat.mongoBackendTime));
+    if (lastMongoReadWaitTime)    jh.Double("mongoReadWait",    timeSpecToFloat(lastTimeStat.mongoReadWaitTime));
+    if (lastMongoWriteWaitTime)   jh.Double("mongoWriteWait",   timeSpecToFloat(lastTimeStat.mongoWriteWaitTime));
+    if (lastMongoCommandWaitTime) jh.Double("mongoCommandWait", timeSpecToFloat(lastTimeStat.mongoCommandWaitTime));
+    if (lastRenderTime)           jh.Double("render",           timeSpecToFloat(lastTimeStat.renderTime));
+    if (lastReqTime)              jh.Double("total",            timeSpecToFloat(lastTimeStat.reqTime));
 
-    jh.addRaw("last", lastJh.str());
+    jh.EndObject();
   }
 
+  jh.EndObject();
+
   timeStatSemGive(__FUNCTION__, "putting stats together");
-  return jh.str();
 }
 
 

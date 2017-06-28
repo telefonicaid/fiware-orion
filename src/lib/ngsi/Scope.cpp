@@ -387,16 +387,13 @@ int Scope::fill
 */
 void Scope::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
   writer.StartObject();
 
-  writer.Key("type");
-  writer.String(type.c_str());
-
-  writer.Key("value");
-  writer.String(value.c_str());
+  writer.String("type", type);
+  writer.String("value", value);
 
   writer.EndObject();
 }

@@ -27,8 +27,7 @@
 */
 #include <string>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/Request.h"
 #include "ngsi/AttributeList.h"
@@ -65,7 +64,7 @@ typedef struct QueryContextRequest
   QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const AttributeList& attributeList);
 
   std::string   render(int indent = -1);
-  void          toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void          toJson(JsonHelper& writer);
   std::string   check(ApiVersion apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError);
   void          present(const std::string& indent);
   void          release(void);

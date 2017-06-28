@@ -25,12 +25,10 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/JsonHelper.h"
 #include "common/string.h"
 #include "common/globals.h"
 
@@ -51,21 +49,15 @@ std::string entryPointsTreat
   ParseData*                 parseDataP
 )
 {
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
+  JsonHelper writer(2);
 
   writer.StartObject();
-  writer.Key("entities_url");
-  writer.String(ENTITIES_URL.c_str());
-  writer.Key("types_url");
-  writer.String(TYPES_URL.c_str());
-  writer.Key("subscriptions_url");
-  writer.String(SUBSCRIPTIONS_URL.c_str());
-  writer.Key("registrations_url");
-  writer.String(REGISTRATIONS_URL.c_str());
+  writer.String("entities_url", ENTITIES_URL);
+  writer.String("types_url", TYPES_URL);
+  writer.String("subscriptions_url", SUBSCRIPTIONS_URL);
+  writer.String("registrations_url", REGISTRATIONS_URL);
   writer.EndObject();
 
   ciP->httpStatusCode = SccOk;
-  return sb.GetString();
+  return writer.str();
 }

@@ -27,8 +27,7 @@
 */
 #include <string>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/StatusCode.h"
 #include "ngsi/Request.h"
@@ -46,7 +45,7 @@ typedef struct SubscribeError
   StatusCode      errorCode;          // Mandatory
 
   SubscribeError();
-  void        toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer, RequestType requestType);
+  void        toJson(JsonHelper& writer, RequestType requestType);
 
   std::string check(RequestType         requestType,
                     const std::string&  indent,

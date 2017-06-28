@@ -25,8 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-
 #include "common/globals.h"
 #include "ngsi/Request.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionRequest.h"
@@ -54,22 +52,22 @@ std::string UpdateContextAvailabilitySubscriptionRequest::render
   int indent
 )
 {
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  if (indent < 0)
-  {
-    indent = DEFAULT_JSON_INDENT;
+  if (indent < 0) {
+    indent = DEFAULT_JSON_INDENT_V1;
   }
-  writer.SetIndent(' ', indent);
+  JsonHelper writer(indent);
 
   writer.StartObject();
+
   entityIdVector.toJson(writer);
   attributeList.toJson(writer);
   duration.toJson(writer);
   restriction.toJson(writer);
   subscriptionId.toJson(writer, UpdateContextAvailabilitySubscription);
 
-  return sb.GetString();
+  writer.EndObject();
+
+  return writer.str();
 }
 
 

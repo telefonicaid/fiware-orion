@@ -66,19 +66,17 @@ TEST(Metadata, render)
   utInit();
 
   {
-    rapidjson::StringBuffer sb;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
-    m1.toJson(writer);
+    JsonHelper writer(2);
+    m1.toJsonV1(writer);
     EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-    EXPECT_STREQ(expectedBuf, sb.GetString());
+    EXPECT_STREQ(expectedBuf, writer.str().c_str());
   }
 
   {
-    rapidjson::StringBuffer sb;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
-    m2.toJson(writer);
+    JsonHelper writer(2);
+    m2.toJsonV1(writer);
     EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-    EXPECT_STREQ(expectedBuf, sb.GetString());
+    EXPECT_STREQ(expectedBuf, writer.str().c_str());
   }
 
   utExit();

@@ -40,11 +40,15 @@
 */
 void ContextRegistrationAttributeVector::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
-  writer.Key("attributes");
-  writer.StartArray();
+  if (vec.size() == 0)
+  {
+    return;
+  }
+
+  writer.StartArray("attributes");
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     vec[ix]->toJson(writer);

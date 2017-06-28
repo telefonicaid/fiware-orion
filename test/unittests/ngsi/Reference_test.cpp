@@ -107,21 +107,21 @@ TEST(Reference, render)
   utInit();
 
   {
-    rapidjson::StringBuffer sb;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
-    reference .set("");
+    JsonHelper writer(2);
+    reference.set("");
     reference.toJson(writer);
-    EXPECT_STREQ("", sb.GetString());
+    EXPECT_STREQ("", writer.str().c_str());
   }
 
   reference .set("REF");
 
   {
-    rapidjson::StringBuffer sb;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    JsonHelper writer(2);
+    writer.StartObject();
     reference.toJson(writer);
+    writer.EndObject();
     EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-    EXPECT_STREQ(expectedBuf, sb.GetString());
+    EXPECT_STREQ(expectedBuf, writer.str().c_str());
   }
 
   utExit();

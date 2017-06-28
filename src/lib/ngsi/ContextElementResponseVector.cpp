@@ -26,9 +26,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -44,14 +41,18 @@
 */
 void ContextElementResponseVector::toJsonV1
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  bool                asJsonObject,
-  RequestType         requestType,
-  bool                omitAttributeValues
+  JsonHelper& writer,
+  bool        asJsonObject,
+  RequestType requestType,
+  bool        omitAttributeValues
 )
 {
-  writer.Key("contextResponses");
-  writer.StartArray();
+  if (vec.size() == 0)
+  {
+    return;
+  }
+
+  writer.StartArray("contextResponses");
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -69,7 +70,7 @@ void ContextElementResponseVector::toJsonV1
 */
 void ContextElementResponseVector::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper&                      writer,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   const std::vector<std::string>&  metadataFilter,

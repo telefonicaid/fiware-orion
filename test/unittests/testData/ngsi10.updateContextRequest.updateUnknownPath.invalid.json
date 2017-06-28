@@ -1,15 +1,15 @@
 {
-  "contextElements" : [
+  "contextElements": [
     {
       "type": "Room",
       "isPattern": "false",
-      "id" : "ConferenceRoom",
-      "attributes" : [
+      "id": "ConferenceRoom",
+      "attributes": [
         {
-          "name"    : "temperature",
-          "type"    : "degree",
-          "notHere" : "cannot be here",
-          "value"   : "1"
+          "name": "temperature",
+          "type": "degree",
+          "notHere": "cannot be here",
+          "value": "1"
         }
       ]
     }

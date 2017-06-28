@@ -18,15 +18,15 @@
 	],
 	"duration": "PT1M",
 	"restriction": {
-		"attributeExpression" : "AE",
+		"attributeExpression": "AE",
 		"scopes": [
 			{
-				"type" : "st1",
-				"value" : "1"
+				"type": "st1",
+				"value": "1"
 			},
 			{
-				"type" : "st2",
-				"value" : "2"
+				"type": "st2",
+				"value": "2"
 			}
 		]
 	},

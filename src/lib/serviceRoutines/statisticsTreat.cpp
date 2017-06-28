@@ -139,11 +139,11 @@ static void resetStatistics(void)
 *
 * renderUsedCounter -
 */
-inline void renderUsedCounter(JsonHelper* js, const std::string& field, int counter)
+inline void renderUsedCounter(JsonHelper& jh, const std::string& field, int counter)
 {
   if (counter != -1)
   {
-    js->addNumber(field, counter + 1);
+    jh.Int(field, counter + 1);
   }
 }
 
@@ -153,55 +153,55 @@ inline void renderUsedCounter(JsonHelper* js, const std::string& field, int coun
 *
 * renderCounterStats -
 */
-std::string renderCounterStats(void)
+void renderCounterStats(JsonHelper& jh)
 {
-  JsonHelper js;
+  jh.StartObject();
 
   // FIXME: try to chose names closer to the ones used in API URLs
-  renderUsedCounter(&js, "jsonRequests",                              noOfJsonRequests);
-  renderUsedCounter(&js, "registrations",                             noOfRegistrations);
-  renderUsedCounter(&js, "registrationUpdates",                       noOfRegistrationUpdates);
-  renderUsedCounter(&js, "discoveries",                               noOfDiscoveries);
-  renderUsedCounter(&js, "availabilitySubscriptions",                 noOfAvailabilitySubscriptions);
-  renderUsedCounter(&js, "availabilitySubscriptionUpdates",           noOfAvailabilitySubscriptionUpdates);
-  renderUsedCounter(&js, "availabilityUnsubscriptions",               noOfAvailabilityUnsubscriptions);
-  renderUsedCounter(&js, "availabilityNotificationsReceived",         noOfAvailabilityNotificationsReceived);
-  renderUsedCounter(&js, "availabilityNotificationsSent",             noOfAvailabilityNotificationsSent);
-  renderUsedCounter(&js, "queries",                                   noOfQueries);
-  renderUsedCounter(&js, "updates",                                   noOfUpdates);
-  renderUsedCounter(&js, "subscriptions",                             noOfSubscriptions);
-  renderUsedCounter(&js, "subscriptionUpdates",                       noOfSubscriptionUpdates);
-  renderUsedCounter(&js, "unsubscriptions",                           noOfUnsubscriptions);
-  renderUsedCounter(&js, "notificationsReceived",                     noOfNotificationsReceived);
-  renderUsedCounter(&js, "notificationsSent",                         noOfNotificationsSent);
-  renderUsedCounter(&js, "queryResponsesReceived",                    noOfQueryContextResponses);
-  renderUsedCounter(&js, "updateResponsesReceived",                   noOfUpdateContextResponses);
-  renderUsedCounter(&js, "contextEntitiesByEntityId",                 noOfContextEntitiesByEntityId);
-  renderUsedCounter(&js, "contextEntityAttributes",                   noOfContextEntityAttributes);
-  renderUsedCounter(&js, "entityByIdAttributeByName",                 noOfEntityByIdAttributeByName);
-  renderUsedCounter(&js, "ctxEntityTypes",                            noOfContextEntityTypes);
-  renderUsedCounter(&js, "ctxEntityTypeAttributeContainer",           noOfContextEntityTypeAttributeContainer);
-  renderUsedCounter(&js, "ctxEntityTypeAttribute",                    noOfContextEntityTypeAttribute);
-  renderUsedCounter(&js, "individualContextEntity",                   noOfIndividualContextEntity);
-  renderUsedCounter(&js, "individualContextEntityAttributes",         noOfIndividualContextEntityAttributes);
-  renderUsedCounter(&js, "individualContextEntityAttribute",          noOfIndividualContextEntityAttribute);
-  renderUsedCounter(&js, "updateContextElement",                      noOfUpdateContextElement);
-  renderUsedCounter(&js, "appendContextElement",                      noOfAppendContextElement);
-  renderUsedCounter(&js, "updateContextAttribute",                    noOfUpdateContextAttribute);
-  renderUsedCounter(&js, "ctxEntityTypesNgsi10",                      noOfNgsi10ContextEntityTypes);
-  renderUsedCounter(&js, "ctxEntityTypeAttributeContainerNgsi10",     noOfNgsi10ContextEntityTypesAttributeContainer);
-  renderUsedCounter(&js, "ctxEntityTypeAttributeNgsi10",              noOfNgsi10ContextEntityTypesAttribute);
-  renderUsedCounter(&js, "subscriptionsNgsi10ConvOp",                 noOfNgsi10SubscriptionsConvOp);
-  renderUsedCounter(&js, "allContextEntitiesRequests",                noOfAllContextEntitiesRequests);
-  renderUsedCounter(&js, "allEntitiesWithTypeAndIdRequests",          noOfAllEntitiesWithTypeAndIdRequests);
-  renderUsedCounter(&js, "individualCtxEntityAttributeWithTypeAndId", noOfIndividualContextEntityAttributeWithTypeAndId);
-  renderUsedCounter(&js, "attributeValueInstanceWithTypeAndId",       noOfAttributeValueInstanceWithTypeAndId);
-  renderUsedCounter(&js, "contextEntitiesByEntityIdAndType",          noOfContextEntitiesByEntityIdAndType);
-  renderUsedCounter(&js, "entityByIdAttributeByNameIdAndType",        noOfEntityByIdAttributeByNameIdAndType);
-  renderUsedCounter(&js, "batchQueryRequests",                        noOfBatchQueryRequest);
-  renderUsedCounter(&js, "batchUpdateRequests",                       noOfBatchUpdateRequest);
-  renderUsedCounter(&js, "logTraceRequests",                          noOfLogTraceRequests);
-  renderUsedCounter(&js, "logLevelRequests",                          noOfLogLevelRequests);
+  renderUsedCounter(jh, "jsonRequests",                              noOfJsonRequests);
+  renderUsedCounter(jh, "registrations",                             noOfRegistrations);
+  renderUsedCounter(jh, "registrationUpdates",                       noOfRegistrationUpdates);
+  renderUsedCounter(jh, "discoveries",                               noOfDiscoveries);
+  renderUsedCounter(jh, "availabilitySubscriptions",                 noOfAvailabilitySubscriptions);
+  renderUsedCounter(jh, "availabilitySubscriptionUpdates",           noOfAvailabilitySubscriptionUpdates);
+  renderUsedCounter(jh, "availabilityUnsubscriptions",               noOfAvailabilityUnsubscriptions);
+  renderUsedCounter(jh, "availabilityNotificationsReceived",         noOfAvailabilityNotificationsReceived);
+  renderUsedCounter(jh, "availabilityNotificationsSent",             noOfAvailabilityNotificationsSent);
+  renderUsedCounter(jh, "queries",                                   noOfQueries);
+  renderUsedCounter(jh, "updates",                                   noOfUpdates);
+  renderUsedCounter(jh, "subscriptions",                             noOfSubscriptions);
+  renderUsedCounter(jh, "subscriptionUpdates",                       noOfSubscriptionUpdates);
+  renderUsedCounter(jh, "unsubscriptions",                           noOfUnsubscriptions);
+  renderUsedCounter(jh, "notificationsReceived",                     noOfNotificationsReceived);
+  renderUsedCounter(jh, "notificationsSent",                         noOfNotificationsSent);
+  renderUsedCounter(jh, "queryResponsesReceived",                    noOfQueryContextResponses);
+  renderUsedCounter(jh, "updateResponsesReceived",                   noOfUpdateContextResponses);
+  renderUsedCounter(jh, "contextEntitiesByEntityId",                 noOfContextEntitiesByEntityId);
+  renderUsedCounter(jh, "contextEntityAttributes",                   noOfContextEntityAttributes);
+  renderUsedCounter(jh, "entityByIdAttributeByName",                 noOfEntityByIdAttributeByName);
+  renderUsedCounter(jh, "ctxEntityTypes",                            noOfContextEntityTypes);
+  renderUsedCounter(jh, "ctxEntityTypeAttributeContainer",           noOfContextEntityTypeAttributeContainer);
+  renderUsedCounter(jh, "ctxEntityTypeAttribute",                    noOfContextEntityTypeAttribute);
+  renderUsedCounter(jh, "individualContextEntity",                   noOfIndividualContextEntity);
+  renderUsedCounter(jh, "individualContextEntityAttributes",         noOfIndividualContextEntityAttributes);
+  renderUsedCounter(jh, "individualContextEntityAttribute",          noOfIndividualContextEntityAttribute);
+  renderUsedCounter(jh, "updateContextElement",                      noOfUpdateContextElement);
+  renderUsedCounter(jh, "appendContextElement",                      noOfAppendContextElement);
+  renderUsedCounter(jh, "updateContextAttribute",                    noOfUpdateContextAttribute);
+  renderUsedCounter(jh, "ctxEntityTypesNgsi10",                      noOfNgsi10ContextEntityTypes);
+  renderUsedCounter(jh, "ctxEntityTypeAttributeContainerNgsi10",     noOfNgsi10ContextEntityTypesAttributeContainer);
+  renderUsedCounter(jh, "ctxEntityTypeAttributeNgsi10",              noOfNgsi10ContextEntityTypesAttribute);
+  renderUsedCounter(jh, "subscriptionsNgsi10ConvOp",                 noOfNgsi10SubscriptionsConvOp);
+  renderUsedCounter(jh, "allContextEntitiesRequests",                noOfAllContextEntitiesRequests);
+  renderUsedCounter(jh, "allEntitiesWithTypeAndIdRequests",          noOfAllEntitiesWithTypeAndIdRequests);
+  renderUsedCounter(jh, "individualCtxEntityAttributeWithTypeAndId", noOfIndividualContextEntityAttributeWithTypeAndId);
+  renderUsedCounter(jh, "attributeValueInstanceWithTypeAndId",       noOfAttributeValueInstanceWithTypeAndId);
+  renderUsedCounter(jh, "contextEntitiesByEntityIdAndType",          noOfContextEntitiesByEntityIdAndType);
+  renderUsedCounter(jh, "entityByIdAttributeByNameIdAndType",        noOfEntityByIdAttributeByNameIdAndType);
+  renderUsedCounter(jh, "batchQueryRequests",                        noOfBatchQueryRequest);
+  renderUsedCounter(jh, "batchUpdateRequests",                       noOfBatchUpdateRequest);
+  renderUsedCounter(jh, "logTraceRequests",                          noOfLogTraceRequests);
+  renderUsedCounter(jh, "logLevelRequests",                          noOfLogLevelRequests);
 
   //
   // The valgrind test suite uses REST GET /version to check that the broker is alive
@@ -210,18 +210,18 @@ std::string renderCounterStats(void)
   // Instead of removing version-requests from the statistics,
   // we report the number of version-requests even if zero (-1).
   //
-  js.addNumber("versionRequests", noOfVersionRequests + 1);
+  jh.Int("versionRequests", noOfVersionRequests + 1);
 
-  renderUsedCounter(&js, "exitRequests", noOfExitRequests);
-  renderUsedCounter(&js, "leakRequests", noOfLeakRequests);
-  renderUsedCounter(&js, "statisticsRequests", noOfStatisticsRequests);
-  renderUsedCounter(&js, "invalidRequests", noOfInvalidRequests);
-  renderUsedCounter(&js, "registerResponses", noOfRegisterResponses);
-  renderUsedCounter(&js, "registrationErrors", noOfRegistrationErrors);
-  renderUsedCounter(&js, "registrationUpdateErrors", noOfRegistrationUpdateErrors);
-  renderUsedCounter(&js, "discoveryErrors", noOfDiscoveryErrors);
+  renderUsedCounter(jh, "exitRequests", noOfExitRequests);
+  renderUsedCounter(jh, "leakRequests", noOfLeakRequests);
+  renderUsedCounter(jh, "statisticsRequests", noOfStatisticsRequests);
+  renderUsedCounter(jh, "invalidRequests", noOfInvalidRequests);
+  renderUsedCounter(jh, "registerResponses", noOfRegisterResponses);
+  renderUsedCounter(jh, "registrationErrors", noOfRegistrationErrors);
+  renderUsedCounter(jh, "registrationUpdateErrors", noOfRegistrationUpdateErrors);
+  renderUsedCounter(jh, "discoveryErrors", noOfDiscoveryErrors);
 
-  return js.str();
+  jh.EndObject();
 }
 
 
@@ -230,19 +230,17 @@ std::string renderCounterStats(void)
 *
 * renderSemWaitStats -
 */
-std::string renderSemWaitStats(void)
+void renderSemWaitStats(JsonHelper& jh)
 {
-  JsonHelper jh;
-
-  jh.addFloat("request",           semTimeReqGet());
-  jh.addFloat("dbConnectionPool",  mongoPoolConnectionSemWaitingTimeGet());
-  jh.addFloat("transaction",       semTimeTransGet());
-  jh.addFloat("subCache",          semTimeCacheGet());
-  jh.addFloat("connectionContext", mutexTimeCCGet());
-  jh.addFloat("timeStat",          semTimeTimeStatGet());
-  jh.addFloat("metrics",           ((float) metricsMgr.semWaitTimeGet()) / 1000000);
-
-  return jh.str();
+  jh.StartObject();
+  jh.Double("request",           semTimeReqGet());
+  jh.Double("dbConnectionPool",  mongoPoolConnectionSemWaitingTimeGet());
+  jh.Double("transaction",       semTimeTransGet());
+  jh.Double("subCache",          semTimeCacheGet());
+  jh.Double("connectionContext", mutexTimeCCGet());
+  jh.Double("timeStat",          semTimeTimeStatGet());
+  jh.Double("metrics",           ((float) metricsMgr.semWaitTimeGet()) / 1000000);
+  jh.EndObject();
 }
 
 
@@ -251,22 +249,21 @@ std::string renderSemWaitStats(void)
 *
 * renderNotifQueueStats -
 */
-std::string renderNotifQueueStats(void)
+void renderNotifQueueStats(JsonHelper& jh)
 {
-  JsonHelper jh;
   float      timeInQ = QueueStatistics::getTimeInQ();
   int        out     = QueueStatistics::getOut();
 
-  jh.addNumber("in",             QueueStatistics::getIn());
-  jh.addNumber("out",            out);
-  jh.addNumber("reject",         QueueStatistics::getReject());
-  jh.addNumber("sentOk",         QueueStatistics::getSentOK());     // FIXME P7: this needs to be generalized for all notificationModes
-  jh.addNumber("sentError",      QueueStatistics::getSentError());  // FIXME P7: this needs to be generalized for all notificationModes
-  jh.addFloat ("timeInQueue",    timeInQ);
-  jh.addFloat ("avgTimeInQueue", out==0 ? 0 : (timeInQ/out));
-  jh.addNumber("size",           QueueStatistics::getQSize());
-
-  return jh.str();
+  jh.StartObject();
+  jh.Int(   "in",             QueueStatistics::getIn());
+  jh.Int(   "out",            out);
+  jh.Int(   "reject",         QueueStatistics::getReject());
+  jh.Int(   "sentOk",         QueueStatistics::getSentOK());     // FIXME P7: this needs to be generalized for all notificationModes
+  jh.Int(   "sentError",      QueueStatistics::getSentError());  // FIXME P7: this needs to be generalized for all notificationModes
+  jh.Double("timeInQueue",    timeInQ);
+  jh.Double("avgTimeInQueue", out==0 ? 0 : (timeInQ/out));
+  jh.Int(   "size",           QueueStatistics::getQSize());
+  jh.EndObject();
 }
 
 
@@ -284,45 +281,54 @@ std::string statisticsTreat
 )
 {
 
-  JsonHelper js;
+  JsonHelper jh;
+
+  jh.StartObject();
 
   if (ciP->method == "DELETE")
   {
     resetStatistics();
-    js.addString("message", "All statistics counter reset");
-    return js.str();
+    jh.String("message", "All statistics counter reset");
+    jh.EndObject();
+    return jh.str();
   }
 
   /* Conditional statistics (in the same order as described in statistics.md, although
    * beautifier tools may change this order */
   if (countersStatistics)
   {
-    js.addRaw("counters", renderCounterStats());
+    jh.Key("counters");
+    renderCounterStats(jh);
   }
   if (semWaitStatistics)
   {
-    js.addRaw("semWait", renderSemWaitStats());
+    jh.Key("semWait");
+    renderSemWaitStats(jh);
   }
   if (timingStatistics)
   {
-    js.addRaw("timing", renderTimingStatistics());
+    jh.Key("timing");
+    renderTimingStatistics(jh);
   }
   if ((notifQueueStatistics) && (strcmp(notificationMode, "threadpool") == 0))
   {
-    js.addRaw("notifQueue", renderNotifQueueStats());
+    jh.Key("notifQueue");
+    renderNotifQueueStats(jh);
   }
 
   // Unconditional stats
   int now = getCurrentTime();
-  js.addNumber("uptime_in_secs", now - startTime);
-  js.addNumber("measuring_interval_in_secs", now - statisticsTime);
+  jh.Int("uptime_in_secs", now - startTime);
+  jh.Int("measuring_interval_in_secs", now - statisticsTime);
 
   // Special case: simulated notifications
   int nSimNotif = __sync_fetch_and_add(&noOfSimulatedNotifications, 0);
-  renderUsedCounter(&js, "simulatedNotifications", nSimNotif);
+  renderUsedCounter(jh, "simulatedNotifications", nSimNotif);
+
+  jh.EndObject();
 
   ciP->httpStatusCode = SccOk;
-  return js.str();
+  return jh.str();
 }
 
 
@@ -341,13 +347,15 @@ std::string statisticsCacheTreat
 )
 {
 
-  JsonHelper js;
+  JsonHelper jh;
+  jh.StartObject();
 
   if (ciP->method == "DELETE")
   {
     subCacheStatisticsReset("statisticsTreat::DELETE");
-    js.addString("message", "All statistics counter reset");
-    return js.str();
+    jh.String("message", "All statistics counter reset");
+    jh.EndObject();
+    return jh.str();
   }
 
   //
@@ -364,13 +372,15 @@ std::string statisticsCacheTreat
   subCacheStatisticsGet(&mscRefreshs, &mscInserts, &mscRemoves, &mscUpdates, &cacheItems, listBuffer, sizeof(listBuffer));
   cacheSemGive(__FUNCTION__, "statisticsCacheTreat");
 
-  js.addString("ids", listBuffer);    // FIXME P10: this seems not printing anything... is listBuffer working fine?
-  js.addNumber("refresh", mscRefreshs);
-  js.addNumber("inserts", mscInserts);
-  js.addNumber("removes", mscRemoves);
-  js.addNumber("updates", mscUpdates);
-  js.addNumber("items", cacheItems);
+  jh.String("ids", listBuffer);    // FIXME P10: this seems not printing anything... is listBuffer working fine?
+  jh.Int("refresh", mscRefreshs);
+  jh.Int("inserts", mscInserts);
+  jh.Int("removes", mscRemoves);
+  jh.Int("updates", mscUpdates);
+  jh.Int("items", cacheItems);
+
+  jh.EndObject();
 
   ciP->httpStatusCode = SccOk;
-  return js.str();
+  return jh.str();
 }

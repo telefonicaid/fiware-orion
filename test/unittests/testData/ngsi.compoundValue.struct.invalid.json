@@ -1,4 +1,6 @@
-"struct" : {
-  "structitem" : "a",
-  "structitem2" : "a"
+{
+  "struct": {
+    "structitem": "a",
+    "structitem2": "a"
+  }
 }

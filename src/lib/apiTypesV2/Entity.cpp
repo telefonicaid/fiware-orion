@@ -26,8 +26,6 @@
 #include <vector>
 #include <map>
 
-#include "rapidjson/prettywriter.h"
-
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 #include "common/string.h"
@@ -80,15 +78,9 @@ std::string Entity::render
   int                                  indent
 )
 {
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  if (indent < 0)
-  {
-    indent = DEFAULT_JSON_INDENT;
-  }
-  writer.SetIndent(' ', indent);
+  JsonHelper writer(indent);
   toJson(writer, uriParamOptions, uriParam);
-  return sb.GetString();
+  return writer.str();
 }
 
 
@@ -99,7 +91,7 @@ std::string Entity::render
 */
 void Entity::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper&                          writer,
   std::map<std::string, bool>&         uriParamOptions,
   std::map<std::string, std::string>&  uriParam
 )
@@ -155,14 +147,13 @@ void Entity::toJson
 
     if (renderId)
     {
-      writer.Key("id");
-      writer.String(id.c_str());
+      writer.String("id", id);
 
       writer.Key("type");
       /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
       if (type != "")
       {
-        writer.String(type.c_str());
+        writer.String(type);
       }
       else
       {

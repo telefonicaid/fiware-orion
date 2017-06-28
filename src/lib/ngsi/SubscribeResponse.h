@@ -27,8 +27,7 @@
 */
 #include <string>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/Duration.h"
@@ -48,7 +47,7 @@ typedef struct SubscribeResponse
 
   SubscribeResponse();
 
-  void toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void toJson(JsonHelper& writer);
 } SubscribeResponse;
 
 #endif  // SRC_LIB_NGSI_SUBSCRIBERESPONSE_H_

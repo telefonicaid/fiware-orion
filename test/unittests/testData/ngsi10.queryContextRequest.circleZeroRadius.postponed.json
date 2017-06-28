@@ -18,25 +18,25 @@
   ],
   "reference": "http://127.0.0.1",
   "restriction": {
-    "attributeExpression" : "Attribute Expression",
+    "attributeExpression": "Attribute Expression",
     "scopes": [
       {
-        "type" : "FIWARE_Location",
-        "value" : {
-          "circle" : {
-            "centerLatitude" : "40",
-            "centerLongitude" : "20",
+        "type": "FIWARE_Location",
+        "value": {
+          "circle": {
+            "centerLatitude": "40",
+            "centerLongitude": "20",
             "radius": "0"
           }
         }
       },
       {
-        "type" : "t1",
-        "value" : "1"
+        "type": "t1",
+        "value": "1"
       },
       {
-        "type" : "t2",
-        "value" : "2"
+        "type": "t2",
+        "value": "2"
       }
     ]
   }

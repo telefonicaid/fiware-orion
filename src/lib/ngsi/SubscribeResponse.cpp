@@ -45,10 +45,10 @@ SubscribeResponse::SubscribeResponse()
 */
 void SubscribeResponse::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
-  writer.StartObject();
+  writer.StartObject("subscribeResponse");
   subscriptionId.toJson(writer, RtSubscribeResponse);
   duration.toJson(writer);
   throttling.toJson(writer);

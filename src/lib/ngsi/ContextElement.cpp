@@ -75,7 +75,7 @@ ContextElement::ContextElement(const std::string& id, const std::string& type, c
 */
 void ContextElement::toJsonV1
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper& writer,
   bool asJsonObject,
   RequestType requestType,
   bool omitAttributeValues
@@ -103,7 +103,7 @@ void ContextElement::toJsonV1
 */
 void ContextElement::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper&                      writer,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   const std::vector<std::string>&  metadataFilter,

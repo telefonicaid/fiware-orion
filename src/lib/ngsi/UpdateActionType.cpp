@@ -117,16 +117,13 @@ void UpdateActionType::present(const std::string& indent)
 */
 void UpdateActionType::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
-  if (string == "")
+  if (string != "")
   {
-    return;
+    writer.String("updateAction", string);
   }
-
-  writer.Key("updateAction");
-  writer.String(string.c_str());
 }
 
 

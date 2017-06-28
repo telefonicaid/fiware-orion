@@ -27,8 +27,7 @@
 */
 #include <string>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/Request.h"
 #include "ngsi/RestrictionString.h"
@@ -51,7 +50,7 @@ typedef struct NotifyCondition
   NotifyCondition();
   NotifyCondition(NotifyCondition* ncP);
 
-  void          toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void          toJson(JsonHelper& writer);
   void          present(const std::string& indent, int ix);
   void          release(void);
 

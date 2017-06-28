@@ -24,8 +24,6 @@
 */
 #include <string>
 
-#include "rapidjson/prettywriter.h"
-
 #include "common/globals.h"
 #include "ngsi/Request.h"
 #include "rest/EntityTypeInfo.h"

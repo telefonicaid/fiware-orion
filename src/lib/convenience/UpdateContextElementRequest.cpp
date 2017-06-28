@@ -25,8 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-
 #include "common/globals.h"
 #include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
@@ -48,17 +46,14 @@ std::string UpdateContextElementRequest::render
   int         indent
 )
 {
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  if (indent < 0)
-  {
-    indent = DEFAULT_JSON_INDENT;
+  if (indent < 0) {
+    indent = DEFAULT_JSON_INDENT_V1;
   }
-  writer.SetIndent(' ', indent);
+  JsonHelper writer(indent);
 
   toJson(writer, apiVersion, asJsonObject, requestType);
 
-  return sb.GetString();
+  return writer.str();
 }
 
 
@@ -68,9 +63,9 @@ std::string UpdateContextElementRequest::render
 */
 void UpdateContextElementRequest::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  ApiVersion apiVersion,
-  bool asJsonObject,
+  JsonHelper& writer,
+  ApiVersion  apiVersion,
+  bool        asJsonObject,
   RequestType requestType
 )
 {

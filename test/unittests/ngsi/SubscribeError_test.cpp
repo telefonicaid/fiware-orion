@@ -47,19 +47,21 @@ TEST(SubscribeError, render)
   se.errorCode.fill(SccBadRequest, "detail");
 
   {
-    rapidjson::StringBuffer sb;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    JsonHelper writer(2);
+    writer.StartObject();
     se.toJson(writer, RegisterContext);
+    writer.EndObject();
     EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-    EXPECT_STREQ(expectedBuf, sb.GetString());
+    EXPECT_STREQ(expectedBuf, writer.str().c_str());
   }
 
   {
-    rapidjson::StringBuffer sb;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    JsonHelper writer(2);
+    writer.StartObject();
     se.toJson(writer, SubscribeContext);
+    writer.EndObject();
     EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-    EXPECT_STREQ(expectedBuf, sb.GetString());
+    EXPECT_STREQ(expectedBuf, writer.str().c_str());
   }
 
   utExit();

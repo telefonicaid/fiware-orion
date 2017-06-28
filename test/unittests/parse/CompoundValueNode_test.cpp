@@ -125,12 +125,10 @@ TEST(CompoundValueNode, vectorInvalidAndOk)
   tree->finish();
   EXPECT_STREQ("OK", tree->error.c_str());
 
-  rapidjson::StringBuffer sb;
-  rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
-
+  JsonHelper writer(2);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
   tree->toJson(writer);
-  EXPECT_STREQ(expectedBuf, sb.GetString());
+  EXPECT_STREQ(expectedBuf, writer.str().c_str());
 
   tree->shortShow("");
   tree->show("");
@@ -172,12 +170,10 @@ TEST(CompoundValueNode, structInvalidAndOk)
   tree->finish();
   EXPECT_STREQ("OK", tree->error.c_str());
 
-  rapidjson::StringBuffer sb;
-  rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
-
+  JsonHelper writer(2);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
   tree->toJson(writer);
-  EXPECT_STREQ(expectedBuf, sb.GetString());
+  EXPECT_STREQ(expectedBuf, writer.str().c_str());
 
   tree->shortShow("");
   tree->show("");

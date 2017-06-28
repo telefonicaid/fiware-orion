@@ -26,8 +26,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 
@@ -53,16 +51,11 @@ std::string EntityTypeResponse::render
   int        indent
 )
 {
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  if (indent < 0)
-  {
-    indent = DEFAULT_JSON_INDENT;
-  }
+  JsonHelper writer(indent);
 
   toJson(writer, apiVersion, asJsonObject, asJsonOut, collapsed);
 
-  return sb.GetString();
+  return writer.str();
 }
 
 
@@ -130,24 +123,22 @@ void EntityTypeResponse::release(void)
 */
 void EntityTypeResponse::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  bool                asJsonOut,
-  bool                collapsed
+  JsonHelper&  writer,
+  ApiVersion   apiVersion,
+  bool         asJsonObject,
+  bool         asJsonOut,
+  bool         collapsed
 )
 {
   writer.StartObject();
 
   if (apiVersion == V2)
   {
-    writer.Key("attrs");
-    writer.StartObject();
+    writer.StartObject("attrs");
     entityType.contextAttributeVector.toJsonTypes(writer);
     writer.EndObject();
 
-    writer.Key("count");
-    writer.Uint(entityType.count);
+    writer.Int("count", entityType.count);
   }
   else
   {

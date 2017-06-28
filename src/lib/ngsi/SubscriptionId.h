@@ -27,8 +27,7 @@
 */
 #include <string>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/Request.h"
 
@@ -49,7 +48,7 @@ typedef struct SubscriptionId
   std::string   get(void) const;
   const char*   c_str(void) const;
   bool          isEmpty(void);
-  void          toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer, RequestType requestType);
+  void          toJson(JsonHelper& writer, RequestType requestType);
   void          present(const std::string& indent);
   void          release(void);
   bool          rendered(RequestType container);

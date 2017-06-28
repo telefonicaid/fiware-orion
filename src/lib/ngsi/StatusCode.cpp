@@ -27,8 +27,6 @@
 #include <stdlib.h>
 #include <string>
 
-#include "rapidjson/prettywriter.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -92,16 +90,15 @@ std::string StatusCode::render
   int indent
 )
 {
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
   if (indent < 0)
   {
-    indent = DEFAULT_JSON_INDENT;
+    indent = DEFAULT_JSON_INDENT_V1;
   }
+  JsonHelper writer(indent);
 
   toJsonV1(writer, false);
 
-  return sb.GetString();
+  return writer.str();
 }
 
 /* ****************************************************************************
@@ -110,7 +107,7 @@ std::string StatusCode::render
 */
 void StatusCode::toJsonV1
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper& writer,
   bool showKey
 )
 {
@@ -121,19 +118,16 @@ void StatusCode::toJsonV1
   }
 
   if (showKey) {
-      writer.Key(keyName.c_str());
+      writer.Key(keyName);
   }
   writer.StartObject();
 
-  writer.Key("code");
-  writer.Uint(code);
-  writer.Key("reasonPhrase");
-  writer.String(reasonPhrase.c_str());
+  writer.String("code", toString(code));
+  writer.String("reasonPhrase", reasonPhrase);
 
   if (details != "")
   {
-    writer.Key("details");
-    writer.String(details.c_str());
+    writer.String("details", details);
   }
 
   writer.EndObject();
@@ -149,16 +143,13 @@ void StatusCode::toJsonV1
 */
 void StatusCode::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
   writer.StartObject();
 
-  writer.Key("code");
-  writer.Double(code);
-
-  writer.Key("details");
-  writer.String(details.c_str());
+  writer.Uint("code", code);
+  writer.String("details", details);
 
   writer.EndObject();
 }

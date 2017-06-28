@@ -42,7 +42,7 @@
 */
 void ScopeVector::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
   if (vec.size() == 0)

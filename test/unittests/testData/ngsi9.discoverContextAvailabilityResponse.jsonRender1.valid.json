@@ -1,15 +1,15 @@
 {
-  "contextRegistrationResponses" : [
+  "contextRegistrationResponses": [
     {
-      "contextRegistration" : {
-        "entities" : [
+      "contextRegistration": {
+        "entities": [
           {
-            "type" : "EType",
-            "isPattern" : "false",
-            "id" : "E01"
+            "type": "EType",
+            "isPattern": "false",
+            "id": "E01"
           }
         ],
-        "providingApplication" : "http://tid.test.com/unitTest"
+        "providingApplication": "http://tid.test.com/unitTest"
       }
     }
   ]

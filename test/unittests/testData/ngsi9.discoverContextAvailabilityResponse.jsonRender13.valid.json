@@ -1,22 +1,22 @@
 {
-  "contextRegistrationResponses" : [
+  "contextRegistrationResponses": [
     {
-      "contextRegistration" : {
-        "attributes" : [
+      "contextRegistration": {
+        "attributes": [
           {
-            "name" : "Attr12",
-            "type" : "AType",
-            "isDomain" : "true"
+            "name": "Attr12",
+            "type": "AType",
+            "isDomain": "true"
           }
         ],
-        "metadatas" : [
+        "metadatas": [
           {
-            "name" : "M13",
-            "type" : "string",
-            "value" : "test 13"
+            "name": "M13",
+            "type": "string",
+            "value": "test 13"
           }
         ],
-        "providingApplication" : "http://tid.test.com/unitTest12"
+        "providingApplication": "http://tid.test.com/unitTest12"
       }
     }
   ]

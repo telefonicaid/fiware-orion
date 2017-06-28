@@ -26,9 +26,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -54,16 +51,19 @@ MetadataVector::MetadataVector(void)
 */
 void MetadataVector::toJsonV1
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
-  writer.Key("metadatas");
-  writer.StartObject();
+  if (vec.size() == 0)
+  {
+    return;
+  }
+  writer.StartArray("metadatas");
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     vec[ix]->toJsonV1(writer);
   }
-  writer.EndObject();
+  writer.EndArray();
 }
 
 
@@ -98,7 +98,7 @@ bool MetadataVector::matchFilter(const std::string& mdName, const std::vector<st
 * will have to be used to retreive that information.
 */
 void MetadataVector::toJson(
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper& writer,
   const std::vector<std::string>& metadataFilter
 )
 {

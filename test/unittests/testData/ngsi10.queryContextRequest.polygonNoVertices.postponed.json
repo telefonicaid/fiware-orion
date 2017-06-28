@@ -17,22 +17,22 @@
     "lightstatus"
   ],
   "restriction": {
-    "attributeExpression" : "Attribute Expression",
+    "attributeExpression": "Attribute Expression",
     "scopes": [
       {
-        "type" : "FIWARE_Location",
-        "value" : {
-          "polygon" : {
+        "type": "FIWARE_Location",
+        "value": {
+          "polygon": {
           }
         }
       },
       {
-        "type" : "t1",
-        "value" : "1"
+        "type": "t1",
+        "value": "1"
       },
       {
-        "type" : "t2",
-        "value" : "2"
+        "type": "t2",
+        "value": "2"
       }
     ]
   }

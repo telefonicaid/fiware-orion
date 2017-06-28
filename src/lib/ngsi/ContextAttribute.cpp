@@ -25,8 +25,6 @@
 #include <stdio.h>
 #include <string>
 
-#include "rapidjson/prettywriter.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -488,29 +486,27 @@ std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
 */
 void ContextAttribute::toJsonObject
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  ApiVersion          apiVersion,
-  RequestType         request,
-  bool                asJsonObject,
-  bool                omitValue
+  JsonHelper& writer,
+  ApiVersion  apiVersion,
+  RequestType request,
+  bool        asJsonObject,
+  bool        omitValue
 )
-{
-  
-  writer.Key(name.c_str());
+{ 
   writer.StartObject();
 
-  writer.Key("type");
-  writer.String(type.c_str());
+  writer.String("name", name);
+  writer.String("type", type);
 
-  if (compoundValueP == NULL)
+  if (omitValue == false)
   {
-    if (omitValue == false)
+    if (compoundValueP == NULL)
     {
       writer.Key("value");
       switch (valueType)
       {
       case ValueTypeString:
-        writer.String(stringValue.c_str());
+        writer.String(stringValue);
         break;
 
       case ValueTypeBoolean:
@@ -520,11 +516,16 @@ void ContextAttribute::toJsonObject
       case ValueTypeNumber:
         if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
         {
-          writer.String(isodate2str(numberValue).c_str());
+          writer.Date(numberValue);
         }
-        else // regular number
+        // regular number
+        else if (apiVersion == V2)
         {
           writer.Double(numberValue);
+        }
+        else
+        {
+          writer.String(toString(numberValue));
         }
         break;
 
@@ -534,19 +535,18 @@ void ContextAttribute::toJsonObject
 
       default:
         LM_E(("Runtime Error (unknown value type: %d)", valueType));
-        writer.String(stringValue.c_str());
+        writer.String(stringValue);
       }
     }
-    else if (request == RtUpdateContextResponse)
+    else
     {
       writer.Key("value");
-      writer.String("");
+      compoundValueP->toJson(writer);
     }
   }
-  else
+  else if (request == RtUpdateContextResponse)
   {
-    writer.Key("value");
-    compoundValueP->toJson(writer);
+    writer.String("value", "");
   }
 
   if (apiVersion != V2 || !omitValue)
@@ -563,10 +563,10 @@ void ContextAttribute::toJsonObject
 */
 void ContextAttribute::toJsonString
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
-  writer.String(name.c_str());
+  writer.String(name);
 }
 
 /* ****************************************************************************
@@ -575,13 +575,13 @@ void ContextAttribute::toJsonString
 */
 void ContextAttribute::toJsonV1
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper& writer,
   bool                asJsonObject,
   RequestType         request,
   bool                omitValue
 )
 {
-  return toJsonObject(writer, V1, request, omitValue);
+  return toJsonObject(writer, V1, request, asJsonObject, omitValue);
 }
 
 
@@ -596,7 +596,7 @@ void ContextAttribute::toJsonV1
 */
 void ContextAttribute::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper& writer,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  metadataFilter,
   RequestType                      requestType
@@ -606,7 +606,7 @@ void ContextAttribute::toJson
   {
     if (renderFormat == NGSI_V2_KEYVALUES)
     {
-        writer.Key(name.c_str());
+        writer.Key(name);
     }
 
     if (compoundValueP != NULL)
@@ -617,7 +617,7 @@ void ContextAttribute::toJson
     {
       if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
       {
-        writer.String(isodate2str(numberValue).c_str());
+        writer.Date(numberValue);
       }
       else // regular number
       {
@@ -626,7 +626,7 @@ void ContextAttribute::toJson
     }
     else if (valueType == orion::ValueTypeString)
     {
-      writer.String(stringValue.c_str());
+      writer.String(stringValue);
     }
     else if (valueType == orion::ValueTypeBoolean)
     {
@@ -653,7 +653,7 @@ void ContextAttribute::toJson
 
     if (requestType != EntityAttributeResponse)
     {
-      writer.Key(name.c_str());
+      writer.Key(name);
       writer.StartObject();
     }
 
@@ -672,52 +672,48 @@ void ContextAttribute::toJson
     writer.Key("type");
     if (type != "")
     {
-        writer.String(type.c_str());
+        writer.String(type);
     }
     else
     {
-        writer.String(defType.c_str());
+        writer.String(defType);
     }
 
 
     //
     // value
     //
+    writer.Key("value");
     if (compoundValueP != NULL)
     {
       compoundValueP->toJson(writer);
     }
     else if (valueType == orion::ValueTypeNumber)
     {
-      writer.Key("value");
       if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
       {
-        writer.String(isodate2str(numberValue).c_str());
+        writer.Date(numberValue);
       }
       else // regular number
       {
-        writer.String(toString(numberValue).c_str());
+        writer.Double(numberValue);
       }
     }
     else if (valueType == orion::ValueTypeString)
     {
-      writer.Key("value");
-      writer.String(stringValue.c_str());
+      writer.String(stringValue);
     }
     else if (valueType == orion::ValueTypeBoolean)
     {
-      writer.Key("value");
       writer.Bool(boolValue);
     }
     else if (valueType == orion::ValueTypeNone)
     {
-      writer.Key("value");
       writer.Null();
     }
     else
     {
-      writer.Key("value");
-      writer.String(stringValue.c_str());
+      writer.String(stringValue);
     }
 
     //
@@ -735,19 +731,19 @@ void ContextAttribute::toJson
 
 void ContextAttribute::toJsonAsValue
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
   switch (valueType)
   {
   case orion::ValueTypeString:
-    writer.String(stringValue.c_str());
+    writer.String(stringValue);
     break;
 
   case orion::ValueTypeNumber:
     if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
     {
-      writer.String(isodate2str(numberValue).c_str());
+      writer.Date(numberValue);
     }
     else // regular number
     {
@@ -792,15 +788,10 @@ std::string ContextAttribute::renderAsValue
       // Else treat it as json
   case JSON:
   {
-      rapidjson::StringBuffer sb;
-      rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-      if (indent < 0)
-      {
-          indent = DEFAULT_JSON_INDENT;
-      }
+      JsonHelper writer(indent);
 
       toJsonAsValue(writer);
-      return sb.GetString();
+      return writer.str();
   }
   case NOMIMETYPE:
   default:

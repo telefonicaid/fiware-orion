@@ -136,11 +136,12 @@ TEST(SubscriptionId, render)
 
   sId.set("012345012345012345012345");
 
-  rapidjson::StringBuffer sb;
-  rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+  JsonHelper writer(2);
+  writer.StartObject();
   sId.toJson(writer, UnsubscribeContext);
+  writer.EndObject();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, sb.GetString());
+  EXPECT_STREQ(expectedBuf, writer.str().c_str());
 
   sId.release(); // just to exercise the code
 

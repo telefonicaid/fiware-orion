@@ -2,7 +2,7 @@
 	"subscriptionId": "012345678901234567890123",
 	"contextRegistrationResponses": [
 		{
-			"contextRegistration" : {
+			"contextRegistration": {
 				"entities": [
 					{
 						"type": "Room",

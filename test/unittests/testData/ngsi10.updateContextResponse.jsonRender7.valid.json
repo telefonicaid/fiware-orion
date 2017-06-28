@@ -1,15 +1,15 @@
 {
-  "contextResponses" : [
+  "contextResponses": [
     {
-      "contextElement" : {
-        "type" : "EType",
-        "isPattern" : "false",
-        "id" : "E01",
-        "attributeDomainName" : "AttrDomain"
+      "contextElement": {
+        "type": "EType",
+        "isPattern": "false",
+        "id": "E01",
+        "attributeDomainName": "AttrDomain"
       },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
+      "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
       }
     }
   ]

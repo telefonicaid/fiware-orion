@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -55,7 +52,7 @@
 */
 static const void semRender
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper& writer,
   const char* name,
   bool toplevel,
   const char* state
@@ -67,8 +64,7 @@ static const void semRender
   }
 
   writer.StartObject();
-  writer.Key("status");
-  writer.String(state);
+  writer.String("status", state);
 
   //
   // FIXME P4 Fill in more fields here in the future (as part of issue #2145):
@@ -110,9 +106,7 @@ std::string semStateTreat
   const char* connectionSubContextState  = connectionSubContextSemGet();
   const char* metricsMgrState            = metricsMgr.semStateGet();
 
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  writer.SetIndent(' ', 2);
+  JsonHelper writer(2);
 
   writer.StartObject();
 
@@ -130,5 +124,5 @@ std::string semStateTreat
 
   writer.EndObject();
 
-  return sb.GetString();
+  return writer.str();
 }

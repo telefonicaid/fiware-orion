@@ -28,9 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-
+#include "common/JsonHelper.h"
 #include "common/globals.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -163,7 +161,7 @@ class CompoundValueNode
   CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, bool _value);
   std::string         check(void);
   std::string         finish(void);
-  void                toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void                toJson(JsonHelper& writer);
 
   void                shortShow(const std::string& indent);
   void                show(const std::string& indent);

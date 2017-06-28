@@ -117,7 +117,7 @@ void RegistrationId::present(const std::string& indent)
 */
 void RegistrationId::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper& writer,
   RequestType requestType
 )
 {
@@ -134,8 +134,7 @@ void RegistrationId::toJson
     }
   }
 
-  writer.Key("registrationId");
-  writer.String(string.c_str());
+  writer.String("registrationId", string);
 }
 
 

@@ -1,12 +1,12 @@
 {
-  "contextElement" : {
-    "type" : "Type",
-    "isPattern" : "false",
-    "id" : "ID"
+  "contextElement": {
+    "type": "Type",
+    "isPattern": "false",
+    "id": "ID"
   },
-  "statusCode" : {
-    "code" : "200",
-    "reasonPhrase" : "OK",
-    "details" : "details"
+  "statusCode": {
+    "code": "200",
+    "reasonPhrase": "OK",
+    "details": "details"
   }
 }

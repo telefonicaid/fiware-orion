@@ -24,8 +24,6 @@
 */
 #include <string>
 
-#include "rapidjson/prettywriter.h"
-
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 #include "common/globals.h"
@@ -104,13 +102,10 @@ std::string RegisterContextResponse::render
   int indent
 )
 {
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  if (indent < 0)
-  {
-    indent = DEFAULT_JSON_INDENT;
+  if (indent < 0) {
+    indent = DEFAULT_JSON_INDENT_V1;
   }
-  writer.SetIndent(' ', indent);
+  JsonHelper writer(indent);
 
 
   bool error = (errorCode.code != SccNone) && (errorCode.code != SccOk); 
@@ -130,7 +125,7 @@ std::string RegisterContextResponse::render
 
   writer.EndObject();
 
-  return sb.GetString();
+  return writer.str();
 }
 
 

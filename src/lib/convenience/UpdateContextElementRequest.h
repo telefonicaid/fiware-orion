@@ -28,8 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
@@ -51,7 +50,7 @@ typedef struct UpdateContextElementRequest
                       bool        asJsonObject,
                       RequestType requestType,
                       int         indent = -1);
-  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  void         toJson(JsonHelper& writer,
                       ApiVersion apiVersion,
                       bool asJsonObject,
                       RequestType requestType);

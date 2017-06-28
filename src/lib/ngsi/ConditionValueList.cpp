@@ -38,7 +38,7 @@
 *
 * toJson - 
 */
-void ConditionValueList::toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void ConditionValueList::toJson(JsonHelper& writer)
 {
   std::string  out = "";
 
@@ -48,14 +48,7 @@ void ConditionValueList::toJson(rapidjson::Writer<rapidjson::StringBuffer>& writ
   }
 
   writer.Key("condValueList");
-  writer.StartArray();
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    writer.String(vec[ix].c_str());
-  }
-
-  writer.EndObject();
+  vectorToJson(writer, vec);
 }
 
 

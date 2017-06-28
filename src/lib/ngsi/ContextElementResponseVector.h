@@ -28,8 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/ContextElementResponse.h"
 #include "common/RenderFormat.h"
@@ -44,12 +43,12 @@ typedef struct ContextElementResponseVector
 {
   std::vector<ContextElementResponse*>  vec;
 
-  void                     toJsonV1(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                                    bool                asJsonObject,
-                                    RequestType         requestType,
-                                    bool                omitAttributeValues = false);
+  void                     toJsonV1(JsonHelper& writer,
+                                    bool        asJsonObject,
+                                    RequestType requestType,
+                                    bool        omitAttributeValues = false);
 
-  void                     toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  void                     toJson(JsonHelper&                      writer,
                                   RenderFormat                     renderFormat,
                                   const std::vector<std::string>&  attrsFilter,
                                   const std::vector<std::string>&  metadataFilter,

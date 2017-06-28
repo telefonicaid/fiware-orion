@@ -42,10 +42,9 @@ TEST(ContextAttributeVector, render)
 
   utInit();
 
-  rapidjson::StringBuffer sb;
-  rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+  JsonHelper writer(2);
   cav.toJsonV1(writer, false, UpdateContextAttribute);
-  EXPECT_STREQ("", sb.GetString());
+  EXPECT_STREQ("", writer.str().c_str());
 
   // Just to exercise the code ...
   cav.present("");

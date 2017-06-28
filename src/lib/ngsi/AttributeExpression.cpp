@@ -109,12 +109,11 @@ void AttributeExpression::present(const std::string& indent)
 *
 * AttributeExpression::toJson - 
 */
-void AttributeExpression::toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void AttributeExpression::toJson(JsonHelper& writer)
 {
   if (string != "")
   {
-    writer.Key("attributeExpression");
-    writer.String(string.c_str());
+    writer.String("attributeExpression", string);
   }
 }
 

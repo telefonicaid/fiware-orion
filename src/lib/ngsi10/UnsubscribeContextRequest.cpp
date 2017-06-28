@@ -24,9 +24,6 @@
 */
 #include <string>
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "common/globals.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
@@ -42,19 +39,17 @@ std::string UnsubscribeContextRequest::render
   int indent
 )
 {
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-  if (indent < 0)
+  if (indent == -1)
   {
-    indent = DEFAULT_JSON_INDENT;
+    indent = DEFAULT_JSON_INDENT_V1;
   }
-  writer.SetIndent(' ', indent);
+  JsonHelper writer(indent);
 
   writer.StartObject();
   subscriptionId.toJson(writer, UnsubscribeContext);
   writer.EndObject();
 
-  return sb.GetString();
+  return writer.str();
 }
 
 

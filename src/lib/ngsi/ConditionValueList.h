@@ -28,8 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/Metadata.h"
 #include "ngsi/Request.h"
@@ -44,7 +43,7 @@ typedef struct ConditionValueList
 {
   std::vector<std::string>  vec;
 
-  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+  void         toJson(JsonHelper& writer);
   void         present(const std::string& indent);
   void         release(void);
   void         push_back(const std::string& attributeName);

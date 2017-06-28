@@ -408,11 +408,10 @@ TEST(compoundValue, updateTwoStructsJson)
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
   ci.outMimeType = JSON;
-  rapidjson::StringBuffer sb;
-  rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+  JsonHelper writer(2);
   caP->toJsonV1(writer, false, UpdateContext);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
-  EXPECT_STREQ(expectedBuf, sb.GetString());
+  EXPECT_STREQ(expectedBuf, writer.str().c_str());
 
   orion::CompoundValueNode*  cvnRootP;
   orion::CompoundValueNode*  structP;
@@ -557,11 +556,10 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
   ci.outMimeType = JSON;
-  rapidjson::StringBuffer sb;
-  rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+  JsonHelper writer(2);
   caP->toJsonV1(writer, false, UpdateContext);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
-  EXPECT_STREQ(expectedBuf, sb.GetString());
+  EXPECT_STREQ(expectedBuf, writer.str().c_str());
 
   orion::CompoundValueNode*  cvnRootP;
   orion::CompoundValueNode*  level1;

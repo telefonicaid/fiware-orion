@@ -24,9 +24,6 @@
 */
 #include "ngsi/MetadataVector.h"
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "unittest.h"
 
 
@@ -49,22 +46,22 @@ TEST(MetadataVector, toJsonV1)
   mV.push_back(&m);
 
   {
-    rapidjson::StringBuffer sb;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-    writer.SetIndent(' ', 2);
+    JsonHelper writer(2);
+    writer.StartObject();
     mV.toJsonV1(writer);
+    writer.EndObject();
     EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-    EXPECT_STREQ(expectedBuf, sb.GetString());
+    EXPECT_STREQ(expectedBuf, writer.str().c_str());
   }
 
   {
-    rapidjson::StringBuffer sb;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-    writer.SetIndent(' ', 2);
+    JsonHelper writer(2);
     mV.push_back(&m2);
+    writer.StartObject();
     mV.toJsonV1(writer);
+    writer.EndObject();
     EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-    EXPECT_STREQ(expectedBuf, sb.GetString());
+    EXPECT_STREQ(expectedBuf, writer.str().c_str());
   }
 
   utExit();

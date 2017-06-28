@@ -74,7 +74,7 @@ static std::string addedLookup(const std::vector<std::string>& added, std::strin
 */
 void ContextAttributeVector::toJsonTypes
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
   // Pass 1 - get per-attribute types
@@ -94,10 +94,8 @@ void ContextAttributeVector::toJsonTypes
     std::string                 attrName  = it->first;
     std::map<std::string, int>  attrTypes = it->second;
 
-    writer.Key(attrName.c_str());
-    writer.StartObject();
-    writer.Key("types");
-    writer.StartArray();
+    writer.StartObject(attrName);
+    writer.StartArray("types");
 
     std::map<std::string, int>::iterator jt;
     unsigned int                         jx;
@@ -116,7 +114,7 @@ void ContextAttributeVector::toJsonTypes
       //
       if ((type != "") || (attrTypes.size() != 1))
       {
-        writer.String(type.c_str());
+        writer.String(type);
       }
     }
 
@@ -140,7 +138,7 @@ void ContextAttributeVector::toJsonTypes
 */
 void ContextAttributeVector::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  JsonHelper& writer,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   const std::vector<std::string>&  metadataFilter,
@@ -220,11 +218,11 @@ void ContextAttributeVector::toJson
 */
 void ContextAttributeVector::toJsonV1
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  bool                asJsonObject,
-  RequestType         request,
-  bool                omitValue,
-  bool                attrsAsName
+  JsonHelper& writer,
+  bool        asJsonObject,
+  RequestType request,
+  bool        omitValue,
+  bool        attrsAsName
 )
 {
   if (vec.size() == 0)

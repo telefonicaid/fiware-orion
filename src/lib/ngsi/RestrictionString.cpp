@@ -109,7 +109,7 @@ void RestrictionString::present(const std::string& indent)
 */
 void RestrictionString::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer
+  JsonHelper& writer
 )
 {
   if (string == "")
@@ -117,8 +117,7 @@ void RestrictionString::toJson
     return;
   }
 
-  writer.Key("restriction");
-  writer.String(string.c_str());
+  writer.String("restriction", string);
 }
 
 

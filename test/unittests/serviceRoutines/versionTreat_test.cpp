@@ -79,12 +79,14 @@ TEST(versionTreat, ok)
   EXPECT_TRUE(strstr(out.c_str(), "compiled_by") != NULL);
 
   extern const char*  orionUnitTestVersion;
-  std::string         expected = std::string("\"version\" : \"") + orionUnitTestVersion + "\"";
-  EXPECT_TRUE(strstr(out.c_str(), expected.c_str()) != NULL);
+  std::string         expected = std::string("\"version\": \"") + orionUnitTestVersion + "\"";
+  EXPECT_TRUE(strstr(out.c_str(), expected.c_str()) != NULL)
+      << out;
 
   versionSet("1.2.3");
   out       = restService(&ci, rs);
-  EXPECT_TRUE(strstr(out.c_str(), "\"version\" : \"1.2.3\"") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "\"version\": \"1.2.3\"") != NULL)
+      << out;
 
   versionSet("1.2.3");
   std::string version = versionGet();

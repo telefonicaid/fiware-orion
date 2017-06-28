@@ -27,8 +27,7 @@
 */
 #include <string>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/Request.h"
 #include "common/RenderFormat.h"
@@ -56,11 +55,11 @@ typedef struct ContextElement
   ContextElement(const std::string& id, const std::string& type, const std::string& isPattern);
   ContextElement(EntityId* eP);
 
-  void         toJsonV1(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  void         toJsonV1(JsonHelper& writer,
                         bool asJsonObject,
                         RequestType requestType,
                         bool omitAttributeValues = false);
-  void         toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+  void         toJson(JsonHelper& writer,
                       RenderFormat                     renderFormat,
                       const std::vector<std::string>&  attrsFilter,
                       const std::vector<std::string>&  metadataFilter,

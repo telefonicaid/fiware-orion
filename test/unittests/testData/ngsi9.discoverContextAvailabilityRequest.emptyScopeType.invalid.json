@@ -16,15 +16,15 @@
 		"pressure"
 	],
 	"restriction": {
-		"attributeExpression" : "Attribute Expression",
+		"attributeExpression": "Attribute Expression",
 		"scopes": [
 			{
-				"type" : "",
-				"value" : "sv1"
+				"type": "",
+				"value": "sv1"
 			},
 			{
-				"type" : "st2",
-				"value" : "sv2"
+				"type": "st2",
+				"value": "sv2"
 			}
 		]
 	}

@@ -50,12 +50,17 @@ void ContextElementVector::push_back(ContextElement* item)
 */
 void ContextElementVector::toJson
 (
-  rapidjson::Writer<rapidjson::StringBuffer>& writer,
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         requestType
+  JsonHelper& writer,
+  ApiVersion  apiVersion,
+  bool        asJsonObject,
+  RequestType requestType
 )
 {
+  if (vec.size() == 0)
+  {
+    return;
+  }
+
   writer.Key("contextElements");
   writer.StartArray();
 

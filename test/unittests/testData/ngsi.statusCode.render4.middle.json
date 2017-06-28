@@ -1,5 +1,7 @@
-"statusCode" : {
-  "code" : "200",
-  "reasonPhrase" : "OK",
-  "details" : "DETAILS"
+{
+  "statusCode": {
+    "code": "200",
+    "reasonPhrase": "OK",
+    "details": "DETAILS"
+  }
 }

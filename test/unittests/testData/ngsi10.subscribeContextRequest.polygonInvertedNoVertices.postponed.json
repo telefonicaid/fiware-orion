@@ -13,16 +13,16 @@
   "duration": "P5Y",
   "restriction": {
     "attributeExpression": "testRestriction",
-    "scopes" : [
+    "scopes": [
       {
-        "type" : "TEST-TYPE",
-        "value" : "test-value"
+        "type": "TEST-TYPE",
+        "value": "test-value"
       },
       {
-        "type" : "FIWARE_Location",
-        "value" : {
-          "polygon" : {
-            "inverted" : "true"
+        "type": "FIWARE_Location",
+        "value": {
+          "polygon": {
+            "inverted": "true"
           }
         }
       }

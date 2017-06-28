@@ -28,8 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
@@ -52,11 +51,11 @@ class EntityTypeResponse
                        bool                asJsonOut,
                        bool                collapsed,
                        int                 indent = -1);
-  void          toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                       ApiVersion          apiVersion,
-                       bool                asJsonObject,
-                       bool                asJsonOut,
-                       bool                collapsed);
+  void          toJson(JsonHelper& writer,
+                       ApiVersion  apiVersion,
+                       bool        asJsonObject,
+                       bool        asJsonOut,
+                       bool        collapsed);
 
   std::string   check(ApiVersion          apiVersion,
                       bool                asJsonObject,

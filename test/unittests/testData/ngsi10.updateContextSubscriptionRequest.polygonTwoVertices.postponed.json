@@ -1,32 +1,32 @@
 {
   "duration": "P5Y",
   "restriction": {
-    "attributeExpression" : "AE",
+    "attributeExpression": "AE",
     "scopes": [
       {
-        "type" : "FIWARE_Location",
-        "value" : {
-          "polygon" : {
-            "vertices" : [
+        "type": "FIWARE_Location",
+        "value": {
+          "polygon": {
+            "vertices": [
               {
-                "longitude" : "20",
-                "latitude"  : "20"
+                "longitude": "20",
+                "latitude": "20"
               },
               {
-                "longitude" : "30",
-                "latitude"  : "30"
+                "longitude": "30",
+                "latitude": "30"
               }
             ]
           }
         }
       },
       {
-        "type" : "t1",
-        "value" : "1"
+        "type": "t1",
+        "value": "1"
       },
       {
-        "type" : "t2",
-        "value" : "2"
+        "type": "t2",
+        "value": "2"
       }
     ]
   },

@@ -161,15 +161,14 @@ void Duration::present(const std::string& indent)
 *
 * Duration::toJson -
 */
-void Duration::toJson(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void Duration::toJson(JsonHelper& writer)
 {
   if (string == "" || !valid)
   {
     return;
   }
 
-  writer.Key("duration");
-  writer.String(string.c_str());
+  writer.String("duration", string);
 }
 
 
