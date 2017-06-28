@@ -150,8 +150,8 @@ def supported_extension(root, file):
     :param file:
     :return:
     """
-    extensions = ['py', 'cpp', 'h', 'xml', 'json', 'test', 'vtest', 'txt', 'sh', 'spec', 'cfg', 'DISABLED', 'xtest',
-                  'centos', 'js', 'jmx', 'vtestx', 'feature', 'go']
+    extensions = ['py', 'cpp', 'h', 'xml', 'json', 'test', 'txt', 'sh', 'spec', 'cfg', 'DISABLED', 'xtest',
+                  'centos', 'js', 'jmx', 'feature', 'go']
     names = ['makefile', 'Makefile']
 
     # Check extensions
