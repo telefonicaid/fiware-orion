@@ -519,13 +519,9 @@ void ContextAttribute::toJsonObject
           writer.Date(numberValue);
         }
         // regular number
-        else if (apiVersion == V2)
-        {
-          writer.Double(numberValue);
-        }
         else
         {
-          writer.String(toString(numberValue));
+          writer.Double(numberValue);
         }
         break;
 

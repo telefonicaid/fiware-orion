@@ -30,6 +30,7 @@
 #include <vector>
 #include <map>
 
+#include "common/dtoa.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 
