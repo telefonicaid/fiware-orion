@@ -77,6 +77,47 @@ TEST(CompoundValueNode, tree)
 
 /* ****************************************************************************
 *
+* complex value -
+*/
+TEST(CompoundValueNode, complex_value)
+{
+  orion::CompoundValueNode*  tree  = new orion::CompoundValueNode(orion::ValueTypeObject);
+  orion::CompoundValueNode*  entry1;
+  orion::CompoundValueNode*  array;
+  const char*                outFile = "ngsi.compoundValue.complex.json";
+
+  utInit();
+
+  lmTraceLevelSet(LmtCompoundValueAdd, true);
+
+  entry1 = tree->add(orion::ValueTypeObject, "entry1", "");
+  entry1->add(orion::ValueTypeNumber, "number", 1.333e50);
+  entry1->add(orion::ValueTypeBoolean, "boolean", false);
+  entry1->add(orion::ValueTypeString, "string", "\"\\\b\f\n\r\t");
+  array = entry1->add(orion::ValueTypeVector, "array", "");
+  array->add(orion::ValueTypeNumber, "vectitem", 1.0);
+  array->add(orion::ValueTypeNumber, "vectitem", 2.0);
+  array->add(orion::ValueTypeNumber, "vectitem", 3.0);
+  entry1->add(orion::ValueTypeNone, "null", "");
+
+  tree->add(orion::ValueTypeNumber, "entry2", 1.3);
+
+  tree->add(orion::ValueTypeVector, "entry3", "");
+
+  JsonHelper writer(2);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
+  tree->toJson(writer);
+  EXPECT_STREQ(expectedBuf, writer.str().c_str());
+
+  delete tree;
+
+  lmTraceLevelSet(LmtCompoundValueAdd, false);
+  utExit();
+}
+
+
+/* ****************************************************************************
+*
 * typeName -
 */
 TEST(CompoundValueNode, typeName)
