@@ -94,7 +94,7 @@ if (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
     #   and gcc 4.7.2 (see https://stackoverflow.com/questions/44758939/unexpected-valgrind-invalid-write-when-fstack-check-is-used
     #   for more detail). However, we don't want to use a compiler that is not meant for CentOS 6,
     #   which is the official distro for the context broker, so, we simply remove this option.
-    #   They may be reinstated once Orion context broker updates the official distro to be CentOS 7 (whic uses gcc 4.8.5)
+    #   They may be reinstated once Orion context broker updates the official distro to be CentOS 7 (which uses gcc 4.8.5)
     #  
 
     if (COVERAGE)
