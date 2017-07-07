@@ -51,6 +51,7 @@ export FUNC_TEST_RUNNING_UNDER_VALGRIND="true"
 export CB_TEST_PORT=9999
 
 
+
 # -----------------------------------------------------------------------------
 #
 # valgrindTestSuite.sh is always executed from the git root directory
@@ -59,11 +60,15 @@ export CB_TEST_PORT=9999
 #
 export PATH=$PATH:$PWD/scripts
 
+
+
 # -----------------------------------------------------------------------------
 #
 # global variables
 #
 CASES_DIR=cases
+typeset -i lost
+typeset -i memErrors
 
 
 
@@ -128,6 +133,7 @@ date
 date > /tmp/valgrindDbReset.log
 dbReset ALL
 totalStartTime=$(date +%s.%2N)
+
 
 
 # -----------------------------------------------------------------------------
@@ -308,11 +314,11 @@ function brokerStop()
 
 # -----------------------------------------------------------------------------
 #
-# Process valgrind result
+# Extract leak info from valgrind output file
 #
 # It uses as argument the .out file to process
 #
-function processResult()
+function leakInfo()
 {
     filename=$1
     # Get info from valgrind
@@ -346,6 +352,25 @@ function processResult()
     \rm valgrind.leakSummary valgrind.leakSummary2
 
     lost=$(add $definitelyLost1 $indirectlyLost1 $definitelyLost2 $indirectlyLost2)
+}
+
+
+
+# -----------------------------------------------------------------------------
+#
+# Extract error info from valgrind output file
+#
+# It uses as argument the .out file to process
+#
+function memErrorInfo()
+{
+  filename=$1
+
+  # Get info from valgrind file
+  writeErrors=$(grep -i "Invalid write" $filename | wc -l)
+  readErrors=$(grep -i "Invalid read" $filename | wc -l)
+
+  memErrors=$writeErrors+$readErrors
 }
 
 
@@ -428,9 +453,9 @@ function setNumberOfTests()
 
 # -----------------------------------------------------------------------------
 #
-# Failed tests
+# Leak in test?
 #
-function failedTest()
+function leakFound()
 {
   _valgrindFile=$1
   _file=$2
@@ -454,6 +479,26 @@ function failedTest()
 
   failedTests[$testFailures+1]=$okString
 }
+
+
+
+# -----------------------------------------------------------------------------
+#
+# memErrorFound
+#
+function memErrorFound()
+{
+  _valgrindFile=$1
+  _file=$2
+  _memErrors=$3
+  _testNo=$4
+
+  echo "FAILED (mem errors: $_memErrors). Check $_valgrindFile for clues"
+
+  memErrorV[$memErrorNo]="$_testNo: $_file shows $_memErrors memory errors"
+  memErrorNo=$memErrorNo+1
+}
+
 
 
 # -----------------------------------------------------------------------------
@@ -501,14 +546,22 @@ setNumberOfTests
 
 declare -A failedTests
 declare -A harnessErrorV
+declare -A memErrorV
 typeset -i harnessErrors
 typeset -i testNo
 typeset -i testFailures
+typeset -i memErrorNo
 testNo=0;
 testFailures=0
 harnessErrors=0
+memErrorNo=0
 
 
+#
+# FIXME: The "pure" .vtest test are deprecated, so memory corruption checks are not done for them, only memory errors.
+#        Probably this is going to be removed completely in a soon-coming refactoring
+#
+#
 if [ "$runPure" -eq "1" ] || [ "$leakTest" == "on" ]
 then
   leakTestFile=""
@@ -541,8 +594,8 @@ then
 
     # Executing $vtest
     NAME="./$vtest"
-    typeset -i lost
     lost=0
+    memErrors=0
 
     if [ "$dryrun" == "off" ]
     then
@@ -575,13 +628,18 @@ then
         mv /tmp/accumulator_$LISTENER_PORT       $vtest.accumulator_$LISTENER_PORT
         mv /tmp/accumulator_$LISTENER2_PORT      $vtest.accumulator_$LISTENER2_PORT
 
-        failText=$(failedTest "$vtest.valgrind.out" $vtest 0 "valgrind" $xTestNo)
+        failText=$(leakFound "$vtest.valgrind.out" $vtest 0 "valgrind" $xTestNo)
       else
         fileCleanup $vtest
 
         typeset -i headEndLine1
         typeset -i headEndLine2
-        processResult ${NAME}.out
+
+        lost=0
+        leakInfo ${NAME}.out
+
+        memErrors=0
+        memErrorInfo ${NAME}.out
         failText=''
       fi
     else
@@ -590,7 +648,10 @@ then
 
     if [ "$lost" != "0" ]
     then
-      failedTest "test/valgrind/$vtest.*" $vtest $lost "valgrind" $xTestNo
+      leakFound "test/valgrind/$vtest.*" $vtest $lost "valgrind" $xTestNo
+    elif [ "$memErrors" != "0" ]
+    then
+      memErrorFound "test/valgrind/$vtest.*" $vtest "$memErrors" $xTestNo
     elif [ "$vTestResult" == 0 ]
     then
       echo $okString "($diffTime seconds)" $failText
@@ -601,6 +662,8 @@ then
     echo >> /tmp/valgrindTestSuiteLog
   done
 fi
+
+
 
 #
 # No diff tool for harnessTest when running from valgrind test suite
@@ -667,7 +730,7 @@ then
     printImplementedString $htest
     typeset -i lost
     lost=0
-
+    memErrors=0
     if [ "$dryrun" == "off" ]
     then
       detailForOkString=''
@@ -703,23 +766,26 @@ then
       typeset -i headEndLine1
       typeset -i headEndLine2
       vMsg processing $directory/$htest.valgrind.out in $(pwd)
-      vMsg "calling processResult"
-      processResult test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
-      vMsg "called processResult"
+
+      lost=0
+      leakInfo test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
+
+      memErrors=0
+      memErrorInfo test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
     else
       if [ "$dryLeaks" == "on" ]
       then
         modula3=$(echo $testNo % 30 | bc)
         if [ $modula3 == 0 ]
         then
-            failedTest "$htest.valgrind.out" $htest 1024 $dir $xTestNo
+          leakFound "$htest.valgrind.out" $htest 1024 $dir $xTestNo
         fi
 
         modula4=$(echo $testNo % 40 | bc)
         if [ $modula4 == 0 ]
         then
-            harnessErrorV[$harnessErrors]="$testNo: $file (exit code XXX)"
-            harnessErrors=$harnessErrors+1
+          harnessErrorV[$harnessErrors]="$testNo: $file (exit code XXX)"
+          harnessErrors=$harnessErrors+1
         fi
       fi
     fi
@@ -727,13 +793,22 @@ then
 
     if [ "$lost" != "0" ]
     then
-      failedTest "$htest.valgrind.out" $htest $lost $dir $xTestNo
-    else
+      leakFound "$htest.valgrind.out" $htest $lost $dir $xTestNo
+    fi
+
+    if [ "$memErrors" != "0" ]
+    then
+      memErrorFound "$htest.valgrind.out" $htest $memErrors $xTestNo
+    fi
+
+    if [ "$lost" == "0" ] && [ "$memErrors" == "0" ]
+    then
       echo $okString "($diffTime seconds)" $detailForOkString
     fi
 
   done
 fi
+
 
 retval=0
 if [ "${failedTests[1]}" != "" ]
@@ -751,7 +826,28 @@ then
   done
 
   echo "---------------------------------------"
+  echo
   retval=1
+fi
+
+
+if [ $memErrorNo != 0 ]
+then
+  echo
+  echo
+  echo "$memErrorNo test cases show memory errors:"
+  typeset -i ix
+  ix=0
+
+  while [ $ix -ne $memErrorNo ]
+  do
+    echo "  ${memErrorV[$ix]}"
+    ix=$ix+1
+  done
+
+  echo "---------------------------------------"
+  retval=1
+  echo
 fi
 
 
@@ -770,6 +866,8 @@ then
   done
 
   echo "---------------------------------------"
+  retval=1
+  echo
 fi
 
 totalEndTime=$(date +%s.%2N)
