@@ -94,7 +94,7 @@ The Orion Context Broker comes with a suite of valgrind and end-to-end tests tha
 
 * Install the required tools:
 
-        sudo yum install python python-flask python-jinja2 curl libxml2 nc mongodb valgrind libxslt
+        sudo yum install python python-flask python-jinja2 curl libxml2 nc mongodb valgrind libxslt bc
 
 * Run valgrind tests (it takes some time, please be patient):
 
