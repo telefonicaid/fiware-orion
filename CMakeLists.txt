@@ -85,6 +85,7 @@ if (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
     #   remove_definitions().
     #
     #add_definitions(-fstack-check -fstack-protector)
+    add_definitions(-fstack-protector)
     #
     # NEW:
     #   The option -fstack-check makes valgrind report false positives (millions) in CentOS 6.
