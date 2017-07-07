@@ -76,14 +76,25 @@ if (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
     add_definitions(-DDEBUG -DDEBUG_$ENV{USER} -DDEBUG_${USER})
 
     #
-    # Note that stack protection is activated only in debug compilation.
-    # This is due that this directive makes the compiler introduce code at the beginning/end of each functions,
-    # so it has a pretty big impact on performance
+    # OLD:
+    #   Note that stack protection is activated only in debug compilation.
+    #   This is due that this directive makes the compiler introduce code at the beginning/end of each functions,
+    #   so it has a pretty big impact on performance
     #
-    # Our unit tests don't pass the compilation with "stack protection", so we turn it off using
-    # remove_definitions().
+    #   Our unit tests don't pass the compilation with "stack protection", so we turn it off using
+    #   remove_definitions().
     #
-    add_definitions(-fstack-check -fstack-protector)
+    #add_definitions(-fstack-check -fstack-protector)
+    #
+    # NEW:
+    #   The option -fstack-check makes valgrind report false positives (millions) in CentOS 6.
+    #   This makes the output impossible to use and we have decided to remove these two options (both of them).
+    #   The cause seems to be a bug in the compiler (gcc 4.4.7) and the error disappears for newer versions of the compiler.
+    #   However, we don't want to use a compiler that is not meant for CentOS 6,
+    #   which is the official distro for the context broker, so, we simply remove these two options.
+    #   They may be reinstated once Orion context broker updates the official distro to be CentOS 7
+    #
+
     if (COVERAGE)
         MESSAGE("cmake: Coverage compilation")
         # LM_T macros introduce condition branchs which are not never traversed. Removing LM_T macros doesn't have 
