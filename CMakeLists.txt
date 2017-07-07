@@ -93,7 +93,7 @@ if (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
     #   The cause seems to be a bug in the compiler (gcc 4.4.7), fixed in some moment between that version 
     #   and gcc 4.7.2 (see https://stackoverflow.com/questions/44758939/unexpected-valgrind-invalid-write-when-fstack-check-is-used
     #   for more detail). However, we don't want to use a compiler that is not meant for CentOS 6,
-    #   which is the official distro for the context broker, so, we simply remove these two options.
+    #   which is the official distro for the context broker, so, we simply remove this options.
     #   They may be reinstated once Orion context broker updates the official distro to be CentOS 7 (whic uses gcc 4.8.5)
     #  
 
