@@ -140,8 +140,8 @@ std::string EntityId::toJson(void) const
   out += ",";
   out += JSON_VALUE("type", typeEscaped);
 
-  delete typeEscaped;
-  delete idEscaped;
+  free(typeEscaped);
+  free(idEscaped);
 
   return out;
 }

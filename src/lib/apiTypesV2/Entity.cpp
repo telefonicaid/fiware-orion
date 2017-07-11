@@ -45,7 +45,7 @@
 *
 * Entity::Entity - 
 */
-Entity::Entity(): typeGiven(false), renderId(true), creDate(0), modDate(0)
+Entity::Entity(): isTypePattern(false), typeGiven(false), renderId(true), creDate(0), modDate(0)
 {
 }
 

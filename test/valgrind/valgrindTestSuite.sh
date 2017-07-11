@@ -68,7 +68,7 @@ export PATH=$PATH:$PWD/scripts
 #
 CASES_DIR=cases
 typeset -i lost
-typeset -i memErrors
+typeset -i valgrindErrors
 
 
 
@@ -362,15 +362,15 @@ function leakInfo()
 #
 # It uses as argument the .out file to process
 #
-function memErrorInfo()
+function valgrindErrorInfo()
 {
   filename=$1
 
+  #
   # Get info from valgrind file
-  writeErrors=$(grep -i "Invalid write" $filename | wc -l)
-  readErrors=$(grep -i "Invalid read" $filename | wc -l)
+  #
 
-  memErrors=$writeErrors+$readErrors
+  valgrindErrors=$(grep -i "ERROR SUMMARY:" $filename | grep -v "ERROR SUMMARY: 0" | awk '{ print $4 }')
 }
 
 
@@ -484,19 +484,19 @@ function leakFound()
 
 # -----------------------------------------------------------------------------
 #
-# memErrorFound
+# valgrindErrorFound
 #
-function memErrorFound()
+function valgrindErrorFound()
 {
   _valgrindFile=$1
   _file=$2
-  _memErrors=$3
+  _valgrindErrors=$3
   _testNo=$4
 
-  echo "FAILED (mem errors: $_memErrors). Check $_valgrindFile for clues"
+  echo "FAILED (valgrind errors: $_valgrindErrors). Check $_valgrindFile for clues"
 
-  memErrorV[$memErrorNo]="$_testNo: $_file shows $_memErrors memory errors"
-  memErrorNo=$memErrorNo+1
+  valgrindErrorV[$valgrindErrorNo]="$_testNo: $_file shows $_valgrindErrors valgrind errors"
+  valgrindErrorNo=$valgrindErrorNo+1
 }
 
 
@@ -546,19 +546,19 @@ setNumberOfTests
 
 declare -A failedTests
 declare -A harnessErrorV
-declare -A memErrorV
+declare -A valgrindErrorV
 typeset -i harnessErrors
 typeset -i testNo
 typeset -i testFailures
-typeset -i memErrorNo
+typeset -i valgrindErrorNo
 testNo=0;
 testFailures=0
 harnessErrors=0
-memErrorNo=0
+valgrindErrorNo=0
 
 
 #
-# FIXME: The "pure" .vtest test are deprecated, so memory corruption checks are not done for them, only memory errors.
+# FIXME: The "pure" .vtest test are deprecated, so memory corruption checks are not done for them, only valgrind errors.
 #        Probably this is going to be removed completely in a soon-coming refactoring
 #
 #
@@ -595,7 +595,7 @@ then
     # Executing $vtest
     NAME="./$vtest"
     lost=0
-    memErrors=0
+    valgrindErrors=0
 
     if [ "$dryrun" == "off" ]
     then
@@ -638,8 +638,8 @@ then
         lost=0
         leakInfo ${NAME}.out
 
-        memErrors=0
-        memErrorInfo ${NAME}.out
+        valgrindErrors=0
+        valgrindErrorInfo ${NAME}.out
         failText=''
       fi
     else
@@ -649,9 +649,9 @@ then
     if [ "$lost" != "0" ]
     then
       leakFound "test/valgrind/$vtest.*" $vtest $lost "valgrind" $xTestNo
-    elif [ "$memErrors" != "0" ]
+    elif [ "$valgrindErrors" != "0" ]
     then
-      memErrorFound "test/valgrind/$vtest.*" $vtest "$memErrors" $xTestNo
+      valgrindErrorFound "test/valgrind/$vtest.*" $vtest "$valgrindErrors" $xTestNo
     elif [ "$vTestResult" == 0 ]
     then
       echo $okString "($diffTime seconds)" $failText
@@ -730,7 +730,7 @@ then
     printImplementedString $htest
     typeset -i lost
     lost=0
-    memErrors=0
+    valgrindErrors=0
     if [ "$dryrun" == "off" ]
     then
       detailForOkString=''
@@ -770,8 +770,8 @@ then
       lost=0
       leakInfo test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
 
-      memErrors=0
-      memErrorInfo test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
+      valgrindErrors=0
+      valgrindErrorInfo test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
     else
       if [ "$dryLeaks" == "on" ]
       then
@@ -796,12 +796,12 @@ then
       leakFound "$htest.valgrind.out" $htest $lost $dir $xTestNo
     fi
 
-    if [ "$memErrors" != "0" ]
+    if [ "$valgrindErrors" != "0" ]
     then
-      memErrorFound "$htest.valgrind.out" $htest $memErrors $xTestNo
+      valgrindErrorFound "$htest.valgrind.out" $htest $valgrindErrors $xTestNo
     fi
 
-    if [ "$lost" == "0" ] && [ "$memErrors" == "0" ]
+    if [ "$lost" == "0" ] && [ "$valgrindErrors" == "0" ]
     then
       echo $okString "($diffTime seconds)" $detailForOkString
     fi
@@ -831,17 +831,17 @@ then
 fi
 
 
-if [ $memErrorNo != 0 ]
+if [ $valgrindErrorNo != 0 ]
 then
   echo
   echo
-  echo "$memErrorNo test cases show memory errors:"
+  echo "$valgrindErrorNo test cases show valgrind errors:"
   typeset -i ix
   ix=0
 
-  while [ $ix -ne $memErrorNo ]
+  while [ $ix -ne $valgrindErrorNo ]
   do
-    echo "  ${memErrorV[$ix]}"
+    echo "  ${valgrindErrorV[$ix]}"
     ix=$ix+1
   done
 
