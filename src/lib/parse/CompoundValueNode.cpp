@@ -796,8 +796,24 @@ std::string CompoundValueNode::render(ApiVersion apiVersion, const std::string& 
 std::string CompoundValueNode::toJson(bool isLastElement, bool comma)
 {
   std::string  out       = "";
-  bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
-  std::string  key       = (container->valueType == orion::ValueTypeVector)? "item" : name;
+  bool         jsonComma = false;
+  std::string  key       = name;
+
+  if (container != NULL)
+  {
+    if (!container->childV.empty())
+    {
+      if (siblingNo < ((int) container->childV.size() - 1))
+      {
+        jsonComma = true;
+      }
+    }
+
+    if (container->valueType == orion::ValueTypeVector)
+    {
+      key = "item";
+    }
+  }
 
   // No "comma after" if toplevel
   if ((container == this) || (comma == false))

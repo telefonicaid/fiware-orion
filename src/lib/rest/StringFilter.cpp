@@ -47,7 +47,11 @@ using namespace mongo;
 *
 * StringFilterItem::StringFilterItem -
 */
-StringFilterItem::StringFilterItem() : compiledPattern(false) {}
+StringFilterItem::StringFilterItem() : compiledPattern(false)
+{
+  numberList.clear();
+  stringList.clear();
+}
 
 
 

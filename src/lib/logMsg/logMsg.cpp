@@ -1530,6 +1530,8 @@ char* lmTraceGet(char* levelString, int levelStringSize)
   int       j = 0;
   int       levels[256];
 
+  bzero(levels, sizeof(levels));
+
   if (levelString == NULL)
   {
     LOG_OUT(("returning NULL"));
@@ -1561,8 +1563,8 @@ char* lmTraceGet(char* levelString, int levelStringSize)
     int   prev   = levels[i - 1];
     int   diss   = levels[i];
     int   next   = levels[i + 1];
-    bool  before = (diss == prev + 1);
-    bool  after  = (diss == next - 1);
+    bool  before = (diss == (prev + 1));
+    bool  after  = (diss == (next - 1));
     char  str[12];
 
     if (i == 255)
