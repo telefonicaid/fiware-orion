@@ -669,6 +669,7 @@ fi
 # No diff tool for harnessTest when running from valgrind test suite
 #
 unset CB_DIFF_TOOL
+orderedExit=0
 
 if [ "$runHarness" -eq "1" ]
 then
@@ -805,9 +806,22 @@ then
     then
       echo $okString "($diffTime seconds)" $detailForOkString
     fi
-
   done
+  orderedExit=1
 fi
+
+
+#
+# If 'orderedExit' is not set to 1 right after the loop, then for some reason (syntax error somewhere in the loop) this
+# last line, right after the loop ends, hasn't been executed (this last line sets 'orderedExit' to 1).
+# If this is the case, we cannot continue, but must exit here, signaling an error to the caller (exit code 2).
+#
+if [ "$orderedExit" != 1 ]
+then
+  echo "Something went wrong"
+  exit 2
+fi
+
 
 
 retval=0
