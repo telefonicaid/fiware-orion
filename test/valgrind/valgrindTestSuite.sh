@@ -370,7 +370,7 @@ function valgrindErrorInfo()
   # Get info from valgrind file
   #
 
-  valgrindErrors=$(grep -i "ERROR SUMMARY:" $filename | grep -v "ERROR SUMMARY: 0" | awk '{ print $4 }')
+  valgrindErrors=$(grep -i "ERROR SUMMARY:" $filename | tail -1 | awk '{ print $4 }')
 }
 
 
