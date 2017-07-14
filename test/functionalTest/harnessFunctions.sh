@@ -421,8 +421,11 @@ function localBrokerStart()
     sleep 1
     # FIXME: brokerStartAwait $port  instead of sleep 1?
   else
-    valgrind $CB_START_CMD > /tmp/valgrind.out 2>&1 &
-
+    #
+    # Important: the -v flag must be present so that the text "X errors in context Y of Z" is present in the output
+    #
+    valgrind -v --leak-check=full --track-origins=yes --trace-children=yes $CB_START_CMD > /tmp/valgrind.out 2>&1 &
+    
     # Waiting for valgrind to start (sleep a maximum of 10 secs)
     brokerStartAwait $port
     if [ "$result" != 0 ]
