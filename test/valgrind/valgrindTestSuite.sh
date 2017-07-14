@@ -360,7 +360,7 @@ function leakInfo()
 #
 # Extract error info from valgrind output file
 #
-# It uses as argument the .out file to process
+# The first and only argument to 'valgrindErrorInfo' is the valgrind.out file to process
 #
 function valgrindErrorInfo()
 {
@@ -369,8 +369,14 @@ function valgrindErrorInfo()
   #
   # Get info from valgrind file
   #
-
-  valgrindErrors=$(grep -i "ERROR SUMMARY:" $filename | tail -1 | awk '{ print $4 }')
+  typeset -i vErrors
+  vErrors=0
+  for num in $(grep "errors in context" $filename | awk '{ print $2 }')
+  do
+    vErrors=$vErrors+num
+  done
+  valgrindErrors=$vErrors
+  vMsg valgrindErrors: $valgrindErrors
 }
 
 
