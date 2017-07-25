@@ -1,0 +1,193 @@
+# Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Self notification protection one-hop case
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create self-subscription for entity E attribute A
+# 02. Create entity with A = boom
+# 03. Wait for a while and check that only one notification was sent
+# 04. Get entity with value boomx
+# 05. Check the warning about loop detection in the log
+
+echo "01. Create self-subscription for entity E attribute A"
+echo "====================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E"
+      }
+    ],
+    "condition": {
+      "attrs": [ "A" ]
+    }
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:'${CB_PORT}'/v2/entities/E/attrs",
+      "headers": {
+        "Content-type": "application/json"
+      },
+      "payload": "%7B %22A%22: %7B %22value%22: %22${A}x%22 %2C %22type%22: %22Text%22 %7D %7D"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity with A = boom"
+echo "==============================="
+payload='{
+  "id": "E",
+  "type": "Thing",
+  "A": {
+    "value": "boom",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Wait for a while and check that only one notification was sent"
+echo "=================================================================="
+sleep 5s
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "04. Get entity with value boomx"
+echo "==============================="
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo "05. Check the warning about loop detection in the log"
+echo "====================================================="
+egrep 'WARN' /tmp/contextBroker.log
+echo
+echo
+
+
+--REGEXPECT--
+01. Create self-subscription for entity E attribute A
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity with A = boom
+===============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Wait for a while and check that only one notification was sent
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 471
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "httpCustom": {
+                "headers": {
+                    "Content-type": "application/json"
+                },
+                "payload": "%7B %22A%22: %7B %22value%22: %22${A}x%22 %2C %22type%22: %22Text%22 %7D %7D",
+                "url": "http://localhost:REGEX(\d+)/v2/entities/E/attrs"
+            },
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "timesSent": 1
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [
+                    "A"
+                ]
+            },
+            "entities": [
+                {
+                    "id": "E"
+                }
+            ]
+        }
+    }
+]
+
+
+04. Get entity with value boomx
+===============================
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Text",
+        "value": "boomx"
+    },
+    "id": "E",
+    "type": "Thing"
+}
+
+
+05. Check the warning about loop detection in the log
+=====================================================
+REGEX(.*) msg=Notification loop detected for entity id <E> type <Thing>, skipping subscription triggering
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

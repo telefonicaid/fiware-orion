@@ -51,6 +51,7 @@ export FUNC_TEST_RUNNING_UNDER_VALGRIND="true"
 export CB_TEST_PORT=9999
 
 
+
 # -----------------------------------------------------------------------------
 #
 # valgrindTestSuite.sh is always executed from the git root directory
@@ -59,11 +60,15 @@ export CB_TEST_PORT=9999
 #
 export PATH=$PATH:$PWD/scripts
 
+
+
 # -----------------------------------------------------------------------------
 #
 # global variables
 #
 CASES_DIR=cases
+typeset -i lost
+typeset -i valgrindErrors
 
 
 
@@ -128,6 +133,7 @@ date
 date > /tmp/valgrindDbReset.log
 dbReset ALL
 totalStartTime=$(date +%s.%2N)
+
 
 
 # -----------------------------------------------------------------------------
@@ -308,11 +314,11 @@ function brokerStop()
 
 # -----------------------------------------------------------------------------
 #
-# Process valgrind result
+# Extract leak info from valgrind output file
 #
 # It uses as argument the .out file to process
 #
-function processResult()
+function leakInfo()
 {
     filename=$1
     # Get info from valgrind
@@ -346,6 +352,31 @@ function processResult()
     \rm valgrind.leakSummary valgrind.leakSummary2
 
     lost=$(add $definitelyLost1 $indirectlyLost1 $definitelyLost2 $indirectlyLost2)
+}
+
+
+
+# -----------------------------------------------------------------------------
+#
+# Extract error info from valgrind output file
+#
+# The first and only argument to 'valgrindErrorInfo' is the valgrind.out file to process
+#
+function valgrindErrorInfo()
+{
+  filename=$1
+
+  #
+  # Get info from valgrind file
+  #
+  typeset -i vErrors
+  vErrors=0
+  for num in $(grep "errors in context" $filename | awk '{ print $2 }')
+  do
+    vErrors=$vErrors+$num
+  done
+  valgrindErrors=$vErrors
+  vMsg valgrindErrors: $valgrindErrors
 }
 
 
@@ -428,9 +459,9 @@ function setNumberOfTests()
 
 # -----------------------------------------------------------------------------
 #
-# Failed tests
+# Leak in test?
 #
-function failedTest()
+function leakFound()
 {
   _valgrindFile=$1
   _file=$2
@@ -454,6 +485,26 @@ function failedTest()
 
   failedTests[$testFailures+1]=$okString
 }
+
+
+
+# -----------------------------------------------------------------------------
+#
+# valgrindErrorFound
+#
+function valgrindErrorFound()
+{
+  _valgrindFile=$1
+  _file=$2
+  _valgrindErrors=$3
+  _testNo=$4
+
+  echo "FAILED (valgrind errors: $_valgrindErrors). Check $_valgrindFile for clues"
+
+  valgrindErrorV[$valgrindErrorNo]="$_testNo: $_file shows $_valgrindErrors valgrind errors"
+  valgrindErrorNo=$valgrindErrorNo+1
+}
+
 
 
 # -----------------------------------------------------------------------------
@@ -501,14 +552,22 @@ setNumberOfTests
 
 declare -A failedTests
 declare -A harnessErrorV
+declare -A valgrindErrorV
 typeset -i harnessErrors
 typeset -i testNo
 typeset -i testFailures
+typeset -i valgrindErrorNo
 testNo=0;
 testFailures=0
 harnessErrors=0
+valgrindErrorNo=0
 
 
+#
+# FIXME: The "pure" .vtest test are deprecated, so memory corruption checks are not done for them, only valgrind errors.
+#        Probably this is going to be removed completely in a soon-coming refactoring
+#
+#
 if [ "$runPure" -eq "1" ] || [ "$leakTest" == "on" ]
 then
   leakTestFile=""
@@ -541,8 +600,8 @@ then
 
     # Executing $vtest
     NAME="./$vtest"
-    typeset -i lost
     lost=0
+    valgrindErrors=0
 
     if [ "$dryrun" == "off" ]
     then
@@ -575,13 +634,18 @@ then
         mv /tmp/accumulator_$LISTENER_PORT       $vtest.accumulator_$LISTENER_PORT
         mv /tmp/accumulator_$LISTENER2_PORT      $vtest.accumulator_$LISTENER2_PORT
 
-        failText=$(failedTest "$vtest.valgrind.out" $vtest 0 "valgrind" $xTestNo)
+        failText=$(leakFound "$vtest.valgrind.out" $vtest 0 "valgrind" $xTestNo)
       else
         fileCleanup $vtest
 
         typeset -i headEndLine1
         typeset -i headEndLine2
-        processResult ${NAME}.out
+
+        lost=0
+        leakInfo ${NAME}.out
+
+        valgrindErrors=0
+        valgrindErrorInfo ${NAME}.out
         failText=''
       fi
     else
@@ -590,7 +654,10 @@ then
 
     if [ "$lost" != "0" ]
     then
-      failedTest "test/valgrind/$vtest.*" $vtest $lost "valgrind" $xTestNo
+      leakFound "test/valgrind/$vtest.*" $vtest $lost "valgrind" $xTestNo
+    elif [ "$valgrindErrors" != "0" ]
+    then
+      valgrindErrorFound "test/valgrind/$vtest.*" $vtest "$valgrindErrors" $xTestNo
     elif [ "$vTestResult" == 0 ]
     then
       echo $okString "($diffTime seconds)" $failText
@@ -602,10 +669,13 @@ then
   done
 fi
 
+
+
 #
 # No diff tool for harnessTest when running from valgrind test suite
 #
 unset CB_DIFF_TOOL
+orderedExit=0
 
 if [ "$runHarness" -eq "1" ]
 then
@@ -667,7 +737,7 @@ then
     printImplementedString $htest
     typeset -i lost
     lost=0
-
+    valgrindErrors=0
     if [ "$dryrun" == "off" ]
     then
       detailForOkString=''
@@ -703,23 +773,26 @@ then
       typeset -i headEndLine1
       typeset -i headEndLine2
       vMsg processing $directory/$htest.valgrind.out in $(pwd)
-      vMsg "calling processResult"
-      processResult test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
-      vMsg "called processResult"
+
+      lost=0
+      leakInfo test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
+
+      valgrindErrors=0
+      valgrindErrorInfo test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
     else
       if [ "$dryLeaks" == "on" ]
       then
         modula3=$(echo $testNo % 30 | bc)
         if [ $modula3 == 0 ]
         then
-            failedTest "$htest.valgrind.out" $htest 1024 $dir $xTestNo
+          leakFound "$htest.valgrind.out" $htest 1024 $dir $xTestNo
         fi
 
         modula4=$(echo $testNo % 40 | bc)
         if [ $modula4 == 0 ]
         then
-            harnessErrorV[$harnessErrors]="$testNo: $file (exit code XXX)"
-            harnessErrors=$harnessErrors+1
+          harnessErrorV[$harnessErrors]="$testNo: $file (exit code XXX)"
+          harnessErrors=$harnessErrors+1
         fi
       fi
     fi
@@ -727,13 +800,35 @@ then
 
     if [ "$lost" != "0" ]
     then
-      failedTest "$htest.valgrind.out" $htest $lost $dir $xTestNo
-    else
-      echo $okString "($diffTime seconds)" $detailForOkString
+      leakFound "$htest.valgrind.out" $htest $lost $dir $xTestNo
     fi
 
+    if [ "$valgrindErrors" != "0" ]
+    then
+      valgrindErrorFound "$htest.valgrind.out" $htest $valgrindErrors $xTestNo
+    fi
+
+    if [ "$lost" == "0" ] && [ "$valgrindErrors" == "0" ]
+    then
+      echo $okString "($diffTime seconds)" $detailForOkString
+    fi
   done
+  orderedExit=1
 fi
+
+
+#
+# If 'orderedExit' is not set to 1 right after the loop, then for some reason (syntax error somewhere in the loop) this
+# last line, right after the loop ends, hasn't been executed (this last line sets 'orderedExit' to 1).
+# If this is the case, we cannot continue, but must exit here, signaling an error to the caller (exit code 2).
+#
+if [ "$orderedExit" != 1 ]
+then
+  echo "Something went wrong"
+  exit 2
+fi
+
+
 
 retval=0
 if [ "${failedTests[1]}" != "" ]
@@ -751,7 +846,28 @@ then
   done
 
   echo "---------------------------------------"
+  echo
   retval=1
+fi
+
+
+if [ $valgrindErrorNo != 0 ]
+then
+  echo
+  echo
+  echo "$valgrindErrorNo test cases show valgrind errors:"
+  typeset -i ix
+  ix=0
+
+  while [ $ix -ne $valgrindErrorNo ]
+  do
+    echo "  ${valgrindErrorV[$ix]}"
+    ix=$ix+1
+  done
+
+  echo "---------------------------------------"
+  retval=1
+  echo
 fi
 
 
@@ -770,6 +886,8 @@ then
   done
 
   echo "---------------------------------------"
+  retval=1
+  echo
 fi
 
 totalEndTime=$(date +%s.%2N)

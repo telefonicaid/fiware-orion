@@ -249,13 +249,16 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     //
     // 2. URL
     //
-    macroSubstitute(&url, httpInfo.url, ce);
+    if (macroSubstitute(&url, httpInfo.url, ce) == false)
+    {
+      // Warning already logged in macroSubstitude()
+      return paramsV;  // empty vector
+    }
 
 
     //
     // 3. Payload
     //
-
     if (httpInfo.payload == "")
     {
       NotifyContextRequest   ncr;
@@ -269,12 +272,17 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     }
     else
     {
-      macroSubstitute(&payload, httpInfo.payload, ce);
+      if (macroSubstitute(&payload, httpInfo.payload, ce) == false)
+      {
+        // Warning already logged in macroSubstitude()
+        return paramsV;  // empty vector
+      }
+
       char* pload  = curl_unescape(payload.c_str(), payload.length());
       payload      = std::string(pload);
       renderFormat = NGSI_V2_CUSTOM;
       mimeType     = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
-      free(pload);
+      curl_free(pload);
     }
 
 
@@ -286,8 +294,12 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       std::string key   = it->first;
       std::string value = it->second;
 
-      macroSubstitute(&key,   it->first, ce);
-      macroSubstitute(&value, it->second, ce);
+      if ((macroSubstitute(&key, it->first, ce) == false) || (macroSubstitute(&value, it->second, ce) == false))
+      {
+        // Warning already logged in macroSubstitude()
+        return paramsV;  // empty vector
+      }
+
       if ((value == "") || (key == ""))
       {
         // To avoid e.g '?a=&b=&c='
@@ -305,8 +317,11 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       std::string key   = it->first;
       std::string value = it->second;
 
-      macroSubstitute(&key,   it->first, ce);
-      macroSubstitute(&value, it->second, ce);
+      if ((macroSubstitute(&key, it->first, ce) == false) || (macroSubstitute(&value, it->second, ce) == false))
+      {
+        // Warning already logged in macroSubstitude()
+        return paramsV;  // empty vector
+      }
 
       if (key == "")
       {
@@ -329,7 +344,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     if (!parseUrl(url, host, port, uriPath, protocol))
     {
       LM_E(("Runtime Error (not sending NotifyContextRequest: malformed URL: '%s')", httpInfo.url.c_str()));
-      return paramsV;  //empty vector
+      return paramsV;  // empty vector
     }
 
 
@@ -373,6 +388,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     params->fiwareCorrelator = fiwareCorrelator;
     params->extraHeaders     = headers;
     params->registration     = false;
+    params->subscriptionId   = subscriptionId.get();
 
     paramsV->push_back(params);
   }
@@ -402,7 +418,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     ConnectionInfo                    ci;
     Verb                              verb    = httpInfo.verb;
     std::vector<SenderThreadParams*>* paramsV = NULL;
-
 
     if ((verb == NOVERB) || (verb == UNKNOWNVERB) || disableCusNotif)
     {

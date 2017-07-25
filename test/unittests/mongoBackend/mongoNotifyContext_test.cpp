@@ -200,7 +200,7 @@ TEST(mongoNotifyContextRequest, Ent1Attr1)
     req.contextElementResponseVector.push_back(cerP);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector, "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -342,7 +342,7 @@ TEST(mongoNotifyContextRequest, Ent1AttrN)
     req.contextElementResponseVector.push_back(cerP);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector, "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -489,7 +489,7 @@ TEST(mongoNotifyContextRequest, EntNAttr1)
     req.contextElementResponseVector.push_back(cer2P);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector, "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -640,7 +640,7 @@ TEST(mongoNotifyContextRequest, EntNAttrN)
     req.contextElementResponseVector.push_back(cer2P);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector, "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -780,7 +780,7 @@ TEST(mongoNotifyContextRequest, createEntity)
     req.contextElementResponseVector.push_back(cerP);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector, "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);

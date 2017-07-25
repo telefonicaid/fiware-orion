@@ -516,10 +516,11 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
     headerP->tenant = value;
     toLowercase((char*) headerP->tenant.c_str());
   }
-  else if (strcasecmp(key.c_str(), "X-Auth-Token") == 0)      headerP->xauthToken     = value;
-  else if (strcasecmp(key.c_str(), "X-Real-IP") == 0)         headerP->xrealIp        = value;
-  else if (strcasecmp(key.c_str(), "X-Forwarded-For") == 0)   headerP->xforwardedFor  = value;
-  else if (strcasecmp(key.c_str(), "Fiware-Correlator") == 0) headerP->correlator     = value;
+  else if (strcasecmp(key.c_str(), "X-Auth-Token") == 0)        headerP->xauthToken         = value;
+  else if (strcasecmp(key.c_str(), "X-Real-IP") == 0)           headerP->xrealIp            = value;
+  else if (strcasecmp(key.c_str(), "X-Forwarded-For") == 0)     headerP->xforwardedFor      = value;
+  else if (strcasecmp(key.c_str(), "Fiware-Correlator") == 0)   headerP->correlator         = value;
+  else if (strcasecmp(key.c_str(), "Ngsiv2-AttrsFormat") == 0)  headerP->ngsiv2AttrsFormat  = value;
   else if (strcasecmp(key.c_str(), "Fiware-Servicepath") == 0)
   {
     headerP->servicePath         = value;
@@ -1288,6 +1289,7 @@ static int connectionTreat
       char details[256];
       snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
 
+      alarmMgr.badInput(clientIp, details);
       OrionError oe(SccRequestEntityTooLarge, details);
 
       ciP->httpStatusCode = oe.code;

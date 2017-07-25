@@ -90,26 +90,26 @@ commands that require root privilege):
 
         contextBroker --version
 
-The Orion Context Broker comes with a suite of valgrind and end-to-end tests that you can also run, following the following procedure (optional):
+The Orion Context Broker comes with a suite of functional, valgrind and end-to-end tests that you can also run, following the following procedure (optional):
 
 * Install the required tools:
 
-        sudo yum install python python-flask python-jinja2 curl libxml2 nc mongodb valgrind libxslt
+        sudo yum install python python-flask python-jinja2 curl libxml2 nc mongodb valgrind libxslt bc
 
-* Run valgrind tests (it takes some time, please be patient):
-
-        make valgrind
-
-* Prepare the environment for test harness. Basically, you have to install the accumulator-server.py script and in a path under your control, ~/bin is the recommended one. Alternatively, you can install them in a system directory such as /usr/bin but it could collide with an RPM installation, thus it is not recommended. In addition, you have to set several environment variables used by the harness script (see scripts/testEnv.sh file).
+* Prepare the environment for test harness. Basically, you have to install the `accumulator-server.py` script and in a path under your control, `~/bin` is the recommended one. Alternatively, you can install them in a system directory such as `/usr/bin` but it could collide with an RPM installation, thus it is not recommended. In addition, you have to set several environment variables used by the harness script (see `scripts/testEnv.sh` file).
 
         mkdir ~/bin
         export PATH=~/bin:$PATH
         make install_scripts INSTALL_DIR=~
         . scripts/testEnv.sh
 
-* Run test harness (it takes some time, arm yourself with patience).
+* Run test harness (it takes some time, please be patient).
 
         make functional_test INSTALL_DIR=~
+
+* Once passed all the functional tests, you can run the valgrind tests (this will take longer than the functional tests, arm yourself with a lot of patience):
+
+        make valgrind
 
 You can generate coverage reports for the Orion Context Broker using the following procedure (optional):
 

@@ -537,7 +537,16 @@ std::string postUpdateContext
   attributesToNotFound(upcrP);
 
   HttpStatusCode httpStatusCode;
-  TIMED_MONGO(httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->httpHeaders.correlator, ciP->apiVersion, ngsiV2Flavour));
+  TIMED_MONGO(httpStatusCode = mongoUpdateContext(upcrP,
+                                                  upcrsP,
+                                                  ciP->tenant,
+                                                  ciP->servicePathV,
+                                                  ciP->uriParam,
+                                                  ciP->httpHeaders.xauthToken,
+                                                  ciP->httpHeaders.correlator,
+                                                  ciP->httpHeaders.ngsiv2AttrsFormat,
+                                                  ciP->apiVersion,
+                                                  ngsiV2Flavour));
 
   if (ciP->httpStatusCode != SccCreated)
   {

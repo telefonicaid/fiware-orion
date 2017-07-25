@@ -1770,6 +1770,7 @@ static bool processOnChangeConditionForUpdateContext
   // FIXME: we use a proper origin name
   ncr.originator.set("localhost");
 
+  ncr.subscriptionId.set(subId);
   getNotifier()->sendNotifyContextRequest(&ncr,
                                           httpInfo,
                                           tenant,
@@ -2675,6 +2676,7 @@ static bool processContextAttributeVector
   std::string                                     tenant,
   const std::vector<std::string>&                 servicePathV,
   ApiVersion                                      apiVersion,
+  bool                                            loopDetected,
   OrionError*                                     oe
 )
 {
@@ -2805,10 +2807,14 @@ static bool processContextAttributeVector
     }
   }
 
-  /* Add triggered ONCHANGE subscriptions */
+  /* Add triggered subscriptions */
   std::string err;
 
-  if (!addTriggeredSubscriptions(entityId, entityType, modifiedAttrs, subsToNotify, err, tenant, servicePathV))
+  if (loopDetected)
+  {
+    LM_W(("Notification loop detected for entity id <%s> type <%s>, skipping subscription triggering", entityId.c_str(), entityType.c_str()));
+  }
+  else if (!addTriggeredSubscriptions(entityId, entityType, modifiedAttrs, subsToNotify, err, tenant, servicePathV))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
     oe->fill(SccReceiverInternalError, err, "InternalServerError");
@@ -2853,6 +2859,7 @@ static bool createEntity
   std::string                      tenant,
   const std::vector<std::string>&  servicePathV,
   ApiVersion                       apiVersion,
+  const std::string&               fiwareCorrelator,
   OrionError*                      oe
 )
 {
@@ -2973,6 +2980,9 @@ static bool createEntity
     insertedDoc.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
                                           ENT_LOCATION_COORDS   << geoJson.obj()));
   }
+
+  // Correlator (for notification loop detection logic)
+  insertedDoc.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
 
   if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
   {
@@ -3150,7 +3160,8 @@ static void updateEntity
   bool*                           attributeAlreadyExistsError,
   std::string*                    attributeAlreadyExistsList,
   ApiVersion                      apiVersion,
-  const std::string&              fiwareCorrelator
+  const std::string&              fiwareCorrelator,
+  const std::string&              ngsiV2AttrsFormat
 )
 {
   // Used to accumulate error response information
@@ -3252,6 +3263,14 @@ static void updateEntity
   notifyCerP->contextElement.entityId.creDate = r.hasField(ENT_CREATION_DATE)     ? getIntOrLongFieldAsLongF(r, ENT_CREATION_DATE)     : -1;
   notifyCerP->contextElement.entityId.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getIntOrLongFieldAsLongF(r, ENT_MODIFICATION_DATE) : -1;
 
+  // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
+  // in addition, the request was sent due to a custom notification
+  bool loopDetected = false;
+  if ((ngsiV2AttrsFormat == "custom") && (r.hasField(ENT_LAST_CORRELATOR)))
+  {
+    loopDetected = (getStringFieldF(r, ENT_LAST_CORRELATOR) == fiwareCorrelator);
+  }
+
   if (!processContextAttributeVector(ceP,
                                      action,
                                      subsToNotify,
@@ -3267,6 +3286,7 @@ static void updateEntity
                                      tenant,
                                      servicePathV,
                                      apiVersion,
+                                     loopDetected,
                                      &(responseP->oe)))
   {
     // The entity wasn't actually modified, so we don't need to update it and we can continue with the next one
@@ -3325,6 +3345,13 @@ static void updateEntity
     toUnset.append(ENT_LOCATION, 1);
   }
 
+  // Correlator (for notification loop detection logic). We don't touch toSet in the replace case, due to
+  // the way in which BSON is composed in that case (see below)
+  if (strcasecmp(action.c_str(), "replace") != 0)
+  {
+    toSet.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
+  }
+
   /* FIXME: I don't like the obj() step, but it seems to be the only possible way, let's wait for the answer to
    * http://stackoverflow.com/questions/29668439/get-number-of-fields-in-bsonobjbuilder-object */
   BSONObjBuilder  updatedEntity;
@@ -3337,7 +3364,10 @@ static void updateEntity
   {
     // toSet: { A1: { ... }, A2: { ... } }
     int now = getCurrentTime();
-    updatedEntity.append("$set", BSON(ENT_ATTRS << toSetObj << ENT_ATTRNAMES << toPushArr << ENT_MODIFICATION_DATE << now));
+    updatedEntity.append("$set", BSON(ENT_ATTRS             << toSetObj <<
+                                      ENT_ATTRNAMES         << toPushArr <<
+                                      ENT_MODIFICATION_DATE << now <<
+                                      ENT_LAST_CORRELATOR   << fiwareCorrelator));
 
     notifyCerP->contextElement.entityId.modDate = now;
   }
@@ -3543,6 +3573,7 @@ void processContextElement
   std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                   xauthToken,
   const std::string&                   fiwareCorrelator,
+  const std::string&                   ngsiV2AttrsFormat,
   ApiVersion                           apiVersion,
   Ngsiv2Flavour                        ngsiv2Flavour
 )
@@ -3710,7 +3741,8 @@ void processContextElement
                  &attributeAlreadyExistsError,
                  &attributeAlreadyExistsList,
                  apiVersion,
-                 fiwareCorrelator);
+                 fiwareCorrelator,
+                 ngsiV2AttrsFormat);
   }
 
   /*
@@ -3780,7 +3812,7 @@ void processContextElement
       std::string  errDetail;
       int          now = getCurrentTime();
 
-      if (!createEntity(enP, ceP->contextAttributeVector, now, &errDetail, tenant, servicePathV, apiVersion, &(responseP->oe)))
+      if (!createEntity(enP, ceP->contextAttributeVector, now, &errDetail, tenant, servicePathV, apiVersion, fiwareCorrelator, &(responseP->oe)))
       {
         cerP->statusCode.fill(SccInvalidParameter, errDetail);
         // In this case, responseP->oe is not filled, as createEntity() deals internally with that

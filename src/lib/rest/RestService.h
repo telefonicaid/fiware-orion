@@ -51,12 +51,12 @@ typedef std::string (*RestServiceHandler)(ConnectionInfo* ciP, int compononts, s
 typedef std::string (*RestTreat)(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* reqDataP);
 typedef struct RestService
 {
-  std::string   verb;
-  RequestType   request;
-  int           components;
-  std::string   compV[10];
-  std::string   payloadWord;
-  RestTreat     treat;
+  std::string   verb;             // The method of the service, as a plain string. ("*" matches ALL methods)
+  RequestType   request;          // The type of the request
+  int           components;       // Number of components in the URL path
+  std::string   compV[10];        // Vector of URL path components. E.g. { "v2", "entities" }
+  std::string   payloadWord;      // No longer used, should be removed ... ?
+  RestTreat     treat;            // service function pointer
 } RestService;
 
 

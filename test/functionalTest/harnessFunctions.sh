@@ -422,8 +422,11 @@ function localBrokerStart()
     sleep 1
     # FIXME: brokerStartAwait $port  instead of sleep 1?
   else
-    valgrind $CB_START_CMD > /tmp/valgrind.out 2>&1 &
-
+    #
+    # Important: the -v flag must be present so that the text "X errors in context Y of Z" is present in the output
+    #
+    valgrind -v --leak-check=full --track-origins=yes --trace-children=yes $CB_START_CMD > /tmp/valgrind.out 2>&1 &
+    
     # Waiting for valgrind to start (sleep a maximum of 10 secs)
     brokerStartAwait $port
     if [ "$result" != 0 ]
@@ -989,6 +992,7 @@ function dbInsertEntity()
 #   --servicePath <path>           (Service Path in HTTP header)
 #   --xauthToken  <token>          (X-Auth token value)
 #   --origin      <origin>         (Origin in HTTP header)
+#   --correlator  <correlatorId>   (default: no correlator ID)
 #   --noPayloadCheck               (don't check the payload)
 #   --payloadCheck <format>        (force specific treatment of payload)
 #   --header      <HTTP header>    (more headers)
@@ -1019,6 +1023,7 @@ function orionCurl()
   _forcedNoPayloadCheck='off'
   _tenant=''
   _origin=''
+  _correlator=''
   _inFormat=''
   _outFormat='--header "Accept: application/json"'
   _in='';
@@ -1043,6 +1048,7 @@ function orionCurl()
     elif [ "$1" == "--servicePath" ]; then     _servicePath='--header "Fiware-ServicePath: '${2}'"'; shift;
     elif [ "$1" == "--tenant" ]; then          _tenant='--header "Fiware-Service: '${2}'"'; shift;
     elif [ "$1" == "--origin" ]; then          _origin='--header "Origin: '${2}'"'; shift;
+    elif [ "$1" == "--correlator" ]; then      _correlator='--header "Fiware-Correlator: '${2}'"'; shift;
     elif [ "$1" == "-H" ]; then                _headers=${_headers}" --header \"$2\""; shift;
     elif [ "$1" == "--header" ]; then          _headers=${_headers}" --header \"$2\""; shift;
     elif [ "$1" == "--in" ]; then              _in="$2"; shift;
@@ -1140,6 +1146,7 @@ function orionCurl()
   if [ "$_inFormat"    != "" ]; then  command=${command}' '${_inFormat};    fi
   if [ "$_outFormat"   != "" ]; then  command=${command}' '${_outFormat};   fi
   if [ "$_origin"      != "" ]; then  command=${command}' '${_origin};      fi
+  if [ "$_correlator"  != "" ]; then  command=${command}' '${_correlator};  fi
   if [ "$_xauthToken"  != "" ]; then  command=${command}' '${_xauthToken};  fi
   if [ "$_headers"     != "" ]; then  command=${command}' '${_headers};     fi
   if [ "$_xtra"        != "" ]; then  command=${command}' '${_xtra};        fi
