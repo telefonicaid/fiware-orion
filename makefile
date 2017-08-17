@@ -29,6 +29,14 @@ ifndef INSTALL_DIR
 	INSTALL_DIR=/usr
 endif
 
+ifndef INCLUDE_PATH
+	INCLUDE_PATH=${INSTALL_DIR}/include
+endif
+
+ifndef LIBRARY_PATH
+	LIBRARY_PATH=${INSTALL_DIR}/lib
+endif
+
 ifndef CPU_COUNT
 	CPU_COUNT:=$(shell cat /proc/cpuinfo | grep processor | wc -l)
 endif
@@ -76,20 +84,20 @@ compile_info_release:
 
 prepare_release: compile_info_release
 	mkdir -p  BUILD_RELEASE || true
-	cd BUILD_RELEASE && cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_ARCH=$(BUILD_ARCH) -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
+	cd BUILD_RELEASE && cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_ARCH=$(BUILD_ARCH) -DCMAKE_LIBRARY_PATH=${LIBRARY_PATH} -DCMAKE_INCLUDE_PATH=${INCLUDE_PATH} -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
 prepare_debug: compile_info
 	mkdir -p  BUILD_DEBUG || true
-	cd BUILD_DEBUG && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DDEBUG=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
+	cd BUILD_DEBUG && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DDEBUG=True -DCMAKE_LIBRARY_PATH=${LIBRARY_PATH} -DCMAKE_INCLUDE_PATH=${INCLUDE_PATH} -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
 prepare_coverage: compile_info
 	mkdir -p  BUILD_COVERAGE || true
-	cd BUILD_COVERAGE && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=True -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
+	cd BUILD_COVERAGE && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=True -DCOVERAGE=True -DCMAKE_LIBRARY_PATH=${LIBRARY_PATH} -DCMAKE_INCLUDE_PATH=${INCLUDE_PATH} -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
 prepare_unit_test: compile_info
 	@echo '------------------------------- prepare_unit_test starts ---------------------------------'
 	mkdir -p  BUILD_UNITTEST || true
-	cd BUILD_UNITTEST && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=True -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
+	cd BUILD_UNITTEST && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=True -DCOVERAGE=True -DCMAKE_LIBRARY_PATH=${LIBRARY_PATH} -DCMAKE_INCLUDE_PATH=${INCLUDE_PATH} -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 	@echo '------------------------------- prepare_unit_test ended ---------------------------------'
 
 release: prepare_release

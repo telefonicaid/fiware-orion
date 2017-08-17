@@ -55,7 +55,8 @@ add_definitions(-fPIC)
 
 # Baseline compiler flags, any change here will affect all build types
 #set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror")
-set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -fno-var-tracking-assignments")
+set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -fno-var-tracking-assignments -I${CMAKE_INCLUDE_PATH}")
+set (CMAKE_EXE_LINKER_FLAGS "-L${CMAKE_LIBRARY_PATH}")
 
 #
 # Platform checks
@@ -104,7 +105,7 @@ if (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
         remove_definitions(-DLM_ON)
         # Removing LM_T macros make that some variables get unused, thus -Wno-unused-variable have to be used
         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable -fprofile-arcs -ftest-coverage")
-        set (CMAKE_EXE_LINKER_FLAGS "-fprofile-arcs -ftest-coverage")
+        set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
     endif (COVERAGE)
 
     if (UNIT_TEST)

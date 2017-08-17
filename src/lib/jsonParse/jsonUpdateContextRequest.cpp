@@ -158,6 +158,13 @@ static std::string attributeType(const std::string& path, const std::string& val
   reqDataP->upcr.attributeP->type = value;
   LM_T(LmtParse, ("Set 'type' to '%s' for a contextElement attribute", reqDataP->upcr.attributeP->type.c_str()));
 
+  // Updating value field
+  if (value == "integer") {
+    reqDataP->upcr.attributeP->valueType = orion::ValueTypeNumber;
+  } else {
+    reqDataP->upcr.attributeP->valueType = orion::ValueTypeString;
+  } 
+
   return "OK";
 }
 
@@ -172,8 +179,15 @@ static std::string attributeValue(const std::string& path, const std::string& va
   parseDataP->lastContextAttribute = parseDataP->upcr.attributeP;
   LM_T(LmtCompoundValue, ("Set parseDataP->lastContextAttribute to: %p", parseDataP->lastContextAttribute));
 
-  parseDataP->upcr.attributeP->stringValue = value;
-  parseDataP->upcr.attributeP->valueType = orion::ValueTypeString;
+  if (parseDataP->upcr.attributeP->valueType != orion::ValueTypeNumber) {
+    parseDataP->upcr.attributeP->valueType = orion::ValueTypeString;
+    parseDataP->upcr.attributeP->stringValue = value;
+  } else {
+    parseDataP->upcr.attributeP->numberValue = atof(value.c_str());
+  }
+
+  // parseDataP->upcr.attributeP->stringValue = value;
+  // parseDataP->upcr.attributeP->valueType = orion::ValueTypeString;
   LM_T(LmtParse, ("Set value to '%s' for a contextElement attribute", parseDataP->upcr.attributeP->stringValue.c_str()));
 
   return "OK";
