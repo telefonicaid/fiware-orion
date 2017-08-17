@@ -159,8 +159,28 @@ static std::string attributeType(const std::string& path, const std::string& val
   LM_T(LmtParse, ("Set 'type' to '%s' for a contextElement attribute", reqDataP->upcr.attributeP->type.c_str()));
 
   // Updating value field
-  if (value == "integer") {
+  if ((value == "integer") || (value == "float") || (value == "double") || (value == "number")) {
     reqDataP->upcr.attributeP->valueType = orion::ValueTypeNumber;
+
+    // If the value has already been set, update it to the proper field.
+    if (reqDataP->upcr.attributeP->stringValue != "") {
+      reqDataP->upcr.attributeP->numberValue = atof(reqDataP->upcr.attributeP->stringValue.c_str());
+      reqDataP->upcr.attributeP->stringValue = "";
+    }
+  } else if (value == "bool") {
+    reqDataP->upcr.attributeP->valueType = orion::ValueTypeBoolean;
+    // If the value has already been set, update it to the proper field.
+    if (reqDataP->upcr.attributeP->stringValue != "") {
+      // False, false or 0
+      if (reqDataP->upcr.attributeP->stringValue[0] == 'f' ||
+          reqDataP->upcr.attributeP->stringValue[0] == 'F' ||
+          reqDataP->upcr.attributeP->stringValue[0] == '0') {
+        reqDataP->upcr.attributeP->boolValue = false;
+      } else {
+        reqDataP->upcr.attributeP->boolValue = true;
+      }
+      reqDataP->upcr.attributeP->stringValue = "";
+    }
   } else {
     reqDataP->upcr.attributeP->valueType = orion::ValueTypeString;
   } 
@@ -179,15 +199,20 @@ static std::string attributeValue(const std::string& path, const std::string& va
   parseDataP->lastContextAttribute = parseDataP->upcr.attributeP;
   LM_T(LmtCompoundValue, ("Set parseDataP->lastContextAttribute to: %p", parseDataP->lastContextAttribute));
 
-  if (parseDataP->upcr.attributeP->valueType != orion::ValueTypeNumber) {
+  if (parseDataP->upcr.attributeP->valueType == orion::ValueTypeNumber) {
+    parseDataP->upcr.attributeP->numberValue = atof(value.c_str());
+  } else if (parseDataP->upcr.attributeP->valueType == orion::ValueTypeBoolean) {
+      if (value[0] == 'f' ||
+          value[0] == 'F' ||
+          value[0] == '0') {
+        parseDataP->upcr.attributeP->boolValue = false;
+      } else {
+        parseDataP->upcr.attributeP->boolValue = true;
+      }
+  } else {
     parseDataP->upcr.attributeP->valueType = orion::ValueTypeString;
     parseDataP->upcr.attributeP->stringValue = value;
-  } else {
-    parseDataP->upcr.attributeP->numberValue = atof(value.c_str());
   }
-
-  // parseDataP->upcr.attributeP->stringValue = value;
-  // parseDataP->upcr.attributeP->valueType = orion::ValueTypeString;
   LM_T(LmtParse, ("Set value to '%s' for a contextElement attribute", parseDataP->upcr.attributeP->stringValue.c_str()));
 
   return "OK";
