@@ -22,8 +22,8 @@ building from sources, check [this document](build_source.md).
 * Operating system: CentOS/RedHat. The reference operating system is CentOS 6.3
   but it should work also in any later CentOS/RedHat 6.x version.
 * Database: MongoDB is required to run either in the same host where Orion Context Broker is to be installed or in a different host accessible through the network. The recommended MongoDB versions
-  are 2.6/3.0/3.2. It is not recommended using MongoDB 2.4.x., as some [geolocated queries](../user/geolocation.md) may not work.
-    * In the case of using MongoDB 3.0/3.2 with its new authentication mechanism (SCRAM_SHA1) you may need to compile from sources using special switches for the MongoDB driver.
+  are 2.6/3.0/3.2/3.4. It is not recommended using MongoDB 2.4.x., as some [geolocated queries](../user/geolocation.md) may not work.
+    * In the case of using MongoDB 3.0/3.2/3.4 with its new authentication mechanism (SCRAM_SHA1) you may need to compile from sources using special switches for the MongoDB driver.
       See [this issue](https://github.com/telefonicaid/fiware-orion/issues/1061) for details.
 * RPM dependencies (some of these packages could not be in the official CentOS/RedHat repository but in EPEL, in which case you have to configure EPEL repositories, see <http://fedoraproject.org/wiki/EPEL>):
     * The contextBroker package (mandatory) depends on the following packages: boost-filesystem, boost-thread, gnutls, libgcrypt, logrotate and libcurl.
@@ -79,9 +79,9 @@ You only need to pay attention to this if your upgrade path crosses 0.11.0 or 0.
 
 * Orion versions previous to 0.11.0 recommend MongoDB 2.2
 * Orion version from 0.11.0 to 0.20.0 recommend MongoDB 2.4. Check [the 2.4 upgrade procedure in the oficial MongoDB documentation.](http://docs.mongodb.org/master/release-notes/2.4-upgrade/)
-* Orion version from 0.21.0 on recommend MongoDB 2.6/3.0/3.2. check [the 2.6 upgrade procedure](http://docs.mongodb.org/master/release-notes/2.6-upgrade/),
-  [the 3.0 upgrade procedure](http://docs.mongodb.org/master/release-notes/3.0-upgrade/) or [the 3.2 upgrade procedure](http://docs.mongodb.org/master/release-notes/3.2-upgrade/) in the oficial
-  MongoDB documentation.
+* Orion version from 0.21.0 on recommend MongoDB 2.6/3.0/3.2/3.4. check [the 2.6 upgrade procedure](http://docs.mongodb.org/master/release-notes/2.6-upgrade/),
+  [the 3.0 upgrade procedure](http://docs.mongodb.org/master/release-notes/3.0-upgrade/), [the 3.2 upgrade procedure](http://docs.mongodb.org/master/release-notes/3.2-upgrade/)
+  or [the 3.4 upgrade procedure](https://docs.mongodb.com/master/release-notes/3.4/) in the oficial MongoDB documentation.
 
 ### Migrating the data stored in DB
 
