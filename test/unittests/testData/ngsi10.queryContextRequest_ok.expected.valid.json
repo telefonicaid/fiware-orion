@@ -1,31 +1,31 @@
 {
-  "entities" : [
+  "entities": [
     {
-      "type" : "Room",
-      "isPattern" : "false",
-      "id" : "ConferenceRoom"
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
     },
     {
-      "type" : "Room",
-      "isPattern" : "false",
-      "id" : "OfficeRoom"
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
     }
   ],
-  "attributes" : [
+  "attributes": [
     "temperature",
     "occupancy",
     "lightstatus"
   ],
-  "restriction" : {
-    "attributeExpression" : "Attribute Expression",
-    "scope" : [
+  "restriction": {
+    "attributeExpression": "Attribute Expression",
+    "scope": [
       {
-        "type" : "st1",
-        "value" : "sv1"
+        "type": "st1",
+        "value": "sv1"
       },
       {
-        "type" : "st2",
-        "value" : "sv2"
+        "type": "st2",
+        "value": "sv2"
       }
     ]
   }

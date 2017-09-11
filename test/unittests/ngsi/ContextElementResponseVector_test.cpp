@@ -69,12 +69,14 @@ TEST(ContextElementResponseVector, render)
 {
   ContextElementResponseVector  cerv;
   ContextElementResponse        cer;
-  std::string                   out;
 
   utInit();
 
-  out = cerv.render(V1, false, UpdateContextElement, "");
-  EXPECT_STREQ("", out.c_str());
+  {
+    JsonHelper writer(2);
+    cerv.toJsonV1(writer, false, UpdateContextElement);
+    EXPECT_STREQ("", writer.str().c_str());
+  }
 
   cer.contextElement.entityId.id         = "ID";
   cer.contextElement.entityId.type       = "Type";

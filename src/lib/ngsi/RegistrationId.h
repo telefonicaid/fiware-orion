@@ -27,6 +27,8 @@
 */
 #include <string>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/Request.h"
 
 
@@ -42,7 +44,7 @@ typedef struct RegistrationId
   void          set(const std::string& value);
   std::string   get(void) const;
   bool          isEmpty(void);
-  std::string   render(RequestType requestType, const std::string& indent, bool comma = false);
+  void          toJson(JsonHelper& writer, RequestType requestType);
   void          present(const std::string& indent);
   void          release(void);
 

@@ -32,7 +32,6 @@
 
 #include "common/globals.h"
 #include "common/string.h"
-#include "common/tag.h"
 #include "common/limits.h"
 #include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
@@ -82,43 +81,56 @@ StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const 
 }
 
 
-
 /* ****************************************************************************
 *
 * StatusCode::render -
 */
-std::string StatusCode::render(const std::string& indent, bool comma, bool showKey)
+std::string StatusCode::render
+(
+  int indent
+)
 {
-  std::string  out  = "";
-
-  if (strstr(details.c_str(), "\"") != NULL)
+  if (indent < 0)
   {
-    int    len  = details.length() * 2;
-    char*  s    = (char*) calloc(1, len + 1);
-
-    strReplace(s, len, details.c_str(), "\"", "\\\"");
-    details = s;
-    free(s);
+    indent = DEFAULT_JSON_INDENT_V1;
   }
+  JsonHelper writer(indent);
 
+  toJsonV1(writer, false);
+
+  return writer.str();
+}
+
+/* ****************************************************************************
+*
+* StatusCode::toJsonV1 -
+*/
+void StatusCode::toJsonV1
+(
+  JsonHelper& writer,
+  bool showKey
+)
+{
   if (code == SccNone)
   {
     fill(SccReceiverInternalError, "");
     details += " - ZERO code set to 500";
   }
 
-  out += startTag(indent, showKey? keyName : "");
-  out += valueTag(indent + "  ", "code", code, true);
-  out += valueTag(indent + "  ", "reasonPhrase", reasonPhrase, details != "");
+  if (showKey) {
+      writer.Key(keyName);
+  }
+  writer.StartObject();
+
+  writer.String("code", toString(code));
+  writer.String("reasonPhrase", reasonPhrase);
 
   if (details != "")
   {
-    out += valueTag(indent + "  ", "details", details, false);
+    writer.String("details", details);
   }
 
-  out += endTag(indent, comma);
-
-  return out;
+  writer.EndObject();
 }
 
 
@@ -129,41 +141,17 @@ std::string StatusCode::render(const std::string& indent, bool comma, bool showK
 *
 * For version 2 of the API, the unnecessary 'reasonPhrase' is removed.
 */
-std::string StatusCode::toJson(bool isLastElement)
+void StatusCode::toJson
+(
+  JsonHelper& writer
+)
 {
-  std::string  out  = "";
+  writer.StartObject();
 
-  if (strstr(details.c_str(), "\"") != NULL)
-  {
-    int    len = details.length() * 2;
-    char*  s    = (char*) calloc(1, len + 1);
+  writer.Uint("code", code);
+  writer.String("details", details);
 
-    strReplace(s, len, details.c_str(), "\"", "\\\"");
-    details = s;
-    free(s);
-  }
-
-  char codeV[STRING_SIZE_FOR_INT];
-
-  snprintf(codeV, sizeof(codeV), "%d", code);
-
-  out += "{";
-
-  out += std::string("\"code\":\"") + codeV + "\"";
-  
-  if (details != "")
-  {
-    out += ",\"details\":\"" + details + "\"";
-  }
-
-  out += "}";
-
-  if (!isLastElement)
-  {
-    out += ",";
-  }
-
-  return out;
+  writer.EndObject();
 }
 
 

@@ -25,7 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "common/tag.h"
 #include "common/errorMessages.h"
 #include "common/RenderFormat.h"
 #include "common/string.h"
@@ -40,35 +39,34 @@
 */
 std::string Attribute::render
 (
-  ApiVersion          apiVersion,          // in parameter (pass-through)
-  bool                acceptedTextPlain,   // in parameter (pass-through)
-  bool                acceptedJson,        // in parameter (pass-through)
-  MimeType            outFormatSelection,  // in parameter (pass-through)
-  MimeType*           outMimeTypeP,        // out parameter (pass-through)
-  HttpStatusCode*     scP,                 // out parameter (pass-through)
-  bool                keyValues,           // in parameter
-  const std::string&  metadataList,        // in parameter
-  RequestType         requestType,         // in parameter
-  bool                comma                // in parameter
+  ApiVersion          apiVersion,
+  MimeType            outFormatSelection,
+  HttpStatusCode*     scP,
+  bool                keyValues,
+  const std::string&  metadataList,
+  RequestType         requestType,
+  int                 indent
 )
 {
   RenderFormat  renderFormat = (keyValues == true)? NGSI_V2_KEYVALUES : NGSI_V2_NORMALIZED;
 
   if (pcontextAttribute)
   {
-    std::string out;
-
     if (requestType == EntityAttributeValueRequest)
     {
-      out = pcontextAttribute->toJsonAsValue(apiVersion,
-                                             acceptedTextPlain,
-                                             acceptedJson,
-                                             outFormatSelection,
-                                             outMimeTypeP,
-                                             scP);
+      return pcontextAttribute->renderAsValue(apiVersion,
+                                              outFormatSelection,
+                                              scP,
+                                              indent);
     }
     else
     {
+      if (indent < 0)
+      {
+        indent = DEFAULT_JSON_INDENT;
+      }
+      JsonHelper writer(indent);
+
       std::vector<std::string> metadataFilter;
 
       if (metadataList != "")
@@ -76,27 +74,18 @@ std::string Attribute::render
         stringSplit(metadataList, ',', metadataFilter);
       }
 
-      out = "{";
+      writer.StartObject();
 
-      // First parameter (isLastElement) is 'true' as it is the last and only element
-      out += pcontextAttribute->toJson(true, renderFormat, metadataFilter, requestType);
+      pcontextAttribute->toJson(writer, renderFormat, metadataFilter, requestType);
 
-      out += "}";
+      writer.EndObject();
+
+      return writer.str();
     }
-
-
-    if (comma)
-    {
-      out += ",";
-    }
-
-    return out;
   }
 
-  return oe.toJson();
+  return oe.renderV1();
 }
-
-
 
 
 /* ****************************************************************************

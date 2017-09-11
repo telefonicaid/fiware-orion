@@ -13,15 +13,15 @@
   "duration": "P5Y",
   "restriction": {
     "attributeExpression": "testRestriction",
-    "scopes" : [
+    "scopes": [
       {
-        "type" : "FIWARE_Location",
-        "value" : {
-          "circle" : {
-            "centerLatitude" : "40",
-            "centerLongitude" : "20",
+        "type": "FIWARE_Location",
+        "value": {
+          "circle": {
+            "centerLatitude": "40",
+            "centerLongitude": "20",
             "radius": "10",
-            "inverted" : "true"
+            "inverted": "true"
           }
         }
       }

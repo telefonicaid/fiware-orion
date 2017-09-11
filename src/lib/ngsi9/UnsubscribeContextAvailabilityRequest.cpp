@@ -72,7 +72,7 @@ std::string UnsubscribeContextAvailabilityRequest::check(const std::string& inde
   else
     return "OK";
 
-  return response.render(indent);
+  return response.render();
 }
 
 

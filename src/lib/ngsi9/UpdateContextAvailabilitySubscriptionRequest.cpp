@@ -26,9 +26,7 @@
 #include <vector>
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
-#include "ngsi/StatusCode.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionRequest.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
 
@@ -49,28 +47,27 @@ UpdateContextAvailabilitySubscriptionRequest::UpdateContextAvailabilitySubscript
 *
 * UpdateContextAvailabilitySubscriptionRequest::render -
 */
-std::string UpdateContextAvailabilitySubscriptionRequest::render(const std::string& indent)
+std::string UpdateContextAvailabilitySubscriptionRequest::render
+(
+  int indent
+)
 {
-  std::string   out                      = "";
-  bool          subscriptionRendered     = subscriptionId.rendered(UpdateContextAvailabilitySubscription);
-  bool          restrictionRendered      = restrictions != 0;
-  bool          durationRendered         = duration.get() != "";
-  bool          attributeListRendered    = attributeList.size() != 0;
-  bool          commaAfterSubscriptionId = false; // last element
-  bool          commaAfterRestriction    = subscriptionRendered;
-  bool          commaAfterDuration       = restrictionRendered || subscriptionRendered;
-  bool          commaAfterAttributeList  = durationRendered || restrictionRendered || subscriptionRendered;
-  bool          commaAfterEntityIdVector = attributeListRendered || durationRendered || restrictionRendered || subscriptionRendered;
+  if (indent < 0) {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  out += startTag(indent);
-  out += entityIdVector.render(indent + "  ", commaAfterEntityIdVector);
-  out += attributeList.render( indent + "  ", commaAfterAttributeList);
-  out += duration.render(      indent + "  ", commaAfterDuration);
-  out += restriction.render(   indent + "  ", restrictions, commaAfterRestriction);
-  out += subscriptionId.render(UpdateContextAvailabilitySubscription, indent + "  ", commaAfterSubscriptionId);
-  out += endTag(indent);
+  writer.StartObject();
 
-  return out;
+  entityIdVector.toJson(writer);
+  attributeList.toJson(writer);
+  duration.toJson(writer);
+  restriction.toJson(writer);
+  subscriptionId.toJson(writer, UpdateContextAvailabilitySubscription);
+
+  writer.EndObject();
+
+  return writer.str();
 }
 
 
@@ -116,7 +113,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::check(const std::strin
   else
     return "OK";
 
-  return response.render(indent, counter);
+  return response.render();
 }
 
 

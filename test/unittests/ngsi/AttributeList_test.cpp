@@ -43,15 +43,23 @@ TEST(AttributeList, ok)
 
   utInit();
 
-  out = al.render("");
-  EXPECT_STREQ("", out.c_str());
+  {
+    JsonHelper writer(2);
+    al.toJson(writer);
+    EXPECT_STREQ("", writer.str().c_str());
+  }
 
   al.push_back("a1");
   al.push_back("a2");
 
-  out = al.render("");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    JsonHelper writer(2);
+    writer.StartObject();
+    al.toJson(writer);
+    writer.EndObject();
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+    EXPECT_STREQ(expectedBuf, writer.str().c_str());
+  }
 
   al.push_back("");
   out = al.check(RegisterContext, "", "", 0);

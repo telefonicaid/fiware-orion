@@ -53,10 +53,10 @@ std::string postDiscoverContextAvailability
 )
 {
   DiscoverContextAvailabilityResponse*  dcarP = &parseDataP->dcars.res;
-  std::string                           answer;
+  std::string answer;
 
   TIMED_MONGO(ciP->httpStatusCode = mongoDiscoverContextAvailability(&parseDataP->dcar.res, dcarP, ciP->tenant, ciP->uriParam, ciP->servicePathV));
-  TIMED_RENDER(answer = dcarP->render(""));
+  TIMED_RENDER(answer = dcarP->render());
 
   return answer;
 }

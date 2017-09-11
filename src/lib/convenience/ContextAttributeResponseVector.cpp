@@ -28,7 +28,6 @@
 
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
-#include "common/tag.h"
 #include "convenience/ContextAttributeResponseVector.h"
 #include "rest/ConnectionInfo.h"
 
@@ -36,31 +35,27 @@
 
 /* ****************************************************************************
 *
-* ContextAttributeResponseVector::render - 
+* ContextAttributeResponseVector::toJson - 
 */
-std::string ContextAttributeResponseVector::render
+void ContextAttributeResponseVector::toJson
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         request,
-  const std::string&  indent)
+  JsonHelper& writer,
+  ApiVersion  apiVersion,
+  bool        asJsonObject,
+  RequestType request
+)
 {
-  std::string out = "";
-  std::string key = "contextResponses";
-
   if (vec.size() == 0)
   {
-    return "";
+    return;
   }
 
-  out += startTag(indent, key, true);
+  writer.StartArray("contextResponses");
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(apiVersion, asJsonObject, request, indent + "  ");
+    vec[ix]->toJson(writer, apiVersion, asJsonObject, request);
   }
-  out += endTag(indent, false, true);
-
-  return out;
+  writer.EndArray();
 }
 
 

@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/Request.h"
 
 
@@ -64,14 +66,12 @@ class EntityId
   bool         equal(EntityId* eP);
   bool         isPatternIsTrue(void);
 
-  std::string  render(const std::string&  indent,
-                      bool                comma      = false,
-                      bool                isInVector = false);
+  void         toJsonV1(JsonHelper& writer);
+  void         toJson(JsonHelper& writer) const;
 
   std::string  check(RequestType          requestType,
                      const std::string&   indent);
 
-  std::string  toJson(void) const;
 };
 
 #endif  // SRC_LIB_NGSI_ENTITYID_H_

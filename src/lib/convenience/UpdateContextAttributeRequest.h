@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/MetadataVector.h"
 #include "parse/CompoundValueNode.h"
 
@@ -49,7 +51,10 @@ typedef struct UpdateContextAttributeRequest
   orion::CompoundValueNode*  compoundValueP;
 
   UpdateContextAttributeRequest();
-  std::string  render(ApiVersion apiVersion, std::string indent);
+  std::string  render(ApiVersion apiVersion,
+                      int        indent = -1);
+  void         toJson(JsonHelper& writer,
+                      ApiVersion apiVersion);
   std::string  check(ApiVersion apiVersion, std::string indent, const std::string& preError);
   void         present(std::string indent);
   void         release();

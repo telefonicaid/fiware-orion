@@ -28,6 +28,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/Request.h"
 #include "ngsi/AttributeList.h"
 #include "ngsi/EntityIdVector.h"
@@ -54,7 +57,7 @@ typedef struct UpdateContextAvailabilitySubscriptionRequest
 
   UpdateContextAvailabilitySubscriptionRequest();
 
-  std::string     render(const std::string& indent);
+  std::string     render(int indent = -1);
   void            present(const std::string& indent);
   std::string     check(const std::string& indent, const std::string& predetectedError, int counter);
   void            release(void);

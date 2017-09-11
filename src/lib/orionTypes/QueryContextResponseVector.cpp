@@ -30,7 +30,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "orionTypes/QueryContextResponseVector.h"
 #include "ngsi/Request.h"
 
@@ -124,10 +123,19 @@ void QueryContextResponseVector::present(void)
 *
 * QueryContextResponseVector::render -
 */
-std::string QueryContextResponseVector::render(ApiVersion apiVersion, bool asJsonObject, bool details, const std::string& detailsString)
+std::string QueryContextResponseVector::render
+(
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
+  bool                details,
+  const std::string&  detailsString,
+  int                 indent
+)
 {
+  JsonHelper writer(indent);
+
+
   QueryContextResponse* responseP = new QueryContextResponse();
-  std::string           answer;
 
   //
   // Here we have a vector of QueryContextResponse.
@@ -232,11 +240,11 @@ std::string QueryContextResponseVector::render(ApiVersion apiVersion, bool asJso
     }
   }
 
-  answer = responseP->render(apiVersion, asJsonObject, "");
+  responseP->toJson(writer, apiVersion, asJsonObject);
   responseP->release();
   delete responseP;
 
-  return answer;
+  return writer.str();
 }
 
 

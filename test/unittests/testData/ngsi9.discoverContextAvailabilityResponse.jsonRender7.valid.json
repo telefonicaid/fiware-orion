@@ -1,20 +1,20 @@
 {
-  "contextRegistrationResponses" : [
+  "contextRegistrationResponses": [
     {
-      "contextRegistration" : {
-        "attributes" : [
+      "contextRegistration": {
+        "attributes": [
           {
-            "name" : "Attr1",
-            "type" : "AType",
-            "isDomain" : "false"
+            "name": "Attr1",
+            "type": "AType",
+            "isDomain": "false"
           },
           {
-            "name" : "Attr2",
-            "type" : "AType",
-            "isDomain" : "true"
+            "name": "Attr2",
+            "type": "AType",
+            "isDomain": "true"
           }
         ],
-        "providingApplication" : "http://tid.test.com/unitTest7"
+        "providingApplication": "http://tid.test.com/unitTest7"
       }
     }
   ]

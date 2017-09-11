@@ -29,7 +29,6 @@
 #include "logMsg/logMsg.h"
 #include "common/globals.h"
 #include "common/string.h"
-#include "common/tag.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 
 
@@ -70,38 +69,39 @@ DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse(StatusC
 *
 * DiscoverContextAvailabilityResponse::render -
 */
-std::string DiscoverContextAvailabilityResponse::render(const std::string& indent)
+std::string DiscoverContextAvailabilityResponse::render
+(
+  int indent
+)
 {
-  std::string  out = "";
+  if (indent < 0) {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  //
-  // JSON commas:
-  // Exactly ONE of responseVector|errorCode is included in the discovery response so,
-  // no JSON commas necessary
-  //
-  out += startTag(indent);
+
+  writer.StartObject();
 
   if (responseVector.size() > 0)
   {
-    bool commaNeeded = (errorCode.code != SccNone);
-    out += responseVector.render(indent + "  ", commaNeeded);
+    responseVector.toJson(writer);
   }
 
   if (errorCode.code != SccNone)
   {
-    out += errorCode.render(indent + "  ", false);
+    errorCode.toJsonV1(writer);
   }
 
   /* Safety check: neither errorCode nor CER vector was filled by mongoBackend */
   if (errorCode.code == SccNone && responseVector.size() == 0)
   {
       errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
-      out += errorCode.render(indent + "  ");
+      errorCode.toJsonV1(writer);
   }
 
-  out += endTag(indent);
+  writer.EndObject();
 
-  return out;
+  return writer.str();
 }
 
 

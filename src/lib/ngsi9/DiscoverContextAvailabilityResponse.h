@@ -47,7 +47,7 @@ typedef struct DiscoverContextAvailabilityResponse
   ~DiscoverContextAvailabilityResponse();
   DiscoverContextAvailabilityResponse(StatusCode& _errorCode);
 
-  std::string  render(const std::string& indent);
+  std::string  render(int indent = -1);
   void         release();
 } DiscoverContextAvailabilityResponse;
 

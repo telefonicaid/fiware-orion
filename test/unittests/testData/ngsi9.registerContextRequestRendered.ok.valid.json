@@ -1,41 +1,41 @@
 {
-  "contextRegistrations" : [
+  "contextRegistrations": [
     {
-      "entities" : [
+      "entities": [
         {
-          "type" : "Room",
-          "isPattern" : "false",
-          "id" : "ConferenceRoom"
+          "type": "Room",
+          "isPattern": "false",
+          "id": "ConferenceRoom"
         },
         {
-          "type" : "Room",
-          "isPattern" : "false",
-          "id" : "OfficeRoom"
+          "type": "Room",
+          "isPattern": "false",
+          "id": "OfficeRoom"
         }
       ],
-      "attributes" : [
+      "attributes": [
         {
-          "name" : "temperature",
-          "type" : "degree",
-          "isDomain" : "false",
-          "metadatas" : [
+          "name": "temperature",
+          "type": "degree",
+          "isDomain": "false",
+          "metadatas": [
             {
-              "name" : "ID",
-              "type" : "string",
-              "value" : "1110"
+              "name": "ID",
+              "type": "string",
+              "value": "1110"
             }
           ]
         }
       ],
-      "metadatas" : [
+      "metadatas": [
         {
-          "name" : "ID",
-          "type" : "string",
-          "value" : "2212"
+          "name": "ID",
+          "type": "string",
+          "value": "2212"
         }
       ],
-      "providingApplication" : "http://192.168.100.1:70/application"
+      "providingApplication": "http://192.168.100.1:70/application"
     }
   ],
-  "duration" : "PT1M"
+  "duration": "PT1M"
 }

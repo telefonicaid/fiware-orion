@@ -1,15 +1,15 @@
 {
-  "contextRegistrationResponses" : [
+  "contextRegistrationResponses": [
     {
-      "contextRegistration" : {
-        "attributes" : [
+      "contextRegistration": {
+        "attributes": [
           {
-            "name" : "Attr12",
-            "type" : "AType",
-            "isDomain" : "true"
+            "name": "Attr12",
+            "type": "AType",
+            "isDomain": "true"
           }
         ],
-        "providingApplication" : "http://tid.test.com/unitTest12"
+        "providingApplication": "http://tid.test.com/unitTest12"
       }
     }
   ]

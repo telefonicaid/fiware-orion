@@ -13,26 +13,26 @@
   "duration": "P5Y",
   "restriction": {
     "attributeExpression": "testRestriction",
-    "scopes" : [
+    "scopes": [
       {
-        "type" : "TEST-TYPE",
-        "value" : "test-value"
+        "type": "TEST-TYPE",
+        "value": "test-value"
       },
       {
-        "type" : "FIWARE_Location",
-        "value" : {
-          "polygon" : {
-            "vertices" : [
+        "type": "FIWARE_Location",
+        "value": {
+          "polygon": {
+            "vertices": [
               {
-                "latitude" : "20",
-                "longitude" : "30"
+                "latitude": "20",
+                "longitude": "30"
               },
               {
-                "latitude" : "30",
-                "longitude" : "40"
+                "latitude": "30",
+                "longitude": "40"
               }
             ],
-            "inverted" : "false"
+            "inverted": "false"
           }
         }
       }

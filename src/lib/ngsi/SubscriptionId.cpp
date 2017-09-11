@@ -29,7 +29,6 @@
 
 #include "common/globals.h"
 #include "common/idCheck.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/SubscriptionId.h"
 
@@ -147,9 +146,13 @@ void SubscriptionId::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* SubscriptionId::render -
+* SubscriptionId::toJson -
 */
-std::string SubscriptionId::render(RequestType container, const std::string& indent, bool comma)
+void SubscriptionId::toJson
+(
+  JsonHelper& writer,
+  RequestType container
+)
 {
   std::string xString = string;
 
@@ -171,11 +174,12 @@ std::string SubscriptionId::render(RequestType container, const std::string& ind
     }
     else
     {
-      return "";  // subscriptionId is Optional
+      return;  // subscriptionId is Optional
     }
   }
 
-  return valueTag(indent, "subscriptionId", xString, comma);
+  writer.Key("subscriptionId");
+  writer.String(xString.c_str());
 }
 
 

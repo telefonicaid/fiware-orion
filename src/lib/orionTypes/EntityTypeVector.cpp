@@ -31,7 +31,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "orionTypes/EntityType.h"
 #include "orionTypes/EntityTypeVector.h"
@@ -50,34 +49,55 @@ EntityTypeVector::EntityTypeVector()
 
 /* ****************************************************************************
 *
-* EntityTypeVector::render -
+* EntityTypeVector::toJsonV1 -
 */
-std::string EntityTypeVector::render
+void EntityTypeVector::toJsonV1
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  bool                asJsonOut,
-  bool                collapsed,
-  const std::string&  indent,
-  bool                comma
+  JsonHelper& writer,
+  bool        asJsonObject,
+  bool        asJsonOut,
+  bool        collapsed
 )
 {
-  std::string out  = "";
-
   if (vec.size() > 0)
   {
-    out += startTag(indent, "types", true);
+    writer.StartArray("types");
 
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
-      out += vec[ix]->render(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", ix != vec.size() - 1);
+      vec[ix]->toJsonV1(writer, V1, asJsonObject, asJsonOut, collapsed);
     }
-    out += endTag(indent, comma, true);
+    writer.EndArray();
   }
-
-  return out;
 }
 
+
+/* ****************************************************************************
+*
+* EntityTypeVector::toJson -
+*/
+void EntityTypeVector::toJson
+(
+  JsonHelper& writer,
+  bool values
+)
+{
+  writer.StartArray();
+
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if (values)
+    {
+      writer.String(vec[ix]->type);
+    }
+    else  // default
+    {
+      vec[ix]->toJson(writer, true);
+    }
+  }
+
+  writer.EndArray();
+}
 
 
 /* ****************************************************************************

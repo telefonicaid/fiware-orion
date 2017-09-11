@@ -26,8 +26,6 @@
 #include <string>
 
 #include "common/globals.h"
-#include "common/tag.h"
-#include "ngsi/StatusCode.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/SubscribeContextRequest.h"
@@ -76,7 +74,7 @@ std::string UpdateContextSubscriptionRequest::check(const std::string& indent, c
   else
     return "OK";
 
-  return response.render(indent);
+  return response.render();
 }
 
 

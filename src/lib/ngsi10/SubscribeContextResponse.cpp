@@ -26,7 +26,6 @@
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
-#include "common/tag.h"
 #include "ngsi10/SubscribeContextResponse.h"
 
 /* ****************************************************************************
@@ -62,22 +61,29 @@ SubscribeContextResponse::SubscribeContextResponse(StatusCode& errorCode)
 *
 * SubscribeContextResponse::render - 
 */
-std::string SubscribeContextResponse::render(const std::string& indent)
+std::string SubscribeContextResponse::render
+(
+  int indent
+)
 {
-  std::string out     = "";
+  if (indent == -1)
+  {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  out += startTag(indent);
+  writer.StartObject();
 
   if (subscribeError.errorCode.code == SccNone)
   {
-    out += subscribeResponse.render(indent + "  ", false);
+    subscribeResponse.toJson(writer);
   }
   else
   {
-    out += subscribeError.render(SubscribeContext, indent + "  ", false);
+    subscribeError.toJson(writer, SubscribeContext);
   }
 
-  out += endTag(indent, false);
+  writer.EndObject();
 
-  return out;
+  return writer.str();
 }

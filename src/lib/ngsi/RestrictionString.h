@@ -27,6 +27,8 @@
 */
 #include <string>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/Request.h"
 
 
@@ -42,7 +44,7 @@ typedef struct RestrictionString
   void          set(const std::string& value);
   std::string   get(void);
   bool          isEmpty(void);
-  std::string   render(const std::string& indent, bool comma);
+  void          toJson(JsonHelper& writer);
   void          present(const std::string& indent);
   const char*   c_str();
 

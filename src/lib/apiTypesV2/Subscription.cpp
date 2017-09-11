@@ -59,42 +59,56 @@ Subscription::~Subscription()
 
 /* ****************************************************************************
 *
+* Subscription::render -
+*/
+std::string Subscription::render(int indent)
+{
+  JsonHelper writer;
+  toJson(writer);
+  return writer.str();
+}
+
+
+
+/* ****************************************************************************
+*
 * Subscription::toJson -
 */
-std::string Subscription::toJson(void)
+void Subscription::toJson(JsonHelper& writer)
 {
-  JsonHelper jh;
-
-  jh.addString("id", this->id);
+  writer.StartObject();
+  writer.String("id", this->id);
 
   if (this->description != "")
   {
-    jh.addString("description", this->description);
+    writer.String("description", this->description);
   }
 
   if (this->expires != PERMANENT_SUBS_DATETIME)
   {
-    jh.addDate("expires", this->expires);
+    writer.Date("expires", this->expires);
   }
 
   if ((this->notification.lastFailure > 0) && (this->notification.lastFailure > this->notification.lastSuccess))
   {
-    jh.addString("status", "failed");
+    writer.String("status", "failed");
   }
   else
   {
-    jh.addString("status", this->status);
+    writer.String("status", this->status);
   }
 
-  jh.addRaw("subject", this->subject.toJson());
-  jh.addRaw("notification", this->notification.toJson(renderFormatToString(this->attrsFormat, true, true)));
+  writer.Key("subject");
+  this->subject.toJson(writer);
+  writer.Key("notification");
+  this->notification.toJson(writer, renderFormatToString(this->attrsFormat, true, true));
 
   if (this->throttling > 0)
   {
-    jh.addNumber("throttling", this->throttling);
+    writer.Int("throttling", this->throttling);
   }
 
-  return jh.str();
+  writer.EndObject();
 }
 
 
@@ -106,56 +120,62 @@ std::string Subscription::toJson(void)
 * FIXME P2: we should move 'attrsFormat' from Subject class to Notification
 * class, to avoid passing attrsFormat as argument
 */
-std::string Notification::toJson(const std::string& attrsFormat)
+void Notification::toJson(JsonHelper& writer, const std::string& attrsFormat)
 {
-  JsonHelper jh;
+
+  writer.StartObject();
 
   if (this->timesSent > 0)
   {
-    jh.addNumber("timesSent", this->timesSent);
+    writer.Int("timesSent", this->timesSent);
   }
 
   if (this->lastNotification > 0)
   {
-    jh.addDate("lastNotification", this->lastNotification);
+    writer.Date("lastNotification", this->lastNotification);
   }
 
   if (!this->blacklist)
   {
-    jh.addRaw("attrs", vectorToJson(this->attributes));
+    writer.Key("attrs");
+    vectorToJson(writer, this->attributes);
   }
   else
   {
-    jh.addRaw("exceptAttrs", vectorToJson(this->attributes));
+    writer.Key("exceptAttrs");
+    vectorToJson(writer, this->attributes);
   }
 
-  jh.addString("attrsFormat", attrsFormat);
+  writer.String("attrsFormat", attrsFormat);
 
   if (this->httpInfo.custom)
   {
-    jh.addRaw("httpCustom", this->httpInfo.toJson());
+    writer.Key("httpCustom");
+    this->httpInfo.toJson(writer);
   }
   else
   {
-    jh.addRaw("http", this->httpInfo.toJson());
+    writer.Key("http");
+    this->httpInfo.toJson(writer);
   }
 
   if (this->metadata.size() > 0)
   {
-    jh.addRaw("metadata", vectorToJson(this->metadata));
+    writer.Key("metadata");
+    vectorToJson(writer, this->metadata);
   }
 
   if (this->lastFailure > 0)
   {
-    jh.addDate("lastFailure", this->lastFailure);
+    writer.Date("lastFailure", this->lastFailure);
   }
 
   if (this->lastSuccess > 0)
   {
-    jh.addDate("lastSuccess", this->lastSuccess);
+    writer.Date("lastSuccess", this->lastSuccess);
   }
 
-  return jh.str();
+  writer.EndObject();
 }
 
 
@@ -164,14 +184,13 @@ std::string Notification::toJson(const std::string& attrsFormat)
 *
 * Subject::toJson -
 */
-std::string Subject::toJson()
+void Subject::toJson(JsonHelper& writer)
 {
-  JsonHelper jh;
+  writer.Key("entities");
+  vectorToJson(writer, this->entities);
 
-  jh.addRaw("entities", vectorToJson(this->entities));
-  jh.addRaw("condition", this->condition.toJson());
-
-  return jh.str();
+  writer.Key("condition");
+  this->condition.toJson(writer);
 }
 
 
@@ -180,25 +199,26 @@ std::string Subject::toJson()
 *
 * Condition::toJson -
 */
-std::string Condition::toJson()
+void Condition::toJson(JsonHelper& writer)
 {
-  JsonHelper jh;
+  writer.StartObject();
 
-  jh.addRaw("attrs", vectorToJson(this->attributes));
+  writer.Key("attrs");
+  vectorToJson(writer, this->attributes);
 
-  JsonHelper jhe;
+  if (this->expression.q != "" || this->expression.mq != "" || this->expression.geometry != "" ||
+          this->expression.coords != "" || this->expression.georel != "")
+  {
+    writer.StartObject("expression");
+    if (this->expression.q        != "")  writer.String("q",        this->expression.q);
+    if (this->expression.mq       != "")  writer.String("mq",       this->expression.mq);
+    if (this->expression.geometry != "")  writer.String("geometry", this->expression.geometry);
+    if (this->expression.coords   != "")  writer.String("coords",   this->expression.coords);
+    if (this->expression.georel   != "")  writer.String("georel",   this->expression.georel);
+    writer.EndObject();
+  }
 
-  if (this->expression.q        != "")  jhe.addString("q",        this->expression.q);
-  if (this->expression.mq       != "")  jhe.addString("mq",       this->expression.mq);
-  if (this->expression.geometry != "")  jhe.addString("geometry", this->expression.geometry);
-  if (this->expression.coords   != "")  jhe.addString("coords",   this->expression.coords);
-  if (this->expression.georel   != "")  jhe.addString("georel",   this->expression.georel);
-
-  std::string expressionString = jhe.str();
-
-  if (expressionString != "{}")         jh.addRaw("expression", expressionString);
-
-  return jh.str();
+  writer.EndObject();
 }
 
 
@@ -207,30 +227,30 @@ std::string Condition::toJson()
 *
 * EntID::toJson -
 */
-std::string EntID::toJson()
+void EntID::toJson(JsonHelper& writer)
 {
-  JsonHelper jh;
+  writer.StartObject();
 
   if (!this->id.empty())
   {
-    jh.addString("id", this->id);
+    writer.String("id", this->id);
   }
 
   if (!this->idPattern.empty())
   {
-    jh.addString("idPattern", this->idPattern);
+    writer.String("idPattern", this->idPattern);
   }
 
   if (!this->type.empty())
   {
-    jh.addString("type", this->type);
+    writer.String("type", this->type);
   }
 
   if (!this->typePattern.empty())
   {
-    jh.addString("typePattern", this->typePattern);
+    writer.String("typePattern", this->typePattern);
   }
 
-  return jh.str();
+  writer.EndObject();
 }
 }  // end namespace

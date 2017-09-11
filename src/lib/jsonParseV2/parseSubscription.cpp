@@ -92,7 +92,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     alarmMgr.badInput(clientIp, "JSON parse error");
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return oe.render();
   }
 
   if (!document.IsObject())
@@ -102,7 +102,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     alarmMgr.badInput(clientIp, "JSON parse error");
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return oe.render();
   }
 
   if (document.ObjectEmpty())
@@ -1023,5 +1023,5 @@ static std::string badInput(ConnectionInfo* ciP, const std::string& msg)
 
   ciP->httpStatusCode = oe.code;
 
-  return oe.toJson();
+  return oe.render();
 }

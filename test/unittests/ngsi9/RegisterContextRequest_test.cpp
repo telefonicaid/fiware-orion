@@ -95,7 +95,7 @@ TEST(RegisterContextRequest, json_ok)
   std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", &reqP);
   EXPECT_EQ("OK", result) << "this test should be OK";
 
-  out = rcrP->render("");
+  out = rcrP->render();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   reqP->release(&parseData);

@@ -57,7 +57,6 @@ TEST(Metadata, constructor)
 */
 TEST(Metadata, render)
 {
-  std::string  out;
   Metadata     m1;
   Metadata     m2("Name", "Integer", "19");
 
@@ -66,13 +65,19 @@ TEST(Metadata, render)
 
   utInit();
 
-  out = m1.render("");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    JsonHelper writer(2);
+    m1.toJsonV1(writer);
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+    EXPECT_STREQ(expectedBuf, writer.str().c_str());
+  }
 
-  out = m2.render("");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    JsonHelper writer(2);
+    m2.toJsonV1(writer);
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+    EXPECT_STREQ(expectedBuf, writer.str().c_str());
+  }
 
   utExit();
 }

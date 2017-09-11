@@ -25,13 +25,11 @@
 #include <string>
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/AttributeList.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Duration.h"
 #include "ngsi/Reference.h"
 #include "ngsi/Restriction.h"
-#include "ngsi/StatusCode.h"
 #include "ngsi/SubscriptionId.h"
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
 #include "ngsi9/SubscribeContextAvailabilityRequest.h"
@@ -52,24 +50,25 @@ SubscribeContextAvailabilityRequest::SubscribeContextAvailabilityRequest()
 *
 * SubscribeContextAvailabilityRequest::render -
 */
-std::string SubscribeContextAvailabilityRequest::render(const std::string& indent)
+std::string SubscribeContextAvailabilityRequest::render
+(
+  int indent
+)
 {
-  std::string out                      = "";
-  std::string indent2                  = indent + "  ";
-  bool        commaAfterEntityIdVector = (restrictions > 0) || !duration.isEmpty() || !reference.isEmpty() || (attributeList.size() != 0);
-  bool        commaAfterAttributeList  = (restrictions > 0) || !duration.isEmpty() || !reference.isEmpty();
-  bool        commaAfterReference      = (restrictions > 0) || !duration.isEmpty();
-  bool        commaAfterDuration       = restrictions > 0;
+  if (indent < 0) {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  out += startTag(indent);
-  out += entityIdVector.render(indent2, commaAfterEntityIdVector);
-  out += attributeList.render(indent2, commaAfterAttributeList);
-  out += reference.render(indent2, commaAfterReference);
-  out += duration.render(indent2, commaAfterDuration);
-  out += restriction.render(indent2);
-  out += endTag(indent);
+  writer.StartObject();
+  entityIdVector.toJson(writer);
+  attributeList.toJson(writer);
+  reference.toJson(writer);
+  duration.toJson(writer);
+  restriction.toJson(writer);
+  writer.EndObject();
 
-  return out;
+  return writer.str();
 }
 
 
@@ -98,7 +97,7 @@ std::string SubscribeContextAvailabilityRequest::check(const std::string& indent
   else
     return "OK";
 
-  return response.render(indent);
+  return response.render();
 }
 
 

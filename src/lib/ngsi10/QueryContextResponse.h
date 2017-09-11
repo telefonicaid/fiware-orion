@@ -29,6 +29,8 @@
 #include <iostream>
 #include <sstream>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/ContextElementResponseVector.h"
 #include "ngsi/StatusCode.h"
 
@@ -52,7 +54,12 @@ typedef struct QueryContextResponse
   QueryContextResponse(StatusCode& _errorCode);
   ~QueryContextResponse();
 
-  std::string            render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent);
+  std::string            render(ApiVersion apiVersion,
+                                bool       asJsonObject,
+                                int        indent = -1);
+  void                   toJson(JsonHelper& writer,
+                                ApiVersion apiVersion,
+                                bool asJsonObject);
   std::string            check(ApiVersion apiVersion, bool asJsonObject, const std::string&  indent, const std::string&  predetectedError);
   void                   present(const std::string& indent, const std::string& caller);
   void                   release(void);

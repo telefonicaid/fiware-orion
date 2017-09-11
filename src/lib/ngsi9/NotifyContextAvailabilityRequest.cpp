@@ -25,7 +25,6 @@
 #include <string>
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "ngsi9/NotifyContextAvailabilityResponse.h"
@@ -46,22 +45,23 @@ NotifyContextAvailabilityRequest::NotifyContextAvailabilityRequest()
 *
 * NotifyContextAvailabilityRequest::render -
 */
-std::string NotifyContextAvailabilityRequest::render(const std::string& indent)
+std::string NotifyContextAvailabilityRequest::render
+(
+  int indent
+)
 {
-  std::string out = "";
+  if (indent < 0) {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  //
-  // Note on JSON commas:
-  //  Both subscriptionId and contextRegistrationResponseVector are MANDATORY.
-  //  Always comma for subscriptionId.
-  //  With an empty contextRegistrationResponseVector there would be no notification
-  //
-  out += startTag(indent);
-  out += subscriptionId.render(NotifyContextAvailability, indent + "  ", true);
-  out += contextRegistrationResponseVector.render(indent  + "  ", false);
-  out += endTag(indent);
 
-  return out;
+  writer.StartObject();
+  subscriptionId.toJson(writer, NotifyContextAvailability);
+  contextRegistrationResponseVector.toJson(writer);
+  writer.EndObject();
+
+  return writer.str();
 }
 
 
@@ -89,7 +89,7 @@ std::string NotifyContextAvailabilityRequest::check(ApiVersion apiVersion, const
     return "OK";
   }
 
-  return response.render(indent);
+  return response.render();
 }
 
 

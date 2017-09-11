@@ -27,6 +27,8 @@
 */
 #include <string>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/ContextRegistration.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/Request.h"
@@ -44,7 +46,8 @@ typedef struct ContextRegistrationResponse
 
   ContextRegistrationResponse();
 
-  std::string  render(const std::string& indent, bool comma = false);
+  std::string  render(int indent = -1);
+  void         toJson(JsonHelper& writer);
   void         present(const std::string& indent);
   void         release(void);
 

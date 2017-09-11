@@ -83,9 +83,9 @@ TEST(Restriction, present)
 TEST(Restriction, render)
 {
   Restriction  restriction;
-  std::string  rendered;
   std::string  expected = "";
 
-  rendered = restriction.render("", 0, false);
-  EXPECT_STREQ(expected.c_str(), rendered.c_str());
+  JsonHelper writer(2);
+  restriction.toJson(writer, 0);
+  EXPECT_STREQ(expected.c_str(), writer.str().c_str());
 }

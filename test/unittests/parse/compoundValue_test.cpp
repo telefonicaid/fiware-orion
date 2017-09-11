@@ -392,7 +392,6 @@ TEST(compoundValue, updateTwoStructsJson)
   const char*                renderedFile  = "ngsi.contextAttribute.updateTwoStructsRendered.valid.json";
   ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
   ContextAttribute*          caP;
-  std::string                rendered;
 
   utInit();
 
@@ -409,9 +408,10 @@ TEST(compoundValue, updateTwoStructsJson)
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
   ci.outMimeType = JSON;
-  rendered = caP->render(V1, false, UpdateContext, "");
+  JsonHelper writer(2);
+  caP->toJsonV1(writer, false, UpdateContext);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  EXPECT_STREQ(expectedBuf, writer.str().c_str());
 
   orion::CompoundValueNode*  cvnRootP;
   orion::CompoundValueNode*  structP;
@@ -541,7 +541,6 @@ TEST(compoundValue, sixLevelsJson)
   const char*                renderedFile  = "ngsi.contextAttribute.updateSixLevelsRendered.valid.json";
   ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
   ContextAttribute*          caP;
-  std::string                rendered;
 
   utInit();
 
@@ -557,9 +556,10 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
   ci.outMimeType = JSON;
-  rendered = caP->render(V1, false, UpdateContext, "");
+  JsonHelper writer(2);
+  caP->toJsonV1(writer, false, UpdateContext);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  EXPECT_STREQ(expectedBuf, writer.str().c_str());
 
   orion::CompoundValueNode*  cvnRootP;
   orion::CompoundValueNode*  level1;
@@ -964,7 +964,7 @@ TEST(compoundValue, tenCompounds)
   utInit();
 
   upcrP = &reqData.upcr.res;
-  rendered = upcrP->render(V1, false, "");
+  rendered = upcrP->render(V1, false);
 
   utExit();
 }

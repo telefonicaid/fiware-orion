@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/string.h"
 #include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
@@ -384,20 +383,19 @@ int Scope::fill
 
 /* ****************************************************************************
 *
-* Scope::render -
+* Scope::toJson -
 */
-std::string Scope::render(const std::string& indent, bool notLastInVector)
+void Scope::toJson
+(
+  JsonHelper& writer
+)
 {
-  std::string out      = "";
-  const char* tTag     = "type";
-  const char* vTag     = "value";
+  writer.StartObject();
 
-  out += startTag(indent);
-  out += valueTag(indent + "  ", tTag, type, true);
-  out += valueTag(indent + "  ", vTag, value);
-  out += endTag(indent, notLastInVector);
+  writer.String("type", type);
+  writer.String("value", value);
 
-  return out;
+  writer.EndObject();
 }
 
 

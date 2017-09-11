@@ -28,9 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/JsonHelper.h"
 #include "common/string.h"
 #include "common/globals.h"
-#include "common/tag.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -49,15 +49,15 @@ std::string entryPointsTreat
   ParseData*                 parseDataP
 )
 {
-  std::string out = "{";
+  JsonHelper writer(2);
 
-  out += JSON_VALUE("entities_url",      ENTITIES_URL)      + ",";
-  out += JSON_VALUE("types_url",         TYPES_URL)         + ",";
-  out += JSON_VALUE("subscriptions_url", SUBSCRIPTIONS_URL) + ",";
-  out += JSON_VALUE("registrations_url", REGISTRATIONS_URL);
-
-  out += "}";
+  writer.StartObject();
+  writer.String("entities_url", ENTITIES_URL);
+  writer.String("types_url", TYPES_URL);
+  writer.String("subscriptions_url", SUBSCRIPTIONS_URL);
+  writer.String("registrations_url", REGISTRATIONS_URL);
+  writer.EndObject();
 
   ciP->httpStatusCode = SccOk;
-  return out;
+  return writer.str();
 }

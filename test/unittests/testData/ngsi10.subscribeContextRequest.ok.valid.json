@@ -20,14 +20,14 @@
 	"duration": "P5Y",
 	"restriction": {
 		"attributeExpression": "testRestriction",
-		"scopes" : [
+		"scopes": [
 			{
-				"type" : "t1",
-				"value" : "v1"
+				"type": "t1",
+				"value": "v1"
 			},
 			{
-				"type" : "t2",
-				"value" : "v2"
+				"type": "t2",
+				"value": "v2"
 			}
 		]
 	},

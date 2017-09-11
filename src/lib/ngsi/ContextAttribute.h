@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/JsonHelper.h"
+
 #include "common/RenderFormat.h"
 #include "common/globals.h"
 #include "orionTypes/OrionValueType.h"
@@ -92,24 +94,25 @@ public:
   std::string  getId() const;
   std::string  getLocation(ApiVersion apiVersion = V1) const;
 
-  std::string  render(ApiVersion          apiVersion,
-                      bool                asJsonObject,
-                      RequestType         request,
-                      const std::string&  indent,
-                      bool                comma = false,
-                      bool                omitValue = false);
-  std::string  renderAsJsonObject(ApiVersion apiVersion, RequestType request, const std::string& indent, bool comma, bool omitValue = false);
-  std::string  renderAsNameString(const std::string& indent, bool comma = false);
-  std::string  toJson(bool                             isLastElement,
+  void         toJsonV1(JsonHelper& writer,
+                        bool                asJsonObject,
+                        RequestType         request,
+                        bool                omitValue = false);
+  void         toJsonObject(JsonHelper& writer,
+                            ApiVersion  apiVersion,
+                            RequestType request,
+                            bool        asJsonObject,
+                            bool        omitValue = false);
+  void         toJsonString(JsonHelper& writer);
+  void         toJson(JsonHelper& writer,
                       RenderFormat                     renderFormat,
                       const std::vector<std::string>&  metadataFilter,
                       RequestType                      requestType = NoRequest);
-  std::string  toJsonAsValue(ApiVersion       apiVersion,
-                             bool             acceptedTextPlain,
-                             bool             acceptedJson,
+  std::string  renderAsValue(ApiVersion       apiVersion,
                              MimeType         outFormatSelection,
-                             MimeType*        outMimeTypeP,
-                             HttpStatusCode*  scP);
+                             HttpStatusCode*  scP,
+                             int              indent = -1);
+  void         toJsonAsValue(JsonHelper& writer);
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  getName(void);

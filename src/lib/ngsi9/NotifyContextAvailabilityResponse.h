@@ -43,7 +43,7 @@ typedef struct NotifyContextAvailabilityResponse
   NotifyContextAvailabilityResponse();
   NotifyContextAvailabilityResponse(StatusCode& sc);
 
-  std::string   render(const std::string& indent);
+  std::string   render(int indent = -1);
   void          present(const std::string& indent);
   void          release(void);
 } NotifyContextAvailabilityResponse;

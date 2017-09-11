@@ -29,7 +29,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 #include "convenience/UpdateContextElementRequest.h"
 #include "convenience/AppendContextElementRequest.h"
@@ -66,19 +65,26 @@ UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, 
 *
 * UpdateContextRequest::render -
 */
-std::string UpdateContextRequest::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
+std::string UpdateContextRequest::render
+(
+  ApiVersion apiVersion,
+  bool       asJsonObject,
+  int        indent
+)
 {
-  std::string  out = "";
+  if (indent == -1)
+  {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  // JSON commas:
-  // Both fields are MANDATORY, so, comma after "contextElementVector"
-  //
-  out += startTag(indent);
-  out += contextElementVector.render(apiVersion, asJsonObject, UpdateContext, indent + "  ", true);
-  out += updateActionType.render(indent + "  ", false);
-  out += endTag(indent, false);
 
-  return out;
+  writer.StartObject();
+  contextElementVector.toJson(writer, apiVersion, asJsonObject, UpdateContext);
+  updateActionType.toJson(writer);
+  writer.EndObject();
+
+  return writer.str();
 }
 
 
@@ -95,14 +101,14 @@ std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject
   if (predetectedError != "")
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
-    return response.render(apiVersion, asJsonObject, indent);
+    return response.render(apiVersion, asJsonObject);
   }
 
   if (((res = contextElementVector.check(apiVersion, UpdateContext, indent, predetectedError, counter)) != "OK") ||
       ((res = updateActionType.check()) != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
-    return response.render(apiVersion, asJsonObject, indent);
+    return response.render(apiVersion, asJsonObject);
   }
 
   return "OK";

@@ -39,7 +39,7 @@ typedef struct UnsubscribeContextRequest
 {
   SubscriptionId  subscriptionId;    // Mandatory
 
-  std::string     render(const std::string& indent);
+  std::string     render(int indent = -1);
   std::string     check(const std::string& indent, const std::string& predetectedError, int counter);
   void            present(const std::string& indent);
   void            release(void);

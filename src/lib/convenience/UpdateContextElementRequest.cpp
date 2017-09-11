@@ -26,7 +26,6 @@
 #include <vector>
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "convenience/UpdateContextElementRequest.h"
@@ -39,16 +38,43 @@
 *
 * render - 
 */
-std::string UpdateContextElementRequest::render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, std::string indent)
+std::string UpdateContextElementRequest::render
+(
+  ApiVersion  apiVersion,
+  bool        asJsonObject,
+  RequestType requestType,
+  int         indent
+)
 {
-  std::string out = "";
+  if (indent < 0) {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  out += startTag(indent);
-  out += attributeDomainName.render(indent + "  ", true);
-  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType, indent + "  ");
-  out += endTag(indent);
+  toJson(writer, apiVersion, asJsonObject, requestType);
 
-  return out;
+  return writer.str();
+}
+
+
+/* ****************************************************************************
+*
+* toJson - 
+*/
+void UpdateContextElementRequest::toJson
+(
+  JsonHelper& writer,
+  ApiVersion  apiVersion,
+  bool        asJsonObject,
+  RequestType requestType
+)
+{
+  writer.StartObject();
+
+  attributeDomainName.toJson(writer);
+  contextAttributeVector.toJsonV1(writer, asJsonObject, requestType);
+
+  writer.EndObject();
 }
 
 
@@ -92,7 +118,7 @@ std::string UpdateContextElementRequest::check
     return "OK";
   }
 
-  return response.render(apiVersion, asJsonObject, requestType, indent);
+  return response.render(apiVersion, asJsonObject, requestType);
 }
 
 

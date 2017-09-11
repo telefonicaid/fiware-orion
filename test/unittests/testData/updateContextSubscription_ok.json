@@ -1,15 +1,15 @@
 {
 	"duration": "P5Y",
 	"restriction": {
-		"attributeExpression" : "AE",
+		"attributeExpression": "AE",
 		"scopes": [
 			{
-				"type" : "t1",
-				"value" : "1"
+				"type": "t1",
+				"value": "1"
 			},
 			{
-				"type" : "t2",
-				"value" : "2"
+				"type": "t2",
+				"value": "2"
 			}
 		]
 	},

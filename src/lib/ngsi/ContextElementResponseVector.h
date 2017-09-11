@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/ContextElementResponse.h"
 #include "common/RenderFormat.h"
 
@@ -41,14 +43,13 @@ typedef struct ContextElementResponseVector
 {
   std::vector<ContextElementResponse*>  vec;
 
-  std::string              render(ApiVersion          apiVersion,
-                                  bool                asJsonObject,
-                                  RequestType         requestType,
-                                  const std::string&  indent,
-                                  bool                comma               = false,
-                                  bool                omitAttributeValues = false);
+  void                     toJsonV1(JsonHelper& writer,
+                                    bool        asJsonObject,
+                                    RequestType requestType,
+                                    bool        omitAttributeValues = false);
 
-  std::string              toJson(RenderFormat                     renderFormat,
+  void                     toJson(JsonHelper&                      writer,
+                                  RenderFormat                     renderFormat,
                                   const std::vector<std::string>&  attrsFilter,
                                   const std::vector<std::string>&  metadataFilter,
                                   bool                             blacklist = false);

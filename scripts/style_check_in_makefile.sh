@@ -106,7 +106,6 @@ style_check test/unittests/serviceRoutines
 # o common/string.h                                                          (haderding/remove_ngsiv1_indent: 1 include, 1 external declaration)
 # o common/globals.h                                                         (feature/mqtt_notifications_poc: 1 external declaration)
 # o common/globals.h                                                         (haderding/remove_ngsiv1_indent: 1 new external declaration)
-# o common/tag.cpp                                                           (haderding/remove_ngsiv1_indent: 'indent' removed from 6 signatures, slight change in 6 functions)
 # o common/tag.h                                                             (haderding/remove_ngsiv1_indent: 'indent' removed from 6 signatures)
 # o common/macroSubstitute.cpp                                               (haderding/remove_ngsiv1_indent: 2 lines: a param added to toJson())
 #
@@ -348,8 +347,6 @@ style_check test/unittests/serviceRoutines
 #
 #
 # o unittests/main_UnitTest.cpp                                              (haderding/remove_ngsiv1_indent: 1 variable)
-#
-# o unittests/common/commonTag_test.cpp                                      (haderding/remove_ngsiv1_indent: 24 lineas)
 #
 # o unittests/convenience/AppendContextElementRequest_test.cpp               (haderding/remove_ngsiv1_indent: 1 render(), 4 check())
 # o unittests/convenience/AppendContextElementResponse_test.cpp              (haderding/remove_ngsiv1_indent: 2 render(), 3 check())

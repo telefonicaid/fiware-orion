@@ -30,7 +30,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ScopeVector.h"
@@ -39,25 +38,25 @@
 
 /* ****************************************************************************
 *
-* ScopeVector::render -
+* ScopeVector::toJson -
 */
-std::string ScopeVector::render(const std::string& indent, bool comma)
+void ScopeVector::toJson
+(
+  JsonHelper& writer
+)
 {
-  std::string out = "";
-
   if (vec.size() == 0)
   {
-    return "";
+    return;
   }
 
-  out += startTag(indent, "scope", true);
+  writer.Key("scope");
+  writer.StartArray();
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-     out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);
+     vec[ix]->toJson(writer);
   }
-  out += endTag(indent, comma, true);
-
-  return out;
+  writer.EndArray();
 }
 
 

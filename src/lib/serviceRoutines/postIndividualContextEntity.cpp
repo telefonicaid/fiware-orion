@@ -96,7 +96,6 @@ std::string postIndividualContextEntity
   std::string                   entityTypeFromURL     = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
   std::string                   entityType;
   std::string                   answer;
-  std::string                   out;
 
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
 
@@ -112,8 +111,8 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
-    return out;
+    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
+    return answer;
   }
   entityId = (entityIdFromPayload != "")? entityIdFromPayload : entityIdFromURL;
 
@@ -125,8 +124,8 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
-    return out;
+    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
+    return answer;
   }
   entityType = (entityTypeFromPayload != "")? entityTypeFromPayload :entityTypeFromURL;
 
@@ -139,8 +138,8 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
-    return out;
+    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
+    return answer;
   }
 
   // 01.04. Entity::id must be present, somewhere ...
@@ -151,8 +150,8 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
-    return out;
+    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
+    return answer;
   }
 
   // Now, forward Entity to response
@@ -173,7 +172,7 @@ std::string postIndividualContextEntity
   response.fill(&parseDataP->upcrs.res);
 
   // 05. Cleanup and return result
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
 
   response.release();
   parseDataP->upcr.res.release();

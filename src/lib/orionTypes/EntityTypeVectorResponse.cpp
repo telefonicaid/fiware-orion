@@ -30,7 +30,6 @@
 #include "logMsg/logMsg.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/Request.h"
@@ -40,31 +39,49 @@
 
 /* ****************************************************************************
 *
+* EntityTypeVectorResponse::renderV1 -
+*/
+std::string EntityTypeVectorResponse::renderV1
+(
+  bool                                         asJsonObject,
+  bool                                         asJsonOut,
+  bool                                         collapsed,
+  int                                          indent
+)
+{
+  JsonHelper writer(indent);
+
+  writer.StartObject();
+
+  if (entityTypeVector.size() > 0)
+  {
+    entityTypeVector.toJsonV1(writer, asJsonObject, asJsonOut, collapsed);
+  }
+
+  statusCode.toJsonV1(writer);
+
+  writer.EndObject();
+
+  return writer.str();
+}
+
+
+
+/* ****************************************************************************
+*
 * EntityTypeVectorResponse::render -
 */
 std::string EntityTypeVectorResponse::render
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  bool                asJsonOut,
-  bool                collapsed,
-  const std::string&  indent
+  bool                                         values,
+  int                                          indent
 )
 {
-  std::string out  = "";
+  JsonHelper writer(indent);
 
-  out += startTag(indent);
+  entityTypeVector.toJson(writer, values);
 
-  if (entityTypeVector.size() > 0)
-  {
-    out += entityTypeVector.render(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", true);
-  }
-
-  out += statusCode.render(indent + "  ");
-
-  out += endTag(indent);
-
-  return out;
+  return writer.str();
 }
 
 
@@ -97,7 +114,7 @@ std::string EntityTypeVectorResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, asJsonOut, collapsed, "");
+  return renderV1(asJsonObject, asJsonOut, collapsed);
 }
 
 
@@ -126,36 +143,4 @@ void EntityTypeVectorResponse::release(void)
 {
   entityTypeVector.release();
   statusCode.release();
-}
-
-
-/* ****************************************************************************
-*
-* EntityTypeVectorResponse::toJson -
-*/
-std::string EntityTypeVectorResponse::toJson(bool values)
-{
-  std::string  out = "[";
-
-  for (unsigned int ix = 0; ix < entityTypeVector.vec.size(); ++ix)
-  {
-    if (values)
-    {
-      out += JSON_STR(entityTypeVector.vec[ix]->type);
-    }
-    else  // default
-    {
-      out += entityTypeVector.vec[ix]->toJson(true);
-    }
-
-    if (ix != entityTypeVector.vec.size() - 1)
-    {
-      out += ",";
-    }
-
-  }
-
-  out += "]";
-
-  return out;
 }

@@ -30,7 +30,6 @@
 #include "logMsg/logMsg.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 
@@ -45,23 +44,18 @@
 */
 std::string EntityTypeResponse::render
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  bool                asJsonOut,
-  bool                collapsed,
-  const std::string&  indent
+  ApiVersion apiVersion,
+  bool       asJsonObject,
+  bool       asJsonOut,
+  bool       collapsed,
+  int        indent
 )
 {
-  std::string out = "";
+  JsonHelper writer(indent);
 
-  out += startTag(indent);
+  toJson(writer, apiVersion, asJsonObject, asJsonOut, collapsed);
 
-  out += entityType.render(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", true, true);
-  out += statusCode.render(indent + "  ");
-
-  out += endTag(indent);
-
-  return out;
+  return writer.str();
 }
 
 
@@ -93,7 +87,7 @@ std::string EntityTypeResponse::check
   else
     return "OK";
 
-  return render(apiVersion, asJsonObject, asJsonOut, collapsed, "");
+  return render(apiVersion, asJsonObject, asJsonOut, collapsed);
 }
 
 
@@ -127,21 +121,30 @@ void EntityTypeResponse::release(void)
 *
 * EntityTypeResponse::toJson -
 */
-std::string EntityTypeResponse::toJson(void)
+void EntityTypeResponse::toJson
+(
+  JsonHelper&  writer,
+  ApiVersion   apiVersion,
+  bool         asJsonObject,
+  bool         asJsonOut,
+  bool         collapsed
+)
 {
-  std::string  out = "{";
-  char         countV[STRING_SIZE_FOR_INT];
+  writer.StartObject();
 
-  snprintf(countV, sizeof(countV), "%lld", entityType.count);
+  if (apiVersion == V2)
+  {
+    writer.StartObject("attrs");
+    entityType.contextAttributeVector.toJsonTypes(writer);
+    writer.EndObject();
 
-  out += JSON_STR("attrs") + ":";
+    writer.Int("count", entityType.count);
+  }
+  else
+  {
+    entityType.toJsonV1(writer, apiVersion, asJsonObject, asJsonOut, collapsed, true);
+    statusCode.toJsonV1(writer);
+  }
 
-  out += "{";
-  out += entityType.contextAttributeVector.toJsonTypes();
-  out += "}";
-
-  out += "," + JSON_STR("count") + ":" + countV;
-  out += "}";
-
-  return out;
+  writer.EndObject();
 }

@@ -30,7 +30,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/RenderFormat.h"
 #include "ngsi/ContextElementResponseVector.h"
 
@@ -38,35 +37,29 @@
 
 /* ****************************************************************************
 *
-* ContextElementResponseVector::render -
+* ContextElementResponseVector::toJsonV1 -
 */
-std::string ContextElementResponseVector::render
+void ContextElementResponseVector::toJsonV1
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         requestType,
-  const std::string&  indent,
-  bool                comma,
-  bool                omitAttributeValues
+  JsonHelper& writer,
+  bool        asJsonObject,
+  RequestType requestType,
+  bool        omitAttributeValues
 )
 {
-  std::string out = "";
-
   if (vec.size() == 0)
   {
-    return "";
+    return;
   }
 
-  out += startTag(indent, "contextResponses", true);
+  writer.StartArray("contextResponses");
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(apiVersion, asJsonObject, requestType, indent + "  ", ix < (vec.size() - 1), omitAttributeValues);
+    vec[ix]->toJsonV1(writer, asJsonObject, requestType, omitAttributeValues);
   }
 
-  out += endTag(indent, comma, true);
-
-  return out;
+  writer.EndArray();
 }
 
 
@@ -75,29 +68,30 @@ std::string ContextElementResponseVector::render
 *
 * ContextElementResponseVector::toJson - 
 */
-std::string ContextElementResponseVector::toJson
+void ContextElementResponseVector::toJson
 (
+  JsonHelper&                      writer,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   const std::vector<std::string>&  metadataFilter,
   bool                             blacklist
 )
 {
-  std::string out;
-
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += (renderFormat == NGSI_V2_VALUES)? "[": "{";
-    out += vec[ix]->toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
-    out += (renderFormat == NGSI_V2_VALUES)? "]": "}";
-
-    if (ix != vec.size() - 1)
+    if (renderFormat == NGSI_V2_VALUES)
     {
-      out += ",";
+      writer.StartArray();
+      vec[ix]->toJson(writer, renderFormat, attrsFilter, metadataFilter, blacklist);
+      writer.EndArray();
+    }
+    else
+    {
+      writer.StartObject();
+      vec[ix]->toJson(writer, renderFormat, attrsFilter, metadataFilter, blacklist);
+      writer.EndObject();
     }
   }
-
-  return out;
 }
 
 

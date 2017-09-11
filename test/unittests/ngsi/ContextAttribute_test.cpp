@@ -92,19 +92,19 @@ TEST(ContextAttribute, checkVector)
 
 /* ****************************************************************************
 *
-* render -
+* toJson -
 */
-TEST(ContextAttribute, render)
+TEST(ContextAttribute, toJson)
 {
   ContextAttribute* caP = new ContextAttribute("NAME", "TYPE", "VALUE");
-  std::string       out;
   const char*       outfile1 = "ngsi.contextAttribute.render.middle.json";
 
   utInit();
 
-  out = caP->render(V1, false, UpdateContext, "");
+  JsonHelper writer(2);
+  caP->toJsonV1(writer, false, UpdateContext);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  EXPECT_STREQ(expectedBuf, writer.str().c_str());
 
   utExit();
 }

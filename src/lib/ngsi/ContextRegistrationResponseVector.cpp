@@ -29,7 +29,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/ContextRegistrationResponseVector.h"
 
 
@@ -49,25 +48,44 @@ void ContextRegistrationResponseVector::push_back(ContextRegistrationResponse* i
 *
 * ContextRegistrationResponseVector::render -
 */
-std::string ContextRegistrationResponseVector::render(const std::string& indent, bool comma)
+std::string ContextRegistrationResponseVector::render
+(
+  int indent
+)
 {
-  std::string  out = "";
-
   if (vec.size() == 0)
   {
     return "";
   }
 
-  out += startTag(indent, "contextRegistrationResponses", true);
+  JsonHelper writer(indent);
+
+  writer.StartObject();
+  toJson(writer);
+  writer.EndObject();
+
+  return writer.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextRegistrationResponseVector::toJson -
+*/
+void ContextRegistrationResponseVector::toJson
+(
+  JsonHelper& writer
+)
+{
+  writer.StartArray("contextRegistrationResponses");
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-     out += vec[ix]->render(indent + "  ", (ix != vec.size() - 1));
+    vec[ix]->toJson(writer);
   }
 
-  out += endTag(indent, comma, true);
-
-  return out;
+  writer.EndArray();
 }
 
 

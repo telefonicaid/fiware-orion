@@ -90,7 +90,7 @@ std::string postIndividualContextEntityAttribute
 
 
   // 4. Cleanup and return result
-  TIMED_RENDER(answer = response.render("", false, false));
+  TIMED_RENDER(answer = response.render());
 
   response.release();
   parseDataP->upcr.res.release();

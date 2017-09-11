@@ -56,7 +56,7 @@ std::string deleteMetrics
 
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return oe.render();
   }
 
   metricsMgr.reset();

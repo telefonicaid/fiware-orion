@@ -26,8 +26,6 @@
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
-#include "common/tag.h"
-#include "ngsi/StatusCode.h"
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
 
 
@@ -82,21 +80,28 @@ SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(const
 *
 * SubscribeContextAvailabilityResponse::render -
 */
-std::string SubscribeContextAvailabilityResponse::render(const std::string& indent)
+std::string SubscribeContextAvailabilityResponse::render
+(
+  int indent
+)
 {
-  std::string  out                = "";
-  bool         durationRendered   = !duration.isEmpty();
-  bool         errorCodeRendered  = (errorCode.code != SccNone);
+  if (indent < 0) {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  out += startTag(indent);
 
-  out += subscriptionId.render(RtSubscribeContextAvailabilityResponse, indent + "  ", durationRendered || errorCodeRendered);
-  out += duration.render(indent + "  ", errorCodeRendered);
+  writer.StartObject();
 
-  if (errorCodeRendered)
-     out += errorCode.render(indent + "  ", false);
+  subscriptionId.toJson(writer, RtSubscribeContextAvailabilityResponse);
+  duration.toJson(writer);
 
-  out += endTag(indent);
+  if (errorCode.code != SccNone)
+  {
+     errorCode.toJsonV1(writer);
+  }
 
-  return out;
+  writer.EndObject();
+
+  return writer.str();
 }

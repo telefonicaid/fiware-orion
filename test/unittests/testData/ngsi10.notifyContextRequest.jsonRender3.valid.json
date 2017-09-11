@@ -1,27 +1,27 @@
 {
-  "subscriptionId" : "012345678901234567890123",
-  "originator" : "http://www.tid.es/NotifyContextRequestUnitTest",
-  "contextResponses" : [
+  "subscriptionId": "012345678901234567890123",
+  "originator": "http://www.tid.es/NotifyContextRequestUnitTest",
+  "contextResponses": [
     {
-      "contextElement" : {
-        "type" : "EType",
-        "isPattern" : "false",
-        "id" : "E01"
+      "contextElement": {
+        "type": "EType",
+        "isPattern": "false",
+        "id": "E01"
       },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
+      "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
       }
     },
     {
-      "contextElement" : {
-        "type" : "EType",
-        "isPattern" : "false",
-        "id" : "E02"
+      "contextElement": {
+        "type": "EType",
+        "isPattern": "false",
+        "id": "E02"
       },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
+      "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
       }
     }
   ]

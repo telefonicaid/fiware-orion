@@ -1,25 +1,25 @@
 {
   "duration": "P5Y",
   "restriction": {
-    "attributeExpression" : "AE",
+    "attributeExpression": "AE",
     "scopes": [
       {
-        "type" : "FIWARE_Location",
-        "value" : {
-          "circle" : {
-            "centerLatitude" : "40",
-            "centerLongitude" : "20",
+        "type": "FIWARE_Location",
+        "value": {
+          "circle": {
+            "centerLatitude": "40",
+            "centerLongitude": "20",
             "radius": "5"
           }
         }
       },
       {
-        "type" : "t1",
-        "value" : "1"
+        "type": "t1",
+        "value": "1"
       },
       {
-        "type" : "t2",
-        "value" : "2"
+        "type": "t2",
+        "value": "2"
       }
     ]
   },

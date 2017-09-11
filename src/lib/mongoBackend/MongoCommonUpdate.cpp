@@ -671,9 +671,13 @@ static bool contextAttributeCustomMetadataToBson
 
     if (!isNotCustomMetadata(md->name))
     {
+      JsonHelper writer;
+      md->toStringValue(writer);
+      const char* value = writer.str().c_str();
+
       appendMetadata(&mdToAdd, &mdNamesToAdd, md, useDefaultType);
       LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
-                      md->name.c_str(), md->type.c_str(), md->toStringValue().c_str()));
+                      md->name.c_str(), md->type.c_str(), value));
     }
   }
 

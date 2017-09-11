@@ -40,16 +40,23 @@ TEST(ContextElementVector, render)
 {
   ContextElement*       ceP = new ContextElement();
   EntityId              eId("E_ID", "E_TYPE");
-  std::string           rendered;
   ContextElementVector  ceV;
 
-  rendered = ceV.render(V1, false, UpdateContextElement, "", false);
-  EXPECT_STREQ("", rendered.c_str());
+  {
+    JsonHelper writer(2);
+    ceV.toJson(writer, V1, false, UpdateContextElement);
+    EXPECT_STREQ("", writer.str().c_str());
+  }
 
   ceP->entityId = eId;
   ceV.push_back(ceP);
 
-  rendered = ceV.render(V1, false, UpdateContextElement, "", false);
+  {
+    JsonHelper writer(2);
+    writer.StartObject();
+    ceV.toJson(writer, V1, false, UpdateContextElement);
+    writer.EndObject();
+  }
 
   ceV.release();
 }

@@ -28,7 +28,6 @@
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
-#include "common/tag.h"
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/errorMessages.h"
@@ -76,12 +75,30 @@ std::string Entity::render
 (
   std::map<std::string, bool>&         uriParamOptions,
   std::map<std::string, std::string>&  uriParam,
-  bool                                 comma
+  int                                  indent
+)
+{
+  JsonHelper writer(indent);
+  toJson(writer, uriParamOptions, uriParam);
+  return writer.str();
+}
+
+
+/* ****************************************************************************
+*
+* Entity::toJson -
+*
+*/
+void Entity::toJson
+(
+  JsonHelper&                          writer,
+  std::map<std::string, bool>&         uriParamOptions,
+  std::map<std::string, std::string>&  uriParam
 )
 {
   if ((oe.details != "") || ((oe.reasonPhrase != "OK") && (oe.reasonPhrase != "")))
   {
-    return oe.toJson();
+    oe.toJson(writer);
   }
 
   RenderFormat  renderFormat = NGSI_V2_NORMALIZED;
@@ -90,7 +107,6 @@ std::string Entity::render
   else if (uriParamOptions[OPT_VALUES]        == true)  { renderFormat = NGSI_V2_VALUES;        }
   else if (uriParamOptions[OPT_UNIQUE_VALUES] == true)  { renderFormat = NGSI_V2_UNIQUE_VALUES; }
 
-  std::string               out;
   std::vector<std::string>  metadataFilter;
   std::vector<std::string>  attrsFilter;
 
@@ -118,57 +134,40 @@ std::string Entity::render
 
   if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
   {
-    out = "[";
+    writer.StartArray();
     if (attributeVector.size() != 0)
     {
-      out += attributeVector.toJson(renderFormat, attrsFilter, metadataFilter, false);
+      attributeVector.toJson(writer, renderFormat, attrsFilter, metadataFilter, false);
     }
-    out += "]";
+    writer.EndArray();
   }
   else
   {
-    out = "{";
+    writer.StartObject();
 
     if (renderId)
     {
-      out += JSON_VALUE("id", id);
-      out += ",";
+      writer.String("id", id);
 
+      writer.Key("type");
       /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
-      out += JSON_STR("type") + ":" + ((type != "")? JSON_STR(type) : JSON_STR(DEFAULT_ENTITY_TYPE));
-    }
-
-    std::string attrsOut;
-    if (attributeVector.size() != 0)
-    {
-      attrsOut += attributeVector.toJson(renderFormat, attrsFilter, metadataFilter, false);
-    }
-
-    //
-    // Note that just attributeVector.size() != 0 (used in previous versions) cannot be used
-    // as ciP->uriParam["attrs"] filter could remove all the attributes
-    //
-    if (attrsOut != "")
-    {
-      if (renderId)
+      if (type != "")
       {
-        out +=  "," + attrsOut;
+        writer.String(type);
       }
       else
       {
-        out += attrsOut;
+        writer.String(DEFAULT_ENTITY_TYPE);
       }
     }
 
-    out += "}";
-  }
+    if (attributeVector.size() != 0)
+    {
+      attributeVector.toJson(writer, renderFormat, attrsFilter, metadataFilter, false);
+    }
 
-  if (comma)
-  {
-    out += ",";
+    writer.EndObject();
   }
-
-  return out;
 }
 
 

@@ -27,6 +27,8 @@
 */
 #include <string>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/Request.h"
 #include "ngsi/RestrictionString.h"
 #include "ngsi/ConditionValueList.h"
@@ -48,7 +50,7 @@ typedef struct NotifyCondition
   NotifyCondition();
   NotifyCondition(NotifyCondition* ncP);
 
-  std::string   render(const std::string& indent, bool notLastInVector);
+  void          toJson(JsonHelper& writer);
   void          present(const std::string& indent, int ix);
   void          release(void);
 

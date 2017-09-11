@@ -38,14 +38,14 @@
 TEST(Scope, render)
 {
   Scope        scope("Type", "Value");
-  std::string  out;
   const char*  outfile1 = "ngsi.scope.render.middle.json";
 
   utInit();
 
-  out = scope.render("", false);
+  JsonHelper writer(2);
+  scope.toJson(writer);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  EXPECT_STREQ(expectedBuf, writer.str().c_str());
 
   scope.release();
 

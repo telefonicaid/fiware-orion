@@ -28,9 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/tag.h"
 #include "convenience/ContextAttributeResponseVector.h"
-#include "ngsi/StatusCode.h"
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi10/UpdateContextResponse.h"
 #include "convenience/AppendContextElementResponse.h"
@@ -54,32 +52,38 @@ AppendContextElementResponse::AppendContextElementResponse() : errorCode("errorC
 */
 std::string AppendContextElementResponse::render
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         requestType,
-  const std::string&  indent)
+  ApiVersion  apiVersion,
+  bool        asJsonObject,
+  RequestType requestType,
+  int         indent
+)
 {
-  std::string out = "";
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  out += startTag(indent);
+
+  writer.StartObject();
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(indent + "  ");
+    errorCode.toJsonV1(writer);
   }
   else
   {
     if (entity.id != "")
     {
-      out += entity.render(indent + "  ", true);
+      entity.toJsonV1(writer);
     }
 
-    out += contextAttributeResponseVector.render(apiVersion, asJsonObject, requestType, indent + "  ");
+    contextAttributeResponseVector.toJson(writer, apiVersion, asJsonObject, requestType);
   }
 
-  out += endTag(indent);
+  writer.EndObject();
 
-  return out;
+  return writer.str();
 }
 
 
@@ -112,7 +116,7 @@ std::string AppendContextElementResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, requestType, indent);
+  return render(apiVersion, asJsonObject, requestType);
 }
 
 

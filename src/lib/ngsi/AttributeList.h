@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/Metadata.h"
 #include "ngsi/Request.h"
 
@@ -43,7 +45,7 @@ typedef struct AttributeList
 
   void         fill(const std::vector<std::string>& aVec);
   void         fill(const std::string& commaSeparatedList);
-  std::string  render(const std::string& indent, bool comma = false);
+  void         toJson(JsonHelper& writer);
   std::string  toString(void);
   void         present(const std::string& indent);
   void         release(void);

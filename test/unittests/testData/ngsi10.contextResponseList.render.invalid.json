@@ -1,16 +1,18 @@
-"contextResponses" : [
-  {
-    "attributes" : [
-      {
-        "name" : "caName",
-        "type" : "caType",
-        "value" : "caValue"
+{
+  "contextResponses": [
+    {
+      "attributes": [
+        {
+          "name": "caName",
+          "type": "caType",
+          "value": "caValue"
+        }
+      ],
+      "statusCode": {
+        "code": "400",
+        "reasonPhrase": "Bad Request",
+        "details": "Empty Vector"
       }
-    ],
-    "statusCode" : {
-      "code" : "400",
-      "reasonPhrase" : "Bad Request",
-      "details" : "Empty Vector"
     }
-  }
-]
+  ]
+}

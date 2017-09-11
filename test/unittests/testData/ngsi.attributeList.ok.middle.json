@@ -1,4 +1,6 @@
-"attributes" : [
-  "a1",
-  "a2"
-]
+{
+  "attributes": [
+    "a1",
+    "a2"
+  ]
+}

@@ -72,7 +72,7 @@ std::string putEntityAttribute
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
-    return oe.toJson();
+    return oe.render();
   }
 
   // 01. Fill in UpdateContextRequest from URL and payload
@@ -87,7 +87,7 @@ std::string putEntityAttribute
   std::string  answer = "";
   if (parseDataP->upcrs.res.oe.code != SccNone )
   {
-    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.render());
     ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
   }
   else

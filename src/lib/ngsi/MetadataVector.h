@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 
+#include "common/JsonHelper.h"
 #include "common/globals.h"
 
 #include "ngsi/Metadata.h"
@@ -45,8 +46,8 @@ public:
 
   MetadataVector(void);
 
-  std::string     render(const std::string& indent, bool comma = false);
-  std::string     toJson(bool                             isLastElement,
+  void            toJsonV1(JsonHelper& writer);
+  void            toJson(JsonHelper& writer,
                          const std::vector<std::string>&  metadataFilter);
   std::string     check(ApiVersion apiVersion);
 

@@ -35,14 +35,16 @@
 TEST(EntityId, render)
 {
   EntityId     eId;
-  std::string  out;
   const char*  outfile1 = "ngsi.entityId.render.middle.json";
 
   utInit();
 
-  out = eId.render("");
+  JsonHelper writer(2);
+  writer.StartObject();
+  eId.toJsonV1(writer);
+  writer.EndObject();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  EXPECT_STREQ(expectedBuf, writer.str().c_str());
 
   utExit();
 }

@@ -29,7 +29,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/ContextElementVector.h"
 
 
@@ -47,34 +46,30 @@ void ContextElementVector::push_back(ContextElement* item)
 
 /* ****************************************************************************
 *
-* ContextElementVector::render -
+* ContextElementVector::toJson -
 */
-std::string ContextElementVector::render
+void ContextElementVector::toJson
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         requestType,
-  const std::string&  indent,
-  bool                comma
+  JsonHelper& writer,
+  ApiVersion  apiVersion,
+  bool        asJsonObject,
+  RequestType requestType
 )
 {
-  std::string  out = "";
-
   if (vec.size() == 0)
   {
-    return "";
+    return;
   }
 
-  out += startTag(indent, "contextElements", true);
+  writer.Key("contextElements");
+  writer.StartArray();
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(apiVersion, asJsonObject, requestType, indent + "  ", ix != vec.size() - 1);
+    vec[ix]->toJsonV1(writer, asJsonObject, requestType);
   }
 
-  out += endTag(indent, comma, true);
-
-  return out;
+  writer.EndArray();
 }
 
 

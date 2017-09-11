@@ -29,6 +29,8 @@
 #include <vector>
 #include <map>
 
+#include "common/JsonHelper.h"
+
 #include "apiTypesV2/EntityVector.h"
 #include "rest/OrionError.h"
 
@@ -55,8 +57,12 @@ class Entities
   Entities();
   ~Entities();
 
-  std::string  render(std::map<std::string, bool>&         uriParamOptions,
+  void         toJson(JsonHelper&                          writer,
+                      std::map<std::string, bool>&         uriParamOptions,
                       std::map<std::string, std::string>&  uriParam);
+  std::string  render(std::map<std::string, bool>&         uriParamOptions,
+                      std::map<std::string, std::string>&  uriParam,
+                      int                                  indent = -1);
 
   std::string  check(ApiVersion apiVersion, RequestType requestType);
   void         present(const std::string& indent);

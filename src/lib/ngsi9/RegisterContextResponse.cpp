@@ -27,8 +27,6 @@
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 #include "common/globals.h"
-#include "common/tag.h"
-#include "ngsi/StatusCode.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
@@ -99,28 +97,35 @@ RegisterContextResponse::RegisterContextResponse(const std::string& _registratio
 *
 * RegisterContextResponse::render - 
 */
-std::string RegisterContextResponse::render(const std::string& indent)
+std::string RegisterContextResponse::render
+(
+  int indent
+)
 {
-  std::string  out = "";
-  bool         errorCodeRendered = (errorCode.code != SccNone) && (errorCode.code != SccOk);
+  if (indent < 0) {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  out += startTag(indent);
 
-  if (!errorCodeRendered)
+  bool error = (errorCode.code != SccNone) && (errorCode.code != SccOk); 
+  writer.StartObject();
+
+  if (!error)
   {
-    out += duration.render(indent + "  ", true);
+    duration.toJson(writer);
   }
 
-  out += registrationId.render(RegisterResponse, indent + "  ", errorCodeRendered);
+  registrationId.toJson(writer, RegisterResponse);
 
-  if (errorCodeRendered)
+  if (error)
   {
-    out += errorCode.render(indent + "  ");
+    errorCode.toJsonV1(writer);
   }
 
-  out += endTag(indent);
+  writer.EndObject();
 
-  return out;
+  return writer.str();
 }
 
 
@@ -146,7 +151,7 @@ std::string RegisterContextResponse::check(const std::string& indent, const std:
   else
     return "OK";
 
-  return response.render(indent);
+  return response.render();
 }
 
 

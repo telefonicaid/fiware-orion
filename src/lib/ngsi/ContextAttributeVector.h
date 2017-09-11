@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/JsonHelper.h"
+
 #include "common/RenderFormat.h"
 #include "ngsi/ContextAttribute.h"
 
@@ -57,19 +59,18 @@ typedef struct ContextAttributeVector
 
   std::string        check(ApiVersion apiVersion, RequestType requestType);
 
-  std::string        render(ApiVersion          apiVersion,
-                            bool                asJsonObject,
-                            RequestType         requestType,
-                            const std::string&  indent,
-                            bool                comma       = false,
-                            bool                omitValue   = false,
-                            bool                attrsAsName = false);
+  void               toJsonV1(JsonHelper& writer,
+                              bool                asJsonObject,
+                              RequestType         requestType,
+                              bool                omitValue   = false,
+                              bool                attrsAsName = false);
 
-  std::string        toJson(RenderFormat                     renderFormat,
+  void               toJson(JsonHelper& writer,
+                            RenderFormat                     renderFormat,
                             const std::vector<std::string>&  attrsFilter,
                             const std::vector<std::string>&  metadataV,
                             bool                             blacklist) const;
-  std::string        toJsonTypes(void);
+  void               toJsonTypes(JsonHelper& writer);
 
 } ContextAttributeVector;
 

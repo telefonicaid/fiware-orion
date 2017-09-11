@@ -25,7 +25,8 @@
 #include <stdio.h>
 #include <string>
 
-#include "common/tag.h"
+#include <boost/lexical_cast.hpp>
+
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 
@@ -86,18 +87,18 @@ void OrionError::fill(HttpStatusCode _code, const std::string& _details, const s
 
 /* ****************************************************************************
 *
-* OrionError::smartRender -
+* OrionError::render -
 */
-std::string OrionError::smartRender(ApiVersion apiVersion)
+std::string OrionError::render(ApiVersion apiVersion)
 {
   if (apiVersion == V1 || apiVersion == NO_VERSION)
   {
-    return render();
+    return renderV1();
   }
   else // admin or v2
   {
     shrinkReasonPhrase();
-    return toJson();
+    return render();
   }
 }
 
@@ -114,61 +115,87 @@ std::string OrionError::setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpS
     *scP = code;
   }
 
-  return smartRender(apiVersion);
+  return render(apiVersion);
 }
-
 
 
 /* ****************************************************************************
 *
 * OrionError::toJson -
 */
-std::string OrionError::toJson(void)
+void OrionError::toJson
+(
+  JsonHelper& writer
+)
 {
-  return "{" + JSON_STR("error") + ":" + JSON_STR(reasonPhrase) + "," + JSON_STR("description") + ":" + JSON_STR(details) + "}";
+  writer.StartObject();
+  writer.String("error", reasonPhrase);
+  writer.String("description", details);
+  writer.EndObject();
+}
+
+/* ****************************************************************************
+*
+* OrionError::render -
+*/
+std::string OrionError::render(int indent)
+{
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  JsonHelper writer(indent);
+
+  toJson(writer);
+
+  return writer.str();
 }
 
 
 
 /* ****************************************************************************
 *
-* OrionError::render -
+* OrionError::renderV1 -
 *
 */
-std::string OrionError::render(void)
+std::string OrionError::renderV1(int indent)
 {
-  std::string  out           = "{\n";
-  std::string  indent        = "  ";
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
   //
   // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here
   //
-  out += startTag(indent, "orionError", false);
-  out += valueTag(indent + "  ", "code",          code,         true);
-  out += valueTag(indent + "  ", "reasonPhrase",  reasonPhrase, details != "");
+  writer.StartObject();
+
+  writer.StartObject("orionError");
+  writer.String("code", boost::lexical_cast<std::string>(code));
+  writer.String("reasonPhrase", reasonPhrase);
 
   if (details != "")
   {
-    out += valueTag(indent + "  ", "details",       details);
+    writer.String("details", details);
   }
 
-  out += endTag(indent);
+  writer.EndObject();
+  writer.EndObject();
 
-  out += "}\n";
-
-  return out;
+  return writer.str();
 }
 
 
 
 /* ****************************************************************************
 *
-* OrionError::render -
+* OrionError::shrinkReasonPhrase -
 *
 * This method removes any whitespace in the reasonPhrase field, i.e.
 * transforms "Not Found" to "NotFound".
 *
-* It is used by smartRender method, in order to prepare to render in API v2 case
+* It is used by render method, in order to prepare to render in API v2 case
 *
 * FIXME P4: The following alternative (more compact) way has been proposed:
 *

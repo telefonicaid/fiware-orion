@@ -60,9 +60,9 @@ TEST(EntityTypeResponse, check)
   etR1.entityType.type = "myType";
   etR2.entityType.type = "";
 
-  EXPECT_EQ("OK", etR1.check(V1, false, false, false, ""));
-  EXPECT_NE("OK", etR2.check(V1, false, false, false, ""));
-  EXPECT_NE("OK", etR1.check(V1, false, false, false, "foo"));
+  EXPECT_EQ("OK", etR1.check(V1, true, true, false, ""));
+  EXPECT_NE("OK", etR2.check(V1, true, true, false, ""));
+  EXPECT_NE("OK", etR1.check(V1, true, true, false, "foo"));
 
   utExit();
 }

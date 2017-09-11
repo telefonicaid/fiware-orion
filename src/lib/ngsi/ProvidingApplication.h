@@ -27,6 +27,8 @@
 */
 #include <string>
 
+#include "common/JsonHelper.h"
+
 #include "common/MimeType.h"
 #include "ngsi/Request.h"
 
@@ -47,7 +49,7 @@ typedef struct ProvidingApplication
   std::string   get(void);
   MimeType      getMimeType(void);
   bool          isEmpty(void);
-  std::string   render(const std::string& indent, bool comma);
+  void          toJson(JsonHelper& writer);
   void          present(const std::string& indent);
   const char*   c_str(void);
   void          release(void);

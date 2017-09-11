@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/RestrictionString.h"
 
@@ -106,16 +105,19 @@ void RestrictionString::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* RestrictionString::render -
+* RestrictionString::toJson -
 */
-std::string RestrictionString::render(const std::string& indent, bool comma)
+void RestrictionString::toJson
+(
+  JsonHelper& writer
+)
 {
   if (string == "")
   {
-    return "";
+    return;
   }
 
-  return valueTag(indent, "restriction", string, comma);
+  writer.String("restriction", string);
 }
 
 

@@ -1,14 +1,14 @@
 {
-  "contextElements" : [
+  "contextElements": [
     {
       "type": "Room",
       "isPattern": "false",
-      "id" : "ConferenceRoom",
-      "attributes" : [
+      "id": "ConferenceRoom",
+      "attributes": [
         {
-          "name"    : "temperature",
-          "type"    : "degree",
-          "value"   : {
+          "name": "temperature",
+          "type": "degree",
+          "value": {
             "level1": {
               "level": "2",
               "level2": {

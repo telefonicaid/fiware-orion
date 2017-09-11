@@ -115,7 +115,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
 )
 {
     /* Render NotifyContextAvailabilityRequest */
-    std::string payload = ncar->render("");
+    std::string payload = ncar->render();
 
     /* Parse URL */
     std::string  host;
@@ -233,7 +233,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       cer.contextElement = ce;
       ncr.subscriptionId = subscriptionId;
       ncr.contextElementResponseVector.push_back(&cer);
-      payload  = ncr.toJson(renderFormat, attrsOrder, metadataFilter);
+      payload  = ncr.render(renderFormat, attrsOrder, metadataFilter);
       mimeType = "application/json";
     }
     else
@@ -459,11 +459,11 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     std::string payloadString;
     if (renderFormat == NGSI_V1_LEGACY)
     {
-      payloadString = ncrP->render(ci.apiVersion, ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON, "");
+      payloadString = ncrP->renderV1(ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON);
     }
     else
     {
-      payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
+      payloadString = ncrP->render(renderFormat, attrsOrder, metadataFilter, blackList);
     }
 
     /* Parse URL */

@@ -29,6 +29,8 @@
 #include <vector>
 #include <map>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/ContextAttributeVector.h"
 #include "rest/OrionError.h"
 
@@ -66,9 +68,12 @@ class Entity
   Entity();
   ~Entity();
 
+  void         toJson(JsonHelper&                          writer,
+                      std::map<std::string, bool>&         uriParamOptions,
+                      std::map<std::string, std::string>&  uriParam);
   std::string  render(std::map<std::string, bool>&         uriParamOptions,
                       std::map<std::string, std::string>&  uriParam,
-                      bool                                 comma = false);
+                      int                                  indent = -1);
 
   std::string  check(ApiVersion apiVersion, RequestType requestType);
   void         present(const std::string& indent);

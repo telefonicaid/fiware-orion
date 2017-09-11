@@ -63,7 +63,6 @@ std::string getEntityAttribute
 )
 {
   std::string  type   = ciP->uriParam["type"];
-  std::string  answer;
   Attribute    attribute;
 
   if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str(), NULL) ||
@@ -71,7 +70,7 @@ std::string getEntityAttribute
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
-    return oe.toJson();
+    return oe.render();
   }
 
   // 01. Fill in QueryContextRequest
@@ -86,11 +85,10 @@ std::string getEntityAttribute
   // 03. Render entity attribute response
   attribute.fill(&parseDataP->qcrs.res, compV[4]);
 
+  std::string answer;
+  ciP->outMimeType = ciP->httpHeaders.outformatSelect();
   TIMED_RENDER(answer = attribute.render(ciP->apiVersion,
-                                         ciP->httpHeaders.accepted("text/plain"),
-                                         ciP->httpHeaders.accepted("application/json"),
                                          ciP->httpHeaders.outformatSelect(),
-                                         &(ciP->outMimeType),
                                          &(ciP->httpStatusCode),
                                          ciP->uriParamOptions[OPT_KEY_VALUES],
                                          ciP->uriParam[URI_PARAM_METADATA],

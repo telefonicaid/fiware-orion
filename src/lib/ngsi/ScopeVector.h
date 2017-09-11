@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/Scope.h"
 
 
@@ -40,7 +42,7 @@ typedef struct ScopeVector
 {
   std::vector<Scope*>  vec;
 
-  std::string  render(const std::string& indent, bool comma);
+  void         toJson(JsonHelper& writer);
   void         present(const std::string& indent);
   void         push_back(Scope* item);
   unsigned int size(void) const;

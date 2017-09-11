@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 
+#include "common/JsonHelper.h"
 #include "common/globals.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -160,8 +161,7 @@ class CompoundValueNode
   CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, bool _value);
   std::string         check(void);
   std::string         finish(void);
-  std::string         render(ApiVersion apiVersion, const std::string& indent);
-  std::string         toJson(bool isLastElement, bool comma = true);
+  void                toJson(JsonHelper& writer);
 
   void                shortShow(const std::string& indent);
   void                show(const std::string& indent);

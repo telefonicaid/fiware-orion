@@ -32,7 +32,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/Request.h"
@@ -46,29 +45,37 @@
 */
 std::string EntityVector::render
 (
+  std::map<std::string, bool>&                uriParamOptions,
+  std::map<std::string, std::string>&         uriParam,
+  int                                         indent
+)
+{
+  JsonHelper writer(indent);
+  toJson(writer, uriParamOptions, uriParam);
+  return writer.str();
+}
+
+
+/* ****************************************************************************
+*
+* EntityVector::toJson -
+*/
+void EntityVector::toJson
+(
+  JsonHelper&                          writer,
   std::map<std::string, bool>&         uriParamOptions,
   std::map<std::string, std::string>&  uriParam
 )
 {
-  if (vec.size() == 0)
-  {
-    return "[]";
-  }
-
-  std::string out;
-
-  out += "[";
+  writer.StartArray();
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(uriParamOptions, uriParam, ix != vec.size() - 1);
+    vec[ix]->toJson(writer, uriParamOptions, uriParam);
   }
 
-  out += "]";
-
-  return out;
+  writer.EndArray();
 }
-
 
 
 /* ****************************************************************************

@@ -27,6 +27,9 @@
 */
 #include <string>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/StatusCode.h"
 
@@ -46,7 +49,7 @@ typedef struct UnsubscribeContextAvailabilityResponse
   UnsubscribeContextAvailabilityResponse(SubscriptionId _subscriptionId);
   ~UnsubscribeContextAvailabilityResponse();
 
-  std::string render(const std::string& indent);
+  std::string  render(int indent = -1);
 } UnsubscribeContextAvailabilityResponse;
 
 #endif  // SRC_LIB_NGSI9_UNSUBSCRIBECONTEXTAVAILABILITYRESPONSE_H_

@@ -1,21 +1,21 @@
 {
-  "contextElements" : [
+  "contextElements": [
     {
       "type": "Room",
       "isPattern": "false",
-      "id" : "ConferenceRoom",
-      "attributes" : [
+      "id": "ConferenceRoom",
+      "attributes": [
         {
-          "name"    : "temperature",
-          "type"    : "degree",
-          "value"   : {
-            "s1" : "STRING"
+          "name": "temperature",
+          "type": "degree",
+          "value": {
+            "s1": "STRING"
           }
         },
         {
-          "name"    : "temperature2",
-          "type"    : "degree",
-          "value"   : [
+          "name": "temperature2",
+          "type": "degree",
+          "value": [
             "I-0",
             "I-1",
             "I-2",

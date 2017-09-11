@@ -62,8 +62,7 @@ extern std::string postSubscriptions
     alarmMgr.badInput(clientIp, errMsg);
     scr.subscribeError.errorCode.fill(SccBadRequest, "max one service-path allowed for subscriptions");
 
-    TIMED_RENDER(answer = scr.render(""));
-    return answer;
+    TIMED_RENDER(answer = scr.render());
   }
 
   OrionError  beError;
@@ -80,7 +79,7 @@ extern std::string postSubscriptions
   // Check potential error
   if (beError.code != SccNone)
   {
-    TIMED_RENDER(answer = beError.toJson());
+    TIMED_RENDER(answer = beError.render());
     ciP->httpStatusCode = beError.code;
   }
   else

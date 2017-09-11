@@ -46,7 +46,7 @@ typedef struct SubscribeContextResponse
   SubscribeContextResponse(StatusCode& errorCode);
   ~SubscribeContextResponse();
 
-  std::string render(const std::string& indent);
+  std::string render(int indent = -1);
 } SubscribeContextResponse;
 
 #endif  // SRC_LIB_NGSI10_SUBSCRIBECONTEXTRESPONSE_H_

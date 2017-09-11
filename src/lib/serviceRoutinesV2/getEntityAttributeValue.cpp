@@ -73,7 +73,7 @@ std::string getEntityAttributeValue
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
-    return oe.toJson();
+    return oe.render();
   }
 
   // Fill in QueryContextRequest
@@ -85,7 +85,7 @@ std::string getEntityAttributeValue
 
   if (attribute.oe.code != SccNone)
   {
-    TIMED_RENDER(answer = attribute.oe.toJson());
+    TIMED_RENDER(answer = attribute.oe.render());
     ciP->httpStatusCode = attribute.oe.code;
   }
   else
@@ -96,57 +96,12 @@ std::string getEntityAttributeValue
     // the same of the wrapped operation
     ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
 
-    // Remove unwanted fields from attribute before rendering
-    attribute.pcontextAttribute->type = "";
-    attribute.pcontextAttribute->metadataVector.release();
-
-    if (ciP->outMimeType == JSON)
-    {
-      // Do not use attribute name, change to 'value'
-      attribute.pcontextAttribute->name = "value";
-
-      TIMED_RENDER(answer = attribute.render(ciP->apiVersion,
-                                             ciP->httpHeaders.accepted("text/plain"),
-                                             ciP->httpHeaders.accepted("application/json"),
-                                             ciP->httpHeaders.outformatSelect(),
-                                             &(ciP->outMimeType),
-                                             &(ciP->httpStatusCode),
-                                             ciP->uriParamOptions[OPT_KEY_VALUES],
-                                             ciP->uriParam[URI_PARAM_METADATA],
-                                             EntityAttributeValueRequest,
-                                             false));
-    }
-    else
-    {
-      if (attribute.pcontextAttribute->compoundValueP != NULL)
-      {
-        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->render(ciP->apiVersion, ""));
-
-        if (attribute.pcontextAttribute->compoundValueP->isObject())
-        {
-          answer = "{" + answer + "}";
-        }
-        else if (attribute.pcontextAttribute->compoundValueP->isVector())
-        {
-          answer = "[" + answer + "]";
-        }
-      }
-      else
-      {
-        if ((attributeType == DATE_TYPE) || (attributeType == DATE_TYPE_ALT))
-        {
-          TIMED_RENDER(answer = isodate2str(attribute.pcontextAttribute->numberValue));
-        }
-        else
-        {
-          TIMED_RENDER(answer = attribute.pcontextAttribute->getValue());
-          if (attribute.pcontextAttribute->valueType == orion::ValueTypeString)
-          {
-            answer = '"' + answer + '"';
-          }
-        }
-      }
-    }
+    TIMED_RENDER(answer = attribute.render(ciP->apiVersion,
+                                           ciP->httpHeaders.outformatSelect(),
+                                           &(ciP->httpStatusCode),
+                                           ciP->uriParamOptions[OPT_KEY_VALUES],
+                                           ciP->uriParam[URI_PARAM_METADATA],
+                                           EntityAttributeValueRequest));
   }
 
   // Cleanup and return result

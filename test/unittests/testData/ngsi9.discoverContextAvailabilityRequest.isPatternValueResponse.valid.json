@@ -1,7 +1,7 @@
 {
-  "errorCode" : {
-    "code" : "400",
-    "reasonPhrase" : "Bad Request",
-    "details" : "invalid isPattern value for entity: /falseX/"
+  "errorCode": {
+    "code": "400",
+    "reasonPhrase": "Bad Request",
+    "details": "invalid isPattern value for entity: /falseX/"
   }
 }

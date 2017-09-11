@@ -104,19 +104,26 @@ TEST(UpdateActionType, check)
 TEST(UpdateActionType, render)
 {
   UpdateActionType  uat;
-  std::string       out;
   const char*       outfile1 = "ngsi.updateActionType.render.middle.json";
 
   utInit();
 
-  uat.set("");
-  out = uat.render("");
-  EXPECT_STREQ("", out.c_str());
+  {
+    JsonHelper writer(2);
+    uat.set("");
+    uat.toJson(writer);
+    EXPECT_STREQ("", writer.str().c_str());
+  }
 
-  uat.set("Update");
-  out = uat.render("");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    JsonHelper writer(2);
+    uat.set("Update");
+    writer.StartObject();
+    uat.toJson(writer);
+    writer.EndObject();
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+    EXPECT_STREQ(expectedBuf, writer.str().c_str());
+  }
 
   utExit();
 }

@@ -30,7 +30,6 @@
 
 #include "common/globals.h"
 #include "ngsi/EntityId.h"
-#include "common/tag.h"
 
 
 
@@ -78,50 +77,17 @@ EntityId::EntityId
 
 /* ****************************************************************************
 *
-* EntityId::render -
+* EntityId::toJsonV1 -
 *
 */
-std::string EntityId::render
+void EntityId::toJsonV1
 (
-  const std::string&  indent,
-  bool                comma,
-  bool                isInVector
+  JsonHelper& writer
 )
 {
-  std::string  out              = "";
-  char*        isPatternEscaped = htmlEscape(isPattern.c_str());
-  char*        typeEscaped      = htmlEscape(type.c_str());
-  char*        idEscaped        = htmlEscape(id.c_str());
-
-
-  std::string indent2 = indent;
-
-  if (isInVector)
-  {
-    indent2 += "  ";
-  }
-
-  out += (isInVector? indent + "{\n" : "");
-  out += indent2 + "\"type\" : \""      + typeEscaped      + "\","  + "\n";
-  out += indent2 + "\"isPattern\" : \"" + isPatternEscaped + "\","  + "\n";
-  out += indent2 + "\"id\" : \""        + idEscaped        + "\"";
-
-  if ((comma == true) && (isInVector == false))
-  {
-    out += ",\n";
-  }
-  else
-  {
-    out += "\n";
-    out += (isInVector? indent + "}" : "");
-    out += (comma == true)? ",\n" : (isInVector? "\n" : "");
-  }
-
-  free(typeEscaped);
-  free(idEscaped);
-  free(isPatternEscaped);
-
-  return out;
+  writer.String("type", type);
+  writer.String("isPattern", isPattern);
+  writer.String("id", id);
 }
 
 
@@ -130,20 +96,13 @@ std::string EntityId::render
 *
 * EntityId::toJson - 
 */
-std::string EntityId::toJson(void) const
+void EntityId::toJson
+(
+  JsonHelper& writer
+) const
 {
-  std::string  out;
-  char*        typeEscaped  = htmlEscape(type.c_str());
-  char*        idEscaped    = htmlEscape(id.c_str());
-
-  out += JSON_VALUE("id", idEscaped);
-  out += ",";
-  out += JSON_VALUE("type", typeEscaped);
-
-  free(typeEscaped);
-  free(idEscaped);
-
-  return out;
+  writer.String("id", id);
+  writer.String("type", type);
 }
 
 

@@ -28,7 +28,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/tag.h"
 #include "common/globals.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/NotifyContextResponse.h"
@@ -62,17 +61,25 @@ NotifyContextResponse::NotifyContextResponse(StatusCode& sc)
 *
 * NotifyContextResponse::render -
 */
-std::string NotifyContextResponse::render(const std::string& indent)
+std::string NotifyContextResponse::render
+(
+  int indent
+)
 {
-  std::string out = "";
+  if (indent == -1)
+  {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
+
 
   responseCode.keyNameSet("responseCode");
 
-  out += startTag(indent);
-  out += responseCode.render(indent + "  ");
-  out += endTag(indent);
+  writer.StartObject();
+  responseCode.toJsonV1(writer);
+  writer.EndObject();
 
-  return out;
+  return writer.str();
 }
 
 

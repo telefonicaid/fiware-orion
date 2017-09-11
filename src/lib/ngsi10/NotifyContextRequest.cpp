@@ -25,7 +25,6 @@
 #include <string>
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/RenderFormat.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
@@ -36,40 +35,45 @@
 
 /* ****************************************************************************
 *
-* NotifyContextRequest::render -
+* NotifyContextRequest::renderV1 -
 */
-std::string NotifyContextRequest::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
+std::string NotifyContextRequest::renderV1
+(
+  bool       asJsonObject,
+  int        indent
+)
 {
-  std::string  out                                  = "";
-  bool         contextElementResponseVectorRendered = contextElementResponseVector.size() != 0;
+  if (indent == -1)
+  {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  //
-  // Note on JSON commas:
-  //   subscriptionId and originator are MANDATORY.
-  //   The only doubt here if whether originator should end in a comma.
-  //   This doubt is taken care of by the variable 'contextElementResponseVectorRendered'
-  //
-  out += startTag(indent);
-  out += subscriptionId.render(NotifyContext, indent + "  ", true);
-  out += originator.render(indent  + "  ", contextElementResponseVectorRendered);
-  out += contextElementResponseVector.render(apiVersion, asJsonObject, NotifyContext, indent  + "  ", false);
-  out += endTag(indent);
 
-  return out;
+  writer.StartObject();
+
+  subscriptionId.toJson(writer, NotifyContext);
+  originator.toJson(writer);
+  contextElementResponseVector.toJsonV1(writer, asJsonObject, NotifyContext);
+
+  writer.EndObject();
+
+  return writer.str();
 }
 
 
 
 /* ****************************************************************************
 *
-* NotifyContextRequest::toJson -
+* NotifyContextRequest::render -
 */
-std::string NotifyContextRequest::toJson
+std::string NotifyContextRequest::render
 (
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   const std::vector<std::string>&  metadataFilter,
-  bool                             blacklist
+  bool                             blacklist,
+  int                              indent
 )
 {
   if ((renderFormat != NGSI_V2_NORMALIZED) && (renderFormat != NGSI_V2_KEYVALUES) && (renderFormat != NGSI_V2_VALUES))
@@ -77,22 +81,21 @@ std::string NotifyContextRequest::toJson
     OrionError oe(SccBadRequest, "Invalid notification format");
     alarmMgr.badInput(clientIp, "Invalid notification format");
 
-    return oe.toJson();
+    return oe.renderV1();
   }
 
-  std::string out;
+  JsonHelper writer(indent);
 
-  out += "{";
-  out += JSON_STR("subscriptionId") + ":";
-  out += JSON_STR(subscriptionId.get());
-  out += ",";
-  out += JSON_STR("data") + ":[";
+  writer.StartObject();
 
-  out += contextElementResponseVector.toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
-  out += "]";
-  out += "}";
+  writer.String("subscriptionId", subscriptionId.get());
+  writer.StartArray("data");
+  contextElementResponseVector.toJson(writer, renderFormat, attrsFilter, metadataFilter, blacklist);
+  writer.EndArray();
 
-  return out;
+  writer.EndObject();
+
+  return writer.str();
 }
 
 
@@ -121,7 +124,7 @@ std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string
     return "OK";
   }
 
-  return response.render(indent);
+  return response.render();
 }
 
 

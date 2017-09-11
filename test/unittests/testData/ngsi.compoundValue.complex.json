@@ -1,0 +1,15 @@
+{
+  "entry1": {
+    "number": 1.333e50,
+    "boolean": false,
+    "string": "\"\\\b\f\n\r\t",
+    "array": [
+      1,
+      2,
+      3
+    ],
+    "null": null
+  },
+  "entry2": 1.3,
+  "entry3": []
+}

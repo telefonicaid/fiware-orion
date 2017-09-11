@@ -30,7 +30,6 @@
 
 #include "common/string.h"
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/limits.h"
 #include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"
@@ -483,216 +482,102 @@ std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
 
 /* ****************************************************************************
 *
-* renderAsJsonObject - 
+* toJsonObject - 
 */
-std::string ContextAttribute::renderAsJsonObject
+void ContextAttribute::toJsonObject
 (
-  ApiVersion          apiVersion,
-  RequestType         request,
-  const std::string&  indent,
-  bool                comma,
-  bool                omitValue
+  JsonHelper& writer,
+  ApiVersion  apiVersion,
+  RequestType request,
+  bool        asJsonObject,
+  bool        omitValue
 )
-{
-  std::string  out                    = "";
-  bool         commaAfterContextValue = metadataVector.size() != 0;
-  bool         commaAfterType         = !omitValue || commaAfterContextValue;
+{ 
+  writer.StartObject();
 
-  out += startTag(indent, name, false);
-  out += valueTag(indent + "  ", "type",         type,  commaAfterType);
-
-  if (compoundValueP == NULL)
-  {
-    if (omitValue == false)
-    {
-      std::string effectiveValue  = "";
-      bool        withoutQuotes   = false;
-
-      switch (valueType)
-      {
-      case ValueTypeString:
-        effectiveValue = stringValue;
-        break;
-
-      case ValueTypeBoolean:
-        effectiveValue = boolValue? "true" : "false";
-        withoutQuotes  = true;
-        break;
-
-      case ValueTypeNumber:
-        if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
-        {
-          effectiveValue = isodate2str(numberValue);
-        }
-        else // regular number
-        {
-          effectiveValue = toString(numberValue);
-          withoutQuotes  = true;
-        }
-        break;
-
-      case ValueTypeNone:
-        effectiveValue = "null";
-        withoutQuotes  = true;
-        break;
-
-      default:
-        LM_E(("Runtime Error (unknown value type: %d)", valueType));
-      }
-
-      //
-      // NOTE
-      // renderAsJsonObject is used in v1 only.
-      // => we only need to care about stringValue (not boolValue, numberValue nor nullValue)
-      //
-      out += valueTag(indent + "  ", "value",
-                            (request != RtUpdateContextResponse)? effectiveValue : "",
-                            commaAfterContextValue, false, withoutQuotes);
-    }
-  }
-  else
-  {
-    bool isCompoundVector = false;
-
-    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::ValueTypeVector))
-    {
-      isCompoundVector = true;
-    }
-
-    out += startTag(indent + "  ", "value", isCompoundVector);
-    out += compoundValueP->render(apiVersion, indent + "    ");
-    out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
-  }
+  writer.String("name", name);
+  writer.String("type", type);
 
   if (omitValue == false)
   {
-    out += metadataVector.render(indent + "  ", false);
-  }
-
-  out += endTag(indent, comma);
-
-  return out;
-}
-
-/* ****************************************************************************
-*
-* renderAsNameString -
-*/
-std::string ContextAttribute::renderAsNameString(const std::string& indent, bool comma)
-{
-  std::string  out = "";
-
-  if (comma)
-  {
-    out += indent + "\"" + name + "\",\n";
-  }
-  else
-  {
-    out += indent + "\"" + name + "\"\n";
-  }
-
-  return out;
-
-}
-
-/* ****************************************************************************
-*
-* render - 
-*/
-std::string ContextAttribute::render
-(
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         request,
-  const std::string&  indent,
-  bool                comma,
-  bool                omitValue
-)
-{
-  std::string  out                    = "";
-  bool         valueRendered          = (compoundValueP != NULL) || (omitValue == false) || (request == RtUpdateContextResponse);
-  bool         commaAfterContextValue = metadataVector.size() != 0;
-  bool         commaAfterType         = valueRendered;
-
-  if (asJsonObject)
-  {
-    return renderAsJsonObject(apiVersion, request, indent, comma, omitValue);
-  }
-
-  out += startTag(indent);
-  out += valueTag(indent + "  ", "name", name,  true);  // attribute.type is always rendered
-  out += valueTag(indent + "  ", "type", type,  commaAfterType);
-
-  if (compoundValueP == NULL)
-  {
-    if (omitValue == false)
+    if (compoundValueP == NULL)
     {
-      std::string effectiveValue = "";
-      bool        withoutQuotes  = false;
-
+      writer.Key("value");
       switch (valueType)
       {
       case ValueTypeString:
-        effectiveValue = stringValue;
+        writer.String(stringValue);
         break;
 
       case ValueTypeBoolean:
-        effectiveValue = boolValue? "true" : "false";
-        withoutQuotes  = true;
+        writer.Bool(boolValue);
         break;
 
       case ValueTypeNumber:
         if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
         {
-          effectiveValue = isodate2str(numberValue);
+          writer.Date(numberValue);
         }
-        else // regular number
+        // regular number
+        else
         {
-          effectiveValue = toString(numberValue);
-          withoutQuotes  = true;
+          writer.Double(numberValue);
         }
         break;
 
       case ValueTypeNone:
-        effectiveValue = "null";
-        withoutQuotes  = true;
+        writer.Null();
         break;
 
       default:
         LM_E(("Runtime Error (unknown value type: %d)", valueType));
+        writer.String(stringValue);
       }
-
-      out += valueTag(indent + "  ",
-                      "value",
-                      (request != RtUpdateContextResponse)? effectiveValue : "",
-                      commaAfterContextValue,
-                      false,
-                      withoutQuotes);
-
     }
-    else if (request == RtUpdateContextResponse)
+    else
     {
-      out += valueTag(indent + "  ", "value", "", commaAfterContextValue);
+      writer.Key("value");
+      compoundValueP->toJson(writer);
     }
   }
-  else
+  else if (request == RtUpdateContextResponse)
   {
-    bool isCompoundVector = false;
-
-    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::ValueTypeVector))
-    {
-      isCompoundVector = true;
-    }
-
-    out += startTag(indent + "  ", "value", isCompoundVector);
-    out += compoundValueP->render(apiVersion, indent + "    ");
-    out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
+    writer.String("value", "");
   }
 
-  out += metadataVector.render(indent + "  ", false);
-  out += endTag(indent, comma);
+  if (apiVersion != V2 || !omitValue)
+  {
+    metadataVector.toJsonV1(writer);
+  }
 
-  return out;
+  writer.EndObject();
+}
+
+/* ****************************************************************************
+*
+* toJsonString -
+*/
+void ContextAttribute::toJsonString
+(
+  JsonHelper& writer
+)
+{
+  writer.String(name);
+}
+
+/* ****************************************************************************
+*
+* toJson - 
+*/
+void ContextAttribute::toJsonV1
+(
+  JsonHelper& writer,
+  bool                asJsonObject,
+  RequestType         request,
+  bool                omitValue
+)
+{
+  return toJsonObject(writer, V1, request, asJsonObject, omitValue);
 }
 
 
@@ -705,72 +590,67 @@ std::string ContextAttribute::render
 *        the code paths of the rendering process
 *
 */
-std::string ContextAttribute::toJson
+void ContextAttribute::toJson
 (
-  bool                             isLastElement,
+  JsonHelper& writer,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  metadataFilter,
   RequestType                      requestType
 )
 {
-  std::string  out;
-
-  // Add special metadata representing attribute dates
-  if ((creDate != 0) && (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_DATECREATED) != metadataFilter.end()))
-  {
-    Metadata* mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, creDate);
-    metadataVector.push_back(mdP);
-  }
-  if ((modDate != 0) && (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_DATEMODIFIED) != metadataFilter.end()))
-  {
-    Metadata* mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, modDate);
-    metadataVector.push_back(mdP);
-  }
-
   if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_KEYVALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
   {
-    out = (renderFormat == NGSI_V2_KEYVALUES)? JSON_STR(name) + ":" : "";
+    if (renderFormat == NGSI_V2_KEYVALUES)
+    {
+        writer.Key(name);
+    }
 
     if (compoundValueP != NULL)
     {
-      if (compoundValueP->isObject())
-      {
-        out += "{" + compoundValueP->toJson(true) + "}";
-      }
-      else if (compoundValueP->isVector())
-      {
-        out += "[" + compoundValueP->toJson(true) + "]";
-      }
+      compoundValueP->toJson(writer);
     }
     else if (valueType == orion::ValueTypeNumber)
     {
       if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
       {
-        out += JSON_STR(isodate2str(numberValue));
+        writer.Date(numberValue);
       }
       else // regular number
       {
-        out += toString(numberValue);
+        writer.Double(numberValue);
       }
     }
     else if (valueType == orion::ValueTypeString)
     {
-      out += JSON_STR(stringValue);
+      writer.String(stringValue);
     }
     else if (valueType == orion::ValueTypeBoolean)
     {
-      out += (boolValue == true)? "true" : "false";
+      writer.Bool(boolValue);
     }
     else if (valueType == orion::ValueTypeNone)
     {
-      out += "null";
+      writer.Null();
     }
   }
   else  // Render mode: normalized 
   {
+    // Add special metadata representing attribute dates
+    if ((creDate != 0) && (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_DATECREATED) != metadataFilter.end()))
+    {
+      Metadata* mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, creDate);
+      metadataVector.push_back(mdP);
+    }
+    if ((modDate != 0) && (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_DATEMODIFIED) != metadataFilter.end()))
+    {
+      Metadata* mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, modDate);
+      metadataVector.push_back(mdP);
+    }
+
     if (requestType != EntityAttributeResponse)
     {
-      out = JSON_STR(name) + ":{";
+      writer.Key(name);
+      writer.StartObject();
     }
 
     //
@@ -785,170 +665,137 @@ std::string ContextAttribute::toJson
       defType = defaultType(orion::ValueTypeVector);
     }
 
-    out += (type != "")? JSON_VALUE("type", type) : JSON_VALUE("type", defType);
-    out += ",";
+    writer.Key("type");
+    if (type != "")
+    {
+        writer.String(type);
+    }
+    else
+    {
+        writer.String(defType);
+    }
 
 
     //
     // value
     //
+    writer.Key("value");
     if (compoundValueP != NULL)
     {
-      if (compoundValueP->isObject())
-      {
-        out += JSON_STR("value") + ":{" + compoundValueP->toJson(true) + "}";
-      }
-      else if (compoundValueP->isVector())
-      {
-        out += JSON_STR("value") + ":[" + compoundValueP->toJson(true) + "]";
-      }
+      compoundValueP->toJson(writer);
     }
     else if (valueType == orion::ValueTypeNumber)
     {
       if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
       {
-        out += JSON_VALUE("value", isodate2str(numberValue));;
+        writer.Date(numberValue);
       }
       else // regular number
       {
-        out += JSON_VALUE_NUMBER("value", toString(numberValue));
+        writer.Double(numberValue);
       }
     }
     else if (valueType == orion::ValueTypeString)
     {
-      out += JSON_VALUE("value", stringValue);
+      writer.String(stringValue);
     }
     else if (valueType == orion::ValueTypeBoolean)
     {
-      out += JSON_VALUE_BOOL("value", boolValue);
+      writer.Bool(boolValue);
     }
     else if (valueType == orion::ValueTypeNone)
     {
-      out += JSON_STR("value") + ":" + "null";
+      writer.Null();
     }
     else
     {
-      out += JSON_VALUE("value", stringValue);
+      writer.String(stringValue);
     }
-    out += ",";
 
     //
     // metadata
     //
-    out += JSON_STR("metadata") + ":" + "{" + metadataVector.toJson(true, metadataFilter) + "}";
+    metadataVector.toJson(writer, metadataFilter);
 
     if (requestType != EntityAttributeResponse)
     {
-      out += "}";
+      writer.EndObject();
     }
   }
-
-  if (!isLastElement)
-  {
-    out += ",";
-  }
-
-  return out;
 }
 
 
+void ContextAttribute::toJsonAsValue
+(
+  JsonHelper& writer
+)
+{
+  switch (valueType)
+  {
+  case orion::ValueTypeString:
+    writer.String(stringValue);
+    break;
+
+  case orion::ValueTypeNumber:
+    if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
+    {
+      writer.Date(numberValue);
+    }
+    else // regular number
+    {
+      writer.Double(numberValue);
+    }
+    break;
+
+  case orion::ValueTypeBoolean:
+    writer.Bool(boolValue);
+    break;
+
+  case orion::ValueTypeNone:
+    writer.Null();
+    break;
+
+  default:
+    if (compoundValueP != NULL) {
+      compoundValueP->toJson(writer);
+    }
+  }
+}
 
 /* ****************************************************************************
 *
-* toJsonAsValue -
+* renderAsValue -
 */
-std::string ContextAttribute::toJsonAsValue
+std::string ContextAttribute::renderAsValue
 (
-  ApiVersion       apiVersion,          // in parameter
-  bool             acceptedTextPlain,   // in parameter
-  bool             acceptedJson,        // in parameter
-  MimeType         outFormatSelection,  // in parameter
-  MimeType*        outMimeTypeP,        // out parameter
-  HttpStatusCode*  scP                  // out parameter
+  ApiVersion       apiVersion,
+  MimeType         outFormatSelection,
+  HttpStatusCode*  scP,
+  int              indent
 )
 {
-  std::string  out;
-
-  if (compoundValueP == NULL)  // Not a compound - text/plain must be accepted
-  {
-    if (acceptedTextPlain)
-    {
-      char buf[64];
-
-      *outMimeTypeP = TEXT;
-
-      switch (valueType)
-      {
-      case orion::ValueTypeString:
-        if (apiVersion == V2)
-        { 
-          out = '"' + stringValue + '"';
-        }
-        else
-        { 
-          out = stringValue;
-        }
-        break;
-
-      case orion::ValueTypeNumber:
-        if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
-        {
-          out = isodate2str(numberValue);
-        }
-        else // regular number
-        {
-          out = toString(numberValue);
-        }
-        break;
-
-      case orion::ValueTypeBoolean:
-        snprintf(buf, sizeof(buf), "%s", boolValue? "true" : "false");
-        out = buf;
-        break;
-
-      case orion::ValueTypeNone:
-        snprintf(buf, sizeof(buf), "%s", "null");
-        out = buf;
-        break;
-
-      default:
-        out = "ERROR";
-        break;
+  switch (outFormatSelection) {
+  case TEXT:
+      // Exception for V1
+      if (valueType == orion::ValueTypeString && apiVersion == V1) {
+         return stringValue;
       }
-    }
-    else
-    {
-      OrionError oe(SccNotAcceptable, "accepted MIME types: text/plain", "NotAcceptable");
-      *scP = SccNotAcceptable;
 
-      out = oe.toJson();
-    }
-  }
-  else if (compoundValueP != NULL)  // Compound: application/json OR text/plain must be accepted
+      // Else treat it as json
+  case JSON:
   {
-    if (!acceptedJson && !acceptedTextPlain)
-    {
+      JsonHelper writer(indent);
+
+      toJsonAsValue(writer);
+      return writer.str();
+  }
+  case NOMIMETYPE:
+  default:
       OrionError oe(SccNotAcceptable, "accepted MIME types: application/json, text/plain", "NotAcceptable");
       *scP = SccNotAcceptable;
 
-      out = oe.toJson();
-    }
-    else
-    {
-      *outMimeTypeP = outFormatSelection;
-
-      if (compoundValueP->isVector())
-      {
-        out = "[" + compoundValueP->toJson(true) + "]";
-      }
-      else  // Object
-      {
-        out = "{" + compoundValueP->toJson(false) + "}";
-      }
-    }
+      return oe.render(apiVersion);
   }
-
-  return out;
 }
 
 

@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/string.h"
 #include "ngsi/Request.h"
 #include "ngsi/Reference.h"
@@ -126,16 +125,17 @@ void Reference::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* Reference::render -
+* Reference::toJson -
 */
-std::string Reference::render(const std::string& indent, bool comma)
+void Reference::toJson
+(
+  JsonHelper& writer
+)
 {
-  if (string == "")
+  if (string != "")
   {
-    return "";
+    writer.String("reference", string);
   }
-
-  return valueTag(indent, "reference", string, comma);
 }
 
 

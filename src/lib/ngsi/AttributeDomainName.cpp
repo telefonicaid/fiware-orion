@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/AttributeDomainName.h"
 
@@ -110,16 +109,14 @@ void AttributeDomainName::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* AttributeDomainName::render - 
+* AttributeDomainName::toJson - 
 */
-std::string AttributeDomainName::render(const std::string& indent, bool comma)
+void AttributeDomainName::toJson(JsonHelper& writer)
 {
-  if (string == "")
+  if (string != "")
   {
-    return "";
+    writer.String("attributeDomainName", string);
   }
-
-  return valueTag(indent, "attributeDomainName", string, comma);
 }
 
 

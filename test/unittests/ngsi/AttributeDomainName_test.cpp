@@ -50,16 +50,25 @@ TEST(AttributeDomainName, ok)
   EXPECT_STREQ("ADN", adn.get().c_str());
   EXPECT_STREQ("ADN", adn.c_str());
 
-  out = adn.render("");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    JsonHelper writer(2);
+    writer.StartObject();
+    adn.toJson(writer);
+    writer.EndObject();
+
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+    EXPECT_STREQ(expectedBuf, writer.str().c_str());
+  }
 
   // Just to exercise the code
   adn.present("");
   adn.set("");
   adn.present("");
-  out = adn.render("");
-  EXPECT_STREQ("", out.c_str());
+  {
+    JsonHelper writer(2);
+    adn.toJson(writer);
+    EXPECT_STREQ("", writer.str().c_str());
+  }
 
   utExit();
 }

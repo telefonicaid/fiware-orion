@@ -25,9 +25,7 @@
 #include <string>
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
-#include "ngsi/StatusCode.h"
 #include "rest/EntityTypeInfo.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi10/SubscribeContextRequest.h"
@@ -61,7 +59,7 @@ std::string SubscribeContextRequest::check(const std::string& indent, const std:
   {
     alarmMgr.badInput(clientIp, res);
     response.subscribeError.errorCode.fill(SccBadRequest, std::string("invalid payload: ") + res);
-    return response.render(indent);
+    return response.render();
   }
 
   return "OK";

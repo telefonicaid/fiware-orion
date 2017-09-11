@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/Throttling.h"
 
@@ -130,14 +129,16 @@ void Throttling::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* Throttling::render -
+* Throttling::toJson -
 */
-std::string Throttling::render(const std::string& indent, bool comma)
+void Throttling::toJson
+(
+  JsonHelper& writer
+)
 {
-  if (string == "")
+  if (string != "")
   {
-    return "";
+    writer.String("throttling", string);
   }
 
-  return valueTag(indent, "throttling", string, comma);
 }

@@ -30,7 +30,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/string.h"
 #include "ngsi/AttributeList.h"
 
@@ -63,27 +62,20 @@ void AttributeList::fill(const std::string& commaSeparatedList)
 
 /* ****************************************************************************
 *
-* render - 
+* toJson - 
 */
-std::string AttributeList::render(const std::string& indent, bool comma)
+void AttributeList::toJson
+(
+  JsonHelper& writer
+)
 {
-  std::string  out = "";
-
   if (attributeV.size() == 0)
   {
-    return "";
+    return;
   }
 
-  out += startTag(indent, "attributes", true);
-
-  for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
-  {
-    out += valueTag(indent + "  ", "attribute", attributeV[ix], ix != attributeV.size() - 1, true);
-  }
-
-  out += endTag(indent, comma, true);
-
-  return out;
+  writer.Key("attributes");
+  vectorToJson(writer, attributeV);
 }
 
 

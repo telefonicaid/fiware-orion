@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/AttributeExpression.h"
 
@@ -108,16 +107,14 @@ void AttributeExpression::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* AttributeExpression::render - 
+* AttributeExpression::toJson - 
 */
-std::string AttributeExpression::render(const std::string& indent, bool comma)
+void AttributeExpression::toJson(JsonHelper& writer)
 {
-  if (string == "")
+  if (string != "")
   {
-    return "";
+    writer.String("attributeExpression", string);
   }
-
-  return valueTag(indent, "attributeExpression", string, comma);
 }
 
 

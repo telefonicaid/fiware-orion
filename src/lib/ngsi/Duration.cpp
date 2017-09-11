@@ -31,7 +31,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
 #include "ngsi/Duration.h"
@@ -160,21 +159,16 @@ void Duration::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* Duration::render -
+* Duration::toJson -
 */
-std::string Duration::render(const std::string& indent, bool comma)
+void Duration::toJson(JsonHelper& writer)
 {
-  if (string == "")
+  if (string == "" || !valid)
   {
-    return "";
+    return;
   }
 
-  if (valid == false)
-  {
-    return "";
-  }
-
-  return valueTag(indent, "duration", string, comma);
+  writer.String("duration", string);
 }
 
 

@@ -25,7 +25,6 @@
 #include <string>
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
 
@@ -35,15 +34,22 @@
 *
 * UnsubscribeContextRequest::render - 
 */
-std::string UnsubscribeContextRequest::render(const std::string& indent)
+std::string UnsubscribeContextRequest::render
+(
+  int indent
+)
 {
-  std::string out = "";
+  if (indent == -1)
+  {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  out += startTag(indent);
-  out += subscriptionId.render(UnsubscribeContext, indent + "  ");
-  out += endTag(indent);
+  writer.StartObject();
+  subscriptionId.toJson(writer, UnsubscribeContext);
+  writer.EndObject();
 
-  return out;
+  return writer.str();
 }
 
 
@@ -60,7 +66,7 @@ std::string UnsubscribeContextRequest::check(const std::string& indent, const st
   if ((res = subscriptionId.check(SubscribeContext, indent, predetectedError, counter)) != "OK")
   {
      response.statusCode.fill(SccBadRequest, std::string("Invalid Subscription Id: /") + subscriptionId.get() + "/: " + res);
-     return response.render(indent);
+     return response.render();
   }
 
   return "OK";

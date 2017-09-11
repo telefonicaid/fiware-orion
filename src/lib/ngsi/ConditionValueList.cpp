@@ -30,34 +30,25 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/ConditionValueList.h"
 
 
 
 /* ****************************************************************************
 *
-* render - 
+* toJson - 
 */
-std::string ConditionValueList::render(const std::string& indent, bool comma)
+void ConditionValueList::toJson(JsonHelper& writer)
 {
   std::string  out = "";
 
   if (vec.size() == 0)
   {
-    return "";
+    return;
   }
 
-  out += startTag(indent, "condValueList", true);
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    out += valueTag(indent + "  ", "", vec[ix], ix != vec.size() - 1, true);
-  }
-
-  out += endTag(indent, comma, true);
-
-  return out;
+  writer.Key("condValueList");
+  vectorToJson(writer, vec);
 }
 
 

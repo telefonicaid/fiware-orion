@@ -88,19 +88,26 @@ TEST(Originator, isEmptySetAndGet)
 TEST(Originator, render)
 {
   Originator   originator;
-  std::string  out;
   const char*  outfile1 = "ngsi.originator.render.middle.json";
 
   utInit();
 
-  out = originator.render("");
-  EXPECT_STREQ("", out.c_str());
+  {
+    JsonHelper writer(2);
+    originator.toJson(writer);
+    EXPECT_STREQ("", writer.str().c_str());
+  }
 
   originator.string = "String";
 
-  out = originator.render("");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    JsonHelper writer(2);
+    writer.StartObject();
+    originator.toJson(writer);
+    writer.EndObject();
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+    EXPECT_STREQ(expectedBuf, writer.str().c_str());
+  }
 
   utExit();
 }

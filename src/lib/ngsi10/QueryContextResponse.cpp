@@ -28,7 +28,6 @@
 #include "logMsg/logMsg.h"
 
 #include "common/string.h"
-#include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/HttpStatusCode.h"
 #include "ngsi/StatusCode.h"
@@ -94,21 +93,53 @@ QueryContextResponse::~QueryContextResponse()
 *
 * QueryContextResponse::render -
 */
-std::string QueryContextResponse::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
+std::string QueryContextResponse::render
+(
+  ApiVersion apiVersion,
+  bool       asJsonObject,
+  int        indent
+)
 {
-  std::string  out               = "";
-  bool         errorCodeRendered = false;
+  if (indent == -1)
+  {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
+
+  toJson(writer, apiVersion, asJsonObject);
+
+  return writer.str();
+}
+
+
+/* ****************************************************************************
+*
+* QueryContextResponse::toJson -
+*/
+void QueryContextResponse::toJson
+(
+  JsonHelper&  writer,
+  ApiVersion   apiVersion,
+  bool         asJsonObject
+)
+{
+  writer.StartObject();
+
+  if (contextElementResponseVector.size() > 0)
+  {
+    contextElementResponseVector.toJsonV1(writer, asJsonObject, QueryContext);
+  }
 
   //
-  // 01. Decide whether errorCode should be rendered
+  // Decide whether errorCode should be rendered
   //
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    errorCodeRendered = true;
+    errorCode.toJsonV1(writer);
   }
   else if (contextElementResponseVector.size() == 0)
   {
-    errorCodeRendered = true;
+    errorCode.toJsonV1(writer);
   }
   else if (errorCode.details != "")
   {
@@ -117,28 +148,11 @@ std::string QueryContextResponse::render(ApiVersion apiVersion, bool asJsonObjec
       errorCode.code = SccOk;
     }
 
-    errorCodeRendered = true;
+    errorCode.toJsonV1(writer);
   }
 
-
   //
-  // 02. render
-  //
-  out += startTag(indent);
-
-  if (contextElementResponseVector.size() > 0)
-  {
-    out += contextElementResponseVector.render(apiVersion, asJsonObject, QueryContext, indent + "  ", errorCodeRendered);
-  }
-
-  if (errorCodeRendered == true)
-  {
-    out += errorCode.render(indent + "  ");
-  }
-
-
-  //
-  // 03. Safety Check
+  // Safety Check
   //
   // If neither errorCode nor CER vector was filled by mongoBackend, then we
   // report a special kind of error.
@@ -147,12 +161,10 @@ std::string QueryContextResponse::render(ApiVersion apiVersion, bool asJsonObjec
   {
     LM_W(("Internal Error (Both error-code and response vector empty)"));
     errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
-    out += errorCode.render(indent + "  ");
+    errorCode.toJsonV1(writer);
   }
 
-  out += endTag(indent);
-
-  return out;
+  writer.EndObject();
 }
 
 
@@ -179,7 +191,7 @@ std::string QueryContextResponse::check(ApiVersion apiVersion, bool asJsonObject
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, indent);
+  return render(apiVersion, asJsonObject);
 }
 
 

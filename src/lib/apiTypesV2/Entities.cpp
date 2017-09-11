@@ -63,13 +63,34 @@ Entities::~Entities()
 std::string Entities::render
 (
   std::map<std::string, bool>&         uriParamOptions,
-  std::map<std::string, std::string>&  uriParam
+  std::map<std::string, std::string>&  uriParam,
+  int                                  indent
 )
 {
-  return vec.render(uriParamOptions, uriParam);
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT;
+  }
+  JsonHelper writer(indent);
+  toJson(writer, uriParamOptions, uriParam);
+  return writer.str();
 }
 
 
+/* ****************************************************************************
+*
+* Entities::toJson -
+*
+*/
+void Entities::toJson
+(
+  JsonHelper&                          writer,
+  std::map<std::string, bool>&         uriParamOptions,
+  std::map<std::string, std::string>&  uriParam
+)
+{
+  return vec.toJson(writer, uriParamOptions, uriParam);
+}
 
 /* ****************************************************************************
 *

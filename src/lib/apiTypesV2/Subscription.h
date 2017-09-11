@@ -33,6 +33,7 @@
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 #include "ngsi/Restriction.h"
+#include "common/JsonHelper.h"
 #include "common/RenderFormat.h"
 
 namespace ngsiv2
@@ -47,7 +48,7 @@ struct EntID
   std::string idPattern;
   std::string type;
   std::string typePattern;
-  std::string toJson();
+  void        toJson(JsonHelper& writer);
 
   EntID(const std::string& idA, const std::string& idPatternA,
         const std::string& typeA, const std::string& typePatternA):
@@ -98,7 +99,7 @@ struct Notification
   long long                timesSent;
   long long                lastNotification;
   HttpInfo                 httpInfo;
-  std::string              toJson(const std::string& attrsFormat);
+  void                     toJson(JsonHelper& writer, const std::string& attrsFormat);
   int                      lastFailure;
   int                      lastSuccess;
   Notification():
@@ -122,7 +123,7 @@ struct Condition
 {
   std::vector<std::string>  attributes;
   SubscriptionExpression    expression;
-  std::string               toJson();
+  void                      toJson(JsonHelper& writer);
 };
 
 
@@ -135,7 +136,7 @@ struct Subject
 {
   std::vector<EntID> entities;
   Condition          condition;
-  std::string        toJson();
+  void               toJson(JsonHelper& writer);
 };
 
 
@@ -156,7 +157,8 @@ struct Subscription
   long long     throttling;
   RenderFormat  attrsFormat;
   Restriction   restriction;
-  std::string   toJson();
+  std::string   render(int indent = -1);
+  void          toJson(JsonHelper& writer);
 
   ~Subscription();
 };

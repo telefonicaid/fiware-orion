@@ -29,7 +29,6 @@
 
 #include "common/globals.h"
 #include "common/idCheck.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/RegistrationId.h"
 
@@ -114,9 +113,13 @@ void RegistrationId::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* RegistrationId::render -
+* RegistrationId::toJson -
 */
-std::string RegistrationId::render(RequestType requestType, const std::string& indent, bool comma)
+void RegistrationId::toJson
+(
+  JsonHelper& writer,
+  RequestType requestType
+)
 {
   if (string == "")
   {
@@ -127,11 +130,11 @@ std::string RegistrationId::render(RequestType requestType, const std::string& i
     }
     else
     {
-      return "";
+      return;
     }
   }
 
-  return valueTag(indent, "registrationId", string, comma);
+  writer.String("registrationId", string);
 }
 
 

@@ -28,6 +28,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/MetadataVector.h"
 #include "ngsi/Duration.h"
 #include "ngsi/ProvidingApplication.h"
@@ -48,7 +51,7 @@ typedef struct RegisterProviderRequest
 
   RegisterProviderRequest();
 
-  std::string  render(std::string indent);
+  std::string  render(int indent = -1);
   std::string  check(ApiVersion apiVersion, RequestType requestType, std::string indent, const std::string& preError);
   void         present(std::string indent);
   void         release();

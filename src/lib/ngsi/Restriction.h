@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/Request.h"
 #include "ngsi/AttributeExpression.h"
 #include "ngsi/ScopeVector.h"
@@ -43,7 +45,7 @@ typedef struct Restriction
   AttributeExpression  attributeExpression;   // Optional (FI-WARE changes - MANDATORY in OMA spec)
   ScopeVector          scopeVector;           // Optional
 
-  std::string   render(const std::string& indent, int restrictions = 1, bool comma = false);
+  void          toJson(JsonHelper& writer, int restrictions = 1);
   void          present(const std::string& indent);
   void          release();
   void          fill(Restriction* rP);

@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/ContextRegistration.h"
 
 
@@ -42,7 +44,7 @@ typedef struct ContextRegistrationVector
 
   void                  push_back(ContextRegistration* item);
   unsigned int          size(void);
-  std::string           render(const std::string& indent, bool comma);
+  void                  toJson(JsonHelper& writer);
   void                  present(const std::string& indent);
   void                  release(void);
 

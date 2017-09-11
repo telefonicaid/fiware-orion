@@ -28,9 +28,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
-#include "ngsi/StatusCode.h"
 #include "ngsi/Duration.h"
 #include "ngsi/ContextRegistrationVector.h"
 #include "ngsi9/RegisterContextResponse.h"
@@ -42,24 +40,24 @@
 *
 * RegisterContextRequest::render -
 */
-std::string RegisterContextRequest::render(const std::string& indent)
+std::string RegisterContextRequest::render
+(
+  int indent
+)
 {
-  std::string  out                                 = "";
-  bool         durationRendered                    = duration.get() != "";
-  bool         registrationIdRendered              = registrationId.get() != "";
-  bool         commaAfterRegistrationId            = false; // Last element
-  bool         commaAfterDuration                  = registrationIdRendered;
-  bool         commaAfterContextRegistrationVector = registrationIdRendered || durationRendered;
+  if (indent < 0) {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  out += startTag(indent);
 
-  out += contextRegistrationVector.render(      indent + "  ", commaAfterContextRegistrationVector);
-  out += duration.render(                       indent + "  ", commaAfterDuration);
-  out += registrationId.render(RegisterContext, indent + "  ", commaAfterRegistrationId);
+  writer.StartObject();
+  contextRegistrationVector.toJson(writer);
+  duration.toJson(writer);
+  registrationId.toJson(writer, RegisterContext);
+  writer.EndObject();
 
-  out += endTag(indent, false);
-
-  return out;
+  return writer.str();
 }
 
 
@@ -95,7 +93,7 @@ std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::stri
     return "OK";
   }
 
-  return response.render(indent);
+  return response.render();
 }
 
 

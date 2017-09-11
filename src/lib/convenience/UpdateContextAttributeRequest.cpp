@@ -30,7 +30,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "convenience/UpdateContextAttributeRequest.h"
 #include "ngsi/StatusCode.h"
 #include "parse/compoundValue.h"
@@ -53,37 +52,51 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 *
 * render - 
 */
-std::string UpdateContextAttributeRequest::render(ApiVersion apiVersion, std::string indent)
+std::string UpdateContextAttributeRequest::render
+(
+  ApiVersion apiVersion,
+  int        indent
+)
 {
-  std::string out = "";
-  std::string indent2 = indent + "  ";
-  bool        commaAfterContextValue = metadataVector.size() != 0;
+  if (indent < 0) {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  out += startTag(indent);
-  out += valueTag(indent2, "type", type, true);
+  toJson(writer, apiVersion);
+
+  return writer.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* toJson - 
+*/
+void UpdateContextAttributeRequest::toJson
+(
+  JsonHelper& writer,
+  ApiVersion apiVersion
+)
+{
+  writer.StartObject();
+
+  writer.String("type", type);
 
   if (compoundValueP == NULL)
   {
-    out += valueTag(indent2, "contextValue", contextValue, true);
+    writer.String("contextValue", contextValue);
   }
   else
   {
-    bool isCompoundVector = false;
-
-    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::ValueTypeVector))
-    {
-      isCompoundVector = true;
-    }
-
-    out += startTag(indent + "  ", "value", isCompoundVector);
-    out += compoundValueP->render(apiVersion, indent + "    ");
-    out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
+    writer.Key("value");
+    compoundValueP->toJson(writer);
   }
 
-  out += metadataVector.render(indent2);
-  out += endTag(indent);
+  metadataVector.toJsonV1(writer);
 
-  return out;
+  writer.EndObject();
 }
 
 
@@ -102,8 +115,6 @@ std::string UpdateContextAttributeRequest::check
   StatusCode       response;
   std::string      res;
 
-  indent = "  ";
-
   if (predetectedError != "")
   {
     response.fill(SccBadRequest, predetectedError);
@@ -117,11 +128,11 @@ std::string UpdateContextAttributeRequest::check
     return "OK";
   }
 
-  std::string out = response.render(indent);
-
-  out = "{\n" + out + "}\n";
-
-  return out;
+  JsonHelper writer(indent.length());
+  writer.StartObject();
+  response.toJsonV1(writer);
+  writer.EndObject();
+  return writer.str();
 }
 
 

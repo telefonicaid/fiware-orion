@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/ProvidingApplication.h"
 
@@ -146,16 +145,19 @@ void ProvidingApplication::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* ProvidingApplication::render -
+* ProvidingApplication::toJson -
 */
-std::string ProvidingApplication::render(const std::string& indent, bool comma)
+void ProvidingApplication::toJson
+(
+  JsonHelper& writer
+)
 {
   if (string == "")
   {
-    return "";
+    return;
   }
 
-  return valueTag(indent, "providingApplication", string, comma);
+  writer.String("providingApplication", string);
 }
 
 

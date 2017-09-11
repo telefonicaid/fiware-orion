@@ -83,7 +83,7 @@ std::string getEntityAllTypes
                                  totalTypesP,
                                  noAttrDetail));
   }
-  TIMED_RENDER(answer = response.toJson(ciP->uriParamOptions[OPT_VALUES]));
+  TIMED_RENDER(answer = response.render(ciP->uriParamOptions[OPT_VALUES]));
 
   if (ciP->uriParamOptions[OPT_COUNT])
   {

@@ -65,7 +65,7 @@ TEST(RegisterProviderRequest, json_ok)
   result = jsonTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, "registerProviderRequest", NULL);
   EXPECT_EQ("OK", result) << "this test should be OK";
 
-  rendered = reqData.rpr.res.render("");
+  rendered = reqData.rpr.res.render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
@@ -92,6 +92,6 @@ TEST(RegisterProviderRequest, json_ok)
 
   result = jsonTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, "registerProviderRequest", NULL);
   EXPECT_EQ("OK", result);
-  rendered = reqData.rpr.res.render("");
+  rendered = reqData.rpr.res.render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 }

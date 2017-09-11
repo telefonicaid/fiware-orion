@@ -27,6 +27,8 @@
 */
 #include <string>
 
+#include "common/JsonHelper.h"
+
 #include "common/RenderFormat.h"
 #include "common/globals.h"
 #include "ngsi/ContextElement.h"
@@ -65,13 +67,21 @@ typedef struct ContextElementResponse
                          ApiVersion             apiVersion   = V1);
   ContextElementResponse(ContextElement* ceP, bool useDefaultType = false);
 
-  std::string  render(ApiVersion          apiVersion,
-                      bool                asJsonObject,
-                      RequestType         requestType,
-                      const std::string&  indent,
-                      bool                comma               = false,
-                      bool                omitAttributeValues = false);
-  std::string  toJson(RenderFormat                     renderFormat,
+  std::string  renderV1(bool        asJsonObject,
+                        RequestType requestType,
+                        bool        omitAttributeValues = false,
+                        int         indent = -1);
+  std::string  render(RenderFormat                     renderFormat,
+                      const std::vector<std::string>&  attrsFilter,
+                      const std::vector<std::string>&  metadataFilter,
+                      bool                             blacklist = false,
+                      int                              indent = -1);
+  void         toJsonV1(JsonHelper& writer,
+                        bool        asJsonObject,
+                        RequestType requestType,
+                        bool        omitAttributeValues = false);
+  void         toJson(JsonHelper& writer,
+                      RenderFormat                     renderFormat,
                       const std::vector<std::string>&  attrsFilter,
                       const std::vector<std::string>&  metadataFilter,
                       bool blacklist = false);

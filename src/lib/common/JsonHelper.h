@@ -26,36 +26,47 @@
 * Author: Orion dev team
 */
 
-#include <sstream>
 #include <string>
 #include <vector>
 #include <map>
 
-class JsonHelper
-{
-public:
-  JsonHelper();
+#include "common/dtoa.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
 
-  void        addString(const std::string& key, const std::string& value);
-  void        addRaw(const std::string& key, const std::string& value);
-  void        addNumber(const std::string& key, long long value);
-  void        addFloat(const std::string& key, float value);
-  void        addDate(const std::string& key, long long timestamp);
+
+class JsonHelper {
+public:
+  JsonHelper(int indent = -1);
+
+  void Null();
+  void Bool(bool b);
+  void Date(const std::string& key, long long value);
+  void Date(long long value);
+  void Double(const std::string& key, double d);
+  void Double(double d);
+  void Int(const std::string& key, int64_t i);
+  void Int(int64_t i);
+  void Uint(const std::string& key, uint64_t i);
+  void Uint(uint64_t i);
+  void String(const std::string& key, const std::string& value);
+  void String(const std::string& value);
+  void StartObject(const std::string& key);
+  void StartObject();
+  void Key(const std::string& key);
+  void EndObject();
+  void StartArray(const std::string& key);
+  void StartArray();
+  void EndArray();
+
   std::string str();
 
 private:
- std::ostringstream ss;
- bool               empty;
+  int                                              indent;
+  rapidjson::StringBuffer                          sb;
+  rapidjson::Writer<rapidjson::StringBuffer>       writer;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> pwriter;
 };
-
-
-
-
-/* ****************************************************************************
-*
-* toJsonString -
-*/
-std::string toJsonString(const std::string& input);
 
 
 
@@ -64,28 +75,30 @@ std::string toJsonString(const std::string& input);
 * vectorToJson -
 */
 template <class T>
-std::string vectorToJson(std::vector<T> &list)
+void vectorToJson
+(
+  JsonHelper& writer,
+  std::vector<T> &list
+)
 {
   typedef typename std::vector<T>::size_type size_type;
 
-  if (list.empty())
+  writer.StartArray();
+
+  for (size_type i = 0; i != list.size(); ++i)
   {
-    return "[]";
+    list[i].toJson(writer);
   }
 
-  std::ostringstream ss;
-
-  ss << '[' << list[0].toJson();
-  for (size_type i = 1; i != list.size(); ++i)
-  {
-    ss << ',' << list[i].toJson();
-  }
-  ss << ']';
-  return ss.str();
+  writer.EndArray();
 }
 
 template <>
-std::string vectorToJson(std::vector<std::string> &list);
+void vectorToJson
+(
+  JsonHelper& writer,
+  std::vector<std::string>& list
+);
 
 
 
@@ -93,6 +106,10 @@ std::string vectorToJson(std::vector<std::string> &list);
 *
 * objectToJson -
 */
-extern std::string objectToJson(std::map<std::string, std::string>& list);
+extern void objectToJson
+(
+  JsonHelper& writer,
+  std::map<std::string, std::string>& list
+);
 
 #endif  // SRC_LIB_COMMON_JSONHELPER_H_

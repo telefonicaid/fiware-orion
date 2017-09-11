@@ -27,6 +27,8 @@
 */
 #include <string>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/Request.h"
 #include "orionTypes/areas.h"
 #include "rest/StringFilter.h"
@@ -82,7 +84,7 @@ typedef struct Scope
                     const std::string&  georelString,
                     std::string*        errorString);
 
-  std::string  render(const std::string& indent, bool notLastInVector);
+  void         toJson(JsonHelper& writer);
   void         present(const std::string& indent, int ix);
   void         release(void);
 

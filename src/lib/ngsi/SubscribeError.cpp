@@ -24,7 +24,6 @@
 */
 #include <string>
 
-#include "common/tag.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/Request.h"
 #include "ngsi/SubscribeError.h"
@@ -44,16 +43,17 @@ SubscribeError::SubscribeError()
 
 /* ****************************************************************************
 *
-* SubscribeError::render -
+* SubscribeError::toJson -
 */
-std::string SubscribeError::render(RequestType requestType, const std::string& indent, bool comma)
+void SubscribeError::toJson
+(
+  JsonHelper& writer,
+  RequestType requestType
+)
 {
-  std::string out = "";
-
-  out += startTag(indent, "subscribeError", false);
+  writer.StartObject("subscribeError");
 
   // subscriptionId is Mandatory if part of updateContextSubscriptionResponse
-  // errorCode is Mandatory so, the JSON comma is always TRUE
   if (requestType == UpdateContextSubscription)
   {
     //
@@ -64,20 +64,17 @@ std::string SubscribeError::render(RequestType requestType, const std::string& i
     {
       subscriptionId.set("000000000000000000000000");
     }
-    out += subscriptionId.render(requestType, indent + "  ", true);
+    subscriptionId.toJson(writer, requestType);
   }
   else if ((requestType          == SubscribeContext)           &&
            (subscriptionId.get() != "000000000000000000000000") &&
            (subscriptionId.get() != ""))
   {
-    out += subscriptionId.render(requestType, indent + "  ", true);
+    subscriptionId.toJson(writer, requestType);
   }
 
-  out += errorCode.render(indent + "  ");
-
-  out += endTag(indent, comma);
-
-  return out;
+  errorCode.toJsonV1(writer);
+  writer.EndObject();
 }
 
 

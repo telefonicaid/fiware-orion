@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
@@ -51,10 +53,14 @@ typedef struct ContextAttributeResponse
   ContextAttributeVector     contextAttributeVector;     // Mandatory
   StatusCode                 statusCode;                 // Mandatory
 
-  std::string render(ApiVersion          apiVersion,
-                     bool                asJsonObject,
-                     RequestType         request,
-                     const std::string&  indent);
+  std::string render(ApiVersion   apiVersion,
+                     bool         asJsonObject,
+                     RequestType  request,
+                     int          indent = -1);
+  void        toJson(JsonHelper&  writer,
+                     ApiVersion   apiVersion,
+                     bool         asJsonObject,
+                     RequestType  request);
   void        present(std::string indent);
   void        release(void);
   std::string check(ApiVersion          apiVersion,

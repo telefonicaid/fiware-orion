@@ -1,20 +1,20 @@
 {
-  "contextRegistrationResponses" : [
+  "contextRegistrationResponses": [
     {
-      "contextRegistration" : {
-        "metadatas" : [
+      "contextRegistration": {
+        "metadatas": [
           {
-            "name" : "M1",
-            "type" : "string",
-            "value" : "test 8"
+            "name": "M1",
+            "type": "string",
+            "value": "test 8"
           },
           {
-            "name" : "M2",
-            "type" : "string",
-            "value" : "test 9"
+            "name": "M2",
+            "type": "string",
+            "value": "test 9"
           }
         ],
-        "providingApplication" : "http://tid.test.com/unitTest9"
+        "providingApplication": "http://tid.test.com/unitTest9"
       }
     }
   ]

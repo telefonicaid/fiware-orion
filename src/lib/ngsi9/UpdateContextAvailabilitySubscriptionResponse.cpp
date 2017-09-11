@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
 
@@ -72,23 +71,30 @@ UpdateContextAvailabilitySubscriptionResponse::~UpdateContextAvailabilitySubscri
 *
 * UpdateContextAvailabilitySubscriptionResponse::render - 
 */
-std::string UpdateContextAvailabilitySubscriptionResponse::render(const std::string& indent, int counter)
+std::string UpdateContextAvailabilitySubscriptionResponse::render
+(
+  int indent
+)
 {
-  std::string  out                = "";
-  bool         durationRendered   = !duration.isEmpty();
-  bool         errorCodeRendered  = (errorCode.code != SccNone);
+  if (indent < 0) {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  out += startTag(indent);
 
-  out += subscriptionId.render(RtUpdateContextAvailabilitySubscriptionResponse, indent + "  ", errorCodeRendered || durationRendered);
-  out += duration.render(      indent + "  ", errorCodeRendered);
+  writer.StartObject();
 
-  if (errorCodeRendered)
-     out += errorCode.render(indent + "  ", false);
+  subscriptionId.toJson(writer, RtUpdateContextAvailabilitySubscriptionResponse);
+  duration.toJson(writer);
 
-  out += endTag(indent);
+  if (errorCode.code != SccNone)
+  {
+     errorCode.toJsonV1(writer);
+  }
 
-  return out;
+  writer.EndObject();
+
+  return writer.str();
 }
 
 /* ****************************************************************************
@@ -111,5 +117,5 @@ std::string UpdateContextAvailabilitySubscriptionResponse::check(const std::stri
   else
     return "OK";
 
-  return render(indent, counter);
+  return render();
 }

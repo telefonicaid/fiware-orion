@@ -29,7 +29,6 @@
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 
-#include "common/tag.h"
 #include "common/limits.h"
 #include "ngsi/Request.h"
 #include "orionTypes/EntityType.h"
@@ -59,7 +58,7 @@ EntityType::EntityType(std::string _type): type(_type), count(0)
 
 /* ****************************************************************************
 *
-* EntityType::render -
+* EntityType::toJsonV1 -
 *
 * This method is used by:
 *   o EntityTypeVector
@@ -67,42 +66,33 @@ EntityType::EntityType(std::string _type): type(_type), count(0)
 *
 * 'typeNameBefore' is set to TRUE when called from EntityTypeResponse
 */
-std::string EntityType::render
+void EntityType::toJsonV1
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  bool                asJsonOut,
-  bool                collapsed,
-  const std::string&  indent,
-  bool                comma,
-  bool                typeNameBefore
+  JsonHelper& writer,
+  ApiVersion  apiVersion,
+  bool        asJsonObject,
+  bool        asJsonOut,
+  bool        collapsed,
+  bool        typeNameBefore
 )
 {
-  std::string  out = "";
-
   if (typeNameBefore && asJsonOut)
   {
-    out += valueTag(indent  + "  ", "name", type, true);
-    out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, indent + "  ", true, true, true);
+    writer.String("name", type);
+    contextAttributeVector.toJsonV1(writer, asJsonObject, EntityTypes, true, true);
   }
   else
   {
-    out += startTag(indent);
+    writer.StartObject();
 
-    if (collapsed || contextAttributeVector.size() == 0)
+    writer.String("name", type);
+    if (!collapsed && contextAttributeVector.size() != 0)
     {
-      out += valueTag(indent  + "  ", "name", type, false);
-    }
-    else
-    {
-      out += valueTag(indent  + "  ", "name", type, true);
-      out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, indent + "  ", false, true, true);
+      contextAttributeVector.toJsonV1(writer, asJsonObject, EntityTypes, true, true);
     }
 
-    out += endTag(indent, comma, false);
+    writer.EndObject();
   }
-
-  return out;
 }
 
 
@@ -154,26 +144,24 @@ void EntityType::release(void)
 *
 * EntityType::toJson -
 */
-std::string EntityType::toJson(bool includeType)
+void EntityType::toJson
+(
+  JsonHelper& writer,
+  bool includeType
+)
 {
-  std::string  out = "{";
-  char         countV[STRING_SIZE_FOR_INT];
-
-  snprintf(countV, sizeof(countV), "%lld", count);
+  writer.StartObject();
 
   if (includeType)
   {
-    out += JSON_VALUE("type", type) + ",";
+    writer.String("type", type);
   }
 
-  out += JSON_STR("attrs") + ":";
+  writer.StartObject("attrs");
+  contextAttributeVector.toJsonTypes(writer);
+  writer.EndObject();
 
-  out += "{";
-  out += contextAttributeVector.toJsonTypes();
-  out += "}";
+  writer.Int("count", count);
 
-  out += "," + JSON_STR("count") + ":" + countV;
-  out += "}";
-
-  return out;
+  writer.EndObject();
 }

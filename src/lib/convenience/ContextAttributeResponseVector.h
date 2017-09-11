@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/JsonHelper.h"
+
 #include "convenience/ContextAttributeResponse.h"
 #include "rest/ConnectionInfo.h"
 
@@ -41,10 +43,10 @@ typedef struct ContextAttributeResponseVector
 {
   std::vector<ContextAttributeResponse*>  vec;
 
-  std::string                render(ApiVersion          apiVersion,
-                                    bool                asJsonObject,
-                                    RequestType         request,
-                                    const std::string&  indent);
+  void                       toJson(JsonHelper& writer,
+                                    ApiVersion  apiVersion,
+                                    bool        asJsonObject,
+                                    RequestType request);
   void                       present(std::string indent);
   void                       push_back(ContextAttributeResponse* item);
   unsigned int               size(void);

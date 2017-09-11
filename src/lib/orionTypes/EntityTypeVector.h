@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/JsonHelper.h"
+
 #include "orionTypes/EntityType.h"
 
 
@@ -48,12 +50,12 @@ class EntityTypeVector
   unsigned int  size(void);
   void          release(void);
   std::string   check(ApiVersion apiVersion, const std::string& predetectedError);
-  std::string   render(ApiVersion          apiVersion,
-                       bool                asJsonObject,
-                       bool                asJsonOut,
-                       bool                collapsed,
-                       const std::string&  indent,
-                       bool comma = false);
+  void          toJsonV1(JsonHelper&  writer,
+                         bool         asJsonObject,
+                         bool         asJsonOut,
+                         bool         collapsed);
+  void          toJson(JsonHelper&  writer,
+                       bool         values);
 
   EntityType*   operator[] (unsigned int ix) const;
 

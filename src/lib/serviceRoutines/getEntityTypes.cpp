@@ -58,6 +58,7 @@ std::string getEntityTypes
 )
 {
   EntityTypeVectorResponse  response;
+  std::string               answer;
   unsigned int              totalTypes   = 0;
   unsigned int*             totalTypesP  = NULL;
 
@@ -79,14 +80,11 @@ std::string getEntityTypes
   //
   TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP, true));
 
-  std::string rendered;
-  TIMED_RENDER(rendered = response.render(ciP->apiVersion,
-                                          asJsonObject,
+  TIMED_RENDER(answer = response.renderV1(asJsonObject,
                                           ciP->outMimeType == JSON,
-                                          ciP->uriParam[URI_PARAM_COLLAPSE] == "true",
-                                          ""));
+                                          ciP->uriParam[URI_PARAM_COLLAPSE] == "true"));
 
   response.release();
 
-  return rendered;
+  return answer;
 }

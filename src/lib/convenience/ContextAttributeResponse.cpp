@@ -27,7 +27,6 @@
 
 #include "logMsg/logMsg.h"
 
-#include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/StatusCode.h"
@@ -44,20 +43,39 @@
 */
 std::string ContextAttributeResponse::render
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         request,
-  const std::string&  indent
+  ApiVersion   apiVersion,
+  bool         asJsonObject,
+  RequestType  request,
+  int          indent
 )
 {
-  std::string out = "";
+  if (indent < 0) {
+      indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  out += startTag(indent);
-  out += contextAttributeVector.render(apiVersion, asJsonObject, request, indent + "  ", true);
-  out += statusCode.render(indent + "  ");
-  out += endTag(indent);
+  toJson(writer, apiVersion, asJsonObject, request);
 
-  return out;
+  return writer.str();
+}
+
+
+/* ****************************************************************************
+*
+* toJson - 
+*/
+void ContextAttributeResponse::toJson
+(
+  JsonHelper&  writer,
+  ApiVersion   apiVersion,
+  bool         asJsonObject,
+  RequestType  request
+)
+{
+  writer.StartObject();
+  contextAttributeVector.toJsonV1(writer, asJsonObject, request);
+  statusCode.toJsonV1(writer);
+  writer.EndObject();
 }
 
 
@@ -101,7 +119,7 @@ std::string ContextAttributeResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, requestType, indent);
+  return render(apiVersion, asJsonObject, requestType);
 }
 
 

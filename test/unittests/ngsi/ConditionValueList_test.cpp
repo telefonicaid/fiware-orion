@@ -41,19 +41,31 @@ TEST(ConditionValueList, ok)
   const char*        outfile1 = "ngsi.conditionValueList.ok2.middle.json";
   const char*        outfile2 = "ngsi.conditionValueList.ok3.middle.json";
 
-  out = cvList.render("", false);
-  EXPECT_STREQ("", out.c_str());
+  {
+    JsonHelper writer(2);
+    cvList.toJson(writer);
+    EXPECT_STREQ("", writer.str().c_str());
+  }
 
   cvList.push_back("cv1");
-
-  out = cvList.render("", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    JsonHelper writer(2);
+    writer.StartObject();
+    cvList.toJson(writer);
+    writer.EndObject();
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+    EXPECT_STREQ(expectedBuf, writer.str().c_str());
+  }
 
   cvList.push_back("cv2");
-  out = cvList.render("", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  {
+    JsonHelper writer(2);
+    writer.StartObject();
+    cvList.toJson(writer);
+    writer.EndObject();
+    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+    EXPECT_STREQ(expectedBuf, writer.str().c_str());
+  }
 
   out = cvList.check(SubscribeContext, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());

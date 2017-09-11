@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/NotifyCondition.h"
 
 
@@ -42,7 +44,7 @@ typedef struct NotifyConditionVector
 
   NotifyConditionVector();
 
-  std::string       render(const std::string& indent, bool comma);
+  void              toJson(JsonHelper& writer);
   void              present(const std::string& indent);
   void              push_back(NotifyCondition* item);
   unsigned int      size(void) const;

@@ -29,6 +29,9 @@
 #include <vector>
 #include <cstdlib>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/ContextAttribute.h"
 #include "rest/OrionError.h"
@@ -55,15 +58,12 @@ class Attribute
 
   Attribute(): pcontextAttribute(0) {}
   std::string  render(ApiVersion          apiVersion,
-                      bool                acceptedTextPlain,
-                      bool                acceptedJson,
                       MimeType            outFormatSelection,
-                      MimeType*           outMimeTypeP,
                       HttpStatusCode*     scP,
                       bool                keyValues,
                       const std::string&  metadataList,
                       RequestType         requestType,
-                      bool                comma = false);
+                      int                 indent = -1);
   void         fill(QueryContextResponse* qcrsP, std::string attrName);
 };
 

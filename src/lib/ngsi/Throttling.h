@@ -28,6 +28,8 @@
 #include <stdint.h>
 #include <string>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/Request.h"
 
 
@@ -46,7 +48,7 @@ typedef struct Throttling
   void               set(const std::string& value);
   const std::string  get(void);
   bool               isEmpty(void);
-  std::string        render(const std::string& indent, bool comma);
+  void               toJson(JsonHelper& writer);
 
   std::string        check(RequestType requestType,
                            const std::string& indent,

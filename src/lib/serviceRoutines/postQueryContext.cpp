@@ -104,9 +104,9 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   // 2. Render the string of the request we want to forward
   //
   std::string  payload;
-  TIMED_RENDER(payload = qcrP->render(""));
+  TIMED_RENDER(payload = qcrP->render());
 
-  char* cleanPayload = (char*) payload.c_str();;
+  char* cleanPayload = (char*) payload.c_str();
 
   //
   // 3. Send the request to the Context Provider (and await the reply)
@@ -120,7 +120,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   std::string     out;
   int             r;
 
-  LM_T(LmtCPrForwardRequestPayload, ("forward queryContext request payload: %s", payload.c_str()));
+  LM_T(LmtCPrForwardRequestPayload, ("forward queryContext request payload: %s", cleanPayload));
 
   std::map<std::string, std::string> noHeaders;
   r = httpRequestSend(ip,
@@ -360,7 +360,7 @@ std::string postQueryContext
   //
   if (forwardsPending(qcrsP) == false)
   {
-    TIMED_RENDER(answer = qcrsP->render(ciP->apiVersion, asJsonObject, ""));
+    TIMED_RENDER(answer = qcrsP->render(ciP->apiVersion, asJsonObject));
 
     qcrP->release();
     return answer;

@@ -79,7 +79,7 @@ std::string patchSubscription
   std::string  answer = "";
   if (beError.code != SccNone)
   {
-    TIMED_RENDER(answer = beError.toJson());
+    TIMED_RENDER(answer = beError.render());
     ciP->httpStatusCode = beError.code;
   }
   else

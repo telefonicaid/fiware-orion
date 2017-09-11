@@ -28,6 +28,8 @@
 #include <stdint.h>   // int64_t et al
 #include <string>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/Request.h"
 
 #define DEFAULT_DURATION            "PT24H"
@@ -53,7 +55,7 @@ class Duration
   void          set(const std::string& value);
   std::string   get(void);
   bool          isEmpty(void);
-  std::string   render(const std::string& indent, bool comma = true);
+  void          toJson(JsonHelper& writer);
   int64_t       parse(void);
   void          present(const std::string& indent);
   void          release(void);

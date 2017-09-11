@@ -28,17 +28,17 @@
 					]
 				}
 			],
-      "attributeDomainName" : "ATTR_DOMAIN_NAME",
-      "domainMetadatas" : [
+      "attributeDomainName": "ATTR_DOMAIN_NAME",
+      "domainMetadatas": [
         {
-          "name"  : "dmName",
-          "type"  : "dmType",
-          "value" : "dmValue"
+          "name": "dmName",
+          "type": "dmType",
+          "value": "dmValue"
         },
         {
-          "name"  : "dmName2",
-          "type"  : "dmType2",
-          "value" : "dmValue2"
+          "name": "dmName2",
+          "type": "dmType2",
+          "value": "dmValue2"
         }
       ]
 		}

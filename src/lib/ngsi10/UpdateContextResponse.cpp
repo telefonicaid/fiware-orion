@@ -30,7 +30,6 @@
 
 #include "common/globals.h"
 #include "common/string.h"
-#include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/ContextElementResponse.h"
@@ -80,32 +79,42 @@ UpdateContextResponse::~UpdateContextResponse()
 *
 * UpdateContextResponse::render -
 */
-std::string UpdateContextResponse::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
+std::string UpdateContextResponse::render
+(
+  ApiVersion apiVersion,
+  bool       asJsonObject,
+  int        indent
+)
 {
-  std::string out = "";
+  if (indent == -1)
+  {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  out += startTag(indent);
+
+  writer.StartObject();
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(indent + "  ");
+    errorCode.toJsonV1(writer);
   }
   else
   {
     if (contextElementResponseVector.size() == 0)
     {
       errorCode.fill(SccContextElementNotFound, errorCode.details);
-      out += errorCode.render(indent + "  ");
+      errorCode.toJsonV1(writer);
     }
     else
     {
-      out += contextElementResponseVector.render(apiVersion, asJsonObject, RtUpdateContextResponse, indent + "  ", false);
+      contextElementResponseVector.toJsonV1(writer, asJsonObject, RtUpdateContextResponse, true);
     }
   }
 
-  out += endTag(indent);
+  writer.EndObject();
 
-  return out;
+  return writer.str();
 }
 
 
@@ -138,7 +147,7 @@ std::string UpdateContextResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, indent);
+  return render(apiVersion, asJsonObject);
 }
 
 

@@ -26,7 +26,6 @@
 
 #include "logMsg/logMsg.h"
 #include "common/globals.h"
-#include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
 #include "ngsi/AttributeList.h"
@@ -92,23 +91,39 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 
 /* ****************************************************************************
 *
-* QueryContextRequest::render -
+* QueryContextRequest:: render -
 */
-std::string QueryContextRequest::render(const std::string& indent)
+std::string QueryContextRequest::render
+(
+  int indent
+)
 {
-  std::string   out                      = "";
-  bool          attributeListRendered    = attributeList.size() != 0;
-  bool          restrictionRendered      = restrictions != 0;
-  bool          commaAfterAttributeList  = restrictionRendered;
-  bool          commaAfterEntityIdVector = attributeListRendered || restrictionRendered;
+  if (indent == -1)
+  {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  out += startTag(indent);
-  out += entityIdVector.render(indent + "  ", commaAfterEntityIdVector);
-  out += attributeList.render( indent + "  ", commaAfterAttributeList);
-  out += restriction.render(   indent + "  ", restrictions, false);
-  out += endTag(indent);
+  toJson(writer);
 
-  return out;
+  return writer.str();
+}
+
+
+/* ****************************************************************************
+*
+* QueryContextRequest::toJson -
+*/
+void QueryContextRequest::toJson
+(
+  JsonHelper& writer
+)
+{
+  writer.StartObject();
+  entityIdVector.toJson(writer);
+  attributeList.toJson(writer);
+  restriction.toJson(writer);
+  writer.EndObject();
 }
 
 
@@ -138,7 +153,7 @@ std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject,
     return "OK";
   }
 
-  return response.render(apiVersion, asJsonObject, indent);
+  return response.render(apiVersion, asJsonObject);
 }
 
 

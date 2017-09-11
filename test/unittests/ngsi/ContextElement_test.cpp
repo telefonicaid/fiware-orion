@@ -75,11 +75,13 @@ TEST(ContextElement, check)
 
   // render
   const char*     outfile1 = "ngsi.contextelement.check.middle.json";
-  std::string     out;
+  JsonHelper writer(2);
 
-  out = ce2P->render(V1, false, UpdateContextElement, "", false);
+  writer.StartObject();
+  ce2P->toJsonV1(writer, false, UpdateContextElement);
+  writer.EndObject();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  EXPECT_STREQ(expectedBuf, writer.str().c_str());
 
   // present
   ce2P->present("", -1);

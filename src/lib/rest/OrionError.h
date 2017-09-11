@@ -28,6 +28,7 @@
 #include <string>
 
 #include "common/globals.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/StatusCode.h"
 #include "rest/HttpStatusCode.h"
@@ -49,10 +50,11 @@ public:
   OrionError(StatusCode& statusCode);
   OrionError(HttpStatusCode _code, const std::string& _details = "", const std::string& _reasonPhrase = "");
 
-  std::string  smartRender(ApiVersion apiVersion);
   std::string  setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpStatusCode* scP);
-  std::string  toJson(void);
-  std::string  render(void);
+  std::string  renderV1(int indent = -1);
+  std::string  render(int indent = -1);
+  std::string  render(ApiVersion apiVersion);
+  void         toJson(JsonHelper& writer);
   void         fill(HttpStatusCode _code, const std::string& _details,  const std::string& _reasonPhrase = "");
 
 private:

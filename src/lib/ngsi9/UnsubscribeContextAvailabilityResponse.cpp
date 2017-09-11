@@ -26,7 +26,6 @@
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
-#include "common/tag.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi9/UnsubscribeContextAvailabilityResponse.h"
 
@@ -74,16 +73,23 @@ UnsubscribeContextAvailabilityResponse::~UnsubscribeContextAvailabilityResponse(
 *
 * UnsubscribeContextAvailabilityResponse::render - 
 */
-std::string UnsubscribeContextAvailabilityResponse::render(const std::string& indent)
+std::string UnsubscribeContextAvailabilityResponse::render
+(
+  int indent
+)
 {
-  std::string out = "";
+  if (indent < 0) {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  out += startTag(indent);
 
-  out += subscriptionId.render(RtUnsubscribeContextAvailabilityResponse, indent + "  ", true);  // always json comma - statusCode is mandatory
-  out += statusCode.render(indent + "  ");
+  writer.StartObject();
 
-  out += endTag(indent);
+  subscriptionId.toJson(writer, RtUnsubscribeContextAvailabilityResponse);
+  statusCode.toJsonV1(writer);
 
-  return out;
+  writer.EndObject();
+
+  return writer.str();
 }

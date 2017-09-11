@@ -28,7 +28,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/tag.h"
 #include "common/globals.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi9/NotifyContextAvailabilityResponse.h"
@@ -62,17 +61,21 @@ NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse(StatusCode&
 *
 * NotifyContextAvailabilityResponse::render -
 */
-std::string NotifyContextAvailabilityResponse::render(const std::string& indent)
+std::string NotifyContextAvailabilityResponse::render
+(
+  int indent
+)
 {
-  std::string out = "";
+  JsonHelper writer(indent);
+
 
   responseCode.keyNameSet("responseCode");
 
-  out += startTag(indent);
-  out += responseCode.render(indent + "  ");
-  out += endTag(indent);
+  writer.StartObject();
+  responseCode.toJsonV1(writer);
+  writer.EndObject();
 
-  return out;
+  return writer.str();
 }
 
 

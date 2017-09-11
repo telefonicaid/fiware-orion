@@ -24,7 +24,6 @@
 */
 #include <string>
 
-#include "common/tag.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/ContextRegistrationResponse.h"
 #include "ngsi/Request.h"
@@ -46,25 +45,41 @@ ContextRegistrationResponse::ContextRegistrationResponse()
 *
 * ContextRegistrationResponse::render -
 */
-std::string ContextRegistrationResponse::render(const std::string& indent, bool comma)
+std::string ContextRegistrationResponse::render(
+  int indent
+)
 {
-  std::string  out               = "";
-  bool         errorCodeRendered = errorCode.code != SccNone;
-
-  out += startTag(indent);
-
-  out += contextRegistration.render(indent + "  ", errorCodeRendered, false);
-
-  if (errorCodeRendered)
+  if (indent < 0)
   {
-    out += errorCode.render(indent + "  ", false);
+    indent = DEFAULT_JSON_INDENT_V1;
   }
+  JsonHelper writer(indent);
 
-  out += endTag(indent, comma);
+  toJson(writer);
 
-  return out;
+  return writer.str();
 }
 
+
+/* ****************************************************************************
+*
+* ContextRegistrationResponse::toJson -
+*/
+void ContextRegistrationResponse::toJson(
+  JsonHelper& writer
+)
+{
+  writer.StartObject();
+
+  contextRegistration.toJson(writer, false);
+
+  if (errorCode.code != SccNone)
+  {
+    errorCode.toJsonV1(writer);
+  }
+
+  writer.EndObject();
+}
 
 
 /* ****************************************************************************

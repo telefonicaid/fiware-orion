@@ -28,6 +28,9 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 #include "ngsi/EntityId.h"
 #include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
@@ -56,7 +59,10 @@ typedef struct AppendContextElementRequest
 
   AppendContextElementRequest();
 
-  std::string  render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, std::string indent);
+  std::string  render(ApiVersion apiVersion,
+                      bool asJsonObject,
+                      RequestType requestType,
+                      int indent = -1);
   void         present(std::string indent);
   void         release();
   std::string  check(ApiVersion          apiVersion,

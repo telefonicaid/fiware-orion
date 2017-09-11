@@ -39,14 +39,16 @@ TEST(StatusCode, render)
 {
   StatusCode    sc1;
   StatusCode    sc2(SccOk, "DETAILS");
-  std::string   out;
   const char*   outfile1  = "ngsi.statusCode.render4.middle.json";
 
   utInit();
 
-  out = sc2.render("");
+  JsonHelper writer(2);
+  writer.StartObject();
+  sc2.toJsonV1(writer);
+  writer.EndObject();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  EXPECT_STREQ(expectedBuf, writer.str().c_str());
 
   sc1.release(); // just to exercise the code ...
 

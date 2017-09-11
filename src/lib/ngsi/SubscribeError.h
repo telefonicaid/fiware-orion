@@ -27,6 +27,8 @@
 */
 #include <string>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/StatusCode.h"
 #include "ngsi/Request.h"
 #include "ngsi/SubscriptionId.h"
@@ -43,7 +45,7 @@ typedef struct SubscribeError
   StatusCode      errorCode;          // Mandatory
 
   SubscribeError();
-  std::string render(RequestType requestType, const std::string& indent, bool comma = false);
+  void        toJson(JsonHelper& writer, RequestType requestType);
 
   std::string check(RequestType         requestType,
                     const std::string&  indent,

@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
 #include "orionTypes/EntityType.h"
@@ -48,8 +50,13 @@ class EntityTypeResponse
                        bool                asJsonObject,
                        bool                asJsonOut,
                        bool                collapsed,
-                       const std::string&  indent);
-  std::string   toJson(void);
+                       int                 indent = -1);
+  void          toJson(JsonHelper& writer,
+                       ApiVersion  apiVersion,
+                       bool        asJsonObject,
+                       bool        asJsonOut,
+                       bool        collapsed);
+
   std::string   check(ApiVersion          apiVersion,
                       bool                asJsonObject,
                       bool                asJsonOut,

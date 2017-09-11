@@ -30,7 +30,6 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
-#include "common/tag.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -51,17 +50,21 @@
 *       When the operation "GET /admin/sem/<sem-name>" is implemented, 'toplevel' will
 *       be set to true for the rendering of the response to that request.
 */
-static const std::string semRender(const char* name, bool toplevel, const char* state)
+static const void semRender
+(
+  JsonHelper& writer,
+  const char* name,
+  bool toplevel,
+  const char* state
+)
 {
-  std::string out;
-
   if (!toplevel)
   {
-    out = JSON_STR(name) + ":";
+    writer.Key(name);
   }
 
-  out += "{";
-  out += JSON_STR("status") + ":" + JSON_STR(state);
+  writer.StartObject();
+  writer.String("status", state);
 
   //
   // FIXME P4 Fill in more fields here in the future (as part of issue #2145):
@@ -74,10 +77,7 @@ static const std::string semRender(const char* name, bool toplevel, const char* 
   // "taken":     number of taken semaphores (for connectionEndpoints only)
   //
 
-
-  out += "}";
-
-  return out;
+  writer.EndObject();
 }
 
 
@@ -106,21 +106,23 @@ std::string semStateTreat
   const char* connectionSubContextState  = connectionSubContextSemGet();
   const char* metricsMgrState            = metricsMgr.semStateGet();
 
-  std::string out = "{";
+  JsonHelper writer(2);
 
-  out += semRender("dbConnectionPool",     false, dbConnectionPoolState)     + ",";
-  out += semRender("dbConnection",         false, dbConnectionState)         + ",";
-  out += semRender("request",              false, requestState)              + ",";
-  out += semRender("subCache",             false, subCacheState)             + ",";
-  out += semRender("transaction",          false, transactionState)          + ",";
-  out += semRender("timeStat",             false, timeStatState)             + ",";
-  out += semRender("logMsg",               false, logMsgState)               + ",";
-  out += semRender("alarmMgr",             false, alarmMgrState)             + ",";
-  out += semRender("metricsMgr",           false, metricsMgrState)           + ",";
-  out += semRender("connectionContext",    false, connectionContextState)    + ",";
-  out += semRender("connectionEndpoints",  false, connectionSubContextState);
+  writer.StartObject();
 
-  out += "}";
+  semRender(writer, "dbConnectionPool",     false, dbConnectionPoolState);
+  semRender(writer, "dbConnection",         false, dbConnectionState);
+  semRender(writer, "request",              false, requestState);
+  semRender(writer, "subCache",             false, subCacheState);
+  semRender(writer, "transaction",          false, transactionState);
+  semRender(writer, "timeStat",             false, timeStatState);
+  semRender(writer, "logMsg",               false, logMsgState);
+  semRender(writer, "alarmMgr",             false, alarmMgrState);
+  semRender(writer, "metricsMgr",           false, metricsMgrState);
+  semRender(writer, "connectionContext",    false, connectionContextState);
+  semRender(writer, "connectionEndpoints",  false, connectionSubContextState);
 
-  return out;
+  writer.EndObject();
+
+  return writer.str();
 }

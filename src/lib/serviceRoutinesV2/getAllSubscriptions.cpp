@@ -76,7 +76,7 @@ std::string getAllSubscriptions
   {
     std::string out;
 
-    TIMED_RENDER(out = oe.toJson());
+    TIMED_RENDER(out = oe.render());
     ciP->httpStatusCode = oe.code;
 
     return out;
@@ -88,8 +88,8 @@ std::string getAllSubscriptions
     ciP->httpHeaderValue.push_back(toString(count));
   }
 
-  std::string out;
-  TIMED_RENDER(out = vectorToJson(subs));
+  JsonHelper jh(-1);
+  TIMED_RENDER(vectorToJson(jh, subs));
 
-  return out;
+  return jh.str();
 }

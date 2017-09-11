@@ -27,7 +27,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/tag.h"
 #include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ContextElementResponse.h"
@@ -320,26 +319,65 @@ ContextElementResponse::ContextElementResponse(ContextElement* ceP, bool useDefa
 
 /* ****************************************************************************
 *
+* ContextElementResponse::renderV1 - 
+*/
+std::string ContextElementResponse::renderV1
+(
+  bool        asJsonObject,
+  RequestType requestType,
+  bool        omitAttributeValues,
+  int         indent
+)
+{
+  if (indent < 0)
+  {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
+
+  toJsonV1(writer, asJsonObject, requestType, omitAttributeValues);
+
+  return writer.str();
+}
+
+
+/* ****************************************************************************
+*
 * ContextElementResponse::render - 
 */
 std::string ContextElementResponse::render
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         requestType,
-  const std::string&  indent,
-  bool                comma,
-  bool                omitAttributeValues
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter,
+  const std::vector<std::string>&  metadataFilter,
+  bool                             blacklist,
+  int                              indent
 )
 {
-  std::string out = "";
+  JsonHelper writer(indent);
 
-  out += startTag(indent);
-  out += contextElement.render(apiVersion, asJsonObject, requestType, indent + "  ", true, omitAttributeValues);
-  out += statusCode.render(indent + "  ", false);
-  out += endTag(indent, comma, false);
+  toJson(writer, renderFormat, attrsFilter, metadataFilter, blacklist);
 
-  return out;
+  return writer.str();
+}
+
+
+/* ****************************************************************************
+*
+* ContextElementResponse::toJsonV1 - 
+*/
+void ContextElementResponse::toJsonV1
+(
+  JsonHelper&  writer,
+  bool         asJsonObject,
+  RequestType  requestType,
+  bool         omitAttributeValues
+)
+{
+  writer.StartObject();
+  contextElement.toJsonV1(writer, asJsonObject, requestType, omitAttributeValues);
+  statusCode.toJsonV1(writer);
+  writer.EndObject();
 }
 
 
@@ -348,19 +386,16 @@ std::string ContextElementResponse::render
 *
 * ContextElementResponse::toJson - 
 */
-std::string ContextElementResponse::toJson
+void ContextElementResponse::toJson
 (
+  JsonHelper&                      writer,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   const std::vector<std::string>&  metadataFilter,
   bool                             blacklist
 )
 {
-  std::string out;
-
-  out = contextElement.toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
-
-  return out;
+  contextElement.toJson(writer, renderFormat, attrsFilter, metadataFilter, blacklist);
 }
 
 

@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/ProvidingApplication.h"
 #include "ngsi/ContextRegistrationAttributeVector.h"
@@ -49,7 +51,7 @@ typedef struct ContextRegistration
   bool                                entityIdVectorPresent;                 // entityIdList present during parsing
 
   ContextRegistration();
-  std::string  render(const std::string& indent, bool comma, bool isInVector);
+  void         toJson(JsonHelper& writer, bool isInVector);
   void         present(const std::string& indent, int ix);
   void         release();
 

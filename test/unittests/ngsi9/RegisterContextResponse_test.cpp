@@ -87,27 +87,27 @@ TEST(RegisterContextResponse, jsonRender)
   // 1. Only registrationId
   rcr.registrationId.set("012345678901234567890123");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  rendered = rcr.render("");
+  rendered = rcr.render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   // 2. registrationId and duration
   rcr.duration.set("PT1S");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  rendered = rcr.render("");
+  rendered = rcr.render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   // 3. registrationId and errorCode
   rcr.duration.set("");
   rcr.errorCode.fill(SccBadRequest, "no details");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
-  rendered = rcr.render("");
+  rendered = rcr.render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   // 4. registrationId and duration and errorCode
   rcr.duration.set("PT2S");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename4)) << "Error getting test data from '" << filename4 << "'";
-  rendered = rcr.render("");
+  rendered = rcr.render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   utExit();

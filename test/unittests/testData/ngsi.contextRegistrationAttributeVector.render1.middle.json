@@ -1,7 +1,9 @@
-"attributes" : [
-  {
-    "name" : "name",
-    "type" : "type",
-    "isDomain" : "false"
-  }
-]
+{
+  "attributes": [
+    {
+      "name": "name",
+      "type": "type",
+      "isDomain": "false"
+    }
+  ]
+}

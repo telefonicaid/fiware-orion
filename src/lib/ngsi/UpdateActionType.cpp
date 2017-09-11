@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/UpdateActionType.h"
 
@@ -114,16 +113,17 @@ void UpdateActionType::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* UpdateActionType::render - 
+* UpdateActionType::toJson - 
 */
-std::string UpdateActionType::render(const std::string& indent, bool comma)
+void UpdateActionType::toJson
+(
+  JsonHelper& writer
+)
 {
-  if (string == "")
+  if (string != "")
   {
-    return "";
+    writer.String("updateAction", string);
   }
-
-  return valueTag(indent, "updateAction", string, comma);
 }
 
 

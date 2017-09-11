@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 
+#include "common/JsonHelper.h"
 #include "common/globals.h"
 
 #include "mongo/client/dbclient.h"
@@ -89,12 +90,12 @@ typedef struct Metadata
   Metadata(const std::string& _name, const mongo::BSONObj& mdB);
   ~Metadata();
 
-  std::string  render(const std::string& indent, bool comma = false);
-  std::string  toJson(bool isLastElement);
+  void         toJsonV1(JsonHelper& writer);
+  void         toJson(JsonHelper& writer);
   void         present(const std::string& metadataType, int ix, const std::string& indent);
   void         release(void);
   void         fill(const struct Metadata& md);
-  std::string  toStringValue(void) const;
+  void         toStringValue(JsonHelper& writer) const;
   bool         compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
   std::string  check(ApiVersion apiVersion);

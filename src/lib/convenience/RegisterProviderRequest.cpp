@@ -30,11 +30,9 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "convenience/RegisterProviderRequest.h"
-#include "ngsi/StatusCode.h"
 #include "ngsi/MetadataVector.h"
 #include "ngsi/Duration.h"
 #include "ngsi/ProvidingApplication.h"
@@ -57,25 +55,27 @@ RegisterProviderRequest::RegisterProviderRequest()
 *
 * RegisterProviderRequest::render - 
 */
-std::string RegisterProviderRequest::render(std::string indent)
+std::string RegisterProviderRequest::render
+(
+  int         indent
+)
 {
-  std::string  out                            = "";
-  bool         durationRendered               = duration.get() != "";
-  bool         providingApplicationRendered   = providingApplication.get() != "";
-  bool         registrationIdRendered         = registrationId.get() != "";
-  bool         commaAfterRegistrationId       = false;    // Last element
-  bool         commaAfterProvidingApplication = registrationIdRendered;
-  bool         commaAfterDuration             = commaAfterProvidingApplication || providingApplicationRendered;
-  bool         commaAfterMetadataVector       = commaAfterDuration || durationRendered;
+  if (indent < 0) {
+    indent = DEFAULT_JSON_INDENT_V1;
+  }
+  JsonHelper writer(indent);
 
-  out += startTag(indent);
-  out += metadataVector.render(      indent + "  ", commaAfterMetadataVector);
-  out += duration.render(            indent + "  ", commaAfterDuration);
-  out += providingApplication.render(indent + "  ", commaAfterProvidingApplication);
-  out += registrationId.render(RegisterContext, indent + "  ", commaAfterRegistrationId);
-  out += endTag(indent, false);
 
-  return out;
+  writer.StartObject();
+
+  metadataVector.toJsonV1(writer);
+  duration.toJson(writer);
+  providingApplication.toJson(writer);
+  registrationId.toJson(writer, RegisterContext);
+
+  writer.EndObject();
+
+  return writer.str();
 }
 
 
@@ -114,7 +114,7 @@ std::string RegisterProviderRequest::check
   std::string details = std::string("RegisterProviderRequest Error: '") + res + "'";
   alarmMgr.badInput(clientIp, details);
 
-  return response.render(indent);
+  return response.render();
 }
 
 

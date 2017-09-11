@@ -39,12 +39,12 @@
 TEST(ContextAttributeVector, render)
 {
   ContextAttributeVector  cav;
-  std::string             out;
 
   utInit();
 
-  out = cav.render(V1, false, UpdateContextAttribute, "");
-  EXPECT_STREQ("", out.c_str());
+  JsonHelper writer(2);
+  cav.toJsonV1(writer, false, UpdateContextAttribute);
+  EXPECT_STREQ("", writer.str().c_str());
 
   // Just to exercise the code ...
   cav.present("");

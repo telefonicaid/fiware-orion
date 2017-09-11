@@ -27,6 +27,8 @@
 */
 #include <string>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/Request.h"
 #include "ngsi/AttributeList.h"
 #include "ngsi/EntityIdVector.h"
@@ -61,7 +63,8 @@ typedef struct QueryContextRequest
   QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName);
   QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const AttributeList& attributeList);
 
-  std::string   render(const std::string& indent);
+  std::string   render(int indent = -1);
+  void          toJson(JsonHelper& writer);
   std::string   check(ApiVersion apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError);
   void          present(const std::string& indent);
   void          release(void);

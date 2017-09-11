@@ -27,6 +27,8 @@
 */
 #include <string>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/Duration.h"
 #include "ngsi/Throttling.h"
@@ -45,7 +47,7 @@ typedef struct SubscribeResponse
 
   SubscribeResponse();
 
-  std::string render(const std::string& indent, bool comma = false);
+  void toJson(JsonHelper& writer);
 } SubscribeResponse;
 
 #endif  // SRC_LIB_NGSI_SUBSCRIBERESPONSE_H_

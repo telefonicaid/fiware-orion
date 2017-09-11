@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
 #include "ngsi/Restriction.h"
@@ -91,25 +90,23 @@ void Restriction::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* Restriction::render -
+* Restriction::toJson -
 */
-std::string Restriction::render(const std::string& indent, int restrictions, bool comma)
+void Restriction::toJson
+(
+  JsonHelper& writer,
+  int restrictions
+)
 {
-  std::string  tag = "restriction";
-  std::string  out = "";
-  bool         scopeVectorRendered = scopeVector.size() != 0;
-
   if (restrictions == 0)
   {
-    return "";
+    return;
   }
 
-  out += startTag(indent, tag);
-  out += attributeExpression.render(indent + "  ", scopeVectorRendered);
-  out += scopeVector.render(indent + "  ", false);
-  out += endTag(indent, comma);
-
-  return out;
+  writer.StartObject("restriction");
+  attributeExpression.toJson(writer);
+  scopeVector.toJson(writer);
+  writer.EndObject();
 }
 
 

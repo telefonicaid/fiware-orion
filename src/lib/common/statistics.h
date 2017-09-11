@@ -26,6 +26,7 @@
 * Author: Ken Zangelin
 */
 #include "ngsi/Request.h"
+#include "common/JsonHelper.h"
 #include "common/MimeType.h"
 #include "common/clockFunctions.h"
 
@@ -313,7 +314,7 @@ extern int noOfBatchUpdateRequest;
 *
 * renderTimingStatistics -
 */
-extern std::string renderTimingStatistics(void);
+extern void renderTimingStatistics(JsonHelper& writer);
 
 
 

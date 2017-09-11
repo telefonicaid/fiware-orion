@@ -29,7 +29,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/ContextRegistrationAttribute.h"
 
 
@@ -65,27 +64,22 @@ ContextRegistrationAttribute::ContextRegistrationAttribute
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttribute::render -
+* ContextRegistrationAttribute::toJson -
 */
-std::string ContextRegistrationAttribute::render(const std::string& indent, bool comma)
+void ContextRegistrationAttribute::toJson
+(
+  JsonHelper& writer
+)
 {
-  std::string out = "";
+  writer.StartObject();
 
-  //
-  // About JSON commas:
-  // The field isDomain is mandatory, so all field before that will
-  // have the comma set to true for the render methods.
-  // The only doubt here is whether isDomain should have the comma or not,
-  // that depends on whether the metadataVector is empty or not.
-  //
-  out += startTag(indent);
-  out += valueTag(indent + "  ", "name",     name, true);
-  out += valueTag(indent + "  ", "type",     type, true);
-  out += valueTag(indent + "  ", "isDomain", isDomain, metadataVector.size() != 0);
-  out += metadataVector.render(indent + "  ");
-  out += endTag(indent, comma);
+  writer.String("name", name);
+  writer.String("type", type);
+  writer.String("isDomain", isDomain);
 
-  return out;
+  metadataVector.toJsonV1(writer);
+
+  writer.EndObject();
 }
 
 

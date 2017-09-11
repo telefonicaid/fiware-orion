@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/Originator.h"
 
@@ -106,16 +105,19 @@ void Originator::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* Originator::render -
+* Originator::toJson -
 */
-std::string Originator::render(const std::string& indent, bool comma)
+void Originator::toJson
+(
+  JsonHelper& writer
+)
 {
   if (string == "")
   {
-    return "";
+    return;
   }
 
-  return valueTag(indent, "originator", string, comma);
+  writer.String("originator", string);
 }
 
 

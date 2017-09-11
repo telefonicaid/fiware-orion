@@ -30,7 +30,6 @@
 
 #include "common/MimeType.h"
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/ContextElement.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/Request.h"
@@ -72,30 +71,28 @@ ContextElement::ContextElement(const std::string& id, const std::string& type, c
 
 /* ****************************************************************************
 *
-* ContextElement::render - 
+* ContextElement::toJsonV1 - 
 */
-std::string ContextElement::render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues)
+void ContextElement::toJsonV1
+(
+  JsonHelper& writer,
+  bool asJsonObject,
+  RequestType requestType,
+  bool omitAttributeValues
+)
 {
-  std::string  out                              = "";
-  bool         attributeDomainNameRendered      = attributeDomainName.get() != "";
-  bool         contextAttributeVectorRendered   = contextAttributeVector.size() != 0;
-  bool         domainMetadataVectorRendered     = domainMetadataVector.size() != 0;
+  if (requestType != UpdateContext)
+  {
+    writer.Key("contextElement");
+  }
+  writer.StartObject();
 
-  bool         commaAfterDomainMetadataVector   = false;  // Last element
-  bool         commaAfterContextAttributeVector = domainMetadataVectorRendered;
-  bool         commaAfterAttributeDomainName    = domainMetadataVectorRendered  || contextAttributeVectorRendered;
-  bool         commaAfterEntityId               = commaAfterAttributeDomainName || attributeDomainNameRendered;
+  entityId.toJsonV1(writer);
+  attributeDomainName.toJson(writer);
+  contextAttributeVector.toJsonV1(writer, asJsonObject, requestType, omitAttributeValues);
+  domainMetadataVector.toJsonV1(writer);
 
-  out += startTag(indent, requestType != UpdateContext? "contextElement" : "");
-
-  out += entityId.render(indent + "  ", commaAfterEntityId, false);
-  out += attributeDomainName.render(indent + "  ", commaAfterAttributeDomainName);
-  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType, indent + "  ", commaAfterContextAttributeVector, omitAttributeValues);
-  out += domainMetadataVector.render(indent + "  ", commaAfterDomainMetadataVector);
-
-  out += endTag(indent, comma, false);
-
-  return out;
+  writer.EndObject();
 }
 
 
@@ -104,31 +101,24 @@ std::string ContextElement::render(ApiVersion apiVersion, bool asJsonObject, Req
 *
 * ContextElement::toJson - 
 */
-std::string ContextElement::toJson
+void ContextElement::toJson
 (
+  JsonHelper&                      writer,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   const std::vector<std::string>&  metadataFilter,
   bool                             blacklist
 ) const
 {
-  std::string out;
-
   if (renderFormat != NGSI_V2_VALUES)
   {
-    out += entityId.toJson();
-    if (contextAttributeVector.size() != 0)
-    {
-      out += ",";
-    }
+    entityId.toJson(writer);
   }
 
   if (contextAttributeVector.size() != 0)
   {
-    out += contextAttributeVector.toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
+    contextAttributeVector.toJson(writer, renderFormat, attrsFilter, metadataFilter, blacklist);
   }
-
-  return out;
 }
 
 

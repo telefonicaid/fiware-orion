@@ -27,6 +27,8 @@
 */
 #include <string>
 
+#include "common/JsonHelper.h"
+
 #include "ngsi/Request.h"
 #include "common/RenderFormat.h"
 #include "ngsi/EntityId.h"
@@ -53,8 +55,12 @@ typedef struct ContextElement
   ContextElement(const std::string& id, const std::string& type, const std::string& isPattern);
   ContextElement(EntityId* eP);
 
-  std::string  render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues = false);
-  std::string  toJson(RenderFormat                     renderFormat,
+  void         toJsonV1(JsonHelper& writer,
+                        bool asJsonObject,
+                        RequestType requestType,
+                        bool omitAttributeValues = false);
+  void         toJson(JsonHelper& writer,
+                      RenderFormat                     renderFormat,
                       const std::vector<std::string>&  attrsFilter,
                       const std::vector<std::string>&  metadataFilter,
                       bool                             blacklist = false) const;

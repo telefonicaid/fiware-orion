@@ -1,28 +1,28 @@
 {
-  "contextResponses" : [
+  "contextResponses": [
     {
-      "contextElement" : {
-        "type" : "EType",
-        "isPattern" : "false",
-        "id" : "E01",
-        "attributes" : [
+      "contextElement": {
+        "type": "EType",
+        "isPattern": "false",
+        "id": "E01",
+        "attributes": [
           {
-            "name" : "ca",
-            "type" : "string",
-            "value" : "a context attribute"
+            "name": "ca",
+            "type": "string",
+            "value": "a context attribute"
           }
         ],
-        "metadatas" : [
+        "metadatas": [
           {
-            "name" : "md1",
-            "type" : "string",
-            "value" : "FIN"
+            "name": "md1",
+            "type": "string",
+            "value": "FIN"
           }
         ]
       },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
+      "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
       }
     }
   ]

@@ -23,6 +23,7 @@
 * Author: Orion dev team
 */
 
+#include "common/globals.h"
 #include "common/JsonHelper.h"
 #include "common/string.h"
 #include "common/limits.h"
@@ -33,61 +34,197 @@
 #include <iomanip>
 
 
-/* ****************************************************************************
-*
-* toJsonString -
-*/
-std::string toJsonString(const std::string& input)
-{
-  std::ostringstream ss;
-
-  ss << '"';
-  for (std::string::const_iterator iter = input.begin(); iter != input.end(); ++iter)
+JsonHelper::JsonHelper(int _indent) : sb(), writer(sb), pwriter(sb) {
+  indent = _indent;
+  if (indent < 0)
   {
-    /* FIXME P3: This function ensures that if the DB holds special characters (which are
-     * not supported in JSON according to its specification), they are converted to their escaped
-     * representations. The process wouldn't be necessary if the DB couldn't hold such special characters, 
-     * but as long as we support NGSIv1, it is better to have the check (e.g. a newline could be 
-     * used in an attribute value using XML). Even removing NGSIv1, we have to ensure that the 
-     * input parser (rapidjson) doesn't inject not supported JSON characters in the DB (this needs to be
-     * investigated in the rapidjson documentation)
-     *
-     * JSON specification is a bit obscure about the need of escaping / (what they call 'solidus'). The
-     * picture at JSON specification (http://www.json.org/) seems suggesting so, but after a careful reading of
-     * https://tools.ietf.org/html/rfc4627#section-2.5, we can conclude it is not mandatory. Online checkers
-     * such as http://jsonlint.com confirm this. Looking in some online discussions
-     * (http://andowebsit.es/blog/noteslog.com/post/the-solidus-issue/ and
-     * https://groups.google.com/forum/#!topic/opensocial-and-gadgets-spec/FkLsC-2blbo) it seems that
-     * escaping / may have sense in some situations related with JavaScript code, which is not the case of Orion.
-     */
-    switch (char ch = *iter)
-    {
-    case '\\': ss << "\\\\"; break;
-    case '"': ss << "\\\""; break;    
-    case '\b': ss << "\\b"; break;
-    case '\f': ss << "\\f"; break;
-    case '\n': ss << "\\n"; break;
-    case '\r': ss << "\\r"; break;
-    case '\t': ss << "\\t"; break;
-    default:
-      /* Converting the rest of special chars 0-31 to \u00xx. Note that 0x80 - 0xFF are untouched as they
-       * correspond to UTF-8 multi-byte characters */
-      if (ch >= 0 && ch <= 0x1F)
-      {
-        static const char intToHex[16] =  { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' } ;
+    indent = DEFAULT_JSON_INDENT;    
+  }
+  pwriter.SetIndent(' ', indent);
+}
 
-        ss << "\\u00" << intToHex[(ch & 0xF0) >> 4] << intToHex[ch & 0x0F];
-      }
-      else
-      {
-        ss << ch;
-      }
-      break;
-    } //end-switch
 
-  } //end-for
-  ss << '"';
-  return ss.str();
+void JsonHelper::Null() {
+  if (indent == 0) {
+    writer.Null();
+  } else {
+    pwriter.Null();
+  }
+}
+
+
+void JsonHelper::Bool(bool value) {
+  if (indent == 0) {
+    writer.Bool(value);
+  } else {
+    pwriter.Bool(value);
+  }
+}
+
+
+void JsonHelper::Key(const std::string& key) {
+  if (indent == 0) {
+    writer.Key(key.c_str());
+  } else {
+    pwriter.Key(key.c_str());
+  }
+}
+
+
+void JsonHelper::Date(const std::string& key, long long value) {
+  if (indent == 0) {
+    writer.Key(key.c_str());
+    writer.String(isodate2str(value).c_str());
+  } else {
+    pwriter.Key(key.c_str());
+    pwriter.String(isodate2str(value).c_str());
+  }
+}
+
+
+void JsonHelper::Date(long long value) {
+  if (indent == 0) {
+    writer.String(isodate2str(value).c_str());
+  } else {
+    pwriter.String(isodate2str(value).c_str());
+  }
+}
+
+
+void JsonHelper::Double(const std::string& key, double value) {
+  if (indent == 0) {
+    writer.Key(key.c_str());
+    writer.Double(value);
+  } else {
+    pwriter.Key(key.c_str());
+    pwriter.Double(value);
+  }
+}
+
+
+void JsonHelper::Double(double value) {
+  if (indent == 0) {
+    writer.Double(value);
+  } else {
+    pwriter.Double(value);
+  }
+}
+
+
+void JsonHelper::Uint(const std::string& key, uint64_t value) {
+  if (indent == 0) {
+    writer.Key(key.c_str());
+    writer.Uint64(value);
+  } else {
+    pwriter.Key(key.c_str());
+    pwriter.Uint64(value);
+  }
+}
+
+void JsonHelper::Uint(uint64_t value) {
+  if (indent == 0) {
+    writer.Uint64(value);
+  } else {
+    pwriter.Uint64(value);
+  }
+}
+
+void JsonHelper::Int(const std::string& key, int64_t value) {
+  if (indent == 0) {
+    writer.Key(key.c_str());
+    writer.Int64(value);
+  } else {
+    pwriter.Key(key.c_str());
+    pwriter.Int64(value);
+  }
+}
+
+void JsonHelper::Int(int64_t value) {
+  if (indent == 0) {
+    writer.Int64(value);
+  } else {
+    pwriter.Int64(value);
+  }
+}
+
+void JsonHelper::String(const std::string& key, const std::string& value) {
+  if (indent == 0) {
+    writer.Key(key.c_str());
+    writer.String(value.c_str());
+  } else {
+    pwriter.Key(key.c_str());
+    pwriter.String(value.c_str());
+  }
+}
+
+void JsonHelper::String(const std::string& value) {
+  if (indent == 0) {
+    writer.String(value.c_str());
+  } else {
+    pwriter.String(value.c_str());
+  }
+}
+
+
+void JsonHelper::StartArray(const std::string& key) {
+  if (indent == 0) {
+    writer.Key(key.c_str());
+    writer.StartArray();
+  } else {
+    pwriter.Key(key.c_str());
+    pwriter.StartArray();
+  }
+}
+
+
+void JsonHelper::StartArray() {
+  if (indent == 0) {
+    writer.StartArray();
+  } else {
+    pwriter.StartArray();
+  }
+}
+
+
+void JsonHelper::StartObject(const std::string& key) {
+  if (indent == 0) {
+    writer.Key(key.c_str());
+    writer.StartObject();
+  } else {
+    pwriter.Key(key.c_str());
+    pwriter.StartObject();
+  }
+}
+
+void JsonHelper::StartObject() {
+  if (indent == 0) {
+    writer.StartObject();
+  } else {
+    pwriter.StartObject();
+  }
+}
+
+
+void JsonHelper::EndArray() {
+  if (indent == 0) {
+    writer.EndArray();
+  } else {
+    pwriter.EndArray();
+  }
+}
+
+
+void JsonHelper::EndObject() {
+  if (indent == 0) {
+    writer.EndObject();
+  } else {
+    pwriter.EndObject();
+  }
+}
+
+
+std::string JsonHelper::str() {
+  return sb.GetString();
 }
 
 
@@ -97,27 +234,20 @@ std::string toJsonString(const std::string& input)
 * vectorToJson -
 */
 template <>
-std::string vectorToJson(std::vector<std::string> &list)
+void vectorToJson
+(
+  JsonHelper& writer,
+  std::vector<std::string>& list
+)
 {
-  switch (list.size())
+  writer.StartArray();
+
+  for (std::vector<std::string>::size_type i = 0; i != list.size(); ++i)
   {
-  case 0:
-    return "[]";
-
-  case 1:
-    return "[" + toJsonString(list[0]) + "]";
-
-  default:
-    std::ostringstream os;
-    os << '[';
-    os << toJsonString(list[0]);
-    for (std::vector<std::string>::size_type i = 1; i != list.size(); ++i)
-    {
-      os << ',' << toJsonString(list[i]);
-    }
-    os << ']';
-    return os.str();
+    writer.String(list[i]);
   }
+
+  writer.EndArray();
 }
 
 
@@ -125,141 +255,21 @@ std::string vectorToJson(std::vector<std::string> &list)
 *
 * objectToJson -
 */
-std::string objectToJson(std::map<std::string, std::string>& list)
+void objectToJson
+(
+   JsonHelper& writer,
+   std::map<std::string, std::string>& list
+)
 {
-  std::ostringstream  os;
-  bool                firstTime = true;
-
-  os << '{';
+  writer.StartObject();
 
   for (std::map<std::string, std::string>::const_iterator it = list.begin(); it != list.end(); ++it)
   {
-    std::string key   = it->first;
-    std::string value = it->second;
-
-    if (firstTime)
-    {
-      firstTime = false;
-    }
-    else
-    {
-      os << ',';
-    }
-
-    os << toJsonString(key) << ':' << toJsonString(value);
+    writer.Key(it->first);
+    writer.String(it->first);
+    writer.String(it->second);
   }
 
-  os << '}';
-
-  return os.str();
+  writer.EndObject();
 }
 
-
-
-/* ****************************************************************************
-*
-* JsonHelper -
-*/
-JsonHelper::JsonHelper(): empty(true)
-{
-  ss << '{';
-}
-
-
-
-/* ****************************************************************************
-*
-* JsonHelper::addString -
-*/
-void JsonHelper::addString(const std::string& key, const std::string& value)
-{
-  if (!empty)
-  {
-    ss << ',';
-  }
-  ss << toJsonString(key) << ':' << toJsonString(value);
-
-  empty = false;
-}
-
-
-
-/* ****************************************************************************
-*
-* JsonHelper::addRaw -
-*/
-void JsonHelper::addRaw(const std::string& key, const std::string& value)
-{
-  if (!empty)
-  {
-    ss << ',';
-  }
-  ss << toJsonString(key) << ':' << value;
-
-  empty = false;
-}
-
-
-/* ****************************************************************************
-*
-* JsonHelper::addNumber -
-*/
-void JsonHelper::addNumber(const std::string& key, long long value)
-{
-  if (!empty)
-  {
-    ss << ',';
-  }
-  ss << toJsonString(key) << ':' << value;
-
-  empty = false;
-}
-
-/* ****************************************************************************
-*
-* JsonHelper::addFloat -
-*/
-void JsonHelper::addFloat(const std::string& key, float  value)
-{  
-  unsigned int oldPrecision = ss.precision();
-  ss << std::fixed << std::setprecision(decimalDigits(value));
-
-  if (!empty)
-  {
-    ss << ',';
-  }  
-  ss << toJsonString(key) << ':' << value;
-
-  // Reset stream to old parameters (whichever they are...)
-  ss.unsetf(std::ios_base::fixed);
-  ss << std::setprecision(oldPrecision);
-
-  empty = false;
-}
-
-/* ****************************************************************************
-*
-* JsonHelper::addDate -
-*/
-void JsonHelper::addDate(const std::string& key, long long timestamp)
-{
-  if (!empty)
-  {
-    ss << ',';
-  }
-  ss << toJsonString(key) << ':' << toJsonString(isodate2str(timestamp));
-
-  empty = false;
-}
-
-
-
-/* ****************************************************************************
-*
-* JsonHelper::str -
-*/
-std::string JsonHelper::str()
-{
-  ss << '}';
-  return ss.str();
-}

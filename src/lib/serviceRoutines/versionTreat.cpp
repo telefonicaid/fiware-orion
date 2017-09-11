@@ -28,9 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/JsonHelper.h"
 #include "common/string.h"
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/compileInfo.h"
 
 #include "ngsi/ParseData.h"
@@ -78,8 +78,7 @@ std::string versionTreat
   ParseData*                 parseDataP
 )
 {
-  std::string out     = "";
-  std::string indent  = "";
+  JsonHelper writer(2);
 
 #ifdef UNIT_TEST
   std::string uptime = "0 d, 0 h, 0 m, 0 s";
@@ -87,17 +86,19 @@ std::string versionTreat
   std::string uptime = parsedUptime(getTimer()->getCurrentTime() - startTime);
 #endif
 
-  out += "{\n";
-  out += startTag(indent, "orion");
-  out += valueTag(indent + "  ", "version",       versionString,   true);
-  out += valueTag(indent + "  ", "uptime",        uptime,          true);
-  out += valueTag(indent + "  ", "git_hash",      GIT_HASH,        true);
-  out += valueTag(indent + "  ", "compile_time",  COMPILE_TIME,    true);
-  out += valueTag(indent + "  ", "compiled_by",   COMPILED_BY,     true);
-  out += valueTag(indent + "  ", "compiled_in",   COMPILED_IN,     false);
-  out += endTag(indent, false, false);
-  out += "}\n";
+  writer.StartObject();
+
+  writer.StartObject("orion");
+  writer.String("version", versionString);
+  writer.String("uptime", uptime);
+  writer.String("git_hash", GIT_HASH);
+  writer.String("compile_time", COMPILE_TIME);
+  writer.String("compiled_by", COMPILED_BY);
+  writer.String("compiled_in", COMPILED_IN);
+  writer.EndObject();
+
+  writer.EndObject();
 
   ciP->httpStatusCode = SccOk;
-  return out;
+  return writer.str();
 }
