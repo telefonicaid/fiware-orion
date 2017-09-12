@@ -32,6 +32,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/compileInfo.h"
+#include "common/versionInfo.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -41,7 +42,7 @@
 
 /* ****************************************************************************
 *
-* version - 
+* version -
 */
 static char versionString[30] = { 'a', 'l', 'p', 'h', 'a', 0 };
 
@@ -49,7 +50,7 @@ static char versionString[30] = { 'a', 'l', 'p', 'h', 'a', 0 };
 
 /* ****************************************************************************
 *
-* versionSet - 
+* versionSet -
 */
 void versionSet(const char* version)
 {
@@ -68,7 +69,7 @@ char* versionGet()
 
 /* ****************************************************************************
 *
-* versionTreat - 
+* versionTreat -
 */
 std::string versionTreat
 (
@@ -94,7 +95,9 @@ std::string versionTreat
   out += valueTag(indent + "  ", "git_hash",      GIT_HASH,        true);
   out += valueTag(indent + "  ", "compile_time",  COMPILE_TIME,    true);
   out += valueTag(indent + "  ", "compiled_by",   COMPILED_BY,     true);
-  out += valueTag(indent + "  ", "compiled_in",   COMPILED_IN,     false);
+  out += valueTag(indent + "  ", "compiled_in",   COMPILED_IN,     true);
+  out += valueTag(indent + "  ", "release_date",  RELEASE_DATE,    true);
+  out += valueTag(indent + "  ", "doc",           API_DOC,         false);
   out += endTag(indent, false, false);
   out += "}\n";
 
