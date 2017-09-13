@@ -19,6 +19,27 @@ planning to contribute to the code you should read this document and get familia
 Note that contribution workflows themselves (e.g. pull requests, etc.) are described in another document 
 ([FIWARE Development Guidelines](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Developer_Guidelines)).
 
+## Pull Request protocol
+
+As explained in ([FIWARE Development Guidelines](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Developer_Guidelines)) 
+contributions are done using pull request (PR). The detailed "protocol" used in such PRs is described below:
+
+* Direct commits to master branch (even single-line modifications) are not allowed. Every modification has to come as a PR
+* In the case the PR is implemeting/fixing a numbered issue, the issue number has to be referenced in the body of the PR at creating time
+* Anybody is welcome to provide comments in the PR (either direct comments or using the review github feature)
+* Use *code line comments* instead of *general comments*, for traceability reasons (see comments lifecycle below)
+* Comments lifecycle
+  * Comment is created, initiating a *comment thread*
+  * New comments can be added as responses to the original one, starting a discussion
+  * After discussion, the comment thread ends in one of the following ways
+    * `Fix in <commit hash>` in the case the discussion involves a fix in the PR branch (which commit hash is 
+       included as reference)
+    * `NTC`, in the case at the end nothing needs to be done (NTC = Nothing To Change)
+ * PR can be merged when all the following conditions are met
+    * All comment threads are closed
+    * Anybody who has taken part in some discussion provides a `LGTM` general comment (LGTM = Looks good to me)
+ * Self-merging is not allowed (except in rare and justified circustances)
+
 ## Filesystem layout guidelines
 
 ### Directory layout
