@@ -26,7 +26,7 @@ contributions are done using a pull request (PR). The detailed "protocol" used i
 
 * Direct commits to master branch (even single-line modifications) are not allowed. Every modification has to come as a PR
 * In case the PR is implementing/fixing a numbered issue, the issue number has to be referenced in the body of the PR at creation time
-* Anybody is welcome to provide comments in the PR (either direct comments or using the review feature offered by Github)
+* Anybody is welcome to provide comments to the PR (either direct comments or using the review feature offered by Github)
 * Use *code line comments* instead of *general comments*, for traceability reasons (see comments lifecycle below)
 * Comments lifecycle
   * Comment is created, initiating a *comment thread*
@@ -38,7 +38,7 @@ contributions are done using a pull request (PR). The detailed "protocol" used i
  * PR can be merged when the following conditions are met:
     * All comment threads are closed
     * All the participants in the discussion have provided a `LGTM` general comment (LGTM = Looks good to me)
- * Self-merging is not allowed (except in rare and justified circustances)
+ * Self-merging is not allowed (except in rare and justified circumstances)
 
 ## Filesystem layout guidelines
 
