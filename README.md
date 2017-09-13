@@ -16,7 +16,7 @@
 * [API Walkthrough](#api-walkthrough)
 * [API Reference Documentation](#api-reference-documentation)
 * [Testing](#testing)
-    * [Ent-to-end tests](#ent-to-end-tests)
+    * [End-to-end tests](#end-to-end-tests)
     * [Unit Tests](#unit-tests)
 * [Advanced topics](#advanced-topics)
 * [License](#license)
@@ -129,7 +129,7 @@ Please have a look at the [Quick Start guide](doc/manuals/quick_start_guide.md) 
 
 ## Testing
 
-### Ent-to-end tests
+### End-to-end tests
 
 The functional_test makefile target is used for running end-to-end tests:
 
