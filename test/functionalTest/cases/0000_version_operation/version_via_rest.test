@@ -46,14 +46,15 @@ Date: REGEX(.*)
 
 {
 "orion" : {
-  "version" : "1.8.0-next",
-  "uptime" : "0 d, 0 h, 0 m, 1 s",
-  "git_hash" : "10cbb3898840f49e93bf804e22e627e3a60edbad",
-  "compile_time" : "Tue Sep 12 20:40:09 CEST 2017",
-  "compiled_by" : "kz",
-  "compiled_in" : "malika"
+  "version" : "REGEX(.*)",
+  "uptime" : "REGEX(.*)",
+  "git_hash" : "REGEX(([0-9a-f]{40}|nogitversion))",
+  "compile_time" : "REGEX((.*))",
+  "compiled_by" : "REGEX(.*)",
+  "compiled_in" : "REGEX(.*)"
 }
 }
+
 
 
 --TEARDOWN--
