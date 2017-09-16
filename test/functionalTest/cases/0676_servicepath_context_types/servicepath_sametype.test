@@ -321,7 +321,6 @@ Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-#SORT_START
 {
     "statusCode": {
         "code": "200",
@@ -330,17 +329,18 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
+#SORT_START
                 "e"REGEX(,?)
                 "d"REGEX(,?)
                 "c"REGEX(,?)
                 "b"REGEX(,?)
                 "a"REGEX(,?)
+#SORT_END
             ],
             "name": "T"
         }
     ]
 }
-#SORT_END
 
 
 04. Query types on /A (returns: T - [b, c])
@@ -384,10 +384,12 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                "e",
-                "d",
-                "c",
-                "b"
+#SORT_START
+                "e"REGEX(,?)
+                "d"REGEX(,?)
+                "c"REGEX(,?)
+                "b"REGEX(,?)
+#SORT_END
             ],
             "name": "T"
         }
