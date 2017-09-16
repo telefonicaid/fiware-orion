@@ -1186,6 +1186,7 @@ function orionCurl()
   if [ "$_noPayloadCheck" == "on" ]
   then
     cat /tmp/orionCurl.response
+    echo
     rm -f /tmp/orionCurl.response
   else
     if [ "$_response" != "" ]
