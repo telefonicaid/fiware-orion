@@ -311,6 +311,12 @@ then
     then
       dir=$(dirname $dirOrFile)
       testFilter=$(basename $dirOrFile)
+
+      # Last dir + test file ?
+      if [ -d test/functionalTest/cases/$dirPart ]
+      then
+          dirOrFile=test/functionalTest/cases/$dirPart
+      fi
     else
       testFilter=$(basename $dirOrFile)
     fi
@@ -346,7 +352,7 @@ then
   elif [ -f "$SCRIPT_HOME/../../scripts/testEnv.sh" ]
   then
     # Second, we try with a testEnv.sh file in the script/testEnv.sh (realtive to git repo home).
-    # Note that the script home in this case is test/functionaTest
+    # Note that the script home in this case is test/functionalTest
     vMsg Sourcing $SCRIPT_HOME/../../scripts/testEnv.sh
     source $SCRIPT_HOME/../../scripts/testEnv.sh
   else
@@ -378,6 +384,7 @@ fi
 # Preparations - cd to the test directory
 #
 dMsg Functional Tests Starting ...
+
 if [ "$dirOrFile" != "" ] && [ -d "$dirOrFile" ]
 then
   cd $dirOrFile
@@ -387,7 +394,6 @@ then
 else
   cd $dir
 fi
-
 
 echo "Orion Functional tests starting" > /tmp/orionFuncTestLog
 date >> /tmp/orionFuncTestLog
