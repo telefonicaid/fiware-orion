@@ -163,6 +163,13 @@ std::string mongoCreateSubscription
 
   std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
 
+  // We need to insert the csub in the cache before (potentially) sending the
+  // initial notification (have a look to issue #2974 for details)
+  if (!noCache)
+  {
+    insertInCache(sub, subId, tenant, servicePath, false, 0, 0, 0);
+  }
+
   setCondsAndInitialNotify(sub,
                            subId,
                            status,
@@ -200,11 +207,6 @@ std::string mongoCreateSubscription
     oe->fill(SccReceiverInternalError, err);
 
     return "";
-  }
-
-  if (!noCache)
-  {
-    insertInCache(sub, subId, tenant, servicePath, false, 0, 0, 0);
   }
 
   reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);

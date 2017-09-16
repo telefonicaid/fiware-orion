@@ -255,9 +255,9 @@ Date: REGEX(.*)
 
 04. Check log-file to make sure the Bad Input alarm is active
 =============================================================
-Raising alarm BadInput 0.0.0.0: Invalid URL
-Repeated BadInput 0.0.0.0: Invalid URL
-Repeated BadInput 0.0.0.0: Invalid URL
+Raising alarm BadInput REGEX((0.0.0.0|127.0.0.1)): Invalid URL
+Repeated BadInput REGEX((0.0.0.0|127.0.0.1)): Invalid URL
+Repeated BadInput REGEX((0.0.0.0|127.0.0.1)): Invalid URL
 
 
 05. Create a valid subscription for E1/A1
@@ -278,10 +278,10 @@ Date: REGEX(.*)
 
 06. Check log-file to make sure the Bad Input alarm is reset
 ============================================================
-Raising alarm BadInput 0.0.0.0: Invalid URL
-Repeated BadInput 0.0.0.0: Invalid URL
-Repeated BadInput 0.0.0.0: Invalid URL
-Releasing alarm BadInput 0.0.0.0
+Raising alarm BadInput REGEX((0.0.0.0|127.0.0.1)): Invalid URL
+Repeated BadInput REGEX((0.0.0.0|127.0.0.1)): Invalid URL
+Repeated BadInput REGEX((0.0.0.0|127.0.0.1)): Invalid URL
+Releasing alarm BadInput REGEX((0.0.0.0|127.0.0.1))
 
 
 07. Corrupt reference in subscription (using mongo)
