@@ -56,7 +56,7 @@ add_definitions(-fPIC)
 # Baseline compiler flags, any change here will affect all build types
 
 #
-# FIXME P4:
+# FIXME P4: https://github.com/telefonicaid/fiware-orion/issues/2979
 #   'template class std::auto_ptr' is deprecated in gcc 6.3.0 of Ubuntu 17.04, so -Werror cannot be used, at least not for now.
 #
 #   The *real* fix would be to rewrite the part of the code producing these warnings, but for now,
