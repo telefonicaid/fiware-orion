@@ -54,9 +54,26 @@ add_definitions(-DLM_ON)
 add_definitions(-fPIC)
 
 # Baseline compiler flags, any change here will affect all build types
-#set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror")
 
-
+#
+# FIXME P4:
+#   'template class std::auto_ptr' is deprecated in gcc 6.3.0 of Ubuntu 17.04, so -Werror cannot be used, at least not for now.
+#
+#   The *real* fix would be to rewrite the part of the code producing these warnings, but for now,
+#   disabling the -Werror flag makes the problem go away (warnings will still be found and give errors in other distros).
+#
+#   One example of this warning (there are many warnings, but as in header files, just a few places):
+#
+#   mongoBackend/safeMongo.h:
+#   ----------------------------------------------------------------
+#     extern bool nextSafeOrError
+#     (
+#       const std::auto_ptr<mongo::DBClientCursor>&  cursor,
+#       ...
+#   ----------------------------------------------------------------
+#
+# A grep of 'std::auto_ptr<' in the header files show 7 hits, and 13 hits in cpp files
+#
 IF (${DISTRO} STREQUAL "Ubuntu_17.04")
   set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -fno-var-tracking-assignments")
 ELSE()
