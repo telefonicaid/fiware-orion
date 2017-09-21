@@ -123,7 +123,7 @@ echo
 
 echo "07. Start accumulator again"
 echo "==========================="
-accumulatorStart --pretty-print
+accumulatorStart --pretty-print | grep -v "Connection to"
 sleep 0.5
 echo
 echo
@@ -258,7 +258,6 @@ Date: REGEX(.*)
 07. Start accumulator again
 ===========================
 accumulator running as PID REGEX(\d+)
-Connection to REGEX(.*)
 
 
 08. Update E1, to provoke notification that now works
