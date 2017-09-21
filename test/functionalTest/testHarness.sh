@@ -29,6 +29,20 @@ MAX_TRIES=${CB_MAX_TRIES:-3}
 echo $testStartTime > /tmp/brokerStartCounter
 
 
+# -----------------------------------------------------------------------------
+#
+# DISABLED - funct tests that are disabled, for some reason
+#
+DISABLED=('test/functionalTest/cases/1156_qfilters_and_compounds/qfilters_and_compounds_equals_null.test' \
+          'test/functionalTest/cases/0000_bad_requests/exit.test' \
+          'test/functionalTest/cases/2207_not_spurious_decimals_in_custom_notifications/not_spurious_decimals_in_custom_notifications.test' \
+          'test/functionalTest/cases/0917_queryContext_behaves_differently/query_with_and_without_forwarding.test' \
+          'test/functionalTest/cases/0000_ipv6_support/ipv4_only.test' \
+          'test/functionalTest/cases/0000_ipv6_support/ipv6_only.test' \
+          'test/functionalTest/cases/1310_suspect_200OK/suspect_200OK.test');
+
+
+
 # ------------------------------------------------------------------------------
 #
 # Find out in which directory this script resides
@@ -80,11 +94,26 @@ declare -A okOnThirdV
 typeset -i okOnThird
 declare -A okOnPlus3V
 typeset -i okOnPlus3
+declare -A skipV
+typeset -i skips
+declare -A disabledTestV
+typeset -i disabledTests
+
 export DIFF=$SCRIPT_HOME/testDiff.py
 testError=0
 okOnSecond=0
 okOnThird=0
 okOnPlus3=0
+skips=0
+disabledTests=0
+
+
+# -----------------------------------------------------------------------------
+#
+# Default value of skipList taken from an env var, to make things a little
+# easier in distros with constantly failing tests
+#
+skipList="$CB_SKIP_LIST"
 
 
 
@@ -105,6 +134,7 @@ function usage()
   echo "$empty [--dir <directory>]"
   echo "$empty [--fromIx <index of test where to start>]"
   echo "$empty [--ixList <list of test indexes>]"
+  echo "$empty [--skipList <list of indexes of test cases to be skipped>]"
   echo "$empty [--stopOnError (stop at first error encountered)]"
   echo "$empty [--no-duration (removes duration mark on successful tests)]"
   echo "$empty [--noCache (force broker to be started with the option --noCache)]"
@@ -223,6 +253,7 @@ do
   elif [ "$1" == "--dir" ];          then dir="$2"; dirGiven=yes; shift;
   elif [ "$1" == "--fromIx" ];       then fromIx=$2; shift;
   elif [ "$1" == "--ixList" ];       then ixList=$2; shift;
+  elif [ "$1" == "--skipList" ];     then skipList=$2; shift;
   elif [ "$1" == "--no-duration" ];  then showDuration=off;
   elif [ "$1" == "--noCache" ];      then noCache=ON;
   elif [ "$1" == "--cache" ];        then noCache=OFF;
@@ -799,6 +830,29 @@ function runTest()
 
 
 
+# -----------------------------------------------------------------------------
+#
+# testDisabled
+#
+function testDisabled
+{
+  testcase=$1
+  typeset -i dIx
+  dIx=0
+  while [ $dIx -lt  ${#DISABLED[@]} ]
+  do
+    if [ test/functionalTest/cases/$testcase == ${DISABLED[$dIx]} ]
+    then
+      echo "Disabled"
+      return
+    fi
+    dIx=$dIx+1
+  done
+  echo NOT Disabled
+}
+
+
+
 # ------------------------------------------------------------------------------
 #
 # Main loop
@@ -819,11 +873,37 @@ do
     continue;
   fi
 
+  #
+  # Disabled test?
+  #
+  disabled=$(testDisabled $testFile)
+  if [ "$disabled" == "Disabled" ]
+  then
+    disabledTestV[$disabledTests]=$testNo': '$testFile
+    disabledTests=$disabledTests+1
+    continue
+  fi
+
   if [ "$ixList" != "" ]
   then
     hit=$(echo ' '$ixList' ' | grep ' '$testNo' ')
     if [ "$hit" == "" ]
     then
+      # Test case not found in ix-list, so it is skipped
+      skipV[$skips]=$testNo': '$testFile
+      skips=$skips+1
+      continue
+    fi
+  fi
+
+  if [ "$skipList" != "" ]
+  then
+    hit=$(echo ' '$skipList' ' | grep ' '$testNo' ')
+    if [ "$hit" != "" ]
+    then
+      # Test case found in skip-list, so it is skipped
+      skipV[$skips]=$testNo': '$testFile
+      skips=$skips+1
       continue
     fi
   fi
@@ -986,4 +1066,29 @@ then
     ix=$ix+1
   done
 fi
+
+if [ $skips != 0 ]
+then
+  echo
+  echo WARNING: $skips test cases skipped:
+  ix=0
+  while [ $ix -lt $skips ]
+  do
+    echo "  o " ${skipV[$ix]}
+    ix=$ix+1
+  done
+fi
+
+if [ $disabledTests != 0 ]
+then
+  echo
+  echo WARNING: $disabledTests test cases disabled:
+  ix=0
+  while [ $ix -lt $disabledTests ]
+  do
+    echo "  o " ${disabledTestV[$ix]}
+    ix=$ix+1
+  done
+fi
+
 exit $exitCode
