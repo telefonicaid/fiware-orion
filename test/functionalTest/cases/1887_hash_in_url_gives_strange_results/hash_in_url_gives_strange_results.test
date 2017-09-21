@@ -20,6 +20,16 @@
 
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
+#
+# NOTE: where before the hash sign were used, now we use a '<' sign.
+#       This is because the hash sign is cutting the URL in modern versions
+#       of curl. The version of curl in CentOS 6.* doesn't do this (cut URL at #),
+#       so the original test worked just fine.
+#       However, in more modern distros, the test with '#' doesn't make any sense.
+#       Changing the '#' for '<', the test makes sense again.
+#       The old name has been kept. This might be a good or bad idea. Up for discussion ...
+#
+
 --NAME--
 Hash sign in URL gives strange results
 

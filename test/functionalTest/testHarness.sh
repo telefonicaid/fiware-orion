@@ -889,9 +889,7 @@ do
     hit=$(echo ' '$ixList' ' | grep ' '$testNo' ')
     if [ "$hit" == "" ]
     then
-      # Test case not found in ix-list, so it is skipped
-      skipV[$skips]=$testNo': '$testFile
-      skips=$skips+1
+      # Test case not found in ix-list, so it is not executed
       continue
     fi
   fi
