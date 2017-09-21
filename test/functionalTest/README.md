@@ -18,7 +18,7 @@ does not match ref line:
 ```
 
 This is not an actual problem with the test or Orion, but a rounding problem in the version of the json module that 
-comes with Python 2.6 (the testHarness.sh program typically uses `python -mjson.tool` to beutify responses).
+comes with Python 2.6 (the testHarness.sh program typically uses `python -mjson.tool` to beautify responses).
 
 The solution is easy: don't use Python 2.6. The recommended version is Python 2.7. Note that CentOS 6 comes with Python 2.6 at
 system level, but you can use [virtualenv](https://virtualenv.pypa.io/en/stable/) to use Python 2.7 in a easy way.
