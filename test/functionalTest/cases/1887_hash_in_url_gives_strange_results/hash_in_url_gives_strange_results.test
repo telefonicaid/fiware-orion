@@ -29,7 +29,8 @@
 #       Changing the '#' for '<', the test makes sense again.
 #       The old name has been kept. This might be a good or bad idea. Up for discussion ...
 #
-
+#       See https://stackoverflow.com/questions/46281537/why-modern-curl-versions-cut-off-the-anchor-part-of-the-url
+#
 --NAME--
 Hash sign in URL gives strange results
 
