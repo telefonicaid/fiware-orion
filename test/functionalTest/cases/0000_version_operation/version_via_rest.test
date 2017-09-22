@@ -40,7 +40,17 @@ Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-REGEX({ "orion" : { "version" : "(.*)", "uptime" : "(.*)", "git_hash" : "([0-9a-f]{40}|nogitversion)", "compile_time" : "(.*)", "compiled_by" : "(.*)", "compiled_in" : "(.*)", "release_date" : "(.*)", "doc" : "(.*)" } })
+{
+"orion" : {
+  "version" : "REGEX(.*)",
+  "uptime" : "REGEX(.*)",
+  "git_hash" : "REGEX(([0-9a-f]{40}|nogitversion))",
+  "compile_time" : "REGEX(.*)",
+  "compiled_by" : "REGEX(.*)",
+  "compiled_in" : "REGEX(.*)"
+}
+}
+
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

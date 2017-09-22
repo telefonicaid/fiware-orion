@@ -20,6 +20,17 @@
 
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
+#
+# NOTE: where before the hash sign were used, now we use a '<' sign.
+#       This is because the hash sign is cutting the URL in modern versions
+#       of curl. The version of curl in CentOS 6.* doesn't do this (cut URL at #),
+#       so the original test worked just fine.
+#       However, in more modern distros, the test with '#' doesn't make any sense.
+#       Changing the '#' for '<', the test makes sense again.
+#       The old name has been kept. This might be a good or bad idea. Up for discussion ...
+#
+#       See https://stackoverflow.com/questions/46281537/why-modern-curl-versions-cut-off-the-anchor-part-of-the-url
+#
 --NAME--
 Hash sign in URL gives strange results
 
@@ -36,36 +47,36 @@ brokerStart CB
 # 04. GET /v2/entities/E1/attrs/A1_#/value, Accept text/plain
 #
 
-echo '01. GET /v2/entities/E1_#/attrs/A1/value'
+echo '01. GET /v2/entities/E1_</attrs/A1/value'
 echo '========================================'
-orionCurl --url '/v2/entities/E1_#/attrs/A1/value'
+orionCurl --url '/v2/entities/E1_</attrs/A1/value'
 echo
 echo
 
 
-echo '02. GET /v2/entities/E1/attrs/A1_#/value'
+echo '02. GET /v2/entities/E1/attrs/A1_</value'
 echo '========================================'
-orionCurl --url '/v2/entities/E1/attrs/A1_#/value'
+orionCurl --url '/v2/entities/E1/attrs/A1_</value'
 echo
 echo
 
 
-echo '03. GET /v2/entities/E1_#/attrs/A1/value, Accept text/plain'
+echo '03. GET /v2/entities/E1_</attrs/A1/value, Accept text/plain'
 echo '==========================================================='
-orionCurl --url '/v2/entities/E1_#/attrs/A1/value' --out text/plain
+orionCurl --url '/v2/entities/E1_</attrs/A1/value' --out text/plain
 echo
 echo
 
 
-echo '04. GET /v2/entities/E1/attrs/A1_#/value, Accept text/plain'
+echo '04. GET /v2/entities/E1/attrs/A1_</value, Accept text/plain'
 echo '==========================================================='
-orionCurl --url '/v2/entities/E1/attrs/A1_#/value' --out text/plain
+orionCurl --url '/v2/entities/E1/attrs/A1_</value' --out text/plain
 echo
 echo
 
 
 --REGEXPECT--
-01. GET /v2/entities/E1_#/attrs/A1/value
+01. GET /v2/entities/E1_</attrs/A1/value
 ========================================
 HTTP/1.1 400 Bad Request
 Content-Length: 63
@@ -79,7 +90,7 @@ Date: REGEX(.*)
 }
 
 
-02. GET /v2/entities/E1/attrs/A1_#/value
+02. GET /v2/entities/E1/attrs/A1_</value
 ========================================
 HTTP/1.1 400 Bad Request
 Content-Length: 63
@@ -93,7 +104,7 @@ Date: REGEX(.*)
 }
 
 
-03. GET /v2/entities/E1_#/attrs/A1/value, Accept text/plain
+03. GET /v2/entities/E1_</attrs/A1/value, Accept text/plain
 ===========================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 63
@@ -104,7 +115,7 @@ Date: REGEX(.*)
 {"error":"BadRequest","description":"invalid character in URI"}
 
 
-04. GET /v2/entities/E1/attrs/A1_#/value, Accept text/plain
+04. GET /v2/entities/E1/attrs/A1_</value, Accept text/plain
 ===========================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 63
