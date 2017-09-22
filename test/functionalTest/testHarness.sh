@@ -844,6 +844,16 @@ function testDisabled
     if [ test/functionalTest/cases/$testcase == ${DISABLED[$dIx]} ]
     then
       echo "Disabled"
+
+      #
+      # NOTE: In a non-disabled test, running inside the valgrind test suite, the function 'localBrokerStart()' (from harnessFunctions.sh)
+      #       redirects the output of "valgrind contextBroker" to the file /tmp/valgrind.out.
+      #       Later, the valgrind test suite uses the existence of this file (/tmp/valgrind.out) to detect errors in the valgrind execution.
+      #       But, in the case of a disabled func test, we will not start the test case. and thus we will not reach 'localBrokerStart()', so the
+      #       file will not be created and an error will be flagged by the valgrind test suite.
+      #       The simplest solution is to simply create the file here, in the case of a disabled test.
+      #
+      echo "Disabled" > /tmp/valgrind.out
       return
     fi
     dIx=$dIx+1
