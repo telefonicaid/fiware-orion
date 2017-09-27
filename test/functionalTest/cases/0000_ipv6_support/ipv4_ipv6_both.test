@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-IPv6 IPv4 Both 
+IPv6 IPv4 Both
 
 --SHELL-INIT--
 dbInit CB
@@ -31,10 +31,10 @@ accumulatorStart --pretty-print :: ${LISTENER2_PORT}
 
 --SHELL--
 echo "1: ++++++++++++++++++++"
-orionCurl --url "/version" --host "[::1]" -g 2> /dev/null
+orionCurl --url "/version" --noPayloadCheck --host "[::1]" -g 2> /dev/null
 
 echo "2: ++++++++++++++++++++"
-orionCurl --url "/version" --host "127.0.0.1" -g 2> /dev/null
+orionCurl --url "/version" --noPayloadCheck --host "127.0.0.1" -g 2> /dev/null
 
 echo "3: ++++++++++++++++++++"
 url="/v1/subscribeContext"
@@ -136,15 +136,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "compile_time": "REGEX(.*)",
-        "compiled_by": "REGEX(.*)",
-        "compiled_in": "REGEX(.*)",
-        "git_hash": "REGEX(([0-9a-f]{40}|nogitversion))",
-        "uptime": "REGEX(.*)",
-        "version": "REGEX(.*)"
-    }
+"orion" : {
+  "version" : "REGEX(.*)",
+  "uptime" : "REGEX(.*)",
+  "git_hash" : "REGEX(([0-9a-f]{40}|nogitversion))",
+  "compile_time" : "REGEX(.*)",
+  "compiled_by" : "REGEX(.*)",
+  "compiled_in" : "REGEX(.*)",
+  "release_date" : "REGEX(.*)",
+  "doc" : "REGEX(.*)
 }
+}
+
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: REGEX(\d+)
@@ -153,15 +156,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "compile_time": "REGEX(.*)",
-        "compiled_by": "REGEX(.*)",
-        "compiled_in": "REGEX(.*)",
-        "git_hash": "REGEX(([0-9a-f]{40}|nogitversion))",
-        "uptime": "REGEX(.*)",
-        "version": "REGEX(.*)"
-    }
+"orion" : {
+  "version" : "REGEX(.*)",
+  "uptime" : "REGEX(.*)",
+  "git_hash" : "REGEX(([0-9a-f]{40}|nogitversion))",
+  "compile_time" : "REGEX(.*)",
+  "compiled_by" : "REGEX(.*)",
+  "compiled_in" : "REGEX(.*)",
+  "release_date" : "REGEX(.*)",
+  "doc" : "REGEX(.*)
 }
+}
+
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 109

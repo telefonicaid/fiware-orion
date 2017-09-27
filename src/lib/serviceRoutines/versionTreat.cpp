@@ -32,7 +32,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/compileInfo.h"
-#include "common/versionInfo.h"
+#include "common/defaultValues.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"

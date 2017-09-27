@@ -30,6 +30,9 @@ curl --header 'Accept: application/json' localhost:1026/version
     "compile_time" : "Tue Sep 8 16:56:16 CEST 2015",
     "compiled_by" : "fermin",
     "compiled_in" : "debvm"
+    "release_date" : "Tue Sep 8 16:56:16 CEST 2015",
+    "doc" : "https://fiware-orion.readthedocs.org/en/master/"
+
   }
 }
 ```
