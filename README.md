@@ -42,9 +42,9 @@ For documentation previous to Orion 0.23.0 please check the manuals at FIWARE pu
 
 ## GEi overall description
 
-Orion is a C++ implementation of the NGSI9/10 REST API binding developed as a part of the FIWARE platform.
+Orion is a C++ implementation of the NGSIv2 REST API binding developed as a part of the FIWARE platform.
 
-Orion Context Broker allows you to manage all the whole lifecycle of context information including updates, queries, registrations and subscriptions. It is an NGSI9/10 server implementation to manage context information and its availability. Using the Orion Context Broker, you are able to register context elements and manage them through updates and queries. In addition, you can subscribe to context information so when some condition occurs (e.g. the context elements have changed) you receive a notification. These usage scenarios and the Orion Context Broker features are described in this document.
+Orion Context Broker allows you to manage all the whole lifecycle of context information including updates, queries, registrations and subscriptions. It is an NGSIv2 server implementation to manage context information and its availability. Using the Orion Context Broker, you are able to create context elements and manage them through updates and queries. In addition, you can subscribe to context information so when some condition occurs (e.g. the context elements have changed) you receive a notification. These usage scenarios and the Orion Context Broker features are described in this documentation.
 
 If this is your first contact with the Orion Context Broker, it is highly recommended to have a look to the brief [Quick Start guide](doc/manuals/quick_start_guide.md).
 
