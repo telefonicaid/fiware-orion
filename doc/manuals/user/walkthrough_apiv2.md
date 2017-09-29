@@ -1,4 +1,4 @@
-#<a name="top"></a>FIWARE NGSI APIv2 Walkthrough
+# <a name="top"></a>FIWARE NGSI APIv2 Walkthrough
 
 * [Introduction](#introduction)
 * [Before starting...](#before-starting)
@@ -130,12 +130,6 @@ command:
 # chmod a+x accumulator-server.py
 # ./accumulator-server.py --port 1028 --url /accumulate --host ::1 --pretty-print -v
 ```
-
-The accumulator-server.py is also part of the contextBroker-test package (see
-[optional packages section in how to install](../admin/install.md#optional-packages)).
-The script is located at `/usr/share/contextBroker/tests/accumulator-server.py` after
-installation. However, if you only need the accumulator-server.py it's easier to
-just download it from GitHub, as suggested above.
 
 [Top](#top)
 
