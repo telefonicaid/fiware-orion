@@ -1990,23 +1990,22 @@ Response:
 
 # Group Registrations
 
-Context Registration allows to associate external services to context data. One of the main
-use cases of this functionality is the association of Context Providers.
+A Context Registration allows to associate external context sources. 
 
 A context registration is represented by a JSON object with the following fields:
 
-+ `id`       : Unique identifier assigned to the registration. Automatically generated at creation
-  time.
-+ `subject`  : Object that describes the subject of the registration.
-+ `callback` : URL which denotes the end-point of the registered service. It is optional, as it can
-  be undefined under certain conditions, for instance, transient unavailability of the provider.
-+ `metadata` : An optional JSON object which allows to associate extra metadata properties to the
-  registration.
-  It must follow the same representation conventions as context attribute metadata
-  (See JSON Attribute Representation). 
-+ `duration` : Duration of the registration in ISO8601 format. Default duration is infinite.
++ `id` : Unique identifier assigned to the registration. Automatically generated at creation time.
++ `source` : Object that describes the context source.
++ `dataProvided` : Object that describes the context data provided by the source.
++ `expires` : Registration expiration date in ISO8601 format. Permanent registrations must omit this field.
 
-A `subject` contains the following subfields:
+The `source` field contains the following subfields:
++ `endPoint` : URL which denotes the end-point of the context source.
++ `name` : Name of the context source. Optional. 
++ `description` : Description of the context source. Optional. 
++ `scope` : Scope of the context source. An object T.B.D. Optional. Editor Note: Here we plan to add geographical scopes. 
+
+The `dataProvided` field contains the following subfields:
 
 + `entities`: A list of objects, each one composed of the following subfields:
     + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
@@ -2032,7 +2031,7 @@ Response:
         [
           {
             "id": "abcdefg",
-            "subject": {
+            "dataProvided": {
               "entities": [
                 {
                   "id": "Bcn_Welt",
@@ -2043,24 +2042,18 @@ Response:
                 "temperature"
               ]
             },
-            "callback": "http://weather.example.com/ngsi",
-            "metadata": {
-              "providingService": {
-                 "value": "weather.example.com",
-                 "type": "Text"
-               },
-              "providingAuthority": {
-                 "value": "AEMET - Spain",
-                 "type": "Text"
-               }
+            "source": {
+              "endPoint": "http://contextsource.example.org/v2/entities",
+              "name": "Example 1",
+              "description": "Example Context Source"
             },
-            "duration": "PT1M"
+            "expires": "2017-10-31T12:00:00"
           }
         ]
 
 ### Create a new context provider registration [POST /v2/registrations]
 
-Creates a new registration. This is typically used for associating context providers
+Creates a new registration. This is typically used for associating context sources
 to certain data.
 The registration is represented by a JSON object as described at the beginning of this section.
 
@@ -2073,7 +2066,7 @@ Response:
 + Request (application/json)
 
         {
-          "subject": {
+          "dataProvided": {
             "entities": [
               {
                 "id": "room2",
@@ -2081,16 +2074,13 @@ Response:
               }
             ],
             "attributes": [
-              "humidity"
+              "relativeHumidity"
             ]
           },
-          "callback":  "http://localhost:1234",
-          "metadata" : {
-            "provider": {
-              "value": "example.com"
-            }
-          },
-          "duration": "PT1M"
+          "source": {
+            "endPoint": "http://localhost:1234",
+            "name": "Relative Humidity Context Source" 
+          }
         }
 
 + Response 201
@@ -2119,7 +2109,7 @@ Response:
 
         {
           "id": "abcde",
-          "subject": {
+          "dataProvided": {
             "entities": [
               {
                 "id": "room2",
@@ -2127,11 +2117,13 @@ Response:
               }
             ],
             "attributes": [
-              "humidity"
+              "relativeHumidity"
             ]
           },
-          "callback":  "http://localhost:1234",
-          "duration": "PT1M"
+          "source": {
+            "endPoint": "http://localhost:1234",
+            "name": "Relative Humidity Context Source" 
+          }
         }
 
 ### Update context provider registration [PATCH /v2/registrations/{registrationId}]
@@ -2150,7 +2142,7 @@ Response:
 + Request (application/json)
 
         {
-          "duration": "PT1M"
+          "expires": "2017-10-04T00:00:00"
         }
 
 + Response 204
