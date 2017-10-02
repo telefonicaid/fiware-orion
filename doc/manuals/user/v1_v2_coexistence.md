@@ -1,4 +1,4 @@
-#<a name="top"></a>Considerations on NGSIv1 and NGSIv2 coexistence
+# <a name="top"></a>Considerations on NGSIv1 and NGSIv2 coexistence
 
 NGSIv1 is the API offered by Orion Context Broker from its very first version. 
 [NGSIv2](http://telefonicaid.github.io/fiware-orion/api/v2/stable) development started 
