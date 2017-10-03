@@ -174,6 +174,17 @@ else
 fi
 mv /tmp/README.md README.md
 
+# Adjust Readthedocs documentation link for GET /version response. Note that the procedure is not symmetric 
+# (like in version.h), as dev release sets 'master' and not 'X.Y.Z-next"
+if [ "$BROKER_RELEASE" != "dev" ]
+then
+  sed "s/https:\/\/fiware-orion.readthedocs.org\/en\/master\//https:\/\/fiware-orion.readthedocs.org\/en\/$NEW_VERSION\//" src/lib/common/defaultValues.h > /tmp/defaultValues.h
+else
+  sed "s/https:\/\/fiware-orion.readthedocs.org\/en\/$currentVersion\//https:\/\/fiware-orion.readthedocs.org\/en\/master\//" src/lib/common/defaultValues.h > /tmp/defaultValues.h
+fi
+mv /tmp/defaultValues.h src/lib/common/defaultValues.h
+
+
 # Adjust Dockerfile GIT_REV_ORION. Note that the procedure is not symmetric (like in version.h), as
 # dev release sets 'master' and not 'X.Y.Z-next"
 if [ "$BROKER_RELEASE" != "dev" ]
