@@ -169,7 +169,7 @@ leakTest=off
 dryLeaks=off
 fromIx=0
 ixList=""
-
+file=""
 vMsg "parsing options"
 while [ "$#" != 0 ]
 do
@@ -185,8 +185,14 @@ do
   elif [ "$1" == "-fromIx" ];   then  shift; fromIx=$1;
   elif [ "$1" == "-ixList" ];   then  shift; ixList=$1;
   else
-    echo $0: bad parameter/option: "'"${1}"'";
-    usage 1
+    if [ "$file" == "" ]
+    then
+      file=$1
+      TEST_FILTER=$file
+    else
+      echo $0: bad parameter/option: "'"${1}"'";
+      usage 1
+    fi
   fi
   shift
 done

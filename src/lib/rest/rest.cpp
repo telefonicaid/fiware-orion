@@ -656,6 +656,14 @@ static void requestCompleted
     }
   }
 
+
+  //
+  // delayed release of ContextElementResponseVector must be effectuated now.
+  // See github issue 2994
+  //
+  extern void delayedReleaseExecute(void);
+  delayedReleaseExecute();
+
   delete(ciP);
 }
 
