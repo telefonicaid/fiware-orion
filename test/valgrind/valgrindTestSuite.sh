@@ -78,7 +78,19 @@ typeset -i valgrindErrors
 #
 function usage()
 {
-  echo $0 "[-u (usage)] [-v (verbose)] [-filter (test filter)] [-dryrun (don't execute any tests)] [-leakTest (test a memory leak)] [-dryLeaks (simulate leaks and functest errors)] [-fromIx (index of test where to start)] [-ixList <list of testNo indexes> ] <pure|harness|both>"
+  sfile="Usage: "$(basename $0)
+  empty=$(echo $sfile | tr 'a-zA-z/0-9.:' ' ')
+
+  echo "$sfile [-u (usage)]"
+  echo "$empty [-v (verbose)]"
+  echo "$empty [-filter <test filter>]"
+  echo "$empty [-dryrun (don't execute any tests)]"
+  echo "$empty [-leakTest (test a memory leak)]"
+  echo "$empty [-dryLeaks (simulate leaks and functest errors)]"
+  echo "$empty [-fromIx <index of test where to start>]"
+  echo "$empty [-ixList <list of testNo indexes>]"
+  echo "$empty [test case file]"
+
   exit $1
 }
 
