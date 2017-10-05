@@ -1,4 +1,4 @@
-#<a name="top"></a>Performance tuning
+# <a name="top"></a>Performance tuning
 
 * [MongoDB configuration](#mongodb-configuration)
 * [Database indexes](#database-indexes)

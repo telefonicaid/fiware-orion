@@ -67,6 +67,7 @@ echo '#define GIT_HASH         "'${hash}'"'                                     
 echo '#define COMPILE_TIME     "'${date}'"'                                         >> $TMP_FILE
 echo '#define COMPILED_BY      "'${user}'"'                                         >> $TMP_FILE
 echo '#define COMPILED_IN      "'${host}'"'                                         >> $TMP_FILE
+echo '#define RELEASE_DATE     "'${date}'"'                                         >> $TMP_FILE
 echo                                                                                >> $TMP_FILE
 echo '#endif  // SRC_LIB_COMMON_COMPILEINFO_H_'                                     >> $TMP_FILE
 

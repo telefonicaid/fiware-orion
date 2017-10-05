@@ -136,6 +136,15 @@ grep "tests" MANIFEST > MANIFEST.broker-tests
 
 %changelog
 
+
+# The contextBroker-test package is still taken into account, although it is very old and probably obsolete. If we
+# recover it in the future, dependencies and so on need to be reviewed. The following fragment (removed from
+# install documentation) could be useful:
+#
+#    The contextBroker-test package (optional) depends on the following packages: python, python-flask, 
+#    python-jinja2, curl, libxml2, libxslt, nc, mongo-10gen and contextBroker. The mongo-10gen dependency needs 
+#    to configure MongoDB repository, check [this piece of documentation about that](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/).
+#
 %package tests
 Requires: %{name}, python, python-flask, python-jinja2, nc, curl, libxml2, mongo-10gen 
 Summary: Test suite for %{name}

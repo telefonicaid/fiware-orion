@@ -1,4 +1,4 @@
-#<a name="top"></a>Logs
+# <a name="top"></a>Logs
 
 * [Log file](#log-file)
 * [Log format](#log-format)
