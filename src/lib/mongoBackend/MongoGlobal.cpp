@@ -100,13 +100,13 @@ static std::string          subscribeContextAvailabilityCollectionName;
 static Notifier*            notifier;
 static bool                 multitenant;
 
-thread_local std::vector<ContextElementResponse*>  savedCerVector;
+thread_local std::vector<ContextElementResponse*>  cerVectorForDelayedRelease;
 
 
 
 /* ****************************************************************************
 *
-* WORKAROUND_2994 - see github issue 2994
+* WORKAROUND_2994 - see github issue #2994
 */
 #define WORKAROUND_2994 1
 
@@ -121,7 +121,7 @@ thread_local std::vector<ContextElementResponse*>  savedCerVector;
 static void delayedReleaseAdd(ContextElementResponseVector& cerV)
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
-    savedCerVector.push_back(cerV[ix]);
+    cerVectorForDelayedRelease.push_back(cerV[ix]);
 }
 #endif
 
@@ -132,25 +132,25 @@ static void delayedReleaseAdd(ContextElementResponseVector& cerV)
 * delayedReleaseExecute -
 *
 * NOTE
-*   This function doesn't depend on WORKAROUND_2994 being defined as savedCerVector
+*   This function doesn't depend on WORKAROUND_2994 being defined as cerVectorForDelayedRelease
 *   will be empty if WORKAROUND_2994 is not defined and its action is null and void, if so.
 *   'delayedReleaseExecute()' is called in rest/rest.cpp and with this 'idea', that file doesn't
 *   need to know about the WORKAROUND_2994 definition.
 */
 void delayedReleaseExecute(void)
 {
-  if (savedCerVector.size() == 0)
+  if (cerVectorForDelayedRelease.size() == 0)
   {
     return;
   }
 
-  for (unsigned int ix = 0; ix < savedCerVector.size(); ++ix)
+  for (unsigned int ix = 0; ix < cerVectorForDelayedRelease.size(); ++ix)
   {
-    savedCerVector[ix]->release();
-    delete savedCerVector[ix];
+    cerVectorForDelayedRelease[ix]->release();
+    delete cerVectorForDelayedRelease[ix];
   }
 
-  savedCerVector.clear();
+  cerVectorForDelayedRelease.clear();
 }
 
 
