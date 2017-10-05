@@ -159,7 +159,6 @@ ContextAttribute::ContextAttribute()
   name                  = "";
   type                  = "";
   stringValue           = "";
-  numberValue           = 0;
   valueType             = orion::ValueTypeString;
   compoundValueP        = NULL;
   found                 = false;
@@ -267,7 +266,6 @@ ContextAttribute::ContextAttribute
   name                  = _name;
   type                  = _type;
   stringValue           = std::string(_value);
-  numberValue           = 0;
   valueType             = orion::ValueTypeString;
   compoundValueP        = NULL;
   found                 = _found;
@@ -305,7 +303,6 @@ ContextAttribute::ContextAttribute
   name                  = _name;
   type                  = _type;
   stringValue           = _value;
-  numberValue           = 0;
   valueType             = orion::ValueTypeString;
   compoundValueP        = NULL;
   found                 = _found;
@@ -380,7 +377,6 @@ ContextAttribute::ContextAttribute
   name                  = _name;
   type                  = _type;
   boolValue             = _value;
-  numberValue           = 0;
   valueType             = orion::ValueTypeBoolean;
   compoundValueP        = NULL;
   found                 = _found;
@@ -414,7 +410,6 @@ ContextAttribute::ContextAttribute
   name                  = _name;
   type                  = _type;
   compoundValueP        = _compoundValueP->clone();
-  numberValue           = 0;
   found                 = false;
   valueType             = orion::ValueTypeObject;  // FIXME P6: Could be ValueTypeVector ...
   skip                  = false;
