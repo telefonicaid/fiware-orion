@@ -100,11 +100,64 @@ static std::string          subscribeContextAvailabilityCollectionName;
 static Notifier*            notifier;
 static bool                 multitenant;
 
+thread_local std::vector<ContextElementResponse*>  cerVectorForDelayedRelease;
+
 
 
 /* ****************************************************************************
 *
-* mongoMultitenant - 
+* WORKAROUND_2994 - see github issue #2994
+*/
+#define WORKAROUND_2994 1
+
+
+
+
+#ifdef WORKAROUND_2994
+/* ****************************************************************************
+*
+* delayedReleaseAdd -
+*/
+static void delayedReleaseAdd(ContextElementResponseVector& cerV)
+{
+  for (unsigned int ix = 0; ix < cerV.size(); ++ix)
+    cerVectorForDelayedRelease.push_back(cerV[ix]);
+}
+#endif
+
+
+
+/* ****************************************************************************
+*
+* delayedReleaseExecute -
+*
+* NOTE
+*   This function doesn't depend on WORKAROUND_2994 being defined as cerVectorForDelayedRelease
+*   will be empty if WORKAROUND_2994 is not defined and its action is null and void, if so.
+*   'delayedReleaseExecute()' is called in rest/rest.cpp and with this 'idea', that file doesn't
+*   need to know about the WORKAROUND_2994 definition.
+*/
+void delayedReleaseExecute(void)
+{
+  if (cerVectorForDelayedRelease.size() == 0)
+  {
+    return;
+  }
+
+  for (unsigned int ix = 0; ix < cerVectorForDelayedRelease.size(); ++ix)
+  {
+    cerVectorForDelayedRelease[ix]->release();
+    delete cerVectorForDelayedRelease[ix];
+  }
+
+  cerVectorForDelayedRelease.clear();
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoMultitenant -
 */
 bool mongoMultitenant(void)
 {
@@ -750,7 +803,7 @@ BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
    *
    * More information on: http://stackoverflow.com/questions/24243276/include-regex-elements-in-bsonarraybuilder
    *
-   */  
+   */
 
   //
   // Note that by construction servicePath vector must have at least one element. Note that the
@@ -1515,7 +1568,7 @@ void pruneContextElements(const ContextElementResponseVector& oldCerV, ContextEl
 {
   for (unsigned int ix = 0; ix < oldCerV.size(); ++ix)
   {
-    ContextElementResponse* cerP = oldCerV[ix];
+    ContextElementResponse* cerP    = oldCerV[ix];
     ContextElementResponse* newCerP = new ContextElementResponse();
 
     /* Note we cannot use the ContextElement::fill() method, given that it also copies the ContextAttributeVector. The side-effect
@@ -2037,7 +2090,13 @@ static bool processOnChangeConditionForSubscription
 
   /* Prune "not found" CERs */
   pruneContextElements(rawCerV, &ncr.contextElementResponseVector);
+
+#ifdef WORKAROUND_2994
+  delayedReleaseAdd(rawCerV);
+  rawCerV.vec.clear();
+#else
   rawCerV.release();
+#endif
 
 #if 0
   // FIXME #920: disabled for the moment, maybe to be removed in the end
@@ -2064,7 +2123,12 @@ static bool processOnChangeConditionForSubscription
 
       if (!entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, false, tenant, servicePathV))
       {
+#ifdef WORKAROUND_2994
+        delayedReleaseAdd(rawCerV);
+        rawCerV.vec.clear();
+#else
         rawCerV.release();
+#endif
         ncr.contextElementResponseVector.release();
 
         return false;
@@ -2072,7 +2136,13 @@ static bool processOnChangeConditionForSubscription
 
       /* Prune "not found" CERs */
       pruneContextElements(rawCerV, &allCerV);
+
+#ifdef WORKAROUND_2994
+      delayedReleaseAdd(rawCerV);
+      rawCerV.vec.clear();
+#else
       rawCerV.release();
+#endif
 
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
