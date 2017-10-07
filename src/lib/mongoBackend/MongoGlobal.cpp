@@ -100,7 +100,29 @@ static std::string          subscribeContextAvailabilityCollectionName;
 static Notifier*            notifier;
 static bool                 multitenant;
 
-thread_local std::vector<ContextElementResponse*>  cerVectorForDelayedRelease;
+
+
+/* ****************************************************************************
+*
+* DelayedRelease -
+*
+* This structure is used simply to hold the vector of 'ContextElementResponse'
+* for the delaying of release() of these structures.
+* This was invented to overcome the fact that 'thread_local' is not supported by the
+* older compiler in Centos 6. Initially, the following construct was used:
+*
+*  thread_local std::vector<ContextElementResponse*>  cerVector;
+*
+* And this works just fine in Ubuntu 17.04, but it fails to compile in CentOS 6.
+*
+* For more info about this, see github issue #2994
+*/
+typedef struct DelayedRelease
+{
+  std::vector<ContextElementResponse*>  cerVector;
+} DelayedRelease;
+
+static __thread DelayedRelease* delayedReleaseP = NULL;
 
 
 
@@ -120,8 +142,11 @@ thread_local std::vector<ContextElementResponse*>  cerVectorForDelayedRelease;
 */
 static void delayedReleaseAdd(ContextElementResponseVector& cerV)
 {
+  if (delayedReleaseP == NULL)
+    delayedReleaseP = new DelayedRelease();
+
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
-    cerVectorForDelayedRelease.push_back(cerV[ix]);
+    delayedReleaseP->cerVector.push_back(cerV[ix]);
 }
 #endif
 
@@ -132,25 +157,27 @@ static void delayedReleaseAdd(ContextElementResponseVector& cerV)
 * delayedReleaseExecute -
 *
 * NOTE
-*   This function doesn't depend on WORKAROUND_2994 being defined as cerVectorForDelayedRelease
-*   will be empty if WORKAROUND_2994 is not defined and its action is null and void, if so.
+*   This function doesn't depend on WORKAROUND_2994 being defined, as delayedReleaseP
+*   will be NULL if WORKAROUND_2994 is not defined and its action is null and void, if so.
 *   'delayedReleaseExecute()' is called in rest/rest.cpp and with this 'idea', that file doesn't
 *   need to know about the WORKAROUND_2994 definition.
 */
 void delayedReleaseExecute(void)
 {
-  if (cerVectorForDelayedRelease.size() == 0)
+  if (delayedReleaseP == NULL)
   {
     return;
   }
 
-  for (unsigned int ix = 0; ix < cerVectorForDelayedRelease.size(); ++ix)
+  for (unsigned int ix = 0; ix < delayedReleaseP->cerVector.size(); ++ix)
   {
-    cerVectorForDelayedRelease[ix]->release();
-    delete cerVectorForDelayedRelease[ix];
+    delayedReleaseP->cerVector[ix]->release();
+    delete delayedReleaseP->cerVector[ix];
   }
 
-  cerVectorForDelayedRelease.clear();
+  delayedReleaseP->cerVector.clear();
+  delete delayedReleaseP;
+  delayedReleaseP = NULL;
 }
 
 
