@@ -104,7 +104,91 @@ static bool                 multitenant;
 
 /* ****************************************************************************
 *
-* mongoMultitenant - 
+* DelayedRelease -
+*
+* This structure is used simply to hold the vector of 'ContextElementResponse'
+* for the delaying of release() of these structures.
+* This was invented to overcome the fact that 'thread_local' is not supported by the
+* older compiler in Centos 6. Initially, the following construct was used:
+*
+*  thread_local std::vector<ContextElementResponse*>  cerVector;
+*
+* And this works just fine in Ubuntu 17.04, but it fails to compile in CentOS 6.
+*
+* For more info about this, see github issue #2994
+*/
+typedef struct DelayedRelease
+{
+  std::vector<ContextElementResponse*>  cerVector;
+} DelayedRelease;
+
+static __thread DelayedRelease* delayedReleaseP = NULL;
+
+
+
+/* ****************************************************************************
+*
+* WORKAROUND_2994 - see github issue #2994
+*/
+#define WORKAROUND_2994 1
+
+
+
+
+#ifdef WORKAROUND_2994
+/* ****************************************************************************
+*
+* delayedReleaseAdd -
+*/
+static void delayedReleaseAdd(ContextElementResponseVector& cerV)
+{
+  if (delayedReleaseP == NULL)
+  {
+    delayedReleaseP = new DelayedRelease();
+  }
+
+  for (unsigned int ix = 0; ix < cerV.size(); ++ix)
+  {
+    delayedReleaseP->cerVector.push_back(cerV[ix]);
+  }
+}
+#endif
+
+
+
+/* ****************************************************************************
+*
+* delayedReleaseExecute -
+*
+* NOTE
+*   This function doesn't depend on WORKAROUND_2994 being defined, as delayedReleaseP
+*   will be NULL if WORKAROUND_2994 is not defined and its action is null and void, if so.
+*   'delayedReleaseExecute()' is called in rest/rest.cpp and with this 'idea', that file doesn't
+*   need to know about the WORKAROUND_2994 definition.
+*/
+void delayedReleaseExecute(void)
+{
+  if (delayedReleaseP == NULL)
+  {
+    return;
+  }
+
+  for (unsigned int ix = 0; ix < delayedReleaseP->cerVector.size(); ++ix)
+  {
+    delayedReleaseP->cerVector[ix]->release();
+    delete delayedReleaseP->cerVector[ix];
+  }
+
+  delayedReleaseP->cerVector.clear();
+  delete delayedReleaseP;
+  delayedReleaseP = NULL;
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoMultitenant -
 */
 bool mongoMultitenant(void)
 {
@@ -750,7 +834,7 @@ BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
    *
    * More information on: http://stackoverflow.com/questions/24243276/include-regex-elements-in-bsonarraybuilder
    *
-   */  
+   */
 
   //
   // Note that by construction servicePath vector must have at least one element. Note that the
@@ -1515,7 +1599,7 @@ void pruneContextElements(const ContextElementResponseVector& oldCerV, ContextEl
 {
   for (unsigned int ix = 0; ix < oldCerV.size(); ++ix)
   {
-    ContextElementResponse* cerP = oldCerV[ix];
+    ContextElementResponse* cerP    = oldCerV[ix];
     ContextElementResponse* newCerP = new ContextElementResponse();
 
     /* Note we cannot use the ContextElement::fill() method, given that it also copies the ContextAttributeVector. The side-effect
@@ -2037,7 +2121,13 @@ static bool processOnChangeConditionForSubscription
 
   /* Prune "not found" CERs */
   pruneContextElements(rawCerV, &ncr.contextElementResponseVector);
+
+#ifdef WORKAROUND_2994
+  delayedReleaseAdd(rawCerV);
+  rawCerV.vec.clear();
+#else
   rawCerV.release();
+#endif
 
 #if 0
   // FIXME #920: disabled for the moment, maybe to be removed in the end
@@ -2064,7 +2154,12 @@ static bool processOnChangeConditionForSubscription
 
       if (!entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, false, tenant, servicePathV))
       {
+#ifdef WORKAROUND_2994
+        delayedReleaseAdd(rawCerV);
+        rawCerV.vec.clear();
+#else
         rawCerV.release();
+#endif
         ncr.contextElementResponseVector.release();
 
         return false;
@@ -2072,7 +2167,13 @@ static bool processOnChangeConditionForSubscription
 
       /* Prune "not found" CERs */
       pruneContextElements(rawCerV, &allCerV);
+
+#ifdef WORKAROUND_2994
+      delayedReleaseAdd(rawCerV);
+      rawCerV.vec.clear();
+#else
       rawCerV.release();
+#endif
 
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
