@@ -140,7 +140,7 @@ static __thread DelayedRelease* delayedReleaseP = NULL;
 *
 * delayedReleaseAdd -
 */
-static void delayedReleaseAdd(ContextElementResponseVector& cerV)
+static void delayedReleaseAdd(const ContextElementResponseVector& cerV)
 {
   if (delayedReleaseP == NULL)
   {
