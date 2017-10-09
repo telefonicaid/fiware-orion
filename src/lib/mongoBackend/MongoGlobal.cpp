@@ -143,10 +143,14 @@ static __thread DelayedRelease* delayedReleaseP = NULL;
 static void delayedReleaseAdd(ContextElementResponseVector& cerV)
 {
   if (delayedReleaseP == NULL)
+  {
     delayedReleaseP = new DelayedRelease();
+  }
 
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
+  {
     delayedReleaseP->cerVector.push_back(cerV[ix]);
+  }
 }
 #endif
 
