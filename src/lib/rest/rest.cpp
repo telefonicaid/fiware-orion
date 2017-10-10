@@ -111,7 +111,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 
   if (val == NULL || *val == 0)
   {
-    std::string  errorString = std::string("Empty right-hand-side for URI param /") + ckey + "/";
+    std::string  errorString = std::string("Empty right-hand-side for URI param /") + jsonInvalidCharsTransformation(ckey) + "/";
 
     if (ciP->apiVersion == V2)
     {
