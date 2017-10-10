@@ -905,7 +905,6 @@ then
 
   echo "---------------------------------------"
   echo
-  retval=0
 fi
 
 totalEndTime=$(date +%s.%2N)
