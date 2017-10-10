@@ -1160,7 +1160,8 @@ function orionCurl()
   # Execute the command
   #
   dMsg Executing the curl-command
-  _response=$(eval $command 2> /dev/null)
+  eval $command > /tmp/orionCurl.response 2> /dev/null
+  _response=$(cat /tmp/orionCurl.response)
 
   if [ ! -f /tmp/httpHeaders.out ]
   then
@@ -1185,7 +1186,9 @@ function orionCurl()
   #
   if [ "$_noPayloadCheck" == "on" ]
   then
-    echo $_response
+    cat /tmp/orionCurl.response
+    echo
+    rm -f /tmp/orionCurl.response
   else
     if [ "$_response" != "" ]
     then

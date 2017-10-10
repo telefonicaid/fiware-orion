@@ -1,4 +1,4 @@
-#<a name="top"></a>NGSIv2 Implementation Notes
+# <a name="top"></a>NGSIv2 Implementation Notes
 
 * [Forbidden characters](#forbidden-characters)
 * [Custom payload decoding on notifications](#custom-payload-decoding-on-notifications)

@@ -1,11 +1,4 @@
+- Fix: missing lastSuccess/lastFailure associated to initial notification on subscription creation some times when csub cache is in use (#2974)
+- Fix: several invalid memory accesses (based on a workaround, not a definitive solution, see issue #2994)
+- Add: release_date and doc fields are added to the GET /version output to align with FIWARE scheme (#2970)
 - Hardening: NGSIv1 responses don't use pretty-print JSON format any longer, as NGSIv2 responses work (potentially saving around 50% size) (#2760)
-- Add: self-notification loop protection, based on Fiware-Correlator and Ngsiv2-AttrsFormat headers and lastCorrelator field at DB (#2937)
-- Add: Fiware-Correlator and NgsiV2-AttrsFormat headers cannot be overwritten by the custom notification logic (#2937)
-- Hardening: Mongo driver migrated to legacy-1.1.2 (several bugfixes in the legacy-1.0.7 to legacy-1.1.2 delta)
-- Hardening: Several changes in argument passing in mongoBackend library to avoid passing entire objects on the stack, from "X x" to "const X& x"
-- Fix: several invalid memory accesses
-- Hardening: Several changes in argument passing in mongoBackend library to add 'const' in references to objects that are not altered by the function
-- Fix: bug in parseArg lib that may cause problem printing the error message for wrong CLI usage (#2926)
-- Fix: bug in variable substitution of custom notifications that limited the size of the payload of a custom notification to 1024 bytes (new limit: 8MB)
-- Fix: bug in custom notifications making counters and timestamps not being updated (affected subscription fields: lastSuccess, lastFailure, lastNotifiction, count)
-- Fix: "request payload too large" (>1MB) as Bad Input alarm (WARN log level)

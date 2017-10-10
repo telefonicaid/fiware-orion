@@ -32,6 +32,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/compileInfo.h"
+#include "common/defaultValues.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -41,7 +42,7 @@
 
 /* ****************************************************************************
 *
-* version - 
+* version -
 */
 static char versionString[30] = { 'a', 'l', 'p', 'h', 'a', 0 };
 
@@ -49,7 +50,7 @@ static char versionString[30] = { 'a', 'l', 'p', 'h', 'a', 0 };
 
 /* ****************************************************************************
 *
-* versionSet - 
+* versionSet -
 */
 void versionSet(const char* version)
 {
@@ -68,7 +69,7 @@ char* versionGet()
 
 /* ****************************************************************************
 *
-* versionTreat - 
+* versionTreat -
 */
 std::string versionTreat
 (
@@ -92,9 +93,11 @@ std::string versionTreat
   out += "  \"version\" : \"" + std::string(versionString) + "\",\n";
   out += "  \"uptime\" : \"" + std::string(uptime) + "\",\n";
   out += "  \"git_hash\" : \"" + std::string(GIT_HASH) + "\",\n";
-  out += "  \"compile_time\" : \"" + std::string(COMPILE_TIME) + "\",";
-  out += "  \"compiled_by\" : \"" + std::string(COMPILED_BY) + "\",";
-  out += "  \"compiled_in\" : \"" + std::string(COMPILED_IN) + "\"";
+  out += "  \"compile_time\" : \"" + std::string(COMPILE_TIME) + "\",\n";
+  out += "  \"compiled_by\" : \"" + std::string(COMPILED_BY) + "\",\n";
+  out += "  \"compiled_in\" : \"" + std::string(COMPILED_IN) + "\",\n";
+  out += "  \"release_date\" : \"" + std::string(RELEASE_DATE) + "\",\n";
+  out += "  \"doc\" : \"" + std::string(API_DOC) + "\"\n";
   out += "}\n";
   out += "}\n";
 

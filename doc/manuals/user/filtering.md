@@ -1,4 +1,4 @@
-#<a name="top"></a>Filtering results
+# <a name="top"></a>Filtering results
 
 * [Introduction](#introduction)
 * [NGSIv2 filtering](#ngsiv2-filtering)

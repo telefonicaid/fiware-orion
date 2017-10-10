@@ -136,6 +136,15 @@ grep "tests" MANIFEST > MANIFEST.broker-tests
 
 %changelog
 
+
+# The contextBroker-test package is still taken into account, although it is very old and probably obsolete. If we
+# recover it in the future, dependencies and so on need to be reviewed. The following fragment (removed from
+# install documentation) could be useful:
+#
+#    The contextBroker-test package (optional) depends on the following packages: python, python-flask, 
+#    python-jinja2, curl, libxml2, libxslt, nc, mongo-10gen and contextBroker. The mongo-10gen dependency needs 
+#    to configure MongoDB repository, check [this piece of documentation about that](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/).
+#
 %package tests
 Requires: %{name}, python, python-flask, python-jinja2, nc, curl, libxml2, mongo-10gen 
 Summary: Test suite for %{name}
@@ -164,6 +173,18 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Mon Sep 11 2017 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.8.0-1
+- Add: self-notification loop protection, based on Fiware-Correlator and Ngsiv2-AttrsFormat headers and lastCorrelator field at DB (#2937)
+- Add: Fiware-Correlator and NgsiV2-AttrsFormat headers cannot be overwritten by the custom notification logic (#2937)
+- Fix: several invalid memory accesses
+- Fix: bug in parseArg lib that may cause problem printing the error message for wrong CLI usage (#2926)
+- Fix: bug in variable substitution of custom notifications that limited the size of the payload of a custom notification to 1024 bytes (new limit: 8MB)
+- Fix: bug in custom notifications making counters and timestamps not being updated (affected subscription fields: lastSuccess, lastFailure, lastNotifiction, count)
+- Fix: "request payload too large" (>1MB) as Bad Input alarm (WARN log level)
+- Hardening: Several changes in argument passing in mongoBackend library to add 'const' in references to objects that are not altered by the function
+- Hardening: Several changes in argument passing in mongoBackend library to avoid passing entire objects on the stack, from "X x" to "const X& x"
+- Hardening: Mongo driver migrated to legacy-1.1.2 (several bugfixes in the legacy-1.0.7 to legacy-1.1.2 delta)
+
 * Wed Feb 08 2017 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.7.0-1
 - Add: HTTPS native notifications (#706), fixing at the same time issue #2844
 - Add: new option to accept self-signed certifications used by HTTPS notification endpoints: -insecureNotif (#706)

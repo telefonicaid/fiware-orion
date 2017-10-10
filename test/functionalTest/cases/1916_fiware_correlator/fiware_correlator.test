@@ -36,14 +36,14 @@ brokerStart CB 0
 
 echo "01. version request without correlator, see new correlator in response"
 echo "======================================================================"
-orionCurl --url /version
+orionCurl --url /version --noPayloadCheck
 echo
 echo
 
 
 echo "02. version request with correlator, see same correlator in response"
 echo "===================================================================="
-orionCurl --url /version --header "Fiware-Correlator: OLD_CORRELATOR"
+orionCurl --url /version --noPayloadCheck --header "Fiware-Correlator: OLD_CORRELATOR"
 echo
 echo
 
@@ -58,15 +58,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "compile_time": "REGEX(.*)",
-        "compiled_by": "REGEX(.*)",
-        "compiled_in": "REGEX(.*)",
-        "git_hash": "REGEX(([0-9a-f]{40}|nogitversion))",
-        "uptime": "REGEX(.*)",
-        "version": "REGEX(.*)"
-    }
+"orion" : {
+  "version" : "REGEX(.*)",
+  "uptime" : "REGEX(.*)",
+  "git_hash" : "REGEX(([0-9a-f]{40}|nogitversion))",
+  "compile_time" : "REGEX(.*)",
+  "compiled_by" : "REGEX(.*)",
+  "compiled_in" : "REGEX(.*)",
+  "release_date" : "REGEX(.*)",
+  "doc" : "REGEX(.*)
 }
+}
+
 
 
 02. version request with correlator, see same correlator in response
@@ -78,15 +81,18 @@ Fiware-Correlator: OLD_CORRELATOR
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "compile_time": "REGEX(.*)",
-        "compiled_by": "REGEX(.*)",
-        "compiled_in": "REGEX(.*)",
-        "git_hash": "REGEX(([0-9a-f]{40}|nogitversion))",
-        "uptime": "REGEX(.*)",
-        "version": "REGEX(.*)"
-    }
+"orion" : {
+  "version" : "REGEX(.*)",
+  "uptime" : "REGEX(.*)",
+  "git_hash" : "REGEX(([0-9a-f]{40}|nogitversion))",
+  "compile_time" : "REGEX(.*)",
+  "compiled_by" : "REGEX(.*)",
+  "compiled_in" : "REGEX(.*)",
+  "release_date" : "REGEX(.*)",
+  "doc" : "REGEX(.*)"
 }
+}
+
 
 
 --TEARDOWN--

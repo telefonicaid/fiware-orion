@@ -329,11 +329,13 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                "e",
-                "d",
-                "c",
-                "b",
-                "a"
+#SORT_START
+                "e"REGEX(,?)
+                "d"REGEX(,?)
+                "c"REGEX(,?)
+                "b"REGEX(,?)
+                "a"REGEX(,?)
+#SORT_END
             ],
             "name": "T"
         }
@@ -382,10 +384,12 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                "e",
-                "d",
-                "c",
-                "b"
+#SORT_START
+                "e"REGEX(,?)
+                "d"REGEX(,?)
+                "c"REGEX(,?)
+                "b"REGEX(,?)
+#SORT_END
             ],
             "name": "T"
         }
