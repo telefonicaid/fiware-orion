@@ -24,7 +24,7 @@ Tobias Jacobs (NEC).
 ## Acknowledgements
 
 The editors would like to express their gratitude to the following people who actively
-contributed to this specification (companies listed at the time of :
+contributed to this specification:
 Juan José Hierro (Telefónica I+D), Marcos Reyes (Telefónica I+D), Ken Zangelin (APInf, formerly with Telefónica I+D),
 Iván Arias León (Telefónica I+D), Carlos Romero Brox (Telefónica I+D),
 Antonio José López Navarro (Telefónica I+D),  Marc Capdevielle (Orange), Gilles Privat (Orange), 
@@ -1990,15 +1990,21 @@ Response:
 
 # Group Registrations
 
-A Context Registration allows to bind external context information sources so that they can be play the role of providers
-of certain subsets (entities, attributes) of the context information space, including those located at specific geographical areas.
+A Context Registration allows to bind external context information sources so that they can be
+play the role of providers
+of certain subsets (entities, attributes) of the context information space, including those located
+at specific geographical areas.
 A compliant Context Information provider shall expose an NGSI10 (legacy) or an NGSIv2 interface, in particular:
 
-* Query by entity type(s), entity id(s), geoquery and attribute and/or metadata projection (`attrs` or `metadata` parameter). (See `GET /v2/entities`)
+* Query by entity type(s), entity id(s), geoquery and attribute and/or metadata projection
+(`attrs` or `metadata` parameter). (See `GET /v2/entities`)
 * Update entity attributes (See `PATCH /v2/entities/<entityId>/attrs`)
-When the entities or attributes covered by an active registered provider are the subject of a query or update operation, and the registrations allow to forward requests, 
-implementations must forward a request to such registered context provider so that it can provide the requested data or update it.
-The forwarding algorithm and precise implementation details are work to be completed in next versions of this specification. (*TODO*)
+When the entities or attributes covered by an active registered provider are the subject of a query or
+update operation, and the registrations allow to forward requests, 
+implementations must forward a request to such registered context provider so that it can provide
+the requested data or update it.
+The forwarding algorithm and precise implementation details are work to be completed
+in next versions of this specification. (*TODO*)
 
 A context registration is represented by a JSON object with the following fields:
 
@@ -2014,11 +2020,14 @@ Either `active` (for active registrations) or `inactive` (for inactive registrat
   Also, for registrations experiencing problems with forwarding operations, the status is set to `failed`.
   As soon as the forwarding operations start working again, the status is changed back to `active`.
 + `expires` : Registration expiration date in ISO8601 format. Permanent registrations must omit this field.
-+ `forwardingInformation`: Information related to the forwarding operations made against the provider. Automatically provided by the implementation. 
++ `forwardingInformation`: Information related to the forwarding operations made against the provider.
+Automatically provided by the implementation. 
 
 The `provider` field contains the following subfields:
-+ `http` : It is used to convey parameters for providers which deliver information through the HTTP protocol. (Only protocol supported nowadays).
-It must contain a subfield named `url` with the URL that serves as the endpoint that offers the providing interface. The endpooint must *not* include the protocol
++ `http` : It is used to convey parameters for providers which deliver information through the HTTP protocol.
+(Only protocol supported nowadays).
+It must contain a subfield named `url` with the URL that serves as the endpoint that offers the providing interface.
+The endpooint must *not* include the protocol
 specific part (for instance `/v2/entities`). 
 + `legacy` : `true` if this provider only supports NGSIv1 protocol. `false` if this provider supports NGSIv2.
 Currently `true` by default. In the future, will be changed to `false`. 
@@ -2047,8 +2056,10 @@ The `forwardingInformation` field contains the following subfields:
 
 + `timesSent` (not editable, only present in GET operations): Number of request forwardings sent due to this registration.
 + `lastForwarding` (not editable, only present in GET operations): Last forwarding timestamp in ISO8601 format.
-+ `lastFailure` (not editable, only present in GET operations): Last failure timestamp in ISO8601 format. Not present if registration has never had a problem with forwarding.
-+ `lastSuccess` (not editable, only present in GET operations): Timestamp in ISO8601 format for last successful request forwarding. Not present if registration has never had a successful notification.
++ `lastFailure` (not editable, only present in GET operations): Last failure timestamp in ISO8601 format.
+Not present if registration has never had a problem with forwarding.
++ `lastSuccess` (not editable, only present in GET operations): Timestamp in ISO8601 format for last successful request forwarding.
+Not present if registration has never had a successful notification.
 
 ## Registration list [/v2/registrations]
 
@@ -2098,8 +2109,8 @@ Response:
 
 ### Create a new context provider registration [POST /v2/registrations]
 
-Creates a new registration. This is typically used for associating context sources
-to certain data.
+Creates a new registration. This is typically used for binding context sources
+as providers of certain data.
 The registration is represented by a JSON object as described at the beginning of this section.
 
 Response:
