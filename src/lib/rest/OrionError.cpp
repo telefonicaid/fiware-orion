@@ -125,7 +125,22 @@ std::string OrionError::setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpS
 */
 std::string OrionError::toJson(void)
 {
-  return "{" + JSON_STR("error") + ":" + JSON_STR(reasonPhrase) + "," + JSON_STR("description") + ":" + JSON_STR(details) + "}";
+  std::string  out;
+  char*        reasonPhraseEscaped = htmlEscape(reasonPhrase.c_str());
+  char*        detailsEscaped = htmlEscape(details.c_str());
+
+  out += "{" + JSON_VALUE("error", reasonPhraseEscaped);
+  out += ",";
+  out += JSON_VALUE("description", detailsEscaped) + "}";
+
+  free(reasonPhraseEscaped);
+  free(detailsEscaped);
+
+  return out;
+//	return "{" + JSON_STR("error") + ":" + JSON_STR(reasonPhrase) + "," + JSON_STR("description") + ":" + JSON_STR(details) + "}";
+
+
+
 }
 
 
