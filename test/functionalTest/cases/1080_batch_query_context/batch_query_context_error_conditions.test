@@ -327,13 +327,13 @@ Date: REGEX(.*)
 11. POST /v2/op/query, with a scope whose 'value' is not a String - see error
 =============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 89
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for scope value (must be string)",
+    "description": "invalid JSON type for scope value &#40;must be string&#41;",
     "error": "BadRequest"
 }
 
