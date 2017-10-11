@@ -137,10 +137,6 @@ std::string OrionError::toJson(void)
   free(detailsEscaped);
 
   return out;
-//	return "{" + JSON_STR("error") + ":" + JSON_STR(reasonPhrase) + "," + JSON_STR("description") + ":" + JSON_STR(details) + "}";
-
-
-
 }
 
 
