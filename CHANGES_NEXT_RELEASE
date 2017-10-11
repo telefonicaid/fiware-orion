@@ -8,3 +8,4 @@
 - Fix: bug in variable substitution of custom notifications that limited the size of the payload of a custom notification to 1024 bytes (new limit: 8MB)
 - Fix: bug in custom notifications making counters and timestamps not being updated (affected subscription fields: lastSuccess, lastFailure, lastNotifiction, count)
 - Fix: "request payload too large" (>1MB) as Bad Input alarm (WARN log level)
+- Fix: broken JSON due to unscaped quotes (") in NGSIv2 error description field (#2955)
