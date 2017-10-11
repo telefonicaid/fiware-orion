@@ -391,7 +391,12 @@ function valgrindErrorInfo()
   vErrors=0
   for num in $(grep "errors in context" $filename | awk '{ print $2 }')
   do
-    vErrors=$vErrors+$num
+    typeset -i xNum
+    xNum=$num
+    if [ $xNum != 0 ]
+    then
+      vErrors=$vErrors+$xNum
+    fi
   done
   valgrindErrors=$vErrors
   vMsg valgrindErrors: $valgrindErrors
