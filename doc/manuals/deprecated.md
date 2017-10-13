@@ -33,10 +33,8 @@ A list of deprecated features and the version in which they were deprecated foll
 * XML is deprecated since Orion 0.23.0 (removed in Orion 1.0.0).
 * Deprecated command line arguments in Orion 0.21.0 (removed in 0.25.0):
 	* **-ngsi9**. The broker runs only NGSI9 (NGSI10 is not used).
-	* **-fwdHost <host>**. Forwarding host for NGIS9 registerContext when
-    the broker runs in "ConfMan mode".
-	* **-fwdPort <port>**. Forwarding port for NGIS9 registerContext when
-    the broker runs in "ConfMan mode".
+	* **-fwdHost <host>**. Forwarding host for NGIS9 registerContext when the broker runs in "ConfMan mode".
+	* **-fwdPort <port>**. Forwarding port for NGIS9 registerContext when the broker runs in "ConfMan mode".
 * Configuration Manager role (deprecated in 0.21.0, removed in 0.25.0)
 * Associations (deprecated in 0.21.0, removed in 0.25.0).
 
@@ -49,13 +47,13 @@ information in the case you want to use old versions:
 * Code correponding to old releases (since Orion 0.8.1, the first one available as open source) is
   available at the [Orion github repository](http://github.com/telefonicaid/fiware-orion). Each release number
   (e.g. 0.23.0) has associated the following:
-  * A tag, e.g. `0.23.0`. It points to the base version.
-  * A release branch, `release/0.23.0`. The HEAD of this branch usually matches the aforementioned tag. However, if some
+	* A tag, e.g. `0.23.0`. It points to the base version.
+	* A release branch, `release/0.23.0`. The HEAD of this branch usually matches the aforementioned tag. However, if some
     hotfixes were developed on the base version, this branch contains such hotfixes.
 * Documentation corresponding to old versions can be found:
-  * For 0.23.0 and before: documentation is available at FIWARE public wiki ([user manual](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide)
+	* For 0.23.0 and before: documentation is available at FIWARE public wiki ([user manual](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide)
     and [admin manual](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide)).
-  * For 0.24.0 or newer: documentation is available at [readthedocs.io](https://fiware-orion.readthedocs.io).
+	* For 0.24.0 or newer: documentation is available at [readthedocs.io](https://fiware-orion.readthedocs.io).
     Use the panel in the left bottom corner to navigate to the right version.
 * Docker images corresponding to Orion 0.24.0 and newer can be found at [Dockerhub](https://hub.docker.com/r/fiware/orion/tags/).
 
