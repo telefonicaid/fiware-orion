@@ -162,16 +162,40 @@ Note that in NGSI it is not foreseen that metadata may contain nested metadata.
 
 #### Context Queries
 
-(placeholder for describing what a context query is, and some hints on how this
-is typically done in the REST interface)
+A **context query** is an operation for instantly retrieving context information. A query can specify
+ * entity identifiers
+ * entity types
+ * attribute names
+ * restrictions and operation scopes
+
+As FIWARE NGSI is an interface based on REST principles, some of the above parameters are specified as part of the URL the user interacts with. More specifically, the resource tree includes a resource for each entity, and a sub-resource for each attribute of it. Details on the FIWARE NGSI resource tree are given below.
 
 #### Context Subscriptions
 
-(placeholder for describing the concept of context subscriptions)
+A **context subscription** is an operation for retrieving context information on a regular basis. To this end, users can
+ * create subscriptions
+ * modify subscriptions
+ * cancel subscriptions
 
+The context information subscribed for is returned to the user in form of **context notifications**.
+ 
+Like a context query, a context subscription can specify 
+ * entity identifiers
+ * entity types
+ * attribute names
+ * restrictions and operation scopes
+
+Furthermore, the context subscription specifies the parameters of the notification process:
+ * the **callback URL** where notifications should be sent to
+ * the **duration** of the subscription
+ * the **notification conditions** that have to be satisfied for a notification to be sent
+ * the **throttling iterval**, that is, the minimum time interval between two subsequent notifications
+ 
 #### Context Updates
 
-(placeholder for describing updates)
+**Context updates** are operations to send context data to a FIWARE NGSI enabler. Each context update message contains one or more attribute and metadata values.
+
+The update message also contains the context of the values, that is, the entity and attribute each given value belongs to. As FIWARE NGSI follows REST principles, this information is in some cases implicitly given by the URL which is accessed by the user to submit the update. 
 
 ### Exchanging Context Availability Information
 
