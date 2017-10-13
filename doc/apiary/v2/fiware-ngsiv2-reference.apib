@@ -175,23 +175,36 @@ is typically done in the REST interface)
 
 ### Exchanging Context Availability Information
 
-(placeholder on some introduction of what context availability information is)
+FIWARE NGSI distinguishes between **context information** and **context availability information**. The former can be considered as the actual data. It is exchanged as described above, using the operations of context query, context subscriptions, notifications, and context updates.
+
+**Context availability information**, in contrast, is information about where and how context data can be obtained. FIWARE NGSI defines a model for representing context availability information and a set of operations for exchanging it.
+
+The separation of availability information from the actual data enables FIWARE NGSI to be flexibly used across federated systems. In such scenarios each NGSI subsystem can publish information about the data it can provide, while preserving control over where the actual data is sent to.
 
 #### Context Registrations
 
-(placeholder for describing what a context registration is and what it is used for)
-
+A context registration is a unit of context availability information. Context Registrations contain the following data:
+ * A list of entity identifiers, including their enity types.
+ * A list of attribute names. Ror each of these attributes the value type and metadata can be included.
+ * A list of global metadata which is valid for the whole registration.
+ * The URL of an NGSI component which can provide the context data described by this context registration.
+ 
 #### Context Discovery
 
-(placehoder for describing what discovery does)
+A **context discovery** is an operation to instantly retrieve context availability information. In the request message, the user specifies a set of entity identifiers, entity types, attributes, and restrictions or scopes. The response message from the FIWARE NGSI system consists of a number of context registrations that match the criteria specified in the request.
 
 #### Context Availability Subscription
 
-(placeholder for describing context availability subscriptions)
+FIWARE NGSI defines a subscription mechanism for context availability information, analogously to the subscription mechanism for context data. Users can
+ * subscribe for context availability information
+ * update existing subscriptions for context availability information
+ * cancel existing context availability subscriptions
+ 
+Users subscribing for context availability information need to provide a callback URL where **context availability notifications** can be sent to by the FIWARE NGSI system.
 
 #### Registering Context Availability Information
 
-(placeholder for describing the operation of registering context)
+FIWARE NGSI components can be informed about the availability of context information via the registration operation defined by FIWARE NGSI. The registration message typically contains one or more context registration items.
 
 ### Roles of FIWARE NGSI components
 
