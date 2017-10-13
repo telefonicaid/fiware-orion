@@ -158,7 +158,20 @@ Note that in NGSI it is not foreseen that metadata may contain nested metadata.
 
 #### Restrictions and Operation Scopes
 
-(placeholder to describe restrictions and operation scopes)
+FIWARE NGSI defines operations and mechanisms to retrieve context information, that is, information about context entities and their attributes. Requests for context information simply specifies some entity identifiers, entity types, and/or a set of attributes.
+
+In order to further limit the information obtained, users can add a **restriction** to their information request. Restrictions are expressions which filter a given collection of context information according to some criteria. The restriction is applied by the FIWARE NGSI enabler to the context data before returning it to the user.
+
+*(The exact language for restrictions is currently under discussion.)*
+
+Users requesting information can also limit the reach of their request by the use of *operation scopes*. Unlike restrictions, which are filters for context data, operation scopes are restricting the execution of requests. The following examples demonstrate their typical usage.
+ * Retrieving only cached information instead of accessing sensors.
+ * Retrieving only information from providers from a geographical area.
+ * Retrieving only information from trusted providers.
+
+Each operation scope is defined by a *scope type* and a *scope value*, where the format of the value is determined by the type.
+
+*(The exact language for scopes and a catalogue of pre-defined scopes are currently under discussion.)*
 
 #### Context Queries
 
