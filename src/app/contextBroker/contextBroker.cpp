@@ -203,6 +203,8 @@
 #include "serviceRoutinesV2/semStateTreat.h"
 #include "serviceRoutinesV2/getMetrics.h"
 #include "serviceRoutinesV2/deleteMetrics.h"
+#include "serviceRoutinesV2/optionsGetOnly.h"
+#include "serviceRoutinesV2/optionsGetPostOnly.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
@@ -252,6 +254,7 @@ bool            https;
 bool            mtenant;
 char            rush[256];
 char            allowedOrigin[64];
+char            corsEnabled[64];
 long            dbTimeout;
 long            httpTimeout;
 int             dbPoolSize;
@@ -310,6 +313,7 @@ bool            insecureNotif;
 #define RUSH_DESC              "rush host (IP:port)"
 #define MULTISERVICE_DESC      "service multi tenancy mode"
 #define ALLOWED_ORIGIN_DESC    "CORS allowed origin. use '__ALL' for any"
+#define CORS_ENABLED_DESC      "enable Cross-Origin Resouce Sharing with allowed origin. Use '__ALL' for any"
 #define HTTP_TMO_DESC          "timeout in milliseconds for forwards and notifications"
 #define DBPS_DESC              "database connection pool size"
 #define MAX_L                  900000
@@ -380,6 +384,7 @@ PaArgument paArgs[] =
   { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
 
   { "-corsOrigin",       allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "",          PaNL,  PaNL,     ALLOWED_ORIGIN_DESC    },
+  { "-enableCORS",       corsEnabled,       "CORS_ENABLED",      PaString, PaOpt, _i "",          PaNL,  PaNL,     CORS_ENABLED_DESC      },
   { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,           0,     UINT_MAX, CPR_FORWARD_LIMIT_DESC },
   { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 60,             0,     3600,     SUB_CACHE_IVAL_DESC    },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
@@ -772,12 +777,14 @@ static const char* validLogLevels[] =
 
 
 #define API_V2                                                                                         \
-  { "GET",    EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          entryPointsTreat         }, \
-  { "*",      EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          badVerbGetOnly           }, \
+  { "GET",     EPS,          EPS_COMPS_V2,        ENT_COMPS_WORD,          entryPointsTreat         }, \
+  { "OPTIONS", EPS,          EPS_COMPS_V2,        ENT_COMPS_WORD,          optionsGetOnly           }, \
+  { "*",       EPS,          EPS_COMPS_V2,        ENT_COMPS_WORD,          badVerbGetOnly           }, \
                                                                                                        \
-  { "GET",    ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          getEntities              }, \
-  { "POST",   ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          postEntities             }, \
-  { "*",      ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          badVerbGetPostOnly       }, \
+  { "GET",     ENT,          ENT_COMPS_V2,        ENT_COMPS_WORD,          getEntities              }, \
+  { "POST",    ENT,          ENT_COMPS_V2,        ENT_COMPS_WORD,          postEntities             }, \
+  { "OPTIONS", ENT,          ENT_COMPS_V2,        ENT_COMPS_WORD,          optionsGetPostOnly       }, \
+  { "*",       ENT,          ENT_COMPS_V2,        ENT_COMPS_WORD,          badVerbGetPostOnly       }, \
                                                                                                        \
   { "GET",    IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         getEntity                }, \
   { "DELETE", IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         deleteEntity             }, \
@@ -1817,6 +1824,7 @@ int main(int argC, char* argV[])
              rushHost,
              rushPort,
              allowedOrigin,
+             corsEnabled,
              reqTimeout,
              httpsPrivateServerKey,
              httpsCertificate);
@@ -1837,6 +1845,7 @@ int main(int argC, char* argV[])
              rushHost,
              rushPort,
              allowedOrigin,
+             corsEnabled,
              reqTimeout);
   }
 

@@ -117,9 +117,31 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     }
   }
 
+  if (strlen(restCORSEnabled) > 0)
+  {
+    // If any origin is allowed, the header is sent always with "any" as value
+    if (strcmp(restCORSEnabled, "__ALL") == 0)
+    {
+      MHD_add_response_header(response, "Access-Control-Allow-Origin", "*");
+    }
+    // If a specific origin is allowed, the header is only sent if the origins match
+    else if (strcmp(ciP->httpHeaders.origin.c_str(), restCORSEnabled) == 0)
+    {
+      MHD_add_response_header(response, "Access-Control-Allow-Origin", restCORSEnabled);
+    }
+
+    if (ciP->verb == OPTIONS)
+    {
+      MHD_add_response_header(response, "Access-Control-Allow-Headers", "User-Agent, Fiware-Service, Fiware-Servicepath, Ngsiv2-AttrsFormat, Fiware-Correlator, X-Forwarded-For, X-Real-IP, X-Auth-Token");
+      MHD_add_response_header(response, "Access-Control-Max-Age", "86400");
+    }
+  }
+
   MHD_queue_response(ciP->connection, ciP->httpStatusCode, response);
   MHD_destroy_response(response);
 }
+
+
 
 
 
