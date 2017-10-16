@@ -1780,7 +1780,7 @@ void restInit
   mhdConnectionTimeout = _mhdTimeoutInSeconds;
 
   strncpy(restAllowedOrigin, _allowedOrigin, sizeof(restAllowedOrigin));
-  strncpy(restCORSEnabled, _corsEnabled, sizeof(restCORSEnabled));
+  strncpy(restCORSEnabled,   _corsEnabled,   sizeof(restCORSEnabled));
 
   strncpy(bindIp, LOCAL_IP_V4, MAX_LEN_IP - 1);
   strncpy(bindIPv6, LOCAL_IP_V6, MAX_LEN_IP - 1);

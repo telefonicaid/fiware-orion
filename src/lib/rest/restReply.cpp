@@ -143,8 +143,6 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
 
 
 
-
-
 /* ****************************************************************************
 *
 * tagGet - return a tag (request type) depending on the incoming request string

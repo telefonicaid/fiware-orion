@@ -25,7 +25,7 @@ CORS specific origin
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPV4 -enableCORS arrakis
+brokerStart CB 0-255 IPV4 -cors arrakis
 
 --SHELL--
 echo "01. GET Entry Points (Access-Control-Allow-Origin header not included)"

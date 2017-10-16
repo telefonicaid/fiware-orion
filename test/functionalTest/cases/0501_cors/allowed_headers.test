@@ -25,7 +25,7 @@ CORS allowed headers
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPV4 -enableCORS __ALL
+brokerStart CB 0-255 IPV4 -cors __ALL
 
 --SHELL--
 echo "01. Allowed headers: GET OPTIONS"

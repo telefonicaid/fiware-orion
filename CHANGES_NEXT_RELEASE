@@ -2,4 +2,4 @@
 - Fix: several invalid memory accesses (based on a workaround, not a definitive solution, see issue #2994)
 - Add: release_date and doc fields are added to the GET /version output to align with FIWARE scheme (#2970)
 - Fix: broken JSON due to unscaped quotes (") in NGSIv2 error description field (#2955)
-- Add: Partial CORS Preflight Requests support, -enableCORS switch (#501)
+- Add: Partial CORS Preflight Requests support, -cors switch (#501)

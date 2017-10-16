@@ -313,7 +313,7 @@ bool            insecureNotif;
 #define RUSH_DESC              "rush host (IP:port)"
 #define MULTISERVICE_DESC      "service multi tenancy mode"
 #define ALLOWED_ORIGIN_DESC    "CORS allowed origin. use '__ALL' for any"
-#define CORS_ENABLED_DESC      "enable Cross-Origin Resouce Sharing with allowed origin. Use '__ALL' for any"
+#define CORS_DESC      "enable Cross-Origin Resouce Sharing with allowed origin. Use '__ALL' for any"
 #define HTTP_TMO_DESC          "timeout in milliseconds for forwards and notifications"
 #define DBPS_DESC              "database connection pool size"
 #define MAX_L                  900000
@@ -384,7 +384,7 @@ PaArgument paArgs[] =
   { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
 
   { "-corsOrigin",       allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "",          PaNL,  PaNL,     ALLOWED_ORIGIN_DESC    },
-  { "-enableCORS",       corsEnabled,       "CORS_ENABLED",      PaString, PaOpt, _i "",          PaNL,  PaNL,     CORS_ENABLED_DESC      },
+  { "-cors",             corsEnabled,       "CORS",              PaString, PaOpt, _i "",          PaNL,  PaNL,     CORS_DESC              },
   { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,           0,     UINT_MAX, CPR_FORWARD_LIMIT_DESC },
   { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 60,             0,     3600,     SUB_CACHE_IVAL_DESC    },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
