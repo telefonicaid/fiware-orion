@@ -32,7 +32,7 @@
 *
 * jsonRender -
 */
-TEST(UpdateContextResponse, jsonRender)
+TEST(DISABLED_UpdateContextResponse, jsonRender)
 {
   const char*              filename1  = "ngsi10.updateContextResponse.jsonRender1.valid.json";
   const char*              filename2  = "ngsi10.updateContextResponse.jsonRender2.valid.json";

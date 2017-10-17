@@ -72,7 +72,7 @@ TEST(DiscoverContextAvailabilityResponse, render)
 * NOTE
 *   - providingApplication is MANDATORY inside ContextRegistration
 */
-TEST(DiscoverContextAvailabilityResponse, jsonRender)
+TEST(DISABLED_DiscoverContextAvailabilityResponse, jsonRender)
 {
   const char*                           filename1  = "ngsi9.discoverContextAvailabilityResponse.jsonRender1.valid.json";
   const char*                           filename2  = "ngsi9.discoverContextAvailabilityResponse.jsonRender2.valid.json";

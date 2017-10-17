@@ -74,7 +74,7 @@ TEST(RegisterContextResponse, constructors)
 *
 * jsonRender -
 */
-TEST(RegisterContextResponse, jsonRender)
+TEST(DISABLED_RegisterContextResponse, jsonRender)
 {
   RegisterContextResponse rcr;
   std::string             rendered;

@@ -40,7 +40,7 @@
 * duration:       Optional
 * errorCode:      Optional
 */
-TEST(UpdateContextAvailabilitySubscriptionResponse, jsonRender)
+TEST(DISABLED_UpdateContextAvailabilitySubscriptionResponse, jsonRender)
 {
   const char*                                     filename1  = "ngsi9.updateContextAvailabilitySubscriptionResponse.jsonRender1.valid.json";
   const char*                                     filename2  = "ngsi9.updateContextAvailabilitySubscriptionResponse.jsonRender2.valid.json";

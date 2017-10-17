@@ -55,7 +55,7 @@ TEST(Metadata, constructor)
 *
 * FIXME P4 - extra newline at the end of expected3json
 */
-TEST(Metadata, render)
+TEST(DISABLED_Metadata, render)
 {
   std::string  out;
   Metadata     m1;

@@ -85,7 +85,7 @@ TEST(Originator, isEmptySetAndGet)
 *
 * render -
 */
-TEST(Originator, render)
+TEST(DISABLED_Originator, render)
 {
   Originator   originator;
   std::string  out;

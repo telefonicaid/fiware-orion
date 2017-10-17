@@ -35,7 +35,7 @@
 *
 * render - 
 */
-TEST(SubscribeError, render)
+TEST(DISABLED_SubscribeError, render)
 {
   SubscribeError  se;
   std::string     out;

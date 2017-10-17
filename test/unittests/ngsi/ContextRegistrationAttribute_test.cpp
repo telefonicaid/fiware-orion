@@ -35,7 +35,7 @@
 *
 * render - 
 */
-TEST(ContextRegistrationAttribute, render)
+TEST(DISABLED_ContextRegistrationAttribute, render)
 {
   ContextRegistrationAttribute  cra("name", "type", "false");
   std::string                   out;

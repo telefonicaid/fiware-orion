@@ -62,7 +62,7 @@ TEST(UnsubscribeContextAvailabilityResponse, constructorsAndRender)
 * jsonRender -
 *
 */
-TEST(UnsubscribeContextAvailabilityResponse, jsonRender)
+TEST(DISABLED_UnsubscribeContextAvailabilityResponse, jsonRender)
 {
   const char*                              filename1  = "ngsi9.unsubscribeContextAvailabilityResponse.jsonRender1.valid.json";
   const char*                              filename2  = "ngsi9.unsubscribeContextAvailabilityResponse.jsonRender2.valid.json";

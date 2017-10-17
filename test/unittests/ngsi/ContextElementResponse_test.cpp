@@ -65,7 +65,7 @@ TEST(ContextElementResponse, check)
 *
 * render -
 */
-TEST(ContextElementResponse, render)
+TEST(DISABLED_ContextElementResponse, render)
 {
   ContextElementResponse  cer;
   const char*             outfile = "ngsi.contextElementResponse.render.middle.json";

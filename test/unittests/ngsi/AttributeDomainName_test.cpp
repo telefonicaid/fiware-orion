@@ -35,7 +35,7 @@
 *
 * ok -
 */
-TEST(AttributeDomainName, ok)
+TEST(DISABLED_AttributeDomainName, ok)
 {
   AttributeDomainName adn;
   std::string         out;

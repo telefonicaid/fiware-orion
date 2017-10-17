@@ -35,7 +35,7 @@
 *
 * render -
 */
-TEST(ContextRegistrationAttributeVector, render)
+TEST(DISABLED_ContextRegistrationAttributeVector, render)
 {
   ContextRegistrationAttributeVector crav;
   ContextRegistrationAttribute       cra("name", "type", "false");

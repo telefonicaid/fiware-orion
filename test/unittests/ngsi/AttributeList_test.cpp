@@ -35,7 +35,7 @@
 *
 * ok -
 */
-TEST(AttributeList, ok)
+TEST(DISABLED_AttributeList, ok)
 {
   AttributeList  al;
   std::string    out;

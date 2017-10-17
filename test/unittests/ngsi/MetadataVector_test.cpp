@@ -32,7 +32,7 @@
 *
 * render -
 */
-TEST(MetadataVector, render)
+TEST(DISABLED_MetadataVector, render)
 {
   Metadata        m("Name", "Type", "Value");
   Metadata        m2("Name2", "Type2", "Value2");

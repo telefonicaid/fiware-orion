@@ -35,7 +35,7 @@
 *
 * Check -
 */
-TEST(ContextElement, check)
+TEST(DISABLED_ContextElement, check)
 {
   ContextElement* ceP = new ContextElement();
 

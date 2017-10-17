@@ -35,7 +35,7 @@
 *
 * render -
 */
-TEST(NotifyConditionVector, render)
+TEST(DISABLED_NotifyConditionVector, render)
 {
   NotifyCondition*       ncP = new NotifyCondition();
   NotifyConditionVector  ncV;

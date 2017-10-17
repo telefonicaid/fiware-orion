@@ -62,7 +62,7 @@ TEST(compoundValue, updateNoCompoundValue)
 *
 * updateUnknownPath -
 */
-TEST(compoundValue, updateUnknownPath)
+TEST(DISABLED_compoundValue, updateUnknownPath)
 {
   ParseData       reqData;
   const char*     inFileJson  = "ngsi10.updateContextRequest.updateUnknownPath.invalid.json";
@@ -230,7 +230,7 @@ TEST(compoundValue, updateTwoStringsJson)
 *
 * updateTwoItemsSameNameInStructJson -
 */
-TEST(compoundValue, updateTwoItemsSameNameInStructJson)
+TEST(DISABLED_compoundValue, updateTwoItemsSameNameInStructJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextRequest.updateTwoItemsSameNameInStruct.valid.json";
@@ -385,7 +385,7 @@ TEST(compoundValue, updateContextValueVectorFiveItemsJson)
 *
 * updateTwoStructsJson -
 */
-TEST(compoundValue, updateTwoStructsJson)
+TEST(DISABLED_compoundValue, updateTwoStructsJson)
 {
   ParseData                  reqData;
   const char*                inFile        = "ngsi10.updateContextRequest.updateTwoStructs.valid.json";
@@ -534,7 +534,7 @@ TEST(compoundValue, updateTwoStructsJson)
 *
 * sixLevelsJson -
 */
-TEST(compoundValue, sixLevelsJson)
+TEST(DISABLED_compoundValue, sixLevelsJson)
 {
   ParseData                  reqData;
   const char*                inFile        = "ngsi10.updateContextRequest.sixLevels.valid.json";

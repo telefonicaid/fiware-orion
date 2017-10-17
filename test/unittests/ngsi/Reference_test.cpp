@@ -98,7 +98,7 @@ TEST(Reference, present)
 *
 * render -
 */
-TEST(Reference, render)
+TEST(DISABLED_Reference, render)
 {
   Reference    reference;
   std::string  out;

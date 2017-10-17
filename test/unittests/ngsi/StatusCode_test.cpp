@@ -35,7 +35,7 @@
 *
 * render - 
 */
-TEST(StatusCode, render)
+TEST(DISABLED_StatusCode, render)
 {
   StatusCode    sc1;
   StatusCode    sc2(SccOk, "DETAILS");

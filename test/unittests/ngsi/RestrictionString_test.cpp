@@ -81,7 +81,7 @@ TEST(RestrictionString, isEmptySetAndGet)
 *
 * render -
 */
-TEST(RestrictionString, render)
+TEST(DISABLED_RestrictionString, render)
 {
   RestrictionString   restrictionString;
   std::string         out;

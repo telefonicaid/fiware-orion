@@ -83,7 +83,7 @@ TEST(rest, servicePathCheck)
 *
 * rest.servicePathSplit -
 */
-TEST(rest, servicePathSplit)
+TEST(DISABLED_rest, servicePathSplit)
 {
   ConnectionInfo  ci1;
   ConnectionInfo  ci2;

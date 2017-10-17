@@ -60,7 +60,7 @@ TEST(UnsubscribeContextResponse, constructorsAndRender)
 *
 * jsonRender -
 */
-TEST(UnsubscribeContextResponse, jsonRender)
+TEST(DISABLED_UnsubscribeContextResponse, jsonRender)
 {
   const char*                  infile1  = "ngsi10.unsubscribeContextResponse.jsonRender1.valid.json";
   const char*                  infile2  = "ngsi10.unsubscribeContextResponse.jsonRender2.valid.json";
