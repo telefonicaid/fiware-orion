@@ -62,22 +62,22 @@ SubscribeContextResponse::SubscribeContextResponse(StatusCode& errorCode)
 *
 * SubscribeContextResponse::render - 
 */
-std::string SubscribeContextResponse::render(const std::string& indent)
+std::string SubscribeContextResponse::render(void)
 {
   std::string out     = "";
 
-  out += startTag(indent);
+  out += startTag();
 
   if (subscribeError.errorCode.code == SccNone)
   {
-    out += subscribeResponse.render(indent + "  ", false);
+    out += subscribeResponse.render(false);
   }
   else
   {
-    out += subscribeError.render(SubscribeContext, indent + "  ", false);
+    out += subscribeError.render(SubscribeContext, false);
   }
 
-  out += endTag(indent, false);
+  out += endTag(false);
 
   return out;
 }

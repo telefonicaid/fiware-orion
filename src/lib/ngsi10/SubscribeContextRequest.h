@@ -60,7 +60,7 @@ typedef struct SubscribeContextRequest
 
   SubscribeContextRequest(): restrictions(0) {}
 
-  std::string  check(const std::string& indent, const std::string& predetectedError, int counter);
+  std::string  check(const std::string& predetectedError, int counter);
   void         present(const std::string& indent);
   void         release(void);
   void         toNgsiv2Subscription(ngsiv2::Subscription* sub);

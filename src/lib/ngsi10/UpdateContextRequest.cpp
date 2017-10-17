@@ -66,17 +66,17 @@ UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, 
 *
 * UpdateContextRequest::render -
 */
-std::string UpdateContextRequest::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
+std::string UpdateContextRequest::render(ApiVersion apiVersion, bool asJsonObject)
 {
   std::string  out = "";
 
   // JSON commas:
   // Both fields are MANDATORY, so, comma after "contextElementVector"
-  //
-  out += startTag(indent);
-  out += contextElementVector.render(apiVersion, asJsonObject, UpdateContext, indent + "  ", true);
-  out += updateActionType.render(indent + "  ", false);
-  out += endTag(indent, false);
+  //  
+  out += startTag();
+  out += contextElementVector.render(apiVersion, asJsonObject, UpdateContext, true);
+  out += updateActionType.render(false);
+  out += endTag(false);
 
   return out;
 }
@@ -87,7 +87,7 @@ std::string UpdateContextRequest::render(ApiVersion apiVersion, bool asJsonObjec
 *
 * UpdateContextRequest::check -
 */
-std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject,  const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError)
 {
   std::string            res;
   UpdateContextResponse  response;
@@ -95,14 +95,14 @@ std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject
   if (predetectedError != "")
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
-    return response.render(apiVersion, asJsonObject, indent);
+    return response.render(apiVersion, asJsonObject);
   }
 
-  if (((res = contextElementVector.check(apiVersion, UpdateContext, indent, predetectedError, counter)) != "OK") ||
+  if (((res = contextElementVector.check(apiVersion, UpdateContext)) != "OK") ||
       ((res = updateActionType.check()) != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
-    return response.render(apiVersion, asJsonObject, indent);
+    return response.render(apiVersion, asJsonObject);
   }
 
   return "OK";

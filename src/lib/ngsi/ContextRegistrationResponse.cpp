@@ -46,21 +46,21 @@ ContextRegistrationResponse::ContextRegistrationResponse()
 *
 * ContextRegistrationResponse::render -
 */
-std::string ContextRegistrationResponse::render(const std::string& indent, bool comma)
+std::string ContextRegistrationResponse::render(bool comma)
 {
   std::string  out               = "";
   bool         errorCodeRendered = errorCode.code != SccNone;
 
-  out += startTag(indent);
+  out += startTag();
 
-  out += contextRegistration.render(indent + "  ", errorCodeRendered, false);
+  out += contextRegistration.render(errorCodeRendered, false);
 
   if (errorCodeRendered)
   {
-    out += errorCode.render(indent + "  ", false);
+    out += errorCode.render(false);
   }
 
-  out += endTag(indent, comma);
+  out += endTag(comma);
 
   return out;
 }
@@ -75,12 +75,11 @@ std::string ContextRegistrationResponse::check
 (
   ApiVersion          apiVersion,
   RequestType         requestType,
-  const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
 )
 {
-  return contextRegistration.check(apiVersion, requestType, indent, predetectedError, counter);
+  return contextRegistration.check(apiVersion, requestType, predetectedError, counter);
 }
 
 

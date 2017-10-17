@@ -49,21 +49,26 @@ AppendContextElementRequest::AppendContextElementRequest()
 *
 * render - 
 */
-std::string AppendContextElementRequest::render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, std::string indent)
+std::string AppendContextElementRequest::render
+(
+  ApiVersion   apiVersion,
+  bool         asJsonObject,
+  RequestType  requestType
+)
 {
   std::string out = "";
 
-  out += startTag(indent);
+  out += startTag();
 
   if (entity.id != "")
   {
-    out += entity.render(indent + "  ");
+    out += entity.render(false);
   }
 
-  out += attributeDomainName.render(indent + "  ", true);
-  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType, indent + "  ");
-  out += domainMetadataVector.render(indent + "  ");
-  out += endTag(indent);
+  out += attributeDomainName.render(true);
+  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType);
+  out += domainMetadataVector.render(false);
+  out += endTag();
 
   return out;
 }
@@ -77,7 +82,7 @@ std::string AppendContextElementRequest::render(ApiVersion apiVersion, bool asJs
 * FIXME P3: once (if ever) AttributeDomainName::check stops to always return "OK", put back this piece of code 
 *           in its place:
 -
-*   else if ((res = attributeDomainName.check(AppendContextElement, indent, predetectedError, counter)) != "OK")
+*   else if ((res = attributeDomainName.check(AppendContextElement, predetectedError, counter)) != "OK")
 *   {
 *     response.errorCode.fill(SccBadRequest, res):
 *   }
@@ -88,7 +93,6 @@ std::string AppendContextElementRequest::check
   ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
-  std::string         indent,
   const std::string&  predetectedError     // Predetected Error, normally during parsing
 )
 {
@@ -112,7 +116,7 @@ std::string AppendContextElementRequest::check
     return "OK";
   }
 
-  return response.render(apiVersion, asJsonObject, requestType, indent);
+  return response.render(apiVersion, asJsonObject, requestType);
 }
 
 
@@ -121,7 +125,7 @@ std::string AppendContextElementRequest::check
 *
 * present - 
 */
-void AppendContextElementRequest::present(std::string indent)
+void AppendContextElementRequest::present(const std::string&  indent)
 {
   attributeDomainName.present(indent);
   contextAttributeVector.present(indent);

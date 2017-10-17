@@ -62,7 +62,7 @@ extern std::string postSubscriptions
     alarmMgr.badInput(clientIp, errMsg);
     scr.subscribeError.errorCode.fill(SccBadRequest, "max one service-path allowed for subscriptions");
 
-    TIMED_RENDER(answer = scr.render(""));
+    TIMED_RENDER(answer = scr.render());
     return answer;
   }
 

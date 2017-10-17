@@ -111,7 +111,7 @@ std::string postAllEntitiesWithTypeAndId
     alarmMgr.badInput(clientIp, "unknown field");
     response.errorCode.fill(SccBadRequest, "invalid payload: unknown fields");
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
+    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
 
     return out;
   }
@@ -125,7 +125,7 @@ std::string postAllEntitiesWithTypeAndId
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     response.entity.fill(entityId, entityType, "false");
 
-    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, AllEntitiesWithTypeAndId, ""));
+    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, AllEntitiesWithTypeAndId));
 
     parseDataP->acer.res.release();
     return answer;
@@ -137,7 +137,7 @@ std::string postAllEntitiesWithTypeAndId
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     response.entity.fill(entityId, entityType, "false");
 
-    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, AllEntitiesWithTypeAndId, ""));
+    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, AllEntitiesWithTypeAndId));
 
     parseDataP->acer.res.release();
     return answer;
@@ -160,7 +160,7 @@ std::string postAllEntitiesWithTypeAndId
 
 
   // 07. Cleanup and return result
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
 
   parseDataP->upcr.res.release();
   response.release();

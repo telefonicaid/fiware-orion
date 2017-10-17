@@ -386,7 +386,7 @@ void jsonUpcrRelease(ParseData* reqDataP)
 std::string jsonUpcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-  return reqData->upcr.res.check(ciP->apiVersion, asJsonObject, "", reqData->errorString, 0);
+  return reqData->upcr.res.check(ciP->apiVersion, asJsonObject, reqData->errorString);
 }
 
 

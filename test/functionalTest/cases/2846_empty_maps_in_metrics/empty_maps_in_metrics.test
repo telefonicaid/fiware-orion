@@ -68,7 +68,7 @@ echo
 01. Ask for trace levels, using tenant t1
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 27
+Content-Length: 30
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -81,7 +81,7 @@ Date: REGEX(.*)
 02. Ask for trace levels, using tenant t2
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 27
+Content-Length: 30
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -104,13 +104,13 @@ Date: REGEX(.*)
         "t1": {
             "subservs": {
                 "root-subserv": {
-                    "incomingTransactionResponseSize": 54,
+                    "incomingTransactionResponseSize": 60,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
-                "incomingTransactionResponseSize": 54,
+                "incomingTransactionResponseSize": 60,
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
@@ -118,13 +118,13 @@ Date: REGEX(.*)
         "t2": {
             "subservs": {
                 "root-subserv": {
-                    "incomingTransactionResponseSize": 54,
+                    "incomingTransactionResponseSize": 60,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
-                "incomingTransactionResponseSize": 54,
+                "incomingTransactionResponseSize": 60,
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
@@ -133,13 +133,13 @@ Date: REGEX(.*)
     "sum": {
         "subservs": {
             "root-subserv": {
-                "incomingTransactionResponseSize": 108,
+                "incomingTransactionResponseSize": 120,
                 "incomingTransactions": 2,
                 "serviceTime": REGEX(.*)
             }
         },
         "sum": {
-            "incomingTransactionResponseSize": 108,
+            "incomingTransactionResponseSize": 120,
             "incomingTransactions": 2,
             "serviceTime": REGEX(.*)
         }

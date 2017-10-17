@@ -54,7 +54,7 @@ UpdateContextSubscriptionRequest::UpdateContextSubscriptionRequest()
 *
 * UpdateContextSubscriptionRequest::check - 
 */
-std::string UpdateContextSubscriptionRequest::check(const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateContextSubscriptionRequest::check(const std::string& predetectedError, int counter)
 {
   std::string                       res;
   UpdateContextSubscriptionResponse response;
@@ -64,11 +64,11 @@ std::string UpdateContextSubscriptionRequest::check(const std::string& indent, c
     response.subscribeError.subscriptionId = subscriptionId;
     response.subscribeError.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = duration.check(UpdateContextSubscription, indent, predetectedError, counter))              != "OK") ||
-           ((res = restriction.check(UpdateContextSubscription, indent, predetectedError, restrictions))      != "OK") ||
-           ((res = subscriptionId.check(UpdateContextSubscription, indent, predetectedError, counter))        != "OK") ||
-           ((res = notifyConditionVector.check(UpdateContextSubscription, indent, predetectedError, counter)) != "OK") ||
-           ((res = throttling.check(UpdateContextSubscription, indent, predetectedError, counter))            != "OK"))
+  else if (((res = duration.check())                                                                  != "OK") ||
+           ((res = restriction.check(restrictions))                                                   != "OK") ||
+           ((res = subscriptionId.check())                                                            != "OK") ||
+           ((res = notifyConditionVector.check(UpdateContextSubscription, predetectedError, counter)) != "OK") ||
+           ((res = throttling.check())                                                                != "OK"))
   {
     response.subscribeError.subscriptionId = subscriptionId;
     response.subscribeError.errorCode.fill(SccBadRequest, res);
@@ -76,7 +76,7 @@ std::string UpdateContextSubscriptionRequest::check(const std::string& indent, c
   else
     return "OK";
 
-  return response.render(indent);
+  return response.render();
 }
 
 

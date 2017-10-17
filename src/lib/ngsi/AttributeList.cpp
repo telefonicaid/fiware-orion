@@ -65,7 +65,7 @@ void AttributeList::fill(const std::string& commaSeparatedList)
 *
 * render - 
 */
-std::string AttributeList::render(const std::string& indent, bool comma)
+std::string AttributeList::render(bool comma)
 {
   std::string  out = "";
 
@@ -74,14 +74,14 @@ std::string AttributeList::render(const std::string& indent, bool comma)
     return "";
   }
 
-  out += startTag(indent, "attributes", true);
+  out += startTag("attributes", true);
 
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
   {
-    out += valueTag(indent + "  ", "attribute", attributeV[ix], ix != attributeV.size() - 1, true);
+    out += valueTag("attribute", attributeV[ix], ix != attributeV.size() - 1, true);
   }
 
-  out += endTag(indent, comma, true);
+  out += endTag(comma, true);
 
   return out;
 }
@@ -92,18 +92,14 @@ std::string AttributeList::render(const std::string& indent, bool comma)
 *
 * AttributeList::check - 
 */
-std::string AttributeList::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string AttributeList::check(void)
 {
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
   {
     if (attributeV[ix] == "")
+    {
       return "empty attribute name";
+    }
   }
 
   return "OK";

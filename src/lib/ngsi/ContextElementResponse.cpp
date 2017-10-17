@@ -327,17 +327,16 @@ std::string ContextElementResponse::render
   ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
-  const std::string&  indent,
   bool                comma,
   bool                omitAttributeValues
 )
 {
   std::string out = "";
 
-  out += startTag(indent);
-  out += contextElement.render(apiVersion, asJsonObject, requestType, indent + "  ", true, omitAttributeValues);
-  out += statusCode.render(indent + "  ", false);
-  out += endTag(indent, comma, false);
+  out += startTag();
+  out += contextElement.render(apiVersion, asJsonObject, requestType, true, omitAttributeValues);
+  out += statusCode.render(false);
+  out += endTag(comma, false);
 
   return out;
 }
@@ -385,19 +384,18 @@ std::string ContextElementResponse::check
 (
   ApiVersion          apiVersion,
   RequestType         requestType,
-  const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
 )
 {
   std::string res;
 
-  if ((res = contextElement.check(apiVersion, requestType, indent, predetectedError, counter)) != "OK")
+  if ((res = contextElement.check(apiVersion, requestType)) != "OK")
   {
     return res;
   }
 
-  if ((res = statusCode.check(requestType, indent, predetectedError, counter)) != "OK")
+  if ((res = statusCode.check()) != "OK")
   {
     return res;
   }

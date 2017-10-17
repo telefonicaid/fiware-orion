@@ -46,11 +46,11 @@ SubscribeError::SubscribeError()
 *
 * SubscribeError::render -
 */
-std::string SubscribeError::render(RequestType requestType, const std::string& indent, bool comma)
+std::string SubscribeError::render(RequestType requestType, bool comma)
 {
   std::string out = "";
 
-  out += startTag(indent, "subscribeError", false);
+  out += startTag("subscribeError", false);
 
   // subscriptionId is Mandatory if part of updateContextSubscriptionResponse
   // errorCode is Mandatory so, the JSON comma is always TRUE
@@ -64,18 +64,18 @@ std::string SubscribeError::render(RequestType requestType, const std::string& i
     {
       subscriptionId.set("000000000000000000000000");
     }
-    out += subscriptionId.render(requestType, indent + "  ", true);
+    out += subscriptionId.render(requestType, true);
   }
   else if ((requestType          == SubscribeContext)           &&
            (subscriptionId.get() != "000000000000000000000000") &&
            (subscriptionId.get() != ""))
   {
-    out += subscriptionId.render(requestType, indent + "  ", true);
+    out += subscriptionId.render(requestType, true);
   }
 
-  out += errorCode.render(indent + "  ");
+  out += errorCode.render(false);
 
-  out += endTag(indent, comma);
+  out += endTag(comma);
 
   return out;
 }
@@ -86,13 +86,7 @@ std::string SubscribeError::render(RequestType requestType, const std::string& i
 *
 * check -
 */
-std::string SubscribeError::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string SubscribeError::check(void)
 {
   return "OK";
 }

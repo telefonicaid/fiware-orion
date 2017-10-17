@@ -89,16 +89,16 @@ std::string versionTreat
 #endif
 
   out += "{\n";
-  out += startTag(indent, "orion");
-  out += valueTag(indent + "  ", "version",       versionString,   true);
-  out += valueTag(indent + "  ", "uptime",        uptime,          true);
-  out += valueTag(indent + "  ", "git_hash",      GIT_HASH,        true);
-  out += valueTag(indent + "  ", "compile_time",  COMPILE_TIME,    true);
-  out += valueTag(indent + "  ", "compiled_by",   COMPILED_BY,     true);
-  out += valueTag(indent + "  ", "compiled_in",   COMPILED_IN,     true);
-  out += valueTag(indent + "  ", "release_date",  RELEASE_DATE,    true);
-  out += valueTag(indent + "  ", "doc",           API_DOC,         false);
-  out += endTag(indent, false, false);
+  out += "\"orion\" : {\n";
+  out += "  \"version\" : \"" + std::string(versionString) + "\",\n";
+  out += "  \"uptime\" : \"" + std::string(uptime) + "\",\n";
+  out += "  \"git_hash\" : \"" + std::string(GIT_HASH) + "\",\n";
+  out += "  \"compile_time\" : \"" + std::string(COMPILE_TIME) + "\",\n";
+  out += "  \"compiled_by\" : \"" + std::string(COMPILED_BY) + "\",\n";
+  out += "  \"compiled_in\" : \"" + std::string(COMPILED_IN) + "\",\n";
+  out += "  \"release_date\" : \"" + std::string(RELEASE_DATE) + "\",\n";
+  out += "  \"doc\" : \"" + std::string(API_DOC) + "\"\n";
+  out += "}\n";
   out += "}\n";
 
   ciP->httpStatusCode = SccOk;

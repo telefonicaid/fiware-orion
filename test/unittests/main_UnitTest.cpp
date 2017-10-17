@@ -84,6 +84,10 @@ int           writeConcern;
 char          gtest_filter[1024];
 char          gtest_output[1024];
 
+#ifdef PARANOID_JSON_INDENT
+// Actually it doesn't matter the value of this variable in unit test code
+bool          paranoidV1Indent = true;
+#endif
 
 
 /* ****************************************************************************
