@@ -1,4 +1,4 @@
-# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -25,24 +25,24 @@ CORS allowed headers
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPV4 -cors __ALL
+brokerStart CB 0-255 IPV4 -corsOrigin __ALL
 
 --SHELL--
 echo "01. Allowed headers: GET OPTIONS"
-echo "=============================================================================="
+echo "================================"
 orionCurl --url /v2 -X OPTIONS
 echo
 echo
 
 echo "02. Allowed headers: GET POST OPTIONS"
-echo "=============================================================================="
+echo "====================================="
 orionCurl --url /v2/entities -X OPTIONS
 echo
 echo
 
 --REGEXPECT--
 01. Allowed headers: GET OPTIONS
-==============================================================================
+================================
 HTTP/1.1 200 OK
 Content-Length: 0
 Access-Control-Max-Age: REGEX([0-9]{5})
@@ -55,7 +55,7 @@ Date: REGEX(.*)
 
 
 02. Allowed headers: GET POST OPTIONS
-==============================================================================
+=====================================
 HTTP/1.1 200 OK
 Content-Length: 0
 Access-Control-Max-Age: REGEX([0-9]{5})

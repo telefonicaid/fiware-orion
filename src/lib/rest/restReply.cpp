@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"
 
 #include "common/MimeType.h"
+#include "common/limits.h"
 #include "ngsi/StatusCode.h"
 #include "metricsMgr/metricsMgr.h"
 
@@ -100,40 +101,29 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     {
       MHD_add_response_header(response, "Content-Type", "text/plain");
     }
-
-    // At the present version, CORS is supported only for GET requests
-    if ((strlen(restAllowedOrigin) > 0) && (ciP->verb == GET))
-    {
-      // If any origin is allowed, the header is sent always with "any" as value
-      if (strcmp(restAllowedOrigin, "__ALL") == 0)
-      {
-        MHD_add_response_header(response, "Access-Control-Allow-Origin", "*");
-      }
-      // If a specific origin is allowed, the header is only sent if the origins match
-      else if (strcmp(ciP->httpHeaders.origin.c_str(), restAllowedOrigin) == 0)
-      {
-        MHD_add_response_header(response, "Access-Control-Allow-Origin", restAllowedOrigin);
-      }
-    }
   }
 
-  if (strlen(restCORSEnabled) > 0)
+  if (strlen(restAllowedOrigin) > 0)
   {
     // If any origin is allowed, the header is sent always with "any" as value
-    if (strcmp(restCORSEnabled, "__ALL") == 0)
+    if (strcmp(restAllowedOrigin, "__ALL") == 0)
     {
       MHD_add_response_header(response, "Access-Control-Allow-Origin", "*");
     }
     // If a specific origin is allowed, the header is only sent if the origins match
-    else if (strcmp(ciP->httpHeaders.origin.c_str(), restCORSEnabled) == 0)
+    else if (strcmp(ciP->httpHeaders.origin.c_str(), restAllowedOrigin) == 0)
     {
-      MHD_add_response_header(response, "Access-Control-Allow-Origin", restCORSEnabled);
+      MHD_add_response_header(response, "Access-Control-Allow-Origin", restAllowedOrigin);
     }
 
     if (ciP->verb == OPTIONS)
     {
       MHD_add_response_header(response, "Access-Control-Allow-Headers", "User-Agent, Fiware-Service, Fiware-Servicepath, Ngsiv2-AttrsFormat, Fiware-Correlator, X-Forwarded-For, X-Real-IP, X-Auth-Token");
-      MHD_add_response_header(response, "Access-Control-Max-Age", "86400");
+
+      char corsMaxAge[STRING_SIZE_FOR_INT];
+      snprintf(corsMaxAge, sizeof(corsMaxAge), "%d", restCORSMaxAge);
+
+      MHD_add_response_header(response, "Access-Control-Max-Age", corsMaxAge);
     }
   }
 
