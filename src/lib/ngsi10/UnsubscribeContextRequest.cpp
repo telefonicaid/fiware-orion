@@ -35,13 +35,13 @@
 *
 * UnsubscribeContextRequest::render - 
 */
-std::string UnsubscribeContextRequest::render(const std::string& indent)
+std::string UnsubscribeContextRequest::render(void)
 {
   std::string out = "";
 
-  out += startTag(indent);
-  out += subscriptionId.render(UnsubscribeContext, indent + "  ");
-  out += endTag(indent);
+  out += startTag();
+  out += subscriptionId.render(UnsubscribeContext, false);
+  out += endTag();
 
   return out;
 }
@@ -52,15 +52,15 @@ std::string UnsubscribeContextRequest::render(const std::string& indent)
 *
 * UnsubscribeContextRequest::check - 
 */
-std::string UnsubscribeContextRequest::check(const std::string& indent, const std::string& predetectedError, int counter)
+std::string UnsubscribeContextRequest::check()
 {
   UnsubscribeContextResponse  response;
   std::string                 res;
 
-  if ((res = subscriptionId.check(SubscribeContext, indent, predetectedError, counter)) != "OK")
+  if ((res = subscriptionId.check()) != "OK")
   {
      response.statusCode.fill(SccBadRequest, std::string("Invalid Subscription Id: /") + subscriptionId.get() + "/: " + res);
-     return response.render(indent);
+     return response.render();
   }
 
   return "OK";

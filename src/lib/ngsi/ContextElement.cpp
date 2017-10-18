@@ -74,7 +74,14 @@ ContextElement::ContextElement(const std::string& id, const std::string& type, c
 *
 * ContextElement::render - 
 */
-std::string ContextElement::render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues)
+std::string ContextElement::render
+(
+  ApiVersion   apiVersion,
+  bool         asJsonObject,
+  RequestType  requestType,
+  bool         comma,
+  bool         omitAttributeValues
+)
 {
   std::string  out                              = "";
   bool         attributeDomainNameRendered      = attributeDomainName.get() != "";
@@ -86,14 +93,14 @@ std::string ContextElement::render(ApiVersion apiVersion, bool asJsonObject, Req
   bool         commaAfterAttributeDomainName    = domainMetadataVectorRendered  || contextAttributeVectorRendered;
   bool         commaAfterEntityId               = commaAfterAttributeDomainName || attributeDomainNameRendered;
 
-  out += startTag(indent, requestType != UpdateContext? "contextElement" : "");
+  out += startTag(requestType != UpdateContext? "contextElement" : "");
 
-  out += entityId.render(indent + "  ", commaAfterEntityId, false);
-  out += attributeDomainName.render(indent + "  ", commaAfterAttributeDomainName);
-  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType, indent + "  ", commaAfterContextAttributeVector, omitAttributeValues);
-  out += domainMetadataVector.render(indent + "  ", commaAfterDomainMetadataVector);
+  out += entityId.render(commaAfterEntityId, false);
+  out += attributeDomainName.render(commaAfterAttributeDomainName);
+  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType, commaAfterContextAttributeVector, omitAttributeValues);
+  out += domainMetadataVector.render(commaAfterDomainMetadataVector);
 
-  out += endTag(indent, comma, false);
+  out += endTag(comma, false);
 
   return out;
 }
@@ -158,23 +165,16 @@ ContextAttribute* ContextElement::getAttribute(const std::string& attrName)
 *
 * ContextElement::check
 */
-std::string ContextElement::check
-(
-  ApiVersion          apiVersion,
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string ContextElement::check(ApiVersion apiVersion, RequestType requestType)
 {
   std::string res;
 
-  if ((res = entityId.check(requestType, indent)) != "OK")
+  if ((res = entityId.check(requestType)) != "OK")
   {
     return res;
   }
 
-  if ((res = attributeDomainName.check(requestType, indent, predetectedError, counter)) != "OK")
+  if ((res = attributeDomainName.check()) != "OK")
   {
     return res;
   }

@@ -99,26 +99,26 @@ RegisterContextResponse::RegisterContextResponse(const std::string& _registratio
 *
 * RegisterContextResponse::render - 
 */
-std::string RegisterContextResponse::render(const std::string& indent)
+std::string RegisterContextResponse::render(void)
 {
   std::string  out = "";
   bool         errorCodeRendered = (errorCode.code != SccNone) && (errorCode.code != SccOk);
 
-  out += startTag(indent);
+  out += startTag();
 
   if (!errorCodeRendered)
   {
-    out += duration.render(indent + "  ", true);
+    out += duration.render(true);
   }
 
-  out += registrationId.render(RegisterResponse, indent + "  ", errorCodeRendered);
+  out += registrationId.render(RegisterResponse, errorCodeRendered);
 
   if (errorCodeRendered)
   {
-    out += errorCode.render(indent + "  ");
+    out += errorCode.render(false);
   }
 
-  out += endTag(indent);
+  out += endTag();
 
   return out;
 }
@@ -129,7 +129,7 @@ std::string RegisterContextResponse::render(const std::string& indent)
 *
 * RegisterContextResponse::check - 
 */
-std::string RegisterContextResponse::check(const std::string& indent, const std::string& predetectedError, int counter)
+std::string RegisterContextResponse::check(const std::string& predetectedError, int counter)
 {
   RegisterContextResponse  response;
   std::string              res;
@@ -138,15 +138,15 @@ std::string RegisterContextResponse::check(const std::string& indent, const std:
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = duration.check(RegisterResponse, indent, predetectedError, counter))       != "OK") ||
-           ((res = registrationId.check(RegisterResponse, indent, predetectedError, counter)) != "OK"))
+  else if (((res = duration.check())       != "OK") ||
+           ((res = registrationId.check()) != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";
 
-  return response.render(indent);
+  return response.render();
 }
 
 

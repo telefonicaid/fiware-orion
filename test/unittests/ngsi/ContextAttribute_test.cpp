@@ -94,7 +94,7 @@ TEST(ContextAttribute, checkVector)
 *
 * render -
 */
-TEST(ContextAttribute, render)
+TEST(DISABLED_ContextAttribute, render)
 {
   ContextAttribute* caP = new ContextAttribute("NAME", "TYPE", "VALUE");
   std::string       out;

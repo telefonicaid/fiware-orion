@@ -40,7 +40,7 @@
 * duration:       Optional
 * errorCode:      Optional
 */
-TEST(UpdateContextAvailabilitySubscriptionResponse, jsonRender)
+TEST(DISABLED_UpdateContextAvailabilitySubscriptionResponse, jsonRender)
 {
   const char*                                     filename1  = "ngsi9.updateContextAvailabilitySubscriptionResponse.jsonRender1.valid.json";
   const char*                                     filename2  = "ngsi9.updateContextAvailabilitySubscriptionResponse.jsonRender2.valid.json";
@@ -58,7 +58,7 @@ TEST(UpdateContextAvailabilitySubscriptionResponse, jsonRender)
   ucasP->subscriptionId.set("012345678901234567890123");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  rendered = ucasP->render("", 1);
+  rendered = ucasP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
@@ -66,7 +66,7 @@ TEST(UpdateContextAvailabilitySubscriptionResponse, jsonRender)
   ucasP->errorCode.fill(SccBadRequest);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  rendered = ucasP->render("", 1);
+  rendered = ucasP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
@@ -75,7 +75,7 @@ TEST(UpdateContextAvailabilitySubscriptionResponse, jsonRender)
   ucasP->duration.set("PT1H");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
-  rendered = ucasP->render("", 1);
+  rendered = ucasP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
@@ -83,7 +83,7 @@ TEST(UpdateContextAvailabilitySubscriptionResponse, jsonRender)
   ucasP->errorCode.fill(SccBadRequest, "no details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename4)) << "Error getting test data from '" << filename4 << "'";
-  rendered = ucasP->render("", 1);
+  rendered = ucasP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 

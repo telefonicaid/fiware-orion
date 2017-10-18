@@ -43,7 +43,7 @@ typedef struct AttributeList
 
   void         fill(const std::vector<std::string>& aVec);
   void         fill(const std::string& commaSeparatedList);
-  std::string  render(const std::string& indent, bool comma = false);
+  std::string  render(bool comma);
   std::string  toString(void);
   void         present(const std::string& indent);
   void         release(void);
@@ -53,10 +53,7 @@ typedef struct AttributeList
   unsigned int size(void) const;
   void         clone(const AttributeList& aList);
 
-  std::string  check(RequestType         requestType,
-                     const std::string&  indent,
-                     const std::string&  predetectedError,
-                     int                 counter);
+  std::string  check(void);
 
   std::string  operator[](unsigned int ix)  const
   {

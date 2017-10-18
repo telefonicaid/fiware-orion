@@ -42,8 +42,8 @@ std::string ContextAttributeResponseVector::render
 (
   ApiVersion          apiVersion,
   bool                asJsonObject,
-  RequestType         request,
-  const std::string&  indent)
+  RequestType         request
+)
 {
   std::string out = "";
   std::string key = "contextResponses";
@@ -53,12 +53,12 @@ std::string ContextAttributeResponseVector::render
     return "";
   }
 
-  out += startTag(indent, key, true);
+  out += startTag(key, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(apiVersion, asJsonObject, request, indent + "  ");
+    out += vec[ix]->render(apiVersion, asJsonObject, request);
   }
-  out += endTag(indent, false, true);
+  out += endTag(false, true);
 
   return out;
 }
@@ -74,7 +74,6 @@ std::string ContextAttributeResponseVector::check
   ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         request,
-  std::string         indent,
   const std::string&  predetectedError
 )
 {
@@ -82,7 +81,7 @@ std::string ContextAttributeResponseVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion, asJsonObject, request, indent, predetectedError)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, asJsonObject, request, predetectedError)) != "OK")
     {
       return res;
     }
@@ -97,7 +96,7 @@ std::string ContextAttributeResponseVector::check
 *
 * ContextAttributeResponseVector::present - 
 */
-void ContextAttributeResponseVector::present(std::string indent)
+void ContextAttributeResponseVector::present(const std::string&  indent)
 {
   LM_T(LmtPresent, ("%lu ContextAttributeResponses", (uint64_t) vec.size()));
 

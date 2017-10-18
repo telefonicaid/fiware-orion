@@ -769,7 +769,7 @@ void jsonQcrRelease(ParseData* reqDataP)
 std::string jsonQcrCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-  return reqDataP->qcr.res.check(ciP->apiVersion, asJsonObject, "", reqDataP->errorString);
+  return reqDataP->qcr.res.check(ciP->apiVersion, asJsonObject, reqDataP->errorString);
 }
 
 
