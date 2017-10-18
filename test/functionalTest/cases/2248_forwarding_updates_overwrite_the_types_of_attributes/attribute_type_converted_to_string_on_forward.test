@@ -113,7 +113,7 @@ Date: REGEX(.*)
 ======================================================================================================
 POST http://localhost:REGEX(\d+)/v1/updateContext
 Fiware-Servicepath: /
-Content-Length: 332
+Content-Length: 407
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json

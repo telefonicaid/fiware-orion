@@ -37,13 +37,7 @@
 *
 * AttributeExpression::check - 
 */
-std::string AttributeExpression::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string AttributeExpression::check(void)
 {
   return "OK";
 }
@@ -110,14 +104,14 @@ void AttributeExpression::present(const std::string& indent)
 *
 * AttributeExpression::render - 
 */
-std::string AttributeExpression::render(const std::string& indent, bool comma)
+std::string AttributeExpression::render(bool comma)
 {
   if (string == "")
   {
     return "";
   }
 
-  return valueTag(indent, "attributeExpression", string, comma);
+  return valueTag("attributeExpression", string, comma);
 }
 
 

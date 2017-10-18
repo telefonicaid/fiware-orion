@@ -42,12 +42,11 @@
 */
 std::string ContextElementResponseVector::render
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         requestType,
-  const std::string&  indent,
-  bool                comma,
-  bool                omitAttributeValues
+  ApiVersion   apiVersion,
+  bool         asJsonObject,
+  RequestType  requestType,
+  bool         comma,
+  bool         omitAttributeValues
 )
 {
   std::string out = "";
@@ -57,14 +56,14 @@ std::string ContextElementResponseVector::render
     return "";
   }
 
-  out += startTag(indent, "contextResponses", true);
+  out += startTag("contextResponses", true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(apiVersion, asJsonObject, requestType, indent + "  ", ix < (vec.size() - 1), omitAttributeValues);
+    out += vec[ix]->render(apiVersion, asJsonObject, requestType, ix < (vec.size() - 1), omitAttributeValues);
   }
 
-  out += endTag(indent, comma, true);
+  out += endTag(comma, true);
 
   return out;
 }
@@ -110,7 +109,6 @@ std::string ContextElementResponseVector::check
 (
   ApiVersion          apiVersion,
   RequestType         requestType,
-  const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
 )
@@ -119,7 +117,7 @@ std::string ContextElementResponseVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion, requestType, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType, predetectedError, counter)) != "OK")
     {
       return res;
     }

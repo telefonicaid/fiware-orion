@@ -44,25 +44,24 @@
 */
 std::string EntityTypeVectorResponse::render
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  bool                asJsonOut,
-  bool                collapsed,
-  const std::string&  indent
+  ApiVersion  apiVersion,
+  bool        asJsonObject,
+  bool        asJsonOut,
+  bool        collapsed
 )
 {
   std::string out  = "";
 
-  out += startTag(indent);
+  out += startTag();
 
   if (entityTypeVector.size() > 0)
   {
-    out += entityTypeVector.render(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", true);
+    out += entityTypeVector.render(apiVersion, asJsonObject, asJsonOut, collapsed, true);
   }
 
-  out += statusCode.render(indent + "  ");
+  out += statusCode.render(false);
 
-  out += endTag(indent);
+  out += endTag();
 
   return out;
 }
@@ -97,7 +96,7 @@ std::string EntityTypeVectorResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, asJsonOut, collapsed, "");
+  return render(apiVersion, asJsonObject, asJsonOut, collapsed);
 }
 
 

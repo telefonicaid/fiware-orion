@@ -47,8 +47,7 @@ class EntityTypeResponse
   std::string   render(ApiVersion          apiVersion,
                        bool                asJsonObject,
                        bool                asJsonOut,
-                       bool                collapsed,
-                       const std::string&  indent);
+                       bool                collapsed);
   std::string   toJson(void);
   std::string   check(ApiVersion          apiVersion,
                       bool                asJsonObject,

@@ -42,7 +42,7 @@ typedef struct UpdateActionType
   void          set(const std::string& value);
   std::string   get(void);
   bool          isEmpty(void);
-  std::string   render(const std::string& indent, bool comma = false);
+  std::string   render(bool comma);
   void          present(const std::string& indent);
   const char*   c_str(void);
 

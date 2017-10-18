@@ -56,7 +56,7 @@ UnsubscribeContextAvailabilityRequest::UnsubscribeContextAvailabilityRequest(Sub
 *
 * UnsubscribeContextAvailabilityRequest::check - 
 */
-std::string UnsubscribeContextAvailabilityRequest::check(const std::string& indent, const std::string& predetectedError, int counter)
+std::string UnsubscribeContextAvailabilityRequest::check(const std::string& predetectedError)
 {
    UnsubscribeContextAvailabilityResponse  response(subscriptionId);
    std::string                             res;
@@ -65,14 +65,14 @@ std::string UnsubscribeContextAvailabilityRequest::check(const std::string& inde
   {
     response.statusCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = subscriptionId.check(UnsubscribeContextAvailability, indent, predetectedError, counter)) != "OK")
+  else if ((res = subscriptionId.check()) != "OK")
   {
     response.statusCode.fill(SccBadRequest, res);
   }
   else
     return "OK";
 
-  return response.render(indent);
+  return response.render();
 }
 
 

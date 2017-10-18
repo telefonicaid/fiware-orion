@@ -115,7 +115,7 @@ std::string putIndividualContextEntityAttributeWithTypeAndId
 
 
   // 06. Cleanup and return result
-  TIMED_RENDER(answer = response.render("", false, false));
+  TIMED_RENDER(answer = response.render(false, false));
 
   parseDataP->upcar.res.release();
   parseDataP->upcrs.res.release();

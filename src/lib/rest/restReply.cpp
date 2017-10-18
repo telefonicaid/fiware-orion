@@ -55,7 +55,11 @@
 
 #include "logMsg/traceLevels.h"
 
-
+#ifdef PARANOID_JSON_INDENT
+#include "rapidjson/document.h"
+#include "rapidjson/prettywriter.h"
+#include "common/string.h"   // jsonFix
+#endif
 
 static int replyIx = 0;
 
@@ -63,9 +67,64 @@ static int replyIx = 0;
 *
 * restReply -
 */
-void restReply(ConnectionInfo* ciP, const std::string& answer)
+void restReply(ConnectionInfo* ciP, const std::string& _answer)
 {
   MHD_Response*  response;
+
+  std::string answer;
+
+#ifdef PARANOID_JSON_INDENT
+  if (paranoidV1Indent)
+  {
+    // To mantain paranoid backward compatibility pretty print must be applied if
+    //
+    //  * Result is 415 Unsupported Media Type or 406 Not Acceptable, no matter the outMimeType, and API version is not v2
+    //  * outMimeType is JSON and either
+    //    * API version is v1, or
+    //    * API version is no_version and status code is different from 200
+    //
+    // Apart from the above, answer must have effective payload (i.e. not empty)
+    //
+    bool prettyRenderedResponse = ((ciP->httpStatusCode == SccNotAcceptable) && (ciP->apiVersion != V2)) ||
+        ((ciP->httpStatusCode == SccUnsupportedMediaType) && (ciP->apiVersion != V2)) ||
+        ((ciP->outMimeType == JSON) && ((ciP->apiVersion == V1) ||
+                                        ((ciP->apiVersion == NO_VERSION) && (ciP->httpStatusCode != SccOk))));
+
+    // Exception: responses to ops on /statistics and /v1/admin/statistivcs URLs *must not* be pretty printted
+    prettyRenderedResponse = prettyRenderedResponse && (!(ciP->url == "/statistics") || (ciP->url == "/v1/admin/statistics"));
+
+    if (prettyRenderedResponse && (_answer.length() != 0))
+    {
+      // First stage: conventional pretty printer
+      rapidjson::Document doc;
+      doc.Parse(_answer.c_str());
+
+      rapidjson::StringBuffer s;
+      rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+      writer.SetIndent(' ', 2);
+      doc.Accept(writer);
+
+      std::string prettyPrinted = s.GetString();
+
+      // Second stage: "key": "value" -> "key" : value (legacy reasons... this was the
+      // way we implement JSON rendering at the very beggining)
+      char* prettyPrinted2 = jsonFix(prettyPrinted.c_str());
+      answer = std::string(prettyPrinted2);
+      free(prettyPrinted2);
+    }
+    else
+    {
+      answer = _answer;
+    }
+  }
+  else  // paranoidV1Indent = false
+  {
+    answer = _answer;
+  }
+#else
+  answer = _answer;
+#endif
+
   uint64_t       answerLen = answer.length();
   std::string    spath     = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
 
@@ -200,70 +259,70 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, co
    if (tag == "registerContextResponse")
    {
       RegisterContextResponse rcr("000000000000000000000000", errorCode);
-      reply =  rcr.render(indent);
+      reply =  rcr.render();
    }
    else if (tag == "discoverContextAvailabilityResponse")
    {
       DiscoverContextAvailabilityResponse dcar(errorCode);
-      reply =  dcar.render(indent);
+      reply =  dcar.render();
    }
    else if (tag == "subscribeContextAvailabilityResponse")
    {
       SubscribeContextAvailabilityResponse scar("000000000000000000000000", errorCode);
-      reply =  scar.render(indent);
+      reply =  scar.render();
    }
    else if (tag == "updateContextAvailabilitySubscriptionResponse")
    {
       UpdateContextAvailabilitySubscriptionResponse ucas(errorCode);
-      reply =  ucas.render(indent, 0);
+      reply =  ucas.render();
    }
    else if (tag == "unsubscribeContextAvailabilityResponse")
    {
       UnsubscribeContextAvailabilityResponse ucar(errorCode);
-      reply =  ucar.render(indent);
+      reply =  ucar.render();
    }
    else if (tag == "notifyContextAvailabilityResponse")
    {
       NotifyContextAvailabilityResponse ncar(errorCode);
-      reply =  ncar.render(indent);
+      reply =  ncar.render();
    }
 
    else if (tag == "queryContextResponse")
    {
       QueryContextResponse qcr(errorCode);
       bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-      reply =  qcr.render(ciP->apiVersion, asJsonObject, indent);
+      reply =  qcr.render(ciP->apiVersion, asJsonObject);
    }
    else if (tag == "subscribeContextResponse")
    {
       SubscribeContextResponse scr(errorCode);
-      reply =  scr.render(indent);
+      reply =  scr.render();
    }
    else if (tag == "updateContextSubscriptionResponse")
    {
       UpdateContextSubscriptionResponse ucsr(errorCode);
-      reply =  ucsr.render(indent);
+      reply =  ucsr.render();
    }
    else if (tag == "unsubscribeContextResponse")
    {
       UnsubscribeContextResponse uncr(errorCode);
-      reply =  uncr.render(indent);
+      reply =  uncr.render();
    }
    else if (tag == "updateContextResponse")
    {
       UpdateContextResponse ucr(errorCode);
       bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-      reply = ucr.render(ciP->apiVersion, asJsonObject, indent);
+      reply = ucr.render(ciP->apiVersion, asJsonObject);
    }
    else if (tag == "notifyContextResponse")
    {
       NotifyContextResponse ncr(errorCode);
-      reply =  ncr.render(indent);
+      reply =  ncr.render();
    }
    else if (tag == "StatusCode")
    {
      StatusCode sc(code, details);
-     reply = sc.render(indent);
+     reply = sc.render(false);
    }
    else
    {

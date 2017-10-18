@@ -87,7 +87,7 @@ StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const 
 *
 * StatusCode::render -
 */
-std::string StatusCode::render(const std::string& indent, bool comma, bool showKey)
+std::string StatusCode::render(bool comma, bool showKey)
 {
   std::string  out  = "";
 
@@ -107,16 +107,16 @@ std::string StatusCode::render(const std::string& indent, bool comma, bool showK
     details += " - ZERO code set to 500";
   }
 
-  out += startTag(indent, showKey? keyName : "");
-  out += valueTag(indent + "  ", "code", code, true);
-  out += valueTag(indent + "  ", "reasonPhrase", reasonPhrase, details != "");
+  out += startTag(showKey? keyName : "");
+  out += valueTag("code", code, true);
+  out += valueTag("reasonPhrase", reasonPhrase, details != "");
 
   if (details != "")
   {
-    out += valueTag(indent + "  ", "details", details, false);
+    out += valueTag("details", details, false);
   }
 
-  out += endTag(indent, comma);
+  out += endTag(comma);
 
   return out;
 }
@@ -236,13 +236,7 @@ void StatusCode::fill(const struct UpdateContextResponse& ucrs)
 *
 * StatusCode::check -
 */
-std::string StatusCode::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string StatusCode::check(void)
 {
   if (code == SccNone)
   {

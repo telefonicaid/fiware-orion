@@ -285,13 +285,13 @@ Date: REGEX(.*)
 04. Update subscription with partial geo-parameters (one parameter)
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 123
+Content-Length: 119
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "partial geo expression&#59; geometry, georel and coords have to be provided together",
+    "description": "partial geo expression: geometry, georel and coords have to be provided together",
     "error": "BadRequest"
 }
 
@@ -299,13 +299,13 @@ Date: REGEX(.*)
 05. Update subscription with partial geo-parameters (two parameters)
 ====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 123
+Content-Length: 119
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "partial geo expression&#59; geometry, georel and coords have to be provided together",
+    "description": "partial geo expression: geometry, georel and coords have to be provided together",
     "error": "BadRequest"
 }
 
@@ -313,13 +313,13 @@ Date: REGEX(.*)
 06. Create subscription with partial geo-parameters (one parameter)
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 123
+Content-Length: 119
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "partial geo expression&#59; geometry, georel and coords have to be provided together",
+    "description": "partial geo expression: geometry, georel and coords have to be provided together",
     "error": "BadRequest"
 }
 
@@ -327,13 +327,13 @@ Date: REGEX(.*)
 07. Create subscription with partial geo-parameters (two parameters)
 ====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 123
+Content-Length: 119
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "partial geo expression&#59; geometry, georel and coords have to be provided together",
+    "description": "partial geo expression: geometry, georel and coords have to be provided together",
     "error": "BadRequest"
 }
 

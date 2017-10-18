@@ -49,7 +49,7 @@ void ContextRegistrationResponseVector::push_back(ContextRegistrationResponse* i
 *
 * ContextRegistrationResponseVector::render -
 */
-std::string ContextRegistrationResponseVector::render(const std::string& indent, bool comma)
+std::string ContextRegistrationResponseVector::render(bool comma)
 {
   std::string  out = "";
 
@@ -58,14 +58,14 @@ std::string ContextRegistrationResponseVector::render(const std::string& indent,
     return "";
   }
 
-  out += startTag(indent, "contextRegistrationResponses", true);
+  out += startTag("contextRegistrationResponses", true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-     out += vec[ix]->render(indent + "  ", (ix != vec.size() - 1));
+     out += vec[ix]->render((ix != vec.size() - 1));
   }
 
-  out += endTag(indent, comma, true);
+  out += endTag(comma, true);
 
   return out;
 }
@@ -139,7 +139,6 @@ std::string ContextRegistrationResponseVector::check
 (
   ApiVersion          apiVersion,
   RequestType         requestType,
-  const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
 )
@@ -148,7 +147,7 @@ std::string ContextRegistrationResponseVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion, requestType, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType, predetectedError, counter)) != "OK")
     {
       return res;
     }

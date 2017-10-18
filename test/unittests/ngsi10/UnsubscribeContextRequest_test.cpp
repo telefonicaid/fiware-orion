@@ -38,7 +38,7 @@
 *
 * badSubscriptionId_json -
 */
-TEST(UnsubscribeContextRequest, badSubscriptionId_json)
+TEST(DISABLED_UnsubscribeContextRequest, badSubscriptionId_json)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
@@ -60,7 +60,7 @@ TEST(UnsubscribeContextRequest, badSubscriptionId_json)
   ucrP->present("");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  out = ucrP->render("");
+  out = ucrP->render();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ucrP->release();
