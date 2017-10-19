@@ -1,5 +1,4 @@
-+++ b/src/lib/ngsi/ContextAttribute.cpp
-1;4402;0c/*
+/*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 *
