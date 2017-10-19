@@ -785,12 +785,10 @@ static const char* validLogLevels[] =
 
 #define API_V2                                                                                         \
   { "GET",     EPS,          EPS_COMPS_V2,        ENT_COMPS_WORD,          entryPointsTreat         }, \
-  { "OPTIONS", EPS,          EPS_COMPS_V2,        ENT_COMPS_WORD,          optionsGetOnly           }, \
   { "*",       EPS,          EPS_COMPS_V2,        ENT_COMPS_WORD,          badVerbGetOnly           }, \
                                                                                                        \
   { "GET",     ENT,          ENT_COMPS_V2,        ENT_COMPS_WORD,          getEntities              }, \
   { "POST",    ENT,          ENT_COMPS_V2,        ENT_COMPS_WORD,          postEntities             }, \
-  { "OPTIONS", ENT,          ENT_COMPS_V2,        ENT_COMPS_WORD,          optionsGetPostOnly       }, \
   { "*",       ENT,          ENT_COMPS_V2,        ENT_COMPS_WORD,          badVerbGetPostOnly       }, \
                                                                                                        \
   { "GET",    IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         getEntity                }, \
@@ -834,6 +832,9 @@ static const char* validLogLevels[] =
   { "*",      BUR,          BUR_COMPS_V2,         BUR_COMPS_WORD,          badVerbPostOnly          }
 
 
+#define API_V2_CORS                                                                                    \
+  { "OPTIONS", EPS,          EPS_COMPS_V2,        ENT_COMPS_WORD,          optionsGetOnly           }, \
+  { "OPTIONS", ENT,          ENT_COMPS_V2,        ENT_COMPS_WORD,          optionsGetPostOnly       }
 
 
 #define REGISTRY_STANDARD_REQUESTS_V0                                                                    \
@@ -1191,6 +1192,48 @@ static const char* validLogLevels[] =
 */
 RestService restServiceV[] =
 {
+  API_V2,
+
+  REGISTRY_STANDARD_REQUESTS_V0,
+  REGISTRY_STANDARD_REQUESTS_V1,
+  STANDARD_REQUESTS_V0,
+  STANDARD_REQUESTS_V1,
+
+  REGISTRY_CONVENIENCE_OPERATIONS_V0,
+  REGISTRY_CONVENIENCE_OPERATIONS_V1,
+  CONVENIENCE_OPERATIONS_V0,
+  CONVENIENCE_OPERATIONS_V1,
+  LOG_REQUESTS_V0,
+  LOG_REQUESTS_V1,
+  STAT_REQUESTS_V0,
+  STAT_REQUESTS_V1,
+  STAT_CACHE_REQUESTS_V0,
+  STAT_CACHE_REQUESTS_V1,
+  VERSION_REQUESTS,
+  LOGLEVEL_REQUESTS_V2,
+  SEM_STATE_REQUESTS,
+  METRICS_REQUESTS,
+
+#ifdef DEBUG
+  EXIT_REQUESTS,
+  LEAK_REQUESTS,
+#endif
+
+  INVALID_REQUESTS,
+  END_REQUEST
+};
+
+
+
+/* ****************************************************************************
+*
+* restServiceCORS
+*
+* Adds API_V2_CORS definitions on top of the default service vector (restServiceV)
+*/
+RestService restServiceCORS[] =
+{
+  API_V2_CORS,
   API_V2,
 
   REGISTRY_STANDARD_REQUESTS_V0,
@@ -1737,7 +1780,7 @@ int main(int argC, char* argV[])
   LM_M(("x: '%s'", x));  // Outdeffed
 #endif
 
-  RestService* rsP       = restServiceV;
+  RestService* rsP       = (strlen(allowedOrigin) > 0) ? restServiceCORS : restServiceV;
   IpVersion    ipVersion = IPDUAL;
 
   if (useOnlyIPv4)

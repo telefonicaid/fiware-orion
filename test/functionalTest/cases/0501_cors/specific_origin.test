@@ -118,7 +118,7 @@ Date: REGEX(.*)
 ==========================================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: REGEX([0-9]{5})
+Access-Control-Max-Age: 86400
 Access-Control-Allow-Headers: REGEX(.*)
 Access-Control-Allow-Methods: GET, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -130,7 +130,7 @@ Date: REGEX(.*)
 ==========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: REGEX([0-9]{5})
+Access-Control-Max-Age: 86400
 Access-Control-Allow-Headers: REGEX(.*)
 Access-Control-Allow-Origin: arrakis
 Access-Control-Allow-Methods: GET, OPTIONS
@@ -143,7 +143,7 @@ Date: REGEX(.*)
 ==============================================================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: REGEX([0-9]{5})
+Access-Control-Max-Age: 86400
 Access-Control-Allow-Headers: REGEX(.*)
 Access-Control-Allow-Methods: GET, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
