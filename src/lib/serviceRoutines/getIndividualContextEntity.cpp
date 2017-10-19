@@ -115,7 +115,7 @@ std::string getIndividualContextEntity
 
 
   // 5. Render the ContextElementResponse
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
 
 
   // 6. Cleanup and return result

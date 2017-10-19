@@ -18,7 +18,7 @@ and subscriptions.
 
 ## Editors
 
-José Manuel Cantera Fonseca (Telefónica I+D), Fermín Galán Márquez (Telefónica I+D),
+José Manuel Cantera Fonseca (FIWARE Foundation e.V., formerly with Telefónica I+D), Fermín Galán Márquez (Telefónica I+D),
 Tobias Jacobs (NEC).
   
 ## Acknowledgements
@@ -45,7 +45,7 @@ In addition, note that a list of currently open discussions is available at
 
 ## Copyright
 
-Copyright (c) 2011-2016 Telecom Italia, Telefónica I+D and NEC. 
+Copyright (c) 2011-2017 Telecom Italia, Telefónica I+D and NEC. 
 
 ## License
 
@@ -1990,30 +1990,74 @@ Response:
 
 # Group Registrations
 
-Context Registration allows to associate external services to context data. One of the main
-use cases of this functionality is the association of Context Providers.
+A Context Registration allows to bind external context information sources so that they can
+play the role of providers
+of certain subsets (entities, attributes) of the context information space, including those located
+at specific geographical areas.
+A compliant Context Information provider shall expose an NGSIv2 interface, in particular:
+
+* Query by entity type(s), entity id(s), geoquery and attribute and/or metadata projection
+(`attrs` or `metadata` parameter). (See `GET /v2/entities`)
+* Update entity attributes (See `PATCH /v2/entities/<entityId>/attrs`)
+When the entities or attributes covered by an active registered provider are the subject of a query or
+update operation, and the registrations allow to forward requests, 
+implementations must forward a request to such registered context provider so that it can provide
+the requested data or update it.
+The forwarding algorithm and precise implementation details are work to be completed
+in next versions of this specification. (*TODO*)
 
 A context registration is represented by a JSON object with the following fields:
 
-+ `id`       : Unique identifier assigned to the registration. Automatically generated at creation
-  time.
-+ `subject`  : Object that describes the subject of the registration.
-+ `callback` : URL which denotes the end-point of the registered service. It is optional, as it can
-  be undefined under certain conditions, for instance, transient unavailability of the provider.
-+ `metadata` : An optional JSON object which allows to associate extra metadata properties to the
-  registration.
-  It must follow the same representation conventions as context attribute metadata
-  (See JSON Attribute Representation). 
-+ `duration` : Duration of the registration in ISO8601 format. Default duration is infinite.
++ `id` : Unique identifier assigned to the registration. Automatically generated at creation time.
++ `description` : Description given to this registration. Optional. 
++ `provider` : Object that describes the context source registered. Mandatory. 
++ `dataProvided` : Object that describes the data provided by this source. Mandatory. 
++ `status`: Enumerated field which captures the current status of this registration:
+Either `active` (for active registrations) or `inactive` (for inactive registrations).
+  If this field is not provided at registration creation time, new registrations are created with
+  the `active` status, which may be changed by clients afterwards. For expired registrations, this
+  attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`).
+  Also, for registrations experiencing problems with forwarding operations, the status is set to `failed`.
+  As soon as the forwarding operations start working again, the status is changed back to `active`.
++ `expires` : Registration expiration date in ISO8601 format. Permanent registrations must omit this field.
++ `forwardingInformation`: Information related to the forwarding operations made against the provider.
+Automatically provided by the implementation. 
 
-A `subject` contains the following subfields:
+The `provider` field contains the following subfields:
++ `http` : It is used to convey parameters for providers which deliver information through the HTTP protocol.
+(Only protocol supported nowadays).
+It must contain a subfield named `url` with the URL that serves as the endpoint that offers the providing interface.
+The endpoint must *not* include the protocol
+specific part (for instance `/v2/entities`). 
++ `supportedForwardingMode` : It is used to convey the forwarding mode supported by this context provider. By default `all`. 
+Allowed values are:
+    + `none` : This provider does not support request forwarding.
+    + `query` : This provider only supports request forwarding to query data.
+    + `update` : This provider only supports request forwarding to update data.
+    + `all` : This provider supports both query and update forwarding requests. (Default value)
+
+The `dataProvided` field contains the following subfields:
 
 + `entities`: A list of objects, each one composed of the following subfields:
     + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
       time, but at least one of them must be present.
     + `type` or `typePattern`: Type or pattern of the affected entities. Both cannot be used at
       the same time. If omitted, it means "any entity type".
-+ `attributes`: List of attributes to be provided (if not specified, all attributes).
++ `attrs`: List of attributes to be provided (if not specified, all attributes).
++ `expression`: By means of a filtering expression, allows to express what is the scope of the data provided.
+Currently only geographical scopes are supported through the following subterms:
+    + `georel` : Any of the geographical relationships as specified by the Geoqueries section of this specification. 
+    + `geometry` : Any of the supported geometries as specified by the Geoqueries section of this specification. 
+    + `coords` : String representation of coordinates as specified by the Geoqueries section of this specification. 
+
+The `forwardingInformation` field contains the following subfields:
+
++ `timesSent` (not editable, only present in GET operations): Number of request forwardings sent due to this registration.
++ `lastForwarding` (not editable, only present in GET operations): Last forwarding timestamp in ISO8601 format.
++ `lastFailure` (not editable, only present in GET operations): Last failure timestamp in ISO8601 format.
+Not present if registration has never had a problem with forwarding.
++ `lastSuccess` (not editable, only present in GET operations): Timestamp in ISO8601 format for last successful request forwarding.
+Not present if registration has never had a successful notification.
 
 ## Registration list [/v2/registrations]
 
@@ -2032,36 +2076,39 @@ Response:
         [
           {
             "id": "abcdefg",
-            "subject": {
+            "description": "Example Context Source",
+            "dataProvided": {
               "entities": [
                 {
                   "id": "Bcn_Welt",
                   "type": "Room"
                 }
               ],
-              "attributes": [
+              "attrs": [
                 "temperature"
               ]
             },
-            "callback": "http://weather.example.com/ngsi",
-            "metadata": {
-              "providingService": {
-                 "value": "weather.example.com",
-                 "type": "Text"
-               },
-              "providingAuthority": {
-                 "value": "AEMET - Spain",
-                 "type": "Text"
-               }
+            "provider": {
+              "http": {
+                "url": "http://contextsource.example.org"
+              },
+              "supportedForwardingMode": "all"
             },
-            "duration": "PT1M"
+            "expires": "2017-10-31T12:00:00",
+            "status": "active",
+            "forwardingInformation": {
+              "timesSent": 12,
+              "lastForwarding": "2017-10-06T16:00:00.00Z",
+              "lastSuccess": "2017-10-06T16:00:00.00Z",
+              "lastFailure": "2017-10-05T16:00:00.00Z"
+            }
           }
         ]
 
 ### Create a new context provider registration [POST /v2/registrations]
 
-Creates a new registration. This is typically used for associating context providers
-to certain data.
+Creates a new registration. This is typically used for binding context sources
+as providers of certain data.
 The registration is represented by a JSON object as described at the beginning of this section.
 
 Response:
@@ -2073,24 +2120,23 @@ Response:
 + Request (application/json)
 
         {
-          "subject": {
+          "description": "Relative Humidity Context Source",
+          "dataProvided": {
             "entities": [
               {
                 "id": "room2",
                 "type": "Room"
               }
             ],
-            "attributes": [
-              "humidity"
+            "attrs": [
+              "relativeHumidity"
             ]
           },
-          "callback":  "http://localhost:1234",
-          "metadata" : {
-            "provider": {
-              "value": "example.com"
+          "provider": {
+            "http":{ 
+              "url": "http://localhost:1234"
             }
-          },
-          "duration": "PT1M"
+          }
         }
 
 + Response 201
@@ -2117,22 +2163,35 @@ Response:
 
 + Response 200 (application/json)
 
-        {
-          "id": "abcde",
-          "subject": {
-            "entities": [
-              {
-                "id": "room2",
-                "type": "Room"
-              }
-            ],
-            "attributes": [
-              "humidity"
-            ]
-          },
-          "callback":  "http://localhost:1234",
-          "duration": "PT1M"
-        }
+      {
+            "id": "abcdefg",
+            "description": "Example Context Source",
+            "dataProvided": {
+              "entities": [
+                {
+                  "id": "Bcn_Welt",
+                  "type": "Room"
+                }
+              ],
+              "attrs": [
+                "temperature"
+              ]
+            },
+            "provider": {
+              "http": {
+                "url": "http://contextsource.example.org"
+              },
+              "supportedForwardingMode": "all"
+            },
+            "expires": "2017-10-31T12:00:00",
+            "status": "failed",
+            "forwardingInformation": {
+              "timesSent": 12,
+              "lastForwarding": "2017-10-06T16:00:00.00Z",
+              "lastFailure": "2017-10-06T16:00:00.00Z",
+              "lastSuccess": "2017-10-05T18:25:00.00Z",
+            }
+      }      
 
 ### Update context provider registration [PATCH /v2/registrations/{registrationId}]
 
@@ -2150,7 +2209,7 @@ Response:
 + Request (application/json)
 
         {
-          "duration": "PT1M"
+            "expires": "2017-10-04T00:00:00"
         }
 
 + Response 204

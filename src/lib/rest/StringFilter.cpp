@@ -31,6 +31,7 @@
 
 #include "common/wsStrip.h"
 #include "common/string.h"
+#include "common/errorMessages.h"
 #include "parse/forbiddenChars.h"
 #include "parse/CompoundValueNode.h"
 #include "rest/StringFilter.h"
@@ -171,7 +172,7 @@ bool StringFilterItem::rangeParse(char* s, std::string* errorStringP)
 {
   if ((op != SfopEquals) && (op != SfopDiffers))
   {
-    *errorStringP = "ranges only valid for == and != ops";
+    *errorStringP = ERROR_DESC_BAD_REQUEST_INVALID_RANGE;
     return false;
   }
 
@@ -332,7 +333,7 @@ bool StringFilterItem::listParse(char* s, std::string* errorStringP)
 {
   if ((op != SfopEquals) && (op != SfopDiffers))
   {
-    *errorStringP = "lists only valid for == and != ops";
+    *errorStringP = ERROR_DESC_BAD_REQUEST_INVALID_LIST;
     return false;
   }
 

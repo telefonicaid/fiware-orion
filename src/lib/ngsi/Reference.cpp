@@ -39,13 +39,7 @@
 *
 * Reference::check -
 */
-std::string Reference::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string Reference::check(RequestType requestType)
 {
   if (string == "")
   {
@@ -128,14 +122,14 @@ void Reference::present(const std::string& indent)
 *
 * Reference::render -
 */
-std::string Reference::render(const std::string& indent, bool comma)
+std::string Reference::render(bool comma)
 {
   if (string == "")
   {
     return "";
   }
 
-  return valueTag(indent, "reference", string, comma);
+  return valueTag("reference", string, comma);
 }
 
 

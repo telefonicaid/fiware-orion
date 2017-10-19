@@ -232,7 +232,7 @@ std::string QueryContextResponseVector::render(ApiVersion apiVersion, bool asJso
     }
   }
 
-  answer = responseP->render(apiVersion, asJsonObject, "");
+  answer = responseP->render(apiVersion, asJsonObject);
   responseP->release();
   delete responseP;
 

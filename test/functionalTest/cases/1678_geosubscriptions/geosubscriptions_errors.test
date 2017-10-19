@@ -291,7 +291,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "partial geo expression; geometry, georel and coords have to be provided together",
+    "description": "partial geo expression: geometry, georel and coords have to be provided together",
     "error": "BadRequest"
 }
 
@@ -305,7 +305,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "partial geo expression; geometry, georel and coords have to be provided together",
+    "description": "partial geo expression: geometry, georel and coords have to be provided together",
     "error": "BadRequest"
 }
 
@@ -319,7 +319,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "partial geo expression; geometry, georel and coords have to be provided together",
+    "description": "partial geo expression: geometry, georel and coords have to be provided together",
     "error": "BadRequest"
 }
 
@@ -333,7 +333,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "partial geo expression; geometry, georel and coords have to be provided together",
+    "description": "partial geo expression: geometry, georel and coords have to be provided together",
     "error": "BadRequest"
 }
 

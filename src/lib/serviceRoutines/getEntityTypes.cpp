@@ -83,8 +83,7 @@ std::string getEntityTypes
   TIMED_RENDER(rendered = response.render(ciP->apiVersion,
                                           asJsonObject,
                                           ciP->outMimeType == JSON,
-                                          ciP->uriParam[URI_PARAM_COLLAPSE] == "true",
-                                          ""));
+                                          ciP->uriParam[URI_PARAM_COLLAPSE] == "true"));
 
   response.release();
 

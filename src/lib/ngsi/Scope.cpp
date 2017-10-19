@@ -386,16 +386,16 @@ int Scope::fill
 *
 * Scope::render -
 */
-std::string Scope::render(const std::string& indent, bool notLastInVector)
+std::string Scope::render(bool notLastInVector)
 {
   std::string out      = "";
   const char* tTag     = "type";
   const char* vTag     = "value";
 
-  out += startTag(indent);
-  out += valueTag(indent + "  ", tTag, type, true);
-  out += valueTag(indent + "  ", vTag, value);
-  out += endTag(indent, notLastInVector);
+  out += startTag();
+  out += valueTag(tTag, type, true);
+  out += valueTag(vTag, value);
+  out += endTag(notLastInVector);
 
   return out;
 }
@@ -406,13 +406,7 @@ std::string Scope::render(const std::string& indent, bool notLastInVector)
 *
 * Scope::check -
 */
-std::string Scope::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string Scope::check(void)
 {
   //
   // Check for forbidden characters

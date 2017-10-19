@@ -60,6 +60,12 @@
 #define ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE   "Invalid characters in entity type"
 #define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID    "Invalid JSON type for entity id"
 #define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE  "Invalid JSON type for entity type"
+#define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_SCOPE    "invalid JSON type for scope value: must be string"
+#define ERROR_DESC_BAD_REQUEST_INVALID_ATTRSFORMAT    "invalid attrsFormat, accepted values: legacy, normalized, keyValues, values"
+#define ERROR_DESC_BAD_REQUEST_INVALID_STATUS         "status is not valid: it has to be either active or inactive"
+#define ERROR_DESC_BAD_REQUEST_INVALID_RANGE          "ranges only valid for equal and not equal ops"
+#define ERROR_DESC_BAD_REQUEST_INVALID_LIST           "lists only valid for equal and not equal ops"
+#define ERROR_DESC_BAD_REQUEST_PARTIAL_GEOEXPRESSION  "partial geo expression: geometry, georel and coords have to be provided together"
 
 #define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTIDPATTERN     "Invalid JSON type for entity idPattern"
 #define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPEPATTERN   "Invalid JSON type for entity typePattern"

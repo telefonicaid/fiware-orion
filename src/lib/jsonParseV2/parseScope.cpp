@@ -33,6 +33,7 @@
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseScope.h"
 
+#include "common/errorMessages.h"
 
 
 /* ****************************************************************************
@@ -219,7 +220,7 @@ std::string parseScope(ConnectionInfo* ciP, rapidjson::Value::ConstValueIterator
   {
     if (type != "String")
     {
-      return "invalid JSON type for scope value (must be string)";
+      return ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_SCOPE;
     }
 
     scopeP->value = iter->value.GetString();
