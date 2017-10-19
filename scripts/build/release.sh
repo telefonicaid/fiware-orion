@@ -203,6 +203,7 @@ if [ "$CURRENT_BRANCH" == "master" ]
 then
     git add rpm/SPECS/contextBroker.spec
     git add src/app/contextBroker/version.h
+    git add src/lib/common/defaultValues.h
     git add CHANGES_NEXT_RELEASE
     git add README.md
     git add docker/Dockerfile
