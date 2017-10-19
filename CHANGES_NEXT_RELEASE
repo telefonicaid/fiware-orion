@@ -1,6 +1,1 @@
-- Fix: missing lastSuccess/lastFailure associated to initial notification on subscription creation some times when csub cache is in use (#2974)
-- Fix: several invalid memory accesses (based on a workaround, not a definitive solution, see issue #2994)
-- Add: release_date and doc fields are added to the GET /version output to align with FIWARE scheme (#2970)
-- Fix: broken JSON due to unscaped quotes (") in NGSIv2 error description field (#2955)
-- Hardening: NGSIv1 responses don't use pretty-print JSON format any longer, as NGSIv2 responses work (potentially saving around 50% size) (#2760)
 - Add: CORS Preflight Requests support for /v2 and /v2/entities, -corsMaxAge switch (#501)
