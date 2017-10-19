@@ -35,7 +35,7 @@
 *
 * render - 
 */
-TEST(SubscribeError, render)
+TEST(DISABLED_SubscribeError, render)
 {
   SubscribeError  se;
   std::string     out;
@@ -71,7 +71,7 @@ TEST(SubscribeError, check)
 
   utInit();
 
-  checked = se.check(SubscribeContext, "", "", 0);
+  checked = se.check();
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();

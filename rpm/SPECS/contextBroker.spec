@@ -173,6 +173,13 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Thu Oct 19 2017 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.9.0-1
+- Add: release_date and doc fields are added to the GET /version output to align with FIWARE scheme (#2970)
+- Fix: missing lastSuccess/lastFailure associated to initial notification on subscription creation some times when csub cache is in use (#2974)
+- Fix: several invalid memory accesses (based on a workaround, not a definitive solution, see issue #2994)
+- Fix: broken JSON due to unscaped quotes (") in NGSIv2 error description field (#2955)
+- Hardening: NGSIv1 responses don't use pretty-print JSON format any longer, as NGSIv2 responses work (potentially saving around 50% size) (#2760)
+
 * Mon Sep 11 2017 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.8.0-1
 - Add: self-notification loop protection, based on Fiware-Correlator and Ngsiv2-AttrsFormat headers and lastCorrelator field at DB (#2937)
 - Add: Fiware-Correlator and NgsiV2-AttrsFormat headers cannot be overwritten by the custom notification logic (#2937)

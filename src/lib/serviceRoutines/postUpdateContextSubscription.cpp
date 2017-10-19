@@ -61,7 +61,7 @@ std::string postUpdateContextSubscription
                                                                    ciP->servicePathV,
                                                                    ciP->httpHeaders.correlator));
 
-  TIMED_RENDER(answer = ucsr.render(""));
+  TIMED_RENDER(answer = ucsr.render());
 
   return answer;
 }

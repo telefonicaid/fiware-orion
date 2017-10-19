@@ -225,60 +225,74 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 *
 * Metadata::render -
 */
-std::string Metadata::render(const std::string& indent, bool comma)
+std::string Metadata::render(bool comma)
 {
   std::string out     = "";
   std::string xValue  = toStringValue();
 
-  out += startTag(indent);
-  out += valueTag(indent + "  ", "name", name, true);
-  out += valueTag(indent + "  ", "type", type, true);
+  out += startTag();
+  out += valueTag("name", name, true);
+  out += valueTag("type", type, true);
 
   if (valueType == orion::ValueTypeString)
   {
-    out += valueTag(indent + "  ", "value", xValue, false);
+    out += valueTag("value", xValue, false);
   }
   else if (valueType == orion::ValueTypeNumber)
   {
-    out += indent + "  " + JSON_STR("value") + ": " + xValue;
+    out += JSON_STR("value") + ":" + xValue;
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
-    out += indent + "  " + JSON_STR("value") + ": " + xValue;
+    out += JSON_STR("value") + ":" + xValue;
   }
   else if (valueType == orion::ValueTypeNone)
   {
-    out += indent + "  " + JSON_STR("value") + ": " + xValue; 
+    out += JSON_STR("value") + ":" + xValue;
   }
   else if (valueType == orion::ValueTypeObject)
   {
-    std::string part;
+    bool        isCompoundVector = false;
+    ApiVersion  apiVersion       = V1;
 
-    if (compoundValueP->isObject())
+    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::ValueTypeVector))
     {
-      //
-      // Note in this case we don't add the "value" key, the toJson()
-      // method does it for toplevel compound (a bit crazy... this deserves a FIXME mark)
-      // FIXME P4: modify/simplify the rendering of compound values. Too many if/else ...
-      //
-      compoundValueP->renderName = true;
-      compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
-      part = compoundValueP->toJson(true, false);
+      isCompoundVector = true;
     }
     else if (compoundValueP->isVector())
     {
       compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
-      part = JSON_STR("value") + ": [" + compoundValueP->toJson(true, false) + "]";
     }    
 
-    out += part;
+    //
+    // Make compoundValueP->render not render the name 'value'
+    //
+    compoundValueP->container = compoundValueP;
+
+    out += startTag("value", isCompoundVector);
+    out += compoundValueP->render(apiVersion, true, true);
+    out += endTag(false, isCompoundVector);
   }
   else
   {
-    out += indent + "  " + JSON_STR("value") + ": " + JSON_STR("unknown json type");
+    out += JSON_STR("value") + ":" + JSON_STR("unknown json type");
   }
 
-  out += endTag(indent, comma);
+  if ((valueType == orion::ValueTypeNumber) || (valueType == orion::ValueTypeBoolean) || (valueType == orion::ValueTypeNone))
+  {
+    //
+    // Adding newline for the types that do not use the valueTag() function
+    //
+    // FIXME: This might destroy V2 rendering
+    //   This newline is only desired for V1 requests and as this function hasn't that knowledge, we 'hardcode'
+    //   V1 behavior here, as V2 requests should use toJson and not render().
+    //   So, if V2 rendering is destroyed by this modification, it is only because the V2 rendering is using
+    //   a method that it SHOULD NOT USE !
+    //
+    out += "\n";
+  }
+
+  out += endTag(comma);
 
   return out;
 }

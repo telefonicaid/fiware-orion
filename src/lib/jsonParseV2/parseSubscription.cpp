@@ -218,7 +218,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
 
     if ((statusString != "active") && (statusString != "inactive"))
     {
-      return badInput(ciP, "status is not valid (it has to be either active or inactive)");
+      return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_STATUS);
     }
     subsP->statusProvided = true;
     subsP->status = statusString;
@@ -707,7 +707,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     if (nFormat == NO_FORMAT)
     {
-      return badInput(ciP, "invalid attrsFormat (accepted values: legacy, normalized, keyValues, values)");
+      return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_ATTRSFORMAT);
     }
     subsP->attrsFormatProvided = true;
     subsP->attrsFormat = nFormat;
@@ -896,7 +896,7 @@ static std::string parseNotifyConditionVector
 
     if ((nGeoItems > 0) && (nGeoItems != 3))
     {
-      return badInput(ciP, "partial geo expression; geometry, georel and coords have to be provided together");
+      return badInput(ciP, ERROR_DESC_BAD_REQUEST_PARTIAL_GEOEXPRESSION);
     }
 
     //

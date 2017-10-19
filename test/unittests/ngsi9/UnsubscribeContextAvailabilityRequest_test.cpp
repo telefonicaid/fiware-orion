@@ -55,7 +55,7 @@ TEST(UnsubscribeContextAvailabilityRequest, constructorAndCheck)
 
   std::string   out;
 
-  out = ucar2.check("", "", 0);
+  out = ucar2.check("");
   EXPECT_EQ("OK", out);
 
   utExit();
@@ -67,7 +67,7 @@ TEST(UnsubscribeContextAvailabilityRequest, constructorAndCheck)
 *
 * badSubscriptionId_json -
 */
-TEST(UnsubscribeContextAvailabilityRequest, badSubscriptionId_json)
+TEST(DISABLED_UnsubscribeContextAvailabilityRequest, badSubscriptionId_json)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");

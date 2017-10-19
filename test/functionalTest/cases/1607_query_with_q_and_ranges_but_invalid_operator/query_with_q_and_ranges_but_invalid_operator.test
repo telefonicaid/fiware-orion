@@ -196,13 +196,13 @@ Date: REGEX(.*)
 05. Erroneous GET entities with q=A1>=0..20
 ===========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 74
+Content-Length: 84
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "ranges only valid for == and != ops",
+    "description": "ranges only valid for equal and not equal ops",
     "error": "BadRequest"
 }
 
@@ -210,13 +210,13 @@ Date: REGEX(.*)
 06. Erroneous GET entities with q=A1>0..20
 ==========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 74
+Content-Length: 84
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "ranges only valid for == and != ops",
+    "description": "ranges only valid for equal and not equal ops",
     "error": "BadRequest"
 }
 
@@ -224,13 +224,13 @@ Date: REGEX(.*)
 07. Erroneous GET entities with q=A1<=0..20
 ===========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 74
+Content-Length: 84
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "ranges only valid for == and != ops",
+    "description": "ranges only valid for equal and not equal ops",
     "error": "BadRequest"
 }
 
@@ -238,13 +238,13 @@ Date: REGEX(.*)
 08. Erroneous GET entities with q=A1<0..20
 ==========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 74
+Content-Length: 84
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "ranges only valid for == and != ops",
+    "description": "ranges only valid for equal and not equal ops",
     "error": "BadRequest"
 }
 

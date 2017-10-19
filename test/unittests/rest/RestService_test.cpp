@@ -139,7 +139,7 @@ TEST(RestService, payloadParse)
 *
 * noSuchService -
 */
-TEST(RestService, noSuchServiceAndNotFound)
+TEST(DISABLED_RestService, noSuchServiceAndNotFound)
 {
   ConnectionInfo ci("/ngsi9/discoverContextAvailability",  "POST", "1.1");
   ci.servicePathV.push_back("");

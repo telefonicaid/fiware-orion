@@ -63,22 +63,22 @@ UpdateContextSubscriptionResponse::~UpdateContextSubscriptionResponse() {
 *
 * UpdateContextSubscriptionResponse::render - 
 */
-std::string UpdateContextSubscriptionResponse::render(const std::string& indent)
+std::string UpdateContextSubscriptionResponse::render(void)
 {
   std::string out  = "";
 
-  out += startTag(indent);
+  out += startTag();
 
   if (subscribeError.errorCode.code == SccNone)
   {
-    out += subscribeResponse.render(indent + "  ", false);
+    out += subscribeResponse.render(false);
   }
   else
   {
-    out += subscribeError.render(UpdateContextSubscription, indent + "  ", false);
+    out += subscribeError.render(UpdateContextSubscription, false);
   }
 
-  out += endTag(indent);
+  out += endTag();
 
   return out;
 }

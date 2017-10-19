@@ -46,7 +46,7 @@ typedef struct UnsubscribeContextAvailabilityResponse
   UnsubscribeContextAvailabilityResponse(SubscriptionId _subscriptionId);
   ~UnsubscribeContextAvailabilityResponse();
 
-  std::string render(const std::string& indent);
+  std::string render(void);
 } UnsubscribeContextAvailabilityResponse;
 
 #endif  // SRC_LIB_NGSI9_UNSUBSCRIBECONTEXTAVAILABILITYRESPONSE_H_

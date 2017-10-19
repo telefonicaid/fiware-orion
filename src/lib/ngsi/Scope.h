@@ -82,14 +82,11 @@ typedef struct Scope
                     const std::string&  georelString,
                     std::string*        errorString);
 
-  std::string  render(const std::string& indent, bool notLastInVector);
+  std::string  render(bool notLastInVector);
   void         present(const std::string& indent, int ix);
   void         release(void);
 
-  std::string  check(RequestType         requestType,
-                     const std::string&  indent,
-                     const std::string&  predetectedError,
-                     int                 counter);
+  std::string  check(void);
   void         areaTypeSet(const std::string& areaTypeString);
 } Scope;
 

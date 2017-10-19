@@ -44,7 +44,7 @@ TEST(ContextRegistrationVector, render)
 
   utInit();
 
-  out = crv.render("", false);
+  out = crv.render(false);
   EXPECT_STREQ("", out.c_str());
 
   utExit();

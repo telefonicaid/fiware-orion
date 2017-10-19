@@ -67,11 +67,11 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
       {
         if (vec[ix]->compoundValueP->valueType == orion::ValueTypeVector)
         {
-          *valueP = "[" + vec[ix]->compoundValueP->toJson(true) + "]";
+          *valueP = "[" + vec[ix]->compoundValueP->toJson(true, true) + "]";
         }
         else if (vec[ix]->compoundValueP->valueType == orion::ValueTypeObject)
         {
-          *valueP = "{" + vec[ix]->compoundValueP->toJson(true) + "}";
+          *valueP = "{" + vec[ix]->compoundValueP->toJson(true, true) + "}";
         }
         else
         {
