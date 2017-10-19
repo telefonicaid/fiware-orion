@@ -1,4 +1,5 @@
-/*
++++ b/src/lib/ngsi/ContextAttribute.cpp
+1;4402;0c/*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 *
@@ -1218,7 +1219,44 @@ bool ContextAttribute::compoundItemExists(const std::string& compoundPath, orion
 
     for (unsigned int cIx = 0; cIx < current->childV.size(); ++cIx)
     {
-      if (current->childV[cIx]->name == compoundPathV[ix])
+      //
+      //  Comparing 'a.b' to 'a=b'
+      //
+      // tag names containing a dot are stored in mongo with the dots changed for a '='
+      // Now, to avoid to modify the names, instead of comparing string == string, we will be comparing
+      // char by char, accepting '=' in compoundPathV[ix] when a '.' is found in current->childV[cIx]->name
+      //
+      char* childName    = (char*) current->childV[cIx]->name.c_str();
+      char* compoundName = (char*) compoundPathV[ix].c_str();
+      bool  equal        = true;
+
+      if (strlen(childName) != strlen(compoundName))
+      {
+        equal = false;
+      }
+      else
+      {
+        while (*childName != 0)
+        {
+          if (*childName != *compoundName)
+          {
+            if ((*childName == '.') && (*compoundName == '='))
+            {
+              // accepted
+            }
+            else
+            {
+              equal = false;
+              break;
+            }
+          }
+
+          ++childName;
+          ++compoundName;
+        }
+      }
+
+      if (equal)
       {
         current = current->childV[cIx];
         found   = true;

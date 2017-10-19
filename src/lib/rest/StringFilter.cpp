@@ -870,7 +870,7 @@ const char* StringFilterItem::valueTypeName(void)
 *
 * StringFilterItem::matchEquals(Metadata*) -
 */
-bool StringFilterItem::matchEquals(Metadata* mdP)
+MatchResult StringFilterItem::matchEquals(Metadata* mdP)
 {
   //
   // First of all, are we treating with a compound?
@@ -882,7 +882,7 @@ bool StringFilterItem::matchEquals(Metadata* mdP)
 
     if (mdP->compoundItemExists(compoundPath, &compoundValueP) == false)
     {
-      return false;
+      return MrDoesntExist;
     }
 
     return matchEquals(compoundValueP);
@@ -893,7 +893,7 @@ bool StringFilterItem::matchEquals(Metadata* mdP)
   {
     if ((mdP->numberValue < numberRangeFrom) || (mdP->numberValue > numberRangeTo))
     {
-      return false;
+      return MrNoMatch;
     }
   }
   else if (valueType == SfvtStringRange)
@@ -901,76 +901,76 @@ bool StringFilterItem::matchEquals(Metadata* mdP)
     if ((strcmp(mdP->stringValue.c_str(), stringRangeFrom.c_str()) < 0) ||
         (strcmp(mdP->stringValue.c_str(), stringRangeTo.c_str())   > 0))
     {
-      return false;
+      return MrNoMatch;
     }
   }
   else if ((valueType == SfvtNumberList) || (valueType == SfvtDateList))
   {
-    bool match = false;
+    MatchResult match = MrNoMatch;
 
     // the metadata value has to match at least one of the elements in the vector (OR)
     for (unsigned int vIx = 0; vIx < numberList.size(); ++vIx)
     {
       if (mdP->numberValue == numberList[vIx])
       {
-        match = true;
+        match = MrMatch;
         break;
       }
     }
 
-    if (match == false)
+    if (match != MrMatch)
     {
-      return false;
+      return match;
     }
   }
   else if (valueType == SfvtStringList)
   {
-    bool match = false;
+    MatchResult match = MrNoMatch;
 
     // the metadata value has to match at least one of the elements in the vector (OR)
     for (unsigned int vIx = 0; vIx < stringList.size(); ++vIx)
     {
       if (mdP->stringValue == stringList[vIx])
       {
-        match = true;
+        match = MrMatch;
         break;
       }
     }
 
-    if (match == false)
+    if (match != MrMatch)
     {
-      return false;
+      return match;
     }
   }
   else if ((valueType == SfvtNumber) || (valueType == SfvtDate))
   {
     if (mdP->numberValue != numberValue)
     {
-      return false;
+      return MrNoMatch;
     }
   }
   else if (valueType == SfvtBool)
   {
     if (mdP->boolValue != boolValue)
     {
-      return false;
+      return MrNoMatch;
     }
   }
   else if (valueType == SfvtString)
   {
     if (mdP->stringValue != stringValue)
     {
-      return false;
+      return MrNoMatch;
     }
   }
   else
   {
     LM_E(("Runtime Error (valueType '%s' is not treated)", valueTypeName()));
-    return false;
+    return MrIncompatibleType;
   }
 
 
-  return true;
+  return MrMatch;
 }
 
 
@@ -984,13 +984,13 @@ bool StringFilterItem::matchEquals(Metadata* mdP)
 *           non-compound comparisons. Doesn't really hurt.
 *           Right now, 'Date' in compounds are treated as strings.
 */
-bool StringFilterItem::matchEquals(orion::CompoundValueNode* cvP)
+MatchResult StringFilterItem::matchEquals(orion::CompoundValueNode* cvP)
 {
   if ((valueType == SfvtNumberRange) || (valueType == SfvtDateRange))
   {
     if ((cvP->numberValue < numberRangeFrom) || (cvP->numberValue > numberRangeTo))
     {
-      return false;
+      return MrNoMatch;
     }
   }
   else if (valueType == SfvtStringRange)
@@ -998,75 +998,75 @@ bool StringFilterItem::matchEquals(orion::CompoundValueNode* cvP)
     if ((strcmp(cvP->stringValue.c_str(), stringRangeFrom.c_str()) < 0) ||
         (strcmp(cvP->stringValue.c_str(), stringRangeTo.c_str())   > 0))
     {
-      return false;
+      return MrNoMatch;
     }
   }
   else if ((valueType == SfvtNumberList) || (valueType == SfvtDateList))
   {
-    bool match = false;
+    MatchResult match = MrNoMatch;
 
     // the attribute value has to match at least one of the elements in the vector (OR)
     for (unsigned int vIx = 0; vIx < numberList.size(); ++vIx)
     {
       if (cvP->numberValue == numberList[vIx])
       {
-        match = true;
+        match = MrMatch;
         break;
       }
     }
 
-    if (match == false)
+    if (match == MrNoMatch)
     {
-      return false;
+      return MrNoMatch;
     }
   }
   else if (valueType == SfvtStringList)
   {
-    bool match = false;
+    MatchResult match = MrNoMatch;
 
     // the attribute value has to match at least one of the elements in the vector (OR)
     for (unsigned int vIx = 0; vIx < stringList.size(); ++vIx)
     {
       if (cvP->stringValue == stringList[vIx])
       {
-        match = true;
+        match = MrMatch;
         break;
       }
     }
 
-    if (match == false)
+    if (match != MrMatch)
     {
-      return false;
+      return match;
     }
   }
   else if ((valueType == SfvtNumber) || (valueType == SfvtDate))
   {
     if (cvP->numberValue != numberValue)
     {
-      return false;
+      return MrNoMatch;
     }
   }
   else if (valueType == SfvtBool)
   {
     if (cvP->boolValue != boolValue)
     {
-      return false;
+      return MrNoMatch;
     }
   }
   else if (valueType == SfvtString)
   {
     if (cvP->stringValue != stringValue)
     {
-      return false;
+      return MrNoMatch;
     }
   }
   else
   {
     LM_E(("Runtime Error (valueType '%s' is not treated)", valueTypeName()));
-    return false;
+    return MrIncompatibleType;
   }
 
-  return true;
+  return MrMatch;
 }
 
 
@@ -1075,7 +1075,7 @@ bool StringFilterItem::matchEquals(orion::CompoundValueNode* cvP)
 *
 * StringFilterItem::matchEquals -
 */
-bool StringFilterItem::matchEquals(ContextAttribute* caP)
+MatchResult StringFilterItem::matchEquals(ContextAttribute* caP)
 {
   //
   // First of all, are we treating with a compound?
@@ -1087,7 +1087,7 @@ bool StringFilterItem::matchEquals(ContextAttribute* caP)
 
     if (caP->compoundItemExists(compoundPath, &compoundValueP) == false)
     {
-      return false;
+      return MrDoesntExist;
     }
 
     return matchEquals(compoundValueP);
@@ -1101,7 +1101,7 @@ bool StringFilterItem::matchEquals(ContextAttribute* caP)
   {
     if ((caP->numberValue < numberRangeFrom) || (caP->numberValue > numberRangeTo))
     {
-      return false;
+      return MrNoMatch;
     }
   }
   else if (valueType == SfvtStringRange)
@@ -1118,75 +1118,75 @@ bool StringFilterItem::matchEquals(ContextAttribute* caP)
     if ((strcmp(caP->stringValue.c_str(), stringRangeFrom.c_str()) < 0) ||
         (strcmp(caP->stringValue.c_str(), stringRangeTo.c_str())   > 0))
     {
-      return false;
+      return MrNoMatch;
     }
   }
   else if ((valueType == SfvtNumberList) || (valueType == SfvtDateList))
   {
-    bool match = false;
+    MatchResult match = MrNoMatch;
 
     // the attribute value has to match at least one of the elements in the vector (OR)
     for (unsigned int vIx = 0; vIx < numberList.size(); ++vIx)
     {
       if (caP->numberValue == numberList[vIx])
       {
-        match = true;
+        match = MrMatch;
         break;
       }
     }
 
-    if (match == false)
+    if (match != MrMatch)
     {
-      return false;
+      return match;
     }
   }
   else if (valueType == SfvtStringList)
   {
-    bool match = false;
+    MatchResult match = MrNoMatch;
 
     // the attribute value has to match at least one of the elements in the vector (OR)
     for (unsigned int vIx = 0; vIx < stringList.size(); ++vIx)
     {
       if (caP->stringValue == stringList[vIx])
       {
-        match = true;
+        match = MrMatch;
         break;
       }
     }
 
-    if (match == false)
+    if (match != MrMatch)
     {
-      return false;
+      return match;
     }
   }
   else if ((valueType == SfvtNumber) || (valueType == SfvtDate))
   {
     if (caP->numberValue != numberValue)
     {
-      return false;
+      return MrNoMatch;
     }
   }
   else if (valueType == SfvtBool)
   {
     if (caP->boolValue != boolValue)
     {
-      return false;
+      return MrNoMatch;
     }
   }
   else if (valueType == SfvtString)
   {
     if (caP->stringValue != stringValue)
     {
-      return false;
+      return MrNoMatch;
     }
   }
   else
   {
     LM_E(("Runtime Error (valueType '%s' is not treated)", valueTypeName()));
-    return false;
+    return MrIncompatibleType;
   }
 
-  return true;
+  return MrMatch;
 }
 
 
@@ -1195,7 +1195,7 @@ bool StringFilterItem::matchEquals(ContextAttribute* caP)
 *
 * StringFilterItem::matchPattern -
 */
-bool StringFilterItem::matchPattern(ContextAttribute* caP)
+MatchResult StringFilterItem::matchPattern(ContextAttribute* caP)
 {
   //
   // First of all, are we treating with a compound?
@@ -1207,7 +1207,7 @@ bool StringFilterItem::matchPattern(ContextAttribute* caP)
 
     if (caP->compoundItemExists(compoundPath, &compoundValueP) == false)
     {
-      return false;
+      return MrDoesntExist;
     }
 
     return matchPattern(compoundValueP);
@@ -1217,10 +1217,10 @@ bool StringFilterItem::matchPattern(ContextAttribute* caP)
   // pattern evaluation only makes sense for attributes of type 'string'
   if (caP->valueType != orion::ValueTypeString)
   {
-    return false;
+    return MrIncompatibleType;
   }
 
-  return (regexec(&patternValue, caP->stringValue.c_str(), 0, NULL, 0) == 0);
+  return (regexec(&patternValue, caP->stringValue.c_str(), 0, NULL, 0) == 0)? MrMatch : MrNoMatch;
 }
 
 
@@ -1229,15 +1229,15 @@ bool StringFilterItem::matchPattern(ContextAttribute* caP)
 *
 * StringFilterItem::matchPattern -
 */
-bool StringFilterItem::matchPattern(orion::CompoundValueNode* cvP)
+MatchResult StringFilterItem::matchPattern(orion::CompoundValueNode* cvP)
 {
   // pattern evaluation only makes sense for attributes of type 'string'
   if (cvP->valueType != orion::ValueTypeString)
   {
-    return false;
+    return MrIncompatibleType;
   }
 
-  return (regexec(&patternValue, cvP->stringValue.c_str(), 0, NULL, 0) == 0);
+  return (regexec(&patternValue, cvP->stringValue.c_str(), 0, NULL, 0) == 0)? MrMatch : MrNoMatch;
 }
 
 
@@ -1246,7 +1246,7 @@ bool StringFilterItem::matchPattern(orion::CompoundValueNode* cvP)
 *
 * StringFilterItem::matchPattern -
 */
-bool StringFilterItem::matchPattern(Metadata* mdP)
+MatchResult StringFilterItem::matchPattern(Metadata* mdP)
 {
   //
   // First of all, are we treating with a compound?
@@ -1258,7 +1258,7 @@ bool StringFilterItem::matchPattern(Metadata* mdP)
 
     if (mdP->compoundItemExists(compoundPath, &compoundValueP) == false)
     {
-      return false;
+      return MrDoesntExist;
     }
 
     return matchPattern(compoundValueP);
@@ -1269,10 +1269,10 @@ bool StringFilterItem::matchPattern(Metadata* mdP)
   // pattern evaluation only makes sense for metadatas of type 'string'
   if (mdP->valueType != orion::ValueTypeString)
   {
-    return false;
+    return MrIncompatibleType;
   }
 
-  return (regexec(&patternValue, mdP->stringValue.c_str(), 0, NULL, 0) == 0);
+  return (regexec(&patternValue, mdP->stringValue.c_str(), 0, NULL, 0) == 0)? MrMatch : MrNoMatch;
 }
 
 
@@ -1344,7 +1344,7 @@ bool StringFilterItem::compatibleType(orion::CompoundValueNode* cvP)
 *
 * StringFilterItem::matchGreaterThan -
 */
-bool StringFilterItem::matchGreaterThan(ContextAttribute* caP)
+MatchResult StringFilterItem::matchGreaterThan(ContextAttribute* caP)
 {
   //
   // First of all, are we treating with a compound?
@@ -1356,7 +1356,7 @@ bool StringFilterItem::matchGreaterThan(ContextAttribute* caP)
 
     if (caP->compoundItemExists(compoundPath, &compoundValueP) == false)
     {
-      return false;
+      return MrDoesntExist;
     }
 
     return matchGreaterThan(compoundValueP);
@@ -1364,25 +1364,25 @@ bool StringFilterItem::matchGreaterThan(ContextAttribute* caP)
 
   if (!compatibleType(caP))
   {
-    return false;
+    return MrIncompatibleType;
   }
 
   if (caP->valueType == orion::ValueTypeNumber)
   {
     if (caP->numberValue > numberValue)
     {
-      return true;
+      return MrMatch;
     }
   }
   else if (caP->valueType == orion::ValueTypeString)
   {
     if (strcmp(caP->stringValue.c_str(), stringValue.c_str()) > 0)
     {
-      return true;
+      return MrMatch;
     }
   }
 
-  return false;
+  return MrNoMatch;
 }
 
 
@@ -1391,29 +1391,29 @@ bool StringFilterItem::matchGreaterThan(ContextAttribute* caP)
 *
 * StringFilterItem::matchGreaterThan -
 */
-bool StringFilterItem::matchGreaterThan(orion::CompoundValueNode* cvP)
+MatchResult StringFilterItem::matchGreaterThan(orion::CompoundValueNode* cvP)
 {
   if (!compatibleType(cvP))
   {
-    return false;
+    return MrIncompatibleType;
   }
 
   if (cvP->valueType == orion::ValueTypeNumber)
   {
     if (cvP->numberValue > numberValue)
     {
-      return true;
+      return MrMatch;
     }
   }
   else if (cvP->valueType == orion::ValueTypeString)
   {
     if (strcmp(cvP->stringValue.c_str(), stringValue.c_str()) > 0)
     {
-      return true;
+      return MrMatch;
     }
   }
 
-  return false;
+  return MrNoMatch;
 }
 
 
@@ -1422,7 +1422,7 @@ bool StringFilterItem::matchGreaterThan(orion::CompoundValueNode* cvP)
 *
 * StringFilterItem::matchGreaterThan -
 */
-bool StringFilterItem::matchGreaterThan(Metadata* mdP)
+MatchResult StringFilterItem::matchGreaterThan(Metadata* mdP)
 {
   //
   // First of all, are we treating with a compound?
@@ -1434,7 +1434,7 @@ bool StringFilterItem::matchGreaterThan(Metadata* mdP)
 
     if (mdP->compoundItemExists(compoundPath, &compoundValueP) == false)
     {
-      return false;
+      return MrDoesntExist;
     }
 
     return matchGreaterThan(compoundValueP);
@@ -1442,25 +1442,25 @@ bool StringFilterItem::matchGreaterThan(Metadata* mdP)
 
   if (!compatibleType(mdP))
   {
-    return false;
+    return MrIncompatibleType;
   }
 
   if (mdP->valueType == orion::ValueTypeNumber)
   {
     if (mdP->numberValue > numberValue)
     {
-      return true;
+      return MrMatch;
     }
   }
   else if (mdP->valueType == orion::ValueTypeString)
   {
     if (strcmp(mdP->stringValue.c_str(), stringValue.c_str()) > 0)
     {
-      return true;
+      return MrMatch;
     }
   }
 
-  return false;
+  return MrNoMatch;
 }
 
 
@@ -1469,7 +1469,7 @@ bool StringFilterItem::matchGreaterThan(Metadata* mdP)
 *
 * StringFilterItem::matchLessThan -
 */
-bool StringFilterItem::matchLessThan(ContextAttribute* caP)
+MatchResult StringFilterItem::matchLessThan(ContextAttribute* caP)
 {
   //
   // First of all, are we treating with a compound?
@@ -1481,7 +1481,7 @@ bool StringFilterItem::matchLessThan(ContextAttribute* caP)
 
     if (caP->compoundItemExists(compoundPath, &compoundValueP) == false)
     {
-      return false;
+      return MrDoesntExist;
     }
 
     return matchLessThan(compoundValueP);
@@ -1489,25 +1489,25 @@ bool StringFilterItem::matchLessThan(ContextAttribute* caP)
 
   if (!compatibleType(caP))
   {
-    return false;
+    return MrIncompatibleType;
   }
 
   if (caP->valueType == orion::ValueTypeNumber)
   {
     if (caP->numberValue < numberValue)
     {
-      return true;
+      return MrMatch;
     }
   }
   else if (caP->valueType == orion::ValueTypeString)
   {
     if (strcmp(caP->stringValue.c_str(), stringValue.c_str()) < 0)
     {
-      return true;
+      return MrMatch;
     }
   }
 
-  return false;
+  return MrNoMatch;
 }
 
 
@@ -1516,29 +1516,29 @@ bool StringFilterItem::matchLessThan(ContextAttribute* caP)
 *
 * StringFilterItem::matchLessThan -
 */
-bool StringFilterItem::matchLessThan(orion::CompoundValueNode* cvP)
+MatchResult StringFilterItem::matchLessThan(orion::CompoundValueNode* cvP)
 {
   if (!compatibleType(cvP))
   {
-    return false;
+    return MrIncompatibleType;
   }
 
   if (cvP->valueType == orion::ValueTypeNumber)
   {
     if (cvP->numberValue < numberValue)
     {
-      return true;
+      return MrMatch;
     }
   }
   else if (cvP->valueType == orion::ValueTypeString)
   {
     if (strcmp(cvP->stringValue.c_str(), stringValue.c_str()) < 0)
     {
-      return true;
+      return MrMatch;
     }
   }
 
-  return false;
+  return MrNoMatch;
 }
 
 
@@ -1547,7 +1547,7 @@ bool StringFilterItem::matchLessThan(orion::CompoundValueNode* cvP)
 *
 * StringFilterItem::matchLessThan -
 */
-bool StringFilterItem::matchLessThan(Metadata* mdP)
+MatchResult StringFilterItem::matchLessThan(Metadata* mdP)
 {
   //
   // First of all, are we treating with a compound?
@@ -1559,7 +1559,7 @@ bool StringFilterItem::matchLessThan(Metadata* mdP)
 
     if (mdP->compoundItemExists(compoundPath, &compoundValueP) == false)
     {
-      return false;
+      return MrDoesntExist;
     }
 
     return matchLessThan(compoundValueP);
@@ -1567,25 +1567,25 @@ bool StringFilterItem::matchLessThan(Metadata* mdP)
 
   if (!compatibleType(mdP))
   {
-    return false;
+    return MrIncompatibleType;
   }
 
   if (mdP->valueType == orion::ValueTypeNumber)
   {
     if (mdP->numberValue < numberValue)
     {
-      return true;
+      return MrMatch;
     }
   }
   else if (mdP->valueType == orion::ValueTypeString)
   {
     if (strcmp(mdP->stringValue.c_str(), stringValue.c_str()) < 0)
     {
-      return true;
+      return MrMatch;
     }
   }
 
-  return false;
+  return MrNoMatch;
 }
 
 
@@ -2052,7 +2052,6 @@ bool StringFilter::mqMatch(ContextElementResponse* cerP)
 
     if ((itemP->op == SfopExists) || (itemP->op == SfopNotExists))
     {
-
       Metadata*  mdP = (caP == NULL)? NULL : caP->metadataVector.lookupByName(itemP->metadataName);
 
       if (itemP->compoundPath.size() == 0)
@@ -2107,31 +2106,31 @@ bool StringFilter::mqMatch(ContextElementResponse* cerP)
       }
     }
 
-    if ((itemP->op == SfopEquals) && (itemP->matchEquals(mdP) == false))
+    if ((itemP->op == SfopEquals) && (itemP->matchEquals(mdP) != MrMatch))
     {
       return false;
     }
-    else if ((itemP->op == SfopDiffers) && (itemP->matchEquals(mdP) == true))
+    else if ((itemP->op == SfopDiffers) && (itemP->matchEquals(mdP) != MrNoMatch))
     {
       return false;
     }
-    else if ((itemP->op == SfopGreaterThan) && (itemP->matchGreaterThan(mdP) == false))
+    else if ((itemP->op == SfopGreaterThan) && (itemP->matchGreaterThan(mdP) != MrMatch))
     {
       return false;
     }
-    else if ((itemP->op == SfopLessThan) && (itemP->matchLessThan(mdP) == false))
+    else if ((itemP->op == SfopLessThan) && (itemP->matchLessThan(mdP) != MrMatch))
     {
       return false;
     }
-    else if ((itemP->op == SfopGreaterThanOrEqual) && (itemP->matchLessThan(mdP) == true))
+    else if ((itemP->op == SfopGreaterThanOrEqual) && (itemP->matchLessThan(mdP) != MrNoMatch))
     {
       return false;
     }
-    else if ((itemP->op == SfopLessThanOrEqual) && (itemP->matchGreaterThan(mdP) == true))
+    else if ((itemP->op == SfopLessThanOrEqual) && (itemP->matchGreaterThan(mdP) != MrNoMatch))
     {
       return false;
     }
-    else if ((itemP->op == SfopMatchPattern) && (itemP->matchPattern(mdP) == false))
+    else if ((itemP->op == SfopMatchPattern) && (itemP->matchPattern(mdP) != MrMatch))
     {
       return false;
     }
@@ -2224,49 +2223,57 @@ bool StringFilter::qMatch(ContextElementResponse* cerP)
       break;
 
     case SfopEquals:
-      if (itemP->matchEquals(caP) == false)
+      if (itemP->matchEquals(caP) != MrMatch)
       {
         return false;
       }
       break;
 
     case SfopDiffers:
-      if (itemP->matchEquals(caP) == true)
+      if (itemP->matchEquals(caP) != MrNoMatch)
       {
         return false;
       }
       break;
 
     case SfopGreaterThan:
-      if (itemP->matchGreaterThan(caP) == false)
+      if (itemP->matchGreaterThan(caP) != MrMatch)
       {
         return false;
       }
       break;
 
     case SfopLessThan:
-      if (itemP->matchLessThan(caP) == false)
+      if (itemP->matchLessThan(caP) != MrMatch)
       {
         return false;
       }
       break;
 
     case SfopGreaterThanOrEqual:
-      if (itemP->matchLessThan(caP) == true)
+      if (itemP->matchLessThan(caP) != MrNoMatch)
       {
+        //
+        // Double negation ... always complicated
+        //
+        // If matchLessThan() returns NOT COMPATIBLE: GreaterThanOrEqual is also NOT COMPATIBLE => Not a Match (FALSE)
+        // If matchLessThan() returns DOESN'T EXIST:  GreaterThanOrEqual is also DOESN'T EXIST  => Not a Match (FALSE)
+        // If matchLessThan() returns MATCH:          GreaterThanOrEqual is NOT MATCH           => Not a Match (FALSE)
+        // If matchLessThan() returns NO MATCH:       GreaterThanOrEqual IS A MATCH             => MATCH (TRUE)
+        //
         return false;
       }
       break;
 
     case SfopLessThanOrEqual:
-      if (itemP->matchGreaterThan(caP) == true)
+      if (itemP->matchGreaterThan(caP) != MrNoMatch)
       {
         return false;
       }
       break;
 
     case SfopMatchPattern:
-      if (itemP->matchPattern(caP) == false)
+      if (itemP->matchPattern(caP) != MrMatch)
       {
         return false;
       }
