@@ -30,6 +30,7 @@
 
 #include "ngsi/Duration.h"
 #include "ngsi/Throttling.h"
+#include "apiTypesV2/EntID.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 #include "ngsi/Restriction.h"
@@ -37,31 +38,6 @@
 
 namespace ngsiv2
 {
-/* ****************************************************************************
-*
-* EntID -
-*/
-struct EntID
-{
-  std::string id;
-  std::string idPattern;
-  std::string type;
-  std::string typePattern;
-  std::string toJson();
-
-  EntID(const std::string& idA, const std::string& idPatternA,
-        const std::string& typeA, const std::string& typePatternA):
-    id(idA),
-    idPattern(idPatternA),
-    type(typeA),
-    typePattern(typePatternA)
-  {}
-
-  EntID()
-  {}
-};
-
-
 
 /* ****************************************************************************
 *
