@@ -315,7 +315,7 @@ bool            paranoidV1Indent;
 #define HTTPSCERTFILE_DESC     "certificate key file (for https)"
 #define RUSH_DESC              "rush host (IP:port)"
 #define MULTISERVICE_DESC      "service multi tenancy mode"
-#define ALLOWED_ORIGIN_DESC    "enable Cross-Origin Resouce Sharing with allowed origin. Use '__ALL' for any"
+#define ALLOWED_ORIGIN_DESC    "enable Cross-Origin Resource Sharing with allowed origin. Use '__ALL' for any"
 #define CORS_MAX_AGE_DESC      "maximum time in seconds preflight requests are allowed to be cached. Default: 86400"
 #define HTTP_TMO_DESC          "timeout in milliseconds for forwards and notifications"
 #define DBPS_DESC              "database connection pool size"

@@ -182,7 +182,7 @@ void restReply(ConnectionInfo* ciP, const std::string& _answer)
 
     if (ciP->verb == OPTIONS)
     {
-      MHD_add_response_header(response, "Access-Control-Allow-Headers", "Content-Type, User-Agent, Fiware-Service, Fiware-Servicepath, Ngsiv2-AttrsFormat, Fiware-Correlator, X-Forwarded-For, X-Real-IP, X-Auth-Token");
+      MHD_add_response_header(response, "Access-Control-Allow-Headers", "Content-Type, Fiware-Service, Fiware-Servicepath, Ngsiv2-AttrsFormat, Fiware-Correlator, X-Forwarded-For, X-Real-IP, X-Auth-Token");
 
       char corsMaxAge[STRING_SIZE_FOR_INT];
       snprintf(corsMaxAge, sizeof(corsMaxAge), "%d", restCORSMaxAge);
