@@ -43,6 +43,7 @@ SET (SOURCES
     TriggeredSubscription.cpp
     mongoConnectionPool.cpp
     mongoGetSubscriptions.cpp
+    mongoGetRegistrations.cpp
     connectionOperations.cpp
     mongoSubCache.cpp
     safeMongo.cpp    
@@ -75,6 +76,7 @@ SET (HEADERS
     TriggeredSubscription.h
     mongoConnectionPool.h
     mongoGetSubscriptions.h
+    mongoGetRegistrations.h
     connectionOperations.h
     mongoSubCache.h
     safeMongo.h
