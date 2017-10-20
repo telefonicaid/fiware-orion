@@ -21,11 +21,11 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-CORS any origin
+CORS disabled
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPV4 
+brokerStart CB 0-255 IPV4
 
 --SHELL--
 echo "01. GET Entry Points"
