@@ -169,12 +169,12 @@ exists, the semantics of updateContext UPDATE](walkthrough_apiv1.md#update-conte
 Thus, federation doesn't provide exact mirroring: an updateContext DELETE to
 one context broker will not produce the same effect in the federated context broker.
 
-Note that Orion Context Broker could send an initial notification when the federation subscription is done. In some cases, 
-this initial notification could be unprocessable by the reciever Context Broker. In particular, we have found cases in which 
-the initial notification includes more elements in the service path headers than the legally allowed (see 
-[documentation about service path](service_path.md)), thus generating a `"too many service paths - a maximum of ten 
-service paths is allowed` error. However, note that only this initial notification is ignored, regular notifications after 
-it doesn't have this problems and are correctly procesed by the recerived Context Broker.
+Note that Orion Context Broker could send an initial notification when the federation subscription is done (as described
+[here](walkthrough_apiv2.md#subscriptions). In some cases, this initial notification could be unprocessable by the reciever
+Context Broker. In particular, we have found cases in which the initial notification includes more elements in the service 
+path headers than the legally allowed (see [documentation about service path](service_path.md)), thus generating 
+a `"too many service paths - a maximum of ten service paths is allowed` error. However, note that only this initial 
+notification is ignored, regular notifications after it doesn't have this problems and are correctly procesed by the recerived Context Broker.
 
 This mechanism works similarly with registerContext and
 subscribeContextAvailability. In this case, the URL for the reference
