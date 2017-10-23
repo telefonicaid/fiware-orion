@@ -45,7 +45,6 @@ std::string optionsGetPostOnly
   ParseData*                 parseDataP
 )
 {
-
   ciP->httpHeader.push_back("Access-Control-Allow-Methods");
   ciP->httpHeaderValue.push_back("GET, POST, OPTIONS");
   ciP->httpStatusCode = SccOk;
