@@ -795,16 +795,8 @@ format is the same as the one used by the responses to the
 `GET /v2/entities` operation.
 
 You may wonder why accumulator-server.py is getting this message if you
-don't actually do any update. This is because the Orion Context Broker
-considers the transition from "non existing subscription" to
-"subscribed" as a change.
-
-NGSI specification is not clear on if an initial notification has to
-be sent in this case or not. On one hand, some developers have told us
-that it might be useful to know the initial values before starting to
-receive notifications due to actual changes. On the other hand, an
-application can get the initial status using synchronous queries. Thus, this
-behavior could be changed in a later version. What's your opinion? :)
+don't actually do any update. This is due to the *initial notification*,
+which details are described [here](initial_notification.md).
 
 Now, do the following exercise, based on what you know from [update
 entity](#update-entity): oerform the following four updates in sequence, letting
