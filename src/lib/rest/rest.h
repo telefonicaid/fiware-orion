@@ -71,6 +71,7 @@ extern std::string             rushHost;
 extern unsigned short          rushPort;
 extern bool                    multitenant;
 extern char                    restAllowedOrigin[64];
+extern int                     restCORSMaxAge;
 
 
 
@@ -99,6 +100,7 @@ extern void restInit
    const std::string&  _rushHost,
    unsigned short      _rushPort,
    const char*         _allowedOrigin,
+   int                 _corsMaxAge,
    int                 _mhdTimeoutInSeconds,
    const char*         _httpsKey          = NULL,
    const char*         _httpsCert         = NULL,
