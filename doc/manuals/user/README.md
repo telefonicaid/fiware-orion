@@ -19,7 +19,7 @@
   * [Updating registrations and subscriptions](updating_regs_and_subs.md)
   * [Context broker federation](federation.md)
   * [Forbidden characters](forbidden_characters.md)
-  * [Using regular expressions in payloads](user/regex_in_payload.md)
+  * [Using regular expressions in payloads](regex_in_payload.md)
   * [Initial notification](initial_notification.md)
   * [Duration (for registration and subscriptions)](duration.md)
   * [Using empty types](empty_types.md)
