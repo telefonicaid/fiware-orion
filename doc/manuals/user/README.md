@@ -20,6 +20,7 @@
   * [Context broker federation](federation.md)
   * [Forbidden characters](forbidden_characters.md)
   * [Using regular expressions in payloads](user/regex_in_payload.md)
+  * [Initial notification](user/initial_notification.md)
   * [Duration (for registration and subscriptions)](duration.md)
   * [Using empty types](empty_types.md)
   * [Mixing standard and convenience operations](std_conv_mix.md)
