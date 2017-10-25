@@ -1229,35 +1229,8 @@ bool ContextAttribute::compoundItemExists(const std::string& compoundPath, orion
       //
       char* childName    = (char*) current->childV[cIx]->name.c_str();
       char* compoundName = (char*) compoundPathV[ix].c_str();
-      bool  equal        = true;
 
-      if (strlen(childName) != strlen(compoundName))
-      {
-        equal = false;
-      }
-      else
-      {
-        while (*childName != 0)
-        {
-          if (*childName != *compoundName)
-          {
-            if ((*childName == '.') && (*compoundName == '='))
-            {
-              // accepted
-            }
-            else
-            {
-              equal = false;
-              break;
-            }
-          }
-
-          ++childName;
-          ++compoundName;
-        }
-      }
-
-      if (equal)
+      if (dotEqCompare(childName, compoundName))
       {
         current = current->childV[cIx];
         found   = true;

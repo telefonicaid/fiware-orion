@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Q filter in subscriptions
+Q filter in subscription for GTE of non existing metadata compound item
 
 --SHELL-INIT--
 dbInit CB
@@ -31,17 +31,15 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create subscription for entity E, attribute A with a filter q="t.'a.b'.'c.d'>=20"
-# 02. Create entity E1 with t.a.b.c.d == 20
+# 01. Create subscription for entity E*, attribute 't' with a filter mq=t.'a.b'.'c.d'>=20
+# 02. Create entity E1 with attr t with metadata 'a' having a compound 'b.c.d' == 20
 # 03. Make sure no notification has been sent
-# 04. Create entity E2 with t.'a.b'.'c.d' == 19
-# 05. Make sure no notification has been sent
-# 06. Create entity E3 with t.'a.b'.'c.d' == 20
-# 07. Make sure ONE notification has been sent
+# 04. Create entity E2 with attr t with metadata 'a.b' having a compound 'c.d' == 20
+# 05. Make sure ONE notification has been sent
 #
 
-echo "01. Create subscription for entity E, attribute t with a filter q=t.'a.b'.'c.d'>=20"
-echo "==================================================================================="
+echo "01. Create subscription for entity E*, attribute 't' with a filter mq=t.'a.b'.'c.d'>=20"
+echo "======================================================================================="
 filter="t.'a.b'.'c.d'>=20"
 payload='{
   "subject": {
@@ -52,7 +50,7 @@ payload='{
     ],
     "condition": {
       "attrs": [ "t" ],
-      "expression": { "q": "'$filter'" }
+      "expression": { "mq": "'$filter'" }
     }
   },
   "notification": {
@@ -66,22 +64,20 @@ echo
 echo
 
 
-echo "02. Create entity E1 with t.a.b.c.d == 20"
-echo "========================================="
+echo "02. Create entity E1 with attr t with metadata 'a' having a compound 'b.c.d' == 20"
+echo "=================================================================================="
 payload='{
   "id": "E1",
   "t": {
-    "metadata": {},
-    "type": "StructuredData",
-    "value": {
+    "metadata": {
       "a": {
-        "b": {
-          "c": {
-            "d": 20
-          }
+        "value": {
+          "b.c.d": 20
         }
       }
-    }
+    },
+    "type": "Number",
+    "value": 2
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -97,18 +93,20 @@ echo
 echo
 
 
-echo "04. Create entity E2 with t.'a.b'.'c.d' == 19"
-echo "============================================="
+echo "04. Create entity E2 with attr t with metadata 'a.b' having a compound 'c.d' == 20"
+echo "=================================================================================="
 payload='{
   "id": "E2",
   "t": {
-    "metadata": {},
-    "type": "StructuredData",
-    "value": {
+    "metadata": {
       "a.b": {
-        "c.d": 19
+        "value": {
+          "c.d": 20
+        }
       }
-    }
+    },
+    "type": "Number",
+    "value": 4
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -116,34 +114,7 @@ echo
 echo
 
 
-echo "05. Make sure no notification has been sent"
-echo "==========================================="
-accumulatorDump
-accumulatorReset
-echo
-echo
-
-
-echo "06. Create entity E3 with t.'a.b'.'c.d' == 20"
-echo "============================================="
-payload='{
-  "id": "E3",
-  "t": {
-    "metadata": {},
-    "type": "StructuredData",
-    "value": {
-      "a.b": {
-        "c.d": 20
-      }
-    }
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo "07. Make sure ONE notification has been sent"
+echo "05. Make sure ONE notification has been sent"
 echo "============================================"
 accumulatorDump
 echo
@@ -151,8 +122,8 @@ echo
 
 
 --REGEXPECT--
-01. Create subscription for entity E, attribute t with a filter q=t.'a.b'.'c.d'>=20
-===================================================================================
+01. Create subscription for entity E*, attribute 't' with a filter mq=t.'a.b'.'c.d'>=20
+=======================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -161,8 +132,8 @@ Date: REGEX(.*)
 
 
 
-02. Create entity E1 with t.a.b.c.d == 20
-=========================================
+02. Create entity E1 with attr t with metadata 'a' having a compound 'b.c.d' == 20
+==================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=Thing
@@ -175,8 +146,8 @@ Date: REGEX(.*)
 ===========================================
 
 
-04. Create entity E2 with t.'a.b'.'c.d' == 19
-=============================================
+04. Create entity E2 with attr t with metadata 'a.b' having a compound 'c.d' == 20
+==================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E2?type=Thing
@@ -185,25 +156,11 @@ Date: REGEX(.*)
 
 
 
-05. Make sure no notification has been sent
-===========================================
-
-
-06. Create entity E3 with t.'a.b'.'c.d' == 20
-=============================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-07. Make sure ONE notification has been sent
+05. Make sure ONE notification has been sent
 ============================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 152
+Content-Length: 178
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -214,15 +171,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 {
     "data": [
         {
-            "id": "E3", 
+            "id": "E2", 
             "t": {
-                "metadata": {}, 
-                "type": "StructuredData", 
-                "value": {
+                "metadata": {
                     "a.b": {
-                        "c.d": 20
+                        "type": "StructuredValue", 
+                        "value": {
+                            "c.d": 20
+                        }
                     }
-                }
+                }, 
+                "type": "Number", 
+                "value": 4
             }, 
             "type": "Thing"
         }

@@ -1084,6 +1084,46 @@ void toLowercase(char* s)
 }
 
 
+
+/* ****************************************************************************
+*
+* dotEqCompare - special string comparison function
+*
+* This function compares two strings, but if the first string contains a dot (.)
+* and the second string contains an equal sign (=) in that same position, then
+* this is accepted as equality.
+*
+* This is due to that we have to change '.' for '=' to store in mongo.
+*/
+bool dotEqCompare(char* nameWithDot, char* nameWithEqual)
+{
+  int len1 = strlen(nameWithDot);
+  int len2 = strlen(nameWithEqual);
+
+  if (len1 != len2)
+  {
+    return false;
+  }
+
+  while (*nameWithDot != 0)
+  {
+    if (*nameWithDot != *nameWithEqual)
+    {
+      if ((*nameWithDot != '.') || (*nameWithEqual != '='))
+      {
+        return false;
+      }
+    }
+
+    ++nameWithDot;
+    ++nameWithEqual;
+  }
+
+  return true;
+}
+
+
+
 #ifdef PARANOID_JSON_INDENT
 // -----------------------------------------------------------------------------
 //
