@@ -1,1 +1,2 @@
 - Add: CORS Preflight Requests support for /v2 and /v2/entities, -corsMaxAge switch (#501)
+- Fix: case-sensitive header duplication (e.g. "Content-Type" and "Content-type") in custom notifications (#2893)
