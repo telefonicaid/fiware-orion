@@ -329,7 +329,6 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         continue;
       }
 
-      std::transform(key.begin(), key.end(), key.begin(), ::tolower);
       headers[key] = value;
     }
 
