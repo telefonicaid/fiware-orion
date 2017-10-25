@@ -49,6 +49,8 @@ badVerbAllNotDelete.cpp
 semStateTreat.cpp
 getMetrics.cpp
 deleteMetrics.cpp
+optionsGetOnly.cpp
+optionsGetPostOnly.cpp
 )
 
 SET (HEADERS
@@ -80,6 +82,8 @@ badVerbAllNotDelete.h
 semStateTreat.h
 getMetrics.h
 deleteMetrics.h
+optionsGetOnly.h
+optionsGetPostOnly.h
 )
 
 

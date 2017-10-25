@@ -10,7 +10,7 @@ This is the Jmeter scripts repository for the Orion Context Broker, used for Per
 * have a account in Loadosophia (optional) - (http://loadosophia.org)
 * "nginx" app exists in Balancer VM (only in cluster case)
 * Verify nginx configuration for each scenario (only in cluster case)
-* Verify mongoDB version (3.2.x)
+* Verify mongoDB version (3.4.x)
 	
 #### Steps:
 
