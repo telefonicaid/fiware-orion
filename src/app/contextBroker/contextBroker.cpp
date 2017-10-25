@@ -1188,7 +1188,7 @@ static const char* validLogLevels[] =
 *
 * restServiceV - services for BROKER (ngsi9/10)
 *
-* This is the default service vector, that is used if the broker is started without the -ngsi9 option
+* This is the default service vector, that is used if the broker is started without the -corsOrigin option
 */
 RestService restServiceV[] =
 {
