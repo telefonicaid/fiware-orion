@@ -35,6 +35,7 @@
 #include "common/string.h"
 #include "common/wsStrip.h"
 #include "common/limits.h"
+#include "common/globals.h"
 #include "alarmMgr/alarmMgr.h"
 
 
@@ -1094,6 +1095,20 @@ void toLowercase(char* s)
 * this is accepted as equality.
 *
 * This is due to that we have to change '.' for '=' to store in mongo.
+*
+* Instead of '=' and '.', we use two defines from mongoBackend/dbFieldEncoding.h:
+*
+* #define ESCAPE_1_DECODED  '.'
+* #define ESCAPE_1_ENCODED  '='
+*
+* This way, if we decide to change the encoded representation of '.' in the DB, this function
+* will keep working.
+*
+* Unfortunately, this makes the important line:
+*   if ((*nameWithDot != ESCAPE_1_DECODED) || (*nameWithEqual != ESCAPE_1_ENCODED))
+* pretty hard to understand ...
+*
+* It was a choice between readibility and maintainability, and maintainability won :-)
 */
 bool dotEqCompare(char* nameWithDot, char* nameWithEqual)
 {
@@ -1109,7 +1124,7 @@ bool dotEqCompare(char* nameWithDot, char* nameWithEqual)
   {
     if (*nameWithDot != *nameWithEqual)
     {
-      if ((*nameWithDot != '.') || (*nameWithEqual != '='))
+      if ((*nameWithDot != ESCAPE_1_DECODED) || (*nameWithEqual != ESCAPE_1_ENCODED))
       {
         return false;
       }

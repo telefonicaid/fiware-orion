@@ -98,7 +98,7 @@ typedef enum StringFilterValueType
 
 /* ****************************************************************************
 *
-* MatchResult - 
+* MatchResult - see issue 2995 for an explanation of these four values
 */
 typedef enum MatchResult
 {
