@@ -26,7 +26,7 @@ Case sensitivness in httpCustom notification headers
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart --pretty-print
+accumulatorStart
 
 --SHELL--
 
@@ -52,7 +52,8 @@ payload='{
   "notification": {
     "httpCustom": {
       "url":     "http://127.0.0.1:'${LISTENER_PORT}'/notify",
-      "headers": { "${A3}": "${A4}" }
+      "headers": { "${A3}": "${A4}" },
+      "payload" : "Attributes are: ${A1} - ${A2} - ${A3} - ${A4}\n"
     }
   }
 }'
@@ -68,7 +69,7 @@ payload='{
   "A1": "foo",
   "A2": "bar",
   "A3": "Content-Type",
-  "A4": "application/json"
+  "A4": "text/plain"
 }'
 orionCurl --url /v2/entities?options=keyValues --payload "$payload"
 echo
@@ -107,43 +108,15 @@ Date: REGEX(.*)
 ========================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 299
+Content-Length: 54
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
+Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
-Content-Type: application/json
+Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
-{
-    "data": [
-        {
-            "A1": {
-                "metadata": {},
-                "type": "Text",
-                "value": "foo"
-            },
-            "A2": {
-                "metadata": {},
-                "type": "Text",
-                "value": "bar"
-            },
-            "A3": {
-                "metadata": {},
-                "type": "Text",
-                "value": "Content-Type"
-            },
-            "A4": {
-                "metadata": {},
-                "type": "Text",
-                "value": "application/json"
-            },
-            "id": "E1",
-            "type": "Thing"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
+Attributes are: foo - bar - Content-Type - text/plain
 =======================================
 
 
