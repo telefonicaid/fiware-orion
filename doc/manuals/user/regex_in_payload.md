@@ -1,6 +1,7 @@
 # Using regular expressions in payloads
 
-In some operations (both in NGSIv1 and NGSIv2) regular expressions can be used, as shown below.
+In some operations (both in NGSIv1 and NGSIv2) regular expressions can be used, as shown below. The
+set of supported regular expressions is POSIX Extended (see details [here](https://stackoverflow.com/questions/46888312/regular-expressions-in-orion-context-broker)).
 
 NGSIv1 example:
 
