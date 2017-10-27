@@ -205,6 +205,12 @@
 #include "serviceRoutinesV2/deleteMetrics.h"
 #include "serviceRoutinesV2/optionsGetOnly.h"
 #include "serviceRoutinesV2/optionsGetPostOnly.h"
+#include "serviceRoutinesV2/optionsGetDeleteOnly.h"
+#include "serviceRoutinesV2/optionsAllNotDelete.h"
+#include "serviceRoutinesV2/optionsGetPutOnly.h"
+#include "serviceRoutinesV2/optionsGetPutDeleteOnly.h"
+#include "serviceRoutinesV2/optionsGetDeletePatchOnly.h"
+#include "serviceRoutinesV2/optionsPostOnly.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
@@ -784,12 +790,12 @@ static const char* validLogLevels[] =
 
 
 #define API_V2                                                                                         \
-  { "GET",     EPS,          EPS_COMPS_V2,        ENT_COMPS_WORD,          entryPointsTreat         }, \
-  { "*",       EPS,          EPS_COMPS_V2,        ENT_COMPS_WORD,          badVerbGetOnly           }, \
+  { "GET",    EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          entryPointsTreat         }, \
+  { "*",      EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          badVerbGetOnly           }, \
                                                                                                        \
-  { "GET",     ENT,          ENT_COMPS_V2,        ENT_COMPS_WORD,          getEntities              }, \
-  { "POST",    ENT,          ENT_COMPS_V2,        ENT_COMPS_WORD,          postEntities             }, \
-  { "*",       ENT,          ENT_COMPS_V2,        ENT_COMPS_WORD,          badVerbGetPostOnly       }, \
+  { "GET",    ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          getEntities              }, \
+  { "POST",   ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          postEntities             }, \
+  { "*",      ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          badVerbGetPostOnly       }, \
                                                                                                        \
   { "GET",    IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         getEntity                }, \
   { "DELETE", IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         deleteEntity             }, \
@@ -833,8 +839,18 @@ static const char* validLogLevels[] =
 
 
 #define API_V2_CORS                                                                                    \
-  { "OPTIONS", EPS,          EPS_COMPS_V2,        ENT_COMPS_WORD,          optionsGetOnly           }, \
-  { "OPTIONS", ENT,          ENT_COMPS_V2,        ENT_COMPS_WORD,          optionsGetPostOnly       }
+  { "OPTIONS", EPS,         EPS_COMPS_V2,         ENT_COMPS_WORD,          optionsGetOnly           }, \
+  { "OPTIONS", ENT,         ENT_COMPS_V2,         ENT_COMPS_WORD,          optionsGetPostOnly       }, \
+  { "OPTIONS", IENT,        IENT_COMPS_V2,        IENT_COMPS_WORD,         optionsGetDeleteOnly     }, \
+  { "OPTIONS", IENTOA,      IENTOA_COMPS_V2,      IENTOA_COMPS_WORD,       optionsAllNotDelete      }, \
+  { "OPTIONS", IENTATTRVAL, IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  optionsGetPutOnly        }, \
+  { "OPTIONS", IENTATTR,    IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     optionsGetPutDeleteOnly  }, \
+  { "OPTIONS", ENTT,        ENTT_COMPS_V2,        ENTT_COMPS_WORD,         optionsGetOnly           }, \
+  { "OPTIONS", ETT,         ETT_COMPS_V2,         ETT_COMPS_WORD,          optionsGetOnly           }, \
+  { "OPTIONS", SSR,         SSR_COMPS_V2,         SSR_COMPS_WORD,          optionsGetPostOnly       }, \
+  { "OPTIONS", ISR,         ISR_COMPS_V2,         ISR_COMPS_WORD,          optionsGetDeletePatchOnly}, \
+  { "OPTIONS", BQR,         BQR_COMPS_V2,         BQR_COMPS_WORD,          optionsPostOnly          }, \
+  { "OPTIONS", BUR,         BUR_COMPS_V2,         BUR_COMPS_WORD,          optionsPostOnly          }
 
 
 #define REGISTRY_STANDARD_REQUESTS_V0                                                                    \

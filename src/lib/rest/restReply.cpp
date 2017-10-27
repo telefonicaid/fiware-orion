@@ -162,8 +162,8 @@ void restReply(ConnectionInfo* ciP, const std::string& _answer)
     }
   }
 
-  //Check if CORS is enabled
-  if (strlen(restAllowedOrigin) > 0)
+  //Check if CORS is enabled and the response is not bad verb response
+  if (strlen(restAllowedOrigin) > 0 && ciP->httpStatusCode != SccBadVerb)
   {
     //Only GET method is supported for V1 API
     if (ciP->apiVersion == V2 || (ciP->apiVersion == V1 && ciP->verb == GET))

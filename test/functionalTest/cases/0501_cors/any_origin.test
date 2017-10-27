@@ -40,6 +40,12 @@ orionCurl --url /v2 -X OPTIONS
 echo
 echo
 
+echo "03. Bad Verb Entry Points"
+echo "========================="
+orionCurl --url /v2 -X BADVERB
+echo
+echo
+
 --REGEXPECT--
 01. GET Entry Points
 ====================
@@ -69,6 +75,21 @@ Access-Control-Allow-Methods: GET, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+
+
+03. Bad Verb Entry Points
+=========================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 63
+Content-Type: application/json
+Allow: GET, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed" 
+}
 
 
 --TEARDOWN--

@@ -1,1 +1,1 @@
-- Add: CORS Preflight Requests support for /v2 and /v2/entities, -corsMaxAge switch (#501)
+- Add: CORS Preflight Requests support for all NGSIv2 resources, -corsMaxAge switch (#501)

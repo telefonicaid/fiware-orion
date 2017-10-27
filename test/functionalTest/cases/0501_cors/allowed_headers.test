@@ -40,6 +40,42 @@ orionCurl --url /v2/entities -X OPTIONS
 echo
 echo
 
+echo "03. Allowed headers: GET DELETE OPTIONS"
+echo "======================================="
+orionCurl --url /v2/entities/testEntity -X OPTIONS
+echo
+echo
+
+echo "04. Allowed headers: GET PATCH POST PUT OPTIONS"
+echo "==============================================="
+orionCurl --url /v2/entities/testEntity/attrs -X OPTIONS
+echo
+echo
+
+echo "05. Allowed headers: GET PUT OPTIONS"
+echo "===================================="
+orionCurl --url /v2/entities/testEntity/attrs/testAttr/value -X OPTIONS
+echo
+echo
+
+echo "06. Allowed headers: GET PUT DELETE OPTIONS"
+echo "==========================================="
+orionCurl --url /v2/entities/testEntity/attrs/testAttr -X OPTIONS
+echo
+echo
+
+echo "07. Allowed headers: GET DELETE PATCH OPTIONS"
+echo "============================================="
+orionCurl --url /v2/subscriptions/testSub -X OPTIONS
+echo
+echo
+
+echo "08. Allowed headers: POST OPTIONS"
+echo "================================="
+orionCurl --url /v2/op/query -X OPTIONS
+echo
+echo
+
 --REGEXPECT--
 01. Allowed headers: GET OPTIONS
 ================================
@@ -62,6 +98,84 @@ Access-Control-Max-Age: 86400
 Access-Control-Allow-Headers: REGEX(.*)
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, POST, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Allowed headers: GET DELETE OPTIONS
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: 86400
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, DELETE, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Allowed headers: GET PATCH POST PUT OPTIONS
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: 86400
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, PATCH, POST, PUT, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Allowed headers: GET PUT OPTIONS
+====================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: 86400
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, PUT, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Allowed headers: GET PUT DELETE OPTIONS
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: 86400
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, PUT, DELETE, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Allowed headers: GET DELETE PATCH OPTIONS
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: 86400
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, DELETE, PATCH, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Allowed headers: POST OPTIONS
+=================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: 86400
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: POST, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
