@@ -74,13 +74,9 @@ commands that require root privilege):
         cd fiware-orion
         make
 
-* (Optional but highly recommended) run unit test. Firstly, you have to install MongoDB (as the unit tests rely on mongod running in localhost).
-
-        sudo yum install mongodb-server
-        sudo yum  update pcre            # otherwise, mongod crashes in CentOS 6.3
-        sudo /etc/init.d/mongod start
-        sudo /etc/init.d/mongod status   # to check that mongod is actually running
-        make unit_test
+* (Optional but highly recommended) run unit test. Firstly, you have to install MongoDB as the unit and functional tests
+rely on mongod running in localhost. Check [the official MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/)
+for details. Recommended version is 3.4 (although 3.2 should also work fine).
 
 * Install the binary. You can use INSTALL_DIR to set the installation prefix path (default is /usr), thus the broker is installed in `$INSTALL_DIR/bin` directory.
 
@@ -94,7 +90,7 @@ The Orion Context Broker comes with a suite of functional, valgrind and end-to-e
 
 * Install the required tools:
 
-        sudo yum install python python-flask python-jinja2 curl libxml2 nc mongodb valgrind libxslt bc
+        sudo yum install python python-flask pyOpenSSL curl nc mongodb-org-shell valgrind bc
 
 * Prepare the environment for test harness. Basically, you have to install the `accumulator-server.py` script and in a path under your control, `~/bin` is the recommended one. Alternatively, you can install them in a system directory such as `/usr/bin` but it could collide with an RPM installation, thus it is not recommended. In addition, you have to set several environment variables used by the harness script (see `scripts/testEnv.sh` file).
 

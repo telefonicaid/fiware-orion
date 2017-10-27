@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"
 
 #include "common/MimeType.h"
+#include "common/limits.h"
 #include "ngsi/StatusCode.h"
 #include "metricsMgr/metricsMgr.h"
 
@@ -159,9 +160,13 @@ void restReply(ConnectionInfo* ciP, const std::string& _answer)
     {
       MHD_add_response_header(response, "Content-Type", "text/plain");
     }
+  }
 
-    // At the present version, CORS is supported only for GET requests
-    if ((strlen(restAllowedOrigin) > 0) && (ciP->verb == GET))
+  //Check if CORS is enabled
+  if (strlen(restAllowedOrigin) > 0)
+  {
+    //Only GET method is supported for V1 API
+    if (ciP->apiVersion == V2 || (ciP->apiVersion == V1 && ciP->verb == GET))
     {
       // If any origin is allowed, the header is sent always with "any" as value
       if (strcmp(restAllowedOrigin, "__ALL") == 0)
@@ -173,6 +178,16 @@ void restReply(ConnectionInfo* ciP, const std::string& _answer)
       {
         MHD_add_response_header(response, "Access-Control-Allow-Origin", restAllowedOrigin);
       }
+    }
+
+    if (ciP->verb == OPTIONS)
+    {
+      MHD_add_response_header(response, "Access-Control-Allow-Headers", "Content-Type, Fiware-Service, Fiware-Servicepath, Ngsiv2-AttrsFormat, Fiware-Correlator, X-Forwarded-For, X-Real-IP, X-Auth-Token");
+
+      char corsMaxAge[STRING_SIZE_FOR_INT];
+      snprintf(corsMaxAge, sizeof(corsMaxAge), "%d", restCORSMaxAge);
+
+      MHD_add_response_header(response, "Access-Control-Max-Age", corsMaxAge);
     }
   }
 

@@ -35,6 +35,7 @@ pages:
       - 'Known limitations': 'user/known_limitations.md'
       - 'Forbidden characters': 'user/forbidden_characters.md'
       - 'Using regular expressions in payloads': 'user/regex_in_payload.md'
+      - 'Initial notification': 'user/initial_notification.md'
       - 'Docker': 'user/docker.md'
       - 'NGSIv2 Implementation Notes': 'user/ngsiv2_implementation_notes.md'
       - 'Considerations on NGSIv1 and NGSIv2 coexistence': 'user/v1_v2_coexistence.md'
