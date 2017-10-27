@@ -1,1 +1,1 @@
-- Fix: bug in GTE and LTE operations in query filters, both for GET operations and subscriptions (#2995)
+- Fix: bug in GTE and LTE operations in query filters (q/mq), both for GET operations and subscriptions (#2995)
