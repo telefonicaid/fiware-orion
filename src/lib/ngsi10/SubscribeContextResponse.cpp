@@ -60,6 +60,30 @@ SubscribeContextResponse::SubscribeContextResponse(StatusCode& errorCode)
 
 /* ****************************************************************************
 *
+* SubscribeContextResponse::toJson -
+*/
+std::string SubscribeContextResponse::toJson(void)
+{
+  std::string out     = "";
+
+  out += "{" ;
+
+  if (subscribeError.errorCode.code == SccNone)
+  {
+    out += subscribeResponse.render(false);
+  }
+  else
+  {
+    out += subscribeError.toJson(SubscribeContext, false);
+  }
+
+  out +=  "}";
+
+  return out;
+}
+
+/* ****************************************************************************
+*
 * SubscribeContextResponse::render - 
 */
 std::string SubscribeContextResponse::render(void)
