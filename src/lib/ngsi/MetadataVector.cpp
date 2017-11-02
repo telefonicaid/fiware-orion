@@ -31,6 +31,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/string.h"
 #include "ngsi/MetadataVector.h"
 
 
@@ -280,7 +281,7 @@ Metadata* MetadataVector::lookupByName(const std::string& _name)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    if (vec[ix]->name == _name)
+    if (dotEqCompare((char*) vec[ix]->name.c_str(), (char*) _name.c_str()))
     {
       return vec[ix];
     }

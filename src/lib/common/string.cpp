@@ -35,6 +35,7 @@
 #include "common/string.h"
 #include "common/wsStrip.h"
 #include "common/limits.h"
+#include "common/globals.h"
 #include "alarmMgr/alarmMgr.h"
 
 
@@ -1082,6 +1083,60 @@ void toLowercase(char* s)
     ++s;
   }
 }
+
+
+
+/* ****************************************************************************
+*
+* dotEqCompare - special string comparison function
+*
+* This function compares two strings, but if the first string contains a dot (.)
+* and the second string contains an equal sign (=) in that same position, then
+* this is accepted as equality.
+*
+* This is due to that we have to change '.' for '=' to store in mongo.
+*
+* Instead of '=' and '.', we use two defines from mongoBackend/dbFieldEncoding.h:
+*
+* #define ESCAPE_1_DECODED  '.'
+* #define ESCAPE_1_ENCODED  '='
+*
+* This way, if we decide to change the encoded representation of '.' in the DB, this function
+* will keep working.
+*
+* Unfortunately, this makes the important line:
+*   if ((*nameWithDot != ESCAPE_1_DECODED) || (*nameWithEqual != ESCAPE_1_ENCODED))
+* pretty hard to understand ...
+*
+* It was a choice between readibility and maintainability, and maintainability won :-)
+*/
+bool dotEqCompare(char* nameWithDot, char* nameWithEqual)
+{
+  int len1 = strlen(nameWithDot);
+  int len2 = strlen(nameWithEqual);
+
+  if (len1 != len2)
+  {
+    return false;
+  }
+
+  while (*nameWithDot != 0)
+  {
+    if (*nameWithDot != *nameWithEqual)
+    {
+      if ((*nameWithDot != ESCAPE_1_DECODED) || (*nameWithEqual != ESCAPE_1_ENCODED))
+      {
+        return false;
+      }
+    }
+
+    ++nameWithDot;
+    ++nameWithEqual;
+  }
+
+  return true;
+}
+
 
 
 #ifdef PARANOID_JSON_INDENT
