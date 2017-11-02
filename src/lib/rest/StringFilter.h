@@ -102,10 +102,10 @@ typedef enum StringFilterValueType
 */
 typedef enum MatchResult
 {
-  MrDoesntExist = 0,
-  MrIncompatibleType,
-  MrNoMatch,
-  MrMatch
+  MrDoesntExist = 0,   // E.g. q=a>2 if attribute 'a' doesn't exist in DB
+  MrIncompatibleType,  // E.g. q=a>2 if attribute 'a' exists in the DB but is a boolean (can't be compared with the number 2)
+  MrNoMatch,           // E.g. q=a>2 if attribute 'a' exists in the DB and is a Number but with a value of 1
+  MrMatch              // E.g. q=a>2 if attribute 'a' exists in the DB and is a Number AND with a value of 3 (greater than 2)
 } MatchResult;
 
 
