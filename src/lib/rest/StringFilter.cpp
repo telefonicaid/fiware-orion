@@ -964,12 +964,19 @@ MatchResult StringFilterItem::matchEquals(Metadata* mdP)
       return MrNoMatch;
     }
   }
+  else if (valueType == SfvtNull)
+  {
+    if (mdP->valueType != orion::ValueTypeNone)
+    {
+      LM_TMP(("NO Match for NULL valueType"));
+      return MrNoMatch;
+    }
+  }
   else
   {
     LM_E(("Runtime Error (valueType '%s' is not treated)", valueTypeName()));
     return MrIncompatibleType;
   }
-
 
   return MrMatch;
 }
@@ -1061,6 +1068,14 @@ MatchResult StringFilterItem::matchEquals(orion::CompoundValueNode* cvP)
       return MrNoMatch;
     }
   }
+  else if (valueType == SfvtNull)
+  {
+    if (cvP->valueType != orion::ValueTypeNone)
+    {
+      LM_TMP(("NO Match for NULL valueType"));
+      return MrNoMatch;
+    }
+  }
   else
   {
     LM_E(("Runtime Error (valueType '%s' is not treated)", valueTypeName()));
@@ -1078,6 +1093,7 @@ MatchResult StringFilterItem::matchEquals(orion::CompoundValueNode* cvP)
 */
 MatchResult StringFilterItem::matchEquals(ContextAttribute* caP)
 {
+  LM_TMP(("StringFilterItem::matchEquals of ContextAttribute '%s'", caP->name.c_str()));
   //
   // First of all, are we treating with a compound?
   // If so, check for errors and if all OK, delegate to other function
@@ -1178,6 +1194,14 @@ MatchResult StringFilterItem::matchEquals(ContextAttribute* caP)
   {
     if (caP->stringValue != stringValue)
     {
+      return MrNoMatch;
+    }
+  }
+  else if (valueType == SfvtNull)
+  {
+    if (caP->valueType != orion::ValueTypeNone)
+    {
+      LM_TMP(("NO Match for NULL valueType"));
       return MrNoMatch;
     }
   }
@@ -2224,6 +2248,7 @@ bool StringFilter::qMatch(ContextElementResponse* cerP)
       break;
 
     case SfopEquals:
+      LM_TMP(("Q filter for SfopEquals"));
       if (itemP->matchEquals(caP) != MrMatch)
       {
         return false;
