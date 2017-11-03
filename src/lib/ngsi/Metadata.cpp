@@ -574,7 +574,7 @@ bool Metadata::compoundItemExists(const std::string& compoundPath, orion::Compou
 
     for (unsigned int cIx = 0; cIx < current->childV.size(); ++cIx)
     {
-      if (current->childV[cIx]->name == compoundPathV[ix])
+      if (dotEqCompare((char*) current->childV[cIx]->name.c_str(), (char*) compoundPathV[ix].c_str()) == true)
       {
         current = current->childV[cIx];
         found   = true;
