@@ -1,1 +1,3 @@
 - Add: CORS Preflight Requests support for all NGSIv2 resources, -corsMaxAge switch (#501)
+- Fix: case-sensitive header duplication (e.g. "Content-Type" and "Content-type") in custom notifications (#2893)
+- Fix: bug in GTE and LTE operations in query filters (q/mq), both for GET operations and subscriptions (#2995)

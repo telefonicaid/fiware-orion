@@ -1969,7 +1969,7 @@ static bool processSubscriptions
      * before adding the subscription to the map.
      */
 
-    /* Check 1: timming (not expired and ok from throttling point of view) */
+    /* Check 1: timing (not expired and ok from throttling point of view) */
     if (tSubP->throttling != 1 && tSubP->lastNotification != 1)
     {
       long long  current               = getCurrentTime();

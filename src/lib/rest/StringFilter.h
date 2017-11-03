@@ -98,6 +98,20 @@ typedef enum StringFilterValueType
 
 /* ****************************************************************************
 *
+* MatchResult - see issue 2995 for an explanation of these four values
+*/
+typedef enum MatchResult
+{
+  MrDoesntExist = 0,   // E.g. q=a>2 if attribute 'a' doesn't exist in DB
+  MrIncompatibleType,  // E.g. q=a>2 if attribute 'a' exists in the DB but is a boolean (can't be compared with the number 2)
+  MrNoMatch,           // E.g. q=a>2 if attribute 'a' exists in the DB and is a Number but with a value of 1
+  MrMatch              // E.g. q=a>2 if attribute 'a' exists in the DB and is a Number AND with a value of 3 (greater than 2)
+} MatchResult;
+
+
+
+/* ****************************************************************************
+*
 * StringFilterItem - 
 *
 * FIELDS
@@ -125,12 +139,12 @@ typedef enum StringFilterValueType
 *   rangeParse           parse a range 'xxx..yyy' and check its validity
 *   listParse            parse a list 'a,b,c,d' and check its validity
 *   listItemAdd          add an item to a list - used by listParse
-*   matchEquals          returns true if '== comparison' gives a match
-*   matchPattern         returns true if '~= comparison' gives a match
-*   matchGreaterThan     returns true if '> comparison' gives a match
-*                        Note that '<= comparisons' use !matchGreaterThan()
-*   matchLessThan        returns true if '< comparison' gives a match
-*                        Note that '>= comparisons' use !matchLessThan()
+*   matchEquals          returns MrMatch if '== comparison' gives a match
+*   matchPattern         returns MrMatch if '~= comparison' gives a match
+*   matchGreaterThan     returns MrMatch if '> comparison' gives a match
+*                        Note that '<= comparisons' use matchGreaterThan() != MrNoMatch
+*   matchLessThan        returns MrMatch if '< comparison' gives a match
+*                        Note that '>= comparisons' use matchLessThan() != MrNoMatch
 */
 class StringFilterItem
 {
@@ -173,18 +187,18 @@ public:
   bool                      rangeParse(char* s, std::string* errorStringP);
   bool                      listParse(char* s, std::string* errorStringP);
   bool                      listItemAdd(char* s, std::string* errorStringP);
-  bool                      matchEquals(ContextAttribute* caP);
-  bool                      matchEquals(Metadata* mdP);
-  bool                      matchEquals(orion::CompoundValueNode* cvP);
-  bool                      matchPattern(ContextAttribute* caP);
-  bool                      matchPattern(Metadata* mdP);
-  bool                      matchPattern(orion::CompoundValueNode* cvP);
-  bool                      matchGreaterThan(ContextAttribute* caP);
-  bool                      matchGreaterThan(Metadata* mdP);
-  bool                      matchGreaterThan(orion::CompoundValueNode* cvP);
-  bool                      matchLessThan(ContextAttribute* caP);
-  bool                      matchLessThan(Metadata* mdP);
-  bool                      matchLessThan(orion::CompoundValueNode* cvP);
+  MatchResult               matchEquals(ContextAttribute* caP);
+  MatchResult               matchEquals(Metadata* mdP);
+  MatchResult               matchEquals(orion::CompoundValueNode* cvP);
+  MatchResult               matchPattern(ContextAttribute* caP);
+  MatchResult               matchPattern(Metadata* mdP);
+  MatchResult               matchPattern(orion::CompoundValueNode* cvP);
+  MatchResult               matchGreaterThan(ContextAttribute* caP);
+  MatchResult               matchGreaterThan(Metadata* mdP);
+  MatchResult               matchGreaterThan(orion::CompoundValueNode* cvP);
+  MatchResult               matchLessThan(ContextAttribute* caP);
+  MatchResult               matchLessThan(Metadata* mdP);
+  MatchResult               matchLessThan(orion::CompoundValueNode* cvP);
   bool                      fill(StringFilterItem* sfiP, std::string* errorStringP);
 
 private:
