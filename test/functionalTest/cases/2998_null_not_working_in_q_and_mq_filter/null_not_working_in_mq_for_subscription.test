@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Q filter in subscription with null value of attribute
+MQ filter in subscription with null value of attribute
 
 --SHELL-INIT--
 dbInit CB
@@ -31,17 +31,17 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create subscription for entity E*, attribute 't' with a filter q=t==null
-# 02. Create entity E1 with attr 't' == null
+# 01. Create subscription for entity E*, attribute 't' with a filter mq=t.m==null
+# 02. Create entity E1 with attr 't' having a metadata 'm' == null
 # 03. Make sure ONE notification has been sent
-# 04. Modify E1::t to 4
+# 04. Modify E1::t.m to 4
 # 05. Make sure no notification has been sent
-# 06. Modify E1::t to null
+# 06. Modify E1::t.m to null
 # 07. Make sure ONE notification has been sent
 #
 
-echo "01. Create subscription for entity E*, attribute 't' with a filter q=t==null"
-echo "============================================================================"
+echo "01. Create subscription for entity E*, attribute 't' with a filter mq=t.m==null"
+echo "==============================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -51,7 +51,7 @@ payload='{
     ],
     "condition": {
       "attrs": [ "t" ],
-      "expression": { "q": "t==null" }
+      "expression": { "mq": "t.m==null" }
     }
   },
   "notification": {
@@ -65,12 +65,17 @@ echo
 echo
 
 
-echo "02. Create entity E1 with attr 't' == null"
-echo "=========================================="
+echo "02. Create entity E1 with attr 't' having a metadata 'm' == null"
+echo "================================================================"
 payload='{
   "id": "E1",
   "t": {
-    "value": null
+    "value": "02",
+    "metadata": {
+      "m": {
+        "value": null
+      }
+    }
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -86,14 +91,19 @@ echo
 echo
 
 
-echo "04. Modify E1::t to 4"
-echo "====================="
+echo "04. Modify E1::t.m to 4"
+echo "======================="
 payload='{
   "t": {
-    "value": 4
+    "value": "04",
+    "metadata": {
+      "m": {
+        "value": 4
+      }
+    }
   }
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload"
+orionCurl --url /v2/entities/E1/attrs -X PATCH --payload "$payload"
 echo
 echo
 
@@ -106,11 +116,16 @@ echo
 echo
 
 
-echo "06. Modify E1::t to null"
-echo "========================"
+echo "06. Modify E1::t.m to null"
+echo "=========================="
 payload='{
   "t": {
-    "value": null
+    "value": "06",
+    "metadata": {
+      "m": {
+        "value": null
+      }
+    }
   }
 }'
 orionCurl --url /v2/entities/E1/attrs --payload "$payload"
@@ -127,8 +142,8 @@ echo
 
 
 --REGEXPECT--
-01. Create subscription for entity E*, attribute 't' with a filter q=t==null
-============================================================================
+01. Create subscription for entity E*, attribute 't' with a filter mq=t.m==null
+===============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -137,8 +152,8 @@ Date: REGEX(.*)
 
 
 
-02. Create entity E1 with attr 't' == null
-==========================================
+02. Create entity E1 with attr 't' having a metadata 'm' == null
+================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=Thing
@@ -151,7 +166,7 @@ Date: REGEX(.*)
 ============================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 128
+Content-Length: 160
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -164,9 +179,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "id": "E1",
             "t": {
-                "metadata": {},
-                "type": "None",
-                "value": null
+                "metadata": {
+                    "m": {
+                        "type": "None",
+                        "value": null
+                    }
+                },
+                "type": "Text",
+                "value": "02"
             }, 
             "type": "Thing"
         }
@@ -176,8 +196,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-04. Modify E1::t to 4
-=====================
+04. Modify E1::t.m to 4
+=======================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -189,8 +209,8 @@ Date: REGEX(.*)
 ===========================================
 
 
-06. Modify E1::t to null
-========================
+06. Modify E1::t.m to null
+==========================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -202,7 +222,7 @@ Date: REGEX(.*)
 ============================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 128
+Content-Length: 160
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -215,9 +235,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "id": "E1",
             "t": {
-                "metadata": {},
-                "type": "None",
-                "value": null
+                "metadata": {
+                    "m": {
+                        "type": "None",
+                        "value": null
+                    }
+                },
+                "type": "Text",
+                "value": "06"
             }, 
             "type": "Thing"
         }
