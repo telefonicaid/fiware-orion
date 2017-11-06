@@ -71,7 +71,8 @@ std::string postSubscribeContext
   {
     char  noOfV[STRING_SIZE_FOR_INT];
     snprintf(noOfV, sizeof(noOfV), "%lu", ciP->servicePathV.size());
-    std::string details = std::string("max *one* service-path allowed for subscriptions (") + noOfV + " given";
+    ciP->httpStatusCode           = SccBadRequest;
+    std::string details           = std::string("max *one* service-path allowed for subscriptions (") + noOfV + " given";
 
     alarmMgr.badInput(clientIp, details);
 

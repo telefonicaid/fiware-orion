@@ -56,6 +56,7 @@ extern std::string postSubscriptions
   {
     const size_t  MSG_SIZE        = 96;  // strlen(msg) + enough room for digits
     char          errMsg[MSG_SIZE];
+    ciP->httpStatusCode           = SccBadRequest;
 
     snprintf(errMsg, MSG_SIZE, "max *one* service-path allowed for subscriptions (%lu given)",
              (unsigned long) ciP->servicePathV.size());
