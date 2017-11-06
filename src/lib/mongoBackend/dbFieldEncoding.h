@@ -78,6 +78,15 @@ inline std::string idPart(std::string name)
 
 /* ****************************************************************************
 *
+* ESC decoded/encoded
+*/
+#define ESCAPE_1_DECODED  '.'
+#define ESCAPE_1_ENCODED  '='
+
+
+
+/* ****************************************************************************
+*
 * dbDotEncode -
 */
 inline std::string dbDotEncode(const std::string& _s)
