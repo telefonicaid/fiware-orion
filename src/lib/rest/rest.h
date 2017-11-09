@@ -70,6 +70,7 @@ extern IpVersion               ipVersionUsed;
 extern std::string             rushHost;
 extern unsigned short          rushPort;
 extern bool                    multitenant;
+extern bool                    corsEnabled;
 extern char                    restAllowedOrigin[64];
 extern int                     restCORSMaxAge;
 

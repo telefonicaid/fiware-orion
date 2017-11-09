@@ -58,7 +58,7 @@ std::string badVerbAllNotDelete
   ciP->httpHeader.push_back("Allow");
   std::string headerValue = "GET, PATCH, POST, PUT";
   //OPTIONS verb is only available for V2 API
-  if (strlen(restAllowedOrigin) > 0 && ciP->apiVersion == V2)
+  if ((corsEnabled == true) && (ciP->apiVersion == V2))
   {
     headerValue = headerValue + ", OPTIONS";
   }

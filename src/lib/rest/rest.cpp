@@ -71,6 +71,7 @@ IpVersion                        ipVersionUsed         = IPDUAL;
 bool                             multitenant           = false;
 std::string                      rushHost              = "";
 unsigned short                   rushPort              = NO_PORT;
+bool                             corsEnabled           = false;
 char                             restAllowedOrigin[64];
 int                              restCORSMaxAge;
 static MHD_Daemon*               mhdDaemon             = NULL;
@@ -1781,6 +1782,7 @@ void restInit
   mhdConnectionTimeout = _mhdTimeoutInSeconds;
 
   strncpy(restAllowedOrigin, _allowedOrigin, sizeof(restAllowedOrigin));
+  corsEnabled = (restAllowedOrigin[0] != 0);
 
   strncpy(bindIp, LOCAL_IP_V4, MAX_LEN_IP - 1);
   strncpy(bindIPv6, LOCAL_IP_V6, MAX_LEN_IP - 1);
