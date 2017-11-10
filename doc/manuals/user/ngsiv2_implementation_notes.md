@@ -15,6 +15,7 @@
 * [Notification throttling](#notification-throttling)
 * [Ordering between:$
  different attribute value types](#ordering-between-different-attribute-value-types)
+* [Initial notifications](#initial_notifications)
 * [Deprecated features](#deprecated-features)
 
 This document describes some considerations to take into account
@@ -247,6 +248,15 @@ From lowest to highest:
 4. Object
 5. Array
 6. Boolean
+
+[Top](#top)
+
+## Initial notifications
+
+The NGSIv2 specification describes in section "Subscriptions" the rules that trigger notifications
+corresponding to a given subscription, based on updates to the entities covered by the subscription.
+Apart from that kind of regular notifications, Orion may send also an initial notification at
+subscription creation/update time. Check details in the document about [initial notifications](initial_notification.md)
 
 [Top](#top)
 

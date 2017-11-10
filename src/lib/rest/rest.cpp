@@ -72,6 +72,7 @@ bool                             multitenant           = false;
 std::string                      rushHost              = "";
 unsigned short                   rushPort              = NO_PORT;
 char                             restAllowedOrigin[64];
+int                              restCORSMaxAge;
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
@@ -1755,6 +1756,7 @@ void restInit
   const std::string&  _rushHost,
   unsigned short      _rushPort,
   const char*         _allowedOrigin,
+  int                 _corsMaxAge,
   int                 _mhdTimeoutInSeconds,
   const char*         _httpsKey,
   const char*         _httpsCertificate,
@@ -1774,6 +1776,7 @@ void restInit
   threadPoolSize   = _mhdThreadPoolSize;
   rushHost         = _rushHost;
   rushPort         = _rushPort;
+  restCORSMaxAge   = _corsMaxAge;
 
   mhdConnectionTimeout = _mhdTimeoutInSeconds;
 
