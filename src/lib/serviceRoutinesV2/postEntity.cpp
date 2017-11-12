@@ -46,7 +46,7 @@
 *
 * postEntity -
 *
-* POST /v2/entities/{entityId}
+* POST /v2/entities/{entityId}/attrs
 *
 * Payload In:  Entity
 * Payload Out: None
