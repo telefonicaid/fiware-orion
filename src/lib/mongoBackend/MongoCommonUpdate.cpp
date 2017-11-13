@@ -2276,7 +2276,8 @@ static void updateAttrInNotifyCer
       // If an attribute has no value, then its value is not updated (neither is previousValue).
       // However this may be problematic ... see the issue.
       //
-      // New data on this: the functest "null_not_working_in_q_for_subscription.test" fails with this 'if-clause' (not outdeffed),
+      // New data on this: the functest
+      // "test/functionalTest/cases/2998*/null_not_working_in_q_for_subscription.test" fails with this 'if-clause' (not outdeffed),
       // and removing the 'if' the functest 'only q_and_mq_as_uri_param_for_metadata.test' fails, but it seems like the test is
       // incorrect and this fix is good.
       //

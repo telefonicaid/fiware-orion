@@ -38,6 +38,8 @@ accumulatorStart --pretty-print
 # 05. Make sure no notification has been sent
 # 06. Modify E1::t to null
 # 07. Make sure ONE notification has been sent
+# 08. Modify E1::t to the string 'null'
+# 09. Make sure no notification has been sent
 #
 
 echo "01. Create subscription for entity E*, attribute 't' with a filter q=t==null"
@@ -120,6 +122,26 @@ echo
 
 echo "07. Make sure ONE notification has been sent"
 echo "============================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "08. Modify E1::t to the string 'null'"
+echo "====================================="
+payload='{
+  "t": {
+    "value": "null"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "09. Make sure no notification has been sent"
+echo "==========================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -225,6 +247,19 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
+
+
+08. Modify E1::t to the string 'null'
+=====================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. Make sure no notification has been sent
+===========================================
 
 
 --TEARDOWN--
