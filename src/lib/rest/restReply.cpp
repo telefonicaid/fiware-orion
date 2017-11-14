@@ -170,14 +170,14 @@ void restReply(ConnectionInfo* ciP, const std::string& _answer)
     if ((ciP->apiVersion == V2) || (ciP->apiVersion == V1 && ciP->verb == GET))
     {
       // If any origin is allowed, the header is sent always with "any" as value
-      if (strcmp(restAllowedOrigin, "__ALL") == 0)
+      if (strcmp(corsOrigin, "__ALL") == 0)
       {
         MHD_add_response_header(response, ACCESS_CONTROL_ALLOW_ORIGIN, "*");
       }
       // If a specific origin is allowed, the header is only sent if the origins match
-      else if (strcmp(ciP->httpHeaders.origin.c_str(), restAllowedOrigin) == 0)
+      else if (strcmp(ciP->httpHeaders.origin.c_str(), corsOrigin) == 0)
       {
-        MHD_add_response_header(response, ACCESS_CONTROL_ALLOW_ORIGIN, restAllowedOrigin);
+        MHD_add_response_header(response, ACCESS_CONTROL_ALLOW_ORIGIN, corsOrigin);
       }
     }
 
@@ -185,10 +185,10 @@ void restReply(ConnectionInfo* ciP, const std::string& _answer)
     {
       MHD_add_response_header(response, ACCESS_CONTROL_ALLOW_HEADERS, CORS_ALLOWED_HEADERS);
 
-      char corsMaxAge[STRING_SIZE_FOR_INT];
-      snprintf(corsMaxAge, sizeof(corsMaxAge), "%d", restCORSMaxAge);
+      char maxAge[STRING_SIZE_FOR_INT];
+      snprintf(maxAge, sizeof(maxAge), "%d", corsMaxAge);
 
-      MHD_add_response_header(response, ACCESS_CONTROL_MAX_AGE, corsMaxAge);
+      MHD_add_response_header(response, ACCESS_CONTROL_MAX_AGE, maxAge);
     }
   }
 

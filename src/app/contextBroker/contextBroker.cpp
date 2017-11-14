@@ -260,7 +260,7 @@ bool            https;
 bool            mtenant;
 char            rush[256];
 char            allowedOrigin[64];
-int             corsMaxAge;
+int             maxAge;
 long            dbTimeout;
 long            httpTimeout;
 int             dbPoolSize;
@@ -393,7 +393,7 @@ PaArgument paArgs[] =
   { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
 
   { "-corsOrigin",       allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "",          PaNL,  PaNL,     ALLOWED_ORIGIN_DESC    },
-  { "-corsMaxAge",       &corsMaxAge,       "CORS_MAX_AGE",      PaInt,    PaOpt, 86400,          -1,    86400,    CORS_MAX_AGE_DESC      },
+  { "-corsMaxAge",       &maxAge,           "CORS_MAX_AGE",      PaInt,    PaOpt, 86400,          -1,    86400,    CORS_MAX_AGE_DESC      },
   { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,           0,     UINT_MAX, CPR_FORWARD_LIMIT_DESC },
   { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 60,             0,     3600,     SUB_CACHE_IVAL_DESC    },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
@@ -1890,7 +1890,7 @@ int main(int argC, char* argV[])
              rushHost,
              rushPort,
              allowedOrigin,
-             corsMaxAge,
+             maxAge,
              reqTimeout,
              httpsPrivateServerKey,
              httpsCertificate);
@@ -1911,7 +1911,7 @@ int main(int argC, char* argV[])
              rushHost,
              rushPort,
              allowedOrigin,
-             corsMaxAge,
+             maxAge,
              reqTimeout);
   }
 

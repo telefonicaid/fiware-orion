@@ -71,8 +71,8 @@ extern std::string             rushHost;
 extern unsigned short          rushPort;
 extern bool                    multitenant;
 extern bool                    corsEnabled;
-extern char                    restAllowedOrigin[64];
-extern int                     restCORSMaxAge;
+extern char                    corsOrigin[64];
+extern int                     corsMaxAge;
 
 
 
