@@ -2278,8 +2278,8 @@ static void updateAttrInNotifyCer
       //
       // New data on this: the functest
       // "test/functionalTest/cases/2998*/null_not_working_in_q_for_subscription.test" fails with this 'if-clause' (not outdeffed),
-      // and removing the 'if' the functest 'only q_and_mq_as_uri_param_for_metadata.test' fails, but it seems like the test is
-      // incorrect and this fix is good.
+      // and removing the 'if' the functest 'test/functionalTest/cases/2998*/only q_and_mq_as_uri_param_for_metadata.test' fails,
+      // but it seems like the test is incorrect and this fix is good.
       //
       // This clearly needs to be looked over ...
       //
