@@ -86,15 +86,6 @@
 
 /* ****************************************************************************
 *
-* ESC decoded/encoded
-*/
-#define ESCAPE_1_DECODED  '.'
-#define ESCAPE_1_ENCODED  '='
-
-
-
-/* ****************************************************************************
-*
 * Default Types for entities, attributes and metadata
 */
 #define DEFAULT_ENTITY_TYPE       "Thing"

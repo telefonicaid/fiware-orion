@@ -34,7 +34,7 @@
 #include "common/string.h"
 #include "ngsi/MetadataVector.h"
 
-
+#include "mongoBackend/dbFieldEncoding.h"
 
 /* ****************************************************************************
 *
@@ -281,7 +281,7 @@ Metadata* MetadataVector::lookupByName(const std::string& _name)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    if (dotEqCompare((char*) vec[ix]->name.c_str(), (char*) _name.c_str()))
+    if (dbDotEncode(vec[ix]->name) == _name)
     {
       return vec[ix];
     }
