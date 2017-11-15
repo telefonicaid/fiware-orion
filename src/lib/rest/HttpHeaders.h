@@ -32,6 +32,33 @@
 
 
 
+/* ****************************************************************************
+*
+* HTTP Headers -
+*/
+#define CONTENT_TYPE                 "Content-Type"
+#define FIWARE_SERVICE               "Fiware-Service"
+#define X_AUTH_TOKEN                 "X-Auth-Token"
+#define X_REAL_IP                    "X-Real-IP"
+#define X_FORWARDED_FOR              "X-Forwarded-For"
+#define FIWARE_CORRELATOR            "Fiware-Correlator"
+#define NGSIV2_ATTRSFORMAT           "Ngsiv2-AttrsFormat"
+#define FIWARE_SERVICEPATH           "Fiware-Servicepath"
+#define ACCESS_CONTROL_ALLOW_ORIGIN  "Access-Control-Allow-Origin"
+#define ACCESS_CONTROL_ALLOW_HEADERS "Access-Control-Allow-Headers"
+#define ACCESS_CONTROL_ALLOW_METHODS "Access-Control-Allow-Methods"
+#define ACCESS_CONTROL_MAX_AGE       "Access-Control-Max-Age"
+
+
+
+/* ****************************************************************************
+*
+* CORS Allowed Headers -
+*/
+#define CORS_ALLOWED_HEADERS CONTENT_TYPE", "FIWARE_SERVICE", "FIWARE_SERVICEPATH", "NGSIV2_ATTRSFORMAT", "FIWARE_CORRELATOR", "X_FORWARDED_FOR", " X_REAL_IP", " X_AUTH_TOKEN
+
+
+
 // -----------------------------------------------------------------------------
 //
 // HttpAcceptHeader -
@@ -62,7 +89,7 @@ typedef struct HttpAcceptHeader
 
 /* ****************************************************************************
 *
-* HttpHeaders - 
+* HttpHeaders -
 */
 typedef struct HttpHeaders
 {

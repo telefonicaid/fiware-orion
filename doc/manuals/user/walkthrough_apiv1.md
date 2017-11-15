@@ -3176,7 +3176,7 @@ The response is as follows:
                 ],
                 "entities": [
                     {
-                        "id": "Room1",
+                        "id": "Room2",
                         "isPattern": "false",
                         "type": ""
                     }
@@ -3195,7 +3195,7 @@ The response is as follows:
                 ],
                 "entities": [
                     {
-                        "id": "Room1",
+                        "id": "Room2",
                         "isPattern": "false",
                         "type": ""
                     }

@@ -37,6 +37,7 @@
 #include "ngsi/Request.h"
 #include "ngsi/ContextElement.h"
 
+#include "mongoBackend/dbFieldEncoding.h"
 
 
 /* ****************************************************************************
@@ -152,7 +153,7 @@ ContextAttribute* ContextElement::getAttribute(const std::string& attrName)
   {
     ContextAttribute* caP = contextAttributeVector[ix];
 
-    if (dotEqCompare((char*) attrName.c_str(), (char*) caP->name.c_str()))
+    if (dbDotEncode(caP->name) == attrName)
     {
       return caP;
     }

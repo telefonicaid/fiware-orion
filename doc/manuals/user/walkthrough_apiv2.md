@@ -790,7 +790,7 @@ Fiware-Correlator: 3451e5c2-226d-11e6-aaf0-d48564c29d20
 Orion Context Broker notifies context subscriptions using the POST
 HTTP method (on the URL for the subscription). The payload includes
 a reference to the subscription ID and a `data` vector, with the
-actual data for the entities. Note that the the entity representation
+actual data for the entities. Note that the entity representation
 format is the same as the one used by the responses to the
 `GET /v2/entities` operation.
 
