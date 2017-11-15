@@ -67,12 +67,12 @@ std::string SubscribeError::toJson(RequestType requestType, bool comma)
     }
     out += ",";
     out += JSON_PROP("affectedItems") + "[" + JSON_STR(subscriptionId.toJson(requestType, true)) + "]";
- }
+  }
   else if ((requestType          == SubscribeContext)           &&
            (subscriptionId.get() != "000000000000000000000000") &&
            (subscriptionId.get() != ""))
   {
-	out += ",";
+    out += ",";
     out += JSON_PROP("affectedItems") + "[" + JSON_STR(subscriptionId.toJson(requestType, true)) + "]";
   }
 

@@ -64,9 +64,9 @@ SubscribeContextResponse::SubscribeContextResponse(StatusCode& errorCode)
 */
 std::string SubscribeContextResponse::toJson(void)
 {
-  std::string out     = "";
+  std::string out = "";
 
-  out += "{" ;
+  out += "{";
 
   if (subscribeError.errorCode.code == SccNone)
   {

@@ -30,12 +30,11 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create subscription for E1 with multiple service paths header
-
+# 01. Attempt to create subscription for E1 with multiple service paths header, and see it fail
 #
 
-echo "01. Create subscription for E1 with multiple service paths header"
-echo "=============================================================="
+echo "01. Attempt to create subscription for E1 with multiple service paths header, and see it fail"
+echo "============================================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -59,8 +58,8 @@ echo
 
 
 --REGEXPECT--
-01. Create subscription for E1 with multiple service paths header
-==============================================================
+01. Attempt to create subscription for E1 with multiple service paths header, and see it fail
+=============================================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 86
 Content-Type: application/json
