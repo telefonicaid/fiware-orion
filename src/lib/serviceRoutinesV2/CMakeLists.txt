@@ -51,6 +51,12 @@ getMetrics.cpp
 deleteMetrics.cpp
 optionsGetOnly.cpp
 optionsGetPostOnly.cpp
+optionsGetDeleteOnly
+optionsAllNotDelete
+optionsGetPutOnly
+optionsGetPutDeleteOnly
+optionsGetDeletePatchOnly
+optionsPostOnly
 )
 
 SET (HEADERS
