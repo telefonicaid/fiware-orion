@@ -30,7 +30,7 @@ brokerStart CB 0-255 IPV4 -corsOrigin __ALL -corsMaxAge 600
 --SHELL--
 echo "01. OPTIONS Entry Points"
 echo "========================"
-orionCurl --url /v2 -X OPTIONS
+orionCurl --url /v2 -X OPTIONS --origin TEST_ORIGIN
 echo
 echo
 
@@ -41,6 +41,7 @@ HTTP/1.1 200 OK
 Content-Length: 0
 Access-Control-Max-Age: 600
 Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

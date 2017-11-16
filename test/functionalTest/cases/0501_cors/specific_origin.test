@@ -85,6 +85,7 @@ Date: REGEX(.*)
 ======================================================================================
 HTTP/1.1 200 OK
 Content-Length: 135
+Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: arrakis
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -118,9 +119,6 @@ Date: REGEX(.*)
 ==========================================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: 86400
-Access-Control-Allow-Headers: REGEX(.*)
-Access-Control-Allow-Methods: GET, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -132,6 +130,7 @@ HTTP/1.1 200 OK
 Content-Length: 0
 Access-Control-Max-Age: 86400
 Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: arrakis
 Access-Control-Allow-Methods: GET, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -143,9 +142,6 @@ Date: REGEX(.*)
 ==============================================================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: 86400
-Access-Control-Allow-Headers: REGEX(.*)
-Access-Control-Allow-Methods: GET, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
