@@ -57,9 +57,14 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
     {
       *valueP = (vec[ix]->boolValue == true)? "true" : "false";
     }
-    else if (vec[ix]->valueType == orion::ValueTypeNone)
+    else if (vec[ix]->valueType == orion::ValueTypeNull)
     {
       *valueP = "null";
+    }
+    else if (vec[ix]->valueType == orion::ValueTypeNotGiven)
+    {
+      // FIXME PR: this case is weird... not sure what to return here
+      *valueP = "";
     }
     else if ((vec[ix]->valueType == orion::ValueTypeObject) || (vec[ix]->valueType == orion::ValueTypeVector))
     {

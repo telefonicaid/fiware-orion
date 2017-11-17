@@ -127,7 +127,7 @@ static std::string attribute(const std::string& path, const std::string& value, 
   LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
 
   reqDataP->upcr.attributeP = new ContextAttribute("", "", "");
-  reqDataP->upcr.attributeP->valueType = orion::ValueTypeNone;
+  reqDataP->upcr.attributeP->valueType = orion::ValueTypeNotGiven;
   reqDataP->upcr.ceP->contextAttributeVector.push_back(reqDataP->upcr.attributeP);
 
   return "OK";

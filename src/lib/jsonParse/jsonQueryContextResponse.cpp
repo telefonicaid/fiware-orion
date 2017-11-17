@@ -125,7 +125,7 @@ static std::string attribute(const std::string& path, const std::string& value, 
 {
   LM_T(LmtParse, ("Creating an attribute"));
   parseDataP->qcrs.attributeP = new ContextAttribute();
-  parseDataP->qcrs.attributeP->valueType = orion::ValueTypeNone;
+  parseDataP->qcrs.attributeP->valueType = orion::ValueTypeNotGiven;
   parseDataP->qcrs.cerP->contextElement.contextAttributeVector.push_back(parseDataP->qcrs.attributeP);
   return "OK";
 }

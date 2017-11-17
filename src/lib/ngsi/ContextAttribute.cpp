@@ -73,8 +73,12 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr) const
       bsonAttr.append(ENT_ATTRS_VALUE, boolValue);
       break;
 
-    case ValueTypeNone:
+    case ValueTypeNull:
       bsonAttr.appendNull(ENT_ATTRS_VALUE);
+      break;
+
+    case ValueTypeNotGiven:
+      // FIXME PR: not sure what to do...
       break;
 
     default:
@@ -126,10 +130,14 @@ void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr) const
       // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
       bsonAttr.append(ENT_ATTRS_VALUE, compoundValueP->boolValue);
     }
-    else if (compoundValueP->valueType == ValueTypeNone)
+    else if (compoundValueP->valueType == ValueTypeNull)
     {
       // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
       bsonAttr.appendNull(ENT_ATTRS_VALUE);
+    }
+    else if (compoundValueP->valueType == ValueTypeNotGiven)
+    {
+      // FIXME PR: don't know that to do...
     }
     else
     {
@@ -537,9 +545,13 @@ std::string ContextAttribute::renderAsJsonObject
         }
         break;
 
-      case ValueTypeNone:
+      case ValueTypeNull:
         effectiveValue = "null";
         withoutQuotes  = true;
+        break;
+
+      case ValueTypeNotGiven:
+        // FIXME PR: don't know what to do... this should be rendered...
         break;
 
       default:
@@ -662,9 +674,13 @@ std::string ContextAttribute::render
         }
         break;
 
-      case ValueTypeNone:
+      case ValueTypeNull:
         effectiveValue = "null";
         withoutQuotes  = true;
+        break;
+
+      case ValueTypeNotGiven:
+        // FIXME PR: I don't know what to do... this shouldn't be rendered...
         break;
 
       default:
@@ -767,9 +783,13 @@ std::string ContextAttribute::toJson
     {
       out += (boolValue == true)? "true" : "false";
     }
-    else if (valueType == orion::ValueTypeNone)
+    else if (valueType == orion::ValueTypeNull)
     {
       out += "null";
+    }
+    else if (valueType == orion::ValueTypeNotGiven)
+    {
+      // FIXME PR: don't know what to do, this should be printed...
     }
   }
   else  // Render mode: normalized 
@@ -828,9 +848,13 @@ std::string ContextAttribute::toJson
     {
       out += JSON_VALUE_BOOL("value", boolValue);
     }
-    else if (valueType == orion::ValueTypeNone)
+    else if (valueType == orion::ValueTypeNull)
     {
       out += JSON_STR("value") + ":" + "null";
+    }
+    else if (valueType == orion::ValueTypeNotGiven)
+    {
+      // FIXME PR: I don't know what to do... this should be rendered...
     }
     else
     {
@@ -912,9 +936,13 @@ std::string ContextAttribute::toJsonAsValue
         out = buf;
         break;
 
-      case orion::ValueTypeNone:
+      case orion::ValueTypeNull:
         snprintf(buf, sizeof(buf), "%s", "null");
         out = buf;
+        break;
+
+      case orion::ValueTypeNotGiven:
+        // FIXME PR: I don't know what to do... this should be printed...
         break;
 
       default:
@@ -1075,9 +1103,13 @@ void ContextAttribute::present(const std::string& indent, int ix)
 			indent.c_str(), 
 			(boolValue == false)? "false" : "true"));
     }
-    else if (valueType == orion::ValueTypeNone)
+    else if (valueType == orion::ValueTypeNull)
     {
       LM_T(LmtPresent, ("%s  No Value", indent.c_str()));
+    }
+    else if (valueType == orion::ValueTypeNotGiven)
+    {
+      // FIXME PR: not sure what to do...
     }
     else
     {
@@ -1162,8 +1194,13 @@ std::string ContextAttribute::getValue(void) const
     return boolValue ? "true" : "false";
     break;
 
-  case orion::ValueTypeNone:
+  case orion::ValueTypeNull:
     return "null";
+    break;
+
+  case orion::ValueTypeNotGiven:
+    // FIXME PR: is this correct?
+    return "<not given>";
     break;
 
   default:

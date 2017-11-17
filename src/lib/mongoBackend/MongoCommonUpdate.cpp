@@ -281,8 +281,10 @@ static bool equalMetadata(const BSONObj& md1, const BSONObj& md2)
 */
 static bool attributeValueAbsent(ContextAttribute* caP, ApiVersion apiVersion)
 {
+  // FIXME PR
   /* In v2, absent attribute means "null", which has different semantics */
-  return ((caP->valueType == orion::ValueTypeNone) && (apiVersion == V1));
+  //return ((caP->valueType == orion::ValueTypeNone) && (apiVersion == V1));
+  return (caP->valueType == orion::ValueTypeNotGiven);
 }
 
 
@@ -316,7 +318,8 @@ static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVers
   }
 
   /* No value in the request means that the value stays as it was before, so it is not a change */
-  if (caP->valueType == orion::ValueTypeNone && apiVersion != V2)
+  //if (caP->valueType == orion::ValueTypeNone && apiVersion != V2)
+  if (caP->valueType == orion::ValueTypeNotGiven)
   {
     return false;
   }
@@ -339,7 +342,7 @@ static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVers
     return caP->valueType != orion::ValueTypeString || caP->stringValue != getStringFieldF(attr, ENT_ATTRS_VALUE);
 
   case mongo::jstNULL:
-    return caP->valueType != orion::ValueTypeNone;
+    return caP->valueType != orion::ValueTypeNull;
 
   default:
     LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(attr, ENT_ATTRS_VALUE).type()));
@@ -394,7 +397,7 @@ static void appendMetadata
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->boolValue));
       return;
 
-    case orion::ValueTypeNone:
+    case orion::ValueTypeNull:
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mongo::BSONNULL));
       return;
 
@@ -434,7 +437,7 @@ static void appendMetadata
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mdP->boolValue));
       return;
 
-    case orion::ValueTypeNone:
+    case orion::ValueTypeNull:
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mongo::BSONNULL));
       return;
 
@@ -1843,9 +1846,13 @@ static void setPreviousValueMetadata(ContextElementResponse* notifyCerP)
         mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->numberValue);
         break;
 
-      case orion::ValueTypeNone:
+      case orion::ValueTypeNull:
         mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, "");
-        mdP->valueType = orion::ValueTypeNone;
+        mdP->valueType = orion::ValueTypeNull;
+        break;
+
+      case orion::ValueTypeNotGiven:
+        // FIXME PR: don't know what to do
         break;
 
       default:
@@ -2286,7 +2293,8 @@ static void updateAttrInNotifyCer
 #if 0
       if (targetAttr->valueType != orion::ValueTypeNone)
 #else
-      if (true)
+      //if (true)
+      if (targetAttr->valueType != orion::ValueTypeNotGiven)
 #endif
       {
         /* Store previous value (it may be necessary to render previousValue metadata) */

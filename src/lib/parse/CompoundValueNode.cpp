@@ -466,11 +466,16 @@ void CompoundValueNode::shortShow(const std::string& indent)
                                  (boolValue == true)? "true" : "false"));
     return;
   }
-  else if (valueType == orion::ValueTypeNone)
+  else if (valueType == orion::ValueTypeNull)
   {
     LM_T(LmtCompoundValue,      ("%s%s (null)",
                                  indent.c_str(),
                                  name.c_str()));
+    return;
+  }
+  else if (valueType == orion::ValueTypeNotGiven)
+  {
+    // FIXME PR: I don't know what to do...
     return;
   }
   else if (valueType == orion::ValueTypeNumber)
@@ -540,10 +545,14 @@ void CompoundValueNode::show(const std::string& indent)
                                 indent.c_str(),
                                 numberValue));
   }
-  else if (valueType == orion::ValueTypeNone)
+  else if (valueType == orion::ValueTypeNull)
   {
     LM_T(LmtCompoundValueShow, ("%sNull",
                                 indent.c_str()));
+  }
+  else if (valueType == orion::ValueTypeNotGiven)
+  {
+    // FIXME PR: I don't know what to do...
   }
   else if (childV.size() != 0)
   {
@@ -685,10 +694,14 @@ std::string CompoundValueNode::render(ApiVersion apiVersion, bool noComma, bool 
     LM_T(LmtCompoundValueRender, ("I am a bool (%s)", name.c_str()));
     out = valueTag(key, boolValue? "true" : "false", jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
-  else if (valueType == orion::ValueTypeNone)
+  else if (valueType == orion::ValueTypeNull)
   {
     LM_T(LmtCompoundValueRender, ("I am NULL (%s)", name.c_str()));
     out = valueTag(key, "null", jsonComma, container->valueType == orion::ValueTypeVector, true);
+  }
+  else if (valueType == orion::ValueTypeNotGiven)
+  {
+    // FIXME PR: I don't know what to do
   }
 
 #if 0
@@ -870,7 +883,7 @@ std::string CompoundValueNode::toJson(bool isLastElement, bool comma)
       out = JSON_STR(key) + ":" + JSON_BOOL(boolValue);
     }
   }
-  else if (valueType == orion::ValueTypeNone)
+  else if (valueType == orion::ValueTypeNull)
   {
     LM_T(LmtCompoundValueRender, ("I am NULL (%s)", name.c_str()));
 
@@ -882,6 +895,10 @@ std::string CompoundValueNode::toJson(bool isLastElement, bool comma)
     {
       out = JSON_STR(key) + ":" + "null";
     }
+  }
+  else if (valueType == orion::ValueTypeNotGiven)
+  {
+    // FIXME PR: I don't know what to do...
   }
   else if ((valueType == orion::ValueTypeVector) && (renderName == true))
   {
@@ -1016,9 +1033,15 @@ CompoundValueNode* CompoundValueNode::clone(void)
       me = new CompoundValueNode(container, path, name, boolValue, siblingNo, valueType, level);
       break;
 
-    case orion::ValueTypeNone:
+    case orion::ValueTypeNull:
       me = new CompoundValueNode(container, path, name, stringValue, siblingNo, valueType, level);
-      me->valueType = orion::ValueTypeNone;
+      me->valueType = orion::ValueTypeNull;
+      break;
+
+    case orion::ValueTypeNotGiven:
+      // FIXME PR: does this make any sense?
+      me = new CompoundValueNode(container, path, name, stringValue, siblingNo, valueType, level);
+      me->valueType = orion::ValueTypeNotGiven;
       break;
 
     default:

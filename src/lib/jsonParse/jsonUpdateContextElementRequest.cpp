@@ -61,7 +61,7 @@ static std::string contextAttribute(const std::string& path, const std::string& 
 {
   LM_T(LmtParse, ("Got an attribute"));
   reqData->ucer.attributeP = new ContextAttribute();
-  reqData->ucer.attributeP->valueType = orion::ValueTypeNone;
+  reqData->ucer.attributeP->valueType = orion::ValueTypeNotGiven;
   reqData->ucer.res.contextAttributeVector.push_back(reqData->ucer.attributeP);
   return "OK";
 }

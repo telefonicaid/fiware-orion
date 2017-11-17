@@ -200,7 +200,7 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
     break;
 
   case jstNULL:
-    valueType = orion::ValueTypeNone;
+    valueType = orion::ValueTypeNull;
     break;
 
   case Object:
@@ -247,7 +247,7 @@ std::string Metadata::render(bool comma)
   {
     out += JSON_STR("value") + ":" + xValue;
   }
-  else if (valueType == orion::ValueTypeNone)
+  else if (valueType == orion::ValueTypeNull)
   {
     out += JSON_STR("value") + ":" + xValue;
   }
@@ -274,12 +274,17 @@ std::string Metadata::render(bool comma)
     out += compoundValueP->render(apiVersion, true, true);
     out += endTag(false, isCompoundVector);
   }
+  else if (valueType == orion::ValueTypeNotGiven)
+  {
+    // FIXME PR: don't know what to do here
+    out += JSON_STR("value") + ":" + JSON_STR("not given");
+  }
   else
   {
     out += JSON_STR("value") + ":" + JSON_STR("unknown json type");
   }
 
-  if ((valueType == orion::ValueTypeNumber) || (valueType == orion::ValueTypeBoolean) || (valueType == orion::ValueTypeNone))
+  if ((valueType == orion::ValueTypeNumber) || (valueType == orion::ValueTypeBoolean) || (valueType == orion::ValueTypeNull))
   {
     //
     // Adding newline for the types that do not use the valueTag() function
@@ -454,8 +459,12 @@ std::string Metadata::toStringValue(void) const
     return boolValue ? "true" : "false";
     break;
 
-  case orion::ValueTypeNone:
+  case orion::ValueTypeNull:
     return "null";
+    break;
+
+  case orion::ValueTypeNotGiven:
+    // FIXME PR: I don't know that to do...
     break;
 
   default:
@@ -512,7 +521,7 @@ std::string Metadata::toJson(bool isLastElement)
   {
     out += JSON_VALUE_BOOL("value", boolValue);
   }
-  else if (valueType == orion::ValueTypeNone)
+  else if (valueType == orion::ValueTypeNull)
   {
     out += JSON_STR("value") + ":null";
   }
@@ -523,6 +532,10 @@ std::string Metadata::toJson(bool isLastElement)
       compoundValueP->renderName = true;
       out += compoundValueP->toJson(isLastElement, false);
     }
+  }
+  else if (valueType == orion::ValueTypeNotGiven)
+  {
+    // FIXME PR: don't know what to do...
   }
   else
   {

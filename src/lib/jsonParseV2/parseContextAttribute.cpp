@@ -56,8 +56,9 @@ static std::string parseContextAttributeObject
 {
   int members = 0;
 
-  // valueTypeNone will be overridden inside the 'for' block in case the attribute has an actual value
-  caP->valueType = orion::ValueTypeNone;
+  // FIXME PR: in NGSIv2 no value means implicit null
+  // valueTypeNotGiven will be overridden inside the 'for' block in case the attribute has an actual value
+  caP->valueType = orion::ValueTypeNull;
 
   for (rapidjson::Value::ConstMemberIterator iter = start.MemberBegin(); iter != start.MemberEnd(); ++iter)
   {
@@ -101,7 +102,7 @@ static std::string parseContextAttributeObject
       }
       else if (type == "Null")
       {
-        caP->valueType    = orion::ValueTypeNone;
+        caP->valueType    = orion::ValueTypeNull;
       }
       else if (type == "Array")
       {
@@ -156,10 +157,12 @@ static std::string parseContextAttributeObject
     }
   }
 
-  if (members == 0)
+  // FIXME PR: probably this is redundant, as if I don't enter in the block with member++ above
+  // then the initial value of ValueTypeNotGiven will not be clanged
+  /*if (members == 0)
   {
-    caP->valueType = orion::ValueTypeNone;
-  }
+    caP->valueType = orion::ValueTypeNotGiven;
+  }*/
 
   // Is it a date?
   if ((caP->type == DATE_TYPE) || (caP->type == DATE_TYPE_ALT))
@@ -228,7 +231,7 @@ std::string parseContextAttribute
     else if (type == "Null")
     {
       caP->type        = "";
-      caP->valueType   = orion::ValueTypeNone;
+      caP->valueType   = orion::ValueTypeNull;
     }
     else if (type == "Array")
     {

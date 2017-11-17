@@ -60,7 +60,7 @@ static std::string contextAttribute(const std::string& path, const std::string& 
 {
   LM_T(LmtParse, ("Got an attribute"));
   reqData->acer.attributeP = new ContextAttribute();
-  reqData->acer.attributeP->valueType = orion::ValueTypeNone;
+  reqData->acer.attributeP->valueType = orion::ValueTypeNotGiven;
   reqData->acer.res.contextAttributeVector.push_back(reqData->acer.attributeP);
   return "OK";
 }
