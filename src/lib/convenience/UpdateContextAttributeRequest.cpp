@@ -44,7 +44,6 @@
 UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 {
   compoundValueP = NULL;
-  // FIXME PR: formarely it was ValueTypeNOne
   valueType = orion::ValueTypeNotGiven;
 }
 

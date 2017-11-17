@@ -54,16 +54,12 @@ static std::string parseContextAttributeObject
   bool*                    compoundVector
 )
 {
-  int members = 0;
-
-  // FIXME PR: in NGSIv2 no value means implicit null
+  // This is NGSIv2 parsing and in NGSIv2, no value means implicit null. Note that
   // valueTypeNotGiven will be overridden inside the 'for' block in case the attribute has an actual value
   caP->valueType = orion::ValueTypeNull;
 
   for (rapidjson::Value::ConstMemberIterator iter = start.MemberBegin(); iter != start.MemberEnd(); ++iter)
   {
-    ++members;
-
     std::string name   = iter->name.GetString();
     std::string type   = jsonParseTypeNames[iter->value.GetType()];
 
@@ -156,13 +152,6 @@ static std::string parseContextAttributeObject
       return "unrecognized property for context attribute";
     }
   }
-
-  // FIXME PR: probably this is redundant, as if I don't enter in the block with member++ above
-  // then the initial value of ValueTypeNotGiven will not be clanged
-  /*if (members == 0)
-  {
-    caP->valueType = orion::ValueTypeNotGiven;
-  }*/
 
   // Is it a date?
   if ((caP->type == DATE_TYPE) || (caP->type == DATE_TYPE_ALT))

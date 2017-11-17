@@ -46,7 +46,6 @@ const char* valueTypeName(const orion::ValueType _type)
   case ValueTypeVector:       return "Vector";
   case ValueTypeNull:         return "Null";
   case ValueTypeNotGiven:     return "NotGiven";
-  case ValueTypeUnknown:      return "Unknown";
   }
 
   return "Invalid";
@@ -62,7 +61,6 @@ const char* defaultType(ValueType valueType)
 {
   switch (valueType)
   {
-  case ValueTypeUnknown:    return "Unknown";
   case ValueTypeString:     return DEFAULT_ATTR_STRING_TYPE;
   case ValueTypeNumber:     return DEFAULT_ATTR_NUMBER_TYPE;
   case ValueTypeBoolean:    return DEFAULT_ATTR_BOOL_TYPE;

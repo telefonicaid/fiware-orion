@@ -1852,7 +1852,7 @@ static void setPreviousValueMetadata(ContextElementResponse* notifyCerP)
         break;
 
       case orion::ValueTypeNotGiven:
-        // FIXME PR: don't know what to do
+        LM_E(("Runtime Error (ValueTypeNotGiven value type)"));
         break;
 
       default:
@@ -2278,24 +2278,7 @@ static void updateAttrInNotifyCer
 
     if (caP->name == targetAttr->name)
     {
-      //
-      // FIXME P6: https://github.com/telefonicaid/fiware-orion/issues/2587
-      // If an attribute has no value, then its value is not updated (neither is previousValue).
-      // However this may be problematic ... see the issue.
-      //
-      // New data on this: the functest
-      // "test/functionalTest/cases/2998*/null_not_working_in_q_for_subscription.test" fails with this 'if-clause' (not outdeffed),
-      // and removing the 'if' the functest 'test/functionalTest/cases/1156*/q_and_mq_as_uri_param_for_metadata.test' fails,
-      // but it seems like the test is incorrect and this fix is good.
-      //
-      // This clearly needs to be looked over ...
-      //
-#if 0
-      if (targetAttr->valueType != orion::ValueTypeNone)
-#else
-      //if (true)
       if (targetAttr->valueType != orion::ValueTypeNotGiven)
-#endif
       {
         /* Store previous value (it may be necessary to render previousValue metadata) */
         if (caP->previousValue == NULL)

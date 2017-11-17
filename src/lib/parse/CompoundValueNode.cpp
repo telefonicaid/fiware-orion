@@ -46,7 +46,7 @@ namespace orion
 */
 CompoundValueNode::CompoundValueNode():
   name        ("Unset"),
-  valueType   (orion::ValueTypeUnknown),
+  valueType   (orion::ValueTypeNotGiven),
   numberValue (0.0),
   boolValue   (false),
   container   (NULL),
@@ -475,7 +475,9 @@ void CompoundValueNode::shortShow(const std::string& indent)
   }
   else if (valueType == orion::ValueTypeNotGiven)
   {
-    // FIXME PR: I don't know what to do...
+    LM_T(LmtCompoundValue,      ("%s%s (not given)",
+                                 indent.c_str(),
+                                 name.c_str()));
     return;
   }
   else if (valueType == orion::ValueTypeNumber)
@@ -552,7 +554,8 @@ void CompoundValueNode::show(const std::string& indent)
   }
   else if (valueType == orion::ValueTypeNotGiven)
   {
-    // FIXME PR: I don't know what to do...
+    LM_T(LmtCompoundValueShow, ("%sNotGiven",
+                                indent.c_str()));
   }
   else if (childV.size() != 0)
   {
@@ -701,7 +704,8 @@ std::string CompoundValueNode::render(ApiVersion apiVersion, bool noComma, bool 
   }
   else if (valueType == orion::ValueTypeNotGiven)
   {
-    // FIXME PR: I don't know what to do
+    LM_E(("Runtime Error (ValueTypeNotGiven (%s))", name.c_str()));
+    out = valueTag(key, "not given", jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
 
 #if 0
@@ -898,7 +902,15 @@ std::string CompoundValueNode::toJson(bool isLastElement, bool comma)
   }
   else if (valueType == orion::ValueTypeNotGiven)
   {
-    // FIXME PR: I don't know what to do...
+     LM_E(("Runtime Error (ValueTypeNotGiven (%s))", name.c_str()));
+    if (container->valueType == orion::ValueTypeVector)
+    {
+      out = "null";
+    }
+    else
+    {
+      out = JSON_STR(key) + ":" + "not given";
+    }
   }
   else if ((valueType == orion::ValueTypeVector) && (renderName == true))
   {
@@ -1039,9 +1051,8 @@ CompoundValueNode* CompoundValueNode::clone(void)
       break;
 
     case orion::ValueTypeNotGiven:
-      // FIXME PR: does this make any sense?
-      me = new CompoundValueNode(container, path, name, stringValue, siblingNo, valueType, level);
-      me->valueType = orion::ValueTypeNotGiven;
+      me = NULL;
+      LM_E(("Runtime Error (ValueTypeNotGiven compound node value type)"));
       break;
 
     default:

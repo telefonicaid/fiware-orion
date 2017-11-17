@@ -78,7 +78,7 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr) const
       break;
 
     case ValueTypeNotGiven:
-      // FIXME PR: not sure what to do...
+      LM_E(("Runtime Error (ValueTypeNotGiven in compound value)"));
       break;
 
     default:
@@ -137,7 +137,7 @@ void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr) const
     }
     else if (compoundValueP->valueType == ValueTypeNotGiven)
     {
-      // FIXME PR: don't know that to do...
+      LM_E(("Runtime Error (ValueTypeNotGiven in compound value)"));
     }
     else
     {
@@ -551,7 +551,7 @@ std::string ContextAttribute::renderAsJsonObject
         break;
 
       case ValueTypeNotGiven:
-        // FIXME PR: don't know what to do... this should be rendered...
+        LM_E(("Runtime Error (ValueTypeNotGiven in compound value)"));
         break;
 
       default:
@@ -680,7 +680,7 @@ std::string ContextAttribute::render
         break;
 
       case ValueTypeNotGiven:
-        // FIXME PR: I don't know what to do... this shouldn't be rendered...
+        LM_E(("Runtime Error (ValueTypeNotGiven in compound value)"));
         break;
 
       default:
@@ -789,7 +789,7 @@ std::string ContextAttribute::toJson
     }
     else if (valueType == orion::ValueTypeNotGiven)
     {
-      // FIXME PR: don't know what to do, this should be printed...
+      LM_E(("Runtime Error (ValueTypeNotGiven in compound value)"));
     }
   }
   else  // Render mode: normalized 
@@ -854,7 +854,7 @@ std::string ContextAttribute::toJson
     }
     else if (valueType == orion::ValueTypeNotGiven)
     {
-      // FIXME PR: I don't know what to do... this should be rendered...
+      LM_E(("Runtime Error (ValueTypeNotGiven in compound value)"));
     }
     else
     {
@@ -942,7 +942,7 @@ std::string ContextAttribute::toJsonAsValue
         break;
 
       case orion::ValueTypeNotGiven:
-        // FIXME PR: I don't know what to do... this should be printed...
+        LM_E(("Runtime Error (ValueTypeNotGiven in compound value)"));
         break;
 
       default:
@@ -1109,7 +1109,7 @@ void ContextAttribute::present(const std::string& indent, int ix)
     }
     else if (valueType == orion::ValueTypeNotGiven)
     {
-      // FIXME PR: not sure what to do...
+      LM_E(("Runtime Error (ValueTypeNotGiven in compound value)"));
     }
     else
     {
@@ -1198,8 +1198,7 @@ std::string ContextAttribute::getValue(void) const
     return "null";
     break;
 
-  case orion::ValueTypeNotGiven:
-    // FIXME PR: is this correct?
+  case orion::ValueTypeNotGiven:    
     return "<not given>";
     break;
 

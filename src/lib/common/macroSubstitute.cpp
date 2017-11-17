@@ -63,7 +63,7 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
     }
     else if (vec[ix]->valueType == orion::ValueTypeNotGiven)
     {
-      // FIXME PR: this case is weird... not sure what to return here
+      LM_E(("Runtime Error (ValueTpeNotGiven for attribute)"));
       *valueP = "";
     }
     else if ((vec[ix]->valueType == orion::ValueTypeObject) || (vec[ix]->valueType == orion::ValueTypeVector))

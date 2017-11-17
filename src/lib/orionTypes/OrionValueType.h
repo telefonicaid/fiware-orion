@@ -44,7 +44,6 @@ namespace orion
 */
 typedef enum ValueType
 {
-  ValueTypeUnknown,
   ValueTypeString,
   ValueTypeNumber,
   ValueTypeBoolean,
