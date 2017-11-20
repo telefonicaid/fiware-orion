@@ -25,8 +25,6 @@
 *
 * Author: Fermín Galán Márquez
 */
-
-
 #include <string>
 #include <vector>
 

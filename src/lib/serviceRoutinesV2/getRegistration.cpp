@@ -20,76 +20,43 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Fermín Galán Márquez
+* Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "common/string.h"
+
+#include "rest/ConnectionInfo.h"
+#include "rest/OrionError.h"
+#include "ngsi/ParseData.h"
 #include "apiTypesV2/Registration.h"
-#include "common/JsonHelper.h"
-
-
-
-namespace ngsiv2
-{
-/* ****************************************************************************
-*
-* Registration::~Registration -
-*/
-Registration::~Registration()
-{
-}
+#include "serviceRoutinesV2/getRegistration.h"
+#include "alarmMgr/alarmMgr.h"
 
 
 
 /* ****************************************************************************
 *
-* Registration::toJson -
-*/
-std::string Registration::toJson(void)
-{
-  JsonHelper jh;
-  //TBD
-  return jh.str();
-}
-
-
-
-/* ****************************************************************************
+* getRegistration - 
 *
-* DataProvided::toJson -
+* GET /v2/registration
 *
+* Payload In:  None
+* Payload Out: ngsiv2::Registration in JSON textual format
 */
-std::string DataProvided::toJson(void)
+std::string getRegistration
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
-  JsonHelper jh;
-  // TBD
-  return jh.str();
+  std::string regId  = compV[2];
+  std::string answer = "{ \"Sorry\": \"Not Implemented\" }";
+
+  return answer;
 }
-
-
-
-/* ****************************************************************************
-*
-* Provider::toJson -
-*/
-std::string Provider::toJson()
-{
-  JsonHelper jh;
-  // TBD
-  return jh.str();
-}
-
-
-
-/* ****************************************************************************
-*
-* ForwardingInformation::toJson -
-*/
-std::string ForwardingInformation::toJson()
-{
-  JsonHelper jh;
-  // TBD
-  return jh.str();
-}
-
-}  // end namespace
