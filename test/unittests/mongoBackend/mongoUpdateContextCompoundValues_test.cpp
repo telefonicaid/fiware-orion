@@ -156,14 +156,14 @@ using mongo::BSONNULL;
                                                                          \
     x    = str->add(orion::ValueTypeVector, "x", "");                    \
     str->add(orion::ValueTypeNumber,        "y", 3.0);                   \
-    str->add(orion::ValueTypeNone,          "z", "");                    \
+    str->add(orion::ValueTypeNull,          "z", "");                    \
                                                                          \
     x->add(orion::ValueTypeString,          "",  "x1");                  \
     x->add(orion::ValueTypeString,          "",  "x2");                  \
                                                                          \
     vec->add(orion::ValueTypeString,        "",  "z1");                  \
     vec->add(orion::ValueTypeBoolean,       "",  false);                 \
-    vec->add(orion::ValueTypeNone,          "",  "");                    \
+    vec->add(orion::ValueTypeNull,          "",  "");                    \
                                                                          \
     cv->shortShow("shortShow1: ");                                       \
     cv->show("show1: ");
@@ -178,7 +178,7 @@ using mongo::BSONNULL;
                                                                          \
     x    = cv->add(orion::ValueTypeObject, "x",  "");                    \
     y    = cv->add(orion::ValueTypeVector, "y",  "");                    \
-    cv->add(orion::ValueTypeNone,          "z",  "");                    \
+    cv->add(orion::ValueTypeNull,          "z",  "");                    \
                                                                          \
     x->add(orion::ValueTypeString,         "x1", "a");                   \
     x->add(orion::ValueTypeBoolean,        "x2", true);                  \

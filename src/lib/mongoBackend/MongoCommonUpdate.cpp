@@ -274,39 +274,6 @@ static bool equalMetadata(const BSONObj& md1, const BSONObj& md2)
 
 /* ****************************************************************************
 *
-* attributeValueAbsent -
-*
-* Check that the attribute doesn't have any value
-*
-*/
-static bool attributeValueAbsent(ContextAttribute* caP, ApiVersion apiVersion)
-{
-  // FIXME PR
-  /* In v2, absent attribute means "null", which has different semantics */
-  //return ((caP->valueType == orion::ValueTypeNone) && (apiVersion == V1));
-  return (caP->valueType == orion::ValueTypeNotGiven);
-}
-
-
-
-/* ****************************************************************************
-*
-* attributeTypeAbsent -
-*
-* Check that the attribute doesn't have any type
-*
-*/
-static bool attributeTypeAbsent(ContextAttribute* caP)
-{
-  // FIXME P10: this is a temporal solution while the ContextAttribute class gets
-  // modified to include a "NoneType" or similar. Type "" should be allowed in NGSIv2
-  return caP->type == "";
-}
-
-
-
-/* ****************************************************************************
-*
 * changedAttr -
 */
 static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVersion apiVersion)
@@ -481,7 +448,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
   /* 1. Add value, if present in the request (it could be omitted in the case of updating only metadata).
    *    When the value of the attribute is empty (no update needed/wanted), then the value of the attribute is
    *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
-  if (!attributeValueAbsent(caP, apiVersion))
+  if (caP->valueType != orion::ValueTypeNotGiven)
   {
     caP->valueBson(ab);
   }
@@ -3520,7 +3487,7 @@ static bool contextElementPreconditionsCheck
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
       ContextAttribute* aP = ceP->contextAttributeVector[ix];
-      if (attributeValueAbsent(aP, apiVersion) && attributeTypeAbsent(aP) && (aP->metadataVector.size() == 0))
+      if (aP->valueType == orion::ValueTypeNotGiven && aP->type == "" && (aP->metadataVector.size() == 0))
       {
         ContextAttribute* ca = new ContextAttribute(aP);
 
