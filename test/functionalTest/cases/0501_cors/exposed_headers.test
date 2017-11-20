@@ -21,32 +21,32 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 # CORS functionality is tested with a collection of test files in this directory.
-# This CORS test focuses on the Access-Control-Max-Age header. Other CORS
+# This CORS test focuses on the Access-Control-Expose-Headers header. Other CORS
 # related headers in this test file use REGEX(.*) as value since they are being
 # tested in their respective test files.
 
 --NAME--
-CORS Max Age
+CORS Exposed Headers
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPV4 -corsOrigin __ALL -corsMaxAge 600
+brokerStart CB 0-255 IPV4 -corsOrigin __ALL
 
 --SHELL--
-echo "01. Specific Max Age Value"
-echo "=========================="
+echo "01. CORS Exposed Headers"
+echo "========================"
 orionCurl --url /v2 -X OPTIONS --origin TEST_ORIGIN
 echo
 echo
 
 --REGEXPECT--
-01. Specific Max Age Value
-==========================
+01. CORS Exposed Headers
+========================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: 600
+Access-Control-Max-Age: REGEX([0-9]+)
 Access-Control-Allow-Headers: REGEX(.*)
-Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Expose-Headers: Fiware-Correlator, Fiware-Total-Count, Location 
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

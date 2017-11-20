@@ -27,6 +27,7 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/HttpHeaders.h"
 #include "rest/rest.h"
 #include "serviceRoutinesV2/optionsGetOnly.h"
 
@@ -46,9 +47,9 @@ std::string optionsGetOnly
   ParseData*                 parseDataP
 )
 {
-  if ( (ciP->httpHeaders.origin != "") && ((strcmp(corsOrigin, "__ALL") == 0) || (strcmp(ciP->httpHeaders.origin.c_str(), corsOrigin) == 0)) )
+  if ( isOriginAllowedForCORS(ciP->httpHeaders.origin) )
   {
-    ciP->httpHeader.push_back("Access-Control-Allow-Methods");
+    ciP->httpHeader.push_back(ACCESS_CONTROL_ALLOW_METHODS);
     ciP->httpHeaderValue.push_back("GET, OPTIONS");
   }
   ciP->httpStatusCode = SccOk;

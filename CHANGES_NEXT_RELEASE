@@ -1,6 +1,5 @@
-- Add: CORS Preflight Requests support for all NGSIv2 resources, -corsMaxAge switch (#501)
+- Add: CORS Preflight Requests support for all NGSIv2 resources, -corsMaxAge switch, CORS exposed headers (#501, #3030)
 - Fix: null not working in q/mq filter in subscriptions (#2998)
 - Fix: case-sensitive header duplication (e.g. "Content-Type" and "Content-type") in custom notifications (#2893)
 - Fix: bug in GTE and LTE operations in query filters (q/mq), both for GET operations and subscriptions (#2995)
 - Fix: Wrong "max one service-path allowed for subscriptions" in NGSIv2 subscription operation (#2948)
-- Fix: Add support for accessing response headers when making CORS requests (#3030)

@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-CORS any origin
+CORS Bad Verbs 
 
 --SHELL-INIT--
 dbInit CB

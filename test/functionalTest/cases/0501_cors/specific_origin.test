@@ -20,6 +20,11 @@
 
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
+# CORS functionality is tested with a collection of test files in this directory.
+# This CORS test focuses on the Access-Control-Allow-Origin header. Other CORS
+# related headers in this test file use REGEX(.*) as value since they are being
+# tested in their respective test files.
+
 --NAME--
 CORS specific origin
 
@@ -128,11 +133,11 @@ Date: REGEX(.*)
 ==========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: 86400
+Access-Control-Max-Age: REGEX([0-9]+)
 Access-Control-Allow-Headers: REGEX(.*)
 Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: arrakis
-Access-Control-Allow-Methods: GET, OPTIONS
+Access-Control-Allow-Methods: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

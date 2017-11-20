@@ -124,4 +124,13 @@ extern int servicePathCheck(ConnectionInfo* ciP, const char* servicePath);
 */
 extern void firstServicePath(const char* servicePath, char* servicePath0, int servicePath0Len);
 
+
+
+/* ****************************************************************************
+*
+* isOriginAllowedForCORS - checks the Origin header of the request and returns
+* true if that Origin is allowed to make a CORS request
+*/
+extern bool isOriginAllowedForCORS(std::string requestOrigin);
+
 #endif

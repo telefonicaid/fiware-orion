@@ -182,7 +182,8 @@ void restReply(ConnectionInfo* ciP, const std::string& _answer)
         MHD_add_response_header(response, ACCESS_CONTROL_ALLOW_ORIGIN, corsOrigin);
       }
       // If there is no match, originAllowed flag is set to false
-      else {
+      else
+      {
         originAllowed = false;
       }
 
