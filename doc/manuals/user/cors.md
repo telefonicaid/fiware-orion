@@ -68,8 +68,8 @@ below:
 ## Access-Control-Max-Age
 
 This header should be present in Orion's response for every `OPTIONS` request
-made to `/v2` resources. The user is free to set a value for the maximum time
-(in seconds) a preflight request made to Orion can be cached by the client.
+made to `/v2` resources. The user is free to set a value for the maximum time 
+(in seconds) a client is allowed to cache a preflight request made to Orion.
 
 If `-corsMaxAge` is set to a specific value, `600` in this case, Orion's response
 to a valid `OPTIONS` request would include the header and value below:
