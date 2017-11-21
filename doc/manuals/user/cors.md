@@ -3,12 +3,15 @@
 [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) can be enabled
 for Orion using the `-corsOrigin` switch during startup. `-corsOrigin` takes either
 a string value of a single origin that would be allowed to make CORS requests or
- `__ALL` for allowing any origin to make CORS requests to the context broker.
+ `__ALL` for allowing any origin to make CORS requests to the Context Broker.
 
 The only configurable aspect of Orion's CORS mode besides the allowed origin is
 the maximum time a preflight request can be cached by the client, which is
 handled by the `-corsMaxAge` switch. It takes the maximum amount of cache time in
-seconds and defaults to `86400` (24 hours)if not used.
+seconds and defaults to `86400` (24 hours) if not used.
+
+More information about Orion CLI switches cat be found in 
+[the administration manual](../admin/cli.md).
 
 For example:
 
@@ -22,7 +25,7 @@ maximum preflight cache time
 
         contextBroker -corsOrigin specificdomain.com
 
-CORS is available for all /v2 resources but for /v1 resources, it is only
+CORS is available for all `/v2` resources but for `/v1` resources, it is only
 available for [simple GET requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#Simple_requests).
 
 ## Access-Control-Allow-Origin
@@ -35,11 +38,11 @@ Please note that if the above condition is not true and
 Access-Control-Allow-Origin header is not added to the response, all the CORS
 processes are stopped and no other CORS headers are added to the response.
 
-If -corsOrigin is set to a specific value, `specificdomain.com` in this case:
+If `-corsOrigin` is set to a specific value, `specificdomain.com` in this case:
 
     Access-Control-Allow-Origin: specifidomain.com
 
-If -corsOrigin is set to `__ALL`:
+If `-corsOrigin` is set to `__ALL`:
 
     Access-Control-Allow-Origin: *
 
@@ -48,7 +51,7 @@ If -corsOrigin is set to `__ALL`:
 
 This header should be present in Orion's response for every `OPTIONS` request
 made to `/v2` resources. Each resource has its own set of allowed methods and
-the header value is set by the `options..Only` service routines in
+the header value is set by the `options*Only` service routines in
 [lib/serviceRoutinesV2](https://github.com/telefonicaid/fiware-orion/tree/master/src/lib/serviceRoutinesV2)
 
 ## Access-Control-Allow-Headers
@@ -68,12 +71,12 @@ This header should be present in Orion's response for every `OPTIONS` request
 made to `/v2` resources. The user is free to set a value for the maximum time
 (in seconds) a preflight request made to Orion can be cached by the client.
 
-If -corsMaxAge is set to a specific value, `600` in this case, Orion's response
+If `-corsMaxAge` is set to a specific value, `600` in this case, Orion's response
 to a valid `OPTIONS` request would include the header and value below:
 
     Access-Control-Max-Age: 600
 
-If -corsMaxAge is not set on startup, it will default to '86400' (24 hours) and
+If `-corsMaxAge` is not set on startup, it will default to '86400' (24 hours) and
 Orion's response to a valid `OPTIONS` request would include the header and value
 below:
 
@@ -82,7 +85,7 @@ below:
 ## Access-Control-Expose-Headers
 
 This header should be present in Orion's response for every request made with a
-valid Origin value.Orion allows a specific set of response headers to be
+valid Origin value. Orion allows a specific set of response headers to be
 accessed by the user agent (i.e. browser) in CORS requests and these are defined
 in [lib/rest/HttpHeaders.h](https://github.com/telefonicaid/fiware-orion/blob/master/src/lib/rest/HttpHeaders.h)
 
