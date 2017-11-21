@@ -30,21 +30,21 @@ CORS Max Age
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPV4 -corsOrigin __ALL -corsMaxAge 600
+brokerStart CB 0-255 IPV4 -corsOrigin __ALL
 
 --SHELL--
-echo "01. Specific Max Age Value"
-echo "=========================="
+echo "01. Default Max Age Value"
+echo "========================="
 orionCurl --url /v2 -X OPTIONS --origin TEST_ORIGIN
 echo
 echo
 
 --REGEXPECT--
-01. Specific Max Age Value
-==========================
+01. Default Max Age Value
+=========================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: 600
+Access-Control-Max-Age: 86400
 Access-Control-Allow-Headers: REGEX(.*)
 Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: *
