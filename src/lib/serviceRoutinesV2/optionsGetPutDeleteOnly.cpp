@@ -47,7 +47,7 @@ std::string optionsGetPutDeleteOnly
   ParseData*                 parseDataP
 )
 {
-  if ( isOriginAllowedForCORS(ciP->httpHeaders.origin) )
+  if (isOriginAllowedForCORS(ciP->httpHeaders.origin))
   {
     ciP->httpHeader.push_back(ACCESS_CONTROL_ALLOW_METHODS);
     ciP->httpHeaderValue.push_back("GET, PUT, DELETE, OPTIONS");
