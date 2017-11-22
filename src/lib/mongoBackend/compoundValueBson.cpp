@@ -87,7 +87,7 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, B
     }
     else if (child->valueType == orion::ValueTypeNotGiven)
     {
-      LM_E(("Runtime Error (ValueTypeNotGiven in compound value)"));
+      LM_E(("Runtime Error (value not given in compound value)"));
     }
     else
     {
@@ -141,7 +141,7 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, B
     }
     else if (child->valueType == orion::ValueTypeNotGiven)
     {
-      LM_E(("Runtime Error (ValueTypeNotGiven in compound value)"));
+      LM_E(("Runtime Error (value not given in compound value)"));
     }
     else
     {

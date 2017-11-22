@@ -902,7 +902,7 @@ std::string CompoundValueNode::toJson(bool isLastElement, bool comma)
   }
   else if (valueType == orion::ValueTypeNotGiven)
   {
-     LM_E(("Runtime Error (ValueTypeNotGiven (%s))", name.c_str()));
+    LM_E(("Runtime Error (ValueTypeNotGiven (%s))", name.c_str()));
     if (container->valueType == orion::ValueTypeVector)
     {
       out = "null";

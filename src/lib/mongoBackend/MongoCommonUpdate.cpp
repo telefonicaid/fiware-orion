@@ -1819,7 +1819,7 @@ static void setPreviousValueMetadata(ContextElementResponse* notifyCerP)
         break;
 
       case orion::ValueTypeNotGiven:
-        LM_E(("Runtime Error (ValueTypeNotGiven value type)"));
+        LM_E(("Runtime Error (value not given for metadata)"));
         break;
 
       default:

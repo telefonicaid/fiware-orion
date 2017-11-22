@@ -78,7 +78,7 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr) const
       break;
 
     case ValueTypeNotGiven:
-      LM_E(("Runtime Error (ValueTypeNotGiven in compound value)"));
+      LM_E(("Runtime Error (value not given in compound value)"));
       break;
 
     default:
@@ -137,7 +137,7 @@ void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr) const
     }
     else if (compoundValueP->valueType == ValueTypeNotGiven)
     {
-      LM_E(("Runtime Error (ValueTypeNotGiven in compound value)"));
+      LM_E(("Runtime Error (value not given in compound value)"));
     }
     else
     {
@@ -551,7 +551,7 @@ std::string ContextAttribute::renderAsJsonObject
         break;
 
       case ValueTypeNotGiven:
-        LM_E(("Runtime Error (ValueTypeNotGiven in compound value)"));
+        LM_E(("Runtime Error (value not given in compound value)"));
         break;
 
       default:
@@ -680,7 +680,7 @@ std::string ContextAttribute::render
         break;
 
       case ValueTypeNotGiven:
-        LM_E(("Runtime Error (ValueTypeNotGiven in compound value)"));
+        LM_E(("Runtime Error (value not given in compound value)"));
         break;
 
       default:
@@ -789,7 +789,7 @@ std::string ContextAttribute::toJson
     }
     else if (valueType == orion::ValueTypeNotGiven)
     {
-      LM_E(("Runtime Error (ValueTypeNotGiven in compound value)"));
+      LM_E(("Runtime Error (value not given in compound value)"));
     }
   }
   else  // Render mode: normalized 
@@ -854,7 +854,7 @@ std::string ContextAttribute::toJson
     }
     else if (valueType == orion::ValueTypeNotGiven)
     {
-      LM_E(("Runtime Error (ValueTypeNotGiven in compound value)"));
+      LM_E(("Runtime Error (value not given in compound value)"));
     }
     else
     {
@@ -942,7 +942,7 @@ std::string ContextAttribute::toJsonAsValue
         break;
 
       case orion::ValueTypeNotGiven:
-        LM_E(("Runtime Error (ValueTypeNotGiven in compound value)"));
+        LM_E(("Runtime Error (value not given in compound value)"));
         break;
 
       default:
@@ -1109,7 +1109,7 @@ void ContextAttribute::present(const std::string& indent, int ix)
     }
     else if (valueType == orion::ValueTypeNotGiven)
     {
-      LM_E(("Runtime Error (ValueTypeNotGiven in compound value)"));
+      LM_E(("Runtime Error (value not given in compound value)"));
     }
     else
     {
