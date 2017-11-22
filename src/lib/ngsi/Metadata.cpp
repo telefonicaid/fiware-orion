@@ -67,7 +67,7 @@ Metadata::Metadata()
   name            = "";
   type            = "";
   stringValue     = "";
-  valueType       = orion::ValueTypeString;
+  valueType       = orion::ValueTypeNotGiven;
   typeGiven       = false;
   compoundValueP  = NULL;
 }

@@ -204,11 +204,6 @@ static std::string craMetadata(const std::string& path, const std::string& value
   LM_T(LmtParse, ("Creating a metadata"));
 
   reqDataP->rcr.attributeMetadataP = new Metadata();
-
-  reqDataP->rcr.attributeMetadataP->type  = "";
-  reqDataP->rcr.attributeMetadataP->name  = "";
-  reqDataP->rcr.attributeMetadataP->stringValue = "";
-
   reqDataP->rcr.attributeP->metadataVector.push_back(reqDataP->rcr.attributeMetadataP);
 
   return "OK";
@@ -252,6 +247,7 @@ static std::string craMetadataValue(const std::string& path, const std::string& 
 {
   LM_T(LmtParse, ("Got a metadata value: '%s'", value.c_str()));
   reqDataP->rcr.attributeMetadataP->stringValue = value;
+  reqDataP->rcr.attributeMetadataP->valueType = orion::ValueTypeString;
 
   return "OK";
 }
@@ -267,9 +263,6 @@ static std::string regMetadata(const std::string& path, const std::string& value
   LM_T(LmtParse, ("Creating a reg metadata"));
 
   reqDataP->rcr.registrationMetadataP = new Metadata();
-  reqDataP->rcr.registrationMetadataP->type  = "";
-  reqDataP->rcr.registrationMetadataP->name  = "";
-  reqDataP->rcr.registrationMetadataP->stringValue = "";
   reqDataP->rcr.crP->registrationMetadataVector.push_back(reqDataP->rcr.registrationMetadataP);
 
   return "OK";
@@ -313,7 +306,7 @@ static std::string regMetadataValue(const std::string& path, const std::string& 
 {
   LM_T(LmtParse, ("Got a reg metadata value: '%s'", value.c_str()));
   reqDataP->rcr.registrationMetadataP->stringValue = value;
-
+  reqDataP->rcr.registrationMetadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 

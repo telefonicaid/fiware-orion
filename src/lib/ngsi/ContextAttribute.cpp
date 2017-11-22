@@ -170,7 +170,7 @@ ContextAttribute::ContextAttribute()
   type                  = "";
   stringValue           = "";
   numberValue           = 0;
-  valueType             = orion::ValueTypeString;
+  valueType             = orion::ValueTypeNotGiven;
   compoundValueP        = NULL;
   found                 = false;
   skip                  = false;
