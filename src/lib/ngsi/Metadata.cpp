@@ -215,7 +215,7 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 
   default:
     valueType = orion::ValueTypeNotGiven;
-    LM_E(("Runtime Error (unknown metadata value value type in DB: %d, using ValueTypeNotGiven)", getFieldF(mdB, ENT_ATTRS_MD_VALUE).type()));
+    LM_E(("Runtime Error (unknown metadata value type in DB: %d, using ValueTypeNotGiven)", getFieldF(mdB, ENT_ATTRS_MD_VALUE).type()));
     break;
   }
 }
@@ -534,7 +534,7 @@ std::string Metadata::toJson(bool isLastElement)
   }
   else if (valueType == orion::ValueTypeNotGiven)
   {
-    LM_E(("Runtime Error (ValueTypeNotGiven for metadata %s)", name.c_str()));
+    LM_E(("Runtime Error (value not given for metadata %s)", name.c_str()));
     out += JSON_VALUE("value", stringValue);
   }
   else

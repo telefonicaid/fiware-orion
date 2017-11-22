@@ -704,7 +704,7 @@ std::string CompoundValueNode::render(ApiVersion apiVersion, bool noComma, bool 
   }
   else if (valueType == orion::ValueTypeNotGiven)
   {
-    LM_E(("Runtime Error (ValueTypeNotGiven (%s))", name.c_str()));
+    LM_E(("Runtime Error (value not given (%s))", name.c_str()));
     out = valueTag(key, "not given", jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
 
@@ -902,7 +902,7 @@ std::string CompoundValueNode::toJson(bool isLastElement, bool comma)
   }
   else if (valueType == orion::ValueTypeNotGiven)
   {
-    LM_E(("Runtime Error (ValueTypeNotGiven (%s))", name.c_str()));
+    LM_E(("Runtime Error (value not given (%s))", name.c_str()));
     if (container->valueType == orion::ValueTypeVector)
     {
       out = "null";
@@ -1052,7 +1052,7 @@ CompoundValueNode* CompoundValueNode::clone(void)
 
     case orion::ValueTypeNotGiven:
       me = NULL;
-      LM_E(("Runtime Error (ValueTypeNotGiven compound node value type)"));
+      LM_E(("Runtime Error (value not given in compound node value)"));
       break;
 
     default:
