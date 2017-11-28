@@ -169,7 +169,7 @@ Orion Context Broker is licensed under Affero General Public License (GPL) versi
 
 ## Support
 
-Ask your thorough programmming questions using [stackoverflow](http://stackoverflow.com/questions/ask)
+Ask your thorough programming questions using [stackoverflow](http://stackoverflow.com/questions/ask)
 and your general questions on [FIWARE Q&A](https://ask.fiware.org). In both cases please use the tag `fiware-orion`
 
 [Top](#top)
