@@ -31,6 +31,34 @@
 
 namespace ngsiv2
 {
+
+
+/* ****************************************************************************
+*
+* ForwardingInformation::ForwardingInformation -
+*/
+ForwardingInformation::ForwardingInformation():
+  lastFailure(0),
+  lastSuccess(0),
+  timesSent(0),
+  lastForwarding(0)
+{
+}
+
+
+
+/* ****************************************************************************
+*
+* Registration::Registration -
+*/
+Registration::Registration():
+  descriptionProvided(false),
+  expires(-1)
+{
+}
+
+
+
 /* ****************************************************************************
 *
 * Registration::~Registration -
@@ -48,7 +76,24 @@ Registration::~Registration()
 std::string Registration::toJson(void)
 {
   JsonHelper jh;
-  //TBD
+
+  jh.addString("id", id);
+
+  if (description != "")
+  {
+    jh.addString("description", description);
+  }
+
+  if (expires != -1)
+  {
+    jh.addDate("expires", expires);
+  }
+
+  jh.addRaw("dataProvided", dataProvided.toJson());
+  jh.addRaw("provider", provider.toJson());
+  jh.addString("status", (status != "")? status : "active");
+  jh.addRaw("forwardingInformation", forwardingInformation.toJson());
+
   return jh.str();
 }
 
@@ -57,12 +102,14 @@ std::string Registration::toJson(void)
 /* ****************************************************************************
 *
 * DataProvided::toJson -
-*
 */
 std::string DataProvided::toJson(void)
 {
   JsonHelper jh;
-  // TBD
+
+  jh.addRaw("entities", vectorToJson(entities));
+  jh.addRaw("attrs", vectorToJson(attributes));
+
   return jh.str();
 }
 
@@ -72,10 +119,15 @@ std::string DataProvided::toJson(void)
 *
 * Provider::toJson -
 */
-std::string Provider::toJson()
+std::string Provider::toJson(void)
 {
-  JsonHelper jh;
-  // TBD
+  JsonHelper   jh;
+  std::string  urlAsJson = "{\"url\": \"" + url + "\"}";
+
+  jh.addRaw("http", urlAsJson);
+  jh.addString("supportedForwardingMode", "all");
+  jh.addBool("legacyForwarding", true);
+
   return jh.str();
 }
 
@@ -87,9 +139,26 @@ std::string Provider::toJson()
 */
 std::string ForwardingInformation::toJson()
 {
-  JsonHelper jh;
-  // TBD
+  JsonHelper  jh;
+
+  jh.addInt("timesSent", timesSent);
+
+  if (lastSuccess > 0)
+  {
+    jh.addDate("lastSuccess", lastSuccess);
+  }
+
+  if (lastFailure > 0)
+  {
+    jh.addDate("lastFailure", lastFailure);
+  }
+
+  if (lastForwarding > 0)
+  {
+    jh.addDate("lastForwarding", lastForwarding);
+  }
+
   return jh.str();
 }
 
-}  // end namespace
+}

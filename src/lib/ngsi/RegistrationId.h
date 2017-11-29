@@ -39,6 +39,9 @@ typedef struct RegistrationId
 {
   std::string   string;
 
+  RegistrationId();
+  RegistrationId(const std::string& regId);
+
   void          set(const std::string& value);
   std::string   get(void) const;
   bool          isEmpty(void);

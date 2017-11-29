@@ -43,7 +43,7 @@ SET (SOURCES
     TriggeredSubscription.cpp
     mongoConnectionPool.cpp
     mongoGetSubscriptions.cpp
-    mongoGetRegistrations.cpp
+    mongoRegistrationGet.cpp
     connectionOperations.cpp
     mongoSubCache.cpp
     safeMongo.cpp    

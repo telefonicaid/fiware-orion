@@ -33,6 +33,7 @@
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Registration.h"
+#include "mongoBackend/mongoRegistrationGet.h"
 #include "serviceRoutinesV2/getRegistration.h"
 #include "alarmMgr/alarmMgr.h"
 
@@ -42,7 +43,7 @@
 *
 * getRegistration - 
 *
-* GET /v2/registration
+* GET /v2/registration/<reg id>
 *
 * Payload In:  None
 * Payload Out: ngsiv2::Registration in JSON textual format
@@ -55,8 +56,16 @@ std::string getRegistration
   ParseData*                 parseDataP
 )
 {
-  std::string regId  = compV[2];
-  std::string answer = "{ \"Sorry\": \"Not Implemented\" }";
+  std::string           regId  = compV[2];
+  ngsiv2::Registration  registration;
+  OrionError            oe;
 
-  return answer;
+  TIMED_MONGO(mongoRegistrationGet(&registration, regId, ciP->tenant, ciP->servicePathV[0], &oe));
+
+  if (oe.code != SccOk)
+  {
+    return oe.toJson();
+  }
+
+  return registration.toJson();
 }

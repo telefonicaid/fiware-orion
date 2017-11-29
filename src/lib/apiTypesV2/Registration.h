@@ -30,58 +30,64 @@
 
 #include "apiTypesV2/EntID.h"
 
-/*
 
+#if 0
+------------------------------------------------------------------------------------
   FIXME: Reference registration document (delete once this get implemented)
 
-      {
-            "id": "abcdefg",
-            "description": "Example Context Source",
-            "dataProvided": {
-              "entities": [
-                {
-                  "id": "Bcn_Welt",
-                  "type": "Room"
-                }
-              ],
-              "attrs": [
-                "temperature"
-              ]
-            },
-            "provider": {
-              "http": {
-                "url": "http://contextsource.example.org"
-              },
-              "supportedForwardingMode": "all",
-              "legacyForwarding": true
-            },
-            "expires": "2017-10-31T12:00:00",
-            "status": "failed",
-            "forwardingInformation": {
-              "timesSent": 12,
-              "lastForwarding": "2017-10-06T16:00:00.00Z",
-              "lastFailure": "2017-10-06T16:00:00.00Z",
-              "lastSuccess": "2017-10-05T18:25:00.00Z",
-            }
-}
-
-*/
+  {
+    "id": "abcdefg",
+    "description": "Example Context Source",
+    "dataProvided": {
+      "entities": [
+        {
+          "id": "Bcn_Welt",
+          "type": "Room"
+        }
+      ],
+      "attrs": [
+        "temperature"
+      ]
+    },
+    "provider": {
+      "http": {
+        "url": "http://contextsource.example.org"
+      },
+      "supportedForwardingMode": "all",
+      "legacyForwarding": true
+    },
+    "expires": "2017-10-31T12:00:00",
+    "status": "failed",
+    "forwardingInformation": {
+      "timesSent": 12,
+      "lastForwarding": "2017-10-06T16:00:00.00Z",
+      "lastFailure": "2017-10-06T16:00:00.00Z",
+      "lastSuccess": "2017-10-05T18:25:00.00Z",
+    }
+  }
+------------------------------------------------------------------------------------
+#endif
 
 
 namespace ngsiv2
 {
+
 /* ****************************************************************************
 *
 * ForwardingInformation -
 */
-struct ForwardingInformation
+class ForwardingInformation
 {
-  int          lastFailure;  // FIXME: in Subscrition.h we use int for this, not long long as in lastNotification. why?
-  int          lastSuccess;  // FIXME: in Subscrition.h we use int for this, not long long as in lastNotification. why?
+public:
+  long long    lastFailure;
+  long long    lastSuccess;
   long long    timesSent;
-  long long    lastNotification;
+  long long    lastForwarding;
+
+  ForwardingInformation();
   std::string  toJson();
 };
+
 
 
 /* ****************************************************************************
@@ -91,6 +97,7 @@ struct ForwardingInformation
 struct Provider
 {
   std::string  url;
+
   std::string  toJson();
 };
 
@@ -104,6 +111,7 @@ struct DataProvided
 {
   std::vector<EntID>        entities;
   std::vector<std::string>  attributes;
+
   std::string               toJson();
 };
 
@@ -116,6 +124,7 @@ struct DataProvided
 struct Registration
 {
   std::string            id;
+  std::string            servicePath;
   std::string            description;
   bool                   descriptionProvided;
   DataProvided           dataProvided;
@@ -123,10 +132,12 @@ struct Registration
   std::string            status;
   Provider               provider;
   ForwardingInformation  forwardingInformation;
-  std::string            toJson();
 
+  Registration();
   ~Registration();
+  std::string            toJson();
 };
-}  // end namespace
+
+}
 
 #endif  // SRC_LIB_APITYPESV2_REGISTRATION_H_

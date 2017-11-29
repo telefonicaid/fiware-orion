@@ -31,7 +31,7 @@ brokerStart CB
 
 #
 # At the moment of implementing the functionality of issue #3008, there was no way to create
-# registrations using APIv2 (Nov/Dec 2017), so, to test this new functionality of quering registrations
+# registrations using APIv2 (Nov/Dec 2017), so, to test this new functionality of querying registrations
 # in APIv2, the registrations had to be created using APIv1.
 # Now, one might say, so, as soon as APIv2 implements creation of registrations, this test should be changed to
 # use APIv2 registration creation instead.
@@ -49,9 +49,13 @@ payload='{
   {
     "entities": [
       {
-         "type": "T1",
+         "id": "E1",
          "isPattern": "false",
-         "id": "E1"
+         "type": "T1"
+      },
+      {
+         "id": "E2",
+         "type": "T2"
       }
     ],
     "attributes": [
@@ -59,9 +63,14 @@ payload='{
         "name": "A1",
         "type": "string",
         "isDomain": "false"
+      },
+      {
+        "name": "A2",
+        "type": "string",
+        "isDomain": "false"
       }
     ],
-    "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
+    "providingApplication": "http://localhost:'${CP1_PORT}'/v2"
     }
  ],
  "duration": "P1M"
@@ -96,6 +105,42 @@ Date: REGEX(.*)
 
 02. GET the registration using APIv2
 ====================================
+HTTP/1.1 200 OK
+Content-Length: 301
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "dataProvided": {
+        "attrs": [
+            "A1",
+            "A2"
+        ],
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            },
+            {
+                "id": "E2",
+                "type": "T2"
+            }
+        ]
+    },
+    "forwardingInformation": {
+        "timesSent": 0
+    },
+    "id": "REGEX([0-9a-f\-]{24})",
+    "provider": {
+        "http": {
+            "url": "http://localhost:9801/v2"
+        },
+        "legacyForwarding": true,
+        "supportedForwardingMode": "all"
+    },
+    "status": "active"
+}
 
 
 --TEARDOWN--

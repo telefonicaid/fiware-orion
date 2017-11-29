@@ -515,7 +515,7 @@ static const char* validLogLevels[] =
 #define BUR_COMPS_WORD          ""
 
 //
-// /v2 registry API
+// /v2 registration API
 //
 #define REG                     RegistrationRequest
 #define REG_COMPS_V2            3, { "v2", "registrations", "*" }

@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_MONGOBACKEND_MONGOREGISTRATIONGET_H_
+#define SRC_LIB_MONGOBACKEND_MONGOREGISTRATIONGET_H_
+
 /*
 *
 * Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
@@ -20,30 +23,28 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Fermín Galán Máquez
+* Author: Ken Zangelin
 */
-
-#include "mongoBackend/mongoGetRegistrations.h"
-#include "apiTypesV2/Registration.h"
-
 #include <string>
 #include <vector>
-#include <map>
+
+#include "rest/HttpStatusCode.h"
+#include "rest/OrionError.h"
+#include "apiTypesV2/Registration.h"
+
+
 
 /* ****************************************************************************
 *
-* mongoGetSubscription -
+* mongoRegistrationGet - 
 */
-void mongoGetSubscription
+extern void mongoRegistrationGet
 (
-  ngsiv2::Registration*                reg,
-  OrionError*                          oe,
-  const std::string&                   idSub,
-  std::map<std::string, std::string>&  uriParam,
-  const std::string&                   tenant
-)
-{
-  // TBD
-  return;
-}
+  ngsiv2::Registration*  regP,
+  const std::string&     regId,
+  const std::string&     tenant,
+  const std::string&     servicePathV,
+  OrionError*            oeP
+);
 
+#endif  // SRC_LIB_MONGOBACKEND_MONGOREGISTRATIONGET_H_
