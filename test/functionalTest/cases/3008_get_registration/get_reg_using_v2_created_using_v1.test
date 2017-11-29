@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET registration simple test
+GET registration using APIv2, created using V1
 
 --SHELL-INIT--
 dbInit CB
