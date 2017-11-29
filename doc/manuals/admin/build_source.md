@@ -133,7 +133,7 @@ You can generate the RPM for the source code (optional):
 
 * The generated RPMs are placed in directory `~/rpmbuild/RPMS/x86_64`.
 
-## Building MongoDB driver with SASL and SSL support
+### Building MongoDB driver with SASL and SSL support
 
 The procedure is as follows:
 
