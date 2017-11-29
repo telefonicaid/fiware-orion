@@ -70,8 +70,9 @@ extern IpVersion               ipVersionUsed;
 extern std::string             rushHost;
 extern unsigned short          rushPort;
 extern bool                    multitenant;
-extern char                    restAllowedOrigin[64];
-extern int                     restCORSMaxAge;
+extern bool                    corsEnabled;
+extern char                    corsOrigin[64];
+extern int                     corsMaxAge;
 
 
 
@@ -122,5 +123,14 @@ extern int servicePathCheck(ConnectionInfo* ciP, const char* servicePath);
 * firstServicePath - extract first component of service-path
 */
 extern void firstServicePath(const char* servicePath, char* servicePath0, int servicePath0Len);
+
+
+
+/* ****************************************************************************
+*
+* isOriginAllowedForCORS - checks the Origin header of the request and returns
+* true if that Origin is allowed to make a CORS request
+*/
+extern bool isOriginAllowedForCORS(const std::string& requestOrigin);
 
 #endif

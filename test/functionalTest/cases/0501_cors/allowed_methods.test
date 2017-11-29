@@ -1,0 +1,279 @@
+# Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+# CORS functionality is tested with a collection of test files in this directory.
+# This CORS test focuses on the Access-Control-Allow-Methods header. Other CORS 
+# related headers in this test file use REGEX(.*) as value since they are being 
+# tested in their respective test files.
+
+--NAME--
+CORS allowed methods
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255 IPV4 -corsOrigin __ALL
+
+--SHELL--
+echo "01. Entry Points - Allowed methods: GET OPTIONS"
+echo "==============================================="
+orionCurl --url /v2 -X OPTIONS --origin TEST_ORIGIN
+echo
+echo
+
+echo "02. All Entities - Allowed methods: GET POST OPTIONS"
+echo "===================================================="
+orionCurl --url /v2/entities -X OPTIONS --origin TEST_ORIGIN
+echo
+echo
+
+echo "03. Entity - Allowed methods: GET DELETE OPTIONS"
+echo "================================================"
+orionCurl --url /v2/entities/testEntity -X OPTIONS --origin TEST_ORIGIN
+echo
+echo
+
+echo "04. Entity Attributes - Allowed methods: GET PATCH POST PUT OPTIONS"
+echo "==================================================================="
+orionCurl --url /v2/entities/testEntity/attrs -X OPTIONS --origin TEST_ORIGIN
+echo
+echo
+
+echo "05. Entity Attribute Value - Allowed methods: GET PUT OPTIONS"
+echo "============================================================="
+orionCurl --url /v2/entities/testEntity/attrs/testAttr/value -X OPTIONS --origin TEST_ORIGIN
+echo
+echo
+
+echo "06. Entity Attribute - Allowed methods: GET PUT DELETE OPTIONS"
+echo "=============================================================="
+orionCurl --url /v2/entities/testEntity/attrs/testAttr -X OPTIONS --origin TEST_ORIGIN
+echo
+echo
+
+echo "07. Entity Type - Allowed methods: GET OPTIONS"
+echo "=============================================="
+orionCurl --url /v2/types/testType -X OPTIONS --origin TEST_ORIGIN
+echo
+echo
+
+echo "08. All Entity Types - Allowed methods: GET OPTIONS"
+echo "==================================================="
+orionCurl --url /v2/types -X OPTIONS --origin TEST_ORIGIN
+echo
+echo
+
+echo "09. All Subscriptions - Allowed methods: GET POST OPTIONS"
+echo "========================================================="
+orionCurl --url /v2/subscriptions -X OPTIONS --origin TEST_ORIGIN
+echo
+echo
+
+echo "10. Specific Subscription - Allowed methods: GET DELETE PATCH OPTIONS"
+echo "====================================================================="
+orionCurl --url /v2/subscriptions/testSub -X OPTIONS --origin TEST_ORIGIN
+echo
+echo
+
+echo "11. Batch Query - Allowed methods: POST OPTIONS"
+echo "==============================================="
+orionCurl --url /v2/op/query -X OPTIONS --origin TEST_ORIGIN
+echo
+echo
+
+echo "12. Batch Update - Allowed methods: POST OPTIONS"
+echo "================================================"
+orionCurl --url /v2/op/update -X OPTIONS --origin TEST_ORIGIN
+echo
+echo
+
+--REGEXPECT--
+01. Entry Points - Allowed methods: GET OPTIONS
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: REGEX([0-9]+)
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. All Entities - Allowed methods: GET POST OPTIONS
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: REGEX([0-9]+)
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Entity - Allowed methods: GET DELETE OPTIONS
+================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: REGEX([0-9]+)
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, DELETE, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Entity Attributes - Allowed methods: GET PATCH POST PUT OPTIONS
+===================================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: REGEX([0-9]+)
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, PATCH, POST, PUT, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Entity Attribute Value - Allowed methods: GET PUT OPTIONS
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: REGEX([0-9]+)
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, PUT, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Entity Attribute - Allowed methods: GET PUT DELETE OPTIONS
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: REGEX([0-9]+)
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, PUT, DELETE, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Entity Type - Allowed methods: GET OPTIONS
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: REGEX([0-9]+)
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. All Entity Types - Allowed methods: GET OPTIONS
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: REGEX([0-9]+)
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. All Subscriptions - Allowed methods: GET POST OPTIONS
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: REGEX([0-9]+)
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. Specific Subscription - Allowed methods: GET DELETE PATCH OPTIONS
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: REGEX([0-9]+)
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, DELETE, PATCH, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+11. Batch Query - Allowed methods: POST OPTIONS
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: REGEX([0-9]+)
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: POST, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+12. Batch Update - Allowed methods: POST OPTIONS
+================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: REGEX([0-9]+)
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: POST, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -1969,7 +1969,7 @@ static bool processSubscriptions
      * before adding the subscription to the map.
      */
 
-    /* Check 1: timming (not expired and ok from throttling point of view) */
+    /* Check 1: timing (not expired and ok from throttling point of view) */
     if (tSubP->throttling != 1 && tSubP->lastNotification != 1)
     {
       long long  current               = getCurrentTime();
@@ -2274,9 +2274,20 @@ static void updateAttrInNotifyCer
       //
       // FIXME P6: https://github.com/telefonicaid/fiware-orion/issues/2587
       // If an attribute has no value, then its value is not updated (neither is previousValue).
-      // However this may be problematic ... see the issue
+      // However this may be problematic ... see the issue.
       //
+      // New data on this: the functest
+      // "test/functionalTest/cases/2998*/null_not_working_in_q_for_subscription.test" fails with this 'if-clause' (not outdeffed),
+      // and removing the 'if' the functest 'test/functionalTest/cases/1156*/q_and_mq_as_uri_param_for_metadata.test' fails,
+      // but it seems like the test is incorrect and this fix is good.
+      //
+      // This clearly needs to be looked over ...
+      //
+#if 0
       if (targetAttr->valueType != orion::ValueTypeNone)
+#else
+      if (true)
+#endif
       {
         /* Store previous value (it may be necessary to render previousValue metadata) */
         if (caP->previousValue == NULL)

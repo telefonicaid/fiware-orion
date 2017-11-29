@@ -31,10 +31,13 @@
 #include "common/MimeType.h"
 #include "common/globals.h"
 #include "common/tag.h"
-#include "ngsi/ContextElement.h"
+#include "common/string.h"
+
 #include "ngsi/EntityId.h"
 #include "ngsi/Request.h"
+#include "ngsi/ContextElement.h"
 
+#include "mongoBackend/dbFieldEncoding.h"
 
 
 /* ****************************************************************************
@@ -148,11 +151,11 @@ ContextAttribute* ContextElement::getAttribute(const std::string& attrName)
 {
   for (unsigned int ix = 0; ix < contextAttributeVector.size(); ++ix)
   {
-    ContextAttribute* ca = contextAttributeVector[ix];
+    ContextAttribute* caP = contextAttributeVector[ix];
 
-    if (ca->name == attrName)
+    if (dbDotEncode(caP->name) == attrName)
     {
-      return ca;
+      return caP;
     }
   }
 

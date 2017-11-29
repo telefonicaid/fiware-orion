@@ -1,0 +1,286 @@
+# Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+CORS Bad Verbs 
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255 IPV4 -corsOrigin __ALL
+
+--SHELL--
+echo "01. Bad Verb Entry Points"
+echo "========================="
+orionCurl --url /v2 -X BADVERB
+echo
+echo
+
+echo "02. Bad Verb All Entities"
+echo "========================="
+orionCurl --url /v2/entities -X BADVERB
+echo
+echo
+
+echo "03. Bad Verb Entity"
+echo "==================="
+orionCurl --url /v2/entities/testEntity -X BADVERB
+echo
+echo
+
+echo "04. Bad Verb Entity Attributes"
+echo "=============================="
+orionCurl --url /v2/entities/testEntity/attrs -X BADVERB
+echo
+echo
+
+echo "05. Bad Verb Entity Attribute Value"
+echo "==================================="
+orionCurl --url /v2/entities/testEntity/attrs/testAttr/value -X BADVERB
+echo
+echo
+
+echo "06. Bad Verb Entity Attribute"
+echo "============================="
+orionCurl --url /v2/entities/testEntity/attrs/testAttr -X BADVERB
+echo
+echo
+
+echo "07. Bad Verb Entity Type"
+echo "========================"
+orionCurl --url /v2/types/testType -X BADVERB
+echo
+echo
+
+echo "08. Bad Verb All Entity Types"
+echo "============================="
+orionCurl --url /v2/types -X BADVERB
+echo
+echo
+
+echo "09. Bad Verb All Subscriptions"
+echo "=============================="
+orionCurl --url /v2/subscriptions -X BADVERB
+echo
+echo
+
+echo "10. Bad Verb Specific Subscription"
+echo "=================================="
+orionCurl --url /v2/subscriptions/testSub -X BADVERB
+echo
+echo
+
+echo "11. Bad Verb Batch Query"
+echo "========================"
+orionCurl --url /v2/op/query -X BADVERB
+echo
+echo
+
+echo "12. Bad Verb Batch Update"
+echo "========================="
+orionCurl --url /v2/op/update -X BADVERB
+echo
+echo
+
+--REGEXPECT--
+01. Bad Verb Entry Points
+=========================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 63
+Content-Type: application/json
+Allow: GET, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
+
+
+02. Bad Verb All Entities
+=========================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 63
+Content-Type: application/json
+Allow: POST, GET, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
+
+
+03. Bad Verb Entity
+===================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 63
+Content-Type: application/json
+Allow: GET, DELETE, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
+
+
+04. Bad Verb Entity Attributes
+==============================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 63
+Content-Type: application/json
+Allow: GET, PATCH, POST, PUT, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
+
+
+05. Bad Verb Entity Attribute Value
+===================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 63
+Content-Type: application/json
+Allow: GET, PUT, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
+
+
+06. Bad Verb Entity Attribute
+=============================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 63
+Content-Type: application/json
+Allow: GET, PUT, DELETE, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
+
+
+07. Bad Verb Entity Type
+========================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 63
+Content-Type: application/json
+Allow: GET, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
+
+
+08. Bad Verb All Entity Types
+=============================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 63
+Content-Type: application/json
+Allow: GET, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
+
+
+09. Bad Verb All Subscriptions
+==============================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 63
+Content-Type: application/json
+Allow: POST, GET, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
+
+
+10. Bad Verb Specific Subscription
+==================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 63
+Content-Type: application/json
+Allow: GET, DELETE, PATCH, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
+
+
+11. Bad Verb Batch Query
+========================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 63
+Content-Type: application/json
+Allow: POST, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
+
+
+12. Bad Verb Batch Update
+=========================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 63
+Content-Type: application/json
+Allow: POST, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

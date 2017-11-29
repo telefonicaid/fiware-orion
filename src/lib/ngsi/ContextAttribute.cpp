@@ -45,6 +45,7 @@
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/compoundValueBson.h"
+#include "mongoBackend/dbFieldEncoding.h"
 
 using namespace mongo;
 using namespace orion;
@@ -708,9 +709,7 @@ std::string ContextAttribute::render
 *
 * toJson -
 *
-* FIXME: Refactor this method in order to simplify
-*        the code paths of the rendering process
-*
+* FIXME: Refactor this method in order to simplify the code paths of the rendering process
 */
 std::string ContextAttribute::toJson
 (
@@ -1141,6 +1140,8 @@ std::string ContextAttribute::getName(void)
   return name;
 }
 
+
+
 /* ****************************************************************************
 *
 * ContextAttribute::getValue -
@@ -1220,7 +1221,7 @@ bool ContextAttribute::compoundItemExists(const std::string& compoundPath, orion
 
     for (unsigned int cIx = 0; cIx < current->childV.size(); ++cIx)
     {
-      if (current->childV[cIx]->name == compoundPathV[ix])
+      if (dbDotEncode(current->childV[cIx]->name) == compoundPathV[ix])
       {
         current = current->childV[cIx];
         found   = true;
