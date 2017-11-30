@@ -33,6 +33,7 @@
 #include "ngsi/Request.h"
 #include "jsonParseV2/parseEntityVector.h"
 #include "jsonParseV2/parseAttributeList.h"
+#include "jsonParseV2/parseStringList.h"
 #include "jsonParseV2/parseScopeVector.h"
 #include "jsonParseV2/parseBatchQuery.h"
 
@@ -129,8 +130,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
     }
     else if (name == "metadata")
     {
-      // FIXME P2: parseAttributeList to change name to parseStringList
-      std::string r = parseAttributeList(ciP, iter, &bqrP->metadataV);
+      std::string r = parseStringList(ciP, iter, &bqrP->metadataV, name);
 
       if (r != "OK")
       {

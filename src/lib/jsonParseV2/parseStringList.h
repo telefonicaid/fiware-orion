@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_JSONPARSEV2_PARSESTRINGLIST_H_
+#define SRC_LIB_JSONPARSEV2_PARSESTRINGLIST_H_
+
 /*
 *
 * Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
@@ -23,56 +26,24 @@
 * Author: Ken Zangelin
 */
 #include <string>
-#include <vector>
 
-#include "alarmMgr/alarmMgr.h"
-#include "rest/OrionError.h"
-#include "apiTypesV2/BatchQuery.h"
+#include "rapidjson/document.h"
 
-
-
-/* ****************************************************************************
-*
-* BatchQuery::BatchQuery - 
-*/
-BatchQuery::BatchQuery()
-{
-}
+#include "rest/ConnectionInfo.h"
+#include "ngsi/StringList.h"
 
 
 
 /* ****************************************************************************
 *
-* BatchQuery::~BatchQuery - 
+* parseStringList -
 */
-BatchQuery::~BatchQuery()
-{
-}
+extern std::string parseStringList
+(
+  ConnectionInfo*                               ciP,
+  const rapidjson::Value::ConstMemberIterator&  iter,
+  StringList*                                   sP,
+  const std::string&                            fieldName
+);
 
-
-
-/* ****************************************************************************
-*
-* BatchQuery::present - 
-*/
-void BatchQuery::present(const std::string& indent)
-{
-  entities.present(indent);
-  attributeV.present(indent);
-  scopeV.present(indent);
-  metadataV.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
-* BatchQuery::release - 
-*/
-void BatchQuery::release(void)
-{
-  entities.release();
-  attributeV.release();
-  scopeV.release();
-  metadataV.release();
-}
+#endif  // SRC_LIB_JSONPARSEV2_PARSESTRINGLIST_H_

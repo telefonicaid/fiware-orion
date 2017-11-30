@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_APITYPESV2_BATCHQUERY_H_
-#define SRC_LIB_APITYPESV2_BATCHQUERY_H_
+#ifndef SRC_LIB_NGSI_STRINGLIST_H_
+#define SRC_LIB_NGSI_STRINGLIST_H_
 
 /*
 *
-* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -28,31 +28,43 @@
 #include <string>
 #include <vector>
 
-#include "ngsi/AttributeList.h"
-#include "ngsi/StringList.h"
+#include "ngsi/Metadata.h"
 #include "ngsi/Request.h"
-#include "ngsi/ScopeVector.h"
-#include "apiTypesV2/Entities.h"
 
 
 
 /* ****************************************************************************
 *
-* BatchQuery - 
+* StringList -
 */
-class BatchQuery
+typedef struct StringList
 {
- public:
-  Entities       entities;
-  AttributeList  attributeV;
-  ScopeVector    scopeV;
-  StringList     metadataV;
+  std::vector<std::string>  stringV;
 
-  BatchQuery();
-  ~BatchQuery();
+  void         fill(const std::vector<std::string>& aVec);
+  void         fill(const std::string& commaSeparatedList);
+  std::string  render(bool comma);
+  std::string  toString(void);
+  void         present(const std::string& indent);
+  void         release(void);
+  bool         lookup(const std::string& string) const;
+  void         push_back(const std::string& string);
+  void         push_back_if_absent(const std::string& string);
+  unsigned int size(void) const;
+  void         clone(const StringList& sList);
 
-  void           present(const std::string& indent);
-  void           release(void);
-};
+  std::string  check(void);
 
-#endif  // SRC_LIB_APITYPESV2_BATCHQUERY_H_
+  std::string  operator[](unsigned int ix)  const
+  {
+    return stringV[ix];
+  }
+
+  std::string  get(unsigned int ix)  const
+  {
+    return stringV[ix];
+  }
+
+} StringList;
+
+#endif  // SRC_LIB_NGSI_STRINGLIST_H_

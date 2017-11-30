@@ -23,56 +23,47 @@
 * Author: Ken Zangelin
 */
 #include <string>
-#include <vector>
 
-#include "alarmMgr/alarmMgr.h"
-#include "rest/OrionError.h"
-#include "apiTypesV2/BatchQuery.h"
-
-
-
-/* ****************************************************************************
-*
-* BatchQuery::BatchQuery - 
-*/
-BatchQuery::BatchQuery()
-{
-}
+#include "rest/ConnectionInfo.h"
+#include "ngsi/AttributeList.h"
+#include "jsonParseV2/jsonParseTypeNames.h"
+#include "jsonParseV2/parseStringList.h"
 
 
 
 /* ****************************************************************************
 *
-* BatchQuery::~BatchQuery - 
+* parseStringList -
 */
-BatchQuery::~BatchQuery()
+std::string parseStringList
+(
+  ConnectionInfo*                               ciP,
+  const rapidjson::Value::ConstMemberIterator&  iter,
+  StringList*                                   sP,
+  const std::string&                            fieldName
+)
 {
-}
+  std::string type = jsonParseTypeNames[iter->value.GetType()];
 
+  if (type != "Array")
+  {
+    return "the field /" + fieldName + "/ must be a JSON array";
+  }
 
+  for (rapidjson::Value::ConstValueIterator iter2 = iter->value.Begin(); iter2 != iter->value.End(); ++iter2)
+  {
+    std::string  val;
 
-/* ****************************************************************************
-*
-* BatchQuery::present - 
-*/
-void BatchQuery::present(const std::string& indent)
-{
-  entities.present(indent);
-  attributeV.present(indent);
-  scopeV.present(indent);
-  metadataV.present(indent);
-}
+    type = jsonParseTypeNames[iter2->GetType()];
 
+    if (type != "String")
+    {
+      return "only JSON Strings allowed in " + fieldName + " list";
+    }
 
+    val  = iter2->GetString();
+    sP->push_back(val);
+  }
 
-/* ****************************************************************************
-*
-* BatchQuery::release - 
-*/
-void BatchQuery::release(void)
-{
-  entities.release();
-  attributeV.release();
-  scopeV.release();
-  metadataV.release();
+  return "OK";
 }

@@ -35,6 +35,7 @@ SET (SOURCES
     parseEntityObject.cpp
     parseAttributeList.cpp
     parseScopeVector.cpp
+    parseStringList.cpp
     parseScope.cpp
     parseBatchUpdate.cpp
     utilsParse.cpp
@@ -57,6 +58,7 @@ SET (HEADERS
     parseAttributeList.h
     parseScopeVector.h
     parseScope.h
+    parseStringList.h
     parseBatchUpdate.h
     utilsParse.h
     parseMetadataCompoundValue.h

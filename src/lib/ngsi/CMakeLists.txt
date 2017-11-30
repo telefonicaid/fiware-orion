@@ -54,6 +54,7 @@ SET (SOURCES
     Scope.cpp
     ScopeVector.cpp
     StatusCode.cpp
+    StringList.cpp
     SubscribeResponse.cpp
     SubscribeError.cpp
     SubscriptionId.cpp
@@ -92,6 +93,7 @@ SET (HEADERS
     RestrictionString.h
     Scope.h
     StatusCode.h
+    StringList.h
     SubscribeError.h
     SubscribeResponse.h
     SubscriptionId.h
