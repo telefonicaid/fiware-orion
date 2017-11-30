@@ -743,7 +743,7 @@ function accumulatorStart()
    sleep 1
 
    time=$time+1
-   nc -w 2 localhost $port >/dev/null </dev/null
+   nc -w 2 $bindIp $port >/dev/null </dev/null
    port_not_ok=$?
   done
 }
