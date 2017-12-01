@@ -60,8 +60,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "error": "BadRequest",
-    "description": "the field /metadata/ must be a JSON array"
+    "description": "the field /metadata/ must be a JSON array",
+    "error": "BadRequest"
 }
 
 
