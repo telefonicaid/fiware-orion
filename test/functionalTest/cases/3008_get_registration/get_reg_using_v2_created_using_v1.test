@@ -25,7 +25,7 @@ GET registration using APIv2, created using V1
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 0 IPv4 -statCounters
 
 --SHELL--
 
@@ -41,6 +41,7 @@ brokerStart CB
 # 01. Register entity E1/A1, using APIv1
 # 02. GET the registration using APIv2
 # 03. Attempt to GET a non existing registration (using a syntactical correct Reg ID)
+# 04. GET /statistics
 #
 
 echo "01. Register entity E1/A1, using APIv1"
@@ -92,6 +93,13 @@ echo
 echo "03. Attempt to GET a non existing registration (using a syntactical correct Reg ID)"
 echo "==================================================================================="
 orionCurl --url /v2/registrations/111111111111111111111111 -X GET
+echo
+echo
+
+
+echo "04. GET /statistics"
+echo "==================="
+orionCurl --url /statistics
 echo
 echo
 
@@ -162,6 +170,27 @@ Date: REGEX(.*)
 {
     "description": "The requested registration has not been found. Check id",
     "error": "NotFound"
+}
+
+
+04. GET /statistics
+===================
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "counters": {
+        "jsonRequests": 1,
+        "registrationRequest": 2,
+        "registrations": 1,
+        "statisticsRequests": 1,
+        "versionRequests": 0
+    },
+    "measuring_interval_in_secs": REGEX(\d+),
+    "uptime_in_secs": REGEX(\d+)
 }
 
 
