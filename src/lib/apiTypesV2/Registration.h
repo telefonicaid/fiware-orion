@@ -33,7 +33,7 @@
 
 #if 0
 ------------------------------------------------------------------------------------
-  FIXME: Reference registration document (delete once this get implemented)
+  FIXME: Reference registration document (delete once POST /v2/registrations get implemented)
 
   {
     "id": "abcdefg",

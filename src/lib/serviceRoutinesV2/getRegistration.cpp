@@ -43,7 +43,7 @@
 *
 * getRegistration - 
 *
-* GET /v2/registration/<reg id>
+* GET /v2/registrations/<reg id>
 *
 * Payload In:  None
 * Payload Out: ngsiv2::Registration in JSON textual format

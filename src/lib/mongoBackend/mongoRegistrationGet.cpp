@@ -88,32 +88,10 @@ static void setProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 
 /* ****************************************************************************
 *
-* setDataProvided -
-*
-* Make sure there is only ONE "contextRegistration" in the vector
-* If we have more than one, then the Registration is made in API V1 as this is not
-* possible in V2 and we cannot respond to the request using the current implementation of V2
-*
+* setEntities - 
 */
-static bool setDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r, bool arrayAllowed)
+static void setEntities(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
 {
-  std::vector<mongo::BSONElement> crV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
-
-  if (crV.size() > 1)
-  {
-    return false;
-  }
-
-  //
-  // Extract first CR from the contextRegistration vector
-  //
-  mongo::BSONObj cr0 = crV[0].embeddedObject();
-
-
-
-  //
-  // Entities
-  //
   std::vector<mongo::BSONElement>  dbEntityV = getFieldF(cr0, REG_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < dbEntityV.size(); ++ix)
@@ -159,12 +137,18 @@ static bool setDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r,
 
     regP->dataProvided.entities.push_back(entity);
   }
+}
 
 
-  //
-  // Attributes
-  //
+
+/* ****************************************************************************
+*
+* setAttributes - 
+*/
+static void setAttributes(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
+{
   std::vector<mongo::BSONElement> dbAttributeV = getFieldF(cr0, REG_ATTRS).Array();
+
   for (unsigned int ix = 0; ix < dbAttributeV.size(); ++ix)
   {
     mongo::BSONObj  aobj     = dbAttributeV[ix].embeddedObject();
@@ -175,10 +159,36 @@ static bool setDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r,
       regP->dataProvided.attributes.push_back(attrName);
     }
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* setDataProvided -
+*
+* Make sure there is only ONE "contextRegistration" in the vector
+* If we have more than one, then the Registration is made in API V1 as this is not
+* possible in V2 and we cannot respond to the request using the current implementation of V2.
+* This function will be changed to work in a different way once issue #3044 is dealt with.
+*
+*/
+static bool setDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r, bool arrayAllowed)
+{
+  std::vector<mongo::BSONElement> crV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
+
+  if (crV.size() > 1)
+  {
+    return false;
+  }
 
   //
-  // Providing application
+  // Extract the first (and only) CR from the contextRegistration vector
   //
+  mongo::BSONObj cr0 = crV[0].embeddedObject();
+
+  setEntities(regP, cr0);
+  setAttributes(regP, cr0);
   setProvider(regP, cr0);
 
   return true;
@@ -214,6 +224,7 @@ static void setStatus(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 */
 static void setForwardingInformation(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 {
+  // No forwarding info until API V2 forwarding is implemented
 }
 
 
@@ -289,7 +300,7 @@ void mongoRegistrationGet
     if (setDataProvided(regP, r, false) == false)
     {
       releaseMongoConnection(connection);
-      LM_W(("Bad Input (more than one registration, API V2 can't deal with that)"));
+      LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
       oeP->fill(SccReceiverInternalError, err);
       return;

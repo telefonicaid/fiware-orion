@@ -40,6 +40,7 @@ brokerStart CB
 #
 # 01. Register entity E1/A1, using APIv1
 # 02. GET the registration using APIv2
+# 03. Attempt to GET a non existing registration (using a syntactical correct Reg ID)
 #
 
 echo "01. Register entity E1/A1, using APIv1"
@@ -84,6 +85,13 @@ echo
 echo "02. GET the registration using APIv2"
 echo "===================================="
 orionCurl --url /v2/registrations/${REG_ID} -X GET
+echo
+echo
+
+
+echo "03. Attempt to GET a non existing registration (using a syntactical correct Reg ID)"
+echo "==================================================================================="
+orionCurl --url /v2/registrations/111111111111111111111111 -X GET
 echo
 echo
 
@@ -134,12 +142,26 @@ Date: REGEX(.*)
     "id": "REGEX([0-9a-f\-]{24})",
     "provider": {
         "http": {
-            "url": "http://localhost:9801/v2"
+            "url": "http://localhost:REGEX(\d+)/v2"
         },
         "legacyForwarding": true,
         "supportedForwardingMode": "all"
     },
     "status": "active"
+}
+
+
+03. Attempt to GET a non existing registration (using a syntactical correct Reg ID)
+===================================================================================
+HTTP/1.1 200 OK
+Content-Length: 92
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The requested registration has not been found. Check id",
+    "error": "NotFound"
 }
 
 
