@@ -30,9 +30,7 @@ commands that require root privilege):
 
         sudo yum install boost-devel libcurl-devel gnutls-devel libgcrypt-devel openssl-devel libuuid-devel
 
-* Install the Mongo Driver from source. The following procedure corresponds with default installation, if you
-  want to include SASL and SSL support use [this alternative procedure](#building-mongodb-driver-with-sasl-and-ssl-support) 
-  instead.
+* Install the Mongo Driver from source. The following procedure corresponds with default installation, if you want to include SASL and SSL support use [this alternative procedure](#building-mongodb-driver-with-sasl-and-ssl-support) instead.
 
         wget https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz
         tar xfvz legacy-1.1.2.tar.gz
