@@ -141,7 +141,7 @@ std::string ForwardingInformation::toJson()
 {
   JsonHelper  jh;
 
-  jh.addInt("timesSent", timesSent);
+  jh.addNumber("timesSent", timesSent);
 
   if (lastSuccess > 0)
   {
