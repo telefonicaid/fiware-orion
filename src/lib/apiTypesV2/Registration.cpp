@@ -92,7 +92,11 @@ std::string Registration::toJson(void)
   jh.addRaw("dataProvided", dataProvided.toJson());
   jh.addRaw("provider", provider.toJson());
   jh.addString("status", (status != "")? status : "active");
-  jh.addRaw("forwardingInformation", forwardingInformation.toJson());
+
+  //
+  // FIXME P6: once forwarding is implemented for APIv2, include this call
+  // jh.addRaw("forwardingInformation", forwardingInformation.toJson());
+  //
 
   return jh.str();
 }

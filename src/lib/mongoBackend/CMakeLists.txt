@@ -76,7 +76,7 @@ SET (HEADERS
     TriggeredSubscription.h
     mongoConnectionPool.h
     mongoGetSubscriptions.h
-    mongoGetRegistrations.h
+    mongoRegistrationGet.h
     connectionOperations.h
     mongoSubCache.h
     safeMongo.h

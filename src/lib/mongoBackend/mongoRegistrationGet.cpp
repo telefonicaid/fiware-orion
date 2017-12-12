@@ -260,10 +260,8 @@ void mongoRegistrationGet
   std::auto_ptr<mongo::DBClientCursor>  cursor;
   mongo::BSONObj                        q;
 
-  if (servicePath.empty())
-    q = BSON("_id" << oid);
-  else
-    q = BSON("_id" << oid << REG_SERVICE_PATH << servicePath);
+  // FIXME P0: what about the service path ... ?   See issue #3051
+  q = BSON("_id" << oid);
 
   TIME_STAT_MONGO_READ_WAIT_START();
   mongo::DBClientBase* connection = getMongoConnection();
