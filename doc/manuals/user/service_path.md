@@ -92,7 +92,7 @@ Some additional remarks:
 
 While entities belong to services *and* servicepaths, subscriptions and registrations
 belong *only* to the service. The servicepath in subscriptions and registrations
-doesn't denotes sense of beloging, but is the expression of the query associated
+doesn't denote sense of belonging, but is the expression of the query associated
 to the subscription or registration.
 
 Taking this into consideration, the following rules apply:
