@@ -51,6 +51,7 @@ getMetrics.cpp
 deleteMetrics.cpp
 optionsGetOnly.cpp
 optionsGetPostOnly.cpp
+getRegistration.cpp
 )
 
 SET (HEADERS

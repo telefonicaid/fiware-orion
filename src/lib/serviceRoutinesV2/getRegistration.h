@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_NGSI_REGISTRATIONID_H_
-#define SRC_LIB_NGSI_REGISTRATIONID_H_
+#ifndef SRC_LIB_SERVICEROUTINESV2_GETREGISTRATION_H_
+#define SRC_LIB_SERVICEROUTINESV2_GETREGISTRATION_H_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -26,30 +26,24 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "ngsi/Request.h"
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* RegistrationId - 
+* getRegistration - 
 */
-typedef struct RegistrationId
-{
-  std::string   string;
+extern std::string getRegistration
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-  RegistrationId();
-  RegistrationId(const std::string& regId);
+#endif  // SRC_LIB_SERVICEROUTINESV2_GETREGISTRATION_H_
 
-  void          set(const std::string& value);
-  std::string   get(void) const;
-  bool          isEmpty(void);
-  std::string   render(RequestType requestType, bool comma);
-  void          present(const std::string& indent);
-  void          release(void);
-
-  std::string   check(void);
-} RegistrationId;
-
-#endif  // SRC_LIB_NGSI_REGISTRATIONID_H_

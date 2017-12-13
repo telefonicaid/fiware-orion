@@ -151,7 +151,6 @@ std::string jsonRequestTreat
     {
       return answer;
     }
-
     break;
 
   default:

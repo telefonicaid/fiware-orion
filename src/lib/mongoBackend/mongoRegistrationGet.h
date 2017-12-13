@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_NGSI_REGISTRATIONID_H_
-#define SRC_LIB_NGSI_REGISTRATIONID_H_
+#ifndef SRC_LIB_MONGOBACKEND_MONGOREGISTRATIONGET_H_
+#define SRC_LIB_MONGOBACKEND_MONGOREGISTRATIONGET_H_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -26,30 +26,25 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "ngsi/Request.h"
+#include "rest/HttpStatusCode.h"
+#include "rest/OrionError.h"
+#include "apiTypesV2/Registration.h"
 
 
 
 /* ****************************************************************************
 *
-* RegistrationId - 
+* mongoRegistrationGet - 
 */
-typedef struct RegistrationId
-{
-  std::string   string;
+extern void mongoRegistrationGet
+(
+  ngsiv2::Registration*  regP,
+  const std::string&     regId,
+  const std::string&     tenant,
+  const std::string&     servicePathV,
+  OrionError*            oeP
+);
 
-  RegistrationId();
-  RegistrationId(const std::string& regId);
-
-  void          set(const std::string& value);
-  std::string   get(void) const;
-  bool          isEmpty(void);
-  std::string   render(RequestType requestType, bool comma);
-  void          present(const std::string& indent);
-  void          release(void);
-
-  std::string   check(void);
-} RegistrationId;
-
-#endif  // SRC_LIB_NGSI_REGISTRATIONID_H_
+#endif  // SRC_LIB_MONGOBACKEND_MONGOREGISTRATIONGET_H_

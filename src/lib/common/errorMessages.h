@@ -82,6 +82,7 @@
 #define ERROR_DESC_NOT_FOUND_CONTEXT_ELEMENT          "No context element found"
 #define ERROR_DESC_NOT_FOUND_ATTRIBUTE                "The entity does not have such an attribute"
 #define ERROR_DESC_NOT_FOUND_SUBSCRIPTION             "The requested subscription has not been found. Check id"
+#define ERROR_DESC_NOT_FOUND_REGISTRATION             "The requested registration has not been found. Check id"
 
 #define ERROR_TOO_MANY                                "TooManyResults"
 #define ERROR_DESC_TOO_MANY_ENTITIES                  "More than one matching entity. Please refine your query"
