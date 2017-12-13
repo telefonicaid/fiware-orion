@@ -20,30 +20,52 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Fermín Galán Máquez
+* Author: Ken Zangelin
 */
-
-#include "mongoBackend/mongoGetRegistrations.h"
-#include "apiTypesV2/Registration.h"
-
 #include <string>
 #include <vector>
-#include <map>
+
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "common/string.h"
+
+#include "rest/ConnectionInfo.h"
+#include "rest/OrionError.h"
+#include "ngsi/ParseData.h"
+#include "apiTypesV2/Registration.h"
+#include "mongoBackend/mongoRegistrationGet.h"
+#include "serviceRoutinesV2/getRegistration.h"
+#include "alarmMgr/alarmMgr.h"
+
+
 
 /* ****************************************************************************
 *
-* mongoGetSubscription -
+* getRegistration - 
+*
+* GET /v2/registrations/<reg id>
+*
+* Payload In:  None
+* Payload Out: ngsiv2::Registration in JSON textual format
 */
-void mongoGetSubscription
+std::string getRegistration
 (
-  ngsiv2::Registration*                reg,
-  OrionError*                          oe,
-  const std::string&                   idSub,
-  std::map<std::string, std::string>&  uriParam,
-  const std::string&                   tenant
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
 )
 {
-  // TBD
-  return;
-}
+  std::string           regId  = compV[2];
+  ngsiv2::Registration  registration;
+  OrionError            oe;
 
+  TIMED_MONGO(mongoRegistrationGet(&registration, regId, ciP->tenant, ciP->servicePathV[0], &oe));
+
+  if (oe.code != SccOk)
+  {
+    return oe.toJson();
+  }
+
+  return registration.toJson();
+}

@@ -57,6 +57,8 @@ The counter block provides information about counters for the times a particular
     "queries" : 3698,
     "updates" : 2416,
     "subscriptions" : 138,
+    "registrationRequest": 11,
+    "registrations": 41,
     "unsubscriptions" : 6,
     "notificationsReceived" : 216936,
     "notificationsSent" : 579542,

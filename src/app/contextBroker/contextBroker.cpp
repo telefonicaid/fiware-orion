@@ -205,6 +205,7 @@
 #include "serviceRoutinesV2/deleteMetrics.h"
 #include "serviceRoutinesV2/optionsGetOnly.h"
 #include "serviceRoutinesV2/optionsGetPostOnly.h"
+#include "serviceRoutinesV2/getRegistration.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
@@ -512,6 +513,15 @@ static const char* validLogLevels[] =
 #define BUR                     BatchUpdateRequest
 #define BUR_COMPS_V2            3, { "v2", "op", "update" }
 #define BUR_COMPS_WORD          ""
+
+//
+// /v2 registration API
+//
+#define REG                     RegistrationRequest
+#define REG_COMPS_V2            3, { "v2", "registrations", "*" }
+#define REG_COMPS_WORD          ""
+
+
 
 //
 // NGSI9
@@ -837,7 +847,12 @@ static const char* validLogLevels[] =
   { "OPTIONS", ENT,          ENT_COMPS_V2,        ENT_COMPS_WORD,          optionsGetPostOnly       }
 
 
-#define REGISTRY_STANDARD_REQUESTS_V0                                                                    \
+#define API_V2_REGISTRY                                                                                \
+  { "GET",    REG,          REG_COMPS_V2,         REG_COMPS_WORD,          getRegistration          }, \
+  { "*",      REG,          REG_COMPS_V2,         REG_COMPS_WORD,          badVerbGetOnly           }
+  
+
+#define REGISTRY_STANDARD_REQUESTS_V0                                   \
   { "POST",   RCR,   RCR_COMPS_V0,         RCR_POST_WORD,   postRegisterContext                       }, \
   { "*",      RCR,   RCR_COMPS_V0,         RCR_POST_WORD,   badVerbPostOnly                           }, \
   { "POST",   DCAR,  DCAR_COMPS_V0,        DCAR_POST_WORD,  postDiscoverContextAvailability           }, \
@@ -1193,6 +1208,7 @@ static const char* validLogLevels[] =
 RestService restServiceV[] =
 {
   API_V2,
+  API_V2_REGISTRY,
 
   REGISTRY_STANDARD_REQUESTS_V0,
   REGISTRY_STANDARD_REQUESTS_V1,
@@ -1235,6 +1251,7 @@ RestService restServiceCORS[] =
 {
   API_V2_CORS,
   API_V2,
+  API_V2_REGISTRY,
 
   REGISTRY_STANDARD_REQUESTS_V0,
   REGISTRY_STANDARD_REQUESTS_V1,
