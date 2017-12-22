@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_JSONPARSEV2_PARSEATTRIBUTELIST_H_
-#define SRC_LIB_JSONPARSEV2_PARSEATTRIBUTELIST_H_
-
 /*
 *
-* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,24 +22,40 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
-#include "rapidjson/document.h"
+#include "ngsi/StringList.h"
 
-#include "rest/ConnectionInfo.h"
-#include "ngsi/AttributeList.h"
+#include "unittest.h"
 
 
 
 /* ****************************************************************************
 *
-* parseAttributeList - 
+* ok -
 */
-extern std::string parseAttributeList
-(
-  ConnectionInfo*                               ciP,
-  const rapidjson::Value::ConstMemberIterator&  iter,
-  AttributeList*                                aP
-);
+TEST(DISABLED_AttributeList, ok)
+{
+  StringList     al;
+  std::string    out;
+  const char*    outfile1 = "ngsi.attributeList.ok.middle.json";
 
-#endif  // SRC_LIB_JSONPARSEV2_PARSEATTRIBUTELIST_H_
+  utInit();
+
+  out = al.render(false);
+  EXPECT_STREQ("", out.c_str());
+
+  al.push_back("a1");
+  al.push_back("a2");
+  
+  out = al.render(false);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  al.push_back("");
+  out = al.check();
+  EXPECT_STREQ("empty attribute name", out.c_str());
+
+  utExit();
+}

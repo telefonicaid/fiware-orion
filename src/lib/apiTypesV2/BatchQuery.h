@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "ngsi/AttributeList.h"
 #include "ngsi/StringList.h"
 #include "ngsi/Request.h"
 #include "ngsi/ScopeVector.h"
@@ -44,7 +43,7 @@ class BatchQuery
 {
  public:
   Entities       entities;
-  AttributeList  attributeV;
+  StringList     attributeV;
   ScopeVector    scopeV;
   StringList     metadataV;
 

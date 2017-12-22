@@ -33,7 +33,6 @@ SET (SOURCES
     parseBatchQuery.cpp
     parseEntityVector.cpp
     parseEntityObject.cpp
-    parseAttributeList.cpp
     parseScopeVector.cpp
     parseStringList.cpp
     parseScope.cpp
@@ -55,7 +54,6 @@ SET (HEADERS
     parseBatchQuery.h
     parseEntityVector.h
     parseEntityObject.h
-    parseAttributeList.h
     parseScopeVector.h
     parseScope.h
     parseStringList.h

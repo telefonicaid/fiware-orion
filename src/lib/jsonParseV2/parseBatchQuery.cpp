@@ -32,7 +32,6 @@
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
 #include "jsonParseV2/parseEntityVector.h"
-#include "jsonParseV2/parseAttributeList.h"
 #include "jsonParseV2/parseStringList.h"
 #include "jsonParseV2/parseScopeVector.h"
 #include "jsonParseV2/parseBatchQuery.h"
@@ -104,7 +103,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
     }
     else if (name == "attributes")
     {
-      std::string r = parseAttributeList(ciP, iter, &bqrP->attributeV);
+      std::string r = parseStringList(ciP, iter, &bqrP->attributeV,name);
 
       if (r != "OK")
       {

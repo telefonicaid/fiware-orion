@@ -26,7 +26,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Duration.h"
 #include "ngsi/Reference.h"

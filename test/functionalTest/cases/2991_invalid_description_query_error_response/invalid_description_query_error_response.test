@@ -34,7 +34,7 @@ brokerStart CB
 #
 
 echo "01. Attempt to perform a batch query with invalid metadata field, and see it fail with a proper error description"
-echo "============================================================================================="
+echo "================================================================================================================="
 payload='{ 
     "entities": [ 
         { 
@@ -52,7 +52,7 @@ echo
 
 --REGEXPECT--
 01. Attempt to perform a batch query with invalid metadata field, and see it fail with a proper error description
-=============================================================================================
+=================================================================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 80
 Content-Type: application/json

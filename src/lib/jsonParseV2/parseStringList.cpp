@@ -25,7 +25,7 @@
 #include <string>
 
 #include "rest/ConnectionInfo.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseStringList.h"
 
