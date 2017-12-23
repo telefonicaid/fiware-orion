@@ -62,7 +62,7 @@ std::string SubscribeContextAvailabilityRequest::render(void)
 
   out += startTag();
   out += entityIdVector.render(commaAfterEntityIdVector);
-  out += attributeList.render(commaAfterAttributeList);
+  out += attributeList.render(commaAfterAttributeList, "attributes");
   out += reference.render(commaAfterReference);
   out += duration.render(commaAfterDuration);
   out += restriction.render(restrictions, true);

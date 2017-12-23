@@ -104,7 +104,7 @@ std::string QueryContextRequest::render(void)
 
   out += startTag();
   out += entityIdVector.render(commaAfterEntityIdVector);
-  out += attributeList.render(commaAfterAttributeList);
+  out += attributeList.render(commaAfterAttributeList, "attributes");
   out += restriction.render(restrictions, false);
   out += endTag();
 

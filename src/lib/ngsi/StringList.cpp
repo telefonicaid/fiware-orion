@@ -65,7 +65,7 @@ void StringList::fill(const std::string& commaSeparatedList)
 *
 * render - 
 */
-std::string StringList::render(bool comma)
+std::string StringList::render(bool comma, const std::string& fieldName)
 {
   std::string  out = "";
 
@@ -74,11 +74,11 @@ std::string StringList::render(bool comma)
     return "";
   }
 
-  out += startTag("strings", true);
+  out += startTag(fieldName, true);
 
   for (unsigned int ix = 0; ix < stringV.size(); ++ix)
   {
-    out += valueTag("string", stringV[ix], ix != stringV.size() - 1, true);
+    out += valueTag(fieldName, stringV[ix], ix != stringV.size() - 1, true);
   }
 
   out += endTag(comma, true);
@@ -174,7 +174,7 @@ void StringList::push_back_if_absent(const std::string& string)
 {
   if (lookup(string) == false)
   {
-	  stringV.push_back(string);
+    stringV.push_back(string);
   }
 }
 

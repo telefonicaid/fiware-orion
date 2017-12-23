@@ -103,7 +103,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
     }
     else if (name == "attributes")
     {
-      std::string r = parseStringList(ciP, iter, &bqrP->attributeV,name);
+      std::string r = parseStringList(ciP, iter, &bqrP->attributeV, name);
 
       if (r != "OK")
       {
