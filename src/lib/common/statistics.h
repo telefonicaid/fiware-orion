@@ -307,6 +307,7 @@ extern int noOfSimulatedNotifications;
 extern int noOfBatchQueryRequest;
 extern int noOfBatchUpdateRequest;
 extern int noOfRegistrationRequest;
+extern int noOfRegistrationsRequest;
 
 
 

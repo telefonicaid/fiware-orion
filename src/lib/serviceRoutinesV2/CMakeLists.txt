@@ -52,6 +52,7 @@ deleteMetrics.cpp
 optionsGetOnly.cpp
 optionsGetPostOnly.cpp
 getRegistration.cpp
+postRegistration.cpp
 )
 
 SET (HEADERS
@@ -85,6 +86,8 @@ getMetrics.h
 deleteMetrics.h
 optionsGetOnly.h
 optionsGetPostOnly.h
+getRegistration.h
+postRegistration.h
 )
 
 

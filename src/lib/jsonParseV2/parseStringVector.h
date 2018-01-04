@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_COMMON_DEFAULTVALUES_H_
-#define SRC_LIB_COMMON_DEFAULTVALUES_H_
+#ifndef SRC_LIB_JSONPARSEV2_PARSESTRINGVECTOR_H_
+#define SRC_LIB_JSONPARSEV2_PARSESTRINGVECTOR_H_
 
 /*
 *
-* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,23 +25,24 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+#include <vector>
+
+#include "rapidjson/document.h"
 
 
 
 /* ****************************************************************************
 *
-* Default Service Paths
+* parseStringVector - 
 */
-#define  DEFAULT_SERVICE_PATH_UPDATES         "/"
-#define  DEFAULT_SERVICE_PATH_QUERIES         "/#"
-#define  DEFAULT_SERVICE_PATH_REGISTRATIONS   "/"
+extern bool parseStringVector
+(
+  std::vector<std::string>*  sVecP,
+  const rapidjson::Value&    jsonVector,
+  const std::string&         fieldName,
+  bool                       emptyStringNotAllowed,
+  std::string*               errorStringP
+);
 
-
-
-/* ****************************************************************************
-*
-* API Documentation - The link to the the GEri documentation, either in the gh-pages (.github.io/) inside the fiware organization in GitHub or ReadTheDocs manual.
-*/
-#define API_DOC                               "https://fiware-orion.readthedocs.org/en/master/"
-
-#endif  // SRC_LIB_COMMON_DEFAULTVALUES_H_
+#endif  // SRC_LIB_JSONPARSEV2_PARSESTRINGVECTOR_H_

@@ -1,4 +1,5 @@
 - Add: CORS Preflight Requests support for /v2 and /v2/entities, -corsMaxAge switch (#501)
 - Fix: case-sensitive header duplication (e.g. "Content-Type" and "Content-type") in custom notifications (#2893)
 - Add: support for GET /v2/registrations/<registration-id> (#3008)
+- Add: support for POST /v2/registrations to create registrations in APIv2 (#3004)
 - Fix: bug in GTE and LTE operations in query filters (q/mq), both for GET operations and subscriptions (#2995)

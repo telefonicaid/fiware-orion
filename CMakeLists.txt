@@ -75,7 +75,7 @@ add_definitions(-fPIC)
 # A grep of 'std::auto_ptr<' in the header files show 7 hits, and 13 hits in cpp files
 #
 IF (${DISTRO} STREQUAL "Ubuntu_17.04")
-  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -fno-var-tracking-assignments")
+  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
 ELSE()
   set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -fno-var-tracking-assignments")
 ENDIF ()

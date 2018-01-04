@@ -126,7 +126,7 @@ std::string DataProvided::toJson(void)
 std::string Provider::toJson(void)
 {
   JsonHelper   jh;
-  std::string  urlAsJson = "{\"url\": \"" + url + "\"}";
+  std::string  urlAsJson = "{\"url\": \"" + http.url + "\"}";
 
   jh.addRaw("http", urlAsJson);
   jh.addString("supportedForwardingMode", "all");

@@ -92,11 +92,23 @@ public:
 
 /* ****************************************************************************
 *
+* Http -
+*/
+struct Http
+{
+  std::string url;
+};
+
+
+
+/* ****************************************************************************
+*
 * Provider -
 */
 struct Provider
 {
-  std::string  url;
+  Http         http;
+  std::string  supportedForwardingMode;
 
   std::string  toJson();
 };

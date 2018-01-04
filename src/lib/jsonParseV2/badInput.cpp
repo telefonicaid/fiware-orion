@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_COMMON_DEFAULTVALUES_H_
-#define SRC_LIB_COMMON_DEFAULTVALUES_H_
-
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -23,25 +20,26 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Orion dev team
 */
+#include <string>
+
+#include "rest/ConnectionInfo.h"
+#include "rest/OrionError.h"
+#include "alarmMgr/alarmMgr.h"
 
 
 
 /* ****************************************************************************
 *
-* Default Service Paths
+* badInput -
 */
-#define  DEFAULT_SERVICE_PATH_UPDATES         "/"
-#define  DEFAULT_SERVICE_PATH_QUERIES         "/#"
-#define  DEFAULT_SERVICE_PATH_REGISTRATIONS   "/"
+std::string badInput(ConnectionInfo* ciP, const std::string& msg)
+{
+  alarmMgr.badInput(clientIp, msg);
+  OrionError oe(SccBadRequest, msg, "BadRequest");
 
+  ciP->httpStatusCode = oe.code;
 
-
-/* ****************************************************************************
-*
-* API Documentation - The link to the the GEri documentation, either in the gh-pages (.github.io/) inside the fiware organization in GitHub or ReadTheDocs manual.
-*/
-#define API_DOC                               "https://fiware-orion.readthedocs.org/en/master/"
-
-#endif  // SRC_LIB_COMMON_DEFAULTVALUES_H_
+  return oe.toJson();
+}

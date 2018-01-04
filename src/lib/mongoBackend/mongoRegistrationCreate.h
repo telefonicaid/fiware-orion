@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_COMMON_DEFAULTVALUES_H_
-#define SRC_LIB_COMMON_DEFAULTVALUES_H_
+#ifndef SRC_LIB_MONGOBACKEND_MONGOREGISTRATIONCREATE_H_
+#define SRC_LIB_MONGOBACKEND_MONGOREGISTRATIONCREATE_H_
 
 /*
 *
-* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,23 +25,26 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+#include <vector>
+
+#include "rest/HttpStatusCode.h"
+#include "rest/OrionError.h"
+#include "apiTypesV2/Registration.h"
 
 
 
 /* ****************************************************************************
 *
-* Default Service Paths
+* mongoRegistrationCreate - 
 */
-#define  DEFAULT_SERVICE_PATH_UPDATES         "/"
-#define  DEFAULT_SERVICE_PATH_QUERIES         "/#"
-#define  DEFAULT_SERVICE_PATH_REGISTRATIONS   "/"
+extern void mongoRegistrationCreate
+(
+  ngsiv2::Registration*  regP,
+  const std::string&     tenant,
+  const std::string&     servicePathV,
+  std::string*           regIdP,
+  OrionError*            oeP
+);
 
-
-
-/* ****************************************************************************
-*
-* API Documentation - The link to the the GEri documentation, either in the gh-pages (.github.io/) inside the fiware organization in GitHub or ReadTheDocs manual.
-*/
-#define API_DOC                               "https://fiware-orion.readthedocs.org/en/master/"
-
-#endif  // SRC_LIB_COMMON_DEFAULTVALUES_H_
+#endif  // SRC_LIB_MONGOBACKEND_MONGOREGISTRATIONCREATE_H_

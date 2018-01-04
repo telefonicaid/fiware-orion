@@ -206,6 +206,7 @@
 #include "serviceRoutinesV2/optionsGetOnly.h"
 #include "serviceRoutinesV2/optionsGetPostOnly.h"
 #include "serviceRoutinesV2/getRegistration.h"
+#include "serviceRoutinesV2/postRegistration.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
@@ -520,6 +521,10 @@ static const char* validLogLevels[] =
 #define REG                     RegistrationRequest
 #define REG_COMPS_V2            3, { "v2", "registrations", "*" }
 #define REG_COMPS_WORD          ""
+
+#define REGS                     RegistrationsRequest
+#define REGS_COMPS_V2            2, { "v2", "registrations" }
+#define REGS_COMPS_WORD          ""
 
 
 
@@ -849,7 +854,10 @@ static const char* validLogLevels[] =
 
 #define API_V2_REGISTRY                                                                                \
   { "GET",    REG,          REG_COMPS_V2,         REG_COMPS_WORD,          getRegistration          }, \
-  { "*",      REG,          REG_COMPS_V2,         REG_COMPS_WORD,          badVerbGetOnly           }
+  { "*",      REG,          REG_COMPS_V2,         REG_COMPS_WORD,          badVerbGetOnly           }, \
+                                                                                                       \
+  { "POST",   REGS,         REGS_COMPS_V2,        REGS_COMPS_WORD,         postRegistration         }, \
+  { "*",      REGS,         REGS_COMPS_V2,        REGS_COMPS_WORD,         badVerbPostOnly          }
   
 
 #define REGISTRY_STANDARD_REQUESTS_V0                                   \

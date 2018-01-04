@@ -160,6 +160,7 @@ int noOfSimulatedNotifications                           = -1;
 int noOfBatchQueryRequest                                = -1;
 int noOfBatchUpdateRequest                               = -1;
 int noOfRegistrationRequest                              = -1;
+int noOfRegistrationsRequest                             = -1;
 
 
 
@@ -387,5 +388,6 @@ void statisticsUpdate(RequestType request, MimeType inMimeType)
   case BatchUpdateRequest:                               ++noOfBatchUpdateRequest; break;
 
   case RegistrationRequest:                              ++noOfRegistrationRequest; break;
+  case RegistrationsRequest:                             ++noOfRegistrationsRequest; break;
   }
 }

@@ -125,6 +125,7 @@ const char* requestType(RequestType rt)
   case BatchUpdateRequest:                               return "BatchUpdateRequest";
 
   case RegistrationRequest:                              return "RegistrationRequest";
+  case RegistrationsRequest:                             return "RegistrationsRequest";
   }
 
   return "";

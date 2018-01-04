@@ -41,9 +41,11 @@
 #include "rest/Verb.h"
 #include "ngsi/Request.h"
 #include "parse/forbiddenChars.h"
+#include "jsonParseV2/badInput.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 #include "jsonParseV2/utilsParse.h"
+#include "jsonParseV2/parseEntitiesVector.h"
 #include "jsonParseV2/parseSubscription.h"
 
 
@@ -65,9 +67,7 @@ using rapidjson::Value;
 static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::string>* vec, const Value& attributes);
 static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& notification);
 static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& subject);
-static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* eivP, const Value& entities);
 static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& condition);
-static std::string badInput(ConnectionInfo* ciP, const std::string& msg);
 static std::string parseDictionary(ConnectionInfo*                      ciP,
                                    std::map<std::string, std::string>&  dict,
                                    const Value&                         object,
@@ -252,7 +252,8 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
 */
 static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& subject)
 {
-  std::string r;
+  std::string  r;
+  bool         b;
 
   subsP->subjectProvided  = true;
 
@@ -267,10 +268,11 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
     return badInput(ciP, "no subject entities specified");
   }
 
-  r = parseEntitiesVector(ciP, &subsP->subject.entities, subject["entities"]);
-  if (r != "")
+  std::string errorString;
+  b = parseEntitiesVector(ciP, &subsP->subject.entities, subject["entities"], &errorString);
+  if (b == false)
   {
-    return r;
+    return badInput(ciP, errorString);
   }
 
   // Condition
@@ -296,162 +298,6 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
   }
 
   return r;
-}
-
-
-
-/* ****************************************************************************
-*
-* parseEntitiesVector -
-*
-*/
-static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* eivP, const Value& entities)
-{
-  if (!entities.IsArray())
-  {
-    return badInput(ciP, "subject entities is not an array");
-  }
-
-  for (Value::ConstValueIterator iter = entities.Begin(); iter != entities.End(); ++iter)
-  {
-    if (!iter->IsObject())
-    {
-      return badInput(ciP, "subject entities element is not an object");
-    }
-
-    if (!iter->HasMember("id") && !iter->HasMember("idPattern"))
-    {
-      return badInput(ciP, "subject entities element does not have id nor idPattern");
-    }
-
-    if (iter->HasMember("id") && iter->HasMember("idPattern"))
-    {
-      return badInput(ciP, "subject entities element has id and idPattern");
-    }
-
-    if (iter->HasMember("type") && iter->HasMember("typePattern"))
-    {
-      return badInput(ciP, "subject entities element has type and typePattern");
-    }
-
-
-    std::string  id;
-    std::string  idPattern;
-    std::string  type;
-    std::string  typePattern;
-
-    {
-      Opt<std::string> idOpt = getStringOpt(*iter, "id", "subject entities element id");
-
-      if (!idOpt.ok())
-      {
-        return badInput(ciP, idOpt.error);
-      }
-      else if (idOpt.given)
-      {
-        if (idOpt.value.empty())
-        {
-          return badInput(ciP, "subject entities element id is empty");
-        }
-        if (forbiddenIdCharsV2(idOpt.value.c_str()))
-        {
-          return badInput(ciP, "forbidden characters in subject entities element id");
-        }
-        if (idOpt.value.length() > MAX_ID_LEN)
-        {
-          return badInput(ciP, "max id length exceeded");
-        }
-        id = idOpt.value;
-      }
-    }
-
-    {
-      Opt<std::string> idPatOpt = getStringOpt(*iter, "idPattern", "subject entities element idPattern");
-
-      if (!idPatOpt.ok())
-      {
-        return badInput(ciP, idPatOpt.error);
-      }
-      else if (idPatOpt.given)
-      {
-        if (idPatOpt.value.empty())
-        {
-          return badInput(ciP, "subject entities element idPattern is empty");
-        }
-
-        idPattern = idPatOpt.value;
-
-        // FIXME P5: Keep the regex and propagate to sub-cache
-        regex_t re;
-        if (regcomp(&re, idPattern.c_str(), REG_EXTENDED) != 0)
-        {
-          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTIDPATTERN);
-        }
-        regfree(&re);  // If regcomp fails it frees up itself
-      }
-    }
-
-    {
-      Opt<std::string> typeOpt = getStringOpt(*iter, "type", "subject entities element type");
-
-      if (!typeOpt.ok())
-      {
-        return badInput(ciP, typeOpt.error);
-      }
-      else if (typeOpt.given)
-      {
-        if (forbiddenIdCharsV2(typeOpt.value.c_str()))
-        {
-          return badInput(ciP, "forbidden characters in subject entities element type");
-        }
-        if (typeOpt.value.length() > MAX_ID_LEN)
-        {
-          return badInput(ciP, "max type length exceeded");
-        }
-        if (typeOpt.value.empty())
-        {
-          return badInput(ciP, ERROR_DESC_BAD_REQUEST_EMPTY_ENTTYPE);
-        }
-        type = typeOpt.value;
-      }
-    }
-
-    {
-      Opt<std::string> typePatOpt = getStringOpt(*iter, "typePattern", "subject entities element typePattern");
-
-      if (!typePatOpt.ok())
-      {
-        return badInput(ciP, typePatOpt.error);
-      }
-      else if (typePatOpt.given)
-      {
-        if (typePatOpt.value.empty())
-        {
-          return badInput(ciP, "subject entities element typePattern is empty");
-        }
-
-        typePattern = typePatOpt.value;
-
-        // FIXME P5: Keep the regex and propagate to sub-cache
-        regex_t re;
-        if (regcomp(&re, typePattern.c_str(), REG_EXTENDED) != 0)
-        {
-          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTTYPEPATTERN);
-        }
-        regfree(&re);  // If regcomp fails it frees up itself
-      }
-    }
-
-
-    EntID  eid(id, idPattern, type, typePattern);
-
-    if (std::find(eivP->begin(), eivP->end(), eid) == eivP->end())  // if not already included
-    {
-      eivP->push_back(eid);
-    }
-  }
-
-  return "";
 }
 
 
@@ -1008,20 +854,4 @@ static std::string parseDictionary
   }
 
   return "";
-}
-
-
-
-/* ****************************************************************************
-*
-* badInput -
-*/
-static std::string badInput(ConnectionInfo* ciP, const std::string& msg)
-{
-  alarmMgr.badInput(clientIp, msg);
-  OrionError oe(SccBadRequest, msg, "BadRequest");
-
-  ciP->httpStatusCode = oe.code;
-
-  return oe.toJson();
 }

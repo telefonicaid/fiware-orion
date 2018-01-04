@@ -73,13 +73,13 @@ echo
 01. POST /v2/subscriptions
 ==========================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 96
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "max type length exceeded",
+    "description": "max type length exceeded in /entities/ vector item /type/",
     "error": "BadRequest"
 }
 

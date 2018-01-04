@@ -130,6 +130,7 @@ typedef enum RequestType
 
   // v2 registration
   RegistrationRequest,
+  RegistrationsRequest,
 
   InvalidRequest = 100
 } RequestType;
