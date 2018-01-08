@@ -1,6 +1,6 @@
 #!/bin/bash
 
-q#
+#
 # contextBroker         Start/Stop the Context Broker
 #
 # chkconfig: 2345 99 60
@@ -138,7 +138,7 @@ broker_coredump_start()
         cd /var/cb_cores
         rotate_cores &
         ulimit -c unlimited
-        ulimit -n {{ orion_config.orion_root_max_open_files | mandatory }}
+        ulimit -n 10240
         ${EXECUTABLE} ${BROKER_OPTS} -fg &> /dev/null &
         sleep 2 # wait some time to let the contextbroker start
         ps -ef | grep ${EXECUTABLE} | grep -v grep | awk '{print $2}' > ${BROKER_PID_FILE}

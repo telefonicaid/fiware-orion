@@ -34,6 +34,9 @@ BROKER_PORT=1026
 # BROKER_LOG_DIR - Where to log to
 BROKER_LOG_DIR=/var/log/contextBroker
 
+# BROKER_LOG_LEVEL - Log File Level
+BROKER_LOG_LEVEL=WARN
+
 # BROKER_PID_FILE - Where to store the pid for orion-broker
 BROKER_PID_FILE=/var/run/contextBroker/contextBroker.pid
 
