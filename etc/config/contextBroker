@@ -57,3 +57,10 @@ BROKER_DATABASE_NAME=orion
 # We need to start the CB with log append mode to not overwrite previous logs and logrotate work correctly
 BROKER_EXTRA_OPS="-multiservice -logAppend"
 
+# The next environment variable generates, if it is defined as 'true', an archive in the 
+# path /var/cb_cores with the core file and the logs when the process crash. When this var is 'true' 
+# the process is started with 'root' user. Use this parameter for debug purposes.
+# The archive name has the next format: /var/cb_cores/CB_core_yyyymmdd_HHMMSS.tar.bz2. 
+# IE: /var/cb_cores/CB_core_220180108_151502.tar.bz2.
+# To avoid filling the disk only the las 8 cores and logs are maintained.
+GENERATE_COREDUMP=false
