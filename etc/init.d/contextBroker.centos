@@ -140,7 +140,7 @@ broker_coredump_start()
         ulimit -c unlimited
         ulimit -n {{ orion_config.orion_root_max_open_files | mandatory }}
         ${EXECUTABLE} ${BROKER_OPTS} -fg &> /dev/null &
-        sleep 2 # wait some time to leave contextbroker start
+        sleep 2 # wait some time to let the contextbroker start
         ps -ef | grep ${EXECUTABLE} | grep -v grep | awk '{print $2}' > ${BROKER_PID_FILE}
         PID=$(cat ${BROKER_PID_FILE})
         if [[ -z "${PID}" ]]; then
@@ -161,7 +161,8 @@ broker_stop()
 {
     printf "%-50s" "Stopping $NAME..."
     if [ -f "${BROKER_PID_FILE}" ]; then
-        kill $(cat ${BROKER_PID_FILE}) 2> /dev/null
+        kill -HUP $(cat ${BROKER_PID_FILE}) 2> /dev/null
+        # kill $(cat ${BROKER_PID_FILE}) 2> /dev/null
         rm -f ${BROKER_PID_FILE}
         printf "%s\n" "$(success)"
     else
