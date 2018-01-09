@@ -121,6 +121,7 @@ Date: REGEX(.*)
 ==================================================================================
 HTTP/1.1 200 OK
 Content-Length: 279
+Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: rivendel
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

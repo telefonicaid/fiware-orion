@@ -163,12 +163,14 @@ void restReply(ConnectionInfo* ciP, const std::string& _answer)
     }
   }
 
-  // Check if CORS is enabled and the response is not a bad verb response
-  if ((corsEnabled == true) && (ciP->httpStatusCode != SccBadVerb))
+  // Check if CORS is enabled, the Origin header is present in the request and the response is not a bad verb response
+  if ((corsEnabled == true) && (ciP->httpHeaders.origin != "") && (ciP->httpStatusCode != SccBadVerb))
   {
-    //Only GET method is supported for V1 API
+    // Only GET method is supported for V1 API
     if ((ciP->apiVersion == V2) || (ciP->apiVersion == V1 && ciP->verb == GET))
     {
+      bool originAllowed = true;
+
       // If any origin is allowed, the header is sent always with "any" as value
       if (strcmp(corsOrigin, "__ALL") == 0)
       {
@@ -179,16 +181,28 @@ void restReply(ConnectionInfo* ciP, const std::string& _answer)
       {
         MHD_add_response_header(response, ACCESS_CONTROL_ALLOW_ORIGIN, corsOrigin);
       }
-    }
+      // If there is no match, originAllowed flag is set to false
+      else
+      {
+        originAllowed = false;
+      }
 
-    if (ciP->verb == OPTIONS)
-    {
-      MHD_add_response_header(response, ACCESS_CONTROL_ALLOW_HEADERS, CORS_ALLOWED_HEADERS);
+      // If the origin is not allowed, no headers are added to the response
+      if (originAllowed)
+      {
+        // Add Access-Control-Expose-Headers to the response
+        MHD_add_response_header(response, ACCESS_CONTROL_EXPOSE_HEADERS, CORS_EXPOSED_HEADERS);
 
-      char maxAge[STRING_SIZE_FOR_INT];
-      snprintf(maxAge, sizeof(maxAge), "%d", corsMaxAge);
+        if (ciP->verb == OPTIONS)
+        {
+          MHD_add_response_header(response, ACCESS_CONTROL_ALLOW_HEADERS, CORS_ALLOWED_HEADERS);
 
-      MHD_add_response_header(response, ACCESS_CONTROL_MAX_AGE, maxAge);
+          char maxAge[STRING_SIZE_FOR_INT];
+          snprintf(maxAge, sizeof(maxAge), "%d", corsMaxAge);
+
+          MHD_add_response_header(response, ACCESS_CONTROL_MAX_AGE, maxAge);
+        }
+      }
     }
   }
 

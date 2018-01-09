@@ -27,6 +27,8 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/HttpHeaders.h"
+#include "rest/rest.h"
 #include "serviceRoutinesV2/optionsPostOnly.h"
 
 
@@ -45,8 +47,11 @@ std::string optionsPostOnly
   ParseData*                 parseDataP
 )
 {
-  ciP->httpHeader.push_back("Access-Control-Allow-Methods");
-  ciP->httpHeaderValue.push_back("POST, OPTIONS");
+  if (isOriginAllowedForCORS(ciP->httpHeaders.origin))
+  {
+    ciP->httpHeader.push_back(ACCESS_CONTROL_ALLOW_METHODS);
+    ciP->httpHeaderValue.push_back("POST, OPTIONS");
+  }
   ciP->httpStatusCode = SccOk;
 
   return "";

@@ -813,6 +813,18 @@ void firstServicePath(const char* servicePath, char* servicePath0, int servicePa
 
 /* ****************************************************************************
 *
+* isOriginAllowedForCORS - checks the Origin header of the request and returns
+* true if that Origin is allowed to make a CORS request
+*/
+bool isOriginAllowedForCORS(const std::string& requestOrigin)
+{
+  return ((requestOrigin != "") && ((strcmp(corsOrigin, "__ALL") == 0) || (strcmp(requestOrigin.c_str(), corsOrigin) == 0)));
+}
+
+
+
+/* ****************************************************************************
+*
 * servicePathSplit -
 */
 int servicePathSplit(ConnectionInfo* ciP)
