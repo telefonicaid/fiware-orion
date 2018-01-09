@@ -116,9 +116,10 @@ The list of available options is the following:
 -   **-cprForwardLimit**. Maximum number of forwarded requests to Context Providers for a single client request
     (default is no limit). Use 0 to disable Context Providers forwarding completely.
 -   **-corsOrigin <domain>**. Enables Cross-Origin Resource Sharing,
-    specifing the allowed origin (use `__ALL` for `*`). Detailed information on CORS can be found [here](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) and [here](https://www.w3.org/TR/cors/).
+    specifing the allowed origin (use `__ALL` for `*`). More information about CORS support in Orion can be found
+    in [the users manual](../user/cors.md).
 -   **-corsMaxAge <time>**. Specifies the maximum time (in seconds) preflight requests are allowed to be cached. Defaults
-    to 86400 if not set.
+    to 86400 if not set. More information about CORS support in Orion can be found in [the users manual](../user/cors.md).
 -   **-reqMutexPolicy <all|none|write|read>**. Specifies the internal
     mutex policy. See [performance tuning](perf_tuning.md#mutex-policy-impact-on-performance) documentation
     for details.

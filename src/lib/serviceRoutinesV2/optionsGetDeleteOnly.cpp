@@ -27,6 +27,8 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/HttpHeaders.h"
+#include "rest/rest.h"
 #include "serviceRoutinesV2/optionsGetDeleteOnly.h"
 
 
@@ -45,8 +47,11 @@ std::string optionsGetDeleteOnly
   ParseData*                 parseDataP
 )
 {
-  ciP->httpHeader.push_back("Access-Control-Allow-Methods");
-  ciP->httpHeaderValue.push_back("GET, DELETE, OPTIONS");
+  if (isOriginAllowedForCORS(ciP->httpHeaders.origin))
+  {
+    ciP->httpHeader.push_back(ACCESS_CONTROL_ALLOW_METHODS);
+    ciP->httpHeaderValue.push_back("GET, DELETE, OPTIONS");
+  }
   ciP->httpStatusCode = SccOk;
 
   return "";

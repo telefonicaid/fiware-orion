@@ -20,6 +20,11 @@
 
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
+# CORS functionality is tested with a collection of test files in this directory.
+# This CORS test focuses on the Access-Control-Allow-Methods header. Other CORS 
+# related headers in this test file use REGEX(.*) as value since they are being 
+# tested in their respective test files.
+
 --NAME--
 CORS allowed methods
 
@@ -30,73 +35,73 @@ brokerStart CB 0-255 IPV4 -corsOrigin __ALL
 --SHELL--
 echo "01. Entry Points - Allowed methods: GET OPTIONS"
 echo "==============================================="
-orionCurl --url /v2 -X OPTIONS
+orionCurl --url /v2 -X OPTIONS --origin TEST_ORIGIN
 echo
 echo
 
 echo "02. All Entities - Allowed methods: GET POST OPTIONS"
 echo "===================================================="
-orionCurl --url /v2/entities -X OPTIONS
+orionCurl --url /v2/entities -X OPTIONS --origin TEST_ORIGIN
 echo
 echo
 
 echo "03. Entity - Allowed methods: GET DELETE OPTIONS"
 echo "================================================"
-orionCurl --url /v2/entities/testEntity -X OPTIONS
+orionCurl --url /v2/entities/testEntity -X OPTIONS --origin TEST_ORIGIN
 echo
 echo
 
 echo "04. Entity Attributes - Allowed methods: GET PATCH POST PUT OPTIONS"
 echo "==================================================================="
-orionCurl --url /v2/entities/testEntity/attrs -X OPTIONS
+orionCurl --url /v2/entities/testEntity/attrs -X OPTIONS --origin TEST_ORIGIN
 echo
 echo
 
 echo "05. Entity Attribute Value - Allowed methods: GET PUT OPTIONS"
 echo "============================================================="
-orionCurl --url /v2/entities/testEntity/attrs/testAttr/value -X OPTIONS
+orionCurl --url /v2/entities/testEntity/attrs/testAttr/value -X OPTIONS --origin TEST_ORIGIN
 echo
 echo
 
 echo "06. Entity Attribute - Allowed methods: GET PUT DELETE OPTIONS"
 echo "=============================================================="
-orionCurl --url /v2/entities/testEntity/attrs/testAttr -X OPTIONS
+orionCurl --url /v2/entities/testEntity/attrs/testAttr -X OPTIONS --origin TEST_ORIGIN
 echo
 echo
 
 echo "07. Entity Type - Allowed methods: GET OPTIONS"
 echo "=============================================="
-orionCurl --url /v2/types/testType -X OPTIONS
+orionCurl --url /v2/types/testType -X OPTIONS --origin TEST_ORIGIN
 echo
 echo
 
 echo "08. All Entity Types - Allowed methods: GET OPTIONS"
 echo "==================================================="
-orionCurl --url /v2/types -X OPTIONS
+orionCurl --url /v2/types -X OPTIONS --origin TEST_ORIGIN
 echo
 echo
 
 echo "09. All Subscriptions - Allowed methods: GET POST OPTIONS"
 echo "========================================================="
-orionCurl --url /v2/subscriptions -X OPTIONS
+orionCurl --url /v2/subscriptions -X OPTIONS --origin TEST_ORIGIN
 echo
 echo
 
 echo "10. Specific Subscription - Allowed methods: GET DELETE PATCH OPTIONS"
 echo "====================================================================="
-orionCurl --url /v2/subscriptions/testSub -X OPTIONS
+orionCurl --url /v2/subscriptions/testSub -X OPTIONS --origin TEST_ORIGIN
 echo
 echo
 
 echo "11. Batch Query - Allowed methods: POST OPTIONS"
 echo "==============================================="
-orionCurl --url /v2/op/query -X OPTIONS
+orionCurl --url /v2/op/query -X OPTIONS --origin TEST_ORIGIN
 echo
 echo
 
 echo "12. Batch Update - Allowed methods: POST OPTIONS"
 echo "================================================"
-orionCurl --url /v2/op/update -X OPTIONS
+orionCurl --url /v2/op/update -X OPTIONS --origin TEST_ORIGIN
 echo
 echo
 
@@ -105,8 +110,9 @@ echo
 ===============================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: 86400
+Access-Control-Max-Age: REGEX([0-9]+)
 Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -118,8 +124,9 @@ Date: REGEX(.*)
 ====================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: 86400
+Access-Control-Max-Age: REGEX([0-9]+)
 Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, POST, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -131,8 +138,9 @@ Date: REGEX(.*)
 ================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: 86400
+Access-Control-Max-Age: REGEX([0-9]+)
 Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, DELETE, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -144,8 +152,9 @@ Date: REGEX(.*)
 ===================================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: 86400
+Access-Control-Max-Age: REGEX([0-9]+)
 Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, PATCH, POST, PUT, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -157,8 +166,9 @@ Date: REGEX(.*)
 =============================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: 86400
+Access-Control-Max-Age: REGEX([0-9]+)
 Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, PUT, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -170,8 +180,9 @@ Date: REGEX(.*)
 ==============================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: 86400
+Access-Control-Max-Age: REGEX([0-9]+)
 Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, PUT, DELETE, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -183,8 +194,9 @@ Date: REGEX(.*)
 ==============================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: 86400
+Access-Control-Max-Age: REGEX([0-9]+)
 Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -196,8 +208,9 @@ Date: REGEX(.*)
 ===================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: 86400
+Access-Control-Max-Age: REGEX([0-9]+)
 Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -209,8 +222,9 @@ Date: REGEX(.*)
 =========================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: 86400
+Access-Control-Max-Age: REGEX([0-9]+)
 Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, POST, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -222,8 +236,9 @@ Date: REGEX(.*)
 =====================================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: 86400
+Access-Control-Max-Age: REGEX([0-9]+)
 Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, DELETE, PATCH, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -235,8 +250,9 @@ Date: REGEX(.*)
 ===============================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: 86400
+Access-Control-Max-Age: REGEX([0-9]+)
 Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: POST, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -248,8 +264,9 @@ Date: REGEX(.*)
 ================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Access-Control-Max-Age: 86400
+Access-Control-Max-Age: REGEX([0-9]+)
 Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: POST, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
