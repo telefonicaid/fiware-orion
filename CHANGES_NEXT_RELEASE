@@ -1,0 +1,1 @@
+- Fix: Invalid description in POST /op/query error response (#2991)

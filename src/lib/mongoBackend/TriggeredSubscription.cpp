@@ -43,7 +43,7 @@ TriggeredSubscription::TriggeredSubscription
   long long                _lastNotification,
   RenderFormat             _renderFormat,
   const ngsiv2::HttpInfo&  _httpInfo,
-  const AttributeList&     _attrL,
+  const StringList&        _attrL,
   const std::string&       _cacheSubId,
   const char*              _tenant
 )
@@ -73,7 +73,7 @@ TriggeredSubscription::TriggeredSubscription
 (
   RenderFormat             _renderFormat,
   const ngsiv2::HttpInfo&  _httpInfo,
-  const AttributeList&     _attrL
+  const StringList&        _attrL
 )
 :
   throttling(-1),
