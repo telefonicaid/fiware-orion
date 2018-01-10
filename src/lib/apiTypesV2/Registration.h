@@ -101,16 +101,30 @@ struct Http
 
 
 
+/* *****************************************************************************
+*
+* ForwardingMode -
+*/
+typedef enum ForwardingMode
+{
+  ForwardAll,
+  ForwardNone,
+  ForwardQuery,
+  ForwardUpdate
+} ForwardingMode;
+
+
+
 /* ****************************************************************************
 *
 * Provider -
 */
 struct Provider
 {
-  Http         http;
-  std::string  supportedForwardingMode;
+  Http            http;
+  ForwardingMode  supportedForwardingMode;
 
-  std::string  toJson();
+  std::string     toJson();
 };
 
 

@@ -212,21 +212,25 @@ static bool providerParse(ConnectionInfo* ciP, ngsiv2::Provider* providerP, cons
 
   if (provider.HasMember("supportedForwardingMode"))
   {
-    const rapidjson::Value& supportedForwardingMode = provider["supportedForwardingMode"];
-    if (!supportedForwardingMode.IsString())
+    const rapidjson::Value& supportedForwardingModeValue = provider["supportedForwardingMode"];
+    std::string             supportedForwardingMode;
+
+    if (!supportedForwardingModeValue.IsString())
     {
       *errorStringP = "/supportedForwardingMode/ must be a JSON string";
       return false;
     }
 
-    providerP->supportedForwardingMode = supportedForwardingMode.GetString();
-    
+    supportedForwardingMode = supportedForwardingModeValue.GetString();
+
     //
-    // Valid strings: ngsiV2, legacy, all
+    // Check Valid strings for supportedForwardingMode
     //
-    if ((providerP->supportedForwardingMode != "ngsiV2") &&  // FIXME PR: what are the exact values?
-        (providerP->supportedForwardingMode != "legacy") &&
-        (providerP->supportedForwardingMode != "all"))
+    if      (supportedForwardingMode == "none")   providerP->supportedForwardingMode = ngsiv2::ForwardNone;
+    else if (supportedForwardingMode == "query")  providerP->supportedForwardingMode = ngsiv2::ForwardQuery;
+    else if (supportedForwardingMode == "update") providerP->supportedForwardingMode = ngsiv2::ForwardUpdate;
+    else if (supportedForwardingMode == "all")    providerP->supportedForwardingMode = ngsiv2::ForwardAll;
+    else
     {
       *errorStringP = "invalid value of /supportedForwardingMode/";
       return false;
@@ -234,7 +238,7 @@ static bool providerParse(ConnectionInfo* ciP, ngsiv2::Provider* providerP, cons
   }
   else
   {
-    providerP->supportedForwardingMode = "legacy";  // FIXME PR: what is the default value?
+    providerP->supportedForwardingMode = ngsiv2::ForwardAll;
   }
 
   return true;
