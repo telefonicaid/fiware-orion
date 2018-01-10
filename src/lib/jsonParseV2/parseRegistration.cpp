@@ -345,8 +345,7 @@ std::string parseRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP)
   }
   else
   {
-    // FIXME PR: default expiration?
-    regP->expires = getCurrentTime() + DEFAULT_DURATION_IN_SECONDS;
+    regP->expires = 0x7FFFFFFFFFFFFFFF;
   }
   
   //

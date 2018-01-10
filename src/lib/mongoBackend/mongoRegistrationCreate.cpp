@@ -115,29 +115,14 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
   for (unsigned int eIx = 0; eIx < regP->dataProvided.entities.size(); ++eIx)
   {
     ngsiv2::EntID* eP = &regP->dataProvided.entities[eIx];
-    std::string    eId;
-    std::string    eType;
 
-    eId           = (eP->idPattern   != "")? eP->idPattern : eP->id;
-    eType         = (eP->typePattern != "")? eP->typePattern : eP->type;
-
-    //
-    // FIXME PR: should patterns be supported or not?
-    //
-    // std::string  isIdPattern   = (eP->idPattern   != "")? "true" : "false";
-    // bool         isTypePattern = (eP->typePattern != "")? true : false;
-
-    if (eType == "")  // No type provided => all types
+    if (eP->type == "")  // No type provided => all types
     {
-      // entities.append(BSON(REG_ENTITY_ID << eId << REG_ENTITY_ISPATTERN << isIdPattern));
-      entities.append(BSON(REG_ENTITY_ID << eId));
+      entities.append(BSON(REG_ENTITY_ID << eP->id));
     }
     else
     {
-      // entities.append(BSON(REG_ENTITY_ID   << eId   << REG_ENTITY_ISPATTERN     << isIdPattern <<
-      //                      REG_ENTITY_TYPE << eType << REG_ENTITY_ISTYPEPATTERN << isTypePattern));
-
-      entities.append(BSON(REG_ENTITY_ID   << eId   << REG_ENTITY_TYPE << eType));
+      entities.append(BSON(REG_ENTITY_ID << eP->id << REG_ENTITY_TYPE << eP->type));
     }
   }
 
