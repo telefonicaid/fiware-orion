@@ -1,1 +1,3 @@
 - Fix: Bug that may cause contextBroker to crash when passing inappropriate parameter in query context payload (#3055)
+- Fix: Invalid description in POST /op/query error response (#2991)
+
