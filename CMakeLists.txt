@@ -57,7 +57,7 @@ add_definitions(-fPIC)
 
 #
 # FIXME P4: https://github.com/telefonicaid/fiware-orion/issues/2979
-#   'template class std::auto_ptr' is deprecated in gcc 6.3.0 of Ubuntu 17.04, so -Werror cannot be used, at least not for now.
+#   'template class std::auto_ptr' is deprecated in gcc 6.3.0 of Ubuntu 17.04, so -Werror cannot be used alone, at least not for now.
 #
 #   The *real* fix would be to rewrite the part of the code producing these warnings, but for now,
 #   disabling the -Werror flag makes the problem go away (warnings will still be found and give errors in other distros).
@@ -74,7 +74,7 @@ add_definitions(-fPIC)
 #
 # A grep of 'std::auto_ptr<' in the header files show 7 hits, and 13 hits in cpp files
 #
-# In PR https://github.com/apinf/fiware-orion/pull/15, a workaround for Ubuntu is implemented.
+# In PR https://github.com/telefonicaid/fiware-orion/pull/3069, a workaround for Ubuntu is implemented.
 # This workaround consists of putting back the -Werror flag and instead solving the problem by
 # adding another flag: -Wno-deprecated-declarations
 #
