@@ -208,13 +208,8 @@ bool parseEntitiesVector
       }
     }
 
-
     ngsiv2::EntID  eid(id, idPattern, type, typePattern);
 
-    //
-    // FIXME PR: the following commented line gives strange compilation errors in Ubuntu 17.04
-    //   if (std::find(eivP->begin(), eivP->end(), eid) == eivP->end())  // if not already included
-    //
     eivP->push_back(eid);
   }
 
