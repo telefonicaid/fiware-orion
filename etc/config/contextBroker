@@ -73,4 +73,6 @@ BROKER_EXTRA_OPS="-multiservice -logAppend"
 #     Check /etc/init.d/contextBroker for details
 #   * The archive name has the next format: /var/cb_cores/CB_core_yyyymmdd_HHMMSS.tar.bz2, e.g. /var/cb_cores/CB_core_220180108_151502.tar.bz2
 #   * To avoid filling the disk only the las 8 cores and logs are maintained.
+#   * Have a look to the coredump_watcher.sh script (can be found at Orion repo at https://github.com/telefonicaid/fiware-orion/tree/master/scripts),
+#     which can be used to send an email whenever a new core file is generated
 GENERATE_COREDUMP=false
