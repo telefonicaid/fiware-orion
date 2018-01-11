@@ -141,6 +141,40 @@ void SubscriptionId::present(const std::string& indent)
 
 /* ****************************************************************************
 *
+* SubscriptionId::toJson -
+*/
+std::string SubscriptionId::toJson(RequestType container, bool comma)
+{
+  std::string xString = string;
+
+  if (xString == "")
+  {
+    if ((container == RtSubscribeContextAvailabilityResponse)          ||
+        (container == RtUpdateContextAvailabilitySubscriptionResponse) ||
+        (container == RtUnsubscribeContextAvailabilityResponse)        ||
+        (container == NotifyContextAvailability)                       ||
+        (container == UpdateContextSubscription)                       ||
+        (container == UnsubscribeContext)                              ||
+        (container == RtUnsubscribeContextResponse)                    ||
+        (container == NotifyContext)                                   ||
+        (container == RtSubscribeResponse)                             ||
+        (container == RtSubscribeError))
+    {
+      // subscriptionId is Mandatory
+      xString = "000000000000000000000000";
+    }
+    else
+    {
+      return "";  // subscriptionId is Optional
+    }
+  }
+
+  return xString;
+}
+
+
+/* ****************************************************************************
+*
 * SubscriptionId::render -
 */
 std::string SubscriptionId::render(RequestType container, bool comma)

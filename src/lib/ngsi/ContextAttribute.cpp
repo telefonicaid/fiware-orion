@@ -709,9 +709,7 @@ std::string ContextAttribute::render
 *
 * toJson -
 *
-* FIXME: Refactor this method in order to simplify
-*        the code paths of the rendering process
-*
+* FIXME: Refactor this method in order to simplify the code paths of the rendering process
 */
 std::string ContextAttribute::toJson
 (
@@ -1141,6 +1139,8 @@ std::string ContextAttribute::getName(void)
 {
   return name;
 }
+
+
 
 /* ****************************************************************************
 *

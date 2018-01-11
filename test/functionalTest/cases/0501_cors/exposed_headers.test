@@ -1,0 +1,59 @@
+# Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+# CORS functionality is tested with a collection of test files in this directory.
+# This CORS test focuses on the Access-Control-Expose-Headers header. Other CORS
+# related headers in this test file use REGEX(.*) as value since they are being
+# tested in their respective test files.
+
+--NAME--
+CORS Exposed Headers
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255 IPV4 -corsOrigin __ALL
+
+--SHELL--
+echo "01. CORS Exposed Headers"
+echo "========================"
+orionCurl --url /v2 -X OPTIONS --origin TEST_ORIGIN
+echo
+echo
+
+--REGEXPECT--
+01. CORS Exposed Headers
+========================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: REGEX([0-9]+)
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: Fiware-Correlator, Fiware-Total-Count, Location 
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

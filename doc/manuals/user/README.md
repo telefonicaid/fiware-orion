@@ -1,8 +1,8 @@
- 
+
 # User & Programmer's Manual
- 
+
  Orion Context Broker: User & Programmer's Manual
- 
+
 ## Table of Contents
 
   * [API Walkthrough (v2)](walkthrough_apiv2.md)
@@ -27,5 +27,7 @@
   * [HTTP and NGSI response codes](http_and_ngsi_sc.md)
   * [Security considerations](security.md)
   * [Known Limitations](known_limitations.md)
-  * [Considerations on NGSIv1 and NGSIv2 coexistence](v1_v2_coexistence.md)
+  * [CORS](cors.md)
+  * [Docker](docker.md)
   * [NGSIv2 Implementation Notes](ngsiv2_implementation_notes.md)
+  * [Considerations on NGSIv1 and NGSIv2 coexistence](v1_v2_coexistence.md)

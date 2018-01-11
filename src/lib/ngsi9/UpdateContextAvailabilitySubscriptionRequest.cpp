@@ -64,7 +64,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::render(void)
 
   out += startTag();
   out += entityIdVector.render(commaAfterEntityIdVector);
-  out += attributeList.render(commaAfterAttributeList);
+  out += attributeList.render(commaAfterAttributeList, "attributes");
   out += duration.render(commaAfterDuration);
   out += restriction.render(restrictions, commaAfterRestriction);
   out += subscriptionId.render(UpdateContextAvailabilitySubscription, commaAfterSubscriptionId);

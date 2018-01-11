@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_JSONPARSEV2_PARSEATTRIBUTELIST_H_
-#define SRC_LIB_JSONPARSEV2_PARSEATTRIBUTELIST_H_
+#ifndef SRC_LIB_JSONPARSEV2_PARSESTRINGLIST_H_
+#define SRC_LIB_JSONPARSEV2_PARSESTRINGLIST_H_
 
 /*
 *
@@ -30,19 +30,20 @@
 #include "rapidjson/document.h"
 
 #include "rest/ConnectionInfo.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 
 
 
 /* ****************************************************************************
 *
-* parseAttributeList - 
+* parseStringList -
 */
-extern std::string parseAttributeList
+extern std::string parseStringList
 (
   ConnectionInfo*                               ciP,
   const rapidjson::Value::ConstMemberIterator&  iter,
-  AttributeList*                                aP
+  StringList*                                   sP,
+  const std::string&                            fieldName
 );
 
-#endif  // SRC_LIB_JSONPARSEV2_PARSEATTRIBUTELIST_H_
+#endif  // SRC_LIB_JSONPARSEV2_PARSESTRINGLIST_H_

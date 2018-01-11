@@ -2906,12 +2906,15 @@ int64_t lmLogLineGet
 
     // Set file pointer to the beginning of the fifth line
     char* fgP;
+
     fgP = fgets(line, 1024, fP);
     if (fgP != NULL) fgP = fgets(line, 1024, fP);
     if (fgP != NULL) fgP = fgets(line, 1024, fP);
     if (fgP != NULL) fgP = fgets(line, 1024, fP);
     if (fgP == NULL)
+    {
       goto lmerror;
+    }
   }
   else
   {

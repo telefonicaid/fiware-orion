@@ -47,6 +47,7 @@ typedef struct SubscribeContextResponse
   ~SubscribeContextResponse();
 
   std::string render(void);
+  std::string toJson(void);
 } SubscribeContextResponse;
 
 #endif  // SRC_LIB_NGSI10_SUBSCRIBECONTEXTRESPONSE_H_

@@ -67,9 +67,6 @@ std::string postBatchQuery
   Entities              entities;
   std::string           answer;
 
-  qcrP->fill(bqP);
-  bqP->release();  // qcrP just 'took over' the data from bqP, bqP no longer needed
-
   //
   // This request does not support (it ignores) the URI parameter 'metadata'.
   // Instead the metadata filter comes inside the payload.
@@ -79,6 +76,9 @@ std::string postBatchQuery
   // URI param with the value of the metadata filter from the payload.
   //
   ciP->uriParam[URI_PARAM_METADATA] = bqP->metadataV.toString();
+
+  qcrP->fill(bqP);
+  bqP->release();  // qcrP just 'took over' the data from bqP, bqP no longer needed
 
   answer = postQueryContext(ciP, components, compV, parseDataP);
 
