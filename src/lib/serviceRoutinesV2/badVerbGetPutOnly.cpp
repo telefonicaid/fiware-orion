@@ -33,6 +33,7 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/rest.h"
 #include "rest/OrionError.h"
 #include "serviceRoutinesV2/badVerbGetPutOnly.h"
 
@@ -40,7 +41,7 @@
 
 /* ****************************************************************************
 *
-* badVerbGetPutOnly - 
+* badVerbGetPutOnly -
 */
 std::string badVerbGetPutOnly
 (
@@ -54,7 +55,13 @@ std::string badVerbGetPutOnly
   OrionError   oe(SccBadVerb, ERROR_DESC_BAD_VERB);
 
   ciP->httpHeader.push_back("Allow");
-  ciP->httpHeaderValue.push_back("GET, PUT");
+  std::string headerValue = "GET, PUT";
+  // OPTIONS verb is only available for V2 API
+  if ((corsEnabled == true) && (ciP->apiVersion == V2))
+  {
+    headerValue = headerValue + ", OPTIONS";
+  }
+  ciP->httpHeaderValue.push_back(headerValue);
   ciP->httpStatusCode = SccBadVerb;
 
   alarmMgr.badInput(clientIp, details);

@@ -964,12 +964,18 @@ MatchResult StringFilterItem::matchEquals(Metadata* mdP)
       return MrNoMatch;
     }
   }
+  else if (valueType == SfvtNull)
+  {
+    if (mdP->valueType != orion::ValueTypeNone)
+    {
+      return MrNoMatch;
+    }
+  }
   else
   {
     LM_E(("Runtime Error (valueType '%s' is not treated)", valueTypeName()));
     return MrIncompatibleType;
   }
-
 
   return MrMatch;
 }
@@ -1057,6 +1063,13 @@ MatchResult StringFilterItem::matchEquals(orion::CompoundValueNode* cvP)
   else if (valueType == SfvtString)
   {
     if (cvP->stringValue != stringValue)
+    {
+      return MrNoMatch;
+    }
+  }
+  else if (valueType == SfvtNull)
+  {
+    if (cvP->valueType != orion::ValueTypeNone)
     {
       return MrNoMatch;
     }
@@ -1177,6 +1190,13 @@ MatchResult StringFilterItem::matchEquals(ContextAttribute* caP)
   else if (valueType == SfvtString)
   {
     if (caP->stringValue != stringValue)
+    {
+      return MrNoMatch;
+    }
+  }
+  else if (valueType == SfvtNull)
+  {
+    if (caP->valueType != orion::ValueTypeNone)
     {
       return MrNoMatch;
     }

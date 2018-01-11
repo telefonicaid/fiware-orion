@@ -18,14 +18,17 @@ and subscriptions.
 
 ## Editors
 
-José Manuel Cantera Fonseca (FIWARE Foundation e.V., formerly with Telefónica I+D), Fermín Galán Márquez (Telefónica I+D),
+José Manuel Cantera Fonseca (FIWARE Foundation e.V., formerly with Telefónica I+D), 
+Fermín Galán Márquez (Telefónica España, formerly with Telefónica I+D),
 Tobias Jacobs (NEC).
   
 ## Acknowledgements
 
 The editors would like to express their gratitude to the following people who actively
 contributed to this specification:
-Juan José Hierro (Telefónica I+D), Marcos Reyes (Telefónica I+D), Ken Zangelin (Telefónica I+D),
+Juan José Hierro (FIWARE Foundation e.V., formerly with Telefónica I+D), 
+Marcos Reyes (Telefónica España, formerly with Telefónica I+D), 
+Ken Zangelin (APInf, formerly with Telefónica I+D),
 Iván Arias León (Telefónica I+D), Carlos Romero Brox (Telefónica I+D),
 Antonio José López Navarro (Telefónica I+D),  Marc Capdevielle (Orange), Gilles Privat (Orange), 
 Sergio García Gómez (Telefónica I+D), Martin Bauer (NEC).
@@ -612,7 +615,7 @@ might be useful in understanding the format.
 The Simple Query Language provides a simplified syntax to retrieve entities which match a set of
 conditions.
 A query is composed by a list of statements separated by the ';' character.
-Each statement express a matching condition.
+Each statement expresses a matching condition.
 The query returns all the entities that match all the matching conditions (AND logical operator). 
 
 There are two kinds of statements: *unary statements* and *binary statements*.
@@ -664,7 +667,7 @@ The list of operators (and the format of the values they use) is as follows:
       entities with an attribute named `color` but whose value is `white` do not match.
     + A range, specified as a minimum and a maximum, separated by `..`, e.g. `temperature==10..20`.
       For an entity to match, it must contain the *target property* (temperature),
-      and the *target property value* must be in the interval between the minimum and maximum
+      and the *target property value* must be between the upper and lower limits
       of the range (both included). Ranges can only be used with *target properties* that represent
       dates (in ISO8601 format), numbers or strings.
 + **Unequal**: `!=`. This operator accepts the following types of right-hand side:
@@ -678,7 +681,7 @@ The list of operators (and the format of the values they use) is as follows:
       attribute `color` is set to `white` will match.
     + A range, specified as a minimum and maximum separated by `..`, e.g. `temperature!=10..20`.
       For an entity to match, it must contain the *target property* (temperature) and the
-      *target property value* must **not** be in the interval between the minimum and the maximum
+      *target property value* must **not** be between the upper and lower limits
       (both included). Ranges can only be used with elements *target properties* that represent dates
       (in ISO8601 format), numbers or strings.
 + **Greater than**: `>`. The right-hand side must be a single element, e.g. `temperature>42`.
@@ -709,7 +712,7 @@ The list of operators (and the format of the values they use) is as follows:
 
 The symbol `:` can be used instead of `==`.
 
-In the case of equal or unequal, if s string to match includes a `,`, you can use simple quote
+In case of equal or unequal, if the string to match includes a `,`, you can use single quote
 (`'`) to disable the special meaning of the comma,  e.g: `color=='light,green','deep,blue'`.
 The first example would match a color with the exact value 'light,green' OR 'deep,blue'. The
 simple quote syntax can be also used to force string interpretation in filters, e.g.
@@ -1029,20 +1032,20 @@ Response code:
 + Parameters
     + id: Boe_Idearium (optional, string) - A comma-separated list of elements.
       Retrieve entities whose ID matches one of the elements in the list.
-      Incompatible with idPattern.
+      Incompatible with `idPattern`.
     
     + type: Room (optional, string) -  comma-separated list of elements.
       Retrieve entities whose type matches one of the elements in the list.
       Incompatible with `typePattern`.
 
     + idPattern: Bode_.* (optional, string) - A correctly formated regular expression.
-      Retrieve entities whose ID matches the regular expression. Incompatible with id.
+      Retrieve entities whose ID matches the regular expression. Incompatible with `id`.
 
     + typePattern: Room_.* (optional, string) - A correctly formated regular expression.
       Retrieve entities whose type matches the regular expression. Incompatible with `type`.
     
     + q: temperature>40 (optional, string) - A query expression, composed of a list of statements
-      separated by `;`, i.e., q=statement;statements;statement.
+      separated by `;`, i.e., q=statement1;statement2;statement3.
       See [Simple Query Language specification](#simple_query_language). 
 
     + mq: temperature.accuracy<0.9 (optional, string) - A query expression for attribute metadata,
@@ -1255,7 +1258,7 @@ Response:
 
 + Parameters
     + entityId (required, string) - Id of the entity to be retrieved
-    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
       entities with the same entity id.
     + attrs: temperature,humidity (optional, string) - Comma-separated list of attribute names whose
       data are to be included in the response. The attributes are retrieved in the order specified
@@ -1395,7 +1398,7 @@ Response:
 
 + Parameters 
     + entityId (required, string) - Id of the entity in question.
-    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
       entities with the same entity id.
     + options (optional, string) - Operations options
         + Members
@@ -1427,7 +1430,7 @@ Response:
 
 + Parameters 
     + entityId (required, string) - Id of the entity to be deleted
-    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
       entities with the same entity id.
 
 + Response 204
@@ -1450,7 +1453,7 @@ Response:
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Id of the entity
-    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
       entities with the same entity id.
     + attrName: temperature (required, string) - Name of the attribute to be retrieved.
     + metadata: accuracy (optional, string) - A list of metadata names to include in the response.
@@ -1508,7 +1511,7 @@ Response:
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Id of the entity.
-    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
     entities with the same entity id.
     + attrName: temperature (required, string) - Attribute name.
 
@@ -1526,7 +1529,7 @@ This operation returns the `value` property with the value of the attribute.
 * If attribute value is JSON Array or Object:
   * If `Accept` header can be expanded to `application/json` or `text/plain` return the value as a JSON with a
     response type of application/json or text/plain (whichever is the first in `Accept` header or
-    `application/json` in the case of `Accept: */*`).
+    `application/json` in case of `Accept: */*`).
   * Else return a HTTP error "406 Not Acceptable: accepted MIME types: application/json, text/plain"
 * If attribute value is a string, number, null or boolean:
   * If `Accept` header can be expanded to text/plain return the value as text. In case of a string, citation
@@ -1541,7 +1544,7 @@ Response:
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Id of the entity in question
-    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
       entities with the same entity id.
     + attrName: address (required, string) - Name of the attribute to be retrieved.
 
@@ -1580,7 +1583,7 @@ Response:
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Id of the entity to be updated.
-    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
       entities with the same entity id.
     + attrName: address (required, string) - Attribute name.
 
@@ -1728,7 +1731,7 @@ A `subject` contains the following subfields:
 
 + `entities`: A list of objects, each one composed of the following subfields:
   + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
-     time, but at least one of them must be present.
+     time, but one of them must be present.
   + `type` or `typePattern`: Type or type pattern of the affected entities. Both cannot be used at
      the same time. If omitted, it means "any entity type".
 + `condition`: Condition to trigger notifications. This field is optional and it may contain two
@@ -2040,7 +2043,7 @@ The `dataProvided` field contains the following subfields:
 
 + `entities`: A list of objects, each one composed of the following subfields:
     + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
-      time, but at least one of them must be present.
+      time, but one of them must be present.
     + `type` or `typePattern`: Type or pattern of the affected entities. Both cannot be used at
       the same time. If omitted, it means "any entity type".
 + `attrs`: List of attributes to be provided (if not specified, all attributes).
@@ -2309,7 +2312,7 @@ The payload may contain the following elements (all of them optional):
 + `entities`: a list of entites to search for. Each element is represented by a JSON object with the
   following elements:
     + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
-      time, but at least one of them must be present.
+      time, but one of them must be present.
     + `type` or `typePattern`: Type or type pattern of the entities to search for. Both cannot be used at
       the same time. If omitted, it means "any entity type".
 + `attributes`: a list of attribute names to search for. If omitted, it means "all attributes".
@@ -2414,12 +2417,12 @@ operation. The payload is an object with two properties:
 
 + `actionType`, to specify the kind of register action to do: either CREATE, UPDATE, or DELETE.
 + `registrations`, an array of registrations, each one specified using the JSON registration 
-  representation format (described above). In the case of CREATE operation, the registration `id`
+  representation format (described above). In case of CREATE operation, the registration `id`
   must not be included.
 
 Response:
 
-* Successful operation uses 200 OK. In addition, in the case of successful CREATE, a list of IDs is
+* Successful operation uses 200 OK. In addition, in case of successful CREATE, a list of IDs is
   returned, each one corresponding to the ID of the element in the request payload and in that same
   order.
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
@@ -2479,7 +2482,7 @@ The payload may contain the following elements (all of them optional):
 + `entities`: a list of entites to search for. Each entity is represented by a JSON object with the
   following elements:
     + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
-      time, but at least one of them must be present.
+      time, but one of them must be present.
     + `type` or `typePattern`: Type or type pattern of the entities to search for. Both cannot be used at
       the same time. If omitted, it means "any entity type".
 + `attributes`: a list of attribute names to search for. If omitted, it means "all attributes".

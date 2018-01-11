@@ -936,9 +936,9 @@ do
 
         init=$testFile" ................................................................................................................."
         init=${init:0:110}
-        printf "%03d/%d: %s %s " "$testNo" "$noOfTests" "$init" "$tryNoInfo"
+        printf "%04d/%d: %s %s " "$testNo" "$noOfTests" "$init" "$tryNoInfo"
       else
-        printf "Running test %03d/%d: %s\n" "$testNo" "$noOfTests" "$testFile"
+        printf "Running test %04d/%d: %s\n" "$testNo" "$noOfTests" "$testFile"
       fi
 
       runTest $testFile $tryNo
@@ -971,9 +971,9 @@ do
     then
       init=$testFile" ................................................................................................................."
       init=${init:0:110}
-      printf "%03d/%d: %s " "$testNo" "$noOfTests" "$init"
+      printf "%04d/%d: %s " "$testNo" "$noOfTests" "$init"
     else
-      printf "Running test %03d/%d: %s\n" "$testNo" "$noOfTests" "$testFile"
+      printf "Running test %04d/%d: %s\n" "$testNo" "$noOfTests" "$testFile"
     fi
   fi
 
