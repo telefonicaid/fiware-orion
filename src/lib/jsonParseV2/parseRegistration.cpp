@@ -42,44 +42,6 @@
 
 
 
-#if 0
-------------------------------------------------------------------------------------
-  FIXME: Reference registration document (delete once POST /v2/registrations get implemented)
-
-  {
-    "description": "Example Context Source",
-    "dataProvided": {
-      "entities": [
-        {
-          "id": "Bcn_Welt",
-          "type": "Room"
-        }
-      ],
-      "attrs": [
-        "temperature"
-      ]
-    },
-    "provider": {
-      "http": {
-        "url": "http://contextsource.example.org"
-      },
-      "supportedForwardingMode": "all",
-      "legacyForwarding": true
-    },
-    "expires": "2017-10-31T12:00:00",
-    "status": "failed",
-    "forwardingInformation": {
-      "timesSent": 12,
-      "lastForwarding": "2017-10-06T16:00:00.00Z",
-      "lastFailure": "2017-10-06T16:00:00.00Z",
-      "lastSuccess": "2017-10-05T18:25:00.00Z",
-    }
-  }
-------------------------------------------------------------------------------------
-#endif
-
-
-
 /* ****************************************************************************
 *
 * dataProvidedParse -
