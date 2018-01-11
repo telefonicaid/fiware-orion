@@ -130,7 +130,7 @@ for opt, arg in opts:
 if https:
     if key_file is None or cert_file is None:
         print "if --https is used then you have to provide --key and --cert"
-        os.exit(1)
+        sys.exit(1)
 
 if verbose:
     print "verbose mode is on"
@@ -139,8 +139,9 @@ if verbose:
     print "server_url: " + str(server_url)
     print "pretty: " + str(pretty)
     print "https: " + str(https)
-    print "key file: " + key_file
-    print "cert file: " + cert_file
+    if https:
+        print "key file: " + key_file
+        print "cert file: " + cert_file
 
 pid     = str(os.getpid())
 pidfile = "/tmp/accumulator." + str(port) + ".pid"

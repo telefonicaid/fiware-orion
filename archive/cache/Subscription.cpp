@@ -136,9 +136,9 @@ Subscription::Subscription
   //
   // 3. Insert all attributes 
   //
-  for (ix = 0; ix < scrP->attributeList.attributeV.size(); ++ix)
+  for (ix = 0; ix < scrP->attributeList.stringV.size(); ++ix)
   {
-    attributes.push_back(scrP->attributeList.attributeV[ix]);
+    attributes.push_back(scrP->attributeList.stringV[ix]);
   }
 
 

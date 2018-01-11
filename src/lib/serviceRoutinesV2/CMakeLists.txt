@@ -49,9 +49,15 @@ badVerbAllNotDelete.cpp
 semStateTreat.cpp
 getMetrics.cpp
 deleteMetrics.cpp
+getRegistration.cpp
 optionsGetOnly.cpp
 optionsGetPostOnly.cpp
-getRegistration.cpp
+optionsGetDeleteOnly
+optionsAllNotDelete
+optionsGetPutOnly
+optionsGetPutDeleteOnly
+optionsGetDeletePatchOnly
+optionsPostOnly
 )
 
 SET (HEADERS
