@@ -66,13 +66,13 @@ BROKER_EXTRA_OPS="-multiservice -logAppend"
 # path /var/cb_cores with the core file and the logs when the process crash (the directory is
 # automatically created if it doesn't previously exist). Use this parameter for debug purposes.
 # In addition, take into account the following:
-#   * It is assumed that the user starting CB is 'root' user
+#   * BROKER_USER is ignored and contextBroker will be started by root user
 #   * It is assumed bzip2 tool installed in the system
 #   * Core generation requires CB to be launched with -fg and put in background at shell level
 #     (i.e. "with ending &"). Note this is different from regular CB launch (i.e. not using -fg).
 #     Check /etc/init.d/contextBroker for details
-#   * The archive name has the next format: /var/cb_cores/CB_core_yyyymmdd_HHMMSS.tar.bz2, e.g. /var/cb_cores/CB_core_220180108_151502.tar.bz2
-#   * To avoid filling the disk only the las 8 cores and logs are maintained.
+#   * The file names have the next format: /var/cb_cores/CB_core_yyyymmdd_HHMMSS.tar.bz2, e.g. /var/cb_cores/CB_core_220180108_151502.tar.bz2
+#   * To avoid filling the disk only the last 8 cores and logs are maintained.
 #   * Have a look to the coredump_watcher.sh script (can be found at Orion repo at https://github.com/telefonicaid/fiware-orion/tree/master/scripts),
 #     which can be used to send an email whenever a new core file is generated
 GENERATE_COREDUMP=false

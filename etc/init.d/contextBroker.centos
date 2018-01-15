@@ -43,6 +43,7 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
+[[ $(id -u) -ne 0 ]] && echo "User root must execute this script" && exit 1
 
 . /etc/rc.d/init.d/functions
 
@@ -96,7 +97,7 @@ broker_start()
         # logs are always managed by CB and written to file inside directory BROKER_LOG_DIR (see /etc/sysconfig/contextBroker) and rotated by logrotate
         BROKER_STDERR_LOG=${BROKER_LOG_DIR}/${NAME}-error.log
         su $BROKER_USER -c "${EXECUTABLE} ${BROKER_OPTS} 1>/dev/null 2>${BROKER_STDERR_LOG}"
-        sleep 2 # wait some time to leave contextbroker start
+        sleep 2 # wait some time to let contextbroker start
         PID=$(cat ${BROKER_PID_FILE})
         if [[ -z "${PID}" ]]; then
             printf "%s" "pidfile not found"
