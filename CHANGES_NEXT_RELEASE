@@ -1,2 +1,3 @@
 - Add: new BROKER_LOG_LEVEL variable at /etc/config/contextBroker to set log level
 - Add: new GENERATE_COREDUMP variable at /etc/config/contextBroker to enable core generation and archiving (useful for debugging)
+- Fix: BROKER_PID_FILE default changed to /var/run/contextBroker/contextBroker.pid in /etc/config/contextBroker (previously 'log/' were used instead of 'run/')
