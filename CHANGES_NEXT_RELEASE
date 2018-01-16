@@ -1,3 +1,4 @@
 - Add: new BROKER_LOG_LEVEL variable at /etc/config/contextBroker to set log level
 - Add: new GENERATE_COREDUMP variable at /etc/config/contextBroker to enable core generation and archiving (useful for debugging)
 - Add: handler for SIGHUP termination signal
+- Fix: using SIGTERM instead of SIGHUP for stopping broker in init.d service script
