@@ -162,8 +162,7 @@ broker_stop()
 {
     printf "%-50s" "Stopping $NAME..."
     if [ -f "${BROKER_PID_FILE}" ]; then
-        kill -HUP $(cat ${BROKER_PID_FILE}) 2> /dev/null
-        # kill $(cat ${BROKER_PID_FILE}) 2> /dev/null
+        kill $(cat ${BROKER_PID_FILE}) 2> /dev/null
         rm -f ${BROKER_PID_FILE}
         printf "%s\n" "$(success)"
     else
