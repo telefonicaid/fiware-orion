@@ -174,12 +174,10 @@ typedef enum ApiVersion
 
 
 /* ****************************************************************************
-* Future date to represent permanent subscriptions.
-* High enough to make the subscription "permanent" but leaving room for
-* some (sloppy) increments, without causing overflow and accidental subscription
-* inactivation.
+*
+* PERMANENT_EXPIRES_DATETIME - date for permanent subscriptions/registrations
 */
-#define PERMANENT_SUBS_DATETIME ((int64_t) 9e18)
+#define PERMANENT_EXPIRES_DATETIME ((int64_t) 0x7FFFFFFFFFFFFFFF)
 
 
 

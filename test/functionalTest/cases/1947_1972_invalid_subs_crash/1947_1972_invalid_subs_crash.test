@@ -725,13 +725,13 @@ Date: REGEX(.*)
 09. POST /v2/subscriptions (condition attributes is not an array)
 =================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 60
+Content-Length: 77
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "attrs is not an array",
+    "description": "the field /attrs/ must be a JSON array",
     "error": "BadRequest"
 }
 
@@ -809,13 +809,13 @@ Date: REGEX(.*)
 15. POST /v2/subscriptions (notification attributes is not an array)
 ====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 60
+Content-Length: 77
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "attrs is not an array",
+    "description": "the field /attrs/ must be a JSON array",
     "error": "BadRequest"
 }
 

@@ -46,6 +46,7 @@
 #include "jsonParseV2/jsonRequestTreat.h"
 #include "jsonParseV2/utilsParse.h"
 #include "jsonParseV2/parseEntitiesVector.h"
+#include "jsonParseV2/parseStringVector.h"
 #include "jsonParseV2/parseSubscription.h"
 
 
@@ -64,7 +65,6 @@ using rapidjson::Value;
 *
 * Prototypes
 */
-static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::string>* vec, const Value& attributes);
 static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& notification);
 static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& subject);
 static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& condition);
@@ -187,7 +187,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
 
     if (expires.empty())
     {
-        eT = PERMANENT_SUBS_DATETIME;
+      eT = PERMANENT_EXPIRES_DATETIME;
     }
     else
     {
@@ -203,7 +203,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   }
   else if (!update)
   {
-    subsP->expires = PERMANENT_SUBS_DATETIME;
+    subsP->expires = PERMANENT_EXPIRES_DATETIME;
   }
 
   // Status field
@@ -492,7 +492,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     return badInput(ciP, "http notification is missing");
   }
 
+
   // Attributes
+  std::string errorString;
+
   if (notification.HasMember("attrs") && notification.HasMember("exceptAttrs"))
   {
     return badInput(ciP, "http notification has attrs and exceptAttrs");
@@ -500,11 +503,9 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
   if (notification.HasMember("attrs"))
   {
-    std::string r = parseAttributeList(ciP, &subsP->notification.attributes, notification["attrs"]);
-
-    if (r != "")
+    if (parseStringVector(&subsP->notification.attributes, notification["attrs"], "attrs", true, &errorString) == false)
     {
-      return r;
+      return badInput(ciP, errorString);
     }
 
     subsP->notification.blacklist = false;
@@ -512,11 +513,9 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   }
   else if (notification.HasMember("exceptAttrs"))
   {
-    std::string r = parseAttributeList(ciP, &subsP->notification.attributes, notification["exceptAttrs"]);
-
-    if (r != "")
+    if (parseStringVector(&subsP->notification.attributes, notification["exceptAttrs"], "exceptAttrs", true, &errorString) == false)
     {
-      return r;
+      return badInput(ciP, errorString);
     }
 
     if (subsP->notification.attributes.empty())
@@ -531,11 +530,9 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   // metadata
   if (notification.HasMember("metadata"))
   {
-    std::string r = parseAttributeList(ciP, &subsP->notification.metadata, notification["metadata"]);
-
-    if (r != "")
+    if (parseStringVector(&subsP->notification.metadata, notification["metadata"], "metadata", true, &errorString) == false)
     {
-      return r;
+      return badInput(ciP, errorString);
     }
   }
 
@@ -588,11 +585,11 @@ static std::string parseNotifyConditionVector
   // Attributes
   if (condition.HasMember("attrs"))
   {
-    std::string r = parseAttributeList(ciP, &subsP->subject.condition.attributes, condition["attrs"]);
+    std::string errorString;
 
-    if (r != "")
+    if (parseStringVector(&subsP->subject.condition.attributes, condition["attrs"], "attrs", true, &errorString) == false)
     {
-      return r;
+      return badInput(ciP, errorString);
     }
   }
 
@@ -763,49 +760,6 @@ static std::string parseNotifyConditionVector
       }
       subsP->restriction.scopeVector.push_back(scopeP);
     }
-  }
-
-  return "";
-}
-
-
-
-/* ****************************************************************************
-*
-* parseAttributeList -
-*/
-static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::string>* vec, const Value& attributes)
-{
-  if (!attributes.IsArray())
-  {
-    return badInput(ciP, "attrs is not an array");
-  }
-
-  for (Value::ConstValueIterator iter = attributes.Begin(); iter != attributes.End(); ++iter)
-  {
-    if (!iter->IsString())
-    {
-      return badInput(ciP, "attrs element is not a string");
-    }
-
-    std::string attrName = iter->GetString();
-
-    if (attrName.empty())
-    {
-      return badInput(ciP, "attrs element is empty");
-    }
-
-    if (forbiddenIdCharsV2(attrName.c_str()))
-    {
-      return badInput(ciP, "attrs element has forbidden char");
-    }
-
-    if (attrName.length() > MAX_ID_LEN)
-    {
-      return badInput(ciP, "max attribute length exceeded");
-    }
-
-    vec->push_back(attrName);
   }
 
   return "";

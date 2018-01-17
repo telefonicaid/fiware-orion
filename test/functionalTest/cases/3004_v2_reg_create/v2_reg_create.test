@@ -58,7 +58,8 @@ payload='{
    "provider": {
      "http": {
        "url": "http://localhost:'${CP1_PORT}'/v2"
-     }
+     },
+     "legacyForwarding": true
    },
    "status": "inactive"
 }'

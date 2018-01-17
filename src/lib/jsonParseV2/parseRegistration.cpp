@@ -188,10 +188,10 @@ static bool providerParse(ConnectionInfo* ciP, ngsiv2::Provider* providerP, cons
     //
     // Check Valid strings for supportedForwardingMode
     //
-    if      (supportedForwardingMode == "none")   providerP->supportedForwardingMode = ngsiv2::ForwardNone;
-    else if (supportedForwardingMode == "query")  providerP->supportedForwardingMode = ngsiv2::ForwardQuery;
-    else if (supportedForwardingMode == "update") providerP->supportedForwardingMode = ngsiv2::ForwardUpdate;
-    else if (supportedForwardingMode == "all")    providerP->supportedForwardingMode = ngsiv2::ForwardAll;
+    if      (supportedForwardingMode == "all")      providerP->supportedForwardingMode = ngsiv2::ForwardAll;
+    else if (supportedForwardingMode == "none")     providerP->supportedForwardingMode = ngsiv2::ForwardNone;
+    else if (supportedForwardingMode == "query")    providerP->supportedForwardingMode = ngsiv2::ForwardQuery;
+    else if (supportedForwardingMode == "update")   providerP->supportedForwardingMode = ngsiv2::ForwardUpdate;
     else
     {
       *errorStringP = "invalid value of /supportedForwardingMode/";
@@ -201,6 +201,29 @@ static bool providerParse(ConnectionInfo* ciP, ngsiv2::Provider* providerP, cons
   else
   {
     providerP->supportedForwardingMode = ngsiv2::ForwardAll;
+  }
+
+  if (provider.HasMember("legacyForwarding"))
+  {
+    const rapidjson::Value& legacyForwarding = provider["legacyForwarding"];
+
+    if (!legacyForwarding.IsBool())
+    {
+      *errorStringP = "the field /legacyForwarding/ must be a boolean and set to /true/";
+      return false;
+    }
+
+    bool legacyForwardingValue = legacyForwarding.GetBool();
+    if (legacyForwardingValue != true)
+    {
+      *errorStringP = "the field /legacyForwarding/ must be set to /true/";
+      return false;
+    }
+  }
+  else
+  {
+    *errorStringP = "the field /legacyForwarding/ must be present as a boolean and set to /true/";
+    return false;
   }
 
   return true;
@@ -307,7 +330,7 @@ std::string parseRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP)
   }
   else
   {
-    regP->expires = 0x7FFFFFFFFFFFFFFF;
+    regP->expires = PERMANENT_EXPIRES_DATETIME;
   }
   
   //

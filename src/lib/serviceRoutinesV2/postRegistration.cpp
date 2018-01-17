@@ -48,28 +48,6 @@
 * POST /v2/registrations
 *
 * Payload In:  ngsiv2::Registration
-* <TMP>
-* {
-*   "description": "Relative Humidity Context Source",
-*   "dataProvided": {
-*     "entities": [
-*       {
-*         "id": "room2",
-*         "type": "Room"
-*       }
-*     ],
-*     "attrs": [
-*       "relativeHumidity"
-*     ]
-*   },
-*   "provider": {
-*     "http": {
-*       "url": "http://localhost:1234"
-*     }
-*   }
-* }
-* </TMP>
-*
 * Payload Out: None
 */
 std::string postRegistration
@@ -82,16 +60,27 @@ std::string postRegistration
 {
   ngsiv2::Registration  registration;
   OrionError            oe;
-  std::string           servicePath = (ciP->servicePathV[0] == "")? DEFAULT_SERVICE_PATH_REGISTRATIONS : ciP->servicePathV[0];
+  std::string           servicePath = (ciP->servicePathV[0] == "")? SERVICE_PATH_ROOT : ciP->servicePathV[0];
   std::string           regId;
   std::string           answer;
+
+  //
+  // FIXME P4: Forwarding modes "none", "query", and "update" to be implemented
+  //
+  if (parseDataP->reg.provider.supportedForwardingMode != ngsiv2::ForwardAll)
+  {
+    oe.fill(SccNotImplemented, "non-supported Forwarding Mode");
+    ciP->httpStatusCode = oe.code;
+    TIMED_RENDER(answer = oe.smartRender(ciP->apiVersion));
+    return answer;
+  }
 
   TIMED_MONGO(mongoRegistrationCreate(&parseDataP->reg, ciP->tenant, servicePath, &regId, &oe));
   ciP->httpStatusCode = oe.code;
 
   if (oe.code != SccOk)
   {
-    TIMED_RENDER(answer = oe.toJson());
+    TIMED_RENDER(answer = oe.smartRender(ciP->apiVersion));
   }
   else
   {

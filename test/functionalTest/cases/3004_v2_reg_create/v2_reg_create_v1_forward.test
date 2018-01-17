@@ -57,7 +57,8 @@ payload='{
    "provider": {
      "http": {
        "url": "http://localhost:'${CP1_PORT}'/v1"
-     }
+     },
+     "legacyForwarding": true
    },
    "status": "active"
 }'
@@ -177,5 +178,5 @@ Date: REGEX(.*)
 --TEARDOWN--
 brokerStop CB
 brokerStop CP1
-#dbDrop CB
+dbDrop CB
 dbDrop CP1

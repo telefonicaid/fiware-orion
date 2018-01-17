@@ -57,6 +57,7 @@ SET (HEADERS
     parseSubscription.h
     parseBatchQuery.h
     parseEntityVector.h
+    parseEntitiesVector.h
     parseEntityObject.h
     parseScopeVector.h
     parseScope.h

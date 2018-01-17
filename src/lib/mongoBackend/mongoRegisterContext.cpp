@@ -71,7 +71,7 @@ HttpStatusCode mongoRegisterContext
 )
 {
   bool         reqSemTaken;
-  std::string  sPath = (servicePath == "")? DEFAULT_SERVICE_PATH_UPDATES : servicePath;
+  std::string  sPath = (servicePath == "")? SERVICE_PATH_ROOT : servicePath;
 
   reqSemTake(__FUNCTION__, "ngsi9 register request", SemWriteOp, &reqSemTaken);
 

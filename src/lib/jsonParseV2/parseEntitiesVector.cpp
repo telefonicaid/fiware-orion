@@ -210,7 +210,10 @@ bool parseEntitiesVector
 
     ngsiv2::EntID  eid(id, idPattern, type, typePattern);
 
-    eivP->push_back(eid);
+    if (std::find(eivP->begin(), eivP->end(), eid) == eivP->end())  // if not already included
+    {
+      eivP->push_back(eid);
+    }
   }
 
   return true;

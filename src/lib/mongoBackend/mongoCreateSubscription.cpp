@@ -145,7 +145,7 @@ std::string mongoCreateSubscription
   reqSemTake(__FUNCTION__, "ngsiv2 create subscription request", SemWriteOp, &reqSemTaken);
 
   BSONObjBuilder     b;
-  std::string        servicePath      = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
+  std::string        servicePath      = servicePathV[0] == "" ? SERVICE_PATH_ALL : servicePathV[0];
   bool               notificationDone = false;
   const std::string  subId            = setNewSubscriptionId(&b);
 

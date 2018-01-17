@@ -71,6 +71,12 @@ brokerStart CB 0-255 IPv4 -statCounters
 # 40. provider/http/url invalid
 # 41. status is not a string
 # 42. invalid value for status
+# 43. legacyForwarding missing
+# 44. legacyForwarding not a boolean
+# 45. legacyForwarding set to false
+# 46. supportedForwardingMode set to 'none'
+# 47. supportedForwardingMode set to 'query'
+# 48. supportedForwardingMode set to 'update'
 #
 
 
@@ -773,7 +779,8 @@ payload='{
   "provider": {
     "http": {
       "url": "http://localhost:'${CP1_PORT}'/v2"
-    }
+    },
+    "legacyForwarding": true
   },
   "status": 4
 }'
@@ -798,9 +805,165 @@ payload='{
   "provider": {
     "http": {
       "url": "http://localhost:'${CP1_PORT}'/v2"
+    },
+    "legacyForwarding": true
+  },
+  "status": "green"
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "43. legacyForwarding missing"
+echo "============================"
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
     }
   },
   "status": "green"
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "44. legacyForwarding not a boolean"
+echo "=================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    },
+    "legacyForwarding": 14
+  },
+  "status": "green"
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "45. legacyForwarding set to false"
+echo "================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    },
+    "legacyForwarding": false
+  },
+  "status": "green"
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "46. supportedForwardingMode set to 'none'"
+echo "========================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    },
+    "legacyForwarding": true,
+    "supportedForwardingMode": "none"
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "47. supportedForwardingMode set to 'query'"
+echo "=========================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    },
+    "legacyForwarding": true,
+    "supportedForwardingMode": "query"
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "48. supportedForwardingMode set to 'update'"
+echo "==========================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    },
+    "legacyForwarding": true,
+    "supportedForwardingMode": "update"
+  }
 }'
 orionCurl --url /v2/registrations --payload "$payload"
 echo
@@ -1393,6 +1556,90 @@ Date: REGEX(.*)
 {
     "description": "invalid value for /status/",
     "error": "BadRequest"
+}
+
+
+43. legacyForwarding missing
+============================
+HTTP/1.1 400 Bad Request
+Content-Length: 114
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "the field /legacyForwarding/ must be present as a boolean and set to /true/",
+    "error": "BadRequest"
+}
+
+
+44. legacyForwarding not a boolean
+==================================
+HTTP/1.1 400 Bad Request
+Content-Length: 103
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "the field /legacyForwarding/ must be a boolean and set to /true/",
+    "error": "BadRequest"
+}
+
+
+45. legacyForwarding set to false
+=================================
+HTTP/1.1 400 Bad Request
+Content-Length: 89
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "the field /legacyForwarding/ must be set to /true/",
+    "error": "BadRequest"
+}
+
+
+46. supportedForwardingMode set to 'none'
+=========================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "non-supported Forwarding Mode",
+    "error": "Not Implemented"
+}
+
+
+47. supportedForwardingMode set to 'query'
+==========================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "non-supported Forwarding Mode",
+    "error": "Not Implemented"
+}
+
+
+48. supportedForwardingMode set to 'update'
+===========================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "non-supported Forwarding Mode",
+    "error": "Not Implemented"
 }
 
 

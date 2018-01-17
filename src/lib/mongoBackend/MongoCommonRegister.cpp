@@ -351,7 +351,7 @@ HttpStatusCode processRegisterContext
 
   reg.append("_id", oid);
   reg.append(REG_EXPIRATION, expiration);
-  reg.append(REG_SERVICE_PATH, servicePath == "" ? DEFAULT_SERVICE_PATH_UPDATES : servicePath);
+  reg.append(REG_SERVICE_PATH, servicePath == "" ? SERVICE_PATH_ROOT : servicePath);
   reg.append(REG_FORMAT, format);
 
 
