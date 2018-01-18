@@ -29,6 +29,8 @@ brokerStart CB
 
 --SHELL--
 # Prepare the big file to use for the test
+# I have found that when the test in run in jenkins in CentOS 7, tr outputs a 'broken pipe' message which
+# makes test to fail (it generated content in .stderr file). Using 2>/dev/null avoids the problem
 BIGFILE=$(mktemp)
 tr -dc A-Za-z0-9 </dev/urandom  2>/dev/null |  head -c 1500000 > $BIGFILE
 
