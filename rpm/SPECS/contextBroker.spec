@@ -952,7 +952,7 @@ fi
 - REST interface for changing log and trace levels
 - Memory leak fixes
 
-* Mon Jun 04 2013 Fermín Galán <fermin@tid.es> 0.3.0-1 (FIWARE-2.3.3-1)
+* Tue Jun 04 2013 Fermín Galán <fermin@tid.es> 0.3.0-1 (FIWARE-2.3.3-1)
 - CLI argument -logAppend
 - Handlers for SIGUSR1 and SIGUSR2 signals to stop/resume logging
 - Handlers for SIGTERM and SIGINT signals for smart exiting
