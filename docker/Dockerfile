@@ -1,4 +1,4 @@
-FROM centos:centos6.6
+FROM centos:centos7.4
 
 MAINTAINER FIWARE Orion Context Broker Team. Telefónica I+D
 
