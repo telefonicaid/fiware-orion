@@ -98,7 +98,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 
 `parseEntity()` is a toplevel parse function so it must call **rapidjson** to create the tree in RAM. *Lowlevel* parse functions (`parseContextAttribute()`, `parseMetadataVector()`, etc.) don't actually parse anything as that is done by the toplevel parse function. Instead, the lowlevel functions just examine their part of the tree, which is passed to the functions as a parameter. This parameter (that references the part of the tree) is normally of the type `rapidjson::Value`, but sometines an iterator for it is sent as parameter (of the type `rapidjson::Value::ConstMemberIterator` or `rapidjson::Value::ConstValueIterator`).
 
-Under `src/lib/jsonParseV2` there are a number (16 as of the time of writing this document) of modules that each take care of a part of the parsing of an entire request, such as `parseAttributeList.h/cpp` that parses a vector of strings.
+Under `src/lib/jsonParseV2` there are a number (16 as of the time of writing this document) of modules that each take care of a part of the parsing of an entire request, such as `parseStringList.h/cpp` that parses a vector of strings.
 
 ## jsonRequestTreat()
 The function `jsonRequestTreat()` is the entry point of NGSIv2 parsing and this function, examining the type of the payload calls one toplevel parse function or another.

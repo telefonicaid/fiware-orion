@@ -28,7 +28,7 @@
 #include "apiTypesV2/ngsiWrappers.h"
 #include "apiTypesV2/Subscription.h"
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi/NotifyCondition.h"
 

@@ -173,6 +173,13 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Mon Dec 11 2017 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.10.0-1
+- Add: CORS Preflight Requests support for all NGSIv2 resources, -corsMaxAge switch, CORS exposed headers (#501, #3030)
+- Fix: null not working in q/mq filter in subscriptions (#2998)
+- Fix: case-sensitive header duplication (e.g. "Content-Type" and "Content-type") in custom notifications (#2893)
+- Fix: bug in GTE and LTE operations in query filters (q/mq), both for GET operations and subscriptions (#2995)
+- Fix: Wrong "max one service-path allowed for subscriptions" in NGSIv2 subscription operation (#2948)
+
 * Thu Oct 19 2017 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.9.0-1
 - Add: release_date and doc fields are added to the GET /version output to align with FIWARE scheme (#2970)
 - Fix: missing lastSuccess/lastFailure associated to initial notification on subscription creation some times when csub cache is in use (#2974)
@@ -945,7 +952,7 @@ fi
 - REST interface for changing log and trace levels
 - Memory leak fixes
 
-* Mon Jun 04 2013 Fermín Galán <fermin@tid.es> 0.3.0-1 (FIWARE-2.3.3-1)
+* Tue Jun 04 2013 Fermín Galán <fermin@tid.es> 0.3.0-1 (FIWARE-2.3.3-1)
 - CLI argument -logAppend
 - Handlers for SIGUSR1 and SIGUSR2 signals to stop/resume logging
 - Handlers for SIGTERM and SIGINT signals for smart exiting
