@@ -351,6 +351,8 @@ HttpStatusCode processRegisterContext
 
   reg.append("_id", oid);
   reg.append(REG_EXPIRATION, expiration);
+
+  // FIXME P4: See issue #3078
   reg.append(REG_SERVICE_PATH, servicePath == "" ? SERVICE_PATH_ROOT : servicePath);
   reg.append(REG_FORMAT, format);
 

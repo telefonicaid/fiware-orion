@@ -317,22 +317,29 @@ std::string parseRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP)
   //
   // Extracting field "expires"
   //
-  if (document.HasMember("expires"))
-  {
-    const rapidjson::Value& expires = document["expires"];
+  Opt<std::string> expiresOpt   = getStringOpt(document, "expires");
+  int64_t          expiresValue = PERMANENT_EXPIRES_DATETIME;
 
-    if (!expires.IsString())
+  if (!expiresOpt.ok())
+  {
+    return badInput(ciP, expiresOpt.error);
+  }
+  else if (expiresOpt.given)
+  {
+    std::string  expires = expiresOpt.value;
+
+    if (!expires.empty())
     {
-      return badInput(ciP, "/expires/ must be a JSON string");
+      expiresValue = parse8601Time(expires);
+      if (expiresValue == -1)
+      {
+        return badInput(ciP, "the field /expires/ has an invalid format");
+      }
     }
+  }
+  regP->expires = expiresValue;
 
-    regP->expires = parse8601Time(expires.GetString());
-  }
-  else
-  {
-    regP->expires = PERMANENT_EXPIRES_DATETIME;
-  }
-  
+ 
   //
   // Extracting field "status"
   //

@@ -26,6 +26,7 @@
 * Author: Ken Zangelin
 */
 #include <stdint.h>
+#include <limits.h>
 #include <string>
 
 #include "common/Timer.h"
@@ -177,7 +178,7 @@ typedef enum ApiVersion
 *
 * PERMANENT_EXPIRES_DATETIME - date for permanent subscriptions/registrations
 */
-#define PERMANENT_EXPIRES_DATETIME ((int64_t) 0x7FFFFFFFFFFFFFFF)
+#define PERMANENT_EXPIRES_DATETIME  LLONG_MAX
 
 
 

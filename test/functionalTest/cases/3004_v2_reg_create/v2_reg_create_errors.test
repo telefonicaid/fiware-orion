@@ -1604,42 +1604,42 @@ Date: REGEX(.*)
 46. supportedForwardingMode set to 'none'
 =========================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 73
+Content-Length: 72
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "non-supported Forwarding Mode",
-    "error": "Not Implemented"
+    "error": "NotImplemented"
 }
 
 
 47. supportedForwardingMode set to 'query'
 ==========================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 73
+Content-Length: 72
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "non-supported Forwarding Mode",
-    "error": "Not Implemented"
+    "error": "NotImplemented"
 }
 
 
 48. supportedForwardingMode set to 'update'
 ===========================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 73
+Content-Length: 72
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "non-supported Forwarding Mode",
-    "error": "Not Implemented"
+    "error": "NotImplemented"
 }
 
 
