@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_JSONPARSEV2_PARSEATTRIBUTELIST_H_
-#define SRC_LIB_JSONPARSEV2_PARSEATTRIBUTELIST_H_
-
 /*
 *
 * Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
@@ -27,22 +24,46 @@
 */
 #include <string>
 
-#include "rapidjson/document.h"
-
 #include "rest/ConnectionInfo.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
+#include "jsonParseV2/jsonParseTypeNames.h"
+#include "jsonParseV2/parseStringList.h"
 
 
 
 /* ****************************************************************************
 *
-* parseAttributeList - 
+* parseStringList -
 */
-extern std::string parseAttributeList
+std::string parseStringList
 (
   ConnectionInfo*                               ciP,
   const rapidjson::Value::ConstMemberIterator&  iter,
-  AttributeList*                                aP
-);
+  StringList*                                   sP,
+  const std::string&                            fieldName
+)
+{
+  std::string type = jsonParseTypeNames[iter->value.GetType()];
 
-#endif  // SRC_LIB_JSONPARSEV2_PARSEATTRIBUTELIST_H_
+  if (type != "Array")
+  {
+    return "the field /" + fieldName + "/ must be a JSON array";
+  }
+
+  for (rapidjson::Value::ConstValueIterator iter2 = iter->value.Begin(); iter2 != iter->value.End(); ++iter2)
+  {
+    std::string  val;
+
+    type = jsonParseTypeNames[iter2->GetType()];
+
+    if (type != "String")
+    {
+      return "only JSON Strings allowed in " + fieldName + " list";
+    }
+
+    val  = iter2->GetString();
+    sP->push_back(val);
+  }
+
+  return "OK";
+}

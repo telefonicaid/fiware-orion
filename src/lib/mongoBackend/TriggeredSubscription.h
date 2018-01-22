@@ -30,7 +30,7 @@
 
 #include "apiTypesV2/HttpInfo.h"
 #include "common/RenderFormat.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "rest/StringFilter.h"
 
 
@@ -56,7 +56,7 @@ class TriggeredSubscription
   long long                 lastNotification;
   RenderFormat              renderFormat;
   ngsiv2::HttpInfo          httpInfo;
-  AttributeList             attrL;
+  StringList                attrL;
   std::string               cacheSubId;
   std::string               tenant;
   StringFilter*             stringFilterP;
@@ -75,13 +75,13 @@ class TriggeredSubscription
                         long long                _lastNotification,
                         RenderFormat             _renderFormat,
                         const ngsiv2::HttpInfo&  _httpInfo,
-                        const AttributeList&     _attrL,
+                        const StringList&        _attrL,
                         const std::string&       _cacheSubId,
                         const char*              _tenant);
 
   TriggeredSubscription(RenderFormat             _renderFormat,
                         const ngsiv2::HttpInfo&  _httpInfo,
-                        const AttributeList&     _attrL);
+                        const StringList&        _attrL);
 
   ~TriggeredSubscription();
 

@@ -34,7 +34,7 @@
 #include "common/RenderFormat.h"
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 #include "apiTypesV2/Subscription.h"

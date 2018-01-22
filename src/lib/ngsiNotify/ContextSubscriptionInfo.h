@@ -27,7 +27,7 @@
 */
 #include "common/MimeType.h"
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 
 
 
@@ -38,7 +38,7 @@
 typedef struct ContextSubscriptionInfo
 {
   EntityIdVector  entityIdVector;
-  AttributeList   attributeList;
+  StringList      attributeList;
   std::string     url;
   MimeType        mimeType;
   int             lastNotification;
