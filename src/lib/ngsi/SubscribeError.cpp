@@ -44,6 +44,45 @@ SubscribeError::SubscribeError()
 
 /* ****************************************************************************
 *
+* SubscribeError::toJson -
+*/
+std::string SubscribeError::toJson(RequestType requestType, bool comma)
+{
+  std::string  out;
+
+  out += JSON_VALUE("error", errorCode.reasonPhrase.c_str());
+  out += ",";
+  out += JSON_VALUE("description", errorCode.details.c_str());
+
+
+  if (requestType == UpdateContextSubscription)
+  {
+    //
+    // NOTE: the subscriptionId must have come from the request.
+    //       If the field is empty, we are in unit tests and I here set it to all zeroes
+    //
+    if (subscriptionId.get() == "")
+    {
+      subscriptionId.set("000000000000000000000000");
+    }
+    out += ",";
+    out += JSON_PROP("affectedItems") + "[" + JSON_STR(subscriptionId.toJson(requestType, true)) + "]";
+  }
+  else if ((requestType          == SubscribeContext)           &&
+           (subscriptionId.get() != "000000000000000000000000") &&
+           (subscriptionId.get() != ""))
+  {
+    out += ",";
+    out += JSON_PROP("affectedItems") + "[" + JSON_STR(subscriptionId.toJson(requestType, true)) + "]";
+  }
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
 * SubscribeError::render -
 */
 std::string SubscribeError::render(RequestType requestType, bool comma)

@@ -31,7 +31,7 @@
 #include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ContextElementResponse.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi10/QueryContextResponse.h"
 
 #include "mongoBackend/dbConstants.h"
@@ -96,7 +96,7 @@ ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP)
 * get implemented.
 *
 */
-static bool includedAttribute(const ContextAttribute& attr, const AttributeList& attrsV)
+static bool includedAttribute(const ContextAttribute& attr, const StringList& attrsV)
 {
   //
   // This is the case in which the queryContextRequest doesn't include attributes,
@@ -132,7 +132,7 @@ static bool includedAttribute(const ContextAttribute& attr, const AttributeList&
 ContextElementResponse::ContextElementResponse
 (
   const mongo::BSONObj&  entityDoc,
-  const AttributeList&   attrL,
+  const StringList&   attrL,
   bool                   includeEmpty,
   ApiVersion             apiVersion
 )

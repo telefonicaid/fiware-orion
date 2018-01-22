@@ -218,6 +218,8 @@ extern std::string isodate2str(long long timestamp);
 */
 extern void toLowercase(char* s);
 
+
+
 #ifdef PARANOID_JSON_INDENT
 // -----------------------------------------------------------------------------
 //

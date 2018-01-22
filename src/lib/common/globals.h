@@ -26,7 +26,6 @@
 * Author: Ken Zangelin
 */
 #include <stdint.h>
-
 #include <string>
 
 #include "common/Timer.h"
@@ -40,16 +39,24 @@
 
 /* ****************************************************************************
 *
+* FIXME P10: temporal definition, it should be removed soon
+*/
+#define PARANOID_JSON_INDENT
+
+
+
+/* ****************************************************************************
+*
 * FIWARE_LOCATION - 
 */
 #define FIWARE_LOCATION             "FIWARE::Location"
 #define FIWARE_LOCATION_DEPRECATED  "FIWARE_Location"   // Deprecated (but still supported) in Orion 0.16.0
 #define FIWARE_LOCATION_V2          "FIWARE::Location::NGSIv2"
 
-#define EARTH_RADIUS_METERS     6371000
+#define EARTH_RADIUS_METERS         6371000
 
-#define LOCATION_WGS84          "WGS84"
-#define LOCATION_WGS84_LEGACY   "WSG84"    /* We fixed the right string at 0.17.0, but the old one needs to be mantained */
+#define LOCATION_WGS84              "WGS84"
+#define LOCATION_WGS84_LEGACY       "WSG84"    // We fixed the right string at 0.17.0, but the old one needs to be mantained
 
 
 
@@ -132,7 +139,8 @@
 #define OPT_DATE_MODIFIED   DATE_MODIFIED
 #define OPT_NO_ATTR_DETAIL  "noAttrDetail"
 
- 
+
+
 /* ****************************************************************************
 *
 * NGSIv2 "flavours" to tune some behaviours in mongoBackend -
@@ -170,13 +178,14 @@ typedef enum ApiVersion
 
 
 /* ****************************************************************************
- * Future date to represent permanent subscriptions.
- * High enough to make the subscription "permanent" but leaving room for
- * some (sloppy) increments, without causing overflow and accidental subscription
- * inactivation.
- *
+* Future date to represent permanent subscriptions.
+* High enough to make the subscription "permanent" but leaving room for
+* some (sloppy) increments, without causing overflow and accidental subscription
+* inactivation.
 */
 #define PERMANENT_SUBS_DATETIME ((int64_t) 9e18)
+
+
 
 /* ****************************************************************************
 *
@@ -189,6 +198,7 @@ typedef enum ApiVersion
 #ifndef MAX
 #  define MAX(a, b)     ((a) > (b)? (a) : (b))
 #endif
+
 
 
 /* ****************************************************************************
@@ -228,6 +238,7 @@ extern bool               insecureNotif;
 #ifdef PARANOID_JSON_INDENT
 extern bool               paranoidV1Indent;
 #endif
+
 
 
 /* ****************************************************************************
@@ -358,7 +369,16 @@ extern void correlatorIdSet(const char* corrId);
 * It return false in the case of a 'degenerate' box
 *
 */
-extern bool orderCoordsForBox(double* minLat, double* maxLat, double* minLon, double* maxLon, double lat1, double lat2, double lon1, double lon2);
+extern bool orderCoordsForBox
+(
+  double* minLat,
+  double* maxLat,
+  double* minLon,
+  double* maxLon,
+  double lat1,
+  double lat2,
+  double lon1,
+  double lon2
+);
 
 #endif  // SRC_LIB_COMMON_GLOBALS_H_
-	

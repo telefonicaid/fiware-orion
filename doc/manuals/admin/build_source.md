@@ -30,7 +30,7 @@ commands that require root privilege):
 
         sudo yum install boost-devel libcurl-devel gnutls-devel libgcrypt-devel openssl-devel libuuid-devel
 
-* Install the Mongo Driver from source:
+* Install the Mongo Driver from source. The following procedure corresponds with default installation, if you want to include SASL and SSL support use [this alternative procedure](#building-mongodb-driver-with-sasl-and-ssl-support) instead.
 
         wget https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz
         tar xfvz legacy-1.1.2.tar.gz
@@ -74,13 +74,9 @@ commands that require root privilege):
         cd fiware-orion
         make
 
-* (Optional but highly recommended) run unit test. Firstly, you have to install MongoDB (as the unit tests rely on mongod running in localhost).
-
-        sudo yum install mongodb-server
-        sudo yum  update pcre            # otherwise, mongod crashes in CentOS 6.3
-        sudo /etc/init.d/mongod start
-        sudo /etc/init.d/mongod status   # to check that mongod is actually running
-        make unit_test
+* (Optional but highly recommended) run unit test. Firstly, you have to install MongoDB as the unit and functional tests
+rely on mongod running in localhost. Check [the official MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/)
+for details. Recommended version is 3.4 (although 3.2 should also work fine).
 
 * Install the binary. You can use INSTALL_DIR to set the installation prefix path (default is /usr), thus the broker is installed in `$INSTALL_DIR/bin` directory.
 
@@ -94,7 +90,7 @@ The Orion Context Broker comes with a suite of functional, valgrind and end-to-e
 
 * Install the required tools:
 
-        sudo yum install python python-flask python-jinja2 curl libxml2 nc mongodb valgrind libxslt bc
+        sudo yum install python python-flask pyOpenSSL curl nc mongodb-org-shell valgrind bc
 
 * Prepare the environment for test harness. Basically, you have to install the `accumulator-server.py` script and in a path under your control, `~/bin` is the recommended one. Alternatively, you can install them in a system directory such as `/usr/bin` but it could collide with an RPM installation, thus it is not recommended. In addition, you have to set several environment variables used by the harness script (see `scripts/testEnv.sh` file).
 
@@ -134,6 +130,18 @@ You can generate the RPM for the source code (optional):
         make rpm
 
 * The generated RPMs are placed in directory `~/rpmbuild/RPMS/x86_64`.
+
+### Building MongoDB driver with SASL and SSL support
+
+The procedure is as follows:
+
+```
+wget https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz
+tar xfvz legacy-1.1.2.tar.gz cd mongo-cxx-driver-legacy-1.1.2
+yum install cyrus-sasl-devel
+scons --use-sasl-client --ssl                                   # The build/linux2/normal/libmongoclient.a library is generated as outcome
+sudo scons install --prefix=/usr/local --use-sasl-client --ssl  # This puts .h files in /usr/local/include/mongo and libmongoclient.a in /usr/local/lib
+```
 
 ## Others
 

@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"
 
 #include "common/MimeType.h"
+#include "common/limits.h"
 #include "ngsi/StatusCode.h"
 #include "metricsMgr/metricsMgr.h"
 
@@ -48,6 +49,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
 #include "rest/HttpStatusCode.h"
+#include "rest/HttpHeaders.h"
 #include "rest/mhd.h"
 #include "rest/OrionError.h"
 #include "rest/restReply.h"
@@ -159,19 +161,47 @@ void restReply(ConnectionInfo* ciP, const std::string& _answer)
     {
       MHD_add_response_header(response, "Content-Type", "text/plain");
     }
+  }
 
-    // At the present version, CORS is supported only for GET requests
-    if ((strlen(restAllowedOrigin) > 0) && (ciP->verb == GET))
+  // Check if CORS is enabled, the Origin header is present in the request and the response is not a bad verb response
+  if ((corsEnabled == true) && (ciP->httpHeaders.origin != "") && (ciP->httpStatusCode != SccBadVerb))
+  {
+    // Only GET method is supported for V1 API
+    if ((ciP->apiVersion == V2) || (ciP->apiVersion == V1 && ciP->verb == GET))
     {
+      bool originAllowed = true;
+
       // If any origin is allowed, the header is sent always with "any" as value
-      if (strcmp(restAllowedOrigin, "__ALL") == 0)
+      if (strcmp(corsOrigin, "__ALL") == 0)
       {
-        MHD_add_response_header(response, "Access-Control-Allow-Origin", "*");
+        MHD_add_response_header(response, ACCESS_CONTROL_ALLOW_ORIGIN, "*");
       }
       // If a specific origin is allowed, the header is only sent if the origins match
-      else if (strcmp(ciP->httpHeaders.origin.c_str(), restAllowedOrigin) == 0)
+      else if (strcmp(ciP->httpHeaders.origin.c_str(), corsOrigin) == 0)
       {
-        MHD_add_response_header(response, "Access-Control-Allow-Origin", restAllowedOrigin);
+        MHD_add_response_header(response, ACCESS_CONTROL_ALLOW_ORIGIN, corsOrigin);
+      }
+      // If there is no match, originAllowed flag is set to false
+      else
+      {
+        originAllowed = false;
+      }
+
+      // If the origin is not allowed, no headers are added to the response
+      if (originAllowed)
+      {
+        // Add Access-Control-Expose-Headers to the response
+        MHD_add_response_header(response, ACCESS_CONTROL_EXPOSE_HEADERS, CORS_EXPOSED_HEADERS);
+
+        if (ciP->verb == OPTIONS)
+        {
+          MHD_add_response_header(response, ACCESS_CONTROL_ALLOW_HEADERS, CORS_ALLOWED_HEADERS);
+
+          char maxAge[STRING_SIZE_FOR_INT];
+          snprintf(maxAge, sizeof(maxAge), "%d", corsMaxAge);
+
+          MHD_add_response_header(response, ACCESS_CONTROL_MAX_AGE, maxAge);
+        }
       }
     }
   }

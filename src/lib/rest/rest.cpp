@@ -71,7 +71,9 @@ IpVersion                        ipVersionUsed         = IPDUAL;
 bool                             multitenant           = false;
 std::string                      rushHost              = "";
 unsigned short                   rushPort              = NO_PORT;
-char                             restAllowedOrigin[64];
+bool                             corsEnabled           = false;
+char                             corsOrigin[64];
+int                              corsMaxAge;
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
@@ -805,6 +807,18 @@ void firstServicePath(const char* servicePath, char* servicePath0, int servicePa
   {
     strncpy(servicePath0, servicePath, servicePath0Len);
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* isOriginAllowedForCORS - checks the Origin header of the request and returns
+* true if that Origin is allowed to make a CORS request
+*/
+bool isOriginAllowedForCORS(const std::string& requestOrigin)
+{
+  return ((requestOrigin != "") && ((strcmp(corsOrigin, "__ALL") == 0) || (strcmp(requestOrigin.c_str(), corsOrigin) == 0)));
 }
 
 
@@ -1754,7 +1768,8 @@ void restInit
   unsigned int        _mhdThreadPoolSize,
   const std::string&  _rushHost,
   unsigned short      _rushPort,
-  const char*         _allowedOrigin,
+  const char*         _corsOrigin,
+  int                 _corsMaxAge,
   int                 _mhdTimeoutInSeconds,
   const char*         _httpsKey,
   const char*         _httpsCertificate,
@@ -1774,10 +1789,12 @@ void restInit
   threadPoolSize   = _mhdThreadPoolSize;
   rushHost         = _rushHost;
   rushPort         = _rushPort;
+  corsMaxAge       = _corsMaxAge;
 
   mhdConnectionTimeout = _mhdTimeoutInSeconds;
 
-  strncpy(restAllowedOrigin, _allowedOrigin, sizeof(restAllowedOrigin));
+  strncpy(corsOrigin, _corsOrigin, sizeof(corsOrigin));
+  corsEnabled = (corsOrigin[0] != 0);
 
   strncpy(bindIp, LOCAL_IP_V4, MAX_LEN_IP - 1);
   strncpy(bindIPv6, LOCAL_IP_V6, MAX_LEN_IP - 1);

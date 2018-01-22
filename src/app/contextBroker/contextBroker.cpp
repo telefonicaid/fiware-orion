@@ -203,6 +203,14 @@
 #include "serviceRoutinesV2/semStateTreat.h"
 #include "serviceRoutinesV2/getMetrics.h"
 #include "serviceRoutinesV2/deleteMetrics.h"
+#include "serviceRoutinesV2/optionsGetOnly.h"
+#include "serviceRoutinesV2/optionsGetPostOnly.h"
+#include "serviceRoutinesV2/optionsGetDeleteOnly.h"
+#include "serviceRoutinesV2/optionsAllNotDelete.h"
+#include "serviceRoutinesV2/optionsGetPutOnly.h"
+#include "serviceRoutinesV2/optionsGetPutDeleteOnly.h"
+#include "serviceRoutinesV2/optionsGetDeletePatchOnly.h"
+#include "serviceRoutinesV2/optionsPostOnly.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
@@ -252,6 +260,7 @@ bool            https;
 bool            mtenant;
 char            rush[256];
 char            allowedOrigin[64];
+int             maxAge;
 long            dbTimeout;
 long            httpTimeout;
 int             dbPoolSize;
@@ -312,7 +321,8 @@ bool            paranoidV1Indent;
 #define HTTPSCERTFILE_DESC     "certificate key file (for https)"
 #define RUSH_DESC              "rush host (IP:port)"
 #define MULTISERVICE_DESC      "service multi tenancy mode"
-#define ALLOWED_ORIGIN_DESC    "CORS allowed origin. use '__ALL' for any"
+#define ALLOWED_ORIGIN_DESC    "enable Cross-Origin Resource Sharing with allowed origin. Use '__ALL' for any"
+#define CORS_MAX_AGE_DESC      "maximum time in seconds preflight requests are allowed to be cached. Default: 86400"
 #define HTTP_TMO_DESC          "timeout in milliseconds for forwards and notifications"
 #define DBPS_DESC              "database connection pool size"
 #define MAX_L                  900000
@@ -383,6 +393,7 @@ PaArgument paArgs[] =
   { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
 
   { "-corsOrigin",       allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "",          PaNL,  PaNL,     ALLOWED_ORIGIN_DESC    },
+  { "-corsMaxAge",       &maxAge,           "CORS_MAX_AGE",      PaInt,    PaOpt, 86400,          -1,    86400,    CORS_MAX_AGE_DESC      },
   { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,           0,     UINT_MAX, CPR_FORWARD_LIMIT_DESC },
   { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 60,             0,     3600,     SUB_CACHE_IVAL_DESC    },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
@@ -827,6 +838,19 @@ static const char* validLogLevels[] =
   { "*",      BUR,          BUR_COMPS_V2,         BUR_COMPS_WORD,          badVerbPostOnly          }
 
 
+#define API_V2_CORS                                                                                    \
+  { "OPTIONS", EPS,         EPS_COMPS_V2,         ENT_COMPS_WORD,          optionsGetOnly           }, \
+  { "OPTIONS", ENT,         ENT_COMPS_V2,         ENT_COMPS_WORD,          optionsGetPostOnly       }, \
+  { "OPTIONS", IENT,        IENT_COMPS_V2,        IENT_COMPS_WORD,         optionsGetDeleteOnly     }, \
+  { "OPTIONS", IENTOA,      IENTOA_COMPS_V2,      IENTOA_COMPS_WORD,       optionsAllNotDelete      }, \
+  { "OPTIONS", IENTATTRVAL, IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  optionsGetPutOnly        }, \
+  { "OPTIONS", IENTATTR,    IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     optionsGetPutDeleteOnly  }, \
+  { "OPTIONS", ENTT,        ENTT_COMPS_V2,        ENTT_COMPS_WORD,         optionsGetOnly           }, \
+  { "OPTIONS", ETT,         ETT_COMPS_V2,         ETT_COMPS_WORD,          optionsGetOnly           }, \
+  { "OPTIONS", SSR,         SSR_COMPS_V2,         SSR_COMPS_WORD,          optionsGetPostOnly       }, \
+  { "OPTIONS", ISR,         ISR_COMPS_V2,         ISR_COMPS_WORD,          optionsGetDeletePatchOnly}, \
+  { "OPTIONS", BQR,         BQR_COMPS_V2,         BQR_COMPS_WORD,          optionsPostOnly          }, \
+  { "OPTIONS", BUR,         BUR_COMPS_V2,         BUR_COMPS_WORD,          optionsPostOnly          }
 
 
 #define REGISTRY_STANDARD_REQUESTS_V0                                                                    \
@@ -1180,10 +1204,52 @@ static const char* validLogLevels[] =
 *
 * restServiceV - services for BROKER (ngsi9/10)
 *
-* This is the default service vector, that is used if the broker is started without the -ngsi9 option
+* This is the default service vector, that is used if the broker is started without the -corsOrigin option
 */
 RestService restServiceV[] =
 {
+  API_V2,
+
+  REGISTRY_STANDARD_REQUESTS_V0,
+  REGISTRY_STANDARD_REQUESTS_V1,
+  STANDARD_REQUESTS_V0,
+  STANDARD_REQUESTS_V1,
+
+  REGISTRY_CONVENIENCE_OPERATIONS_V0,
+  REGISTRY_CONVENIENCE_OPERATIONS_V1,
+  CONVENIENCE_OPERATIONS_V0,
+  CONVENIENCE_OPERATIONS_V1,
+  LOG_REQUESTS_V0,
+  LOG_REQUESTS_V1,
+  STAT_REQUESTS_V0,
+  STAT_REQUESTS_V1,
+  STAT_CACHE_REQUESTS_V0,
+  STAT_CACHE_REQUESTS_V1,
+  VERSION_REQUESTS,
+  LOGLEVEL_REQUESTS_V2,
+  SEM_STATE_REQUESTS,
+  METRICS_REQUESTS,
+
+#ifdef DEBUG
+  EXIT_REQUESTS,
+  LEAK_REQUESTS,
+#endif
+
+  INVALID_REQUESTS,
+  END_REQUEST
+};
+
+
+
+/* ****************************************************************************
+*
+* restServiceCORS
+*
+* Adds API_V2_CORS definitions on top of the default service vector (restServiceV)
+*/
+RestService restServiceCORS[] =
+{
+  API_V2_CORS,
   API_V2,
 
   REGISTRY_STANDARD_REQUESTS_V0,
@@ -1730,7 +1796,7 @@ int main(int argC, char* argV[])
   LM_M(("x: '%s'", x));  // Outdeffed
 #endif
 
-  RestService* rsP       = restServiceV;
+  RestService* rsP       = (strlen(allowedOrigin) > 0) ? restServiceCORS : restServiceV;
   IpVersion    ipVersion = IPDUAL;
 
   if (useOnlyIPv4)
@@ -1824,6 +1890,7 @@ int main(int argC, char* argV[])
              rushHost,
              rushPort,
              allowedOrigin,
+             maxAge,
              reqTimeout,
              httpsPrivateServerKey,
              httpsCertificate);
@@ -1844,6 +1911,7 @@ int main(int argC, char* argV[])
              rushHost,
              rushPort,
              allowedOrigin,
+             maxAge,
              reqTimeout);
   }
 

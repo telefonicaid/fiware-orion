@@ -1152,7 +1152,7 @@ static bool addTriggeredSubscriptions_withCache
     //           Perhaps CachedSubscription should include an AttributeList (cSubP->attributes)
     //           instead of its std::vector<std::string> ... ?
     //
-    AttributeList aList;
+    StringList aList;
 
     aList.fill(cSubP->attributes);
 
@@ -1712,7 +1712,7 @@ static bool addTriggeredSubscriptions
 static bool processOnChangeConditionForUpdateContext
 (
   ContextElementResponse*          notifyCerP,
-  const AttributeList&             attrL,
+  const StringList&                attrL,
   const std::vector<std::string>&  metadataV,
   std::string                      subId,
   RenderFormat                     renderFormat,
@@ -1969,7 +1969,7 @@ static bool processSubscriptions
      * before adding the subscription to the map.
      */
 
-    /* Check 1: timming (not expired and ok from throttling point of view) */
+    /* Check 1: timing (not expired and ok from throttling point of view) */
     if (tSubP->throttling != 1 && tSubP->lastNotification != 1)
     {
       long long  current               = getCurrentTime();
@@ -2093,7 +2093,7 @@ static bool processSubscriptions
                                                                 tenant,
                                                                 xauthToken,
                                                                 fiwareCorrelator,
-                                                                tSubP->attrL.attributeV,
+                                                                tSubP->attrL.stringV,
                                                                 tSubP->httpInfo,
                                                                 tSubP->blacklist);
 
@@ -2274,9 +2274,20 @@ static void updateAttrInNotifyCer
       //
       // FIXME P6: https://github.com/telefonicaid/fiware-orion/issues/2587
       // If an attribute has no value, then its value is not updated (neither is previousValue).
-      // However this may be problematic ... see the issue
+      // However this may be problematic ... see the issue.
       //
+      // New data on this: the functest
+      // "test/functionalTest/cases/2998*/null_not_working_in_q_for_subscription.test" fails with this 'if-clause' (not outdeffed),
+      // and removing the 'if' the functest 'test/functionalTest/cases/1156*/q_and_mq_as_uri_param_for_metadata.test' fails,
+      // but it seems like the test is incorrect and this fix is good.
+      //
+      // This clearly needs to be looked over ...
+      //
+#if 0
       if (targetAttr->valueType != orion::ValueTypeNone)
+#else
+      if (true)
+#endif
       {
         /* Store previous value (it may be necessary to render previousValue metadata) */
         if (caP->previousValue == NULL)
@@ -3062,7 +3073,7 @@ static void searchContextProviders
 {
   ContextRegistrationResponseVector  crrV;
   EntityIdVector                     enV;
-  AttributeList                      attrL;
+  StringList                         attrL;
   std::string                        err;
 
   /* Fill input data for registrationsQuery() */
@@ -3094,7 +3105,7 @@ static void searchContextProviders
   }
 
   /* Second CPr lookup (in the case some element stills not being found): looking in E-<null> registrations */
-  AttributeList attrNullList;
+  StringList attrNullList;
   if (someContextElementNotFound(*cerP))
   {
     if (registrationsQuery(enV, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
@@ -3255,7 +3266,7 @@ static void updateEntity
   }
 
   /* Build CER used for notifying (if needed) */
-  AttributeList            emptyAttrL;
+  StringList               emptyAttrL;
   ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL);
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
