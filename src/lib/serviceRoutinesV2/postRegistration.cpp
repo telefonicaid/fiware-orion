@@ -58,9 +58,10 @@ std::string postRegistration
   ParseData*                 parseDataP
 )
 {
+  // FIXME P4: See issue #3078 about servicePath for registrations
+  std::string           servicePath = (ciP->servicePathV[0] == "")? SERVICE_PATH_ROOT : ciP->servicePathV[0];
   ngsiv2::Registration  registration;
   OrionError            oe;
-  std::string           servicePath = (ciP->servicePathV[0] == "")? SERVICE_PATH_ROOT : ciP->servicePathV[0];
   std::string           regId;
   std::string           answer;
 
