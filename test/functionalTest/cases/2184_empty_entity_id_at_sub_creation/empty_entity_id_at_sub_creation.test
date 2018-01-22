@@ -31,7 +31,7 @@ brokerStart CB
 
 #
 # 01. Attempt to create subscription with empty Entity ID - see error
-# 02. Get /v2/subscriptions, see no subscriptions
+# 02. GET /v2/subscriptions, see no subscriptions
 #
 
 echo "01. Attempt to create subscription with empty Entity ID - see error"
@@ -59,7 +59,7 @@ echo
 echo
 
 
-echo "02. Get /v2/subscriptions, see no subscriptions"
+echo "02. GET /v2/subscriptions, see no subscriptions"
 echo "==============================================="
 orionCurl --url /v2/subscriptions
 echo
@@ -70,18 +70,18 @@ echo
 01. Attempt to create subscription with empty Entity ID - see error
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
+Content-Length: 69
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "subject entities element id is empty",
+    "description": "/entities/ element id is empty",
     "error": "BadRequest"
 }
 
 
-02. Get /v2/subscriptions, see no subscriptions
+02. GET /v2/subscriptions, see no subscriptions
 ===============================================
 HTTP/1.1 200 OK
 Content-Length: 2

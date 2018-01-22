@@ -619,7 +619,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "subject entities element id is not a string",
+    "description": "/entities/ vector item /id/ is not a string",
     "error": "BadRequest"
 }
 
@@ -633,7 +633,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "subject entities element idPattern is not a string",
+    "description": "/entities/ vector item /idPattern/ is not a string",
     "error": "BadRequest"
 }
 
@@ -641,13 +641,13 @@ Date: REGEX(.*)
 03. POST /v2/subscriptions (type is not an string)
 ==================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 84
+Content-Length: 82
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "subject entities element type is not a string",
+    "description": "/entities/ vector item type is not a string",
     "error": "BadRequest"
 }
 
@@ -697,13 +697,13 @@ Date: REGEX(.*)
 07. POST /v2/subscriptions (subject entities is not an array)
 =============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 71
+Content-Length: 65
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "subject entities is not an array",
+    "description": "/entities/ is not an array",
     "error": "BadRequest"
 }
 
@@ -725,13 +725,13 @@ Date: REGEX(.*)
 09. POST /v2/subscriptions (condition attributes is not an array)
 =================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 60
+Content-Length: 77
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "attrs is not an array",
+    "description": "the field /attrs/ must be a JSON array",
     "error": "BadRequest"
 }
 
@@ -809,13 +809,13 @@ Date: REGEX(.*)
 15. POST /v2/subscriptions (notification attributes is not an array)
 ====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 60
+Content-Length: 77
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "attrs is not an array",
+    "description": "the field /attrs/ must be a JSON array",
     "error": "BadRequest"
 }
 

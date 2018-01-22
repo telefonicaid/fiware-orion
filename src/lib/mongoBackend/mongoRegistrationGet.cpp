@@ -81,7 +81,7 @@ static void setDescription(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 */
 static void setProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 {
-  regP->provider.url = (r.hasField(REG_PROVIDING_APPLICATION))? getStringFieldF(r, REG_PROVIDING_APPLICATION): "";
+  regP->provider.http.url = (r.hasField(REG_PROVIDING_APPLICATION))? getStringFieldF(r, REG_PROVIDING_APPLICATION): "";
 }
 
 
@@ -279,7 +279,6 @@ void mongoRegistrationGet
   if (moreSafe(cursor))
   {
     mongo::BSONObj r;
-
     if (!nextSafeOrErrorF(cursor, &r, &err))
     {
       releaseMongoConnection(connection);
@@ -295,6 +294,7 @@ void mongoRegistrationGet
     //
     setRegistrationId(regP, r);
     setDescription(regP, r);
+
     if (setDataProvided(regP, r, false) == false)
     {
       releaseMongoConnection(connection);

@@ -61,13 +61,13 @@ echo
 01. Intent to create a subscription without id nor idPattern - see error
 ========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 94
+Content-Length: 96
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "subject entities element does not have id nor idPattern",
+    "description": "/entities/ vector item does not have /id/ nor /idPattern/",
     "error": "BadRequest"
 }
 

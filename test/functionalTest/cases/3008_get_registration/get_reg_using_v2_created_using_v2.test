@@ -1,4 +1,4 @@
-# Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET registration using APIv2, created using V1
+GET registration using APIv2, created also using V2
 
 --SHELL-INIT--
 dbInit CB
@@ -30,55 +30,35 @@ brokerStart CB 0 IPv4 -statCounters
 --SHELL--
 
 #
-# At the moment of implementing the functionality of issue #3008, there was no way to create
-# registrations using APIv2 (Nov/Dec 2017), so, to test this new functionality of querying registrations
-# in APIv2, the registrations had to be created using APIv1.
-# Now, one might say, so, as soon as APIv2 implements creation of registrations, this test should be changed to
-# use APIv2 registration creation instead.
-# Sure, but, creating and getting registrations in pure APIv2 will be sufficiently tested in the future.
-# I would prefer to keep this tests as is, creation in APIv1 and getting in APIv2, to test the 'API version cross'.
-#
-# 01. Register entity E1/A1, using APIv1
+# 01. Register entity E1/A1, using APIv2
 # 02. GET the registration using APIv2
 # 03. Attempt to GET a non existing registration (using a syntactical correct Reg ID)
 # 04. GET /statistics
 #
 
-echo "01. Register entity E1/A1, using APIv1"
+echo "01. Register entity E1/A1, using APIv2"
 echo "======================================"
 payload='{
-  "contextRegistrations": [
-  {
-    "entities": [
-      {
+   "description": "located in CP1",
+   "dataProvided": {
+     "entities": [
+       {
          "id": "E1",
-         "isPattern": "false",
          "type": "T1"
-      },
-      {
-         "id": "E2",
-         "type": "T2"
-      }
-    ],
-    "attributes": [
-      {
-        "name": "A1",
-        "type": "string",
-        "isDomain": "false"
-      },
-      {
-        "name": "A2",
-        "type": "string",
-        "isDomain": "false"
-      }
-    ],
-    "providingApplication": "http://localhost:'${CP1_PORT}'/v2"
-    }
- ],
- "duration": "P1M"
+       }
+     ],
+     "attrs": [ "A1" ]
+   },
+   "provider": {
+     "http": {
+       "url": "http://localhost:'${CP1_PORT}'/v2"
+     },
+     "legacyForwarding": true
+   },
+   "status": "active"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload"
-REG_ID=$(echo "$_response" | grep registrationId | awk -F\" '{ print $4}')
+orionCurl --url /v2/registrations --payload "$payload"
+REG_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 echo
 echo
 
@@ -105,24 +85,20 @@ echo
 
 
 --REGEXPECT--
-01. Register entity E1/A1, using APIv1
+01. Register entity E1/A1, using APIv2
 ======================================
-HTTP/1.1 200 OK
-Content-Length: 74
-Content-Type: application/json
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "duration": "P1M",
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
 
 
 02. GET the registration using APIv2
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 261
+Content-Length: 263
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -130,20 +106,16 @@ Date: REGEX(.*)
 {
     "dataProvided": {
         "attrs": [
-            "A1",
-            "A2"
+            "A1"
         ],
         "entities": [
             {
                 "id": "E1",
                 "type": "T1"
-            },
-            {
-                "id": "E2",
-                "type": "T2"
             }
         ]
     },
+    "description": "located in CP1",
     "id": "REGEX([0-9a-f\-]{24})",
     "provider": {
         "http": {
@@ -182,7 +154,7 @@ Date: REGEX(.*)
     "counters": {
         "jsonRequests": 1,
         "registrationRequest": 2,
-        "registrations": 1,
+        "registrationsRequest": 1,
         "statisticsRequests": 1,
         "versionRequests": 0
     },

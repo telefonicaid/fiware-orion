@@ -74,7 +74,6 @@ OrionError::OrionError(StatusCode& sc)
 /* ****************************************************************************
 *
 * OrionError::fill -
-*
 */
 void OrionError::fill(HttpStatusCode _code, const std::string& _details, const std::string& _reasonPhrase)
 {

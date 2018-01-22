@@ -72,7 +72,7 @@ std::string Subscription::toJson(void)
     jh.addString("description", this->description);
   }
 
-  if (this->expires != PERMANENT_SUBS_DATETIME)
+  if (this->expires != PERMANENT_EXPIRES_DATETIME)
   {
     jh.addDate("expires", this->expires);
   }

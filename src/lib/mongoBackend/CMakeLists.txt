@@ -44,6 +44,7 @@ SET (SOURCES
     mongoConnectionPool.cpp
     mongoGetSubscriptions.cpp
     mongoRegistrationGet.cpp
+    mongoRegistrationCreate.cpp
     connectionOperations.cpp
     mongoSubCache.cpp
     safeMongo.cpp    
@@ -77,6 +78,7 @@ SET (HEADERS
     mongoConnectionPool.h
     mongoGetSubscriptions.h
     mongoRegistrationGet.h
+    mongoRegistrationCreate.h
     connectionOperations.h
     mongoSubCache.h
     safeMongo.h

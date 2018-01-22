@@ -41,29 +41,6 @@ namespace ngsiv2
 
 /* ****************************************************************************
 *
-* operator== -
-*/
-inline bool operator==(const EntID& lhs, const EntID& rhs)
-{
-  return (lhs.id   == rhs.id)   && (lhs.idPattern   == rhs.idPattern)
-      && (lhs.type == rhs.type) && (lhs.typePattern == rhs.typePattern);
-}
-
-
-
-/* ****************************************************************************
-*
-* operator!= -
-*/
-inline bool operator!=(const EntID& lhs, const EntID& rhs)
-{
-  return !(lhs == rhs);
-}
-
-
-
-/* ****************************************************************************
-*
 * Notification -
 */
 struct Notification
@@ -136,6 +113,7 @@ struct Subscription
 
   ~Subscription();
 };
+
 }  // end namespace
 
 #endif  // SRC_LIB_APITYPESV2_SUBSCRIPTION_H_
