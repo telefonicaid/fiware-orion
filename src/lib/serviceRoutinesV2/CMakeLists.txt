@@ -52,6 +52,8 @@ deleteMetrics.cpp
 getRegistration.cpp
 optionsGetOnly.cpp
 optionsGetPostOnly.cpp
+getRegistration.cpp
+postRegistration.cpp
 optionsGetDeleteOnly
 optionsAllNotDelete
 optionsGetPutOnly
@@ -91,6 +93,8 @@ getMetrics.h
 deleteMetrics.h
 optionsGetOnly.h
 optionsGetPostOnly.h
+getRegistration.h
+postRegistration.h
 )
 
 

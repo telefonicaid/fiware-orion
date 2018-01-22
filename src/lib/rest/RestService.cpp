@@ -49,6 +49,7 @@
 #include "rest/uriParamNames.h"
 #include "mongoBackend/mongoSubCache.h"
 
+#include "serviceRoutinesV2/postRegistration.h"
 
 
 /* ****************************************************************************

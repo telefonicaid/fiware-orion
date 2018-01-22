@@ -50,8 +50,23 @@ struct EntID
     typePattern(typePatternA)
   {}
 
-  EntID()
-  {}
+  EntID()  {}
+
+  bool operator==(const EntID& e)
+  {
+    return (id          == e.id)        &&
+           (idPattern   == e.idPattern) &&
+           (type        == e.type)      &&
+           (typePattern == e.typePattern);
+  }
+
+  bool operator!=(const EntID& e)
+  {
+    return (id          != e.id)        ||
+           (idPattern   != e.idPattern) ||
+           (type        != e.type)      ||
+           (typePattern != e.typePattern);
+  }
 };
 
 }  // end namespace

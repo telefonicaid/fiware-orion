@@ -74,7 +74,7 @@ std::string postNotifyContextAvailability
   }
   else if (ciP->servicePathV.size() == 0)
   {
-    ciP->servicePathV.push_back(DEFAULT_SERVICE_PATH_UPDATES);
+    ciP->servicePathV.push_back(SERVICE_PATH_ROOT);
   }
 
   std::string res = servicePathCheck(ciP->servicePathV[0].c_str());

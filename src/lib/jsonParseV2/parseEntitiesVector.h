@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_COMMON_DEFAULTVALUES_H_
-#define SRC_LIB_COMMON_DEFAULTVALUES_H_
+#ifndef SRC_LIB_JSONPARSEV2_PARSEENTITIESVECTOR_H_
+#define SRC_LIB_JSONPARSEV2_PARSEENTITIESVECTOR_H_
 
 /*
 *
@@ -23,24 +23,28 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Orion dev team
 */
+#include <string>
+#include <vector>
+
+#include "rapidjson/document.h"
+
+#include "rest/ConnectionInfo.h"
+#include "apiTypesV2/EntID.h"
 
 
 
 /* ****************************************************************************
 *
-* Default Service Paths
+* parseEntitiesVector -
 */
-#define  SERVICE_PATH_ROOT      "/"
-#define  SERVICE_PATH_ALL       "/#"
+extern bool parseEntitiesVector
+(
+  ConnectionInfo*              ciP,
+  std::vector<ngsiv2::EntID>*  eivP,
+  const rapidjson::Value&      entities,
+  std::string*                 errorStringP
+);
 
-
-
-/* ****************************************************************************
-*
-* API Documentation - The link to the the GEri documentation, either in the gh-pages (.github.io/) inside the fiware organization in GitHub or ReadTheDocs manual.
-*/
-#define API_DOC                               "https://fiware-orion.readthedocs.org/en/master/"
-
-#endif  // SRC_LIB_COMMON_DEFAULTVALUES_H_
+#endif  // SRC_LIB_JSONPARSEV2_PARSEENTITIESVECTOR_H_

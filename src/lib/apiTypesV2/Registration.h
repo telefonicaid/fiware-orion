@@ -92,13 +92,39 @@ public:
 
 /* ****************************************************************************
 *
+* Http -
+*/
+struct Http
+{
+  std::string url;
+};
+
+
+
+/* *****************************************************************************
+*
+* ForwardingMode -
+*/
+typedef enum ForwardingMode
+{
+  ForwardAll,
+  ForwardNone,
+  ForwardQuery,
+  ForwardUpdate
+} ForwardingMode;
+
+
+
+/* ****************************************************************************
+*
 * Provider -
 */
 struct Provider
 {
-  std::string  url;
+  Http            http;
+  ForwardingMode  supportedForwardingMode;
 
-  std::string  toJson();
+  std::string     toJson();
 };
 
 
