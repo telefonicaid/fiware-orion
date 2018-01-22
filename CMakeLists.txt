@@ -24,6 +24,8 @@
 PROJECT(contextBroker)
 cmake_minimum_required(VERSION 2.6)
 
+set (CMAKE_CXX_STANDARD 11)
+
 #
 # DEBUG or RELEASE build ?
 #
@@ -78,11 +80,11 @@ add_definitions(-fPIC)
 # This workaround consists of putting back the -Werror flag and instead solving the problem by
 # adding another flag: -Wno-deprecated-declarations
 #
-IF (${DISTRO} STREQUAL "Ubuntu_17.04")
+#IF (${DISTRO} STREQUAL "Ubuntu_17.04")
  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
-ELSE()
-  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -fno-var-tracking-assignments")
-ENDIF ()
+#ELSE()
+#  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -fno-var-tracking-assignments")
+#ENDIF ()
 
 #
 # Platform checks
@@ -210,6 +212,7 @@ SET (BOOST_MT
 SET (COMMON_STATIC_LIBS
     microhttpd.a
     mongoclient.a
+    mongocxx.a
 )
 
 SET (DYNAMIC_LIBS
@@ -237,6 +240,7 @@ endif (UNIT_TEST)
 # Common include
 #
 include_directories("/usr/include")
+include_directories("/usr/local/include/mongocxx/v_noabi")
 
 #
 # Library directories

@@ -66,6 +66,8 @@
 #include "mongoBackend/compoundResponses.h"
 #include "mongoBackend/MongoGlobal.h"
 
+#include "mongocxx/instance.hpp"
+
 
 
 /* ****************************************************************************
@@ -308,6 +310,8 @@ bool mongoStart
   alreadyDone = true;
 
   multitenant = _multitenant;
+
+  mongocxx::instance instance{};
 
   mongo::Status status = mongo::client::initialize();
   if (!status.isOK())
