@@ -198,7 +198,7 @@ echo "+++++ Discovery 2 Done +++++++++++++++"
 --REGEXPECT--
 +++++ Starting +++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -209,7 +209,7 @@ Date: REGEX(.*)
 }
 +++++ Registration 1 Done +++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 607
+Content-Length: 319
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -245,7 +245,7 @@ Date: REGEX(.*)
 +++++ Discovery 1 Done +++++++++++++++
 +++++ Register 2: two attributes in vector +++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -256,7 +256,7 @@ Date: REGEX(.*)
 }
 +++++ Registration 2 Done +++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 599
+Content-Length: 311
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

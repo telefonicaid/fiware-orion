@@ -135,7 +135,7 @@ echo
 01. Make CP2 subscribe to entity Room/Room1 in CP1
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 135
+Content-Length: 104
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -152,7 +152,7 @@ Date: REGEX(.*)
 02. Make CP3 subscribe to entity Room/Room1 in CP2
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 135
+Content-Length: 104
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -169,7 +169,7 @@ Date: REGEX(.*)
 03. Create an entity Room/Room1, attribute temperature in CP1 (CP2 should get informed and after that CP3 also)
 ===============================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 396
+Content-Length: 202
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -200,7 +200,7 @@ Date: REGEX(.*)
 04. Query CP3 for entity Room/Room1, to make sure the entity has propagated CP1->CP2->CP3
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 398
+Content-Length: 204
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

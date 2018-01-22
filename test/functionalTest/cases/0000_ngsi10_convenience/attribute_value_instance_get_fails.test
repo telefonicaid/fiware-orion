@@ -72,7 +72,7 @@ orionCurl --url "/v1/contextEntities/Room1/attributes/temperature/ground"
 --REGEXPECT--
 +++++ 1. create an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 763
+Content-Length: 358
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -118,7 +118,7 @@ Date: REGEX(.*)
 }
 +++++ 2. lookup an attribute by valueID +++++
 HTTP/1.1 200 OK
-Content-Length: 323
+Content-Length: 181
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -145,7 +145,7 @@ Date: REGEX(.*)
 }
 +++++ 3. delete an attribute by valueID +++++
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -156,7 +156,7 @@ Date: REGEX(.*)
 }
 +++++ 4. lookup the attribute again +++++
 HTTP/1.1 200 OK
-Content-Length: 133
+Content-Length: 102
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

@@ -555,7 +555,7 @@ echo
 01. Update/APPEND OfficeRoom/Room/pressure=p230
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 398
+Content-Length: 204
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -587,7 +587,7 @@ Date: REGEX(.*)
 02. Update/APPEND OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 768
+Content-Length: 390
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -637,7 +637,7 @@ Date: REGEX(.*)
 03. Update/APPEND OfficeRoom/Room/pressure=p230
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 398
+Content-Length: 204
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -669,7 +669,7 @@ Date: REGEX(.*)
 04. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 768
+Content-Length: 390
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -719,7 +719,7 @@ Date: REGEX(.*)
 05. Update/APPEND OfficeRoom/Room/pressure=p23
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 398
+Content-Length: 204
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -751,7 +751,7 @@ Date: REGEX(.*)
 06. Update/UPDATE OfficeRoom/Room/pressure=p230
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 398
+Content-Length: 204
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -783,7 +783,7 @@ Date: REGEX(.*)
 07. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 768
+Content-Length: 390
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -833,7 +833,7 @@ Date: REGEX(.*)
 08. Update/APPEND OfficeRoom/Room/pressure=
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 398
+Content-Length: 204
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -865,7 +865,7 @@ Date: REGEX(.*)
 09. Update/UPDATE OfficeRoom/Room/pressure=
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 398
+Content-Length: 204
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -897,7 +897,7 @@ Date: REGEX(.*)
 10. Update/DELETE OfficeRoom/Room/pressure
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 398
+Content-Length: 204
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -929,7 +929,7 @@ Date: REGEX(.*)
 11. Update/DELETE OfficeRoom/Room/pressure AGAIN (error)
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 557
+Content-Length: 352
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -962,7 +962,7 @@ Date: REGEX(.*)
 12. Update/DELETE OfficeRoom/Room/pressure AGAIN AGAIN (same error)
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 557
+Content-Length: 352
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -995,7 +995,7 @@ Date: REGEX(.*)
 13. Update/UPDATE OfficeRoom/Room/pressure=p230
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 535
+Content-Length: 330
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1028,7 +1028,7 @@ Date: REGEX(.*)
 14. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 905
+Content-Length: 516
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1079,7 +1079,7 @@ Date: REGEX(.*)
 15. Update/APPEND OfficeRoom/Room/pressure=p23
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 398
+Content-Length: 204
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1111,7 +1111,7 @@ Date: REGEX(.*)
 16. Update/UPDATE OfficeRoom/Room/pressure=p2300+lightstatus=L23 (pressure OK, lightstatus ERROR)
 =================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 823
+Content-Length: 434
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1162,7 +1162,7 @@ Date: REGEX(.*)
 17. Update/APPEND OfficeRoom/Room/pressure=p2300+lightstatus=L23 (both OK)
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 514
+Content-Length: 253
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1199,7 +1199,7 @@ Date: REGEX(.*)
 18. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 768
+Content-Length: 390
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

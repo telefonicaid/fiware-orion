@@ -145,7 +145,7 @@ echo
 01. Create E/T/A1, service-path /father
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 381
+Content-Length: 187
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -177,7 +177,7 @@ Date: REGEX(.*)
 02. Create E/T/A1, service-path /father/son
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 381
+Content-Length: 187
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -209,7 +209,7 @@ Date: REGEX(.*)
 03. Query  E/T/A1 (with implicit service-path /#) - see two entities
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 739
+Content-Length: 361
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -259,7 +259,7 @@ Date: REGEX(.*)
 04. Delete E/T/A1, service-path /father
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 381
+Content-Length: 187
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -291,7 +291,7 @@ Date: REGEX(.*)
 05. Query  E/T/A1 (with implicit service-path /#) - see one entity
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 384
+Content-Length: 190
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

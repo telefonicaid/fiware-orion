@@ -84,7 +84,7 @@ echo
 01. Update/APPEND E1/A1, servicePath /#
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 130
+Content-Length: 99
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -101,7 +101,7 @@ Date: REGEX(.*)
 02. Update/APPEND E1/A1, servicePath /a,/b
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 153
+Content-Length: 122
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

@@ -230,7 +230,7 @@ echo
 
 03. Query broker for E1/A1 (nothing found)
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -245,7 +245,7 @@ Date: REGEX(.*)
 
 04. Register an entity/attribute E1/A1 in broker, with CP as providing application
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 64
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -258,7 +258,7 @@ Date: REGEX(.*)
 
 05. Query broker for E1/A1 (will go to CP, but CP doesn't know about E1/A1)
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -273,7 +273,7 @@ Date: REGEX(.*)
 
 06. Update/APPEND E1/A1(=CP) in CP
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -304,7 +304,7 @@ Date: REGEX(.*)
 
 07. Query CP for E1/A1
 HTTP/1.1 200 OK
-Content-Length: 380
+Content-Length: 186
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -335,7 +335,7 @@ Date: REGEX(.*)
 
 08. Query broker for E1/A1 (will go to CP and it will work, A1=CP is returned)
 HTTP/1.1 200 OK
-Content-Length: 380
+Content-Length: 186
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -366,7 +366,7 @@ Date: REGEX(.*)
 
 09. Update/APPEND E1/A1(=broker) in broker
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -397,7 +397,7 @@ Date: REGEX(.*)
 
 10. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=CB))
 HTTP/1.1 200 OK
-Content-Length: 380
+Content-Length: 186
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

@@ -111,7 +111,7 @@ echo
 01. Register E1/T1/A1
 =====================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -125,7 +125,7 @@ Date: REGEX(.*)
 02. Availability-Subscribe to E1/A1 for accumulator, on a non-responding URL
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

@@ -128,7 +128,7 @@ echo
 01. Register E1/A1 using POST /v1/registry/contextEntities/E1/attributes/A1, CP1 as providing application
 =========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -142,7 +142,7 @@ Date: REGEX(.*)
 02. Discover E1/A1
 ==================
 HTTP/1.1 200 OK
-Content-Length: 444
+Content-Length: 223
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -175,7 +175,7 @@ Date: REGEX(.*)
 03. Create E1/A1 in CP1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 381
+Content-Length: 187
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -207,7 +207,7 @@ Date: REGEX(.*)
 04. Update/UPDATE E1/A1 in CB
 =============================
 HTTP/1.1 200 OK
-Content-Length: 381
+Content-Length: 187
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -239,7 +239,7 @@ Date: REGEX(.*)
 05. Query E1/A1 in CB
 =====================
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

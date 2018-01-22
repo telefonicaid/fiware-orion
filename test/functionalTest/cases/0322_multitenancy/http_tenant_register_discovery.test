@@ -125,7 +125,7 @@ orionCurl --url "${url}" --payload "${payload}" --tenant "t_02"
 1. Register entity E with HTTP-Tenant t_01
 +++++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -139,7 +139,7 @@ Date: REGEX(.*)
 2. Register entity E with HTTP-Tenant t_02
 +++++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -153,7 +153,7 @@ Date: REGEX(.*)
 3. Discover entity E with HTTP-Tenant t_01
 ++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 473
+Content-Length: 252
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -186,7 +186,7 @@ Date: REGEX(.*)
 4. Discover entity E with HTTP-Tenant t_02
 ++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 473
+Content-Length: 252
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

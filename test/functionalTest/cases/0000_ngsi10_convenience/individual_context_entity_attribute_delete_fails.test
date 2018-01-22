@@ -34,7 +34,7 @@ orionCurl --url "/v1/contextEntities/entity01/attributes/attr01" -X "DELETE"
 --REGEXPECT--
 +++++ 1. delete an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 77
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

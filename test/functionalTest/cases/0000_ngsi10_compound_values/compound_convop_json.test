@@ -102,7 +102,7 @@ orionCurl --url "/v1/contextEntities/EObject"
 --REGEXPECT--
 1: +++++++++ create vector compound +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 322
+Content-Length: 176
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -129,7 +129,7 @@ Date: REGEX(.*)
 }
 2: +++++++++ create object compound +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 322
+Content-Length: 176
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -156,7 +156,7 @@ Date: REGEX(.*)
 }
 3: ++++++++++ query for vector compound in JSON ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 646
+Content-Length: 237
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -198,7 +198,7 @@ Date: REGEX(.*)
 }
 4: ++++++++++ query for object compound in JSON ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 577
+Content-Length: 234
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -236,7 +236,7 @@ Date: REGEX(.*)
 }
 5: ++++++++++ query for vector compound in JSON convop ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 489
+Content-Length: 214
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -274,7 +274,7 @@ Date: REGEX(.*)
 }
 6: ++++++++++ query for object compound in JSON convop ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 436
+Content-Length: 211
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
