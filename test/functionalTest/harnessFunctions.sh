@@ -236,7 +236,7 @@ function brokerStopAwait
 
   while [ $loopNo -lt $loops ]
   do
-    nc -z localhost $port > /dev/null
+    nc -w 2 localhost $port &>/dev/null </dev/null
     if [ "$?" != "0" ]
     then
       vMsg The orion context broker on port $port has stopped
@@ -299,7 +299,7 @@ function brokerStartAwait
 
   while [ $loopNo -lt $loops ]
   do
-    nc -z localhost $port > /dev/null
+    nc -w 2 localhost $port &>/dev/null </dev/null
     if [ "$?" == "0" ]
     then
       vMsg The orion context broker has started, listening on port $port
@@ -743,7 +743,7 @@ function accumulatorStart()
    sleep 1
 
    time=$time+1
-   nc -z localhost $port
+   nc -w 2 $bindIp $port &>/dev/null </dev/null
    port_not_ok=$?
   done
 }

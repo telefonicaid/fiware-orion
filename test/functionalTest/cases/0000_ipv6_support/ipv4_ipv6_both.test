@@ -26,8 +26,8 @@ IPv6 IPv4 Both
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart --pretty-print 0.0.0.0 ${LISTENER_PORT}
-accumulatorStart --pretty-print :: ${LISTENER2_PORT}
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+accumulatorStart --pretty-print ::1 ${LISTENER2_PORT}
 
 --SHELL--
 echo "1: ++++++++++++++++++++"
