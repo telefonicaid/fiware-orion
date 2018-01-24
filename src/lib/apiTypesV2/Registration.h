@@ -115,6 +115,20 @@ typedef enum ForwardingMode
 
 
 
+inline std::string forwardingModeToString(ForwardingMode f)
+{
+  switch (f)
+  {
+  case ForwardAll:     return "all";
+  case ForwardNone:    return "none";
+  case ForwardQuery:   return "query";
+  case ForwardUpdate:  return "update";
+  default:             return "Undefined";
+  }
+}
+
+
+
 /* ****************************************************************************
 *
 * Provider -
@@ -123,6 +137,7 @@ struct Provider
 {
   Http            http;
   ForwardingMode  supportedForwardingMode;
+  bool            legacyForwardingMode;
 
   std::string     toJson();
 };

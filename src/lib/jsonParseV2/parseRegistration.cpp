@@ -207,23 +207,19 @@ static bool providerParse(ConnectionInfo* ciP, ngsiv2::Provider* providerP, cons
   {
     const rapidjson::Value& legacyForwarding = provider["legacyForwarding"];
 
-    if (!legacyForwarding.IsBool())
+    if (legacyForwarding.IsBool())
     {
-      *errorStringP = "the field /legacyForwarding/ must be a boolean and set to /true/";
-      return false;
+      providerP->legacyForwardingMode = legacyForwarding.GetBool();
     }
-
-    bool legacyForwardingValue = legacyForwarding.GetBool();
-    if (legacyForwardingValue != true)
+    else
     {
-      *errorStringP = "the field /legacyForwarding/ must be set to /true/";
+      *errorStringP = "the field /legacyForwarding/ must be a boolean";
       return false;
     }
   }
   else
   {
-    *errorStringP = "the field /legacyForwarding/ must be present as a boolean and set to /true/";
-    return false;
+    providerP->legacyForwardingMode = false;
   }
 
   return true;

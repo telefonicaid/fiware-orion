@@ -82,6 +82,11 @@ static void setDescription(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 static void setProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 {
   regP->provider.http.url = (r.hasField(REG_PROVIDING_APPLICATION))? getStringFieldF(r, REG_PROVIDING_APPLICATION): "";
+
+  // FIXME P4: by the moment supportedForwardingMode and legacyForwardingMode are hardwired (i.e. DB is not taken
+  // into account for them)
+  regP->provider.supportedForwardingMode = ngsiv2::ForwardAll;
+  regP->provider.legacyForwardingMode = true;
 }
 
 

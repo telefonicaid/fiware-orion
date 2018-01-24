@@ -833,7 +833,7 @@ payload='{
       "url": "http://localhost:'${CP1_PORT}'/v2"
     }
   },
-  "status": "green"
+  "status": "active"
 }'
 orionCurl --url /v2/registrations --payload "$payload"
 echo
@@ -859,7 +859,7 @@ payload='{
     },
     "legacyForwarding": 14
   },
-  "status": "green"
+  "status": "active"
 }'
 orionCurl --url /v2/registrations --payload "$payload"
 echo
@@ -885,7 +885,7 @@ payload='{
     },
     "legacyForwarding": false
   },
-  "status": "green"
+  "status": "active"
 }'
 orionCurl --url /v2/registrations --payload "$payload"
 echo
@@ -1561,43 +1561,43 @@ Date: REGEX(.*)
 
 43. legacyForwarding missing
 ============================
-HTTP/1.1 400 Bad Request
-Content-Length: 114
+HTTP/1.1 501 Not Implemented
+Content-Length: 144
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "the field /legacyForwarding/ must be present as a boolean and set to /true/",
-    "error": "BadRequest"
+    "description": "Only NGSIv1-based forwarding supported at the present moment. Set explictely legacyForwarding to true",
+    "error": "NotImplemented"
 }
 
 
 44. legacyForwarding not a boolean
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 103
+Content-Length: 85
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "the field /legacyForwarding/ must be a boolean and set to /true/",
+    "description": "the field /legacyForwarding/ must be a boolean",
     "error": "BadRequest"
 }
 
 
 45. legacyForwarding set to false
 =================================
-HTTP/1.1 400 Bad Request
-Content-Length: 89
+HTTP/1.1 501 Not Implemented
+Content-Length: 144
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "the field /legacyForwarding/ must be set to /true/",
-    "error": "BadRequest"
+    "description": "Only NGSIv1-based forwarding supported at the present moment. Set explictely legacyForwarding to true",
+    "error": "NotImplemented"
 }
 
 
