@@ -103,7 +103,7 @@ TEST(CompoundValueNode, typeName)
 * vectorInvalidAndOk -
 *
 */
-TEST(DISABLED_CompoundValueNode, vectorInvalidAndOk)
+TEST(CompoundValueNode, vectorInvalidAndOk)
 {
   lmTraceLevelSet(LmtCompoundValueAdd, true);
 
@@ -148,7 +148,7 @@ TEST(DISABLED_CompoundValueNode, vectorInvalidAndOk)
 * structInvalidAndOk -
 *
 */
-TEST(DISABLED_CompoundValueNode, structInvalidAndOk)
+TEST(CompoundValueNode, structInvalidAndOk)
 {
   lmTraceLevelSet(LmtCompoundValueAdd, true);
 

@@ -61,7 +61,7 @@ TEST(ContextAttributeResponse, render_json)
 *
 * check_json -
 */
-TEST(DISABLED_ContextAttributeResponse, check_json)
+TEST(ContextAttributeResponse, check_json)
 {
   ContextAttribute          ca("caName", "caType", "caValue");
   ContextAttributeResponse  car;

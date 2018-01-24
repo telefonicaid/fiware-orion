@@ -34,7 +34,7 @@
 *
 * json_render -
 */
-TEST(DISABLED_QueryContextResponse, json_render)
+TEST(QueryContextResponse, json_render)
 {
   const char*              filename1  = "ngsi10.queryContextResponse.jsonRender1.valid.json";
   const char*              filename2  = "ngsi10.queryContextResponse.jsonRender2.valid.json";

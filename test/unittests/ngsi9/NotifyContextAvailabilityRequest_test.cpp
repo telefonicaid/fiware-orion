@@ -37,7 +37,7 @@
 *
 * ok_json -
 */
-TEST(DISABLED_NotifyContextAvailabilityRequest, ok_json)
+TEST(NotifyContextAvailabilityRequest, ok_json)
 {
   ParseData       parseData;
   const char*     fileName = "ngsi9.notifyContextAvailabilityRequest.ok2.valid.json";
@@ -95,7 +95,7 @@ TEST(NotifyContextAvailabilityRequest, check)
 *
 * json_render -
 */
-TEST(DISABLED_NotifyContextAvailabilityRequest, json_render)
+TEST(NotifyContextAvailabilityRequest, json_render)
 {
   const char*                          filename1  = "ngsi10.notifyContextAvailabilityRequest.jsonRender1.valid.json";
   const char*                          filename2  = "ngsi10.notifyContextAvailabilityRequest.jsonRender2.valid.json";

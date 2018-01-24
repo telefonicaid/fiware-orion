@@ -82,7 +82,7 @@ TEST(UpdateContextRequest, ok_json)
 *
 * badIsPattern_json -
 */
-TEST(DISABLED_UpdateContextRequest, badIsPattern_json)
+TEST(UpdateContextRequest, badIsPattern_json)
 {
    ParseData       parseData;
    ConnectionInfo  ci("", "POST", "1.1");

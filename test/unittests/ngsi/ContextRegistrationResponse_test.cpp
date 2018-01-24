@@ -35,7 +35,7 @@
 *
 * render - 
 */
-TEST(DISABLED_ContextRegistrationResponse, render)
+TEST(ContextRegistrationResponse, render)
 {
   ContextRegistrationResponse  crr;
   std::string                  rendered;

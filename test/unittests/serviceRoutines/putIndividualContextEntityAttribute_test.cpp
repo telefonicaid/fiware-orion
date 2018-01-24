@@ -53,7 +53,7 @@ static RestService rs[] =
 *
 * json -
 */
-TEST(DISABLED_putIndividualContextEntityAttribute, json)
+TEST(putIndividualContextEntityAttribute, json)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity11/attributes/temperature",  "PUT", "1.1");
 

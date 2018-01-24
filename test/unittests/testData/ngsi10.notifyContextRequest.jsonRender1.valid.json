@@ -1,4 +1,1 @@
-{
-  "subscriptionId" : "012345678901234567890123",
-  "originator" : "http://www.tid.es/NotifyContextRequestUnitTest"
-}
+{"subscriptionId":"012345678901234567890123","originator":"http://www.tid.es/NotifyContextRequestUnitTest"}

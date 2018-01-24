@@ -34,7 +34,7 @@
 *
 * ok - 
 */
-TEST(DISABLED_ConditionValueList, ok)
+TEST(ConditionValueList, ok)
 {
   ConditionValueList cvList;
   std::string        out;
