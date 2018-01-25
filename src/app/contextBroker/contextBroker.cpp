@@ -294,6 +294,7 @@ bool            paranoidV1Indent;
 #endif
 
 
+
 /* ****************************************************************************
 *
 * Definitions to make paArgs lines shorter ...
@@ -1285,10 +1286,34 @@ RestService restServiceCORS[] =
 
 /* ****************************************************************************
 *
+* fileExists -
+*/
+static bool fileExists(char* path)
+{
+  if (access(path, F_OK) == 0)
+    return true;
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
 * pidFile -
+*
+* When run "interactively" (with the CLI option '-fg' set), the error messages get really ugly.
+* However, that is a minor bad, compared to what would happen to a 'nice printf message' when started as a service.
+* It would be lost. The log file is important and we can't just use 'fprintf(stderr, ...)' ...
 */
 int pidFile(void)
 {
+  if (fileExists(pidPath))
+  {
+    LM_E(("PID-file '%s' found. A broker seems to be running already", pidPath));
+    return 1;
+  }
+
   int    fd = open(pidPath, O_WRONLY | O_CREAT | O_TRUNC, 0777);
   pid_t  pid;
   char   buffer[32];
@@ -1297,8 +1322,8 @@ int pidFile(void)
 
   if (fd == -1)
   {
-    LM_E(("PID File (open '%s': %s", pidPath, strerror(errno)));
-    return -1;
+    LM_E(("PID File (open '%s': %s)", pidPath, strerror(errno)));
+    return 2;
   }
 
   pid = getpid();
@@ -1309,7 +1334,7 @@ int pidFile(void)
   if (nb != sz)
   {
     LM_E(("PID File (written %d bytes and not %d to '%s': %s)", nb, sz, pidPath, strerror(errno)));
-    return -2;
+    return 3;
   }
 
   return 0;
@@ -1662,6 +1687,8 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
 */
 int main(int argC, char* argV[])
 {
+  int s;
+
   lmTransactionReset();
 
   uint16_t       rushPort = 0;
@@ -1734,6 +1761,15 @@ int main(int argC, char* argV[])
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
+
+  //
+  // NOTE: Calling '_exit()' and not 'exit()' if 'pidFile()' returns error.
+  //       The exit-function removes the PID-file and we don't want that. We want
+  //       the PID-file to remain.
+  //       Calling '_exit()' instead of 'exit()' makes sure that the exit-function is not called.
+  //
+  if ((s = pidFile()) != 0)
+    _exit(s);
 
   // Argument consistency check (-t AND NOT -logLevel)
   if ((paTraceV[0] != 0) && (strcmp(paLogLevel, "DEBUG") != 0))
@@ -1808,12 +1844,6 @@ int main(int argC, char* argV[])
     ipVersion = IPV6;
   }
 
-
-  //
-  //  Where everything begins
-  //
-
-  pidFile();
   SemOpType policy = policyGet(reqMutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
   mongoInit(dbHost, rplSet, dbName, user, pwd, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
