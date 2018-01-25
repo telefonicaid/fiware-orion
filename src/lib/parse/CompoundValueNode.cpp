@@ -46,7 +46,7 @@ namespace orion
 */
 CompoundValueNode::CompoundValueNode():
   name        ("Unset"),
-  valueType   (orion::ValueTypeUnknown),
+  valueType   (orion::ValueTypeNotGiven),
   numberValue (0.0),
   boolValue   (false),
   container   (NULL),
@@ -466,9 +466,16 @@ void CompoundValueNode::shortShow(const std::string& indent)
                                  (boolValue == true)? "true" : "false"));
     return;
   }
-  else if (valueType == orion::ValueTypeNone)
+  else if (valueType == orion::ValueTypeNull)
   {
     LM_T(LmtCompoundValue,      ("%s%s (null)",
+                                 indent.c_str(),
+                                 name.c_str()));
+    return;
+  }
+  else if (valueType == orion::ValueTypeNotGiven)
+  {
+    LM_T(LmtCompoundValue,      ("%s%s (not given)",
                                  indent.c_str(),
                                  name.c_str()));
     return;
@@ -540,9 +547,14 @@ void CompoundValueNode::show(const std::string& indent)
                                 indent.c_str(),
                                 numberValue));
   }
-  else if (valueType == orion::ValueTypeNone)
+  else if (valueType == orion::ValueTypeNull)
   {
     LM_T(LmtCompoundValueShow, ("%sNull",
+                                indent.c_str()));
+  }
+  else if (valueType == orion::ValueTypeNotGiven)
+  {
+    LM_T(LmtCompoundValueShow, ("%sNotGiven",
                                 indent.c_str()));
   }
   else if (childV.size() != 0)
@@ -685,10 +697,15 @@ std::string CompoundValueNode::render(ApiVersion apiVersion, bool noComma, bool 
     LM_T(LmtCompoundValueRender, ("I am a bool (%s)", name.c_str()));
     out = valueTag(key, boolValue? "true" : "false", jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
-  else if (valueType == orion::ValueTypeNone)
+  else if (valueType == orion::ValueTypeNull)
   {
     LM_T(LmtCompoundValueRender, ("I am NULL (%s)", name.c_str()));
     out = valueTag(key, "null", jsonComma, container->valueType == orion::ValueTypeVector, true);
+  }
+  else if (valueType == orion::ValueTypeNotGiven)
+  {
+    LM_E(("Runtime Error (value not given (%s))", name.c_str()));
+    out = valueTag(key, "not given", jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
 
 #if 0
@@ -870,7 +887,7 @@ std::string CompoundValueNode::toJson(bool isLastElement, bool comma)
       out = JSON_STR(key) + ":" + JSON_BOOL(boolValue);
     }
   }
-  else if (valueType == orion::ValueTypeNone)
+  else if (valueType == orion::ValueTypeNull)
   {
     LM_T(LmtCompoundValueRender, ("I am NULL (%s)", name.c_str()));
 
@@ -881,6 +898,18 @@ std::string CompoundValueNode::toJson(bool isLastElement, bool comma)
     else
     {
       out = JSON_STR(key) + ":" + "null";
+    }
+  }
+  else if (valueType == orion::ValueTypeNotGiven)
+  {
+    LM_E(("Runtime Error (value not given (%s))", name.c_str()));
+    if (container->valueType == orion::ValueTypeVector)
+    {
+      out = "null";
+    }
+    else
+    {
+      out = JSON_STR(key) + ":" + "not given";
     }
   }
   else if ((valueType == orion::ValueTypeVector) && (renderName == true))
@@ -1016,9 +1045,14 @@ CompoundValueNode* CompoundValueNode::clone(void)
       me = new CompoundValueNode(container, path, name, boolValue, siblingNo, valueType, level);
       break;
 
-    case orion::ValueTypeNone:
+    case orion::ValueTypeNull:
       me = new CompoundValueNode(container, path, name, stringValue, siblingNo, valueType, level);
-      me->valueType = orion::ValueTypeNone;
+      me->valueType = orion::ValueTypeNull;
+      break;
+
+    case orion::ValueTypeNotGiven:
+      me = NULL;
+      LM_E(("Runtime Error (value not given in compound node value)"));
       break;
 
     default:

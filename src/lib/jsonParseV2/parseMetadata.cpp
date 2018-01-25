@@ -48,6 +48,10 @@ static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* 
 {
   bool  compoundVector = false;
 
+  // This is NGSIv2 parsing and in NGSIv2, no value means implicit null. Note that
+  // valueTypeNotGiven will be overridden inside the 'for' block in case the attribute has an actual value
+  mdP->valueType = orion::ValueTypeNull;
+
   for (rapidjson::Value::ConstMemberIterator iter = start.MemberBegin(); iter != start.MemberEnd(); ++iter)
   {
     std::string name   = iter->name.GetString();
@@ -88,7 +92,7 @@ static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* 
       }
       else if (type == "Null")
       {
-        mdP->valueType     = orion::ValueTypeNone;
+        mdP->valueType     = orion::ValueTypeNull;
       }
       else if ((type == "Array") || (type == "Object"))
       {

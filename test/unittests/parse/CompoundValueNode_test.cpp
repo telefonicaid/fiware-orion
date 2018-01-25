@@ -81,8 +81,8 @@ TEST(CompoundValueNode, tree)
 */
 TEST(CompoundValueNode, typeName)
 {
-  orion::ValueType  type[]     = { orion::ValueTypeUnknown, orion::ValueTypeObject, orion::ValueTypeVector, orion::ValueTypeString };
-  const char*       expected[] = { "Unknown",               "Object",               "Vector",               "String"               };
+  orion::ValueType  type[]     = { orion::ValueTypeNotGiven, orion::ValueTypeObject, orion::ValueTypeVector, orion::ValueTypeString };
+  const char*       expected[] = { "NotGiven",               "Object",               "Vector",               "String"               };
 
   utInit();
 
