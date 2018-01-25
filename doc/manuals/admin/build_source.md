@@ -1,23 +1,20 @@
 # Building from sources
 
-Orion Context Broker reference distribution is CentOS 6.x. This doesn't mean that the broker cannot be built in other distributions (actually, it can). This section also includes indications on how to build in other distributions, just in the case it may help people that don't use CentOS. However, note that the only "officially supported" procedure is the one for CentOS 6.x; the others are provided "as is" and can get obsolete from time to time.
+Orion Context Broker reference distribution is CentOS 7.x. This doesn't mean that the broker cannot be built in other distributions (actually, it can). This section also includes indications on how to build in other distributions, just in the case it may help people that don't use CentOS. However, note that the only "officially supported" procedure is the one for CentOS 7.x; the others are provided "as is" and can get obsolete from time to time.
 
-## CentOS 6.x. (officially supported)
+## CentOS 7.x (officially supported)
 
 The Orion Context Broker uses the following libraries as build dependencies:
 
-* boost: 1.41 (the one that comes in EPEL6 repository)
+* boost: 1.53
 * libmicrohttpd: 0.9.48 (from source)
-* libcurl: 7.19.7
-* openssl: 1.0.1e
-* libuuid: 2.17.2
+* libcurl: 7.29.0
+* openssl: 1.0.2k
+* libuuid: 2.23.2
 * Mongo Driver: legacy-1.1.2 (from source)
 * rapidjson: 1.0.2 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
-
-We assume that EPEL6 repository is configured in yum, given that many RPM packages are installed from there
-(check the procedure at http://fedoraproject.org/wiki/EPEL#How_can_I_use_these_extra_packages.3F):
 
 The basic procedure is as follows (assuming you don't run commands as root, we use sudo for those
 commands that require root privilege):
@@ -109,9 +106,9 @@ The Orion Context Broker comes with a suite of functional, valgrind and end-to-e
 
 You can generate coverage reports for the Orion Context Broker using the following procedure (optional):
 
-* Install the required tools. You need lcov 1.10 - the one that comes with CentOS 6.3 (lcov 1.9) is not valid.
+* Install the lcov tool
 
-        sudo rpm -Uhv http://downloads.sourceforge.net/ltp/lcov-1.10-1.noarch.rpm
+        sudo yum install lcov
 
 * Do first a successful pass for unit_test and functional_test, to check that everything is ok (see above)
 
@@ -145,7 +142,7 @@ sudo scons install --prefix=/usr/local --use-sasl-client --ssl  # This puts .h f
 
 ## Others
 
-If you have build orion in a system different from CentOS 6.x, don't hesitate to tell us and contribute to expand this section. Probably the best way if doing a pull request to modify this file with the new information. Thanks!
+If you have build orion in a system different from CentOS 7.x, don't hesitate to tell us and contribute to expand this section. Probably the best way if doing a pull request to modify this file with the new information. Thanks!
 
 ### Debian 7
 

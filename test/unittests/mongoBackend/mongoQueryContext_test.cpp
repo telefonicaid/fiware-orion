@@ -53,7 +53,7 @@ using mongo::DBException;
 using orion::ValueTypeString;
 using orion::ValueTypeNumber;
 using orion::ValueTypeBoolean;
-using orion::ValueTypeNone;
+using orion::ValueTypeNull;
 using ::testing::Throw;
 using ::testing::_;
 
@@ -3158,7 +3158,7 @@ TEST(mongoQueryContextRequest, queryCustomMetadataNative)
     EXPECT_EQ(orion::ValueTypeBoolean, RES_CER_ATTR(0, 0)->metadataVector[2]->valueType);
     EXPECT_EQ("MD4", RES_CER_ATTR(0, 0)->metadataVector[3]->name);
     EXPECT_EQ("TMD4", RES_CER_ATTR(0, 0)->metadataVector[3]->type);
-    EXPECT_EQ(orion::ValueTypeNone, RES_CER_ATTR(0, 0)->metadataVector[3]->valueType);
+    EXPECT_EQ(orion::ValueTypeNull, RES_CER_ATTR(0, 0)->metadataVector[3]->valueType);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -3958,7 +3958,7 @@ TEST(mongoQueryContextRequest, queryNativeTypes)
 
     EXPECT_EQ("A6", RES_CER_ATTR(0, 5)->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 5)->type);
-    EXPECT_EQ(ValueTypeNone, RES_CER_ATTR(0, 5)->valueType);
+    EXPECT_EQ(ValueTypeNull, RES_CER_ATTR(0, 5)->valueType);
     EXPECT_EQ(0, RES_CER_ATTR(0, 5)->metadataVector.size());
 
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);

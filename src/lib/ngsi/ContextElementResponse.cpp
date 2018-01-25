@@ -218,7 +218,7 @@ ContextElementResponse::ContextElementResponse
 
       case jstNULL:
         caP = new ContextAttribute(ca.name, ca.type, "");
-        caP->valueType = orion::ValueTypeNone;
+        caP->valueType = orion::ValueTypeNull;
         break;
 
       case Object:

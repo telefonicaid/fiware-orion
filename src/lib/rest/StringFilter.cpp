@@ -966,7 +966,7 @@ MatchResult StringFilterItem::matchEquals(Metadata* mdP)
   }
   else if (valueType == SfvtNull)
   {
-    if (mdP->valueType != orion::ValueTypeNone)
+    if (mdP->valueType != orion::ValueTypeNull)
     {
       return MrNoMatch;
     }
@@ -1069,7 +1069,7 @@ MatchResult StringFilterItem::matchEquals(orion::CompoundValueNode* cvP)
   }
   else if (valueType == SfvtNull)
   {
-    if (cvP->valueType != orion::ValueTypeNone)
+    if (cvP->valueType != orion::ValueTypeNull)
     {
       return MrNoMatch;
     }
@@ -1196,7 +1196,7 @@ MatchResult StringFilterItem::matchEquals(ContextAttribute* caP)
   }
   else if (valueType == SfvtNull)
   {
-    if (caP->valueType != orion::ValueTypeNone)
+    if (caP->valueType != orion::ValueTypeNull)
     {
       return MrNoMatch;
     }
