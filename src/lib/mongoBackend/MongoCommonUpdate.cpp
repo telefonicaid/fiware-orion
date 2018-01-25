@@ -285,7 +285,6 @@ static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVers
   }
 
   /* No value in the request means that the value stays as it was before, so it is not a change */
-  //if (caP->valueType == orion::ValueTypeNone && apiVersion != V2)
   if (caP->valueType == orion::ValueTypeNotGiven)
   {
     return false;
