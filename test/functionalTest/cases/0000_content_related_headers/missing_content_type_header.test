@@ -70,7 +70,7 @@ orionCurl --url "$url" --payload "$payload" --in "application/json; charset=UTF-
 --REGEXPECT--
 1: ++++++++++++++++++++
 HTTP/1.1 415 Unsupported Media Type
-Content-Length: 192
+Content-Length: 161
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -84,7 +84,7 @@ Date: REGEX(.*)
 }
 2: ++++++++++++++++++++
 HTTP/1.1 415 Unsupported Media Type
-Content-Length: 171
+Content-Length: 140
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -98,7 +98,7 @@ Date: REGEX(.*)
 }
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

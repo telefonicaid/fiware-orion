@@ -630,7 +630,7 @@ Date: REGEX(.*)
 06. Query coveredBy point (5, 5) -> not supported
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 173
+Content-Length: 142
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -647,7 +647,7 @@ Date: REGEX(.*)
 07. Query coveredBy line (5, 5) (9, 5) -> not supported
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 172
+Content-Length: 141
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -664,7 +664,7 @@ Date: REGEX(.*)
 08. Query coveredBy box (-5, 0) (6, 11) -> A, E
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 758
+Content-Length: 380
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -714,7 +714,7 @@ Date: REGEX(.*)
 09. Query coveredBy polygon (0, 0) (24, 0) (0, 20) -> A, B, C
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 1119
+Content-Length: 557
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -782,7 +782,7 @@ Date: REGEX(.*)
 10. Query intersects point (5, 5) -> A
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 394
+Content-Length: 200
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -814,7 +814,7 @@ Date: REGEX(.*)
 11. Query intersects line (5, 5) (9, 5) -> A, B
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 756
+Content-Length: 378
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -864,7 +864,7 @@ Date: REGEX(.*)
 12. Query intersects box (-5, 0) (6, 11) -> A, E
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 758
+Content-Length: 380
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -914,7 +914,7 @@ Date: REGEX(.*)
 13. Query intersects polygon (0, 0) (24, 0) (0, 20) -> A, B, C
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 1119
+Content-Length: 557
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -982,7 +982,7 @@ Date: REGEX(.*)
 14. Query disjoint point (5, 5) -> B, C, D, E
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 1485
+Content-Length: 739
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1068,7 +1068,7 @@ Date: REGEX(.*)
 15. Query disjoint line (5, 5) (9, 5) -> C, D, E
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 1123
+Content-Length: 561
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1136,7 +1136,7 @@ Date: REGEX(.*)
 16. Query disjoint box (-5, 0) (6, 11) -> B, C, D
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 1121
+Content-Length: 559
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1204,7 +1204,7 @@ Date: REGEX(.*)
 17. Query disjoint polygon (0, 0) (24, 0) (0, 20) -> D, E
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 760
+Content-Length: 382
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1254,7 +1254,7 @@ Date: REGEX(.*)
 18. Query equals point (15, 15) -> D
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 396
+Content-Length: 202
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1286,7 +1286,7 @@ Date: REGEX(.*)
 19. Query equals line (5, 5) (9, 5) -> none
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1302,7 +1302,7 @@ Date: REGEX(.*)
 20. Query equals box (-5, 0) (6, 11) -> none
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1318,7 +1318,7 @@ Date: REGEX(.*)
 21. Query equals polygon (0, 0) (24, 0) (0, 20) -> none
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

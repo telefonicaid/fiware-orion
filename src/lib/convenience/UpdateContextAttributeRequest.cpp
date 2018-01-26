@@ -44,7 +44,7 @@
 UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 {
   compoundValueP = NULL;
-  valueType = orion::ValueTypeNone;
+  valueType = orion::ValueTypeNotGiven;
 }
 
 

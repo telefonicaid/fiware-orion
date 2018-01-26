@@ -106,7 +106,7 @@ echo
 --REGEXPECT--
 1: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -119,7 +119,7 @@ Date: REGEX(.*)
 
 2: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 158
+Content-Length: 127
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -135,7 +135,7 @@ Date: REGEX(.*)
 
 3: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 188
+Content-Length: 157
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

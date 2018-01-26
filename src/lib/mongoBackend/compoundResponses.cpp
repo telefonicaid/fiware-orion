@@ -80,7 +80,7 @@ static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
     break;
 
   case mongo::jstNULL:
-    child->valueType  = orion::ValueTypeNone;
+    child->valueType  = orion::ValueTypeNull;
     break;
 
   case mongo::Object:

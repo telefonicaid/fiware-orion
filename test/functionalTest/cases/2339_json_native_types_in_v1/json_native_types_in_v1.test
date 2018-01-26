@@ -155,7 +155,7 @@ Date: REGEX(.*)
 02. GET the entity using /v1/queryContext
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 3566
+Content-Length: 1263
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -320,7 +320,7 @@ Date: REGEX(.*)
 03. Subscribe to E1, using V1
 =============================
 HTTP/1.1 200 OK
-Content-Length: 109
+Content-Length: 85
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -337,7 +337,7 @@ Date: REGEX(.*)
 ====================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 3645
+Content-Length: 1332
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json

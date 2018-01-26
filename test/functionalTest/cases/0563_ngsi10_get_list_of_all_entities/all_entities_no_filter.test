@@ -134,7 +134,7 @@ echo
 0. Query all entities using convop /v1/contextEntities
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -150,7 +150,7 @@ Date: REGEX(.*)
 1. APPEND entity E1, type T1 with attribute A1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 380
+Content-Length: 186
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -182,7 +182,7 @@ Date: REGEX(.*)
 2. APPEND entity E2, WITHOUT TYPE and with attribute A2
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -214,7 +214,7 @@ Date: REGEX(.*)
 3. APPEND entity E3, type T3 with attribute A3
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 380
+Content-Length: 186
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -246,7 +246,7 @@ Date: REGEX(.*)
 4. Query all entities using convop /v1/contextEntities
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 1080
+Content-Length: 518
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -314,7 +314,7 @@ Date: REGEX(.*)
 5. Statistics
 =============
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
+Content-Length: 51
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

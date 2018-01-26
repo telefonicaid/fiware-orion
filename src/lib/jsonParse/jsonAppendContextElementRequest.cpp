@@ -60,7 +60,6 @@ static std::string contextAttribute(const std::string& path, const std::string& 
 {
   LM_T(LmtParse, ("Got an attribute"));
   reqData->acer.attributeP = new ContextAttribute();
-  reqData->acer.attributeP->valueType = orion::ValueTypeNone;
   reqData->acer.res.contextAttributeVector.push_back(reqData->acer.attributeP);
   return "OK";
 }
@@ -156,6 +155,7 @@ static std::string contextMetadataValue(const std::string& path, const std::stri
 {
   LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
   reqData->acer.metadataP->stringValue = value;
+  reqData->acer.metadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 
@@ -209,6 +209,7 @@ static std::string domainMetadataValue(const std::string& path, const std::strin
 {
   LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
   reqData->acer.domainMetadataP->stringValue = value;
+  reqData->acer.domainMetadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 

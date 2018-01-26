@@ -324,7 +324,7 @@ echo
 01. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A1?entity::type=T2 and see it fail
 =================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 183
+Content-Length: 147
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -342,7 +342,7 @@ Date: REGEX(.*)
 02. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A1?!exist=entity::type and see it fail
 =====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 195
+Content-Length: 159
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -360,7 +360,7 @@ Date: REGEX(.*)
 03. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A1 and see it work
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -374,7 +374,7 @@ Date: REGEX(.*)
 04. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A2?exist=entity::type and see it work
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -388,7 +388,7 @@ Date: REGEX(.*)
 05. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A4?entity::type=T1 and see it work
 =================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -402,7 +402,7 @@ Date: REGEX(.*)
 06. Discover E1-T1, get three hits
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 1247
+Content-Length: 604
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -473,7 +473,7 @@ Date: REGEX(.*)
 07. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, without service-path
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -487,7 +487,7 @@ Date: REGEX(.*)
 08. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, service-path /s1
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -501,7 +501,7 @@ Date: REGEX(.*)
 09. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, service-path /s2
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -515,7 +515,7 @@ Date: REGEX(.*)
 10. Discover E1-T1-A3, without service-path, get three hits
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 1247
+Content-Length: 604
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -586,7 +586,7 @@ Date: REGEX(.*)
 11. Discover E1-T1-A3, with service-path /#, get three hits
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 1247
+Content-Length: 604
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -657,7 +657,7 @@ Date: REGEX(.*)
 12. Discover E1-T1-A3, with service-path /, get one hit
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 445
+Content-Length: 224
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -690,7 +690,7 @@ Date: REGEX(.*)
 13. Discover E1-T1-A3, with service-path /s1, get one hit
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 445
+Content-Length: 224
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -723,7 +723,7 @@ Date: REGEX(.*)
 14. Discover E1-T1-A3, with service-path /s2, get one hit
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 445
+Content-Length: 224
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -756,7 +756,7 @@ Date: REGEX(.*)
 15. Discover E1-T1-A3, with service-path /s3, get zero hits
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

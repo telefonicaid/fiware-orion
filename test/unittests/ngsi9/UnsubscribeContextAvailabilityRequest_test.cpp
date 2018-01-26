@@ -67,7 +67,7 @@ TEST(UnsubscribeContextAvailabilityRequest, constructorAndCheck)
 *
 * badSubscriptionId_json -
 */
-TEST(DISABLED_UnsubscribeContextAvailabilityRequest, badSubscriptionId_json)
+TEST(UnsubscribeContextAvailabilityRequest, badSubscriptionId_json)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");

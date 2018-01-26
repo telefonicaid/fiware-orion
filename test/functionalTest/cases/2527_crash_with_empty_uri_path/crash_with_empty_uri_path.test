@@ -44,7 +44,7 @@ echo
 01. Request with empty URL - see Bad Request
 ============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 119
+Content-Length: 88
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

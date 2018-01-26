@@ -180,7 +180,7 @@ grep "to HTTP server" /tmp/contextBroker.log | grep "Sending message" | awk -F\|
 
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 109
+Content-Length: 85
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -194,7 +194,7 @@ Date: REGEX(.*)
 
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 109
+Content-Length: 85
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -208,7 +208,7 @@ Date: REGEX(.*)
 
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 109
+Content-Length: 85
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -222,7 +222,7 @@ Date: REGEX(.*)
 
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 109
+Content-Length: 85
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -240,9 +240,9 @@ Date: REGEX(.*)
 ** Too large errors:
 1
 ** Notification sizes:
-Sending message 1 to HTTP server: sending message of REGEX((19690|19691|19692|19693|19694|19695|19696)) bytes to HTTP server
-Sending message 2 to HTTP server: sending message of REGEX((21691|216792|21693|21694|21695|21696|21697)) bytes to HTTP server
-Sending message 3 to HTTP server: sending message of REGEX((8100692|8100693|8100694|8100695|8100696|8100697|8100698)) bytes to HTTP server
+Sending message 1 to HTTP server: sending message of REGEX((19490|19491|19492|19493|19494|19495|19496)) bytes to HTTP server
+Sending message 2 to HTTP server: sending message of REGEX((21491|21492|21493|21494|21495|21496|21497)) bytes to HTTP server
+Sending message 3 to HTTP server: sending message of REGEX((8100492|8100493|8100494|8100495|8100496|8100497|8100498)) bytes to HTTP server
 --TEARDOWN--
 #
 # NOTE: the six different sizes above is to cover for different sizes in the version string

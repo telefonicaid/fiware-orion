@@ -141,7 +141,7 @@ echo
 01. Register entity 'device' of type 'devicetest', attribute 'ping' in CB, provApp: accumulator
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -155,7 +155,7 @@ Date: REGEX(.*)
 02. Create device/devicetest in CB
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 875
+Content-Length: 413
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -207,7 +207,7 @@ Date: REGEX(.*)
 03. Update/UPDATE device/devicetest in CB, 'ping' with a compound value
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 147
+Content-Length: 116
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -225,7 +225,7 @@ Date: REGEX(.*)
 ===============================================
 POST http://localhost:REGEX(\d+)/v1/updateContext
 Fiware-Servicepath: /
-Content-Length: 382
+Content-Length: 201
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json

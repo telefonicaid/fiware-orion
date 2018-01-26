@@ -29,8 +29,10 @@ brokerStart CB
 
 --SHELL--
 # Prepare the big file to use for the test
+# I have found that when the test in run in jenkins in CentOS 7, tr outputs a 'broken pipe' message which
+# makes test to fail (it generated content in .stderr file). Using 2>/dev/null avoids the problem
 BIGFILE=$(mktemp)
-tr -dc A-Za-z0-9 </dev/urandom |  head -c 1500000 > $BIGFILE
+tr -dc A-Za-z0-9 </dev/urandom 2>/dev/null |  head -c 1500000 > $BIGFILE
 
 # Note that we are not including an actual JSON payload, but in this test what matters
 # is the size, not the format of the data
@@ -39,7 +41,7 @@ orionCurl --url "/v1/updateContext" --payload "$BIGFILE"
 rm $BIGFILE
 --REGEXPECT--
 HTTP/1.1 413 Request Entity Too Large
-Content-Length: 164
+Content-Length: 133
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
