@@ -129,8 +129,8 @@ std::string Provider::toJson(void)
   std::string  urlAsJson = "{\"url\": \"" + http.url + "\"}";
 
   jh.addRaw("http", urlAsJson);
-  jh.addString("supportedForwardingMode", "all");
-  jh.addBool("legacyForwarding", true);
+  jh.addString("supportedForwardingMode", forwardingModeToString(supportedForwardingMode));
+  jh.addBool("legacyForwarding", legacyForwardingMode? "true" : "false");
 
   return jh.str();
 }
