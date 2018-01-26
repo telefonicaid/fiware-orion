@@ -370,8 +370,7 @@ function localBrokerStart()
     IPvOption="-ipv6"
   fi
 
-  # FIXME P10: eventually the -paranoidV1Indent flag has to be removed
-  CB_START_CMD_PREFIX="contextBroker -harakiri -paranoidV1Indent"
+  CB_START_CMD_PREFIX="contextBroker -harakiri"
   if [ "$role" == "CB" ]
   then
     port=$CB_PORT

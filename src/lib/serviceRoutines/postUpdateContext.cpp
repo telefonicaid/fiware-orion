@@ -46,12 +46,6 @@
 #include "rest/uriParamNames.h"
 #include "serviceRoutines/postUpdateContext.h"
 
-#ifdef PARANOID_JSON_INDENT
-#include "rapidjson/document.h"
-#include "rapidjson/prettywriter.h"
-#include "common/string.h"   // jsonFix
-#endif
-
 
 
 /* ****************************************************************************
@@ -138,7 +132,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   // 2. Render the string of the request we want to forward
   //
   MimeType     outMimeType = ciP->outMimeType;
-  std::string  _payload;
+  std::string  payload;
   char*        cleanPayload;
 
   ciP->outMimeType  = JSON;
@@ -149,44 +143,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   //        Once we implement forwards in NGSIv2, this render() should be like this:
   //        TIMED_RENDER(payload = upcrP->render(ciP->apiVersion, asJsonObject, ""));
   //
-  TIMED_RENDER(_payload = upcrP->render(V1, asJsonObject));
-
-  std::string payload;
-
-#ifdef PARANOID_JSON_INDENT
-  if (paranoidV1Indent)
-  {
-    // As stated in documentation (v1_v2_coexistence.md#ngsiv2-query-update-forwarding-to-context-providers):
-    //
-    //  "The forwarded message in the CB to CPr communication, and its response, is done using NGSIv1."
-    //
-    // So, different from restReply(), nothing to check here
-
-    // First stage: conventional pretty printer
-    rapidjson::Document doc;
-    doc.Parse(_payload.c_str());
-
-    rapidjson::StringBuffer ss;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(ss);
-    writer.SetIndent(' ', 2);
-    doc.Accept(writer);
-
-    std::string prettyPrinted = ss.GetString();
-
-    // Second stage: "key": "value" -> "key" : value (legacy reasons... this was the
-    // way we implement JSON rendering at the very beggining)
-    char* prettyPrinted2 = jsonFix(prettyPrinted.c_str());
-    payload = std::string(prettyPrinted2);
-    free(prettyPrinted2);
-  }
-  else
-  {
-    payload = _payload;
-  }
-
-#else
-  payload = _payload;
-#endif
+  TIMED_RENDER(payload = upcrP->render(V1, asJsonObject));
 
   ciP->outMimeType  = outMimeType;
   cleanPayload      = (char*) payload.c_str();

@@ -101,7 +101,7 @@ echo
 01. Subscribe to OfficeRoom.* / Room
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 109
+Content-Length: 85
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -117,7 +117,7 @@ Date: REGEX(.*)
 02. Create OfficeRoom/Room/pressure
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 398
+Content-Length: 204
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -150,7 +150,7 @@ Date: REGEX(.*)
 ========================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 480
+Content-Length: 276
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json

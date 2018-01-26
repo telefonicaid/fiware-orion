@@ -118,7 +118,7 @@ echo
 01. Register an entity with type Room and id Room
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -132,7 +132,7 @@ Date: REGEX(.*)
 02. Discover with convop GET /v1/registry/contextEntities/Room
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 474
+Content-Length: 253
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -165,7 +165,7 @@ Date: REGEX(.*)
 03. Discover with convop GET /v1/registry/contextEntities/Room/attributes/temperature
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 474
+Content-Length: 253
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -198,7 +198,7 @@ Date: REGEX(.*)
 04. Discover with convop GET /v1/registry/contextEntityTypes/Room
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 595
+Content-Length: 307
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -236,7 +236,7 @@ Date: REGEX(.*)
 05. Discover with convop GET /v1/registry/contextEntityTypes/Room/attributes/temperature
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 595
+Content-Length: 307
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -274,7 +274,7 @@ Date: REGEX(.*)
 06. Discover with convop GET /v1/registry/contextEntities/type/Room/id/Room
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 474
+Content-Length: 253
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -307,7 +307,7 @@ Date: REGEX(.*)
 07. Discover with convop GET /v1/registry/contextEntities/type/Room/id/Room/attributes/temperature
 ==================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 474
+Content-Length: 253
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

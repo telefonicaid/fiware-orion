@@ -102,7 +102,7 @@ echo
 01. Make the issue 690 query with invalid polygon geoscope and make sure the broker does not crash
 ==================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

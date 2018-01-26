@@ -69,7 +69,7 @@ echo
 01. Make accumulator subscribe to all entities of Service Path /Madrid/# AND /Barcelona/#
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 184
+Content-Length: 135
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

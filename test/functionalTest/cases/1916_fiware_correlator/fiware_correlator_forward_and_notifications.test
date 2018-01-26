@@ -211,7 +211,7 @@ Date: REGEX(.*)
 04. Register E2/A2 for CPR1 in CB
 =================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -235,7 +235,7 @@ Date: REGEX(.*)
 06. Update E2/A2 in CB, using correlator CORRELATOR3, provoking a forward and after that a notification to accumulator of E2/A2
 ===============================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 386
+Content-Length: 192
 Content-Type: application/json
 Fiware-Correlator: CORRELATOR3
 Date: REGEX(.*)
