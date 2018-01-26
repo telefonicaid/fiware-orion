@@ -299,10 +299,10 @@ bool            paranoidV1Indent;
 *
 * Definitions to make paArgs lines shorter ...
 */
-#define PIDPATH             _i "/tmp/contextBroker.pid"
-#define IP_ALL              _i "0.0.0.0"
-#define LOCALHOST           _i "localhost"
-#define ONE_MONTH_PERIOD    (3600 * 24 * 31)
+#define PIDPATH                _i "/tmp/contextBroker.pid"
+#define IP_ALL                 _i "0.0.0.0"
+#define LOCALHOST              _i "localhost"
+#define ONE_MONTH_PERIOD       (3600 * 24 * 31)
 
 #define FG_DESC                "don't start as daemon"
 #define LOCALIP_DESC           "IP to receive new connections"
@@ -1291,7 +1291,9 @@ RestService restServiceCORS[] =
 static bool fileExists(char* path)
 {
   if (access(path, F_OK) == 0)
+  {
     return true;
+  }
 
   return false;
 }
@@ -1411,6 +1413,8 @@ void sigHandler(int sigNo)
   }
 }
 
+
+
 /* ****************************************************************************
 *
 * orionExit -
@@ -1479,25 +1483,25 @@ const char* description =
 
 
 
-
 /* ****************************************************************************
 *
 * contextBrokerInit -
 */
 static void contextBrokerInit(std::string dbPrefix, bool multitenant)
 {
-
   Notifier* pNotifier = NULL;
 
   /* If we use a queue for notifications, start worker threads */
   if (strcmp(notificationMode, "threadpool") == 0)
   {
     QueueNotifier*  pQNotifier = new QueueNotifier(notificationQueueSize, notificationThreadNum);
-    int rc = pQNotifier->start();
+    int             rc         = pQNotifier->start();
+
     if (rc != 0)
     {
       LM_X(1,("Runtime Error starting notification queue workers (%d)", rc));
     }
+
     pNotifier = pQNotifier;
   }
   else
@@ -1628,6 +1632,8 @@ static SemOpType policyGet(std::string mutexPolicy)
   return SemReadWriteOp;
 }
 
+
+
 /* ****************************************************************************
 *
 * notificationModeParse -
@@ -1679,6 +1685,8 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
 
   free(mode);
 }
+
+
 
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
 /* ****************************************************************************
@@ -1769,7 +1777,9 @@ int main(int argC, char* argV[])
   //       Calling '_exit()' instead of 'exit()' makes sure that the exit-function is not called.
   //
   if ((s = pidFile()) != 0)
+  {
     _exit(s);
+  }
 
   // Argument consistency check (-t AND NOT -logLevel)
   if ((paTraceV[0] != 0) && (strcmp(paLogLevel, "DEBUG") != 0))
