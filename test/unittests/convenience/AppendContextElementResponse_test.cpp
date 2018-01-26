@@ -39,7 +39,7 @@
 *
 * render_json -
 */
-TEST(DISABLED_AppendContextElementResponse, render_json)
+TEST(AppendContextElementResponse, render_json)
 {
   AppendContextElementResponse  acer;
   ContextAttributeResponse      car;
@@ -69,7 +69,7 @@ TEST(DISABLED_AppendContextElementResponse, render_json)
 *
 * check_json -
 */
-TEST(DISABLED_AppendContextElementResponse, check_json)
+TEST(AppendContextElementResponse, check_json)
 {
   AppendContextElementResponse  acer;
   ContextAttributeResponse      car;

@@ -38,7 +38,7 @@
 *
 * json_ok -
 */
-TEST(DISABLED_UpdateContextAvailabilitySubscriptionRequest, json_ok)
+TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
 {
   ConnectionInfo  ci("", "POST", "1.1");
   ParseData       parseData;
@@ -84,7 +84,7 @@ TEST(DISABLED_UpdateContextAvailabilitySubscriptionRequest, json_ok)
 *
 * json_invalidIsPattern -
 */
-TEST(DISABLED_UpdateContextAvailabilitySubscriptionRequest, json_invalidIsPattern)
+TEST(UpdateContextAvailabilitySubscriptionRequest, json_invalidIsPattern)
 {
   ParseData       reqData;
   const char*     infile  = "updateContextAvailabilitySubscriptionRequest_invalidIsPattern.json";

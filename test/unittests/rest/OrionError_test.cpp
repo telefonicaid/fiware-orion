@@ -37,7 +37,7 @@
 *
 * all -
 */
-TEST(DISABLED_OrionError, all)
+TEST(OrionError, all)
 {
   StatusCode    sc(SccBadRequest, "no details 2");
   OrionError    e0;

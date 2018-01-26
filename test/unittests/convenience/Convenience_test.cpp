@@ -78,7 +78,7 @@ TEST(Convenience, emptyPath)
 * shortPath -
 *
 */
-TEST(DISABLED_Convenience, shortPath)
+TEST(Convenience, shortPath)
 {
   ConnectionInfo  ci1("ngsi9", "GET", "1.1");
   ConnectionInfo  ci2("ngsi10", "GET", "1.1");
@@ -117,7 +117,7 @@ TEST(DISABLED_Convenience, shortPath)
 * badPathNgsi9 -
 *
 */
-TEST(DISABLED_Convenience, badPathNgsi9)
+TEST(Convenience, badPathNgsi9)
 {
   ConnectionInfo            ci("ngsi9/badpathcomponent", "GET", "1.1");
   std::string               out;
@@ -141,7 +141,7 @@ TEST(DISABLED_Convenience, badPathNgsi9)
 * badPathNgsi10 -
 *
 */
-TEST(DISABLED_Convenience, badPathNgsi10)
+TEST(Convenience, badPathNgsi10)
 {
   ConnectionInfo            ci("ngsi10/badpathcomponent", "GET", "1.1");
   std::string               out;
