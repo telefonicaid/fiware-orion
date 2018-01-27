@@ -1301,12 +1301,17 @@ static bool fileExists(char* path)
 * However, that is a minor bad, compared to what would happen to a 'nice printf message' when started as a service.
 * It would be lost. The log file is important and we can't just use 'fprintf(stderr, ...)' ...
 */
-int pidFile(void)
+int pidFile(bool justCheck)
 {
   if (fileExists(pidPath))
   {
     LM_E(("PID-file '%s' found. A broker seems to be running already", pidPath));
     return 1;
+  }
+
+  if (justCheck == true)
+  {
+    return 0;
   }
 
   int    fd = open(pidPath, O_WRONLY | O_CREAT | O_TRUNC, 0777);
@@ -1769,7 +1774,12 @@ int main(int argC, char* argV[])
   //       the PID-file to remain.
   //       Calling '_exit()' instead of 'exit()' makes sure that the exit-function is not called.
   //
-  if ((s = pidFile()) != 0)
+  //       This call here is just to check for the existance of the PID-file.
+  //       If the file exists, the broker dies here.
+  //       The creation of the PID-file must be done AFTER "daemonize()" as here we still don't know the
+  //       PID of the broker. The father process dies and the son-process continues, in "daemonize()".
+  //
+  if ((s = pidFile(true)) != 0)
   {
     _exit(s);
   }
@@ -1821,6 +1831,11 @@ int main(int argC, char* argV[])
   if (fg == false)
   {
     daemonize();
+  }
+
+  if ((s = pidFile(false)) != 0)
+  {
+    _exit(s);
   }
 
 #if 0
