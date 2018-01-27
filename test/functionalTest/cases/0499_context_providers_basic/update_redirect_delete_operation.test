@@ -164,7 +164,7 @@ echo
 01. Register an entity/attribute E1/A1 in broker, with CP as providing application
 ==================================================================================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 64
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -178,7 +178,7 @@ Date: REGEX(.*)
 02. Update/APPEND E1/A1(=CP) in CP
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -210,7 +210,7 @@ Date: REGEX(.*)
 03. Query broker for E1/A1 (will go to CP and E1/A1(=CP) is found)
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 380
+Content-Length: 186
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -242,7 +242,7 @@ Date: REGEX(.*)
 04. Update/DELETE E1/A1 in broker (will fail as E1/A1 isn't local)
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 221
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -275,7 +275,7 @@ Date: REGEX(.*)
 05. Query broker for E1/A1 (will go to CP and E1/A1(=CP) is found)
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 380
+Content-Length: 186
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

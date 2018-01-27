@@ -35,7 +35,7 @@
 *
 * render -
 */
-TEST(DISABLED_Scope, render)
+TEST(Scope, render)
 {
   Scope        scope("Type", "Value");
   std::string  out;

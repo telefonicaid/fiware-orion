@@ -1,16 +1,1 @@
-{
-  "metadatas" : [
-    {
-      "name" : "ID",
-      "type" : "string",
-      "value" : "1110"
-    },
-    {
-      "name" : "cm2",
-      "type" : "string",
-      "value" : "XXX"
-    }
-  ],
-  "duration" : "PT1S",
-  "providingApplication" : "http://kz.tid.es/abc"
-}
+{"metadatas":[{"name":"ID","type":"string","value":"1110"},{"name":"cm2","type":"string","value":"XXX"}],"duration":"PT1S","providingApplication":"http://kz.tid.es/abc"}

@@ -1,6 +1,1 @@
-{
-  "errorCode" : {
-    "code" : "400",
-    "reasonPhrase" : "Bad Request"
-  }
-}
+{"errorCode":{"code":"400","reasonPhrase":"Bad Request"}}

@@ -115,7 +115,7 @@ echo
 01. CREATE E1/T1/A1/M1
 ======================
 HTTP/1.1 200 OK
-Content-Length: 550
+Content-Length: 241
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -154,7 +154,7 @@ Date: REGEX(.*)
 02. Query E1
 ============
 HTTP/1.1 200 OK
-Content-Length: 561
+Content-Length: 252
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -193,7 +193,7 @@ Date: REGEX(.*)
 03. DELETE E1/T1/A1/M2 and see it fail
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 183
+Content-Length: 166
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -208,7 +208,7 @@ Date: REGEX(.*)
 04. DELETE E1/T1/A1/M1 and see it work
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -222,7 +222,7 @@ Date: REGEX(.*)
 05. Query E1 to make sure it's gone
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 240
+Content-Length: 133
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

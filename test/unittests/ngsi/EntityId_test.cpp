@@ -32,7 +32,7 @@
 *
 * render - 
 */
-TEST(DISABLED_EntityId, render)
+TEST(EntityId, render)
 {
   EntityId     eId;
   std::string  out;

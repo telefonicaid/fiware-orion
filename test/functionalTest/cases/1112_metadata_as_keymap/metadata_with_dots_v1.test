@@ -88,7 +88,7 @@ echo
 01. Create entity with metadata with dot in the name
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 685
+Content-Length: 289
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -132,7 +132,7 @@ Date: REGEX(.*)
 02. Retrieve entity
 ===================
 HTTP/1.1 200 OK
-Content-Length: 535
+Content-Length: 269
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

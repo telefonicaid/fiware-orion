@@ -36,7 +36,7 @@
 *
 * render_json -
 */
-TEST(DISABLED_UpdateContextAttributeRequest, render_json)
+TEST(UpdateContextAttributeRequest, render_json)
 {
   UpdateContextAttributeRequest  ucar;
   Metadata                       mdata("name", "type", "value");
@@ -63,7 +63,7 @@ TEST(DISABLED_UpdateContextAttributeRequest, render_json)
 *
 * check_json -
 */
-TEST(DISABLED_UpdateContextAttributeRequest, check_json)
+TEST(UpdateContextAttributeRequest, check_json)
 {
   UpdateContextAttributeRequest  ucar;
   Metadata                       mdata("name", "type", "value");

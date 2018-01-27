@@ -121,7 +121,7 @@ echo
 01. Create subscription in service path /sp1
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 135
+Content-Length: 104
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -175,7 +175,7 @@ Date: REGEX(.*)
 03. Update subscription with service path /sp1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 136
+Content-Length: 105
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -229,7 +229,7 @@ Date: REGEX(.*)
 05. Update subscription with service path /sp2
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 136
+Content-Length: 105
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
