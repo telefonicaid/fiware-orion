@@ -134,7 +134,7 @@ echo
 01. Set up entities
 ===================
 HTTP/1.1 200 OK
-Content-Length: 316
+Content-Length: 170
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -162,7 +162,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 318
+Content-Length: 172
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -190,7 +190,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 318
+Content-Length: 172
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -218,7 +218,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 316
+Content-Length: 170
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -246,7 +246,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 318
+Content-Length: 172
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -274,7 +274,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 318
+Content-Length: 172
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -302,7 +302,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 316
+Content-Length: 170
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -332,7 +332,7 @@ Date: REGEX(.*)
 02. Query on /Madrid/Gardens/# (returns: tEG, tEGN, tEGS)
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 327
+Content-Length: 163
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -368,7 +368,7 @@ Date: REGEX(.*)
 03. Query on /Madrid/Gardens (returns: tEG)
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 169
+Content-Length: 93
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -392,7 +392,7 @@ Date: REGEX(.*)
 04. Query on /Madrid/Gardens/North (returns: tEGN)
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 170
+Content-Length: 94
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -416,7 +416,7 @@ Date: REGEX(.*)
 05. Query on /Madrid/Gardens/North/# (returns: tEGN)
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 170
+Content-Length: 94
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -440,7 +440,7 @@ Date: REGEX(.*)
 06. Query on /Madrid/Gardens, /Madrid/Transport (returns: tEG, tET)
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 247
+Content-Length: 127
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -470,7 +470,7 @@ Date: REGEX(.*)
 07. Query on /Madrid/Gardens/#, /Madrid/Transport/# (returns: tEG, tEGN, tEGS, tET, tETP, tETH)
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 563
+Content-Length: 267
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -524,7 +524,7 @@ Date: REGEX(.*)
 08. Query on /Madrid/Gardens, /Madrid/Transport/# (return: tEG, tET, tETP, tETH)
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 405
+Content-Length: 197
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -566,7 +566,7 @@ Date: REGEX(.*)
 09. Query on /Madrid/Gardens, /Madrid/Transport (return: tEG, tET)
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 247
+Content-Length: 127
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

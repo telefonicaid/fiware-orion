@@ -35,7 +35,7 @@
 *
 * render - 
 */
-TEST(DISABLED_ProvidingApplication, render)
+TEST(ProvidingApplication, render)
 {
   ProvidingApplication  pa;
   std::string           out;

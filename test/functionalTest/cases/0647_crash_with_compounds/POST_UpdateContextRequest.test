@@ -82,7 +82,7 @@ echo
 01. POST /v1/updateContext with compound attribute value { "a": "3" } in JSON
 =============================================================================
 HTTP/1.1 200 OK
-Content-Length: 384
+Content-Length: 190
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -114,7 +114,7 @@ Date: REGEX(.*)
 02. GET  /v1/queryContext to see the compound in JSON
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 421
+Content-Length: 197
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

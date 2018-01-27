@@ -261,7 +261,7 @@ echo
 00. Registration with invalid service path
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 158
+Content-Length: 127
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -278,7 +278,7 @@ Date: REGEX(.*)
 01. Register E1/A1 with service path /a1/e1
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -292,7 +292,7 @@ Date: REGEX(.*)
 02. Register E2/A1 with service path /a1/e2
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -306,7 +306,7 @@ Date: REGEX(.*)
 03. Register E3/A1 with service path /a1/e3
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -320,7 +320,7 @@ Date: REGEX(.*)
 04. Register E4/A1 with service path /a1/e4
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -334,7 +334,7 @@ Date: REGEX(.*)
 05. Discovery of E.*/A1 with service path /a1/e1,/a1/e2,/a1/e3,/a1/e4
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 1672
+Content-Length: 818
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -424,7 +424,7 @@ Date: REGEX(.*)
 06. Discovery of E.*/A1 with service path /a1/e1,/a1/e2,/a1/e3
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 1265
+Content-Length: 622
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -495,7 +495,7 @@ Date: REGEX(.*)
 07. Discovery of E.*/A1 with service path /a1/e1,/a1/e2
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 858
+Content-Length: 426
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -547,7 +547,7 @@ Date: REGEX(.*)
 08. Discovery of E.*/A1 with service path /a1/e1
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 451
+Content-Length: 230
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

@@ -1,7 +1,1 @@
-{
-  "errorCode" : {
-    "code" : "500",
-    "reasonPhrase" : "Internal Server Error",
-    "details" : "Both the error-code structure and the response vector were empty"
-  }
-}
+{"errorCode":{"code":"500","reasonPhrase":"Internal Server Error","details":"Both the error-code structure and the response vector were empty"}}

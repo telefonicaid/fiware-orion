@@ -35,7 +35,7 @@
 *
 * render - 
 */
-TEST(DISABLED_SubscribeError, render)
+TEST(SubscribeError, render)
 {
   SubscribeError  se;
   std::string     out;
@@ -47,11 +47,11 @@ TEST(DISABLED_SubscribeError, render)
   se.subscriptionId.set("SUB_123");
   se.errorCode.fill(SccBadRequest, "detail");
 
-  out = se.render(RegisterContext, "");
+  out = se.render(RegisterContext, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = se.render(SubscribeContext, "");
+  out = se.render(SubscribeContext, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

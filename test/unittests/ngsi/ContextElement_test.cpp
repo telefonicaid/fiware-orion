@@ -35,7 +35,7 @@
 *
 * Check -
 */
-TEST(DISABLED_ContextElement, check)
+TEST(ContextElement, check)
 {
   ContextElement* ceP = new ContextElement();
 
@@ -77,7 +77,7 @@ TEST(DISABLED_ContextElement, check)
   const char*     outfile1 = "ngsi.contextelement.check.middle.json";
   std::string     out;
 
-  out = ce2P->render(V1, false, UpdateContextElement, "", false);
+  out = ce2P->render(V1, false, UpdateContextElement, false, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

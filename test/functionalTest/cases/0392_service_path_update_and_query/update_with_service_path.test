@@ -319,7 +319,7 @@ echo
 --REGEXPECT--
 +++++ 1.  Create an entity E, attr A=k for  ServicePath /home/kz
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -350,7 +350,7 @@ Date: REGEX(.*)
 
 +++++ 2.  Create an entity E, attr A=k1 for ServicePath /home/kz/01
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -381,7 +381,7 @@ Date: REGEX(.*)
 
 +++++ 3.  Create an entity E, attr A=k2 for ServicePath /home/kz/02
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -412,7 +412,7 @@ Date: REGEX(.*)
 
 +++++ 4.  Create an entity E, attr A=k3 for ServicePath /home/kz/03
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -443,7 +443,7 @@ Date: REGEX(.*)
 
 +++++ 5.  Create an entity E, attr A=f for  ServicePath /home/fg
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -474,7 +474,7 @@ Date: REGEX(.*)
 
 +++++ 6.  Create an entity E, attr A=f1 for ServicePath /home/fg/01
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -505,7 +505,7 @@ Date: REGEX(.*)
 
 +++++ 7.  Create an entity E, attr A=f2 for ServicePath /home/fg/02
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -536,7 +536,7 @@ Date: REGEX(.*)
 
 +++++ 8.  Create an entity E, attr A=f3 for ServicePath /home/fg/03
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -567,7 +567,7 @@ Date: REGEX(.*)
 
 +++++ 9.  Query for entity E, attr A for  ServicePath /home/kz
 HTTP/1.1 200 OK
-Content-Length: 379
+Content-Length: 185
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -598,7 +598,7 @@ Date: REGEX(.*)
 
 +++++ 10. Query for entity E, attr A for  ServicePath /home/kz/01
 HTTP/1.1 200 OK
-Content-Length: 380
+Content-Length: 186
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -629,7 +629,7 @@ Date: REGEX(.*)
 
 +++++ 11. Query for entity E, attr A for  ServicePath /home/fg
 HTTP/1.1 200 OK
-Content-Length: 379
+Content-Length: 185
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -660,7 +660,7 @@ Date: REGEX(.*)
 
 +++++ 12. Query for entity E, attr A for  ServicePath /home/fg/01
 HTTP/1.1 200 OK
-Content-Length: 380
+Content-Length: 186
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -691,7 +691,7 @@ Date: REGEX(.*)
 
 +++++ 13. Query for entity E, attr A for  ServicePath /home/#
 HTTP/1.1 200 OK
-Content-Length: 2814
+Content-Length: 1332
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

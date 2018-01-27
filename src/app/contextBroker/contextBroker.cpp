@@ -289,9 +289,6 @@ bool            disableMetrics;
 int             reqTimeout;
 bool            insecureNotif;
 
-#ifdef PARANOID_JSON_INDENT
-bool            paranoidV1Indent;
-#endif
 
 
 
@@ -420,10 +417,6 @@ PaArgument paArgs[] =
   { "-disableMetrics", &disableMetrics,  "DISABLE_METRICS",    PaBool, PaOpt, false, false, true,             METRICS_DESC        },
 
   { "-insecureNotif", &insecureNotif, "INSECURE_NOTIF", PaBool, PaOpt, false, false, true, INSECURE_NOTIF },
-
-#ifdef PARANOID_JSON_INDENT
-  { "-paranoidV1Indent", &paranoidV1Indent, "PARANOID_V1_INDENT", PaBool, PaHid, false, false, true, "you shouldn't use this ;)" },
-#endif
 
   PA_END_OF_ARGS
 };

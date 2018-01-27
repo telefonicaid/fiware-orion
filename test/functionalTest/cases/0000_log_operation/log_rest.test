@@ -93,7 +93,7 @@ echo
 --REGEXPECT--
 === 1. GET trace level
 HTTP/1.1 200 OK
-Content-Length: 32
+Content-Length: 25
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -105,7 +105,7 @@ Date: REGEX(.*)
 
 === 2. PUT trace level
 HTTP/1.1 200 OK
-Content-Length: 29
+Content-Length: 22
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -117,7 +117,7 @@ Date: REGEX(.*)
 
 === 3. GET trace level
 HTTP/1.1 200 OK
-Content-Length: 29
+Content-Length: 22
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -139,7 +139,7 @@ Date: REGEX(.*)
 
 === 5. PUT trace level
 HTTP/1.1 200 OK
-Content-Length: 33
+Content-Length: 26
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -151,7 +151,7 @@ Date: REGEX(.*)
 
 === 6. GET trace level
 HTTP/1.1 200 OK
-Content-Length: 34
+Content-Length: 27
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -163,7 +163,7 @@ Date: REGEX(.*)
 
 === 7. DELETE trace level
 HTTP/1.1 200 OK
-Content-Length: 35
+Content-Length: 28
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -175,7 +175,7 @@ Date: REGEX(.*)
 
 === 8. GET trace level
 HTTP/1.1 200 OK
-Content-Length: 41
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -187,7 +187,7 @@ Date: REGEX(.*)
 
 === 9. DELETE trace level
 HTTP/1.1 200 OK
-Content-Length: 45
+Content-Length: 38
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -199,7 +199,7 @@ Date: REGEX(.*)
 
 === 10. GET trace level
 HTTP/1.1 200 OK
-Content-Length: 30
+Content-Length: 23
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

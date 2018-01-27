@@ -65,7 +65,7 @@ TEST(ContextElementResponse, check)
 *
 * render -
 */
-TEST(DISABLED_ContextElementResponse, render)
+TEST(ContextElementResponse, render)
 {
   ContextElementResponse  cer;
   const char*             outfile = "ngsi.contextElementResponse.render.middle.json";
@@ -79,7 +79,7 @@ TEST(DISABLED_ContextElementResponse, render)
 
    cer.statusCode.fill(SccOk, "details");
 
-   out = cer.render(V1, false, UpdateContextElement, "");
+   out = cer.render(V1, false, UpdateContextElement, false);
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
 

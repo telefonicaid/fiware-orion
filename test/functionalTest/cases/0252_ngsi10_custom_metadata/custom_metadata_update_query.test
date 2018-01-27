@@ -180,7 +180,7 @@ orionCurl --url "/v1/contextEntities/Room1"
 --REGEXPECT--
 === 1. Create an entity with an attribute with metadata
 HTTP/1.1 200 OK
-Content-Length: 1121
+Content-Length: 476
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -238,7 +238,7 @@ Date: REGEX(.*)
 }
 === 2. Query the entity
 HTTP/1.1 200 OK
-Content-Length: 909
+Content-Length: 462
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -292,7 +292,7 @@ Date: REGEX(.*)
 }
 === 3. Update the entity changing metadata value an adding a new one
 HTTP/1.1 200 OK
-Content-Length: 716
+Content-Length: 320
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -333,7 +333,7 @@ Date: REGEX(.*)
 }
 === 4. Query the entity
 HTTP/1.1 200 OK
-Content-Length: 1025
+Content-Length: 511
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -392,7 +392,7 @@ Date: REGEX(.*)
 }
 === 5. Append a new attribute with metadata
 HTTP/1.1 200 OK
-Content-Length: 714
+Content-Length: 318
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -433,7 +433,7 @@ Date: REGEX(.*)
 }
 === 6. Query the entity
 HTTP/1.1 200 OK
-Content-Length: 1395
+Content-Length: 680
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -509,7 +509,7 @@ Date: REGEX(.*)
 }
 === 7. Remove an attribute with metadata
 HTTP/1.1 200 OK
-Content-Length: 401
+Content-Length: 207
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -538,7 +538,7 @@ Date: REGEX(.*)
 }
 === 8. Query the entity
 HTTP/1.1 200 OK
-Content-Length: 907
+Content-Length: 460
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

@@ -78,7 +78,7 @@ Date: REGEX(.*)
 02. Get entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 540
+Content-Length: 287
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -121,7 +121,7 @@ Date: REGEX(.*)
 02. Get entity with attributeFormat=object
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 476
+Content-Length: 259
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

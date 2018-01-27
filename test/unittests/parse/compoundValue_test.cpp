@@ -62,7 +62,7 @@ TEST(compoundValue, updateNoCompoundValue)
 *
 * updateUnknownPath -
 */
-TEST(DISABLED_compoundValue, updateUnknownPath)
+TEST(compoundValue, updateUnknownPath)
 {
   ParseData       reqData;
   const char*     inFileJson  = "ngsi10.updateContextRequest.updateUnknownPath.invalid.json";
@@ -230,7 +230,7 @@ TEST(compoundValue, updateTwoStringsJson)
 *
 * updateTwoItemsSameNameInStructJson -
 */
-TEST(DISABLED_compoundValue, updateTwoItemsSameNameInStructJson)
+TEST(compoundValue, updateTwoItemsSameNameInStructJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextRequest.updateTwoItemsSameNameInStruct.valid.json";
@@ -385,7 +385,7 @@ TEST(compoundValue, updateContextValueVectorFiveItemsJson)
 *
 * updateTwoStructsJson -
 */
-TEST(DISABLED_compoundValue, updateTwoStructsJson)
+TEST(compoundValue, updateTwoStructsJson)
 {
   ParseData                  reqData;
   const char*                inFile        = "ngsi10.updateContextRequest.updateTwoStructs.valid.json";
@@ -409,7 +409,7 @@ TEST(DISABLED_compoundValue, updateTwoStructsJson)
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
   ci.outMimeType = JSON;
-  rendered = caP->render(V1, false, UpdateContext, "");
+  rendered = caP->render(V1, false, UpdateContext, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
@@ -534,7 +534,7 @@ TEST(DISABLED_compoundValue, updateTwoStructsJson)
 *
 * sixLevelsJson -
 */
-TEST(DISABLED_compoundValue, sixLevelsJson)
+TEST(compoundValue, sixLevelsJson)
 {
   ParseData                  reqData;
   const char*                inFile        = "ngsi10.updateContextRequest.sixLevels.valid.json";
@@ -557,7 +557,7 @@ TEST(DISABLED_compoundValue, sixLevelsJson)
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
   ci.outMimeType = JSON;
-  rendered = caP->render(V1, false, UpdateContext, "");
+  rendered = caP->render(V1, false, UpdateContext, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 

@@ -181,7 +181,7 @@ echo
 01. Subscribe to E1.*/A1
 ========================
 HTTP/1.1 200 OK
-Content-Length: 135
+Content-Length: 104
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -198,7 +198,7 @@ Date: REGEX(.*)
 02. Subscribe to E2.*,E3/A1+A2
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 135
+Content-Length: 104
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -215,7 +215,7 @@ Date: REGEX(.*)
 03. Subscribe to E3.*,E4,E5.*/A1+A2+A3
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 135
+Content-Length: 104
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -238,7 +238,7 @@ Broker Restarted
 05. Statistics in JSON
 ======================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
+Content-Length: 144
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

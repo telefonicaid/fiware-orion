@@ -160,7 +160,7 @@ echo
 --REGEXPECT--
 1: Append entity E1 with two different attributes A1 and A2
 HTTP/1.1 200 OK
-Content-Length: 489
+Content-Length: 228
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -196,7 +196,7 @@ Date: REGEX(.*)
 
 2. JsonAttributeObjectQuery for the entity E1 for attributes A1 and A2
 HTTP/1.1 200 OK
-Content-Length: 451
+Content-Length: 216
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -230,7 +230,7 @@ Date: REGEX(.*)
 
 3. Append entity E2 with two attributes with identical names 'A3', but different meta IDs
 HTTP/1.1 200 OK
-Content-Length: 837
+Content-Length: 346
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -280,7 +280,7 @@ Date: REGEX(.*)
 
 4. Normal Query for the entity E2 for attribute A3 - both attributes are returned
 HTTP/1.1 200 OK
-Content-Length: 839
+Content-Length: 348
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -330,7 +330,7 @@ Date: REGEX(.*)
 
 5. JsonAttributeObjectQuery Query for the entity E2 for attribute A3 - only one attribute is returned
 HTTP/1.1 200 OK
-Content-Length: 538
+Content-Length: 242
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

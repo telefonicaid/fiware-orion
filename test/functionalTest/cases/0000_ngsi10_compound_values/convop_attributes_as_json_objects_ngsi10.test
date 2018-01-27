@@ -99,7 +99,7 @@ echo
 --REGEXPECT--
 1. Create E1/A1 using conv op POST /v1/contextEntities/E1/attributes
 HTTP/1.1 200 OK
-Content-Length: 294
+Content-Length: 159
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -127,7 +127,7 @@ Date: REGEX(.*)
 
 2. query E1/A1 using conv op GET /v1/contextEntities/E1 (with attributeFormat=object)
 HTTP/1.1 200 OK
-Content-Length: 259
+Content-Length: 156
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -153,7 +153,7 @@ Date: REGEX(.*)
 
 3. query E1/A1 using conv op GET /v1/contextEntities/E1 (without attributeFormat=object)
 HTTP/1.1 200 OK
-Content-Length: 275
+Content-Length: 163
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -180,7 +180,7 @@ Date: REGEX(.*)
 
 4. Update E1/A1 using conv op PUT /v1/contextEntities/E1/attributes
 HTTP/1.1 200 OK
-Content-Length: 239
+Content-Length: 119
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -205,7 +205,7 @@ Date: REGEX(.*)
 
 5. query E1/A1 using conv op GET /v1/contextEntities/E1/attributes/A1 (with attributeFormat=object)
 HTTP/1.1 200 OK
-Content-Length: 160
+Content-Length: 98
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -226,7 +226,7 @@ Date: REGEX(.*)
 
 6. query E1/A1 using conv op GET /v1/contextEntities/E1/attributes/A1 (without attributeFormat=object)
 HTTP/1.1 200 OK
-Content-Length: 174
+Content-Length: 105
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

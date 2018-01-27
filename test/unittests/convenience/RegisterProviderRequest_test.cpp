@@ -43,7 +43,7 @@
 *
 * json_ok -
 */
-TEST(DISABLED_RegisterProviderRequest, json_ok)
+TEST(RegisterProviderRequest, json_ok)
 {
   ParseData       reqData;
   const char*     inFile1  = "ngsi9.registerProviderRequest.noRegistrationId.valid.json";

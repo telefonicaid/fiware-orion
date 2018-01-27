@@ -124,7 +124,7 @@ echo
 01. Register E1/A1 on CB  with CP1 as providing application
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -138,7 +138,7 @@ Date: REGEX(.*)
 02. Register E1/A1 on CP1  with CP2 as providing application
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

@@ -41,7 +41,7 @@ orionCurl --url "/v1/queryContext" --payload "$BIGFILE"
 rm $BIGFILE
 --REGEXPECT--
 HTTP/1.1 413 Request Entity Too Large
-Content-Length: 164
+Content-Length: 133
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

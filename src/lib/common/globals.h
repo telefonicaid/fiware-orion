@@ -35,14 +35,6 @@
 
 /* ****************************************************************************
 *
-* FIXME P10: temporal definition, it should be removed soon
-*/
-#define PARANOID_JSON_INDENT
-
-
-
-/* ****************************************************************************
-*
 * FIWARE_LOCATION - 
 */
 #define FIWARE_LOCATION             "FIWARE::Location"
@@ -230,10 +222,6 @@ extern bool               checkIdv1;
 extern bool               disableCusNotif;
 
 extern bool               insecureNotif;
-
-#ifdef PARANOID_JSON_INDENT
-extern bool               paranoidV1Indent;
-#endif
 
 
 

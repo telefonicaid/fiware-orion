@@ -147,7 +147,7 @@ echo
 01. GET /v1/contextEntities/E1/attributes/A1/ID_A?entity::type=T1 and see it fail
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 130
+Content-Length: 99
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -164,7 +164,7 @@ Date: REGEX(.*)
 02. Create E1/T1/A1 with metadata ID ID_A
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 553
+Content-Length: 244
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -203,7 +203,7 @@ Date: REGEX(.*)
 03. GET /v1/contextEntities/E1/attributes/A1/ID_A?entity::type=T1 and see it work
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 304
+Content-Length: 162
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -233,7 +233,7 @@ Date: REGEX(.*)
 04. GET /v1/contextEntities/E1/attributes/A1/ID_B?entity::type=T1 and see it fail
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 130
+Content-Length: 99
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -250,7 +250,7 @@ Date: REGEX(.*)
 05. GET /v1/contextEntities/E1/attributes/A1/ID_A?entity::type=T1&attributesFormat=object
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 290
+Content-Length: 155
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -279,7 +279,7 @@ Date: REGEX(.*)
 06. Create E2//A1 with metadata ID ID_B
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 551
+Content-Length: 242
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -318,7 +318,7 @@ Date: REGEX(.*)
 07. GET /v1/contextEntities/E2/attributes/A1/ID_B?!exist=entity::type and see it work
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 304
+Content-Length: 162
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -348,7 +348,7 @@ Date: REGEX(.*)
 08. GET /v1/contextEntities/E2/attributes/A1/ID_B?exist=entity::type and see it fail
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 130
+Content-Length: 99
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
