@@ -2,3 +2,6 @@
 - Add: new GENERATE_COREDUMP variable at /etc/config/contextBroker to enable core generation and archiving (useful for debugging)
 - Add: handler for SIGHUP termination signal
 - Fix: using SIGTERM instead of SIGHUP for stopping broker in init.d service script
+- Reference distribution changes from RHEL/CentOS 6 to RHEL/CentOS 7
+- Fix: Invalid description in POST /op/query error response (#2991)
+- Fix: Bug that may cause contextBroker to crash when passing inappropriate parameter in query context payload (#3055)

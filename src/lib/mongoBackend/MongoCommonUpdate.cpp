@@ -274,37 +274,6 @@ static bool equalMetadata(const BSONObj& md1, const BSONObj& md2)
 
 /* ****************************************************************************
 *
-* attributeValueAbsent -
-*
-* Check that the attribute doesn't have any value
-*
-*/
-static bool attributeValueAbsent(ContextAttribute* caP, ApiVersion apiVersion)
-{
-  /* In v2, absent attribute means "null", which has different semantics */
-  return ((caP->valueType == orion::ValueTypeNone) && (apiVersion == V1));
-}
-
-
-
-/* ****************************************************************************
-*
-* attributeTypeAbsent -
-*
-* Check that the attribute doesn't have any type
-*
-*/
-static bool attributeTypeAbsent(ContextAttribute* caP)
-{
-  // FIXME P10: this is a temporal solution while the ContextAttribute class gets
-  // modified to include a "NoneType" or similar. Type "" should be allowed in NGSIv2
-  return caP->type == "";
-}
-
-
-
-/* ****************************************************************************
-*
 * changedAttr -
 */
 static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVersion apiVersion)
@@ -316,7 +285,7 @@ static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVers
   }
 
   /* No value in the request means that the value stays as it was before, so it is not a change */
-  if (caP->valueType == orion::ValueTypeNone && apiVersion != V2)
+  if (caP->valueType == orion::ValueTypeNotGiven)
   {
     return false;
   }
@@ -339,7 +308,7 @@ static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVers
     return caP->valueType != orion::ValueTypeString || caP->stringValue != getStringFieldF(attr, ENT_ATTRS_VALUE);
 
   case mongo::jstNULL:
-    return caP->valueType != orion::ValueTypeNone;
+    return caP->valueType != orion::ValueTypeNull;
 
   default:
     LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(attr, ENT_ATTRS_VALUE).type()));
@@ -394,7 +363,7 @@ static void appendMetadata
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->boolValue));
       return;
 
-    case orion::ValueTypeNone:
+    case orion::ValueTypeNull:
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mongo::BSONNULL));
       return;
 
@@ -434,7 +403,7 @@ static void appendMetadata
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mdP->boolValue));
       return;
 
-    case orion::ValueTypeNone:
+    case orion::ValueTypeNull:
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mongo::BSONNULL));
       return;
 
@@ -478,7 +447,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
   /* 1. Add value, if present in the request (it could be omitted in the case of updating only metadata).
    *    When the value of the attribute is empty (no update needed/wanted), then the value of the attribute is
    *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
-  if (!attributeValueAbsent(caP, apiVersion))
+  if (caP->valueType != orion::ValueTypeNotGiven)
   {
     caP->valueBson(ab);
   }
@@ -1152,7 +1121,7 @@ static bool addTriggeredSubscriptions_withCache
     //           Perhaps CachedSubscription should include an AttributeList (cSubP->attributes)
     //           instead of its std::vector<std::string> ... ?
     //
-    AttributeList aList;
+    StringList aList;
 
     aList.fill(cSubP->attributes);
 
@@ -1712,7 +1681,7 @@ static bool addTriggeredSubscriptions
 static bool processOnChangeConditionForUpdateContext
 (
   ContextElementResponse*          notifyCerP,
-  const AttributeList&             attrL,
+  const StringList&                attrL,
   const std::vector<std::string>&  metadataV,
   std::string                      subId,
   RenderFormat                     renderFormat,
@@ -1843,9 +1812,13 @@ static void setPreviousValueMetadata(ContextElementResponse* notifyCerP)
         mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->numberValue);
         break;
 
-      case orion::ValueTypeNone:
+      case orion::ValueTypeNull:
         mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, "");
-        mdP->valueType = orion::ValueTypeNone;
+        mdP->valueType = orion::ValueTypeNull;
+        break;
+
+      case orion::ValueTypeNotGiven:
+        LM_E(("Runtime Error (value not given for metadata)"));
         break;
 
       default:
@@ -2093,7 +2066,7 @@ static bool processSubscriptions
                                                                 tenant,
                                                                 xauthToken,
                                                                 fiwareCorrelator,
-                                                                tSubP->attrL.attributeV,
+                                                                tSubP->attrL.stringV,
                                                                 tSubP->httpInfo,
                                                                 tSubP->blacklist);
 
@@ -2271,23 +2244,7 @@ static void updateAttrInNotifyCer
 
     if (caP->name == targetAttr->name)
     {
-      //
-      // FIXME P6: https://github.com/telefonicaid/fiware-orion/issues/2587
-      // If an attribute has no value, then its value is not updated (neither is previousValue).
-      // However this may be problematic ... see the issue.
-      //
-      // New data on this: the functest
-      // "test/functionalTest/cases/2998*/null_not_working_in_q_for_subscription.test" fails with this 'if-clause' (not outdeffed),
-      // and removing the 'if' the functest 'test/functionalTest/cases/1156*/q_and_mq_as_uri_param_for_metadata.test' fails,
-      // but it seems like the test is incorrect and this fix is good.
-      //
-      // This clearly needs to be looked over ...
-      //
-#if 0
-      if (targetAttr->valueType != orion::ValueTypeNone)
-#else
-      if (true)
-#endif
+      if (targetAttr->valueType != orion::ValueTypeNotGiven)
       {
         /* Store previous value (it may be necessary to render previousValue metadata) */
         if (caP->previousValue == NULL)
@@ -3073,7 +3030,7 @@ static void searchContextProviders
 {
   ContextRegistrationResponseVector  crrV;
   EntityIdVector                     enV;
-  AttributeList                      attrL;
+  StringList                         attrL;
   std::string                        err;
 
   /* Fill input data for registrationsQuery() */
@@ -3105,7 +3062,7 @@ static void searchContextProviders
   }
 
   /* Second CPr lookup (in the case some element stills not being found): looking in E-<null> registrations */
-  AttributeList attrNullList;
+  StringList attrNullList;
   if (someContextElementNotFound(*cerP))
   {
     if (registrationsQuery(enV, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
@@ -3266,7 +3223,7 @@ static void updateEntity
   }
 
   /* Build CER used for notifying (if needed) */
-  AttributeList            emptyAttrL;
+  StringList               emptyAttrL;
   ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL);
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
@@ -3529,7 +3486,7 @@ static bool contextElementPreconditionsCheck
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
       ContextAttribute* aP = ceP->contextAttributeVector[ix];
-      if (attributeValueAbsent(aP, apiVersion) && attributeTypeAbsent(aP) && (aP->metadataVector.size() == 0))
+      if (aP->valueType == orion::ValueTypeNotGiven && aP->type == "" && (aP->metadataVector.size() == 0))
       {
         ContextAttribute* ca = new ContextAttribute(aP);
 

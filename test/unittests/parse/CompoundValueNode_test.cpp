@@ -81,8 +81,8 @@ TEST(CompoundValueNode, tree)
 */
 TEST(CompoundValueNode, typeName)
 {
-  orion::ValueType  type[]     = { orion::ValueTypeUnknown, orion::ValueTypeObject, orion::ValueTypeVector, orion::ValueTypeString };
-  const char*       expected[] = { "Unknown",               "Object",               "Vector",               "String"               };
+  orion::ValueType  type[]     = { orion::ValueTypeNotGiven, orion::ValueTypeObject, orion::ValueTypeVector, orion::ValueTypeString };
+  const char*       expected[] = { "NotGiven",               "Object",               "Vector",               "String"               };
 
   utInit();
 
@@ -103,7 +103,7 @@ TEST(CompoundValueNode, typeName)
 * vectorInvalidAndOk -
 *
 */
-TEST(DISABLED_CompoundValueNode, vectorInvalidAndOk)
+TEST(CompoundValueNode, vectorInvalidAndOk)
 {
   lmTraceLevelSet(LmtCompoundValueAdd, true);
 
@@ -148,7 +148,7 @@ TEST(DISABLED_CompoundValueNode, vectorInvalidAndOk)
 * structInvalidAndOk -
 *
 */
-TEST(DISABLED_CompoundValueNode, structInvalidAndOk)
+TEST(CompoundValueNode, structInvalidAndOk)
 {
   lmTraceLevelSet(LmtCompoundValueAdd, true);
 

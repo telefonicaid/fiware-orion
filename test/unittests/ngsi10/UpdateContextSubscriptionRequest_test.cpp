@@ -46,7 +46,7 @@
 *
 * badLength_json -
 */
-TEST(DISABLED_UpdateContextSubscriptionRequest, badLength_json)
+TEST(UpdateContextSubscriptionRequest, badLength_json)
 {
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
@@ -97,7 +97,7 @@ TEST(DISABLED_UpdateContextSubscriptionRequest, badLength_json)
 *
 * invalidDuration_json -
 */
-TEST(DISABLED_UpdateContextSubscriptionRequest, invalidDuration_json)
+TEST(UpdateContextSubscriptionRequest, invalidDuration_json)
 {
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
@@ -174,7 +174,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedJson)
 *
 * scopeGeolocationCircleInvertedBadValueJson -
 */
-TEST(DISABLED_UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedBadValueJson)
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedBadValueJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.circleInvertedBadValue.postponed.json";
@@ -202,7 +202,7 @@ TEST(DISABLED_UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedBa
 *
 * scopeGeolocationCircleZeroRadiusJson -
 */
-TEST(DISABLED_UpdateContextSubscriptionRequest, scopeGeolocationCircleZeroRadiusJson)
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleZeroRadiusJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.circleZeroRadius.postponed.json";
@@ -280,7 +280,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedJson)
 *
 * scopeGeolocationPolygonInvertedBadValueJson -
 */
-TEST(DISABLED_UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedBadValueJson)
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedBadValueJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonInvertedBadValue.postponed.json";
@@ -308,7 +308,7 @@ TEST(DISABLED_UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedB
 *
 * scopeGeolocationPolygonNoVerticesJson -
 */
-TEST(DISABLED_UpdateContextSubscriptionRequest, scopeGeolocationPolygonNoVerticesJson)
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonNoVerticesJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonNoVertices.postponed.json";
@@ -336,7 +336,7 @@ TEST(DISABLED_UpdateContextSubscriptionRequest, scopeGeolocationPolygonNoVertice
 *
 * scopeGeolocationPolygonOneVertexJson -
 */
-TEST(DISABLED_UpdateContextSubscriptionRequest, scopeGeolocationPolygonOneVertexJson)
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonOneVertexJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonOneVertex.postponed.json";
@@ -364,7 +364,7 @@ TEST(DISABLED_UpdateContextSubscriptionRequest, scopeGeolocationPolygonOneVertex
 *
 * scopeGeolocationPolygonTwoVerticesJson -
 */
-TEST(DISABLED_UpdateContextSubscriptionRequest, scopeGeolocationPolygonTwoVerticesJson)
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonTwoVerticesJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonTwoVertices.postponed.json";

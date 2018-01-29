@@ -205,7 +205,7 @@ Date: REGEX(.*)
 04. Query inside 13.5 kms radius from Madrid center -> Madrid, Leganes
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 801
+Content-Length: 423
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -255,7 +255,7 @@ Date: REGEX(.*)
 05. Query inside 15 kms radius from Madrid center -> Madrid, Alcobendas, Leganes
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1191
+Content-Length: 629
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -323,7 +323,7 @@ Date: REGEX(.*)
 06. Query in 13.5 kms radius outside Madrid center -> Alcobendas
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 422
+Content-Length: 228
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

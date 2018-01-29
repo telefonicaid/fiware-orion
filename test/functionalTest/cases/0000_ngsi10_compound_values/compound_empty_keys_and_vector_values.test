@@ -105,7 +105,7 @@ Date: REGEX(.*)
 03. Get entity (NGSIv1)
 =======================
 HTTP/1.1 200 OK
-Content-Length: 388
+Content-Length: 191
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

@@ -282,7 +282,7 @@ echo
 
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -294,7 +294,7 @@ Date: REGEX(.*)
 
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -309,7 +309,7 @@ Notification count from mongo:
 
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -324,7 +324,7 @@ Notification count from mongo:
 
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -336,7 +336,7 @@ Date: REGEX(.*)
 
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -351,7 +351,7 @@ Notification count from mongo:
 
 5: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -363,7 +363,7 @@ Date: REGEX(.*)
 
 6: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -378,7 +378,7 @@ Notification count from mongo:
 
 7: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 122
+Content-Length: 93
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -393,7 +393,7 @@ Date: REGEX(.*)
 
 8: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 144
+Content-Length: 115
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -408,7 +408,7 @@ Date: REGEX(.*)
 
 9: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -421,7 +421,7 @@ Date: REGEX(.*)
 Accumulated data:
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 519
+Content-Length: 293
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
@@ -455,7 +455,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 513
+Content-Length: 287
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
@@ -489,7 +489,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 519
+Content-Length: 293
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
@@ -523,7 +523,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 515
+Content-Length: 289
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json

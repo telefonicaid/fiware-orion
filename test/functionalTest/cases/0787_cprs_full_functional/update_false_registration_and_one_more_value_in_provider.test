@@ -172,7 +172,7 @@ echo
 01. Register E1/T1/A1-CP1 in CB
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -186,7 +186,7 @@ Date: REGEX(.*)
 02. Register E1/T1/A2-CP2 in CB
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -200,7 +200,7 @@ Date: REGEX(.*)
 03. Update/APPEND E1/T1/A2 in CP2
 =================================
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -232,7 +232,7 @@ Date: REGEX(.*)
 04. Update/UPDATE E1/T1/A1+A2 in CB (A2 OK, A1 NOT OK)
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 782
+Content-Length: 393
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -283,7 +283,7 @@ Date: REGEX(.*)
 05. Query E1/T1/A2 in CP2
 =========================
 HTTP/1.1 200 OK
-Content-Length: 403
+Content-Length: 209
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

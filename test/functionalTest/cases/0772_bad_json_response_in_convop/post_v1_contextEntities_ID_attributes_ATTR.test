@@ -64,7 +64,7 @@ echo
 01. POST /v1/contextEntities/EID/attributes/A and see response with valid JSON
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -78,7 +78,7 @@ Date: REGEX(.*)
 02. Query EID/A
 ===============
 HTTP/1.1 200 OK
-Content-Length: 377
+Content-Length: 183
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

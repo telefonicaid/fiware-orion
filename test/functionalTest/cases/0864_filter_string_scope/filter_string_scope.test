@@ -183,7 +183,7 @@ Date: REGEX(.*)
 06. v1 Query: temperature<60;humidity==61..83;status==ERR -> E2
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 618
+Content-Length: 290
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

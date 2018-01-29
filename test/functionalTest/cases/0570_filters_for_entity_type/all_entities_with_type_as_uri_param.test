@@ -125,7 +125,7 @@ echo
 1. Create entity E1, with type T1 and with attribute A1
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 379
+Content-Length: 185
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -157,7 +157,7 @@ Date: REGEX(.*)
 2. Create entity E1, with type T2 and with attribute A2
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 379
+Content-Length: 185
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -189,7 +189,7 @@ Date: REGEX(.*)
 3. Create entity E2, with type T2 and with attribute A3
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 379
+Content-Length: 185
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -221,7 +221,7 @@ Date: REGEX(.*)
 4. Lookup E1/T1 using GET /v1/contextEntities?entity::type=T1
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 381
+Content-Length: 187
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -253,7 +253,7 @@ Date: REGEX(.*)
 5. Lookup E1/T2+E2/T2 using GET /v1/contextEntities?entity::type=T2
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 730
+Content-Length: 352
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

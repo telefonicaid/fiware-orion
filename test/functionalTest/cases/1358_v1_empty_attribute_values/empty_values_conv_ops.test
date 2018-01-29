@@ -161,7 +161,7 @@ echo
 01. Create E1 with empty value
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 311
+Content-Length: 165
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -191,7 +191,7 @@ Date: REGEX(.*)
 02. GET E1 and see empty value
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 273
+Content-Length: 161
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -219,7 +219,7 @@ Date: REGEX(.*)
 03. Update E1 with non-empty value (foo)
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 256
+Content-Length: 125
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -246,7 +246,7 @@ Date: REGEX(.*)
 04. GET E1 and see non-empty value (foo)
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 276
+Content-Length: 164
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -274,7 +274,7 @@ Date: REGEX(.*)
 05. Update E1 with empty value
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 256
+Content-Length: 125
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -301,7 +301,7 @@ Date: REGEX(.*)
 06. GET E1 and see empty value
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 273
+Content-Length: 161
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -329,7 +329,7 @@ Date: REGEX(.*)
 07. Update E1 with non-empty value (bar)
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 256
+Content-Length: 125
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -356,7 +356,7 @@ Date: REGEX(.*)
 08. GET E1 and see non-empty value (bar)
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 276
+Content-Length: 164
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -384,7 +384,7 @@ Date: REGEX(.*)
 09. Update E1 with absent value
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 256
+Content-Length: 125
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -411,7 +411,7 @@ Date: REGEX(.*)
 10. GET E1 and see attribute hasn't changed (bar)
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 276
+Content-Length: 164
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

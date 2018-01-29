@@ -62,7 +62,7 @@ echo
 --REGEXPECT--
 +++++ 1. bad characters in URI param 'limit'
 HTTP/1.1 400 Bad Request
-Content-Length: 156
+Content-Length: 125
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -78,7 +78,7 @@ Date: REGEX(.*)
 
 +++++ 2. bad characters in URI param 'offset'
 HTTP/1.1 400 Bad Request
-Content-Length: 157
+Content-Length: 126
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -94,7 +94,7 @@ Date: REGEX(.*)
 
 +++++ 3. URI param 'limit' == 0
 HTTP/1.1 400 Bad Request
-Content-Length: 166
+Content-Length: 135
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -110,7 +110,7 @@ Date: REGEX(.*)
 
 +++++ 4. URI param 'details' == 'Yes'
 HTTP/1.1 400 Bad Request
-Content-Length: 187
+Content-Length: 156
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

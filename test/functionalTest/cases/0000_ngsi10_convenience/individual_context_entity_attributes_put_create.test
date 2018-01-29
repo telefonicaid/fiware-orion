@@ -70,7 +70,7 @@ orionCurl --url "$url" --payload "${payload}" -X "PUT"
 --REGEXPECT--
 +++++ 1. put an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 122
+Content-Length: 91
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -84,7 +84,7 @@ Date: REGEX(.*)
 }
 +++++ 2. post an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 320
+Content-Length: 174
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -111,7 +111,7 @@ Date: REGEX(.*)
 }
 +++++ 3. put an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 259
+Content-Length: 128
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

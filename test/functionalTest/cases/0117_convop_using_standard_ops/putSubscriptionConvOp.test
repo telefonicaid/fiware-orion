@@ -265,7 +265,7 @@ echo
 01. PUT /v1/contextSubscriptions/1234567890 and see it fail
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 205
+Content-Length: 149
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -285,7 +285,7 @@ Date: REGEX(.*)
 02. PUT /v1/contextSubscriptions/123456789012345678901234 with 000000000000000000000000 in payload and see it fail
 ==================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 284
+Content-Length: 228
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -305,7 +305,7 @@ Date: REGEX(.*)
 03. PUT /v1/contextSubscriptions/123456789012345678901234 and see it fail
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 180
+Content-Length: 133
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -324,7 +324,7 @@ Date: REGEX(.*)
 04. Subscribe to E1/T1/A1+A2
 ============================
 HTTP/1.1 200 OK
-Content-Length: 135
+Content-Length: 104
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -341,7 +341,7 @@ Date: REGEX(.*)
 05. Create E1/T1/A1+A2
 ======================
 HTTP/1.1 200 OK
-Content-Length: 491
+Content-Length: 230
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -379,7 +379,7 @@ Date: REGEX(.*)
 =====================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 572
+Content-Length: 301
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -421,7 +421,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 07. PUT /v1/contextSubscriptions/SUB_ID, removing A2 from notifyConditions
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 135
+Content-Length: 104
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -439,7 +439,7 @@ Date: REGEX(.*)
 ===========================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 572
+Content-Length: 301
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -478,7 +478,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 572
+Content-Length: 301
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -520,7 +520,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 09. Update E1/T1/A2
 ===================
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -553,7 +553,7 @@ Date: REGEX(.*)
 ======================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 572
+Content-Length: 301
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -592,7 +592,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 572
+Content-Length: 301
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -634,7 +634,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 11. Update E1/T1/A1
 ===================
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -667,7 +667,7 @@ Date: REGEX(.*)
 =============================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 572
+Content-Length: 301
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -706,7 +706,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 572
+Content-Length: 301
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -745,7 +745,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 574
+Content-Length: 303
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json

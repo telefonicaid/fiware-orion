@@ -66,7 +66,7 @@ echo
 01. Update/APPEND E1-T1-A1 (Access-Control-Allow-Origin not included for POST)
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -98,7 +98,7 @@ Date: REGEX(.*)
 02. Query E1-T1 With Origin Header (Access-Control-Allow-Origin included)
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 279
+Content-Length: 167
 Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: *
 Content-Type: application/json
@@ -128,7 +128,7 @@ Date: REGEX(.*)
 03. Query E1-T1 Without Origin Header (Access-Control-Allow-Origin not included)
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 279
+Content-Length: 167
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

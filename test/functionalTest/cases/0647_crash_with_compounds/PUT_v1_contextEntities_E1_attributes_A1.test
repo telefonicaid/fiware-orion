@@ -131,7 +131,7 @@ echo
 01. PUT /v1/contextEntities/E/attributes/A with compound attribute value using JSON
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 87
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -146,7 +146,7 @@ Date: REGEX(.*)
 02. POST /v1/updateContext to create Entity E, attribute A
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 550
+Content-Length: 241
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -185,7 +185,7 @@ Date: REGEX(.*)
 03. GET /v1/contextEntities/E to make sure 03 worked
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 418
+Content-Length: 219
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -220,7 +220,7 @@ Date: REGEX(.*)
 04. PUT /v1/contextEntities/E/attributes/A with compound attribute value using JSON
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -234,7 +234,7 @@ Date: REGEX(.*)
 05. GET /v1/contextEntities/E to make sure 05 worked
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 447
+Content-Length: 226
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

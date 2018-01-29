@@ -93,7 +93,7 @@ accumulatorDump
 1. Subscribe to changes in  E/att
 +++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 109
+Content-Length: 85
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -109,7 +109,7 @@ Date: REGEX(.*)
 2. Update/Append E/att
 ++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 382
+Content-Length: 188
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -142,7 +142,7 @@ Date: REGEX(.*)
 +++++++++++++++++++
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 463
+Content-Length: 259
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 X-Relayer-Host: 128.1.2.3:1234

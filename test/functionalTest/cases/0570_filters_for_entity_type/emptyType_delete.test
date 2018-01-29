@@ -114,7 +114,7 @@ echo
 1. Create entity E1, without type and with attribute A
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 375
+Content-Length: 181
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -146,7 +146,7 @@ Date: REGEX(.*)
 2. Create entity E1, with type T1 and with attribute A2
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 379
+Content-Length: 185
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -178,7 +178,7 @@ Date: REGEX(.*)
 3. DELETE E1/<empty>
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -192,7 +192,7 @@ Date: REGEX(.*)
 4. Lookup E1/<empty> (not found)
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 218
+Content-Length: 158
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -214,7 +214,7 @@ Date: REGEX(.*)
 5. Lookup E1/T1 (found)
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 276
+Content-Length: 164
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

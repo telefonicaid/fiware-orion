@@ -1,8 +1,1 @@
-{
-  "subscriptionId" : "012345678901234567890123",
-  "errorCode" : {
-    "code" : "400",
-    "reasonPhrase" : "Bad Request",
-    "details" : "invalid isPattern value for entity: /2/"
-  }
-}
+{"subscriptionId":"012345678901234567890123","errorCode":{"code":"400","reasonPhrase":"Bad Request","details":"invalid isPattern value for entity: /2/"}}
