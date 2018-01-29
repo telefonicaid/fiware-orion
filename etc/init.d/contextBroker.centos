@@ -141,8 +141,7 @@ broker_coredump_start()
         ulimit -c unlimited
         ulimit -n 10240
         ${EXECUTABLE} ${BROKER_OPTS} -fg &> /dev/null &
-        sleep 2 # wait some time to let the contextbroker start
-        ps -ef | grep ${EXECUTABLE} | grep -v grep | awk '{print $2}' > ${BROKER_PID_FILE}
+        sleep 2 # wait some time to let the contextbroker start        
         PID=$(cat ${BROKER_PID_FILE})
         if [[ -z "${PID}" ]]; then
             printf "%s" "pidfile not found"
