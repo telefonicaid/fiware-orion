@@ -291,14 +291,15 @@ bool            insecureNotif;
 
 
 
+
 /* ****************************************************************************
 *
 * Definitions to make paArgs lines shorter ...
 */
-#define PIDPATH             _i "/tmp/contextBroker.pid"
-#define IP_ALL              _i "0.0.0.0"
-#define LOCALHOST           _i "localhost"
-#define ONE_MONTH_PERIOD    (3600 * 24 * 31)
+#define PIDPATH                _i "/tmp/contextBroker.pid"
+#define IP_ALL                 _i "0.0.0.0"
+#define LOCALHOST              _i "localhost"
+#define ONE_MONTH_PERIOD       (3600 * 24 * 31)
 
 #define FG_DESC                "don't start as daemon"
 #define LOCALIP_DESC           "IP to receive new connections"
@@ -1278,10 +1279,41 @@ RestService restServiceCORS[] =
 
 /* ****************************************************************************
 *
-* pidFile -
+* fileExists -
 */
-int pidFile(void)
+static bool fileExists(char* path)
 {
+  if (access(path, F_OK) == 0)
+  {
+    return true;
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* pidFile -
+*
+* When run "interactively" (with the CLI option '-fg' set), the error messages get really ugly.
+* However, that is a minor bad, compared to what would happen to a 'nice printf message' when started as a service.
+* It would be lost. The log file is important and we can't just use 'fprintf(stderr, ...)' ...
+*/
+int pidFile(bool justCheck)
+{
+  if (fileExists(pidPath))
+  {
+    LM_E(("PID-file '%s' found. A broker seems to be running already", pidPath));
+    return 1;
+  }
+
+  if (justCheck == true)
+  {
+    return 0;
+  }
+
   int    fd = open(pidPath, O_WRONLY | O_CREAT | O_TRUNC, 0777);
   pid_t  pid;
   char   buffer[32];
@@ -1290,8 +1322,8 @@ int pidFile(void)
 
   if (fd == -1)
   {
-    LM_E(("PID File (open '%s': %s", pidPath, strerror(errno)));
-    return -1;
+    LM_E(("PID File (open '%s': %s)", pidPath, strerror(errno)));
+    return 2;
   }
 
   pid = getpid();
@@ -1302,7 +1334,7 @@ int pidFile(void)
   if (nb != sz)
   {
     LM_E(("PID File (written %d bytes and not %d to '%s': %s)", nb, sz, pidPath, strerror(errno)));
-    return -2;
+    return 3;
   }
 
   return 0;
@@ -1379,6 +1411,8 @@ void sigHandler(int sigNo)
   }
 }
 
+
+
 /* ****************************************************************************
 *
 * orionExit -
@@ -1447,25 +1481,25 @@ const char* description =
 
 
 
-
 /* ****************************************************************************
 *
 * contextBrokerInit -
 */
 static void contextBrokerInit(std::string dbPrefix, bool multitenant)
 {
-
   Notifier* pNotifier = NULL;
 
   /* If we use a queue for notifications, start worker threads */
   if (strcmp(notificationMode, "threadpool") == 0)
   {
     QueueNotifier*  pQNotifier = new QueueNotifier(notificationQueueSize, notificationThreadNum);
-    int rc = pQNotifier->start();
+    int             rc         = pQNotifier->start();
+
     if (rc != 0)
     {
       LM_X(1,("Runtime Error starting notification queue workers (%d)", rc));
     }
+
     pNotifier = pQNotifier;
   }
   else
@@ -1596,6 +1630,8 @@ static SemOpType policyGet(std::string mutexPolicy)
   return SemReadWriteOp;
 }
 
+
+
 /* ****************************************************************************
 *
 * notificationModeParse -
@@ -1648,6 +1684,8 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
   free(mode);
 }
 
+
+
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
 /* ****************************************************************************
 *
@@ -1655,6 +1693,8 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
 */
 int main(int argC, char* argV[])
 {
+  int s;
+
   lmTransactionReset();
 
   uint16_t       rushPort = 0;
@@ -1728,6 +1768,22 @@ int main(int argC, char* argV[])
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
+  //
+  // NOTE: Calling '_exit()' and not 'exit()' if 'pidFile()' returns error.
+  //       The exit-function removes the PID-file and we don't want that. We want
+  //       the PID-file to remain.
+  //       Calling '_exit()' instead of 'exit()' makes sure that the exit-function is not called.
+  //
+  //       This call here is just to check for the existance of the PID-file.
+  //       If the file exists, the broker dies here.
+  //       The creation of the PID-file must be done AFTER "daemonize()" as here we still don't know the
+  //       PID of the broker. The father process dies and the son-process continues, in "daemonize()".
+  //
+  if ((s = pidFile(true)) != 0)
+  {
+    _exit(s);
+  }
+
   // Argument consistency check (-t AND NOT -logLevel)
   if ((paTraceV[0] != 0) && (strcmp(paLogLevel, "DEBUG") != 0))
   {
@@ -1777,6 +1833,11 @@ int main(int argC, char* argV[])
     daemonize();
   }
 
+  if ((s = pidFile(false)) != 0)
+  {
+    _exit(s);
+  }
+
 #if 0
   //
   // This 'almost always outdeffed' piece of code is used whenever a change is done to the
@@ -1801,12 +1862,6 @@ int main(int argC, char* argV[])
     ipVersion = IPV6;
   }
 
-
-  //
-  //  Where everything begins
-  //
-
-  pidFile();
   SemOpType policy = policyGet(reqMutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
   mongoInit(dbHost, rplSet, dbName, user, pwd, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
