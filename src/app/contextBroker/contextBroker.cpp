@@ -1405,6 +1405,7 @@ void sigHandler(int sigNo)
   {
   case SIGINT:
   case SIGTERM:
+  case SIGHUP:
     LM_I(("Orion context broker exiting due to receiving a signal"));
     exit(0);
     break;
@@ -1702,6 +1703,7 @@ int main(int argC, char* argV[])
 
   signal(SIGINT,  sigHandler);
   signal(SIGTERM, sigHandler);
+  signal(SIGHUP,  sigHandler);
 
   atexit(exitFunc);
 

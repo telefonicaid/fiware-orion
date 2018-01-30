@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #
 # contextBroker         Start/Stop the Context Broker
 #
@@ -11,7 +12,7 @@
 # Default-Start:  345
 # Default-Stop: 90
 # Short-Description: run contextBroker
-# Description: The Origion Context Broker is an implementation of the NGSI9 and NGSI10 interfaces. 
+# Description: The Orion Context Broker is an implementation of the NGSI9 and NGSI10 interfaces.
 # Using these interfaces, clients can do several operations:
 # * Register context producer applications, e.g. a temperature sensor within a room.
 # * Update context information, e.g. send updates of temperature.
@@ -42,6 +43,7 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
+[[ $(id -u) -ne 0 ]] && echo "User root must execute this script" && exit 1
 
 . /etc/rc.d/init.d/functions
 
@@ -69,6 +71,7 @@ fi
 # Mandatory parameters
 BROKER_OPTS="-port ${BROKER_PORT} \
    -logDir ${BROKER_LOG_DIR} \
+   -logLevel ${BROKER_LOG_LEVEL} \
    -pidpath ${BROKER_PID_FILE} \
    -dbhost ${BROKER_DATABASE_HOST} \
    -db ${BROKER_DATABASE_NAME} \
@@ -94,11 +97,11 @@ broker_start()
         # logs are always managed by CB and written to file inside directory BROKER_LOG_DIR (see /etc/sysconfig/contextBroker) and rotated by logrotate
         BROKER_STDERR_LOG=${BROKER_LOG_DIR}/${NAME}-error.log
         su $BROKER_USER -c "${EXECUTABLE} ${BROKER_OPTS} 1>/dev/null 2>${BROKER_STDERR_LOG}"
-        sleep 2 # wait some time to let the contextbroker start
-        PID=$(cat ${BROKER_PID_FILE} 2> /dev/null)
+        sleep 2 # wait some time to let contextbroker start
+        PID=$(cat ${BROKER_PID_FILE})
         if [[ -z "${PID}" ]]; then
             printf "%s" "pidfile not found"
-            printf "%s\n" "$(failure)" 
+            printf "%s\n" "$(failure)"
             exit 1
         else
             printf "%s\n" "$(success)"
@@ -107,14 +110,58 @@ broker_start()
         printf "%s\n" "Fail - missing ${EXECUTABLE} executable"
         exit 1
     fi
-   
+
+}
+
+rotate_cores ()
+{
+    cd /var/cb_cores
+    STR_DATE=$(date +"%Y%m%d_%H%M%S")
+    if [[ $(ls core* 2>/dev/null | wc -l) -gt 0 ]]; then 
+        cp ${BROKER_LOG_DIR}/contextBroker.log . 
+        tar jcf CB_core_${STR_DATE}.tar.bz2 core* contextBroker.log
+        rm -f core* contextBroker.log
+    fi
+
+    TOTAL=$(ls CB_core_* 2>/dev/null | wc -l)
+    KEEP_CORE=8
+    if [[ ${TOTAL} -gt ${KEEP_CORE} ]]; then
+        rm -f $(ls -tr 2>/dev/null |  head -$((${TOTAL} - ${KEEP_CORE})))
+    fi
+
+}
+
+broker_coredump_start()
+{
+    printf "%-50s" "Starting ${NAME}..."
+    if [[ -x ${EXECUTABLE} ]]; then
+        mkdir -p /var/cb_cores &> /dev/null
+        cd /var/cb_cores
+        rotate_cores &
+        ulimit -c unlimited
+        ulimit -n 10240
+        ${EXECUTABLE} ${BROKER_OPTS} -fg &> /dev/null &
+        sleep 2 # wait some time to let the contextbroker start        
+        PID=$(cat ${BROKER_PID_FILE})
+        if [[ -z "${PID}" ]]; then
+            printf "%s" "pidfile not found"
+            printf "%s\n" "$(failure)"
+            exit 1
+        else
+            printf "%s\n" "$(success)"
+        fi
+    else
+        printf "%s\n" "Fail - missing ${EXECUTABLE} executable"
+        exit 1
+    fi
+
 }
 
 broker_stop()
 {
     printf "%-50s" "Stopping $NAME..."
     if [ -f "${BROKER_PID_FILE}" ]; then
-        kill -HUP $(cat ${BROKER_PID_FILE})
+        kill $(cat ${BROKER_PID_FILE}) 2> /dev/null
         rm -f ${BROKER_PID_FILE}
         printf "%s\n" "$(success)"
     else
@@ -131,9 +178,14 @@ broker_status()
 case ${PARAM} in
 
     'start')
-        echo "Starting..."
         status -p ${BROKER_PID_FILE} ${EXECUTABLE} && exit 0
-        broker_start
+        if [[ ! -z ${GENERATE_COREDUMP} && ${GENERATE_COREDUMP} == "true" ]]; then
+            echo "Starting with coredump generation..."
+            broker_coredump_start
+        else
+            echo "Starting..."
+            broker_start
+        fi
         ;;
 
     'stop')
@@ -144,7 +196,11 @@ case ${PARAM} in
 
     'restart')
         broker_stop
-        broker_start
+        if [[ ! -z ${GENERATE_COREDUMP} && ${GENERATE_COREDUMP} == "true" ]]; then
+            broker_coredump_start
+        else
+            broker_start
+        fi
         ;;
 
     'status')
@@ -152,4 +208,3 @@ case ${PARAM} in
         ;;
 
 esac
-
