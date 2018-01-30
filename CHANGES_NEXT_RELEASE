@@ -5,3 +5,4 @@
 - Reference distribution changes from RHEL/CentOS 6 to RHEL/CentOS 7
 - Fix: Invalid description in POST /op/query error response (#2991)
 - Fix: Bug that may cause contextBroker to crash when passing inappropriate parameter in query context payload (#3055)
+- Fix: Correct treatment of PID-file (#3075)
