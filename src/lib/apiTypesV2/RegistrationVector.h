@@ -23,7 +23,7 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Fermín Galán Márquez
+* Author: Ken Zangelin
 */
 #include <string>
 #include <vector>

@@ -36,6 +36,7 @@ brokerStart CB
 # 04. GET all three registrations, without service path
 # 05. GET all three registrations using service path /a1/#
 # 06. GET one registration using service path /a1/e2
+# 07. GET no registrations using service path /a2/#
 #
 
 echo "01. Register entity E1/A1"
@@ -137,7 +138,7 @@ echo
 echo
 
 
-echo "06. GET no registrations using service path /a2/#"
+echo "07. GET no registrations using service path /a2/#"
 echo "================================================="
 orionCurl --url /v2/registrations --servicePath "/a2/#"
 echo
@@ -372,7 +373,7 @@ Date: REGEX(.*)
 ]
 
 
-06. GET no registrations using service path /a2/#
+07. GET no registrations using service path /a2/#
 =================================================
 HTTP/1.1 200 OK
 Content-Length: 2
