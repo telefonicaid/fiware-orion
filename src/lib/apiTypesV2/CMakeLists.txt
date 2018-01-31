@@ -27,6 +27,7 @@ SET (SOURCES
     Attribute.cpp
     Subscription.cpp
     Registration.cpp
+    RegistrationVector.cpp
     EntID.cpp
     BatchQuery.cpp
     BatchUpdate.cpp
@@ -41,6 +42,7 @@ SET (HEADERS
     Attribute.h
     Subscription.h
     Registration.h
+    RegistrationVector.h
     EntID.h
     BatchQuery.h
     BatchUpdate.h
