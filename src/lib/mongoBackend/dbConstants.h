@@ -61,6 +61,7 @@
 #define REG_FORMAT                   "format"
 #define REG_DESCRIPTION              "description"
 #define REG_STATUS                   "status"
+#define REG_FORWARDING_INFORMATION   "forwardingInformation"
 
 #define ENT_ATTRS                    "attrs"
 #define ENT_ATTRNAMES                "attrNames"

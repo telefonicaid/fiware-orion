@@ -40,197 +40,8 @@
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/MongoCommonRegister.h"
 #include "mongoBackend/mongoRegistrationGet.h"
-
-
-
-/* ****************************************************************************
-*
-* setRegistrationId -
-*/
-static void setRegistrationId(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  regP->id = getFieldF(r, "_id").OID().toString();
-}
-
-
-
-/* ****************************************************************************
-*
-* setDescription -
-*/
-static void setDescription(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  if (r.hasField(REG_DESCRIPTION))
-  {
-    regP->description         = getStringFieldF(r, REG_DESCRIPTION);
-    regP->descriptionProvided = true;
-  }
-  else
-  {
-    regP->description         = "";
-    regP->descriptionProvided = false;
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setProvider -
-*/
-static void setProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  regP->provider.http.url = (r.hasField(REG_PROVIDING_APPLICATION))? getStringFieldF(r, REG_PROVIDING_APPLICATION): "";
-
-  // FIXME P4: by the moment supportedForwardingMode and legacyForwardingMode are hardwired (i.e. DB is not taken
-  // into account for them)
-  regP->provider.supportedForwardingMode = ngsiv2::ForwardAll;
-  regP->provider.legacyForwardingMode = true;
-}
-
-
-
-/* ****************************************************************************
-*
-* setEntities - 
-*/
-static void setEntities(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
-{
-  std::vector<mongo::BSONElement>  dbEntityV = getFieldF(cr0, REG_ENTITIES).Array();
-
-  for (unsigned int ix = 0; ix < dbEntityV.size(); ++ix)
-  {
-    ngsiv2::EntID    entity;
-    mongo::BSONObj   ce = dbEntityV[ix].embeddedObject();
-
-    if (ce.hasField(REG_ENTITY_ISPATTERN))
-    {
-      std::string isPattern = getStringFieldF(ce, REG_ENTITY_ISPATTERN);
-
-      if (isPattern == "true")
-      {
-        entity.idPattern = getStringFieldF(ce, REG_ENTITY_ID);
-      }
-      else
-      {
-        entity.id = getStringFieldF(ce, REG_ENTITY_ID);
-      }
-    }
-    else
-    {
-      entity.id = getStringFieldF(ce, REG_ENTITY_ID);
-    }
-    
-    if (ce.hasField(REG_ENTITY_ISTYPEPATTERN))
-    {
-      std::string isPattern = getStringFieldF(ce, REG_ENTITY_ISTYPEPATTERN);
-
-      if (isPattern == "true")
-      {
-        entity.typePattern = getStringFieldF(ce, REG_ENTITY_TYPE);
-      }
-      else
-      {
-        entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
-      }
-    }
-    else
-    {
-      entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
-    }
-
-    regP->dataProvided.entities.push_back(entity);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setAttributes - 
-*/
-static void setAttributes(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
-{
-  std::vector<mongo::BSONElement> dbAttributeV = getFieldF(cr0, REG_ATTRS).Array();
-
-  for (unsigned int ix = 0; ix < dbAttributeV.size(); ++ix)
-  {
-    mongo::BSONObj  aobj     = dbAttributeV[ix].embeddedObject();
-    std::string     attrName = getStringFieldF(aobj, REG_ATTRS_NAME);
-
-    if (attrName != "")
-    {
-      regP->dataProvided.attributes.push_back(attrName);
-    }
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setDataProvided -
-*
-* Make sure there is only ONE "contextRegistration" in the vector
-* If we have more than one, then the Registration is made in API V1 as this is not
-* possible in V2 and we cannot respond to the request using the current implementation of V2.
-* This function will be changed to work in a different way once issue #3044 is dealt with.
-*
-*/
-static bool setDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r, bool arrayAllowed)
-{
-  std::vector<mongo::BSONElement> crV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
-
-  if (crV.size() > 1)
-  {
-    return false;
-  }
-
-  //
-  // Extract the first (and only) CR from the contextRegistration vector
-  //
-  mongo::BSONObj cr0 = crV[0].embeddedObject();
-
-  setEntities(regP, cr0);
-  setAttributes(regP, cr0);
-  setProvider(regP, cr0);
-
-  return true;
-}
-
-
-
-/* ****************************************************************************
-*
-* setExpires -
-*/
-static void setExpires(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  regP->expires = (r.hasField(REG_EXPIRATION))? getIntFieldF(r, REG_EXPIRATION) : -1;
-}
-
-
-
-/* ****************************************************************************
-*
-* setStatus -
-*/
-static void setStatus(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  regP->status = (r.hasField(REG_STATUS))? getStringFieldF(r, REG_STATUS): "";
-}
-
-
-
-/* ****************************************************************************
-*
-* setForwardingInformation -
-*/
-static void setForwardingInformation(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  // No forwarding info until API V2 forwarding is implemented
-}
 
 
 
@@ -297,10 +108,10 @@ void mongoRegistrationGet
     //
     // Fill in the Registration with data retrieved from the data base
     //
-    setRegistrationId(regP, r);
-    setDescription(regP, r);
+    mongoRegistrationIdExtract(regP, r);
+    mongoDescriptionExtract(regP, r, REG_DESCRIPTION);
 
-    if (setDataProvided(regP, r, false) == false)
+    if (mongoDataProvidedExtract(regP, r, false, REG_CONTEXT_REGISTRATION) == false)
     {
       releaseMongoConnection(connection);
       LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
@@ -309,9 +120,9 @@ void mongoRegistrationGet
       return;
     }
 
-    setExpires(regP, r);
-    setStatus(regP, r);
-    setForwardingInformation(regP, r);
+    mongoExpiresExtract(regP, r, REG_EXPIRATION);
+    mongoStatusExtract(regP, r, REG_STATUS);
+    mongoForwardingInformationExtract(regP, r, REG_FORWARDING_INFORMATION);
     
     if (moreSafe(cursor))  // Can only be one ...
     {

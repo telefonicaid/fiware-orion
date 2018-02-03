@@ -33,10 +33,10 @@
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Registration.h"
-#include "apiTypesV2/RegistrationVector.h"
 #include "mongoBackend/mongoRegistrationsGet.h"
-#include "serviceRoutinesV2/getRegistrations.h"
 #include "alarmMgr/alarmMgr.h"
+#include "common/JsonHelper.h"
+#include "serviceRoutinesV2/getRegistrations.h"
 
 
 
@@ -57,15 +57,21 @@ std::string getRegistrations
   ParseData*                 parseDataP
 )
 {
-  ngsiv2::RegistrationVector  registrationV;
-  OrionError                  oe;
+  std::vector<ngsiv2::Registration>  registrationV;
+  OrionError                         oe;
+  std::string                        out;
 
-  TIMED_MONGO(mongoRegistrationsGet(&registrationV.vec, ciP->tenant, ciP->servicePathV, &oe));
+  TIMED_MONGO(mongoRegistrationsGet(&registrationV, ciP->tenant, ciP->servicePathV, &oe));
 
   if (oe.code != SccOk)
   {
-    return oe.toJson();
+    TIMED_RENDER(out = oe.toJson());
+    ciP->httpStatusCode = oe.code;
+
+    return out;
   }
 
-  return registrationV.toJson();
+  TIMED_RENDER(out = vectorToJson(registrationV));
+
+  return out;
 }

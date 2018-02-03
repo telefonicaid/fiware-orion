@@ -40,196 +40,8 @@
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/MongoCommonRegister.h"
 #include "mongoBackend/mongoRegistrationsGet.h"
-
-
-
-/* ****************************************************************************
-*
-* setRegistrationId -
-*/
-static void setRegistrationId(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  regP->id = getFieldF(r, "_id").OID().toString();
-}
-
-
-
-/* ****************************************************************************
-*
-* setDescription -
-*/
-static void setDescription(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  if (r.hasField(REG_DESCRIPTION))
-  {
-    regP->description         = getStringFieldF(r, REG_DESCRIPTION);
-    regP->descriptionProvided = true;
-  }
-  else
-  {
-    regP->description         = "";
-    regP->descriptionProvided = false;
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setProvider -
-*/
-static void setProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  regP->provider.http.url = (r.hasField(REG_PROVIDING_APPLICATION))? getStringFieldF(r, REG_PROVIDING_APPLICATION): "";
-
-  // FIXME P4: for now, supportedForwardingMode and legacyForwardingMode are hardwired (i.e. DB content is not taken into account)
-  regP->provider.supportedForwardingMode = ngsiv2::ForwardAll;
-  regP->provider.legacyForwardingMode = true;
-}
-
-
-
-/* ****************************************************************************
-*
-* setEntities - 
-*/
-static void setEntities(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
-{
-  std::vector<mongo::BSONElement>  dbEntityV = getFieldF(cr0, REG_ENTITIES).Array();
-
-  for (unsigned int ix = 0; ix < dbEntityV.size(); ++ix)
-  {
-    ngsiv2::EntID    entity;
-    mongo::BSONObj   ce = dbEntityV[ix].embeddedObject();
-
-    if (ce.hasField(REG_ENTITY_ISPATTERN))
-    {
-      std::string isPattern = getStringFieldF(ce, REG_ENTITY_ISPATTERN);
-
-      if (isPattern == "true")
-      {
-        entity.idPattern = getStringFieldF(ce, REG_ENTITY_ID);
-      }
-      else
-      {
-        entity.id = getStringFieldF(ce, REG_ENTITY_ID);
-      }
-    }
-    else
-    {
-      entity.id = getStringFieldF(ce, REG_ENTITY_ID);
-    }
-    
-    if (ce.hasField(REG_ENTITY_ISTYPEPATTERN))
-    {
-      std::string isPattern = getStringFieldF(ce, REG_ENTITY_ISTYPEPATTERN);
-
-      if (isPattern == "true")
-      {
-        entity.typePattern = getStringFieldF(ce, REG_ENTITY_TYPE);
-      }
-      else
-      {
-        entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
-      }
-    }
-    else
-    {
-      entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
-    }
-
-    regP->dataProvided.entities.push_back(entity);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setAttributes - 
-*/
-static void setAttributes(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
-{
-  std::vector<mongo::BSONElement> dbAttributeV = getFieldF(cr0, REG_ATTRS).Array();
-
-  for (unsigned int ix = 0; ix < dbAttributeV.size(); ++ix)
-  {
-    mongo::BSONObj  aobj     = dbAttributeV[ix].embeddedObject();
-    std::string     attrName = getStringFieldF(aobj, REG_ATTRS_NAME);
-
-    if (attrName != "")
-    {
-      regP->dataProvided.attributes.push_back(attrName);
-    }
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setDataProvided -
-*
-* Make sure there is only ONE "contextRegistration" in the vector
-* If we have more than one, then the Registration is made in API V1 as this is not
-* possible in V2 and we cannot respond to the request using the current implementation of V2.
-* This function will be changed to work in a different way once issue #3044 is dealt with.
-*
-*/
-static bool setDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r, bool arrayAllowed)
-{
-  std::vector<mongo::BSONElement> crV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
-
-  if (crV.size() > 1)
-  {
-    return false;
-  }
-
-  //
-  // Extract the first (and only) CR from the contextRegistration vector
-  //
-  mongo::BSONObj cr0 = crV[0].embeddedObject();
-
-  setEntities(regP, cr0);
-  setAttributes(regP, cr0);
-  setProvider(regP, cr0);
-
-  return true;
-}
-
-
-
-/* ****************************************************************************
-*
-* setExpires -
-*/
-static void setExpires(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  regP->expires = (r.hasField(REG_EXPIRATION))? getIntFieldF(r, REG_EXPIRATION) : -1;
-}
-
-
-
-/* ****************************************************************************
-*
-* setStatus -
-*/
-static void setStatus(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  regP->status = (r.hasField(REG_STATUS))? getStringFieldF(r, REG_STATUS): "";
-}
-
-
-
-/* ****************************************************************************
-*
-* setForwardingInformation -
-*/
-static void setForwardingInformation(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  // No forwarding info until API V2 forwarding is implemented
-}
 
 
 
@@ -249,19 +61,27 @@ void mongoRegistrationsGet
   std::string  err;
   mongo::OID   oid;
   StatusCode   sc;
+  int          limit  = 5000;  // FIXME: Pagination: limit, offset and count are a preparation for it - see mongoGetSubscriptions()
+  int          offset = 0;
+  long long    count;
 
   reqSemTake(__FUNCTION__, "Mongo Get Registrations", SemReadOp, &reqSemTaken);
 
   LM_T(LmtMongo, ("Mongo Get Registrations"));
 
   std::auto_ptr<mongo::DBClientCursor>  cursor;
-  mongo::BSONObj                        q;
+  mongo::Query                          q;
 
-  q = BSON(REG_SERVICE_PATH << fillQueryServicePath(servicePathV));
+  if ((servicePathV.size() != 0) && (servicePathV[0] != "/#"))
+  {
+    q = BSON(REG_SERVICE_PATH << fillQueryServicePath(servicePathV));
+  }
+  
+  q.sort(BSON("_id" << 1));
 
   TIME_STAT_MONGO_READ_WAIT_START();
   mongo::DBClientBase* connection = getMongoConnection();
-  if (!collectionQuery(connection, getRegistrationsCollectionName(tenant), q, &cursor, &err))
+  if (!collectionRangedQuery(connection, getRegistrationsCollectionName(tenant), q, limit, offset, &cursor, &count, &err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -272,6 +92,7 @@ void mongoRegistrationsGet
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
+  int docs = 0;
   while (moreSafe(cursor))
   {
     mongo::BSONObj        r;
@@ -279,21 +100,20 @@ void mongoRegistrationsGet
 
     if (!nextSafeOrErrorF(cursor, &r, &err))
     {
-      releaseMongoConnection(connection);
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
-      reqSemGive(__FUNCTION__, "Mongo Get Registrations", reqSemTaken);
-      oeP->fill(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
-      return;
+      continue;
     }
-    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+
+    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
+    ++docs;
 
     //
     // Fill in the Registration with data retrieved from the data base
     //
-    setRegistrationId(&reg, r);
-    setDescription(&reg, r);
+    mongoRegistrationIdExtract(&reg, r);
+    mongoDescriptionExtract(&reg, r, REG_DESCRIPTION);
 
-    if (setDataProvided(&reg, r, false) == false)
+    if (mongoDataProvidedExtract(&reg, r, false, REG_CONTEXT_REGISTRATION) == false)
     {
       releaseMongoConnection(connection);
       LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
@@ -302,9 +122,9 @@ void mongoRegistrationsGet
       return;
     }
 
-    setExpires(&reg, r);
-    setStatus(&reg, r);
-    setForwardingInformation(&reg, r);
+    mongoExpiresExtract(&reg, r, REG_EXPIRATION);
+    mongoStatusExtract(&reg, r, REG_STATUS);
+    mongoForwardingInformationExtract(&reg, r, REG_FORWARDING_INFORMATION);
 
     // FIXME PR: What about the Service Path of the Registration ... ?
     regV->push_back(reg);

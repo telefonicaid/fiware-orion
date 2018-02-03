@@ -31,6 +31,7 @@
 
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
+#include "apiTypesV2/Registration.h"
 
 
 
@@ -48,5 +49,77 @@ extern HttpStatusCode processRegisterContext
   const std::string&        format,
   const std::string&        fiwareCorrelator
 );
+
+
+
+/* ****************************************************************************
+*
+* mongoRegistrationIdExtract -
+*/
+extern void mongoRegistrationIdExtract(ngsiv2::Registration* regP, const mongo::BSONObj& r);
+
+
+
+/* ****************************************************************************
+*
+* mongoDescriptionExtract -
+*/
+extern void mongoDescriptionExtract(ngsiv2::Registration* regP, const mongo::BSONObj& r, const char* dbLabel);
+
+
+
+/* ****************************************************************************
+*
+* mongoProviderExtract -
+*/
+extern void mongoProviderExtract(ngsiv2::Registration* regP, const mongo::BSONObj& r, const char* dbLabel);
+
+
+
+/* ****************************************************************************
+*
+* mongoEntitiesExtract -
+*/
+extern void mongoEntitiesExtract(ngsiv2::Registration* regP, const mongo::BSONObj& cr0, const char* dbLabel);
+
+
+
+/* ****************************************************************************
+*
+* mongoAttributesExtract -
+*/
+extern void setAttributes(ngsiv2::Registration* regP, const mongo::BSONObj& cr0, const char* dbLabel);
+
+
+
+/* ****************************************************************************
+*
+* mongoDataProvidedExtract -
+*/
+extern bool mongoDataProvidedExtract(ngsiv2::Registration* regP, const mongo::BSONObj& r, bool arrayAllowed, const char* dbLabel);
+
+
+
+/* ****************************************************************************
+*
+* mongoExpiresExtract -
+*/
+extern void mongoExpiresExtract(ngsiv2::Registration* regP, const mongo::BSONObj& r, const char* dbLabel);
+
+
+
+/* ****************************************************************************
+*
+* mongoStatusExtract -
+*/
+extern void mongoStatusExtract(ngsiv2::Registration* regP, const mongo::BSONObj& r, const char* dbLabel);
+
+
+
+/* ****************************************************************************
+*
+* mongoForwardingInformationExtract -
+*/
+extern void mongoForwardingInformationExtract(ngsiv2::Registration* regP, const mongo::BSONObj& r, const char* dbLabel);
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOCOMMONREGISTER_H_

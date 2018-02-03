@@ -450,3 +450,192 @@ HttpStatusCode processRegisterContext
 
   return SccOk;
 }
+
+
+/* ****************************************************************************
+*
+* mongoRegistrationIdExtract -
+*/
+void mongoRegistrationIdExtract(ngsiv2::Registration* regP, const mongo::BSONObj& r)
+{
+  regP->id = getFieldF(r, "_id").OID().toString();
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoDescriptionExtract -
+*/
+void mongoDescriptionExtract(ngsiv2::Registration* regP, const mongo::BSONObj& r, const char* dbLabel)
+{
+  if (r.hasField(dbLabel))
+  {
+    regP->description         = getStringFieldF(r, dbLabel);
+    regP->descriptionProvided = true;
+  }
+  else
+  {
+    regP->description         = "";
+    regP->descriptionProvided = false;
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoProviderExtract -
+*/
+void mongoProviderExtract(ngsiv2::Registration* regP, const mongo::BSONObj& r, const char* dbLabel)
+{
+  regP->provider.http.url = (r.hasField(dbLabel))? getStringFieldF(r, dbLabel): "";
+
+  //
+  // FIXME P4: for the moment supportedForwardingMode and legacyForwardingMode are hardwired (i.e. DB is not taken
+  // into account for them)
+  //
+  regP->provider.supportedForwardingMode = ngsiv2::ForwardAll;
+  regP->provider.legacyForwardingMode = true;
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoEntitiesExtract -
+*/
+void mongoEntitiesExtract(ngsiv2::Registration* regP, const mongo::BSONObj& cr0, const char* dbLabel)
+{
+  std::vector<mongo::BSONElement>  dbEntityV = getFieldF(cr0, dbLabel).Array();
+
+  for (unsigned int ix = 0; ix < dbEntityV.size(); ++ix)
+  {
+    ngsiv2::EntID    entity;
+    mongo::BSONObj   ce = dbEntityV[ix].embeddedObject();
+
+    if (ce.hasField(REG_ENTITY_ISPATTERN))
+    {
+      std::string isPattern = getStringFieldF(ce, REG_ENTITY_ISPATTERN);
+
+      if (isPattern == "true")
+      {
+        entity.idPattern = getStringFieldF(ce, REG_ENTITY_ID);
+      }
+      else
+      {
+        entity.id = getStringFieldF(ce, REG_ENTITY_ID);
+      }
+    }
+    else
+    {
+      entity.id = getStringFieldF(ce, REG_ENTITY_ID);
+    }
+
+    if (ce.hasField(REG_ENTITY_ISTYPEPATTERN))
+    {
+      std::string isPattern = getStringFieldF(ce, REG_ENTITY_ISTYPEPATTERN);
+
+      if (isPattern == "true")
+      {
+        entity.typePattern = getStringFieldF(ce, REG_ENTITY_TYPE);
+      }
+      else
+      {
+        entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
+      }
+    }
+    else
+    {
+      entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
+    }
+
+    regP->dataProvided.entities.push_back(entity);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoAttributesExtract -
+*/
+void mongoAttributesExtract(ngsiv2::Registration* regP, const mongo::BSONObj& cr0, const char* dbLabel)
+{
+  std::vector<mongo::BSONElement> dbAttributeV = getFieldF(cr0, dbLabel).Array();
+
+  for (unsigned int ix = 0; ix < dbAttributeV.size(); ++ix)
+  {
+    mongo::BSONObj  aobj     = dbAttributeV[ix].embeddedObject();
+    std::string     attrName = getStringFieldF(aobj, REG_ATTRS_NAME);
+
+    if (attrName != "")
+    {
+      regP->dataProvided.attributes.push_back(attrName);
+    }
+  }
+}
+
+
+/* ****************************************************************************
+*
+* mongoDataProvidedExtract -
+*
+* Make sure there is only ONE "contextRegistration" in the vector
+* If we have more than one, then the Registration is made in API V1 as this is not
+* possible in V2 and we cannot respond to the request using the current implementation of V2.
+* This function will be changed to work in a different way once issue #3044 is dealt with.
+*/
+bool mongoDataProvidedExtract(ngsiv2::Registration* regP, const mongo::BSONObj& r, bool arrayAllowed, const char* dbLabel)
+{
+  std::vector<mongo::BSONElement> crV = getFieldF(r, dbLabel).Array();
+
+  if (crV.size() > 1)
+  {
+    return false;
+  }
+
+  //
+  // Extract the first (and only) CR from the contextRegistration vector
+  //
+  mongo::BSONObj cr0 = crV[0].embeddedObject();
+
+  mongoEntitiesExtract(regP, cr0, REG_ENTITIES);
+  mongoAttributesExtract(regP, cr0, REG_ATTRS);
+  mongoProviderExtract(regP, cr0, REG_PROVIDING_APPLICATION);
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoExpiresExtract -
+*/
+void mongoExpiresExtract(ngsiv2::Registration* regP, const mongo::BSONObj& r, const char* dbLabel)
+{
+  regP->expires = (r.hasField(dbLabel))? getIntFieldF(r, dbLabel) : -1;
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoStatusExtract -
+*/
+void mongoStatusExtract(ngsiv2::Registration* regP, const mongo::BSONObj& r, const char* dbLabel)
+{
+  regP->status = (r.hasField(dbLabel))? getStringFieldF(r, dbLabel): "";
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoForwardingInformationExtract -
+*/
+void mongoForwardingInformationExtract(ngsiv2::Registration* regP, const mongo::BSONObj& r, const char* dbLabel)
+{
+  // No forwarding info until API V2 forwarding is implemented
+}
