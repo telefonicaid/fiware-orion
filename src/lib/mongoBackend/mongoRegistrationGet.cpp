@@ -254,7 +254,6 @@ void mongoRegistrationGet
   std::auto_ptr<mongo::DBClientCursor>  cursor;
   mongo::BSONObj                        q;
 
-  // FIXME P0: what about the service path ... ?   See issue #3051
   q = BSON("_id" << oid);
 
   TIME_STAT_MONGO_READ_WAIT_START();
@@ -355,9 +354,10 @@ void mongoRegistrationsGet
   std::auto_ptr<mongo::DBClientCursor>  cursor;
   mongo::Query                          q;
 
+  // FIXME P4: Return error if more than one service path in servicePathV ?
   if ((servicePathV.size() != 0) && (servicePathV[0] != "/#"))
   {
-    q = BSON(REG_SERVICE_PATH << fillQueryServicePath(servicePathV));
+    q = BSON(REG_SERVICE_PATH << servicePathV[0]);
   }
   
   q.sort(BSON("_id" << 1));
@@ -408,7 +408,6 @@ void mongoRegistrationsGet
     setExpires(&reg, r, REG_EXPIRATION);
     setStatus(&reg, r, REG_STATUS);
 
-    // FIXME PR: What about the Service Path of the Registration ... ?
     regV->push_back(reg);
   }
 
