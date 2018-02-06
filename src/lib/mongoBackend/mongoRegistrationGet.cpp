@@ -225,17 +225,6 @@ static void setStatus(ngsiv2::Registration* regP, const mongo::BSONObj& r, const
 
 /* ****************************************************************************
 *
-* setForwardingInformation -
-*/
-static void setForwardingInformation(ngsiv2::Registration* regP, const mongo::BSONObj& r, const char* dbLabel)
-{
-  // No forwarding info until API V2 forwarding is implemented
-}
-
-
-
-/* ****************************************************************************
-*
 * mongoRegistrationGet - 
 */
 void mongoRegistrationGet
@@ -311,7 +300,6 @@ void mongoRegistrationGet
 
     setExpires(regP, r, REG_EXPIRATION);
     setStatus(regP, r, REG_STATUS);
-    setForwardingInformation(regP, r, REG_FORWARDING_INFORMATION);
     
     if (moreSafe(cursor))  // Can only be one ...
     {
@@ -419,7 +407,6 @@ void mongoRegistrationsGet
 
     setExpires(&reg, r, REG_EXPIRATION);
     setStatus(&reg, r, REG_STATUS);
-    setForwardingInformation(&reg, r, REG_FORWARDING_INFORMATION);
 
     // FIXME PR: What about the Service Path of the Registration ... ?
     regV->push_back(reg);

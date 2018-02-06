@@ -822,9 +822,6 @@ static void fillQueryEntity(BSONArrayBuilder* baP, const EntityId* enP)
 * If the servicePath is empty, then we return all entities, no matter their servicePath. This
 * can be seen as a query on "/#" considering that entities without servicePath are implicitly
 * assigned to "/" service path.
-*
-* FIXME P2: to gain some tput, if the service path vector is empty (or containing a /#), then the
-*           service path should be completely omitted in the query.
 */
 BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
 {
