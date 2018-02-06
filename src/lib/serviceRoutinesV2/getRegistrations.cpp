@@ -33,7 +33,7 @@
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Registration.h"
-#include "mongoBackend/mongoRegistrationsGet.h"
+#include "mongoBackend/mongoRegistrationGet.h"  // FIXME P0: Two external functions in the same module ...
 #include "alarmMgr/alarmMgr.h"
 #include "common/JsonHelper.h"
 #include "serviceRoutinesV2/getRegistrations.h"

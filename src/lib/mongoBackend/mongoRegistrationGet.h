@@ -47,4 +47,18 @@ extern void mongoRegistrationGet
   OrionError*            oeP
 );
 
+
+
+/* ****************************************************************************
+*
+* mongoRegistrationsGet - 
+*/
+extern void mongoRegistrationsGet
+(
+  std::vector<ngsiv2::Registration>*  regV,
+  const std::string&                  tenant,
+  const std::vector<std::string>&     servicePathV,
+  OrionError*                         oeP
+);
+
 #endif  // SRC_LIB_MONGOBACKEND_MONGOREGISTRATIONGET_H_
