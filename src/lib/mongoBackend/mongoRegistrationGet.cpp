@@ -355,7 +355,7 @@ void mongoRegistrationsGet
   mongo::Query                          q;
 
   // FIXME P4: Return error if more than one service path in servicePathV ?
-  if ((servicePathV.size() != 0) && (servicePathV[0] != "/#"))
+  if ((servicePathV.size() != 0) && (servicePathV[0] != ""))
   {
     q = BSON(REG_SERVICE_PATH << servicePathV[0]);
   }

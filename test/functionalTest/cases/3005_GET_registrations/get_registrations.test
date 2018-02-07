@@ -30,17 +30,18 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Register entity E1/A1
-# 02. Register entity E2/A1
-# 03. Register entity E3/A1
-# 04. GET all three registrations, without service path
-# 05. GET all three registrations using service path /a1/#
-# 06. GET one registration using service path /a1/e2
-# 07. GET no registrations using service path /a2/#
+# 01. Register entity E1/A1, with service path /a1/e1
+# 02. Register entity E2/A1, with service path /a1/e2
+# 03. Register entity E3/A1, with service path /a1/e3
+# 04. Register entity E4/A1, with service path /#
+# 05. GET all four registrations, without service path
+# 06. GET no registration, with service path /a1/# ...
+# 07. GET one registration using service path /a1/e2
+# 08. GET no registration using service path /#
 #
 
-echo "01. Register entity E1/A1"
-echo "========================="
+echo "01. Register entity E1/A1, with service path /a1/e1"
+echo "==================================================="
 payload='{
    "description": "located in CP1",
    "dataProvided": {
@@ -65,8 +66,8 @@ echo
 echo
 
 
-echo "02. Register entity E2/A1"
-echo "========================="
+echo "02. Register entity E2/A1, with service path /a1/e2"
+echo "==================================================="
 payload='{
    "description": "located in CP1",
    "dataProvided": {
@@ -91,8 +92,8 @@ echo
 echo
 
 
-echo "03. Register entity E3/A1"
-echo "========================="
+echo "03. Register entity E3/A1, with service path /a1/e3"
+echo "==================================================="
 payload='{
    "description": "located in CP1",
    "dataProvided": {
@@ -117,37 +118,63 @@ echo
 echo
 
 
-echo "04. GET all three registration, without service path"
+echo "04. Register entity E4/A1, with service path /#"
+echo "==============================================="
+payload='{
+   "description": "located in CP1",
+   "dataProvided": {
+     "entities": [
+       {
+         "id": "E4",
+         "type": "T1"
+       }
+     ],
+     "attrs": [ "A1" ]
+   },
+   "provider": {
+     "http": {
+       "url": "http://localhost:'${CP1_PORT}'/v2"
+     },
+     "legacyForwarding": true
+   },
+   "status": "active"
+}'
+orionCurl --url /v2/registrations --payload "$payload" --servicePath /a1/e1
+echo
+echo
+
+
+echo "05. GET all four registration, without service path"
 echo "===================================================="
 orionCurl --url /v2/registrations
 echo
 echo
 
 
-echo "05. GET all three registrations using service path /a1/#"
-echo "========================================================"
+echo "06. GET no registration, with service path /a1/# ..."
+echo "===================================================="
 orionCurl --url /v2/registrations --servicePath "/a1/#"
 echo
 echo
 
 
-echo "06. GET one registration using service path /a1/e2"
+echo "07. GET one registration using service path /a1/e2"
 echo "=================================================="
 orionCurl --url /v2/registrations --servicePath /a1/e2
 echo
 echo
 
 
-echo "07. GET no registrations using service path /a2/#"
-echo "================================================="
-orionCurl --url /v2/registrations --servicePath "/a2/#"
+echo "08. GET no registration using service path /#"
+echo "============================================="
+orionCurl --url /v2/registrations --servicePath "/#"
 echo
 echo
 
 
 --REGEXPECT--
-01. Register entity E1/A1
-=========================
+01. Register entity E1/A1, with service path /a1/e1
+===================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/registrations/REGEX([0-9a-f\-]{24})
@@ -156,8 +183,8 @@ Date: REGEX(.*)
 
 
 
-02. Register entity E2/A1
-=========================
+02. Register entity E2/A1, with service path /a1/e2
+===================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/registrations/REGEX([0-9a-f\-]{24})
@@ -166,8 +193,8 @@ Date: REGEX(.*)
 
 
 
-03. Register entity E3/A1
-=========================
+03. Register entity E3/A1, with service path /a1/e3
+===================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/registrations/REGEX([0-9a-f\-]{24})
@@ -176,10 +203,20 @@ Date: REGEX(.*)
 
 
 
-04. GET all three registration, without service path
+04. Register entity E4/A1, with service path /#
+===============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. GET all four registration, without service path
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 793
+Content-Length: 1057
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -253,92 +290,45 @@ Date: REGEX(.*)
             "supportedForwardingMode": "all"
         },
         "status": "active"
+    },
+    {
+        "dataProvided": {
+            "attrs": [
+                "A1"
+            ],
+            "entities": [
+                {
+                    "id": "E4",
+                    "type": "T1"
+                }
+            ]
+        },
+        "description": "located in CP1",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "provider": {
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/v2"
+            },
+            "legacyForwarding": true,
+            "supportedForwardingMode": "all"
+        },
+        "status": "active"
     }
 ]
 
 
-05. GET all three registrations using service path /a1/#
-========================================================
+06. GET no registration, with service path /a1/# ...
+====================================================
 HTTP/1.1 200 OK
-Content-Length: 793
+Content-Length: 2
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-[
-    {
-        "dataProvided": {
-            "attrs": [
-                "A1"
-            ],
-            "entities": [
-                {
-                    "id": "E1",
-                    "type": "T1"
-                }
-            ]
-        },
-        "description": "located in CP1",
-        "id": "REGEX([0-9a-f\-]{24})",
-        "provider": {
-            "http": {
-                "url": "http://localhost:REGEX(\d+)/v2"
-            },
-            "legacyForwarding": true,
-            "supportedForwardingMode": "all"
-        },
-        "status": "active"
-    },
-    {
-        "dataProvided": {
-            "attrs": [
-                "A1"
-            ],
-            "entities": [
-                {
-                    "id": "E2",
-                    "type": "T1"
-                }
-            ]
-        },
-        "description": "located in CP1",
-        "id": "REGEX([0-9a-f\-]{24})",
-        "provider": {
-            "http": {
-                "url": "http://localhost:REGEX(\d+)/v2"
-            },
-            "legacyForwarding": true,
-            "supportedForwardingMode": "all"
-        },
-        "status": "active"
-    },
-    {
-        "dataProvided": {
-            "attrs": [
-                "A1"
-            ],
-            "entities": [
-                {
-                    "id": "E3",
-                    "type": "T1"
-                }
-            ]
-        },
-        "description": "located in CP1",
-        "id": "REGEX([0-9a-f\-]{24})",
-        "provider": {
-            "http": {
-                "url": "http://localhost:REGEX(\d+)/v2"
-            },
-            "legacyForwarding": true,
-            "supportedForwardingMode": "all"
-        },
-        "status": "active"
-    }
-]
+[]
 
 
-06. GET one registration using service path /a1/e2
+07. GET one registration using service path /a1/e2
 ==================================================
 HTTP/1.1 200 OK
 Content-Length: 265
@@ -373,8 +363,8 @@ Date: REGEX(.*)
 ]
 
 
-07. GET no registrations using service path /a2/#
-=================================================
+08. GET no registration using service path /#
+=============================================
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
