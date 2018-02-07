@@ -188,18 +188,18 @@ below are the results obtained for the three configurations obtained by adding a
 
 
 
-![](scalingCBres.png "scalingCBres.png")
+![](ScalingCBres.png "ScalingCBres.png")
 
 ## Scalability Scenario 2
 
-![](sharding_MDB.png "sharding_MDB.png")
+![](Sharding_MDB.png "Sharding_MDB.png")
 
 below are the results obtained for the three configurations obtained by adding a Context Broker at a time. We can see that there is no increase in throughput, but only a slight improvement in response time.
 
 
 
 
-![](ShardingMDBres.png "sharding_MDB.png")
+![](ShardingMDBres.png "ShardingMDBres.png")
 
 # Latency ?
 
