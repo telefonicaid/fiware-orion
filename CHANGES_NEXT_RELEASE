@@ -1,5 +1,6 @@
+- Add: support for GET /v2/registrations (#3005)
 - Add: support for GET /v2/registrations/<registration-id> (#3008)
 - Add: support for POST /v2/registrations to create registrations in APIv2 (#3004)
 - Fix: Invalid description in POST /op/query error response (#2991)
-- Fix: Bug that may cause the contextBroker to crash when passing an inappropriate field in a query context payload (#3055)
-- Reference distribution changes from RHEL/CentOS 6 to RHEL/CentOS 7
+- Fix: Bug that caused the contextBroker to crash when passing an inappropriate field in a query context payload (#3055)
+- Reference distribution changed from RHEL/CentOS 6 to RHEL/CentOS 7

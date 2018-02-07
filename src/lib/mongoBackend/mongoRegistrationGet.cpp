@@ -83,8 +83,10 @@ static void setProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 {
   regP->provider.http.url = (r.hasField(REG_PROVIDING_APPLICATION))? getStringFieldF(r, REG_PROVIDING_APPLICATION): "";
 
-  // FIXME P4: by the moment supportedForwardingMode and legacyForwardingMode are hardwired (i.e. DB is not taken
+  //
+  // FIXME P4: for the moment supportedForwardingMode and legacyForwardingMode are hardwired (i.e. DB is not taken
   // into account for them)
+  //
   regP->provider.supportedForwardingMode = ngsiv2::ForwardAll;
   regP->provider.legacyForwardingMode = true;
 }
@@ -93,7 +95,7 @@ static void setProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 
 /* ****************************************************************************
 *
-* setEntities - 
+* setEntities -
 */
 static void setEntities(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
 {
@@ -121,7 +123,7 @@ static void setEntities(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
     {
       entity.id = getStringFieldF(ce, REG_ENTITY_ID);
     }
-    
+
     if (ce.hasField(REG_ENTITY_ISTYPEPATTERN))
     {
       std::string isPattern = getStringFieldF(ce, REG_ENTITY_ISTYPEPATTERN);
@@ -148,7 +150,7 @@ static void setEntities(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
 
 /* ****************************************************************************
 *
-* setAttributes - 
+* setAttributes -
 */
 static void setAttributes(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
 {
@@ -176,7 +178,6 @@ static void setAttributes(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
 * If we have more than one, then the Registration is made in API V1 as this is not
 * possible in V2 and we cannot respond to the request using the current implementation of V2.
 * This function will be changed to work in a different way once issue #3044 is dealt with.
-*
 */
 static bool setDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r, bool arrayAllowed)
 {
@@ -225,17 +226,6 @@ static void setStatus(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 
 /* ****************************************************************************
 *
-* setForwardingInformation -
-*/
-static void setForwardingInformation(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  // No forwarding info until API V2 forwarding is implemented
-}
-
-
-
-/* ****************************************************************************
-*
 * mongoRegistrationGet - 
 */
 void mongoRegistrationGet
@@ -265,7 +255,6 @@ void mongoRegistrationGet
   std::auto_ptr<mongo::DBClientCursor>  cursor;
   mongo::BSONObj                        q;
 
-  // FIXME P0: what about the service path ... ?   See issue #3051
   q = BSON("_id" << oid);
 
   TIME_STAT_MONGO_READ_WAIT_START();
@@ -311,7 +300,6 @@ void mongoRegistrationGet
 
     setExpires(regP, r);
     setStatus(regP, r);
-    setForwardingInformation(regP, r);
     
     if (moreSafe(cursor))  // Can only be one ...
     {
@@ -334,6 +322,99 @@ void mongoRegistrationGet
 
   releaseMongoConnection(connection);
   reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
+
+  oeP->fill(SccOk, "");
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoRegistrationsGet - 
+*/
+void mongoRegistrationsGet
+(
+  std::vector<ngsiv2::Registration>*  regV,
+  const std::string&                  tenant,
+  const std::vector<std::string>&     servicePathV,
+  OrionError*                         oeP
+)
+{
+  bool         reqSemTaken = false;
+  std::string  err;
+  mongo::OID   oid;
+  StatusCode   sc;
+  int          limit  = 5000;  // FIXME: Pagination: limit, offset and count are a preparation for it - see mongoGetSubscriptions()
+  int          offset = 0;
+  long long    count;
+  std::string  servicePath = (servicePathV.size() == 0)? "/#" : servicePathV[0];  // FIXME P4: see #3100
+
+  reqSemTake(__FUNCTION__, "Mongo Get Registrations", SemReadOp, &reqSemTaken);
+
+  LM_T(LmtMongo, ("Mongo Get Registrations"));
+
+  std::auto_ptr<mongo::DBClientCursor>  cursor;
+  mongo::Query                          q;
+
+  // FIXME P6: This here is a bug ... See #3099 for more info
+  if (!servicePath.empty() && (servicePath != "/#"))
+  {
+    q = BSON(REG_SERVICE_PATH << servicePathV[0]);
+  }
+  
+  q.sort(BSON("_id" << 1));
+
+  TIME_STAT_MONGO_READ_WAIT_START();
+  mongo::DBClientBase* connection = getMongoConnection();
+  if (!collectionRangedQuery(connection, getRegistrationsCollectionName(tenant), q, limit, offset, &cursor, &count, &err))
+  {
+    releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+    reqSemGive(__FUNCTION__, "Mongo Get Registrations", reqSemTaken);
+    oeP->fill(SccReceiverInternalError, err);
+    return;
+  }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
+
+  /* Process query result */
+  int docs = 0;
+  while (moreSafe(cursor))
+  {
+    mongo::BSONObj        r;
+    ngsiv2::Registration  reg;
+
+    if (!nextSafeOrErrorF(cursor, &r, &err))
+    {
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
+      continue;
+    }
+
+    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
+    ++docs;
+
+    //
+    // Fill in the Registration with data retrieved from the data base
+    //
+    setRegistrationId(&reg, r);
+    setDescription(&reg, r);
+
+    if (setDataProvided(&reg, r, false) == false)
+    {
+      releaseMongoConnection(connection);
+      LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
+      reqSemGive(__FUNCTION__, "Mongo Get Registrations", reqSemTaken);
+      oeP->fill(SccReceiverInternalError, err);
+      return;
+    }
+
+    setExpires(&reg, r);
+    setStatus(&reg, r);
+
+    regV->push_back(reg);
+  }
+
+  releaseMongoConnection(connection);
+  reqSemGive(__FUNCTION__, "Mongo Get Registrations", reqSemTaken);
 
   oeP->fill(SccOk, "");
 }

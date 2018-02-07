@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_MONGOBACKEND_MONGOREGISTRATIONGET_H_
-#define SRC_LIB_MONGOBACKEND_MONGOREGISTRATIONGET_H_
+#ifndef SRC_LIB_SERVICEROUTINESV2_GETREGISTRATIONS_H_
+#define SRC_LIB_SERVICEROUTINESV2_GETREGISTRATIONS_H_
 
 /*
 *
-* Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -28,37 +28,22 @@
 #include <string>
 #include <vector>
 
-#include "rest/HttpStatusCode.h"
-#include "rest/OrionError.h"
-#include "apiTypesV2/Registration.h"
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* mongoRegistrationGet - 
+* getRegistrations - 
 */
-extern void mongoRegistrationGet
+extern std::string getRegistrations
 (
-  ngsiv2::Registration*  regP,
-  const std::string&     regId,
-  const std::string&     tenant,
-  const std::string&     servicePathV,
-  OrionError*            oeP
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
 );
 
+#endif  // SRC_LIB_SERVICEROUTINESV2_GETREGISTRATIONS_H_
 
-
-/* ****************************************************************************
-*
-* mongoRegistrationsGet - 
-*/
-extern void mongoRegistrationsGet
-(
-  std::vector<ngsiv2::Registration>*  regV,
-  const std::string&                  tenant,
-  const std::vector<std::string>&     servicePathV,
-  OrionError*                         oeP
-);
-
-#endif  // SRC_LIB_MONGOBACKEND_MONGOREGISTRATIONGET_H_

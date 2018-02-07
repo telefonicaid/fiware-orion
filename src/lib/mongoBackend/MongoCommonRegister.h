@@ -31,6 +31,7 @@
 
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
+#include "apiTypesV2/Registration.h"
 
 
 
