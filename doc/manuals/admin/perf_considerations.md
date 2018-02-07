@@ -181,7 +181,7 @@ In order to measure the scalability of Context Broker three types of scenarios h
 
 In this scenario, a single MongoDB node has been used, increasing the CB number of nodes gradually. Each node is in a separate virtual machine. It also has an Apache Balancer on a separate node. The following diagram shows the sample tested infrastructure.
 
-![scalingcb1](Scaling_CB.png "Scaling_CB.png")
+![scalingcb1](Scaling_CB.png "Scaling_CB.PNG")
 
 below are the results obtained for the three configurations obtained by adding a Context Broker at a time. We can see that there is no increase in throughput, but only a slight improvement in response time.
 
