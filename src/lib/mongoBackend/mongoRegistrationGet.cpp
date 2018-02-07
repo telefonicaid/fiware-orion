@@ -347,6 +347,7 @@ void mongoRegistrationsGet
   int          limit  = 5000;  // FIXME: Pagination: limit, offset and count are a preparation for it - see mongoGetSubscriptions()
   int          offset = 0;
   long long    count;
+  std::string  servicePath = (servicePathV.size() == 0)? "/#" : servicePathV[0];  // FIXME P4: see #3100
 
   reqSemTake(__FUNCTION__, "Mongo Get Registrations", SemReadOp, &reqSemTaken);
 
@@ -355,8 +356,8 @@ void mongoRegistrationsGet
   std::auto_ptr<mongo::DBClientCursor>  cursor;
   mongo::Query                          q;
 
-  // FIXME P4: Return error if more than one service path in servicePathV ?
-  if ((servicePathV.size() != 0) && (servicePathV[0] != ""))
+  // FIXME P6: This here is a bug ... See #3099 for more info
+  if (!servicePath.empty() && (servicePath != "/#"))
   {
     q = BSON(REG_SERVICE_PATH << servicePathV[0]);
   }
