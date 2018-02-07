@@ -39,6 +39,10 @@ brokerStart CB
 # 07. GET one registration using service path /a1/e2
 # 08. GET all four registrations (step 04) for service path /#
 #
+# FIXME P6: The test case 08 doesn't really do what one would expect ...
+#           Logically, only the registration of entity E4/A1, with service path /# should be returned.
+#           This we consider a bug, and it is described in issue #3099
+#
 
 echo "01. Register entity E1/A1, with service path /a1/e1"
 echo "==================================================="
