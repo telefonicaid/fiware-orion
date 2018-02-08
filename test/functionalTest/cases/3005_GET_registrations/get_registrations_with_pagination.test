@@ -34,7 +34,7 @@ brokerStart CB
 # 02. Register entity E2/A1
 # 03. Register entity E3/A1
 # 04. Register entity E4/A1
-# 05. GET all four registrations, as the default result
+# 05. GET all four registrations, as the default result (with 'count' parameter)
 # 06. GET the first two registrations (offset: default=0, limit 2)
 # 07. GET second and third registrations (offset: 1, limit 2)
 # 08. GET only the fourth registration (offset: 3, limit: default=20)
@@ -145,9 +145,9 @@ echo
 echo
 
 
-echo "05. GET all four registrations, as the default result"
-echo "====================================================="
-orionCurl --url /v2/registrations
+echo "05. GET all four registrations, as the default result (with 'count' parameter)"
+echo "=============================================================================="
+orionCurl --url "/v2/registrations?options=count"
 echo
 echo
 
@@ -221,11 +221,12 @@ Date: REGEX(.*)
 
 
 
-05. GET all four registrations, as the default result
-=====================================================
+05. GET all four registrations, as the default result (with 'count' parameter)
+==============================================================================
 HTTP/1.1 200 OK
 Content-Length: 1057
 Content-Type: application/json
+Fiware-Total-Count: 4
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
