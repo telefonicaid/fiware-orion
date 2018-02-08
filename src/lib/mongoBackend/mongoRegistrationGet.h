@@ -58,6 +58,9 @@ extern void mongoRegistrationsGet
   std::vector<ngsiv2::Registration>*  regV,
   const std::string&                  tenant,
   const std::vector<std::string>&     servicePathV,
+  int                                 offset,
+  int                                 limit,
+  long long*                          countP,
   OrionError*                         oeP
 );
 

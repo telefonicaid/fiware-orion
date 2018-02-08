@@ -337,6 +337,9 @@ void mongoRegistrationsGet
   std::vector<ngsiv2::Registration>*  regV,
   const std::string&                  tenant,
   const std::vector<std::string>&     servicePathV,
+  int                                 offset,
+  int                                 limit,
+  long long*                          countP,
   OrionError*                         oeP
 )
 {
@@ -344,9 +347,6 @@ void mongoRegistrationsGet
   std::string  err;
   mongo::OID   oid;
   StatusCode   sc;
-  int          limit  = 5000;  // FIXME: Pagination: limit, offset and count are a preparation for it - see mongoGetSubscriptions()
-  int          offset = 0;
-  long long    count;
   std::string  servicePath = (servicePathV.size() == 0)? "/#" : servicePathV[0];  // FIXME P4: see #3100
 
   reqSemTake(__FUNCTION__, "Mongo Get Registrations", SemReadOp, &reqSemTaken);
@@ -366,7 +366,7 @@ void mongoRegistrationsGet
 
   TIME_STAT_MONGO_READ_WAIT_START();
   mongo::DBClientBase* connection = getMongoConnection();
-  if (!collectionRangedQuery(connection, getRegistrationsCollectionName(tenant), q, limit, offset, &cursor, &count, &err))
+  if (!collectionRangedQuery(connection, getRegistrationsCollectionName(tenant), q, limit, offset, &cursor, countP, &err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();

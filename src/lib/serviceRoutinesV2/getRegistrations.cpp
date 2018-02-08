@@ -28,14 +28,14 @@
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/string.h"
-
+#include "common/JsonHelper.h"
+#include "apiTypesV2/Registration.h"
+#include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
-#include "ngsi/ParseData.h"
-#include "apiTypesV2/Registration.h"
+#include "rest/uriParamNames.h"
 #include "mongoBackend/mongoRegistrationGet.h"  // FIXME P0: Two external functions in the same module ...
 #include "alarmMgr/alarmMgr.h"
-#include "common/JsonHelper.h"
 #include "serviceRoutinesV2/getRegistrations.h"
 
 
@@ -48,6 +48,12 @@
 *
 * Payload In:  None
 * Payload Out: Vector of ngsiv2::Registration in JSON textual format
+*
+* URI parameters:
+*   - limit=NUMBER
+*   - offset=NUMBER
+*   - count=true/false
+* 
 */
 std::string getRegistrations
 (
@@ -60,8 +66,11 @@ std::string getRegistrations
   std::vector<ngsiv2::Registration>  registrationV;
   OrionError                         oe;
   std::string                        out;
+  int                                offset = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
+  int                                limit  = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
+  long long                          count  = 0;
 
-  TIMED_MONGO(mongoRegistrationsGet(&registrationV, ciP->tenant, ciP->servicePathV, &oe));
+  TIMED_MONGO(mongoRegistrationsGet(&registrationV, ciP->tenant, ciP->servicePathV, offset, limit, &count, &oe));
 
   if (oe.code != SccOk)
   {
@@ -69,6 +78,12 @@ std::string getRegistrations
     ciP->httpStatusCode = oe.code;
 
     return out;
+  }
+
+  if ((ciP->uriParamOptions["count"]))
+  {
+    ciP->httpHeader.push_back("Fiware-Total-Count");
+    ciP->httpHeaderValue.push_back(toString(count));
   }
 
   TIMED_RENDER(out = vectorToJson(registrationV));
