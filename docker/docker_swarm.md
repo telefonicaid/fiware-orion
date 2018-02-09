@@ -15,7 +15,7 @@ To deploy on your linux based system a Docker Swarm test cluster, you can used
 
 The only pre-requisite are:
 * [Docker Machine](https://docs.docker.com/machine/install-machine/)
-* [Virtual Box](http://virtualbox.org/).
+* [Virtual Box](http://virtualbox.org/)
 
 ### Install miniswarm
 
@@ -64,7 +64,8 @@ Details on how to deploy a MongoDB ReplicaSet in Docker Swarm are available
 
       mongo:
         image: mongo:3.2
-        # the bind_ip option is requried from MONGO Version 3.6, alternatively you can use --bind_ip_all
+        # the bind_ip option is required from MONGO Version 3.6, alternatively you can use --bind_ip_all
+        # However, note that Orion doesn't work yet with MongoDB 3.6. Have a look to issue https://github.com/telefonicaid/fiware-orion/issues/3070
         entrypoint: [ "/usr/bin/mongod", "--replSet", "rs", "--journal", "--smallfiles", "--bind_ip", "0.0.0.0"]
         volumes:
           - mongodata:/data/db
@@ -150,7 +151,7 @@ Details on how to deploy a MongoDB ReplicaSet in Docker Swarm are available
     services:
 
       orion:
-        image: fiware/orion:1.7.0
+        image: fiware/orion:latest
         ports:
           - "1026:1026"
         command: -logLevel DEBUG -dbhost mongo_mongo -rplSet rs -dbTimeout 10000
