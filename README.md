@@ -151,6 +151,7 @@ Please have a look to the section [on building the source code](doc/manuals/admi
 
 * [Advanced Programming](doc/manuals/user/README.md)
 * [Installation and administration](doc/manuals/admin/README.md)
+  * [HA Architecture and Deployment](doc/manuals/admin/extra/ha.md)
 * Container-based deployment
   * [Docker](docker/README.md)
 * [Development Manual](doc/manuals/devel/README.md)
