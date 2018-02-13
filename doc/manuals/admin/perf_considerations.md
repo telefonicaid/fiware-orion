@@ -173,38 +173,40 @@ From no-Cache Optimized Stability Scenario, we can get:
 
 
 The scalability tests performed for the Orion Context Broker concerned the most important functionality: the attribute update.
-In order to measure the scalability of Context Broker three types of scenarios has been executed:
+In order to measure the scalability of Context Broker two types of scenarios has been executed:
 
-1.  [Scenario 1](#scalability-scenario-1)Context Broker nodes horizontal scaling; these tests were executed gradually increasing the number of CB nodes
+1.  [Context Broker nodes horizontal scaling](#context-broker-nodes-horizontal-scaling); these tests were executed gradually increasing the number of CB nodes
 
-2.  MongoDB shards horizontal scaling: these tests were executed gradually increasing the number of MongoDB shards
+2.  [MongoDB shards horizontal scaling](MongoDB-shards-horizontal-scaling); these tests were executed gradually increasing the number of MongoDB shards
 
-3.  Context Broker database connections configuration: these tests were executed gradually increasing the number of CB connections to the database
 
-## Scalability Scenario 1
+
+## Context Broker nodes horizontal scaling
 
 
 In this scenario, a single MongoDB node has been used, increasing the CB number of nodes gradually. Each node is in a separate virtual machine. It also has an Apache Balancer on a separate node. The following diagram shows the sample tested infrastructure.
 
 ![scalingcb1](Scaling_CB.PNG "Scaling_CB.PNG")
 
-below are the results obtained for the three configurations obtained by adding a Context Broker at a time. We can see that there is no increase in throughput, but only a slight improvement in response time.
+below you can see the results obtained for the three configurations obtained by adding a Context Broker at a time. We can see that there is no increase in throughput, but only a slight improvement in response time. 
 
 
 
 
 ![scalingcb2](ScalingCBres.png "ScalingCBres.png")
 
-## Scalability Scenario 2
+## MongoDB shards horizontal scaling
+
+In this scenario, a single Orion Context Broker node has been used, increasing the number of MongoDB shards (from 1 to 3). Each node is in a separate virtual machine.  The following diagram shows the sample tested infrastructure.
 
 ![shardingMDB1](Sharding_MDB.PNG "Sharding_MDB.png")
 
-below are the results obtained for the three configurations obtained by adding a Context Broker at a time. We can see that there is no increase in throughput, but only a slight improvement in response time.
-
-
+In the following table you can see the results obtained for the three configurations obtained by adding a MongoDB shard at a time. the results show clearly that the configuration witch achieve higher performance is 1CB_2SDB scenario. Is clear that adding the third MongoDB shard performance worsens.
 
 
 ![shardingMDB2](ShardingMDBres.PNG "ShardingMDBres.png")
+
+
 
 # Latency ?
 
