@@ -34,6 +34,9 @@ BROKER_PORT=1026
 # BROKER_LOG_DIR - Where to log to
 BROKER_LOG_DIR=/var/log/contextBroker
 
+# BROKER_LOG_LEVEL - Log File Level
+BROKER_LOG_LEVEL=WARN
+
 # BROKER_PID_FILE - Where to store the pid for orion-broker
 BROKER_PID_FILE=/var/run/contextBroker/contextBroker.pid
 
@@ -57,3 +60,19 @@ BROKER_DATABASE_NAME=orion
 # We need to start the CB with log append mode to not overwrite previous logs and logrotate work correctly
 BROKER_EXTRA_OPS="-multiservice -logAppend"
 
+#### ADVANCED CONFIGURATION AREA ####
+
+# The next environment variable generates, if it is defined as 'true', an archive in the 
+# path /var/cb_cores with the core file and the logs when the process crash (the directory is
+# automatically created if it doesn't previously exist). Use this parameter for debug purposes.
+# In addition, take into account the following:
+#   * BROKER_USER is ignored and contextBroker will be started by root user
+#   * It is assumed bzip2 tool installed in the system
+#   * Core generation requires CB to be launched with -fg and put in background at shell level
+#     (i.e. "with ending &"). Note this is different from regular CB launch (i.e. not using -fg).
+#     Check /etc/init.d/contextBroker for details
+#   * The file names have the next format: /var/cb_cores/CB_core_yyyymmdd_HHMMSS.tar.bz2, e.g. /var/cb_cores/CB_core_220180108_151502.tar.bz2
+#   * To avoid filling the disk only the last 8 cores and logs are maintained.
+#   * Have a look to the coredump_watcher.sh script (can be found at Orion repo at https://github.com/telefonicaid/fiware-orion/tree/master/scripts),
+#     which can be used to send an email whenever a new core file is generated
+GENERATE_COREDUMP=false
