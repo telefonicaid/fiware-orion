@@ -157,6 +157,20 @@ static void setStatus(const std::string& status, mongo::BSONObjBuilder* bobP)
 
 /* ****************************************************************************
 *
+* setFormat -
+*/
+static void setFormat(const std::string& format, mongo::BSONObjBuilder* bobP)
+{
+  if (format != "")
+  {
+    bobP->append(REG_FORMAT, format);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * mongoRegistrationCreate - 
 */
 void mongoRegistrationCreate
@@ -183,7 +197,7 @@ void mongoRegistrationCreate
   setServicePath(servicePath, &bob);
   setContextRegistrationVector(regP, &bob);
   setStatus(regP->status, &bob);
-  
+  setFormat("JSON", &bob);   // FIXME #3068: this would be unhardired when we implement NGSIv2-based forwarding
 
   //
   // Insert in DB  
