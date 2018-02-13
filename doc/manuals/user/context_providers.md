@@ -1,15 +1,29 @@
 # Context Providers registration and request forwarding
 
-The register context operation (both in
-[standard](walkthrough_apiv1.md#register-context-operation) and [convenience](walkthrough_apiv1.md#convenience-register-context) cases) uses a
-field named "providing application" which is a URL that identifies the
+The register context operation (both in NGSIv1 and NGSIv2) uses the
+concept of "context provider" which is a URL that identifies the
 source of the context information for the entities/attributes included
-in that registration. We call that source the "Context Provider" (or
-CPr, for short).
+in that registration.
 
-     ...
-     "providingApplication" : "http://mysensors.com/Rooms"
-     ...
+In the case of NGSIv2, this is provided by within `provider` field:
+
+```
+...
+"provider": {
+  "http": {
+    "url": "http://mysensors.com/Rooms"
+  }
+}
+...
+```
+
+In the case of NGSIv1, this is provided by the field `providingApplication`
+
+```
+...
+"providingApplication" : "http://mysensors.com/Rooms"
+...
+```
   
 If Orion receives a query or update operation (either in the standard or
 in the convenience family) and it cannot find the targeted context
@@ -33,29 +47,25 @@ Let's illustrate this with an example.
       its API on <http://sensor48.mycity.com/v1>
       
 ```
-(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \
-    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+curl localhost:1026/v2/registrations -s -S -H 'Content-Type: application/json' -H 'Accept: application/json' -d @-  <<EOF
 {
-    "contextRegistrations": [
-        {
-            "entities": [
-                {
-                    "type": "Street",
-                    "isPattern": "false",
-                    "id": "Street4"
-                }
-            ],
-            "attributes": [
-                {
-                    "name": "temperature",
-                    "type": "float",
-                    "isDomain": "false"
-                }
-            ],
-            "providingApplication": "http://sensor48.mycity.com/v1"
-        }
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "Strret4",
+        "type": "Street"
+      }
     ],
-    "duration": "P1M"
+    "attrs": [
+      "temperature"
+    ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://sensor48.mycity.com/v1"
+    },
+    "legacyForwarding": true
+  }
 }
 EOF
 ```
@@ -65,24 +75,10 @@ EOF
       (message number 2).
 
       
+```
+curl localhost:1026/v2/entities/Street4/attrs/temperature?type=Street -s -S \
+    -H 'Accept: application/json' -d @- | python -mjson.tool
 ``` 
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \
-    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
-    "entities": [
-        {
-            "type": "Street",
-            "isPattern": "false",
-            "id": "Street4"
-        }
-    ],
-    "attributes": [
-        "temperature"
-    ]
-}
-EOF
-``` 
-
 
 -     Orion doesn't know the Street 4 temperature, but it knows (due to
       the registration in the previous step) that the Context Provider at
@@ -90,8 +86,10 @@ EOF
       (message number 3) to the URL
       <http://sensor48.mycity.com/v1/queryContext> (i.e. the URL used in
       the Providing Application field at registration time, plus the
-      "/queryContext" operation).
-
+      "/queryContext" operation). Note the query is forwarded using
+      NGSIv1 format although the original request from client used NGSIv2
+      (this is due lack of support yet of NGSIv2 based forwarding, see
+      [this issue about it](https://github.com/telefonicaid/fiware-orion/issues/3068)).
 
 ``` 
 {
@@ -107,7 +105,6 @@ EOF
     ]
 }
 ``` 
-
 
 -     The Context Provider at <http://sensor48.mycity.com/v1> responds
       with the data (message number 4).
@@ -137,51 +134,14 @@ EOF
 }
 ``` 
 
--     Orion fordwars the response to the client (message number 5). Note
-      that the response is not exactly the same, as it includes a
-      reference to the Context Provider that has resolved it (that's why
-      it is said that "the process is *mostly* transparent" instead of
-      "the process is *completely* transparent"). The client can use
-      (or ignore) that information. Orion doesn't store the
-      Street4 temperature.
+-     Orion fordwars the response to the client (message number 5).
  
 ``` 
 {
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "temperature",
-                        "type": "float",
-                        "value": "16"
-                    }
-                ],
-                "id": "Street4",
-                "isPattern": "false",
-                "type": "Street"
-            },
-            "statusCode": {
-                "code": "200",
-                "details": "Redirected to context provider http://sensor48.mycity.com/v1",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
+   "value": 16,
+   "type": "Number
 }
-``` 
-  
-The Context Providers and request forwarding functionality was developed
-in release 0.15.0. Previous version
-of Orion Context Broker just stores this field in the database. Thus,
-applications can access the Providing Application using the [discover
-context availability operation](walkthrough_apiv1.md#discover-context-availability-operation) and do
-whatever they want with it. This is typically the case when the Orion
-Context Broker is used just as a repository for NGSI9 registrations, but
-the actual management of context information is done by other components
-of the architecture. Although current versions support Context Providers
-and request forwarding functionaly, nothing precludes you from using
-Orion also in that way.
+```
 
 Some additional comments:
 

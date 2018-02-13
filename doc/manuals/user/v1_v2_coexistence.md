@@ -15,6 +15,7 @@ This document explains some consideration to take into account regarding such co
 * [`orderBy` parameter](#orderby-parameter)
 * [NGSIv1 notification with NGSIv2 subscriptions](#ngsiv1-notification-with-ngsiv2-subscriptions)
 * [NGSIv2 query update forwarding to Context Providers](#ngsiv2-query-update-forwarding-to-context-providers)
+* [Getting registrations created with NGSIv1 using NGSIv2 operations](#getting-registrations-created-with-NGSIv1-using-NGSIv2-operations)
 
 ## Native JSON types
 
@@ -105,10 +106,10 @@ NGSIv1 legacy notifications receivers.
 
 ## NGSIv2 query update forwarding to Context Providers
 
-Context availability management functionality (i.e. operations to register Context Providers) is still to be
-implemented for NGSIv2. However, you can [register providers using NGSIv1 operations](context_providers.md)
-and have your NGSIv2-based updates and queries being forwarded to Context Providers, getting the response in NGSIv2.
-The forwarded message in the CB to CPr communication, and its response, is done using NGSIv1.
+You can [register providers using either NGSIv1 or NGSIv2 operations](context_providers.md) and have your NGSIv2-based updates and
+queries being forwarded to Context Providers, getting the response in NGSIv2. The forwarded message in the CB
+to CPr communication, and its response, is done using NGSIv1, although [an NGSIv2-based forwarding mechanism could
+be defined at some point](https://github.com/telefonicaid/fiware-orion/issues/3068).
 
 However, the following considerations have to be taken into account:
 
@@ -126,3 +127,22 @@ However, the following considerations have to be taken into account:
 
 [Top](#top)
 
+## Getting registrations created with NGSIv1 using NGSIv2 operations
+
+In general, there isn't any problem creating registrations using NGSIv1 (in particular, `POST /v1/registry/registerContext`) then retrieving them using NGSIv2 (in particular, either `GET /v2/registrations` or `GET /v2/registrations/<id>`).
+
+Note that NGSIv1 considers the concept of "context registration". A registration is composed of several context
+registrations, each one being composed of a set of entities and attribute. NGSIv2 proposes a much simpler approach,
+without context registration as intermediate element, i.e. a registrations is associated to a set of entities and
+attributes directly.
+
+In the case of retrieving a NGSIv1 created registration with more than one context registration with
+`GET /v2/registrations` or `GET /v2/registrations/<id>` only the first one is taken into account. In other words,
+the `dataProvided` element in the response to `GET /v2/registrations` or `GET /v2/registrations/<id>` is
+filled using the first context registration (the rest are ignored).
+
+This doesn't use to be a problem, as most NGSIv1 registrations use only one context registrations (there isn't any
+practical advantage of having more than one, from a functional point of view, e.g. forwarding). However, this is
+[pending on a more definitive solution](https://github.com/telefonicaid/fiware-orion/issues/3044).
+
+[Top](#top)
