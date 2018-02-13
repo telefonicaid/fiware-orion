@@ -41,10 +41,10 @@ Let's illustrate this with an example.
 ![](QueryContextWithContextProvider.png "QueryContextWithContextProvider.png")
 
 
--     First (message number 1), the application (maybe on behalf of a
-      Context Provider) registers the Context Provider at Orion for the
-      Street4 temperature. Let's assume that the Context Provider exposes
-      its API on <http://sensor48.mycity.com/v1>
+* First (message number 1), the application (maybe on behalf of a
+  Context Provider) registers the Context Provider at Orion for the
+  Street4 temperature. Let's assume that the Context Provider exposes
+  its API on <http://sensor48.mycity.com/v1>
       
 ```
 curl localhost:1026/v2/registrations -s -S -H 'Content-Type: application/json' -H 'Accept: application/json' -d @-  <<EOF
@@ -71,8 +71,8 @@ EOF
 ```
       
       
--     Next, consider that a client queries the Street4 temperature
-      (message number 2).
+* Next, consider that a client queries the Street4 temperature
+  (message number 2).
 
       
 ```
@@ -80,16 +80,16 @@ curl localhost:1026/v2/entities/Street4/attrs/temperature?type=Street -s -S \
     -H 'Accept: application/json' -d @- | python -mjson.tool
 ``` 
 
--     Orion doesn't know the Street 4 temperature, but it knows (due to
-      the registration in the previous step) that the Context Provider at
-      <http://sensor48.mycity.com/v1> knows that, so it forwards the query
-      (message number 3) to the URL
-      <http://sensor48.mycity.com/v1/queryContext> (i.e. the URL used in
-      the Providing Application field at registration time, plus the
-      "/queryContext" operation). Note the query is forwarded using
-      NGSIv1 format although the original request from client used NGSIv2
-      (this is due lack of support yet of NGSIv2 based forwarding, see
-      [this issue about it](https://github.com/telefonicaid/fiware-orion/issues/3068)).
+* Orion doesn't know the Street 4 temperature, but it knows (due to
+  the registration in the previous step) that the Context Provider at
+  <http://sensor48.mycity.com/v1> knows that, so it forwards the query
+  (message number 3) to the URL
+  <http://sensor48.mycity.com/v1/queryContext> (i.e. the URL used in
+  the Providing Application field at registration time, plus the
+  "/queryContext" operation). Note the query is forwarded using
+  NGSIv1 format although the original request from client used NGSIv2
+  (this is due lack of support yet of NGSIv2 based forwarding, see
+  [this issue about it](https://github.com/telefonicaid/fiware-orion/issues/3068)).
 
 ``` 
 {
@@ -106,8 +106,8 @@ curl localhost:1026/v2/entities/Street4/attrs/temperature?type=Street -s -S \
 }
 ``` 
 
--     The Context Provider at <http://sensor48.mycity.com/v1> responds
-      with the data (message number 4).
+* The Context Provider at <http://sensor48.mycity.com/v1> responds
+  with the data (message number 4).
 
 ``` 
 {
@@ -134,7 +134,7 @@ curl localhost:1026/v2/entities/Street4/attrs/temperature?type=Street -s -S \
 }
 ``` 
 
--     Orion fordwars the response to the client (message number 5).
+* Orion fordwars the response to the client (message number 5).
  
 ``` 
 {
