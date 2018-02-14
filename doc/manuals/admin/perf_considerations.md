@@ -3,9 +3,9 @@
 
 In order to better understand how to deploy Orion in production, we report here the results of non functional tests carried out by the FIWARE QA team and in other research initiatives.
 
-* [Stress Test](#Stress-tests)
-* [Scalability Test](#Scalability-Test)
-* [Latency Test](#Scalability-Test)
+* [Stress Test](#stress-tests)
+* [Scalability Test](#scalability-test)
+* [Latency Test](#latency)
 
 
 # Stress test
@@ -78,6 +78,8 @@ From Update Stress Scenario (1-20 attributes), we can get:
 -   Reliability is 100% (there were no errors).
 -   The CPU and the memory usage is stable.
 
+[Top](#top)
+
 ## Scenario 2
 
 
@@ -91,6 +93,8 @@ From Update Stress Scenario (1-6 attributes), we can get:
 -   Reliability is 100% (there were no errors).
 -   The CPU and the memory usage is stable.
 
+[Top](#top)
+
 ## Scenario 3
 
 
@@ -101,6 +105,8 @@ From Convenience Update Stress Scenario, we can get:
 -   The throughput is about 275 KBytes/sec
 -   Reliability is 100% (there were no errors).
 -   The CPU usage is stable, and the memory usage is more stable.
+
+[Top](#top)
 
 ## Scenario 4
 
@@ -115,6 +121,8 @@ From NGSIv2 Update Stress Scenario, we can get:
 
 Response times are 75% higher, and the requests per second rate is 43% lower. We can conclude that NGSIv1 case can handle a higher data volume than NGSIv2, but the network usage is much higher (lower performance), then NGSIv1 has better data handling performance, but lower network usage performance.
 
+[Top](#top)
+
 ## Scenario 5
 
 
@@ -126,6 +134,8 @@ From Update Stress with notifications, we can get:
 -   Reliability is 100% (there were no errors).
 -   17523 notifications were generated and sent.
 -   The CPU and memory usages are stable.
+
+[Top](#top)
 
 ## Scenario 6
 
@@ -139,6 +149,8 @@ From NGSIv2 Update Stress with notifications Scenario, we can get:
 -   Reliability is 100% (there were no errors).
 -   The CPU and memory usages are stable.
 
+[Top](#top)
+
 ## Scenario 7
 
 
@@ -148,6 +160,8 @@ From Stability Scenario, we can get:
 -   In these conditions, average response time is similar for the three operations (around 4,9 seconds).
 -   Reliability is 100% (there were no errors).
 -   The CPU usage is stable, but the memory usage increases in the time. The system ran out of memory, but it didn’t fall.
+
+[Top](#top)
 
 ## Scenario 8
 
@@ -159,6 +173,8 @@ From Optimized Stability Scenario, we can get:
 -   The performance is much better. Now it can handle about 361% more requests than without the optimizations, and the response times, in average now are better too.
 -   The CPU usage is stable, but the memory usage increases in the time, as it happened without optimizations, but due to the higher load handling, the system ran out of memory before, and fell after 3 hours, due to lack of memory.
 
+[Top](#top)
+
 ## Scenario 9
 
 
@@ -169,6 +185,8 @@ From no-Cache Optimized Stability Scenario, we can get:
 -   The performance is much worse. Now it can handle about a third of requests than with the cache enabled, and the response times are extremely high for updates and convenience updates operations.
 -   The memory management problem doesn’t appear in this case, and the memory usage keeps stable along all the test.
 
+[Top](#top)
+
 # Scalability Test
 
 
@@ -177,9 +195,9 @@ In order to measure the scalability of Context Broker two types of scenarios has
 
 1.  [Context Broker nodes horizontal scaling](#context-broker-nodes-horizontal-scaling); these tests were executed gradually increasing the number of CB nodes
 
-2.  [MongoDB shards horizontal scaling](#MongoDB-shards-horizontal-scaling); these tests were executed gradually increasing the number of MongoDB shards
+2.  [MongoDB shards horizontal scaling](#mongodb-shards-horizontal-scaling); these tests were executed gradually increasing the number of MongoDB shards
 
-
+[Top](#top)
 
 ## Context Broker nodes horizontal scaling
 
@@ -195,6 +213,8 @@ below you can see the results obtained for the three configurations obtained by 
 
 ![scalingcb2](ScalingCBres.png "ScalingCBres.png")
 
+[Top](#top)
+
 ## MongoDB shards horizontal scaling
 
 In this scenario, a single Orion Context Broker node has been used, increasing the number of MongoDB shards (from 1 to 3). Each node is in a separate virtual machine.  The following diagram shows the sample tested infrastructure.
@@ -206,11 +226,14 @@ In the following table you can see the results obtained for the three configurat
 
 ![shardingMDB2](ShardingMDBres.PNG "ShardingMDBres.png")
 
-
+[Top](#top)
 
 # Latency 
 
 In order to investigate the latency using Orion under real usage conditions, this section summarizes a study carried out by the Universidad Politécnica de Cartagena. [Here](http://www.mdpi.com/1424-8220/16/11/1979/html?share=email&nb=1) you can find the complete document.  
+
+[Top](#top)
+
 ## Experimentation Environment
 
 There is a community account in FILAB’s Spain2 cloud infrastructure enabling the deployment of a virtual machine (VM) hosting an instance of Orion Context Broker (version 1.2.1), version 3.0.12 of a MongoDB database and version 0.13.0 of the Cygnus-NGSI injector. 
@@ -243,15 +266,21 @@ These parameters were adjusted for each test.
 
 Third, Cygnus-NGSI components were adjusted to increase performance and avoid potential bottlenecks in order to properly assess Orion. 
 
+[Top](#top)
+
 ## Context Generation Methods
 The client application developed permits two ways of generating NGSI traffic. The first method (blocking method) simulates intermediate IoT node NGSI traffic generation. Its implementation is supported by the java.net API and its functionality is based on the HttpURLConnection class. This class only allows blocking connections. Thus, in each simulation the same number of persistent HTTP connections as simulated IoT nodes are opened.
 The second method (non-blocking method) simulates final IoT node NGSI traffic generation. Its implementation is focused on mechanisms that allow concurrent traffic generation. In this case, the SocketChannel class of the java.nio API was used to create non-blocking connections. Therefore, in each simulation the same number of connections as NGSI requests generated are opened.
 Another implementation detail to keep in mind is that each NGSI client (blocking or not) simulates the behaviour of a virtual IoT node in a separate thread.
 
+[Top](#top)
+
 ## Test Strategy
-Test Plan
+
 Considering the payload of the updateContext requests sent to Orion, four types of tests were run (1 kB, 10 kB, 100 kB and 1 MB). Each of these tests is divided into two categories depending on the context generation method used (blocking or non-blocking). The first category includes performance tests employing the blocking method to measure throughput parameters (expressed in requests per second or kilobytes per second) and round-trip time (in milliseconds). The second category includes performance tests employing the non-blocking method to measure the throughput parameter (expressed in requests per second or kilobytes per second). 20 simulations were launched per category on different days and in different time slots. The test plan, therefore, involves more than 400 simulations. The following section shows the representative results of each type of test.
 The following procedure was followed in the tests. The IoT nodes are modelled by threads associated with processes. In the initial simulations, we started with 12 single-threaded processes, each executed on a different machine. When the number of IoT nodes exceeds 12, new threads are started in the processes. To simplify testing, multiples of the number of processes started for the tests are simulated, generally 12, in order to equitably distribute the simulation load among the processes. In certain cases, to refine the results, we worked with fewer machines and therefore fewer processes (always one process per machine). That is why the graphs show measurements with a number of nodes that is not a multiple of 12. A simulation concludes when each virtual IoT node has tried to send 200 requests to the Orion Context Broker. The throughput and round-trip time values of the simulation are calculated from the average of the 200 measurements obtained.
+
+[Top](#top)
 
 ## Results
 
