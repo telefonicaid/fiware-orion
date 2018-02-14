@@ -1,7 +1,7 @@
 <a name="top"></a>Performance and Scalability consideration
 ===========================================================
 
-In order to better understand how to deploy Orion in production, we report here the results of non functional tests carried out by the FIWARE QA team and in other research initiatives.
+In order to better understand how to deploy Orion in production, we report here the results of non functional tests performed by the FIWARE QA team and in other independent research activities.
 
 * [Stress Test](#stress-test)
 * [Scalability Test](#scalability-test)
@@ -11,7 +11,7 @@ In order to better understand how to deploy Orion in production, we report here 
 # Stress test
 
 This is an overview of the stress test performed by the FIWARE QA team.
-For the execution of the tests it was configured a test environment consists of two physical machines with the same configuration, one for the deployment of Orion Context Broker (Version 1.6.0) and its database and another for client test and monitoring applications.
+For the execution of the tests it was configured a test environment consisting of two physical machines with the same configuration, one for the deployment of Orion Context Broker (Version 1.6.0) and its database and another for client test and monitoring applications.
 
          CPU: 1 Intel(R) Xeon(R) E31230 
          CPU-GHz: 3.20
