@@ -177,7 +177,7 @@ In order to measure the scalability of Context Broker two types of scenarios has
 
 1.  [Context Broker nodes horizontal scaling](#context-broker-nodes-horizontal-scaling); these tests were executed gradually increasing the number of CB nodes
 
-2.  [MongoDB shards horizontal scaling](MongoDB-shards-horizontal-scaling); these tests were executed gradually increasing the number of MongoDB shards
+2.  [MongoDB shards horizontal scaling](#MongoDB-shards-horizontal-scaling); these tests were executed gradually increasing the number of MongoDB shards
 
 
 
