@@ -3,7 +3,7 @@
 
 In order to better understand how to deploy Orion in production, we report here the results of non functional tests carried out by the FIWARE QA team and in other research initiatives.
 
-* [Stress Test](#stress-tests)
+* [Stress Test](#stress-test)
 * [Scalability Test](#scalability-test)
 * [Latency Test](#latency)
 
