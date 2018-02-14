@@ -208,5 +208,80 @@ In the following table you can see the results obtained for the three configurat
 
 
 
-# Latency ?
+# Latency 
+
+In order to investigate the latency using Orion under real usage conditions, this section summarizes a study carried out by the Universidad Politécnica de Cartagena. [Here](http://www.mdpi.com/1424-8220/16/11/1979/html?share=email&nb=1) you can find the complete document.  
+## Experimentation Environment
+
+There is a community account in FILAB’s Spain2 cloud infrastructure enabling the deployment of a virtual machine (VM) hosting an instance of Orion Context Broker (version 1.2.1), version 3.0.12 of a MongoDB database and version 0.13.0 of the Cygnus-NGSI injector. 
+The VM has the following characteristics: 
+        
+        CPU: 4 (Virtual)
+        RAM: 8 GB  
+        Disk: 80GB 
+
+This more than meets the hardware requirements of Orion and Cygnus-NGSI. 
+
+Phisical machines with the same characteristics was used for the clients in the tests:
+
+        Hardware: HP Compaq Business Desktop dc7700p
+        CPU: Intel Core 2 Duo E6600/2.4 GHz Dual-Core processor
+        Cache: 4 MB cache per core L2 cache 4 MB
+        RAM: 2GB
+        OS: Windows 7 Home Premium operating system
+        Dev: Luna Eclipse development environment SR2 (4.4.2) and context generator application.
+
+
+From a performance point of view, FIWARE recommendations were taken into account to refine the following testbed components: MongoDB;  Orion and Cygnus-NGSI. The most important aspects of configuration are as follows:
+First, version 3.0.12 of MongoDB was used, recommended for intensive update scenarios. In addition, the adjustments limiting use to deployed VM resources were checked and Transparent Huge Pages were disabled (THP).
+
+Second, Orion parameters were adjusted for scenarios with high update/notification rates
+
+        -reqPoolSize, -dbPoolSize and -notificationModethreadPool:q:n
+        
+These parameters were adjusted for each test.
+
+Third, Cygnus-NGSI components were adjusted to increase performance and avoid potential bottlenecks in order to properly assess Orion. 
+
+## Context Generation Methods
+The client application developed permits two ways of generating NGSI traffic. The first method (blocking method) simulates intermediate IoT node NGSI traffic generation. Its implementation is supported by the java.net API and its functionality is based on the HttpURLConnection class. This class only allows blocking connections. Thus, in each simulation the same number of persistent HTTP connections as simulated IoT nodes are opened.
+The second method (non-blocking method) simulates final IoT node NGSI traffic generation. Its implementation is focused on mechanisms that allow concurrent traffic generation. In this case, the SocketChannel class of the java.nio API was used to create non-blocking connections. Therefore, in each simulation the same number of connections as NGSI requests generated are opened.
+Another implementation detail to keep in mind is that each NGSI client (blocking or not) simulates the behaviour of a virtual IoT node in a separate thread.
+
+## Test Strategy
+Test Plan
+Considering the payload of the updateContext requests sent to Orion, four types of tests were run (1 kB, 10 kB, 100 kB and 1 MB). Each of these tests is divided into two categories depending on the context generation method used (blocking or non-blocking). The first category includes performance tests employing the blocking method to measure throughput parameters (expressed in requests per second or kilobytes per second) and round-trip time (in milliseconds). The second category includes performance tests employing the non-blocking method to measure the throughput parameter (expressed in requests per second or kilobytes per second). 20 simulations were launched per category on different days and in different time slots. The test plan, therefore, involves more than 400 simulations. The following section shows the representative results of each type of test.
+The following procedure was followed in the tests. The IoT nodes are modelled by threads associated with processes. In the initial simulations, we started with 12 single-threaded processes, each executed on a different machine. When the number of IoT nodes exceeds 12, new threads are started in the processes. To simplify testing, multiples of the number of processes started for the tests are simulated, generally 12, in order to equitably distribute the simulation load among the processes. In certain cases, to refine the results, we worked with fewer machines and therefore fewer processes (always one process per machine). That is why the graphs show measurements with a number of nodes that is not a multiple of 12. A simulation concludes when each virtual IoT node has tried to send 200 requests to the Orion Context Broker. The throughput and round-trip time values of the simulation are calculated from the average of the 200 measurements obtained.
+
+## Results
+
+To study the behavior of the Orion RESTful server numerous simulations were made. The realization of these simulations was a very time-demanding task due to network latency. The results obtained  do offer a realistic view of the performance of this Generic Enabler under different deployments and load conditions.
+
+
+illustrates the results obtained when using the blocking method to generate the context requests for each payload established in the test plan (1 kB, 10 kB, 100 kB and 1 MB). 
+
+A new message is sent as soon as the previous one has been completely delivered. Latency is expressed as Round-Trip Time (RTT) measured in milliseconds (ms) versus number of NGSI clients, which can be sensors (edge devices in general) or intermediate nodes. Simulations results will be interpreted differently depending on whether the active entities are sensors or intermediate nodes. 
+
+ The graphs show that Orion has an initial range (close to linear) where throughput increases at a more or less linear rate and RTT remains constant or linear. 
+ 
+ ![LatencyGraph](LatencyGraph.png "LatencyGraph.png")
+ 
+ After this range, the above parameters tend to increase RTT (waiting time) and decrease throughput (requests processed). 
+
+Analysing the results from the throughput/RTT perspective
+
+
+* The highest rate of data transfer was 2963 kB/s obtained when simulating a payload of 1 MB and 20 NGSI clients. RTT in this simulation is 3200 ms .
+* The second best result was 2846 kB/s obtained when simulating a payload of 100 kB and 24 NGSI clients. However, RTT was 430 ms, clearly much lower than the preceding case.
+* The next throughput measurement in descending order was 2520 kB/s corresponding to the simulated payload of 10 kB and 24 NGSI clients. Although the same number of active entities as in the previous case was used, RTT was lower (83 ms).
+* Finally, the lowest data transfer rate (978 kB/s) was obtained with the simulation of a payload of 1 kB and 72 NGSI clients. We should note that a much higher number of active entities was needed in comparison with the other simulations. Also, RTT (72 ms) is the lowest value of the cases included in this analysis.
+
+In other words, the system performs better in term of throughput when faced with high loads generated by few nodes. The increase in the number of nodes causes a very sharp decrease in the volume of data that can be transferred. 
+In those situations where there are many clients that update with small loads the context can be easily satisfied low latency constraints.
+
+
+
+
+
+
 
