@@ -37,7 +37,7 @@ brokerStart CB
 # 05. Get sorted by id: E1/D, E2/A, E3/C, E4/B
 # 06. Get sorted by id in reverse order: E4/B, E3/C, E2/A, E1/D
 # 07. Get sorted by type: E2/A, E4/B, E3/C, E1/D
-# 08. Get sorted by type in reserve order: E1/D, E3/C, E4/B, E2/A
+# 08. Get sorted by type in reverse order: E1/D, E3/C, E4/B, E2/A
 #
 
 echo "01. Create entity E2/A"
@@ -109,7 +109,7 @@ echo
 echo
 
 
-echo "08. Get sorted by type in reserve order: E1/D, E3/C, E4/B, E2/A"
+echo "08. Get sorted by type in reverse order: E1/D, E3/C, E4/B, E2/A"
 echo "==============================================================="
 orionCurl --url '/v2/entities?options=keyValues&orderBy=!type'
 echo
@@ -253,7 +253,7 @@ Date: REGEX(.*)
 ]
 
 
-08. Get sorted by type in reserve order: E1/D, E3/C, E4/B, E2/A
+08. Get sorted by type in reverse order: E1/D, E3/C, E4/B, E2/A
 ===============================================================
 HTTP/1.1 200 OK
 Content-Length: 152

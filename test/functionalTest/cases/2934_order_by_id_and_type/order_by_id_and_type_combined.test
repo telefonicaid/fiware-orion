@@ -88,8 +88,8 @@ echo
 echo
 
 
-echo "05. 05. Get sorted by id, then name: E1/B/Bob, E1/A/Daniel, E2/B/Alice, E2/A/Carl"
-echo "================================================================================="
+echo "05. Get sorted by id, then name: E1/B/Bob, E1/A/Daniel, E2/B/Alice, E2/A/Carl"
+echo "============================================================================="
 orionCurl --url '/v2/entities?options=keyValues&orderBy=id,name'
 echo
 echo
@@ -157,8 +157,8 @@ Date: REGEX(.*)
 
 
 
-05. 05. Get sorted by id, then name: E1/B/Bob, E1/A/Daniel, E2/B/Alice, E2/A/Carl
-=================================================================================
+05. Get sorted by id, then name: E1/B/Bob, E1/A/Daniel, E2/B/Alice, E2/A/Carl
+=============================================================================
 HTTP/1.1 200 OK
 Content-Length: 151
 Content-Type: application/json
