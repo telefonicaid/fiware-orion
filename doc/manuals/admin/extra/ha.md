@@ -349,7 +349,7 @@ For each server:
 1. Test the Context Broker
 
     ```bash
-    $ curl localhost:1026/v2/entities -s -S --header 'Accept: application/json' | python -mjson.tool
+    $ curl localhost:1026/version -s -S | python -mjson.tool
     ```
 
 ### HA Proxy Configuration
@@ -437,5 +437,5 @@ For each server:
 1. Test the HA Proxy
 
     ```bash
-    $ curl localhost:1026/v2 -s -S --header 'Accept: application/json' | python -mjson.tool
+    $ curl localhost:1026/version -s -S | python -mjson.tool
     ```
