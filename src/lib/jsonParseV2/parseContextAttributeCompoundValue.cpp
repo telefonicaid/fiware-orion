@@ -27,6 +27,7 @@
 #include "rapidjson/document.h"
 
 #include "logMsg/logMsg.h"
+#include "common/limits.h"
 #include "ngsi/ContextAttribute.h"
 #include "parse/CompoundValueNode.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
@@ -124,13 +125,13 @@ std::string parseContextAttributeCompoundValue
   }
   else if (node->IsArray())
   {
-    int counter  = 0;
+    short counter  = 0;
 
     for (rapidjson::Value::ConstValueIterator iter = node->Begin(); iter != node->End(); ++iter)
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[4];
+      char                       itemNo[STRING_SIZE_FOR_SHORT];
 
       snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
@@ -227,13 +228,13 @@ std::string parseContextAttributeCompoundValue
   //
   if (type == "Array")
   {
-    int counter  = 0;
+    short counter  = 0;
 
     for (rapidjson::Value::ConstValueIterator iter = node->value.Begin(); iter != node->value.End(); ++iter)
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[4];
+      char                       itemNo[STRING_SIZE_FOR_SHORT];
 
       snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
@@ -369,13 +370,13 @@ std::string parseContextAttributeCompoundValueStandAlone
   //
   if (caP->valueType == orion::ValueTypeVector)
   {
-    int counter  = 0;
+    short counter  = 0;
 
     for (rapidjson::Value::ConstValueIterator iter = document.Begin(); iter != document.End(); ++iter)
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[4];
+      char                       itemNo[STRING_SIZE_FOR_SHORT];
 
       snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
@@ -433,7 +434,7 @@ std::string parseContextAttributeCompoundValueStandAlone
   }
   else if (caP->valueType == orion::ValueTypeObject)
   {
-    int counter  = 0;
+    short counter  = 0;
 
     for (rapidjson::Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
     {

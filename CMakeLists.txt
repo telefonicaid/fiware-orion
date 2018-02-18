@@ -80,6 +80,8 @@ add_definitions(-fPIC)
 #
 IF (${DISTRO} STREQUAL "Ubuntu_17.04")
  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
+ELSEIF (${DISTRO} STREQUAL "Ubuntu_17.10")
+ set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
 ELSE()
   set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -fno-var-tracking-assignments")
 ENDIF ()
