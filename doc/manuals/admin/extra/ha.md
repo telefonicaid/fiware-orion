@@ -5,12 +5,12 @@ Orion Context Broker cluster in High Availability.
 
 The architecture is made by three logical layers:
 * A Load Balancer (implemented using HA Proxy)
-* The Orion Context Broker API
+* The Orion Context Broker
 * The MongoDB ReplicaSet backend
 
 The ideal solution for providing Active-Active access to the HA Proxy cluster
-(and consequently of the Context Broker) is the adoption of a DNS service that
-support multiple IPs for a single name.
+(and consequently to the Context Broker) is the adoption of a DNS service that
+supports multiple IPs for a single name.
 This will allow the clients to use a round-robin solution to pick the actual 
 host to connect with, in case of failure, the second will be used and so on.
 The alternative is the usage of a VIP mechanism to provide Active-Passive access
@@ -47,6 +47,11 @@ The picture below present the network architecture of the deployed cluster.
    +------------+    +------------+    +------------+
 ```
 
+In the following we describe the different steps to configure such a cluster
+on a set of virtual machines. In docker related documentation, we shortly
+discuss how to create the same architecture leveraging on a
+[Docker Swarm cluster](../../../../docker/docker_swarm.md).
+
 ## Services configuration
 
 The configuration discussed below assume you have one server per each box
@@ -54,8 +59,8 @@ represented in the architecture. Of course, different layers, e.g. HA Proxy
 and Context Broker can be combined together on a single server.
 
 Requirements:
-* 3 VMs running Centos for the contextBroker layer.
-* 6 VMs running Ubuntu 16.04 LTS for the HA Proxy and MongoDB
+* 3 VMs running Centos for the Context Broker layer.
+* 6 VMs running Ubuntu 16.04 LTS for the HA Proxy and MongoDB layers.
 
 ### MongoDB configuration
 
@@ -92,15 +97,13 @@ For each server:
     10.0.64.33   mongo2
     10.0.64.34   mongo3
 
-    10.0.64.32   mongo1.lab.fiware.org
-    10.0.64.33   mongo2.lab.fiware.org
-    10.0.64.34   mongo3.lab.fiware.org
-    10.0.64.35   contextbroker1.lab.fiware.org
-    10.0.64.36   contextbroker2.lab.fiware.org
-    10.0.64.37   contextbroker3.lab.fiware.org
-    10.0.64.38   proxy1.lab.fiware.org
-    10.0.64.39   proxy2.lab.fiware.org
-    10.0.64.40   proxy3.lab.fiware.org
+    10.0.64.35   contextbroker1
+    10.0.64.36   contextbroker2
+    10.0.64.37   contextbroker3
+
+    10.0.64.38   proxy1
+    10.0.64.39   proxy2
+    10.0.64.40   proxy3
     ```
 
 1. Install MongoDB 3.2 using the following commands
@@ -305,15 +308,13 @@ For each server:
     10.0.64.33   mongo2
     10.0.64.34   mongo3
 
-    10.0.64.32   mongo1.lab.fiware.org
-    10.0.64.33   mongo2.lab.fiware.org
-    10.0.64.34   mongo3.lab.fiware.org
-    10.0.64.35   contextbroker1.lab.fiware.org
-    10.0.64.36   contextbroker2.lab.fiware.org
-    10.0.64.37   contextbroker3.lab.fiware.org
-    10.0.64.38   proxy1.lab.fiware.org
-    10.0.64.39   proxy2.lab.fiware.org
-    10.0.64.40   proxy3.lab.fiware.org
+    10.0.64.35   contextbroker1
+    10.0.64.36   contextbroker2
+    10.0.64.37   contextbroker3
+
+    10.0.64.38   proxy1
+    10.0.64.39   proxy2
+    10.0.64.40   proxy3
     ```
 
 1. Install the Context Broker with the following commands
@@ -349,7 +350,7 @@ For each server:
 1. Test the Context Broker
 
     ```bash
-    $ curl localhost:1026/version -s -S | python -mjson.tool
+    $ curl localhost:1026/version -s -S
     ```
 
 ### HA Proxy Configuration
@@ -386,15 +387,13 @@ For each server:
     10.0.64.33   mongo2
     10.0.64.34   mongo3
 
-    10.0.64.32   mongo1.lab.fiware.org
-    10.0.64.33   mongo2.lab.fiware.org
-    10.0.64.34   mongo3.lab.fiware.org
-    10.0.64.35   contextbroker1.lab.fiware.org
-    10.0.64.36   contextbroker2.lab.fiware.org
-    10.0.64.37   contextbroker3.lab.fiware.org
-    10.0.64.38   proxy1.lab.fiware.org
-    10.0.64.39   proxy2.lab.fiware.org
-    10.0.64.40   proxy3.lab.fiware.org
+    10.0.64.35   contextbroker1
+    10.0.64.36   contextbroker2
+    10.0.64.37   contextbroker3
+
+    10.0.64.38   proxy1
+    10.0.64.39   proxy2
+    10.0.64.40   proxy3
     ```
 
 1. Install the HA Proxy
@@ -415,9 +414,9 @@ For each server:
     backend ctx_pool
             balance roundrobin
             mode http
-            server ctx1 contextbroker1.lab.fiware.org:1026 check
-            server ctx2 contextbroker2.lab.fiware.org:1026 check
-            server ctx3 contextbroker3.lab.fiware.org:1026 check
+            server ctx1 contextbroker1:1026 check
+            server ctx2 contextbroker2:1026 check
+            server ctx3 contextbroker3:1026 check
     ```
 
 1. Enable the automatic restart of HA Proxy on reboot
@@ -437,5 +436,5 @@ For each server:
 1. Test the HA Proxy
 
     ```bash
-    $ curl localhost:1026/version -s -S | python -mjson.tool
+    $ curl localhost:1026/version -s -S
     ```
