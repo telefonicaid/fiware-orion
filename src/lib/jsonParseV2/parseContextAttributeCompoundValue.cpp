@@ -125,13 +125,13 @@ std::string parseContextAttributeCompoundValue
   }
   else if (node->IsArray())
   {
-    short counter  = 0;
+    int counter  = 0;
 
     for (rapidjson::Value::ConstValueIterator iter = node->Begin(); iter != node->End(); ++iter)
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[STRING_SIZE_FOR_SHORT];
+      char                       itemNo[STRING_SIZE_FOR_INT];
 
       snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
@@ -228,13 +228,13 @@ std::string parseContextAttributeCompoundValue
   //
   if (type == "Array")
   {
-    short counter  = 0;
+    int counter  = 0;
 
     for (rapidjson::Value::ConstValueIterator iter = node->value.Begin(); iter != node->value.End(); ++iter)
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[STRING_SIZE_FOR_SHORT];
+      char                       itemNo[STRING_SIZE_FOR_INT];
 
       snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
@@ -370,13 +370,13 @@ std::string parseContextAttributeCompoundValueStandAlone
   //
   if (caP->valueType == orion::ValueTypeVector)
   {
-    short counter  = 0;
+    int counter  = 0;
 
     for (rapidjson::Value::ConstValueIterator iter = document.Begin(); iter != document.End(); ++iter)
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[STRING_SIZE_FOR_SHORT];
+      char                       itemNo[STRING_SIZE_FOR_INT];
 
       snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
@@ -434,7 +434,7 @@ std::string parseContextAttributeCompoundValueStandAlone
   }
   else if (caP->valueType == orion::ValueTypeObject)
   {
-    short counter  = 0;
+    int counter  = 0;
 
     for (rapidjson::Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
     {
