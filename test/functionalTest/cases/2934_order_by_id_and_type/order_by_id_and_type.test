@@ -1,0 +1,290 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Order by id and type
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E2/A
+# 02. Create entity E4/B
+# 03. Create entity E1/D
+# 04. Create entity E3/C
+# 05. Get sorted by id: E1/D, E2/A, E3/C, E4/B
+# 06. Get sorted by id in reverse order: E4/B, E3/C, E2/A, E1/D
+# 07. Get sorted by type: E2/A, E4/B, E3/C, E1/D
+# 08. Get sorted by type in reverse order: E1/D, E3/C, E4/B, E2/A
+#
+
+echo "01. Create entity E2/A"
+echo "======================"
+payload='{
+  "id": "E2",
+  "type": "A",
+  "name": "John"
+}'
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E4/B"
+echo "======================"
+payload='{
+  "id": "E4",
+  "type": "B",
+  "name": "Paul"
+}'
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity E1/D"
+echo "======================"
+payload='{
+  "id": "E1",
+  "type": "D",
+  "name": "Ringo"
+}'
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
+echo
+echo
+
+
+echo "04. Create entity E3/C"
+echo "======================"
+payload='{
+  "id": "E3",
+  "type": "C",
+  "name": "George"
+}'
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
+echo
+echo
+
+
+echo "05. Get sorted by id: E1/D, E2/A, E3/C, E4/B"
+echo "============================================"
+orionCurl --url '/v2/entities?options=keyValues&orderBy=id'
+echo
+echo
+
+
+echo "06. Get sorted by id in reverse order: E4/B, E3/C, E2/A, E1/D"
+echo "============================================================="
+orionCurl --url '/v2/entities?options=keyValues&orderBy=!id'
+echo
+echo
+
+
+echo "07. Get sorted by type: E2/A, E4/B, E3/C, E1/D"
+echo "=============================================="
+orionCurl --url '/v2/entities?options=keyValues&orderBy=type'
+echo
+echo
+
+
+echo "08. Get sorted by type in reverse order: E1/D, E3/C, E4/B, E2/A"
+echo "==============================================================="
+orionCurl --url '/v2/entities?options=keyValues&orderBy=!type'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E2/A
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=A
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity E4/B
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=B
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create entity E1/D
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=D
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create entity E3/C
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=C
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Get sorted by id: E1/D, E2/A, E3/C, E4/B
+============================================
+HTTP/1.1 200 OK
+Content-Length: 152
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "name": "Ringo",
+        "type": "D"
+    },
+    {
+        "id": "E2",
+        "name": "John",
+        "type": "A"
+    },
+    {
+        "id": "E3",
+        "name": "George",
+        "type": "C"
+    },
+    {
+        "id": "E4",
+        "name": "Paul",
+        "type": "B"
+    }
+]
+
+
+06. Get sorted by id in reverse order: E4/B, E3/C, E2/A, E1/D
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 152
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E4",
+        "name": "Paul",
+        "type": "B"
+    },
+    {
+        "id": "E3",
+        "name": "George",
+        "type": "C"
+    },
+    {
+        "id": "E2",
+        "name": "John",
+        "type": "A"
+    },
+    {
+        "id": "E1",
+        "name": "Ringo",
+        "type": "D"
+    }
+]
+
+
+07. Get sorted by type: E2/A, E4/B, E3/C, E1/D
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 152
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E2",
+        "name": "John",
+        "type": "A"
+    },
+    {
+        "id": "E4",
+        "name": "Paul",
+        "type": "B"
+    },
+    {
+        "id": "E3",
+        "name": "George",
+        "type": "C"
+    },
+    {
+        "id": "E1",
+        "name": "Ringo",
+        "type": "D"
+    }
+]
+
+
+08. Get sorted by type in reverse order: E1/D, E3/C, E4/B, E2/A
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 152
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "name": "Ringo",
+        "type": "D"
+    },
+    {
+        "id": "E3",
+        "name": "George",
+        "type": "C"
+    },
+    {
+        "id": "E4",
+        "name": "Paul",
+        "type": "B"
+    },
+    {
+        "id": "E2",
+        "name": "John",
+        "type": "A"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
