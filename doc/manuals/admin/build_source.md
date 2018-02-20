@@ -139,15 +139,3 @@ yum install cyrus-sasl-devel
 scons --use-sasl-client --ssl                                   # The build/linux2/normal/libmongoclient.a library is generated as outcome
 sudo scons install --prefix=/usr/local --use-sasl-client --ssl  # This puts .h files in /usr/local/include/mongo and libmongoclient.a in /usr/local/lib
 ```
-
-## Others
-
-If you have build orion in a system different from CentOS 7.x, don't hesitate to tell us and contribute to expand this section. Probably the best way if doing a pull request to modify this file with the new information. Thanks!
-
-### Debian 7
-
-The packages are basically the same described for RedHat/CentOS above, except that we need to install packages using apt-get instead of yum.
-
-Install Google Test and Google Mock version 1.5 directly from sources.
-
-The version of lcov that comes with Debian 7.0 (1.9) has a bug (see https://bugs.launchpad.net/ubuntu/+source/lcov/+bug/1163758). Install lcov 1.10 from sources.
