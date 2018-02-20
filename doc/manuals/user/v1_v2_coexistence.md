@@ -22,7 +22,7 @@ NGSIv2 allows to create/update attributes (and metadata) whose values use JSON n
 types (number, boolean, string, etc.). By default, NGSIv1 uses a JSON parser that converts
 numbers and boolean values to string at creation/update time. Thus, an attempt of 
 setting `A=2` using NGSIv1 will actually store `A="2"` in the Orion database. However,
-if is possible some degree of native types support in NGSIv1 storing using
+some degree of native types is possible in NGSIv1 storing, using
 the [autocast feature](ngsiv1autocast.md).
 
 No matter if autocast is enabled or not, NGSIv1 rendering is able to correctly retrieve

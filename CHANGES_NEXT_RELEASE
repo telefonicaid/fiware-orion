@@ -1,2 +1,2 @@
 - Add: support for entity id and type in orderBy parameter (#2934)
-- Add: NGSIv1 autocast for nubmers, booleans and dates (using flag -ngsiv1Autocast) (#3112)
+- Add: NGSIv1 autocast for numbers, booleans and dates (using flag -ngsiv1Autocast) (#3112)

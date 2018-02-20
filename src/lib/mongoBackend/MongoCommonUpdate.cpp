@@ -449,7 +449,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
    *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
   if (caP->valueType != orion::ValueTypeNotGiven)
   {
-    caP->valueBson(ab, getStringFieldF(attr, ENT_ATTRS_TYPE), ngsiv1Autocast && apiVersion == V1);
+    caP->valueBson(ab, getStringFieldF(attr, ENT_ATTRS_TYPE), ngsiv1Autocast && (apiVersion == V1));
   }
   else
   {
@@ -729,7 +729,7 @@ static bool updateAttribute
     newAttr.append(ENT_ATTRS_CREATION_DATE, now);
     newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
-    caP->valueBson(newAttr, attrType, ngsiv1Autocast && apiVersion == V1);
+    caP->valueBson(newAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
     /* Custom metadata */
     BSONObj    md;
@@ -810,7 +810,7 @@ static bool appendAttribute
   BSONObjBuilder ab;
 
   /* 1. Value */
-  caP->valueBson(ab, caP->type, ngsiv1Autocast && apiVersion == V1);
+  caP->valueBson(ab, caP->type, ngsiv1Autocast && (apiVersion == V1));
 
   /* 2. Type */
   if ((apiVersion == V2) && !caP->typeGiven)
@@ -2886,7 +2886,7 @@ static bool createEntity
     bsonAttr.append(ENT_ATTRS_CREATION_DATE, now);
     bsonAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
-    attrsV[ix]->valueBson(bsonAttr, attrType, ngsiv1Autocast && apiVersion == V1);
+    attrsV[ix]->valueBson(bsonAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
     std::string effectiveName = dbDotEncode(attrsV[ix]->name);
     if (attrId.length() != 0)

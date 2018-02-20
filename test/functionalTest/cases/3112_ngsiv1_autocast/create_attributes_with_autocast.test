@@ -31,9 +31,9 @@ brokerStart CB 0 IPV4 -ngsiv1Autocast
 
 #
 # 01. Create entity with Quantity, Number, Boolean, DateTime and ISO8601 types
-# 02. Get entity using NGSIv2 and check values are rigth
+# 02. Get entity using NGSIv2 and check values are right
 # 03. Append five new attributes with Quantity, Number, Boolean, DateTime and ISO8601 types
-# 04. Get entity using NGSIv2 and check values are rigth
+# 04. Get entity using NGSIv2 and check values are right
 #
 # Test is focused in updateContext operation. Note that we have several convenience operations
 # in NGSIv1 to do attribute creation/update, but all them are the end are mapped internally
@@ -83,7 +83,7 @@ echo
 echo
 
 
-echo "02. Get entity using NGSIv2 and check values are rigth"
+echo "02. Get entity using NGSIv2 and check values are right "
 echo "======================================================"
 orionCurl --url /v2/entities/E
 echo
@@ -133,7 +133,7 @@ echo
 echo
 
 
-echo "04. Get entity using NGSIv2 and check values are rigth"
+echo "04. Get entity using NGSIv2 and check values are right "
 echo "======================================================"
 orionCurl --url /v2/entities/E
 echo
@@ -193,7 +193,7 @@ Date: REGEX(.*)
 }
 
 
-02. Get entity using NGSIv2 and check values are rigth
+02. Get entity using NGSIv2 and check values are right
 ======================================================
 HTTP/1.1 200 OK
 Content-Length: 314
@@ -284,7 +284,7 @@ Date: REGEX(.*)
 }
 
 
-04. Get entity using NGSIv2 and check values are rigth
+04. Get entity using NGSIv2 and check values are right
 ======================================================
 HTTP/1.1 200 OK
 Content-Length: 613

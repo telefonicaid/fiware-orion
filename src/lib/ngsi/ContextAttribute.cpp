@@ -74,7 +74,7 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::
       {
         effectiveValueType = ValueTypeNumber;
       }
-      // Note that if str2double() fails, we keep on ValueTypeString and all works like without autocast
+      // Note that if str2double() fails, we keep ValueTypeString and everything works like without autocast
     }
     if (attrType == DEFAULT_ATTR_BOOL_TYPE)
     {
@@ -90,7 +90,7 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::
         effectiveBoolValue = false;
         effectiveValueType = ValueTypeBoolean;
       }
-      // Note that if above checks fail, we keep on ValueTypeString and all works like without autocast
+      // Note that if above checks fail, we keep ValueTypeString and everything works like without autocast
     }
     if ((attrType == DATE_TYPE) || (attrType == DATE_TYPE_ALT))
     {
@@ -99,7 +99,7 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::
       {
         effectiveValueType = ValueTypeNumber;
       }
-      // Note that if parse8601Time() fails, we keep on ValueTypeString and all works like without autocast
+      // Note that if parse8601Time() fails, we keep ValueTypeString and everything works like without autocast
     }
   }
 

@@ -15,15 +15,16 @@ NGSIv1 create/update operations:
 
 The processing is as follows:
 
-* At attribute creation time, if the attribute type _in the request_ is one of the above, a casting to the right
+* At attribute creation time, if the attribute type _in the request_ is one of the above, a casting to the corresponding
   type is done before storing the attribute.
 * At attribute modification time, involving such modification _both attribute value and type_, if the attribute
-  type _in the request_ is one of the above, a casting to the right type is done before storing the attribute.
+  type _in the request_ is one of the above, a casting to the corresponding type is done before storing the attribute.
 * At attribute modification time, involving such modification _only attribute value_ (note this is a possibility in NGSIv1),
-  if the attribute type _stored by Orion_ is one of the above, a casting to the right type is done before updating the attribute value.
+  if the attribute type _stored by Orion_ is one of the above, a casting to the corresponding type is done before updating the attribute value.
 
 Some additonal remarks:
 
-* If cast fails, then the attribute is stored as string.
+* If the conversion to the target type is not possible, such as `{ "value": "Yes", "type": "Number" }`,
+  or `{ "value": 29, "type": "Boolean" }`, then the attribute is stored as a string.
 * This only applies to NGSiv1 create/update operations. NGSIv2 functionality remaing unaltered, no matter if `-ngsiv1Autocast` is
   used or not.
