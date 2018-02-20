@@ -37,6 +37,7 @@ pages:
       - 'Security considerations': 'user/security.md'
       - 'Known limitations': 'user/known_limitations.md'
       - 'CORS': 'user/cors.md'
+      - 'NGSIv1 Autocast': 'user/ngsiv1autocast.md'
       - 'Docker': 'user/docker.md'
       - 'NGSIv2 Implementation Notes': 'user/ngsiv2_implementation_notes.md'
       - 'Considerations on NGSIv1 and NGSIv2 coexistence': 'user/v1_v2_coexistence.md'
