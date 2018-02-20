@@ -161,7 +161,7 @@ std::string tenantCheck(const std::string& tenant)
   if (strlen(name) > SERVICE_NAME_MAX_LEN)
   {
     char numV1[STRING_SIZE_FOR_INT];
-    char numV2[STRING_SIZE_FOR_INT];
+    char numV2[STRING_SIZE_FOR_LONG];
 
     snprintf(numV1, sizeof(numV1), "%d",  SERVICE_NAME_MAX_LEN);
     snprintf(numV2, sizeof(numV2), "%lu", strlen(name));
