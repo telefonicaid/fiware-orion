@@ -7,11 +7,9 @@ In order to better understand how to deploy Orion in production, we report here 
 * [Scalability Test](#scalability-test)
 * [Latency Test](#latency)
 
-
 # Stress test
 
 This is an overview of the stress test performed by the FIWARE QA team.  a test environment was configured for the execution of the tests, consisting of two physical machines with the same configuration: one for the deployment of Orion Context Broker (Version 1.6.0) and its related database and another one for client test and monitoring applications.
-
 
          CPU: 1 Intel(R) Xeon(R) E31230 
          CPU-GHz: 3.20
@@ -36,7 +34,6 @@ The executed performance tests are composed by nine scenarios:
 
 Scenarios 1,2, 3 and 6 foresee to add a thread every six seconds to reach 300 for the Context Broker Update service. 
 A data set of 5000 entities was updated to  a number of attributes ranging from 1 to 20. The scenario stops 10 minutes after the 300 concurrent threads are reached. At the beginning of the execution of this scenario  the subscriptions necessary to perform the texts are already in place.
-
 
 Scenarios 4 and 5 are updated scenarios using NGSIv2 APIs instead of NGSIv1 ones. Scenario 2 is the same than scenario 1, but the number of attributes is lower in order to compare the results with scenario 2 (NGSIv1 vs NGSIv2).
 
@@ -71,7 +68,6 @@ The obtained results were:
 
 ## Scenario 1
 
-
 From Update Stress Scenario (1-20 attributes), we can get:
 
 -   Orion can handle near 514 update request per second, updating 1-20 attributes in each request.
@@ -83,8 +79,6 @@ From Update Stress Scenario (1-20 attributes), we can get:
 [Top](#top)
 
 ## Scenario 2
-
-
 
 From Update Stress Scenario (1-6 attributes), we can get:
 
@@ -99,7 +93,6 @@ From Update Stress Scenario (1-6 attributes), we can get:
 
 ## Scenario 3
 
-
 From Convenience Update Stress Scenario, we can get:
 
 -   Orion can handle about 183 convenience update requests per second, updating 1-20 attributes in each request.
@@ -111,7 +104,6 @@ From Convenience Update Stress Scenario, we can get:
 [Top](#top)
 
 ## Scenario 4
-
 
 From NGSIv2 Update Stress Scenario, we can get:
 
@@ -127,7 +119,6 @@ Response time is 75% higher, and the requests per second rate is 43% lower. We c
 
 ## Scenario 5
 
-
 From Update Stress with notifications, we can get:
 
 -   Orion can handle almost 304 update requests per second, updating 1-6 attributes in each request.
@@ -140,7 +131,6 @@ From Update Stress with notifications, we can get:
 [Top](#top)
 
 ## Scenario 6
-
 
 From NGSIv2 Update Stress with notifications Scenario, we can get:
 
@@ -155,7 +145,6 @@ From NGSIv2 Update Stress with notifications Scenario, we can get:
 
 ## Scenario 7
 
-
 From Stability Scenario, we can get:
 
 -   With 30 threads, 10 for each operation, Orion handles around 6 requests per second.
@@ -166,7 +155,6 @@ From Stability Scenario, we can get:
 [Top](#top)
 
 ## Scenario 8
-
 
 From Optimized Stability Scenario, we can get:
 
@@ -179,7 +167,6 @@ From Optimized Stability Scenario, we can get:
 
 ## Scenario 9
 
-
 From no-Cache Optimized Stability Scenario, we can get:
 
 -   With 30 threads, 10 for each operation, Orion handles around 9 requests per second.
@@ -190,7 +177,6 @@ From no-Cache Optimized Stability Scenario, we can get:
 [Top](#top)
 
 # Scalability Test
-
 
 The scalability tests performed for the Orion Context Broker concerning the most important functionality: the attribute updating.
 In order to measure the scalability of Context Broker two types of scenarios has been executed:
@@ -203,15 +189,11 @@ In order to measure the scalability of Context Broker two types of scenarios has
 
 ## Context Broker nodes horizontal scaling
 
-
 In this scenario, a single MongoDB node has been used  increasing the CB number of nodes gradually. Each node is in a separate virtual machine. It also has an Apache Balancer on a separate node. The following diagram shows the sample tested. infrastructure.
 
 ![scalingcb1](Scaling_CB.PNG "Scaling_CB.PNG")
 
 Below you can see the results came out for the three configurations obtained by adding a Context Broker at a time. We can see that there is no increase in throughput, but only a slight improvement in response time. 
-
-
-
 
 ![scalingcb2](ScalingCBres.png "ScalingCBres.png")
 
@@ -224,7 +206,6 @@ In this scenario, a single Orion Context Broker node has been used, increasing t
 ![shardingMDB1](Sharding_MDB.PNG "Sharding_MDB.png")
 
 In the following table you can see the results obtained for the three configurations came out by adding a MongoDB shard at a time. The results show clearly that the configuration, that achieves higher performance, is 1CB_2SDB scenario. It is clear that adding the third MongoDB shard performance worsens.
-
 
 ![shardingMDB2](ShardingMDBres.PNG "ShardingMDBres.png")
 
@@ -254,7 +235,6 @@ Physical machines with the same characteristics was used for the clients in the 
         RAM: 2GB
         OS: Windows 7 Home Premium operating system
         Dev: Luna Eclipse development environment SR2 (4.4.2) and context generator application.
-
 
 From a performance point of view, FIWARE recommendations were taken into account to refine the following testbed components: MongoDB;  Orion and Cygnus-NGSI. The most important aspects of configuration are as follows:
 
@@ -288,7 +268,6 @@ The following procedure was followed in the tests. The IoT nodes are modelled by
 
 To study the behavior of the Orion RESTful server numerous simulations were made. The realization of these simulations was a very time-demanding task due to network latency. The results obtained  do offer a realistic view of the performance of this Generic Enabler under different deployments and load conditions.
 
-
 illustrates the results obtained when using the blocking method to generate the context requests for each payload established in the test plan (1 kB, 10 kB, 100 kB and 1 MB). 
 
 A new message is sent as soon as the previous one has been completely delivered. Latency is expressed as Round-Trip Time (RTT) measured in milliseconds (ms) versus number of NGSI clients, which can be sensors (edge devices in general) or intermediate nodes. Simulations results will be interpreted differently depending on whether the active entities are sensors or intermediate nodes. 
@@ -301,16 +280,10 @@ A new message is sent as soon as the previous one has been completely delivered.
 
 Analysing the results from the throughput/RTT perspective
 
-
 * The highest rate of data transfer was 2963 kB/s obtained when simulating a payload of 1 MB and 20 NGSI clients. RTT in this simulation is 3200 ms .
 * The second best result was 2846 kB/s obtained when simulating a payload of 100 kB and 24 NGSI clients. However, RTT was 430 ms, clearly much lower than the preceding case.
 * The next throughput measurement in descending order was 2520 kB/s corresponding to the simulated payload of 10 kB and 24 NGSI clients. Although the same number of active entities as in the previous case was used, RTT was lower (83 ms).
 * Finally, the lowest data transfer rate (978 kB/s) was obtained with the simulation of a payload of 1 kB and 72 NGSI clients. We should note that a much higher number of active entities was needed in comparison with the other simulations. Also, RTT (72 ms) is the lowest value of the cases included in this analysis.
 
-In other words, the system performs better in term of throughput when faced with high loads generated by few nodes. The increase in the number of nodes causes a very sharp decrease in the volume of data that can be transferred. Low latency constraints can be easily satisfied in those situations, where there are many clients updating the context with small loads. 
-
-
-
-
-
-
+In other words, the system performs better in term of throughput when faced with high loads generated by few nodes. 
+The increase in the number of nodes causes a very sharp decrease in the volume of data that can be transferred. Low latency constraints can be easily satisfied in those situations, where there are many clients updating the context with small loads. 
