@@ -9,7 +9,7 @@ In order to better understand how to deploy Orion in production, we report here 
 
 # Stress test
 
-This is an overview of the stress test performed by the FIWARE QA team.  a test environment was configured for the execution of the tests, consisting of two physical machines with the same configuration: one for the deployment of Orion Context Broker (Version 1.6.0) and its related database and another one for client test and monitoring applications.
+This is an overview of the stress test performed by the FIWARE QA team.  A test environment was configured for the execution of the tests, consisting of two physical machines with the same configuration: one for the deployment of Orion Context Broker (Version 1.6.0) and its related database and another one for client test and monitoring applications.
 
          CPU: 1 Intel(R) Xeon(R) E31230 
          CPU-GHz: 3.20
@@ -32,8 +32,8 @@ The executed performance tests are composed by nine scenarios:
 8.  [Optimized Stability Scenario](#scenario-8)
 9.  [No-cache Optimized Stability Scenario](#scenario-9)
 
-Scenarios 1,2, 3 and 6 foresee to add a thread every six seconds to reach 300 for the Context Broker Update service. 
-A data set of 5000 entities was updated to  a number of attributes ranging from 1 to 20. The scenario stops 10 minutes after the 300 concurrent threads are reached. At the beginning of the execution of this scenario  the subscriptions necessary to perform the texts are already in place.
+Scenarios 1, 2, 3 and 6 foresee to add a thread every six seconds to reach 300 for the Context Broker Update service. 
+A data set of 5000 entities was updated to  a number of attributes ranging from 1 to 20. The scenario stops 10 minutes after the 300 concurrent threads are reached. At the beginning of the execution of this scenario  the subscriptions necessary to perform the tests are already in place.
 
 Scenarios 4 and 5 are updated scenarios using NGSIv2 APIs instead of NGSIv1 ones. Scenario 2 is the same than scenario 1, but the number of attributes is lower in order to compare the results with scenario 2 (NGSIv1 vs NGSIv2).
 
@@ -111,7 +111,7 @@ From NGSIv2 Update Stress Scenario, we can get:
 -   In these conditions, response time is about 373 milliseconds.
 -   The throughput was 82KB/s, which is about the 10% of NGSIv1 case’s throughput.
 -   Reliability is 100% (there were no errors).
--   The CPU and memory usages are stable.-
+-   The CPU and memory usages are stable.
 
 Response time is 75% higher, and the requests per second rate is 43% lower. We can conclude that NGSIv1 case can handle a higher data volume than NGSIv2, but the network usage is much higher (lower performance), then NGSIv1 has better data handling performance, but lower network usage performance.
 
