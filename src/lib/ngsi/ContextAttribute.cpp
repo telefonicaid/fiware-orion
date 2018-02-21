@@ -57,20 +57,64 @@ using namespace orion;
 * ContextAttribute::bsonAppendAttrValue -
 *
 */
-void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr) const
+void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast) const
 {
-  switch (valueType)
+  std::string effectiveStringValue = stringValue;
+  bool        effectiveBoolValue   = boolValue;
+  double      effectiveNumberValue = numberValue;
+  ValueType   effectiveValueType   = valueType;
+
+  // Checking for ValueTypeString is an additional safety measure (ensuring that the attribute came from NGSIv1 in plain text)
+  if ((autocast) && (effectiveValueType == ValueTypeString))
+  {
+    // Autocast only for selected attribute types
+    if ((attrType == DEFAULT_ATTR_NUMBER_TYPE) || (attrType == NUMBER_TYPE_ALT))
+    {
+      if (str2double(effectiveStringValue.c_str(), &effectiveNumberValue))
+      {
+        effectiveValueType = ValueTypeNumber;
+      }
+      // Note that if str2double() fails, we keep ValueTypeString and everything works like without autocast
+    }
+    if (attrType == DEFAULT_ATTR_BOOL_TYPE)
+    {
+      // Note that we cannot use isTrue() or isFalse() functions, as they consider also 0 and 1 as
+      // valid true/false values and JSON spec mandates exactly true or false
+      if (effectiveStringValue == "true")
+      {
+        effectiveBoolValue = true;
+        effectiveValueType = ValueTypeBoolean;
+      }
+      else if (effectiveStringValue == "false")
+      {
+        effectiveBoolValue = false;
+        effectiveValueType = ValueTypeBoolean;
+      }
+      // Note that if above checks fail, we keep ValueTypeString and everything works like without autocast
+    }
+    if ((attrType == DATE_TYPE) || (attrType == DATE_TYPE_ALT))
+    {
+      effectiveNumberValue = parse8601Time(effectiveStringValue);
+      if (effectiveNumberValue != -1)
+      {
+        effectiveValueType = ValueTypeNumber;
+      }
+      // Note that if parse8601Time() fails, we keep ValueTypeString and everything works like without autocast
+    }
+  }
+
+  switch (effectiveValueType)
   {
     case ValueTypeString:
-      bsonAttr.append(ENT_ATTRS_VALUE, stringValue);
+      bsonAttr.append(ENT_ATTRS_VALUE, effectiveStringValue);
       break;
 
     case ValueTypeNumber:
-      bsonAttr.append(ENT_ATTRS_VALUE, numberValue);
+      bsonAttr.append(ENT_ATTRS_VALUE, effectiveNumberValue);
       break;
 
     case ValueTypeBoolean:
-      bsonAttr.append(ENT_ATTRS_VALUE, boolValue);
+      bsonAttr.append(ENT_ATTRS_VALUE, effectiveBoolValue);
       break;
 
     case ValueTypeNull:
@@ -94,11 +138,11 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr) const
 *
 * Used to render attribute value to BSON, appended into the bsonAttr builder
 */
-void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr) const
+void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast) const
 {
   if (compoundValueP == NULL)
   {
-    bsonAppendAttrValue(bsonAttr);
+    bsonAppendAttrValue(bsonAttr, attrType, autocast);
   }
   else
   {
