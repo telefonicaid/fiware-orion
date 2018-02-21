@@ -22,15 +22,15 @@ This is an overview of the stress test performed by the FIWARE QA team.  A test 
 
 The executed performance tests are composed by nine scenarios:
 
-1.  [Update Stress Scenario (1-20 attributes)](#scenario-1)
-2.  [Update Stress Scenario (1-6 attributes)](#scenario-2)
-3.  [Convenience Update Stress Scenario](#scenario-3)
-4.  [NGSIv2 Update Stress Scenario](#scenario-4)
-5.  [Update Stress with notifications](#scenario-5)
-6.  [NGSIv2 Update Stress with notifications](#scenario-6)
-7.  [Stability Scenario](#scenario-7)
-8.  [Optimized Stability Scenario](#scenario-8)
-9.  [No-cache Optimized Stability Scenario](#scenario-9)
+1.  [Update Stress Scenario 20 attributes](#scenario-1:-update-stress-scenario-20-attributes)
+2.  [Update Stress Scenario 6 attributes](#scenario-2:-update-stress-scenario-6-attributes)
+3.  [Convenience Update Stress Scenario](#scenario-3:-convenience-update-stress)
+4.  [NGSIv2 Update Stress Scenario](#scenario-4:-ngsiv2-update-stress)
+5.  [Update Stress with notifications](#scenario-5:-update-stress-with-notifications)
+6.  [NGSIv2 Update Stress with notifications](#scenario-6:-ngsiv2-update-stress-with-notifications)
+7.  [Stability Scenario](#scenario-7:-stability-scenario)
+8.  [Optimized Stability Scenario](#scenario-8:-optimized-stability-scenario)
+9.  [No-cache Optimized Stability Scenario](#scenario-9:-no-cache-optimized-stability-scenario)
 
 Scenarios 1, 2, 3 and 6 foresee to add a thread every six seconds to reach 300 for the Context Broker Update service. 
 A data set of 5000 entities was updated to  a number of attributes ranging from 1 to 20. The scenario stops 10 minutes after the 300 concurrent threads are reached. At the beginning of the execution of this scenario  the subscriptions necessary to perform the tests are already in place.
@@ -47,11 +47,11 @@ In Scenario 7 (Stability scenario), 3 thread (one per each tested service) every
 
 The scenario 7 stops after 10 hours. The goal of this scenario is to check whether the system is degraded with a moderate load for a long period of time.
 
-Scenario 8 is the same than scenario 6, with the optimizations recommended by Orion’s developers, as follows:
+Scenario 8 is the same than scenario 6, with the [optimizations recommended by Orion’s developers](perf_tuning.md), as follows:
 
 1 - Added the next parameters to Orion startup:
 
-        -reqMutexPolicy none -writeConcern 0 -logLevel ERROR -notificationMode threadpool:q:n
+        -reqMutexPolicy none -writeConcern 0 -logLevel ERROR -notificationMode threadpool:1500:150
 
 2 - Created four indexes over the entities collection in the database:
 
@@ -60,13 +60,13 @@ Scenario 8 is the same than scenario 6, with the optimizations recommended by Or
         db.entities.createIndex( { "_id.servicePath": 1 } )
         db.entities.createIndex( { "attrNames": 1 } )
 
-Finally scenario 9 is the same than scenario 8, previously disabling the cache.
+Finally scenario 9 is the same than scenario 8, previously disabling the cache using the command line option -noCache.
 
 The obtained results were:
 
 [Top](#top)
 
-## Scenario 1
+## Scenario 1: Update Stress Scenario 20 attributes
 
 From Update Stress Scenario (1-20 attributes), we can get:
 
@@ -78,7 +78,7 @@ From Update Stress Scenario (1-20 attributes), we can get:
 
 [Top](#top)
 
-## Scenario 2
+## Scenario 2: Update Stress Scenario 6 attributes
 
 From Update Stress Scenario (1-6 attributes), we can get:
 
@@ -91,7 +91,7 @@ From Update Stress Scenario (1-6 attributes), we can get:
 
 [Top](#top)
 
-## Scenario 3
+## Scenario 3: Convenience Update Stress
 
 From Convenience Update Stress Scenario, we can get:
 
@@ -103,7 +103,7 @@ From Convenience Update Stress Scenario, we can get:
 
 [Top](#top)
 
-## Scenario 4
+## Scenario 4: NGSIv2 Update Stress
 
 From NGSIv2 Update Stress Scenario, we can get:
 
@@ -117,7 +117,7 @@ Response time is 75% higher, and the requests per second rate is 43% lower. We c
 
 [Top](#top)
 
-## Scenario 5
+## Scenario 5: Update Stress with notifications
 
 From Update Stress with notifications, we can get:
 
@@ -130,7 +130,7 @@ From Update Stress with notifications, we can get:
 
 [Top](#top)
 
-## Scenario 6
+## Scenario 6: NGSIv2 Update Stress with notifications
 
 From NGSIv2 Update Stress with notifications Scenario, we can get:
 
@@ -143,7 +143,7 @@ From NGSIv2 Update Stress with notifications Scenario, we can get:
 
 [Top](#top)
 
-## Scenario 7
+## Scenario 7: Stability Scenario
 
 From Stability Scenario, we can get:
 
@@ -154,7 +154,7 @@ From Stability Scenario, we can get:
 
 [Top](#top)
 
-## Scenario 8
+## Scenario 8: Optimized Stability Scenario
 
 From Optimized Stability Scenario, we can get:
 
@@ -165,7 +165,7 @@ From Optimized Stability Scenario, we can get:
 
 [Top](#top)
 
-## Scenario 9
+## Scenario 9: No-cache Optimized Stability Scenario
 
 From no-Cache Optimized Stability Scenario, we can get:
 
@@ -219,7 +219,7 @@ In order to investigate the latency using Orion under real usage conditions, thi
 
 ## Experimentation Environment
 
-The experimentation environment is hosted by a community account in FILAB’s Spain2 cloud infrastructure enabling the deployment of a virtual machine (VM) hosting an instance of Orion Context Broker (version 1.2.1), version 3.0.12 of a MongoDB database and version 0.13.0 of the Cygnus-NGSI injector. The VM has the following characteristics:
+The experimentation environment is hosted by a community account in the FIWARE Lab cloud infrastructure enabling the deployment of a virtual machine (VM) hosting an instance of Orion Context Broker (version 1.2.1), version 3.0.12 of a MongoDB database and version 0.13.0 of the Cygnus-NGSI injector. The VM has the following characteristics:
         
         CPU: 4 (Virtual)
         RAM: 8 GB  
@@ -236,18 +236,19 @@ Physical machines with the same characteristics was used for the clients in the 
         OS: Windows 7 Home Premium operating system
         Dev: Luna Eclipse development environment SR2 (4.4.2) and context generator application.
 
-From a performance point of view, FIWARE recommendations were taken into account to refine the following testbed components: MongoDB;  Orion and Cygnus-NGSI. The most important aspects of configuration are as follows:
+From a performance point of view, FIWARE tuning recommendations were taken into account to refine the following testbed components: MongoDB;  Orion and Cygnus-NGSI. The most important aspects of configuration are as follows:
 
 Firstly, version 3.0.12 of MongoDB was used, recommended for intensive update scenarios. In addition, the adjustments limiting use to deployed VM resources were checked and Transparent Huge Pages were disabled (THP).
 
 Secondly, Orion parameters were adjusted for scenarios with high update/notification rates
 
-        -reqPoolSize, -dbPoolSize and -notificationModethreadPool:q:n
+        -reqPoolSize, -dbPoolSize and -notificationMode  threadPool:q:n
         
 These parameters were adjusted for each test.
 
-Lastly, Cygnus-NGSI components were adjusted to increase performance and avoid potential bottlenecks in order to properly assess Orion. 
-
+Lastly,Cygnus-NGSI components were adjusted to increase performance and avoid potential bottlenecks in order to properly assess Orion. 
+To achieve this an HTTP source was selected where the OrionRestHandler was configured to convert NGSI events from Orion into Flume events. 
+Memory Channel because of its performance was chosen. This type of channel is ideal for flows that require increased performance and are willing to lose data in the case of Flume agent errors. Finally, an Orion HDFS Sink was used. Its performance was enhanced by using the batching mechanism to reduce the number of writes in the HDFS storage. 
 [Top](#top)
 
 ## Context Generation Methods
