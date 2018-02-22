@@ -22,15 +22,15 @@ This is an overview of the stress test performed by the FIWARE QA team.  A test 
 
 The executed performance tests are composed by nine scenarios:
 
-1.  [Update Stress Scenario 20 attributes](#scenario-1:-update-stress-scenario-20-attributes)
-2.  [Update Stress Scenario 6 attributes](#scenario-2:-update-stress-scenario-6-attributes)
-3.  [Convenience Update Stress Scenario](#scenario-3:-convenience-update-stress)
-4.  [NGSIv2 Update Stress Scenario](#scenario-4:-ngsiv2-update-stress)
-5.  [Update Stress with notifications](#scenario-5:-update-stress-with-notifications)
-6.  [NGSIv2 Update Stress with notifications](#scenario-6:-ngsiv2-update-stress-with-notifications)
-7.  [Stability Scenario](#scenario-7:-stability-scenario)
-8.  [Optimized Stability Scenario](#scenario-8:-optimized-stability-scenario)
-9.  [No-cache Optimized Stability Scenario](#scenario-9:-no-cache-optimized-stability-scenario)
+1.  [Update Stress Scenario 20 attributes](#scenario-1-update-stress-scenario-20-attributes)
+2.  [Update Stress Scenario 6 attributes](#scenario-2-update-stress-scenario-6-attributes)
+3.  [Convenience Update Stress Scenario](#scenario-3-convenience-update-stress)
+4.  [NGSIv2 Update Stress Scenario](#scenario-4-ngsiv2-update-stress)
+5.  [Update Stress with notifications](#scenario-5-update-stress-with-notifications)
+6.  [NGSIv2 Update Stress with notifications](#scenario-6-ngsiv2-update-stress-with-notifications)
+7.  [Stability Scenario](#scenario-7-stability-scenario)
+8.  [Optimized Stability Scenario](#scenario-8-optimized-stability-scenario)
+9.  [No-cache Optimized Stability Scenario](#scenario-9-no-cache-optimized-stability-scenario)
 
 Scenarios 1, 2, 3 and 6 foresee to add a thread every six seconds to reach 300 for the Context Broker Update service. 
 A data set of 5000 entities was updated to  a number of attributes ranging from 1 to 20. The scenario stops 10 minutes after the 300 concurrent threads are reached. At the beginning of the execution of this scenario  the subscriptions necessary to perform the tests are already in place.
@@ -66,7 +66,7 @@ The obtained results were:
 
 [Top](#top)
 
-## Scenario 1: Update Stress Scenario 20 attributes
+## Scenario 1 Update Stress Scenario 20 attributes
 
 From Update Stress Scenario (1-20 attributes), we can get:
 
@@ -78,7 +78,7 @@ From Update Stress Scenario (1-20 attributes), we can get:
 
 [Top](#top)
 
-## Scenario 2: Update Stress Scenario 6 attributes
+## Scenario 2 Update Stress Scenario 6 attributes
 
 From Update Stress Scenario (1-6 attributes), we can get:
 
@@ -91,7 +91,7 @@ From Update Stress Scenario (1-6 attributes), we can get:
 
 [Top](#top)
 
-## Scenario 3: Convenience Update Stress
+## Scenario 3 Convenience Update Stress
 
 From Convenience Update Stress Scenario, we can get:
 
@@ -103,7 +103,7 @@ From Convenience Update Stress Scenario, we can get:
 
 [Top](#top)
 
-## Scenario 4: NGSIv2 Update Stress
+## Scenario 4 NGSIv2 Update Stress
 
 From NGSIv2 Update Stress Scenario, we can get:
 
@@ -117,7 +117,7 @@ Response time is 75% higher, and the requests per second rate is 43% lower. We c
 
 [Top](#top)
 
-## Scenario 5: Update Stress with notifications
+## Scenario 5 Update Stress with notifications
 
 From Update Stress with notifications, we can get:
 
@@ -130,7 +130,7 @@ From Update Stress with notifications, we can get:
 
 [Top](#top)
 
-## Scenario 6: NGSIv2 Update Stress with notifications
+## Scenario 6 NGSIv2 Update Stress with notifications
 
 From NGSIv2 Update Stress with notifications Scenario, we can get:
 
@@ -143,7 +143,7 @@ From NGSIv2 Update Stress with notifications Scenario, we can get:
 
 [Top](#top)
 
-## Scenario 7: Stability Scenario
+## Scenario 7 Stability Scenario
 
 From Stability Scenario, we can get:
 
@@ -154,7 +154,7 @@ From Stability Scenario, we can get:
 
 [Top](#top)
 
-## Scenario 8: Optimized Stability Scenario
+## Scenario 8 Optimized Stability Scenario
 
 From Optimized Stability Scenario, we can get:
 
@@ -165,7 +165,7 @@ From Optimized Stability Scenario, we can get:
 
 [Top](#top)
 
-## Scenario 9: No-cache Optimized Stability Scenario
+## Scenario 9 No Cache Optimized Stability Scenario
 
 From no-Cache Optimized Stability Scenario, we can get:
 
