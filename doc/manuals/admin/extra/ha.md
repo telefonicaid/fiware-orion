@@ -20,32 +20,7 @@ will take on the Virtual IP.
 
 The picture below present the network architecture of the deployed cluster.
 
-```
-    +------------+    +------------+    +------------+
-    | HA Proxy 1 |    | HA Proxy 2 |    | HA Proxy 3 |
-    | 10.0.64.38 |    | 10.0.64.39 |    | 10.0.64.40 |
-    +------------+    +------------+    +------------+
-          |                  |                 |
-          +------------------------------------+
-                             |
-          +------------------------------------+
-          |                  |                 |
-    +------------+    +------------+    +------------+
-    |    Orion   |    |    Orion   |    |    Orion   |
-    |   Context  |    |   Context  |    |   Context  |
-    |   Broker 1 |    |   Broker 2 |    |   Broker 3 |
-    | 10.0.64.35 |    | 10.0.64.36 |    | 10.0.64.37 |
-    +------------+    +------------+    +------------+
-          |                  |                 |
-          +------------------------------------+
-                             |
-          +------------------------------------+
-          |                  |                 |
-   +------------+    +------------+    +------------+
-   |  MongoDB 1 |    |  MongoDB 2 |    |  MongoDB 3 |
-   | 10.0.64.32 |    | 10.0.64.33 |    | 10.0.64.34 |
-   +------------+    +------------+    +------------+
-```
+![ha.png](ha.png)
 
 In the following we describe the different steps to configure such a cluster
 on a set of virtual machines. In docker related documentation, we shortly
