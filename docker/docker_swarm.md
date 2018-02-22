@@ -8,9 +8,12 @@ Broker on Docker Swarm at this [link](https://smartsdk.github.io/smartsdk-recipe
 
 Here we provide only a quick overview.
 
+Alternatively, you can find a general discussion on Orion HA deployment
+[here](../doc/manuals/admin/extra/ha.md).
+
 ## Installing a Docker Swarm test cluster
 
-To deploy on your linux based system a Docker Swarm test cluster, you can used
+To deploy on your Linux based system a Docker Swarm test cluster, you can use
 [miniswarm](https://github.com/aelsabbahy/miniswarm).
 
 The only pre-requisite are:
@@ -32,11 +35,30 @@ $ chmod +rx /usr/local/bin/miniswarm
 $ miniswarm start 3
 ```
 
+The above command will create a Docker Swarm cluster of 3 nodes, including 
+1 master and 2 workers nodes.
+
 ### Connect to the cluster
 
 ```bash
 $ eval $(docker-machine env ms-manager0)
 ```
+
+Now your Docker client will be connected to the manager node of
+the cluster you just created.
+
+You can check that by running
+
+```bash
+$ docker machine ls
+
+NAME          ACTIVE   DRIVER       STATE     URL                          SWARM   DOCKER        ERRORS  
+ms-manager0   *        virtualbox   Running   tcp://192.168.99.101:2376            v18.02.0-ce   
+ms-worker0    -        virtualbox   Running   tcp://192.168.99.102:2376            v18.02.0-ce   
+ms-worker1    -        virtualbox   Running   tcp://192.168.99.100:2376            v18.02.0-ce   
+```
+
+The node with `*` is the node to which your docker client will connect.
 
 ## Deploy Orion Context Broker in HA
 
@@ -52,6 +74,7 @@ Details on how to deploy a MongoDB ReplicaSet in Docker Swarm are available
 
     ```bash
     $ docker network create --opt encrypted -d overlay backend
+    ncb90nkwpiofoof757te09xmt
     ```
 
 1. Create a docker-compose-mongo.yml file (or reuse the scripts in the
@@ -76,9 +99,16 @@ Details on how to deploy a MongoDB ReplicaSet in Docker Swarm are available
           restart_policy:
             condition: on-failure
           update_config:
+            # should you update the mongo cluster this configuration ensure
+            # that nodes are updated one by one ensuring that the mongo service
+            # remains available to other services. the delay ensure that
+            # when the new mongo is deployed it has enough time to be connected
+            # to the cluster
             parallelism: 1
             delay: 1m30s
 
+      # this service contains the logic to manage the mongo db
+      # replicaset consistency
       controller:
         image: martel/mongo-replica-ctrl:latest
         volumes:
@@ -117,9 +147,12 @@ Details on how to deploy a MongoDB ReplicaSet in Docker Swarm are available
 
     ```bash
     $ docker stack deploy -c docker-compose-mongo.yml mongo
+    Creating service mongo_mongo
+    Creating service mongo_controller
     ```
 
-1. Check that the deployment worked out correctly:
+1. Check that the deployment worked out correctly
+    (you need to wait the services  deployment to be completed):
 
     ```bash
     $ docker service logs -f mongo_controller
@@ -166,20 +199,39 @@ Details on how to deploy a MongoDB ReplicaSet in Docker Swarm are available
         external: true
     ```
 
-1. Deploy the MongoDB ReplicaSet
+1. Deploy the Orion Context Broker cluster
 
     ```bash
     $ docker stack deploy -c docker-compose-orion.yml orion
+    Creating service orion_orion
     ```
 
-1. Check that the deployment worked out correctly:
+1. Check that the deployment worked out correctly
+    (you need to wait the services  deployment to be completed):
 
     ```bash
-    $ curl $(docker-machine ip ms-manager0):1026/v2/entities -s -S --header 'Accept: application/json' --header 'fiware-service: default' --header 'fiware-ServicePath: /'
+    $ curl $(docker-machine ip ms-manager0):1026/version -s -S
+
+    {
+    "orion" : {
+      "version" : "1.7.0",
+      "uptime" : "0 d, 5 h, 9 m, 30 s",
+      "git_hash" : "e544780eb64a4a2557c1f51dde070b8d82b86c49",
+      "compile_time" : "Wed Feb 8 13:03:53 UTC 2017",
+      "compiled_by" : "root",
+      "compiled_in" : "b99744612d0b"
+    }
+    }
     ```
 
 1. Scale up orion:
 
     ```bash
     $ docker service scale orion_orion=3
+
+    orion_orion scaled to 3
+    overall progress: 2 out of 3 tasks 
+    1/3: running   [==================================================>] 
+    2/3: preparing [=================================>                 ] 
+    3/3: running   [==================================================>] 
     ```
