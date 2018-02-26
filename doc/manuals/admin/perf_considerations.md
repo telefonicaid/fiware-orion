@@ -32,12 +32,17 @@ The executed performance tests are composed by nine scenarios:
 8.  [Optimized Stability Scenario](#scenario-8-optimized-stability-scenario)
 9.  [No-cache Optimized Stability Scenario](#scenario-9-no-cache-optimized-stability-scenario)
 
-Scenarios 1, 2, 3 and 6 foresee to add a thread every six seconds to reach 300 for the Context Broker Update service. 
-A data set of 5000 entities was updated to  a number of attributes ranging from 1 to 20. The scenario stops 10 minutes after the 300 concurrent threads are reached. At the beginning of the execution of this scenario  the subscriptions necessary to perform the tests are already in place.
+In the scenario 1 Orion is stressed with massive update requests; a thread is added every six seconds to reach 300 for the Context Broker Update service. No subscription exists in the database, so no notification is generated during the test. The update request contains a random number of attribute updates between 1 and 20.
 
-Scenarios 4 and 5 are updated scenarios using NGSIv2 APIs instead of NGSIv1 ones. Scenario 2 is the same than scenario 1, but the number of attributes is lower in order to compare the results with scenario 2 (NGSIv1 vs NGSIv2).
+In the scenario 2 Orion is stressed with massive update requests; a thread is added every six seconds to reach 300 for the Context Broker Update service. No subscription exists in the database, so no notification is generated during the test. The update request contains a random number of attribute updates between 1 and 6.
 
-Scenarios 4 and 5 are the same than scenarios 1 and 3, but a previous load of 1000 subscriptions has been launched over the database, in order to  generate notifications by Orion.
+Scenario 3 is analogous to Test case 1, but updating attributes for a specific entity in each requests (convenience update).
+
+This scenario 4 is analogous of the scenario 2, but using NGSIv2 API. Orion is stressed with massive update requests. No subscription exists in the database, so no notification is generated during the test. The update request contains a random number of attribute updates. This number is between 1 and 6. 
+
+Scenario 5 (NGSIv1) is analogous to the test case 2, but this time a load of 1000 subscriptions has been launched before the test, in order to make Orion to generate notifications.
+
+Scenario 6 (NGSIv2)is analogous to the test case 4, but this time a load of 1000 subscriptions has been launched before the test, in order to make Orion to generate notifications.
 
 In Scenario 7 (Stability scenario), 3 thread (one per each tested service) every six seconds were added to reach 30:
 
@@ -252,7 +257,7 @@ Memory Channel because of its performance was chosen. This type of channel is id
 [Top](#top)
 
 ## Context Generation Methods
-The client application developed permits two ways of generating NGSI traffic. The first method (blocking method) simulates intermediate IoT node NGSI traffic generation. Its implementation is supported by the java.net API and its functionality is based on the HttpURLConnection class. This class only allows blocking connections. Thus, in each simulation the same number of persistent HTTP connections as simulated IoT nodes are opened.
+The client application developed permits two ways of generating NGSIv1 traffic. The first method (blocking method) simulates intermediate IoT node NGSI traffic generation. Its implementation is supported by the java.net API and its functionality is based on the HttpURLConnection class. This class only allows blocking connections. Thus, in each simulation the same number of persistent HTTP connections as simulated IoT nodes are opened.
 The second method (non-blocking method) simulates final IoT node NGSI traffic generation. Its implementation is focused on mechanisms that allow concurrent traffic generation. In this case, the SocketChannel class of the java.nio API was used to create non-blocking connections. Therefore, in each simulation the same number of connections as NGSI requests generated are opened.
 Another implementation detail to keep in mind is that each NGSI client (blocking or not) simulates the behaviour of a virtual IoT node in a separate thread.
 
