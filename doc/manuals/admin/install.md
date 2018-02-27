@@ -31,7 +31,7 @@ building from sources, check [this document](build_source.md).
 
 ### Using yum (recommended)
 
-Configure the FIWARE yum repository ([as described in this post](http://stackoverflow.com/questions/24331330/how-to-configure-system-to-use-the-fi-ware-yum-repository/24510985#24510985)). Then you can install doing (as root):
+Configure the FIWARE yum repository as described [here](yum.md). Then you can install doing (as root):
 
 ```
 yum install contextBroker
@@ -42,7 +42,7 @@ Sometimes the above commands fails due to yum cache. In that case, run
 
 ### Using RPM file
 
-Download the package from the [FIWARE Files area](https://forge.fiware.org/frs/?group_id=7). Look for the "DATA-OrionContextBroker" entry.
+Download the package directly from the [FIWARE yum repository](http://nexus.lab.fiware.org/service/rest/repository/browse/el/7/x86_64/). You can choose release or nightly packages.
 
 Next, install the package using the rpm command (as root):
 
@@ -97,7 +97,7 @@ yum install contextBroker
 Sometimes the above commands fails due to yum cache. In that case, run
 `yum clean all` and try again.
 
-If you are upgrading using the RPM file, then first download the new package from the [FIWARE Files area](https://forge.fiware.org/frs/?group_id=7). Look for the "DATA-OrionContextBroker" entry.
+If you are upgrading using the RPM file, then first download the new package from the [FIWARE yum repository](http://nexus.lab.fiware.org/service/rest/repository/browse/el/7/x86_64/). Choose variant of package to install (nightly or release).
 
 Then upgrade the package using the rpm command (as root):
 
