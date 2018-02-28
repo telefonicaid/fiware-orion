@@ -39,8 +39,8 @@
 #define IR  InvalidRequest
 static RestService rs[] =
 {
-  { "*", AVI, 6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "", badVerbGetPutDeleteOnly },
-  { "",  IR,  0, {                                                          }, "", NULL                    }
+  { AVI, 6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "", badVerbGetPutDeleteOnly },
+  { IR,  0, {                                                          }, "", NULL                    }
 };
 
 

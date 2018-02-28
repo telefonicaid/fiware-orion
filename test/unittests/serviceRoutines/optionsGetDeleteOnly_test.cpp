@@ -38,8 +38,8 @@
 */
 static RestService rs[] =
 {
-  { "OPTIONS", EntityRequest,  3, { "v2", "entities", "*" }, "", optionsGetDeleteOnly },
-  { "",        InvalidRequest, 0, {                       }, "", NULL                 }
+  { EntityRequest,  3, { "v2", "entities", "*" }, "", optionsGetDeleteOnly },
+  { InvalidRequest, 0, {                       }, "", NULL                 }
 };
 
 

@@ -45,9 +45,9 @@ extern bool harakiri;
 */
 static RestService rs[] =
 {
-  { "GET", ExitRequest,    2, { "exit", "*" }, "", exitTreat },
-  { "GET", ExitRequest,    1, { "exit"      }, "", exitTreat },
-  { "",    InvalidRequest, 0, {             }, "", NULL      }
+  { ExitRequest,    2, { "exit", "*" }, "", exitTreat },
+  { ExitRequest,    1, { "exit"      }, "", exitTreat },
+  { InvalidRequest, 0, {             }, "", NULL      }
 };
 
 

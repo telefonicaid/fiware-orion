@@ -73,6 +73,7 @@ extern bool                    multitenant;
 extern bool                    corsEnabled;
 extern char                    corsOrigin[64];
 extern int                     corsMaxAge;
+extern RestService*            noServices;
 
 
 
@@ -80,7 +81,15 @@ extern int                     corsMaxAge;
 *
 * RestServeFunction -
 */
-typedef void (*RestServeFunction)(ConnectionInfo* ciP);
+typedef std::string (*RestServeFunction)(ConnectionInfo* ciP);
+
+
+
+/* ****************************************************************************
+*
+* serve -
+*/
+extern std::string serve(ConnectionInfo* ciP);
 
 
 
@@ -90,7 +99,13 @@ typedef void (*RestServeFunction)(ConnectionInfo* ciP);
 */
 extern void restInit
 (
-   RestService*        _restServiceV,
+   RestService*        _getServiceV,
+   RestService*        _putServiceV,
+   RestService*        _postServiceV,
+   RestService*        _patchServiceV,
+   RestService*        _deleteServiceV,
+   RestService*        _optionsServiceV,
+   RestService*        _noServiceV,
    IpVersion           _ipVersion,
    const char*         _bindAddress,
    unsigned short      _port,
@@ -132,5 +147,22 @@ extern void firstServicePath(const char* servicePath, char* servicePath0, int se
 * true if that Origin is allowed to make a CORS request
 */
 extern bool isOriginAllowedForCORS(const std::string& requestOrigin);
+
+
+
+/* ****************************************************************************
+*
+* serviceVectorsSet - only for unit tests
+*/
+extern void serviceVectorsSet
+(
+  RestService*        _getServiceV,
+  RestService*        _putServiceV,
+  RestService*        _postServiceV,
+  RestService*        _patchServiceV,
+  RestService*        _deleteServiceV,
+  RestService*        _optionsServiceV,
+  RestService*        _noServiceV
+);
 
 #endif

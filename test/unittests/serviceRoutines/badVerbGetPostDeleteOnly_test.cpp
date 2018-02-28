@@ -39,8 +39,8 @@
 #define IR   InvalidRequest
 static RestService rs[] =
 {
-  { "*", ICEA, 5, { "ngsi10", "contextEntities", "*", "attributes", "*" }, "", badVerbGetPostDeleteOnly },
-  { "",  IR,   0, {                                                     }, "", NULL                     }
+  { ICEA, 5, { "ngsi10", "contextEntities", "*", "attributes", "*" }, "", badVerbGetPostDeleteOnly },
+  { IR,   0, {                                                     }, "", NULL                     }
 };
 
 

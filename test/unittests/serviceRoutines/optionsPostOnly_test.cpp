@@ -38,8 +38,8 @@
 */
 static RestService rs[] =
 {
-  { "OPTIONS", BatchQueryRequest,  3, { "v2", "op", "query" }, "", optionsPostOnly },
-  { "",        InvalidRequest,     0, {                     }, "", NULL            }
+  { BatchQueryRequest,  3, { "v2", "op", "query" }, "", optionsPostOnly },
+  { InvalidRequest,     0, {                     }, "", NULL            }
 };
 
 

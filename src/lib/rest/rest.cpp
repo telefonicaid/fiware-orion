@@ -62,7 +62,13 @@
 *
 * Globals
 */
-static RestService*              restServiceV          = NULL;
+static RestService*              getServiceV           = NULL;
+static RestService*              putServiceV           = NULL;
+static RestService*              postServiceV          = NULL;
+static RestService*              patchServiceV         = NULL;
+static RestService*              deleteServiceV        = NULL;
+static RestService*              optionsServiceV       = NULL;
+RestService*                     noServices            = NULL;
 static unsigned short            port                  = 0;
 static RestServeFunction         serveFunction         = NULL;
 static char                      bindIp[MAX_LEN_IP]    = "0.0.0.0";
@@ -559,9 +565,15 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 *
 * serve -
 */
-static void serve(ConnectionInfo* ciP)
+std::string serve(ConnectionInfo* ciP)
 {
-  restService(ciP, restServiceV);
+  if      ((ciP->verb == GET)     && (getServiceV     != NULL))    return restService(ciP, getServiceV, "GET");
+  else if ((ciP->verb == POST)    && (postServiceV    != NULL))    return restService(ciP, postServiceV, "POST");
+  else if ((ciP->verb == PUT)     && (putServiceV     != NULL))    return restService(ciP, putServiceV, "PUT");
+  else if ((ciP->verb == PATCH)   && (patchServiceV   != NULL))    return restService(ciP, patchServiceV, "PATCH");
+  else if ((ciP->verb == DELETE)  && (deleteServiceV  != NULL))    return restService(ciP, deleteServiceV, "DELETE");
+  else if ((ciP->verb == OPTIONS) && (optionsServiceV != NULL))    return restService(ciP, optionsServiceV, "OPTIONS");
+  else                                                             return restService(ciP, noServices, "noServices");  // FIXME PR: Call badVerb() directly?
 }
 
 
@@ -1751,6 +1763,32 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
 /* ****************************************************************************
 *
+* serviceVectorsSet - only for unit tests
+*/
+void serviceVectorsSet
+(
+  RestService*        _getServiceV,
+  RestService*        _putServiceV,
+  RestService*        _postServiceV,
+  RestService*        _patchServiceV,
+  RestService*        _deleteServiceV,
+  RestService*        _optionsServiceV,
+  RestService*        _noServiceV
+)
+{
+  getServiceV      = _getServiceV;
+  putServiceV      = _putServiceV;
+  postServiceV     = _postServiceV;
+  patchServiceV    = _patchServiceV;
+  deleteServiceV   = _deleteServiceV;
+  optionsServiceV  = _optionsServiceV;
+  noServices       = _noServiceV;
+}
+
+
+
+/* ****************************************************************************
+*
 * restInit -
 *
 * FIXME P5: add vector of the accepted content-types, instead of the bool
@@ -1758,7 +1796,13 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 */
 void restInit
 (
-  RestService*        _restServiceV,
+  RestService*        _getServiceV,
+  RestService*        _putServiceV,
+  RestService*        _postServiceV,
+  RestService*        _patchServiceV,
+  RestService*        _deleteServiceV,
+  RestService*        _optionsServiceV,
+  RestService*        _noServiceV,
   IpVersion           _ipVersion,
   const char*         _bindAddress,
   unsigned short      _port,
@@ -1780,7 +1824,14 @@ void restInit
   const char* cert = _httpsCertificate;
 
   port             = _port;
-  restServiceV     = _restServiceV;
+  getServiceV      = _getServiceV;
+  putServiceV      = _putServiceV;
+  postServiceV     = _postServiceV;
+  patchServiceV    = _patchServiceV;
+  deleteServiceV   = _deleteServiceV;
+  optionsServiceV  = _optionsServiceV;
+  noServices       = _noServiceV;
+
   ipVersionUsed    = _ipVersion;
   serveFunction    = (_serveFunction != NULL)? _serveFunction : serve;
   multitenant      = _multitenant;

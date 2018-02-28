@@ -38,8 +38,8 @@
 */
 static RestService rs[] =
 {
-  { "OPTIONS", EntryPointsRequest,  1, { "v2" }, "", optionsGetOnly  },
-  { "",        InvalidRequest,      0, {      }, "", NULL            }
+  { EntryPointsRequest,  1, { "v2" }, "", optionsGetOnly  },
+  { InvalidRequest,      0, {      }, "", NULL            }
 };
 
 

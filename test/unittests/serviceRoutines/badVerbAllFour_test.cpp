@@ -37,10 +37,10 @@
 */
 static RestService rs[] =
 {
-  { "*", IndividualContextEntity, 3, { "ngsi10", "contextEntities", "*" }, "", badVerbAllFour },
-  { "*", IndividualContextEntity, 2, { "ngsi10", "contextEntities"      }, "", badVerbAllFour },
-  { "*", IndividualContextEntity, 1, { "ngsi10"                         }, "", badVerbAllFour },
-  { "",  InvalidRequest,          0, {                                  }, "", NULL           }
+  { IndividualContextEntity, 3, { "ngsi10", "contextEntities", "*" }, "", badVerbAllFour },
+  { IndividualContextEntity, 2, { "ngsi10", "contextEntities"      }, "", badVerbAllFour },
+  { IndividualContextEntity, 1, { "ngsi10"                         }, "", badVerbAllFour },
+  { InvalidRequest,          0, {                                  }, "", NULL           }
 };
 
 

@@ -49,19 +49,12 @@
 RestService rs[] =
 {
   // NGSI-9 Requests
-  { "POST", RegisterContext, 2, { "ngsi9", "registerContext" }, "registerContextRequest", postRegisterContext },
-  { "*",    RegisterContext, 2, { "ngsi9", "registerContext" }, "registerContextRequest", badVerbPostOnly     },
-
-  // End marker for the array
-  { "", InvalidRequest, 0, {}, "", NULL }
+  { RegisterContext, 2, { "ngsi9", "registerContext" }, "registerContextRequest", postRegisterContext },
+  { RegisterContext, 2, { "ngsi9", "registerContext" }, "registerContextRequest", badVerbPostOnly     },
+  { InvalidRequest, 0, {}, "", NULL }
 };
 
 
-
-/* ****************************************************************************
-*
-* rs2 -
-*/
 #define RC   RegisterContext
 #define DCA  DiscoverContextAvailability
 #define RCR  "registerContextRequest"
@@ -70,13 +63,13 @@ RestService rs[] =
 RestService rs2[] =
 {
   // NGSI-9 Requests
-  { "POST", RC,  2, { "ngsi9",  "registerContext"             }, RCR,  postRegisterContext             },
-  { "*",    RC,  2, { "ngsi9",  "registerContext"             }, RCR,  badVerbPostOnly                 },
-  { "POST", DCA, 2, { "ngsi9",  "discoverContextAvailability" }, DCAR, postDiscoverContextAvailability },
-  { "*",    DCA, 2, { "ngsi9",  "discoverContextAvailability" }, DCAR, badVerbPostOnly                 },
+  { RC,  2, { "ngsi9",  "registerContext"             }, RCR,  postRegisterContext             },
+  { RC,  2, { "ngsi9",  "registerContext"             }, RCR,  badVerbPostOnly                 },
+  { DCA, 2, { "ngsi9",  "discoverContextAvailability" }, DCAR, postDiscoverContextAvailability },
+  { DCA, 2, { "ngsi9",  "discoverContextAvailability" }, DCAR, badVerbPostOnly                 },
 
   // End marker for the array
-  { "", InvalidRequest, 0, {}, "", NULL }
+  { InvalidRequest, 0, {}, "", NULL }
 };
 
 

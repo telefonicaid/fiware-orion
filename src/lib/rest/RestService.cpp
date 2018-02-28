@@ -35,19 +35,21 @@
 #include "common/string.h"
 #include "common/limits.h"
 #include "common/errorMessages.h"
+
 #include "alarmMgr/alarmMgr.h"
 #include "metricsMgr/metricsMgr.h"
-
 #include "ngsi/ParseData.h"
+#include "mongoBackend/mongoSubCache.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 #include "parse/textParse.h"
+#include "serviceRoutines/badRequest.h"
+
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
-#include "rest/RestService.h"
 #include "rest/restReply.h"
 #include "rest/rest.h"
 #include "rest/uriParamNames.h"
-#include "mongoBackend/mongoSubCache.h"
+#include "rest/RestService.h"
 
 
 
@@ -445,7 +447,7 @@ static bool compErrorDetect
 *
 * restService -
 */
-std::string restService(ConnectionInfo* ciP, RestService* serviceV)
+std::string restService(ConnectionInfo* ciP, RestService* serviceV, const char* serviceVectorName)
 {
   std::vector<std::string>  compV;
   int                       components;
@@ -487,14 +489,10 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   //
   // Lookup the requested service
   //
+  
   for (unsigned int ix = 0; serviceV[ix].treat != NULL; ++ix)
   {
     if ((serviceV[ix].components != 0) && (serviceV[ix].components != components))
-    {
-      continue;
-    }
-
-    if ((ciP->method != serviceV[ix].verb) && (serviceV[ix].verb != "*"))
     {
       continue;
     }
@@ -503,14 +501,16 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     bool match = true;
     for (int compNo = 0; compNo < components; ++compNo)
     {
-      if (serviceV[ix].compV[compNo] == "*")
+      const char* component = serviceV[ix].compV[compNo].c_str();
+      
+      if ((component[0] == '*') && (component[1] == 0))
       {
         continue;
       }
 
       if (ciP->apiVersion == V1)
       {
-        if (strcasecmp(serviceV[ix].compV[compNo].c_str(), compV[compNo].c_str()) != 0)
+        if (strcasecmp(component, compV[compNo].c_str()) != 0)
         {
           match = false;
           break;
@@ -518,7 +518,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       }
       else
       {
-        if (strcmp(serviceV[ix].compV[compNo].c_str(), compV[compNo].c_str()) != 0)
+        if (strcmp(component, compV[compNo].c_str()) != 0)
         {
           match = false;
           break;
@@ -531,7 +531,11 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       continue;
     }
 
-    if ((ciP->payload != NULL) && (ciP->payloadSize != 0) && (ciP->payload[0] != 0) && (serviceV[ix].verb != "*"))
+
+    //
+    // If in noService vector, no need to check the payload
+    //
+    if ((serviceV != noServices) && (ciP->payload != NULL) && (ciP->payloadSize != 0) && (ciP->payload[0] != 0))
     {
       std::string response;
       std::string spath = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
@@ -563,7 +567,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       }
     }
 
-    LM_T(LmtService, ("Treating service %s %s", serviceV[ix].verb.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
+    LM_T(LmtService, ("Treating service %s %s", ciP->method.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
     if (ciP->payloadSize == 0)
     {
       ciP->inMimeType = NOMIMETYPE;
@@ -610,12 +614,11 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     //
     // If we have gotten this far the Input is OK.
-    // Except for all the badVerb/badRequest, etc.
-    // A common factor for all these 'services' is that the verb is '*'
+    // Except for all the badVerb/badRequest, in the noServices vector.
     //
     // So, the 'Bad Input' alarm is cleared for this client.
     //
-    if (serviceV[ix].verb != "*")
+    if (serviceV != noServices)
     {
       alarmMgr.badInputReset(clientIp);
     }
@@ -645,6 +648,18 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     return response;
   }
 
+  if (noServices == NULL)
+  {
+    std::vector<std::string> cV;
+
+    return badRequest(ciP, 0, cV, NULL);
+  }
+
+  if (serviceV != noServices)
+  {
+    return restService(ciP, noServices, "noServices");
+  }
+    
   std::string details = std::string("service '") + ciP->url + "' not recognized";
   alarmMgr.badInput(clientIp, details);
 

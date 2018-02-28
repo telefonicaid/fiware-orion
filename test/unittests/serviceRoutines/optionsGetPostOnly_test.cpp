@@ -38,16 +38,14 @@
 */
 static RestService rs[] =
 {
-  { "OPTIONS", EntitiesRequest,  2, { "v2", "entities" }, "", optionsGetPostOnly },
-  { "",        InvalidRequest,   0, {                  }, "", NULL               }
+  { ", EntitiesRequest,  2, { "v2", "entities" }, "", optionsGetPostOnly },
+  { equest,   0, {                  }, "", NULL               }
 };
 
 
 
-/* ****************************************************************************
-*
-* ok -
-*/
+/* ********************************************************************
+**/
 TEST(versionTreat, ok)
 {
   ConnectionInfo  ci("/v2/entities",  "OPTIONS", "1.1");

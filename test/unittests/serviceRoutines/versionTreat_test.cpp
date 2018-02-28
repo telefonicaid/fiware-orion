@@ -37,8 +37,8 @@
 */
 static RestService rs[] =
 {
-  { "GET", VersionRequest, 1, { "version" }, "", versionTreat  },
-  { "",    InvalidRequest, 0, {           }, "", NULL          }
+  { VersionRequest, 1, { "version" }, "", versionTreat  },
+  { InvalidRequest, 0, {           }, "", NULL          }
 };
 
 

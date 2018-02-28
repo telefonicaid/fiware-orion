@@ -33,6 +33,7 @@
 #include "serviceRoutines/putAvailabilitySubscriptionConvOp.h"
 #include "serviceRoutines/deleteAvailabilitySubscriptionConvOp.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 #include "unittests/unittest.h"
 
@@ -47,17 +48,31 @@
 #define IR    InvalidRequest
 #define SCAR  "subscribeContextAvailabilityRequest"
 #define UCASR "updateContextAvailabilitySubscriptionRequest"
-static RestService rs[] =
+
+static RestService postV[] =
 {
-  { "POST",   SCA, 2, { "ngsi9", "contextAvailabilitySubscriptions"      }, SCAR,  postSubscribeContextAvailability  },
-  { "*",      SCA, 2, { "ngsi9", "contextAvailabilitySubscriptions"      }, "",    badVerbPostOnly                   },
+  { SCA,  2, { "ngsi9", "contextAvailabilitySubscriptions"      }, SCAR,  postSubscribeContextAvailability  },
+  { IR,   0, {                                                  }, "",    NULL                              }
+};
 
-  { "PUT",    SCO, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, UCASR, putAvailabilitySubscriptionConvOp },
-  { "DELETE", SCO, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "", deleteAvailabilitySubscriptionConvOp },
-  { "*",      SCO, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "",    badVerbPutDeleteOnly              },
+static RestService putV[] =
+{
+  { SCO, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, UCASR, putAvailabilitySubscriptionConvOp },
+  { IR,   0, {                                                  }, "",    NULL                              }
+};
 
-  { "*",     IR,   0, { "*", "*", "*", "*", "*", "*"                     }, "",    badRequest                        },
-  { "",      IR,   0, {                                                  }, "",    NULL                              }
+static RestService deleteV[] =
+{
+  { SCO, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "", deleteAvailabilitySubscriptionConvOp },
+  { IR,  0, {                                                  }, "",    NULL                              }
+};
+
+static RestService noServiceV[] =
+{
+  { SCA, 2, { "ngsi9", "contextAvailabilitySubscriptions"      }, "",    badVerbPostOnly                   },
+  { SCO, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "",    badVerbPutDeleteOnly              },
+  { IR,  0, { "*", "*", "*", "*", "*", "*"                     }, "",    badRequest                        },
+  { IR,  0, {                                                  }, "",    NULL                              }
 };
 
 
@@ -75,12 +90,14 @@ TEST(putAvailabilitySubscriptionConvOp, put)
 
   utInit();
 
-  out = restService(&ci1, rs);
+  serviceVectorsSet(NULL, putV, postV, NULL, deleteV, NULL, noServiceV);  
+  
+  out = serve(&ci1);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci1.httpHeader[0]);
   EXPECT_EQ("POST",  ci1.httpHeaderValue[0]);
 
-  out = restService(&ci2, rs);
+  out = serve(&ci2);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci2.httpHeader[0]);
   EXPECT_EQ("PUT, DELETE", ci2.httpHeaderValue[0]);
