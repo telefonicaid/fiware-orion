@@ -40,9 +40,9 @@
 
 /* ****************************************************************************
 *
-* noServiceV -
+* badVerbV -
 */
-static RestService noServiceV[] =
+static RestService badVerbV[] =
 {
   { Ngsi10SubscriptionsConvOp,  3, { "ngsi10", "contextSubscriptions", "*" }, "", badVerbPutDeleteOnly },
   { InvalidRequest,             0, { "*", "*", "*", "*", "*", "*"          }, "", badRequest           },
@@ -66,8 +66,8 @@ TEST(putSubscriptionConvOp, put)
   ci1.payload        = NULL;
   ci1.payloadSize    = 0;
 
-  serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, noServiceV);
-  out = serve(&ci1);
+  serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, badVerbV);
+  out = orionServe(&ci1);
 
   EXPECT_EQ("Allow",       ci1.httpHeader[0]);
   EXPECT_EQ("PUT, DELETE", ci1.httpHeaderValue[0]);

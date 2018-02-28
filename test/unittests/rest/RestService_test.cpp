@@ -37,6 +37,7 @@
 #include "rest/restReply.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 #include "unittests/unittest.h"
 
@@ -44,12 +45,16 @@
 
 /* ****************************************************************************
 *
-* rs -
+* service routine vectors -
 */
-RestService rs[] =
+RestService postV[] =
 {
-  // NGSI-9 Requests
   { RegisterContext, 2, { "ngsi9", "registerContext" }, "registerContextRequest", postRegisterContext },
+  { InvalidRequest, 0, {}, "", NULL }
+};
+
+RestService badVerbs[] =
+{
   { RegisterContext, 2, { "ngsi9", "registerContext" }, "registerContextRequest", badVerbPostOnly     },
   { InvalidRequest, 0, {}, "", NULL }
 };
@@ -60,15 +65,17 @@ RestService rs[] =
 #define RCR  "registerContextRequest"
 #define DCAR "discoverContextAvailabilityRequest"
 
-RestService rs2[] =
+RestService postV2[] =
 {
-  // NGSI-9 Requests
   { RC,  2, { "ngsi9",  "registerContext"             }, RCR,  postRegisterContext             },
-  { RC,  2, { "ngsi9",  "registerContext"             }, RCR,  badVerbPostOnly                 },
   { DCA, 2, { "ngsi9",  "discoverContextAvailability" }, DCAR, postDiscoverContextAvailability },
-  { DCA, 2, { "ngsi9",  "discoverContextAvailability" }, DCAR, badVerbPostOnly                 },
+  { InvalidRequest, 0, {}, "", NULL }
+};
 
-  // End marker for the array
+RestService badVerbs2[] =
+{
+  { DCA, 2, { "ngsi9",  "discoverContextAvailability" }, DCAR, badVerbPostOnly                 },
+  { RC,  2, { "ngsi9",  "registerContext"             }, RCR,  badVerbPostOnly                 },
   { InvalidRequest, 0, {}, "", NULL }
 };
 
@@ -104,7 +111,7 @@ TEST(RestService, payloadParse)
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
 
-  out = payloadParse(&ci, &parseData, &rs[0], NULL, &jsonRelease, compV);
+  out = payloadParse(&ci, &parseData, &postV[0], NULL, &jsonRelease, compV);
   EXPECT_EQ("OK", out);
 
 
@@ -120,7 +127,7 @@ TEST(RestService, payloadParse)
   ci.payload        = (char*) "123";
   ci.payloadSize    = strlen(ci.payload);
 
-  out = payloadParse(&ci, &parseData, &rs[0], NULL, &jsonRelease, compV);
+  out = payloadParse(&ci, &parseData, &postV[0], NULL, &jsonRelease, compV);
   EXPECT_EQ("Bad inMimeType", out);
 
   utExit();
@@ -156,7 +163,9 @@ TEST(RestService, noSuchServiceAndNotFound)
   ci.inMimeType     = JSON;
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
-  out               = restService(&ci, rs);
+
+  serviceVectorsSet(NULL, NULL, postV, NULL, NULL, NULL, badVerbs);
+  out = orionServe(&ci);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Not found
@@ -171,7 +180,10 @@ TEST(RestService, noSuchServiceAndNotFound)
   ci.inMimeType     = JSON;
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
-  out               = restService(&ci, rs2);
+
+  serviceVectorsSet(NULL, NULL, postV2, NULL, NULL, NULL, badVerbs2);
+  out = orionServe(&ci);
+
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

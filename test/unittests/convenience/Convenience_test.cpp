@@ -24,6 +24,8 @@
 */
 #include "gtest/gtest.h"
 
+#include "unittest.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -37,8 +39,6 @@
 #include "serviceRoutines/getContextEntitiesByEntityId.h"
 #include "serviceRoutines/badVerbGetOnly.h"
 
-#include "unittest.h"
-
 
 
 /* ****************************************************************************
@@ -51,7 +51,7 @@ RestService getV[] =
   { InvalidRequest,                        0, {                                                   }, "", NULL                             }
 };
 
-RestService noServiceV[] =
+RestService badVerbV[] =
 {
   { ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                   }, "", badVerbGetOnly                   },
   { InvalidRequest,                        0, {                                                   }, "", NULL                             }
@@ -71,9 +71,9 @@ TEST(Convenience, emptyPath)
 
   utInit();
 
-  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, noServiceV);
+  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
 
-  response = serve(&ci);
+  response = orionServe(&ci);
   EXPECT_STREQ(expected.c_str(), response.c_str());
 
   utExit();
@@ -99,22 +99,22 @@ TEST(Convenience, shortPath)
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, noServiceV);
+  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
 
   ci1.apiVersion = V1;
-  out = serve(&ci1);
+  out = orionServe(&ci1);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ci2.apiVersion = V1;
-  out = serve(&ci2);
+  out = orionServe(&ci2);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ci3.apiVersion = V1;
-  out = serve(&ci3);
+  out = orionServe(&ci3);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ci4.apiVersion = V1;
-  out = serve(&ci4);
+  out = orionServe(&ci4);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -137,10 +137,10 @@ TEST(Convenience, badPathNgsi9)
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, noServiceV);
+  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
 
   ci.apiVersion = V1;
-  out = serve(&ci);
+  out = orionServe(&ci);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -161,11 +161,11 @@ TEST(Convenience, badPathNgsi10)
 
   utInit();
 
-  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, noServiceV);
+  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   ci.apiVersion = V1;
-  out = serve(&ci);
+  out = orionServe(&ci);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

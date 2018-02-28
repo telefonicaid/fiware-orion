@@ -28,12 +28,13 @@
 
 #include "serviceRoutines/logTreat.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs -
+* service vectors -
 */
 static RestService getV[] =
 {
@@ -63,7 +64,7 @@ static RestService deleteV[] =
   { InvalidRequest,  0, {                              }, NULL            }
 };
 
-static RestService noServiceV[] =
+static RestService badVerbV[] =
 {
   { LogTraceRequest, 2, { "log", "*"                   }, logErrorTreat   },
   { LogTraceRequest, 3, { "log", "*", "*"              }, logErrorTreat   },
@@ -82,7 +83,9 @@ TEST(versionTreat, get_verbose)
   ConnectionInfo ci("/log/verbose",  "GET", "1.1");
   std::string out;
 
-  out = restService(&ci, getV);
+  serviceVectorsSet(getV, putV, postV, NULL, deleteV, NULL, badVerbV);
+  out = orionServe(&ci);
+  
   EXPECT_STREQ("OK", out.c_str());
 }
 
@@ -97,7 +100,9 @@ TEST(versionTreat, put_verbose)
   ConnectionInfo ci("/log/verbose/3",  "PUT", "1.1");
   std::string out;
 
-  out = restService(&ci, putV);
+  serviceVectorsSet(getV, putV, postV, NULL, deleteV, NULL, badVerbV);
+  out = orionServe(&ci);
+
   EXPECT_STREQ("OK", out.c_str());
 }
 
@@ -112,7 +117,9 @@ TEST(versionTreat, post_verbose)
   ConnectionInfo ci("/log/verbose/3",  "POST", "1.1");
   std::string out;
 
-  out = restService(&ci, postV);
+  serviceVectorsSet(getV, putV, postV, NULL, deleteV, NULL, badVerbV);
+  out = orionServe(&ci);
+
   EXPECT_STREQ("OK", out.c_str());
 }
 
@@ -127,6 +134,8 @@ TEST(versionTreat, delete_verbose)
   ConnectionInfo ci("/log/verbose",  "DELETE", "1.1");
   std::string out;
 
-  out = restService(&ci, deleteV);
+  serviceVectorsSet(getV, putV, postV, NULL, deleteV, NULL, badVerbV);
+  out = orionServe(&ci);
+
   EXPECT_STREQ("OK", out.c_str());
 }

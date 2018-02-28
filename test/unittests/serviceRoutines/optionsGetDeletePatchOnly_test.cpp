@@ -34,9 +34,9 @@
 
 /* ****************************************************************************
 *
-* rs -
+* optionsV -
 */
-static RestService rs[] =
+static RestService optionsV[] =
 {
   { IndividualSubscriptionRequest,  3, { "v2", "subscriptions", "*" }, "", optionsGetDeletePatchOnly },
   { InvalidRequest,                 0, {                            }, "", NULL                      }
@@ -53,7 +53,8 @@ TEST(versionTreat, ok)
   ConnectionInfo  ci("/v2/subscriptions/testSub",  "OPTIONS", "1.1");
   std::string     out;
 
-  out = restService(&ci, rs);
+  serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, optionsV, NULL);
+  out = orionServe(&ci);
 
   EXPECT_TRUE(strstr(out.c_str(), "Access-Control-Allow-Origin")  != NULL);
   EXPECT_TRUE(strstr(out.c_str(), "Access-Control-Max-Age")       != NULL);

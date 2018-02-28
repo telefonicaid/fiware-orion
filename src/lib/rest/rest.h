@@ -73,7 +73,7 @@ extern bool                    multitenant;
 extern bool                    corsEnabled;
 extern char                    corsOrigin[64];
 extern int                     corsMaxAge;
-extern RestService*            noServices;
+extern RestService*            restBadVerbV;
 
 
 
@@ -162,7 +162,7 @@ extern void serviceVectorsSet
   RestService*        _patchServiceV,
   RestService*        _deleteServiceV,
   RestService*        _optionsServiceV,
-  RestService*        _noServiceV
+  RestService*        _badVerbV
 );
 
 #endif

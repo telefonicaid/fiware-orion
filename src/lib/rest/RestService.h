@@ -62,14 +62,6 @@ typedef struct RestService
 
 /* ****************************************************************************
 *
-* restService -
-*/
-extern std::string restService(ConnectionInfo* ciP, RestService* serviceV, const char* serviceVectorName = "noname");
-
-
-
-/* ****************************************************************************
-*
 * payloadParse -
 */
 extern std::string payloadParse
@@ -89,5 +81,30 @@ extern std::string payloadParse
 * tenantCheck -
 */
 extern std::string tenantCheck(const std::string& tenant);
+
+
+
+/* ****************************************************************************
+*
+* serviceVectorsSet - only for unit tests
+*/
+extern void serviceVectorsSet
+(
+  RestService*        _getServiceV,
+  RestService*        _putServiceV,
+  RestService*        _postServiceV,
+  RestService*        _patchServiceV,
+  RestService*        _deleteServiceV,
+  RestService*        _optionsServiceV,
+  RestService*        _restBadVerbV
+);
+
+
+
+/* ****************************************************************************
+*
+* orionServe -
+*/
+extern std::string orionServe(ConnectionInfo* ciP);
 
 #endif

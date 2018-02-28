@@ -55,6 +55,46 @@
 
 /* ****************************************************************************
 *
+* service vectors - 
+*/
+static RestService*              getServiceV           = NULL;
+static RestService*              putServiceV           = NULL;
+static RestService*              postServiceV          = NULL;
+static RestService*              patchServiceV         = NULL;
+static RestService*              deleteServiceV        = NULL;
+static RestService*              optionsServiceV       = NULL;
+RestService*                     restBadVerbV          = NULL;
+
+
+
+/* ****************************************************************************
+*
+* serviceVectorsSet - only for unit tests
+*/
+void serviceVectorsSet
+(
+  RestService*        _getServiceV,
+  RestService*        _putServiceV,
+  RestService*        _postServiceV,
+  RestService*        _patchServiceV,
+  RestService*        _deleteServiceV,
+  RestService*        _optionsServiceV,
+  RestService*        _restBadVerbV
+)
+{
+  getServiceV      = _getServiceV;
+  putServiceV      = _putServiceV;
+  postServiceV     = _postServiceV;
+  patchServiceV    = _patchServiceV;
+  deleteServiceV   = _deleteServiceV;
+  optionsServiceV  = _optionsServiceV;
+  restBadVerbV     = _restBadVerbV;
+}
+
+
+
+/* ****************************************************************************
+*
 * delayedRelease -
 */
 static void delayedRelease(JsonDelayedRelease* releaseP)
@@ -447,7 +487,7 @@ static bool compErrorDetect
 *
 * restService -
 */
-std::string restService(ConnectionInfo* ciP, RestService* serviceV, const char* serviceVectorName)
+static std::string restService(ConnectionInfo* ciP, RestService* serviceV, const char* serviceVectorName)
 {
   std::vector<std::string>  compV;
   int                       components;
@@ -533,9 +573,9 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV, const char* 
 
 
     //
-    // If in noService vector, no need to check the payload
+    // If in restBadVerbV vector, no need to check the payload
     //
-    if ((serviceV != noServices) && (ciP->payload != NULL) && (ciP->payloadSize != 0) && (ciP->payload[0] != 0))
+    if ((serviceV != restBadVerbV) && (ciP->payload != NULL) && (ciP->payloadSize != 0) && (ciP->payload[0] != 0))
     {
       std::string response;
       std::string spath = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
@@ -614,11 +654,11 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV, const char* 
 
     //
     // If we have gotten this far the Input is OK.
-    // Except for all the badVerb/badRequest, in the noServices vector.
+    // Except for all the badVerb/badRequest, in the restBadVerbV vector.
     //
     // So, the 'Bad Input' alarm is cleared for this client.
     //
-    if (serviceV != noServices)
+    if (serviceV != restBadVerbV)
     {
       alarmMgr.badInputReset(clientIp);
     }
@@ -648,16 +688,16 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV, const char* 
     return response;
   }
 
-  if (noServices == NULL)
+  if (restBadVerbV == NULL)
   {
     std::vector<std::string> cV;
 
     return badRequest(ciP, 0, cV, NULL);
   }
 
-  if (serviceV != noServices)
+  if (serviceV != restBadVerbV)
   {
-    return restService(ciP, noServices, "noServices");
+    return restService(ciP, restBadVerbV, "BAD VERB");
   }
     
   std::string details = std::string("service '") + ciP->url + "' not recognized";
@@ -669,4 +709,21 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV, const char* 
 
   compV.clear();
   return answer;
+}
+
+
+
+/* ****************************************************************************
+*
+* orionServe -
+*/
+std::string orionServe(ConnectionInfo* ciP)
+{
+  if      ((ciP->verb == GET)     && (getServiceV     != NULL))    return restService(ciP, getServiceV,     "GET");
+  else if ((ciP->verb == POST)    && (postServiceV    != NULL))    return restService(ciP, postServiceV,    "POST");
+  else if ((ciP->verb == PUT)     && (putServiceV     != NULL))    return restService(ciP, putServiceV,     "PUT");
+  else if ((ciP->verb == PATCH)   && (patchServiceV   != NULL))    return restService(ciP, patchServiceV,   "PATCH");
+  else if ((ciP->verb == DELETE)  && (deleteServiceV  != NULL))    return restService(ciP, deleteServiceV,  "DELETE");
+  else if ((ciP->verb == OPTIONS) && (optionsServiceV != NULL))    return restService(ciP, optionsServiceV, "OPTIONS");
+  else                                                             return restService(ciP, restBadVerbV,    "BADVERB");
 }

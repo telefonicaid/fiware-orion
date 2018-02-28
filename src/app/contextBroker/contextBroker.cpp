@@ -1035,9 +1035,9 @@ static RestService deleteServiceV[] =
 
 /* ****************************************************************************
 *
-* noServiceV - 
+* badVerbV - 
 */
-static RestService noServiceV[] =
+static RestService badVerbV[] =
 {
   { EPS,          EPS_COMPS_V2,           ENT_COMPS_WORD,          badVerbGetOnly                             },
   { ENT,          ENT_COMPS_V2,           ENT_COMPS_WORD,          badVerbGetPostOnly                         },
@@ -1827,7 +1827,7 @@ int main(int argC, char* argV[])
     LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
 
-    restInit(getServiceV, putServiceV, postServiceV, patchServiceV, deleteServiceV, optionsServiceV, noServiceV,
+    restInit(getServiceV, putServiceV, postServiceV, patchServiceV, deleteServiceV, optionsServiceV, badVerbV,
              ipVersion,
              bindAddress,
              port,
@@ -1848,7 +1848,7 @@ int main(int argC, char* argV[])
   }
   else
   {
-    restInit(getServiceV, putServiceV, postServiceV, patchServiceV, deleteServiceV, optionsServiceV, noServiceV,
+    restInit(getServiceV, putServiceV, postServiceV, patchServiceV, deleteServiceV, optionsServiceV, badVerbV,
              ipVersion,
              bindAddress,
              port,

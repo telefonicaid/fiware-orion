@@ -49,7 +49,7 @@ static RestService deleteV[] =
   { InvalidRequest,    0, {              }, "", NULL                 }
 };
 
-static RestService noServiceV[] =
+static RestService badVerbV[] =
 {
   { StatisticsRequest, 1, { "statistics" }, "", badVerbGetDeleteOnly },
   { InvalidRequest,    0, {              }, "", NULL                 }
@@ -67,8 +67,8 @@ TEST(badVerbGetDeleteOnly, ok)
   std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
   std::string     out;
 
-  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, noServiceV);
-  out = serve(&ci);
+  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);
+  out = orionServe(&ci);
 
   EXPECT_EQ(expected, out);
   EXPECT_EQ("Allow",       ci.httpHeader[0]);

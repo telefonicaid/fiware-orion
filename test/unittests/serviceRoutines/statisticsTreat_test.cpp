@@ -37,7 +37,7 @@
 
 /* ****************************************************************************
 *
-* rs -
+* service vectors -
 */
 static RestService getV[] =
 {
@@ -53,7 +53,7 @@ static RestService deleteV[] =
   { InvalidRequest,    0, {                       }, "", NULL                 }
 };
 
-static RestService noServiceV[] =
+static RestService badVerbV[] =
 {
   { StatisticsRequest, 1, { "statistics"          }, "", badVerbGetDeleteOnly },
   { InvalidRequest,    0, {                       }, "", NULL                 }
@@ -72,10 +72,10 @@ TEST(statisticsTreat, delete)
 
   utInit();
 
-  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, noServiceV);  
+  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);  
 
   ci.outMimeType = JSON;
-  out            = serve(&ci);
+  out            = orionServe(&ci);
 
   EXPECT_STREQ("{\"message\":\"All statistics counter reset\"}", out.c_str());
 
@@ -95,10 +95,10 @@ TEST(statisticsTreat, get)
 
   utInit();
 
-  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, noServiceV);  
+  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);  
 
   ci.outMimeType = JSON;
-  out            = serve(&ci);
+  out            = orionServe(&ci);
 
   EXPECT_STREQ("{\"uptime_in_secs\":0,\"measuring_interval_in_secs\":0}", out.c_str());
 
@@ -118,10 +118,10 @@ TEST(statisticsTreat, deleteCache)
 
   utInit();
 
-  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, noServiceV);  
+  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);  
 
   ci.outMimeType = JSON;
-  out            = serve(&ci);
+  out            = orionServe(&ci);
 
   EXPECT_STREQ("{\"message\":\"All statistics counter reset\"}", out.c_str());
 
@@ -141,10 +141,10 @@ TEST(statisticsTreat, getCache)
 
   utInit();
 
-  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, noServiceV);  
+  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);  
 
   ci.outMimeType = JSON;
-  out            = serve(&ci);
+  out            = orionServe(&ci);
 
   EXPECT_STREQ("{\"ids\":\"\",\"refresh\":0,\"inserts\":0,\"removes\":0,\"updates\":0,\"items\":0}", out.c_str());
 
@@ -164,9 +164,9 @@ TEST(statisticsTreat, badVerb)
 
   utInit();
 
-  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, noServiceV);  
+  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);  
 
-  out = serve(&ci);
+  out = orionServe(&ci);
 
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow",        ci.httpHeader[0]);
