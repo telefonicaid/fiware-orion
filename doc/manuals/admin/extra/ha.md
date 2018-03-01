@@ -11,7 +11,7 @@ The architecture is made by three logical layers:
 The ideal solution for providing Active-Active access to the HA Proxy cluster
 (and consequently to the Context Broker) is the adoption of a DNS service that
 supports multiple IPs for a single name.
-This will allow the clients to use a round-robin solution to pick the actual 
+This will allow clients to use a round-robin solution to pick the actual 
 host to connect with, in case of failure, the second will be used and so on.
 The alternative is the usage of a VIP mechanism to provide Active-Passive access
 to the HA Proxy cluster. In this case, the active instance of HA proxy will be
