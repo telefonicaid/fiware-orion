@@ -13,7 +13,7 @@ Alternatively, you can find a general discussion on Orion HA deployment
 
 ## Installing a Docker Swarm test cluster
 
-To deploy on your Linux based system a Docker Swarm test cluster, you can use
+To deploy on your Linux-based system a Docker Swarm test cluster, you can use
 [miniswarm](https://github.com/aelsabbahy/miniswarm).
 
 The only pre-requisite are:
