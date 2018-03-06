@@ -69,7 +69,7 @@ RestService*                     restBadVerbV          = NULL;
 
 /* ****************************************************************************
 *
-* serviceVectorsSet - only for unit tests
+* serviceVectorsSet
 */
 void serviceVectorsSet
 (
@@ -713,11 +713,13 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV, const
 
 
 
+namespace orion
+{
 /* ****************************************************************************
 *
-* orionServe -
+* orion::requestServe -
 */
-std::string orionServe(ConnectionInfo* ciP)
+std::string requestServe(ConnectionInfo* ciP)
 {
   if      ((ciP->verb == GET)     && (getServiceV     != NULL))    return restService(ciP, getServiceV,     "GET");
   else if ((ciP->verb == POST)    && (postServiceV    != NULL))    return restService(ciP, postServiceV,    "POST");
@@ -726,4 +728,6 @@ std::string orionServe(ConnectionInfo* ciP)
   else if ((ciP->verb == DELETE)  && (deleteServiceV  != NULL))    return restService(ciP, deleteServiceV,  "DELETE");
   else if ((ciP->verb == OPTIONS) && (optionsServiceV != NULL))    return restService(ciP, optionsServiceV, "OPTIONS");
   else                                                             return restService(ciP, restBadVerbV,    "BADVERB");
+}
+
 }

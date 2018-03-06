@@ -83,13 +83,13 @@ TEST(putAvailabilitySubscriptionConvOp, put)
   utInit();
 
   serviceVectorsSet(NULL, putV, postV, NULL, deleteV, NULL, badVerbV);  
-  out = orionServe(&ci1);
+  out = orion::requestServe(&ci1);
 
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci1.httpHeader[0]);
   EXPECT_EQ("POST",  ci1.httpHeaderValue[0]);
 
-  out = orionServe(&ci2);
+  out = orion::requestServe(&ci2);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci2.httpHeader[0]);
   EXPECT_EQ("PUT, DELETE", ci2.httpHeaderValue[0]);

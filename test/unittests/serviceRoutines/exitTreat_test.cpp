@@ -68,7 +68,7 @@ TEST(exitTreat, error)
   ci.apiVersion = V1;
 
   serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, NULL);
-  out = orionServe(&ci);
+  out = orion::requestServe(&ci);
 
   EXPECT_STREQ("DIE", out.c_str());
   harakiri = false;

@@ -67,7 +67,7 @@ TEST(putSubscriptionConvOp, put)
   ci1.payloadSize    = 0;
 
   serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, badVerbV);
-  out = orionServe(&ci1);
+  out = orion::requestServe(&ci1);
 
   EXPECT_EQ("Allow",       ci1.httpHeader[0]);
   EXPECT_EQ("PUT, DELETE", ci1.httpHeaderValue[0]);

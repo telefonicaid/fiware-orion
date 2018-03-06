@@ -101,10 +101,14 @@ extern void serviceVectorsSet
 
 
 
+namespace orion
+{
 /* ****************************************************************************
 *
-* orionServe -
+* orion::requestServe -
 */
-extern std::string orionServe(ConnectionInfo* ciP);
+extern std::string requestServe(ConnectionInfo* ciP);
+
+}
 
 #endif

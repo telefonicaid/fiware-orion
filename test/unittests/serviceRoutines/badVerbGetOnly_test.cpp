@@ -62,7 +62,7 @@ TEST(badVerbGetOnly, ok)
   std::string     out;
 
   serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
-  out = orionServe(&ci);
+  out = orion::requestServe(&ci);
 
   EXPECT_EQ(expected, out);
   EXPECT_EQ("Allow", ci.httpHeader[0]);

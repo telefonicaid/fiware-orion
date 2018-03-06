@@ -54,7 +54,7 @@ TEST(versionTreat, ok)
   std::string     out;
 
   serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, NULL);
-  out = orionServe(&ci);
+  out = orion::requestServe(&ci);
 
   // FIXME P2: Some day we'll do this ...
   //
@@ -87,7 +87,7 @@ TEST(versionTreat, ok)
   EXPECT_TRUE(strstr(out.c_str(), expected.c_str()) != NULL);
 
   versionSet("1.2.3");
-  out = orionServe(&ci);
+  out = orion::requestServe(&ci);
   EXPECT_TRUE(strstr(out.c_str(), "\"version\" : \"1.2.3\"") != NULL);
 
   versionSet("1.2.3");

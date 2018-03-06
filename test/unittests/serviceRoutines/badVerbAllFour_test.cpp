@@ -61,14 +61,14 @@ TEST(badVerbAllFour, error)
   ci1.apiVersion = V1;
 
   serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, badVerbV);
-  out = orionServe(&ci1);
+  out = orion::requestServe(&ci1);
 
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci1.httpHeader[0]);
   EXPECT_EQ("POST, GET, PUT, DELETE", ci1.httpHeaderValue[0]);
 
   ci2.apiVersion = V1;
-  out = orionServe(&ci2);
+  out = orion::requestServe(&ci2);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci2.httpHeader[0]);
   EXPECT_EQ("POST, GET, PUT, DELETE", ci2.httpHeaderValue[0]);

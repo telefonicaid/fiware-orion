@@ -165,7 +165,7 @@ TEST(RestService, noSuchServiceAndNotFound)
   ci.payloadSize    = strlen(testBuf);
 
   serviceVectorsSet(NULL, NULL, postV, NULL, NULL, NULL, badVerbs);
-  out = orionServe(&ci);
+  out = orion::requestServe(&ci);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Not found
@@ -182,7 +182,7 @@ TEST(RestService, noSuchServiceAndNotFound)
   ci.payloadSize    = strlen(testBuf);
 
   serviceVectorsSet(NULL, NULL, postV2, NULL, NULL, NULL, badVerbs2);
-  out = orionServe(&ci);
+  out = orion::requestServe(&ci);
 
   EXPECT_STREQ(expectedBuf, out.c_str());
 

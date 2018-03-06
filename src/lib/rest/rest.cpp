@@ -1777,7 +1777,7 @@ void restInit
 
   port             = _port;
   ipVersionUsed    = _ipVersion;
-  serveFunction    = (_serveFunction != NULL)? _serveFunction : orionServe;
+  serveFunction    = (_serveFunction != NULL)? _serveFunction : orion::requestServe;
   multitenant      = _multitenant;
   connMemory       = _connectionMemory;
   maxConns         = _maxConnections;

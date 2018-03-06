@@ -75,7 +75,7 @@ TEST(statisticsTreat, delete)
   serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);  
 
   ci.outMimeType = JSON;
-  out            = orionServe(&ci);
+  out            = orion::requestServe(&ci);
 
   EXPECT_STREQ("{\"message\":\"All statistics counter reset\"}", out.c_str());
 
@@ -98,7 +98,7 @@ TEST(statisticsTreat, get)
   serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);  
 
   ci.outMimeType = JSON;
-  out            = orionServe(&ci);
+  out            = orion::requestServe(&ci);
 
   EXPECT_STREQ("{\"uptime_in_secs\":0,\"measuring_interval_in_secs\":0}", out.c_str());
 
@@ -121,7 +121,7 @@ TEST(statisticsTreat, deleteCache)
   serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);  
 
   ci.outMimeType = JSON;
-  out            = orionServe(&ci);
+  out            = orion::requestServe(&ci);
 
   EXPECT_STREQ("{\"message\":\"All statistics counter reset\"}", out.c_str());
 
@@ -144,7 +144,7 @@ TEST(statisticsTreat, getCache)
   serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);  
 
   ci.outMimeType = JSON;
-  out            = orionServe(&ci);
+  out            = orion::requestServe(&ci);
 
   EXPECT_STREQ("{\"ids\":\"\",\"refresh\":0,\"inserts\":0,\"removes\":0,\"updates\":0,\"items\":0}", out.c_str());
 
@@ -166,7 +166,7 @@ TEST(statisticsTreat, badVerb)
 
   serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);  
 
-  out = orionServe(&ci);
+  out = orion::requestServe(&ci);
 
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow",        ci.httpHeader[0]);
