@@ -87,14 +87,6 @@ typedef std::string (*RestServeFunction)(ConnectionInfo* ciP);
 
 /* ****************************************************************************
 *
-* serve -
-*/
-extern std::string serve(ConnectionInfo* ciP);
-
-
-
-/* ****************************************************************************
-*
 * restInit -
 */
 extern void restInit

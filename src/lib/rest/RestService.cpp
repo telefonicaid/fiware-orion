@@ -487,7 +487,7 @@ static bool compErrorDetect
 *
 * restService -
 */
-static std::string restService(ConnectionInfo* ciP, RestService* serviceV, const char* serviceVectorName)
+static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 {
   std::vector<std::string>  compV;
   int                       components;
@@ -697,7 +697,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV, const
 
   if (serviceV != restBadVerbV)
   {
-    return restService(ciP, restBadVerbV, "BAD VERB");
+    return restService(ciP, restBadVerbV);
   }
     
   std::string details = std::string("service '") + ciP->url + "' not recognized";
@@ -721,13 +721,13 @@ namespace orion
 */
 std::string requestServe(ConnectionInfo* ciP)
 {
-  if      ((ciP->verb == GET)     && (getServiceV     != NULL))    return restService(ciP, getServiceV,     "GET");
-  else if ((ciP->verb == POST)    && (postServiceV    != NULL))    return restService(ciP, postServiceV,    "POST");
-  else if ((ciP->verb == PUT)     && (putServiceV     != NULL))    return restService(ciP, putServiceV,     "PUT");
-  else if ((ciP->verb == PATCH)   && (patchServiceV   != NULL))    return restService(ciP, patchServiceV,   "PATCH");
-  else if ((ciP->verb == DELETE)  && (deleteServiceV  != NULL))    return restService(ciP, deleteServiceV,  "DELETE");
-  else if ((ciP->verb == OPTIONS) && (optionsServiceV != NULL))    return restService(ciP, optionsServiceV, "OPTIONS");
-  else                                                             return restService(ciP, restBadVerbV,    "BADVERB");
+  if      ((ciP->verb == GET)     && (getServiceV     != NULL))    return restService(ciP, getServiceV);
+  else if ((ciP->verb == POST)    && (postServiceV    != NULL))    return restService(ciP, postServiceV);
+  else if ((ciP->verb == PUT)     && (putServiceV     != NULL))    return restService(ciP, putServiceV);
+  else if ((ciP->verb == PATCH)   && (patchServiceV   != NULL))    return restService(ciP, patchServiceV);
+  else if ((ciP->verb == DELETE)  && (deleteServiceV  != NULL))    return restService(ciP, deleteServiceV);
+  else if ((ciP->verb == OPTIONS) && (optionsServiceV != NULL))    return restService(ciP, optionsServiceV);
+  else                                                             return restService(ciP, restBadVerbV);
 }
 
 }
