@@ -486,6 +486,13 @@ static bool compErrorDetect
 /* ****************************************************************************
 *
 * restService -
+*
+* This function is called with the appropriate RestService vector, depending on the VERB used in the request.
+* If no matching service is found in this RestService vector, then a recursive call in made, using the "badVerb RestService vector",
+* to see if we have a matching bad-verb-service-routine.
+* If there is no badVerb RestService vector, then the "default error service routine "badRequest" is used.
+* And lastly, if there is a badVerb RestService vector, but still no service routine is found, then we create a "service not recognized"
+* response. See comments incrusted in the function as well.
 */
 static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 {
@@ -688,6 +695,11 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     return response;
   }
 
+  //
+  // No service routine found. Need to check bad-verb service vector.
+  // If there is no bad-verb service vector (restBadVerbV == NULL), then
+  // badRequest() is used as service routine ... 
+  //
   if (restBadVerbV == NULL)
   {
     std::vector<std::string> cV;
@@ -695,11 +707,20 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     return badRequest(ciP, 0, cV, NULL);
   }
 
+  //
+  // ... but, if we have a non-NULL restBadVerbV, then we make a recursive call, using the
+  // restBadVerbV service vector.  But, only if the current service vector is NOT the restBadVerbV,
+  // of course. A situation like that would mean we are already in the recursive call and need to end
+  // the recursion and return an error  ...
+  //
   if (serviceV != restBadVerbV)
   {
     return restService(ciP, restBadVerbV);
   }
-    
+
+  //
+  // ... and this here is the error that is returned. A 400 Bad Request with "service XXX not recognized" as payload
+  //
   std::string details = std::string("service '") + ciP->url + "' not recognized";
   alarmMgr.badInput(clientIp, details);
 

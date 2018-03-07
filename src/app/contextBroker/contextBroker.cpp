@@ -462,6 +462,13 @@ static const char* validLogLevels[] =
 */
 
 
+//
+// FIXME PR-set: all these defines will be "removed" (expanded in the RestService vectors) within the #3109 refactor set of PRs
+//               Also, the RestService vectors them sleves will be moved to rest.cpp. This change will make the broker a whole lot
+//               less configurable, but we invented all this configuration possibilities way back, when the libraries of Orion
+//               were used for other executables as well (iota + config manager). No longer needed.
+//
+
 
 //
 // /v2 API

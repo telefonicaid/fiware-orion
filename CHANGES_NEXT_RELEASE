@@ -1,1 +1,2 @@
 - Add: support for entity id and type in orderBy parameter (#2934)
+- Hardening: refactor request routing logic (#3109, step 1)
