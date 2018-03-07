@@ -96,6 +96,16 @@ Related to mongoBackend logic (MB and MD prefixes):
 	* Continues in MD-04 
 * [MB-22: mongoUnsubscribeContextAvailability](mongoBackend.md#flow-mb-22)
 	* Continues from RQ-02
+* [MB-23: mongoRegistrationGet](mongoBackend.md#flow-mb-23)
+	* Continues from RQ-02
+* [MB-24: mongoRegistrationsGet](mongoBackend.md#flow-mb-24)
+	* Continues from RQ-02
+* [MB-25: mongoRegistrationCreate](mongoBackend.md#flow-mb-25)
+	* Continues from RQ-02
+* MB-26: mongoRegistrationUpdate (*pending*)
+	* Continues from RQ-02
+* MB-27: mongoRegistrationDelete (*pending*)
+	* Continues from RQ-02
 * [MD-01: `processSubscriptions()` function detail](mongoBackend.md#flow-md-01)
 	* Continues from MB-01, MB-03, MB-04 or MB-05
 	* Continues in NF-01 or NF-03  
