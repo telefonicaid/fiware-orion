@@ -63,7 +63,6 @@
 * Globals
 */
 static unsigned short            port                  = 0;
-static RestServeFunction         serveFunction         = NULL;
 static char                      bindIp[MAX_LEN_IP]    = "0.0.0.0";
 static char                      bindIPv6[MAX_LEN_IP]  = "::";
 IpVersion                        ipVersionUsed         = IPDUAL;
@@ -1559,7 +1558,7 @@ static int connectionTreat
   }
   else
   {
-    serveFunction(ciP);
+    orion::requestServe(ciP);
   }
 
   return MHD_YES;
@@ -1766,8 +1765,7 @@ void restInit
   int                 _corsMaxAge,
   int                 _mhdTimeoutInSeconds,
   const char*         _httpsKey,
-  const char*         _httpsCertificate,
-  RestServeFunction   _serveFunction
+  const char*         _httpsCertificate
 )
 {
   const char* key  = _httpsKey;
@@ -1777,7 +1775,6 @@ void restInit
 
   port             = _port;
   ipVersionUsed    = _ipVersion;
-  serveFunction    = (_serveFunction != NULL)? _serveFunction : orion::requestServe;
   multitenant      = _multitenant;
   connMemory       = _connectionMemory;
   maxConns         = _maxConnections;

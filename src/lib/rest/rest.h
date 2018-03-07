@@ -111,8 +111,7 @@ extern void restInit
    int                 _corsMaxAge,
    int                 _mhdTimeoutInSeconds,
    const char*         _httpsKey          = NULL,
-   const char*         _httpsCert         = NULL,
-   RestServeFunction   _serveFunction     = NULL
+   const char*         _httpsCert         = NULL
 );
 
 
