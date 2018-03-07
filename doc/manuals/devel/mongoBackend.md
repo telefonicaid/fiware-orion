@@ -600,7 +600,7 @@ Regarding `mongoRegistrationGet()`:
 <a name="flow-mb-23"></a>
 ![mongoRegistrationGet](images/Flow-MB-23.png)
 
-_MB-13: mongoRegistrationGet_
+_MB-23: mongoRegistrationGet_
 
 * `mongoRegistrationGet()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (read mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
@@ -613,7 +613,7 @@ Regarding `mongoRegistrationsGet()`:
 <a name="flow-mb-24"></a>
 ![mongoRegistrationsGet](images/Flow-MB-24.png)
 
-_MB-14: mongoRegistrationsGet_
+_MB-24: mongoRegistrationsGet_
 
 * `mongoRegistrationsGet()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (read mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
