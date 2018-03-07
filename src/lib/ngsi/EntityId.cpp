@@ -140,7 +140,7 @@ std::string EntityId::toJson(void) const
 */
 std::string EntityId::check(RequestType requestType)
 {
-  if (id == "")
+  if (id == "" || ((id.find('\0')) != (std::string::npos)))
   {
     return "empty entityId:id";
   }
