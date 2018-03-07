@@ -132,7 +132,7 @@ If no payload is present in the request, there will be only two calls to connect
 
 The seventh parameter of connectionTreat is a pointer to `size_t` and in the last call to connectionTreat, this pointer points to a size_t variable that contains the value zero.
 
-After receiving this last callback, the payload can be parsed and treated, which is taken care of by `serveFunction()`,
+After receiving this last callback, the payload can be parsed and treated, which is taken care of by `orion::requestServe()`,
 invoked at the end of `connectionTreat()`, after quite a few checks.
 
 The URI parameters of the request are ready from the very first call of `connectionTreat()` and they are
@@ -155,7 +155,7 @@ _RQ-01: Reception of a request_
 * `connectionTreat()` is the brokers callback function for incoming connections from MHD (microhttpd). This callback is setup in the call to `MHD_start_daemon()` in `restStart()` in `src/lib/rest/rest.cpp` and invoked upon client request arrival (step 2 and 3).
 * As long as MHD receives payload from the client, the callback function (`connectionTreat()`) is called with a new chunk of payload (steps 4 and 5)
 * The last call to `connectionTreat()` is to inform the client callback that the entire request has been received. This is done by sending the data length as zero in this last callback (step 6).
-* The entire request is read so `serveFunction()` is invoked to take care of serving the request, all the way until responding to the request (step 7). See diagram RQ-02.
+* The entire request is read so `orion::requestServe()` is invoked to take care of serving the request, all the way until responding to the request (step 7). See diagram RQ-02.
 * Control is returned to MHD (step 8).
 
 ### Treating an incoming request
@@ -165,7 +165,7 @@ _RQ-01: Reception of a request_
 
 _RQ-02: Treatment of a request_
 
-* `serveFunction()` calls `restService()` (step 1). Actually, `serveFunction()` is not a function but a pointer to one. By default it points to the function `serve()` from `src/lib/rest/rest.cpp`, but this can be configured by setting some function as parameter `_serveFunction` in the call to `restInit()`.
+* `orion::requestServe()` calls `restService()` (step 1).
 * Also, if payload is present, `restService()` calls `payloadParse()` to parse the payload (step 2). Details are provided in the diagram [PP-01](#flow-pp-01).
 * The service function of the request takes over (step 3). The service function is chosen based on the **URL path** and **HTTP Method** used in the request. To determine which of all the service functions (found in lib/serviceFunctions and lib/serviceFunctionV2, please see the `RestService` vectors in [`app/app/contextBroker/contextBroker.cpp`](#srcappcontextbroker)).
 * The service function may invoke a lower level service function. See [the service routines mapping document](ServiceRoutines.txt) for details (step 4).
