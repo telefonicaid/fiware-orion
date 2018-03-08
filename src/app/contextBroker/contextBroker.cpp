@@ -452,7 +452,6 @@ static const char* validLogLevels[] =
 * "ngsi9" and "registerContext".
 *
 * Each line contains the necessary information for ONE service:
-*   std::string   verb        - GET/POST/PUT/DELETE
 *   RequestType   request     - The type of the request
 *   int           components  - Number of components in the following URL component vector
 *   std::string   compV       - Component vector of the URL
@@ -462,339 +461,12 @@ static const char* validLogLevels[] =
 */
 
 
-//
-// FIXME PR-set: all these defines will be "removed" (expanded in the RestService vectors) within the #3109 refactor set of PRs
-//               Also, the RestService vectors them sleves will be moved to rest.cpp. This change will make the broker a whole lot
-//               less configurable, but we invented all this configuration possibilities way back, when the libraries of Orion
-//               were used for other executables as well (iota + config manager). No longer needed.
-//
-
-
-//
-// /v2 API
-//
-#define EPS                     EntryPointsRequest
-#define EPS_COMPS_V2            1, { "v2"             }
-
-#define ENT                     EntitiesRequest
-#define ENT_COMPS_V2            2, { "v2", "entities" }
-#define ENT_COMPS_WORD          ""
-
-#define IENT                    EntityRequest
-#define IENT_COMPS_V2           3, { "v2", "entities", "*" }
-#define IENT_COMPS_WORD         ""
-
-#define IENTOA                  EntityRequest
-#define IENTOA_COMPS_V2         4, { "v2", "entities", "*", "attrs" }
-#define IENTOA_COMPS_WORD       ""
-
-#define IENTATTR                EntityAttributeRequest
-#define IENTATTR_COMPS_V2       5, { "v2", "entities", "*", "attrs", "*" }
-#define IENTATTR_COMPS_WORD     ""
-
-#define ENTT                    EntityTypeRequest
-#define ENTT_COMPS_V2           3, { "v2", "types", "*" }
-#define ENTT_COMPS_WORD         ""
-
-#define IENTATTRVAL             EntityAttributeValueRequest
-#define IENTATTRVAL_COMPS_V2    6, { "v2", "entities", "*", "attrs", "*", "value" }
-#define IENTATTRVAL_COMPS_WORD  ""
-
-#define ETT                     EntityAllTypesRequest
-#define ETT_COMPS_V2            2, { "v2", "types" }
-#define ETT_COMPS_WORD          ""
-
-#define SSR                     SubscriptionsRequest
-#define SSR_COMPS_V2            2, { "v2", "subscriptions" }
-#define SSR_COMPS_WORD          ""
-
-#define ISR                     IndividualSubscriptionRequest
-#define ISR_COMPS_V2            3, { "v2", "subscriptions", "*" }
-#define ISR_COMPS_WORD          ""
-
-#define BQR                     BatchQueryRequest
-#define BQR_COMPS_V2            3, { "v2", "op", "query" }
-#define BQR_COMPS_WORD          ""
-
-#define BUR                     BatchUpdateRequest
-#define BUR_COMPS_V2            3, { "v2", "op", "update" }
-#define BUR_COMPS_WORD          ""
-
-//
-// NGSI9
-//
-#define RCR                RegisterContext
-#define DCAR               DiscoverContextAvailability
-#define SCAR               SubscribeContextAvailability
-#define UCAR               UnsubscribeContextAvailability
-#define UCAS               UpdateContextAvailabilitySubscription
-#define NCAR               NotifyContextAvailability
-
-#define RCR_COMPS_V0       2, { "ngsi9",          "registerContext" }
-#define RCR_COMPS_V1       3, { "v1", "registry", "registerContext" }
-#define RCR_POST_WORD      "registerContextRequest"
-
-#define DCAR_COMPS_V0      2, { "ngsi9",          "discoverContextAvailability" }
-#define DCAR_COMPS_V1      3, { "v1", "registry", "discoverContextAvailability" }
-#define DCAR_POST_WORD     "discoverContextAvailabilityRequest"
-
-#define SCAR_COMPS_V0      2, { "ngsi9",          "subscribeContextAvailability" }
-#define SCAR_COMPS_V1      3, { "v1", "registry", "subscribeContextAvailability" }
-#define SCAR_POST_WORD     "subscribeContextAvailabilityRequest"
-
-#define UCAR_COMPS_V0      2, { "ngsi9",          "unsubscribeContextAvailability" }
-#define UCAR_COMPS_V1      3, { "v1", "registry", "unsubscribeContextAvailability" }
-#define UCAR_POST_WORD     "unsubscribeContextAvailabilityRequest"
-
-#define UCAS_COMPS_V0      2, { "ngsi9",          "updateContextAvailabilitySubscription" }
-#define UCAS_COMPS_V1      3, { "v1", "registry", "updateContextAvailabilitySubscription" }
-#define UCAS_POST_WORD     "updateContextAvailabilitySubscriptionRequest"
-
-#define NCAR_COMPS_V0      2, { "ngsi9",          "notifyContextAvailability" }
-#define NCAR_COMPS_V1      3, { "v1", "registry", "notifyContextAvailability" }
-#define NCAR_POST_WORD     "notifyContextAvailabilityRequest"
-
-
-
-//
-// NGSI10
-//
-#define UPCR          UpdateContext
-#define QCR           QueryContext
-#define SCR           SubscribeContext
-#define UCSR          UpdateContextSubscription
-#define UNCR          UnsubscribeContext
-#define NCR           NotifyContext
-
-#define UPCR_COMPS_V0       2, { "ngsi10",  "updateContext" }
-#define UPCR_COMPS_V1       2, { "v1",      "updateContext" }
-#define UPCR_POST_WORD     "updateContextRequest"
-
-#define QCR_COMPS_V0        2, { "ngsi10",  "queryContext" }
-#define QCR_COMPS_V1        2, { "v1",      "queryContext" }
-#define QCR_POST_WORD      "queryContextRequest"
-
-#define SCR_COMPS_V0        2, { "ngsi10",  "subscribeContext" }
-#define SCR_COMPS_V1        2, { "v1",      "subscribeContext" }
-#define SCR_POST_WORD      "subscribeContextRequest"
-
-#define UCSR_COMPS_V0       2, { "ngsi10",  "updateContextSubscription" }
-#define UCSR_COMPS_V1       2, { "v1",      "updateContextSubscription" }
-#define UCSR_POST_WORD     "updateContextSubscriptionRequest"
-
-#define UNCR_COMPS_V0       2, { "ngsi10",  "unsubscribeContext" }
-#define UNCR_COMPS_V1       2, { "v1",      "unsubscribeContext" }
-#define UNCR_POST_WORD     "unsubscribeContextRequest"
-
-#define NCR_COMPS_V0        2, { "ngsi10",  "notifyContext" }
-#define NCR_COMPS_V1        2, { "v1",      "notifyContext" }
-#define NCR_POST_WORD      "notifyContextRequest"
-
-
-//
-// NGSI9 Convenience Operations
-//
-#define CE                 ContextEntitiesByEntityId
-#define CE_COMPS_V0        3, { "ngsi9",          "contextEntities", "*" }
-#define CE_COMPS_V1        4, { "v1", "registry", "contextEntities", "*" }
-#define CE_POST_WORD       "registerProviderRequest"
-
-#define CEA                ContextEntityAttributes
-#define CEA_COMPS_V0       4, { "ngsi9",          "contextEntities", "*", "attributes" }
-#define CEA_COMPS_V1       5, { "v1", "registry", "contextEntities", "*", "attributes" }
-#define CEA_POST_WORD      "registerProviderRequest"
-
-#define CEAA               EntityByIdAttributeByName
-#define CEAA_COMPS_V0      5, { "ngsi9",          "contextEntities", "*", "attributes", "*" }
-#define CEAA_COMPS_V1      6, { "v1", "registry", "contextEntities", "*", "attributes", "*" }
-#define CEAA_POST_WORD     "registerProviderRequest"
-
-#define CT                 ContextEntityTypes
-#define CT_COMPS_V0        3, { "ngsi9",          "contextEntityTypes", "*" }
-#define CT_COMPS_V1        4, { "v1", "registry", "contextEntityTypes", "*" }
-#define CT_POST_WORD       "registerProviderRequest"
-
-#define CTA                ContextEntityTypeAttributeContainer
-#define CTA_COMPS_V0       4, { "ngsi9",          "contextEntityTypes", "*", "attributes" }
-#define CTA_COMPS_V1       5, { "v1", "registry", "contextEntityTypes", "*", "attributes" }
-#define CTA_POST_WORD      "registerProviderRequest"
-
-#define CTAA               ContextEntityTypeAttribute
-#define CTAA_COMPS_V0      5, { "ngsi9",          "contextEntityTypes", "*", "attributes", "*" }
-#define CTAA_COMPS_V1      6, { "v1", "registry", "contextEntityTypes", "*", "attributes", "*" }
-#define CTAA_POST_WORD     "registerProviderRequest"
-
-#define SCA                SubscribeContextAvailability
-#define SCA_COMPS_V0       2, { "ngsi9",          "contextAvailabilitySubscriptions" }
-#define SCA_COMPS_V1       3, { "v1", "registry", "contextAvailabilitySubscriptions" }
-#define SCA_POST_WORD      "subscribeContextAvailabilityRequest"
-
-#define SCAS               Ngsi9SubscriptionsConvOp
-#define SCAS_COMPS_V0      3, { "ngsi9",          "contextAvailabilitySubscriptions", "*" }
-#define SCAS_COMPS_V1      4, { "v1", "registry", "contextAvailabilitySubscriptions", "*" }
-#define SCAS_PUT_WORD      "updateContextAvailabilitySubscriptionRequest"
-
-
-
-//
-// NGSI10 Convenience Operations
-//
-#define ICE                IndividualContextEntity
-#define ICE_COMPS_V0       3, { "ngsi10",  "contextEntities", "*" }
-#define ICE_COMPS_V1       3, { "v1",      "contextEntities", "*" }
-#define ICE_POST_WORD      "appendContextElementRequest"
-#define ICE_PUT_WORD       "updateContextElementRequest"
-
-#define ICEA               IndividualContextEntityAttributes
-#define ICEA_COMPS_V0      4, { "ngsi10",  "contextEntities", "*", "attributes" }
-#define ICEA_COMPS_V1      4, { "v1",      "contextEntities", "*", "attributes" }
-#define ICEA_POST_WORD     "appendContextElementRequest"
-#define ICEA_PUT_WORD      "updateContextElementRequest"
-
-#define ICEAA              IndividualContextEntityAttribute
-#define ICEAA_COMPS_V0     5, { "ngsi10",  "contextEntities", "*", "attributes", "*" }
-#define ICEAA_COMPS_V1     5, { "v1",      "contextEntities", "*", "attributes", "*" }
-// FIXME P10: funny having updateContextAttributeRequest for both ... Error in NEC-SPEC?
-#define ICEAA_POST_WORD    "updateContextAttributeRequest"
-#define ICEAA_PUT_WORD     "updateContextAttributeRequest"
-
-#define AVI                AttributeValueInstance
-#define AVI_COMPS_V0       6, { "ngsi10",  "contextEntities", "*", "attributes", "*", "*" }
-#define AVI_COMPS_V1       6, { "v1",      "contextEntities", "*", "attributes", "*", "*" }
-#define AVI_PUT_WORD       "updateContextAttributeRequest"
-
-#define CET                Ngsi10ContextEntityTypes
-#define CET_COMPS_V0       3, { "ngsi10",  "contextEntityTypes", "*" }
-#define CET_COMPS_V1       3, { "v1",      "contextEntityTypes", "*" }
-
-#define CETA               Ngsi10ContextEntityTypesAttributeContainer
-#define CETA_COMPS_V0      4, { "ngsi10",  "contextEntityTypes", "*", "attributes" }
-#define CETA_COMPS_V1      4, { "v1",      "contextEntityTypes", "*", "attributes" }
-
-#define CETAA              Ngsi10ContextEntityTypesAttribute
-#define CETAA_COMPS_V0     5, { "ngsi10",  "contextEntityTypes", "*", "attributes", "*" }
-#define CETAA_COMPS_V1     5, { "v1",      "contextEntityTypes", "*", "attributes", "*" }
-
-#define SC                 SubscribeContext
-#define SC_COMPS_V0        2, { "ngsi10",  "contextSubscriptions" }
-#define SC_COMPS_V1        2, { "v1",      "contextSubscriptions" }
-#define SC_POST_WORD       "subscribeContextRequest"
-
-#define SCS                Ngsi10SubscriptionsConvOp
-#define SCS_COMPS_V0       3, { "ngsi10",  "contextSubscriptions", "*" }
-#define SCS_COMPS_V1       3, { "v1",      "contextSubscriptions", "*" }
-#define SCS_PUT_WORD       "updateContextSubscriptionRequest"
-
-
-
-//
-// TID Convenience Operations
-//
-#define ET                 EntityTypes
-#define ET_COMPS_V1        2, { "v1", "contextTypes" }
-
-#define AFET               AttributesForEntityType
-#define AFET_COMPS_V1      3, { "v1", "contextTypes", "*" }
-
-#define ACE                AllContextEntities
-#define ACE_COMPS_V1       2, { "v1", "contextEntities" }
-#define ACE_POST_WORD     "appendContextElementRequest"
-
-#define ACET               AllEntitiesWithTypeAndId
-#define ACET_COMPS_V1      6, { "v1", "contextEntities", "type", "*", "id", "*" }
-#define ACET_POST_WORD     "appendContextElementRequest"
-#define ACET_PUT_WORD      "updateContextElementRequest"
-
-#define ICEAAT              IndividualContextEntityAttributeWithTypeAndId
-#define ICEAAT_COMPS_V1     8, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*" }
-#define ICEAAT_POST_WORD    "updateContextAttributeRequest"
-#define ICEAAT_PUT_WORD     "updateContextAttributeRequest"
-
-#define AVIT                AttributeValueInstanceWithTypeAndId
-#define AVIT_COMPS_V1       9, { "v1",      "contextEntities", "type", "*", "id", "*", "attributes", "*", "*" }
-#define AVIT_PUT_WORD       "updateContextAttributeRequest"
-#define AVIT_POST_WORD      "updateContextAttributeRequest"
-
-#define CEET                ContextEntitiesByEntityIdAndType
-#define CEET_COMPS_V1       7, { "v1", "registry", "contextEntities", "type", "*", "id", "*" }
-#define CEET_POST_WORD      "registerProviderRequest"
-
-#define CEAAT               EntityByIdAttributeByNameIdAndType
-#define CEAAT_COMPS_V1      9, { "v1", "registry", "contextEntities", "type", "*", "id", "*", "attributes", "*" }
-#define CEAAT_POST_WORD     "registerProviderRequest"
-
-
-
-//
-// Log, version, statistics ...
-//
-#define LOG                LogTraceRequest
-#define LOGT_COMPS_V0      2, { "log", "trace"                           }
-#define LOGTL_COMPS_V0     3, { "log", "trace",      "*"                 }
-#define LOG2T_COMPS_V0     2, { "log", "traceLevel"                      }
-#define LOG2TL_COMPS_V0    3, { "log", "traceLevel", "*"                 }
-#define LOGT_COMPS_V1      4, { "v1", "admin", "log", "trace"            }
-#define LOGTL_COMPS_V1     5, { "v1", "admin", "log", "trace",      "*"  }
-#define LOG2T_COMPS_V1     4, { "v1", "admin", "log", "traceLevel"       }
-#define LOG2TL_COMPS_V1    5, { "v1", "admin", "log", "traceLevel", "*"  }
-
-#define STAT                 StatisticsRequest
-#define STAT_COMPS_V0        1, { "statistics"                             }
-#define STAT_COMPS_V1        3, { "v1", "admin", "statistics"              }
-#define STAT_CACHE_COMPS_V0  2, { "cache", "statistics"                    }
-#define STAT_CACHE_COMPS_V1  4, { "v1", "admin", "cache", "statistics"     }
-
-
-
-//
-// LogLevel
-//
-#define LOGLEVEL           LogLevelRequest
-#define LOGLEVEL_COMPS_V2  2, { "admin", "log"                           }
-
-
-
-//
-// Semaphore state
-//
-#define SEM_STATE          SemStateRequest
-#define SEM_STATE_COMPS    2, { "admin", "sem"                         }
-
-
-
-//
-// Metrics
-//
-#define METRICS            MetricsRequest
-#define METRICS_COMPS      2, { "admin", "metrics"                       }
-
-
-//
-// Unversioned requests
-//
-#define VERS               VersionRequest
-#define VERS_COMPS         1, { "version"                                }
-
-#define EXIT               ExitRequest
-#define EXIT1_COMPS        1, { "exit"                                   }
-#define EXIT2_COMPS        2, { "exit", "*"                              }
-
-#define LEAK               LeakRequest
-#define LEAK1_COMPS        1, { "leak"                                   }
-#define LEAK2_COMPS        2, { "leak", "*"                              }
-
-#define INV                InvalidRequest
-#define INV9_COMPS         2, { "ngsi9",   "*"                           }
-#define INV10_COMPS        2, { "ngsi10",  "*"                           }
-#define INV_ALL_COMPS      0, { "*", "*", "*", "*", "*", "*"             }
-
-
 
 /* ****************************************************************************
 *
 * END_REQUEST - End marker for the array
 */
-#define END_REQUEST  { INV,  0, {}, "", NULL }
+#define END_REQUEST  { InvalidRequest,  0, {}, "", NULL }
 
 
 
@@ -804,68 +476,68 @@ static const char* validLogLevels[] =
 */
 static RestService getServiceV[] =
 {
-  { EPS,          EPS_COMPS_V2,           ENT_COMPS_WORD,          entryPointsTreat                                    },
-  { ENT,          ENT_COMPS_V2,           ENT_COMPS_WORD,          getEntities                                         },
-  { IENT,         IENT_COMPS_V2,          IENT_COMPS_WORD,         getEntity                                           },
-  { IENTOA,       IENTOA_COMPS_V2,        IENTOA_COMPS_WORD,       getEntity                                           },
-  { IENTATTRVAL,  IENTATTRVAL_COMPS_V2,   IENTATTRVAL_COMPS_WORD,  getEntityAttributeValue                             },
-  { IENTATTR,     IENTATTR_COMPS_V2,      IENTATTR_COMPS_WORD,     getEntityAttribute                                  },
-  { ENTT,         ENTT_COMPS_V2,          ENTT_COMPS_WORD,         getEntityType                                       },
-  { ETT,          ETT_COMPS_V2,           ETT_COMPS_WORD,          getEntityAllTypes                                   },
-  { SSR,          SSR_COMPS_V2,           SSR_COMPS_WORD,          getAllSubscriptions                                 },
-  { ISR,          ISR_COMPS_V2,           ISR_COMPS_WORD,          getSubscription                                     },
-  { CE,           CE_COMPS_V0,            "",                      getContextEntitiesByEntityId                        },
-  { CEA,          CEA_COMPS_V0,           "",                      getContextEntityAttributes                          },
-  { CEAA,         CEAA_COMPS_V0,          "",                      getEntityByIdAttributeByName                        },
-  { CT,           CT_COMPS_V0,            "",                      getContextEntityTypes                               },
-  { CTA,          CTA_COMPS_V0,           "",                      getContextEntityTypes                               },
-  { CTAA,         CTAA_COMPS_V0,          "",                      getContextEntityTypeAttribute                       },
-  { CE,           CE_COMPS_V1,            "",                      getContextEntitiesByEntityId                        },
-  { CEA,          CEA_COMPS_V1,           "",                      getContextEntityAttributes                          },
-  { CEAA,         CEAA_COMPS_V1,          "",                      getEntityByIdAttributeByName                        },
-  { CT,           CT_COMPS_V1,            "",                      getContextEntityTypes                               },
-  { CTA,          CTA_COMPS_V1,           "",                      getContextEntityTypes                               },
-  { CTAA,         CTAA_COMPS_V1,          "",                      getContextEntityTypeAttribute                       },
-  { ICE,          ICE_COMPS_V0,           "",                      getIndividualContextEntity                          },
-  { ICEA,         ICEA_COMPS_V0,          "",                      getIndividualContextEntity                          },
-  { ICEAA,        ICEAA_COMPS_V0,         "",                      getIndividualContextEntityAttribute                 },
-  { AVI,          AVI_COMPS_V0,           "",                      getAttributeValueInstance                           },
-  { CET,          CET_COMPS_V0,           "",                      getNgsi10ContextEntityTypes                         },
-  { CETA,         CETA_COMPS_V0,          "",                      getNgsi10ContextEntityTypes                         },
-  { CETAA,        CETAA_COMPS_V0,         "",                      getNgsi10ContextEntityTypesAttribute                },
-  { ICE,          ICE_COMPS_V1,           "",                      getIndividualContextEntity                          },
-  { ICEA,         ICEA_COMPS_V1,          "",                      getIndividualContextEntity                          },
-  { ICEAA,        ICEAA_COMPS_V1,         "",                      getIndividualContextEntityAttribute                 },
-  { AVI,          AVI_COMPS_V1,           "",                      getAttributeValueInstance                           },
-  { CET,          CET_COMPS_V1,           "",                      getNgsi10ContextEntityTypes                         },
-  { CETA,         CETA_COMPS_V1,          "",                      getNgsi10ContextEntityTypes                         },
-  { CETAA,        CETAA_COMPS_V1,         "",                      getNgsi10ContextEntityTypesAttribute                },
-  { ET,           ET_COMPS_V1,            "",                      getEntityTypes                                      },
-  { AFET,         AFET_COMPS_V1,          "",                      getAttributesForEntityType                          },
-  { ACE,          ACE_COMPS_V1,           "",                      getAllContextEntities                               },
-  { ACET,         ACET_COMPS_V1,          "",                      getAllEntitiesWithTypeAndId                         },
-  { ICEAAT,      ICEAAT_COMPS_V1,         "",                      getIndividualContextEntityAttributeWithTypeAndId    },
-  { AVIT,        AVIT_COMPS_V1,           "",                      getAttributeValueInstanceWithTypeAndId              },
-  { CEET,        CEET_COMPS_V1,           "",                      getContextEntitiesByEntityIdAndType                 },
-  { CEAAT,       CEAAT_COMPS_V1,          "",                      getEntityByIdAttributeByNameWithTypeAndId           },
-  { LOG,         LOGT_COMPS_V0,           "",                      logTraceTreat                                       },
-  { LOG,         LOG2T_COMPS_V0,          "",                      logTraceTreat                                       },
-  { LOG,         LOGT_COMPS_V1,           "",                      logTraceTreat                                       },
-  { LOG,         LOG2T_COMPS_V1,          "",                      logTraceTreat                                       },
-  { STAT,        STAT_COMPS_V0,           "",                      statisticsTreat                                     },
-  { STAT,        STAT_COMPS_V1,           "",                      statisticsTreat                                     },
-  { STAT,        STAT_CACHE_COMPS_V0,     "",                      statisticsCacheTreat                                },
-  { STAT,        STAT_CACHE_COMPS_V1,     "",                      statisticsCacheTreat                                },
-  { VERS,        VERS_COMPS,              "",                      versionTreat                                        },
-  { LOGLEVEL,    LOGLEVEL_COMPS_V2,       "",                      getLogLevel                                         },
-  { SEM_STATE,   SEM_STATE_COMPS,         "",                      semStateTreat                                       },
-  { METRICS,     METRICS_COMPS,           "",                      getMetrics                                          },
+  { EntryPointsRequest,                            1, { "v2"                                                                           }, "",  entryPointsTreat                                 },
+  { EntitiesRequest,                               2, { "v2", "entities"                                                               }, "",  getEntities                                      },
+  { EntityRequest,                                 3, { "v2", "entities", "*"                                                          }, "",  getEntity                                        },
+  { EntityRequest,                                 4, { "v2", "entities", "*", "attrs"                                                 }, "",  getEntity                                        },
+  { EntityAttributeValueRequest,                   6, { "v2", "entities", "*", "attrs", "*", "value"                                   }, "",  getEntityAttributeValue                          },
+  { EntityAttributeRequest,                        5, { "v2", "entities", "*", "attrs", "*"                                            }, "",  getEntityAttribute                               },
+  { EntityTypeRequest,                             3, { "v2", "types", "*"                                                             }, "",  getEntityType                                    },
+  { EntityAllTypesRequest,                         2, { "v2", "types"                                                                  }, "",  getEntityAllTypes                                },
+  { SubscriptionsRequest,                          2, { "v2", "subscriptions"                                                          }, "",  getAllSubscriptions                              },
+  { IndividualSubscriptionRequest,                 3, { "v2", "subscriptions", "*"                                                     }, "",  getSubscription                                  },
+  { ContextEntitiesByEntityId,                     3, { "ngsi9", "contextEntities", "*"                                                }, "",  getContextEntitiesByEntityId                     },
+  { ContextEntityAttributes,                       4, { "ngsi9",          "contextEntities", "*", "attributes"                         }, "",  getContextEntityAttributes                       },
+  { EntityByIdAttributeByName,                     5, { "ngsi9",          "contextEntities", "*", "attributes", "*"                    }, "",  getEntityByIdAttributeByName                     },
+  { ContextEntityTypes,                            3, { "ngsi9",          "contextEntityTypes", "*"                                    }, "",  getContextEntityTypes                            },
+  { ContextEntityTypeAttributeContainer,           4, { "ngsi9",          "contextEntityTypes", "*", "attributes"                      }, "",  getContextEntityTypes                            },
+  { ContextEntityTypeAttribute,                    5, { "ngsi9",          "contextEntityTypes", "*", "attributes", "*"                 }, "",  getContextEntityTypeAttribute                    },
+  { ContextEntitiesByEntityId,                     4, { "v1", "registry", "contextEntities", "*"                                       }, "",  getContextEntitiesByEntityId                     },
+  { ContextEntityAttributes,                       5, { "v1", "registry", "contextEntities", "*", "attributes"                         }, "",  getContextEntityAttributes                       },
+  { EntityByIdAttributeByName,                     6, { "v1", "registry", "contextEntities", "*", "attributes", "*"                    }, "",  getEntityByIdAttributeByName                     },
+  { ContextEntityTypes,                            4, { "v1", "registry", "contextEntityTypes", "*"                                    }, "",  getContextEntityTypes                            },
+  { ContextEntityTypeAttributeContainer,           5, { "v1", "registry", "contextEntityTypes", "*", "attributes"                      }, "",  getContextEntityTypes                            },
+  { ContextEntityTypeAttribute,                    6, { "v1", "registry", "contextEntityTypes", "*", "attributes", "*"                 }, "",  getContextEntityTypeAttribute                    },
+  { IndividualContextEntity,                       3, { "ngsi10",  "contextEntities", "*"                                              }, "",  getIndividualContextEntity                       },
+  { IndividualContextEntityAttributes,             4, { "ngsi10",  "contextEntities", "*", "attributes"                                }, "",  getIndividualContextEntity                       },
+  { IndividualContextEntityAttribute,              5, { "ngsi10",  "contextEntities", "*", "attributes", "*"                           }, "",  getIndividualContextEntityAttribute              },
+  { AttributeValueInstance,                        6, { "ngsi10",  "contextEntities", "*", "attributes", "*", "*"                      }, "",  getAttributeValueInstance                        },
+  { Ngsi10ContextEntityTypes,                      3, { "ngsi10",  "contextEntityTypes", "*"                                           }, "",  getNgsi10ContextEntityTypes                      },
+  { Ngsi10ContextEntityTypesAttributeContainer,    4, { "ngsi10",  "contextEntityTypes", "*", "attributes"                             }, "",  getNgsi10ContextEntityTypes                      },
+  { Ngsi10ContextEntityTypesAttribute,             5, { "ngsi10",  "contextEntityTypes", "*", "attributes", "*"                        }, "",  getNgsi10ContextEntityTypesAttribute             },
+  { IndividualContextEntity,                       3, { "v1",      "contextEntities", "*"                                              }, "",  getIndividualContextEntity                       },
+  { IndividualContextEntityAttributes,             4, { "v1",      "contextEntities", "*", "attributes"                                }, "",  getIndividualContextEntity                       },
+  { IndividualContextEntityAttribute,              5, { "v1",      "contextEntities", "*", "attributes", "*"                           }, "",  getIndividualContextEntityAttribute              },
+  { AttributeValueInstance,                        6, { "v1",      "contextEntities", "*", "attributes", "*", "*"                      }, "",  getAttributeValueInstance                        },
+  { Ngsi10ContextEntityTypes,                      3, { "v1",      "contextEntityTypes", "*"                                           }, "",  getNgsi10ContextEntityTypes                      },
+  { Ngsi10ContextEntityTypesAttributeContainer,    4, { "v1",      "contextEntityTypes", "*", "attributes"                             }, "",  getNgsi10ContextEntityTypes                      },
+  { Ngsi10ContextEntityTypesAttribute,             5, { "v1",      "contextEntityTypes", "*", "attributes", "*"                        }, "",  getNgsi10ContextEntityTypesAttribute             },
+  { EntityTypes,                                   2, { "v1", "contextTypes"                                                           }, "",  getEntityTypes                                   },
+  { AttributesForEntityType,                       3, { "v1", "contextTypes", "*"                                                      }, "",  getAttributesForEntityType                       },
+  { AllContextEntities,                            2, { "v1", "contextEntities"                                                        }, "",  getAllContextEntities                            },
+  { AllEntitiesWithTypeAndId,                      6, { "v1", "contextEntities", "type", "*", "id", "*"                                }, "",  getAllEntitiesWithTypeAndId                      },
+  { IndividualContextEntityAttributeWithTypeAndId, 8, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*"             }, "",  getIndividualContextEntityAttributeWithTypeAndId },
+  { AttributeValueInstanceWithTypeAndId,           9, { "v1",      "contextEntities", "type", "*", "id", "*", "attributes", "*", "*"   }, "",  getAttributeValueInstanceWithTypeAndId           },
+  { ContextEntitiesByEntityIdAndType,              7, { "v1", "registry", "contextEntities", "type", "*", "id", "*"                    }, "",  getContextEntitiesByEntityIdAndType              },
+  { EntityByIdAttributeByNameIdAndType,            9, { "v1", "registry", "contextEntities", "type", "*", "id", "*", "attributes", "*" }, "",  getEntityByIdAttributeByNameWithTypeAndId        },
+  { LogTraceRequest,                               2, { "log", "trace"                                                                 }, "",  logTraceTreat                                    },
+  { LogTraceRequest,                               2, { "log", "traceLevel"                                                            }, "",  logTraceTreat                                    },
+  { LogTraceRequest,                               4, { "v1", "admin", "log", "trace"                                                  }, "",  logTraceTreat                                    },
+  { LogTraceRequest,                               4, { "v1", "admin", "log", "traceLevel"                                             }, "",  logTraceTreat                                    },
+  { StatisticsRequest,                             1, { "statistics"                                                                   }, "",  statisticsTreat                                  },
+  { StatisticsRequest,                             3, { "v1", "admin", "statistics"                                                    }, "",  statisticsTreat                                  },
+  { StatisticsRequest,                             2, { "cache", "statistics"                                                          }, "",  statisticsCacheTreat                             },
+  { StatisticsRequest,                             4, { "v1", "admin", "cache", "statistics"                                           }, "",  statisticsCacheTreat                             },
+  { VersionRequest,                                1, { "version"                                                                      }, "",  versionTreat                                     },
+  { LogLevelRequest,                               2, { "admin", "log"                                                                 }, "",  getLogLevel                                      },
+  { SemStateRequest,                               2, { "admin", "sem"                                                                 }, "",  semStateTreat                                    },
+  { MetricsRequest,                                2, { "admin", "metrics"                                                             }, "",  getMetrics                                       },
 
 #ifdef DEBUG
-  { EXIT,       EXIT2_COMPS,              "",                      exitTreat                                           },
-  { EXIT,       EXIT1_COMPS,              "",                      exitTreat                                           },
-  { LEAK,       LEAK2_COMPS,              "",                      leakTreat                                           },
-  { LEAK,       LEAK1_COMPS,              "",                      leakTreat                                           },
+  { ExitRequest,                                   2, { "exit", "*"                                                                    }, "",  exitTreat                                        },
+  { ExitRequest,                                   1, { "exit"                                                                         }, "",  exitTreat                                        },
+  { LeakRequest,                                   2, { "leak", "*"                                                                    }, "",  leakTreat                                        },
+  { LeakRequest,                                   1, { "leak"                                                                         }, "",  leakTreat                                        },
 #endif
 
   END_REQUEST
@@ -879,69 +551,69 @@ static RestService getServiceV[] =
 */
 static RestService postServiceV[] =
 {
-  { ENT,          ENT_COMPS_V2,           ENT_COMPS_WORD,          postEntities                                         },
-  { IENTOA,       IENTOA_COMPS_V2,        IENTOA_COMPS_WORD,       postEntity                                           },
-  { SSR,          SSR_COMPS_V2,           SSR_COMPS_WORD,          postSubscriptions                                    },
-  { BQR,          BQR_COMPS_V2,           BQR_COMPS_WORD,          postBatchQuery                                       },
-  { BUR,          BUR_COMPS_V2,           BUR_COMPS_WORD,          postBatchUpdate                                      },
-  { RCR,          RCR_COMPS_V0,           RCR_POST_WORD,           postRegisterContext                                  },
-  { DCAR,         DCAR_COMPS_V0,          DCAR_POST_WORD,          postDiscoverContextAvailability                      },
-  { SCAR,         SCAR_COMPS_V0,          SCAR_POST_WORD,          postSubscribeContextAvailability                     },
-  { UCAR,         UCAR_COMPS_V0,          UCAR_POST_WORD,          postUnsubscribeContextAvailability                   },
-  { UCAS,         UCAS_COMPS_V0,          UCAS_POST_WORD,          postUpdateContextAvailabilitySubscription            },
-  { NCAR,         NCAR_COMPS_V0,          NCAR_POST_WORD,          postNotifyContextAvailability                        },
-  { RCR,          RCR_COMPS_V1,           RCR_POST_WORD,           postRegisterContext                                  },
-  { DCAR,         DCAR_COMPS_V1,          DCAR_POST_WORD,          postDiscoverContextAvailability                      },
-  { SCAR,         SCAR_COMPS_V1,          SCAR_POST_WORD,          postSubscribeContextAvailability                     },
-  { UCAR,         UCAR_COMPS_V1,          UCAR_POST_WORD,          postUnsubscribeContextAvailability                   },
-  { UCAS,         UCAS_COMPS_V1,          UCAS_POST_WORD,          postUpdateContextAvailabilitySubscription            },
-  { NCAR,         NCAR_COMPS_V1,          NCAR_POST_WORD,          postNotifyContextAvailability                        },
-  { RCR,          RCR_COMPS_V0,           RCR_POST_WORD,           postRegisterContext                                  },
-  { DCAR,         DCAR_COMPS_V0,          DCAR_POST_WORD,          postDiscoverContextAvailability                      },
-  { SCAR,         SCAR_COMPS_V0,          SCAR_POST_WORD,          postSubscribeContextAvailability                     },
-  { UCAR,         UCAR_COMPS_V0,          UCAR_POST_WORD,          postUnsubscribeContextAvailability                   },
-  { UCAS,         UCAS_COMPS_V0,          UCAS_POST_WORD,          postUpdateContextAvailabilitySubscription            },
-  { NCAR,         NCAR_COMPS_V0,          NCAR_POST_WORD,          postNotifyContextAvailability                        },
-  { UPCR,         UPCR_COMPS_V1,          UPCR_POST_WORD,          (RestTreat) postUpdateContext                        },
-  { QCR,          QCR_COMPS_V1,           QCR_POST_WORD,           postQueryContext                                     },
-  { SCR,          SCR_COMPS_V1,           SCR_POST_WORD,           postSubscribeContext                                 },
-  { UCSR,         UCSR_COMPS_V1,          UCSR_POST_WORD,          postUpdateContextSubscription                        },
-  { UNCR,         UNCR_COMPS_V1,          UNCR_POST_WORD,          postUnsubscribeContext                               },
-  { NCR,          NCR_COMPS_V1,           NCR_POST_WORD,           postNotifyContext                                    },
-  { CE,           CE_COMPS_V0,            CE_POST_WORD,            postContextEntitiesByEntityId                        },
-  { CEA,          CEA_COMPS_V0,           CEA_POST_WORD,           postContextEntityAttributes                          },
-  { CEAA,         CEAA_COMPS_V0,          CEAA_POST_WORD,          postEntityByIdAttributeByName                        },
-  { CT,           CT_COMPS_V0,            CT_POST_WORD,            postContextEntityTypes                               },
-  { CTA,          CTA_COMPS_V0,           CTA_POST_WORD,           postContextEntityTypes                               },
-  { CTAA,         CTAA_COMPS_V0,          CTAA_POST_WORD,          postContextEntityTypeAttribute                       },
-  { SCA,          SCA_COMPS_V0,           SCA_POST_WORD,           postSubscribeContextAvailabilityConvOp               },
-  { CE,           CE_COMPS_V1,            CE_POST_WORD,            postContextEntitiesByEntityId                        },
-  { CEA,          CEA_COMPS_V1,           CEA_POST_WORD,           postContextEntityAttributes                          },
-  { CEAA,         CEAA_COMPS_V1,          CEAA_POST_WORD,          postEntityByIdAttributeByName                        },
-  { CT,           CT_COMPS_V1,            CT_POST_WORD,            postContextEntityTypes                               },
-  { CTA,          CTA_COMPS_V1,           CTA_POST_WORD,           postContextEntityTypes                               },
-  { CTAA,         CTAA_COMPS_V1,          CTAA_POST_WORD,          postContextEntityTypeAttribute                       },
-  { SCA,          SCA_COMPS_V1,           SCA_POST_WORD,           postSubscribeContextAvailability                     },
-  { ICE,          ICE_COMPS_V0,           ICE_POST_WORD,           postIndividualContextEntity                          },
-  { ICEA,         ICEA_COMPS_V0,          ICEA_POST_WORD,          postIndividualContextEntity                          },
-  { ICEAA,        ICEAA_COMPS_V0,         ICEAA_POST_WORD,         postIndividualContextEntityAttribute                 },
-  { SC,           SC_COMPS_V0,            SC_POST_WORD,            postSubscribeContextConvOp                           },
-  { ICE,          ICE_COMPS_V1,           ICE_POST_WORD,           postIndividualContextEntity                          },
-  { ICEA,         ICEA_COMPS_V1,          ICEA_POST_WORD,          postIndividualContextEntity                          },
-  { ICEAA,        ICEAA_COMPS_V1,         ICEAA_POST_WORD,         postIndividualContextEntityAttribute                 },
-  { SC,           SC_COMPS_V1,            SC_POST_WORD,            postSubscribeContextConvOp                           },
-  { ACE,          ACE_COMPS_V1,           ACE_POST_WORD,           postIndividualContextEntity                          },
-  { ACET,         ACET_COMPS_V1,          ACET_POST_WORD,          postAllEntitiesWithTypeAndId                         },
-  { ICEAAT,      ICEAAT_COMPS_V1,         ICEAAT_POST_WORD,        postIndividualContextEntityAttributeWithTypeAndId    },
-  { AVIT,        AVIT_COMPS_V1,           AVIT_POST_WORD,          postAttributeValueInstanceWithTypeAndId              },
-  { CEET,        CEET_COMPS_V1,           CEET_POST_WORD,          postContextEntitiesByEntityIdAndType                 },
-  { CEAAT,       CEAAT_COMPS_V1,          CEAAT_POST_WORD,         postEntityByIdAttributeByNameWithTypeAndId           },
-  { UPCR,        UPCR_COMPS_V0,           UPCR_POST_WORD,          (RestTreat) postUpdateContext                        },
-  { QCR,         QCR_COMPS_V0,            QCR_POST_WORD,           postQueryContext                                     },
-  { SCR,         SCR_COMPS_V0,            SCR_POST_WORD,           postSubscribeContext                                 },
-  { UCSR,        UCSR_COMPS_V0,           UCSR_POST_WORD,          postUpdateContextSubscription                        },
-  { UNCR,        UNCR_COMPS_V0,           UNCR_POST_WORD,          postUnsubscribeContext                               },
-  { NCR,         NCR_COMPS_V0,            NCR_POST_WORD,           postNotifyContext                                    },
+  { EntitiesRequest,                               2, { "v2", "entities"                                                               }, "",                                             postEntities                                      },
+  { EntityRequest,                                 4, { "v2", "entities", "*", "attrs"                                                 }, "",                                             postEntity                                        },
+  { SubscriptionsRequest,                          2, { "v2", "subscriptions"                                                          }, "",                                             postSubscriptions                                 },
+  { BatchQueryRequest,                             3, { "v2", "op", "query"                                                            }, "",                                             postBatchQuery                                    },
+  { BatchUpdateRequest,                            3, { "v2", "op", "update"                                                           }, "",                                             postBatchUpdate                                   },
+  { RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, "registerContextRequest",                       postRegisterContext                               },
+  { DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, "discoverContextAvailabilityRequest",           postDiscoverContextAvailability                   },
+  { SubscribeContextAvailability,                  2, { "ngsi9",          "subscribeContextAvailability"                               }, "subscribeContextAvailabilityRequest",          postSubscribeContextAvailability                  },
+  { UnsubscribeContextAvailability,                2, { "ngsi9",          "unsubscribeContextAvailability"                             }, "unsubscribeContextAvailabilityRequest",        postUnsubscribeContextAvailability                },
+  { UpdateContextAvailabilitySubscription,         2, { "ngsi9",          "updateContextAvailabilitySubscription"                      }, "updateContextAvailabilitySubscriptionRequest", postUpdateContextAvailabilitySubscription         },
+  { NotifyContextAvailability,                     2, { "ngsi9",          "notifyContextAvailability"                                  }, "notifyContextAvailabilityRequest",             postNotifyContextAvailability                     },
+  { RegisterContext,                               3, { "v1", "registry", "registerContext"                                            }, "registerContextRequest",                       postRegisterContext                               },
+  { DiscoverContextAvailability,                   3, { "v1", "registry", "discoverContextAvailability"                                }, "discoverContextAvailabilityRequest",           postDiscoverContextAvailability                   },
+  { SubscribeContextAvailability,                  3, { "v1", "registry", "subscribeContextAvailability"                               }, "subscribeContextAvailabilityRequest",          postSubscribeContextAvailability                  },
+  { UnsubscribeContextAvailability,                3, { "v1", "registry", "unsubscribeContextAvailability"                             }, "unsubscribeContextAvailabilityRequest",        postUnsubscribeContextAvailability                },
+  { UpdateContextAvailabilitySubscription,         3, { "v1", "registry", "updateContextAvailabilitySubscription"                      }, "updateContextAvailabilitySubscriptionRequest", postUpdateContextAvailabilitySubscription         },
+  { NotifyContextAvailability,                     3, { "v1", "registry", "notifyContextAvailability"                                  }, "notifyContextAvailabilityRequest",             postNotifyContextAvailability                     },
+  { RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, "registerContextRequest",                       postRegisterContext                               },
+  { DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, "discoverContextAvailabilityRequest",           postDiscoverContextAvailability                   },
+  { SubscribeContextAvailability,                  2, { "ngsi9",          "subscribeContextAvailability"                               }, "subscribeContextAvailabilityRequest",          postSubscribeContextAvailability                  },
+  { UnsubscribeContextAvailability,                2, { "ngsi9",          "unsubscribeContextAvailability"                             }, "unsubscribeContextAvailabilityRequest",        postUnsubscribeContextAvailability                },
+  { UpdateContextAvailabilitySubscription,         2, { "ngsi9",          "updateContextAvailabilitySubscription"                      }, "updateContextAvailabilitySubscriptionRequest", postUpdateContextAvailabilitySubscription         },
+  { NotifyContextAvailability,                     2, { "ngsi9",          "notifyContextAvailability"                                  }, "notifyContextAvailabilityRequest",             postNotifyContextAvailability                     },
+  { UpdateContext,                                 2, { "v1",      "updateContext"                                                     }, "updateContextRequest",                         (RestTreat) postUpdateContext                     },
+  { QueryContext,                                  2, { "v1",      "queryContext"                                                      }, "queryContextRequest",                          postQueryContext                                  },
+  { SubscribeContext,                              2, { "v1",      "subscribeContext"                                                  }, "subscribeContextRequest",                      postSubscribeContext                              },
+  { UpdateContextSubscription,                     2, { "v1",      "updateContextSubscription"                                         }, "updateContextSubscriptionRequest",             postUpdateContextSubscription                     },
+  { UnsubscribeContext,                            2, { "v1",      "unsubscribeContext"                                                }, "unsubscribeContextRequest",                    postUnsubscribeContext                            },
+  { NotifyContext,                                 2, { "v1",      "notifyContext"                                                     }, "notifyContextRequest",                         postNotifyContext                                 },
+  { ContextEntitiesByEntityId,                     3, { "ngsi9",          "contextEntities", "*"                                       }, "registerProviderRequest",                      postContextEntitiesByEntityId                     },
+  { ContextEntityAttributes,                       4, { "ngsi9",          "contextEntities", "*", "attributes"                         }, "registerProviderRequest",                      postContextEntityAttributes                       },
+  { EntityByIdAttributeByName,                     5, { "ngsi9",          "contextEntities", "*", "attributes", "*"                    }, "registerProviderRequest",                      postEntityByIdAttributeByName                     },
+  { ContextEntityTypes,                            3, { "ngsi9",          "contextEntityTypes", "*"                                    }, "registerProviderRequest",                      postContextEntityTypes                            },
+  { ContextEntityTypeAttributeContainer,           4, { "ngsi9",          "contextEntityTypes", "*", "attributes"                      }, "registerProviderRequest",                      postContextEntityTypes                            },
+  { ContextEntityTypeAttribute,                    5, { "ngsi9",          "contextEntityTypes", "*", "attributes", "*"                 }, "registerProviderRequest",                      postContextEntityTypeAttribute                    },
+  { SubscribeContextAvailability,                  2, { "ngsi9",          "contextAvailabilitySubscriptions"                           }, "subscribeContextAvailabilityRequest",          postSubscribeContextAvailabilityConvOp            },
+  { ContextEntitiesByEntityId,                     4, { "v1", "registry", "contextEntities", "*"                                       }, "registerProviderRequest",                      postContextEntitiesByEntityId                     },
+  { ContextEntityAttributes,                       5, { "v1", "registry", "contextEntities", "*", "attributes"                         }, "registerProviderRequest",                      postContextEntityAttributes                       },
+  { EntityByIdAttributeByName,                     6, { "v1", "registry", "contextEntities", "*", "attributes", "*"                    }, "registerProviderRequest",                      postEntityByIdAttributeByName                     },
+  { ContextEntityTypes,                            4, { "v1", "registry", "contextEntityTypes", "*"                                    }, "registerProviderRequest",                      postContextEntityTypes                            },
+  { ContextEntityTypeAttributeContainer,           5, { "v1", "registry", "contextEntityTypes", "*", "attributes"                      }, "registerProviderRequest",                      postContextEntityTypes                            },
+  { ContextEntityTypeAttribute,                    6, { "v1", "registry", "contextEntityTypes", "*", "attributes", "*"                 }, "registerProviderRequest",                      postContextEntityTypeAttribute                    },
+  { SubscribeContextAvailability,                  3, { "v1", "registry", "contextAvailabilitySubscriptions"                           }, "subscribeContextAvailabilityRequest",          postSubscribeContextAvailability                  },
+  { IndividualContextEntity,                       3, { "ngsi10",  "contextEntities", "*"                                              }, "appendContextElementRequest",                  postIndividualContextEntity                       },
+  { IndividualContextEntityAttributes,             4, { "ngsi10",  "contextEntities", "*", "attributes"                                }, "appendContextElementRequest",                  postIndividualContextEntity                       },
+  { IndividualContextEntityAttribute,              5, { "ngsi10",  "contextEntities", "*", "attributes", "*"                           }, "updateContextAttributeRequest",                postIndividualContextEntityAttribute              },
+  { SubscribeContext,                              2, { "ngsi10",  "contextSubscriptions"                                              }, "subscribeContextRequest",                      postSubscribeContextConvOp                        },
+  { IndividualContextEntity,                       3, { "v1",      "contextEntities", "*"                                              }, "appendContextElementRequest",                  postIndividualContextEntity                       },
+  { IndividualContextEntityAttributes,             4, { "v1",      "contextEntities", "*", "attributes"                                }, "appendContextElementRequest",                  postIndividualContextEntity                       },
+  { IndividualContextEntityAttribute,              5, { "v1",      "contextEntities", "*", "attributes", "*"                           }, "updateContextAttributeRequest",                postIndividualContextEntityAttribute              },
+  { SubscribeContext,                              2, { "v1",      "contextSubscriptions"                                              }, "subscribeContextRequest",                      postSubscribeContextConvOp                        },
+  { AllContextEntities,                            2, { "v1", "contextEntities"                                                        }, "appendContextElementRequest",                  postIndividualContextEntity                       },
+  { AllEntitiesWithTypeAndId,                      6, { "v1", "contextEntities", "type", "*", "id", "*"                                }, "appendContextElementRequest",                  postAllEntitiesWithTypeAndId                      },
+  { IndividualContextEntityAttributeWithTypeAndId, 8, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*"             }, "updateContextAttributeRequest",                postIndividualContextEntityAttributeWithTypeAndId },
+  { AttributeValueInstanceWithTypeAndId,           9, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*", "*"        }, "updateContextAttributeRequest",                postAttributeValueInstanceWithTypeAndId           },
+  { ContextEntitiesByEntityIdAndType,              7, { "v1", "registry", "contextEntities", "type", "*", "id", "*"                    }, "registerProviderRequest",                      postContextEntitiesByEntityIdAndType              },
+  { EntityByIdAttributeByNameIdAndType,            9, { "v1", "registry", "contextEntities", "type", "*", "id", "*", "attributes", "*" }, "registerProviderRequest",                      postEntityByIdAttributeByNameWithTypeAndId        },
+  { UpdateContext,                                 2, { "ngsi10",  "updateContext"                                                     }, "updateContextRequest",                         (RestTreat) postUpdateContext                     },
+  { QueryContext,                                  2, { "ngsi10",  "queryContext"                                                      }, "queryContextRequest",                          postQueryContext                                  },
+  { SubscribeContext,                              2, { "ngsi10",  "subscribeContext"                                                  }, "subscribeContextRequest",                      postSubscribeContext                              },
+  { UpdateContextSubscription,                     2, { "ngsi10",  "updateContextSubscription"                                         }, "updateContextSubscriptionRequest",             postUpdateContextSubscription                     },
+  { UnsubscribeContext,                            2, { "ngsi10",  "unsubscribeContext"                                                }, "unsubscribeContextRequest",                    postUnsubscribeContext                            },
+  { NotifyContext,                                 2, { "ngsi10",  "notifyContext"                                                     }, "notifyContextRequest",                         postNotifyContext                                 },
 
   END_REQUEST
 };
@@ -954,29 +626,29 @@ static RestService postServiceV[] =
 */
 static RestService putServiceV[] =
 {
-  { IENTOA,       IENTOA_COMPS_V2,        IENTOA_COMPS_WORD,       putEntity                                           },
-  { IENTATTRVAL,  IENTATTRVAL_COMPS_V2,   IENTATTRVAL_COMPS_WORD,  putEntityAttributeValue                             },
-  { IENTATTR,     IENTATTR_COMPS_V2,      IENTATTR_COMPS_WORD,     putEntityAttribute                                  },
-  { SCAS,         SCAS_COMPS_V0,          SCAS_PUT_WORD,           putAvailabilitySubscriptionConvOp                   },
-  { SCAS,         SCAS_COMPS_V1,          SCAS_PUT_WORD,           putAvailabilitySubscriptionConvOp                   },
-  { ICE,          ICE_COMPS_V0,           ICE_PUT_WORD,            putIndividualContextEntity                          },
-  { ICEA,         ICEA_COMPS_V0,          ICEA_PUT_WORD,           putIndividualContextEntity                          },
-  { ICEAA,        ICEAA_COMPS_V0,         ICEAA_PUT_WORD,          putIndividualContextEntityAttribute                 },
-  { AVI,          AVI_COMPS_V0,           AVI_PUT_WORD,            putAttributeValueInstance                           },
-  { SCS,          SCS_COMPS_V0,           SCS_PUT_WORD,            putSubscriptionConvOp                               },
-  { ICE,          ICE_COMPS_V1,           ICE_PUT_WORD,            putIndividualContextEntity                          },
-  { ICEA,         ICEA_COMPS_V1,          ICEA_PUT_WORD,           putIndividualContextEntity                          },
-  { ICEAA,        ICEAA_COMPS_V1,         ICEAA_PUT_WORD,          putIndividualContextEntityAttribute                 },
-  { AVI,          AVI_COMPS_V1,           AVI_PUT_WORD,            putAttributeValueInstance                           },
-  { SCS,          SCS_COMPS_V1,           SCS_PUT_WORD,            putSubscriptionConvOp                               },
-  { ACET,         ACET_COMPS_V1,          ACET_PUT_WORD,           putAllEntitiesWithTypeAndId                         },
-  { ICEAAT,      ICEAAT_COMPS_V1,         ICEAAT_PUT_WORD,         putIndividualContextEntityAttributeWithTypeAndId    },
-  { AVIT,        AVIT_COMPS_V1,           AVIT_PUT_WORD,           putAttributeValueInstanceWithTypeAndId              },
-  { LOG,         LOGTL_COMPS_V0,          "",                      logTraceTreat                                       },
-  { LOG,         LOG2TL_COMPS_V0,         "",                      logTraceTreat                                       },
-  { LOG,         LOGTL_COMPS_V1,          "",                      logTraceTreat                                       },
-  { LOG,         LOG2TL_COMPS_V1,         "",                      logTraceTreat                                       },
-  { LOGLEVEL,    LOGLEVEL_COMPS_V2,       "",                      changeLogLevel                                      },
+  { EntityRequest,                                 4, { "v2", "entities", "*", "attrs"                                               }, "",                                             putEntity                                        },
+  { EntityAttributeValueRequest,                   6, { "v2", "entities", "*", "attrs", "*", "value"                                 }, "",                                             putEntityAttributeValue                          },
+  { EntityAttributeRequest,                        5, { "v2", "entities", "*", "attrs", "*"                                          }, "",                                             putEntityAttribute                               },
+  { Ngsi9SubscriptionsConvOp,                      3, { "ngsi9",          "contextAvailabilitySubscriptions", "*"                    }, "updateContextAvailabilitySubscriptionRequest", putAvailabilitySubscriptionConvOp                },
+  { Ngsi9SubscriptionsConvOp,                      4, { "v1", "registry", "contextAvailabilitySubscriptions", "*"                    }, "updateContextAvailabilitySubscriptionRequest", putAvailabilitySubscriptionConvOp                },
+  { IndividualContextEntity,                       3, { "ngsi10",  "contextEntities", "*"                                            }, "updateContextElementRequest",                  putIndividualContextEntity                       },
+  { IndividualContextEntityAttributes,             4, { "ngsi10",  "contextEntities", "*", "attributes"                              }, "updateContextElementRequest",                  putIndividualContextEntity                       },
+  { IndividualContextEntityAttribute,              5, { "ngsi10",  "contextEntities", "*", "attributes", "*"                         }, "updateContextAttributeRequest",                putIndividualContextEntityAttribute              },
+  { AttributeValueInstance,                        6, { "ngsi10",  "contextEntities", "*", "attributes", "*", "*"                    }, "updateContextAttributeRequest",                putAttributeValueInstance                        },
+  { Ngsi10SubscriptionsConvOp,                     3, { "ngsi10",  "contextSubscriptions", "*"                                       }, "updateContextSubscriptionRequest",             putSubscriptionConvOp                            },
+  { IndividualContextEntity,                       3, { "v1",      "contextEntities", "*"                                            }, "updateContextElementRequest",                  putIndividualContextEntity                       },
+  { IndividualContextEntityAttributes,             4, { "v1",      "contextEntities", "*", "attributes"                              }, "updateContextElementRequest",                  putIndividualContextEntity                       },
+  { IndividualContextEntityAttribute,              5, { "v1",      "contextEntities", "*", "attributes", "*"                         }, "updateContextAttributeRequest",                putIndividualContextEntityAttribute              },
+  { AttributeValueInstance,                        6, { "v1",      "contextEntities", "*", "attributes", "*", "*"                    }, "updateContextAttributeRequest",                putAttributeValueInstance                        },
+  { Ngsi10SubscriptionsConvOp,                     3, { "v1",      "contextSubscriptions", "*"                                       }, "updateContextSubscriptionRequest",             putSubscriptionConvOp                            },
+  { AllEntitiesWithTypeAndId,                      6, { "v1", "contextEntities", "type", "*", "id", "*"                              }, "updateContextElementRequest",                  putAllEntitiesWithTypeAndId                      },
+  { IndividualContextEntityAttributeWithTypeAndId, 8, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*"           }, "updateContextAttributeRequest",                putIndividualContextEntityAttributeWithTypeAndId },
+  { AttributeValueInstanceWithTypeAndId,           9, { "v1",      "contextEntities", "type", "*", "id", "*", "attributes", "*", "*" }, "updateContextAttributeRequest",                putAttributeValueInstanceWithTypeAndId           },
+  { LogTraceRequest,                               3, { "log", "trace",      "*"                                                     }, "",                                             logTraceTreat                                    },
+  { LogTraceRequest,                               3, { "log", "traceLevel", "*"                                                     }, "",                                             logTraceTreat                                    },
+  { LogTraceRequest,                               5, { "v1", "admin", "log", "trace",      "*"                                      }, "",                                             logTraceTreat                                    },
+  { LogTraceRequest,                               5, { "v1", "admin", "log", "traceLevel", "*"                                      }, "",                                             logTraceTreat                                    },
+  { LogLevelRequest,                               2, { "admin", "log"                                                               }, "",                                             changeLogLevel                                   },
 
   END_REQUEST
 };
@@ -989,8 +661,8 @@ static RestService putServiceV[] =
 */
 static RestService patchServiceV[] =
 {
-  { IENTOA,       IENTOA_COMPS_V2,        IENTOA_COMPS_WORD,       patchEntity                               },
-  { ISR,          ISR_COMPS_V2,           ISR_COMPS_WORD,          patchSubscription                         },
+  { EntityRequest,                 4, { "v2", "entities", "*", "attrs" }, "", patchEntity       },
+  { IndividualSubscriptionRequest, 3, { "v2", "subscriptions", "*"     }, "", patchSubscription },
 
   END_REQUEST
 };
@@ -1003,37 +675,37 @@ static RestService patchServiceV[] =
 */
 static RestService deleteServiceV[] =
 {
-  { IENT,         IENT_COMPS_V2,          IENT_COMPS_WORD,         deleteEntity                                        },
-  { IENTATTR,     IENTATTR_COMPS_V2,      IENTATTR_COMPS_WORD,     deleteEntity                                        },
-  { ISR,          ISR_COMPS_V2,           ISR_COMPS_WORD,          deleteSubscription                                  },
-  { SCAS,         SCAS_COMPS_V0,          "",                      deleteAvailabilitySubscriptionConvOp                },
-  { SCAS,         SCAS_COMPS_V1,          "",                      deleteAvailabilitySubscriptionConvOp                },
-  { ICE,          ICE_COMPS_V0,           "",                      deleteIndividualContextEntity                       },
-  { ICEA,         ICEA_COMPS_V0,          "",                      deleteIndividualContextEntity                       },
-  { ICEAA,        ICEAA_COMPS_V0,         "",                      deleteIndividualContextEntityAttribute              },
-  { AVI,          AVI_COMPS_V0,           "",                      deleteAttributeValueInstance                        },
-  { SCS,          SCS_COMPS_V0,           "",                      deleteSubscriptionConvOp                            },
-  { ICE,          ICE_COMPS_V1,           "",                      deleteIndividualContextEntity                       },
-  { ICEA,         ICEA_COMPS_V1,          "",                      deleteIndividualContextEntity                       },
-  { ICEAA,        ICEAA_COMPS_V1,         "",                      deleteIndividualContextEntityAttribute              },
-  { AVI,          AVI_COMPS_V1,           "",                      deleteAttributeValueInstance                        },
-  { SCS,          SCS_COMPS_V1,           "",                      deleteSubscriptionConvOp                            },
-  { ACET,         ACET_COMPS_V1,          "",                      deleteAllEntitiesWithTypeAndId                      },
-  { ICEAAT,      ICEAAT_COMPS_V1,         "",                      deleteIndividualContextEntityAttributeWithTypeAndId },
-  { AVIT,        AVIT_COMPS_V1,           "",                      deleteAttributeValueInstanceWithTypeAndId           },
-  { LOG,         LOGT_COMPS_V0,           "",                      logTraceTreat                                       },
-  { LOG,         LOGTL_COMPS_V0,          "",                      logTraceTreat                                       },
-  { LOG,         LOG2T_COMPS_V0,          "",                      logTraceTreat                                       },
-  { LOG,         LOG2TL_COMPS_V0,         "",                      logTraceTreat                                       },
-  { LOG,         LOGT_COMPS_V1,           "",                      logTraceTreat                                       },
-  { LOG,         LOGTL_COMPS_V1,          "",                      logTraceTreat                                       },
-  { LOG,         LOG2T_COMPS_V1,          "",                      logTraceTreat                                       },
-  { LOG,         LOG2TL_COMPS_V1,         "",                      logTraceTreat                                       },
-  { STAT,        STAT_COMPS_V0,           "",                      statisticsTreat                                     },
-  { STAT,        STAT_COMPS_V1,           "",                      statisticsTreat                                     },
-  { STAT,        STAT_CACHE_COMPS_V0,     "",                      statisticsCacheTreat                                },
-  { STAT,        STAT_CACHE_COMPS_V1,     "",                      statisticsCacheTreat                                },
-  { METRICS,     METRICS_COMPS,           "",                      deleteMetrics                                       },
+  { EntityRequest,                                 3, { "v2", "entities", "*"                                                        }, "", deleteEntity                                        },
+  { EntityAttributeRequest,                        5, { "v2", "entities", "*", "attrs", "*"                                          }, "", deleteEntity                                        },
+  { IndividualSubscriptionRequest,                 3, { "v2", "subscriptions", "*"                                                   }, "", deleteSubscription                                  },
+  { Ngsi9SubscriptionsConvOp,                      3, { "ngsi9",          "contextAvailabilitySubscriptions", "*"                    }, "", deleteAvailabilitySubscriptionConvOp                },
+  { Ngsi9SubscriptionsConvOp,                      4, { "v1", "registry", "contextAvailabilitySubscriptions", "*"                    }, "", deleteAvailabilitySubscriptionConvOp                },
+  { IndividualContextEntity,                       3, { "ngsi10",  "contextEntities", "*"                                            }, "", deleteIndividualContextEntity                       },
+  { IndividualContextEntityAttributes,             4, { "ngsi10",  "contextEntities", "*", "attributes"                              }, "", deleteIndividualContextEntity                       },
+  { IndividualContextEntityAttribute,              5, { "ngsi10",  "contextEntities", "*", "attributes", "*"                         }, "", deleteIndividualContextEntityAttribute              },
+  { AttributeValueInstance,                        6, { "ngsi10",  "contextEntities", "*", "attributes", "*", "*"                    }, "", deleteAttributeValueInstance                        },
+  { Ngsi10SubscriptionsConvOp,                     3, { "ngsi10",  "contextSubscriptions", "*"                                       }, "", deleteSubscriptionConvOp                            },
+  { IndividualContextEntity,                       3, { "v1",      "contextEntities", "*"                                            }, "", deleteIndividualContextEntity                       },
+  { IndividualContextEntityAttributes,             4, { "v1",      "contextEntities", "*", "attributes"                              }, "", deleteIndividualContextEntity                       },
+  { IndividualContextEntityAttribute,              5, { "v1",      "contextEntities", "*", "attributes", "*"                         }, "", deleteIndividualContextEntityAttribute              },
+  { AttributeValueInstance,                        6, { "v1",      "contextEntities", "*", "attributes", "*", "*"                    }, "", deleteAttributeValueInstance                        },
+  { Ngsi10SubscriptionsConvOp,                     3, { "v1",      "contextSubscriptions", "*"                                       }, "", deleteSubscriptionConvOp                            },
+  { AllEntitiesWithTypeAndId,                      6, { "v1", "contextEntities", "type", "*", "id", "*"                              }, "", deleteAllEntitiesWithTypeAndId                      },
+  { IndividualContextEntityAttributeWithTypeAndId, 8, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*"           }, "", deleteIndividualContextEntityAttributeWithTypeAndId },
+  { AttributeValueInstanceWithTypeAndId,           9, { "v1",      "contextEntities", "type", "*", "id", "*", "attributes", "*", "*" }, "", deleteAttributeValueInstanceWithTypeAndId           },
+  { LogTraceRequest,                               2, { "log", "trace"                                                               }, "", logTraceTreat                                       },
+  { LogTraceRequest,                               3, { "log", "trace",      "*"                                                     }, "", logTraceTreat                                       },
+  { LogTraceRequest,                               2, { "log", "traceLevel"                                                          }, "", logTraceTreat                                       },
+  { LogTraceRequest,                               3, { "log", "traceLevel", "*"                                                     }, "", logTraceTreat                                       },
+  { LogTraceRequest,                               4, { "v1", "admin", "log", "trace"                                                }, "", logTraceTreat                                       },
+  { LogTraceRequest,                               5, { "v1", "admin", "log", "trace",      "*"                                      }, "", logTraceTreat                                       },
+  { LogTraceRequest,                               4, { "v1", "admin", "log", "traceLevel"                                           }, "", logTraceTreat                                       },
+  { LogTraceRequest,                               5, { "v1", "admin", "log", "traceLevel", "*"                                      }, "", logTraceTreat                                       },
+  { StatisticsRequest,                             1, { "statistics"                                                                 }, "", statisticsTreat                                     },
+  { StatisticsRequest,                             3, { "v1", "admin", "statistics"                                                  }, "", statisticsTreat                                     },
+  { StatisticsRequest,                             2, { "cache", "statistics"                                                        }, "", statisticsCacheTreat                                },
+  { StatisticsRequest,                             4, { "v1", "admin", "cache", "statistics"                                         }, "", statisticsCacheTreat                                },
+  { MetricsRequest,                                2, { "admin", "metrics"                                                           }, "", deleteMetrics                                       },
 
   END_REQUEST
 };
@@ -1046,110 +718,110 @@ static RestService deleteServiceV[] =
 */
 static RestService badVerbV[] =
 {
-  { EPS,          EPS_COMPS_V2,           ENT_COMPS_WORD,          badVerbGetOnly                             },
-  { ENT,          ENT_COMPS_V2,           ENT_COMPS_WORD,          badVerbGetPostOnly                         },
-  { IENT,         IENT_COMPS_V2,          IENT_COMPS_WORD,         badVerbGetDeleteOnly                       },
-  { IENTOA,       IENTOA_COMPS_V2,        IENTOA_COMPS_WORD,       badVerbAllNotDelete                        },
-  { IENTATTRVAL,  IENTATTRVAL_COMPS_V2,   IENTATTRVAL_COMPS_WORD,  badVerbGetPutOnly                          },
-  { IENTATTR,     IENTATTR_COMPS_V2,      IENTATTR_COMPS_WORD,     badVerbGetPutDeleteOnly                    },
-  { ENTT,         ENTT_COMPS_V2,          ENTT_COMPS_WORD,         badVerbGetOnly                             },
-  { ETT,          ETT_COMPS_V2,           ETT_COMPS_WORD,          badVerbGetOnly                             },
-  { SSR,          SSR_COMPS_V2,           SSR_COMPS_WORD,          badVerbGetPostOnly                         },
-  { ISR,          ISR_COMPS_V2,           ISR_COMPS_WORD,          badVerbGetDeletePatchOnly                  },
-  { BQR,          BQR_COMPS_V2,           BQR_COMPS_WORD,          badVerbPostOnly                            },
-  { BUR,          BUR_COMPS_V2,           BUR_COMPS_WORD,          badVerbPostOnly                            },
-  { RCR,          RCR_COMPS_V0,           RCR_POST_WORD,           badVerbPostOnly                            },
-  { DCAR,         DCAR_COMPS_V0,          DCAR_POST_WORD,          badVerbPostOnly                            },
-  { SCAR,         SCAR_COMPS_V0,          SCAR_POST_WORD,          badVerbPostOnly                            },
-  { UCAR,         UCAR_COMPS_V0,          UCAR_POST_WORD,          badVerbPostOnly                            },
-  { UCAS,         UCAS_COMPS_V0,          UCAS_POST_WORD,          badVerbPostOnly                            },
-  { NCAR,         NCAR_COMPS_V0,          NCAR_POST_WORD,          badVerbPostOnly                            },
-  { RCR,          RCR_COMPS_V1,           RCR_POST_WORD,           badVerbPostOnly                            },
-  { DCAR,         DCAR_COMPS_V1,          DCAR_POST_WORD,          badVerbPostOnly                            },
-  { SCAR,         SCAR_COMPS_V1,          SCAR_POST_WORD,          badVerbPostOnly                            },
-  { UCAR,         UCAR_COMPS_V1,          UCAR_POST_WORD,          badVerbPostOnly                            },
-  { UCAS,         UCAS_COMPS_V1,          UCAS_POST_WORD,          badVerbPostOnly                            },
-  { NCAR,         NCAR_COMPS_V1,          NCAR_POST_WORD,          badVerbPostOnly                            },
-  { RCR,          RCR_COMPS_V0,           RCR_POST_WORD,           badVerbPostOnly                            },
-  { DCAR,         DCAR_COMPS_V0,          DCAR_POST_WORD,          badVerbPostOnly                            },
-  { SCAR,         SCAR_COMPS_V0,          SCAR_POST_WORD,          badVerbPostOnly                            },
-  { UCAR,         UCAR_COMPS_V0,          UCAR_POST_WORD,          badVerbPostOnly                            },
-  { UCAS,         UCAS_COMPS_V0,          UCAS_POST_WORD,          badVerbPostOnly                            },
-  { NCAR,         NCAR_COMPS_V0,          NCAR_POST_WORD,          badVerbPostOnly                            },
-  { UPCR,         UPCR_COMPS_V1,          UPCR_POST_WORD,          badVerbPostOnly                            },
-  { QCR,          QCR_COMPS_V1,           QCR_POST_WORD,           badVerbPostOnly                            },
-  { SCR,          SCR_COMPS_V1,           SCR_POST_WORD,           badVerbPostOnly                            },
-  { UCSR,         UCSR_COMPS_V1,          UCSR_POST_WORD,          badVerbPostOnly                            },
-  { UNCR,         UNCR_COMPS_V1,          UNCR_POST_WORD,          badVerbPostOnly                            },
-  { NCR,          NCR_COMPS_V1,           NCR_POST_WORD,           badVerbPostOnly                            },
-  { CE,           CE_COMPS_V0,            "",                      badVerbGetPostOnly                         },
-  { CEA,          CEA_COMPS_V0,           "",                      badVerbGetPostOnly                         },
-  { CEAA,         CEAA_COMPS_V0,          "",                      badVerbGetPostOnly                         },
-  { CT,           CT_COMPS_V0,            "",                      badVerbGetPostOnly                         },
-  { CTA,          CTA_COMPS_V0,           "",                      badVerbGetPostOnly                         },
-  { CTAA,         CTAA_COMPS_V0,          "",                      badVerbGetPostOnly                         },
-  { SCA,          SCA_COMPS_V0,           "",                      badVerbPostOnly                            },
-  { SCAS,         SCAS_COMPS_V0,          "",                      badVerbPutDeleteOnly                       },
-  { CE,           CE_COMPS_V1,            "",                      badVerbGetPostOnly                         },
-  { CEA,          CEA_COMPS_V1,           "",                      badVerbGetPostOnly                         },
-  { CEAA,         CEAA_COMPS_V1,          "",                      badVerbGetPostOnly                         },
-  { CT,           CT_COMPS_V1,            "",                      badVerbGetPostOnly                         },
-  { CTA,          CTA_COMPS_V1,           "",                      badVerbGetPostOnly                         },
-  { CTAA,         CTAA_COMPS_V1,          "",                      badVerbGetPostOnly                         },
-  { SCA,          SCA_COMPS_V1,           "",                      badVerbPostOnly                            },
-  { SCAS,         SCAS_COMPS_V1,          "",                      badVerbPutDeleteOnly                       },
-  { ICE,          ICE_COMPS_V0,           "",                      badVerbAllFour                             },
-  { ICEA,         ICEA_COMPS_V0,          "",                      badVerbAllFour                             },
-  { ICEAA,        ICEAA_COMPS_V0,         "",                      badVerbAllFour                             },
-  { AVI,          AVI_COMPS_V0,           "",                      badVerbGetPutDeleteOnly                    },
-  { CET,          CET_COMPS_V0,           "",                      badVerbGetOnly                             },
-  { CETA,         CETA_COMPS_V0,          "",                      badVerbGetOnly                             },
-  { CETAA,        CETAA_COMPS_V0,         "",                      badVerbGetOnly                             },
-  { SC,           SC_COMPS_V0,            "",                      badVerbPostOnly                            },
-  { SCS,          SCS_COMPS_V0,           "",                      badVerbPutDeleteOnly                       },
-  { ICE,          ICE_COMPS_V1,           "",                      badVerbAllFour                             },
-  { ICEA,         ICEA_COMPS_V1,          "",                      badVerbAllFour                             },
-  { ICEAA,        ICEAA_COMPS_V1,         "",                      badVerbAllFour                             },
-  { AVI,          AVI_COMPS_V1,           "",                      badVerbGetPutDeleteOnly                    },
-  { CET,          CET_COMPS_V1,           "",                      badVerbGetOnly                             },
-  { CETA,         CETA_COMPS_V1,          "",                      badVerbGetOnly                             },
-  { CETAA,        CETAA_COMPS_V1,         "",                      badVerbGetOnly                             },
-  { SC,           SC_COMPS_V1,            "",                      badVerbPostOnly                            },
-  { SCS,          SCS_COMPS_V1,           "",                      badVerbPutDeleteOnly                       },
-  { ET,           ET_COMPS_V1,            "",                      badVerbGetOnly                             },
-  { AFET,         AFET_COMPS_V1,          "",                      badVerbGetOnly                             },
-  { ACE,          ACE_COMPS_V1,           "",                      badVerbGetPostOnly                         },
-  { ACET,         ACET_COMPS_V1,          "",                      badVerbAllFour                             },
-  { ICEAAT,      ICEAAT_COMPS_V1,         "",                      badVerbAllFour                             },
-  { AVIT,        AVIT_COMPS_V1,           "",                      badVerbAllFour                             },
-  { CEET,        CEET_COMPS_V1,           "",                      badVerbGetPostOnly                         },
-  { CEAAT,       CEAAT_COMPS_V1,          "",                      badVerbGetPostOnly                         },
-  { LOG,         LOGT_COMPS_V0,           "",                      badVerbGetDeleteOnly                       },
-  { LOG,         LOGTL_COMPS_V0,          "",                      badVerbPutDeleteOnly                       },
-  { LOG,         LOG2T_COMPS_V0,          "",                      badVerbGetDeleteOnly                       },
-  { LOG,         LOG2TL_COMPS_V0,         "",                      badVerbPutDeleteOnly                       },
-  { LOG,         LOGT_COMPS_V1,           "",                      badVerbGetDeleteOnly                       },
-  { LOG,         LOGTL_COMPS_V1,          "",                      badVerbPutDeleteOnly                       },
-  { LOG,         LOG2T_COMPS_V1,          "",                      badVerbGetDeleteOnly                       },
-  { LOG,         LOG2TL_COMPS_V1,         "",                      badVerbPutDeleteOnly                       },
-  { STAT,        STAT_COMPS_V0,           "",                      badVerbGetDeleteOnly                       },
-  { STAT,        STAT_COMPS_V1,           "",                      badVerbGetDeleteOnly                       },
-  { STAT,        STAT_CACHE_COMPS_V0,     "",                      badVerbGetDeleteOnly                       },
-  { STAT,        STAT_CACHE_COMPS_V1,     "",                      badVerbGetDeleteOnly                       },
-  { VERS,        VERS_COMPS,              "",                      badVerbGetOnly                             },
-  { LOGLEVEL,    LOGLEVEL_COMPS_V2,       "",                      badVerbPutOnly                             },
-  { SEM_STATE,   SEM_STATE_COMPS,         "",                      badVerbGetOnly                             },
-  { METRICS,     METRICS_COMPS,           "",                      badVerbGetDeleteOnly                       },
-  { UPCR,        UPCR_COMPS_V0,           UPCR_POST_WORD,          badVerbPostOnly                            },
-  { QCR,         QCR_COMPS_V0,            QCR_POST_WORD,           badVerbPostOnly                            },
-  { SCR,         SCR_COMPS_V0,            SCR_POST_WORD,           badVerbPostOnly                            },
-  { UCSR,        UCSR_COMPS_V0,           UCSR_POST_WORD,          badVerbPostOnly                            },
-  { UNCR,        UNCR_COMPS_V0,           UNCR_POST_WORD,          badVerbPostOnly                            },
-  { NCR,         NCR_COMPS_V0,            NCR_POST_WORD,           badVerbPostOnly                            },
-  { INV,         INV9_COMPS,              "",                      badNgsi9Request                            },
-  { INV,         INV10_COMPS,             "",                      badNgsi10Request                           },
-  { INV,         INV_ALL_COMPS,           "",                      badRequest                                 },
-  { INV,         0, {},                   "",                      NULL                                       },
+  { EntryPointsRequest,                            1, { "v2"                                                                           }, "",                                             badVerbGetOnly            },
+  { EntitiesRequest,                               2, { "v2", "entities"                                                               }, "",                                             badVerbGetPostOnly        },
+  { EntityRequest,                                 3, { "v2", "entities", "*"                                                          }, "",                                             badVerbGetDeleteOnly      },
+  { EntityRequest,                                 4, { "v2", "entities", "*", "attrs"                                                 }, "",                                             badVerbAllNotDelete       },
+  { EntityAttributeValueRequest,                   6, { "v2", "entities", "*", "attrs", "*", "value"                                   }, "",                                             badVerbGetPutOnly         },
+  { EntityAttributeRequest,                        5, { "v2", "entities", "*", "attrs", "*"                                            }, "",                                             badVerbGetPutDeleteOnly   },
+  { EntityTypeRequest,                             3, { "v2", "types", "*"                                                             }, "",                                             badVerbGetOnly            },
+  { EntityAllTypesRequest,                         2, { "v2", "types"                                                                  }, "",                                             badVerbGetOnly            },
+  { SubscriptionsRequest,                          2, { "v2", "subscriptions"                                                          }, "",                                             badVerbGetPostOnly        },
+  { IndividualSubscriptionRequest,                 3, { "v2", "subscriptions", "*"                                                     }, "",                                             badVerbGetDeletePatchOnly },
+  { BatchQueryRequest,                             3, { "v2", "op", "query"                                                            }, "",                                             badVerbPostOnly           },
+  { BatchUpdateRequest,                            3, { "v2", "op", "update"                                                           }, "",                                             badVerbPostOnly           },
+  { RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, "registerContextRequest",                       badVerbPostOnly           },
+  { DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, "discoverContextAvailabilityRequest",           badVerbPostOnly           },
+  { SubscribeContextAvailability,                  2, { "ngsi9",          "subscribeContextAvailability"                               }, "subscribeContextAvailabilityRequest",          badVerbPostOnly           },
+  { UnsubscribeContextAvailability,                2, { "ngsi9",          "unsubscribeContextAvailability"                             }, "unsubscribeContextAvailabilityRequest",        badVerbPostOnly           },
+  { UpdateContextAvailabilitySubscription,         2, { "ngsi9",          "updateContextAvailabilitySubscription"                      }, "updateContextAvailabilitySubscriptionRequest", badVerbPostOnly           },
+  { NotifyContextAvailability,                     2, { "ngsi9",          "notifyContextAvailability"                                  }, "notifyContextAvailabilityRequest",             badVerbPostOnly           },
+  { RegisterContext,                               3, { "v1", "registry", "registerContext"                                            }, "registerContextRequest",                       badVerbPostOnly           },
+  { DiscoverContextAvailability,                   3, { "v1", "registry", "discoverContextAvailability"                                }, "discoverContextAvailabilityRequest",           badVerbPostOnly           },
+  { SubscribeContextAvailability,                  3, { "v1", "registry", "subscribeContextAvailability"                               }, "subscribeContextAvailabilityRequest",          badVerbPostOnly           },
+  { UnsubscribeContextAvailability,                3, { "v1", "registry", "unsubscribeContextAvailability"                             }, "unsubscribeContextAvailabilityRequest",        badVerbPostOnly           },
+  { UpdateContextAvailabilitySubscription,         3, { "v1", "registry", "updateContextAvailabilitySubscription"                      }, "updateContextAvailabilitySubscriptionRequest", badVerbPostOnly           },
+  { NotifyContextAvailability,                     3, { "v1", "registry", "notifyContextAvailability"                                  }, "notifyContextAvailabilityRequest",             badVerbPostOnly           },
+  { RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, "registerContextRequest",                       badVerbPostOnly           },
+  { DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, "discoverContextAvailabilityRequest",           badVerbPostOnly           },
+  { SubscribeContextAvailability,                  2, { "ngsi9",          "subscribeContextAvailability"                               }, "subscribeContextAvailabilityRequest",          badVerbPostOnly           },
+  { UnsubscribeContextAvailability,                2, { "ngsi9",          "unsubscribeContextAvailability"                             }, "unsubscribeContextAvailabilityRequest",        badVerbPostOnly           },
+  { UpdateContextAvailabilitySubscription,         2, { "ngsi9",          "updateContextAvailabilitySubscription"                      }, "updateContextAvailabilitySubscriptionRequest", badVerbPostOnly           },
+  { NotifyContextAvailability,                     2, { "ngsi9",          "notifyContextAvailability"                                  }, "notifyContextAvailabilityRequest",             badVerbPostOnly           },
+  { UpdateContext,                                 2, { "v1",             "updateContext"                                              }, "updateContextRequest",                         badVerbPostOnly           },
+  { QueryContext,                                  2, { "v1",             "queryContext"                                               }, "queryContextRequest",                          badVerbPostOnly           },
+  { SubscribeContext,                              2, { "v1",             "subscribeContext"                                           }, "subscribeContextRequest",                      badVerbPostOnly           },
+  { UpdateContextSubscription,                     2, { "v1",             "updateContextSubscription"                                  }, "updateContextSubscriptionRequest",             badVerbPostOnly           },
+  { UnsubscribeContext,                            2, { "v1",             "unsubscribeContext"                                         }, "unsubscribeContextRequest",                    badVerbPostOnly           },
+  { NotifyContext,                                 2, { "v1",             "notifyContext"                                              }, "notifyContextRequest",                         badVerbPostOnly           },
+  { ContextEntitiesByEntityId,                     3, { "ngsi9",          "contextEntities", "*"                                       }, "",                                             badVerbGetPostOnly        },
+  { ContextEntityAttributes,                       4, { "ngsi9",          "contextEntities", "*", "attributes"                         }, "",                                             badVerbGetPostOnly        },
+  { EntityByIdAttributeByName,                     5, { "ngsi9",          "contextEntities", "*", "attributes", "*"                    }, "",                                             badVerbGetPostOnly        },
+  { ContextEntityTypes,                            3, { "ngsi9",          "contextEntityTypes", "*"                                    }, "",                                             badVerbGetPostOnly        },
+  { ContextEntityTypeAttributeContainer,           4, { "ngsi9",          "contextEntityTypes", "*", "attributes"                      }, "",                                             badVerbGetPostOnly        },
+  { ContextEntityTypeAttribute,                    5, { "ngsi9",          "contextEntityTypes", "*", "attributes", "*"                 }, "",                                             badVerbGetPostOnly        },
+  { SubscribeContextAvailability,                  2, { "ngsi9",          "contextAvailabilitySubscriptions"                           }, "",                                             badVerbPostOnly           },
+  { Ngsi9SubscriptionsConvOp,                      3, { "ngsi9",          "contextAvailabilitySubscriptions", "*"                      }, "",                                             badVerbPutDeleteOnly      },
+  { ContextEntitiesByEntityId,                     4, { "v1", "registry", "contextEntities", "*"                                       }, "",                                             badVerbGetPostOnly        },
+  { ContextEntityAttributes,                       5, { "v1", "registry", "contextEntities", "*", "attributes"                         }, "",                                             badVerbGetPostOnly        },
+  { EntityByIdAttributeByName,                     6, { "v1", "registry", "contextEntities", "*", "attributes", "*"                    }, "",                                             badVerbGetPostOnly        },
+  { ContextEntityTypes,                            4, { "v1", "registry", "contextEntityTypes", "*"                                    }, "",                                             badVerbGetPostOnly        },
+  { ContextEntityTypeAttributeContainer,           5, { "v1", "registry", "contextEntityTypes", "*", "attributes"                      }, "",                                             badVerbGetPostOnly        },
+  { ContextEntityTypeAttribute,                    6, { "v1", "registry", "contextEntityTypes", "*", "attributes", "*"                 }, "",                                             badVerbGetPostOnly        },
+  { SubscribeContextAvailability,                  3, { "v1", "registry", "contextAvailabilitySubscriptions"                           }, "",                                             badVerbPostOnly           },
+  { Ngsi9SubscriptionsConvOp,                      4, { "v1", "registry", "contextAvailabilitySubscriptions", "*"                      }, "",                                             badVerbPutDeleteOnly      },
+  { IndividualContextEntity,                       3, { "ngsi10",  "contextEntities", "*"                                              }, "",                                             badVerbAllFour            },
+  { IndividualContextEntityAttributes,             4, { "ngsi10",  "contextEntities", "*", "attributes"                                }, "",                                             badVerbAllFour            },
+  { IndividualContextEntityAttribute,              5, { "ngsi10",  "contextEntities", "*", "attributes", "*"                           }, "",                                             badVerbAllFour            },
+  { AttributeValueInstance,                        6, { "ngsi10",  "contextEntities", "*", "attributes", "*", "*"                      }, "",                                             badVerbGetPutDeleteOnly   },
+  { Ngsi10ContextEntityTypes,                      3, { "ngsi10",  "contextEntityTypes", "*"                                           }, "",                                             badVerbGetOnly            },
+  { Ngsi10ContextEntityTypesAttributeContainer,    4, { "ngsi10",  "contextEntityTypes", "*", "attributes"                             }, "",                                             badVerbGetOnly            },
+  { Ngsi10ContextEntityTypesAttribute,             5, { "ngsi10",  "contextEntityTypes", "*", "attributes", "*"                        }, "",                                             badVerbGetOnly            },
+  { SubscribeContext,                              2, { "ngsi10",  "contextSubscriptions"                                              }, "",                                             badVerbPostOnly           },
+  { Ngsi10SubscriptionsConvOp,                     3, { "ngsi10",  "contextSubscriptions", "*"                                         }, "",                                             badVerbPutDeleteOnly      },
+  { IndividualContextEntity,                       3, { "v1",      "contextEntities", "*"                                              }, "",                                             badVerbAllFour            },
+  { IndividualContextEntityAttributes,             4, { "v1",      "contextEntities", "*", "attributes"                                }, "",                                             badVerbAllFour            },
+  { IndividualContextEntityAttribute,              5, { "v1",      "contextEntities", "*", "attributes", "*"                           }, "",                                             badVerbAllFour            },
+  { AttributeValueInstance,                        6, { "v1",      "contextEntities", "*", "attributes", "*", "*"                      }, "",                                             badVerbGetPutDeleteOnly   },
+  { Ngsi10ContextEntityTypes,                      3, { "v1",      "contextEntityTypes", "*"                                           }, "",                                             badVerbGetOnly            },
+  { Ngsi10ContextEntityTypesAttributeContainer,    4, { "v1",      "contextEntityTypes", "*", "attributes"                             }, "",                                             badVerbGetOnly            },
+  { Ngsi10ContextEntityTypesAttribute,             5, { "v1",      "contextEntityTypes", "*", "attributes", "*"                        }, "",                                             badVerbGetOnly            },
+  { SubscribeContext,                              2, { "v1",      "contextSubscriptions"                                              }, "",                                             badVerbPostOnly           },
+  { Ngsi10SubscriptionsConvOp,                     3, { "v1",      "contextSubscriptions", "*"                                         }, "",                                             badVerbPutDeleteOnly      },
+  { EntityTypes,                                   2, { "v1", "contextTypes"                                                           }, "",                                             badVerbGetOnly            },
+  { AttributesForEntityType,                       3, { "v1", "contextTypes", "*"                                                      }, "",                                             badVerbGetOnly            },
+  { AllContextEntities,                            2, { "v1", "contextEntities"                                                        }, "",                                             badVerbGetPostOnly        },
+  { AllEntitiesWithTypeAndId,                      6, { "v1", "contextEntities", "type", "*", "id", "*"                                }, "",                                             badVerbAllFour            },
+  { IndividualContextEntityAttributeWithTypeAndId, 8, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*"             }, "",                                             badVerbAllFour            },
+  { AttributeValueInstanceWithTypeAndId,           9, { "v1",      "contextEntities", "type", "*", "id", "*", "attributes", "*", "*"   }, "",                                             badVerbAllFour            },
+  { ContextEntitiesByEntityIdAndType,              7, { "v1", "registry", "contextEntities", "type", "*", "id", "*"                    }, "",                                             badVerbGetPostOnly        },
+  { EntityByIdAttributeByNameIdAndType,            9, { "v1", "registry", "contextEntities", "type", "*", "id", "*", "attributes", "*" }, "",                                             badVerbGetPostOnly        },
+  { LogTraceRequest,                               2, { "log", "trace"                                                                 }, "",                                             badVerbGetDeleteOnly      },
+  { LogTraceRequest,                               3, { "log", "trace",      "*"                                                       }, "",                                             badVerbPutDeleteOnly      },
+  { LogTraceRequest,                               2, { "log", "traceLevel"                                                            }, "",                                             badVerbGetDeleteOnly      },
+  { LogTraceRequest,                               3, { "log", "traceLevel", "*"                                                       }, "",                                             badVerbPutDeleteOnly      },
+  { LogTraceRequest,                               4, { "v1", "admin", "log", "trace"                                                  }, "",                                             badVerbGetDeleteOnly      },
+  { LogTraceRequest,                               5, { "v1", "admin", "log", "trace",      "*"                                        }, "",                                             badVerbPutDeleteOnly      },
+  { LogTraceRequest,                               4, { "v1", "admin", "log", "traceLevel"                                             }, "",                                             badVerbGetDeleteOnly      },
+  { LogTraceRequest,                               5, { "v1", "admin", "log", "traceLevel", "*"                                        }, "",                                             badVerbPutDeleteOnly      },
+  { StatisticsRequest,                             1, { "statistics"                                                                   }, "",                                             badVerbGetDeleteOnly      },
+  { StatisticsRequest,                             3, { "v1", "admin", "statistics"                                                    }, "",                                             badVerbGetDeleteOnly      },
+  { StatisticsRequest,                             2, { "cache", "statistics"                                                          }, "",                                             badVerbGetDeleteOnly      },
+  { StatisticsRequest,                             4, { "v1", "admin", "cache", "statistics"                                           }, "",                                             badVerbGetDeleteOnly      },
+  { VersionRequest,                                1, { "version"                                                                      }, "",                                             badVerbGetOnly            },
+  { LogLevelRequest,                               2, { "admin", "log"                                                                 }, "",                                             badVerbPutOnly            },
+  { SemStateRequest,                               2, { "admin", "sem"                                                                 }, "",                                             badVerbGetOnly            },
+  { MetricsRequest,                                2, { "admin", "metrics"                                                             }, "",                                             badVerbGetDeleteOnly      },
+  { UpdateContext,                                 2, { "ngsi10",  "updateContext"                                                     }, "updateContextRequest",                         badVerbPostOnly           },
+  { QueryContext,                                  2, { "ngsi10",  "queryContext"                                                      }, "queryContextRequest",                          badVerbPostOnly           },
+  { SubscribeContext,                              2, { "ngsi10",  "subscribeContext"                                                  }, "subscribeContextRequest",                      badVerbPostOnly           },
+  { UpdateContextSubscription,                     2, { "ngsi10",  "updateContextSubscription"                                         }, "updateContextSubscriptionRequest",             badVerbPostOnly           },
+  { UnsubscribeContext,                            2, { "ngsi10",  "unsubscribeContext"                                                }, "unsubscribeContextRequest",                    badVerbPostOnly           },
+  { NotifyContext,                                 2, { "ngsi10",  "notifyContext"                                                     }, "notifyContextRequest",                         badVerbPostOnly           },
+  { InvalidRequest,                                2, { "ngsi9",   "*"                                                                 }, "",                                             badNgsi9Request           },
+  { InvalidRequest,                                2, { "ngsi10",  "*"                                                                 }, "",                                             badNgsi10Request          },
+  { InvalidRequest,                                0, { "*", "*", "*", "*", "*", "*"                                                   }, "",                                             badRequest                },
+  { InvalidRequest,                                0, {                                                                                }, "",                                             NULL                      },
 
   END_REQUEST
 };
@@ -1164,18 +836,18 @@ static RestService badVerbV[] =
 */
 static RestService optionsV[] =
 {
-  { EPS,         EPS_COMPS_V2,         ENT_COMPS_WORD,          optionsGetOnly           },
-  { ENT,         ENT_COMPS_V2,         ENT_COMPS_WORD,          optionsGetPostOnly       },
-  { IENT,        IENT_COMPS_V2,        IENT_COMPS_WORD,         optionsGetDeleteOnly     },
-  { IENTOA,      IENTOA_COMPS_V2,      IENTOA_COMPS_WORD,       optionsAllNotDelete      },
-  { IENTATTRVAL, IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  optionsGetPutOnly        },
-  { IENTATTR,    IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     optionsGetPutDeleteOnly  },
-  { ENTT,        ENTT_COMPS_V2,        ENTT_COMPS_WORD,         optionsGetOnly           },
-  { ETT,         ETT_COMPS_V2,         ETT_COMPS_WORD,          optionsGetOnly           },
-  { SSR,         SSR_COMPS_V2,         SSR_COMPS_WORD,          optionsGetPostOnly       },
-  { ISR,         ISR_COMPS_V2,         ISR_COMPS_WORD,          optionsGetDeletePatchOnly},
-  { BQR,         BQR_COMPS_V2,         BQR_COMPS_WORD,          optionsPostOnly          },
-  { BUR,         BUR_COMPS_V2,         BUR_COMPS_WORD,          optionsPostOnly          },
+  { EntryPointsRequest,            1, { "v2"                                         }, "", optionsGetOnly            },
+  { EntitiesRequest,               2, { "v2", "entities"                             }, "", optionsGetPostOnly        },
+  { EntityRequest,                 3, { "v2", "entities", "*"                        }, "", optionsGetDeleteOnly      },
+  { EntityRequest,                 4, { "v2", "entities", "*", "attrs"               }, "", optionsAllNotDelete       },
+  { EntityAttributeValueRequest,   6, { "v2", "entities", "*", "attrs", "*", "value" }, "", optionsGetPutOnly         },
+  { EntityAttributeRequest,        5, { "v2", "entities", "*", "attrs", "*"          }, "", optionsGetPutDeleteOnly   },
+  { EntityTypeRequest,             3, { "v2", "types", "*"                           }, "", optionsGetOnly            },
+  { EntityAllTypesRequest,         2, { "v2", "types"                                }, "", optionsGetOnly            },
+  { SubscriptionsRequest,          2, { "v2", "subscriptions"                        }, "", optionsGetPostOnly        },
+  { IndividualSubscriptionRequest, 3, { "v2", "subscriptions", "*"                   }, "", optionsGetDeletePatchOnly },
+  { BatchQueryRequest,             3, { "v2", "op", "query"                          }, "", optionsPostOnly           },
+  { BatchUpdateRequest,            3, { "v2", "op", "update"                         }, "", optionsPostOnly           },
 
   END_REQUEST
 };
