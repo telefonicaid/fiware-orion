@@ -140,7 +140,7 @@ std::string EntityId::toJson(void) const
 */
 std::string EntityId::check(RequestType requestType)
 {
-  if (id == "" || ((id.find('\0')) != (std::string::npos)))
+  if (id == "")
   {
     return "empty entityId:id";
   }
@@ -158,7 +158,7 @@ std::string EntityId::check(RequestType requestType)
   if (isTrue(isPattern))
   {
     regex_t re;
-    if (regcomp(&re, id.c_str(), REG_EXTENDED) != 0)
+    if ((regcomp(&re, id.c_str(), REG_EXTENDED) != 0) || ((id.find('\0')) != (std::string::npos)))
     {
       return "invalid regex for entity id pattern";
     }
