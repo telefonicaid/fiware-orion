@@ -60,7 +60,7 @@ Date: REGEX(.*)
 {
     "errorCode": {
         "code": "400",
-        "details": "empty entityId:id",
+        "details": "invalid regex for entity id pattern",
         "reasonPhrase": "Bad Request"
     }
 }
