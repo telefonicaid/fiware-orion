@@ -162,3 +162,5 @@ The list of available options is the following:
     Use this parameter to start the broker without metrics overhead.
 -   **-insecureNotif**. Allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates. This is similar
     to the `-k` or `--insecure` parameteres of the curl command.
+-   ** -ngsiv1Autocast**. Enables the NGSIv1 autocast mode for numbers, booleans and dates attributes. See
+    [NGSIv1 autocast documentation](../user/ngsiv1autocast.md) for more information.

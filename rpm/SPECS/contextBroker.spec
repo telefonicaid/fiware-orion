@@ -173,6 +173,10 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Wed Feb 21 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.12.0-1
+- Add: support for entity id and type in orderBy parameter (#2934)
+- Add: NGSIv1 autocast for numbers, booleans and dates (using flag -ngsiv1Autocast) (#3112)
+
 * Wed Feb 14 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.11.0-1
 - Reference distribution changed from RHEL/CentOS 6 to RHEL/CentOS 7
 - Add: new BROKER_LOG_LEVEL variable at /etc/config/contextBroker to set log level

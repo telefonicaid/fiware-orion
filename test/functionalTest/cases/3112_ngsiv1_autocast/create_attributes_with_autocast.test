@@ -1,0 +1,353 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Create attributes using NGSIv1 autocast functionality
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPV4 -ngsiv1Autocast
+
+--SHELL--
+
+#
+# 01. Create entity with Quantity, Number, Boolean, DateTime and ISO8601 types
+# 02. Get entity using NGSIv2 and check values are right
+# 03. Append five new attributes with Quantity, Number, Boolean, DateTime and ISO8601 types
+# 04. Get entity using NGSIv2 and check values are right
+#
+# Test is focused in updateContext operation. Note that we have several convenience operations
+# in NGSIv1 to do attribute creation/update, but all them are the end are mapped internally
+# to updateContext so focusing on it we get proper testing coverage
+
+
+echo "01. Create entity with Quantity, Number, Boolean, DateTime and ISO8601 types"
+echo "============================================================================"
+payload='{
+  "contextElements": [
+    {
+      "type": "T",
+      "id": "E",
+      "attributes": [
+        {
+          "name": "N",
+          "type": "Number",
+          "value": "-23"
+        },
+        {
+          "name": "Q",
+          "type": "Quantity",
+          "value": "11.31"
+        },
+        {
+          "name": "B",
+          "type": "Boolean",
+          "value": "true"
+        },
+        {
+          "name": "D",
+          "type": "DateTime",
+          "value": "2016-01-12T15:25:00.00Z"
+        },
+        {
+          "name": "I",
+          "type": "ISO8601",
+          "value": "2016-02-24T10:00:00.00Z"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo "02. Get entity using NGSIv2 and check values are right "
+echo "======================================================"
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo "03. Append five new attributes with Quantity, Number, Boolean, DateTime and ISO8601 types"
+echo "========================================================================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "T",
+      "id": "E",
+      "attributes": [
+        {
+          "name": "N1",
+          "type": "Number",
+          "value": "11"
+        },
+        {
+          "name": "Q1",
+          "type": "Quantity",
+          "value": "-41.31"
+        },
+        {
+          "name": "B1",
+          "type": "Boolean",
+          "value": "false"
+        },
+        {
+          "name": "D1",
+          "type": "DateTime",
+          "value": "2018-01-12T15:25:00.00Z"
+        },
+        {
+          "name": "I1",
+          "type": "ISO8601",
+          "value": "2019-02-24T10:00:00.00Z"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo "04. Get entity using NGSIv2 and check values are right "
+echo "======================================================"
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity with Quantity, Number, Boolean, DateTime and ISO8601 types
+============================================================================
+HTTP/1.1 200 OK
+Content-Length: 352
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "N",
+                        "type": "Number",
+                        "value": ""
+                    },
+                    {
+                        "name": "Q",
+                        "type": "Quantity",
+                        "value": ""
+                    },
+                    {
+                        "name": "B",
+                        "type": "Boolean",
+                        "value": ""
+                    },
+                    {
+                        "name": "D",
+                        "type": "DateTime",
+                        "value": ""
+                    },
+                    {
+                        "name": "I",
+                        "type": "ISO8601",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+02. Get entity using NGSIv2 and check values are right
+======================================================
+HTTP/1.1 200 OK
+Content-Length: 314
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "B": {
+        "metadata": {},
+        "type": "Boolean",
+        "value": true
+    },
+    "D": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-01-12T15:25:00.00Z"
+    },
+    "I": {
+        "metadata": {},
+        "type": "ISO8601",
+        "value": "2016-02-24T10:00:00.00Z"
+    },
+    "N": {
+        "metadata": {},
+        "type": "Number",
+        "value": -23
+    },
+    "Q": {
+        "metadata": {},
+        "type": "Quantity",
+        "value": 11.31
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+03. Append five new attributes with Quantity, Number, Boolean, DateTime and ISO8601 types
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 357
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "N1",
+                        "type": "Number",
+                        "value": ""
+                    },
+                    {
+                        "name": "Q1",
+                        "type": "Quantity",
+                        "value": ""
+                    },
+                    {
+                        "name": "B1",
+                        "type": "Boolean",
+                        "value": ""
+                    },
+                    {
+                        "name": "D1",
+                        "type": "DateTime",
+                        "value": ""
+                    },
+                    {
+                        "name": "I1",
+                        "type": "ISO8601",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+04. Get entity using NGSIv2 and check values are right
+======================================================
+HTTP/1.1 200 OK
+Content-Length: 613
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "B": {
+        "metadata": {},
+        "type": "Boolean",
+        "value": true
+    },
+    "B1": {
+        "metadata": {},
+        "type": "Boolean",
+        "value": false
+    },
+    "D": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-01-12T15:25:00.00Z"
+    },
+    "D1": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2018-01-12T15:25:00.00Z"
+    },
+    "I": {
+        "metadata": {},
+        "type": "ISO8601",
+        "value": "2016-02-24T10:00:00.00Z"
+    },
+    "I1": {
+        "metadata": {},
+        "type": "ISO8601",
+        "value": "2019-02-24T10:00:00.00Z"
+    },
+    "N": {
+        "metadata": {},
+        "type": "Number",
+        "value": -23
+    },
+    "N1": {
+        "metadata": {},
+        "type": "Number",
+        "value": 11
+    },
+    "Q": {
+        "metadata": {},
+        "type": "Quantity",
+        "value": 11.31
+    },
+    "Q1": {
+        "metadata": {},
+        "type": "Quantity",
+        "value": -41.31
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
