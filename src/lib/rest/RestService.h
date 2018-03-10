@@ -86,7 +86,7 @@ extern std::string tenantCheck(const std::string& tenant);
 
 /* ****************************************************************************
 *
-* serviceVectorsSet - only for unit tests
+* serviceVectorsSet -
 */
 extern void serviceVectorsSet
 (

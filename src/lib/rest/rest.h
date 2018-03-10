@@ -139,21 +139,4 @@ extern void firstServicePath(const char* servicePath, char* servicePath0, int se
 */
 extern bool isOriginAllowedForCORS(const std::string& requestOrigin);
 
-
-
-/* ****************************************************************************
-*
-* serviceVectorsSet - only for unit tests
-*/
-extern void serviceVectorsSet
-(
-  RestService*        _getServiceV,
-  RestService*        _putServiceV,
-  RestService*        _postServiceV,
-  RestService*        _patchServiceV,
-  RestService*        _deleteServiceV,
-  RestService*        _optionsServiceV,
-  RestService*        _badVerbV
-);
-
 #endif
