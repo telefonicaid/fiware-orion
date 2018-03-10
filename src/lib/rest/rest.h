@@ -73,6 +73,7 @@ extern bool                    multitenant;
 extern bool                    corsEnabled;
 extern char                    corsOrigin[64];
 extern int                     corsMaxAge;
+extern RestService*            restBadVerbV;
 
 
 
@@ -80,7 +81,7 @@ extern int                     corsMaxAge;
 *
 * RestServeFunction -
 */
-typedef void (*RestServeFunction)(ConnectionInfo* ciP);
+typedef std::string (*RestServeFunction)(ConnectionInfo* ciP);
 
 
 
@@ -90,7 +91,13 @@ typedef void (*RestServeFunction)(ConnectionInfo* ciP);
 */
 extern void restInit
 (
-   RestService*        _restServiceV,
+   RestService*        _getServiceV,
+   RestService*        _putServiceV,
+   RestService*        _postServiceV,
+   RestService*        _patchServiceV,
+   RestService*        _deleteServiceV,
+   RestService*        _optionsServiceV,
+   RestService*        _noServiceV,
    IpVersion           _ipVersion,
    const char*         _bindAddress,
    unsigned short      _port,
@@ -104,8 +111,7 @@ extern void restInit
    int                 _corsMaxAge,
    int                 _mhdTimeoutInSeconds,
    const char*         _httpsKey          = NULL,
-   const char*         _httpsCert         = NULL,
-   RestServeFunction   _serveFunction     = NULL
+   const char*         _httpsCert         = NULL
 );
 
 

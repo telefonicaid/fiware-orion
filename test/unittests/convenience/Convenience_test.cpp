@@ -24,6 +24,8 @@
 */
 #include "gtest/gtest.h"
 
+#include "unittest.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -33,22 +35,26 @@
 #include "common/globals.h"
 
 #include "rest/RestService.h"
-#include "serviceRoutines/postRegisterContext.h"
+#include "rest/rest.h"
 #include "serviceRoutines/getContextEntitiesByEntityId.h"
-
-#include "unittest.h"
+#include "serviceRoutines/badVerbGetOnly.h"
 
 
 
 /* ****************************************************************************
 *
-* restServiceV - 
+* getV - 
 */
-RestService restServiceV[] =
+RestService getV[] =
 {
-  { "POST",   RegisterContext,                       2, { "ngsi9",  "registerContext"                       }, "", postRegisterContext                       },
-  { "GET",    ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                   }, "", getContextEntitiesByEntityId              },
-  { "",       InvalidRequest,                        0, {                                                   }, "", NULL                                      }
+  { ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                   }, "", getContextEntitiesByEntityId     },
+  { InvalidRequest,                        0, {                                                   }, "", NULL                             }
+};
+
+RestService badVerbV[] =
+{
+  { ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                   }, "", badVerbGetOnly                   },
+  { InvalidRequest,                        0, {                                                   }, "", NULL                             }
 };
 
 
@@ -65,7 +71,9 @@ TEST(Convenience, emptyPath)
 
   utInit();
 
-  response = restService(&ci, restServiceV);
+  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
+
+  response = orion::requestServe(&ci);
   EXPECT_STREQ(expected.c_str(), response.c_str());
 
   utExit();
@@ -91,20 +99,22 @@ TEST(Convenience, shortPath)
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
+  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
+
   ci1.apiVersion = V1;
-  out = restService(&ci1, restServiceV);
+  out = orion::requestServe(&ci1);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ci2.apiVersion = V1;
-  out = restService(&ci2, restServiceV);
+  out = orion::requestServe(&ci2);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ci3.apiVersion = V1;
-  out = restService(&ci3, restServiceV);
+  out = orion::requestServe(&ci3);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ci4.apiVersion = V1;
-  out = restService(&ci4, restServiceV);
+  out = orion::requestServe(&ci4);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -127,8 +137,10 @@ TEST(Convenience, badPathNgsi9)
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
+  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
+
   ci.apiVersion = V1;
-  out = restService(&ci, restServiceV);
+  out = orion::requestServe(&ci);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -149,9 +161,11 @@ TEST(Convenience, badPathNgsi10)
 
   utInit();
 
+  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   ci.apiVersion = V1;
-  out = restService(&ci, restServiceV);
+  out = orion::requestServe(&ci);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

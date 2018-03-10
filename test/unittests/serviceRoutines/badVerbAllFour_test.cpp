@@ -26,6 +26,7 @@
 
 #include "serviceRoutines/badVerbAllFour.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 #include "unittests/unittest.h"
 
@@ -33,14 +34,14 @@
 
 /* ****************************************************************************
 *
-* rs -
+* badVerbV -
 */
-static RestService rs[] =
+static RestService badVerbV[] =
 {
-  { "*", IndividualContextEntity, 3, { "ngsi10", "contextEntities", "*" }, "", badVerbAllFour },
-  { "*", IndividualContextEntity, 2, { "ngsi10", "contextEntities"      }, "", badVerbAllFour },
-  { "*", IndividualContextEntity, 1, { "ngsi10"                         }, "", badVerbAllFour },
-  { "",  InvalidRequest,          0, {                                  }, "", NULL           }
+  { IndividualContextEntity, 3, { "ngsi10", "contextEntities", "*" }, "", badVerbAllFour },
+  { IndividualContextEntity, 2, { "ngsi10", "contextEntities"      }, "", badVerbAllFour },
+  { IndividualContextEntity, 1, { "ngsi10"                         }, "", badVerbAllFour },
+  { InvalidRequest,          0, {                                  }, "", NULL           }
 };
 
 
@@ -58,13 +59,16 @@ TEST(badVerbAllFour, error)
   utInit();
 
   ci1.apiVersion = V1;
-  out = restService(&ci1, rs);
+
+  serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, badVerbV);
+  out = orion::requestServe(&ci1);
+
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci1.httpHeader[0]);
   EXPECT_EQ("POST, GET, PUT, DELETE", ci1.httpHeaderValue[0]);
 
   ci2.apiVersion = V1;
-  out = restService(&ci2, rs);
+  out = orion::requestServe(&ci2);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci2.httpHeader[0]);
   EXPECT_EQ("POST, GET, PUT, DELETE", ci2.httpHeaderValue[0]);

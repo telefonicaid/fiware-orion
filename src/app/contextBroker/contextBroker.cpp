@@ -466,6 +466,13 @@ static const char* validLogLevels[] =
 */
 
 
+//
+// FIXME PR-set: all these defines will be "removed" (expanded in the RestService vectors) within the #3109 refactor set of PRs
+//               Also, the RestService vectors them sleves will be moved to rest.cpp. This change will make the broker a whole lot
+//               less configurable, but we invented all this configuration possibilities way back, when the libraries of Orion
+//               were used for other executables as well (iota + config manager). No longer needed.
+//
+
 
 //
 // /v2 API
@@ -787,453 +794,84 @@ static const char* validLogLevels[] =
 
 
 
-#define API_V2                                                                                         \
-  { "GET",    EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          entryPointsTreat         }, \
-  { "*",      EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          badVerbGetOnly           }, \
-                                                                                                       \
-  { "GET",    ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          getEntities              }, \
-  { "POST",   ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          postEntities             }, \
-  { "*",      ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          badVerbGetPostOnly       }, \
-                                                                                                       \
-  { "GET",    IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         getEntity                }, \
-  { "DELETE", IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         deleteEntity             }, \
-  { "*",      IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         badVerbGetDeleteOnly     }, \
-                                                                                                       \
-  { "GET",    IENTOA,       IENTOA_COMPS_V2,      IENTOA_COMPS_WORD,       getEntity                }, \
-  { "POST",   IENTOA,       IENTOA_COMPS_V2,      IENTOA_COMPS_WORD,       postEntity               }, \
-  { "PUT",    IENTOA,       IENTOA_COMPS_V2,      IENTOA_COMPS_WORD,       putEntity                }, \
-  { "PATCH",  IENTOA,       IENTOA_COMPS_V2,      IENTOA_COMPS_WORD,       patchEntity              }, \
-  { "*",      IENTOA,       IENTOA_COMPS_V2,      IENTOA_COMPS_WORD,       badVerbAllNotDelete      }, \
-                                                                                                       \
-  { "GET",    IENTATTRVAL,  IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  getEntityAttributeValue  }, \
-  { "PUT",    IENTATTRVAL,  IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  putEntityAttributeValue  }, \
-  { "*",      IENTATTRVAL,  IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  badVerbGetPutOnly        }, \
-                                                                                                       \
-  { "GET",    IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     getEntityAttribute       }, \
-  { "PUT",    IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     putEntityAttribute       }, \
-  { "DELETE", IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     deleteEntity             }, \
-  { "*",      IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     badVerbGetPutDeleteOnly  }, \
-                                                                                                       \
-  { "GET",    ENTT,         ENTT_COMPS_V2,        ENTT_COMPS_WORD,         getEntityType            }, \
-  { "*",      ENTT,         ENTT_COMPS_V2,        ENTT_COMPS_WORD,         badVerbGetOnly           }, \
-                                                                                                       \
-  { "GET",    ETT,          ETT_COMPS_V2,         ETT_COMPS_WORD,          getEntityAllTypes        }, \
-  { "*",      ETT,          ETT_COMPS_V2,         ETT_COMPS_WORD,          badVerbGetOnly           }, \
-                                                                                                       \
-  { "GET",    SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          getAllSubscriptions      }, \
-  { "POST",   SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          postSubscriptions        }, \
-  { "*",      SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          badVerbGetPostOnly       }, \
-                                                                                                       \
-  { "GET",    ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          getSubscription          }, \
-  { "DELETE", ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          deleteSubscription       }, \
-  { "PATCH",  ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          patchSubscription        }, \
-  { "*",      ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          badVerbGetDeletePatchOnly}, \
-                                                                                                       \
-  { "POST",   BQR,          BQR_COMPS_V2,         BQR_COMPS_WORD,          postBatchQuery           }, \
-  { "*",      BQR,          BQR_COMPS_V2,         BQR_COMPS_WORD,          badVerbPostOnly          }, \
-                                                                                                       \
-  { "POST",   BUR,          BUR_COMPS_V2,         BUR_COMPS_WORD,          postBatchUpdate          }, \
-  { "*",      BUR,          BUR_COMPS_V2,         BUR_COMPS_WORD,          badVerbPostOnly          }
-
-
-#define API_V2_CORS                                                                                    \
-  { "OPTIONS", EPS,         EPS_COMPS_V2,         ENT_COMPS_WORD,          optionsGetOnly           }, \
-  { "OPTIONS", ENT,         ENT_COMPS_V2,         ENT_COMPS_WORD,          optionsGetPostOnly       }, \
-  { "OPTIONS", IENT,        IENT_COMPS_V2,        IENT_COMPS_WORD,         optionsGetDeleteOnly     }, \
-  { "OPTIONS", IENTOA,      IENTOA_COMPS_V2,      IENTOA_COMPS_WORD,       optionsAllNotDelete      }, \
-  { "OPTIONS", IENTATTRVAL, IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  optionsGetPutOnly        }, \
-  { "OPTIONS", IENTATTR,    IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     optionsGetPutDeleteOnly  }, \
-  { "OPTIONS", ENTT,        ENTT_COMPS_V2,        ENTT_COMPS_WORD,         optionsGetOnly           }, \
-  { "OPTIONS", ETT,         ETT_COMPS_V2,         ETT_COMPS_WORD,          optionsGetOnly           }, \
-  { "OPTIONS", SSR,         SSR_COMPS_V2,         SSR_COMPS_WORD,          optionsGetPostOnly       }, \
-  { "OPTIONS", ISR,         ISR_COMPS_V2,         ISR_COMPS_WORD,          optionsGetDeletePatchOnly}, \
-  { "OPTIONS", BQR,         BQR_COMPS_V2,         BQR_COMPS_WORD,          optionsPostOnly          }, \
-  { "OPTIONS", BUR,         BUR_COMPS_V2,         BUR_COMPS_WORD,          optionsPostOnly          }
-
-
-#define REGISTRY_STANDARD_REQUESTS_V0                                                                    \
-  { "POST",   RCR,   RCR_COMPS_V0,         RCR_POST_WORD,   postRegisterContext                       }, \
-  { "*",      RCR,   RCR_COMPS_V0,         RCR_POST_WORD,   badVerbPostOnly                           }, \
-  { "POST",   DCAR,  DCAR_COMPS_V0,        DCAR_POST_WORD,  postDiscoverContextAvailability           }, \
-  { "*",      DCAR,  DCAR_COMPS_V0,        DCAR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   SCAR,  SCAR_COMPS_V0,        SCAR_POST_WORD,  postSubscribeContextAvailability          }, \
-  { "*",      SCAR,  SCAR_COMPS_V0,        SCAR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   UCAR,  UCAR_COMPS_V0,        UCAR_POST_WORD,  postUnsubscribeContextAvailability        }, \
-  { "*",      UCAR,  UCAR_COMPS_V0,        UCAR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   UCAS,  UCAS_COMPS_V0,        UCAS_POST_WORD,  postUpdateContextAvailabilitySubscription }, \
-  { "*",      UCAS,  UCAS_COMPS_V0,        UCAS_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   NCAR,  NCAR_COMPS_V0,        NCAR_POST_WORD,  postNotifyContextAvailability             }, \
-  { "*",      NCAR,  NCAR_COMPS_V0,        NCAR_POST_WORD,  badVerbPostOnly                           }
-
-
-
-#define REGISTRY_STANDARD_REQUESTS_V1                                                                      \
-  { "POST",   RCR,   RCR_COMPS_V1,           RCR_POST_WORD,   postRegisterContext                       }, \
-  { "*",      RCR,   RCR_COMPS_V1,           RCR_POST_WORD,   badVerbPostOnly                           }, \
-  { "POST",   DCAR,  DCAR_COMPS_V1,          DCAR_POST_WORD,  postDiscoverContextAvailability           }, \
-  { "*",      DCAR,  DCAR_COMPS_V1,          DCAR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   SCAR,  SCAR_COMPS_V1,          SCAR_POST_WORD,  postSubscribeContextAvailability          }, \
-  { "*",      SCAR,  SCAR_COMPS_V1,          SCAR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   UCAR,  UCAR_COMPS_V1,          UCAR_POST_WORD,  postUnsubscribeContextAvailability        }, \
-  { "*",      UCAR,  UCAR_COMPS_V1,          UCAR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   UCAS,  UCAS_COMPS_V1,          UCAS_POST_WORD,  postUpdateContextAvailabilitySubscription }, \
-  { "*",      UCAS,  UCAS_COMPS_V1,          UCAS_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   NCAR,  NCAR_COMPS_V1,          NCAR_POST_WORD,  postNotifyContextAvailability             }, \
-  { "*",      NCAR,  NCAR_COMPS_V1,          NCAR_POST_WORD,  badVerbPostOnly                           }
-
-
-
-#define STANDARD_REQUESTS_V0                                                                             \
-  { "POST",   UPCR,  UPCR_COMPS_V0,        UPCR_POST_WORD,  (RestTreat) postUpdateContext             }, \
-  { "*",      UPCR,  UPCR_COMPS_V0,        UPCR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   QCR,   QCR_COMPS_V0,         QCR_POST_WORD,   postQueryContext                          }, \
-  { "*",      QCR,   QCR_COMPS_V0,         QCR_POST_WORD,   badVerbPostOnly                           }, \
-  { "POST",   SCR,   SCR_COMPS_V0,         SCR_POST_WORD,   postSubscribeContext                      }, \
-  { "*",      SCR,   SCR_COMPS_V0,         SCR_POST_WORD,   badVerbPostOnly                           }, \
-  { "POST",   UCSR,  UCSR_COMPS_V0,        UCSR_POST_WORD,  postUpdateContextSubscription             }, \
-  { "*",      UCSR,  UCSR_COMPS_V0,        UCSR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   UNCR,  UNCR_COMPS_V0,        UNCR_POST_WORD,  postUnsubscribeContext                    }, \
-  { "*",      UNCR,  UNCR_COMPS_V0,        UNCR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   NCR,   NCR_COMPS_V0,         NCR_POST_WORD,   postNotifyContext                         }, \
-  { "*",      NCR,   NCR_COMPS_V0,         NCR_POST_WORD,   badVerbPostOnly                           }
-
-
-
-#define STANDARD_REQUESTS_V1                                                                               \
-  { "POST",   UPCR,  UPCR_COMPS_V1,          UPCR_POST_WORD,  (RestTreat) postUpdateContext             }, \
-  { "*",      UPCR,  UPCR_COMPS_V1,          UPCR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   QCR,   QCR_COMPS_V1,           QCR_POST_WORD,   postQueryContext                          }, \
-  { "*",      QCR,   QCR_COMPS_V1,           QCR_POST_WORD,   badVerbPostOnly                           }, \
-  { "POST",   SCR,   SCR_COMPS_V1,           SCR_POST_WORD,   postSubscribeContext                      }, \
-  { "*",      SCR,   SCR_COMPS_V1,           SCR_POST_WORD,   badVerbPostOnly                           }, \
-  { "POST",   UCSR,  UCSR_COMPS_V1,          UCSR_POST_WORD,  postUpdateContextSubscription             }, \
-  { "*",      UCSR,  UCSR_COMPS_V1,          UCSR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   UNCR,  UNCR_COMPS_V1,          UNCR_POST_WORD,  postUnsubscribeContext                    }, \
-  { "*",      UNCR,  UNCR_COMPS_V1,          UNCR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   NCR,   NCR_COMPS_V1,           NCR_POST_WORD,   postNotifyContext                         }, \
-  { "*",      NCR,   NCR_COMPS_V1,           NCR_POST_WORD,   badVerbPostOnly                           }
-
-
-
-#define REGISTRY_CONVENIENCE_OPERATIONS_V0                                                               \
-  { "GET",    CE,    CE_COMPS_V0,          "",              getContextEntitiesByEntityId              }, \
-  { "POST",   CE,    CE_COMPS_V0,          CE_POST_WORD,    postContextEntitiesByEntityId             }, \
-  { "*",      CE,    CE_COMPS_V0,          "",              badVerbGetPostOnly                        }, \
-                                                                                                         \
-  { "GET",    CEA,   CEA_COMPS_V0,         "",              getContextEntityAttributes                }, \
-  { "POST",   CEA,   CEA_COMPS_V0,         CEA_POST_WORD,   postContextEntityAttributes               }, \
-  { "*",      CEA,   CEA_COMPS_V0,         "",              badVerbGetPostOnly                        }, \
-                                                                                                         \
-  { "GET",    CEAA,  CEAA_COMPS_V0,        "",              getEntityByIdAttributeByName              }, \
-  { "POST",   CEAA,  CEAA_COMPS_V0,        CEAA_POST_WORD,  postEntityByIdAttributeByName             }, \
-  { "*",      CEAA,  CEAA_COMPS_V0,        "",              badVerbGetPostOnly                        }, \
-                                                                                                         \
-  { "GET",    CT,    CT_COMPS_V0,          "",              getContextEntityTypes                     }, \
-  { "POST",   CT,    CT_COMPS_V0,          CT_POST_WORD,    postContextEntityTypes                    }, \
-  { "*",      CT,    CT_COMPS_V0,          "",              badVerbGetPostOnly                        }, \
-                                                                                                         \
-  { "GET",    CTA,   CTA_COMPS_V0,         "",              getContextEntityTypes                     }, \
-  { "POST",   CTA,   CTA_COMPS_V0,         CTA_POST_WORD,   postContextEntityTypes                    }, \
-  { "*",      CTA,   CTA_COMPS_V0,         "",              badVerbGetPostOnly                        }, \
-                                                                                                         \
-  { "GET",    CTAA,  CTAA_COMPS_V0,        "",              getContextEntityTypeAttribute             }, \
-  { "POST",   CTAA,  CTAA_COMPS_V0,        CTAA_POST_WORD,  postContextEntityTypeAttribute            }, \
-  { "*",      CTAA,  CTAA_COMPS_V0,        "",              badVerbGetPostOnly                        }, \
-                                                                                                         \
-  { "POST",   SCA,   SCA_COMPS_V0,         SCA_POST_WORD,   postSubscribeContextAvailabilityConvOp    }, \
-  { "*",      SCA,   SCA_COMPS_V0,         "",              badVerbPostOnly                           }, \
-                                                                                                         \
-  { "PUT",    SCAS,  SCAS_COMPS_V0,        SCAS_PUT_WORD,   putAvailabilitySubscriptionConvOp         }, \
-  { "DELETE", SCAS,  SCAS_COMPS_V0,        "",              deleteAvailabilitySubscriptionConvOp      }, \
-  { "*",      SCAS,  SCAS_COMPS_V0,        "",              badVerbPutDeleteOnly                      }
-
-
-
-#define REGISTRY_CONVENIENCE_OPERATIONS_V1                                                                 \
-  { "GET",    CE,    CE_COMPS_V1,            "",              getContextEntitiesByEntityId              }, \
-  { "POST",   CE,    CE_COMPS_V1,            CE_POST_WORD,    postContextEntitiesByEntityId             }, \
-  { "*",      CE,    CE_COMPS_V1,            "",              badVerbGetPostOnly                        }, \
-                                                                                                           \
-  { "GET",    CEA,   CEA_COMPS_V1,           "",              getContextEntityAttributes                }, \
-  { "POST",   CEA,   CEA_COMPS_V1,           CEA_POST_WORD,   postContextEntityAttributes               }, \
-  { "*",      CEA,   CEA_COMPS_V1,           "",              badVerbGetPostOnly                        }, \
-                                                                                                           \
-  { "GET",    CEAA,  CEAA_COMPS_V1,          "",              getEntityByIdAttributeByName              }, \
-  { "POST",   CEAA,  CEAA_COMPS_V1,          CEAA_POST_WORD,  postEntityByIdAttributeByName             }, \
-  { "*",      CEAA,  CEAA_COMPS_V1,          "",              badVerbGetPostOnly                        }, \
-                                                                                                           \
-  { "GET",    CT,    CT_COMPS_V1,            "",              getContextEntityTypes                     }, \
-  { "POST",   CT,    CT_COMPS_V1,            CT_POST_WORD,    postContextEntityTypes                    }, \
-  { "*",      CT,    CT_COMPS_V1,            "",              badVerbGetPostOnly                        }, \
-                                                                                                           \
-  { "GET",    CTA,   CTA_COMPS_V1,           "",              getContextEntityTypes                     }, \
-  { "POST",   CTA,   CTA_COMPS_V1,           CTA_POST_WORD,   postContextEntityTypes                    }, \
-  { "*",      CTA,   CTA_COMPS_V1,           "",              badVerbGetPostOnly                        }, \
-                                                                                                           \
-  { "GET",    CTAA,  CTAA_COMPS_V1,          "",              getContextEntityTypeAttribute             }, \
-  { "POST",   CTAA,  CTAA_COMPS_V1,          CTAA_POST_WORD,  postContextEntityTypeAttribute            }, \
-  { "*",      CTAA,  CTAA_COMPS_V1,          "",              badVerbGetPostOnly                        }, \
-                                                                                                           \
-  { "POST",   SCA,   SCA_COMPS_V1,           SCA_POST_WORD,   postSubscribeContextAvailability          }, \
-  { "*",      SCA,   SCA_COMPS_V1,           "",              badVerbPostOnly                           }, \
-                                                                                                           \
-  { "PUT",    SCAS,  SCAS_COMPS_V1,          SCAS_PUT_WORD,   putAvailabilitySubscriptionConvOp         }, \
-  { "DELETE", SCAS,  SCAS_COMPS_V1,          "",              deleteAvailabilitySubscriptionConvOp      }, \
-  { "*",      SCAS,  SCAS_COMPS_V1,          "",              badVerbPutDeleteOnly                      }
-
-
-
-#define CONVENIENCE_OPERATIONS_V0                                                                        \
-  { "GET",    ICE,   ICE_COMPS_V0,         "",              getIndividualContextEntity                }, \
-  { "PUT",    ICE,   ICE_COMPS_V0,         ICE_PUT_WORD,    putIndividualContextEntity                }, \
-  { "POST",   ICE,   ICE_COMPS_V0,         ICE_POST_WORD,   postIndividualContextEntity               }, \
-  { "DELETE", ICE,   ICE_COMPS_V0,         "",              deleteIndividualContextEntity             }, \
-  { "*",      ICE,   ICE_COMPS_V0,         "",              badVerbAllFour                            }, \
-                                                                                                         \
-  { "GET",    ICEA,  ICEA_COMPS_V0,        "",              getIndividualContextEntity                }, \
-  { "PUT",    ICEA,  ICEA_COMPS_V0,        ICEA_PUT_WORD,   putIndividualContextEntity                }, \
-  { "POST",   ICEA,  ICEA_COMPS_V0,        ICEA_POST_WORD,  postIndividualContextEntity               }, \
-  { "DELETE", ICEA,  ICEA_COMPS_V0,        "",              deleteIndividualContextEntity             }, \
-  { "*",      ICEA,  ICEA_COMPS_V0,        "",              badVerbAllFour                            }, \
-                                                                                                         \
-  { "GET",    ICEAA, ICEAA_COMPS_V0,       "",              getIndividualContextEntityAttribute       }, \
-  { "PUT",    ICEAA, ICEAA_COMPS_V0,       ICEAA_PUT_WORD,  putIndividualContextEntityAttribute       }, \
-  { "POST",   ICEAA, ICEAA_COMPS_V0,       ICEAA_POST_WORD, postIndividualContextEntityAttribute      }, \
-  { "DELETE", ICEAA, ICEAA_COMPS_V0,       "",              deleteIndividualContextEntityAttribute    }, \
-  { "*",      ICEAA, ICEAA_COMPS_V0,       "",              badVerbAllFour                            }, \
-                                                                                                         \
-  { "GET",    AVI,   AVI_COMPS_V0,         "",              getAttributeValueInstance                 }, \
-  { "PUT",    AVI,   AVI_COMPS_V0,         AVI_PUT_WORD,    putAttributeValueInstance                 }, \
-  { "DELETE", AVI,   AVI_COMPS_V0,         "",              deleteAttributeValueInstance              }, \
-  { "*",      AVI,   AVI_COMPS_V0,         "",              badVerbGetPutDeleteOnly                   }, \
-                                                                                                         \
-  { "GET",    CET,   CET_COMPS_V0,         "",              getNgsi10ContextEntityTypes               }, \
-  { "*",      CET,   CET_COMPS_V0,         "",              badVerbGetOnly                            }, \
-                                                                                                         \
-  { "GET",    CETA,  CETA_COMPS_V0,        "",              getNgsi10ContextEntityTypes               }, \
-  { "*",      CETA,  CETA_COMPS_V0,        "",              badVerbGetOnly                            }, \
-                                                                                                         \
-  { "GET",    CETAA, CETAA_COMPS_V0,       "",              getNgsi10ContextEntityTypesAttribute      }, \
-  { "*",      CETAA, CETAA_COMPS_V0,       "",              badVerbGetOnly                            }, \
-                                                                                                         \
-  { "POST",   SC,    SC_COMPS_V0,          SC_POST_WORD,    postSubscribeContextConvOp                }, \
-  { "*",      SC,    SC_COMPS_V0,          "",              badVerbPostOnly                           }, \
-                                                                                                         \
-  { "PUT",    SCS,   SCS_COMPS_V0,         SCS_PUT_WORD,    putSubscriptionConvOp                     }, \
-  { "DELETE", SCS,   SCS_COMPS_V0,         "",              deleteSubscriptionConvOp                  }, \
-  { "*",      SCS,   SCS_COMPS_V0,         "",              badVerbPutDeleteOnly                      }
-
-
-
-#define CONVENIENCE_OPERATIONS_V1                                                                          \
-  { "GET",    ICE,   ICE_COMPS_V1,           "",              getIndividualContextEntity                }, \
-  { "PUT",    ICE,   ICE_COMPS_V1,           ICE_PUT_WORD,    putIndividualContextEntity                }, \
-  { "POST",   ICE,   ICE_COMPS_V1,           ICE_POST_WORD,   postIndividualContextEntity               }, \
-  { "DELETE", ICE,   ICE_COMPS_V1,           "",              deleteIndividualContextEntity             }, \
-  { "*",      ICE,   ICE_COMPS_V1,           "",              badVerbAllFour                            }, \
-                                                                                                           \
-  { "GET",    ICEA,  ICEA_COMPS_V1,          "",              getIndividualContextEntity                }, \
-  { "PUT",    ICEA,  ICEA_COMPS_V1,          ICEA_PUT_WORD,   putIndividualContextEntity                }, \
-  { "POST",   ICEA,  ICEA_COMPS_V1,          ICEA_POST_WORD,  postIndividualContextEntity               }, \
-  { "DELETE", ICEA,  ICEA_COMPS_V1,          "",              deleteIndividualContextEntity             }, \
-  { "*",      ICEA,  ICEA_COMPS_V1,          "",              badVerbAllFour                            }, \
-                                                                                                           \
-  { "GET",    ICEAA, ICEAA_COMPS_V1,         "",              getIndividualContextEntityAttribute       }, \
-  { "PUT",    ICEAA, ICEAA_COMPS_V1,         ICEAA_PUT_WORD,  putIndividualContextEntityAttribute       }, \
-  { "POST",   ICEAA, ICEAA_COMPS_V1,         ICEAA_POST_WORD, postIndividualContextEntityAttribute      }, \
-  { "DELETE", ICEAA, ICEAA_COMPS_V1,         "",              deleteIndividualContextEntityAttribute    }, \
-  { "*",      ICEAA, ICEAA_COMPS_V1,         "",              badVerbAllFour                            }, \
-                                                                                                           \
-  { "GET",    AVI,   AVI_COMPS_V1,           "",              getAttributeValueInstance                 }, \
-  { "PUT",    AVI,   AVI_COMPS_V1,           AVI_PUT_WORD,    putAttributeValueInstance                 }, \
-  { "DELETE", AVI,   AVI_COMPS_V1,           "",              deleteAttributeValueInstance              }, \
-  { "*",      AVI,   AVI_COMPS_V1,           "",              badVerbGetPutDeleteOnly                   }, \
-                                                                                                           \
-  { "GET",    CET,   CET_COMPS_V1,           "",              getNgsi10ContextEntityTypes               }, \
-  { "*",      CET,   CET_COMPS_V1,           "",              badVerbGetOnly                            }, \
-                                                                                                           \
-  { "GET",    CETA,  CETA_COMPS_V1,          "",              getNgsi10ContextEntityTypes               }, \
-  { "*",      CETA,  CETA_COMPS_V1,          "",              badVerbGetOnly                            }, \
-                                                                                                           \
-  { "GET",    CETAA, CETAA_COMPS_V1,         "",              getNgsi10ContextEntityTypesAttribute      }, \
-  { "*",      CETAA, CETAA_COMPS_V1,         "",              badVerbGetOnly                            }, \
-                                                                                                           \
-  { "POST",   SC,    SC_COMPS_V1,            SC_POST_WORD,    postSubscribeContextConvOp                }, \
-  { "*",      SC,    SC_COMPS_V1,            "",              badVerbPostOnly                           }, \
-                                                                                                           \
-  { "PUT",    SCS,   SCS_COMPS_V1,           SCS_PUT_WORD,    putSubscriptionConvOp                     }, \
-  { "DELETE", SCS,   SCS_COMPS_V1,           "",              deleteSubscriptionConvOp                  }, \
-  { "*",      SCS,   SCS_COMPS_V1,           "",              badVerbPutDeleteOnly                      }, \
-                                                                                                           \
-  { "GET",    ET,    ET_COMPS_V1,            "",              getEntityTypes                            }, \
-  { "*",      ET,    ET_COMPS_V1,            "",              badVerbGetOnly                            }, \
-                                                                                                           \
-  { "GET",    AFET,  AFET_COMPS_V1,          "",              getAttributesForEntityType                }, \
-  { "*",      AFET,  AFET_COMPS_V1,          "",              badVerbGetOnly                            }, \
-                                                                                                           \
-  { "GET",    ACE,   ACE_COMPS_V1,           "",              getAllContextEntities                     }, \
-  { "POST",   ACE,   ACE_COMPS_V1,           ACE_POST_WORD,   postIndividualContextEntity               }, \
-  { "*",      ACE,   ACE_COMPS_V1,           "",              badVerbGetPostOnly                        }, \
-                                                                                                           \
-  { "GET",    ACET,  ACET_COMPS_V1,          "",              getAllEntitiesWithTypeAndId               }, \
-  { "POST",   ACET,  ACET_COMPS_V1,          ACET_POST_WORD,  postAllEntitiesWithTypeAndId              }, \
-  { "PUT",    ACET,  ACET_COMPS_V1,          ACET_PUT_WORD,   putAllEntitiesWithTypeAndId               }, \
-  { "DELETE", ACET,  ACET_COMPS_V1,          "",              deleteAllEntitiesWithTypeAndId            }, \
-  { "*",      ACET,  ACET_COMPS_V1,          "",              badVerbAllFour                            }, \
-                                                                                                           \
-  { "GET",    ICEAAT,  ICEAAT_COMPS_V1,      "",               getIndividualContextEntityAttributeWithTypeAndId    }, \
-  { "POST",   ICEAAT,  ICEAAT_COMPS_V1,      ICEAAT_POST_WORD, postIndividualContextEntityAttributeWithTypeAndId   }, \
-  { "PUT",    ICEAAT,  ICEAAT_COMPS_V1,      ICEAAT_PUT_WORD,  putIndividualContextEntityAttributeWithTypeAndId    }, \
-  { "DELETE", ICEAAT,  ICEAAT_COMPS_V1,      "",               deleteIndividualContextEntityAttributeWithTypeAndId }, \
-  { "*",      ICEAAT,  ICEAAT_COMPS_V1,      "",               badVerbAllFour                                      }, \
-                                                                                                                      \
-  { "GET",    AVIT,    AVIT_COMPS_V1,        "",               getAttributeValueInstanceWithTypeAndId              }, \
-  { "POST",   AVIT,    AVIT_COMPS_V1,        AVIT_POST_WORD,   postAttributeValueInstanceWithTypeAndId             }, \
-  { "PUT",    AVIT,    AVIT_COMPS_V1,        AVIT_PUT_WORD,    putAttributeValueInstanceWithTypeAndId              }, \
-  { "DELETE", AVIT,    AVIT_COMPS_V1,        "",               deleteAttributeValueInstanceWithTypeAndId           }, \
-  { "*",      AVIT,    AVIT_COMPS_V1,        "",               badVerbAllFour                                      }, \
-                                                                                                                      \
-  { "GET",    CEET,    CEET_COMPS_V1,        "",               getContextEntitiesByEntityIdAndType                 }, \
-  { "POST",   CEET,    CEET_COMPS_V1,        CEET_POST_WORD,   postContextEntitiesByEntityIdAndType                }, \
-  { "*",      CEET,    CEET_COMPS_V1,        "",               badVerbGetPostOnly                                  }, \
-                                                                                                                      \
-  { "GET",    CEAAT,   CEAAT_COMPS_V1,       "",               getEntityByIdAttributeByNameWithTypeAndId           }, \
-  { "POST",   CEAAT,   CEAAT_COMPS_V1,       CEAAT_POST_WORD,  postEntityByIdAttributeByNameWithTypeAndId          }, \
-  { "*",      CEAAT,   CEAAT_COMPS_V1,       "",               badVerbGetPostOnly                                  }
-
-
-
-/* *****************************************************************************
-*
-* log requests
-* The documentation (Installation and Admin Guide) says /log/trace ...
-* ... and to maintain backward compatibility we keep supporting /log/traceLevel too
-*/
-#define LOG_REQUESTS_V0                                                              \
-  { "GET",    LOG,  LOGT_COMPS_V0,    "",  logTraceTreat                          }, \
-  { "DELETE", LOG,  LOGT_COMPS_V0,    "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGT_COMPS_V0,    "",  badVerbGetDeleteOnly                   }, \
-  { "PUT",    LOG,  LOGTL_COMPS_V0,   "",  logTraceTreat                          }, \
-  { "DELETE", LOG,  LOGTL_COMPS_V0,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGTL_COMPS_V0,   "",  badVerbPutDeleteOnly                   }, \
-  { "GET",    LOG,  LOG2T_COMPS_V0,   "",  logTraceTreat                          }, \
-  { "DELETE", LOG,  LOG2T_COMPS_V0,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2T_COMPS_V0,   "",  badVerbGetDeleteOnly                   }, \
-  { "PUT",    LOG,  LOG2TL_COMPS_V0,  "",  logTraceTreat                          }, \
-  { "DELETE", LOG,  LOG2TL_COMPS_V0,  "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2TL_COMPS_V0,  "",  badVerbPutDeleteOnly                   }
-
-#define LOG_REQUESTS_V1                                                              \
-  { "GET",    LOG,  LOGT_COMPS_V1,    "",  logTraceTreat                          }, \
-  { "DELETE", LOG,  LOGT_COMPS_V1,    "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGT_COMPS_V1,    "",  badVerbGetDeleteOnly                   }, \
-  { "PUT",    LOG,  LOGTL_COMPS_V1,   "",  logTraceTreat                          }, \
-  { "DELETE", LOG,  LOGTL_COMPS_V1,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGTL_COMPS_V1,   "",  badVerbPutDeleteOnly                   }, \
-  { "GET",    LOG,  LOG2T_COMPS_V1,   "",  logTraceTreat                          }, \
-  { "DELETE", LOG,  LOG2T_COMPS_V1,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2T_COMPS_V1,   "",  badVerbGetDeleteOnly                   }, \
-  { "PUT",    LOG,  LOG2TL_COMPS_V1,  "",  logTraceTreat                          }, \
-  { "DELETE", LOG,  LOG2TL_COMPS_V1,  "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2TL_COMPS_V1,  "",  badVerbPutDeleteOnly                   }
-
-#define STAT_REQUESTS_V0                                                             \
-  { "GET",    STAT, STAT_COMPS_V0,    "",  statisticsTreat                        }, \
-  { "DELETE", STAT, STAT_COMPS_V0,    "",  statisticsTreat                        }, \
-  { "*",      STAT, STAT_COMPS_V0,    "",  badVerbGetDeleteOnly                   }
-
-#define STAT_REQUESTS_V1                                                             \
-  { "GET",    STAT, STAT_COMPS_V1,    "",  statisticsTreat                        }, \
-  { "DELETE", STAT, STAT_COMPS_V1,    "",  statisticsTreat                        }, \
-  { "*",      STAT, STAT_COMPS_V1,    "",  badVerbGetDeleteOnly                   }
-
-#define STAT_CACHE_REQUESTS_V0                                                       \
-  { "GET",    STAT, STAT_CACHE_COMPS_V0,    "",  statisticsCacheTreat             }, \
-  { "DELETE", STAT, STAT_CACHE_COMPS_V0,    "",  statisticsCacheTreat             }, \
-  { "*",      STAT, STAT_CACHE_COMPS_V0,    "",  badVerbGetDeleteOnly             }
-
-#define STAT_CACHE_REQUESTS_V1                                                       \
-  { "GET",    STAT, STAT_CACHE_COMPS_V1,    "",  statisticsCacheTreat             }, \
-  { "DELETE", STAT, STAT_CACHE_COMPS_V1,    "",  statisticsCacheTreat             }, \
-  { "*",      STAT, STAT_CACHE_COMPS_V1,    "",  badVerbGetDeleteOnly             }
-
-#define VERSION_REQUESTS                                                             \
-  { "GET",    VERS, VERS_COMPS,    "",  versionTreat                              }, \
-  { "*",      VERS, VERS_COMPS,    "",  badVerbGetOnly                            }
-
-#define EXIT_REQUESTS                                                                \
-  { "GET",    EXIT, EXIT2_COMPS,   "",  exitTreat                                 }, \
-  { "GET",    EXIT, EXIT1_COMPS,   "",  exitTreat                                 }
-
-#define LEAK_REQUESTS                                                                \
-  { "GET",    LEAK, LEAK2_COMPS,   "",  leakTreat                                 }, \
-  { "GET",    LEAK, LEAK1_COMPS,   "",  leakTreat                                 }
-
-#define INVALID_REQUESTS                             \
-  { "*", INV, INV9_COMPS,    "", badNgsi9Request  }, \
-  { "*", INV, INV10_COMPS,   "", badNgsi10Request }, \
-  { "*", INV, INV_ALL_COMPS, "", badRequest       }
-
-#define LOGLEVEL_REQUESTS_V2                                                         \
-  { "PUT",   LOGLEVEL,  LOGLEVEL_COMPS_V2, "", changeLogLevel                     }, \
-  { "GET",   LOGLEVEL,  LOGLEVEL_COMPS_V2, "", getLogLevel                        }, \
-  { "*",     LOGLEVEL,  LOGLEVEL_COMPS_V2, "", badVerbPutOnly                     }
-
-#define SEM_STATE_REQUESTS                                                           \
-  { "GET",   SEM_STATE, SEM_STATE_COMPS,   "", semStateTreat                      }, \
-  { "*",     SEM_STATE, SEM_STATE_COMPS,   "", badVerbGetOnly                     }
-
-#define METRICS_REQUESTS                                                             \
-  { "GET",    METRICS, METRICS_COMPS,   "", getMetrics                            }, \
-  { "DELETE", METRICS, METRICS_COMPS,   "", deleteMetrics                         }, \
-  { "*",      METRICS, METRICS_COMPS,   "", badVerbGetDeleteOnly                  }
-
-
-
 /* ****************************************************************************
 *
 * END_REQUEST - End marker for the array
 */
-#define END_REQUEST  { "", INV,  0, {}, "", NULL }
+#define END_REQUEST  { INV,  0, {}, "", NULL }
 
 
 
 /* ****************************************************************************
 *
-* restServiceV - services for BROKER (ngsi9/10)
-*
-* This is the default service vector, that is used if the broker is started without the -corsOrigin option
+* getServiceV - 
 */
-RestService restServiceV[] =
+static RestService getServiceV[] =
 {
-  API_V2,
-
-  REGISTRY_STANDARD_REQUESTS_V0,
-  REGISTRY_STANDARD_REQUESTS_V1,
-  STANDARD_REQUESTS_V0,
-  STANDARD_REQUESTS_V1,
-
-  REGISTRY_CONVENIENCE_OPERATIONS_V0,
-  REGISTRY_CONVENIENCE_OPERATIONS_V1,
-  CONVENIENCE_OPERATIONS_V0,
-  CONVENIENCE_OPERATIONS_V1,
-  LOG_REQUESTS_V0,
-  LOG_REQUESTS_V1,
-  STAT_REQUESTS_V0,
-  STAT_REQUESTS_V1,
-  STAT_CACHE_REQUESTS_V0,
-  STAT_CACHE_REQUESTS_V1,
-  VERSION_REQUESTS,
-  LOGLEVEL_REQUESTS_V2,
-  SEM_STATE_REQUESTS,
-  METRICS_REQUESTS,
+  { EPS,          EPS_COMPS_V2,           ENT_COMPS_WORD,          entryPointsTreat                                    },
+  { ENT,          ENT_COMPS_V2,           ENT_COMPS_WORD,          getEntities                                         },
+  { IENT,         IENT_COMPS_V2,          IENT_COMPS_WORD,         getEntity                                           },
+  { IENTOA,       IENTOA_COMPS_V2,        IENTOA_COMPS_WORD,       getEntity                                           },
+  { IENTATTRVAL,  IENTATTRVAL_COMPS_V2,   IENTATTRVAL_COMPS_WORD,  getEntityAttributeValue                             },
+  { IENTATTR,     IENTATTR_COMPS_V2,      IENTATTR_COMPS_WORD,     getEntityAttribute                                  },
+  { ENTT,         ENTT_COMPS_V2,          ENTT_COMPS_WORD,         getEntityType                                       },
+  { ETT,          ETT_COMPS_V2,           ETT_COMPS_WORD,          getEntityAllTypes                                   },
+  { SSR,          SSR_COMPS_V2,           SSR_COMPS_WORD,          getAllSubscriptions                                 },
+  { ISR,          ISR_COMPS_V2,           ISR_COMPS_WORD,          getSubscription                                     },
+  { CE,           CE_COMPS_V0,            "",                      getContextEntitiesByEntityId                        },
+  { CEA,          CEA_COMPS_V0,           "",                      getContextEntityAttributes                          },
+  { CEAA,         CEAA_COMPS_V0,          "",                      getEntityByIdAttributeByName                        },
+  { CT,           CT_COMPS_V0,            "",                      getContextEntityTypes                               },
+  { CTA,          CTA_COMPS_V0,           "",                      getContextEntityTypes                               },
+  { CTAA,         CTAA_COMPS_V0,          "",                      getContextEntityTypeAttribute                       },
+  { CE,           CE_COMPS_V1,            "",                      getContextEntitiesByEntityId                        },
+  { CEA,          CEA_COMPS_V1,           "",                      getContextEntityAttributes                          },
+  { CEAA,         CEAA_COMPS_V1,          "",                      getEntityByIdAttributeByName                        },
+  { CT,           CT_COMPS_V1,            "",                      getContextEntityTypes                               },
+  { CTA,          CTA_COMPS_V1,           "",                      getContextEntityTypes                               },
+  { CTAA,         CTAA_COMPS_V1,          "",                      getContextEntityTypeAttribute                       },
+  { ICE,          ICE_COMPS_V0,           "",                      getIndividualContextEntity                          },
+  { ICEA,         ICEA_COMPS_V0,          "",                      getIndividualContextEntity                          },
+  { ICEAA,        ICEAA_COMPS_V0,         "",                      getIndividualContextEntityAttribute                 },
+  { AVI,          AVI_COMPS_V0,           "",                      getAttributeValueInstance                           },
+  { CET,          CET_COMPS_V0,           "",                      getNgsi10ContextEntityTypes                         },
+  { CETA,         CETA_COMPS_V0,          "",                      getNgsi10ContextEntityTypes                         },
+  { CETAA,        CETAA_COMPS_V0,         "",                      getNgsi10ContextEntityTypesAttribute                },
+  { ICE,          ICE_COMPS_V1,           "",                      getIndividualContextEntity                          },
+  { ICEA,         ICEA_COMPS_V1,          "",                      getIndividualContextEntity                          },
+  { ICEAA,        ICEAA_COMPS_V1,         "",                      getIndividualContextEntityAttribute                 },
+  { AVI,          AVI_COMPS_V1,           "",                      getAttributeValueInstance                           },
+  { CET,          CET_COMPS_V1,           "",                      getNgsi10ContextEntityTypes                         },
+  { CETA,         CETA_COMPS_V1,          "",                      getNgsi10ContextEntityTypes                         },
+  { CETAA,        CETAA_COMPS_V1,         "",                      getNgsi10ContextEntityTypesAttribute                },
+  { ET,           ET_COMPS_V1,            "",                      getEntityTypes                                      },
+  { AFET,         AFET_COMPS_V1,          "",                      getAttributesForEntityType                          },
+  { ACE,          ACE_COMPS_V1,           "",                      getAllContextEntities                               },
+  { ACET,         ACET_COMPS_V1,          "",                      getAllEntitiesWithTypeAndId                         },
+  { ICEAAT,      ICEAAT_COMPS_V1,         "",                      getIndividualContextEntityAttributeWithTypeAndId    },
+  { AVIT,        AVIT_COMPS_V1,           "",                      getAttributeValueInstanceWithTypeAndId              },
+  { CEET,        CEET_COMPS_V1,           "",                      getContextEntitiesByEntityIdAndType                 },
+  { CEAAT,       CEAAT_COMPS_V1,          "",                      getEntityByIdAttributeByNameWithTypeAndId           },
+  { LOG,         LOGT_COMPS_V0,           "",                      logTraceTreat                                       },
+  { LOG,         LOG2T_COMPS_V0,          "",                      logTraceTreat                                       },
+  { LOG,         LOGT_COMPS_V1,           "",                      logTraceTreat                                       },
+  { LOG,         LOG2T_COMPS_V1,          "",                      logTraceTreat                                       },
+  { STAT,        STAT_COMPS_V0,           "",                      statisticsTreat                                     },
+  { STAT,        STAT_COMPS_V1,           "",                      statisticsTreat                                     },
+  { STAT,        STAT_CACHE_COMPS_V0,     "",                      statisticsCacheTreat                                },
+  { STAT,        STAT_CACHE_COMPS_V1,     "",                      statisticsCacheTreat                                },
+  { VERS,        VERS_COMPS,              "",                      versionTreat                                        },
+  { LOGLEVEL,    LOGLEVEL_COMPS_V2,       "",                      getLogLevel                                         },
+  { SEM_STATE,   SEM_STATE_COMPS,         "",                      semStateTreat                                       },
+  { METRICS,     METRICS_COMPS,           "",                      getMetrics                                          },
 
 #ifdef DEBUG
-  EXIT_REQUESTS,
-  LEAK_REQUESTS,
+  { EXIT,       EXIT2_COMPS,              "",                      exitTreat                                           },
+  { EXIT,       EXIT1_COMPS,              "",                      exitTreat                                           },
+  { LEAK,       LEAK2_COMPS,              "",                      leakTreat                                           },
+  { LEAK,       LEAK1_COMPS,              "",                      leakTreat                                           },
 #endif
 
-  INVALID_REQUESTS,
   END_REQUEST
 };
 
@@ -1241,41 +879,308 @@ RestService restServiceV[] =
 
 /* ****************************************************************************
 *
-* restServiceCORS
+* postServiceV - 
+*/
+static RestService postServiceV[] =
+{
+  { ENT,          ENT_COMPS_V2,           ENT_COMPS_WORD,          postEntities                                         },
+  { IENTOA,       IENTOA_COMPS_V2,        IENTOA_COMPS_WORD,       postEntity                                           },
+  { SSR,          SSR_COMPS_V2,           SSR_COMPS_WORD,          postSubscriptions                                    },
+  { BQR,          BQR_COMPS_V2,           BQR_COMPS_WORD,          postBatchQuery                                       },
+  { BUR,          BUR_COMPS_V2,           BUR_COMPS_WORD,          postBatchUpdate                                      },
+  { RCR,          RCR_COMPS_V0,           RCR_POST_WORD,           postRegisterContext                                  },
+  { DCAR,         DCAR_COMPS_V0,          DCAR_POST_WORD,          postDiscoverContextAvailability                      },
+  { SCAR,         SCAR_COMPS_V0,          SCAR_POST_WORD,          postSubscribeContextAvailability                     },
+  { UCAR,         UCAR_COMPS_V0,          UCAR_POST_WORD,          postUnsubscribeContextAvailability                   },
+  { UCAS,         UCAS_COMPS_V0,          UCAS_POST_WORD,          postUpdateContextAvailabilitySubscription            },
+  { NCAR,         NCAR_COMPS_V0,          NCAR_POST_WORD,          postNotifyContextAvailability                        },
+  { RCR,          RCR_COMPS_V1,           RCR_POST_WORD,           postRegisterContext                                  },
+  { DCAR,         DCAR_COMPS_V1,          DCAR_POST_WORD,          postDiscoverContextAvailability                      },
+  { SCAR,         SCAR_COMPS_V1,          SCAR_POST_WORD,          postSubscribeContextAvailability                     },
+  { UCAR,         UCAR_COMPS_V1,          UCAR_POST_WORD,          postUnsubscribeContextAvailability                   },
+  { UCAS,         UCAS_COMPS_V1,          UCAS_POST_WORD,          postUpdateContextAvailabilitySubscription            },
+  { NCAR,         NCAR_COMPS_V1,          NCAR_POST_WORD,          postNotifyContextAvailability                        },
+  { RCR,          RCR_COMPS_V0,           RCR_POST_WORD,           postRegisterContext                                  },
+  { DCAR,         DCAR_COMPS_V0,          DCAR_POST_WORD,          postDiscoverContextAvailability                      },
+  { SCAR,         SCAR_COMPS_V0,          SCAR_POST_WORD,          postSubscribeContextAvailability                     },
+  { UCAR,         UCAR_COMPS_V0,          UCAR_POST_WORD,          postUnsubscribeContextAvailability                   },
+  { UCAS,         UCAS_COMPS_V0,          UCAS_POST_WORD,          postUpdateContextAvailabilitySubscription            },
+  { NCAR,         NCAR_COMPS_V0,          NCAR_POST_WORD,          postNotifyContextAvailability                        },
+  { UPCR,         UPCR_COMPS_V1,          UPCR_POST_WORD,          (RestTreat) postUpdateContext                        },
+  { QCR,          QCR_COMPS_V1,           QCR_POST_WORD,           postQueryContext                                     },
+  { SCR,          SCR_COMPS_V1,           SCR_POST_WORD,           postSubscribeContext                                 },
+  { UCSR,         UCSR_COMPS_V1,          UCSR_POST_WORD,          postUpdateContextSubscription                        },
+  { UNCR,         UNCR_COMPS_V1,          UNCR_POST_WORD,          postUnsubscribeContext                               },
+  { NCR,          NCR_COMPS_V1,           NCR_POST_WORD,           postNotifyContext                                    },
+  { CE,           CE_COMPS_V0,            CE_POST_WORD,            postContextEntitiesByEntityId                        },
+  { CEA,          CEA_COMPS_V0,           CEA_POST_WORD,           postContextEntityAttributes                          },
+  { CEAA,         CEAA_COMPS_V0,          CEAA_POST_WORD,          postEntityByIdAttributeByName                        },
+  { CT,           CT_COMPS_V0,            CT_POST_WORD,            postContextEntityTypes                               },
+  { CTA,          CTA_COMPS_V0,           CTA_POST_WORD,           postContextEntityTypes                               },
+  { CTAA,         CTAA_COMPS_V0,          CTAA_POST_WORD,          postContextEntityTypeAttribute                       },
+  { SCA,          SCA_COMPS_V0,           SCA_POST_WORD,           postSubscribeContextAvailabilityConvOp               },
+  { CE,           CE_COMPS_V1,            CE_POST_WORD,            postContextEntitiesByEntityId                        },
+  { CEA,          CEA_COMPS_V1,           CEA_POST_WORD,           postContextEntityAttributes                          },
+  { CEAA,         CEAA_COMPS_V1,          CEAA_POST_WORD,          postEntityByIdAttributeByName                        },
+  { CT,           CT_COMPS_V1,            CT_POST_WORD,            postContextEntityTypes                               },
+  { CTA,          CTA_COMPS_V1,           CTA_POST_WORD,           postContextEntityTypes                               },
+  { CTAA,         CTAA_COMPS_V1,          CTAA_POST_WORD,          postContextEntityTypeAttribute                       },
+  { SCA,          SCA_COMPS_V1,           SCA_POST_WORD,           postSubscribeContextAvailability                     },
+  { ICE,          ICE_COMPS_V0,           ICE_POST_WORD,           postIndividualContextEntity                          },
+  { ICEA,         ICEA_COMPS_V0,          ICEA_POST_WORD,          postIndividualContextEntity                          },
+  { ICEAA,        ICEAA_COMPS_V0,         ICEAA_POST_WORD,         postIndividualContextEntityAttribute                 },
+  { SC,           SC_COMPS_V0,            SC_POST_WORD,            postSubscribeContextConvOp                           },
+  { ICE,          ICE_COMPS_V1,           ICE_POST_WORD,           postIndividualContextEntity                          },
+  { ICEA,         ICEA_COMPS_V1,          ICEA_POST_WORD,          postIndividualContextEntity                          },
+  { ICEAA,        ICEAA_COMPS_V1,         ICEAA_POST_WORD,         postIndividualContextEntityAttribute                 },
+  { SC,           SC_COMPS_V1,            SC_POST_WORD,            postSubscribeContextConvOp                           },
+  { ACE,          ACE_COMPS_V1,           ACE_POST_WORD,           postIndividualContextEntity                          },
+  { ACET,         ACET_COMPS_V1,          ACET_POST_WORD,          postAllEntitiesWithTypeAndId                         },
+  { ICEAAT,      ICEAAT_COMPS_V1,         ICEAAT_POST_WORD,        postIndividualContextEntityAttributeWithTypeAndId    },
+  { AVIT,        AVIT_COMPS_V1,           AVIT_POST_WORD,          postAttributeValueInstanceWithTypeAndId              },
+  { CEET,        CEET_COMPS_V1,           CEET_POST_WORD,          postContextEntitiesByEntityIdAndType                 },
+  { CEAAT,       CEAAT_COMPS_V1,          CEAAT_POST_WORD,         postEntityByIdAttributeByNameWithTypeAndId           },
+  { UPCR,        UPCR_COMPS_V0,           UPCR_POST_WORD,          (RestTreat) postUpdateContext                        },
+  { QCR,         QCR_COMPS_V0,            QCR_POST_WORD,           postQueryContext                                     },
+  { SCR,         SCR_COMPS_V0,            SCR_POST_WORD,           postSubscribeContext                                 },
+  { UCSR,        UCSR_COMPS_V0,           UCSR_POST_WORD,          postUpdateContextSubscription                        },
+  { UNCR,        UNCR_COMPS_V0,           UNCR_POST_WORD,          postUnsubscribeContext                               },
+  { NCR,         NCR_COMPS_V0,            NCR_POST_WORD,           postNotifyContext                                    },
+
+  END_REQUEST
+};
+
+
+
+/* ****************************************************************************
+*
+* putServiceV - 
+*/
+static RestService putServiceV[] =
+{
+  { IENTOA,       IENTOA_COMPS_V2,        IENTOA_COMPS_WORD,       putEntity                                           },
+  { IENTATTRVAL,  IENTATTRVAL_COMPS_V2,   IENTATTRVAL_COMPS_WORD,  putEntityAttributeValue                             },
+  { IENTATTR,     IENTATTR_COMPS_V2,      IENTATTR_COMPS_WORD,     putEntityAttribute                                  },
+  { SCAS,         SCAS_COMPS_V0,          SCAS_PUT_WORD,           putAvailabilitySubscriptionConvOp                   },
+  { SCAS,         SCAS_COMPS_V1,          SCAS_PUT_WORD,           putAvailabilitySubscriptionConvOp                   },
+  { ICE,          ICE_COMPS_V0,           ICE_PUT_WORD,            putIndividualContextEntity                          },
+  { ICEA,         ICEA_COMPS_V0,          ICEA_PUT_WORD,           putIndividualContextEntity                          },
+  { ICEAA,        ICEAA_COMPS_V0,         ICEAA_PUT_WORD,          putIndividualContextEntityAttribute                 },
+  { AVI,          AVI_COMPS_V0,           AVI_PUT_WORD,            putAttributeValueInstance                           },
+  { SCS,          SCS_COMPS_V0,           SCS_PUT_WORD,            putSubscriptionConvOp                               },
+  { ICE,          ICE_COMPS_V1,           ICE_PUT_WORD,            putIndividualContextEntity                          },
+  { ICEA,         ICEA_COMPS_V1,          ICEA_PUT_WORD,           putIndividualContextEntity                          },
+  { ICEAA,        ICEAA_COMPS_V1,         ICEAA_PUT_WORD,          putIndividualContextEntityAttribute                 },
+  { AVI,          AVI_COMPS_V1,           AVI_PUT_WORD,            putAttributeValueInstance                           },
+  { SCS,          SCS_COMPS_V1,           SCS_PUT_WORD,            putSubscriptionConvOp                               },
+  { ACET,         ACET_COMPS_V1,          ACET_PUT_WORD,           putAllEntitiesWithTypeAndId                         },
+  { ICEAAT,      ICEAAT_COMPS_V1,         ICEAAT_PUT_WORD,         putIndividualContextEntityAttributeWithTypeAndId    },
+  { AVIT,        AVIT_COMPS_V1,           AVIT_PUT_WORD,           putAttributeValueInstanceWithTypeAndId              },
+  { LOG,         LOGTL_COMPS_V0,          "",                      logTraceTreat                                       },
+  { LOG,         LOG2TL_COMPS_V0,         "",                      logTraceTreat                                       },
+  { LOG,         LOGTL_COMPS_V1,          "",                      logTraceTreat                                       },
+  { LOG,         LOG2TL_COMPS_V1,         "",                      logTraceTreat                                       },
+  { LOGLEVEL,    LOGLEVEL_COMPS_V2,       "",                      changeLogLevel                                      },
+
+  END_REQUEST
+};
+
+
+
+/* ****************************************************************************
+*
+* patchServiceV - 
+*/
+static RestService patchServiceV[] =
+{
+  { IENTOA,       IENTOA_COMPS_V2,        IENTOA_COMPS_WORD,       patchEntity                               },
+  { ISR,          ISR_COMPS_V2,           ISR_COMPS_WORD,          patchSubscription                         },
+
+  END_REQUEST
+};
+
+
+
+/* ****************************************************************************
+*
+* deleteServiceV - 
+*/
+static RestService deleteServiceV[] =
+{
+  { IENT,         IENT_COMPS_V2,          IENT_COMPS_WORD,         deleteEntity                                        },
+  { IENTATTR,     IENTATTR_COMPS_V2,      IENTATTR_COMPS_WORD,     deleteEntity                                        },
+  { ISR,          ISR_COMPS_V2,           ISR_COMPS_WORD,          deleteSubscription                                  },
+  { SCAS,         SCAS_COMPS_V0,          "",                      deleteAvailabilitySubscriptionConvOp                },
+  { SCAS,         SCAS_COMPS_V1,          "",                      deleteAvailabilitySubscriptionConvOp                },
+  { ICE,          ICE_COMPS_V0,           "",                      deleteIndividualContextEntity                       },
+  { ICEA,         ICEA_COMPS_V0,          "",                      deleteIndividualContextEntity                       },
+  { ICEAA,        ICEAA_COMPS_V0,         "",                      deleteIndividualContextEntityAttribute              },
+  { AVI,          AVI_COMPS_V0,           "",                      deleteAttributeValueInstance                        },
+  { SCS,          SCS_COMPS_V0,           "",                      deleteSubscriptionConvOp                            },
+  { ICE,          ICE_COMPS_V1,           "",                      deleteIndividualContextEntity                       },
+  { ICEA,         ICEA_COMPS_V1,          "",                      deleteIndividualContextEntity                       },
+  { ICEAA,        ICEAA_COMPS_V1,         "",                      deleteIndividualContextEntityAttribute              },
+  { AVI,          AVI_COMPS_V1,           "",                      deleteAttributeValueInstance                        },
+  { SCS,          SCS_COMPS_V1,           "",                      deleteSubscriptionConvOp                            },
+  { ACET,         ACET_COMPS_V1,          "",                      deleteAllEntitiesWithTypeAndId                      },
+  { ICEAAT,      ICEAAT_COMPS_V1,         "",                      deleteIndividualContextEntityAttributeWithTypeAndId },
+  { AVIT,        AVIT_COMPS_V1,           "",                      deleteAttributeValueInstanceWithTypeAndId           },
+  { LOG,         LOGT_COMPS_V0,           "",                      logTraceTreat                                       },
+  { LOG,         LOGTL_COMPS_V0,          "",                      logTraceTreat                                       },
+  { LOG,         LOG2T_COMPS_V0,          "",                      logTraceTreat                                       },
+  { LOG,         LOG2TL_COMPS_V0,         "",                      logTraceTreat                                       },
+  { LOG,         LOGT_COMPS_V1,           "",                      logTraceTreat                                       },
+  { LOG,         LOGTL_COMPS_V1,          "",                      logTraceTreat                                       },
+  { LOG,         LOG2T_COMPS_V1,          "",                      logTraceTreat                                       },
+  { LOG,         LOG2TL_COMPS_V1,         "",                      logTraceTreat                                       },
+  { STAT,        STAT_COMPS_V0,           "",                      statisticsTreat                                     },
+  { STAT,        STAT_COMPS_V1,           "",                      statisticsTreat                                     },
+  { STAT,        STAT_CACHE_COMPS_V0,     "",                      statisticsCacheTreat                                },
+  { STAT,        STAT_CACHE_COMPS_V1,     "",                      statisticsCacheTreat                                },
+  { METRICS,     METRICS_COMPS,           "",                      deleteMetrics                                       },
+
+  END_REQUEST
+};
+
+
+
+/* ****************************************************************************
+*
+* badVerbV - 
+*/
+static RestService badVerbV[] =
+{
+  { EPS,          EPS_COMPS_V2,           ENT_COMPS_WORD,          badVerbGetOnly                             },
+  { ENT,          ENT_COMPS_V2,           ENT_COMPS_WORD,          badVerbGetPostOnly                         },
+  { IENT,         IENT_COMPS_V2,          IENT_COMPS_WORD,         badVerbGetDeleteOnly                       },
+  { IENTOA,       IENTOA_COMPS_V2,        IENTOA_COMPS_WORD,       badVerbAllNotDelete                        },
+  { IENTATTRVAL,  IENTATTRVAL_COMPS_V2,   IENTATTRVAL_COMPS_WORD,  badVerbGetPutOnly                          },
+  { IENTATTR,     IENTATTR_COMPS_V2,      IENTATTR_COMPS_WORD,     badVerbGetPutDeleteOnly                    },
+  { ENTT,         ENTT_COMPS_V2,          ENTT_COMPS_WORD,         badVerbGetOnly                             },
+  { ETT,          ETT_COMPS_V2,           ETT_COMPS_WORD,          badVerbGetOnly                             },
+  { SSR,          SSR_COMPS_V2,           SSR_COMPS_WORD,          badVerbGetPostOnly                         },
+  { ISR,          ISR_COMPS_V2,           ISR_COMPS_WORD,          badVerbGetDeletePatchOnly                  },
+  { BQR,          BQR_COMPS_V2,           BQR_COMPS_WORD,          badVerbPostOnly                            },
+  { BUR,          BUR_COMPS_V2,           BUR_COMPS_WORD,          badVerbPostOnly                            },
+  { RCR,          RCR_COMPS_V0,           RCR_POST_WORD,           badVerbPostOnly                            },
+  { DCAR,         DCAR_COMPS_V0,          DCAR_POST_WORD,          badVerbPostOnly                            },
+  { SCAR,         SCAR_COMPS_V0,          SCAR_POST_WORD,          badVerbPostOnly                            },
+  { UCAR,         UCAR_COMPS_V0,          UCAR_POST_WORD,          badVerbPostOnly                            },
+  { UCAS,         UCAS_COMPS_V0,          UCAS_POST_WORD,          badVerbPostOnly                            },
+  { NCAR,         NCAR_COMPS_V0,          NCAR_POST_WORD,          badVerbPostOnly                            },
+  { RCR,          RCR_COMPS_V1,           RCR_POST_WORD,           badVerbPostOnly                            },
+  { DCAR,         DCAR_COMPS_V1,          DCAR_POST_WORD,          badVerbPostOnly                            },
+  { SCAR,         SCAR_COMPS_V1,          SCAR_POST_WORD,          badVerbPostOnly                            },
+  { UCAR,         UCAR_COMPS_V1,          UCAR_POST_WORD,          badVerbPostOnly                            },
+  { UCAS,         UCAS_COMPS_V1,          UCAS_POST_WORD,          badVerbPostOnly                            },
+  { NCAR,         NCAR_COMPS_V1,          NCAR_POST_WORD,          badVerbPostOnly                            },
+  { RCR,          RCR_COMPS_V0,           RCR_POST_WORD,           badVerbPostOnly                            },
+  { DCAR,         DCAR_COMPS_V0,          DCAR_POST_WORD,          badVerbPostOnly                            },
+  { SCAR,         SCAR_COMPS_V0,          SCAR_POST_WORD,          badVerbPostOnly                            },
+  { UCAR,         UCAR_COMPS_V0,          UCAR_POST_WORD,          badVerbPostOnly                            },
+  { UCAS,         UCAS_COMPS_V0,          UCAS_POST_WORD,          badVerbPostOnly                            },
+  { NCAR,         NCAR_COMPS_V0,          NCAR_POST_WORD,          badVerbPostOnly                            },
+  { UPCR,         UPCR_COMPS_V1,          UPCR_POST_WORD,          badVerbPostOnly                            },
+  { QCR,          QCR_COMPS_V1,           QCR_POST_WORD,           badVerbPostOnly                            },
+  { SCR,          SCR_COMPS_V1,           SCR_POST_WORD,           badVerbPostOnly                            },
+  { UCSR,         UCSR_COMPS_V1,          UCSR_POST_WORD,          badVerbPostOnly                            },
+  { UNCR,         UNCR_COMPS_V1,          UNCR_POST_WORD,          badVerbPostOnly                            },
+  { NCR,          NCR_COMPS_V1,           NCR_POST_WORD,           badVerbPostOnly                            },
+  { CE,           CE_COMPS_V0,            "",                      badVerbGetPostOnly                         },
+  { CEA,          CEA_COMPS_V0,           "",                      badVerbGetPostOnly                         },
+  { CEAA,         CEAA_COMPS_V0,          "",                      badVerbGetPostOnly                         },
+  { CT,           CT_COMPS_V0,            "",                      badVerbGetPostOnly                         },
+  { CTA,          CTA_COMPS_V0,           "",                      badVerbGetPostOnly                         },
+  { CTAA,         CTAA_COMPS_V0,          "",                      badVerbGetPostOnly                         },
+  { SCA,          SCA_COMPS_V0,           "",                      badVerbPostOnly                            },
+  { SCAS,         SCAS_COMPS_V0,          "",                      badVerbPutDeleteOnly                       },
+  { CE,           CE_COMPS_V1,            "",                      badVerbGetPostOnly                         },
+  { CEA,          CEA_COMPS_V1,           "",                      badVerbGetPostOnly                         },
+  { CEAA,         CEAA_COMPS_V1,          "",                      badVerbGetPostOnly                         },
+  { CT,           CT_COMPS_V1,            "",                      badVerbGetPostOnly                         },
+  { CTA,          CTA_COMPS_V1,           "",                      badVerbGetPostOnly                         },
+  { CTAA,         CTAA_COMPS_V1,          "",                      badVerbGetPostOnly                         },
+  { SCA,          SCA_COMPS_V1,           "",                      badVerbPostOnly                            },
+  { SCAS,         SCAS_COMPS_V1,          "",                      badVerbPutDeleteOnly                       },
+  { ICE,          ICE_COMPS_V0,           "",                      badVerbAllFour                             },
+  { ICEA,         ICEA_COMPS_V0,          "",                      badVerbAllFour                             },
+  { ICEAA,        ICEAA_COMPS_V0,         "",                      badVerbAllFour                             },
+  { AVI,          AVI_COMPS_V0,           "",                      badVerbGetPutDeleteOnly                    },
+  { CET,          CET_COMPS_V0,           "",                      badVerbGetOnly                             },
+  { CETA,         CETA_COMPS_V0,          "",                      badVerbGetOnly                             },
+  { CETAA,        CETAA_COMPS_V0,         "",                      badVerbGetOnly                             },
+  { SC,           SC_COMPS_V0,            "",                      badVerbPostOnly                            },
+  { SCS,          SCS_COMPS_V0,           "",                      badVerbPutDeleteOnly                       },
+  { ICE,          ICE_COMPS_V1,           "",                      badVerbAllFour                             },
+  { ICEA,         ICEA_COMPS_V1,          "",                      badVerbAllFour                             },
+  { ICEAA,        ICEAA_COMPS_V1,         "",                      badVerbAllFour                             },
+  { AVI,          AVI_COMPS_V1,           "",                      badVerbGetPutDeleteOnly                    },
+  { CET,          CET_COMPS_V1,           "",                      badVerbGetOnly                             },
+  { CETA,         CETA_COMPS_V1,          "",                      badVerbGetOnly                             },
+  { CETAA,        CETAA_COMPS_V1,         "",                      badVerbGetOnly                             },
+  { SC,           SC_COMPS_V1,            "",                      badVerbPostOnly                            },
+  { SCS,          SCS_COMPS_V1,           "",                      badVerbPutDeleteOnly                       },
+  { ET,           ET_COMPS_V1,            "",                      badVerbGetOnly                             },
+  { AFET,         AFET_COMPS_V1,          "",                      badVerbGetOnly                             },
+  { ACE,          ACE_COMPS_V1,           "",                      badVerbGetPostOnly                         },
+  { ACET,         ACET_COMPS_V1,          "",                      badVerbAllFour                             },
+  { ICEAAT,      ICEAAT_COMPS_V1,         "",                      badVerbAllFour                             },
+  { AVIT,        AVIT_COMPS_V1,           "",                      badVerbAllFour                             },
+  { CEET,        CEET_COMPS_V1,           "",                      badVerbGetPostOnly                         },
+  { CEAAT,       CEAAT_COMPS_V1,          "",                      badVerbGetPostOnly                         },
+  { LOG,         LOGT_COMPS_V0,           "",                      badVerbGetDeleteOnly                       },
+  { LOG,         LOGTL_COMPS_V0,          "",                      badVerbPutDeleteOnly                       },
+  { LOG,         LOG2T_COMPS_V0,          "",                      badVerbGetDeleteOnly                       },
+  { LOG,         LOG2TL_COMPS_V0,         "",                      badVerbPutDeleteOnly                       },
+  { LOG,         LOGT_COMPS_V1,           "",                      badVerbGetDeleteOnly                       },
+  { LOG,         LOGTL_COMPS_V1,          "",                      badVerbPutDeleteOnly                       },
+  { LOG,         LOG2T_COMPS_V1,          "",                      badVerbGetDeleteOnly                       },
+  { LOG,         LOG2TL_COMPS_V1,         "",                      badVerbPutDeleteOnly                       },
+  { STAT,        STAT_COMPS_V0,           "",                      badVerbGetDeleteOnly                       },
+  { STAT,        STAT_COMPS_V1,           "",                      badVerbGetDeleteOnly                       },
+  { STAT,        STAT_CACHE_COMPS_V0,     "",                      badVerbGetDeleteOnly                       },
+  { STAT,        STAT_CACHE_COMPS_V1,     "",                      badVerbGetDeleteOnly                       },
+  { VERS,        VERS_COMPS,              "",                      badVerbGetOnly                             },
+  { LOGLEVEL,    LOGLEVEL_COMPS_V2,       "",                      badVerbPutOnly                             },
+  { SEM_STATE,   SEM_STATE_COMPS,         "",                      badVerbGetOnly                             },
+  { METRICS,     METRICS_COMPS,           "",                      badVerbGetDeleteOnly                       },
+  { UPCR,        UPCR_COMPS_V0,           UPCR_POST_WORD,          badVerbPostOnly                            },
+  { QCR,         QCR_COMPS_V0,            QCR_POST_WORD,           badVerbPostOnly                            },
+  { SCR,         SCR_COMPS_V0,            SCR_POST_WORD,           badVerbPostOnly                            },
+  { UCSR,        UCSR_COMPS_V0,           UCSR_POST_WORD,          badVerbPostOnly                            },
+  { UNCR,        UNCR_COMPS_V0,           UNCR_POST_WORD,          badVerbPostOnly                            },
+  { NCR,         NCR_COMPS_V0,            NCR_POST_WORD,           badVerbPostOnly                            },
+  { INV,         INV9_COMPS,              "",                      badNgsi9Request                            },
+  { INV,         INV10_COMPS,             "",                      badNgsi10Request                           },
+  { INV,         INV_ALL_COMPS,           "",                      badRequest                                 },
+  { INV,         0, {},                   "",                      NULL                                       },
+
+  END_REQUEST
+};
+
+
+
+/* ****************************************************************************
+*
+* optionsV - options service vector to be used if CORS is enabled
 *
 * Adds API_V2_CORS definitions on top of the default service vector (restServiceV)
 */
-RestService restServiceCORS[] =
+static RestService optionsV[] =
 {
-  API_V2_CORS,
-  API_V2,
+  { EPS,         EPS_COMPS_V2,         ENT_COMPS_WORD,          optionsGetOnly           },
+  { ENT,         ENT_COMPS_V2,         ENT_COMPS_WORD,          optionsGetPostOnly       },
+  { IENT,        IENT_COMPS_V2,        IENT_COMPS_WORD,         optionsGetDeleteOnly     },
+  { IENTOA,      IENTOA_COMPS_V2,      IENTOA_COMPS_WORD,       optionsAllNotDelete      },
+  { IENTATTRVAL, IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  optionsGetPutOnly        },
+  { IENTATTR,    IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     optionsGetPutDeleteOnly  },
+  { ENTT,        ENTT_COMPS_V2,        ENTT_COMPS_WORD,         optionsGetOnly           },
+  { ETT,         ETT_COMPS_V2,         ETT_COMPS_WORD,          optionsGetOnly           },
+  { SSR,         SSR_COMPS_V2,         SSR_COMPS_WORD,          optionsGetPostOnly       },
+  { ISR,         ISR_COMPS_V2,         ISR_COMPS_WORD,          optionsGetDeletePatchOnly},
+  { BQR,         BQR_COMPS_V2,         BQR_COMPS_WORD,          optionsPostOnly          },
+  { BUR,         BUR_COMPS_V2,         BUR_COMPS_WORD,          optionsPostOnly          },
 
-  REGISTRY_STANDARD_REQUESTS_V0,
-  REGISTRY_STANDARD_REQUESTS_V1,
-  STANDARD_REQUESTS_V0,
-  STANDARD_REQUESTS_V1,
-
-  REGISTRY_CONVENIENCE_OPERATIONS_V0,
-  REGISTRY_CONVENIENCE_OPERATIONS_V1,
-  CONVENIENCE_OPERATIONS_V0,
-  CONVENIENCE_OPERATIONS_V1,
-  LOG_REQUESTS_V0,
-  LOG_REQUESTS_V1,
-  STAT_REQUESTS_V0,
-  STAT_REQUESTS_V1,
-  STAT_CACHE_REQUESTS_V0,
-  STAT_CACHE_REQUESTS_V1,
-  VERSION_REQUESTS,
-  LOGLEVEL_REQUESTS_V2,
-  SEM_STATE_REQUESTS,
-  METRICS_REQUESTS,
-
-#ifdef DEBUG
-  EXIT_REQUESTS,
-  LEAK_REQUESTS,
-#endif
-
-  INVALID_REQUESTS,
   END_REQUEST
 };
 
@@ -1856,8 +1761,8 @@ int main(int argC, char* argV[])
   LM_M(("x: '%s'", x));  // Outdeffed
 #endif
 
-  RestService* rsP       = (strlen(allowedOrigin) > 0) ? restServiceCORS : restServiceV;
-  IpVersion    ipVersion = IPDUAL;
+  RestService* optionsServiceV  = (strlen(allowedOrigin) > 0) ? optionsV : NULL;
+  IpVersion    ipVersion        = IPDUAL;
 
   if (useOnlyIPv4)
   {
@@ -1933,7 +1838,7 @@ int main(int argC, char* argV[])
     LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
 
-    restInit(rsP,
+    restInit(getServiceV, putServiceV, postServiceV, patchServiceV, deleteServiceV, optionsServiceV, badVerbV,
              ipVersion,
              bindAddress,
              port,
@@ -1954,7 +1859,7 @@ int main(int argC, char* argV[])
   }
   else
   {
-    restInit(rsP,
+    restInit(getServiceV, putServiceV, postServiceV, patchServiceV, deleteServiceV, optionsServiceV, badVerbV,
              ipVersion,
              bindAddress,
              port,

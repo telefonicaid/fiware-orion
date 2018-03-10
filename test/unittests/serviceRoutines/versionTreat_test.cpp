@@ -28,17 +28,18 @@
 
 #include "serviceRoutines/versionTreat.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs -
+* getV -
 */
-static RestService rs[] =
+static RestService getV[] =
 {
-  { "GET", VersionRequest, 1, { "version" }, "", versionTreat  },
-  { "",    InvalidRequest, 0, {           }, "", NULL          }
+  { VersionRequest, 1, { "version" }, "", versionTreat  },
+  { InvalidRequest, 0, {           }, "", NULL          }
 };
 
 
@@ -52,7 +53,8 @@ TEST(versionTreat, ok)
   ConnectionInfo  ci("/version",  "GET", "1.1");
   std::string     out;
 
-  out = restService(&ci, rs);
+  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, NULL);
+  out = orion::requestServe(&ci);
 
   // FIXME P2: Some day we'll do this ...
   //
@@ -85,7 +87,7 @@ TEST(versionTreat, ok)
   EXPECT_TRUE(strstr(out.c_str(), expected.c_str()) != NULL);
 
   versionSet("1.2.3");
-  out       = restService(&ci, rs);
+  out = orion::requestServe(&ci);
   EXPECT_TRUE(strstr(out.c_str(), "\"version\" : \"1.2.3\"") != NULL);
 
   versionSet("1.2.3");
