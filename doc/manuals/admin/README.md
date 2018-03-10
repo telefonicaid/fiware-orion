@@ -18,6 +18,7 @@ Orion Context Broker: Installation & Administration Manual.
 * [Metrics API](metrics_api.md)
 * [Statistics](statistics.md)
 * [Performance Tuning](perf_tuning.md)
+* [HA Architecture and Deployment](extra/ha.md)
 * [Upgrading from previous to 0.14.1](upgrading_crossing_0-14-1.md)
 * [Upgrading from previous to 0.19.0](upgrading_crossing_0-19-0.md)
 * [Upgrading from previous to 0.21.0](admin/upgrading_crossing_0-21-0.md)

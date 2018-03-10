@@ -288,6 +288,7 @@ bool            logForHumans;
 bool            disableMetrics;
 int             reqTimeout;
 bool            insecureNotif;
+bool            ngsiv1Autocast;
 
 
 
@@ -347,6 +348,7 @@ bool            insecureNotif;
 #define METRICS_DESC           "turn off the 'metrics' feature"
 #define REQ_TMO_DESC           "connection timeout for REST requests (in seconds)"
 #define INSECURE_NOTIF         "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
+#define NGSIV1_AUTOCAST        "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
 
 
 
@@ -417,6 +419,8 @@ PaArgument paArgs[] =
   { "-disableMetrics", &disableMetrics,  "DISABLE_METRICS",    PaBool, PaOpt, false, false, true,             METRICS_DESC        },
 
   { "-insecureNotif", &insecureNotif, "INSECURE_NOTIF", PaBool, PaOpt, false, false, true, INSECURE_NOTIF },
+
+  { "-ngsiv1Autocast", &ngsiv1Autocast, "NGSIV1_AUTOCAST", PaBool, PaOpt, false, false, true, NGSIV1_AUTOCAST },
 
   PA_END_OF_ARGS
 };
