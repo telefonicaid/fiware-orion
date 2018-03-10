@@ -24,10 +24,11 @@
 */
 #include <string>
 
+#include "unittests/unittest.h"
+
 #include "serviceRoutines/exitTreat.h"
 #include "rest/RestService.h"
-
-#include "unittests/unittest.h"
+#include "rest/rest.h"
 
 
 
@@ -41,13 +42,13 @@ extern bool harakiri;
 
 /* ****************************************************************************
 *
-* rs -
+* getV -
 */
-static RestService rs[] =
+static RestService getV[] =
 {
-  { "GET", ExitRequest,    2, { "exit", "*" }, "", exitTreat },
-  { "GET", ExitRequest,    1, { "exit"      }, "", exitTreat },
-  { "",    InvalidRequest, 0, {             }, "", NULL      }
+  { ExitRequest,    2, { "exit", "*" }, "", exitTreat },
+  { ExitRequest,    1, { "exit"      }, "", exitTreat },
+  { InvalidRequest, 0, {             }, "", NULL      }
 };
 
 
@@ -58,15 +59,17 @@ static RestService rs[] =
 */
 TEST(exitTreat, error)
 {
-  ConnectionInfo ci1("/exit/harakiri",  "GET", "1.1");
+  ConnectionInfo ci("/exit/harakiri",  "GET", "1.1");
   std::string    out;
 
   utInit();
 
   harakiri = true;
-  ci1.apiVersion = V1;
+  ci.apiVersion = V1;
 
-  out = restService(&ci1, rs);
+  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, NULL);
+  out = orion::requestServe(&ci);
+
   EXPECT_STREQ("DIE", out.c_str());
   harakiri = false;
 
