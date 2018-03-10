@@ -29,6 +29,7 @@
 #include "serviceRoutines/badVerbGetDeleteOnly.h"
 #include "serviceRoutines/statisticsTreat.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 
 
@@ -36,13 +37,22 @@
 *
 * rs -
 */
-static RestService rs[] =
+static RestService getV[] =
 {
-  { "GET",    StatisticsRequest, 1, { "statistics" }, "", statisticsTreat      },
-  { "DELETE", StatisticsRequest, 1, { "statistics" }, "", statisticsTreat      },
-  { "*",      StatisticsRequest, 1, { "statistics" }, "", badVerbGetDeleteOnly },
+  { StatisticsRequest, 1, { "statistics" }, "", statisticsTreat      },
+  { InvalidRequest,    0, {              }, "", NULL                 }
+};
 
-  { "",       InvalidRequest,    0, {              }, "", NULL                 }
+static RestService deleteV[] =
+{
+  { StatisticsRequest, 1, { "statistics" }, "", statisticsTreat      },
+  { InvalidRequest,    0, {              }, "", NULL                 }
+};
+
+static RestService badVerbV[] =
+{
+  { StatisticsRequest, 1, { "statistics" }, "", badVerbGetDeleteOnly },
+  { InvalidRequest,    0, {              }, "", NULL                 }
 };
 
 
@@ -57,7 +67,8 @@ TEST(badVerbGetDeleteOnly, ok)
   std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
   std::string     out;
 
-  out = restService(&ci, rs);
+  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);
+  out = orion::requestServe(&ci);
 
   EXPECT_EQ(expected, out);
   EXPECT_EQ("Allow",       ci.httpHeader[0]);

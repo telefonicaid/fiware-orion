@@ -28,31 +28,48 @@
 
 #include "serviceRoutines/logTreat.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs -
+* service vectors -
 */
-static RestService rs[] =
+static RestService getV[] =
 {
-  { "GET",    LogTraceRequest, 2, { "log", "verbose"             }, logVerboseTreat },
-  { "PUT",    LogTraceRequest, 3, { "log", "verbose", "*"        }, logVerboseTreat },
-  { "POST",   LogTraceRequest, 3, { "log", "verbose", "*"        }, logVerboseTreat },
-  { "DELETE", LogTraceRequest, 2, { "log", "verbose"             }, logVerboseTreat },
+  { LogTraceRequest, 2, { "log", "verbose"             }, logVerboseTreat },
+  { LogTraceRequest, 2, { "log", "traceLevel"          }, logTraceTreat   },
+  { InvalidRequest,  0, {                              }, NULL            }
+};
 
-  { "GET",    LogTraceRequest, 2, { "log", "traceLevel"          }, logTraceTreat   },
-  { "PUT",    LogTraceRequest, 3, { "log", "traceLevel", "*"     }, logTraceTreat   },
-  { "POST",   LogTraceRequest, 3, { "log", "traceLevel", "*"     }, logTraceTreat   },
-  { "DELETE", LogTraceRequest, 2, { "log", "traceLevel"          }, logTraceTreat   },
+static RestService putV[] =
+{
+  { LogTraceRequest, 3, { "log", "verbose", "*"        }, logVerboseTreat },
+  { LogTraceRequest, 3, { "log", "traceLevel", "*"     }, logTraceTreat   },
+  { InvalidRequest,  0, {                              }, NULL            }
+};
 
-  { "*",      LogTraceRequest, 2, { "log", "*"                   }, logErrorTreat   },
-  { "*",      LogTraceRequest, 3, { "log", "*", "*"              }, logErrorTreat   },
+static RestService postV[] =
+{
+  { LogTraceRequest, 3, { "log", "verbose", "*"        }, logVerboseTreat },
+  { LogTraceRequest, 3, { "log", "traceLevel", "*"     }, logTraceTreat   },
+  { InvalidRequest,  0, {                              }, NULL            }
+};
 
-  { "*",      InvalidRequest,  0, { "*", "*", "*", "*", "*", "*" }, badRequest      },
+static RestService deleteV[] =
+{
+  { LogTraceRequest, 2, { "log", "verbose"             }, logVerboseTreat },
+  { LogTraceRequest, 2, { "log", "traceLevel"          }, logTraceTreat   },
+  { InvalidRequest,  0, {                              }, NULL            }
+};
 
-  { "",       InvalidRequest,  0, {                              }, NULL            }
+static RestService badVerbV[] =
+{
+  { LogTraceRequest, 2, { "log", "*"                   }, logErrorTreat   },
+  { LogTraceRequest, 3, { "log", "*", "*"              }, logErrorTreat   },
+  { InvalidRequest,  0, { "*", "*", "*", "*", "*", "*" }, badRequest      },
+  { InvalidRequest,  0, {                              }, NULL            }
 };
 
 
@@ -66,7 +83,9 @@ TEST(versionTreat, get_verbose)
   ConnectionInfo ci("/log/verbose",  "GET", "1.1");
   std::string out;
 
-  out = restService(&ci, rs);
+  serviceVectorsSet(getV, putV, postV, NULL, deleteV, NULL, badVerbV);
+  out = orionServe(&ci);
+  
   EXPECT_STREQ("OK", out.c_str());
 }
 
@@ -81,7 +100,9 @@ TEST(versionTreat, put_verbose)
   ConnectionInfo ci("/log/verbose/3",  "PUT", "1.1");
   std::string out;
 
-  out = restService(&ci, rs);
+  serviceVectorsSet(getV, putV, postV, NULL, deleteV, NULL, badVerbV);
+  out = orionServe(&ci);
+
   EXPECT_STREQ("OK", out.c_str());
 }
 
@@ -96,7 +117,9 @@ TEST(versionTreat, post_verbose)
   ConnectionInfo ci("/log/verbose/3",  "POST", "1.1");
   std::string out;
 
-  out = restService(&ci, rs);
+  serviceVectorsSet(getV, putV, postV, NULL, deleteV, NULL, badVerbV);
+  out = orionServe(&ci);
+
   EXPECT_STREQ("OK", out.c_str());
 }
 
@@ -111,6 +134,8 @@ TEST(versionTreat, delete_verbose)
   ConnectionInfo ci("/log/verbose",  "DELETE", "1.1");
   std::string out;
 
-  out = restService(&ci, rs);
+  serviceVectorsSet(getV, putV, postV, NULL, deleteV, NULL, badVerbV);
+  out = orionServe(&ci);
+
   EXPECT_STREQ("OK", out.c_str());
 }

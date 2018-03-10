@@ -28,19 +28,18 @@
 
 #include "serviceRoutines/badVerbGetPutDeleteOnly.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs -
+* badVerbV -
 */
-#define AVI AttributeValueInstance
-#define IR  InvalidRequest
-static RestService rs[] =
+static RestService badVerbV[] =
 {
-  { "*", AVI, 6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "", badVerbGetPutDeleteOnly },
-  { "",  IR,  0, {                                                          }, "", NULL                    }
+  { AttributeValueInstance, 6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "", badVerbGetPutDeleteOnly },
+  { InvalidRequest,         0, {                                                          }, "", NULL                    }
 };
 
 
@@ -55,7 +54,8 @@ TEST(badVerbGetPutDeleteOnly, ok)
   std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
   std::string     out;
 
-  out = restService(&ci, rs);
+  serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, badVerbV);
+  out = orion::requestServe(&ci);
 
   EXPECT_EQ(expected, out);
   EXPECT_EQ("Allow", ci.httpHeader[0]);
