@@ -80,7 +80,7 @@ TEST(putIndividualContextEntityAttribute, json)
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
 
-  serviceVectorsSet(NULL, putV, NULL, NULL, NULL, NULL, badVerbV);  
+  serviceVectorsSet(NULL, putV, NULL, NULL, NULL, NULL, badVerbV);
   out = orion::requestServe(&ci);
 
   EXPECT_STREQ(expectedBuf, out.c_str());

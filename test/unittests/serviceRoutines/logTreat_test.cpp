@@ -85,7 +85,7 @@ TEST(versionTreat, get_verbose)
 
   serviceVectorsSet(getV, putV, postV, NULL, deleteV, NULL, badVerbV);
   out = orionServe(&ci);
-  
+
   EXPECT_STREQ("OK", out.c_str());
 }
 
