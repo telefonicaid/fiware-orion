@@ -158,7 +158,7 @@ std::string EntityId::check(RequestType requestType)
   if (isTrue(isPattern))
   {
     regex_t re;
-    if ((regcomp(&re, id.c_str(), REG_EXTENDED) != 0) || ((id.find('\0')) != (std::string::npos)))
+    if ((strstr(id.c_str(), "\0") == NULL) || (regcomp(&re, id.c_str(), REG_EXTENDED) != 0))
     {
       return "invalid regex for entity id pattern";
     }
