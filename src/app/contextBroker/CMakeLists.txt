@@ -20,9 +20,11 @@
 
 SET (SOURCES
     contextBroker.cpp
+    orionRestServices.cpp
 )
 
 SET (HEADERS
+    orionRestServices.h
 )
 
 
