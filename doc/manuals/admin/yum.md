@@ -6,7 +6,7 @@ There are two available repositories:
 - nightly, for nightly packages.
 - release, for release packages.
 
-You can read about differences between packages [here](install.md##installation) 
+You can read about differences between packages [here](install.md#installation) 
 
 You can manually add a config for repositories, or download it from the FIWARE public repository.
 Keep in mind, if you use both repositories together on the same server, nightly packages will always be ahead of release.
@@ -40,8 +40,7 @@ or download it from [FIWARE public repository](https://nexus.lab.fiware.org/repo
 sudo wget -d /etc/yum.repos.d/ https://nexus.lab.fiware.org/repository/raw/public/repositories/el/7/x86_64/fiware-nightly.repo
 
 ```
-You can read about Yum variables $basearch and $releasever at [access.redhat.com](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/deployment_guide/sec-using_yum_variables
-)
+You can read about Yum variables $basearch and $releasever at [access.redhat.com](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/deployment_guide/sec-using_yum_variables)
 
 Next you can simply install ContextBroker
 ```
