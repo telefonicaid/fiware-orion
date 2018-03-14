@@ -51,9 +51,9 @@ commands that require root privilege):
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-* Install Google Test/Mock from sources (there are RPM pacakges for this, but they don't seem to be working with the current CMakeLists.txt configuration). Previously the URL was http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 but google removed that package in late August 2016 and it is no longer working.
+* Install Google Test/Mock from sources (there are RPM packages for this, but they do not work with the current CMakeLists.txt configuration). Previously the URL was http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 but Google removed that package in late August 2016 and it is no longer working.
 
-        wget ftp://repositories.lab.fiware.org/gmock-1.5.0.tar.bz2
+        wget https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2
         tar xfvj gmock-1.5.0.tar.bz2
         cd gmock-1.5.0
         ./configure
