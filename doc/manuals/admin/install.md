@@ -17,7 +17,7 @@ building from sources, check [this document](build_source.md).
 
 ## Requirements
 
-* System resources: see [these recommendations](diagnosis.md##resource-availability)
+* System resources: see [these recommendations](diagnosis.md#resource-availability)
 * Operating system: CentOS/RedHat. The reference operating system is CentOS 7.4.1708
   but it should work also in any later CentOS/RedHat 7.x version.
 * Database: MongoDB is required to run either in the same host where Orion Context Broker is to be installed or in a different host accessible through the network. The recommended MongoDB versions
