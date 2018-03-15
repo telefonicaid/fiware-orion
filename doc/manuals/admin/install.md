@@ -30,10 +30,12 @@ building from sources, check [this document](build_source.md).
 ## Installation
 
 There are two available packages:
+
 * Nightly, which are built from master branch every night.
 * Release, "official" release RPMs. The usual release period is 1-2 months.
 
 Depending on their type (nightly or release), packages have different versioning:
+
 * Release packages: contextBroker-X.Y.Z-1
 * Nightly packages: contextBroker-X.Y.Z-yyyy.mm.dd
 
