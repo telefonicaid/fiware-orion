@@ -3,6 +3,7 @@
 This document describes the guidelines of using FIWARE Yum repository to install Orion Context Broker. Provided configuration corresponds to x86_64 architecture and CentOS/RHEL 7 OS.
 
 There are two available repositories:
+
 * Nightly, for nightly packages.
 * Release, for release packages.
 
