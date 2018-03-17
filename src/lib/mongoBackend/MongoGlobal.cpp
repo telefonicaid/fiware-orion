@@ -66,7 +66,12 @@
 #include "mongoBackend/compoundResponses.h"
 #include "mongoBackend/MongoGlobal.h"
 
-
+#ifdef MONGO_CXX_11_DRIVER
+#include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/v_noabi/bsoncxx/json.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
+#endif
 
 /* ****************************************************************************
 *
@@ -308,6 +313,12 @@ bool mongoStart
   alreadyDone = true;
 
   multitenant = _multitenant;
+
+#ifdef MONGO_CXX_11_DRIVER
+ mongocxx::instance inst{};
+ mongocxx::client conn{mongocxx::uri{}};
+ bsoncxx::builder::stream::document document{};
+#endif
 
   mongo::Status status = mongo::client::initialize();
   if (!status.isOK())
