@@ -31,8 +31,10 @@ The main program is found in `contextBroker.cpp` and its purpose it to:
 * Call `orionRestServicesInit()` to setup the service vectors (`RestService xxxV`) that define the REST services that the broker supports, one vector per verb/method.
 * Start the REST interface (that runs in a separate thread).
 
-This is the file to go to when adding a command line parameter and when adding
-a REST service for the broker.
+This is the file to go to when adding a command line parameter.
+For adding a REST service for the broker, you will need to edit `orionRestServices.cpp` in the same directory.
+In `orionRestServices.cpp` all the services of Orion are setup and the call to `restInit()`, to start the REST services is made.
+
 See the [cookbook](cookbook.md) for details about these two important topics.  
 
 [Top](#top)
