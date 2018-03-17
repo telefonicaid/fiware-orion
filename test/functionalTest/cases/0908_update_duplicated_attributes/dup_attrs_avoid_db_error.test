@@ -94,7 +94,7 @@ echo
 01. Create entity
 =================
 HTTP/1.1 200 OK
-Content-Length: 430
+Content-Length: 227
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -129,7 +129,7 @@ Date: REGEX(.*)
 02. Update entity using the same attribute name twice
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 144
+Content-Length: 113
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -146,7 +146,7 @@ Date: REGEX(.*)
 03. Query entity
 ================
 HTTP/1.1 200 OK
-Content-Length: 387
+Content-Length: 228
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

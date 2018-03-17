@@ -134,7 +134,7 @@ echo
 01. GET /v1/contextTypes/T1 and see it fail
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 112
+Content-Length: 83
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -151,7 +151,7 @@ Date: REGEX(.*)
 02. POST /v1/updateContext, creating E1-T1-A1+A2
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 491
+Content-Length: 230
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -188,7 +188,7 @@ Date: REGEX(.*)
 03. GET /v1/contextTypes/T1 and see it work
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 133
+Content-Length: 86
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -209,7 +209,7 @@ Date: REGEX(.*)
 04. POST /v1/updateContext, creating E1-T1-A3+A4, servicePath /s1
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 491
+Content-Length: 230
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -246,7 +246,7 @@ Date: REGEX(.*)
 05. GET /v1/contextTypes/T1, without servicePath, see four types
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 153
+Content-Length: 96
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -269,7 +269,7 @@ Date: REGEX(.*)
 06. GET /v1/contextTypes/T1, with servicePath /s1, see two types
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 133
+Content-Length: 86
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -290,7 +290,7 @@ Date: REGEX(.*)
 07. GET /v1/contextTypes/T1, with servicePath /, see two types
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 133
+Content-Length: 86
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

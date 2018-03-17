@@ -1,9 +1,1 @@
-{
-  "subscriptionId" : "012345678901234567890123",
-  "duration" : "PT1H",
-  "errorCode" : {
-    "code" : "400",
-    "reasonPhrase" : "Bad Request",
-    "details" : "no details"
-  }
-}
+{"subscriptionId":"012345678901234567890123","duration":"PT1H","errorCode":{"code":"400","reasonPhrase":"Bad Request","details":"no details"}}

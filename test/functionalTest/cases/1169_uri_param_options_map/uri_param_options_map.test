@@ -142,7 +142,7 @@ Date: REGEX(.*)
 06. Error: Test an arbitrary API v1 path
 ========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 139
+Content-Length: 108
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

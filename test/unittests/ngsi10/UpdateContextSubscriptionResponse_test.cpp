@@ -35,7 +35,7 @@
 *
 * jsonRender -
 */
-TEST(DISABLED_UpdateContextSubscriptionResponse, json_render)
+TEST(UpdateContextSubscriptionResponse, json_render)
 {
   const char*                         filename1  = "ngsi10.updateContextSubscriptionResponse.jsonRender1.valid.json";
   const char*                         filename2  = "ngsi10.updateContextSubscriptionResponse.jsonRender2.valid.json";

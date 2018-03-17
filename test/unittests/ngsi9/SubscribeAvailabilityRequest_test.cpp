@@ -111,7 +111,7 @@ TEST(SubscribeContextAvailabilityRequest, json_badIsPattern)
 *
 * json_noEntityId -
 */
-TEST(DISABLED_SubscribeContextAvailabilityRequest, json_noEntityId)
+TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
 {
   ParseData       reqData;
   const char*     infile  = "ngsi9.subscribeContextAvailabilityRequest.noEntityId.invalid.json";
@@ -138,7 +138,7 @@ TEST(DISABLED_SubscribeContextAvailabilityRequest, json_noEntityId)
 *
 * json_badDuration -
 */
-TEST(DISABLED_SubscribeContextAvailabilityRequest, json_badDuration)
+TEST(SubscribeContextAvailabilityRequest, json_badDuration)
 {
   ParseData       reqData;
   const char*     infile  = "ngsi9.subscribeContextAvailabilityRequest.badDuration.invalid.json";

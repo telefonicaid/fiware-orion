@@ -92,7 +92,7 @@ echo
 01. POST /v1/updateContext to create 8787GHY entity
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 841
+Content-Length: 379
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

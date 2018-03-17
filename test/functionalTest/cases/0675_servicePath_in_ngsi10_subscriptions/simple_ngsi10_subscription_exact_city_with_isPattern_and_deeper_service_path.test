@@ -112,7 +112,7 @@ echo
 01. Make accumulator subscribe to all entities of Service Path /Spain/City/Madrid
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 135
+Content-Length: 104
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -129,7 +129,7 @@ Date: REGEX(.*)
 02. Create entity E/T with Service Path /Spain/City/Madrid
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 310
+Content-Length: 164
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -159,7 +159,7 @@ Date: REGEX(.*)
 03. Create entity E/T with Service Path /Spain/City/Barcelona
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 310
+Content-Length: 164
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -190,7 +190,7 @@ Date: REGEX(.*)
 ===================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /Spain/City/Madrid
-Content-Length: 462
+Content-Length: 258
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json

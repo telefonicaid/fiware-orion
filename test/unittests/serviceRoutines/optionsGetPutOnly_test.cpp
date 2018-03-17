@@ -34,12 +34,12 @@
 
 /* ****************************************************************************
 *
-* rs -
+* optionsV -
 */
-static RestService rs[] =
+static RestService optionsV[] =
 {
-  { "OPTIONS", EntityAttributeValueRequest,  6, { "v2", "entities", "*", "attrs", "*", "value" }, "", optionsGetPutOnly },
-  { "",        InvalidRequest,               0, {                                              }, "", NULL              }
+  { EntityAttributeValueRequest,  6, { "v2", "entities", "*", "attrs", "*", "value" }, "", optionsGetPutOnly },
+  { InvalidRequest,               0, {                                              }, "", NULL              }
 };
 
 
@@ -53,7 +53,8 @@ TEST(versionTreat, ok)
   ConnectionInfo  ci("/v2/entities/testEntity/attrs/testAttr/value",  "OPTIONS", "1.1");
   std::string     out;
 
-  out = restService(&ci, rs);
+  serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, optionsV, NULL);
+  out = orionServe(&ci);
 
   EXPECT_TRUE(strstr(out.c_str(), "Access-Control-Allow-Origin")  != NULL);
   EXPECT_TRUE(strstr(out.c_str(), "Access-Control-Max-Age")       != NULL);

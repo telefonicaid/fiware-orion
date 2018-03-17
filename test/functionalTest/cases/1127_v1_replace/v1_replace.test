@@ -123,7 +123,7 @@ Date: REGEX(.*)
 03. v1 REPLACE with attr3, attr4
 ================================
 HTTP/1.1 200 OK
-Content-Length: 485
+Content-Length: 224
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

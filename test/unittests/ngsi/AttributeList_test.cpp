@@ -35,7 +35,7 @@
 *
 * ok -
 */
-TEST(DISABLED_AttributeList, ok)
+TEST(AttributeList, ok)
 {
   StringList     al;
   std::string    out;
@@ -55,7 +55,7 @@ TEST(DISABLED_AttributeList, ok)
 
   al.push_back("");
   out = al.check();
-  EXPECT_STREQ("empty attribute name", out.c_str());
+  EXPECT_STREQ("empty string", out.c_str());
 
   utExit();
 }

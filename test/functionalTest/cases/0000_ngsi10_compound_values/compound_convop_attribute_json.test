@@ -127,7 +127,7 @@ orionCurl --url "/v1/contextEntities/EObject/attributes/att"
 --REGEXPECT--
 1: +++++++++ create vector compound +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 745
+Content-Length: 340
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -173,7 +173,7 @@ Date: REGEX(.*)
 }
 2: +++++++++ create object compound +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 745
+Content-Length: 340
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -219,7 +219,7 @@ Date: REGEX(.*)
 }
 3: ++++++++++ query for vector compound by attribute ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 882
+Content-Length: 356
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -284,7 +284,7 @@ Date: REGEX(.*)
 }
 4: ++++++++++ query for object compound by attribute ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 792
+Content-Length: 350
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

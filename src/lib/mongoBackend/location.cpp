@@ -156,7 +156,8 @@ static bool getGeoJson
      */
     BSONObjBuilder bo;
 
-    caP->valueBson(bo);
+    // Autocast doesn't make sense in this context
+    caP->valueBson(bo, "", false);
     geoJson->appendElements(getObjectFieldF(bo.obj(), ENT_ATTRS_VALUE));
 
     return true;

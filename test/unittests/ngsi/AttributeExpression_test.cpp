@@ -35,7 +35,7 @@
 *
 * ok - 
 */
-TEST(DISABLED_AttributeExpression, ok)
+TEST(AttributeExpression, ok)
 {
    AttributeExpression ae;
    const char*         outfile1 = "ngsi10.attributeExpression.ok.middle.json";

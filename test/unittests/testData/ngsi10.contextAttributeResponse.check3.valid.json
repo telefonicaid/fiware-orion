@@ -1,14 +1,1 @@
-{
-  "attributes" : [
-    {
-      "name" : "caName",
-      "type" : "caType",
-      "value" : "caValue"
-    }
-  ],
-  "statusCode" : {
-    "code" : "400",
-    "reasonPhrase" : "Bad Request",
-    "details" : "PRE Error"
-  }
-}
+{"attributes":[{"name":"caName","type":"caType","value":"caValue"}],"statusCode":{"code":"400","reasonPhrase":"Bad Request","details":"PRE Error"}}

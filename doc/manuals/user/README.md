@@ -28,6 +28,7 @@
   * [Security considerations](security.md)
   * [Known Limitations](known_limitations.md)
   * [CORS](cors.md)
+  * [NGSIv1 Autocast](ngsiv1autocast.md)
   * [Docker](docker.md)
   * [NGSIv2 Implementation Notes](ngsiv2_implementation_notes.md)
   * [Considerations on NGSIv1 and NGSIv2 coexistence](v1_v2_coexistence.md)

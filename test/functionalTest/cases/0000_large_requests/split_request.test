@@ -268,7 +268,7 @@ orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -279,7 +279,7 @@ Date: REGEX(.*)
 }
 ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 477
+Content-Length: 256
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

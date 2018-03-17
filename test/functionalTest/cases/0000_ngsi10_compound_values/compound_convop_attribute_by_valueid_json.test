@@ -133,7 +133,7 @@ orionCurl --url "/v1/contextEntities/EObject/attributes/att/wall"
 --REGEXPECT--
 1: +++++++++ create vector compound +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 745
+Content-Length: 340
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -179,7 +179,7 @@ Date: REGEX(.*)
 }
 2: +++++++++ create object compound +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 745
+Content-Length: 340
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -225,7 +225,7 @@ Date: REGEX(.*)
 }
 3: ++++++++++ query for vector compound by valueID 'ground' ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 490
+Content-Length: 211
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -265,7 +265,7 @@ Date: REGEX(.*)
 }
 4: ++++++++++ query for vector compound by valueID 'wall' ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 488
+Content-Length: 209
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -305,7 +305,7 @@ Date: REGEX(.*)
 }
 5: ++++++++++ query for object compound by valueID 'ground' ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 445
+Content-Length: 208
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -341,7 +341,7 @@ Date: REGEX(.*)
 }
 6: ++++++++++ query for object compound by valueID 'wall' ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 443
+Content-Length: 206
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

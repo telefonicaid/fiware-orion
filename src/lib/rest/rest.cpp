@@ -62,9 +62,7 @@
 *
 * Globals
 */
-static RestService*              restServiceV          = NULL;
 static unsigned short            port                  = 0;
-static RestServeFunction         serveFunction         = NULL;
 static char                      bindIp[MAX_LEN_IP]    = "0.0.0.0";
 static char                      bindIPv6[MAX_LEN_IP]  = "::";
 IpVersion                        ipVersionUsed         = IPDUAL;
@@ -551,17 +549,6 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   headerP->gotHeaders = true;
 
   return MHD_YES;
-}
-
-
-
-/* ****************************************************************************
-*
-* serve -
-*/
-static void serve(ConnectionInfo* ciP)
-{
-  restService(ciP, restServiceV);
 }
 
 
@@ -1571,7 +1558,7 @@ static int connectionTreat
   }
   else
   {
-    serveFunction(ciP);
+    orion::requestServe(ciP);
   }
 
   return MHD_YES;
@@ -1758,7 +1745,13 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 */
 void restInit
 (
-  RestService*        _restServiceV,
+  RestService*        _getServiceV,
+  RestService*        _putServiceV,
+  RestService*        _postServiceV,
+  RestService*        _patchServiceV,
+  RestService*        _deleteServiceV,
+  RestService*        _optionsServiceV,
+  RestService*        _restBadVerbV,
   IpVersion           _ipVersion,
   const char*         _bindAddress,
   unsigned short      _port,
@@ -1772,17 +1765,16 @@ void restInit
   int                 _corsMaxAge,
   int                 _mhdTimeoutInSeconds,
   const char*         _httpsKey,
-  const char*         _httpsCertificate,
-  RestServeFunction   _serveFunction
+  const char*         _httpsCertificate
 )
 {
   const char* key  = _httpsKey;
   const char* cert = _httpsCertificate;
 
+  serviceVectorsSet(_getServiceV, _putServiceV, _postServiceV, _patchServiceV, _deleteServiceV, _optionsServiceV, _restBadVerbV);
+
   port             = _port;
-  restServiceV     = _restServiceV;
   ipVersionUsed    = _ipVersion;
-  serveFunction    = (_serveFunction != NULL)? _serveFunction : serve;
   multitenant      = _multitenant;
   connMemory       = _connectionMemory;
   maxConns         = _maxConnections;

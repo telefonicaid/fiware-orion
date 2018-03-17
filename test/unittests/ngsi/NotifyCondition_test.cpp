@@ -53,7 +53,7 @@ TEST(NotifyCondition, Creation)
 *
 * render -
 */
-TEST(DISABLED_NotifyCondition, render)
+TEST(NotifyCondition, render)
 {
   NotifyCondition  nc;
   const char*      outfile1 = "ngsi.notifyCondition.render.middle.json";

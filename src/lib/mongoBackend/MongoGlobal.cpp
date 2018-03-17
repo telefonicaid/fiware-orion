@@ -1036,6 +1036,16 @@ static std::string sortCriteria(const std::string& sortToken)
     return ENT_MODIFICATION_DATE;
   }
 
+  if (sortToken == ENT_ENTITY_ID)
+  {
+    return std::string("_id.") + ENT_ENTITY_ID;
+  }
+
+  if (sortToken == ENT_ENTITY_TYPE)
+  {
+    return std::string("_id.") + ENT_ENTITY_TYPE;
+  }
+
   return std::string(ENT_ATTRS) + "." + sortToken + "." + ENT_ATTRS_VALUE;
 }
 

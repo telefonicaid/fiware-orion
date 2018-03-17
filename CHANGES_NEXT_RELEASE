@@ -6,3 +6,6 @@
 - Fix: Bug that may contextBroker to crash when passing inappropriate parameter in query context payload (#3055)
 - Fix: Invalid description in POST /op/query error response (#2991)
 - Fix: Bug that may cause contextBroker to crash when passing inappropriate parameter in query context payload (#3055)
+- Hardening: refactor request routing logic (#3109, step 1)
+- Bug that may lead contextBroker to crash when passing null character "\u0000" with ID parameter in query context payload (#3119)
+

@@ -39,7 +39,7 @@
 *
 * render_json -
 */
-TEST(DISABLED_UpdateContextElementRequest, render_json)
+TEST(UpdateContextElementRequest, render_json)
 {
   UpdateContextElementRequest     ucer;
   ContextAttribute                ca("caName", "caType", "caValue");
@@ -66,7 +66,7 @@ TEST(DISABLED_UpdateContextElementRequest, render_json)
 *
 * check_json -
 */
-TEST(DISABLED_UpdateContextElementRequest, check_json)
+TEST(UpdateContextElementRequest, check_json)
 {
   UpdateContextElementRequest     ucer;
   ContextAttribute                ca("caName", "caType", "caValue");

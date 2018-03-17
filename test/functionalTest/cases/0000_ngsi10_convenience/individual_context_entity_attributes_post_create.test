@@ -49,7 +49,7 @@ orionCurl --url "$url" --payload "$payload"
 --REGEXPECT--
 +++++ 1. post an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 432
+Content-Length: 229
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

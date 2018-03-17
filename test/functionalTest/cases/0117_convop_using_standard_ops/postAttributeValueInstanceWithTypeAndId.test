@@ -110,7 +110,7 @@ echo
 01. POST /v1/contextEntities/type/T1/id/E1/attributes/A1/M1?entity::type=T2 and see it fail
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 106
+Content-Length: 89
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -125,7 +125,7 @@ Date: REGEX(.*)
 02. POST /v1/contextEntities/type/T1/id/E1/attributes/A1/M1, with metaID 'M2' in payload, see it fail
 =====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 127
+Content-Length: 110
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -140,7 +140,7 @@ Date: REGEX(.*)
 03. POST /v1/contextEntities/type/T1/id/E1/attributes/A1/M1 and see it work
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -154,7 +154,7 @@ Date: REGEX(.*)
 04. POST /v1/contextEntities/type/T1/id/E1/attributes/A2/M1, with metaID 'M1' in payload and see it work
 ========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -168,7 +168,7 @@ Date: REGEX(.*)
 05. Query E1/T1, see A1 and A2
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 825
+Content-Length: 334
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

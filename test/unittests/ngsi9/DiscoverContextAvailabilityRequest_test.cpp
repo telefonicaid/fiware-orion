@@ -110,7 +110,7 @@ TEST(DiscoverContextAvailabilityRequest, okNoRestrictions_json)
 *
 * noEntityIdList_json -
 */
-TEST(DISABLED_DiscoverContextAvailabilityRequest, noEntityIdList_json)
+TEST(DiscoverContextAvailabilityRequest, noEntityIdList_json)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.noEntityIdList.invalid.json";
@@ -134,7 +134,7 @@ TEST(DISABLED_DiscoverContextAvailabilityRequest, noEntityIdList_json)
 *
 * emptyEntityIdList_json -
 */
-TEST(DISABLED_DiscoverContextAvailabilityRequest, emptyEntityIdList_json)
+TEST(DiscoverContextAvailabilityRequest, emptyEntityIdList_json)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.emptyEntityIdList.invalid.json";
@@ -158,7 +158,7 @@ TEST(DISABLED_DiscoverContextAvailabilityRequest, emptyEntityIdList_json)
 *
 * invalidIsPatternValue_json -
 */
-TEST(DISABLED_DiscoverContextAvailabilityRequest, invalidIsPatternValue_json)
+TEST(DiscoverContextAvailabilityRequest, invalidIsPatternValue_json)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.isPatternValue.invalid.json";
@@ -182,7 +182,7 @@ TEST(DISABLED_DiscoverContextAvailabilityRequest, invalidIsPatternValue_json)
 *
 * unsupportedAttributeForEntityId_json -
 */
-TEST(DISABLED_DiscoverContextAvailabilityRequest, unsupportedAttributeForEntityId_json)
+TEST(DiscoverContextAvailabilityRequest, unsupportedAttributeForEntityId_json)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.unsupportedAttributeForEntityId.invalid.json";
@@ -294,7 +294,7 @@ TEST(DiscoverContextAvailabilityRequest, twoEntityIdTypes_json)
 *
 * overrideEntityIdIsPattern_json -
 */
-TEST(DISABLED_DiscoverContextAvailabilityRequest, overrideEntityIdIsPattern_json)
+TEST(DiscoverContextAvailabilityRequest, overrideEntityIdIsPattern_json)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.overrideEntityIdIsPattern.invalid.json";
@@ -317,7 +317,7 @@ TEST(DISABLED_DiscoverContextAvailabilityRequest, overrideEntityIdIsPattern_json
 *
 * emptyEntityIdId_json -
 */
-TEST(DISABLED_DiscoverContextAvailabilityRequest, emptyEntityIdId_json)
+TEST(DiscoverContextAvailabilityRequest, emptyEntityIdId_json)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.emptyEntityIdId.valid.json";
@@ -340,7 +340,7 @@ TEST(DISABLED_DiscoverContextAvailabilityRequest, emptyEntityIdId_json)
 *
 * noEntityIdId_json -
 */
-TEST(DISABLED_DiscoverContextAvailabilityRequest, noEntityIdId_json)
+TEST(DiscoverContextAvailabilityRequest, noEntityIdId_json)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.noEntityIdId.invalid.json";
@@ -409,7 +409,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyAttributeExpression_json)
 *
 * noScopeType_json -
 */
-TEST(DISABLED_DiscoverContextAvailabilityRequest, noScopeType_json)
+TEST(DiscoverContextAvailabilityRequest, noScopeType_json)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.noScopeType.invalid.json";
@@ -432,7 +432,7 @@ TEST(DISABLED_DiscoverContextAvailabilityRequest, noScopeType_json)
 *
 * noScopeValue_json -
 */
-TEST(DISABLED_DiscoverContextAvailabilityRequest, noScopeValue_json)
+TEST(DiscoverContextAvailabilityRequest, noScopeValue_json)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.noScopeValue.invalid.json";
@@ -455,7 +455,7 @@ TEST(DISABLED_DiscoverContextAvailabilityRequest, noScopeValue_json)
 *
 * emptyScopeType_json -
 */
-TEST(DISABLED_DiscoverContextAvailabilityRequest, emptyScopeType_json)
+TEST(DiscoverContextAvailabilityRequest, emptyScopeType_json)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.emptyScopeType.invalid.json";
@@ -478,7 +478,7 @@ TEST(DISABLED_DiscoverContextAvailabilityRequest, emptyScopeType_json)
 *
 * emptyScopeValue_json -
 */
-TEST(DISABLED_DiscoverContextAvailabilityRequest, emptyScopeValue_json)
+TEST(DiscoverContextAvailabilityRequest, emptyScopeValue_json)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.emptyScopeValue.invalid.json";
@@ -522,7 +522,7 @@ TEST(DiscoverContextAvailabilityRequest, parseError_json)
 *
 * emptyAttributeName_json -
 */
-TEST(DISABLED_DiscoverContextAvailabilityRequest, emptyAttributeName_json)
+TEST(DiscoverContextAvailabilityRequest, emptyAttributeName_json)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.emptyAttributeName.invalid.json";

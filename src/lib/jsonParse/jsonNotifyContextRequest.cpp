@@ -148,7 +148,6 @@ static std::string attribute(const std::string& path, const std::string& value, 
 {
   LM_T(LmtParse, ("Creating an attribute"));
   parseDataP->ncr.attributeP = new ContextAttribute();
-  parseDataP->ncr.attributeP->valueType = orion::ValueTypeNone;
   parseDataP->ncr.cerP->contextElement.contextAttributeVector.push_back(parseDataP->ncr.attributeP);
   return "OK";
 }
@@ -284,6 +283,7 @@ static std::string attributeMetadataValue(const std::string& path, const std::st
 {
   LM_T(LmtParse, ("Got an attributeMetadata value: '%s'", value.c_str()));
   parseDataP->ncr.attributeMetadataP->stringValue = value;
+  parseDataP->ncr.attributeMetadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 
@@ -337,6 +337,7 @@ static std::string domainMetadataValue(const std::string& path, const std::strin
 {
   LM_T(LmtParse, ("Got a domainMetadata value: '%s'", value.c_str()));
   parseDataP->ncr.domainMetadataP->stringValue = value;
+  parseDataP->ncr.domainMetadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 

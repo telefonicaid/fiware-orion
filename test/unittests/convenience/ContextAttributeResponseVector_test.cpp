@@ -41,7 +41,7 @@
 *
 * render_json -
 */
-TEST(DISABLED_ContextAttributeResponseVector, render_json)
+TEST(ContextAttributeResponseVector, render_json)
 {
   ContextAttributeResponseVector  carV;
   ContextAttribute                ca("caName", "caType", "caValue");
@@ -69,7 +69,7 @@ TEST(DISABLED_ContextAttributeResponseVector, render_json)
 *
 * check_json -
 */
-TEST(DISABLED_ContextAttributeResponseVector, check_json)
+TEST(ContextAttributeResponseVector, check_json)
 {
   ContextAttributeResponseVector  carV;
   ContextAttribute                ca("caName", "caType", "caValue");

@@ -40,7 +40,7 @@
 *
 * jsonTreat - 
 */
-TEST(DISABLED_jsonRequest, jsonTreat)
+TEST(jsonRequest, jsonTreat)
 {
   ConnectionInfo  ci("/ngsi9/registerContext", "POST", "1.1");
   ParseData       parseData;

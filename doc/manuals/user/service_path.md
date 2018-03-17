@@ -103,4 +103,7 @@ Taking this into consideration, the following rules apply:
 * Fiware-ServicePath header is taken into account in `GET /v2/subscriptions` and `GET /v2/registrations`
   in order to narrow down the results to subscriptions/registrations that use *exactly*
   that service path as query.
+* At the present moment hierarchical service paths (i.e. the ones using ending with `#`) are not allowed
+  in registrations. We have [an issue about it at Github](https://github.com/telefonicaid/fiware-orion/issues/3078) and 
+  the limitation could be eventually solved.
 

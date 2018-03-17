@@ -94,7 +94,7 @@ TEST(ContextAttribute, checkVector)
 *
 * render -
 */
-TEST(DISABLED_ContextAttribute, render)
+TEST(ContextAttribute, render)
 {
   ContextAttribute* caP = new ContextAttribute("NAME", "TYPE", "VALUE");
   std::string       out;
@@ -102,7 +102,7 @@ TEST(DISABLED_ContextAttribute, render)
 
   utInit();
 
-  out = caP->render(V1, false, UpdateContext, "");
+  out = caP->render(V1, false, UpdateContext, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

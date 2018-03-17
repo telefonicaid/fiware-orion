@@ -57,9 +57,14 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
     {
       *valueP = (vec[ix]->boolValue == true)? "true" : "false";
     }
-    else if (vec[ix]->valueType == orion::ValueTypeNone)
+    else if (vec[ix]->valueType == orion::ValueTypeNull)
     {
       *valueP = "null";
+    }
+    else if (vec[ix]->valueType == orion::ValueTypeNotGiven)
+    {
+      LM_E(("Runtime Error (value not given for attribute)"));
+      *valueP = "";
     }
     else if ((vec[ix]->valueType == orion::ValueTypeObject) || (vec[ix]->valueType == orion::ValueTypeVector))
     {

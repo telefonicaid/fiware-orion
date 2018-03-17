@@ -167,7 +167,7 @@ Date: REGEX(.*)
 04. Create E2/<null>/A1+A3 (using NGSIv1)
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 487
+Content-Length: 226
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

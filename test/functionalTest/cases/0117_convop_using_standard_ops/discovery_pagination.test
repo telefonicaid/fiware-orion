@@ -605,7 +605,7 @@ echo
 01. Register E1/T1/A0
 =====================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -619,7 +619,7 @@ Date: REGEX(.*)
 02. Register E1/T1/A1
 =====================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -633,7 +633,7 @@ Date: REGEX(.*)
 03. Register E1/T1/A2
 =====================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -647,7 +647,7 @@ Date: REGEX(.*)
 04. Register E1/T1/A3
 =====================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -661,7 +661,7 @@ Date: REGEX(.*)
 05. Register E1/T1/A4
 =====================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -675,7 +675,7 @@ Date: REGEX(.*)
 06. Register E1/T1/A5
 =====================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -689,7 +689,7 @@ Date: REGEX(.*)
 07. Register E1/T1/A6
 =====================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -703,7 +703,7 @@ Date: REGEX(.*)
 08. Register E1/T1/A7
 =====================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -717,7 +717,7 @@ Date: REGEX(.*)
 09. Register E1/T1/A8
 =====================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -731,7 +731,7 @@ Date: REGEX(.*)
 10. Register E1/T1/A9
 =====================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -745,7 +745,7 @@ Date: REGEX(.*)
 11. Register E2/T2/A9
 =====================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -759,7 +759,7 @@ Date: REGEX(.*)
 12. Register E2/T3/A9
 =====================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -773,7 +773,7 @@ Date: REGEX(.*)
 13. Register E3/T4/A10
 ======================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -787,7 +787,7 @@ Date: REGEX(.*)
 14. Register E4/T4/A10
 ======================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -801,7 +801,7 @@ Date: REGEX(.*)
 15. Register E5/T4/A10
 ======================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -815,7 +815,7 @@ Date: REGEX(.*)
 16. Discover E1 using /v1/registry/contextEntities/E1, pagination '0-2'
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 1256
+Content-Length: 613
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -886,7 +886,7 @@ Date: REGEX(.*)
 17. Discover E1 using /v1/registry/contextEntities/E1, pagination '3-23'
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 2872
+Content-Length: 1385
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1033,7 +1033,7 @@ Date: REGEX(.*)
 18. Discover E1 using /v1/registry/contextEntities/E1, pagination '5', with details
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 546
+Content-Length: 296
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1071,7 +1071,7 @@ Date: REGEX(.*)
 19. Discover E1 using /v1/registry/contextEntities/E1/attributes, pagination '0-2'
 ==================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1256
+Content-Length: 613
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1142,7 +1142,7 @@ Date: REGEX(.*)
 20. Discover E1 using /v1/registry/contextEntities/E1/attributes, pagination '3-23'
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 2872
+Content-Length: 1385
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1289,7 +1289,7 @@ Date: REGEX(.*)
 21. Discover E1 using /v1/registry/contextEntities/E1/attributes, pagination '5', with details
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 546
+Content-Length: 296
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1327,7 +1327,7 @@ Date: REGEX(.*)
 22. Discover E2 using /v1/registry/contextEntities/E2/attributes/A9, pagination '0-1'
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 852
+Content-Length: 420
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1379,7 +1379,7 @@ Date: REGEX(.*)
 23. Discover E2 using /v1/registry/contextEntities/E2/attributes/A9, pagination '1-21'
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 448
+Content-Length: 227
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1412,7 +1412,7 @@ Date: REGEX(.*)
 24. Discover E2 using /v1/registry/contextEntities/E2/attributes/A9, pagination '0', with details
 =================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 545
+Content-Length: 295
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1450,7 +1450,7 @@ Date: REGEX(.*)
 25. Discover type T1 using /v1/registry/contextEntityTypes/T1, pagination '0-1'
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 852
+Content-Length: 420
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1502,7 +1502,7 @@ Date: REGEX(.*)
 26. Discover type T1 using /v1/registry/contextEntityTypes/T1, pagination '1-21'
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 3680
+Content-Length: 1771
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1687,7 +1687,7 @@ Date: REGEX(.*)
 27. Discover type T1 using /v1/registry/contextEntityTypes/T1, pagination '0', with details
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 546
+Content-Length: 296
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1725,7 +1725,7 @@ Date: REGEX(.*)
 28. Discover type T4, attribute A10, using /v1/registry/contextEntityTypes/T4/attributes/A10, pagination '0-1'
 ==============================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 854
+Content-Length: 422
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1777,7 +1777,7 @@ Date: REGEX(.*)
 29. Discover type T4, attribute A10, using /v1/registry/contextEntityTypes/T4/attributes/A10, pagination '1-21'
 ===============================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 854
+Content-Length: 422
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1829,7 +1829,7 @@ Date: REGEX(.*)
 30. Discover type T4, attribute A10, using /v1/registry/contextEntityTypes/T4/attributes/A10, pagination '0', with details
 ==========================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 546
+Content-Length: 296
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

@@ -144,7 +144,7 @@ echo
 01. Subscribe to E1/T1 (POST /v1/registry/contextAvailabilitySubscriptions)
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -158,7 +158,7 @@ Date: REGEX(.*)
 02. Register E1/T2
 ==================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -176,7 +176,7 @@ Date: REGEX(.*)
 04. Register E1/T1
 ==================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -191,7 +191,7 @@ Date: REGEX(.*)
 =================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 497
+Content-Length: 271
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json

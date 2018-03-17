@@ -35,14 +35,6 @@
 
 /* ****************************************************************************
 *
-* FIXME P10: temporal definition, it should be removed soon
-*/
-#define PARANOID_JSON_INDENT
-
-
-
-/* ****************************************************************************
-*
 * FIWARE_LOCATION - 
 */
 #define FIWARE_LOCATION             "FIWARE::Location"
@@ -97,6 +89,7 @@
 #define DEFAULT_ATTR_NULL_TYPE    "None"
 #define DATE_TYPE                 "DateTime"
 #define DATE_TYPE_ALT             "ISO8601"
+#define NUMBER_TYPE_ALT           "Quantity"
 
 
 
@@ -230,10 +223,7 @@ extern bool               checkIdv1;
 extern bool               disableCusNotif;
 
 extern bool               insecureNotif;
-
-#ifdef PARANOID_JSON_INDENT
-extern bool               paranoidV1Indent;
-#endif
+extern bool               ngsiv1Autocast;
 
 
 

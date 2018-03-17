@@ -294,7 +294,7 @@ function brokerStart()
 
     while [ $loopNo -lt $loops ]
     do
-      nc -z localhost ${CB_TEST_PORT} > /dev/null
+      nc -w 2 localhost ${CB_TEST_PORT} &>/dev/null </dev/null
       if [ "$?" == "0" ]
       then
         vMsg The orion context broker has started, listening on port $CB_TEST_PORT
@@ -536,7 +536,7 @@ function valgrindErrorFound()
 #
 
 # Port tests
-nc -z localhost ${CB_TEST_PORT} > /dev/null 
+nc -w 2 localhost ${CB_TEST_PORT} &>/dev/null </dev/null
 if [ "$?" == "0" ]
 then
    # Successful nc means that port CB_TEST_PORT is used, thus exit

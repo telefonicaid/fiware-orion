@@ -83,7 +83,7 @@ TEST(rest, servicePathCheck)
 *
 * rest.servicePathSplit -
 */
-TEST(DISABLED_rest, servicePathSplit)
+TEST(rest, servicePathSplit)
 {
   ConnectionInfo  ci1;
   ConnectionInfo  ci2;
@@ -137,6 +137,6 @@ TEST(DISABLED_rest, servicePathSplit)
   ci5.apiVersion = V1;
   r = servicePathSplit(&ci5);
   EXPECT_EQ(-1, r);
-  EXPECT_EQ(168, ci5.answer.size());
+  EXPECT_EQ(137, ci5.answer.size());
   LM_M(("---- 5 -----"));
 }

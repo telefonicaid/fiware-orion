@@ -122,7 +122,7 @@ echo
 01. GET /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr01 and see it fail
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -138,7 +138,7 @@ Date: REGEX(.*)
 02. POST /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr01 OK
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -152,7 +152,7 @@ Date: REGEX(.*)
 03. GET /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr01 OK
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 453
+Content-Length: 232
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -185,7 +185,7 @@ Date: REGEX(.*)
 04. POST /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr02
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -199,7 +199,7 @@ Date: REGEX(.*)
 05. GET /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr02
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 453
+Content-Length: 232
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -232,7 +232,7 @@ Date: REGEX(.*)
 06. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
+Content-Length: 163
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

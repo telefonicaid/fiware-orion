@@ -38,7 +38,7 @@
 *
 * badSubscriptionId_json -
 */
-TEST(DISABLED_UnsubscribeContextRequest, badSubscriptionId_json)
+TEST(UnsubscribeContextRequest, badSubscriptionId_json)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
