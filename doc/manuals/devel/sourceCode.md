@@ -28,11 +28,13 @@ The main program is found in `contextBroker.cpp` and its purpose it to:
 
 * Parse and treat the command line parameters.
 * Initialize the libraries of the broker.
-* Setup the service vectors (`RestService xxxV`) that define the REST services that the broker supports, one vector per verb/method.
+* Call `orionRestServicesInit()` to setup the service vectors (`RestService xxxV`) that define the REST services that the broker supports, one vector per verb/method.
 * Start the REST interface (that runs in a separate thread).
 
-This is the file to go to when adding a command line parameter and when adding
-a REST service for the broker.
+This is the file to go to when adding a command line parameter.
+For adding a REST service for the broker, you will need to edit `orionRestServices.cpp` in the same directory.
+In `orionRestServices.cpp` all the services of Orion are setup and the call to `restInit()`, to start the REST services is made.
+
 See the [cookbook](cookbook.md) for details about these two important topics.  
 
 [Top](#top)
@@ -110,8 +112,7 @@ The **rest** library is where the broker interacts with the external library *mi
 incoming REST connections and their responses.
 
 ### `restInit()`
-The function `restInit()` in `rest.cpp` is the function that receives the extremely important vectors
-of REST services from the main program - the vectors that defines the set of services that the broker supports.
+The function `restInit()` in `rest.cpp` is the function that receives the extremely important vectors of REST services from the main program (actually, from the function `orionRestServicesInit`, that is called from `main`) - the vectors that defines the set of services that the broker supports.
 
 ### `restStart()`
 `restStart()` starts the microhttpd deamon (calling `MHD_start_daemon()`), for IPv4 or IPv6, or both.
@@ -167,7 +168,7 @@ _RQ-02: Treatment of a request_
 
 * `orion::requestServe()` calls `restService()` (step 1).
 * Also, if payload is present, `restService()` calls `payloadParse()` to parse the payload (step 2). Details are provided in the diagram [PP-01](#flow-pp-01).
-* The service function of the request takes over (step 3). The service function is chosen based on the **URL path** and **HTTP Method** used in the request. To determine which of all the service functions (found in lib/serviceFunctions and lib/serviceFunctionV2, please see the `RestService` vectors in [`app/app/contextBroker/contextBroker.cpp`](#srcappcontextbroker)).
+* The service function of the request takes over (step 3). The service function is chosen based on the **URL path** and **HTTP Method** used in the request. To determine which of all the service functions (found in lib/serviceFunctions and lib/serviceFunctionV2, please see the `RestService` vectors in [`src/app/contextBroker/orionRestServices.cpp`](#srcappcontextbroker)).
 * The service function may invoke a lower level service function. See [the service routines mapping document](ServiceRoutines.txt) for details (step 4).
 * Finally, a function in [the **mongoBackend** library](#srclibmongobackend) is invoked (step 5). The MB diagrams provide detailed descriptions for the different cases.
 * A response string is created by the Service Routine and returned to `restService()` (step 6).
