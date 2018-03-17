@@ -76,7 +76,7 @@
 *
 * json_ok -
 */
-TEST(DISABLED_RegisterContextRequest, json_ok)
+TEST(RegisterContextRequest, json_ok)
 {
   ParseData                parseData;
   const char*              inFile   = "ngsi9.registerContextRequest.ok.valid.json";
@@ -107,7 +107,7 @@ TEST(DISABLED_RegisterContextRequest, json_ok)
 *
 * json_noContextRegistration -
 */
-TEST(DISABLED_RegisterContextRequest, json_noContextRegistration)
+TEST(RegisterContextRequest, json_noContextRegistration)
 {
   ParseData       parseData;
   const char*     inFile  = "ngsi9.registerContextRequest.noContextRegistration.invalid.json";
@@ -131,7 +131,7 @@ TEST(DISABLED_RegisterContextRequest, json_noContextRegistration)
 *
 * json_noProvidingApplication -
 */
-TEST(DISABLED_RegisterContextRequest, json_noProvidingApplication)
+TEST(RegisterContextRequest, json_noProvidingApplication)
 {
   ParseData       parseData;
   const char*     inFile  = "ngsi9.registerContextRequest.noProvidingApplication.invalid.json";
@@ -154,7 +154,7 @@ TEST(DISABLED_RegisterContextRequest, json_noProvidingApplication)
 *
 * json_emptyProvidingApplication -
 */
-TEST(DISABLED_RegisterContextRequest, json_emptyProvidingApplication)
+TEST(RegisterContextRequest, json_emptyProvidingApplication)
 {
   ParseData       parseData;
   const char*     inFile  = "ngsi9.registerContextRequest.emptyProvidingApplication.invalid.json";
@@ -177,7 +177,7 @@ TEST(DISABLED_RegisterContextRequest, json_emptyProvidingApplication)
 *
 * json_entityIdWithIsPatternTrue -
 */
-TEST(DISABLED_RegisterContextRequest, json_entityIdWithIsPatternTrue)
+TEST(RegisterContextRequest, json_entityIdWithIsPatternTrue)
 {
   ParseData       parseData;
   const char*     inFile  = "ngsi9.registerContextRequest.entityIdWithIsPatternTrue.valid.json";
@@ -243,7 +243,7 @@ TEST(RegisterContextRequest, json_overwriteEntityIdType)
 *
 * json_badContextRegistrationAttributeIsDomain -
 */
-TEST(DISABLED_RegisterContextRequest, json_badContextRegistrationAttributeIsDomain)
+TEST(RegisterContextRequest, json_badContextRegistrationAttributeIsDomain)
 {
   ParseData       parseData;
   const char*     inFile  = "ngsi9.registerContextRequest.badContextRegistrationAttributeIsDomain.invalid.json";

@@ -29,6 +29,7 @@
 #include "serviceRoutines/putIndividualContextEntityAttribute.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 #include "unittests/unittest.h"
 
@@ -38,13 +39,16 @@
 *
 * rs -
 */
-#define ICEA IndividualContextEntityAttribute
-#define IR   InvalidRequest
-static RestService rs[] =
+static RestService putV[] =
 {
-  { "PUT", ICEA, 5, { "ngsi10", "contextEntities", "*", "attributes", "*" }, "", putIndividualContextEntityAttribute },
-  { "*",   IR,   0, { "*", "*", "*", "*", "*", "*"                        }, "", badRequest                          },
-  { "",    IR,   0, {                                                     }, "", NULL                                }
+  { IndividualContextEntityAttribute, 5, { "ngsi10", "contextEntities", "*", "attributes", "*" }, "", putIndividualContextEntityAttribute },
+  { InvalidRequest,                   0, {                                                     }, "", NULL                                }
+};
+
+static RestService badVerbV[] =
+{
+  { InvalidRequest,   0, { "*", "*", "*", "*", "*", "*"                        }, "", badRequest                          },
+  { InvalidRequest,   0, {                                                     }, "", NULL                                }
 };
 
 
@@ -53,7 +57,7 @@ static RestService rs[] =
 *
 * json -
 */
-TEST(DISABLED_putIndividualContextEntityAttribute, json)
+TEST(putIndividualContextEntityAttribute, json)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity11/attributes/temperature",  "PUT", "1.1");
 
@@ -75,7 +79,9 @@ TEST(DISABLED_putIndividualContextEntityAttribute, json)
   ci.inMimeType     = JSON;
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
-  out               = restService(&ci, rs);
+
+  serviceVectorsSet(NULL, putV, NULL, NULL, NULL, NULL, badVerbV);  
+  out = orion::requestServe(&ci);
 
   EXPECT_STREQ(expectedBuf, out.c_str());
 

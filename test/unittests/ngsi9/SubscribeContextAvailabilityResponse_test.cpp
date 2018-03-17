@@ -66,7 +66,7 @@ TEST(SubscribeContextAvailabilityResponse, constructors)
 * duration:       Optional
 * errorCode:      Optional
 */
-TEST(DISABLED_SubscribeContextAvailabilityResponse, jsonRender)
+TEST(SubscribeContextAvailabilityResponse, jsonRender)
 {
   const char*                            filename1  = "ngsi9.subscribeContextAvailabilityResponse.jsonRender1.valid.json";
   const char*                            filename2  = "ngsi9.subscribeContextAvailabilityResponse.jsonRender2.valid.json";

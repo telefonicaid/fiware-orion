@@ -161,7 +161,7 @@ echo
 01. GET /v1/contextEntityTypes/ET1 and see 0 responses
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 147
+Content-Length: 116
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -178,7 +178,7 @@ Date: REGEX(.*)
 02. Update/APPEND E1/ET1
 ========================
 HTTP/1.1 200 OK
-Content-Length: 379
+Content-Length: 185
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -210,7 +210,7 @@ Date: REGEX(.*)
 03. GET /v1/contextEntityTypes/ET1 and see 1 response
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 380
+Content-Length: 186
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -242,7 +242,7 @@ Date: REGEX(.*)
 04. Update/APPEND E1/ET2
 ========================
 HTTP/1.1 200 OK
-Content-Length: 379
+Content-Length: 185
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -274,7 +274,7 @@ Date: REGEX(.*)
 05. GET /v1/contextEntityTypes/ET1 and see 1 response
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 380
+Content-Length: 186
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -306,7 +306,7 @@ Date: REGEX(.*)
 06. GET /v1/contextEntityTypes/ET2 and see 1 response
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 380
+Content-Length: 186
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -338,7 +338,7 @@ Date: REGEX(.*)
 07. GET /v1/contextEntityTypes/ET1?attributesFormat=object
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 360
+Content-Length: 179
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -369,7 +369,7 @@ Date: REGEX(.*)
 08. GET /v1/contextEntityTypes/ET1?entity::type=ET1 and see 1 response
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 380
+Content-Length: 186
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -401,7 +401,7 @@ Date: REGEX(.*)
 09. GET /v1/contextEntityTypes/ET1?exist=entity::type and see 1 response
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 380
+Content-Length: 186
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -433,7 +433,7 @@ Date: REGEX(.*)
 10. GET /v1/contextEntityTypes/ET1?!exist=entity::type end see it fail
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 146
+Content-Length: 115
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -450,7 +450,7 @@ Date: REGEX(.*)
 11. GET /v1/contextEntityTypes/ET1?entity::type=ET2 and see it fail
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 134
+Content-Length: 103
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

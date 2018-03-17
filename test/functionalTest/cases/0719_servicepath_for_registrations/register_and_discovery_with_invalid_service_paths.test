@@ -163,7 +163,7 @@ echo
 01. Registration with invalid service path /a1/e1+@
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 158
+Content-Length: 127
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -180,7 +180,7 @@ Date: REGEX(.*)
 02. Registration with invalid service path /a1/#
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 179
+Content-Length: 143
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -198,7 +198,7 @@ Date: REGEX(.*)
 03. Registration with TWO service paths /a1/e1,/a1/e2
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 193
+Content-Length: 157
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -216,7 +216,7 @@ Date: REGEX(.*)
 04. Discovery with invalid service path /a1/e1+@
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 158
+Content-Length: 127
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -233,7 +233,7 @@ Date: REGEX(.*)
 05. Discovery with valid /a1/# but nothing found
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

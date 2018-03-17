@@ -1,23 +1,20 @@
 # Building from sources
 
-Orion Context Broker reference distribution is CentOS 6.x. This doesn't mean that the broker cannot be built in other distributions (actually, it can). This section also includes indications on how to build in other distributions, just in the case it may help people that don't use CentOS. However, note that the only "officially supported" procedure is the one for CentOS 6.x; the others are provided "as is" and can get obsolete from time to time.
+Orion Context Broker reference distribution is CentOS 7.x. This doesn't mean that the broker cannot be built in other distributions (actually, it can). This section also includes indications on how to build in other distributions, just in the case it may help people that don't use CentOS. However, note that the only "officially supported" procedure is the one for CentOS 7.x; the others are provided "as is" and can get obsolete from time to time.
 
-## CentOS 6.x. (officially supported)
+## CentOS 7.x (officially supported)
 
 The Orion Context Broker uses the following libraries as build dependencies:
 
-* boost: 1.41 (the one that comes in EPEL6 repository)
+* boost: 1.53
 * libmicrohttpd: 0.9.48 (from source)
-* libcurl: 7.19.7
-* openssl: 1.0.1e
-* libuuid: 2.17.2
+* libcurl: 7.29.0
+* openssl: 1.0.2k
+* libuuid: 2.23.2
 * Mongo Driver: legacy-1.1.2 (from source)
 * rapidjson: 1.0.2 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
-
-We assume that EPEL6 repository is configured in yum, given that many RPM packages are installed from there
-(check the procedure at http://fedoraproject.org/wiki/EPEL#How_can_I_use_these_extra_packages.3F):
 
 The basic procedure is as follows (assuming you don't run commands as root, we use sudo for those
 commands that require root privilege):
@@ -54,9 +51,9 @@ commands that require root privilege):
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-* Install Google Test/Mock from sources (there are RPM pacakges for this, but they don't seem to be working with the current CMakeLists.txt configuration). Previously the URL was http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 but google removed that package in late August 2016 and it is no longer working.
+* Install Google Test/Mock from sources (there are RPM packages for this, but they do not work with the current CMakeLists.txt configuration). Previously the URL was http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 but Google removed that package in late August 2016 and it is no longer working.
 
-        wget https://www.fiware.org/shared-content/public/gmock-1.5.0.tar.bz2
+        wget https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2
         tar xfvj gmock-1.5.0.tar.bz2
         cd gmock-1.5.0
         ./configure
@@ -109,9 +106,9 @@ The Orion Context Broker comes with a suite of functional, valgrind and end-to-e
 
 You can generate coverage reports for the Orion Context Broker using the following procedure (optional):
 
-* Install the required tools. You need lcov 1.10 - the one that comes with CentOS 6.3 (lcov 1.9) is not valid.
+* Install the lcov tool
 
-        sudo rpm -Uhv http://downloads.sourceforge.net/ltp/lcov-1.10-1.noarch.rpm
+        sudo yum install lcov
 
 * Do first a successful pass for unit_test and functional_test, to check that everything is ok (see above)
 
@@ -142,15 +139,3 @@ yum install cyrus-sasl-devel
 scons --use-sasl-client --ssl                                   # The build/linux2/normal/libmongoclient.a library is generated as outcome
 sudo scons install --prefix=/usr/local --use-sasl-client --ssl  # This puts .h files in /usr/local/include/mongo and libmongoclient.a in /usr/local/lib
 ```
-
-## Others
-
-If you have build orion in a system different from CentOS 6.x, don't hesitate to tell us and contribute to expand this section. Probably the best way if doing a pull request to modify this file with the new information. Thanks!
-
-### Debian 7
-
-The packages are basically the same described for RedHat/CentOS above, except that we need to install packages using apt-get instead of yum.
-
-Install Google Test and Google Mock version 1.5 directly from sources.
-
-The version of lcov that comes with Debian 7.0 (1.9) has a bug (see https://bugs.launchpad.net/ubuntu/+source/lcov/+bug/1163758). Install lcov 1.10 from sources.

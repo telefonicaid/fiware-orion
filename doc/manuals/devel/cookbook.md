@@ -106,16 +106,15 @@ Note the right-most column saying `(environment variable)` for the `-fg` option.
 [Top](#top)
 
 ## Adding a REST service
-The REST services that the Orion Context Broker supports are items in the `RestService` vector `restServiceV`, found in [the main program](sourceCode.md#srcappcontextbroker) in `contextBroker.cpp`. This vector is a reminiscent from back when Orion also implemented the FIWARE Configuration Manager and thus had to be able to assume different roles. The set of services that are supported pretty much defines the role and by starting the REST interface with one `RestService` vector or another took care of the role selection. Now Orion has only one role, to work as context broker, but the `RestService` vector remains.
+The REST services that the Orion Context Broker supports are items in the seven `RestService` vectors `restServiceV`, found in [orionRestServices.cpp](sourceCode.md#srcappcontextbroker). There is one service vector per HTTP Method/Verb that Orion supports: GET, PUT, POST, PATCH, DELETE, OPTIONS, plus a special vector for 'bad verb'. The set of services that are supported pretty much defines the role and by starting the REST interface with one `RestService` vector or another defines what the broker is able to do, all its services are included in these seven vectors.
 
-To add a REST service to Orion, a new item in `RestService restServiceV[]` is needed. Just like with CLI parameters, the easiest way is to copy an old service (item in `restServiceV`) and then modify the copy to suit your needs.
+To add a REST service to Orion, a new item in `RestService xxxServiceV[]` (`xxx` being the verb of the service (`get`, `put`, etc) is needed. Just like with CLI parameters, the easiest way is to copy an old service (an item in `xxxServiceV`) and then modify the copy to suit your needs.
 
 To understand this new item in the `RestService` vector, take a look at the struct `RestService`, in `src/lib/rest/RestService.h`:
 
 ```
 typedef struct RestService  
 {  
-  std::string   verb;             // The method of the service, as a plain string. ("*" matches ALL methods)  
   RequestType   request;          // The type of the request  
   int           components;       // Number of components in the URL path  
   std::string   compV[10];        // Vector of URL path components. E.g. { "v2", "entities" }  
@@ -124,24 +123,23 @@ typedef struct RestService
 } RestService;
 ```
 
-So, to add a REST service eg. `PUT /v2/entities/{EntitId}/attrs/{AttributeName}/metadata/{MetadataName}`, the new item if the RestService vector would look like this:
+So, to add a REST service eg. `PUT /v2/entities/{EntitId}/attrs/{AttributeName}/metadata/{MetadataName}`, the new item if the RestService vector `putServiceV` would look like this:
 
 ```
-{ "PUT", Metadata,  7, { "v2", "entities", "*", "attrs", "*", "metadata", "*" }, "", putMetadata }
+{ Metadata,  7, { "v2", "entities", "*", "attrs", "*", "metadata", "*" }, "", putMetadata }
 ```
 
 NOTE:
 
-* Item 2: `Metadata` would have to be added as an enum constant in the `enum RequestType` in `src/lib/ngsi/Request.h`
-* Item 4: `"*"`. An asterisc in the component vector `RestService::compV` matches ANY string, and whenever a path including entity id, attribute name, etc is defined, `"*"` must be used.
-* Item 6: `putMetadata()` is the service routine for `PUT /v2/entities/*/attrs/*/metadata/*` and the function must be implemented. The directory of the library for NGSIv2 service routines is `src/lib/serviceRoutinesV2` (see [library description](sourceCode.md#srclibserviceroutinesv2)).
+* Item 1: `Metadata` would have to be added as an enum constant in the `enum RequestType` in `src/lib/ngsi/Request.h`
+* Item 3: `"*"`. An asterisc in the component vector `RestService::compV` matches ANY string, and whenever a path including entity id, attribute name, etc is defined, `"*"` must be used.
+* Item 5: `putMetadata()` is the service routine for `PUT /v2/entities/*/attrs/*/metadata/*` and the function must be implemented. The directory of the library for NGSIv2 service routines is `src/lib/serviceRoutinesV2` (see [library description](sourceCode.md#srclibserviceroutinesv2)).
 
-Note also that in `contextBroker.cpp`, these `RestService` vector lines have been grouped and as the lines got really long, defines for the component vector have been created.    
+Note also that in `orionRestServices.cpp`, these `RestService` vector lines are really long, and our style guide is against too long lines. However, making the lines shorter by using definitions just make the code more difficult to understand and we don't want that.
 
-> Side-note: The [style guide](../contribution_guidelines.md#s9-line-length) says a source code line **shouldn't** be longer than 120 chars. These lines, before splitting into defines were well over 200 chars. Unfortunately, the new way, with shorter lines, is a lot more difficult to read.
+> Side-note: The [style guide](../contribution_guidelines.md#s9-line-length) says a source code line **shouldn't** be longer than 120 chars.
 
-Now, the service routine `putMetadata()` should reside in `src/lib/serviceRoutinesV2/putMetadata.h/cpp` and its signature must
-be as follows:  
+The service routine `putMetadata()` should reside in `src/lib/serviceRoutinesV2/putMetadata.h/cpp` and its signature must be as follows:  
 ```
 std::string putMetadata  
 (  

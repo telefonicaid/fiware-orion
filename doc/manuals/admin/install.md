@@ -12,26 +12,40 @@
 
 ## Introduction
 
-The recommended procedure is to install using RPM packages in CentOS 6.x. If you are interested in
+The recommended procedure is to install using RPM packages in CentOS 7.x. If you are interested in
 building from sources, check [this document](build_source.md).
 
 ## Requirements
 
-* System resources: see [these recommendations](diagnosis.md##resource-availability)
-* Operating system: CentOS/RedHat. The reference operating system is CentOS 6.3
-  but it should work also in any later CentOS/RedHat 6.x version.
+* System resources: see [these recommendations](diagnosis.md#resource-availability)
+* Operating system: CentOS/RedHat. The reference operating system is CentOS 7.4.1708
+  but it should work also in any later CentOS/RedHat 7.x version.
 * Database: MongoDB is required to run either in the same host where Orion Context Broker is to be installed or in a different host accessible through the network. The recommended MongoDB versions
   are 2.6/3.0/3.2/3.4. It is not recommended using MongoDB 2.4.x., as some [geolocated queries](../user/geolocation.md) may not work.
     * In the case of using MongoDB 3.0/3.2/3.4 with its new authentication mechanism (SCRAM_SHA1) you may need to compile from sources using special switches for the MongoDB driver.
       See [this issue](https://github.com/telefonicaid/fiware-orion/issues/1061) for details.
 * RPM dependencies (some of these packages could not be in the official CentOS/RedHat repository but in EPEL, in which case you have to configure EPEL repositories, see <http://fedoraproject.org/wiki/EPEL>):
-    * The contextBroker package (mandatory) depends on the following packages: boost-filesystem, boost-thread, gnutls, libgcrypt, logrotate and libcurl.    
+    * The contextBroker package (mandatory) depends on the following packages: libstdc++, boost-thread, boost-filesystem, gnutls, libgcrypt, libcurl, openssl, logrotate and libuuid
 
 ## Installation
 
+There are two available packages:
+
+* Nightly, which are built from master branch every night.
+* Release, "official" release RPMs. The usual release period is 1-2 months.
+
+Depending on their type (nightly or release), packages have different versioning:
+
+* Release packages: contextBroker-X.Y.Z-1
+* Nightly packages: contextBroker-X.Y.Z-yyyy.mm.dd
+
+Keep in mind, the version of nightly packages will always be ahead of release, and we advise to use nightly packages only for testing purposes.
+
+From this point, if you want to use the nightly builds, remember that it has a different system of versions.
+
 ### Using yum (recommended)
 
-Configure the FIWARE yum repository ([as described in this post](http://stackoverflow.com/questions/24331330/how-to-configure-system-to-use-the-fi-ware-yum-repository/24510985#24510985)). Then you can install doing (as root):
+Configure the FIWARE yum repository as described [here](yum.md). Then you can install doing (as root):
 
 ```
 yum install contextBroker
@@ -42,7 +56,7 @@ Sometimes the above commands fails due to yum cache. In that case, run
 
 ### Using RPM file
 
-Download the package from the [FIWARE Files area](https://forge.fiware.org/frs/?group_id=7). Look for the "DATA-OrionContextBroker" entry.
+Download the package directly from the [FIWARE Yum repository](https://nexus.lab.fiware.org/service/rest/repository/browse/el/7/x86_64/) (both types of packages are provided).
 
 Next, install the package using the rpm command (as root):
 
@@ -97,7 +111,7 @@ yum install contextBroker
 Sometimes the above commands fails due to yum cache. In that case, run
 `yum clean all` and try again.
 
-If you are upgrading using the RPM file, then first download the new package from the [FIWARE Files area](https://forge.fiware.org/frs/?group_id=7). Look for the "DATA-OrionContextBroker" entry.
+If you are upgrading using the RPM file, then first download the new package from the [FIWARE yum repository](https://nexus.lab.fiware.org/service/rest/repository/browse/el/7/x86_64/) (both types of packages are provided).
 
 Then upgrade the package using the rpm command (as root):
 

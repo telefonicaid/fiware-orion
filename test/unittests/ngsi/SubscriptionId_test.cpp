@@ -127,7 +127,7 @@ TEST(SubscriptionId, present)
 *
 * render
 */
-TEST(DISABLED_SubscriptionId, render)
+TEST(SubscriptionId, render)
 {
   SubscriptionId  sId;
   std::string     out;
@@ -137,7 +137,7 @@ TEST(DISABLED_SubscriptionId, render)
 
   sId.set("012345012345012345012345");
 
-  out = sId.render(UnsubscribeContext, "");
+  out = sId.render(UnsubscribeContext, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

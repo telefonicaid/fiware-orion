@@ -86,7 +86,7 @@ TEST(Throttling, check)
 *
 * render - 
 */
-TEST(DISABLED_Throttling, render)
+TEST(Throttling, render)
 {
   Throttling   t;
   std::string  out;

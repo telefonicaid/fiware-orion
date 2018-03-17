@@ -8901,7 +8901,7 @@ TEST(mongoUpdateContextRequest, createNativeTypes)
     ContextAttribute* ca2P = new ContextAttribute("A2", "T", 42.5);
     ContextAttribute* ca3P = new ContextAttribute("A3", "T", false);
     ContextAttribute* ca4P = new ContextAttribute("A4", "T", "");
-    ca4P->valueType = orion::ValueTypeNone;
+    ca4P->valueType = orion::ValueTypeNull;
     ceP->contextAttributeVector.push_back(ca1P);
     ceP->contextAttributeVector.push_back(ca2P);
     ceP->contextAttributeVector.push_back(ca3P);
@@ -9112,7 +9112,7 @@ TEST(mongoUpdateContextRequest, updateNativeTypes)
     ContextElement* ce2P = new ContextElement();
     ce2P->entityId.fill("E2", "T2", "false");
     ContextAttribute* ca3P = new ContextAttribute("A3", "T", "");
-    ca3P->valueType = orion::ValueTypeNone;
+    ca3P->valueType = orion::ValueTypeNull;
     ce2P->contextAttributeVector.push_back(ca3P);
     req.contextElementVector.push_back(ce2P);
 
@@ -9392,7 +9392,7 @@ TEST(mongoUpdateContextRequest, createMdNativeTypes)
     Metadata md2("MD2", "T", 55.5);
     Metadata md3("MD3", "T", false);
     Metadata md4("MD4", "T", "");
-    md4.valueType = orion::ValueTypeNone;
+    md4.valueType = orion::ValueTypeNull;
     caP->metadataVector.push_back(&md1);
     caP->metadataVector.push_back(&md2);
     caP->metadataVector.push_back(&md3);
@@ -9435,7 +9435,7 @@ TEST(mongoUpdateContextRequest, createMdNativeTypes)
     EXPECT_FALSE(RES_CER_ATTR(0, 0)->metadataVector[2]->boolValue);
     EXPECT_EQ("MD4", RES_CER_ATTR(0, 0)->metadataVector[3]->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 0)->metadataVector[3]->type);
-    EXPECT_EQ(orion::ValueTypeNone, RES_CER_ATTR(0, 0)->metadataVector[3]->valueType);
+    EXPECT_EQ(orion::ValueTypeNull, RES_CER_ATTR(0, 0)->metadataVector[3]->valueType);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);

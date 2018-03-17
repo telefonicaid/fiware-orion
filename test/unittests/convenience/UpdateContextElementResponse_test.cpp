@@ -39,7 +39,7 @@
 *
 * render_json - 
 */
-TEST(DISABLED_UpdateContextElementResponse, render_json)
+TEST(UpdateContextElementResponse, render_json)
 {
   UpdateContextElementResponse    ucer;
   ContextAttributeResponse        car;
@@ -63,7 +63,7 @@ TEST(DISABLED_UpdateContextElementResponse, render_json)
 *
 * check_json - 
 */
-TEST(DISABLED_UpdateContextElementResponse, check_json)
+TEST(UpdateContextElementResponse, check_json)
 {
   UpdateContextElementResponse  ucer;
   ContextAttributeResponse      car;

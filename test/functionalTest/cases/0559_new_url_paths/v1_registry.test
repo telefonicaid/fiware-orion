@@ -364,7 +364,7 @@ echo
 1. POST /v1/registry/registerContext
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 64
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -388,7 +388,7 @@ Date: REGEX(.*)
 2. POST /v1/registry/discoverContextAvailability
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 302
+Content-Length: 168
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -424,7 +424,7 @@ Date: REGEX(.*)
 3. POST /v1/registry/subscribeContextAvailability
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -448,7 +448,7 @@ Date: REGEX(.*)
 4. POST /v1/registry/updateContextAvailabilitySubscription
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -472,7 +472,7 @@ Date: REGEX(.*)
 5. POST /v1/registry/unsubscribeContextAvailability
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 122
+Content-Length: 93
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -499,7 +499,7 @@ Date: REGEX(.*)
 6. POST /v1/registry/contextEntities/E
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -513,7 +513,7 @@ Date: REGEX(.*)
 6. GET /v1/registry/contextEntities/E
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 294
+Content-Length: 160
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -549,7 +549,7 @@ Date: REGEX(.*)
 7. POST /v1/registry/contextEntities/F/attributes
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -563,7 +563,7 @@ Date: REGEX(.*)
 7. GET /v1/registry/contextEntities/F/attributes
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 294
+Content-Length: 160
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -599,7 +599,7 @@ Date: REGEX(.*)
 8. POST /v1/registry/contextEntities/G/attributes/A
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -613,7 +613,7 @@ Date: REGEX(.*)
 8. GET /v1/registry/contextEntities/G/attributes/A
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 438
+Content-Length: 217
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -656,7 +656,7 @@ Date: REGEX(.*)
 9. POST /v1/registry/contextEntityTypes/S
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 64
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -670,7 +670,7 @@ Date: REGEX(.*)
 9. GET /v1/registry/contextEntityTypes/S
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 294
+Content-Length: 160
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -706,7 +706,7 @@ Date: REGEX(.*)
 10. POST /v1/registry/contextEntityTypes/U/attributes
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 64
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -720,7 +720,7 @@ Date: REGEX(.*)
 10. GET /v1/registry/contextEntityTypes/U/attributes
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 294
+Content-Length: 160
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -756,7 +756,7 @@ Date: REGEX(.*)
 11. POST /v1/registry/contextEntityTypes/V/attributes/A
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -770,7 +770,7 @@ Date: REGEX(.*)
 11. GET /v1/registry/contextEntityTypes/V/attributes/A
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 438
+Content-Length: 217
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -813,7 +813,7 @@ Date: REGEX(.*)
 12. POST /v1/registry/contextAvailabilitySubscriptions
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -837,7 +837,7 @@ Date: REGEX(.*)
 13. PUT /v1/registry/contextAvailabilitySubscriptions/SUB_ID
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -851,7 +851,7 @@ Date: REGEX(.*)
 13. DELETE /v1/registry/contextAvailabilitySubscriptions/SUB_ID
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 122
+Content-Length: 93
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

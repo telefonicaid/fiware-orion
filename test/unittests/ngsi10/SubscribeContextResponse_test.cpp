@@ -55,7 +55,7 @@ TEST(SubscribeContextResponse, constructorsAndRender)
 *
 * jsonRender -
 */
-TEST(DISABLED_SubscribeContextResponse, json_render)
+TEST(SubscribeContextResponse, json_render)
 {
   const char*                filename1  = "ngsi10.subscribeContextResponse.jsonRender1.valid.json";
   const char*                filename2  = "ngsi10.subscribeContextResponse.jsonRender2.valid.json";

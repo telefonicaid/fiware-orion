@@ -27,6 +27,7 @@
 #include "rapidjson/document.h"
 
 #include "logMsg/logMsg.h"
+#include "common/limits.h"
 #include "ngsi/Metadata.h"
 #include "parse/CompoundValueNode.h"
 
@@ -47,7 +48,7 @@ static orion::ValueType stringToCompoundType(std::string nodeType)
   else if (nodeType == "False")   return orion::ValueTypeBoolean;
   else if (nodeType == "Object")  return orion::ValueTypeObject;
   else if (nodeType == "Array")   return orion::ValueTypeVector;
-  else if (nodeType == "Null")    return orion::ValueTypeNone;
+  else if (nodeType == "Null")    return orion::ValueTypeNull;
 
   return orion::ValueTypeString;
 }
@@ -97,7 +98,7 @@ std::string parseMetadataCompoundValue
       }
       else if (nodeType == "Null")
       {
-        cvnP->valueType = orion::ValueTypeNone;
+        cvnP->valueType = orion::ValueTypeNull;
       }
       else if (nodeType == "Object")
       {
@@ -131,7 +132,7 @@ std::string parseMetadataCompoundValue
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[4];
+      char                       itemNo[STRING_SIZE_FOR_INT];
 
       snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
@@ -156,7 +157,7 @@ std::string parseMetadataCompoundValue
       }
       else if (nodeType == "Null")
       {
-        cvnP->valueType = orion::ValueTypeNone;
+        cvnP->valueType = orion::ValueTypeNull;
       }
       else if (nodeType == "Object")
       {
@@ -227,7 +228,7 @@ std::string parseMetadataCompoundValue
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[4];
+      char                       itemNo[STRING_SIZE_FOR_INT];
 
       snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 

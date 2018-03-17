@@ -72,7 +72,7 @@ echo
 --REGEXPECT--
 0. Adding an entity of type 'Room', with two attributes, temperature:celsius and pressure:mmHg
 HTTP/1.1 200 OK
-Content-Length: 519
+Content-Length: 258
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -108,7 +108,7 @@ Date: REGEX(.*)
 
 1. Listing of Entity Type Attributes. Response in JSON
 HTTP/1.1 200 OK
-Content-Length: 150
+Content-Length: 103
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -128,7 +128,7 @@ Date: REGEX(.*)
 
 2. Listing of Entity Type Attributes. Response in JSON, details=on
 HTTP/1.1 200 OK
-Content-Length: 178
+Content-Length: 124
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

@@ -346,7 +346,7 @@ echo
 --REGEXPECT--
 1: +++++++++ Point A +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 572
+Content-Length: 263
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -384,7 +384,7 @@ Date: REGEX(.*)
 
 2: +++++++++ Point B +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 572
+Content-Length: 263
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -422,7 +422,7 @@ Date: REGEX(.*)
 
 3: +++++++++ Point C +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 572
+Content-Length: 263
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -460,7 +460,7 @@ Date: REGEX(.*)
 
 4: ++++++++++ Rectangle in: A, B ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1120
+Content-Length: 512
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -523,7 +523,7 @@ Date: REGEX(.*)
 
 5: ++++++++++ Rectangle in: B, C ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1120
+Content-Length: 512
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -586,7 +586,7 @@ Date: REGEX(.*)
 
 6: ++++++++++ Triangle in: A ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 576
+Content-Length: 267
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -624,7 +624,7 @@ Date: REGEX(.*)
 
 7: ++++++++++ Rectangle out: A ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 576
+Content-Length: 267
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -662,7 +662,7 @@ Date: REGEX(.*)
 
 8: ++++++++++ Triangle out: B, C ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1120
+Content-Length: 512
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

@@ -111,7 +111,7 @@ orionCurl --url "/v1/contextEntities/ENTITY_ID" -X "DELETE"
 --REGEXPECT--
 1: ++++++++ GET that fails +++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 232
+Content-Length: 172
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -130,7 +130,7 @@ Date: REGEX(.*)
 }
 2: ++++++++ DELETE that fails +++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 95
+Content-Length: 78
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -142,7 +142,7 @@ Date: REGEX(.*)
 }
 3: ++++++++ POST that is OK ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 326
+Content-Length: 180
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -169,7 +169,7 @@ Date: REGEX(.*)
 }
 4: +++++++++ PUT that fails +++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 203
+Content-Length: 172
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -183,7 +183,7 @@ Date: REGEX(.*)
 }
 5: +++++++++ Register an entity +++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -194,7 +194,7 @@ Date: REGEX(.*)
 }
 6: ++++++++++++ GET that is OK +++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 291
+Content-Length: 179
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -219,7 +219,7 @@ Date: REGEX(.*)
 }
 7: +++++++++++++ PUT that is OK ++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 264
+Content-Length: 133
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -243,7 +243,7 @@ Date: REGEX(.*)
 }
 8: ++++++++++++++ DELETE that is OK +++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

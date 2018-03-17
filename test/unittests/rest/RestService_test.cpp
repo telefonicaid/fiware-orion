@@ -37,6 +37,7 @@
 #include "rest/restReply.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 #include "unittests/unittest.h"
 
@@ -44,39 +45,38 @@
 
 /* ****************************************************************************
 *
-* rs -
+* service routine vectors -
 */
-RestService rs[] =
+RestService postV[] =
 {
-  // NGSI-9 Requests
-  { "POST", RegisterContext, 2, { "ngsi9", "registerContext" }, "registerContextRequest", postRegisterContext },
-  { "*",    RegisterContext, 2, { "ngsi9", "registerContext" }, "registerContextRequest", badVerbPostOnly     },
+  { RegisterContext, 2, { "ngsi9", "registerContext" }, "registerContextRequest", postRegisterContext },
+  { InvalidRequest, 0, {}, "", NULL }
+};
 
-  // End marker for the array
-  { "", InvalidRequest, 0, {}, "", NULL }
+RestService badVerbs[] =
+{
+  { RegisterContext, 2, { "ngsi9", "registerContext" }, "registerContextRequest", badVerbPostOnly     },
+  { InvalidRequest, 0, {}, "", NULL }
 };
 
 
-
-/* ****************************************************************************
-*
-* rs2 -
-*/
 #define RC   RegisterContext
 #define DCA  DiscoverContextAvailability
 #define RCR  "registerContextRequest"
 #define DCAR "discoverContextAvailabilityRequest"
 
-RestService rs2[] =
+RestService postV2[] =
 {
-  // NGSI-9 Requests
-  { "POST", RC,  2, { "ngsi9",  "registerContext"             }, RCR,  postRegisterContext             },
-  { "*",    RC,  2, { "ngsi9",  "registerContext"             }, RCR,  badVerbPostOnly                 },
-  { "POST", DCA, 2, { "ngsi9",  "discoverContextAvailability" }, DCAR, postDiscoverContextAvailability },
-  { "*",    DCA, 2, { "ngsi9",  "discoverContextAvailability" }, DCAR, badVerbPostOnly                 },
+  { RC,  2, { "ngsi9",  "registerContext"             }, RCR,  postRegisterContext             },
+  { DCA, 2, { "ngsi9",  "discoverContextAvailability" }, DCAR, postDiscoverContextAvailability },
+  { InvalidRequest, 0, {}, "", NULL }
+};
 
-  // End marker for the array
-  { "", InvalidRequest, 0, {}, "", NULL }
+RestService badVerbs2[] =
+{
+  { DCA, 2, { "ngsi9",  "discoverContextAvailability" }, DCAR, badVerbPostOnly                 },
+  { RC,  2, { "ngsi9",  "registerContext"             }, RCR,  badVerbPostOnly                 },
+  { InvalidRequest, 0, {}, "", NULL }
 };
 
 
@@ -111,7 +111,7 @@ TEST(RestService, payloadParse)
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
 
-  out = payloadParse(&ci, &parseData, &rs[0], NULL, &jsonRelease, compV);
+  out = payloadParse(&ci, &parseData, &postV[0], NULL, &jsonRelease, compV);
   EXPECT_EQ("OK", out);
 
 
@@ -127,7 +127,7 @@ TEST(RestService, payloadParse)
   ci.payload        = (char*) "123";
   ci.payloadSize    = strlen(ci.payload);
 
-  out = payloadParse(&ci, &parseData, &rs[0], NULL, &jsonRelease, compV);
+  out = payloadParse(&ci, &parseData, &postV[0], NULL, &jsonRelease, compV);
   EXPECT_EQ("Bad inMimeType", out);
 
   utExit();
@@ -139,7 +139,7 @@ TEST(RestService, payloadParse)
 *
 * noSuchService -
 */
-TEST(DISABLED_RestService, noSuchServiceAndNotFound)
+TEST(RestService, noSuchServiceAndNotFound)
 {
   ConnectionInfo ci("/ngsi9/discoverContextAvailability",  "POST", "1.1");
   ci.servicePathV.push_back("");
@@ -163,7 +163,9 @@ TEST(DISABLED_RestService, noSuchServiceAndNotFound)
   ci.inMimeType     = JSON;
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
-  out               = restService(&ci, rs);
+
+  serviceVectorsSet(NULL, NULL, postV, NULL, NULL, NULL, badVerbs);
+  out = orion::requestServe(&ci);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Not found
@@ -178,7 +180,10 @@ TEST(DISABLED_RestService, noSuchServiceAndNotFound)
   ci.inMimeType     = JSON;
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
-  out               = restService(&ci, rs2);
+
+  serviceVectorsSet(NULL, NULL, postV2, NULL, NULL, NULL, badVerbs2);
+  out = orion::requestServe(&ci);
+
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

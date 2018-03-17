@@ -75,7 +75,7 @@ echo
 01. Delete a non-existing subscription
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 144
+Content-Length: 115
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -92,7 +92,7 @@ Date: REGEX(.*)
 02. Subscribe to availability of E1/A1
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -106,7 +106,7 @@ Date: REGEX(.*)
 03. Delete the subscription to availability of E1/A1
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 122
+Content-Length: 93
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

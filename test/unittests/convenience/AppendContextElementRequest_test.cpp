@@ -39,7 +39,7 @@
 *
 * render_json -
 */
-TEST(DISABLED_AppendContextElementRequest, render_json)
+TEST(AppendContextElementRequest, render_json)
 {
    AppendContextElementRequest  acer;
    std::string                  out;
@@ -66,7 +66,7 @@ TEST(DISABLED_AppendContextElementRequest, render_json)
 *
 * check_json -
 */
-TEST(DISABLED_AppendContextElementRequest, check_json)
+TEST(AppendContextElementRequest, check_json)
 {
    AppendContextElementRequest  acer;
    std::string                  out;

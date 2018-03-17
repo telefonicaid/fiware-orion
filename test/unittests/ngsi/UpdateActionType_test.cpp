@@ -101,7 +101,7 @@ TEST(UpdateActionType, check)
 *
 * render - 
 */
-TEST(DISABLED_UpdateActionType, render)
+TEST(UpdateActionType, render)
 {
   UpdateActionType  uat;
   std::string       out;

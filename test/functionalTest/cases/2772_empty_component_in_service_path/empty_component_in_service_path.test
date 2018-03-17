@@ -51,7 +51,7 @@ echo
 01. Try a NGSI v1 registration using a service path with an empty component, see error
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 132
+Content-Length: 101
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

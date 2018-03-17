@@ -91,7 +91,7 @@ orionCurl --url "/v1/contextEntities/Room1/attributes/temperature"
 --REGEXPECT--
 +++++ 1. create entity +++++
 HTTP/1.1 200 OK
-Content-Length: 432
+Content-Length: 229
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -123,7 +123,7 @@ Date: REGEX(.*)
 }
 +++++ 2. put an entity with type +++++
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -134,7 +134,7 @@ Date: REGEX(.*)
 }
 +++++ 3. query +++++
 HTTP/1.1 200 OK
-Content-Length: 389
+Content-Length: 230
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -164,7 +164,7 @@ Date: REGEX(.*)
 }
 +++++ 4. put an entity without type +++++
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -175,7 +175,7 @@ Date: REGEX(.*)
 }
 +++++ 5. query again +++++
 HTTP/1.1 200 OK
-Content-Length: 389
+Content-Length: 230
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -205,7 +205,7 @@ Date: REGEX(.*)
 }
 +++++ 6. update without type +++++
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -216,7 +216,7 @@ Date: REGEX(.*)
 }
 +++++ 7. query +++++
 HTTP/1.1 200 OK
-Content-Length: 189
+Content-Length: 120
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -236,7 +236,7 @@ Date: REGEX(.*)
 }
 +++++ 8. update with type +++++
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -247,7 +247,7 @@ Date: REGEX(.*)
 }
 +++++ 9. query (JSON) +++++
 HTTP/1.1 200 OK
-Content-Length: 189
+Content-Length: 120
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

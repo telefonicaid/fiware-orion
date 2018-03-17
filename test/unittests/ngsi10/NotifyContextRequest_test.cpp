@@ -40,7 +40,7 @@
 *
 * json_ok -
 */
-TEST(DISABLED_NotifyContextRequest, json_ok)
+TEST(NotifyContextRequest, json_ok)
 {
   ParseData              reqData;
   ConnectionInfo         ci("", "POST", "1.1");
@@ -82,7 +82,7 @@ TEST(DISABLED_NotifyContextRequest, json_ok)
 *
 * json_badIsPattern -
 */
-TEST(DISABLED_NotifyContextRequest, json_badIsPattern)
+TEST(NotifyContextRequest, json_badIsPattern)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
@@ -133,7 +133,7 @@ TEST(NotifyContextResponse, Constructor)
 *
 * json_render -
 */
-TEST(DISABLED_NotifyContextRequest, json_render)
+TEST(NotifyContextRequest, json_render)
 {
   const char*              filename1  = "ngsi10.notifyContextRequest.jsonRender1.valid.json";
   const char*              filename2  = "ngsi10.notifyContextRequest.jsonRender2.valid.json";

@@ -26,7 +26,7 @@ Bad Input On Notification Error
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0-255 IPv4 -subCacheIval 5
-accumulatorStart --pretty-print 0.0.0.0 ${LISTENER_PORT}
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 --SHELL--
 

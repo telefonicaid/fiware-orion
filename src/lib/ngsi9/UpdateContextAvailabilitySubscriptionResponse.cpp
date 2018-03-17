@@ -81,7 +81,7 @@ std::string UpdateContextAvailabilitySubscriptionResponse::render(void)
   out += startTag();
 
   out += subscriptionId.render(RtUpdateContextAvailabilitySubscriptionResponse, errorCodeRendered || durationRendered);
-  out += duration.render(false);
+  out += duration.render(errorCodeRendered);
 
   if (errorCodeRendered)
   {
