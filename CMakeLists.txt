@@ -24,6 +24,8 @@
 PROJECT(contextBroker)
 cmake_minimum_required(VERSION 2.6)
 
+# Using --std=cxx11
+set (CMAKE_CXX_STANDARD 11)
 #
 # DEBUG or RELEASE build ?
 #
@@ -215,6 +217,8 @@ SET (DYNAMIC_LIBS
     gcrypt
     ssl
     uuid
+    mongocxx
+    bsoncxx
 )
 
 #
@@ -233,6 +237,8 @@ endif (UNIT_TEST)
 # Common include
 #
 include_directories("/usr/include")
+include_directories("/usr/local/include/bsoncxx/v_noabi")
+include_directories("/usr/local/include/mongocxx/v_noabi")
 
 #
 # Library directories
