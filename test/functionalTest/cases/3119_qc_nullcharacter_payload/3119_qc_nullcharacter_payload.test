@@ -47,9 +47,80 @@ orionCurl --url '/v1/queryContext' --payload "$payload"
 echo
 echo
 
+#
+# 02. Request context query with inappropriate value parameter in payload.
+#
+
+echo "02. Request context query with inappropriate value parameter in payload."
+echo "========================================================================"
+payload='{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "true",
+            "id": "Room\u0000"
+        }
+    ]
+}'
+orionCurl --url '/v1/queryContext' --payload "$payload"
+echo
+echo
+
+#
+# 03. Request context query with inappropriate value parameter in payload.
+#
+
+echo "03. Request context query with inappropriate value parameter in payload."
+echo "========================================================================"
+payload='{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "true",
+            "id": "R\u0000oom"
+        }
+    ]
+}'
+orionCurl --url '/v1/queryContext' --payload "$payload"
+echo
+echo
 
 --REGEXPECT--
 01. Request context query with inappropriate value parameter in payload.
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 105
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400",
+        "details": "invalid regex for entity id pattern",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+02. Request context query with inappropriate value parameter in payload.
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 105
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400",
+        "details": "invalid regex for entity id pattern",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+03. Request context query with inappropriate value parameter in payload.
 ========================================================================
 HTTP/1.1 200 OK
 Content-Length: 105
