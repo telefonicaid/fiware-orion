@@ -44,6 +44,7 @@ pages:
   - 'Installation & Administration Manual':
       - 'Introduction': 'admin/index.md'
       - 'Installing Orion': 'admin/install.md'
+      - 'Using Yum repositories': 'admin/yum.md'
       - 'Building from Sources': 'admin/build_source.md'
       - 'Running Orion as system service': 'admin/running.md'
       - 'Running Orion from command line': 'admin/cli.md'

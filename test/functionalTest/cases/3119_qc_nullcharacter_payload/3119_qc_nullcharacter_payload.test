@@ -1,0 +1,142 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Inappropriate parameter in query context payload.
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Request context query with inappropriate value parameter in payload.
+#
+echo "01. Request context query with inappropriate value parameter in payload."
+echo "========================================================================"
+payload='{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "true",
+            "id": "\u0000"
+        }
+    ]
+}'
+orionCurl --url '/v1/queryContext' --payload "$payload"
+echo
+echo
+
+#
+# 02. Request context query with inappropriate value parameter in payload.
+#
+
+echo "02. Request context query with inappropriate value parameter in payload."
+echo "========================================================================"
+payload='{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "true",
+            "id": "Room\u0000"
+        }
+    ]
+}'
+orionCurl --url '/v1/queryContext' --payload "$payload"
+echo
+echo
+
+#
+# 03. Request context query with inappropriate value parameter in payload.
+#
+
+echo "03. Request context query with inappropriate value parameter in payload."
+echo "========================================================================"
+payload='{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "true",
+            "id": "R\u0000oom"
+        }
+    ]
+}'
+orionCurl --url '/v1/queryContext' --payload "$payload"
+echo
+echo
+
+--REGEXPECT--
+01. Request context query with inappropriate value parameter in payload.
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 105
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400",
+        "details": "invalid regex for entity id pattern",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+02. Request context query with inappropriate value parameter in payload.
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 105
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400",
+        "details": "invalid regex for entity id pattern",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+03. Request context query with inappropriate value parameter in payload.
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 105
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400",
+        "details": "invalid regex for entity id pattern",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
