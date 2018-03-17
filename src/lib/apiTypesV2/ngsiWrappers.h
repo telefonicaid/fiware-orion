@@ -30,7 +30,7 @@
 
 #include "apiTypesV2/Subscription.h"  // EntID
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/NotifyConditionVector.h"
 
 

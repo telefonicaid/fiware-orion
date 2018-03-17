@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_CACHE_ENTITYINFO_H_
-#define SRC_LIB_CACHE_ENTITYINFO_H_
+#ifndef SRC_LIB_JSONPARSEV2_PARSESTRINGLIST_H_
+#define SRC_LIB_JSONPARSEV2_PARSESTRINGLIST_H_
 
 /*
 *
-* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,38 +25,25 @@
 *
 * Author: Ken Zangelin
 */
-#include <regex.h>
 #include <string>
 
-namespace orion
-{
+#include "rapidjson/document.h"
+
+#include "rest/ConnectionInfo.h"
+#include "ngsi/StringList.h"
+
 
 
 /* ****************************************************************************
 *
-* EntityInfo - 
-*
-* The struct fields:
-* -------------------------------------------------------------------------------
-* o entityIdPattern      regex describing EntityId::id (OMA NGSI type)
-* o entityType           string containing the type of the EntityId
-*
+* parseStringList -
 */
-typedef struct EntityInfo
-{
-  regex_t       entityIdPattern;
-  std::string   entityType;
-  bool          entityIdPatternToBeFreed;
+extern std::string parseStringList
+(
+  ConnectionInfo*                               ciP,
+  const rapidjson::Value::ConstMemberIterator&  iter,
+  StringList*                                   sP,
+  const std::string&                            fieldName
+);
 
-  EntityInfo() {}
-  EntityInfo(const std::string& idPattern, const std::string& _entityType);
-  ~EntityInfo() { release(); }
-
-  bool          match(const std::string& idPattern, const std::string& type);
-  void          release(void);
-  void          present(const std::string& prefix);
-} EntityInfo;
-
-}  // namespace orion
-
-#endif  // SRC_LIB_CACHE_ENTITYINFO_H_
+#endif  // SRC_LIB_JSONPARSEV2_PARSESTRINGLIST_H_

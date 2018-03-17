@@ -1152,7 +1152,7 @@ static bool addTriggeredSubscriptions_withCache
     //           Perhaps CachedSubscription should include an AttributeList (cSubP->attributes)
     //           instead of its std::vector<std::string> ... ?
     //
-    AttributeList aList;
+    StringList aList;
 
     aList.fill(cSubP->attributes);
 
@@ -1712,7 +1712,7 @@ static bool addTriggeredSubscriptions
 static bool processOnChangeConditionForUpdateContext
 (
   ContextElementResponse*          notifyCerP,
-  const AttributeList&             attrL,
+  const StringList&                attrL,
   const std::vector<std::string>&  metadataV,
   std::string                      subId,
   RenderFormat                     renderFormat,
@@ -2093,7 +2093,7 @@ static bool processSubscriptions
                                                                 tenant,
                                                                 xauthToken,
                                                                 fiwareCorrelator,
-                                                                tSubP->attrL.attributeV,
+                                                                tSubP->attrL.stringV,
                                                                 tSubP->httpInfo,
                                                                 tSubP->blacklist);
 
@@ -3073,7 +3073,7 @@ static void searchContextProviders
 {
   ContextRegistrationResponseVector  crrV;
   EntityIdVector                     enV;
-  AttributeList                      attrL;
+  StringList                         attrL;
   std::string                        err;
 
   /* Fill input data for registrationsQuery() */
@@ -3105,7 +3105,7 @@ static void searchContextProviders
   }
 
   /* Second CPr lookup (in the case some element stills not being found): looking in E-<null> registrations */
-  AttributeList attrNullList;
+  StringList attrNullList;
   if (someContextElementNotFound(*cerP))
   {
     if (registrationsQuery(enV, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
@@ -3266,7 +3266,7 @@ static void updateEntity
   }
 
   /* Build CER used for notifying (if needed) */
-  AttributeList            emptyAttrL;
+  StringList               emptyAttrL;
   ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL);
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not

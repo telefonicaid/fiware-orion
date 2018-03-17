@@ -28,7 +28,7 @@
 #include <string>
 
 #include "ngsi/Request.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Restriction.h"
 #include "rest/EntityTypeInfo.h"
@@ -50,16 +50,16 @@ class BatchQuery;
 typedef struct QueryContextRequest
 {
   EntityIdVector    entityIdVector; // Mandatory
-  AttributeList     attributeList;  // Optional
+  StringList        attributeList;  // Optional
   Restriction       restriction;    // Optional
 
   int               restrictions;
-  AttributeList     metadataList;     // From URI param 'metadata'
+  StringList        metadataList;     // From URI param 'metadata'
   std::string       contextProvider;  // Not part of the payload - used internally only
 
   QueryContextRequest();
   QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName);
-  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const AttributeList& attributeList);
+  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const StringList& attributeList);
 
   std::string   render(void);
   std::string   check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError);

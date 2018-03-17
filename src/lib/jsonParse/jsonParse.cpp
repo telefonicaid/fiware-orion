@@ -378,7 +378,7 @@ static std::string jsonParse
 
   boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;
   int                         noOfChildren = subtree.size();
-  if ((isCompoundPath(path.c_str()) == true) && (nodeValue == "") && (noOfChildren != 0))
+  if ((isCompoundPath(path.c_str()) == true) && (nodeValue == "") && (noOfChildren != 0) && (treated == true))
   {
 
     LM_T(LmtCompoundValue, ("Calling eatCompound for '%s'", path.c_str()));

@@ -29,7 +29,7 @@
 #include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Restriction.h"
 #include "ngsi10/QueryContextResponse.h"
@@ -77,7 +77,7 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 *
 * QueryContextRequest::QueryContextRequest
 */
-QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const AttributeList& _attributeList)
+QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const StringList& _attributeList)
 {
   contextProvider = _contextProvider;
 
@@ -104,7 +104,7 @@ std::string QueryContextRequest::render(void)
 
   out += startTag();
   out += entityIdVector.render(commaAfterEntityIdVector);
-  out += attributeList.render(commaAfterAttributeList);
+  out += attributeList.render(commaAfterAttributeList, "attributes");
   out += restriction.render(restrictions, false);
   out += endTag();
 
@@ -242,7 +242,7 @@ void QueryContextRequest::fill(BatchQuery* bqP)
     entityIdVector.push_back(eP);
   }
 
-  attributeList.fill(bqP->attributeV.attributeV);
+  attributeList.fill(bqP->attributeV.stringV);
   restriction.scopeVector.fill(bqP->scopeV, false);  // false: DO NOT ALLOCATE NEW scopes - reference the 'old' ones
   bqP->scopeV.vec.clear();  // QueryContextRequest::restriction.scopeVector has taken over the Scopes from bqP
 }

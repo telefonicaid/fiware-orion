@@ -419,7 +419,7 @@ HttpStatusCode mongoQueryContext
   }
 
   /* Second CPr lookup (in the case some element stills not being found): looking in E-<null> registrations */
-  AttributeList attrNullList;
+  StringList attrNullList;
 
   if (someContextElementNotFound(rawCerV))
   {

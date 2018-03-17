@@ -30,7 +30,7 @@ commands that require root privilege):
 
         sudo yum install boost-devel libcurl-devel gnutls-devel libgcrypt-devel openssl-devel libuuid-devel
 
-* Install the Mongo Driver from source:
+* Install the Mongo Driver from source. The following procedure corresponds with default installation, if you want to include SASL and SSL support use [this alternative procedure](#building-mongodb-driver-with-sasl-and-ssl-support) instead.
 
         wget https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz
         tar xfvz legacy-1.1.2.tar.gz
@@ -130,6 +130,18 @@ You can generate the RPM for the source code (optional):
         make rpm
 
 * The generated RPMs are placed in directory `~/rpmbuild/RPMS/x86_64`.
+
+### Building MongoDB driver with SASL and SSL support
+
+The procedure is as follows:
+
+```
+wget https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz
+tar xfvz legacy-1.1.2.tar.gz cd mongo-cxx-driver-legacy-1.1.2
+yum install cyrus-sasl-devel
+scons --use-sasl-client --ssl                                   # The build/linux2/normal/libmongoclient.a library is generated as outcome
+sudo scons install --prefix=/usr/local --use-sasl-client --ssl  # This puts .h files in /usr/local/include/mongo and libmongoclient.a in /usr/local/lib
+```
 
 ## Others
 

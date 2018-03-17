@@ -4,3 +4,5 @@
 - Fix: bug in GTE and LTE operations in query filters (q/mq), both for GET operations and subscriptions (#2995)
 - Fix: Wrong "max one service-path allowed for subscriptions" in NGSIv2 subscription operation (#2948)
 - Fix: Bug that may contextBroker to crash when passing inappropriate parameter in query context payload (#3055)
+- Fix: Invalid description in POST /op/query error response (#2991)
+- Fix: Bug that may cause contextBroker to crash when passing inappropriate parameter in query context payload (#3055)

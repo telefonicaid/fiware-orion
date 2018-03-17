@@ -29,7 +29,7 @@
 
 #include "ngsi/Request.h"
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/Restriction.h"
 #include "rest/EntityTypeInfo.h"
 
@@ -42,7 +42,7 @@
 typedef struct DiscoverContextAvailabilityRequest
 {
   EntityIdVector       entityIdVector; // Mandatory
-  AttributeList        attributeList;  // Optional
+  StringList           attributeList;  // Optional
   Restriction          restriction;    // Optional
 
   int                  restrictions;  // Auxiliar - the parameter for check should be removed

@@ -49,7 +49,7 @@
 #include "apiTypesV2/HttpInfo.h"
 
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/ContextElementResponseVector.h"
 #include "ngsi/Duration.h"
 #include "ngsi/Restriction.h"
@@ -65,8 +65,8 @@
 #include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/compoundResponses.h"
 #include "mongoBackend/MongoGlobal.h"
-
-#ifdef MONGO_CXX_11_DRIVER
+#define MONGO_CXX_DRIVER
+#ifdef MONGO_CXX_DRIVER
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/v_noabi/bsoncxx/json.hpp>
 #include <mongocxx/client.hpp>
@@ -220,6 +220,12 @@ void mongoInit
   bool         mutexTimeStat
 )
 {
+
+#ifdef MONGO_CXX_DRIVER
+  mongocxx::instance inst{};
+  mongocxx::client conn{mongocxx::uri{}};
+  bsoncxx::builder::stream::document document{};
+#else
   double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
 
   if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo, writeConcern, dbPoolSize, mutexTimeStat))
@@ -263,6 +269,7 @@ void mongoInit
       ensureLocationIndex(tenant);
     }
   }
+  #endif
 }
 
 
@@ -313,12 +320,6 @@ bool mongoStart
   alreadyDone = true;
 
   multitenant = _multitenant;
-
-#ifdef MONGO_CXX_11_DRIVER
- mongocxx::instance inst{};
- mongocxx::client conn{mongocxx::uri{}};
- bsoncxx::builder::stream::document document{};
-#endif
 
   mongo::Status status = mongo::client::initialize();
   if (!status.isOK())
@@ -761,7 +762,7 @@ bool includedEntity(EntityId en, const EntityIdVector& entityIdV)
 *
 * includedAttribute -
 */
-bool includedAttribute(const ContextRegistrationAttribute& attr, const AttributeList& attrsV)
+bool includedAttribute(const ContextRegistrationAttribute& attr, const StringList& attrsV)
 {
   //
   // This is the case in which the discoverAvailabilityRequest doesn't include attributes,
@@ -1216,8 +1217,8 @@ static bool isCustomAttr(std::string attrName)
 bool entitiesQuery
 (
   const EntityIdVector&            enV,
-  const AttributeList&             attrL,
-  const AttributeList&             metadataList,
+  const StringList&                attrL,
+  const StringList&                metadataList,
   const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
@@ -1684,7 +1685,7 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
 *
 * processAttribute -
 */
-static void processAttribute(ContextRegistrationResponse* crr, const AttributeList& attrL, const BSONObj& attribute)
+static void processAttribute(ContextRegistrationResponse* crr, const StringList& attrL, const BSONObj& attribute)
 {
   ContextRegistrationAttribute attr(
     getStringFieldF(attribute, REG_ATTRS_NAME),
@@ -1711,7 +1712,7 @@ static void processContextRegistrationElement
 (
   BSONObj                             cr,
   const EntityIdVector&               enV,
-  const AttributeList&                attrL,
+  const StringList&                   attrL,
   ContextRegistrationResponseVector*  crrV,
   MimeType                            mimeType
 )
@@ -1779,7 +1780,7 @@ static void processContextRegistrationElement
 bool registrationsQuery
 (
   const EntityIdVector&               enV,
-  const AttributeList&                attrL,
+  const StringList&                   attrL,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
   const std::string&                  tenant,
@@ -2028,9 +2029,9 @@ EntityIdVector subToEntityIdVector(const BSONObj& sub)
 * Extract the attribute list from a BSON document (in the format of the csubs/casub
 * collection)
 */
-AttributeList subToAttributeList(const BSONObj& sub)
+StringList subToAttributeList(const BSONObj& sub)
 {
-  AttributeList             attrL;
+  StringList                attrL;
   std::vector<BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
 
   for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
@@ -2093,7 +2094,7 @@ static void setOnSubscriptionMetadata(ContextElementResponseVector* cerVP)
 static bool processOnChangeConditionForSubscription
 (
   const EntityIdVector&            enV,
-  const AttributeList&             attrL,
+  const StringList&                attrL,
   const std::vector<std::string>&  metadataV,
   ConditionValueList*              condValues,
   const std::string&               subId,
@@ -2111,8 +2112,8 @@ static bool processOnChangeConditionForSubscription
   std::string                   err;
   NotifyContextRequest          ncr;
   ContextElementResponseVector  rawCerV;
-  AttributeList                 emptyList;
-  AttributeList                 metadataList;
+  StringList                    emptyList;
+  StringList                    metadataList;
 
   metadataList.fill(metadataV);
   if (!blacklist && !entitiesQuery(enV, attrL, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
@@ -2238,7 +2239,7 @@ static BSONArray processConditionVector
 (
   NotifyConditionVector*           ncvP,
   const EntityIdVector&            enV,
-  const AttributeList&             attrL,
+  const StringList&                attrL,
   const std::vector<std::string>&  metadataV,
   const std::string&               subId,
   const HttpInfo&                  httpInfo,
@@ -2328,7 +2329,7 @@ BSONArray processConditionVector
 {
   NotifyConditionVector ncV;
   EntityIdVector        enV;
-  AttributeList         attrL;
+  StringList            attrL;
 
   attrsStdVector2NotifyConditionVector(condAttributesV, &ncV);
   entIdStdVector2EntityIdVector(entitiesV, &enV);
@@ -2399,7 +2400,7 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
 bool processAvailabilitySubscription
 (
   const EntityIdVector& enV,
-  const AttributeList&  attrL,
+  const StringList&     attrL,
   const std::string&    subId,
   const std::string&    notifyUrl,
   RenderFormat          renderFormat,

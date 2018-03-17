@@ -31,7 +31,7 @@
 #include "common/globals.h"
 #include "ngsi/ContextElement.h"
 #include "ngsi/StatusCode.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -60,7 +60,7 @@ typedef struct ContextElementResponse
   ContextElementResponse(EntityId* eP, ContextAttribute* aP);
   ContextElementResponse(ContextElementResponse* cerP);
   ContextElementResponse(const mongo::BSONObj&  entityDoc,
-                         const AttributeList&   attrL,
+                         const StringList&      attrL,
                          bool                   includeEmpty = true,
                          ApiVersion             apiVersion   = V1);
   ContextElementResponse(ContextElement* ceP, bool useDefaultType = false);

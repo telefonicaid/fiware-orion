@@ -29,7 +29,7 @@
 
 #include "common/RenderFormat.h"
 #include "ngsi/Request.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Duration.h"
 #include "ngsi/NotifyConditionVector.h"
@@ -48,7 +48,7 @@
 typedef struct SubscribeContextRequest
 {
   EntityIdVector         entityIdVector;         // Mandatory
-  AttributeList          attributeList;          // Optional
+  StringList             attributeList;          // Optional
   Reference              reference;              // Mandatory
   Duration               duration;               // Optional
   Restriction            restriction;            // Optional

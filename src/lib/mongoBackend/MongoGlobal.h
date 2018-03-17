@@ -40,7 +40,7 @@
 #include "ngsi/ContextRegistrationAttribute.h"
 #include "ngsi/ContextAttribute.h"
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/ContextElementResponseVector.h"
 #include "ngsi/ConditionValueList.h"
 #include "ngsi/Restriction.h"
@@ -293,7 +293,7 @@ extern bool includedEntity(EntityId en, const EntityIdVector& entityIdV);
 *
 * includedAttribute -
 */
-extern bool includedAttribute(const ContextRegistrationAttribute& attr, const AttributeList& attrsV);
+extern bool includedAttribute(const ContextRegistrationAttribute& attr, const StringList& attrsV);
 
 
 
@@ -313,8 +313,8 @@ extern bool processAreaScopeV2(const Scope* scoP, mongo::BSONObj* areaQueryP);
 extern bool entitiesQuery
 (
   const EntityIdVector&            enV,
-  const AttributeList&             attrL,
-  const AttributeList&             metadataList,
+  const StringList&                attrL,
+  const StringList&                metadataList,
   const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
@@ -346,7 +346,7 @@ extern void pruneContextElements(const ContextElementResponseVector& oldCerV, Co
 extern bool registrationsQuery
 (
   const EntityIdVector&               enV,
-  const AttributeList&                attrL,
+  const StringList&                   attrL,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
   const std::string&                  tenant,
@@ -384,7 +384,7 @@ extern EntityIdVector subToEntityIdVector(const mongo::BSONObj& sub);
 *
 * Extract the attribute list from a BSON document (in the format of the csubs collection)
 */
-extern AttributeList subToAttributeList(const mongo::BSONObj& attrL);
+extern StringList subToAttributeList(const mongo::BSONObj& attrL);
 
 
 
@@ -422,7 +422,7 @@ extern mongo::BSONArray processConditionVector
 */
 extern bool processAvailabilitySubscription(
     const EntityIdVector& enV,
-    const AttributeList&  attrL,
+    const StringList&     attrL,
     const std::string&    subId,
     const std::string&    notifyUrl,
     RenderFormat          renderFormat,

@@ -25,7 +25,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 
 #include "unittest.h"
 
@@ -37,19 +37,19 @@
 */
 TEST(DISABLED_AttributeList, ok)
 {
-  AttributeList  al;
+  StringList     al;
   std::string    out;
   const char*    outfile1 = "ngsi.attributeList.ok.middle.json";
 
   utInit();
 
-  out = al.render(false);
+  out = al.render(false, "attributes");
   EXPECT_STREQ("", out.c_str());
 
   al.push_back("a1");
   al.push_back("a2");
   
-  out = al.render(false);
+  out = al.render(false, "attributes");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

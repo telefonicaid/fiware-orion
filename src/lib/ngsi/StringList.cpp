@@ -32,19 +32,19 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/string.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 
 
 
 /* ****************************************************************************
 *
-* AttributeList::fill - 
+* StringList::fill -
 */
-void AttributeList::fill(const std::vector<std::string>& aVec)
+void StringList::fill(const std::vector<std::string>& sVec)
 {
-  for (unsigned int ix = 0; ix < aVec.size(); ++ix)
+  for (unsigned int ix = 0; ix < sVec.size(); ++ix)
   {
-    attributeV.push_back(aVec[ix]);
+    stringV.push_back(sVec[ix]);
   }
 }
 
@@ -52,11 +52,11 @@ void AttributeList::fill(const std::vector<std::string>& aVec)
 
 /* ****************************************************************************
 *
-* AttributeList::fill - 
+* StringList::fill -
 */
-void AttributeList::fill(const std::string& commaSeparatedList)
+void StringList::fill(const std::string& commaSeparatedList)
 {
-  stringSplit(commaSeparatedList, ',', attributeV);
+  stringSplit(commaSeparatedList, ',', stringV);
 }
 
 
@@ -65,20 +65,20 @@ void AttributeList::fill(const std::string& commaSeparatedList)
 *
 * render - 
 */
-std::string AttributeList::render(bool comma)
+std::string StringList::render(bool comma, const std::string& fieldName)
 {
   std::string  out = "";
 
-  if (attributeV.size() == 0)
+  if (stringV.size() == 0)
   {
     return "";
   }
 
-  out += startTag("attributes", true);
+  out += startTag(fieldName, true);
 
-  for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
+  for (unsigned int ix = 0; ix < stringV.size(); ++ix)
   {
-    out += valueTag("attribute", attributeV[ix], ix != attributeV.size() - 1, true);
+    out += valueTag(fieldName, stringV[ix], ix != stringV.size() - 1, true);
   }
 
   out += endTag(comma, true);
@@ -90,15 +90,15 @@ std::string AttributeList::render(bool comma)
 
 /* ****************************************************************************
 *
-* AttributeList::check - 
+* StringList::check -
 */
-std::string AttributeList::check(void)
+std::string StringList::check(void)
 {
-  for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
+  for (unsigned int ix = 0; ix < stringV.size(); ++ix)
   {
-    if (attributeV[ix] == "")
+    if (stringV[ix] == "")
     {
-      return "empty attribute name";
+      return "empty string";
     }
   }
 
@@ -109,17 +109,17 @@ std::string AttributeList::check(void)
 
 /* ****************************************************************************
 *
-* AttributeList::present - 
+* StringList::present -
 */
-void AttributeList::present(const std::string& indent)
+void StringList::present(const std::string& indent)
 {
-  LM_T(LmtPresent, ("%sAttribute List",    indent.c_str()));
+  LM_T(LmtPresent, ("%String List",    indent.c_str()));
 
-  for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
+  for (unsigned int ix = 0; ix < stringV.size(); ++ix)
   {
     LM_T(LmtPresent, ("%s  %s", 
 		      indent.c_str(), 
-		      attributeV[ix].c_str()));
+			  stringV[ix].c_str()));
   }
 }
 
@@ -127,11 +127,11 @@ void AttributeList::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* AttributeList::release - 
+* StringList::release -
 */
-void AttributeList::release(void)
+void StringList::release(void)
 {
-  attributeV.clear();
+ stringV.clear();
 }
 
 
@@ -140,11 +140,11 @@ void AttributeList::release(void)
 *
 * lookup - 
 */
-bool AttributeList::lookup(const std::string& attributeName) const
+bool StringList::lookup(const std::string& string) const
 {
-  for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
+  for (unsigned int ix = 0; ix < stringV.size(); ++ix)
   {
-    if (attributeV[ix] == attributeName)
+    if (stringV[ix] == string)
     {
       return true;
     }
@@ -159,9 +159,9 @@ bool AttributeList::lookup(const std::string& attributeName) const
 *
 * push_back - 
 */
-void AttributeList::push_back(const std::string& attributeName)
+void StringList::push_back(const std::string& string)
 {
-  attributeV.push_back(attributeName);
+  stringV.push_back(string);
 }
 
 
@@ -170,11 +170,11 @@ void AttributeList::push_back(const std::string& attributeName)
 *
 * push_back_if_absent - 
 */
-void AttributeList::push_back_if_absent(const std::string& attributeName)
+void StringList::push_back_if_absent(const std::string& string)
 {
-  if (lookup(attributeName) == false)
+  if (lookup(string) == false)
   {
-    attributeV.push_back(attributeName);
+    stringV.push_back(string);
   }
 }
 
@@ -182,11 +182,11 @@ void AttributeList::push_back_if_absent(const std::string& attributeName)
 
 /* ****************************************************************************
 *
-* AttributeList::size - 
+* StringList::size -
 */
-unsigned int AttributeList::size(void) const
+unsigned int StringList::size(void) const
 {
-  return attributeV.size();
+  return stringV.size();
 }
 
 
@@ -195,29 +195,29 @@ unsigned int AttributeList::size(void) const
 
 /* ****************************************************************************
 *
-* AttributeList::clone - 
+* StringList::clone -
 */
-void AttributeList::clone(const AttributeList& aList)
+void StringList::clone(const StringList& sList)
 {
-  for (unsigned int ix = 0; ix < aList.size(); ++ix)
+  for (unsigned int ix = 0; ix < sList.size(); ++ix)
   {
-    push_back(aList[ix]);
+    push_back(sList[ix]);
   }
 }
 
 
 /* ****************************************************************************
 *
-* AttributeList::toString - 
+* StringList::toString -
 */
-std::string AttributeList::toString(void)
+std::string StringList::toString(void)
 {
   std::string out;
 
-  for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
+  for (unsigned int ix = 0; ix < stringV.size(); ++ix)
   {
-    out += attributeV[ix];
-    if (ix < attributeV.size() - 1)
+    out += stringV[ix];
+    if (ix < stringV.size() - 1)
     {
       out += ",";
     }

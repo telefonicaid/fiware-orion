@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_NGSI_ATTRIBUTELIST_H_
-#define SRC_LIB_NGSI_ATTRIBUTELIST_H_
+#ifndef SRC_LIB_NGSI_STRINGLIST_H_
+#define SRC_LIB_NGSI_STRINGLIST_H_
 
 /*
 *
@@ -35,36 +35,36 @@
 
 /* ****************************************************************************
 *
-* AttributeList -
+* StringList -
 */
-typedef struct AttributeList
+typedef struct StringList
 {
-  std::vector<std::string>  attributeV;
+  std::vector<std::string>  stringV;
 
   void         fill(const std::vector<std::string>& aVec);
   void         fill(const std::string& commaSeparatedList);
-  std::string  render(bool comma);
+  std::string  render(bool comma, const std::string& fieldName);
   std::string  toString(void);
   void         present(const std::string& indent);
   void         release(void);
-  bool         lookup(const std::string& attributeName) const;
-  void         push_back(const std::string& attributeName);
-  void         push_back_if_absent(const std::string& attributeName);
+  bool         lookup(const std::string& string) const;
+  void         push_back(const std::string& string);
+  void         push_back_if_absent(const std::string& string);
   unsigned int size(void) const;
-  void         clone(const AttributeList& aList);
+  void         clone(const StringList& sList);
 
   std::string  check(void);
 
   std::string  operator[](unsigned int ix)  const
   {
-    return attributeV[ix];
+    return stringV[ix];
   }
 
   std::string  get(unsigned int ix)  const
   {
-    return attributeV[ix];
+    return stringV[ix];
   }
 
-} AttributeList;
+} StringList;
 
-#endif  // SRC_LIB_NGSI_ATTRIBUTELIST_H_
+#endif  // SRC_LIB_NGSI_STRINGLIST_H_

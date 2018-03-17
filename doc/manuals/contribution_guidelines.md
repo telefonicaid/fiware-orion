@@ -159,7 +159,7 @@ descriptive list of its parameters, and its return values.
 
 Example:
 
-```    
+```
 /* ****************************************************************************
 *
 * parseUrl - parse a URL and return its pieces
@@ -435,7 +435,7 @@ directly or indirectly are forced to have that construct as well.
 
 #### S2 (Object action naming convention):
 
-*Rule*: “objectAction” SHOULD be used, eg.:
+*Rule*: "objectAction" SHOULD be used, eg.:
 
 ```
 listInit()
@@ -449,6 +449,9 @@ initList()
 resetList()
 findList()
 ```
+
+This rule is applied to variable names, function names and even file names (for files which
+contain only one external function so the name of the file is the name of the function).
 
 *Rationale*: a set of functions are ‘grouped’ thanks to their prefix (“object”, in the example: “list”).
 
@@ -677,7 +680,7 @@ X:X(int _i, float _f):  i(_i), f(_f)
 Y:Y(const std::string& _fooName, const std::string& _myLongFooName):
   fooName(_fooName),
   myLongFooName(_myLongFooName)
-{            
+{
 }
 ```
 
@@ -722,6 +725,28 @@ In C++ it gets a a bit weird and it is better to avoid this by adding a helper v
 The difference between "C pointers" and "C++ references" is minimal, but really, it depends on the implementation of the compiler.
 See [this question](https://stackoverflow.com/questions/44239212/how-do-c-compilers-actually-pass-literal-constant-in-reference-parameters) and 
 [this one](https://stackoverflow.com/questions/2936805/how-do-c-compilers-actually-pass-reference-parameters) in stackoverflow, for discussions on this. 
+
+*How to check*: manually
+
+#### S15 (Error output parameter at the end)
+
+*Rule*: in the case a function uses an output parameter to potencially provide error output to the caller, that
+parameter SHOULD be declared at the end of the parameters list, e.g.:
+
+```
++void mongoRegistrationGet
+(
+  ngsiv2::Registration*  regP,
+  const std::string&     regId,
+  const std::string&     tenant,
+  const std::string&     servicePath,
+  OrionError*            oeP
+);
+
+void myFunction(const std::string s, std::string* err);
+```
+
+*Rationale*: the code gets more ordered this way.
 
 *How to check*: manually
 
