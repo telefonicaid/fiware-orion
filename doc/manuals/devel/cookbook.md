@@ -106,7 +106,7 @@ Note the right-most column saying `(environment variable)` for the `-fg` option.
 [Top](#top)
 
 ## Adding a REST service
-The REST services that the Orion Context Broker supports are items in the seven `RestService` vectors `restServiceV`, found in [orionRestServices.cpp](sourceCode.md#srcappcontextbroker). There are one service vector per HTTP Method/Verb that Orion supports: GET, PUT, POST, PATCH, DELETE, OPTIONS, plus a special vector for 'bad verb'. The set of services that are supported pretty much defines the role and by starting the REST interface with one `RestService` vector or another defines what the broker is able to do, all its services are included in these seven vectors.
+The REST services that the Orion Context Broker supports are items in the seven `RestService` vectors `restServiceV`, found in [orionRestServices.cpp](sourceCode.md#srcappcontextbroker). There is one service vector per HTTP Method/Verb that Orion supports: GET, PUT, POST, PATCH, DELETE, OPTIONS, plus a special vector for 'bad verb'. The set of services that are supported pretty much defines the role and by starting the REST interface with one `RestService` vector or another defines what the broker is able to do, all its services are included in these seven vectors.
 
 To add a REST service to Orion, a new item in `RestService xxxServiceV[]` (`xxx` being the verb of the service (`get`, `put`, etc) is needed. Just like with CLI parameters, the easiest way is to copy an old service (an item in `xxxServiceV`) and then modify the copy to suit your needs.
 
