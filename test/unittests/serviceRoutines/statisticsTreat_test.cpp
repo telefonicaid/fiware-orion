@@ -72,7 +72,7 @@ TEST(statisticsTreat, delete)
 
   utInit();
 
-  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);  
+  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);
 
   ci.outMimeType = JSON;
   out            = orion::requestServe(&ci);
@@ -95,7 +95,7 @@ TEST(statisticsTreat, get)
 
   utInit();
 
-  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);  
+  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);
 
   ci.outMimeType = JSON;
   out            = orion::requestServe(&ci);
@@ -118,7 +118,7 @@ TEST(statisticsTreat, deleteCache)
 
   utInit();
 
-  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);  
+  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);
 
   ci.outMimeType = JSON;
   out            = orion::requestServe(&ci);
@@ -141,7 +141,7 @@ TEST(statisticsTreat, getCache)
 
   utInit();
 
-  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);  
+  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);
 
   ci.outMimeType = JSON;
   out            = orion::requestServe(&ci);
@@ -164,7 +164,7 @@ TEST(statisticsTreat, badVerb)
 
   utInit();
 
-  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);  
+  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);
 
   out = orion::requestServe(&ci);
 
