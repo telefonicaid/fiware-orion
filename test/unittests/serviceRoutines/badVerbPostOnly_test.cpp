@@ -56,7 +56,7 @@ TEST(badVerbPostOnly, ok)
 
   serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, badVerbV);
   out = orion::requestServe(&ci);
-  
+
   EXPECT_EQ(expected, out);
   EXPECT_EQ("Allow", ci.httpHeader[0]);
   EXPECT_EQ("POST",  ci.httpHeaderValue[0]);

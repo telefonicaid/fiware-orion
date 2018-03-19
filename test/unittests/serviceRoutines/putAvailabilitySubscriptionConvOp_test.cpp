@@ -72,7 +72,7 @@ static RestService badVerbV[] =
 
 /* ****************************************************************************
 *
-* put - 
+* put -
 */
 TEST(putAvailabilitySubscriptionConvOp, put)
 {
@@ -82,7 +82,7 @@ TEST(putAvailabilitySubscriptionConvOp, put)
 
   utInit();
 
-  serviceVectorsSet(NULL, putV, postV, NULL, deleteV, NULL, badVerbV);  
+  serviceVectorsSet(NULL, putV, postV, NULL, deleteV, NULL, badVerbV);
   out = orion::requestServe(&ci1);
 
   EXPECT_EQ("", out);
