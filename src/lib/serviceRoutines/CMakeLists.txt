@@ -99,6 +99,7 @@ getEntityByIdAttributeByNameWithTypeAndId.cpp
 postEntityByIdAttributeByNameWithTypeAndId.cpp
 postSubscribeContextConvOp.cpp
 postSubscribeContextAvailabilityConvOp.cpp
+optionsVersionRequest.cpp
 )
 
 SET (HEADERS
@@ -166,6 +167,7 @@ postContextEntitiesByEntityIdAndType.h
 getEntityByIdAttributeByNameWithTypeAndId.h
 postEntityByIdAttributeByNameWithTypeAndId.h
 postSubscribeContextConvOp.h
+optionsVersionRequest.h
 )
 
 
