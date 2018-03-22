@@ -552,7 +552,7 @@ void orionRestServicesInit
    const char*         httpsCert
 )
 {
-  //Use options service vector (optionsServiceV) only when CORS is enabled
+  // Use options service vector (optionsServiceV) only when CORS is enabled
   RestService* optionsServiceV  = (strlen(allowedOrigin) > 0) ? optionsV : NULL;
 
   restInit(getServiceV,

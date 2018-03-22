@@ -84,7 +84,7 @@ std::string versionTreat
   if (isOriginAllowedForCORS(ciP->httpHeaders.origin))
   {
     ciP->httpHeader.push_back(ACCESS_CONTROL_ALLOW_ORIGIN);
-    // If any origin is allowed, the header is sent always with "any" as value
+    // If any origin is allowed, the header is always sent with the value "*"
     if (strcmp(corsOrigin, "__ALL") == 0)
     {
       ciP->httpHeaderValue.push_back("*");

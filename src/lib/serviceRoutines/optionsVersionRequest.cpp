@@ -50,7 +50,8 @@ std::string optionsVersionRequest
   if (isOriginAllowedForCORS(ciP->httpHeaders.origin))
   {
     ciP->httpHeader.push_back(ACCESS_CONTROL_ALLOW_ORIGIN);
-    // If any origin is allowed, the header is sent always with "any" as value
+
+    // If any origin is allowed, the header is always sent with the value "*"
     if (strcmp(corsOrigin, "__ALL") == 0)
     {
       ciP->httpHeaderValue.push_back("*");
@@ -60,17 +61,22 @@ std::string optionsVersionRequest
     {
       ciP->httpHeaderValue.push_back(corsOrigin);
     }
+
     ciP->httpHeader.push_back(ACCESS_CONTROL_ALLOW_METHODS);
     ciP->httpHeaderValue.push_back("GET, OPTIONS");
+
     ciP->httpHeader.push_back(ACCESS_CONTROL_EXPOSE_HEADERS);
     ciP->httpHeaderValue.push_back(CORS_EXPOSED_HEADERS);
+
     ciP->httpHeader.push_back(ACCESS_CONTROL_ALLOW_HEADERS);
     ciP->httpHeaderValue.push_back(CORS_ALLOWED_HEADERS);
+
     char maxAge[STRING_SIZE_FOR_INT];
     snprintf(maxAge, sizeof(maxAge), "%d", corsMaxAge);
     ciP->httpHeader.push_back(ACCESS_CONTROL_MAX_AGE);
     ciP->httpHeaderValue.push_back(maxAge);
   }
+
   ciP->httpStatusCode = SccOk;
 
   return "";
