@@ -1,0 +1,181 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+# CORS functionality is tested with a collection of test files in this directory.
+# This CORS test focuses on the Access-Control-Allow-Origin header. Other CORS
+# related headers in this test file use REGEX(.*) as value since they are being
+# tested in their respective test files.
+
+--NAME--
+CORS version request
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255 IPV4 -corsOrigin arrakis
+
+--SHELL--
+echo "01. GET Version (Access-Control-Allow-Origin header not included)"
+echo "================================================================="
+orionCurl --url /version --noPayloadCheck
+echo
+echo
+
+echo "02. GET Version with arrakis origin (Access-Control-Allow-Origin header included)"
+echo "================================================================================="
+orionCurl --url /version -X GET --origin arrakis --noPayloadCheck
+echo
+echo
+
+echo "03. GET Version with caladan origin (Access-Control-Allow-Origin header not included)"
+echo "====================================================================================="
+orionCurl --url /version -X GET --origin caladan --noPayloadCheck
+echo
+echo
+
+echo "04. OPTIONS Version (Access-Control-Allow-Origin header not included)"
+echo "====================================================================="
+orionCurl --url /version -X OPTIONS --noPayloadCheck
+echo
+echo
+
+echo "05. OPTIONS Version with arrakis origin (Access-Control-Allow-Origin header included)"
+echo "====================================================================================="
+orionCurl --url /version -X OPTIONS --origin arrakis --noPayloadCheck
+echo
+echo
+
+echo "06. OPTIONS Version with caladan origin (Access-Control-Allow-Origin header not included)"
+echo "========================================================================================="
+orionCurl --url /version -X OPTIONS --origin caladan --noPayloadCheck
+echo
+echo
+
+--REGEXPECT--
+01. GET Version (Access-Control-Allow-Origin header not included)
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+"orion" : {
+  "version" : "REGEX(.*)",
+  "uptime" : "REGEX(.*)",
+  "git_hash" : "REGEX(([0-9a-f]{40}|nogitversion))",
+  "compile_time" : "REGEX(.*)",
+  "compiled_by" : "REGEX(.*)",
+  "compiled_in" : "REGEX(.*)",
+  "release_date" : "REGEX(.*)",
+  "doc" : "REGEX(.*)"
+}
+}
+
+
+
+02. GET Version with arrakis origin (Access-Control-Allow-Origin header included)
+=================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Allow-Origin: arrakis
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+"orion" : {
+  "version" : "REGEX(.*)",
+  "uptime" : "REGEX(.*)",
+  "git_hash" : "REGEX(([0-9a-f]{40}|nogitversion))",
+  "compile_time" : "REGEX(.*)",
+  "compiled_by" : "REGEX(.*)",
+  "compiled_in" : "REGEX(.*)",
+  "release_date" : "REGEX(.*)",
+  "doc" : "REGEX(.*)"
+}
+}
+
+
+
+03. GET Version with caladan origin (Access-Control-Allow-Origin header not included)
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+"orion" : {
+  "version" : "REGEX(.*)",
+  "uptime" : "REGEX(.*)",
+  "git_hash" : "REGEX(([0-9a-f]{40}|nogitversion))",
+  "compile_time" : "REGEX(.*)",
+  "compiled_by" : "REGEX(.*)",
+  "compiled_in" : "REGEX(.*)",
+  "release_date" : "REGEX(.*)",
+  "doc" : "REGEX(.*)"
+}
+}
+
+
+
+04. OPTIONS Version (Access-Control-Allow-Origin header not included)
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+
+05. OPTIONS Version with arrakis origin (Access-Control-Allow-Origin header included)
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: REGEX([0-9]+)
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Allow-Methods: REGEX(.*)
+Access-Control-Allow-Origin: arrakis
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+
+06. OPTIONS Version with caladan origin (Access-Control-Allow-Origin header not included)
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

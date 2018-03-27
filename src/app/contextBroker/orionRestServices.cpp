@@ -139,6 +139,7 @@
 #include "serviceRoutinesV2/optionsGetPutDeleteOnly.h"
 #include "serviceRoutinesV2/optionsGetDeletePatchOnly.h"
 #include "serviceRoutinesV2/optionsPostOnly.h"
+#include "serviceRoutines/optionsVersionRequest.h"
 
 #include "rest/RestService.h"
 #include "rest/rest.h"
@@ -506,9 +507,8 @@ static RestService badVerbV[] =
 
 /* ****************************************************************************
 *
-* optionsV - options service vector to be used if CORS is enabled
+* optionsV - 
 *
-* Adds API_V2_CORS definitions on top of the default service vector (restServiceV)
 */
 static RestService optionsV[] =
 {
@@ -524,6 +524,7 @@ static RestService optionsV[] =
   { IndividualSubscriptionRequest, 3, { "v2", "subscriptions", "*"                   }, "", optionsGetDeletePatchOnly },
   { BatchQueryRequest,             3, { "v2", "op", "query"                          }, "", optionsPostOnly           },
   { BatchUpdateRequest,            3, { "v2", "op", "update"                         }, "", optionsPostOnly           },
+  { VersionRequest,                1, { "version"                                    }, "", optionsVersionRequest     },
 
   ORION_REST_SERVICE_END
 };
@@ -551,6 +552,7 @@ void orionRestServicesInit
    const char*         httpsCert
 )
 {
+  // Use options service vector (optionsServiceV) only when CORS is enabled
   RestService* optionsServiceV  = (strlen(allowedOrigin) > 0) ? optionsV : NULL;
 
   restInit(getServiceV,
