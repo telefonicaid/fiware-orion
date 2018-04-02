@@ -269,8 +269,6 @@ the following aspects:
 * `PATCH /v2/registration/<id>` is not implemented. Thus, registrations cannot be updated
   directly, i.e. updates have to be done deleting and re-creating the registration. Please
   see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3007) about this.
-* `OPTIONS /v2/registrations` and `OPTIONS /v2/registrations/<id>` are not implemented, thus
-  CORS doesn't work for these requests. Please, see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3049) about this.
 * `idPattern` and `typePattern` are not implemented. This is similar to NGSIv1 registrations,
   where isPattern is not implemented.
 * The only valid `supportedForwardingMode` is `all`. Trying to use any other will end
