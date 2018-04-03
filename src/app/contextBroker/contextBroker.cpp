@@ -860,7 +860,9 @@ static const char* validLogLevels[] =
   { "OPTIONS", SSR,         SSR_COMPS_V2,         SSR_COMPS_WORD,          optionsGetPostOnly       }, \
   { "OPTIONS", ISR,         ISR_COMPS_V2,         ISR_COMPS_WORD,          optionsGetDeletePatchOnly}, \
   { "OPTIONS", BQR,         BQR_COMPS_V2,         BQR_COMPS_WORD,          optionsPostOnly          }, \
-  { "OPTIONS", BUR,         BUR_COMPS_V2,         BUR_COMPS_WORD,          optionsPostOnly          }
+  { "OPTIONS", BUR,         BUR_COMPS_V2,         BUR_COMPS_WORD,          optionsPostOnly          }, \
+  { "OPTIONS", REG,         REG_COMPS_V2,         REG_COMPS_WORD,          optionsGetDeleteOnly     }, \
+  { "OPTIONS", REGS,        REGS_COMPS_V2,        REGS_COMPS_WORD,         optionsGetPostOnly       }
 
 
 #define API_V2_REGISTRY                                                                                \
