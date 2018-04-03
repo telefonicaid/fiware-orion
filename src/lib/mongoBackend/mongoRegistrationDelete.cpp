@@ -137,5 +137,5 @@ void mongoRegistrationDelete
   releaseMongoConnection(connection);
   reqSemGive(__FUNCTION__, "Mongo Delete Registration", reqSemTaken);
 
-  oeP->fill(SccOk, "");
+  oeP->fill(SccNoContent, "");
 }
