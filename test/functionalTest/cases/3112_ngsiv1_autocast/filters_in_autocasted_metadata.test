@@ -1,0 +1,230 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Filtering on attribute values created with NGSIv1 autocast
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPV4 -ngsiv1Autocast
+
+--SHELL--
+
+#
+# 01. Create E1 entity, with metadata level = 70, date = 2016-01-12T15:25:00.00Z
+# 02. Create E2 entity, with metadata level = 80, date = 2016-01-12T14:25:00.00Z
+# 03. Create E3 entity, with metadata level = 90, date = 2016-01-12T13:25:00.00Z
+# 04. Query level<85, get E1 and E2
+# 05. Query date<2016-01-12T15:00:00.00Z, get E2 and E3
+#
+# Test is focused in updateContext operation. Note that we have several convenience operations
+# in NGSIv1 to do attribute creation/update, but all them are the end are mapped internally
+# to updateContext so focusing on it we get proper testing coverage
+
+
+echo "01. Create E1 entity, with metadata level = 70, date = 20160112T15:25:00.00Z"
+echo "============================================================================"
+payload='{
+  "contextElements": [
+    {
+      "type": "T",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "A",
+          "type": "T",
+          "value": "foo",
+          "metadatas": [
+            {
+              "name": "level",
+              "type": "Number",
+              "value": "70"
+            },
+            {
+              "name": "date",
+              "type": "ISO8601",
+              "value": "2016-01-12T15:25:00.00Z"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E2 entity, with metadata level = 80, date = 2016-01-12T14:25:00.00Z"
+echo "=============================================================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "T",
+      "id": "E2",
+      "attributes": [
+        {
+          "name": "A",
+          "type": "T",
+          "value": "foo",
+          "metadatas": [
+            {
+              "name": "level",
+              "type": "Number",
+              "value": "80"
+            },
+            {
+              "name": "date",
+              "type": "ISO8601",
+              "value": "2016-01-12T14:25:00.00Z"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo "03. Create E3 entity, with metadata level = 90, date = 2016-01-12T13:25:00.00Z"
+echo "=============================================================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "T",
+      "id": "E3",
+      "attributes": [
+        {
+          "name": "A",
+          "type": "T",
+          "value": "foo",
+          "metadatas": [
+            {
+              "name": "level",
+              "type": "Number",
+              "value": "90"
+            },
+            {
+              "name": "date",
+              "type": "ISO8601",
+              "value": "2016-01-12T13:25:00.00Z"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo "04. Query level<85, get E1 and E2"
+echo "================================="
+orionCurl --url '/v2/entities?mq=A.level<85'
+echo
+echo
+
+
+echo "05. Query date<2016-01-12T15:00:00.00Z, get E2 and E3"
+echo "====================================================="
+orionCurl --url '/v2/entities?mq=A.date<2016-01-12T15:00:00.00Z'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 entity, with metadata level = 70, date = 20160112T15:25:00.00Z
+============================================================================
+HTTP/1.1 200 OK
+Content-Length: 235
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+}
+
+
+02. Create E2 entity, with metadata level = 80, date = 2016-01-12T14:25:00.00Z
+==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 235
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+
+}
+
+
+03. Create E3 entity, with metadata level = 90, date = 2016-01-12T13:25:00.00Z
+==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 235
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+
+}
+
+
+04. Query level<85, get E1 and E2
+=================================
+HTTP/1.1 200 OK
+Content-Length: 297
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+
+]
+
+
+05. Query date<2016-01-12T15:00:00.00Z, get E2 and E3
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 297
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

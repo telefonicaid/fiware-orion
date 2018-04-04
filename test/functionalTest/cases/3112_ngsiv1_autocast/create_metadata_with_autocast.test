@@ -1,0 +1,127 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Create metadata using NGSIv1 autocast functionality
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPV4 -ngsiv1Autocast
+
+--SHELL--
+
+#
+# 01. Create entity with Quantity, Number, Boolean, DateTime and ISO8601 types
+# 02. Get entity using NGSIv2 and check values are right
+#
+# Test is focused in updateContext operation. Note that we have several convenience operations
+# in NGSIv1 to do attribute creation/update, but all them are the end are mapped internally
+# to updateContext so focusing on it we get proper testing coverage
+
+
+echo "01. Create entity with Quantity, Number, Boolean, DateTime and ISO8601 types"
+echo "============================================================================"
+payload='{
+  "contextElements": [
+    {
+      "type": "T",
+      "id": "E",
+      "attributes": [
+        {
+          "name": "A",
+          "type": "T",
+          "value": "foo",
+          "metadatas": [
+            {
+              "name": "N",
+              "type": "Number",
+              "value": "-23"
+            },
+            {
+              "name": "Q",
+              "type": "Quantity",
+              "value": "11.31"
+            },
+            {
+              "name": "B",
+              "type": "Boolean",
+              "value": "true"
+            },
+            {
+              "name": "D",
+              "type": "DateTime",
+              "value": "2016-01-12T15:25:00.00Z"
+            },
+            {
+              "name": "I",
+              "type": "ISO8601",
+              "value": "2016-02-24T10:00:00.00Z"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo "02. Get entity using NGSIv2 and check values are right "
+echo "======================================================"
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity with Quantity, Number, Boolean, DateTime and ISO8601 types
+============================================================================
+HTTP/1.1 200 OK
+Content-Length: 352
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+
+}
+
+
+02. Get entity using NGSIv2 and check values are right
+======================================================
+HTTP/1.1 200 OK
+Content-Length: 314
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

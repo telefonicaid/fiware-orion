@@ -327,7 +327,8 @@ static void appendMetadata
   BSONObjBuilder*    mdBuilder,
   BSONArrayBuilder*  mdNamesBuilder,
   const Metadata*    mdP,
-  bool               useDefaultType
+  bool               useDefaultType,
+  bool               autocast
 )
 {
   std::string type = mdP->type;
@@ -347,20 +348,63 @@ static void appendMetadata
   mdNamesBuilder->append(mdP->name);
   std::string effectiveName = dbDotEncode(mdP->name);
 
+  std::string        effectiveStringValue = mdP->stringValue;
+  bool               effectiveBoolValue   = mdP->boolValue;
+  double             effectiveNumberValue = mdP->numberValue;
+  orion::ValueType   effectiveValueType   = mdP->valueType;
+
+  if ((autocast) && (effectiveValueType == orion::ValueTypeString))
+  {
+    // Autocast only for selected metadata types
+    if ((type == DEFAULT_ATTR_NUMBER_TYPE) || (type == NUMBER_TYPE_ALT))
+    {
+      if (str2double(effectiveStringValue.c_str(), &effectiveNumberValue))
+      {
+        effectiveValueType = orion::ValueTypeNumber;
+      }
+      // Note that if str2double() fails, we keep ValueTypeString and everything works like without autocast
+    }
+    if (type == DEFAULT_ATTR_BOOL_TYPE)
+    {
+      // Note that we cannot use isTrue() or isFalse() functions, as they consider also 0 and 1 as
+      // valid true/false values and JSON spec mandates exactly true or false
+      if (effectiveStringValue == "true")
+      {
+        effectiveBoolValue = true;
+        effectiveValueType = orion::ValueTypeBoolean;
+      }
+      else if (effectiveStringValue == "false")
+      {
+        effectiveBoolValue = false;
+        effectiveValueType = orion::ValueTypeBoolean;
+      }
+      // Note that if above checks fail, we keep ValueTypeString and everything works like without autocast
+    }
+    if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
+    {
+      effectiveNumberValue = parse8601Time(effectiveStringValue);
+      if (effectiveNumberValue != -1)
+      {
+        effectiveValueType = orion::ValueTypeNumber;
+      }
+      // Note that if parse8601Time() fails, we keep ValueTypeString and everything works like without autocast
+    }
+  }
+
   if (type != "")
   {
-    switch (mdP->valueType)
+    switch (effectiveValueType)
     {
     case orion::ValueTypeString:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->stringValue));
+      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << effectiveStringValue));
       return;
 
     case orion::ValueTypeNumber:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->numberValue));
+      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << effectiveNumberValue));
       return;
 
     case orion::ValueTypeBoolean:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->boolValue));
+      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << effectiveBoolValue));
       return;
 
     case orion::ValueTypeNull:
@@ -389,18 +433,18 @@ static void appendMetadata
   }
   else
   {
-    switch (mdP->valueType)
+    switch (effectiveValueType)
     {
     case orion::ValueTypeString:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mdP->stringValue));
+      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << effectiveStringValue));
       return;
 
     case orion::ValueTypeNumber:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mdP->numberValue));
+      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << effectiveNumberValue));
       return;
 
     case orion::ValueTypeBoolean:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mdP->boolValue));
+      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << effectiveBoolValue));
       return;
 
     case orion::ValueTypeNull:
@@ -516,7 +560,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
       continue;
     }
 
-    appendMetadata(&mdBuilder, &mdNamesBuilder, mdP, apiVersion == V2);
+    appendMetadata(&mdBuilder, &mdNamesBuilder, mdP, apiVersion == V2, apiVersion == V1 && ngsiv1Autocast);
   }
 
 
@@ -544,7 +588,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
       {
         if (!hasMetadata(dbDotDecode(md.name), md.type, caP))
         {
-          appendMetadata(&mdBuilder, &mdNamesBuilder, &md, false);
+          appendMetadata(&mdBuilder, &mdNamesBuilder, &md, false, apiVersion == V1 && ngsiv1Autocast);
         }
       }
 
@@ -628,7 +672,8 @@ static bool contextAttributeCustomMetadataToBson
   BSONObj*                 md,
   BSONArray*               mdNames,
   const ContextAttribute*  ca,
-  bool                     useDefaultType
+  bool                     useDefaultType,
+  bool                     autocast
 )
 {
   BSONObjBuilder    mdToAdd;
@@ -640,7 +685,7 @@ static bool contextAttributeCustomMetadataToBson
 
     if (!isNotCustomMetadata(md->name))
     {
-      appendMetadata(&mdToAdd, &mdNamesToAdd, md, useDefaultType);
+      appendMetadata(&mdToAdd, &mdNamesToAdd, md, useDefaultType, autocast);
       LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
                       md->name.c_str(), md->type.c_str(), md->toStringValue().c_str()));
     }
@@ -735,7 +780,7 @@ static bool updateAttribute
     BSONObj    md;
     BSONArray  mdNames;
 
-    if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2))
+    if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2, ngsiv1Autocast && (apiVersion == V1)))
     {
       newAttr.append(ENT_ATTRS_MD, md);
     }
@@ -837,7 +882,7 @@ static bool appendAttribute
   BSONObj   md;
   BSONArray mdNames;
 
-  if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2))
+  if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2, ngsiv1Autocast && (apiVersion == V1)))
   {
     ab.append(ENT_ATTRS_MD, md);
   }
@@ -2902,7 +2947,7 @@ static bool createEntity
     /* Custom metadata */
     BSONObj   md;
     BSONArray mdNames;
-    if (contextAttributeCustomMetadataToBson(&md, &mdNames, attrsV[ix], apiVersion == V2))
+    if (contextAttributeCustomMetadataToBson(&md, &mdNames, attrsV[ix], apiVersion == V2, ngsiv1Autocast && (apiVersion == V1)))
     {
       bsonAttr.append(ENT_ATTRS_MD, md);
     }
