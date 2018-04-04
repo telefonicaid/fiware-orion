@@ -27,6 +27,7 @@
 #include "rapidjson/document.h"
 
 #include "logMsg/logMsg.h"
+#include "common/limits.h"
 #include "ngsi/ContextAttribute.h"
 #include "parse/CompoundValueNode.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
@@ -130,7 +131,7 @@ std::string parseContextAttributeCompoundValue
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[4];
+      char                       itemNo[STRING_SIZE_FOR_INT];
 
       snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
@@ -233,7 +234,7 @@ std::string parseContextAttributeCompoundValue
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[4];
+      char                       itemNo[STRING_SIZE_FOR_INT];
 
       snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
@@ -375,7 +376,7 @@ std::string parseContextAttributeCompoundValueStandAlone
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[4];
+      char                       itemNo[STRING_SIZE_FOR_INT];
 
       snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 

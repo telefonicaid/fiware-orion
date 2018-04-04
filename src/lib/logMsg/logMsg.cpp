@@ -270,7 +270,7 @@ do                                                \
 #define TIME_FORMAT_DEF  "%A %d %h %H:%M:%S %Y"
 #define F_LEN            200
 #define TF_LEN           64
-#define INFO_LEN         512
+#define INFO_LEN         256
 #define TMS_LEN          20
 #define TME_LEN          20
 #define TMS_DEF          "<trace "
@@ -2755,8 +2755,7 @@ LmStatus lmReopen(int index)
 
   s = LmsOk;
 
-  snprintf(tmpName, sizeof(tmpName), "%s_%d",
-           fds[index].info, (int) getpid());
+  snprintf(tmpName, sizeof(tmpName), "%s_%d", fds[index].info, (int) getpid());
 
   if ((fd = open(tmpName, O_WRONLY | O_CREAT | O_TRUNC, 0666)) == -1)
   {

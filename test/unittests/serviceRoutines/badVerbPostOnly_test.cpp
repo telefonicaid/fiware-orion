@@ -28,17 +28,18 @@
 
 #include "serviceRoutines/badVerbPostOnly.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs -
+* badVerbV -
 */
-static RestService rs[] =
+static RestService badVerbV[] =
 {
-  { "*", RegisterContext, 2, { "ngsi9",  "registerContext" }, "", badVerbPostOnly },
-  { "",  InvalidRequest,  0, {                             }, "", NULL            }
+  { RegisterContext, 2, { "ngsi9",  "registerContext" }, "", badVerbPostOnly },
+  { InvalidRequest,  0, {                             }, "", NULL            }
 };
 
 
@@ -53,7 +54,8 @@ TEST(badVerbPostOnly, ok)
   std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
   std::string     out;
 
-  out = restService(&ci, rs);
+  serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, badVerbV);
+  out = orion::requestServe(&ci);
 
   EXPECT_EQ(expected, out);
   EXPECT_EQ("Allow", ci.httpHeader[0]);

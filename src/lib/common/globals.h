@@ -90,6 +90,7 @@
 #define DEFAULT_ATTR_NULL_TYPE    "None"
 #define DATE_TYPE                 "DateTime"
 #define DATE_TYPE_ALT             "ISO8601"
+#define NUMBER_TYPE_ALT           "Quantity"
 
 
 
@@ -221,6 +222,7 @@ extern bool               checkIdv1;
 extern bool               disableCusNotif;
 
 extern bool               insecureNotif;
+extern bool               ngsiv1Autocast;
 
 
 

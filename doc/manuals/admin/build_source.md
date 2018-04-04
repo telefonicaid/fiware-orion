@@ -51,9 +51,9 @@ commands that require root privilege):
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-* Install Google Test/Mock from sources (there are RPM pacakges for this, but they don't seem to be working with the current CMakeLists.txt configuration). Previously the URL was http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 but google removed that package in late August 2016 and it is no longer working.
+* Install Google Test/Mock from sources (there are RPM packages for this, but they do not work with the current CMakeLists.txt configuration). Previously the URL was http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 but Google removed that package in late August 2016 and it is no longer working.
 
-        wget https://www.fiware.org/shared-content/public/gmock-1.5.0.tar.bz2
+        wget https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2
         tar xfvj gmock-1.5.0.tar.bz2
         cd gmock-1.5.0
         ./configure
@@ -139,15 +139,3 @@ yum install cyrus-sasl-devel
 scons --use-sasl-client --ssl                                   # The build/linux2/normal/libmongoclient.a library is generated as outcome
 sudo scons install --prefix=/usr/local --use-sasl-client --ssl  # This puts .h files in /usr/local/include/mongo and libmongoclient.a in /usr/local/lib
 ```
-
-## Others
-
-If you have build orion in a system different from CentOS 7.x, don't hesitate to tell us and contribute to expand this section. Probably the best way if doing a pull request to modify this file with the new information. Thanks!
-
-### Debian 7
-
-The packages are basically the same described for RedHat/CentOS above, except that we need to install packages using apt-get instead of yum.
-
-Install Google Test and Google Mock version 1.5 directly from sources.
-
-The version of lcov that comes with Debian 7.0 (1.9) has a bug (see https://bugs.launchpad.net/ubuntu/+source/lcov/+bug/1163758). Install lcov 1.10 from sources.
