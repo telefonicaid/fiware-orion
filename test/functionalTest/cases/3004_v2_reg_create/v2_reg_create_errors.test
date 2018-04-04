@@ -1,0 +1,1648 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Errors during registration creation in APIv2
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255 IPv4 -statCounters
+
+--SHELL--
+
+# 01. Invalid JSON in payload
+# 02. Payload is not a JSON object
+# 03. Payload is an empty object
+# 04. description is not a string
+# 05. description too long
+# 06. forbidden characters in description
+# 07. dataProvided missing
+# 08. dataProvided not a JSON object
+# 09. dataProvided empty
+# 10. dataProvided:entities not an array
+# 11. dataProvided:entities:entity not an object
+# 12. dataProvided:entities:entity without id and idPattern
+# 13. dataProvided:entities:entity with both id and idPattern
+# 14. dataProvided:entities:entity:id not a string
+# 15. dataProvided:entities:entity:id given but empty
+# 16. dataProvided:entities:entity:id with forbidden characters
+# 17. dataProvided:entities:entity:id too long
+# 18. dataProvided:entities:entity:idPattern not a string
+# 19. dataProvided:entities:entity:idPattern given but empty
+# 20. dataProvided:entities:entity with both type and typePattern
+# 21. dataProvided:entities:entity:type not a string
+# 22. dataProvided:entities:entity:type given but empty
+# 23. dataProvided:entities:entity:type with forbidden characters
+# 24. dataProvided:entities:entity:type too long
+# 25. dataProvided:entities:entity:typePattern not a string
+# 26. dataProvided:entities:entity:typePattern given but empty
+# 27. dataProvided:entities:attrs not an array
+# 28. dataProvided:entities:attrs item not a string
+# 29. dataProvided:entities:attrs item empty string
+# 30. provider missing
+# 31. provider empty
+# 32. provider not a JSON object
+# 33. provider has no http field
+# 34. supportedForwardingMode not a string
+# 35. invalid supportedForwardingMode
+# 36. provider/http not a JSON object
+# 37. provider/http/url missing
+# 38. provider/http/url not a string
+# 39. provider/http/url is the empty string
+# 40. provider/http/url invalid
+# 41. status is not a string
+# 42. invalid value for status
+# 43. legacyForwarding missing
+# 44. legacyForwarding not a boolean
+# 45. legacyForwarding set to false
+# 46. supportedForwardingMode set to 'none'
+# 47. supportedForwardingMode set to 'query'
+# 48. supportedForwardingMode set to 'update'
+#
+
+
+echo "01. Invalid JSON in payload"
+echo "==========================="
+payload='{{'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Payload is not a JSON object"
+echo "================================"
+payload='["a", "b"]'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "03. Payload is an empty object"
+echo "=============================="
+payload='{}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "04. description is not a string"
+echo "==============================="
+payload='{
+   "description": 4
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "05. description too long"
+echo "========================"
+payload='{
+   "description": "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789 123456789012345678901234"
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "06. forbidden characters in description"
+echo "======================================="
+payload='{
+   "description": "<>="
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+
+echo "07. dataProvided missing"
+echo "========================"
+payload='{
+  "description": "DESC"
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "08. dataProvided not a JSON object"
+echo "=================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": 5
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "09. dataProvided empty"
+echo "======================"
+payload='{
+  "description": "DESC",
+  "dataProvided": {}
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "10. dataProvided:entities not an array"
+echo "======================================"
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": 6
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "11. dataProvided:entities:entity not an object"
+echo "=============================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      1, 2, 3
+    ]
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "12. dataProvided:entities:entity without id and idPattern"
+echo "========================================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T1"
+      }
+    ]
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "13. dataProvided:entities:entity with both id and idPattern"
+echo "==========================================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "idPattern": "E,*"
+      }
+    ]
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "14. dataProvided:entities:entity:id not a string"
+echo "================================================"
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": true
+      }
+    ]
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "15. dataProvided:entities:entity:id given but empty"
+echo "==================================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": ""
+      }
+    ]
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "16. dataProvided:entities:entity:id with forbidden characters"
+echo "============================================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "<>!="
+      }
+    ]
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "17. dataProvided:entities:entity:id too long"
+echo "============================================"
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345"
+      }
+    ]
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "18. dataProvided:entities:entity:idPattern not a string"
+echo "======================================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "idPattern": 7
+      }
+    ]
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "19. dataProvided:entities:entity:idPattern given but empty"
+echo "=========================================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "idPattern": ""
+      }
+    ]
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "20. dataProvided:entities:entity with both type and typePattern"
+echo "==============================================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1",
+        "typePattern": "T.*"
+      }
+    ]
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "21. dataProvided:entities:entity:type not a string"
+echo "=================================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": 6
+      }
+    ]
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "22. dataProvided:entities:entity:type given but empty"
+echo "====================================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": ""
+      }
+    ]
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "23. dataProvided:entities:entity:type with forbidden characters"
+echo "==============================================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "<=>"
+      }
+    ]
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "24. dataProvided:entities:entity:type too long"
+echo "=============================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345"
+      }
+    ]
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "25. dataProvided:entities:entity:typePattern not a string"
+echo "========================================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "typePattern": false
+      }
+    ]
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "26. dataProvided:entities:entity:typePattern given but empty"
+echo "============================================================"
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "typePattern": ""
+      }
+    ]
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "27. dataProvided:entities:attrs not an array"
+echo "============================================"
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": true
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "28. dataProvided:entities:attrs item not a string"
+echo "================================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ 1, 2 ]
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "29. dataProvided:entities:attrs item empty string"
+echo "================================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "" ]
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "30. provider missing"
+echo "===================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "31. provider empty"
+echo "=================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {}
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "32. provider not a JSON object"
+echo "=============================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": 7  
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "33. provider has no http field"
+echo "=============================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": { "a": 0 }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "34. supportedForwardingMode not a string"
+echo "========================================"
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+     },
+     "supportedForwardingMode": true
+   }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "35. invalid supportedForwardingMode"
+echo "==================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    },
+    "supportedForwardingMode": "invalid"
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "36. provider/http not a JSON object"
+echo "==================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": []
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "37. provider/http/url missing"
+echo "============================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "noUrl": true
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "38. provider/http/url not a string"
+echo "=================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": true
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "39. provider/http/url is the empty string"
+echo "========================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": ""
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "40. provider/http/url invalid"
+echo "============================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "www:/abc"
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "41. status is not a string"
+echo "=========================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    },
+    "legacyForwarding": true
+  },
+  "status": 4
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "42. invalid value for status"
+echo "============================"
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    },
+    "legacyForwarding": true
+  },
+  "status": "green"
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "43. legacyForwarding missing"
+echo "============================"
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    }
+  },
+  "status": "active"
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "44. legacyForwarding not a boolean"
+echo "=================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    },
+    "legacyForwarding": 14
+  },
+  "status": "active"
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "45. legacyForwarding set to false"
+echo "================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    },
+    "legacyForwarding": false
+  },
+  "status": "active"
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "46. supportedForwardingMode set to 'none'"
+echo "========================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    },
+    "legacyForwarding": true,
+    "supportedForwardingMode": "none"
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "47. supportedForwardingMode set to 'query'"
+echo "=========================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    },
+    "legacyForwarding": true,
+    "supportedForwardingMode": "query"
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "48. supportedForwardingMode set to 'update'"
+echo "==========================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    },
+    "legacyForwarding": true,
+    "supportedForwardingMode": "update"
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Invalid JSON in payload
+===========================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Errors found in incoming JSON buffer",
+    "error": "BadRequest"
+}
+
+
+02. Payload is not a JSON object
+================================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "not a JSON object",
+    "error": "BadRequest"
+}
+
+
+03. Payload is an empty object
+==============================
+HTTP/1.1 400 Bad Request
+Content-Length: 52
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "empty payload",
+    "error": "BadRequest"
+}
+
+
+04. description is not a string
+===============================
+HTTP/1.1 400 Bad Request
+Content-Length: 58
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "invalid description",
+    "error": "BadRequest"
+}
+
+
+05. description too long
+========================
+HTTP/1.1 400 Bad Request
+Content-Length: 70
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "max description length exceeded",
+    "error": "BadRequest"
+}
+
+
+06. forbidden characters in description
+=======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 74
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "forbidden characters in description",
+    "error": "BadRequest"
+}
+
+
+07. dataProvided missing
+========================
+HTTP/1.1 400 Bad Request
+Content-Length: 85
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "the field /dataProvided/ is missing in payload",
+    "error": "BadRequest"
+}
+
+
+08. dataProvided not a JSON object
+==================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/dataProvided/ must be a JSON object",
+    "error": "BadRequest"
+}
+
+
+09. dataProvided empty
+======================
+HTTP/1.1 400 Bad Request
+Content-Length: 62
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/dataProvided/ is empty",
+    "error": "BadRequest"
+}
+
+
+10. dataProvided:entities not an array
+======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 65
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/entities/ is not an array",
+    "error": "BadRequest"
+}
+
+
+11. dataProvided:entities:entity not an object
+==============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 78
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/entities/ vector item is not an object",
+    "error": "BadRequest"
+}
+
+
+12. dataProvided:entities:entity without id and idPattern
+=========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 96
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/entities/ vector item does not have /id/ nor /idPattern/",
+    "error": "BadRequest"
+}
+
+
+13. dataProvided:entities:entity with both id and idPattern
+===========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 91
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/entities/ vector item has both /id/ and /idPattern/",
+    "error": "BadRequest"
+}
+
+
+14. dataProvided:entities:entity:id not a string
+================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 82
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/entities/ vector item /id/ is not a string",
+    "error": "BadRequest"
+}
+
+
+15. dataProvided:entities:entity:id given but empty
+===================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 69
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/entities/ element id is empty",
+    "error": "BadRequest"
+}
+
+
+16. dataProvided:entities:entity:id with forbidden characters
+=============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 90
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "forbidden characters in /entities/ vector item /id/",
+    "error": "BadRequest"
+}
+
+
+17. dataProvided:entities:entity:id too long
+============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 92
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "max id length exceeded in /entities/ vector item /id/",
+    "error": "BadRequest"
+}
+
+
+18. dataProvided:entities:entity:idPattern not a string
+=======================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 89
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/entities/ vector item /idPattern/ is not a string",
+    "error": "BadRequest"
+}
+
+
+19. dataProvided:entities:entity:idPattern given but empty
+==========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 82
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/entities/ vector item /idPattern/ is empty",
+    "error": "BadRequest"
+}
+
+
+20. dataProvided:entities:entity with both type and typePattern
+===============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 91
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/entities/ element has both /type/ and /typePattern/",
+    "error": "BadRequest"
+}
+
+
+21. dataProvided:entities:entity:type not a string
+==================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 82
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/entities/ vector item type is not a string",
+    "error": "BadRequest"
+}
+
+
+22. dataProvided:entities:entity:type given but empty
+=====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 85
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity type length: 0, min length supported: 1",
+    "error": "BadRequest"
+}
+
+
+23. dataProvided:entities:entity:type with forbidden characters
+===============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 92
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "forbidden characters in /entities/ vector item /type/",
+    "error": "BadRequest"
+}
+
+
+24. dataProvided:entities:entity:type too long
+==============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 96
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "max type length exceeded in /entities/ vector item /type/",
+    "error": "BadRequest"
+}
+
+
+25. dataProvided:entities:entity:typePattern not a string
+=========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 91
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/entities/ vector item /typePattern/ is not a string",
+    "error": "BadRequest"
+}
+
+
+26. dataProvided:entities:entity:typePattern given but empty
+============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 84
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/entities/ vector item /typePattern/ is empty",
+    "error": "BadRequest"
+}
+
+
+27. dataProvided:entities:attrs not an array
+============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 77
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "the field /attrs/ must be a JSON array",
+    "error": "BadRequest"
+}
+
+
+28. dataProvided:entities:attrs item not a string
+=================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 89
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "only JSON Strings allowed in string vector /attrs/",
+    "error": "BadRequest"
+}
+
+
+29. dataProvided:entities:attrs item empty string
+=================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 82
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "empty string found in string vector /attrs/",
+    "error": "BadRequest"
+}
+
+
+30. provider missing
+====================
+HTTP/1.1 400 Bad Request
+Content-Length: 81
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "the field /provider/ is missing in payload",
+    "error": "BadRequest"
+}
+
+
+31. provider empty
+==================
+HTTP/1.1 400 Bad Request
+Content-Length: 55
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/provider/ empty",
+    "error": "BadRequest"
+}
+
+
+32. provider not a JSON object
+==============================
+HTTP/1.1 400 Bad Request
+Content-Length: 71
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/provider/ must be a JSON object",
+    "error": "BadRequest"
+}
+
+
+33. provider has no http field
+==============================
+HTTP/1.1 400 Bad Request
+Content-Length: 77
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/provider/ must contain a field /http/",
+    "error": "BadRequest"
+}
+
+
+34. supportedForwardingMode not a string
+========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 86
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/supportedForwardingMode/ must be a JSON string",
+    "error": "BadRequest"
+}
+
+
+35. invalid supportedForwardingMode
+===================================
+HTTP/1.1 400 Bad Request
+Content-Length: 81
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "invalid value of /supportedForwardingMode/",
+    "error": "BadRequest"
+}
+
+
+36. provider/http not a JSON object
+===================================
+HTTP/1.1 400 Bad Request
+Content-Length: 67
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/http/ must be a JSON object",
+    "error": "BadRequest"
+}
+
+
+37. provider/http/url missing
+=============================
+HTTP/1.1 400 Bad Request
+Content-Length: 72
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/http/ must contain a field /url/",
+    "error": "BadRequest"
+}
+
+
+38. provider/http/url not a string
+==================================
+HTTP/1.1 400 Bad Request
+Content-Length: 82
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/url/ field of /http/ must be a JSON string",
+    "error": "BadRequest"
+}
+
+
+39. provider/http/url is the empty string
+=========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 87
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/url/ field of /http/ cannot be the empty string",
+    "error": "BadRequest"
+}
+
+
+40. provider/http/url invalid
+=============================
+HTTP/1.1 400 Bad Request
+Content-Length: 71
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/url/ field of /http/ is invalid",
+    "error": "BadRequest"
+}
+
+
+41. status is not a string
+==========================
+HTTP/1.1 400 Bad Request
+Content-Length: 64
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "/status/ must be a string",
+    "error": "BadRequest"
+}
+
+
+42. invalid value for status
+============================
+HTTP/1.1 400 Bad Request
+Content-Length: 65
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "invalid value for /status/",
+    "error": "BadRequest"
+}
+
+
+43. legacyForwarding missing
+============================
+HTTP/1.1 501 Not Implemented
+Content-Length: 144
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Only NGSIv1-based forwarding supported at the present moment. Set explictely legacyForwarding to true",
+    "error": "NotImplemented"
+}
+
+
+44. legacyForwarding not a boolean
+==================================
+HTTP/1.1 400 Bad Request
+Content-Length: 85
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "the field /legacyForwarding/ must be a boolean",
+    "error": "BadRequest"
+}
+
+
+45. legacyForwarding set to false
+=================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 144
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Only NGSIv1-based forwarding supported at the present moment. Set explictely legacyForwarding to true",
+    "error": "NotImplemented"
+}
+
+
+46. supportedForwardingMode set to 'none'
+=========================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 72
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "non-supported Forwarding Mode",
+    "error": "NotImplemented"
+}
+
+
+47. supportedForwardingMode set to 'query'
+==========================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 72
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "non-supported Forwarding Mode",
+    "error": "NotImplemented"
+}
+
+
+48. supportedForwardingMode set to 'update'
+===========================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 72
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "non-supported Forwarding Mode",
+    "error": "NotImplemented"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

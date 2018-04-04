@@ -91,6 +91,7 @@ void serviceVectorsSet
   restBadVerbV     = _restBadVerbV;
 }
 
+#include "serviceRoutinesV2/postRegistration.h"
 
 
 /* ****************************************************************************

@@ -472,7 +472,7 @@ std::string postUpdateContext
   }
   else if (ciP->servicePathV[0] == "")
   {
-    ciP->servicePathV[0] = DEFAULT_SERVICE_PATH_UPDATES;
+    ciP->servicePathV[0] = SERVICE_PATH_ROOT;
   }
 
   std::string res = servicePathCheck(ciP->servicePathV[0].c_str());

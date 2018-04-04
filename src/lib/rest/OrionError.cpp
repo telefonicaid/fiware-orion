@@ -1,4 +1,4 @@
-/*
+ /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 *
@@ -27,13 +27,14 @@
 
 #include "common/tag.h"
 #include "rest/ConnectionInfo.h"
+#include "ngsi/StatusCode.h"
 #include "rest/OrionError.h"
 
 
 
 /* ****************************************************************************
 *
-* OrionError::OrionError - 
+* OrionError::OrionError -
 */
 OrionError::OrionError()
 {
@@ -59,7 +60,7 @@ OrionError::OrionError(HttpStatusCode _code, const std::string& _details, const 
 
 /* ****************************************************************************
 *
-* OrionError::OrionError - 
+* OrionError::OrionError -
 */
 OrionError::OrionError(StatusCode& sc)
 {
@@ -72,14 +73,26 @@ OrionError::OrionError(StatusCode& sc)
 
 /* ****************************************************************************
 *
-* OrionError::fill - 
-*
+* OrionError::fill -
 */
 void OrionError::fill(HttpStatusCode _code, const std::string& _details, const std::string& _reasonPhrase)
 {
   code          = _code;
   reasonPhrase  = _reasonPhrase != ""? _reasonPhrase : httpStatusCodeString(code);
   details       = _details;
+}
+
+
+
+/* ****************************************************************************
+*
+* OrionError::fill -
+*/
+void OrionError::fill(const StatusCode& sc)
+{
+  code          = sc.code;
+  reasonPhrase  = (sc.reasonPhrase != "")? sc.reasonPhrase : httpStatusCodeString(code);
+  details       = sc.details;
 }
 
 

@@ -77,7 +77,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "forbidden characters in subject entities element type",
+    "description": "forbidden characters in /entities/ vector item /type/",
     "error": "BadRequest"
 }
 
