@@ -449,7 +449,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
    *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
   if (caP->valueType != orion::ValueTypeNotGiven)
   {
-    caP->valueBson(ab);
+    caP->valueBson(ab, getStringFieldF(attr, ENT_ATTRS_TYPE), ngsiv1Autocast && (apiVersion == V1));
   }
   else
   {
@@ -708,10 +708,9 @@ static bool updateAttribute
 
     actualUpdate = true;
 
+    std::string attrType;
     if (!caP->typeGiven && (apiVersion == V2))
     {
-      std::string attrType;
-
       if ((caP->compoundValueP == NULL) || (caP->compoundValueP->valueType != orion::ValueTypeVector))
       {
         attrType = defaultType(caP->valueType);
@@ -720,18 +719,17 @@ static bool updateAttribute
       {
         attrType = defaultType(orion::ValueTypeVector);
       }
-
-      newAttr.append(ENT_ATTRS_TYPE, attrType);
     }
     else
     {
-      newAttr.append(ENT_ATTRS_TYPE, caP->type);
+      attrType = caP->type;
     }
 
+    newAttr.append(ENT_ATTRS_TYPE, attrType);
     newAttr.append(ENT_ATTRS_CREATION_DATE, now);
     newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
-    caP->valueBson(newAttr);
+    caP->valueBson(newAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
     /* Custom metadata */
     BSONObj    md;
@@ -812,7 +810,7 @@ static bool appendAttribute
   BSONObjBuilder ab;
 
   /* 1. Value */
-  caP->valueBson(ab);
+  caP->valueBson(ab, caP->type, ngsiv1Autocast && (apiVersion == V1));
 
   /* 2. Type */
   if ((apiVersion == V2) && !caP->typeGiven)
@@ -2866,10 +2864,10 @@ static bool createEntity
     std::string     attrId = attrsV[ix]->getId();
     BSONObjBuilder  bsonAttr;
 
+    std::string attrType;
+
     if (!attrsV[ix]->typeGiven && (apiVersion == V2))
     {
-      std::string attrType;
-
       if ((attrsV[ix]->compoundValueP == NULL) || (attrsV[ix]->compoundValueP->valueType != orion::ValueTypeVector))
       {
         attrType = defaultType(attrsV[ix]->valueType);
@@ -2878,18 +2876,17 @@ static bool createEntity
       {
         attrType = defaultType(orion::ValueTypeVector);
       }
-
-      bsonAttr.append(ENT_ATTRS_TYPE, attrType);
     }
     else
     {
-      bsonAttr.append(ENT_ATTRS_TYPE, attrsV[ix]->type);
+      attrType = attrsV[ix]->type;
     }
 
+    bsonAttr.append(ENT_ATTRS_TYPE, attrType);
     bsonAttr.append(ENT_ATTRS_CREATION_DATE, now);
     bsonAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
-    attrsV[ix]->valueBson(bsonAttr);
+    attrsV[ix]->valueBson(bsonAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
     std::string effectiveName = dbDotEncode(attrsV[ix]->name);
     if (attrId.length() != 0)

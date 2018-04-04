@@ -27,6 +27,7 @@
 #include "rapidjson/document.h"
 
 #include "logMsg/logMsg.h"
+#include "common/limits.h"
 #include "ngsi/Metadata.h"
 #include "parse/CompoundValueNode.h"
 
@@ -131,7 +132,7 @@ std::string parseMetadataCompoundValue
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[4];
+      char                       itemNo[STRING_SIZE_FOR_INT];
 
       snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
@@ -227,7 +228,7 @@ std::string parseMetadataCompoundValue
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[4];
+      char                       itemNo[STRING_SIZE_FOR_INT];
 
       snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 

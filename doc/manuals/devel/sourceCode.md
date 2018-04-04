@@ -28,11 +28,13 @@ The main program is found in `contextBroker.cpp` and its purpose it to:
 
 * Parse and treat the command line parameters.
 * Initialize the libraries of the broker.
-* Setup the service vector (`RestService restServiceV`) that defines the REST services that the broker supports.
+* Call `orionRestServicesInit()` to setup the service vectors (`RestService xxxV`) that define the REST services that the broker supports, one vector per verb/method.
 * Start the REST interface (that runs in a separate thread).
 
-This is the file to go to when adding a command line parameter and when adding
-a REST service for the broker.
+This is the file to go to when adding a command line parameter.
+For adding a REST service for the broker, you will need to edit `orionRestServices.cpp` in the same directory.
+In `orionRestServices.cpp` all the services of Orion are setup and the call to `restInit()`, to start the REST services is made.
+
 See the [cookbook](cookbook.md) for details about these two important topics.  
 
 [Top](#top)
@@ -110,8 +112,7 @@ The **rest** library is where the broker interacts with the external library *mi
 incoming REST connections and their responses.
 
 ### `restInit()`
-The function `restInit()` in `rest.cpp` is the function that receives the extremely important vector
-of REST services from the main program - the vector that defines the set of services that the broker supports.
+The function `restInit()` in `rest.cpp` is the function that receives the extremely important vectors of REST services from the main program (actually, from the function `orionRestServicesInit`, that is called from `main`) - the vectors that defines the set of services that the broker supports.
 
 ### `restStart()`
 `restStart()` starts the microhttpd deamon (calling `MHD_start_daemon()`), for IPv4 or IPv6, or both.
@@ -132,7 +133,7 @@ If no payload is present in the request, there will be only two calls to connect
 
 The seventh parameter of connectionTreat is a pointer to `size_t` and in the last call to connectionTreat, this pointer points to a size_t variable that contains the value zero.
 
-After receiving this last callback, the payload can be parsed and treated, which is taken care of by `serveFunction()`,
+After receiving this last callback, the payload can be parsed and treated, which is taken care of by `orion::requestServe()`,
 invoked at the end of `connectionTreat()`, after quite a few checks.
 
 The URI parameters of the request are ready from the very first call of `connectionTreat()` and they are
@@ -155,7 +156,7 @@ _RQ-01: Reception of a request_
 * `connectionTreat()` is the brokers callback function for incoming connections from MHD (microhttpd). This callback is setup in the call to `MHD_start_daemon()` in `restStart()` in `src/lib/rest/rest.cpp` and invoked upon client request arrival (step 2 and 3).
 * As long as MHD receives payload from the client, the callback function (`connectionTreat()`) is called with a new chunk of payload (steps 4 and 5)
 * The last call to `connectionTreat()` is to inform the client callback that the entire request has been received. This is done by sending the data length as zero in this last callback (step 6).
-* The entire request is read so `serveFunction()` is invoked to take care of serving the request, all the way until responding to the request (step 7). See diagram RQ-02.
+* The entire request is read so `orion::requestServe()` is invoked to take care of serving the request, all the way until responding to the request (step 7). See diagram RQ-02.
 * Control is returned to MHD (step 8).
 
 ### Treating an incoming request
@@ -165,9 +166,9 @@ _RQ-01: Reception of a request_
 
 _RQ-02: Treatment of a request_
 
-* `serveFunction()` calls `restService()` (step 1). Actually, `serveFunction()` is not a function but a pointer to one. By default it points to the function `serve()` from `src/lib/rest/rest.cpp`, but this can be configured by setting some function as parameter `_serveFunction` in the call to `restInit()`.
+* `orion::requestServe()` calls `restService()` (step 1).
 * Also, if payload is present, `restService()` calls `payloadParse()` to parse the payload (step 2). Details are provided in the diagram [PP-01](#flow-pp-01).
-* The service function of the request takes over (step 3). The service function is chosen based on the **URL path** and **HTTP Method** used in the request. To determine which of all the service functions (found in lib/serviceFunctions and lib/serviceFunctionV2, please see the `RestService` vector in [`app/app/contextBroker/contextBroker.cpp`](#srcappcontextbroker)).
+* The service function of the request takes over (step 3). The service function is chosen based on the **URL path** and **HTTP Method** used in the request. To determine which of all the service functions (found in lib/serviceFunctions and lib/serviceFunctionV2, please see the `RestService` vectors in [`src/app/contextBroker/orionRestServices.cpp`](#srcappcontextbroker)).
 * The service function may invoke a lower level service function. See [the service routines mapping document](ServiceRoutines.txt) for details (step 4).
 * Finally, a function in [the **mongoBackend** library](#srclibmongobackend) is invoked (step 5). The MB diagrams provide detailed descriptions for the different cases.
 * A response string is created by the Service Routine and returned to `restService()` (step 6).
@@ -356,11 +357,10 @@ This must be like this as all service routines are called from one unique place,
 ```
 typedef struct RestService
 {
-  std::string   verb;             // The method of the service, as a plain string. ("*" matches ALL methods)
   RequestType   request;          // The type of the request
   int           components;       // Number of components in the URL path
   std::string   compV[10];        // Vector of URL path components. E.g. { "v2", "entities" }
-  std::string   payloadWord;      // No longer used, should be removed ... ?
+  std::string   payloadWord;      // No longer used (RequestType request can replace it), so, to be removed ... !
   RestTreat     treat;            // service function pointer
 } RestService;
 ```
@@ -370,7 +370,7 @@ The last field of the struct is the actual pointer to the service routine. Its t
 typedef std::string (*RestTreat)(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* reqDataP);
 ```
 
-So, for the rest library to find the service routine of an incoming request, it uses the vector of `RestService` it was passed as the first parameter to `restInit()`, which is searched until an item matching the verb/method and the URL PATH and when the `RestService` item is found, the service routine is also found, as it is a part of the `RestService` item.
+So, for the rest library to find the service routine of an incoming request, it uses the vectors of `RestService` as passed as the first seven parameters to `restInit()`, which are searched until an item matching the verb/method and the URL PATH and when the `RestService` item is found, the service routine is also found, as it is a part of a `RestService` item.
 
 
 [Top](#top)

@@ -450,9 +450,10 @@ The value of `orderBy` can be:
 * The keyword `geo:distance` to order results by distance to a reference geometry when a "near"
   (`georel=near`) spatial relationship is used. 
 
-* A comma-separated list of attributes (including system/builtin attributes), e.g. `temperature,!humidity`.
-  Results are ordered by the first attribute. On ties, the results are ordered by the second
-  attribute and so on. A "!" before the attribute name means that the order is reversed.
+* A comma-separated list of attributes (including system/builtin attributes), `id` (for entity
+  ID) and `type` (for entity type), e.g. `temperature,!humidity`. Results are ordered by the first
+  field. On ties, the results are ordered by the second field and so on. A "!" before
+  the field name means that the order is reversed.
 
 ## Error Responses
 
@@ -1809,8 +1810,8 @@ Response:
   more details.
 
 + Parameters
-    + limit: 10 (optional, number) - Limit the number of types to be retrieved
-    + offset: 20 (optional, number) - Skip a number of records
+    + limit: 10 (optional, number) - Limit the number of subscriptions to be retrieved
+    + offset: 20 (optional, number) - Skip a number of subscriptions
     + options (optional, string) - Options dictionary
       + Members
           + count - when used, the total number of subscriptions is returned in the HTTP header
@@ -2064,9 +2065,17 @@ Not present if registration has never had a successful notification.
 
 ## Registration list [/v2/registrations]
 
-### Retrieve registrations [GET /v2/registrations]
+### Retrieve registrations [GET /v2/registrations{?limit,offset,options}]
 
 Lists all the registrations present in the system.
+
++ Parameters
+    + limit: 10 (optional, number) - Limit the number of registrations to be retrieved
+    + offset: 20 (optional, number) - Skip a number of registrations
+    + options (optional, string) - Options dictionary
+      + Members
+          + count - when used, the total number of registrations is returned in the HTTP header
+            `Fiware-Total-Count`
 
 Response:
 

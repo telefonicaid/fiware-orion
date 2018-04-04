@@ -33,6 +33,8 @@
 #include "common/tag.h"
 #include "common/compileInfo.h"
 #include "common/defaultValues.h"
+#include "rest/HttpHeaders.h"
+#include "rest/rest.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -79,6 +81,23 @@ std::string versionTreat
   ParseData*                 parseDataP
 )
 {
+  if (isOriginAllowedForCORS(ciP->httpHeaders.origin))
+  {
+    ciP->httpHeader.push_back(ACCESS_CONTROL_ALLOW_ORIGIN);
+    // If any origin is allowed, the header is always sent with the value "*"
+    if (strcmp(corsOrigin, "__ALL") == 0)
+    {
+      ciP->httpHeaderValue.push_back("*");
+    }
+    // If a specific origin is allowed, the header is only sent if the origins match
+    else
+    {
+      ciP->httpHeaderValue.push_back(corsOrigin);
+    }
+    ciP->httpHeader.push_back(ACCESS_CONTROL_EXPOSE_HEADERS);
+    ciP->httpHeaderValue.push_back(CORS_EXPOSED_HEADERS);
+  }
+  
   std::string out     = "";
   std::string indent  = "";
 

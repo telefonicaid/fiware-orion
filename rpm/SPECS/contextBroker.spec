@@ -173,6 +173,20 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Wed Feb 21 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.12.0-1
+- Add: support for entity id and type in orderBy parameter (#2934)
+- Add: NGSIv1 autocast for numbers, booleans and dates (using flag -ngsiv1Autocast) (#3112)
+
+* Wed Feb 14 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.11.0-1
+- Reference distribution changed from RHEL/CentOS 6 to RHEL/CentOS 7
+- Add: new BROKER_LOG_LEVEL variable at /etc/config/contextBroker to set log level
+- Add: new GENERATE_COREDUMP variable at /etc/config/contextBroker to enable core generation and archiving (useful for debugging)
+- Add: handler for SIGHUP termination signal
+- Fix: using SIGTERM instead of SIGHUP for stopping broker in init.d service script
+- Fix: Invalid description in POST /op/query error response (#2991)
+- Fix: Bug that may cause contextBroker to crash when passing inappropriate parameter in query context payload (#3055)
+- Fix: Correct treatment of PID-file (#3075)
+
 * Mon Dec 11 2017 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.10.0-1
 - Add: CORS Preflight Requests support for all NGSIv2 resources, -corsMaxAge switch, CORS exposed headers (#501, #3030)
 - Fix: null not working in q/mq filter in subscriptions (#2998)
