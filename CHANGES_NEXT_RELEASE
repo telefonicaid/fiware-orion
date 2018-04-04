@@ -1,3 +1,4 @@
 - Hardening: refactor request routing logic (#3109, step 1)
 - Bug that may lead contextBroker to crash when passing null character "\u0000" with ID parameter in query context payload (#3119)
 - Add: CORS Preflight Requests support for /version (#3066)
+- Deprecated: ID metadata (and associated NGSIv1 operations)

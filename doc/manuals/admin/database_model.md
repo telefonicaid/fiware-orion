@@ -39,9 +39,7 @@ Fields:
 -   **attrs** is an keymap of the different attributes that have been
     created for that entity. The key is generated with the attribute
     name (changing "." for "=", as "." is not a valid character in
-    MongoDB document keys), appending `()<id>` in the case of having
-    and ID. For example, the attribute with name "my.attr" with ID "id1"
-    will use the following key: `my=attr()id2`. Each one of the
+    MongoDB document keys). Each one of the
     elements in the map has the following information:
     -   **type**: the attribute type
     -   **value**: the attribute value (for those attribute that has
