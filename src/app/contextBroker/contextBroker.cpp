@@ -204,6 +204,7 @@
 #include "serviceRoutinesV2/getMetrics.h"
 #include "serviceRoutinesV2/deleteMetrics.h"
 #include "serviceRoutinesV2/getRegistration.h"
+#include "serviceRoutinesV2/deleteRegistration.h"
 #include "serviceRoutinesV2/getRegistrations.h"
 #include "serviceRoutinesV2/postRegistration.h"
 #include "serviceRoutinesV2/optionsGetOnly.h"
@@ -866,7 +867,8 @@ static const char* validLogLevels[] =
 
 #define API_V2_REGISTRY                                                                                \
   { "GET",    REG,          REG_COMPS_V2,         REG_COMPS_WORD,          getRegistration          }, \
-  { "*",      REG,          REG_COMPS_V2,         REG_COMPS_WORD,          badVerbGetOnly           }, \
+  { "DELETE", REG,          REG_COMPS_V2,         REG_COMPS_WORD,          deleteRegistration       }, \
+  { "*",      REG,          REG_COMPS_V2,         REG_COMPS_WORD,          badVerbGetDeleteOnly     }, \
                                                                                                        \
   { "POST",   REGS,         REGS_COMPS_V2,        REGS_COMPS_WORD,         postRegistration         }, \
   { "GET",    REGS,         REGS_COMPS_V2,        REGS_COMPS_WORD,         getRegistrations         }, \

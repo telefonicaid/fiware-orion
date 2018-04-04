@@ -50,6 +50,7 @@ semStateTreat.cpp
 getMetrics.cpp
 deleteMetrics.cpp
 getRegistration.cpp
+deleteRegistration.cpp
 getRegistrations.cpp
 optionsGetOnly.cpp
 optionsGetPostOnly.cpp
@@ -94,6 +95,7 @@ deleteMetrics.h
 optionsGetOnly.h
 optionsGetPostOnly.h
 getRegistration.h
+deleteRegistration.h
 getRegistrations.h
 postRegistration.h
 )
