@@ -1073,12 +1073,12 @@ future* (see [NGSIv2 implementation notes](ngsiv2_implementation_notes.md#scope-
 
 ## Context availability management
 
-While context management is about *entities and attributes information* (creating, updating, retrieving, etc.),
-context availability management is about the *sources of entities and attributes information*. The basic concept
-in context availability management is the *registration* resource. A registrations contains information about a source of
-information (named "context provider") and which entities and attributes are provided by that source.
+While context management is about *entities and attributes* (creating, updating, retrieving, etc.),
+context availability management is about the *source of the entities and attributes*. The basic concept
+in context availability management is the *registration* resource. A registration contains information about a source of
+information (named a "context provider") and whose entities and attributes are provided by that source.
 
-Let's illustrate with an example, creating the following registration. We are stating that the attributes temperature and
+Let's illustrate with an example, creating a simple registration. We are stating that the attributes temperature and
 pressure of Room5 are provided by a context provider in the URL http://mysensors.com/Rooms:
 
 ```
@@ -1139,10 +1139,10 @@ curl localhost:1026/v2/registrations/5a82be3d093af1b94ac0f730 -s -S -H 'Accept: 
 
 Orion not only stores information about sources of entities/attributes in the form of registrations, but also
 uses these registrations to implement query/update forwarding. In other words, while a registration is in place,
-Orion uses that information to solve queries/updates in entities that it doesn't manage locally. However, this is an
-advanced topic out of the scope of this tutorial, have a look to the [context providers and request forwarding documentation](context_providers.md) to see the details.
+Orion uses that information to solve queries/updates in entities that aren't managed locally. However, this is an
+advanced topic out of the scope of this tutorial. Please have a look at the [context providers and request forwarding documentation](context_providers.md) for details.
 
-Finally, you can delete existing registration with the following request (replace `5a82be3d093af1b94ac0f730` by the actual
+Finally, you can delete an existing registration with the following request (replace `5a82be3d093af1b94ac0f730` by the actual
 registration ID in your case):
 
 ```

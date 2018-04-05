@@ -263,29 +263,29 @@ subscription creation/update time. Check details in the document about [initial 
 
 ## Registrations
 
-Orion implements registrations management as described in the NGSIv2 specification, except
-the following aspects:
+Orion implements registration management as described in the NGSIv2 specification, except
+for the following aspects:
 
 * `PATCH /v2/registration/<id>` is not implemented. Thus, registrations cannot be updated
-  directly, i.e. updates have to be done deleting and re-creating the registration. Please
+  directly. I.e., updates must be done deleting and re-creating the registration. Please
   see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3007) about this.
 * `idPattern` and `typePattern` are not implemented. This is similar to NGSIv1 registrations,
   where isPattern is not implemented.
-* The only valid `supportedForwardingMode` is `all`. Trying to use any other will end
+* The only valid `supportedForwardingMode` is `all`. Trying to use any other value will end
   in a 501 Not Implemented error response. Please
   see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3106) about this.
 * The `expression` field (within `dataProvided`) is not supported. The field is simply
   ignored. Please see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3107) about it.
-* The `inactive` value for `status` is not supported, i.e. the field is stored/retrieved correctly,
-  but registration is always active, even when the value is `invalid`. Please see
+* The `inactive` value for `status` is not supported. I.e., the field is stored/retrieved correctly,
+  but the registration is always active, even when the value is `inactive`. Please see
   [this issue](https://github.com/telefonicaid/fiware-orion/issues/3108) about it.
 
 Orion implements an additional field `legacyForwarding` (within `provider`) not included in NGSIv2
 specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
-for forwarding requests associated to that registration. However, by the time being NGSIv2-based
+for forwarding requests associated to that registration. However, for the time being, NGSIv2-based
 forwarding has not been defined (see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3068)
-about it) so the only valid option is to use always `"legacyForwarding": true` (otherwise a 501 Not Implemented
-error response will be get).
+about it) so the only valid option is to always use `"legacyForwarding": true` (otherwise a 501 Not Implemented
+error response will be the result).
 
 [Top](#top)
 

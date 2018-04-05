@@ -5,7 +5,7 @@ concept of "context provider" which is a URL that identifies the
 source of the context information for the entities/attributes included
 in that registration.
 
-In the case of NGSIv2, this is provided by within `provider` field:
+In the case of NGSIv2, this is provided by the field `provider`:
 
 ```
 ...
@@ -82,13 +82,13 @@ curl localhost:1026/v2/entities/Street4/attrs/temperature?type=Street -s -S \
 
 * Orion doesn't know the Street 4 temperature, but it knows (due to
   the registration in the previous step) that the Context Provider at
-  <http://sensor48.mycity.com/v1> knows that, so it forwards the query
+  <http://sensor48.mycity.com/v1> does know about the Street 4 temperature, so it forwards the query
   (message number 3) to the URL
   <http://sensor48.mycity.com/v1/queryContext> (i.e. the URL used in
   the Providing Application field at registration time, plus the
-  "/queryContext" operation). Note the query is forwarded using
-  NGSIv1 format although the original request from client used NGSIv2
-  (this is due lack of support yet of NGSIv2 based forwarding, see
+  "/queryContext" operation). Note that the query is forwarded using
+  NGSIv1 format although the original request from the client used NGSIv2
+  (this is due to lack of support for NGSIv2 based forwarding, see
   [this issue about it](https://github.com/telefonicaid/fiware-orion/issues/3068)).
 
 ``` 
@@ -134,7 +134,7 @@ curl localhost:1026/v2/entities/Street4/attrs/temperature?type=Street -s -S \
 }
 ``` 
 
-* Orion fordwars the response to the client (message number 5).
+* Orion forwards the response to the client (message number 5).
  
 ``` 
 {

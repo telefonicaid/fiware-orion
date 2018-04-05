@@ -627,16 +627,16 @@ _MB-24: mongoRegistrationsGet_
 
 `mongoRegistrationCreate` encapsulates the context registration creation logic for NGSIv2 API.
 
-The header file contains only the function `mongoRegistrationCreate()` whose work is basically to get the information from a `Registration` object and insert the corresponding document in the `registrations` collection in the database ([described as part of the database model in the administration documentation](../admin/database_model.md#registrations-collection)).
+The header file contains only the function `mongoRegistrationCreate()` whose work is basically to get the information from a `Registration` object and to insert the corresponding document in the `registrations` collection in the database ([described as part of the database model in the administration documentation](../admin/database_model.md#registrations-collection)).
 
 <a name="flow-mb-25"></a>
 ![mongoRegistrationCreate](images/Flow-MB-25.png)
 
 _MB-25: mongoRegistrationCreate_
 
-* `mongoRegistrationCreate()` is invoked from a `postRegistrations()` service routine (step 1).
+* `mongoRegistrationCreate()` is invoked from the `postRegistrations()` service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).  
-* This function builds a BSON object that will be at the end the one to be persisted in the database, using different `set*()` functions (`setExpiration()`, `setRegistrationId()`, etc.). The BSON object corresponding to the new registration is inserted in the database using `collectionInsert()` in the `connectionOperations` module (steps 3 and 4).
+* This function builds a BSON object which in the end is the one to be persisted in the database, using different `set*()` functions (`setExpiration()`, `setRegistrationId()`, etc.). The BSON object corresponding to the new registration is inserted into the database using `collectionInsert()` in the `connectionOperations` module (steps 3 and 4).
 * If the request semaphore was taken in step 2, then it is released before returning (step 5). 
 
 [Top](#top)

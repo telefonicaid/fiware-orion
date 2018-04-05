@@ -1,4 +1,4 @@
-# <a name="top"></a>Data model
+ <a name="top"></a>Data model
 
 * [Introduction](#introduction)
 * [entities collection](#entities-collection)
@@ -193,13 +193,13 @@ Fields:
     we ensure that registration IDs are unique and that queries by
     registration IDs will be very fast (as there is an automatic default
     index in \_id).
--   **format**: the format to use to send forwarded request. Possible value
-    by the time being is only **JSON** (meaning NGSIv1 format), although this
+-   **format**: the format to use to send forwarded requests. The only accepted value for now
+    is **JSON** (meaning NGSIv1 format), although this
     may change in the future (see [issue about NGSIv2-based forwarding](https://github.com/telefonicaid/fiware-orion/issues/3068)).
 -   **servicePath**: related with [the service
     path](../user/service_path.md) functionality.
 -   **status** (optional): either `active` (for active registrations) or `inactive` (for inactive registrations).
-    If not included, registration is considered active.
+    The default status (i.e. if the document omits this field) is "active".
 -   **description** (optional): a free text string describing the registration. Maximum length is 1024.
 -   **expiration**: this is the timestamp for which the
     registration expires. The expiration is calculated using the
