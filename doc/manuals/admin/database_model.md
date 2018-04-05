@@ -1,4 +1,4 @@
- <a name="top"></a>Data model
+ # <a name="top"></a>Data model
 
 * [Introduction](#introduction)
 * [entities collection](#entities-collection)
