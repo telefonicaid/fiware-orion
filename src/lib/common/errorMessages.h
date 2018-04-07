@@ -75,6 +75,7 @@
 #define ERROR_DESC_BAD_REQUEST_ID_AS_ATTR                     "invalid input, 'id' as attribute"
 #define ERROR_DESC_BAD_REQUEST_ENTID_IN_PAYLOAD               "entity id specified in payload"
 #define ERROR_DESC_BAD_REQUEST_ENTTYPE_IN_PAYLOAD             "entity type specified in payload"
+#define ERROR_DESC_BAD_REQUEST_NOT_A_JSON_OBJECT              "not a JSON object"
 
 #define ERROR_NOT_FOUND                               "NotFound"
 #define ERROR_DESC_NOT_FOUND_ENTITY                   "The requested entity has not been found. Check type and id"
@@ -82,6 +83,7 @@
 #define ERROR_DESC_NOT_FOUND_CONTEXT_ELEMENT          "No context element found"
 #define ERROR_DESC_NOT_FOUND_ATTRIBUTE                "The entity does not have such an attribute"
 #define ERROR_DESC_NOT_FOUND_SUBSCRIPTION             "The requested subscription has not been found. Check id"
+#define ERROR_DESC_NOT_FOUND_REGISTRATION             "The requested registration has not been found. Check id"
 
 #define ERROR_TOO_MANY                                "TooManyResults"
 #define ERROR_DESC_TOO_MANY_ENTITIES                  "More than one matching entity. Please refine your query"

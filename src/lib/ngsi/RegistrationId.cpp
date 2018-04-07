@@ -37,6 +37,26 @@
 
 /* ****************************************************************************
 *
+* RegistrationId::RegistrationId -
+*/
+RegistrationId::RegistrationId()
+{
+}
+
+
+
+/* ****************************************************************************
+*
+* RegistrationId::RegistrationId -
+*/
+RegistrationId::RegistrationId(const std::string& regId) : string(regId)
+{
+}
+
+
+
+/* ****************************************************************************
+*
 * RegistrationId::check -
 */
 std::string RegistrationId::check(void)

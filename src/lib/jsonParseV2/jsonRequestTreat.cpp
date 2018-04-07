@@ -38,8 +38,10 @@
 #include "jsonParseV2/parseSubscription.h"
 #include "jsonParseV2/parseBatchQuery.h"
 #include "jsonParseV2/parseBatchUpdate.h"
+#include "jsonParseV2/parseRegistration.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 #include "apiTypesV2/SubscriptionUpdate.h"
+
 
 
 /* ****************************************************************************
@@ -151,7 +153,14 @@ std::string jsonRequestTreat
     {
       return answer;
     }
+    break;
 
+  case RegistrationsRequest:
+    answer = parseRegistration(ciP, &parseDataP->reg);
+    if (answer != "OK")
+    {
+      return answer;
+    }
     break;
 
   default:

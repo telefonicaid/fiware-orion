@@ -41,13 +41,14 @@ public:
   void        addNumber(const std::string& key, long long value);
   void        addFloat(const std::string& key, float value);
   void        addDate(const std::string& key, long long timestamp);
+  void        addBool(const std::string& key, bool b);
+
   std::string str();
 
 private:
  std::ostringstream ss;
  bool               empty;
 };
-
 
 
 

@@ -72,7 +72,7 @@ std::string Subscription::toJson(void)
     jh.addString("description", this->description);
   }
 
-  if (this->expires != PERMANENT_SUBS_DATETIME)
+  if (this->expires != PERMANENT_EXPIRES_DATETIME)
   {
     jh.addDate("expires", this->expires);
   }
@@ -202,35 +202,4 @@ std::string Condition::toJson()
 }
 
 
-
-/* ****************************************************************************
-*
-* EntID::toJson -
-*/
-std::string EntID::toJson()
-{
-  JsonHelper jh;
-
-  if (!this->id.empty())
-  {
-    jh.addString("id", this->id);
-  }
-
-  if (!this->idPattern.empty())
-  {
-    jh.addString("idPattern", this->idPattern);
-  }
-
-  if (!this->type.empty())
-  {
-    jh.addString("type", this->type);
-  }
-
-  if (!this->typePattern.empty())
-  {
-    jh.addString("typePattern", this->typePattern);
-  }
-
-  return jh.str();
-}
 }  // end namespace

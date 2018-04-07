@@ -141,6 +141,11 @@
 #include "serviceRoutinesV2/optionsPostOnly.h"
 #include "serviceRoutines/optionsVersionRequest.h"
 
+#include "serviceRoutinesV2/getRegistration.h"
+#include "serviceRoutinesV2/deleteRegistration.h"
+#include "serviceRoutinesV2/getRegistrations.h"
+#include "serviceRoutinesV2/postRegistration.h"
+
 #include "rest/RestService.h"
 #include "rest/rest.h"
 #include "contextBroker/orionRestServices.h"
@@ -163,6 +168,8 @@ static RestService getServiceV[] =
   { EntityAllTypesRequest,                         2, { "v2", "types"                                                                  }, "",  getEntityAllTypes                                },
   { SubscriptionsRequest,                          2, { "v2", "subscriptions"                                                          }, "",  getAllSubscriptions                              },
   { IndividualSubscriptionRequest,                 3, { "v2", "subscriptions", "*"                                                     }, "",  getSubscription                                  },
+  { RegistrationRequest,                           3, { "v2", "registrations", "*"                                                     }, "",  getRegistration                                  },
+  { RegistrationsRequest,                          2, { "v2", "registrations"                                                          }, "",  getRegistrations                                 },
   { ContextEntitiesByEntityId,                     3, { "ngsi9", "contextEntities", "*"                                                }, "",  getContextEntitiesByEntityId                     },
   { ContextEntityAttributes,                       4, { "ngsi9",          "contextEntities", "*", "attributes"                         }, "",  getContextEntityAttributes                       },
   { EntityByIdAttributeByName,                     5, { "ngsi9",          "contextEntities", "*", "attributes", "*"                    }, "",  getEntityByIdAttributeByName                     },
@@ -233,6 +240,7 @@ static RestService postServiceV[] =
   { SubscriptionsRequest,                          2, { "v2", "subscriptions"                                                          }, "",                                             postSubscriptions                                 },
   { BatchQueryRequest,                             3, { "v2", "op", "query"                                                            }, "",                                             postBatchQuery                                    },
   { BatchUpdateRequest,                            3, { "v2", "op", "update"                                                           }, "",                                             postBatchUpdate                                   },
+  { RegistrationsRequest,                          2, { "v2", "registrations"                                                          }, "",                                             postRegistration                                  },
   { RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, "registerContextRequest",                       postRegisterContext                               },
   { DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, "discoverContextAvailabilityRequest",           postDiscoverContextAvailability                   },
   { SubscribeContextAvailability,                  2, { "ngsi9",          "subscribeContextAvailability"                               }, "subscribeContextAvailabilityRequest",          postSubscribeContextAvailability                  },
@@ -355,6 +363,7 @@ static RestService deleteServiceV[] =
   { EntityRequest,                                 3, { "v2", "entities", "*"                                                        }, "", deleteEntity                                        },
   { EntityAttributeRequest,                        5, { "v2", "entities", "*", "attrs", "*"                                          }, "", deleteEntity                                        },
   { IndividualSubscriptionRequest,                 3, { "v2", "subscriptions", "*"                                                   }, "", deleteSubscription                                  },
+  { RegistrationRequest,                           3, { "v2", "registrations", "*"                                                   }, "", deleteRegistration                                  },
   { Ngsi9SubscriptionsConvOp,                      3, { "ngsi9",          "contextAvailabilitySubscriptions", "*"                    }, "", deleteAvailabilitySubscriptionConvOp                },
   { Ngsi9SubscriptionsConvOp,                      4, { "v1", "registry", "contextAvailabilitySubscriptions", "*"                    }, "", deleteAvailabilitySubscriptionConvOp                },
   { IndividualContextEntity,                       3, { "ngsi10",  "contextEntities", "*"                                            }, "", deleteIndividualContextEntity                       },
@@ -407,6 +416,8 @@ static RestService badVerbV[] =
   { IndividualSubscriptionRequest,                 3, { "v2", "subscriptions", "*"                                                     }, "",                                             badVerbGetDeletePatchOnly },
   { BatchQueryRequest,                             3, { "v2", "op", "query"                                                            }, "",                                             badVerbPostOnly           },
   { BatchUpdateRequest,                            3, { "v2", "op", "update"                                                           }, "",                                             badVerbPostOnly           },
+  { RegistrationRequest,                           3, { "v2", "registrations", "*"                                                     }, "",                                             badVerbGetDeleteOnly      },
+  { RegistrationsRequest,                          2, { "v2", "registrations"                                                          }, "",                                             badVerbPostOnly           },
   { RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, "registerContextRequest",                       badVerbPostOnly           },
   { DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, "discoverContextAvailabilityRequest",           badVerbPostOnly           },
   { SubscribeContextAvailability,                  2, { "ngsi9",          "subscribeContextAvailability"                               }, "subscribeContextAvailabilityRequest",          badVerbPostOnly           },
@@ -524,6 +535,8 @@ static RestService optionsV[] =
   { IndividualSubscriptionRequest, 3, { "v2", "subscriptions", "*"                   }, "", optionsGetDeletePatchOnly },
   { BatchQueryRequest,             3, { "v2", "op", "query"                          }, "", optionsPostOnly           },
   { BatchUpdateRequest,            3, { "v2", "op", "update"                         }, "", optionsPostOnly           },
+  { RegistrationRequest,           3, { "v2", "registrations", "*"                   }, "", optionsGetDeleteOnly      },
+  { RegistrationsRequest,          2, { "v2", "registrations"                        }, "", optionsGetPostOnly        },
   { VersionRequest,                1, { "version"                                    }, "", optionsVersionRequest     },
 
   ORION_REST_SERVICE_END

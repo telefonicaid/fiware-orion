@@ -130,6 +130,8 @@ static void resetStatistics(void)
   noOfSimulatedNotifications                      = -1;
   noOfBatchQueryRequest                           = -1;
   noOfBatchUpdateRequest                          = -1;
+  noOfRegistrationRequest                         = -1;
+  noOfRegistrationsRequest                        = -1;
 
   QueueStatistics::reset();
 
@@ -210,6 +212,8 @@ std::string renderCounterStats(void)
   renderUsedCounter(&js, "entityByIdAttributeByNameIdAndType",        noOfEntityByIdAttributeByNameIdAndType);
   renderUsedCounter(&js, "batchQueryRequests",                        noOfBatchQueryRequest);
   renderUsedCounter(&js, "batchUpdateRequests",                       noOfBatchUpdateRequest);
+  renderUsedCounter(&js, "registrationRequest",                       noOfRegistrationRequest);
+  renderUsedCounter(&js, "registrationsRequest",                      noOfRegistrationsRequest);
   renderUsedCounter(&js, "logTraceRequests",                          noOfLogTraceRequests);
   renderUsedCounter(&js, "logLevelRequests",                          noOfLogLevelRequests);
 

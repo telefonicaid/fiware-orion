@@ -22,9 +22,6 @@
 *
 * Author: Orion dev team
 */
-
-#include "serviceRoutinesV2/getAllSubscriptions.h"
-
 #include <string>
 #include <vector>
 
@@ -32,13 +29,13 @@
 #include "common/clockFunctions.h"
 #include "common/JsonHelper.h"
 #include "common/string.h"
-
 #include "apiTypesV2/Subscription.h"
 #include "mongoBackend/mongoGetSubscriptions.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
+#include "serviceRoutinesV2/getAllSubscriptions.h"
 
 
 
@@ -51,10 +48,10 @@
 */
 std::string getAllSubscriptions
 (
-    ConnectionInfo*            ciP,
-    int                        components,
-    std::vector<std::string>&  compV,
-    ParseData*                 parseDataP
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
 )
 {
   std::vector<ngsiv2::Subscription> subs;

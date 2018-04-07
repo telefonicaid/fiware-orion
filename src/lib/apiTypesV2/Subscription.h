@@ -30,6 +30,7 @@
 
 #include "ngsi/Duration.h"
 #include "ngsi/Throttling.h"
+#include "apiTypesV2/EntID.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 #include "ngsi/Restriction.h"
@@ -37,54 +38,6 @@
 
 namespace ngsiv2
 {
-/* ****************************************************************************
-*
-* EntID -
-*/
-struct EntID
-{
-  std::string id;
-  std::string idPattern;
-  std::string type;
-  std::string typePattern;
-  std::string toJson();
-
-  EntID(const std::string& idA, const std::string& idPatternA,
-        const std::string& typeA, const std::string& typePatternA):
-    id(idA),
-    idPattern(idPatternA),
-    type(typeA),
-    typePattern(typePatternA)
-  {}
-
-  EntID()
-  {}
-};
-
-
-
-/* ****************************************************************************
-*
-* operator== -
-*/
-inline bool operator==(const EntID& lhs, const EntID& rhs)
-{
-  return (lhs.id   == rhs.id)   && (lhs.idPattern   == rhs.idPattern)
-      && (lhs.type == rhs.type) && (lhs.typePattern == rhs.typePattern);
-}
-
-
-
-/* ****************************************************************************
-*
-* operator!= -
-*/
-inline bool operator!=(const EntID& lhs, const EntID& rhs)
-{
-  return !(lhs == rhs);
-}
-
-
 
 /* ****************************************************************************
 *
@@ -99,8 +52,8 @@ struct Notification
   long long                lastNotification;
   HttpInfo                 httpInfo;
   std::string              toJson(const std::string& attrsFormat);
-  int                      lastFailure;
-  int                      lastSuccess;
+  int                      lastFailure;  // FIXME P4: should be long long, like lastNotification
+  int                      lastSuccess;  // FIXME P4: should be long long, like lastNotification
   Notification():
     attributes(),
     blacklist(false),
@@ -160,6 +113,7 @@ struct Subscription
 
   ~Subscription();
 };
+
 }  // end namespace
 
 #endif  // SRC_LIB_APITYPESV2_SUBSCRIPTION_H_

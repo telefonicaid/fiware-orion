@@ -28,8 +28,14 @@
 
 
 
-#define  DEFAULT_SERVICE_PATH_UPDATES         "/"
-#define  DEFAULT_SERVICE_PATH_QUERIES         "/#"
+/* ****************************************************************************
+*
+* Default Service Paths
+*/
+#define  SERVICE_PATH_ROOT      "/"
+#define  SERVICE_PATH_ALL       "/#"
+
+
 
 /* ****************************************************************************
 *
