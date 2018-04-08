@@ -1,0 +1,264 @@
+/*
+*
+* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+*
+* This file is part of Orion Context Broker.
+*
+* Orion Context Broker is free software: you can redistribute it and/or
+* modify it under the terms of the GNU Affero General Public License as
+* published by the Free Software Foundation, either version 3 of the
+* License, or (at your option) any later version.
+*
+* Orion Context Broker is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+* General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+*
+* For those usages not covered by this license please contact with
+* iot_support at tid dot es
+*
+* Author: Ken Zangelin
+*/
+#include <string>
+
+#include "rapidjson/document.h"
+
+#include "common/errorMessages.h"
+#include "apiTypesV2/Entity.h"
+#include "alarmMgr/alarmMgr.h"
+#include "ngsi10/NotifyContextRequest.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/OrionError.h"
+#include "rest/HttpStatusCode.h"
+#include "jsonParseV2/jsonParseTypeNames.h"
+#include "jsonParseV2/parseEntityObject.h"
+#include "jsonParseV2/parseNotification.h"
+
+
+
+/* ****************************************************************************
+*
+* parseContextElementResponse - 
+*
+*  {
+*    "subscriptionId": "12345",
+*    "data": [
+*      {
+*        "id": "Room1",
+*        "type": "Room",
+*        "temperature": {
+*          "value": 23,
+*          "type": "Number",
+*          "metadata": {}
+*        },
+*        "humidity": {
+*          "value": 70,
+*          "type": "percentage",
+*          "metadata": {}
+*        }
+*      },
+*      {
+*        "id": "Room2",
+*        "type": "Room",
+*        "temperature": {
+*          "value": 24,
+*          "type": "Number",
+*          "metadata": {}
+*        }
+*      }
+*    ]
+*  }
+*
+*/
+static bool parseContextElementResponse(rapidjson::Value::ConstValueIterator iter, ContextElementResponse* cerP, OrionError* oeP)
+{
+  std::string type = jsonParseTypeNames[iter->GetType()];
+
+  LM_TMP(("Parsing V2 notificationData"));
+  
+  if (type != "Object")
+  {
+    oeP->fill(SccBadRequest, "notification data vector item must be a JSON Object");
+    return false;
+  }
+
+  //
+  // Let's use the function parseEntityObject(), that is already implemented for a similar case.
+  // Only problem is that 'parseEntityObject' takes an Entity* as input while ContextElement contains an EntityId
+  // This is because we're using an old V1 type for notifications (NotifyContextRequest).
+  // If we instead create a *new* type for V2 notifications we could use parseEntityObject(), without any problem.
+  //
+  // However, we can still use parseEntityObject(), it's just that we need to convert the Entity into an EntityId.
+  //
+  std::string     r;
+  Entity          entity;
+  ConnectionInfo  ci;
+
+  ci.apiVersion  = V2;
+  ci.requestType = NotifyContext;
+  
+  if ((r = parseEntityObject(&ci, iter, &entity, true)) != "OK")
+  {
+    oeP->fill(SccBadRequest, r);
+    return false;
+  }
+
+  LM_TMP(("Got an entity id:'%s', type:'%s'", entity.id.c_str(), entity.type.c_str()));
+  LM_TMP(("Got an sttr vector with %d elements", entity.attributeVector.vec.size()));
+  cerP->contextElement.entityId.fill(entity.id, entity.type, entity.isPattern);
+  cerP->contextElement.contextAttributeVector.push_back(&entity.attributeVector);
+  entity.release();
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* parseNotificationData - 
+*/
+static bool parseNotificationData(rapidjson::Value::ConstMemberIterator iter, NotifyContextRequest* ncrP, OrionError* oeP)
+{
+  std::string type = jsonParseTypeNames[iter->value.GetType()];
+
+  LM_TMP(("Parsing V2 notificationData"));
+  
+  if (type != "Array")
+  {
+    oeP->fill(SccBadRequest, "notification field /data/ must be a JSON Array");
+    return false;
+  }
+
+  for (rapidjson::Value::ConstValueIterator iter2 = iter->value.Begin(); iter2 != iter->value.End(); ++iter2)
+  {
+    ContextElementResponse* cerP = new ContextElementResponse();
+
+    ncrP->contextElementResponseVector.vec.push_back(cerP);
+
+    if (parseContextElementResponse(iter2, cerP, oeP) == false)
+    {
+      return false;
+    }
+  }
+  
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* parseNotification - 
+*/
+std::string parseNotification(ConnectionInfo* ciP, NotifyContextRequest* ncrP)
+{
+  rapidjson::Document  document;
+  OrionError           oe;
+
+  LM_TMP(("Parsing V2 Notification"));
+
+  document.Parse(ciP->payload);
+
+  if (document.HasParseError())
+  {
+    alarmMgr.badInput(clientIp, "JSON Parse Error");
+    oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
+    ciP->httpStatusCode = SccBadRequest;
+
+    return oe.toJson();
+  }
+
+  if (!document.IsObject())
+  {
+    alarmMgr.badInput(clientIp, "JSON Parse Error");
+    oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
+    ciP->httpStatusCode = SccBadRequest;
+
+    return oe.toJson();
+  }
+  else if (document.ObjectEmpty())
+  {
+    alarmMgr.badInput(clientIp, "Empty JSON payload");
+    oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
+    ciP->httpStatusCode = SccBadRequest;
+
+    return oe.toJson();
+  }
+  else if (!document.HasMember("subscriptionId"))
+  {
+    std::string  details = "Invalid JSON payload, mandatory field /subscriptionId/ not found";
+
+    alarmMgr.badInput(clientIp, details);
+    oe.fill(SccBadRequest, details, "BadRequest");
+    ciP->httpStatusCode = SccBadRequest;
+
+    return oe.toJson();
+  }
+  else if (!document.HasMember("data"))
+  {
+    std::string  details = "Invalid JSON payload, mandatory field /data/ not found";
+
+    alarmMgr.badInput(clientIp, details);
+    oe.fill(SccBadRequest, details, "BadRequest");
+    ciP->httpStatusCode = SccBadRequest;
+
+    return oe.toJson();
+  }
+
+  for (rapidjson::Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
+  {
+    std::string name   = iter->name.GetString();
+    std::string type   = jsonParseTypeNames[iter->value.GetType()];
+
+    if (name == "subscriptionId")
+    {
+      if (type != "String")
+      {
+        oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_SUBSCRIPTIONID_NOT_STRING, "BadRequest");
+
+        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_SUBSCRIPTIONID_NOT_STRING);
+        ciP->httpStatusCode = SccBadRequest;
+
+        return oe.toJson();
+      }
+
+      ncrP->subscriptionId.set(iter->value.GetString());
+    }
+    else if (name == "data")
+    {
+      if (type != "Array")
+      {
+        oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_DATA_NOT_ARRAY, "BadRequest");
+
+        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_DATA_NOT_ARRAY);
+        ciP->httpStatusCode = SccBadRequest;
+
+        return oe.toJson();
+      }
+
+      if (parseNotificationData(iter, ncrP, &oe) == false)
+      {
+        alarmMgr.badInput(clientIp, oe.details);
+        ciP->httpStatusCode = SccBadRequest;
+
+        return oe.toJson();
+      }
+    }
+    else
+    {
+      std::string  description = std::string("Unrecognized field in JSON payload: /") + name + "/";
+
+      alarmMgr.badInput(clientIp, description);
+      oe.fill(SccBadRequest, description, "BadRequest");
+      ciP->httpStatusCode = SccBadRequest;
+
+      return oe.toJson();
+    }
+  }
+
+  return "OK";  
+}

@@ -43,6 +43,7 @@ SET (SOURCES
     parseRegistration.cpp
     badInput.cpp
     parseStringVector.cpp
+    parseNotification.cpp
 )
 
 SET (HEADERS
@@ -68,6 +69,7 @@ SET (HEADERS
     parseRegistration.h
     parseStringVector.h
     badInput.h
+    parseNotification.h
 )
 
 

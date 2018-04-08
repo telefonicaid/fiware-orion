@@ -76,6 +76,8 @@
 #define ERROR_DESC_BAD_REQUEST_ENTID_IN_PAYLOAD               "entity id specified in payload"
 #define ERROR_DESC_BAD_REQUEST_ENTTYPE_IN_PAYLOAD             "entity type specified in payload"
 #define ERROR_DESC_BAD_REQUEST_NOT_A_JSON_OBJECT              "not a JSON object"
+#define ERROR_DESC_BAD_REQUEST_SUBSCRIPTIONID_NOT_STRING      "/subscriptionId/ must be a JSON String"
+#define ERROR_DESC_BAD_REQUEST_DATA_NOT_ARRAY                 "/data/ must be a JSON Array"
 
 #define ERROR_NOT_FOUND                               "NotFound"
 #define ERROR_DESC_NOT_FOUND_ENTITY                   "The requested entity has not been found. Check type and id"

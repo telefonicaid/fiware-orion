@@ -32,6 +32,7 @@
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
 #include "alarmMgr/alarmMgr.h"
+#include "apiTypesV2/SubscriptionUpdate.h"
 #include "jsonParseV2/parseEntity.h"
 #include "jsonParseV2/parseContextAttribute.h"
 #include "jsonParseV2/parseAttributeValue.h"
@@ -39,8 +40,8 @@
 #include "jsonParseV2/parseBatchQuery.h"
 #include "jsonParseV2/parseBatchUpdate.h"
 #include "jsonParseV2/parseRegistration.h"
+#include "jsonParseV2/parseNotification.h"
 #include "jsonParseV2/jsonRequestTreat.h"
-#include "apiTypesV2/SubscriptionUpdate.h"
 
 
 
@@ -163,6 +164,14 @@ std::string jsonRequestTreat
     }
     break;
 
+  case NotifyContext:
+    answer = parseNotification(ciP, &parseDataP->ncr.res);
+    if (answer != "OK")
+    {
+      return answer;
+    }
+    break;
+    
   default:
     OrionError error(SccNotImplemented, "Request Treat function not implemented");
     answer = error.render();

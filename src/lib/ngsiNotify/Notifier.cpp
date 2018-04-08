@@ -76,11 +76,20 @@ void Notifier::sendNotifyContextRequest
 )
 {
   pthread_t                         tid;
-  std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncrP, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blackList);
+  std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncrP,
+                                                                          httpInfo,
+                                                                          tenant,
+                                                                          xauthToken,
+                                                                          fiwareCorrelator,
+                                                                          renderFormat,
+                                                                          attrsOrder,
+                                                                          metadataFilter,
+                                                                          blackList);
 
   if (!paramsV->empty()) // al least one param, an empty vector means an error occurred
   {
     int ret = pthread_create(&tid, NULL, startSenderThread, paramsV);
+
     if (ret != 0)
     {
       LM_E(("Runtime Error (error creating thread: %d)", ret));
@@ -171,7 +180,6 @@ void Notifier::sendNotifyContextAvailabilityRequest
 /* ****************************************************************************
 *
 * buildSenderParamsCustom -
-*
 */
 static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 (
@@ -235,6 +243,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       ncr.contextElementResponseVector.push_back(&cer);
       payload  = ncr.toJson(renderFormat, attrsOrder, metadataFilter);
       mimeType = "application/json";
+      LM_TMP(("Created payload for notification"));
     }
     else
     {
@@ -462,10 +471,12 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     {
       bool asJsonObject = (ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON);
       payloadString = ncrP->render(ci.apiVersion, asJsonObject);
+      LM_TMP(("Created payload for NGSI_V1_LEGACY notification"));
     }
     else
     {
       payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
+      LM_TMP(("Created payload for NOT NGSI_V1_LEGACY notification"));
     }
 
     /* Parse URL */
