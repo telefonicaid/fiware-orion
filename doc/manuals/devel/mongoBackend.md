@@ -617,8 +617,8 @@ _MB-24: mongoRegistrationsGet_
 
 * `mongoRegistrationsGet()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (read mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
-* The subscription is retrieved from the database using `collectionRangedQuery()` in the `connectionOperations` module (steps 3 and 4).
-* For each subscription to return, several `set*()` functions are used in order to fill the `Registration` objects. 
+* The registration is retrieved from the database using `collectionRangedQuery()` in the `connectionOperations` module (steps 3 and 4).
+* For each registration to return, several `set*()` functions are used in order to fill the `Registration` objects. 
 * If the request semaphore was taken in step 2, then it is released before returning (step 6). 
 
 [Top](#top)

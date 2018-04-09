@@ -212,7 +212,7 @@ Fields:
     following information:
     -   **entities**: an array containing a list of
         entities (mandatory). The JSON for each entity contains **id**,
-        **type**, **isPattern** and "isTypePattern". Note that, due to legacy
+        **type**, **isPattern** and **isTypePattern**. Note that, due to legacy
         reasons, **isPattern** may be `"true"` or `"false"` (text) while
         **isTypePattern** may be `true` or `false` (boolean).
     -   **attrs**: an array containing a list of attributes (optional).

@@ -139,7 +139,7 @@ without context registration as intermediate element, i.e. a registration is ass
 attributes directly.
 
 In the case of retrieving a registration created using NGSIv1, and that has more than one context registration, with
-`GET /v2/registrations` or `GET /v2/registrations/<id>` only the first one is consideren. In other words,
+`GET /v2/registrations` or `GET /v2/registrations/<id>` only the first one is considered. In other words,
 the `dataProvided` element in the response to `GET /v2/registrations` or `GET /v2/registrations/<id>` is
 filled using the first context registration (the following ones, if any, are ignored).
 
