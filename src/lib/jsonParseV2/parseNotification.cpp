@@ -42,43 +42,17 @@
 /* ****************************************************************************
 *
 * parseContextElementResponse - 
-*
-*  {
-*    "subscriptionId": "12345",
-*    "data": [
-*      {
-*        "id": "Room1",
-*        "type": "Room",
-*        "temperature": {
-*          "value": 23,
-*          "type": "Number",
-*          "metadata": {}
-*        },
-*        "humidity": {
-*          "value": 70,
-*          "type": "percentage",
-*          "metadata": {}
-*        }
-*      },
-*      {
-*        "id": "Room2",
-*        "type": "Room",
-*        "temperature": {
-*          "value": 24,
-*          "type": "Number",
-*          "metadata": {}
-*        }
-*      }
-*    ]
-*  }
-*
 */
-static bool parseContextElementResponse(rapidjson::Value::ConstValueIterator iter, ContextElementResponse* cerP, OrionError* oeP)
+static bool parseContextElementResponse
+(
+  ConnectionInfo*                      ciP,
+  rapidjson::Value::ConstValueIterator iter,
+  ContextElementResponse*              cerP,
+  OrionError*                          oeP
+)
 {
   std::string type = jsonParseTypeNames[iter->GetType()];
 
-  LM_TMP(("Parsing V2 notificationData"));
-  
   if (type != "Object")
   {
     oeP->fill(SccBadRequest, "notification data vector item must be a JSON Object");
@@ -86,28 +60,23 @@ static bool parseContextElementResponse(rapidjson::Value::ConstValueIterator ite
   }
 
   //
-  // Let's use the function parseEntityObject(), that is already implemented for a similar case.
-  // Only problem is that 'parseEntityObject' takes an Entity* as input while ContextElement contains an EntityId
-  // This is because we're using an old V1 type for notifications (NotifyContextRequest).
-  // If we instead create a *new* type for V2 notifications we could use parseEntityObject(), without any problem.
+  // NOTE
+  //   Let's use the function parseEntityObject(), that is already implemented for a similar case.
+  //   Only problem is that 'parseEntityObject' takes an Entity* as input while ContextElement contains an EntityId
+  //   This is because we're using an old V1 type for notifications (NotifyContextRequest).
+  //   If we instead create a *new* type for V2 notifications we could use parseEntityObject(), without any problem.
   //
-  // However, we can still use parseEntityObject(), it's just that we need to convert the Entity into an EntityId.
+  //   However, we can still use parseEntityObject(), it's just that we need to convert the Entity into an EntityId afterwards.
   //
   std::string     r;
   Entity          entity;
-  ConnectionInfo  ci;
-
-  ci.apiVersion  = V2;
-  ci.requestType = NotifyContext;
   
-  if ((r = parseEntityObject(&ci, iter, &entity, true)) != "OK")
+  if ((r = parseEntityObject(ciP, iter, &entity, true)) != "OK")
   {
     oeP->fill(SccBadRequest, r);
     return false;
   }
 
-  LM_TMP(("Got an entity id:'%s', type:'%s'", entity.id.c_str(), entity.type.c_str()));
-  LM_TMP(("Got an sttr vector with %d elements", entity.attributeVector.vec.size()));
   cerP->contextElement.entityId.fill(entity.id, entity.type, entity.isPattern);
   cerP->contextElement.contextAttributeVector.push_back(&entity.attributeVector);
   entity.release();
@@ -121,12 +90,16 @@ static bool parseContextElementResponse(rapidjson::Value::ConstValueIterator ite
 *
 * parseNotificationData - 
 */
-static bool parseNotificationData(rapidjson::Value::ConstMemberIterator iter, NotifyContextRequest* ncrP, OrionError* oeP)
+static bool parseNotificationData
+(
+  ConnectionInfo*                       ciP,
+  rapidjson::Value::ConstMemberIterator iter,
+  NotifyContextRequest*                 ncrP,
+  OrionError*                           oeP
+)
 {
   std::string type = jsonParseTypeNames[iter->value.GetType()];
 
-  LM_TMP(("Parsing V2 notificationData"));
-  
   if (type != "Array")
   {
     oeP->fill(SccBadRequest, "notification field /data/ must be a JSON Array");
@@ -139,7 +112,7 @@ static bool parseNotificationData(rapidjson::Value::ConstMemberIterator iter, No
 
     ncrP->contextElementResponseVector.vec.push_back(cerP);
 
-    if (parseContextElementResponse(iter2, cerP, oeP) == false)
+    if (parseContextElementResponse(ciP, iter2, cerP, oeP) == false)
     {
       return false;
     }
@@ -158,8 +131,6 @@ std::string parseNotification(ConnectionInfo* ciP, NotifyContextRequest* ncrP)
 {
   rapidjson::Document  document;
   OrionError           oe;
-
-  LM_TMP(("Parsing V2 Notification"));
 
   document.Parse(ciP->payload);
 
@@ -240,7 +211,7 @@ std::string parseNotification(ConnectionInfo* ciP, NotifyContextRequest* ncrP)
         return oe.toJson();
       }
 
-      if (parseNotificationData(iter, ncrP, &oe) == false)
+      if (parseNotificationData(ciP, iter, ncrP, &oe) == false)
       {
         alarmMgr.badInput(clientIp, oe.details);
         ciP->httpStatusCode = SccBadRequest;

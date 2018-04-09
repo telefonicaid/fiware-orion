@@ -101,7 +101,7 @@ payload='{
     ]
   },
   "notification": {
-      "http": { "url": "http://localhost:'$CP1_PORT'/v2/notifyContext" },
+      "http": { "url": "http://localhost:'$CP1_PORT'/v2/op/notify" },
     "attrsFormat": "normalized"
   }
 }'

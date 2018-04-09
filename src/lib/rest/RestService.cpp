@@ -158,6 +158,12 @@ std::string payloadParse
   {
     if (ciP->apiVersion == V2)
     {
+      //
+      // FIXME #3151: jsonRequestTreat should return 'bool' and accept an output parameter 'OrionError* oeP'.
+      //              Same same for all underlying JSON APIv2 parsing functions
+      //              Not sure the same thing can be done for 'jsonTreat' in the else-part, but this should AT LEAST
+      //              be fixed for V2.
+      //
       result = jsonRequestTreat(ciP, parseDataP, service->request, jsonReleaseP, compV);
     }
     else

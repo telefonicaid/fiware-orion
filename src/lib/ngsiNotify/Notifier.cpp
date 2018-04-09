@@ -243,7 +243,6 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       ncr.contextElementResponseVector.push_back(&cer);
       payload  = ncr.toJson(renderFormat, attrsOrder, metadataFilter);
       mimeType = "application/json";
-      LM_TMP(("Created payload for notification"));
     }
     else
     {
@@ -471,12 +470,10 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     {
       bool asJsonObject = (ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON);
       payloadString = ncrP->render(ci.apiVersion, asJsonObject);
-      LM_TMP(("Created payload for NGSI_V1_LEGACY notification"));
     }
     else
     {
       payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
-      LM_TMP(("Created payload for NOT NGSI_V1_LEGACY notification"));
     }
 
     /* Parse URL */
