@@ -2003,6 +2003,7 @@ A compliant Context Information provider shall expose an NGSIv2 interface, in pa
 * Query by entity type(s), entity id(s), geoquery and attribute and/or metadata projection
 (`attrs` or `metadata` parameter). (See `GET /v2/entities`)
 * Update entity attributes (See `PATCH /v2/entities/<entityId>/attrs`)
+
 When the entities or attributes covered by an active registered provider are subject of a query or
 update operation, and the registrations allow to forward requests, 
 implementations must forward a request to such a registered context provider so that it can provide
