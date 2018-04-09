@@ -9,7 +9,7 @@ notification time.
 You can use any name for your custom metadata except for a few reserved names, used
 for special metadata that are interpreted by Orion:
 
--   [ID](#metadata-id-for-attributes) (deprecated, but stills "blocked" as forbidden keyword)
+-   [ID](#metadata-id-for-attributes) (deprecated, but still "blocked" as forbidden keyword)
 -   location, which is currently [deprecated](../deprecated.md), but still supported
 -   The ones defined in "System/builtin in metadata" section in the NGSIv2 spec
 

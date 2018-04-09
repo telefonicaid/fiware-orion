@@ -39,8 +39,8 @@ Fields:
 -   **attrs** is an keymap of the different attributes that have been
     created for that entity. The key is generated with the attribute
     name (changing "." for "=", as "." is not a valid character in
-    MongoDB document keys). Each one of the
-    elements in the map has the following information:
+    MongoDB document keys).
+    Each element in the map has the following information:
     -   **type**: the attribute type
     -   **value**: the attribute value (for those attribute that has
         received at least one update). Up to version 0.10.1, this value
