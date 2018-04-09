@@ -57,8 +57,8 @@ The work in progress draft of the specification can be found at
 Changes since RC-2017.11:
 
 * `orderBy` may include also `id` and `type` as ordering fields
-* Include `registrations_url` in `GET /v2` response
-* Add registratios management operations
+* Included `registrations_url` in `GET /v2` response
+* Added registration management operations
    * `GET /v2/registrations`
    * `POST /v2/registrations`
    * `GET /v2/registrations/{id}`
@@ -437,7 +437,7 @@ The value of `orderBy` can be:
   (`georel=near`) spatial relationship is used. 
 
 * A comma-separated list of attributes (including system/builtin attributes), `id` (for entity
-  ID) and `type` (for entity type), e.g. `temperature,!humidity`. Results are ordered by the first
+  ID), and `type` (for entity type), e.g. `temperature,!humidity`. Results are ordered by the first
   field. On ties, the results are ordered by the second field and so on. A "!" before
   the field name means that the order is reversed.
 
@@ -1984,12 +1984,12 @@ A compliant Context Information provider shall expose an NGSIv2 interface, in pa
 * Query by entity type(s), entity id(s), geoquery and attribute and/or metadata projection
 (`attrs` or `metadata` parameter). (See `GET /v2/entities`)
 * Update entity attributes (See `PATCH /v2/entities/<entityId>/attrs`)
-When the entities or attributes covered by an active registered provider are the subject of a query or
+When the entities or attributes covered by an active registered provider are subject of a query or
 update operation, and the registrations allow to forward requests, 
-implementations must forward a request to such registered context provider so that it can provide
+implementations must forward a request to such a registered context provider so that it can provide
 the requested data or update it.
 The forwarding algorithm and precise implementation details are work to be completed
-in next versions of this specification. (*TODO*)
+in a future version of this specification. (*TODO*)
 
 A context registration is represented by a JSON object with the following fields:
 
@@ -2009,7 +2009,7 @@ Either `active` (for active registrations) or `inactive` (for inactive registrat
 Automatically provided by the implementation. 
 
 The `provider` field contains the following subfields:
-+ `http` : It is used to convey parameters for providers which deliver information through the HTTP protocol.
++ `http` : It is used to convey parameters for providers that deliver information through the HTTP protocol.
 (Only protocol supported nowadays).
 It must contain a subfield named `url` with the URL that serves as the endpoint that offers the providing interface.
 The endpoint must *not* include the protocol
