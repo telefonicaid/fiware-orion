@@ -26,15 +26,22 @@ Reception of APIv2 notifications
 --SHELL-INIT--
 dbInit CB
 dbInit CP1
+dbInit CP2
 brokerStart CB
 brokerStart CP1
+brokerStart CP2
 
 --SHELL--
 
 #
 # 01. Make CP1 subscribe to ALL in CB (federation creation)
 # 02. Create entity 'CheckInCP1' in CB to be notified to CP1
-# 03. Query CP1, see 'E1' and 'CheckInCP1'
+# 03. Query CP1, see 'CheckInCP1'
+# 04. Make CP2 subscribe to ALL in CP1 (federation)
+# 05. Query CP2, see 'CheckInCP1'
+# 06. Create entity 'Check2' in CB to be notified to CP1 and CP2 via CP1
+# 07. Query CP1, see 2 entities
+# 08. Query CP2, see 2 entities
 #
 
 echo "01. Make CP1 subscribe to ALL in CB (federation creation)"
@@ -85,6 +92,68 @@ echo
 echo
 
 
+echo "04. Make CP2 subscribe to ALL in CP1 (federation)"
+echo "================================================="
+payload='{
+  "description": "Fed Subscription",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*"
+      }
+    ]
+  },
+  "notification": {
+      "http": {
+        "url": "http://localhost:'$CP2_PORT'/v2/op/notify"
+      },
+    "attrsFormat": "normalized"
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "05. Query CP2, see 'CheckInCP1'"
+echo "==============================="
+orionCurl --url /v2/entities --port $CP2_PORT
+echo
+echo
+
+
+echo "06. Create entity 'Check2' in CB to be notified to CP1 and CP2 via CP1"
+echo "======================================================================"
+payload='{
+  "id": "Check2",
+  "type": "T",
+  "A1": {
+    "type": "geo:json",
+    "value": {
+      "type": "Polygon",
+      "coordinates": [ [ [ 1.0, 1.0 ], [ 1.0, 2.0 ], [ 2.0, 2.0 ], [ 2.0, 1.0 ], [ 1.0, 1.0 ] ] ]
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "07. Query CP1, see 2 entities"
+echo "============================="
+orionCurl --url /v2/entities --port $CP1_PORT
+echo
+echo
+
+
+echo "08. Query CP2, see 2 entities"
+echo "============================="
+orionCurl --url /v2/entities --port $CP2_PORT
+echo
+echo
+
+
 --REGEXPECT--
 01. Make CP1 subscribe to ALL in CB (federation creation)
 =========================================================
@@ -128,6 +197,177 @@ Date: REGEX(.*)
             }
         },
         "id": "CheckInCP1",
+        "type": "T"
+    }
+]
+
+
+04. Make CP2 subscribe to ALL in CP1 (federation)
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Query CP2, see 'CheckInCP1'
+===============================
+HTTP/1.1 200 OK
+Content-Length: 118
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    1,
+                    1.1
+                ],
+                "type": "Point"
+            }
+        },
+        "id": "CheckInCP1",
+        "type": "T"
+    }
+]
+
+
+06. Create entity 'Check2' in CB to be notified to CP1 and CP2 via CP1
+======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Check2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Query CP1, see 2 entities
+=============================
+HTTP/1.1 200 OK
+Content-Length: 259
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    1,
+                    1.1
+                ],
+                "type": "Point"
+            }
+        },
+        "id": "CheckInCP1",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    [
+                        [
+                            1,
+                            1
+                        ],
+                        [
+                            1,
+                            2
+                        ],
+                        [
+                            2,
+                            2
+                        ],
+                        [
+                            2,
+                            1
+                        ],
+                        [
+                            1,
+                            1
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            }
+        },
+        "id": "Check2",
+        "type": "T"
+    }
+]
+
+
+08. Query CP2, see 2 entities
+=============================
+HTTP/1.1 200 OK
+Content-Length: 259
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    1,
+                    1.1
+                ],
+                "type": "Point"
+            }
+        },
+        "id": "CheckInCP1",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    [
+                        [
+                            1,
+                            1
+                        ],
+                        [
+                            1,
+                            2
+                        ],
+                        [
+                            2,
+                            2
+                        ],
+                        [
+                            2,
+                            1
+                        ],
+                        [
+                            1,
+                            1
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            }
+        },
+        "id": "Check2",
         "type": "T"
     }
 ]
