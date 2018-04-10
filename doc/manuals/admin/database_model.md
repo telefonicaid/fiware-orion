@@ -1,4 +1,4 @@
-# <a name="top"></a>Data model
+ # <a name="top"></a>Data model
 
 * [Introduction](#introduction)
 * [entities collection](#entities-collection)
@@ -191,12 +191,14 @@ Fields:
     we ensure that registration IDs are unique and that queries by
     registration IDs will be very fast (as there is an automatic default
     index in \_id).
+-   **format**: the format to use to send forwarded requests. The only accepted value for now
+    is **JSON** (meaning NGSIv1 format), although this
+    may change in the future (see [issue about NGSIv2-based forwarding](https://github.com/telefonicaid/fiware-orion/issues/3068)).
 -   **servicePath**: related with [the service
     path](../user/service_path.md) functionality.
--   **fwdRegId**: the ID corresponding to the registration in the
-    forward Context Broker. Used only in "ConfMan mode", (see
-    [programmers
-    guide](../deprecated.md#configuration-manager-role)).
+-   **status** (optional): either `active` (for active registrations) or `inactive` (for inactive registrations).
+    The default status (i.e. if the document omits this field) is "active".
+-   **description** (optional): a free text string describing the registration. Maximum length is 1024.
 -   **expiration**: this is the timestamp for which the
     registration expires. The expiration is calculated using the
     duration parameter included in the registerContext operation
@@ -208,7 +210,9 @@ Fields:
     following information:
     -   **entities**: an array containing a list of
         entities (mandatory). The JSON for each entity contains **id**,
-        **type** and **isPattern**.
+        **type**, **isPattern** and **isTypePattern**. Note that, due to legacy
+        reasons, **isPattern** may be `"true"` or `"false"` (text) while
+        **isTypePattern** may be `true` or `false` (boolean).
     -   **attrs**: an array containing a list of attributes (optional).
         The JSON for each attribute contains **name**, **type** and
         **isDomain**.
@@ -220,7 +224,7 @@ Example document:
 ```
  {
    "_id": ObjectId("5149f60cf0075f2fabca43da"),
-   "fwdRegId": "5149f60cf0075f241bca22f1",
+   "format": "JSON",
    "expiration": 1360232760,
    "contextRegistration": [
        {
@@ -250,6 +254,7 @@ Example document:
            ],
            "providingApplication": "http://foo.bar/notif"
       },
+      "status": "active"
   ]
  }
 ```
@@ -299,7 +304,7 @@ Fields:
     the subscription.   
 -   **format**: the format to use to send notification, possible values are **JSON**
     (meaning JSON notifications in NGSIv1 format), **normalized**, **keyValues** and **values** (the last three used in NGSIv2 format).
--   **status**: either `active` (for active subscriptions) or `inactive (for inactive subscriptions).
+-   **status**: either `active` (for active subscriptions) or `inactive` (for inactive subscriptions).
 -   **description** (optional field): a free text string describing the subscription. Maximum length is 1024.
 -   **custom**: a boolean field to specify if this subscription uses customized notifications (a functionality in the NGSIv2 API).
     If this field exist and its value is "true" then customized notifications are used and the `headers`, `qs`, `method` and
@@ -342,7 +347,6 @@ Example document:
                 "georel" : ""
         },
         "format" : "JSON",
-        "description": "this is an example subscription",
         "status" : "active"
 }
 ```
