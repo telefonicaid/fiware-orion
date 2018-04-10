@@ -55,7 +55,7 @@ static bool parseContextElementResponse
 
   if (type != "Object")
   {
-    oeP->fill(SccBadRequest, "notification data vector item must be a JSON Object");
+    oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_DATA_ITEM_NOT_OBJECT);
     return false;
   }
 
@@ -102,7 +102,7 @@ static bool parseNotificationData
 
   if (type != "Array")
   {
-    oeP->fill(SccBadRequest, "notification field /data/ must be a JSON Array");
+    oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_DATA_NOT_ARRAY);
     return false;
   }
 
@@ -125,59 +125,56 @@ static bool parseNotificationData
 
 /* ****************************************************************************
 *
-* parseNotification - 
+* parseNotificationNormalized - 
 */
-std::string parseNotification(ConnectionInfo* ciP, NotifyContextRequest* ncrP)
+static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextRequest* ncrP, OrionError* oeP)
 {
   rapidjson::Document  document;
-  OrionError           oe;
 
   document.Parse(ciP->payload);
 
   if (document.HasParseError())
   {
     alarmMgr.badInput(clientIp, "JSON Parse Error");
-    oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
+    oeP->fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return false;
   }
 
   if (!document.IsObject())
   {
     alarmMgr.badInput(clientIp, "JSON Parse Error");
-    oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
+    oeP->fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return false;
   }
   else if (document.ObjectEmpty())
   {
     alarmMgr.badInput(clientIp, "Empty JSON payload");
-    oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
+    oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return false;
   }
   else if (!document.HasMember("subscriptionId"))
   {
-    std::string  details = "Invalid JSON payload, mandatory field /subscriptionId/ not found";
-
-    alarmMgr.badInput(clientIp, details);
-    oe.fill(SccBadRequest, details, "BadRequest");
+    alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_NO_SUBSCRIPTION_ID);
+    oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_NO_SUBSCRIPTION_ID, "BadRequest");
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return false;
   }
   else if (!document.HasMember("data"))
   {
     std::string  details = "Invalid JSON payload, mandatory field /data/ not found";
 
     alarmMgr.badInput(clientIp, details);
-    oe.fill(SccBadRequest, details, "BadRequest");
+    oeP->fill(SccBadRequest, details, "BadRequest");
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.toJson();
+    return false;
   }
 
   for (rapidjson::Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
@@ -189,12 +186,12 @@ std::string parseNotification(ConnectionInfo* ciP, NotifyContextRequest* ncrP)
     {
       if (type != "String")
       {
-        oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_SUBSCRIPTIONID_NOT_STRING, "BadRequest");
+        oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_SUBSCRIPTIONID_NOT_STRING, "BadRequest");
 
         alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_SUBSCRIPTIONID_NOT_STRING);
         ciP->httpStatusCode = SccBadRequest;
 
-        return oe.toJson();
+        return false;
       }
 
       ncrP->subscriptionId.set(iter->value.GetString());
@@ -203,20 +200,20 @@ std::string parseNotification(ConnectionInfo* ciP, NotifyContextRequest* ncrP)
     {
       if (type != "Array")
       {
-        oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_DATA_NOT_ARRAY, "BadRequest");
+        oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_DATA_NOT_ARRAY, "BadRequest");
 
         alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_DATA_NOT_ARRAY);
         ciP->httpStatusCode = SccBadRequest;
 
-        return oe.toJson();
+        return false;
       }
 
-      if (parseNotificationData(ciP, iter, ncrP, &oe) == false)
+      if (parseNotificationData(ciP, iter, ncrP, oeP) == false)
       {
-        alarmMgr.badInput(clientIp, oe.details);
+        alarmMgr.badInput(clientIp, oeP->details);
         ciP->httpStatusCode = SccBadRequest;
 
-        return oe.toJson();
+        return false;
       }
     }
     else
@@ -224,12 +221,53 @@ std::string parseNotification(ConnectionInfo* ciP, NotifyContextRequest* ncrP)
       std::string  description = std::string("Unrecognized field in JSON payload: /") + name + "/";
 
       alarmMgr.badInput(clientIp, description);
-      oe.fill(SccBadRequest, description, "BadRequest");
+      oeP->fill(SccBadRequest, description, "BadRequest");
       ciP->httpStatusCode = SccBadRequest;
 
-      return oe.toJson();
+      return false;
     }
   }
 
-  return "OK";  
+  return true;
+}
+
+
+
+
+/* ****************************************************************************
+*
+* parseNotification - 
+*/
+std::string parseNotification(ConnectionInfo* ciP, NotifyContextRequest* ncrP)
+{
+  OrionError  oe;
+  bool        ok = false;
+
+  if ((ciP->httpHeaders.ngsiv2AttrsFormat == "normalized") || (ciP->httpHeaders.ngsiv2AttrsFormat == ""))
+  {
+    ok = parseNotificationNormalized(ciP, ncrP, &oe);
+  }
+  else if (ciP->httpHeaders.ngsiv2AttrsFormat == "keyValues")
+  {
+    oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_FORMAT_KEYVALUES);
+  }
+  else if (ciP->httpHeaders.ngsiv2AttrsFormat == "uniqueValues")
+  {
+    oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_FORMAT_UNIQUEVALUES);
+  }
+  else if (ciP->httpHeaders.ngsiv2AttrsFormat == "custom")
+  {
+    oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_FORMAT_CUSTOM);
+  }
+  else
+  {
+    oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_FORMAT_INVALID);
+  }
+
+  if (ok == true)
+  {
+    return "OK";  // FIXME #3151: parseNotification should return bool and have an input param "OrionError* oeP"
+  }
+
+  return oe.toJson();
 }

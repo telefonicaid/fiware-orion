@@ -28,68 +28,16 @@ dbInit CB
 dbInit CP1
 brokerStart CB
 brokerStart CP1
-accumulatorStart --pretty-print
 
 --SHELL--
 
 #
-# 01. Create subscription for accumulator
-# 02. Create matching entity (E1) for accumulator subscription
-# 03. Dump accumulator to see notification
-# 04. Make CP1 subscribe to ALL in CB (federation creation)
-# 05. Query CP1 for all entities (E1)
-# 06. Create entity 'CheckInCP1' in CB to be notified to CP1
-# 07. Query CP1, see 'E1' and 'CheckInCP1'
+# 01. Make CP1 subscribe to ALL in CB (federation creation)
+# 02. Create entity 'CheckInCP1' in CB to be notified to CP1
+# 03. Query CP1, see 'E1' and 'CheckInCP1'
 #
-echo "01. Create subscription for accumulator"
-echo "======================================="
-payload='{
-  "description": "Sub 1",
-  "subject": {
-    "entities": [
-      {
-        "id": "E1",
-        "type": "T"
-      },
-      {
-        "id": "E2",
-        "type": "T"
-      }
-    ]
-  },
-  "notification": {
-    "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
-    "attrsFormat": "normalized"
-  }
-}'
-orionCurl --url /v2/subscriptions --payload "$payload"
-echo
-echo
 
-
-
-echo "02. Create matching entity (E1) for accumulator subscription"
-echo "============================================================"
-payload='{
-  "id": "E1",
-  "type": "T",
-  "A1": {
-    "value": [[ 1.0, 1.1 ], [ 2.1, 2.2 ]]
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo "03. Dump accumulator to see notification"
-echo "========================================"
-accumulatorDump
-echo
-echo
-
-
-echo "04. Make CP1 subscribe to ALL in CB (federation creation)"
+echo "01. Make CP1 subscribe to ALL in CB (federation creation)"
 echo "========================================================="
 payload='{
   "description": "Fed Subscription",
@@ -101,7 +49,9 @@ payload='{
     ]
   },
   "notification": {
-      "http": { "url": "http://localhost:'$CP1_PORT'/v2/op/notify" },
+      "http": {
+        "url": "http://localhost:'$CP1_PORT'/v2/op/notify"
+      },
     "attrsFormat": "normalized"
   }
 }'
@@ -110,14 +60,7 @@ echo
 echo
 
 
-echo "05. Query CP1 for all entities (E1)"
-echo "==================================="
-orionCurl --url /v2/entities --port $CP1_PORT
-echo
-echo
-
-
-echo "06. Create entity 'CheckInCP1' in CB to be notified to CP1"
+echo "02. Create entity 'CheckInCP1' in CB to be notified to CP1"
 echo "=========================================================="
 payload='{
   "id": "CheckInCP1",
@@ -135,73 +78,15 @@ echo
 echo
 
 
-echo "07. Query CP1, see 'E1' and 'CheckInCP1'"
-echo "========================================"
+echo "03. Query CP1, see 'CheckInCP1'"
+echo "==============================="
 orionCurl --url /v2/entities --port $CP1_PORT
 echo
 echo
 
 
 --REGEXPECT--
-01. Create subscription for accumulator
-=======================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-02. Create matching entity (E1) for accumulator subscription
-============================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-03. Dump accumulator to see notification
-========================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 151
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "data": [
-        {
-            "A1": {
-                "metadata": {},
-                "type": "StructuredValue",
-                "value": [
-                    [
-                        1, 
-                        1.1
-                    ], 
-                    [
-                        2.1, 
-                        2.2
-                    ]
-                ]
-            }, 
-            "id": "E1",
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
-
-
-04. Make CP1 subscribe to ALL in CB (federation creation)
+01. Make CP1 subscribe to ALL in CB (federation creation)
 =========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -211,37 +96,7 @@ Date: REGEX(.*)
 
 
 
-05. Query CP1 for all entities (E1)
-===================================
-HTTP/1.1 200 OK
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-[
-    {
-        "A1": {
-            "metadata": {},
-            "type": "StructuredValue",
-            "value": [
-                [
-                    1,
-                    1.1
-                ],
-                [
-                    2.1,
-                    2.2
-                ]
-            ]
-        },
-        "id": "E1",
-        "type": "T"
-    }
-]
-
-
-06. Create entity 'CheckInCP1' in CB to be notified to CP1
+02. Create entity 'CheckInCP1' in CB to be notified to CP1
 ==========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -251,33 +106,15 @@ Date: REGEX(.*)
 
 
 
-07. Query CP1, see 'E1' and 'CheckInCP1'
-========================================
+03. Query CP1, see 'CheckInCP1'
+===============================
 HTTP/1.1 200 OK
-Content-Length: 215
+Content-Length: 
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
-    {
-        "A1": {
-            "metadata": {},
-            "type": "StructuredValue",
-            "value": [
-                [
-                    1,
-                    1.1
-                ],
-                [
-                    2.1,
-                    2.2
-                ]
-            ]
-        },
-        "id": "E1",
-        "type": "T"
-    },
     {
         "A1": {
             "metadata": {},
@@ -299,6 +136,7 @@ Date: REGEX(.*)
 --TEARDOWN--
 brokerStop CB
 brokerStop CP1
+brokerStop CP2
 dbDrop CB
 dbDrop CP1
-accumulatorStop
+dbDrop CP2
