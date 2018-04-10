@@ -109,7 +109,7 @@ Date: REGEX(.*)
 03. Query CP1, see 'CheckInCP1'
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 118
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
