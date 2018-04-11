@@ -71,7 +71,7 @@ bool parseStringVector
       *errorStringP = "empty string found in string vector /" + fieldName + "/";
       return false;
     }
-    
+
     sVecP->push_back(value);
   }
 

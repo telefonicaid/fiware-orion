@@ -135,7 +135,7 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
     BSON(REG_ENTITIES              << entities.arr() <<
          REG_ATTRS                 << attrs.arr()    <<
          REG_PROVIDING_APPLICATION << regP->provider.http.url));
-  
+
   bobP->append(REG_CONTEXT_REGISTRATION, contextRegistration.arr());
 }
 
@@ -190,7 +190,7 @@ void mongoRegistrationCreate
   // Build the BSON object to insert
   //
   mongo::BSONObjBuilder  bob;
-  
+
   setRegistrationId(&bob, regIdP);
   setDescription(regP->description, &bob);
   setExpiration(regP->expires, &bob);
@@ -200,7 +200,7 @@ void mongoRegistrationCreate
   setFormat("JSON", &bob);   // FIXME #3068: this would be unhardired when we implement NGSIv2-based forwarding
 
   //
-  // Insert in DB  
+  // Insert in DB
   //
   mongo::BSONObj  doc = bob.obj();
   std::string     err;

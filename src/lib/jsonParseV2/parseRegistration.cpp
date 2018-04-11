@@ -335,7 +335,7 @@ std::string parseRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP)
   }
   regP->expires = expiresValue;
 
- 
+
   //
   // Extracting field "status"
   //

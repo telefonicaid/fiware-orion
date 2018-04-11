@@ -31,17 +31,11 @@
 
 namespace ngsiv2
 {
-
-
 /* ****************************************************************************
 *
 * ForwardingInformation::ForwardingInformation -
 */
-ForwardingInformation::ForwardingInformation():
-  lastFailure(0),
-  lastSuccess(0),
-  timesSent(0),
-  lastForwarding(0)
+ForwardingInformation::ForwardingInformation(): lastFailure(0), lastSuccess(0), timesSent(0), lastForwarding(0)
 {
 }
 
@@ -51,9 +45,7 @@ ForwardingInformation::ForwardingInformation():
 *
 * Registration::Registration -
 */
-Registration::Registration():
-  descriptionProvided(false),
-  expires(-1)
+Registration::Registration(): descriptionProvided(false), expires(-1)
 {
 }
 
@@ -164,5 +156,4 @@ std::string ForwardingInformation::toJson()
 
   return jh.str();
 }
-
 }
