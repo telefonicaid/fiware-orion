@@ -152,6 +152,6 @@ practical advantage of having more than one, from a functional point of view, e.
 
 ## Context availability subscriptions
 
-Note that context availability subscriptions and notifications are not included in NGSIv2. They have been intentionally left out due to it is a feature in NGSIv1 that is rarely used and doesn't worth the effort of being included in NGSIv2.
+Note that context availability subscriptions and notifications are not included in NGSIv2. They have been intentionally left out due to it is a feature in NGSIv1 that is rarely used and it isn't worth the effort to include it in NGSIv2
 
 [Top](#top)
