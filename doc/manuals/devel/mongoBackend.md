@@ -645,7 +645,7 @@ _MB-25: mongoRegistrationCreate_
 
 `mongoRegistrationDelete` encapsulates the logic for removing registrations.
 
-The header file contains only a function named `mongoRegistrationDelete()` which uses an registration ID (`regId`) as parameter.
+The header file contains only a function named `mongoRegistrationDelete()` which uses a registration ID (`regId`) as parameter.
 
 Its work is to remove from the database the document associated to the registration in the `registrations` collection ([described as part of the database model in the administration documentation](../admin/database_model.md#registrations-collection)).
 
