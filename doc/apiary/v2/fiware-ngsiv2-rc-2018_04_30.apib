@@ -1,9 +1,9 @@
 FORMAT: 1A
 HOST: http://orion.lab.fiware.org
-TITLE: FIWARE-NGSI v2 Specification (WIP)
-DATE: to be fixed upon next RC production
-VERSION: latest
-PREVIOUS_VERSION: stable
+TITLE: FIWARE-NGSI v2 Specification RC-2018_04
+DATE: 30 Apr 2018
+VERSION: stable
+PREVIOUS_VERSION: RC-2017_11
 APIARY_PROJECT: orioncontextbroker
 SPEC_URL: https://telefonicaid.github.io/fiware-orion/api/v2/
 GITHUB_SOURCE: http://github.com/telefonicaid/fiware-orion.git
@@ -35,16 +35,62 @@ Sergio García Gómez (Telefónica I+D), Martin Bauer (NEC).
   
 ## Status
 
-This is a work in progress and is changing on a daily basis.
-Please send your comments to fiware-ngsi@lists.fiware.org.
-You can trace the discussions checking the archives of the mailing list:
-https://lists.fiware.org/private/fiware-ngsi/ (list subscription required).
+This specification is the November 2017 release candidate of the NGSIv2 API specification (RC-2017.11).
+By "release candidate" we mean that only Minor Changes are expected to the API described by this document.
+Nonetheless new functionalities will be added in the near future, e.g. NGSI9 (context registration) support.
 
-In addition, note that a list of currently open discussions is available at
+In particular, Minor Changes may be of two types:
 
-* https://github.com/telefonicaid/fiware-orion/issues/1022
-* https://github.com/telefonicaid/fiware-orion/issues/1034
-* https://github.com/telefonicaid/fiware-orion/issues/1035
+* Extensions to the functionality currently specified by this document. Note that in this case
+  there isn't any risk of breaking backward compatibility on existing software implementations.
+* Slight modifications in the functionality currently specified by this document, as a consequence
+  of ongoing discussions. Backward compatibility will be taken into account in this case, trying
+  to minimize the impact on existing software implementations. In particular, only completely
+  justified changes impacting backward compatibility will be allowed and "matter of taste"
+  changes will not be allowed.
+
+The work in progress draft of the specification can be found at
+[the following link](http://fiware.github.io/specifications/ngsiv2/latest).
+
+## Changelog
+
+Changes since RC-2017.11:
+
+* `orderBy` may include also `id` and `type` as ordering fields
+* Included `registrations_url` in `GET /v2` response
+* Added registration management operations
+   * `GET /v2/registrations`
+   * `POST /v2/registrations`
+   * `GET /v2/registrations/{id}`
+   * `PATCH /v2/registrations/{id}`
+   * `DELETE /v2/registrations/{id}`
+
+Changes since RC-2016.10:
+
+* New "System/builtin Metadata" section (using partially former "Special metadata in notifications" section)
+* New "Filtering out attributes and metadata" section
+* Section "Virtual Attributes" renamed to "System/builtin Attributes"
+* New system/builtin metadata: `dateCreated` and `dateModified`
+* Added `*` in "Attribute names restrictions" section
+* Added `lastFailure` and `lastSuccess` to subscription information
+* Added `failed` value for subscription `status` field
+* Added `REPLACE` as `actionType` for `POST /v2/op/update` operation, along with a clearer explanation
+  of the different action types
+* Added `metadata` field to `POST /v2/op/query` operation
+* Added `metadata` URI parameter to the following operations:
+   * `GET /v2/entities`
+   * `GET /v2/entities/{entityId}`
+   * `GET /v2/entities/{entityId}/attrs`
+   * `GET /v2/entities/{entityId}/attrs/{attrName}`
+
+Changes since RC-2016.05:
+
+* Default typing for entities, attributes and metadata aligned with schema.org
+* `typePattern` (similar to `idPattern`)
+* Simple Query Language: metadata filters (`mq`)
+* Simple Query Language: Sub-key filtering (both attribute and metadata values, i.e. `q` and `mq`)
+* Notification metadata filtering
+* System/builtin metadata in notifications: `previousValue` and `actionType`
 
 ## Copyright
 
@@ -68,6 +114,11 @@ NGSI version 2 uses camel case (camelCase) syntax for naming properties and rela
 by the API. When  referring to URIs, as part of HATEOAS patterns, and to mark them appropriately,
 the suffix `_url` is added.
 
+## Reference Implementations
+
+* NGISv2 servers
+  * [Orion Context Broker](http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker) - [Implementation Notes](https://fiware-orion.readthedocs.io/en/master/user/ngsiv2_implementation_notes/index.html)
+
 # Specification
 
 ## Introduction
@@ -80,7 +131,6 @@ The FIWARE NGSI (Next Generation Service Interface) API defines
   update operations
 * a **context availability interface** for exchanging information on how to obtain context
   information (whether to separate the two interfaces is currently under discussion).
-* a set of typical **roles** played by NGSI-compliant components
 
 ## Terminology
 
@@ -104,28 +154,6 @@ For example, a context entity with id *sensor-365* could have the
 type *temperatureSensor*.
 
 Each entity is uniquely identified by the combination of its id and type.
-
-#### Context Elements
-
-*(Note: the distinction between context entities and context elements 
-is still under discussion; therefore the notion of context elements
-currently only appears in this section.)*
-
-A context element is a data object (e.g. JSON object; see the section
-on JSON representation below) that contains information about a
-specific context entity. Consequently, a context element has a
-mandatory property `id` in order to identify the context entity it
-refers to. It furthermore can contain an optional property `type`
-to describe the type of the entity. Further properties can be used
-to represent more information about the entity (see the **context
-attributes** section below).
-
-It is important to understand that the relationship between entities and context elements is
-one-to-many.
-This means that:
-* each context element refers to exactly one entity
-* there can be several context elements referring to the same entity. 
-The context elements can for example contain different pieces of information about the entity.
 
 #### Context Attributes 
 
@@ -158,48 +186,6 @@ above. Similar to attributes, each piece of metadata has:
  * a **metadata value** containing the actual metadata
 
 Note that in NGSI it is not foreseen that metadata may contain nested metadata.
-
-#### Restrictions and Operation Scopes
-
-(placeholder to describe restrictions and operation scopes)
-
-#### Context Queries
-
-(placeholder for describing what a context query is, and some hints on how this
-is typically done in the REST interface)
-
-#### Context Subscriptions
-
-(placeholder for describing the concept of context subscriptions)
-
-#### Context Updates
-
-(placeholder for describing updates)
-
-### Exchanging Context Availability Information
-
-(placeholder on some introduction of what context availability information is)
-
-#### Context Registrations
-
-(placeholder for describing what a context registration is and what it is used for)
-
-#### Context Discovery
-
-(placehoder for describing what discovery does)
-
-#### Context Availability Subscription
-
-(placeholder for describing context availability subscriptions)
-
-#### Registering Context Availability Information
-
-(placeholder for describing the operation of registering context)
-
-### Roles of FIWARE NGSI components
-
-(placeholder to describe roles like context provider, context producer,
-context broker, context registry, context consumer)
 
 ## MIME Types
 
@@ -461,8 +447,6 @@ If present, the error payload is a JSON object including the following fields:
 
 + `error` (required, string): a textual description of the error.
 + `description` (optional, string): additional information about the error.
-+ `affectedItems` (optional, array[string]): a list of elements affected by the error.
-  Depending on the operation, it may refer to entities, registrations or subscriptions.
 
 All NGSIv2 server implementations must use the following HTTP response codes and `error` texts.
 However, the particular text used for `description` field is an implementation specific aspect.
@@ -513,9 +497,6 @@ need special indexes which can be under resource constraints imposed by backend 
 Thus, implementations may raise errors when spatial index limits are exceeded.
 The recommended HTTP status code for those situations is ``413``, *Request entity too large*, and
 the reported error on the response payload must be ``NoResourcesAvailable``.
-
-*Note: At the time of writing it is still under discussion whether supporting both syntaxes is
-really needed* 
 
 ### Simple Location Format
 
@@ -2004,13 +1985,6 @@ A compliant Context Information provider shall expose an NGSIv2 interface, in pa
 (`attrs` or `metadata` parameter). (See `GET /v2/entities`)
 * Update entity attributes (See `PATCH /v2/entities/<entityId>/attrs`)
 
-When the entities or attributes covered by an active registered provider are subject of a query or
-update operation, and the registrations allow to forward requests, 
-implementations must forward a request to such a registered context provider so that it can provide
-the requested data or update it.
-The forwarding algorithm and precise implementation details are work to be completed
-in a future version of this specification. (*TODO*)
-
 A context registration is represented by a JSON object with the following fields:
 
 + `id` : Unique identifier assigned to the registration. Automatically generated at creation time.
@@ -2326,10 +2300,6 @@ The payload may contain the following elements (all of them optional):
     + `type` or `typePattern`: Type or type pattern of the entities to search for. Both cannot be used at
       the same time. If omitted, it means "any entity type".
 + `attributes`: a list of attribute names to search for. If omitted, it means "all attributes".
-+ `scopes`: a list of scopes to restrict the result of the query. Each scope is represented by a
-   JSON object with a `type` (a JSON string) and `value` (whose type depends on the `type`
-   property).
-   The different available scopes are described elsewhere.
 + `metadata`: a list of metadata names to include in the response.
    See "Filtering out attributes and metadata" section for more detail.
 
@@ -2373,12 +2343,6 @@ Response code:
             "temperature",
             "humidity"
           ],
-          "scopes": [
-            {
-              "type": "FIWARE::...",
-              "value": "..."
-            }
-          ],
           "metadata": [
             "accuracy",
             "timestamp"
@@ -2418,200 +2382,3 @@ Response code:
             }
           }
         ]
-
-
-### Register [POST /v2/op/register]
-
-This operation allows to create, update and/or delete several registrations in a single batch
-operation. The payload is an object with two properties:
-
-+ `actionType`, to specify the kind of register action to do: either CREATE, UPDATE, or DELETE.
-+ `registrations`, an array of registrations, each one specified using the JSON registration 
-  representation format (described above). In case of CREATE operation, the registration `id`
-  must not be included.
-
-Response:
-
-* Successful operation uses 200 OK. In addition, in case of successful CREATE, a list of IDs is
-  returned, each one corresponding to the ID of the element in the request payload and in that same
-  order.
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
-
-+ Request (application/json)
-
-        {
-          "actionType": "CREATE",
-          "registrations": [
-            {
-              "subject": {
-                "entities": [
-                  {
-                    "type": "Room"
-                  }
-                ],
-                "attributes": [
-                  "humidity"
-                ]
-              },
-              "callback": "http://localhost:1234",
-              "duration": "PT1M"
-            },
-            {
-              "subject": {
-                "entities": [
-                  {
-                    "type": "Car"
-                  }
-                ],
-                "attributes": [
-                  "speed"
-                ]
-              },
-              "callback": "http://localhost:5678",
-              "duration": "PT1M"
-            }
-          ]
-        }
-
-+ Response 200
-
-        [
-          "abcd",
-          "efgh"
-        ]
-
-
-### Discover [POST /v2/op/discover/{?limit,offset,options}]
-
-The response payload is an Array that contains one object per matching registration.
-The registrations follow the JSON registration representation format (described in a section above).
-
-The payload may contain the following elements (all of them optional):
-
-+ `entities`: a list of entites to search for. Each entity is represented by a JSON object with the
-  following elements:
-    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
-      time, but one of them must be present.
-    + `type` or `typePattern`: Type or type pattern of the entities to search for. Both cannot be used at
-      the same time. If omitted, it means "any entity type".
-+ `attributes`: a list of attribute names to search for. If omitted, it means "all attributes".
-+ `scopes`: a list of scopes to restrict the results of the query. Each scope is represented by a
-  JSON object with a `type` (a JSON string) and a `value` (whose type depends on the `type`
-  property). The different available scopes are described elsewhere.
-
-Response code:
-
-* Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
-
-+ Parameters
-    + limit: 10 (optional, number) - Limit the number of registrations to be retrieved.
-    + offset: 22 (optional, number) - Skip a number of registrations.
-    + options (optional, string) - Options dictionary.
-        + Members
-          + count - when used, the total number of registrations is returned in the response as the
-            HTTP header `Fiware-Total-Count`.
-
-
-+ Request (application/json)
-
-        {
-          "entities": [
-            {
-              "idPattern": ".*",
-              "type": "myFooType"
-            },
-            {
-              "id": "myBar",
-              "type": "myBarType"
-            }
-          ],
-          "attributes": [
-            "temperature",
-            "humidity"
-          ],
-          "scopes": [
-            {
-              "type": "FIWARE::Filter::Foo",
-              "value": "Bar"
-            }
-          ]
-        }
-
-+ Response 200 (application/json)
-
-        [
-          {
-            "id": "abcde",
-            "subject": {
-              "entities": [
-                {
-                  "id": "Foo",
-                  "type": "myFooType"
-                }
-              ],
-              "attributes": [
-                "humidity"
-              ]
-            },
-            "callback": "http://localhost:1234",
-            "duration": "PT1M"
-          },
-          {
-            "id": "efgh",
-            "subject": {
-              "entities": [
-                {
-                  "id": "myBar",
-                  "type": "myBarType"
-                }
-              ],
-              "attributes": [
-                "speed"
-              ]
-            },
-            "callback": "http://localhost:5678",
-            "duration": "PT1M"
-          }
-        ]
-
-# Group OMA-NGSI Operations
-
-(The need/usefulness of these operations is currently under discussion)
-
-For the sake of completeness here is an enumeration of the OMA-NGSI (9 & 10) operations. These
-operations will be supported under the 'v2' resource as well.
-
-### subscribeContext [POST /v2/subscribeContext]
-
-(Not needed, as it is covered by the RESTful POST /v2/subscriptions operation)
-
-### updateContextSubscription [POST /v2/updateContextSubscription]
-
-(Not needed, as it is covered by the RESTful PATCH /v2/subscriptions operation)
-
-### unsubscribeContext [POST /v2/unsubscribeContext]
-
-(Not needed, as it is covered by the RESTful DELETE /v2/subscriptions operation)
-
-### notifyContext [POST /v2/notifyContext]
-
-(The payload of the v2 notifyContext should be described)
-
-### subscribeContextAvailability [POST /v2/subscribeContextAvailability]
-
-(Not needed as POJ RPC, but we need to define a RESTful operation for this, analogous to the NGSI10 one)
-
-### updateContextAvailabilitySubscription [POST /v2/updateContextAvailabilitySubscription]
-
-(Not needed as POJ RPC, but we need to define a RESTful operation for this, analogous to the NGSI10 one)
-
-### unsubscribeContextAvailability [POST /v2/unsubscribeContextAvailability]
-
-(Not needed as POJ RPC, but we need to define a RESTful operation for this, analogous to the NGSI10 one)
-
-### notifyContextAvailability [POST /v2/notifyContextAvailability]
-
-(The payload of the v2 notifyContextAvailability should be described)
