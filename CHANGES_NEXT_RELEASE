@@ -3,6 +3,7 @@
 - Add: support for POST /v2/registrations to create registrations in APIv2 (#3004)
 - Add: support for DELETE /v2/registrations/<registration-id> (#3006)
 - Add: support for CORS requests for /v2/registrations and /v2/registrations/<registration-id> (#3049)
+- Fix: bug when using "legacy" format for custom v2 notifications (#3154)
 - Hardening: refactor request routing logic (#3109, step 1)
 - Bug that may lead contextBroker to crash when passing null character "\u0000" with ID parameter in query context payload (#3119)
 - Add: CORS Preflight Requests support for /version (#3066)
