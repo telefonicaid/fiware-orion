@@ -171,7 +171,6 @@ void Notifier::sendNotifyContextAvailabilityRequest
 /* ****************************************************************************
 *
 * buildSenderParamsCustom -
-*
 */
 static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 (
@@ -217,7 +216,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     //
     if (macroSubstitute(&url, httpInfo.url, ce) == false)
     {
-      // Warning already logged in macroSubstitude()
+      // Warning already logged in macroSubstitute()
       return paramsV;  // empty vector
     }
 
@@ -230,17 +229,28 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       NotifyContextRequest   ncr;
       ContextElementResponse cer;
 
-      cer.contextElement = ce;
-      ncr.subscriptionId = subscriptionId;
+      cer.contextElement  = ce;
+      cer.statusCode.code = SccOk;
+
+      ncr.subscriptionId  = subscriptionId;
       ncr.contextElementResponseVector.push_back(&cer);
-      payload  = ncr.toJson(renderFormat, attrsOrder, metadataFilter);
+
+      if (renderFormat == NGSI_V1_LEGACY)
+      {
+        payload = ncr.render(V1, false);
+      }
+      else
+      {
+        payload  = ncr.toJson(renderFormat, attrsOrder, metadataFilter);
+      }
+
       mimeType = "application/json";
     }
     else
     {
       if (macroSubstitute(&payload, httpInfo.payload, ce) == false)
       {
-        // Warning already logged in macroSubstitude()
+        // Warning already logged in macroSubstitute()
         return paramsV;  // empty vector
       }
 
@@ -262,7 +272,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 
       if ((macroSubstitute(&key, it->first, ce) == false) || (macroSubstitute(&value, it->second, ce) == false))
       {
-        // Warning already logged in macroSubstitude()
+        // Warning already logged in macroSubstitute()
         return paramsV;  // empty vector
       }
 
@@ -285,7 +295,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 
       if ((macroSubstitute(&key, it->first, ce) == false) || (macroSubstitute(&value, it->second, ce) == false))
       {
-        // Warning already logged in macroSubstitude()
+        // Warning already logged in macroSubstitute()
         return paramsV;  // empty vector
       }
 
@@ -336,7 +346,6 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         ++ix;
       }
     }
-
 
     SenderThreadParams*  params = new SenderThreadParams();
 
@@ -409,15 +418,15 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     //
     if (httpInfo.custom && !disableCusNotif)
     {
-        return buildSenderParamsCustom(ncrP->subscriptionId,
-                       ncrP->contextElementResponseVector,
-                       httpInfo,
-                       tenant,
-                       xauthToken,
-                       fiwareCorrelator,
-                       renderFormat,
-                       attrsOrder,
-                       metadataFilter);
+      return buildSenderParamsCustom(ncrP->subscriptionId,
+                                     ncrP->contextElementResponseVector,
+                                     httpInfo,
+                                     tenant,
+                                     xauthToken,
+                                     fiwareCorrelator,
+                                     renderFormat,
+                                     attrsOrder,
+                                     metadataFilter);
     }
 
     paramsV = new std::vector<SenderThreadParams*>();
