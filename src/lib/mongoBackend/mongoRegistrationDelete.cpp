@@ -67,7 +67,7 @@ void mongoRegistrationDelete
     return;
   }
 
-  reqSemTake(__FUNCTION__, "Mongo Delete Registration", SemReadOp, &reqSemTaken);
+  reqSemTake(__FUNCTION__, "Mongo Delete Registration", SemWriteOp, &reqSemTaken);
 
   LM_T(LmtMongo, ("Mongo Delete Registration"));
 
@@ -79,6 +79,10 @@ void mongoRegistrationDelete
   TIME_STAT_MONGO_READ_WAIT_START();
   mongo::DBClientBase* connection = getMongoConnection();
 
+  // FIXME P5: maybe an implemetnation based in collectionFindOne() would be better, have a look to mongoUnsubscribeContext.cpp
+  // Note also that current implementation calls collectionRemove(), which uses a connection internally, without having
+  // released the connection object (this is not a big problem, but a bit unneficient).
+  // If the change is done, then MB-27 diagram (and related texts) in devel manual should be also changed.
   if (!collectionQuery(connection, getRegistrationsCollectionName(tenant), q, &cursor, &err))
   {
     releaseMongoConnection(connection);
@@ -103,9 +107,9 @@ void mongoRegistrationDelete
       oeP->fill(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
       return;
     }
-    
+
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
-    
+
     if (moreSafe(cursor))  // There can only be one registration for a given ID
     {
       releaseMongoConnection(connection);

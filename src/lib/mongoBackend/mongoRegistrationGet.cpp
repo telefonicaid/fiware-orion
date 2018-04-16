@@ -84,11 +84,20 @@ static void setProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
   regP->provider.http.url = (r.hasField(REG_PROVIDING_APPLICATION))? getStringFieldF(r, REG_PROVIDING_APPLICATION): "";
 
   //
-  // FIXME P4: for the moment supportedForwardingMode and legacyForwardingMode are hardwired (i.e. DB is not taken
-  // into account for them)
+  // FIXME #3106: for the moment supportedForwardingMode is hardwired (i.e. DB is not taken
+  // into account for them).
   //
   regP->provider.supportedForwardingMode = ngsiv2::ForwardAll;
-  regP->provider.legacyForwardingMode = true;
+
+  std::string format = r.hasField(REG_FORMAT)? getStringFieldF(r, REG_FORMAT) : "JSON";
+  if (format == "JSON")
+  {
+    regP->provider.legacyForwardingMode = true;
+  }
+  else
+  {
+    // FIXME #3068: to be implemented once we define NGSIv2 based forwarding
+  }
 }
 
 
@@ -300,7 +309,7 @@ void mongoRegistrationGet
 
     setExpires(regP, r);
     setStatus(regP, r);
-    
+
     if (moreSafe(cursor))  // Can only be one ...
     {
       releaseMongoConnection(connection);
@@ -361,7 +370,7 @@ void mongoRegistrationsGet
   {
     q = BSON(REG_SERVICE_PATH << servicePathV[0]);
   }
-  
+
   q.sort(BSON("_id" << 1));
 
   TIME_STAT_MONGO_READ_WAIT_START();

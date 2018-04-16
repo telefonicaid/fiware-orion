@@ -16,6 +16,8 @@
 	* [`mongoSubscribeContextAvailability` (SR)](#mongosubscribecontextavailability-sr)
 	* [`mongoUpdateContextAvailabilitySubscription` (SR)](#mongoupdatecontextavailabilitysubscription-sr)
 	* [`mongoUnsubscribeContextAvailability` (SR)](#mongounsubscribecontextavailability-sr)
+	* [`mongoRegistrationGet` (SR2)](#mongoregistrationget-sr2)
+	* [`mongoRegistrationCreate` (SR2)](#mongoregistrationcreate-sr2) 
 * [Connection pool management](#connection-pool-management)
 * [Low-level modules related to DB interaction](#low-level-modules-related-to-db-interaction)
 * [Specific purpose modules](#specific-purpose-modules)
@@ -576,6 +578,86 @@ _MB-21: mongoUnsubscribeContextAvailability_
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
 * The subscription is retrieved from the database using `collectionFindOne()` in the `connectionOperations` module (steps 3 and 4).
 * The subscription is removed from the database using `collectionRemove()` in the `connectionOperations` module (steps 5 and 6).
+* If the request semaphore was taken in step 2, then it is released before returning (step 7). 
+
+[Top](#top)
+
+#### `mongoRegistrationGet` (SR2)
+
+`mongoRegistrationGet` encapsulates the logic for getting context registrations for NGSIv2 API.
+
+The header file contains two functions:
+
+* `mongoRegistrationGet()`, to get individual context registrations by id, and
+* `mongoRegistrationsGet()`, to get all context registrations.
+
+They both return a `Registration` object (or a vector of `Registration` objects, in the case of get all) with the result.
+
+In both cases, the implementation is based on a query on the `registrations` collection, ([described as part of the database model in the administration documentation](../admin/database_model.md#registrations-collection)).
+
+Regarding `mongoRegistrationGet()`:
+
+<a name="flow-mb-23"></a>
+![mongoRegistrationGet](images/Flow-MB-23.png)
+
+_MB-23: mongoRegistrationGet_
+
+* `mongoRegistrationGet()` is invoked from a service routine (step 1).
+* Depending on `-reqMutexPolicy`, the request semaphore may be taken (read mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
+* The registration is retrieved from the database using `collectionQuery()` in the `connectionOperations` module (steps 3 and 4).
+* Several `set*()` functions are used in order to fill the `Registration` object to return.
+* If the request semaphore was taken in step 2, then it is released before returning (step 5). 
+
+Regarding `mongoRegistrationsGet()`:
+
+<a name="flow-mb-24"></a>
+![mongoRegistrationsGet](images/Flow-MB-24.png)
+
+_MB-24: mongoRegistrationsGet_
+
+* `mongoRegistrationsGet()` is invoked from a service routine (step 1).
+* Depending on `-reqMutexPolicy`, the request semaphore may be taken (read mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
+* The registration is retrieved from the database using `collectionRangedQuery()` in the `connectionOperations` module (steps 3 and 4).
+* For each registration to return, several `set*()` functions are used in order to fill the `Registration` objects. 
+* If the request semaphore was taken in step 2, then it is released before returning (step 6). 
+
+[Top](#top)
+
+#### `mongoRegistrationCreate` (SR2)
+
+`mongoRegistrationCreate` encapsulates the context registration creation logic for NGSIv2 API.
+
+The header file contains only the function `mongoRegistrationCreate()` whose work is basically to get the information from a `Registration` object and to insert the corresponding document in the `registrations` collection in the database ([described as part of the database model in the administration documentation](../admin/database_model.md#registrations-collection)).
+
+<a name="flow-mb-25"></a>
+![mongoRegistrationCreate](images/Flow-MB-25.png)
+
+_MB-25: mongoRegistrationCreate_
+
+* `mongoRegistrationCreate()` is invoked from the `postRegistrations()` service routine (step 1).
+* Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).  
+* This function builds a BSON object which in the end is the one to be persisted in the database, using different `set*()` functions (`setExpiration()`, `setRegistrationId()`, etc.). The BSON object corresponding to the new registration is inserted into the database using `collectionInsert()` in the `connectionOperations` module (steps 3 and 4).
+* If the request semaphore was taken in step 2, then it is released before returning (step 5). 
+
+[Top](#top)
+
+#### `mongoRegistrationDelete` (SR2)
+
+`mongoRegistrationDelete` encapsulates the logic for removing registrations.
+
+The header file contains only a function named `mongoRegistrationDelete()` which uses a registration ID (`regId`) as parameter.
+
+Its work is to remove from the database the document associated to the registration in the `registrations` collection ([described as part of the database model in the administration documentation](../admin/database_model.md#registrations-collection)).
+
+<a name="flow-mb-27"></a>
+![mongoRegistrationDelete](images/Flow-MB-27.png)
+
+_MB-27: mongoRegistrationDelete_
+
+* `mongoRegistrationDelete()` is invoked from a service routine (step 1).
+* Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
+* The registration is retrieved from the database using `collectionQuery()` in the `connectionOperations` module (steps 3 and 4).
+* The registration is removed from the database using `collectionRemove()` in the `connectionOperations` module (steps 5 and 6).
 * If the request semaphore was taken in step 2, then it is released before returning (step 7). 
 
 [Top](#top)

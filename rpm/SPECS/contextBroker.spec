@@ -173,6 +173,17 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Mon Apr 16 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.13.0-1
+- Add: support for GET /v2/registrations (#3005)
+- Add: support for GET /v2/registrations/<registration-id> (#3008)
+- Add: support for POST /v2/registrations to create registrations in APIv2 (#3004)
+- Add: support for DELETE /v2/registrations/<registration-id> (#3006)
+- Add: support for CORS requests for /v2/registrations and /v2/registrations/<registration-id> (#3049)
+- Hardening: refactor request routing logic (#3109, step 1)
+- Bug that may lead contextBroker to crash when passing null character "\u0000" with ID parameter in query context payload (#3119)
+- Add: CORS Preflight Requests support for /version (#3066)
+- Deprecated: ID metadata (and associated NGSIv1 operations)
+
 * Wed Feb 21 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.12.0-1
 - Add: support for entity id and type in orderBy parameter (#2934)
 - Add: NGSIv1 autocast for numbers, booleans and dates (using flag -ngsiv1Autocast) (#3112)
