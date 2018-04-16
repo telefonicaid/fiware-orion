@@ -104,7 +104,7 @@ Related to mongoBackend logic (MB and MD prefixes):
 	* Continues from RQ-02
 * MB-26: mongoRegistrationUpdate (*pending*)
 	* Continues from RQ-02
-* MB-27: mongoRegistrationDelete (*pending*)
+* [MB-27: mongoRegistrationDelete](mongoBackend.md#flow-mb-27)
 	* Continues from RQ-02
 * [MD-01: `processSubscriptions()` function detail](mongoBackend.md#flow-md-01)
 	* Continues from MB-01, MB-03, MB-04 or MB-05

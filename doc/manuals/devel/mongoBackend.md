@@ -641,6 +641,27 @@ _MB-25: mongoRegistrationCreate_
 
 [Top](#top)
 
+#### `mongoRegistrationDelete` (SR2)
+
+`mongoRegistrationDelete` encapsulates the logic for removing registrations.
+
+The header file contains only a function named `mongoRegistrationDelete()` which uses a registration ID (`regId`) as parameter.
+
+Its work is to remove from the database the document associated to the registration in the `registrations` collection ([described as part of the database model in the administration documentation](../admin/database_model.md#registrations-collection)).
+
+<a name="flow-mb-27"></a>
+![mongoRegistrationDelete](images/Flow-MB-27.png)
+
+_MB-27: mongoRegistrationDelete_
+
+* `mongoRegistrationDelete()` is invoked from a service routine (step 1).
+* Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
+* The registration is retrieved from the database using `collectionQuery()` in the `connectionOperations` module (steps 3 and 4).
+* The registration is removed from the database using `collectionRemove()` in the `connectionOperations` module (steps 5 and 6).
+* If the request semaphore was taken in step 2, then it is released before returning (step 7). 
+
+[Top](#top)
+
 ### Connection pool management
 
 The module `mongoConnectionPool` manages the database connection pool. How the pool works is important and deserves an explanation. Basically, Orion Context Broker keeps a list of connections to the database (the `connectionPool` defined in `mongoConnectionPool.cpp`). The list is sized with 

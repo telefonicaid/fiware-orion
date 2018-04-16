@@ -16,6 +16,7 @@ This document explains some consideration to take into account regarding such co
 * [NGSIv1 notification with NGSIv2 subscriptions](#ngsiv1-notification-with-ngsiv2-subscriptions)
 * [NGSIv2 query update forwarding to Context Providers](#ngsiv2-query-update-forwarding-to-context-providers)
 * [Getting registrations created with NGSIv1 using NGSIv2 operations](#getting-registrations-created-with-NGSIv1-using-NGSIv2-operations)
+* [Context availability subscriptions](#context-availability-subscriptions)
 
 ## Native JSON types
 
@@ -146,5 +147,11 @@ filled using the first context registration (the following ones, if any, are ign
 This doesn't have to be a problem, as most NGSIv1 registrations use only one context registration (there isn't any
 practical advantage of having more than one, from a functional point of view, e.g. forwarding). However, this is
 [pending on a more definitive solution](https://github.com/telefonicaid/fiware-orion/issues/3044).
+
+[Top](#top)
+
+## Context availability subscriptions
+
+Note that context availability subscriptions and notifications are not included in NGSIv2. They have been intentionally left out due to it is a feature in NGSIv1 that is rarely used and it isn't worth the effort to include it in NGSIv2
 
 [Top](#top)
