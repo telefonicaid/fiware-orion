@@ -309,7 +309,7 @@ void mongoRegistrationGet
 
     setExpires(regP, r);
     setStatus(regP, r);
-    
+
     if (moreSafe(cursor))  // Can only be one ...
     {
       releaseMongoConnection(connection);
@@ -370,7 +370,7 @@ void mongoRegistrationsGet
   {
     q = BSON(REG_SERVICE_PATH << servicePathV[0]);
   }
-  
+
   q.sort(BSON("_id" << 1));
 
   TIME_STAT_MONGO_READ_WAIT_START();
