@@ -44,7 +44,6 @@
 * Constant strings for field names in collection (first characters
 * are the code name: REG_, ENT_, CSUB_ and CASUB_)
 */
-#define REG_FWS_REGID                "fwdRegId"
 #define REG_CONTEXT_REGISTRATION     "contextRegistration"
 #define REG_PROVIDING_APPLICATION    "providingApplication"
 #define REG_ENTITIES                 "entities"

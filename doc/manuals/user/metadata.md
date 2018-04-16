@@ -1,7 +1,7 @@
 # Attribute Metadata
 
 Apart from metadata elements to which Orion pays special attention (e.g.
-ID, etc.), users can attach their own metadata to entity attributes. These
+`dateCreated`, etc.), users can attach their own metadata to entity attributes. These
 metadata elements are processed by Orion in a transparent way: Orion simply
 stores them in the database at update time and retrieves them at query and
 notification time.
@@ -9,7 +9,7 @@ notification time.
 You can use any name for your custom metadata except for a few reserved names, used
 for special metadata that are interpreted by Orion:
 
--   [ID](#metadata-id-for-attributes)
+-   [ID](#metadata-id-for-attributes) (deprecated, but still "blocked" as forbidden keyword)
 -   location, which is currently [deprecated](../deprecated.md), but still supported
 -   The ones defined in "System/builtin in metadata" section in the NGSIv2 spec
 
@@ -227,180 +227,6 @@ if attribute value itself hasn't changed. Metadata elements cannot be
 deleted once introduced: in order to delete metadata elements you have
 to remove the entity attribute (see [DELETE action type](update_action_types.md#delete)),
 then re-create it (see [APPEND action type](update_action_types.md#append)).
-
-## Metadata ID for attributes
-
-This functionality is not included in the NGSIv2 API.
-
-Sometimes, you could want to model attributes belonging to an entity
-which share the same name and type. For example, let's consider an
-entity "Room1" which has two temperature sensors: one in the ground and
-other in the wall. We can model this as two instances of the attribute
-"temperature", one with ID "ground" and the other with the ID "wall". We
-use the metadata ID for this purpose. Let's illustrate with an example.
-
-First, we create the Room1 entity:
-
-``` 
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
-    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
-    "contextElements": [
-        {
-            "type": "Room",
-            "isPattern": "false",
-            "id": "Room1",
-            "attributes": [
-                {
-                    "name": "temperature",
-                    "type": "float",
-                    "value": "23.5",
-                    "metadatas": [
-                        {
-                            "name": "ID",
-                            "type": "string",
-                            "value": "ground"
-                        }
-                    ]
-                },
-                {
-                    "name": "temperature",
-                    "type": "float",
-                    "value": "23.8",
-                    "metadatas": [
-                        {
-                            "name": "ID",
-                            "type": "string",
-                            "value": "wall"
-                        }
-                    ]
-                }
-            ]
-        }
-    ],
-    "updateAction": "APPEND"
-}
-EOF
-``` 
-
-Now, we can query for temperature to get both instances:
-
-``` 
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \
-    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
-    "entities": [
-        {
-            "type": "Room",
-            "isPattern": "false",
-            "id": "Room1"
-        }
-    ],
-    "attributes": [
-        "temperature"
-    ]
-}
-EOF
-``` 
-
-We can update an specific instance (e.g. ground), letting the other
-untouched:
-
-``` 
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
-    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
-    "contextElements": [
-        {
-            "type": "Room",
-            "isPattern": "false",
-            "id": "Room1",
-            "attributes": [
-                {
-                    "name": "temperature",
-                    "type": "float",
-                    "value": "30",
-                    "metadatas": [
-                        {
-                            "name": "ID",
-                            "type": "string",
-                            "value": "ground"
-                        }
-                    ]
-                }
-            ]
-        }
-    ],
-    "updateAction": "UPDATE"
-}
-EOF
-``` 
-
-Check it using again queryContext (ground has changed to 30ºC but wall
-has its initial value of 23.8º C).
-
-To avoid ambiguities, you cannot mix the same attribute with and without
-ID. The following entity creation will fail:
-
-``` 
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
-    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
-    "contextElements": [
-        {
-            "type": "Room",
-            "isPattern": "false",
-            "id": "Room1",
-            "attributes": [
-                {
-                    "name": "temperature",
-                    "type": "float",
-                    "value": "23.5",
-                    "metadatas": [
-                        {
-                            "name": "ID",
-                            "type": "string",
-                            "value": "ground"
-                        }
-                    ]
-                },
-                {
-                    "name": "temperature",
-                    "type": "float",
-                    "value": "23.8"
-                }
-            ]
-        }
-    ],
-    "updateAction": "APPEND"
-}
-EOF
-``` 
-
-```
-...
-    {
-	"statusCode": {
-	    "code": "472",
-	    "details": "action: APPEND - entity: (Room1, Room) - offending attribute: temperature",
-	    "reasonPhrase": "request parameter is invalid/not allowed"
-	}
-    }
-...
-```
-      
-Finally, you can use also the following convenience operations with
-attributes using ID metadata:
-
--   GET /v1/contextEntities/Room1/attributes/temperature/ground: to get
-    an specific attribute identified by ID
--   PUT /v1/contextEntities/Room1/attributes/temperature/ground (using
-    as payload updateContextElementRequest, as [described in a previous
-    section](walkthrough_apiv1.md#convenience-update-context)).
--   DELETE /v1/contextEntities/Room1/attributes/temperature/ground: to
-    remove an specific attribute identified by ID (see DELETE attribute
-    semantics [described in a previous
-    section](update_action_types.md#delete)).
 
 
 ## Metadata in notifications
