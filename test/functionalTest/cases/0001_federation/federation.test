@@ -34,198 +34,1902 @@ brokerStart CP3 0
 --SHELL--
 
 #
-# 01. Make CP2 subscribe to entity Room/Room1 in CP1
-# 02. Make CP3 subscribe to entity Room/Room1 in CP2
-# 03. Create an entity Room/Room1, attribute temperature in CP1 (CP2 should get informed and after that CP3 also)
-# 04. Query CP3 for entity Room/Room1, to make sure the entity has propagated CP1->CP2->CP3
-#
+# 01. Make CP2 subscribe to all entities in CP1
+# 02. Make CP3 subscribe to all entities in CP2
+# 03. Create an entity in CP1 (CP2 should get informed and after that CP3 also)
+# 04. Query CP3 for entity null
+# 05. Query CP3 for entity number
+# 06. Query CP3 for entity text
+# 07. Query CP3 for entity boolean
+# 08. Query CP3 for entity array-number
+# 09. Query CP3 for entity array-text
+# 10. Query CP3 for entity object-number
+# 11. Query CP3 for entity object-text
+# 12. Query CP3 for entity datetime
+# 13. Query CP3 for entity geo-point-single
+# 14. Query CP3 for entity geo-point-multi
+# 15. Query CP3 for entity geo-line-simple
+# 16. Query CP3 for entity geo-line-multi
+# 17. Query CP3 for entity geo-polygon-single
+# 18. Query CP3 for entity geo-polygon-double
+# 19. Query CP3 for entity geo-polygon-multi-single
+# 20. Query CP3 for entity geo-polygon-multi-double
+# 21. Update an entity in CP1 (CP2 should get informed and after that CP3 also)
+# 22. Query CP3 for entity null
+# 23. Query CP3 for entity number
+# 24. Query CP3 for entity text
+# 25. Query CP3 for entity boolean
+# 26. Query CP3 for entity array-number
+# 27. Query CP3 for entity array-text
+# 28. Query CP3 for entity object-number
+# 29. Query CP3 for entity object-text
+# 30. Query CP3 for entity datetime
+# 31. Query CP3 for entity geo-point-single
+# 32. Query CP3 for entity geo-point-multi
+# 33. Query CP3 for entity geo-line-simple
+# 34. Query CP3 for entity geo-line-multi
+# 35. Query CP3 for entity geo-polygon-single
+# 36. Query CP3 for entity geo-polygon-double
+# 37. Query CP3 for entity geo-polygon-multi-single
+# 38. Query CP3 for entity geo-polygon-multi-double
 
-echo "01. Make CP2 subscribe to entity Room/Room1 in CP1"
+echo "01. Make CP2 subscribe to all entities in CP1"
 echo "=================================================="
-payload='{
-    "entities": [
-        {
-            "type": "Room",
-            "isPattern": "false",
-            "id": "Room1"
-        }
-    ],
-    "reference": "http://localhost:'$CP2_PORT'/v1/notifyContext",
-    "duration": "P1M",
-    "notifyConditions": [
-        {
-            "type": "ONCHANGE",
-            "condValues": [
-                "temperature"
-            ]
-        }
-    ],
-    "throttling": "PT5S"
-
+payload='
+{
+  "description": "TEST",
+  "subject": {
+    "entities": [{
+      "idPattern": ".*"
+    }]
+  },
+  "notification": {
+    "attrsFormat": "legacy",
+    "http": {
+      "url": "http://localhost:'$CP2_PORT'/v1/notifyContext"
+    }
+  },
+  "expires": "2040-01-01T14:00:00.00Z",
+  "throttling": 0
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --port $CP1_PORT
+orionCurl --url /v2/subscriptions --payload "$payload" --port $CP1_PORT
 echo
 echo
 
-echo "02. Make CP3 subscribe to entity Room/Room1 in CP2"
+echo "02. Make CP3 subscribe to all entities in CP2"
 echo "=================================================="
-payload='{
-    "entities": [
-        {
-            "type": "Room",
-            "isPattern": "false",
-            "id": "Room1"
-        }
-    ],
-    "reference": "http://localhost:'$CP3_PORT'/v1/notifyContext",
-    "duration": "P1M",
-    "notifyConditions": [
-        {
-            "type": "ONCHANGE",
-            "condValues": [
-                "temperature"
-            ]
-        }
-    ],
-    "throttling": "PT5S"
+payload='
+{
+  "description": "TEST",
+  "subject": {
+    "entities": [{
+      "idPattern": ".*"
+    }]
+  },
+  "notification": {
+    "attrsFormat": "legacy",
+    "http": {
+      "url": "http://localhost:'$CP3_PORT'/v1/notifyContext"
+    }
+  },
+  "expires": "2040-01-01T14:00:00.00Z",
+  "throttling": 0
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --port $CP2_PORT
+orionCurl --url /v2/subscriptions --payload "$payload" --port $CP2_PORT
 echo
 echo
 
-echo "03. Create an entity Room/Room1, attribute temperature in CP1 (CP2 should get informed and after that CP3 also)"
+echo "03. Create an entity in CP1 (CP2 should get informed and after that CP3 also)"
 echo "==============================================================================================================="
-payload='{
-    "contextElements": [
-        {
-            "type": "Room",
-            "isPattern": "false",
-            "id": "Room1",
-            "attributes": [
-                {
-                    "name": "temperature",
-                    "type": "float",
-                    "value": "23"
-                }
-            ]
-        }
-    ],
-    "updateAction": "APPEND"
-}'
-orionCurl --url /v1/updateContext --payload "$payload" --port $CP1_PORT
+payload='
+{
+  "actionType": "APPEND",
+  "entities": [
+  {
+    "attribute": {
+      "metadata": {},
+      "type": "Null",
+      "value": null
+    },
+    "id": "null",
+    "type": "type"
+  },
+  {
+    "attribute": {
+      "metadata": {},
+      "type": "Number",
+      "value": 1.1
+    },
+    "id": "number",
+    "type": "type"
+  },
+  {
+    "attribute": {
+      "metadata": {},
+      "type": "Text",
+      "value": "g8cira4&epzdjb60219tyumql|xk3"
+    },
+    "id": "text",
+    "type": "type"
+  },
+  {
+    "attribute": {
+      "metadata": {},
+      "type": "Boolean",
+      "value": true
+    },
+    "id": "boolean",
+    "type": "type"
+  },
+  {
+    "attribute": {
+      "metadata": {},
+      "type": "StructuredValue",
+      "value": [1.1, 2.2, 3.3]
+    },
+    "id": "array-number",
+    "type": "type"
+  },
+  {
+    "attribute": {
+      "metadata": {},
+      "type": "StructuredValue",
+      "value": ["1", "2", "3"]
+    },
+    "id": "array-text",
+    "type": "type"
+  },
+  {
+    "attribute": {
+      "metadata": {},
+      "type": "StructuredValue",
+      "value": {"item1":1.1, "item2":2.2}
+    },
+    "id": "object-number",
+    "type": "type"
+  },
+  {
+    "attribute": {
+      "metadata": {},
+      "type": "StructuredValue",
+      "value": {"item1":"1", "item2":"2"}
+    },
+    "id": "object-text",
+    "type": "type"
+  },
+  {
+    "attribute": {
+      "metadata": {},
+      "type": "DateTime",
+      "value": "2017-01-01T00:01:01.001Z"
+    },
+    "id": "datetime",
+    "type": "type"
+  },
+  {
+    "id": "geo-point-single",
+    "location": {
+      "metadata": {},
+      "type": "type",
+      "value": {
+      	"coordinates":
+      	  [30, 10],
+      	"type": "geo:point"
+      }
+    },
+    "type": "type"
+  },
+  {
+    "id": "geo-point-multi",
+    "location": {
+      "metadata": {},
+      "type": "type",
+      "value": {
+      	"coordinates": [
+      	  [10, 40], [40, 30], [20, 20], [30, 10]
+      	],
+      	"type": "geo:point"
+      }
+    },
+    "type": "type"
+  },
+  {
+    "id": "geo-line-simple",
+    "location": {
+      "metadata": {},
+      "type": "type",
+      "value": {
+      	"coordinates": [
+          [30, 10], [10, 30], [40, 40]
+        ],
+      	"type": "geo:line"
+      }
+    },
+    "type": "type"
+  },
+  {
+    "id": "geo-line-multi",
+    "location": {
+      "metadata": {},
+      "type": "type",
+      "value": {
+      	"coordinates": [
+          [[10, 10], [20, 20], [10, 40]],
+          [[40, 40], [30, 30], [40, 20], [30, 10]]
+      	],
+      	"type": "geo:line"
+       }
+    },
+    "type": "type"
+  },
+  {
+    "id": "geo-polygon-single",
+    "location": {
+      "metadata": {},
+      "type": "type",
+      "value": {
+      	"coordinates": [
+      	  [[30, 10], [40, 40], [20, 40], [10, 20], [30, 10]]
+        ],
+      	"type": "geo:polygon"
+      }
+    },
+    "type": "type"
+  },
+  {
+    "id": "geo-polygon-double",
+    "location": {
+      "metadata": {},
+      "type": "type",
+      "value": {
+      	"coordinates": [
+          [[35, 10], [45, 45], [15, 40], [10, 20], [35, 10]],
+          [[20, 30], [35, 35], [30, 20], [20, 30]]
+        ],
+      	"type": "geo:polygon"
+      }
+    },
+    "type": "type"
+  },
+  {
+    "id": "geo-polygon-multi-single",
+    "location": {
+      "metadata": {},
+      "type": "type",
+      "value": {
+      	"coordinates": [
+          [
+            [[30, 20], [45, 40], [10, 40], [30, 20]]
+          ],
+          [
+            [[15, 5], [40, 10], [10, 20], [5, 10], [15, 5]]
+          ]
+        ],
+      	"type": "geo:polygon"
+      }
+    },
+    "type": "type"
+  },
+  {
+    "id": "geo-polygon-multi-double",
+    "location": {
+      "metadata": {},
+      "type": "type",
+      "value": {
+      	"coordinates": [
+          [
+            [[40, 40], [20, 45], [45, 30], [40, 40]]
+          ],
+          [
+            [[20, 35], [10, 30], [10, 10], [30, 5], [45, 20], [20, 35]],
+            [[30, 20], [20, 15], [20, 25], [30, 20]]
+          ]
+        ],
+      	"type": "geo:polygon"
+      }
+    },
+    "type": "type"
+  }
+  ]
+}
+'
+orionCurl --url /v2/op/update --payload "$payload" --port $CP1_PORT
 echo
 
-
-echo "04. Query CP3 for entity Room/Room1, to make sure the entity has propagated CP1->CP2->CP3"
+echo "04. Query CP3 for entity null"
 echo "========================================================================================="
-url="/v1/queryContext"
-payload='{
-    "entities": [
-        {
-            "type": "Room",
-            "isPattern": "false",
-            "id": "Room1"
-        }
-    ]
+orionCurl --url /v2/entities/null --port $CP3_PORT
+echo
+
+echo "05. Query CP3 for entity number"
+echo "========================================================================================="
+orionCurl --url /v2/entities/number --port $CP3_PORT
+echo
+
+echo "06. Query CP3 for entity text"
+echo "========================================================================================="
+orionCurl --url /v2/entities/text --port $CP3_PORT
+echo
+
+echo "07. Query CP3 for entity boolean"
+echo "========================================================================================="
+orionCurl --url /v2/entities/boolean --port $CP3_PORT
+echo
+
+echo "08. Query CP3 for entity array-number"
+echo "========================================================================================="
+orionCurl --url /v2/entities/array-number --port $CP3_PORT
+echo
+
+echo "09. Query CP3 for entity array-text"
+echo "========================================================================================="
+orionCurl --url /v2/entities/array-text --port $CP3_PORT
+echo
+
+echo "10. Query CP3 for entity object-number"
+echo "========================================================================================="
+orionCurl --url /v2/entities/object-number --port $CP3_PORT
+echo
+
+echo "11. Query CP3 for entity object-text"
+echo "========================================================================================="
+orionCurl --url /v2/entities/object-text --port $CP3_PORT
+echo
+
+echo "12. Query CP3 for entity datetime"
+echo "========================================================================================="
+orionCurl --url /v2/entities/datetime --port $CP3_PORT
+echo
+
+echo "13. Query CP3 for entity geo-point-single"
+echo "========================================================================================="
+orionCurl --url /v2/entities/geo-point-single --port $CP3_PORT
+echo
+
+echo "14. Query CP3 for entity geo-point-multi"
+echo "========================================================================================="
+orionCurl --url /v2/entities/geo-point-multi --port $CP3_PORT
+echo
+
+echo "15. Query CP3 for entity geo-line-simple"
+echo "========================================================================================="
+orionCurl --url /v2/entities/geo-line-simple --port $CP3_PORT
+echo
+
+echo "16. Query CP3 for entity geo-line-multi"
+echo "========================================================================================="
+orionCurl --url /v2/entities/geo-line-multi --port $CP3_PORT
+echo
+
+echo "17. Query CP3 for entity geo-polygon-single"
+echo "========================================================================================="
+orionCurl --url /v2/entities/geo-polygon-single --port $CP3_PORT
+echo
+
+echo "18. Query CP3 for entity geo-polygon-double"
+echo "========================================================================================="
+orionCurl --url /v2/entities/geo-polygon-double --port $CP3_PORT
+echo
+
+echo "19. Query CP3 for entity geo-polygon-multi-single"
+echo "========================================================================================="
+orionCurl --url /v2/entities/geo-polygon-multi-single --port $CP3_PORT
+echo
+
+echo "20. Query CP3 for entity geo-polygon-multi-double"
+echo "========================================================================================="
+orionCurl --url /v2/entities/geo-polygon-multi-double --port $CP3_PORT
+echo
+
+echo "21. Update an entity in CP1 (CP2 should get informed and after that CP3 also)"
+echo "==============================================================================================================="
+payload='
+{
+  "actionType": "UPDATE",
+  "entities": [
+  {
+    "attribute": {
+      "metadata": {},
+      "type": "Null",
+      "value": null
+    },
+    "id": "null",
+    "type": "type"
+  },
+  {
+    "attribute": {
+      "metadata": {},
+      "type": "Number",
+      "value": 2.2
+    },
+    "id": "number",
+    "type": "type"
+  },
+  {
+    "attribute": {
+      "metadata": {},
+      "type": "Text",
+      "value": "v84drt3h5d5yrttsdrdhdgt544ql"
+    },
+    "id": "text",
+    "type": "type"
+  },
+  {
+    "attribute": {
+      "metadata": {},
+      "type": "Boolean",
+      "value": false
+    },
+    "id": "boolean",
+    "type": "type"
+  },
+  {
+    "attribute": {
+      "metadata": {},
+      "type": "StructuredValue",
+      "value": [2.2, 4.4, 6.6]
+    },
+    "id": "array-number",
+    "type": "type"
+  },
+  {
+    "attribute": {
+      "metadata": {},
+      "type": "StructuredValue",
+      "value": ["2", "3", "6"]
+    },
+    "id": "array-text",
+    "type": "type"
+  },
+  {
+    "attribute": {
+      "metadata": {},
+      "type": "StructuredValue",
+      "value": {"item1":2.2, "item2":4.4}
+    },
+    "id": "object-number",
+    "type": "type"
+  },
+  {
+    "attribute": {
+      "metadata": {},
+      "type": "StructuredValue",
+      "value": {"item1":"2", "item2":"4"}
+    },
+    "id": "object-text",
+    "type": "type"
+  },
+  {
+    "attribute": {
+      "metadata": {},
+      "type": "DateTime",
+      "value": "2018-12-12T23:23:23.001Z"
+    },
+    "id": "datetime",
+    "type": "type"
+  },
+  {
+    "id": "geo-point-single",
+    "location": {
+      "metadata": {},
+      "type": "type",
+      "value": {
+      	"coordinates":
+      	  [60, 20],
+      	"type": "geo-point"
+      }
+    },
+    "type": "type"
+  },
+  {
+    "id": "geo-point-multi",
+    "location": {
+      "metadata": {},
+      "type": "type",
+      "value": {
+      	"coordinates": [
+      	  [20, 80], [80, 60], [40, 40], [60, 20]
+      	],
+      	"type": "geo-point"
+      }
+    },
+    "type": "type"
+  },
+  {
+    "id": "geo-line-simple",
+    "location": {
+      "metadata": {},
+      "type": "type",
+      "value": {
+      	"coordinates": [
+          [60, 20], [20, 60], [80, 80]
+        ],
+      	"type": "geo-line"
+      }
+    },
+    "type": "type"
+  },
+  {
+    "id": "geo-line-multi",
+    "location": {
+      "metadata": {},
+      "type": "type",
+      "value": {
+      	"coordinates": [
+          [[20, 20], [40, 40], [20, 80]],
+          [[80, 80], [60, 60], [80, 40], [60, 20]]
+      	],
+      	"type": "geo-line"
+       }
+    },
+    "type": "type"
+  },
+  {
+    "id": "geo-polygon-single",
+    "location": {
+      "metadata": {},
+      "type": "type",
+      "value": {
+      	"coordinates": [
+      	  [[60, 20], [80, 80], [40, 80], [20, 40], [60, 20]]
+        ],
+      	"type": "geo-polygon"
+      }
+    },
+    "type": "type"
+  },
+  {
+    "id": "geo-polygon-double",
+    "location": {
+      "metadata": {},
+      "type": "type",
+      "value": {
+      	"coordinates": [
+          [[70, 20], [90, 90], [30, 80], [20, 40], [70, 20]],
+          [[40, 60], [70, 70], [60, 40], [40, 60]]
+        ],
+      	"type": "geo-polygon"
+      }
+    },
+    "type": "type"
+  },
+  {
+    "id": "geo-polygon-multi-single",
+    "location": {
+      "metadata": {},
+      "type": "type",
+      "value": {
+      	"coordinates": [
+          [
+            [[60, 40], [90, 80], [20, 80], [60, 40]]
+          ],
+          [
+            [[30, 10], [80, 20], [20, 40], [10, 20], [30, 10]]
+          ]
+        ],
+      	"type": "geo-polygon"
+      }
+    },
+    "type": "type"
+  },
+  {
+    "id": "geo-polygon-multi-double",
+    "location": {
+      "metadata": {},
+      "type": "type",
+      "value": {
+      	"coordinates": [
+          [
+            [[80, 80], [40, 90], [90, 60], [80, 80]]
+          ],
+          [
+            [[40, 70], [20, 60], [20, 20], [60, 10], [90, 40], [40, 70]],
+            [[60, 40], [40, 30], [40, 50], [60, 40]]
+          ]
+        ],
+      	"type": "geo-polygon"
+      }
+    },
+    "type": "type"
+  }
+  ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --port $CP2_PORT
+
+orionCurl --url /v2/op/update --payload "$payload" --port $CP1_PORT
+echo
+
+echo "22. Query CP3 for entity null"
+echo "========================================================================================="
+orionCurl --url /v2/entities/null --port $CP3_PORT
+echo
+
+echo "23. Query CP3 for entity number"
+echo "========================================================================================="
+orionCurl --url /v2/entities/number --port $CP3_PORT
+echo
+
+echo "24. Query CP3 for entity text"
+echo "========================================================================================="
+orionCurl --url /v2/entities/text --port $CP3_PORT
+echo
+
+echo "25. Query CP3 for entity boolean"
+echo "========================================================================================="
+orionCurl --url /v2/entities/boolean --port $CP3_PORT
+echo
+
+echo "26. Query CP3 for entity array-number"
+echo "========================================================================================="
+orionCurl --url /v2/entities/array-number --port $CP3_PORT
+echo
+
+echo "27. Query CP3 for entity array-text"
+echo "========================================================================================="
+orionCurl --url /v2/entities/array-text --port $CP3_PORT
+echo
+
+echo "28. Query CP3 for entity object-number"
+echo "========================================================================================="
+orionCurl --url /v2/entities/object-number --port $CP3_PORT
+echo
+
+echo "29. Query CP3 for entity object-text"
+echo "========================================================================================="
+orionCurl --url /v2/entities/object-text --port $CP3_PORT
+echo
+
+echo "30. Query CP3 for entity datetime"
+echo "========================================================================================="
+orionCurl --url /v2/entities/datetime --port $CP3_PORT
+echo
+
+echo "31. Query CP3 for entity geo-point-single"
+echo "========================================================================================="
+orionCurl --url /v2/entities/geo-point-single --port $CP3_PORT
+echo
+
+echo "32. Query CP3 for entity geo-point-multi"
+echo "========================================================================================="
+orionCurl --url /v2/entities/geo-point-multi --port $CP3_PORT
+echo
+
+echo "33. Query CP3 for entity geo-line-simple"
+echo "========================================================================================="
+orionCurl --url /v2/entities/geo-line-simple --port $CP3_PORT
+echo
+
+echo "34. Query CP3 for entity geo-line-multi"
+echo "========================================================================================="
+orionCurl --url /v2/entities/geo-line-multi --port $CP3_PORT
+echo
+
+echo "35. Query CP3 for entity geo-polygon-single"
+echo "========================================================================================="
+orionCurl --url /v2/entities/geo-polygon-single --port $CP3_PORT
+echo
+
+echo "36. Query CP3 for entity geo-polygon-double"
+echo "========================================================================================="
+orionCurl --url /v2/entities/geo-polygon-double --port $CP3_PORT
+echo
+
+echo "37. Query CP3 for entity geo-polygon-multi-single"
+echo "========================================================================================="
+orionCurl --url /v2/entities/geo-polygon-multi-single --port $CP3_PORT
+echo
+
+echo "38. Query CP3 for entity geo-polygon-multi-double"
+echo "========================================================================================="
+orionCurl --url /v2/entities/geo-polygon-multi-double --port $CP3_PORT
 echo
 
 --REGEXPECT--
-01. Make CP2 subscribe to entity Room/Room1 in CP1
+01. Make CP2 subscribe to all entities in CP1
 ==================================================
-HTTP/1.1 200 OK
-Content-Length: 104
-Content-Type: application/json
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "subscribeResponse": {
-        "duration": "P1M",
-        "subscriptionId": "REGEX([0-9a-f]{24})",
-        "throttling": "PT5S"
-    }
-}
 
 
-02. Make CP3 subscribe to entity Room/Room1 in CP2
+02. Make CP3 subscribe to all entities in CP2
 ==================================================
-HTTP/1.1 200 OK
-Content-Length: 104
-Content-Type: application/json
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "subscribeResponse": {
-        "duration": "P1M",
-        "subscriptionId": "REGEX([0-9a-f]{24})",
-        "throttling": "PT5S"
-    }
-}
 
 
-03. Create an entity Room/Room1, attribute temperature in CP1 (CP2 should get informed and after that CP3 also)
+03. Create an entity in CP1 (CP2 should get informed and after that CP3 also)
 ===============================================================================================================
-HTTP/1.1 200 OK
-Content-Length: 202
-Content-Type: application/json
+HTTP/1.1 204 No Content
+Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "temperature",
-                        "type": "float",
-                        "value": ""
-                    }
-                ],
-                "id": "Room1",
-                "isPattern": "false",
-                "type": "Room"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
 
-04. Query CP3 for entity Room/Room1, to make sure the entity has propagated CP1->CP2->CP3
+04. Query CP3 for entity null
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 204
+Content-Length: REGEX(.*)
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "temperature",
-                        "type": "float",
-                        "value": "23"
-                    }
-                ],
-                "id": "Room1",
-                "isPattern": "false",
-                "type": "Room"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
+    "attribute": {
+        "metadata": {},
+        "type": "Null",
+        "value": null
+    },
+    "id": "null",
+    "type": "type"
+}
+
+05. Query CP3 for entity number
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attribute": {
+        "metadata": {},
+        "type": "Number",
+        "value": 1.1
+    },
+    "id": "number",
+    "type": "type"
+}
+
+06. Query CP3 for entity text
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attribute": {
+        "metadata": {},
+        "type": "Text",
+        "value": "g8cira4&epzdjb60219tyumql|xk3"
+    },
+    "id": "text",
+    "type": "type"
+}
+
+07. Query CP3 for entity boolean
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attribute": {
+        "metadata": {},
+        "type": "Boolean",
+        "value": true
+    },
+    "id": "boolean",
+    "type": "type"
+}
+
+08. Query CP3 for entity array-number
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attribute": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": [
+            1.1,
+            2.2,
+            3.3
+        ]
+    },
+    "id": "array-number",
+    "type": "type"
+}
+
+09. Query CP3 for entity array-text
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attribute": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": [
+            "1",
+            "2",
+            "3"
+        ]
+    },
+    "id": "array-text",
+    "type": "type"
+}
+
+10. Query CP3 for entity object-number
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attribute": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": {
+            "item1": 1.1,
+            "item2": 2.2
         }
-    ]
+    },
+    "id": "object-number",
+    "type": "type"
+}
+
+11. Query CP3 for entity object-text
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attribute": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": {
+            "item1": "1",
+            "item2": "2"
+        }
+    },
+    "id": "object-text",
+    "type": "type"
+}
+
+12. Query CP3 for entity datetime
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attribute": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2017-01-01T00:01:01.00Z"
+    },
+    "id": "datetime",
+    "type": "type"
+}
+
+13. Query CP3 for entity geo-point-single
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "geo-point-single",
+    "location": {
+        "metadata": {},
+        "type": "type",
+        "value": {
+            "coordinates": [
+                30,
+                10
+            ],
+            "type": "geo:point"
+        }
+    },
+    "type": "type"
+}
+
+14. Query CP3 for entity geo-point-multi
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "geo-point-multi",
+    "location": {
+        "metadata": {},
+        "type": "type",
+        "value": {
+            "coordinates": [
+                [
+                    10,
+                    40
+                ],
+                [
+                    40,
+                    30
+                ],
+                [
+                    20,
+                    20
+                ],
+                [
+                    30,
+                    10
+                ]
+            ],
+            "type": "geo:point"
+        }
+    },
+    "type": "type"
+}
+
+15. Query CP3 for entity geo-line-simple
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "geo-line-simple",
+    "location": {
+        "metadata": {},
+        "type": "type",
+        "value": {
+            "coordinates": [
+                [
+                    30,
+                    10
+                ],
+                [
+                    10,
+                    30
+                ],
+                [
+                    40,
+                    40
+                ]
+            ],
+            "type": "geo:line"
+        }
+    },
+    "type": "type"
+}
+
+16. Query CP3 for entity geo-line-multi
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "geo-line-multi",
+    "location": {
+        "metadata": {},
+        "type": "type",
+        "value": {
+            "coordinates": [
+                [
+                    [
+                        10,
+                        10
+                    ],
+                    [
+                        20,
+                        20
+                    ],
+                    [
+                        10,
+                        40
+                    ]
+                ],
+                [
+                    [
+                        40,
+                        40
+                    ],
+                    [
+                        30,
+                        30
+                    ],
+                    [
+                        40,
+                        20
+                    ],
+                    [
+                        30,
+                        10
+                    ]
+                ]
+            ],
+            "type": "geo:line"
+        }
+    },
+    "type": "type"
+}
+
+17. Query CP3 for entity geo-polygon-single
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "geo-polygon-single",
+    "location": {
+        "metadata": {},
+        "type": "type",
+        "value": {
+            "coordinates": [
+                [
+                    [
+                        30,
+                        10
+                    ],
+                    [
+                        40,
+                        40
+                    ],
+                    [
+                        20,
+                        40
+                    ],
+                    [
+                        10,
+                        20
+                    ],
+                    [
+                        30,
+                        10
+                    ]
+                ]
+            ],
+            "type": "geo:polygon"
+        }
+    },
+    "type": "type"
+}
+
+18. Query CP3 for entity geo-polygon-double
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "geo-polygon-double",
+    "location": {
+        "metadata": {},
+        "type": "type",
+        "value": {
+            "coordinates": [
+                [
+                    [
+                        35,
+                        10
+                    ],
+                    [
+                        45,
+                        45
+                    ],
+                    [
+                        15,
+                        40
+                    ],
+                    [
+                        10,
+                        20
+                    ],
+                    [
+                        35,
+                        10
+                    ]
+                ],
+                [
+                    [
+                        20,
+                        30
+                    ],
+                    [
+                        35,
+                        35
+                    ],
+                    [
+                        30,
+                        20
+                    ],
+                    [
+                        20,
+                        30
+                    ]
+                ]
+            ],
+            "type": "geo:polygon"
+        }
+    },
+    "type": "type"
+}
+
+19. Query CP3 for entity geo-polygon-multi-single
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "geo-polygon-multi-single",
+    "location": {
+        "metadata": {},
+        "type": "type",
+        "value": {
+            "coordinates": [
+                [
+                    [
+                        [
+                            30,
+                            20
+                        ],
+                        [
+                            45,
+                            40
+                        ],
+                        [
+                            10,
+                            40
+                        ],
+                        [
+                            30,
+                            20
+                        ]
+                    ]
+                ],
+                [
+                    [
+                        [
+                            15,
+                            5
+                        ],
+                        [
+                            40,
+                            10
+                        ],
+                        [
+                            10,
+                            20
+                        ],
+                        [
+                            5,
+                            10
+                        ],
+                        [
+                            15,
+                            5
+                        ]
+                    ]
+                ]
+            ],
+            "type": "geo:polygon"
+        }
+    },
+    "type": "type"
+}
+
+20. Query CP3 for entity geo-polygon-multi-double
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "geo-polygon-multi-double",
+    "location": {
+        "metadata": {},
+        "type": "type",
+        "value": {
+            "coordinates": [
+                [
+                    [
+                        [
+                            40,
+                            40
+                        ],
+                        [
+                            20,
+                            45
+                        ],
+                        [
+                            45,
+                            30
+                        ],
+                        [
+                            40,
+                            40
+                        ]
+                    ]
+                ],
+                [
+                    [
+                        [
+                            20,
+                            35
+                        ],
+                        [
+                            10,
+                            30
+                        ],
+                        [
+                            10,
+                            10
+                        ],
+                        [
+                            30,
+                            5
+                        ],
+                        [
+                            45,
+                            20
+                        ],
+                        [
+                            20,
+                            35
+                        ]
+                    ],
+                    [
+                        [
+                            30,
+                            20
+                        ],
+                        [
+                            20,
+                            15
+                        ],
+                        [
+                            20,
+                            25
+                        ],
+                        [
+                            30,
+                            20
+                        ]
+                    ]
+                ]
+            ],
+            "type": "geo:polygon"
+        }
+    },
+    "type": "type"
+}
+
+21. Update an entity in CP1 (CP2 should get informed and after that CP3 also)
+===============================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+22. Query CP3 for entity null
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attribute": {
+        "metadata": {},
+        "type": "Null",
+        "value": null
+    },
+    "id": "null",
+    "type": "type"
+}
+
+23. Query CP3 for entity number
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attribute": {
+        "metadata": {},
+        "type": "Number",
+        "value": 2.2
+    },
+    "id": "number",
+    "type": "type"
+}
+
+24. Query CP3 for entity text
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attribute": {
+        "metadata": {},
+        "type": "Text",
+        "value": "v84drt3h5d5yrttsdrdhdgt544ql"
+    },
+    "id": "text",
+    "type": "type"
+}
+
+25. Query CP3 for entity boolean
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attribute": {
+        "metadata": {},
+        "type": "Boolean",
+        "value": false
+    },
+    "id": "boolean",
+    "type": "type"
+}
+
+26. Query CP3 for entity array-number
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attribute": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": [
+            2.2,
+            4.4,
+            6.6
+        ]
+    },
+    "id": "array-number",
+    "type": "type"
+}
+
+27. Query CP3 for entity array-text
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attribute": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": [
+            "2",
+            "3",
+            "6"
+        ]
+    },
+    "id": "array-text",
+    "type": "type"
+}
+
+28. Query CP3 for entity object-number
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attribute": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": {
+            "item1": 2.2,
+            "item2": 4.4
+        }
+    },
+    "id": "object-number",
+    "type": "type"
+}
+
+29. Query CP3 for entity object-text
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attribute": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": {
+            "item1": "2",
+            "item2": "4"
+        }
+    },
+    "id": "object-text",
+    "type": "type"
+}
+
+30. Query CP3 for entity datetime
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attribute": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2018-12-12T23:23:23.00Z"
+    },
+    "id": "datetime",
+    "type": "type"
+}
+
+31. Query CP3 for entity geo-point-single
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "geo-point-single",
+    "location": {
+        "metadata": {},
+        "type": "type",
+        "value": {
+            "coordinates": [
+                60,
+                20
+            ],
+            "type": "geo-point"
+        }
+    },
+    "type": "type"
+}
+
+32. Query CP3 for entity geo-point-multi
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "geo-point-multi",
+    "location": {
+        "metadata": {},
+        "type": "type",
+        "value": {
+            "coordinates": [
+                [
+                    20,
+                    80
+                ],
+                [
+                    80,
+                    60
+                ],
+                [
+                    40,
+                    40
+                ],
+                [
+                    60,
+                    20
+                ]
+            ],
+            "type": "geo-point"
+        }
+    },
+    "type": "type"
+}
+
+33. Query CP3 for entity geo-line-simple
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "geo-line-simple",
+    "location": {
+        "metadata": {},
+        "type": "type",
+        "value": {
+            "coordinates": [
+                [
+                    60,
+                    20
+                ],
+                [
+                    20,
+                    60
+                ],
+                [
+                    80,
+                    80
+                ]
+            ],
+            "type": "geo-line"
+        }
+    },
+    "type": "type"
+}
+
+34. Query CP3 for entity geo-line-multi
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "geo-line-multi",
+    "location": {
+        "metadata": {},
+        "type": "type",
+        "value": {
+            "coordinates": [
+                [
+                    [
+                        20,
+                        20
+                    ],
+                    [
+                        40,
+                        40
+                    ],
+                    [
+                        20,
+                        80
+                    ]
+                ],
+                [
+                    [
+                        80,
+                        80
+                    ],
+                    [
+                        60,
+                        60
+                    ],
+                    [
+                        80,
+                        40
+                    ],
+                    [
+                        60,
+                        20
+                    ]
+                ]
+            ],
+            "type": "geo-line"
+        }
+    },
+    "type": "type"
+}
+
+35. Query CP3 for entity geo-polygon-single
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "geo-polygon-single",
+    "location": {
+        "metadata": {},
+        "type": "type",
+        "value": {
+            "coordinates": [
+                [
+                    [
+                        60,
+                        20
+                    ],
+                    [
+                        80,
+                        80
+                    ],
+                    [
+                        40,
+                        80
+                    ],
+                    [
+                        20,
+                        40
+                    ],
+                    [
+                        60,
+                        20
+                    ]
+                ]
+            ],
+            "type": "geo-polygon"
+        }
+    },
+    "type": "type"
+}
+
+36. Query CP3 for entity geo-polygon-double
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "geo-polygon-double",
+    "location": {
+        "metadata": {},
+        "type": "type",
+        "value": {
+            "coordinates": [
+                [
+                    [
+                        70,
+                        20
+                    ],
+                    [
+                        90,
+                        90
+                    ],
+                    [
+                        30,
+                        80
+                    ],
+                    [
+                        20,
+                        40
+                    ],
+                    [
+                        70,
+                        20
+                    ]
+                ],
+                [
+                    [
+                        40,
+                        60
+                    ],
+                    [
+                        70,
+                        70
+                    ],
+                    [
+                        60,
+                        40
+                    ],
+                    [
+                        40,
+                        60
+                    ]
+                ]
+            ],
+            "type": "geo-polygon"
+        }
+    },
+    "type": "type"
+}
+
+37. Query CP3 for entity geo-polygon-multi-single
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "geo-polygon-multi-single",
+    "location": {
+        "metadata": {},
+        "type": "type",
+        "value": {
+            "coordinates": [
+                [
+                    [
+                        [
+                            60,
+                            40
+                        ],
+                        [
+                            90,
+                            80
+                        ],
+                        [
+                            20,
+                            80
+                        ],
+                        [
+                            60,
+                            40
+                        ]
+                    ]
+                ],
+                [
+                    [
+                        [
+                            30,
+                            10
+                        ],
+                        [
+                            80,
+                            20
+                        ],
+                        [
+                            20,
+                            40
+                        ],
+                        [
+                            10,
+                            20
+                        ],
+                        [
+                            30,
+                            10
+                        ]
+                    ]
+                ]
+            ],
+            "type": "geo-polygon"
+        }
+    },
+    "type": "type"
+}
+
+38. Query CP3 for entity geo-polygon-multi-double
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "geo-polygon-multi-double",
+    "location": {
+        "metadata": {},
+        "type": "type",
+        "value": {
+            "coordinates": [
+                [
+                    [
+                        [
+                            80,
+                            80
+                        ],
+                        [
+                            40,
+                            90
+                        ],
+                        [
+                            90,
+                            60
+                        ],
+                        [
+                            80,
+                            80
+                        ]
+                    ]
+                ],
+                [
+                    [
+                        [
+                            40,
+                            70
+                        ],
+                        [
+                            20,
+                            60
+                        ],
+                        [
+                            20,
+                            20
+                        ],
+                        [
+                            60,
+                            10
+                        ],
+                        [
+                            90,
+                            40
+                        ],
+                        [
+                            40,
+                            70
+                        ]
+                    ],
+                    [
+                        [
+                            60,
+                            40
+                        ],
+                        [
+                            40,
+                            30
+                        ],
+                        [
+                            40,
+                            50
+                        ],
+                        [
+                            60,
+                            40
+                        ]
+                    ]
+                ]
+            ],
+            "type": "geo-polygon"
+        }
+    },
+    "type": "type"
 }
 
 --TEARDOWN--
@@ -235,4 +1939,3 @@ brokerStop CP3
 dbDrop CP1
 dbDrop CP2
 dbDrop CP3
-
