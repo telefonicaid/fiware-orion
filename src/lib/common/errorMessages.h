@@ -80,9 +80,9 @@
 #define ERROR_DESC_BAD_REQUEST_DATA_NOT_ARRAY                 "notification field /data/ must be a JSON array"
 #define ERROR_DESC_BAD_REQUEST_DATA_ITEM_NOT_OBJECT           "notification data vector item must be a JSON object"
 #define ERROR_DESC_BAD_REQUEST_NO_SUBSCRIPTION_ID             "invalid JSON payload, mandatory field /subscriptionId/ not found"
-#define ERROR_DESC_BAD_REQUEST_FORMAT_KEYVALUES               "attribute render format /keyValues/ not yet supported for notifications"
-#define ERROR_DESC_BAD_REQUEST_FORMAT_UNIQUEVALUES            "attribute render format /uniqueValues/ not yet supported for notifications"
-#define ERROR_DESC_BAD_REQUEST_FORMAT_CUSTOM                  "attribute render format /custom/ not yet supported for notifications"
+#define ERROR_DESC_BAD_REQUEST_FORMAT_KEYVALUES               "attribute render format /keyValues/ not supported for notifications"
+#define ERROR_DESC_BAD_REQUEST_FORMAT_UNIQUEVALUES            "attribute render format /uniqueValues/ not supported for notifications"
+#define ERROR_DESC_BAD_REQUEST_FORMAT_CUSTOM                  "attribute render format /custom/ not supported for notifications"
 #define ERROR_DESC_BAD_REQUEST_FORMAT_INVALID                 "invalid render format for notifications"
 
 #define ERROR_NOT_FOUND                               "NotFound"
