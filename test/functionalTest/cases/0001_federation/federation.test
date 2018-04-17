@@ -46,14 +46,14 @@ brokerStart CP3 0
 # 10. Query CP3 for entity object-number
 # 11. Query CP3 for entity object-text
 # 12. Query CP3 for entity datetime
-# 13. Query CP3 for entity geo-point-single
-# 14. Query CP3 for entity geo-point-multi
-# 15. Query CP3 for entity geo-line-simple
-# 16. Query CP3 for entity geo-line-multi
-# 17. Query CP3 for entity geo-polygon-single
-# 18. Query CP3 for entity geo-polygon-double
-# 19. Query CP3 for entity geo-polygon-multi-single
-# 20. Query CP3 for entity geo-polygon-multi-double
+# 13. Query CP3 for entity geo-json-point
+# 14. Query CP3 for entity geo-json-point-multi
+# 15. Query CP3 for entity geo-json-line
+# 16. Query CP3 for entity geo-json-line-multi
+# 17. Query CP3 for entity geo-json-polygon
+# 18. Query CP3 for entity geo-json-polygon-hole
+# 19. Query CP3 for entity geo-json-polygon-multi
+# 20. Query CP3 for entity geo-json-polygon-hole-multi
 # 21. Update an entity in CP1 (CP2 should get informed and after that CP3 also)
 # 22. Query CP3 for entity null
 # 23. Query CP3 for entity number
@@ -64,14 +64,14 @@ brokerStart CP3 0
 # 28. Query CP3 for entity object-number
 # 29. Query CP3 for entity object-text
 # 30. Query CP3 for entity datetime
-# 31. Query CP3 for entity geo-point-single
-# 32. Query CP3 for entity geo-point-multi
-# 33. Query CP3 for entity geo-line-simple
-# 34. Query CP3 for entity geo-line-multi
-# 35. Query CP3 for entity geo-polygon-single
-# 36. Query CP3 for entity geo-polygon-double
-# 37. Query CP3 for entity geo-polygon-multi-single
-# 38. Query CP3 for entity geo-polygon-multi-double
+# 31. Query CP3 for entity geo-json-point
+# 32. Query CP3 for entity geo-json-point-multi
+# 33. Query CP3 for entity geo-json-line
+# 34. Query CP3 for entity geo-json-line-multi
+# 35. Query CP3 for entity geo-json-polygon
+# 36. Query CP3 for entity geo-json-polygon-hole
+# 37. Query CP3 for entity geo-json-polygon-multi
+# 38. Query CP3 for entity geo-json-polygon-hole-multi
 
 echo "01. Make CP2 subscribe to all entities in CP1"
 echo "=================================================="
@@ -207,95 +207,95 @@ payload='
     "type": "type"
   },
   {
-    "id": "geo-point-single",
+    "id": "geo-json-point",
     "location": {
       "metadata": {},
-      "type": "type",
+      "type": "geo:json",
       "value": {
       	"coordinates":
       	  [30, 10],
-      	"type": "geo:point"
+      	"type": "Point"
       }
     },
     "type": "type"
   },
   {
-    "id": "geo-point-multi",
+    "id": "geo-json-point-multi",
     "location": {
       "metadata": {},
-      "type": "type",
+      "type": "geo:json",
       "value": {
       	"coordinates": [
       	  [10, 40], [40, 30], [20, 20], [30, 10]
       	],
-      	"type": "geo:point"
+      	"type": "MultiPoint"
       }
     },
     "type": "type"
   },
   {
-    "id": "geo-line-simple",
+    "id": "geo-json-line",
     "location": {
       "metadata": {},
-      "type": "type",
+      "type": "geo:json",
       "value": {
       	"coordinates": [
           [30, 10], [10, 30], [40, 40]
         ],
-      	"type": "geo:line"
+      	"type": "LineString"
       }
     },
     "type": "type"
   },
   {
-    "id": "geo-line-multi",
+    "id": "geo-json-line-multi",
     "location": {
       "metadata": {},
-      "type": "type",
+      "type": "geo:json",
       "value": {
       	"coordinates": [
           [[10, 10], [20, 20], [10, 40]],
           [[40, 40], [30, 30], [40, 20], [30, 10]]
       	],
-      	"type": "geo:line"
+      	"type": "MultiLineString"
        }
     },
     "type": "type"
   },
   {
-    "id": "geo-polygon-single",
+    "id": "geo-json-polygon",
     "location": {
       "metadata": {},
-      "type": "type",
+      "type": "geo:json",
       "value": {
       	"coordinates": [
       	  [[30, 10], [40, 40], [20, 40], [10, 20], [30, 10]]
         ],
-      	"type": "geo:polygon"
+      	"type": "Polygon"
       }
     },
     "type": "type"
   },
   {
-    "id": "geo-polygon-double",
+    "id": "geo-json-polygon-hole",
     "location": {
       "metadata": {},
-      "type": "type",
+      "type": "geo:json",
       "value": {
       	"coordinates": [
           [[35, 10], [45, 45], [15, 40], [10, 20], [35, 10]],
           [[20, 30], [35, 35], [30, 20], [20, 30]]
         ],
-      	"type": "geo:polygon"
+      	"type": "Polygon"
       }
     },
     "type": "type"
   },
   {
-    "id": "geo-polygon-multi-single",
+    "id": "geo-json-polygon-multi",
     "location": {
       "metadata": {},
-      "type": "type",
+      "type": "geo:json",
       "value": {
       	"coordinates": [
           [
@@ -305,16 +305,16 @@ payload='
             [[15, 5], [40, 10], [10, 20], [5, 10], [15, 5]]
           ]
         ],
-      	"type": "geo:polygon"
+      	"type": "MultiPolygon"
       }
     },
     "type": "type"
   },
   {
-    "id": "geo-polygon-multi-double",
+    "id": "geo-json-polygon-hole-multi,
     "location": {
       "metadata": {},
-      "type": "type",
+      "type": "geo:json",
       "value": {
       	"coordinates": [
           [
@@ -325,7 +325,7 @@ payload='
             [[30, 20], [20, 15], [20, 25], [30, 20]]
           ]
         ],
-      	"type": "geo:polygon"
+      	"type": "MultiPolygon"
       }
     },
     "type": "type"
@@ -381,44 +381,44 @@ echo "==========================================================================
 orionCurl --url /v2/entities/datetime --port $CP3_PORT
 echo
 
-echo "13. Query CP3 for entity geo-point-single"
+echo "13. Query CP3 for entity geo-json-point"
 echo "========================================================================================="
-orionCurl --url /v2/entities/geo-point-single --port $CP3_PORT
+orionCurl --url /v2/entities/geo-json-point --port $CP3_PORT
 echo
 
-echo "14. Query CP3 for entity geo-point-multi"
+echo "14. Query CP3 for entity geo-json-point-multi"
 echo "========================================================================================="
-orionCurl --url /v2/entities/geo-point-multi --port $CP3_PORT
+orionCurl --url /v2/entities/geo-json-point-multi --port $CP3_PORT
 echo
 
-echo "15. Query CP3 for entity geo-line-simple"
+echo "15. Query CP3 for entity geo-json-line"
 echo "========================================================================================="
-orionCurl --url /v2/entities/geo-line-simple --port $CP3_PORT
+orionCurl --url /v2/entities/geo-json-line --port $CP3_PORT
 echo
 
-echo "16. Query CP3 for entity geo-line-multi"
+echo "16. Query CP3 for entity geo-json-line-multi"
 echo "========================================================================================="
-orionCurl --url /v2/entities/geo-line-multi --port $CP3_PORT
+orionCurl --url /v2/entities/geo-json-line-multi --port $CP3_PORT
 echo
 
-echo "17. Query CP3 for entity geo-polygon-single"
+echo "17. Query CP3 for entity geo-json-polygon"
 echo "========================================================================================="
-orionCurl --url /v2/entities/geo-polygon-single --port $CP3_PORT
+orionCurl --url /v2/entities/geo-json-polygon --port $CP3_PORT
 echo
 
-echo "18. Query CP3 for entity geo-polygon-double"
+echo "18. Query CP3 for entity geo-json-polygon-hole"
 echo "========================================================================================="
-orionCurl --url /v2/entities/geo-polygon-double --port $CP3_PORT
+orionCurl --url /v2/entities/geo-json-polygon-hole --port $CP3_PORT
 echo
 
-echo "19. Query CP3 for entity geo-polygon-multi-single"
+echo "19. Query CP3 for entity geo-json-polygon-multi"
 echo "========================================================================================="
-orionCurl --url /v2/entities/geo-polygon-multi-single --port $CP3_PORT
+orionCurl --url /v2/entities/geo-json-polygon-multi --port $CP3_PORT
 echo
 
-echo "20. Query CP3 for entity geo-polygon-multi-double"
+echo "20. Query CP3 for entity geo-json-polygon-hole-multi"
 echo "========================================================================================="
-orionCurl --url /v2/entities/geo-polygon-multi-double --port $CP3_PORT
+orionCurl --url /v2/entities/geo-json-polygon-hole-multi --port $CP3_PORT
 echo
 
 echo "21. Update an entity in CP1 (CP2 should get informed and after that CP3 also)"
@@ -509,95 +509,95 @@ payload='
     "type": "type"
   },
   {
-    "id": "geo-point-single",
+    "id": "geo-json-point,
     "location": {
       "metadata": {},
-      "type": "type",
+      "type": "geo:json",
       "value": {
       	"coordinates":
       	  [60, 20],
-      	"type": "geo-point"
+      	"type": "Point"
       }
     },
     "type": "type"
   },
   {
-    "id": "geo-point-multi",
+    "id": "geo-json-point-multi",
     "location": {
       "metadata": {},
-      "type": "type",
+      "type": "geo:json",
       "value": {
       	"coordinates": [
       	  [20, 80], [80, 60], [40, 40], [60, 20]
       	],
-      	"type": "geo-point"
+      	"type": "MultiPoint"
       }
     },
     "type": "type"
   },
   {
-    "id": "geo-line-simple",
+    "id": "geo-json-line",
     "location": {
       "metadata": {},
-      "type": "type",
+      "type": "geo:json",
       "value": {
       	"coordinates": [
           [60, 20], [20, 60], [80, 80]
         ],
-      	"type": "geo-line"
+      	"type": "LineString"
       }
     },
     "type": "type"
   },
   {
-    "id": "geo-line-multi",
+    "id": "geo-json-line-multi",
     "location": {
       "metadata": {},
-      "type": "type",
+      "type": "geo:json",
       "value": {
       	"coordinates": [
           [[20, 20], [40, 40], [20, 80]],
           [[80, 80], [60, 60], [80, 40], [60, 20]]
       	],
-      	"type": "geo-line"
+      	"type": "MultiLineString"
        }
     },
     "type": "type"
   },
   {
-    "id": "geo-polygon-single",
+    "id": "geo-json-polygon",
     "location": {
       "metadata": {},
-      "type": "type",
+      "type": "geo:json",
       "value": {
       	"coordinates": [
       	  [[60, 20], [80, 80], [40, 80], [20, 40], [60, 20]]
         ],
-      	"type": "geo-polygon"
+      	"type": "Polygon"
       }
     },
     "type": "type"
   },
   {
-    "id": "geo-polygon-double",
+    "id": "geo-json-polygon-hole",
     "location": {
       "metadata": {},
-      "type": "type",
+      "type": "geo:json",
       "value": {
       	"coordinates": [
           [[70, 20], [90, 90], [30, 80], [20, 40], [70, 20]],
           [[40, 60], [70, 70], [60, 40], [40, 60]]
         ],
-      	"type": "geo-polygon"
+      	"type": "Polygon"
       }
     },
     "type": "type"
   },
   {
-    "id": "geo-polygon-multi-single",
+    "id": "geo-json-polygon-multi",
     "location": {
       "metadata": {},
-      "type": "type",
+      "type": "geo:json",
       "value": {
       	"coordinates": [
           [
@@ -607,16 +607,16 @@ payload='
             [[30, 10], [80, 20], [20, 40], [10, 20], [30, 10]]
           ]
         ],
-      	"type": "geo-polygon"
+      	"type": "MultiPolygon"
       }
     },
     "type": "type"
   },
   {
-    "id": "geo-polygon-multi-double",
+    "id": "geo-json-polygon-hole-multi",
     "location": {
       "metadata": {},
-      "type": "type",
+      "type": "geo:json",
       "value": {
       	"coordinates": [
           [
@@ -627,7 +627,7 @@ payload='
             [[60, 40], [40, 30], [40, 50], [60, 40]]
           ]
         ],
-      	"type": "geo-polygon"
+      	"type": "MultiPolygon"
       }
     },
     "type": "type"
@@ -683,44 +683,44 @@ echo "==========================================================================
 orionCurl --url /v2/entities/datetime --port $CP3_PORT
 echo
 
-echo "31. Query CP3 for entity geo-point-single"
+echo "31. Query CP3 for entity geo-json-point"
 echo "========================================================================================="
-orionCurl --url /v2/entities/geo-point-single --port $CP3_PORT
+orionCurl --url /v2/entities/geo-json-point --port $CP3_PORT
 echo
 
-echo "32. Query CP3 for entity geo-point-multi"
+echo "32. Query CP3 for entity geo-json-point-multi"
 echo "========================================================================================="
-orionCurl --url /v2/entities/geo-point-multi --port $CP3_PORT
+orionCurl --url /v2/entities/geo-json-point-multi --port $CP3_PORT
 echo
 
-echo "33. Query CP3 for entity geo-line-simple"
+echo "33. Query CP3 for entity geo-json-line"
 echo "========================================================================================="
-orionCurl --url /v2/entities/geo-line-simple --port $CP3_PORT
+orionCurl --url /v2/entities/geo-json-line --port $CP3_PORT
 echo
 
-echo "34. Query CP3 for entity geo-line-multi"
+echo "34. Query CP3 for entity geo-json-line-multi"
 echo "========================================================================================="
-orionCurl --url /v2/entities/geo-line-multi --port $CP3_PORT
+orionCurl --url /v2/entities/geo-json-line-multi --port $CP3_PORT
 echo
 
-echo "35. Query CP3 for entity geo-polygon-single"
+echo "35. Query CP3 for entity geo-json-polygon"
 echo "========================================================================================="
-orionCurl --url /v2/entities/geo-polygon-single --port $CP3_PORT
+orionCurl --url /v2/entities/geo-json-polygon --port $CP3_PORT
 echo
 
-echo "36. Query CP3 for entity geo-polygon-double"
+echo "36. Query CP3 for entity geo-json-polygon-hole"
 echo "========================================================================================="
-orionCurl --url /v2/entities/geo-polygon-double --port $CP3_PORT
+orionCurl --url /v2/entities/geo-json-polygon-hole --port $CP3_PORT
 echo
 
-echo "37. Query CP3 for entity geo-polygon-multi-single"
+echo "37. Query CP3 for entity geo-json-polygon-multi"
 echo "========================================================================================="
-orionCurl --url /v2/entities/geo-polygon-multi-single --port $CP3_PORT
+orionCurl --url /v2/entities/geo-json-polygon-multi --port $CP3_PORT
 echo
 
-echo "38. Query CP3 for entity geo-polygon-multi-double"
+echo "38. Query CP3 for entity geo-json-polygon-hole-multi"
 echo "========================================================================================="
-orionCurl --url /v2/entities/geo-polygon-multi-double --port $CP3_PORT
+orionCurl --url /v2/entities/geo-json-polygon-hole-multi --port $CP3_PORT
 echo
 
 --REGEXPECT--
@@ -928,7 +928,7 @@ Date: REGEX(.*)
     "type": "type"
 }
 
-13. Query CP3 for entity geo-point-single
+13. Query CP3 for entity geo-json-point
 =========================================================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
@@ -937,22 +937,22 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "id": "geo-point-single",
+    "id": "geo-json-point",
     "location": {
         "metadata": {},
-        "type": "type",
+        "type": "geo:json",
         "value": {
             "coordinates": [
                 30,
                 10
             ],
-            "type": "geo:point"
+            "type": "Point"
         }
     },
     "type": "type"
 }
 
-14. Query CP3 for entity geo-point-multi
+14. Query CP3 for entity geo-json-point-multi
 =========================================================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
@@ -961,10 +961,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "id": "geo-point-multi",
+    "id": "geo-json-point-multi",
     "location": {
         "metadata": {},
-        "type": "type",
+        "type": "geo:json",
         "value": {
             "coordinates": [
                 [
@@ -984,13 +984,13 @@ Date: REGEX(.*)
                     10
                 ]
             ],
-            "type": "geo:point"
+            "type": "MultiPoint"
         }
     },
     "type": "type"
 }
 
-15. Query CP3 for entity geo-line-simple
+15. Query CP3 for entity geo-json-line
 =========================================================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
@@ -999,10 +999,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "id": "geo-line-simple",
+    "id": "geo-json-line",
     "location": {
         "metadata": {},
-        "type": "type",
+        "type": "geo:json",
         "value": {
             "coordinates": [
                 [
@@ -1018,13 +1018,13 @@ Date: REGEX(.*)
                     40
                 ]
             ],
-            "type": "geo:line"
+            "type": "LineString"
         }
     },
     "type": "type"
 }
 
-16. Query CP3 for entity geo-line-multi
+16. Query CP3 for entity geo-json-line-multi
 =========================================================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
@@ -1033,10 +1033,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "id": "geo-line-multi",
+    "id": "geo-json-line-multi",
     "location": {
         "metadata": {},
-        "type": "type",
+        "type": "geo:json",
         "value": {
             "coordinates": [
                 [
@@ -1072,13 +1072,13 @@ Date: REGEX(.*)
                     ]
                 ]
             ],
-            "type": "geo:line"
+            "type": "MultiLineString"
         }
     },
     "type": "type"
 }
 
-17. Query CP3 for entity geo-polygon-single
+17. Query CP3 for entity geo-json-polygon
 =========================================================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
@@ -1087,10 +1087,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "id": "geo-polygon-single",
+    "id": "geo-json-polygon",
     "location": {
         "metadata": {},
-        "type": "type",
+        "type": "geo:json",
         "value": {
             "coordinates": [
                 [
@@ -1116,13 +1116,13 @@ Date: REGEX(.*)
                     ]
                 ]
             ],
-            "type": "geo:polygon"
+            "type": "Polygon"
         }
     },
     "type": "type"
 }
 
-18. Query CP3 for entity geo-polygon-double
+18. Query CP3 for entity geo-json-polygon-hole
 =========================================================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
@@ -1131,10 +1131,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "id": "geo-polygon-double",
+    "id": "geo-json-polygon-hole",
     "location": {
         "metadata": {},
-        "type": "type",
+        "type": "geo:json",
         "value": {
             "coordinates": [
                 [
@@ -1178,13 +1178,13 @@ Date: REGEX(.*)
                     ]
                 ]
             ],
-            "type": "geo:polygon"
+            "type": "Polygon"
         }
     },
     "type": "type"
 }
 
-19. Query CP3 for entity geo-polygon-multi-single
+19. Query CP3 for entity geo-json-polygon-multi
 =========================================================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
@@ -1193,10 +1193,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "id": "geo-polygon-multi-single",
+    "id": "geo-json-polygon-multi",
     "location": {
         "metadata": {},
-        "type": "type",
+        "type": "geo:json",
         "value": {
             "coordinates": [
                 [
@@ -1244,13 +1244,13 @@ Date: REGEX(.*)
                     ]
                 ]
             ],
-            "type": "geo:polygon"
+            "type": "MultiPolygon"
         }
     },
     "type": "type"
 }
 
-20. Query CP3 for entity geo-polygon-multi-double
+20. Query CP3 for entity geo-json-polygon-hole-multi
 =========================================================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
@@ -1259,10 +1259,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "id": "geo-polygon-multi-double",
+    "id": "geo-json-polygon-hole-multi",
     "location": {
         "metadata": {},
-        "type": "type",
+        "type": "geo:json",
         "value": {
             "coordinates": [
                 [
@@ -1332,7 +1332,7 @@ Date: REGEX(.*)
                     ]
                 ]
             ],
-            "type": "geo:polygon"
+            "type": "MultiPolygon"
         }
     },
     "type": "type"
@@ -1522,7 +1522,7 @@ Date: REGEX(.*)
     "type": "type"
 }
 
-31. Query CP3 for entity geo-point-single
+31. Query CP3 for entity geo-json-point
 =========================================================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
@@ -1531,22 +1531,22 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "id": "geo-point-single",
+    "id": "geo-json-point",
     "location": {
         "metadata": {},
-        "type": "type",
+        "type": "geo:json",
         "value": {
             "coordinates": [
                 60,
                 20
             ],
-            "type": "geo-point"
+            "type": "Point"
         }
     },
     "type": "type"
 }
 
-32. Query CP3 for entity geo-point-multi
+32. Query CP3 for entity geo-json-point-multi
 =========================================================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
@@ -1555,10 +1555,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "id": "geo-point-multi",
+    "id": "geo-json-point-multi",
     "location": {
         "metadata": {},
-        "type": "type",
+        "type": "geo:json",
         "value": {
             "coordinates": [
                 [
@@ -1578,13 +1578,13 @@ Date: REGEX(.*)
                     20
                 ]
             ],
-            "type": "geo-point"
+            "type": "MultiPoint"
         }
     },
     "type": "type"
 }
 
-33. Query CP3 for entity geo-line-simple
+33. Query CP3 for entity geo-json-line
 =========================================================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
@@ -1593,10 +1593,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "id": "geo-line-simple",
+    "id": "geo-json-line",
     "location": {
         "metadata": {},
-        "type": "type",
+        "type": "geo:json",
         "value": {
             "coordinates": [
                 [
@@ -1612,13 +1612,13 @@ Date: REGEX(.*)
                     80
                 ]
             ],
-            "type": "geo-line"
+            "type": "LineString"
         }
     },
     "type": "type"
 }
 
-34. Query CP3 for entity geo-line-multi
+34. Query CP3 for entity geo-json-line-multi
 =========================================================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
@@ -1627,10 +1627,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "id": "geo-line-multi",
+    "id": "geo-json-line-multi",
     "location": {
         "metadata": {},
-        "type": "type",
+        "type": "geo:json",
         "value": {
             "coordinates": [
                 [
@@ -1666,13 +1666,13 @@ Date: REGEX(.*)
                     ]
                 ]
             ],
-            "type": "geo-line"
+            "type": "MultiLineString"
         }
     },
     "type": "type"
 }
 
-35. Query CP3 for entity geo-polygon-single
+35. Query CP3 for entity geo-json-polygon
 =========================================================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
@@ -1681,10 +1681,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "id": "geo-polygon-single",
+    "id": "geo-json-polygon",
     "location": {
         "metadata": {},
-        "type": "type",
+        "type": "geo:json",
         "value": {
             "coordinates": [
                 [
@@ -1710,13 +1710,13 @@ Date: REGEX(.*)
                     ]
                 ]
             ],
-            "type": "geo-polygon"
+            "type": "Polygon"
         }
     },
     "type": "type"
 }
 
-36. Query CP3 for entity geo-polygon-double
+36. Query CP3 for entity geo-json-polygon-hole
 =========================================================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
@@ -1725,10 +1725,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "id": "geo-polygon-double",
+    "id": "geo-json-polygon-hole",
     "location": {
         "metadata": {},
-        "type": "type",
+        "type": "geo:json",
         "value": {
             "coordinates": [
                 [
@@ -1772,13 +1772,13 @@ Date: REGEX(.*)
                     ]
                 ]
             ],
-            "type": "geo-polygon"
+            "type": "Polygon"
         }
     },
     "type": "type"
 }
 
-37. Query CP3 for entity geo-polygon-multi-single
+37. Query CP3 for entity geo-json-polygon-multi
 =========================================================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
@@ -1787,10 +1787,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "id": "geo-polygon-multi-single",
+    "id": "geo-json-polygon-multi",
     "location": {
         "metadata": {},
-        "type": "type",
+        "type": "geo:json",
         "value": {
             "coordinates": [
                 [
@@ -1838,13 +1838,13 @@ Date: REGEX(.*)
                     ]
                 ]
             ],
-            "type": "geo-polygon"
+            "type": "MultiPolygon"
         }
     },
     "type": "type"
 }
 
-38. Query CP3 for entity geo-polygon-multi-double
+38. Query CP3 for entity geo-json-polygon-hole-multi
 =========================================================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
@@ -1853,10 +1853,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "id": "geo-polygon-multi-double",
+    "id": "geo-json-polygon-hole-multi,
     "location": {
         "metadata": {},
-        "type": "type",
+        "type": "geo:json",
         "value": {
             "coordinates": [
                 [
@@ -1926,7 +1926,7 @@ Date: REGEX(.*)
                     ]
                 ]
             ],
-            "type": "geo-polygon"
+            "type": "MultiPolygon"
         }
     },
     "type": "type"
