@@ -86,7 +86,7 @@ payload='
   "notification": {
     "attrsFormat": "legacy",
     "http": {
-      "url": "http://localhost:'$CP2_PORT'/v1/notifyContext"
+      "url": "http://localhost:'$CP2_PORT'/v2/op/notify"
     }
   },
   "expires": "2040-01-01T14:00:00.00Z",
@@ -109,7 +109,7 @@ payload='
   "notification": {
     "attrsFormat": "legacy",
     "http": {
-      "url": "http://localhost:'$CP3_PORT'/v1/notifyContext"
+      "url": "http://localhost:'$CP3_PORT'/v2/op/notify"
     }
   },
   "expires": "2040-01-01T14:00:00.00Z",
