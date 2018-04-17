@@ -513,7 +513,11 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   }
   else if (notification.HasMember("exceptAttrs"))
   {
-    if (parseStringVector(&subsP->notification.attributes, notification["exceptAttrs"], "exceptAttrs", true, &errorString) == false)
+    if (parseStringVector(&subsP->notification.attributes,
+                          notification["exceptAttrs"],
+                          "exceptAttrs",
+                          true,
+                          &errorString) == false)
     {
       return badInput(ciP, errorString);
     }
