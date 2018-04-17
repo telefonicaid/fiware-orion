@@ -1,0 +1,452 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+APIv2 notifications with the most common geo:json types
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+brokerStart CB
+brokerStart CP1
+
+--SHELL--
+
+#
+# 01. Make CP1 subscribe to ALL in CB (federation creation)
+# 02. Create entity 'E1' in CB with a geo:json Point
+# 03. Create entity 'E2' in CB with a geo:json MultiPoint
+# 04. Create entity 'E3' in CB with a geo:json LineString
+# 05. Create entity 'E4' in CB with a geo:json MultiLineString
+# 06. Create entity 'E5' in CB with a geo:json Polygon
+# 07. Create entity 'E6' in CB with a geo:json MultiPolygon
+# 08. Query CP1, see all entites
+#
+
+echo "01. Make CP1 subscribe to ALL in CB (federation creation)"
+echo "========================================================="
+payload='{
+  "description": "Fed Subscription",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*"
+      }
+    ]
+  },
+  "notification": {
+      "http": {
+        "url": "http://localhost:'$CP1_PORT'/v2/op/notify"
+      },
+    "attrsFormat": "normalized"
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity 'E1' in CB with a geo:json Point"
+echo "=================================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "point": {
+    "type": "geo:json",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 12.4, 4.55 ]
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity 'E2' in CB with a geo:json MultiPoint"
+echo "======================================================="
+payload='{
+  "id": "E2",
+  "type": "T",
+  "multiPoint": {
+    "type": "geo:json",
+    "value": {
+      "type": "MultiPoint",
+      "coordinates": [ [10, 40], [40, 30], [20, 20], [30, 10] ]
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Create entity 'E3' in CB with a geo:json LineString"
+echo "======================================================="
+payload='{
+  "id": "E3",
+  "type": "T",
+  "lineString": {
+    "type": "geo:json",
+    "value": {
+      "type": "LineString",
+      "coordinates": [ [2, 2], [7, 7] ]
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Create entity 'E4' in CB with a geo:json MultiLineString"
+echo "============================================================"
+payload='{
+  "id": "E4",
+  "type": "T",
+  "multiLineString": {
+    "type": "geo:json",
+    "value": {
+      "type": "MultiLineString",
+      "coordinates": [ [ [2, 2], [7, 7] ], [ [8, 8], [9, 9] ]]
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Create entity 'E5' in CB with a geo:json Polygon"
+echo "===================================================="
+payload='{
+  "id": "E5",
+  "type": "T",
+  "polygon": {
+    "type": "geo:json",
+    "value": {
+      "type": "Polygon",
+      "coordinates": [ [ [3, 4], [6, 6], [3, 7], [3, 4] ] ]
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "07. Create entity 'E6' in CB with a geo:json MultiPolygon"
+echo "========================================================="
+payload='{
+  "id": "E6",
+  "type": "T",
+  "multiPolygon": {
+    "type": "geo:json",
+    "value": {
+      "type": "MultiPolygon",
+      "coordinates": [ [ [ [3, 4], [6, 6], [3, 7], [3, 4] ] ], [ [ [13, 14], [16, 16], [13, 17], [13, 14] ] ] ]
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "08. Query CP1, see all entites"
+echo "=============================="
+orionCurl --url /v2/entities --port $CP1_PORT
+echo
+echo
+
+
+--REGEXPECT--
+01. Make CP1 subscribe to ALL in CB (federation creation)
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity 'E1' in CB with a geo:json Point
+==================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create entity 'E2' in CB with a geo:json MultiPoint
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create entity 'E3' in CB with a geo:json LineString
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create entity 'E4' in CB with a geo:json MultiLineString
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Create entity 'E5' in CB with a geo:json Polygon
+====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E5?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Create entity 'E6' in CB with a geo:json MultiPolygon
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E6?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Query CP1, see all entites
+==============================
+HTTP/1.1 200 OK
+Content-Length: 867
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "point": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    12.4,
+                    4.55
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "T"
+    },
+    {
+        "id": "E2",
+        "multiPoint": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    [
+                        10,
+                        40
+                    ],
+                    [
+                        40,
+                        30
+                    ],
+                    [
+                        20,
+                        20
+                    ],
+                    [
+                        30,
+                        10
+                    ]
+                ],
+                "type": "MultiPoint"
+            }
+        },
+        "type": "T"
+    },
+    {
+        "id": "E3",
+        "lineString": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    [
+                        2,
+                        2
+                    ],
+                    [
+                        7,
+                        7
+                    ]
+                ],
+                "type": "LineString"
+            }
+        },
+        "type": "T"
+    },
+    {
+        "id": "E4",
+        "multiLineString": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    [
+                        [
+                            2,
+                            2
+                        ],
+                        [
+                            7,
+                            7
+                        ]
+                    ],
+                    [
+                        [
+                            8,
+                            8
+                        ],
+                        [
+                            9,
+                            9
+                        ]
+                    ]
+                ],
+                "type": "MultiLineString"
+            }
+        },
+        "type": "T"
+    },
+    {
+        "id": "E5",
+        "polygon": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    [
+                        [
+                            3,
+                            4
+                        ],
+                        [
+                            6,
+                            6
+                        ],
+                        [
+                            3,
+                            7
+                        ],
+                        [
+                            3,
+                            4
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            }
+        },
+        "type": "T"
+    },
+    {
+        "id": "E6",
+        "multiPolygon": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    [
+                        [
+                            [
+                                3,
+                                4
+                            ],
+                            [
+                                6,
+                                6
+                            ],
+                            [
+                                3,
+                                7
+                            ],
+                            [
+                                3,
+                                4
+                            ]
+                        ]
+                    ],
+                    [
+                        [
+                            [
+                                13,
+                                14
+                            ],
+                            [
+                                16,
+                                16
+                            ],
+                            [
+                                13,
+                                17
+                            ],
+                            [
+                                13,
+                                14
+                            ]
+                        ]
+                    ]
+                ],
+                "type": "MultiPolygon"
+            }
+        },
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1

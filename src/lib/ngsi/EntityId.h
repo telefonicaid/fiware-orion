@@ -44,7 +44,7 @@ class EntityId
   std::string  isPattern;     // Optional
   bool         isTypePattern; // Used by NGSIv2 API
 
-  std::string  servicePath;  // Not part of payload, just an internal field
+  std::string  servicePath;   // Not part of payload, just an internal field
 
   double       creDate;       // used by dateCreated functionality in NGSIv2
   double       modDate;       // used by dateModified functionality in NGSIv2
@@ -58,6 +58,7 @@ class EntityId
 
   void         fill(const std::string& _id, const std::string& _type, const std::string& _isPattern, bool _isTypePattern = false);
   void         fill(const struct EntityId* eidP, bool useDefaultType = false);
+
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  toString(bool useIsPattern = false, const std::string& delimiter = ", ");
