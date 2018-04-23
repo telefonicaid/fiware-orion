@@ -92,7 +92,13 @@ static bool dataProvidedParse
 *
 * httpParse -
 */
-static bool httpParse(ngsiv2::Http* httpP, const rapidjson::Value& jsonHttp, const std::string& fieldName, std::string* errorStringP)
+static bool httpParse
+(
+  ngsiv2::Http*            httpP,
+  const rapidjson::Value&  jsonHttp,
+  const std::string&       fieldName,
+  std::string*             errorStringP
+)
 {
   if (!jsonHttp.IsObject())
   {
@@ -142,7 +148,13 @@ static bool httpParse(ngsiv2::Http* httpP, const rapidjson::Value& jsonHttp, con
 *
 * providerParse -
 */
-static bool providerParse(ConnectionInfo* ciP, ngsiv2::Provider* providerP, const rapidjson::Value& provider, std::string* errorStringP)
+static bool providerParse
+(
+  ConnectionInfo*          ciP,
+  ngsiv2::Provider*        providerP,
+  const rapidjson::Value&  provider,
+  std::string*             errorStringP
+)
 {
   bool b;
 
