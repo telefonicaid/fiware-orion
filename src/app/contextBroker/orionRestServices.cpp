@@ -76,9 +76,6 @@
 #include "serviceRoutines/deleteIndividualContextEntityAttribute.h"
 #include "serviceRoutines/putSubscriptionConvOp.h"
 #include "serviceRoutines/deleteSubscriptionConvOp.h"
-#include "serviceRoutines/getAttributeValueInstance.h"
-#include "serviceRoutines/putAttributeValueInstance.h"
-#include "serviceRoutines/deleteAttributeValueInstance.h"
 #include "serviceRoutines/getAllEntitiesWithTypeAndId.h"
 #include "serviceRoutines/postAllEntitiesWithTypeAndId.h"
 #include "serviceRoutines/putAllEntitiesWithTypeAndId.h"
@@ -87,10 +84,6 @@
 #include "serviceRoutines/postIndividualContextEntityAttributeWithTypeAndId.h"
 #include "serviceRoutines/putIndividualContextEntityAttributeWithTypeAndId.h"
 #include "serviceRoutines/deleteIndividualContextEntityAttributeWithTypeAndId.h"
-#include "serviceRoutines/getAttributeValueInstanceWithTypeAndId.h"
-#include "serviceRoutines/deleteAttributeValueInstanceWithTypeAndId.h"
-#include "serviceRoutines/postAttributeValueInstanceWithTypeAndId.h"
-#include "serviceRoutines/putAttributeValueInstanceWithTypeAndId.h"
 #include "serviceRoutines/getContextEntitiesByEntityIdAndType.h"
 #include "serviceRoutines/postContextEntitiesByEntityIdAndType.h"
 #include "serviceRoutines/getEntityByIdAttributeByNameWithTypeAndId.h"
@@ -185,14 +178,12 @@ static RestService getServiceV[] =
   { IndividualContextEntity,                       3, { "ngsi10",  "contextEntities", "*"                                              }, "",  getIndividualContextEntity                       },
   { IndividualContextEntityAttributes,             4, { "ngsi10",  "contextEntities", "*", "attributes"                                }, "",  getIndividualContextEntity                       },
   { IndividualContextEntityAttribute,              5, { "ngsi10",  "contextEntities", "*", "attributes", "*"                           }, "",  getIndividualContextEntityAttribute              },
-  { AttributeValueInstance,                        6, { "ngsi10",  "contextEntities", "*", "attributes", "*", "*"                      }, "",  getAttributeValueInstance                        },
   { Ngsi10ContextEntityTypes,                      3, { "ngsi10",  "contextEntityTypes", "*"                                           }, "",  getNgsi10ContextEntityTypes                      },
   { Ngsi10ContextEntityTypesAttributeContainer,    4, { "ngsi10",  "contextEntityTypes", "*", "attributes"                             }, "",  getNgsi10ContextEntityTypes                      },
   { Ngsi10ContextEntityTypesAttribute,             5, { "ngsi10",  "contextEntityTypes", "*", "attributes", "*"                        }, "",  getNgsi10ContextEntityTypesAttribute             },
   { IndividualContextEntity,                       3, { "v1",      "contextEntities", "*"                                              }, "",  getIndividualContextEntity                       },
   { IndividualContextEntityAttributes,             4, { "v1",      "contextEntities", "*", "attributes"                                }, "",  getIndividualContextEntity                       },
   { IndividualContextEntityAttribute,              5, { "v1",      "contextEntities", "*", "attributes", "*"                           }, "",  getIndividualContextEntityAttribute              },
-  { AttributeValueInstance,                        6, { "v1",      "contextEntities", "*", "attributes", "*", "*"                      }, "",  getAttributeValueInstance                        },
   { Ngsi10ContextEntityTypes,                      3, { "v1",      "contextEntityTypes", "*"                                           }, "",  getNgsi10ContextEntityTypes                      },
   { Ngsi10ContextEntityTypesAttributeContainer,    4, { "v1",      "contextEntityTypes", "*", "attributes"                             }, "",  getNgsi10ContextEntityTypes                      },
   { Ngsi10ContextEntityTypesAttribute,             5, { "v1",      "contextEntityTypes", "*", "attributes", "*"                        }, "",  getNgsi10ContextEntityTypesAttribute             },
@@ -201,7 +192,6 @@ static RestService getServiceV[] =
   { AllContextEntities,                            2, { "v1", "contextEntities"                                                        }, "",  getAllContextEntities                            },
   { AllEntitiesWithTypeAndId,                      6, { "v1", "contextEntities", "type", "*", "id", "*"                                }, "",  getAllEntitiesWithTypeAndId                      },
   { IndividualContextEntityAttributeWithTypeAndId, 8, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*"             }, "",  getIndividualContextEntityAttributeWithTypeAndId },
-  { AttributeValueInstanceWithTypeAndId,           9, { "v1",      "contextEntities", "type", "*", "id", "*", "attributes", "*", "*"   }, "",  getAttributeValueInstanceWithTypeAndId           },
   { ContextEntitiesByEntityIdAndType,              7, { "v1", "registry", "contextEntities", "type", "*", "id", "*"                    }, "",  getContextEntitiesByEntityIdAndType              },
   { EntityByIdAttributeByNameIdAndType,            9, { "v1", "registry", "contextEntities", "type", "*", "id", "*", "attributes", "*" }, "",  getEntityByIdAttributeByNameWithTypeAndId        },
   { LogTraceRequest,                               2, { "log", "trace"                                                                 }, "",  logTraceTreat                                    },
@@ -291,7 +281,6 @@ static RestService postServiceV[] =
   { AllContextEntities,                            2, { "v1", "contextEntities"                                                        }, "appendContextElementRequest",                  postIndividualContextEntity                       },
   { AllEntitiesWithTypeAndId,                      6, { "v1", "contextEntities", "type", "*", "id", "*"                                }, "appendContextElementRequest",                  postAllEntitiesWithTypeAndId                      },
   { IndividualContextEntityAttributeWithTypeAndId, 8, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*"             }, "updateContextAttributeRequest",                postIndividualContextEntityAttributeWithTypeAndId },
-  { AttributeValueInstanceWithTypeAndId,           9, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*", "*"        }, "updateContextAttributeRequest",                postAttributeValueInstanceWithTypeAndId           },
   { ContextEntitiesByEntityIdAndType,              7, { "v1", "registry", "contextEntities", "type", "*", "id", "*"                    }, "registerProviderRequest",                      postContextEntitiesByEntityIdAndType              },
   { EntityByIdAttributeByNameIdAndType,            9, { "v1", "registry", "contextEntities", "type", "*", "id", "*", "attributes", "*" }, "registerProviderRequest",                      postEntityByIdAttributeByNameWithTypeAndId        },
   { UpdateContext,                                 2, { "ngsi10",  "updateContext"                                                     }, "updateContextRequest",                         (RestTreat) postUpdateContext                     },
@@ -320,16 +309,13 @@ static RestService putServiceV[] =
   { IndividualContextEntity,                       3, { "ngsi10",  "contextEntities", "*"                                            }, "updateContextElementRequest",                  putIndividualContextEntity                       },
   { IndividualContextEntityAttributes,             4, { "ngsi10",  "contextEntities", "*", "attributes"                              }, "updateContextElementRequest",                  putIndividualContextEntity                       },
   { IndividualContextEntityAttribute,              5, { "ngsi10",  "contextEntities", "*", "attributes", "*"                         }, "updateContextAttributeRequest",                putIndividualContextEntityAttribute              },
-  { AttributeValueInstance,                        6, { "ngsi10",  "contextEntities", "*", "attributes", "*", "*"                    }, "updateContextAttributeRequest",                putAttributeValueInstance                        },
   { Ngsi10SubscriptionsConvOp,                     3, { "ngsi10",  "contextSubscriptions", "*"                                       }, "updateContextSubscriptionRequest",             putSubscriptionConvOp                            },
   { IndividualContextEntity,                       3, { "v1",      "contextEntities", "*"                                            }, "updateContextElementRequest",                  putIndividualContextEntity                       },
   { IndividualContextEntityAttributes,             4, { "v1",      "contextEntities", "*", "attributes"                              }, "updateContextElementRequest",                  putIndividualContextEntity                       },
   { IndividualContextEntityAttribute,              5, { "v1",      "contextEntities", "*", "attributes", "*"                         }, "updateContextAttributeRequest",                putIndividualContextEntityAttribute              },
-  { AttributeValueInstance,                        6, { "v1",      "contextEntities", "*", "attributes", "*", "*"                    }, "updateContextAttributeRequest",                putAttributeValueInstance                        },
   { Ngsi10SubscriptionsConvOp,                     3, { "v1",      "contextSubscriptions", "*"                                       }, "updateContextSubscriptionRequest",             putSubscriptionConvOp                            },
   { AllEntitiesWithTypeAndId,                      6, { "v1", "contextEntities", "type", "*", "id", "*"                              }, "updateContextElementRequest",                  putAllEntitiesWithTypeAndId                      },
   { IndividualContextEntityAttributeWithTypeAndId, 8, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*"           }, "updateContextAttributeRequest",                putIndividualContextEntityAttributeWithTypeAndId },
-  { AttributeValueInstanceWithTypeAndId,           9, { "v1",      "contextEntities", "type", "*", "id", "*", "attributes", "*", "*" }, "updateContextAttributeRequest",                putAttributeValueInstanceWithTypeAndId           },
   { LogTraceRequest,                               3, { "log", "trace",      "*"                                                     }, "",                                             logTraceTreat                                    },
   { LogTraceRequest,                               3, { "log", "traceLevel", "*"                                                     }, "",                                             logTraceTreat                                    },
   { LogTraceRequest,                               5, { "v1", "admin", "log", "trace",      "*"                                      }, "",                                             logTraceTreat                                    },
@@ -370,16 +356,13 @@ static RestService deleteServiceV[] =
   { IndividualContextEntity,                       3, { "ngsi10",  "contextEntities", "*"                                            }, "", deleteIndividualContextEntity                       },
   { IndividualContextEntityAttributes,             4, { "ngsi10",  "contextEntities", "*", "attributes"                              }, "", deleteIndividualContextEntity                       },
   { IndividualContextEntityAttribute,              5, { "ngsi10",  "contextEntities", "*", "attributes", "*"                         }, "", deleteIndividualContextEntityAttribute              },
-  { AttributeValueInstance,                        6, { "ngsi10",  "contextEntities", "*", "attributes", "*", "*"                    }, "", deleteAttributeValueInstance                        },
   { Ngsi10SubscriptionsConvOp,                     3, { "ngsi10",  "contextSubscriptions", "*"                                       }, "", deleteSubscriptionConvOp                            },
   { IndividualContextEntity,                       3, { "v1",      "contextEntities", "*"                                            }, "", deleteIndividualContextEntity                       },
   { IndividualContextEntityAttributes,             4, { "v1",      "contextEntities", "*", "attributes"                              }, "", deleteIndividualContextEntity                       },
-  { IndividualContextEntityAttribute,              5, { "v1",      "contextEntities", "*", "attributes", "*"                         }, "", deleteIndividualContextEntityAttribute              },
-  { AttributeValueInstance,                        6, { "v1",      "contextEntities", "*", "attributes", "*", "*"                    }, "", deleteAttributeValueInstance                        },
+  { IndividualContextEntityAttribute,              5, { "v1",      "contextEntities", "*", "attributes", "*"                         }, "", deleteIndividualContextEntityAttribute              },  
   { Ngsi10SubscriptionsConvOp,                     3, { "v1",      "contextSubscriptions", "*"                                       }, "", deleteSubscriptionConvOp                            },
   { AllEntitiesWithTypeAndId,                      6, { "v1", "contextEntities", "type", "*", "id", "*"                              }, "", deleteAllEntitiesWithTypeAndId                      },
   { IndividualContextEntityAttributeWithTypeAndId, 8, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*"           }, "", deleteIndividualContextEntityAttributeWithTypeAndId },
-  { AttributeValueInstanceWithTypeAndId,           9, { "v1",      "contextEntities", "type", "*", "id", "*", "attributes", "*", "*" }, "", deleteAttributeValueInstanceWithTypeAndId           },
   { LogTraceRequest,                               2, { "log", "trace"                                                               }, "", logTraceTreat                                       },
   { LogTraceRequest,                               3, { "log", "trace",      "*"                                                     }, "", logTraceTreat                                       },
   { LogTraceRequest,                               2, { "log", "traceLevel"                                                          }, "", logTraceTreat                                       },

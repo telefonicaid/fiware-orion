@@ -486,25 +486,6 @@ ContextAttribute::ContextAttribute
 
 /* ****************************************************************************
 *
-* ContextAttribute::getId() -
-*/
-std::string ContextAttribute::getId(void) const
-{
-  for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
-  {
-    if (metadataVector[ix]->name == NGSI_MD_ID)
-    {
-      return metadataVector[ix]->stringValue;
-    }
-  }
-
-  return "";
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextAttribute::getLocation() -
 */
 std::string ContextAttribute::getLocation(ApiVersion apiVersion) const

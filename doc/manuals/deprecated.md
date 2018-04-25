@@ -21,9 +21,12 @@ A list of deprecated features and the version in which they were deprecated foll
   duplicated). On the other hand, IDs can easily be implemented using prefixes/suffixes in attribute names,
   e.g. `temperature:ground` and `temperature:ceiling`. As a consecuence of this deprecation, the following
   operations are also deprecated:
-        * `GET /v1/contextEntities/Room1/attributes/{attrName}/{id}`
-        * `PUT /v1/contextEntities/Room1/attributes/{attrName}/{id}`
-        * `DELETE /v1/contextEntities/Room1/attributes/{attrName}/{id}`
+        * `GET /v1/contextEntities/{entityId}/attributes/{attrName}/{attrId}`
+        * `GET /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
+        * `PUT /v1/contextEntities/{entityId}/attributes/{attrName}/{attrId}`
+        * `PUT /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
+        * `DELETE /v1/contextEntities/{entityId}/attributes/{attrName}/{attrId}`
+        * `DELETE /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
 * The usage of `options` URL parameter in order to include `dateCreated` and/or `dateModified`
   attributes in NGSIv2 is deprecated in Orion 1.5.0. Please use `attrs` URI parameter instead.
 * `/ngsi10` and `/ngsi9` as URL path prefixes are deprecated in Orion 1.2.0. Please,

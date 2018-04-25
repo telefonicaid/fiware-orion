@@ -131,7 +131,7 @@ std::string getIndividualContextEntityAttributeWithTypeAndId
 
 
   // 06. Translate QueryContextResponse to ContextAttributeResponse
-  response.fill(&parseDataP->qcrs.res, entityId, entityType, attributeName, "");
+  response.fill(&parseDataP->qcrs.res, entityId, entityType, attributeName);
 
 
   // 07. Cleanup and return result

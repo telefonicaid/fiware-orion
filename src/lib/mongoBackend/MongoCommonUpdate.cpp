@@ -89,8 +89,7 @@ using orion::CompoundValueNode;
 */
 static bool isNotCustomMetadata(std::string md)
 {
-  if (md != NGSI_MD_ID            &&
-      md != NGSI_MD_LOCATION      &&
+  if (md != NGSI_MD_LOCATION      &&
       md != NGSI_MD_DATECREATED   &&
       md != NGSI_MD_DATEMODIFIED)
   {
@@ -696,10 +695,6 @@ static bool updateAttribute
 
   /* Attributes with metadata ID are stored as <attrName>()<ID> in the attributes embedded document */
   std::string effectiveName = dbDotEncode(caP->name);
-  if (caP->getId() != "")
-  {
-    effectiveName += MD_ID_SEPARATOR + caP->getId();
-  }
 
   if (isReplace)
   {
@@ -794,11 +789,6 @@ static bool appendAttribute
 {
   std::string effectiveName = dbDotEncode(caP->name);
 
-  if (caP->getId() != "")
-  {
-    effectiveName += MD_ID_SEPARATOR + caP->getId();
-  }
-
   /* APPEND with existing attribute equals to UPDATE */
   if (attrs.hasField(effectiveName.c_str()))
   {
@@ -865,7 +855,10 @@ static bool appendAttribute
 * Check that the client is not trying to mix attributes ID and no ID for the same
 * name
 *
+* FIXME PR: function not needed ??
+*
 */
+#if 0
 static bool legalIdUsage(const BSONObj& attrs, ContextAttribute* caP)
 {
   std::string prefix = caP->name + MD_ID_SEPARATOR;
@@ -912,7 +905,7 @@ static bool legalIdUsage(const BSONObj& attrs, ContextAttribute* caP)
 
   return true;
 }
-
+#endif
 
 
 /* ****************************************************************************
@@ -920,7 +913,10 @@ static bool legalIdUsage(const BSONObj& attrs, ContextAttribute* caP)
 * legalIdUsage -
 *
 * Check that the client is not trying to mix attributes ID and no ID for the same name
+*
+* FIXME PR: it could be removed
 */
+#if 0
 static bool legalIdUsage(const ContextAttributeVector& caV)
 {
   for (unsigned int ix = 0; ix < caV.size(); ++ix)
@@ -946,7 +942,7 @@ static bool legalIdUsage(const ContextAttributeVector& caV)
 
   return true;
 }
-
+#endif
 
 
 /* ****************************************************************************
@@ -966,11 +962,6 @@ static bool deleteAttribute
 )
 {
   std::string effectiveName = dbDotEncode(caP->name);
-
-  if (caP->getId() != "")
-  {
-    effectiveName += MD_ID_SEPARATOR + caP->getId();
-  }
 
   if (!attrs.hasField(effectiveName.c_str()))
   {
@@ -2166,12 +2157,6 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
   Metadata*  md;
 
   /* Not custom */
-  if (caReq->getId().length() > 0)
-  {
-    md = new Metadata(NGSI_MD_ID, "string", caReq->getId());
-    caRes->metadataVector.push_back(md);
-  }
-
   if ((caReq->getLocation().length() > 0) && (caReq->type != GEO_POINT))
   {
     /* Note that if attribute type is geo:point then the user is using the "new way"
@@ -2202,6 +2187,8 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
 * Returns the number of occurences of the attrName attribute (e.g. "A1") in the attrs
 * BSON (taken from DB). This use to be 1, except in the case of using ID.
 *
+* FIXME PR: maybe this function is not needed after the ID metadata removal
+*
 */
 static unsigned int howManyAttrs(BSONObj& attrs, const std::string& attrName)
 {
@@ -2211,7 +2198,7 @@ static unsigned int howManyAttrs(BSONObj& attrs, const std::string& attrName)
   attrs.getFieldNames(attrNames);
   for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
-    if (basePart(*i) == attrName)
+    if (*i == attrName)
     {
       c++;
     }
@@ -2497,6 +2484,7 @@ static bool appendContextAttributeItem
 {
   std::string err;
 
+#if 0
   if (!legalIdUsage(attrs, targetAttr))
   {
     /* If legalIdUsage() returns false, then that particular attribute can not be appended. In this case,
@@ -2513,6 +2501,7 @@ static bool appendContextAttributeItem
     alarmMgr.badInput(clientIp, "attribute cannot be appended");
     return false;
   }
+#endif
 
   bool actualAppend = appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, apiVersion);
 
@@ -2756,6 +2745,8 @@ static bool processContextAttributeVector
    * the attrsName get desynchronized, e.g. starting situation is A-ID1 and A-ID2, node
    * #1 process DELETE A-ID1 and node #2 process DELETE A-ID2, each one thinking than the
    * other A-IDx copy will be there at the end, thus nobody includes it in the toPull array
+   *
+   * FIXME PR: fix this piece of code
    */
   if (strcasecmp(action.c_str(), "delete") == 0)
   {
@@ -2836,6 +2827,7 @@ static bool createEntity
    * exits (see docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/) */
   ensureLocationIndex(tenant);
 
+#if 0
   if (!legalIdUsage(attrsV))
   {
     *errDetail =
@@ -2845,6 +2837,7 @@ static bool createEntity
     oe->fill(SccInvalidModification, *errDetail, "Unprocessable");
     return false;
   }
+#endif
 
   /* Search for a potential location attribute */
   std::string     locAttr;
@@ -2861,7 +2854,6 @@ static bool createEntity
 
   for (unsigned int ix = 0; ix < attrsV.size(); ++ix)
   {
-    std::string     attrId = attrsV[ix]->getId();
     BSONObjBuilder  bsonAttr;
 
     std::string attrType;
@@ -2889,10 +2881,6 @@ static bool createEntity
     attrsV[ix]->valueBson(bsonAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
     std::string effectiveName = dbDotEncode(attrsV[ix]->name);
-    if (attrId.length() != 0)
-    {
-      effectiveName += MD_ID_SEPARATOR + attrId;
-    }
 
     LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s}",
                     effectiveName.c_str(),
@@ -3446,14 +3434,13 @@ static bool contextElementPreconditionsCheck
   /* Checking there aren't duplicate attributes */
   for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
   {
-    std::string name = ceP->contextAttributeVector[ix]->name;
-    std::string id   = ceP->contextAttributeVector[ix]->getId();
+    std::string name = ceP->contextAttributeVector[ix]->name;    
     for (unsigned int jx = ix + 1; jx < ceP->contextAttributeVector.size(); ++jx)
     {
-      if ((name == ceP->contextAttributeVector[jx]->name) && (id == ceP->contextAttributeVector[jx]->getId()))
+      if (name == ceP->contextAttributeVector[jx]->name)
       {
         ContextAttribute* ca = new ContextAttribute(ceP->contextAttributeVector[ix]);
-        std::string details = std::string("duplicated attribute name: name=<") + name + "> id=<" + id + ">";
+        std::string details = std::string("duplicated attribute name: name=<") + name + ">";
         alarmMgr.badInput(clientIp, details);
         buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification,
                                   "duplicated attribute /" + name + "/");

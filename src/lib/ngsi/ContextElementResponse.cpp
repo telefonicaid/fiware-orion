@@ -172,8 +172,7 @@ ContextElementResponse::ContextElementResponse
     ContextAttribute   ca;
 
     // Name and type
-    ca.name           = dbDotDecode(basePart(attrName));
-    std::string mdId  = idPart(attrName);
+    ca.name           = dbDotDecode(attrName);
     ca.type           = getStringFieldF(attr, ENT_ATTRS_TYPE);
 
     // Skip attribute if the attribute is in the list (or attrL is empty or includes "*")
@@ -241,13 +240,6 @@ ContextElementResponse::ContextElementResponse
       default:
         LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(attr, ENT_ATTRS_VALUE).type()));
       }
-    }
-
-    /* Setting ID (if found) */
-    if (mdId != "")
-    {
-      Metadata* md = new Metadata(NGSI_MD_ID, "string", mdId);
-      caP->metadataVector.push_back(md);
     }
 
     if (apiVersion == V1)

@@ -108,7 +108,7 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
 
 
   // 03. Fill in UpdateContextRequest
-  parseDataP->upcr.res.fill(entityId, entityType, "", attributeName, "", "DELETE");
+  parseDataP->upcr.res.fill(entityId, entityType, "", attributeName, "DELETE");
 
 
   // 04. Call Standard Operation

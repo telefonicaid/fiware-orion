@@ -114,7 +114,7 @@ std::string deleteAllEntitiesWithTypeAndId
 
 
   // 03. Fill in UpdateContextRequest
-  parseDataP->upcr.res.fill(entityId, entityType, "", "", "", "DELETE");
+  parseDataP->upcr.res.fill(entityId, entityType, "", "", "DELETE");
 
 
   // 04. Call Standard Operation

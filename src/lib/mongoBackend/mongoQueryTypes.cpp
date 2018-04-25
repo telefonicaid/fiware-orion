@@ -132,7 +132,7 @@ static void getAttributeTypes
     {
       std::string currentAttr = *i;
 
-      if (basePart(currentAttr) == attrName)
+      if (currentAttr == attrName)
       {
         BSONObj attr = getObjectFieldF(attrs, currentAttr);
         attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));

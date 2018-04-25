@@ -313,6 +313,8 @@ std::string ContextAttributeVector::render
   // only one of them should be included in the vector. Any one of them.
   // So, step 1 is to purge the context attribute vector from 'copies'.
   //
+  // FIXME PR: fix step 1
+  //
   if (asJsonObject)
   {
     std::vector<std::string> added;
