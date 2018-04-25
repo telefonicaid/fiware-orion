@@ -78,7 +78,7 @@ echo
 
 echo "04. Update/APPEND E1/A1(=CP) in CP"
 url4="/v1/updateContext"
-payload6='{
+payload4='{
   "contextElements": [
     {
       "type": "E",
@@ -150,7 +150,7 @@ echo
 
 
 echo "08. Query broker for E1/A2 (will go to CB and should work, A2 array is returned)"
-orionCurl --url /v2/entities/E1/attrs/A2/value
+orionCurl --url /v2/entities/E1/attrs/A2/value --out "text/plain"
 echo
 echo
 
