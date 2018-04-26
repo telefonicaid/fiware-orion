@@ -121,6 +121,8 @@ static void getAttributeTypes
      *
      * However, it doesn't work when the attribute uses metadata ID
      *
+     * FIXME PR: mabye the simpler approach should be recovered?
+     *
      */
 
     BSONObj                attrs = getObjectFieldF(r, ENT_ATTRS);
