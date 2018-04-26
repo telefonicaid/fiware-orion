@@ -52,25 +52,6 @@ ContextAttributeVector::ContextAttributeVector()
 
 /* ****************************************************************************
 *
-* addedLookup - 
-*/
-static std::string addedLookup(const std::vector<std::string>& added, std::string value)
-{
-  for (unsigned int ix = 0; ix < added.size(); ++ix)
-  {
-    if (added[ix] == value)
-    {
-      return value;
-    }
-  }
-
-  return "";
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextAttributeVector::toJsonTypes -
 */
 std::string ContextAttributeVector::toJsonTypes(void)
@@ -309,34 +290,9 @@ std::string ContextAttributeVector::render
   // NOTE:
   // If the URI parameter 'attributeFormat' is set to 'object', then the attribute vector
   // is to be rendered as objects for JSON, and not as a vector.
-  // Also, if we have more than one attribute with the same name (possible if different metaID),
-  // only one of them should be included in the vector. Any one of them.
-  // So, step 1 is to purge the context attribute vector from 'copies'.
-  //
-  // FIXME PR: fix step 1
   //
   if (asJsonObject)
   {
-    std::vector<std::string> added;
-
-    // 1. Remove attributes with attribute names already used.
-    for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    {
-      if (addedLookup(added, vec[ix]->name) == "")
-      {
-        added.push_back(vec[ix]->name);
-        LM_T(LmtJsonAttributes, ("Keeping attribute '%s'", vec[ix]->name.c_str()));
-      }
-      else
-      {
-        LM_T(LmtJsonAttributes, ("Removing attribute '%s'", vec[ix]->name.c_str()));
-        vec[ix]->release();
-        delete vec[ix];
-        vec.erase(vec.begin() + ix);
-      }
-    }
-
-    // 2. Now it's time to render
     // Note that in the case of attribute as name, we have to use a vector, thus using
     // attrsAsName variable as value for isVector parameter
     out += startTag("attributes", attrsAsName);
