@@ -21,12 +21,13 @@ A list of deprecated features and the version in which they were deprecated foll
   duplicated). On the other hand, IDs can easily be implemented using prefixes/suffixes in attribute names,
   e.g. `temperature:ground` and `temperature:ceiling`. As a consecuence of this deprecation, the following
   operations are also deprecated:
-        * `GET /v1/contextEntities/{entityId}/attributes/{attrName}/{attrId}`
-        * `GET /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
-        * `PUT /v1/contextEntities/{entityId}/attributes/{attrName}/{attrId}`
-        * `PUT /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
-        * `DELETE /v1/contextEntities/{entityId}/attributes/{attrName}/{attrId}`
-        * `DELETE /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
+	* `GET /v1/contextEntities/{entityId}/attributes/{attrName}/{attrId}`
+	* `GET /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
+	* `POST /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
+	* `PUT /v1/contextEntities/{entityId}/attributes/{attrName}/{attrId}`
+	* `PUT /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
+	* `DELETE /v1/contextEntities/{entityId}/attributes/{attrName}/{attrId}`
+	* `DELETE /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
 * The usage of `options` URL parameter in order to include `dateCreated` and/or `dateModified`
   attributes in NGSIv2 is deprecated in Orion 1.5.0. Please use `attrs` URI parameter instead.
 * `/ngsi10` and `/ngsi9` as URL path prefixes are deprecated in Orion 1.2.0. Please,
@@ -76,7 +77,7 @@ The following table provides information about the last Orion version supporting
 | `dateCreated` and `dateModified` in `options` URI parameter                | Not yet defined                           | Not yet defined                 |
 | `/ngsi10` and `/ngsi9` URL prefixes                                        | Not yet defined                           | Not yet defined                 |
 | `location` metadata to specify entity location                             | Not yet defined                           | Not yet defined                 |
-| `id` metadata (and associated NGSIv1 operations)                           | 1.14.0                                    | Not yet defined                 |
+| `id` metadata (and associated NGSIv1 operations)                           | 1.13.0                                    | April 16th, 2018                |
 | XML API                                                                    | 0.28.0                                    | February 29th, 2016             |
 | ONTIMEINTERVAL subscription                                                | 0.28.0                                    | February 29th, 2016             |
 | CLI `--silent`                                                             | 0.28.0                                    | February 29th, 2016             |
