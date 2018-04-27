@@ -8,7 +8,7 @@ functionality can be used to implement a kind of "pull" federation (in
 which one Orion instance fowards a query/update to another Orion
 instance). Note that an importand difference between two approaches is
 that in the "push" mode all the Orion instances update its local state,
-while in the "push" approach all the intermediate Orion instances acts
+while in the "pull" approach all the intermediate Orion instances acts
 as "proxy" without storing the data locally.
 
 Apart from processing updateContext and registerContext (usually issued
