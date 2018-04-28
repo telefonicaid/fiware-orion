@@ -86,7 +86,7 @@ static const char* compoundRootV[] =
 * Also, it returns the root of the compound (found in 'compoundValueRootV') and also
 * the 'rest' of the path, i.e. its relative path inside the compound.
 *
-* If the path doesn't belong to any compond, FALSE is returned.
+* If the path doesn't belong to any compound, FALSE is returned.
 */
 static bool isCompoundPath(const char* path)
 {
