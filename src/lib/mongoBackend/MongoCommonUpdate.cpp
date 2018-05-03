@@ -56,6 +56,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
 #include "mongoBackend/location.h"
+#include "mongoBackend/dateExpiration.h"
 #include "mongoBackend/compoundValueBson.h"
 #include "mongoBackend/MongoCommonUpdate.h"
 
@@ -2835,6 +2836,7 @@ static bool createEntity
    * invoke ensureLocationIndex() in anycase, given that it is harmless in the case the collection and index already
    * exits (see docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/) */
   ensureLocationIndex(tenant);
+  ensureDateExpirationIndex(tenant);
 
   if (!legalIdUsage(attrsV))
   {
@@ -2851,6 +2853,15 @@ static bool createEntity
   BSONObjBuilder  geoJson;
 
   if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion, oe))
+  {
+    // oe->fill() already managed by processLocationAtEntityCreation()
+    return false;
+  }
+
+  /* Search for a potential date expiration attribute */
+  mongo::Date_t dateExpiration;
+
+  if (!processDateExpirationAtEntityCreation(attrsV, &dateExpiration, errDetail, oe))
   {
     // oe->fill() already managed by processLocationAtEntityCreation()
     return false;
@@ -2944,6 +2955,13 @@ static bool createEntity
   {
     insertedDoc.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
                                           ENT_LOCATION_COORDS   << geoJson.obj()));
+  }
+
+  std::cout << "Date: " << dateExpiration << std::endl;
+  /* Add date expiration in the case it was found */
+  if (dateExpiration)
+  {
+    insertedDoc.appendDate(ENT_EXPIRATION, dateExpiration);
   }
 
   // Correlator (for notification loop detection logic)

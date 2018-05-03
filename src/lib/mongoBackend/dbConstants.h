@@ -80,6 +80,7 @@
 #define ENT_LOCATION_ATTRNAME        "attrName"
 #define ENT_LOCATION_COORDS          "coords"
 #define ENT_LAST_CORRELATOR          "lastCorrelator"
+#define ENT_EXPIRATION               "dateExpiration"
 
 #define CSUB_DESCRIPTION             "description"
 #define CSUB_EXPIRATION              "expiration"

@@ -25,6 +25,7 @@
 #include <string>
 
 #include "mongo/client/dbclient.h"
+#include "mongo/client/index_spec.h"
 
 #include "logMsg/traceLevels.h"
 #include "common/string.h"
@@ -43,6 +44,7 @@
 */
 using mongo::DBClientBase;
 using mongo::DBClientCursor;
+using mongo::IndexSpec;
 using mongo::BSONObj;
 using mongo::DBException;
 using mongo::Query;
@@ -557,6 +559,7 @@ bool collectionCreateIndex
 (
   const std::string&  col,
   const BSONObj&      indexes,
+  const bool&         isTTL,
   std::string*        err
 )
 {
@@ -575,7 +578,10 @@ bool collectionCreateIndex
 
   try
   {
-    connection->createIndex(col.c_str(), indexes);
+    if (isTTL)
+      connection->createIndex(col.c_str(), IndexSpec().addKeys(indexes).expireAfterSeconds(0));
+    else
+      connection->createIndex(col.c_str(), indexes);
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     LM_I(("Database Operation Successful (createIndex: %s)", indexes.toString().c_str()));
