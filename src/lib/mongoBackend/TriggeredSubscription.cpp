@@ -43,7 +43,7 @@ TriggeredSubscription::TriggeredSubscription
   long long                _lastNotification,
   RenderFormat             _renderFormat,
   const ngsiv2::HttpInfo&  _httpInfo,
-  const AttributeList&     _attrL,
+  const StringList&        _attrL,
   const std::string&       _cacheSubId,
   const char*              _tenant
 )
@@ -56,7 +56,8 @@ TriggeredSubscription::TriggeredSubscription
   cacheSubId(_cacheSubId),
   tenant((_tenant == NULL)? "" : _tenant),
   stringFilterP(NULL),
-  mdStringFilterP(NULL)
+  mdStringFilterP(NULL),
+  blacklist(false)
 {
 }
 
@@ -72,7 +73,7 @@ TriggeredSubscription::TriggeredSubscription
 (
   RenderFormat             _renderFormat,
   const ngsiv2::HttpInfo&  _httpInfo,
-  const AttributeList&     _attrL
+  const StringList&        _attrL
 )
 :
   throttling(-1),
@@ -83,7 +84,8 @@ TriggeredSubscription::TriggeredSubscription
   cacheSubId(""),
   tenant(""),
   stringFilterP(NULL),
-  mdStringFilterP(NULL)
+  mdStringFilterP(NULL),
+  blacklist(false)
 {
 }
 

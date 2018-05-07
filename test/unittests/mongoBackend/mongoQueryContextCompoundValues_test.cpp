@@ -22,8 +22,8 @@
 *
 * Author: Fermin Galan
 */
+#include "mongo/client/dbclient.h"
 #include "gtest/gtest.h"
-#include "unittest.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -36,7 +36,20 @@
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/unittest.h"
+
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONNULL;
+using mongo::OID;
+
+
 
 /* ****************************************************************************
 *
@@ -67,8 +80,8 @@
 * This function is called before every test, to populate some information in the
 * entities collection.
 */
-static void prepareDatabase(void) {
-
+static void prepareDatabase(void)
+{
   /* Set database */
   setupDatabase();
 
@@ -77,59 +90,44 @@ static void prepareDatabase(void) {
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
                      "attrNames" << BSON_ARRAY("A1") <<
                      "attrs" << BSON(
-                        "A1" << BSON("type" << "TA1" <<
-                             "value" << BSON_ARRAY("22" <<
-                                                   BSON("x" << BSON_ARRAY("x1" << "x2") <<
-                                                        "y" << "3") <<
-                                                   BSON_ARRAY("z1" << "z2")
-                                                   )
-                             )
-                        )
-                    );
+                       "A1" << BSON("type" << "TA1" <<
+                                    "value" << BSON_ARRAY("22" <<
+                                                          BSON("x" << BSON_ARRAY("x1" << "x2") <<
+                                                               "y" << "3") <<
+                                                          BSON_ARRAY("z1" << "z2")))));
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2") <<
                      "attrNames" << BSON_ARRAY("A2") <<
                      "attrs" << BSON(
-                        "A2" << BSON("type" << "TA2" <<
-                             "value" << BSON("x" << BSON("x1" << "a" << "x2" << "b") <<
-                                             "y" << BSON_ARRAY("y1" << "y2")
-                                             )
-                             )
-                        )
-                    );
+                       "A2" << BSON("type" << "TA2" <<
+                                    "value" << BSON("x" << BSON("x1" << "a" << "x2" << "b") <<
+                                                    "y" << BSON_ARRAY("y1" << "y2")))));
 
   BSONObj en3 = BSON("_id" << BSON("id" << "E3" << "type" << "T3") <<
                      "attrNames" << BSON_ARRAY("A3" << "A3bis") <<
                      "attrs" << BSON(
-                        "A3" << BSON("type" << "TA3" <<
-                             "value" << BSON_ARRAY("22" <<
-                                                   BSON("x" << BSON_ARRAY("x1" << "x2") <<
-                                                        "y" << "3") <<
-                                                   BSON_ARRAY("z1" << "z2")
-                                                   )
-                             ) <<
-                        "A3bis" << BSON("type" << "TA3" << "value" << "val3")
-                        )
-                    );
+                       "A3" << BSON("type" << "TA3" <<
+                                    "value" << BSON_ARRAY("22" <<
+                                                          BSON("x" << BSON_ARRAY("x1" << "x2") <<
+                                                               "y" << "3") <<
+                                                          BSON_ARRAY("z1" << "z2"))) <<
+                       "A3bis" << BSON("type" << "TA3" << "value" << "val3")));
 
   BSONObj en4 = BSON("_id" << BSON("id" << "E4" << "type" << "T4") <<
                      "attrNames" << BSON_ARRAY("A4" << "A4bis") <<
                      "attrs" << BSON(
-                        "A4" << BSON("type" << "TA4" <<
-                             "value" << BSON("x" << BSON("x1" << "a" << "x2" << "b") <<
-                                             "y" << BSON_ARRAY("y1" << "y2")
-                                             )
-                             ) <<
-                        "A4bis" << BSON("type" << "TA4" << "value" << "val4")
-                        )
-                    );
+                       "A4" << BSON("type" << "TA4" <<
+                                    "value" << BSON("x" << BSON("x1" << "a" << "x2" << "b") <<
+                                                    "y" << BSON_ARRAY("y1" << "y2"))) <<
+                       "A4bis" << BSON("type" << "TA4" << "value" << "val4")));
 
   connection->insert(ENTITIES_COLL, en1);
   connection->insert(ENTITIES_COLL, en2);
   connection->insert(ENTITIES_COLL, en3);
   connection->insert(ENTITIES_COLL, en4);
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -138,8 +136,8 @@ static void prepareDatabase(void) {
 * This function is called before every test, to populate some information in the
 * entities collection.
 */
-static void prepareDatabaseNative(void) {
-
+static void prepareDatabaseNative(void)
+{
   /* Set database */
   setupDatabase();
 
@@ -148,63 +146,48 @@ static void prepareDatabaseNative(void) {
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
                      "attrNames" << BSON_ARRAY("A1") <<
                      "attrs" << BSON(
-                        "A1" << BSON("type" << "TA1" <<
-                             "value" << BSON_ARRAY(22.0 <<
-                                                   BSON("x" << BSON_ARRAY("x1" << "x2") <<
-                                                        "y" << 3.0 <<
-                                                        "z" << BSONNULL) <<
-                                                   BSON_ARRAY("z1" << false << BSONNULL)
-                                                   )
-                             )
-                        )
-                    );
+                       "A1" << BSON("type" << "TA1" <<
+                                    "value" << BSON_ARRAY(22.0 <<
+                                                          BSON("x" << BSON_ARRAY("x1" << "x2") <<
+                                                               "y" << 3.0 <<
+                                                               "z" << BSONNULL) <<
+                                                          BSON_ARRAY("z1" << false << BSONNULL)))));
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2") <<
                      "attrNames" << BSON_ARRAY("A2") <<
                      "attrs" << BSON(
-                        "A2" << BSON("type" << "TA2" <<
-                             "value" << BSON("x" << BSON("x1" << "a" << "x2" << true) <<
-                                             "y" << BSON_ARRAY("y1" << "y2" << BSONNULL) <<
-                                             "z" << BSONNULL
-                                             )
-                             )
-                        )
-                    );
+                       "A2" << BSON("type" << "TA2" <<
+                                    "value" << BSON("x" << BSON("x1" << "a" << "x2" << true) <<
+                                                    "y" << BSON_ARRAY("y1" << "y2" << BSONNULL) <<
+                                                    "z" << BSONNULL))));
 
   BSONObj en3 = BSON("_id" << BSON("id" << "E3" << "type" << "T3") <<
                      "attrNames" << BSON_ARRAY("A3" << "A3bis") <<
                      "attrs" << BSON(
-                        "A3" << BSON("type" << "TA3" <<
-                             "value" << BSON_ARRAY(22.0 <<
-                                                   BSON("x" << BSON_ARRAY("x1" << "x2") <<
-                                                        "y" << 3.0 <<
-                                                        "z" << BSONNULL) <<
-                                                   BSON_ARRAY("z1" << false << BSONNULL)
-                                                   )
-                             ) <<
-                        "A3bis" << BSON("type" << "TA3" << "value" << "val3")
-                        )
-                    );
+                       "A3" << BSON("type" << "TA3" <<
+                                    "value" << BSON_ARRAY(22.0 <<
+                                                          BSON("x" << BSON_ARRAY("x1" << "x2") <<
+                                                               "y" << 3.0 <<
+                                                               "z" << BSONNULL) <<
+                                                          BSON_ARRAY("z1" << false << BSONNULL))) <<
+                       "A3bis" << BSON("type" << "TA3" << "value" << "val3")));
 
   BSONObj en4 = BSON("_id" << BSON("id" << "E4" << "type" << "T4") <<
                      "attrNames" << BSON_ARRAY("A4" << "A4bis") <<
                      "attrs" << BSON(
-                        "A4" << BSON("type" << "TA4" <<
-                             "value" << BSON("x" << BSON("x1" << "a" << "x2" << true) <<
-                                             "y" << BSON_ARRAY("y1" << "y2") <<
-                                             "z" << BSONNULL
-                                             )
-                             ) <<
-                        "A4bis" << BSON("type" << "TA4" << "value" << "val4")
-                        )
-                    );
+                       "A4" << BSON("type" << "TA4" <<
+                                    "value" << BSON("x" << BSON("x1" << "a" << "x2" << true) <<
+                                                    "y" << BSON_ARRAY("y1" << "y2") <<
+                                                    "z" << BSONNULL)) <<
+                       "A4bis" << BSON("type" << "TA4" << "value" << "val4")));
 
   connection->insert(ENTITIES_COLL, en1);
   connection->insert(ENTITIES_COLL, en2);
   connection->insert(ENTITIES_COLL, en3);
   connection->insert(ENTITIES_COLL, en4);
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -212,7 +195,6 @@ static void prepareDatabaseNative(void) {
 */
 TEST(mongoQueryContextCompoundValuesRequest, CompoundValue1)
 {
-
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -227,7 +209,7 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue1)
     req.entityIdVector.push_back(&en);
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
+    servicePathVector.clear();
     ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
     /* Check response is as expected */
@@ -472,7 +454,6 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue2PlusSimpleValue)
 */
 TEST(mongoQueryContextCompoundValuesRequest, CompoundValue1Native)
 {
-
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -516,15 +497,15 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue1Native)
     EXPECT_EQ("x2", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->childV[1]->stringValue);
     EXPECT_EQ(orion::ValueTypeNumber, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->valueType);
     EXPECT_EQ("y", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->name);
-    EXPECT_EQ(3.0, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->numberValue);    
-    EXPECT_EQ(orion::ValueTypeNone, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[2]->valueType);
+    EXPECT_EQ(3.0, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->numberValue);
+    EXPECT_EQ(orion::ValueTypeNull, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[2]->valueType);
     EXPECT_EQ("z", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[2]->name);
     EXPECT_EQ(orion::ValueTypeVector, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->valueType);
     EXPECT_EQ(orion::ValueTypeString, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[0]->valueType);
     EXPECT_EQ("z1", RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[0]->stringValue);
     EXPECT_EQ(orion::ValueTypeBoolean, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[1]->valueType);
-    EXPECT_FALSE(RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[1]->boolValue);    
-    EXPECT_EQ(orion::ValueTypeNone, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[2]->valueType);
+    EXPECT_FALSE(RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[1]->boolValue);
+    EXPECT_EQ(orion::ValueTypeNull, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[2]->valueType);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -587,7 +568,7 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue2Native)
     EXPECT_EQ("y1", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->stringValue);
     EXPECT_EQ(orion::ValueTypeString, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->valueType);
     EXPECT_EQ("y2", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->stringValue);
-    EXPECT_EQ(orion::ValueTypeNone, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->valueType);
+    EXPECT_EQ(orion::ValueTypeNull, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->valueType);
     EXPECT_EQ("z", RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->name);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -648,14 +629,14 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue1PlusSimpleValueNative
     EXPECT_EQ(orion::ValueTypeNumber, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->valueType);
     EXPECT_EQ("y", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->name);
     EXPECT_EQ(3.0, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->numberValue);
-    EXPECT_EQ(orion::ValueTypeNone, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[2]->valueType);
+    EXPECT_EQ(orion::ValueTypeNull, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[2]->valueType);
     EXPECT_EQ("z", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[2]->name);
     EXPECT_EQ(orion::ValueTypeVector, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->valueType);
     EXPECT_EQ(orion::ValueTypeString, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[0]->valueType);
     EXPECT_EQ("z1", RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[0]->stringValue);
     EXPECT_EQ(orion::ValueTypeBoolean, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[1]->valueType);
     EXPECT_FALSE(RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[1]->boolValue);
-    EXPECT_EQ(orion::ValueTypeNone, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[2]->valueType);
+    EXPECT_EQ(orion::ValueTypeNull, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[2]->valueType);
     EXPECT_EQ("A3bis", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA3", RES_CER_ATTR(0, 1)->type);
     EXPECT_EQ("val3", RES_CER_ATTR(0, 1)->stringValue);
@@ -721,7 +702,7 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue2PlusSimpleValueNative
     EXPECT_EQ("y1", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->stringValue);
     EXPECT_EQ(orion::ValueTypeString, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->valueType);
     EXPECT_EQ("y2", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->stringValue);
-    EXPECT_EQ(orion::ValueTypeNone, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->valueType);
+    EXPECT_EQ(orion::ValueTypeNull, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->valueType);
     EXPECT_EQ("z", RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->name);
     EXPECT_EQ("A4bis", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA4", RES_CER_ATTR(0, 1)->type);

@@ -22,11 +22,10 @@
 *
 * Author: Fermin Galan
 */
-#include "unittest.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoDiscoverContextAvailability.h"
@@ -36,9 +35,28 @@
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/unittest.h"
 
-extern void setMongoConnectionForUnitTest(DBClientBase*);
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::OID;
+using mongo::DBException;
+using ::testing::Return;
+using ::testing::Throw;
+using ::testing::_;
+
+
+
+extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+
+
 
 /* ****************************************************************************
 *
@@ -100,8 +118,8 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * This function is called before every test, to populate some information in the
 * registrations collection.
 */
-static void prepareDatabase(void) {
-
+static void prepareDatabase(void)
+{
   /* Set database */
   setupDatabase();
 
@@ -123,84 +141,64 @@ static void prepareDatabase(void) {
 
   BSONObj cr1 = BSON("providingApplication" << "http://cr1.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T1") <<
-                         BSON("id" << "E2" << "type" << "T2") <<
-                         BSON("id" << "E3" << "type" << "T3")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T1")  <<
+                       BSON("id" << "E2" << "type" << "T2")  <<
+                       BSON("id" << "E3" << "type" << "T3")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                         BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                         BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                         )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
+                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
+                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
+
   BSONObj cr2 = BSON("providingApplication" << "http://cr2.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T1")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T1")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                         BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
+                       BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")));
+
   BSONObj cr3 = BSON("providingApplication" << "http://cr3.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E2" << "type" << "T2")
-                         ) <<
+                       BSON("id" << "E2" << "type" << "T2")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                         BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                         )
-                     );
+                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
+                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
 
   BSONObj cr4 = BSON("providingApplication" << "http://cr4.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T1bis")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T1bis")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A1" << "type" << "TA1bis" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1bis" << "isDomain" << "false")));
 
   BSONObj cr5 = BSON("providingApplication" << "http://cr5.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1")
-                         ) <<
+                       BSON("id" << "E1")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")
-                         )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
 
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
-  BSONObj reg1 = BSON(
-              "_id" << OID("51307b66f481db11bf860001") <<
-              "expiration" << 1879048191 <<
-              "contextRegistration" << BSON_ARRAY(cr1 << cr2)
-              );
+  BSONObj reg1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr1 << cr2));
 
-  BSONObj reg2 = BSON(
-              "_id" << OID("51307b66f481db11bf860002") <<
-              "expiration" << 1879048191 <<
-              "contextRegistration" << BSON_ARRAY(cr3)
-              );
+  BSONObj reg2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr3));
 
-  BSONObj reg3 = BSON(
-              "_id" << OID("51307b66f481db11bf860003") <<
-              "expiration" << 1879048191 <<
-              "contextRegistration" << BSON_ARRAY(cr4)
-              );
+  BSONObj reg3 = BSON("_id" << OID("51307b66f481db11bf860003") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr4));
 
-  BSONObj reg4 = BSON(
-              "_id" << OID("51307b66f481db11bf860004") <<
-              "expiration" << 1879048191 <<
-              "contextRegistration" << BSON_ARRAY(cr5)
-              );
+  BSONObj reg4 = BSON("_id" << OID("51307b66f481db11bf860004") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr5));
 
   connection->insert(REGISTRATIONS_COLL, reg1);
   connection->insert(REGISTRATIONS_COLL, reg2);
   connection->insert(REGISTRATIONS_COLL, reg3);
   connection->insert(REGISTRATIONS_COLL, reg4);
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -209,8 +207,8 @@ static void prepareDatabase(void) {
 * This is a variant of populateDatabase function in which all entities have the same type,
 * to ease test for isPattern=true cases
 */
-static void prepareDatabasePatternTrue(void) {
-
+static void prepareDatabasePatternTrue(void)
+{
   /* Set database */
   setupDatabase();
 
@@ -232,87 +230,72 @@ static void prepareDatabasePatternTrue(void) {
 
   BSONObj cr1 = BSON("providingApplication" << "http://cr1.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T") <<
-                         BSON("id" << "E2" << "type" << "T") <<
-                         BSON("id" << "E3" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T") <<
+                       BSON("id" << "E2" << "type" << "T") <<
+                       BSON("id" << "E3" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                         BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                         BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                         )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
+                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
+                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
+
   BSONObj cr2 = BSON("providingApplication" << "http://cr2.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                         BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
+                       BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")));
+
   BSONObj cr3 = BSON("providingApplication" << "http://cr3.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E2" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E2" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                         BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                         )
-                     );
+                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
+                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
 
   BSONObj cr4 = BSON("providingApplication" << "http://cr4.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E2" << "type" << "Tbis")
-                         ) <<
+                       BSON("id" << "E2" << "type" << "Tbis")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A2" << "type" << "TA2bis" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A2" << "type" << "TA2bis" << "isDomain" << "false")));
 
   BSONObj cr5 = BSON("providingApplication" << "http://cr5.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E3")
-                         ) <<
+                       BSON("id" << "E3")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false")));
 
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
   BSONObj reg1 = BSON(
               "_id" << "ff37" <<
               "expiration" << 1879048191 <<
               "subscriptions" << BSONArray() <<
-              "contextRegistration" << BSON_ARRAY(cr1 << cr2)
-              );
+              "contextRegistration" << BSON_ARRAY(cr1 << cr2));
 
   BSONObj reg2 = BSON(
               "_id" << "ff48" <<
               "expiration" << 1879048191 <<
               "subscriptions" << BSONArray() <<
-              "contextRegistration" << BSON_ARRAY(cr3)
-              );
+              "contextRegistration" << BSON_ARRAY(cr3));
 
   BSONObj reg3 = BSON(
               "_id" << "ff80" <<
               "expiration" << 1879048191 <<
               "subscriptions" << BSONArray() <<
-              "contextRegistration" << BSON_ARRAY(cr4)
-              );
+              "contextRegistration" << BSON_ARRAY(cr4));
 
   BSONObj reg4 = BSON(
               "_id" << "ff90" <<
               "expiration" << 1879048191 <<
               "subscriptions" << BSONArray() <<
-              "contextRegistration" << BSON_ARRAY(cr5)
-              );
+              "contextRegistration" << BSON_ARRAY(cr5));
 
   connection->insert(REGISTRATIONS_COLL, reg1);
   connection->insert(REGISTRATIONS_COLL, reg2);
   connection->insert(REGISTRATIONS_COLL, reg3);
   connection->insert(REGISTRATIONS_COLL, reg4);
 }
+
+
 
 /* ****************************************************************************
 *
@@ -335,17 +318,45 @@ static void prepareDatabaseForPagination(void)
    *
    */
 
-  BSONObj cr1 = BSON("providingApplication" << "http://cr1.com" << "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1")) << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
-  BSONObj cr2 = BSON("providingApplication" << "http://cr2.com" << "entities" << BSON_ARRAY(BSON("id" << "E2" << "type" << "T2")) << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
-  BSONObj cr3 = BSON("providingApplication" << "http://cr3.com" << "entities" << BSON_ARRAY(BSON("id" << "E3" << "type" << "T3")) << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
-  BSONObj cr4 = BSON("providingApplication" << "http://cr4.com" << "entities" << BSON_ARRAY(BSON("id" << "E4" << "type" << "T4")) << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
-  BSONObj cr5 = BSON("providingApplication" << "http://cr5.com" << "entities" << BSON_ARRAY(BSON("id" << "E5" << "type" << "T5")) << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
+  BSONObj cr1 = BSON("providingApplication" << "http://cr1.com" <<
+                     "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1")) <<
+                     "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
 
-  BSONObj reg1 = BSON("_id" << OID("51307b66f481db11bf860001") << "expiration" << 1879048191 << "contextRegistration" << BSON_ARRAY(cr1));
-  BSONObj reg2 = BSON("_id" << OID("51307b66f481db11bf860002") << "expiration" << 1879048191 << "contextRegistration" << BSON_ARRAY(cr2));
-  BSONObj reg3 = BSON("_id" << OID("51307b66f481db11bf860003") << "expiration" << 1879048191 << "contextRegistration" << BSON_ARRAY(cr3));
-  BSONObj reg4 = BSON("_id" << OID("51307b66f481db11bf860004") << "expiration" << 1879048191 << "contextRegistration" << BSON_ARRAY(cr4));
-  BSONObj reg5 = BSON("_id" << OID("51307b66f481db11bf860005") << "expiration" << 1879048191 << "contextRegistration" << BSON_ARRAY(cr5));
+  BSONObj cr2 = BSON("providingApplication" << "http://cr2.com" <<
+                     "entities" << BSON_ARRAY(BSON("id" << "E2" << "type" << "T2")) <<
+                     "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
+
+  BSONObj cr3 = BSON("providingApplication" << "http://cr3.com" <<
+                     "entities" << BSON_ARRAY(BSON("id" << "E3" << "type" << "T3")) <<
+                     "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
+
+  BSONObj cr4 = BSON("providingApplication" << "http://cr4.com" <<
+                     "entities" << BSON_ARRAY(BSON("id" << "E4" << "type" << "T4")) <<
+                     "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
+
+  BSONObj cr5 = BSON("providingApplication" << "http://cr5.com" <<
+                     "entities" << BSON_ARRAY(BSON("id" << "E5" << "type" << "T5")) <<
+                     "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
+
+  BSONObj reg1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr1));
+
+  BSONObj reg2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr2));
+
+  BSONObj reg3 = BSON("_id" << OID("51307b66f481db11bf860003") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr3));
+
+  BSONObj reg4 = BSON("_id" << OID("51307b66f481db11bf860004") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr4));
+
+  BSONObj reg5 = BSON("_id" << OID("51307b66f481db11bf860005") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr5));
 
   connection->insert(REGISTRATIONS_COLL, reg1);
   connection->insert(REGISTRATIONS_COLL, reg2);
@@ -383,7 +394,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationDetails)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ("Count: 5", res.errorCode.details);
 
-  ASSERT_EQ(5,res.responseVector.size());
+  ASSERT_EQ(5, res.responseVector.size());
   /* Context registration element #1 */
   ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
   EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -486,7 +497,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationAll)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  ASSERT_EQ(5,res.responseVector.size());
+  ASSERT_EQ(5, res.responseVector.size());
   /* Context registration element #1 */
   ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
   EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -591,7 +602,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationOnlyFirst)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  ASSERT_EQ(1,res.responseVector.size());
+  ASSERT_EQ(1, res.responseVector.size());
   /* Context registration element #1 */
   ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
   EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -640,7 +651,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationOnlySecond)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  ASSERT_EQ(1,res.responseVector.size());
+  ASSERT_EQ(1, res.responseVector.size());
   /* Context registration element #1 */
   ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
   EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -689,7 +700,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationRange)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  ASSERT_EQ(3,res.responseVector.size());
+  ASSERT_EQ(3, res.responseVector.size());
   /* Context registration element #1 */
   ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
   EXPECT_EQ("E3", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -766,7 +777,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExisting)
   EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  ASSERT_EQ(0,res.responseVector.size());
+  ASSERT_EQ(0, res.responseVector.size());
 
   utExit();
 }
@@ -802,7 +813,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExistingOverlap)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  ASSERT_EQ(1,res.responseVector.size());
+  ASSERT_EQ(1, res.responseVector.size());
   /* Context registration element #1 */
   ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
   EXPECT_EQ("E5", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -851,7 +862,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExistingDetails)
   EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
   EXPECT_EQ("Number of matching registrations: 5. Offset is 6", res.errorCode.details);
 
-  ASSERT_EQ(0,res.responseVector.size());
+  ASSERT_EQ(0, res.responseVector.size());
 
   utExit();
 }
@@ -886,7 +897,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrsAll)
   EXPECT_STREQ("", res.errorCode.reasonPhrase.c_str());
   EXPECT_STREQ("", res.errorCode.details.c_str());
 
-  ASSERT_EQ(1,res.responseVector.size());
+  ASSERT_EQ(1, res.responseVector.size());
   /* Context registration element #1 */
   ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
   EXPECT_EQ("E3", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -947,7 +958,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneSingle)
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(1,res.responseVector.size());
+    ASSERT_EQ(1, res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
     EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -964,8 +975,9 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneSingle)
 
     /* Delete mock */
     delete timerMock;
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -1009,7 +1021,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneMulti)
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(2,res.responseVector.size());
+    ASSERT_EQ(2, res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
     EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -1081,7 +1093,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrsSubset)
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(1,res.responseVector.size());
+    ASSERT_EQ(1, res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
     EXPECT_EQ("E3", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -1140,7 +1152,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralCREs)
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(2,res.responseVector.size());
+    ASSERT_EQ(2, res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
     EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -1218,7 +1230,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralRegistrations)
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(2,res.responseVector.size());
+    ASSERT_EQ(2, res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
     EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -1294,7 +1306,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoEntity)
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
     EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
-    EXPECT_EQ(0,res.responseVector.size());
+    EXPECT_EQ(0, res.responseVector.size());
 
     /* Delete mock */
     delete timerMock;
@@ -1338,7 +1350,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoAttribute)
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
     EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
-    EXPECT_EQ(0,res.responseVector.size());
+    EXPECT_EQ(0, res.responseVector.size());
 
     /* Delete mock */
     delete timerMock;
@@ -1384,7 +1396,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntity)
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(3,res.responseVector.size());
+    ASSERT_EQ(3, res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(2, RES_CNTX_REG(0).entityIdVector.size());
     EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -1484,7 +1496,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiAttr)
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(2,res.responseVector.size());
+    ASSERT_EQ(2, res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
     EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -1559,7 +1571,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntityAttrs)
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(3,res.responseVector.size());
+    ASSERT_EQ(3, res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(2, RES_CNTX_REG(0).entityIdVector.size());
     EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -1651,7 +1663,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoType)
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(4,res.responseVector.size());
+    ASSERT_EQ(4, res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
     EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -1835,7 +1847,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern1AttrSingle)
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(1,res.responseVector.size());
+    ASSERT_EQ(1, res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
     EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -1892,7 +1904,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern1AttrMulti)
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(2,res.responseVector.size());
+    ASSERT_EQ(2, res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(2, RES_CNTX_REG(0).entityIdVector.size());
     EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -1968,7 +1980,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNAttr)
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(3,res.responseVector.size());
+    ASSERT_EQ(3, res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(2, RES_CNTX_REG(0).entityIdVector.size());
     EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -2056,7 +2068,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternFail)
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
     EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
-    EXPECT_EQ(0,res.responseVector.size());
+    EXPECT_EQ(0, res.responseVector.size());
 
     /* Delete mock */
     delete timerMock;
@@ -2106,7 +2118,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNoType)
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(4,res.responseVector.size());
+    ASSERT_EQ(4, res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(2, RES_CNTX_REG(0).entityIdVector.size());
     EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -2211,7 +2223,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mixPatternAndNotPattern)
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(3,res.responseVector.size());
+    ASSERT_EQ(3, res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(3, RES_CNTX_REG(0).entityIdVector.size());
     EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
@@ -2284,15 +2296,14 @@ TEST(mongoDiscoverContextAvailabilityRequest, mixPatternAndNotPattern)
 */
 TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
 {
-
     HttpStatusCode                       ms;
     DiscoverContextAvailabilityRequest   req;
-    DiscoverContextAvailabilityResponse  res;   
+    DiscoverContextAvailabilityResponse  res;
 
     /* Prepare mock */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, _query(_,_,_,_,_,_,_))
+    ON_CALL(*connectionMock, _query(_, _, _, _, _, _, _))
             .WillByDefault(Throw(e));
 
     /* Prepare mock */
@@ -2319,12 +2330,13 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
 
     EXPECT_EQ("Database Error (collection: utest.registrations "
-              "- query(): { query: { $or: [ { contextRegistration.entities: { $in: [ { id: \"E3\", type: \"T3\" }, { type: \"T3\", id: \"E3\" } ] } }, "
+              "- query(): { query: { $or: [ { contextRegistration.entities: "
+              "{ $in: [ { id: \"E3\", type: \"T3\" }, { type: \"T3\", id: \"E3\" } ] } }, "
               "{ contextRegistration.entities.id: { $in: [] } } ], "
               "expiration: { $gt: 1360232700 }"
               ", servicePath: { $in: [ /^/.*/, null ] } }"
               ", orderby: { _id: 1 } } - exception: boom!!)", res.errorCode.details);
-    EXPECT_EQ(0,res.responseVector.size());
+    EXPECT_EQ(0, res.responseVector.size());
 
     /* Restore real DB connection */
     setMongoConnectionForUnitTest(connectionDb);
@@ -2332,5 +2344,4 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
     /* Release mock */
     delete connectionMock;
     delete timerMock;
-
 }

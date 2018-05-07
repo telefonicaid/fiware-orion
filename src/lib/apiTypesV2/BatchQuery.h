@@ -28,7 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/Request.h"
 #include "ngsi/ScopeVector.h"
 #include "apiTypesV2/Entities.h"
@@ -41,11 +41,11 @@
 */
 class BatchQuery
 {
-public:
+ public:
   Entities       entities;
-  AttributeList  attributeV;
+  StringList     attributeV;
   ScopeVector    scopeV;
-  AttributeList  metadataV;  // FIXME P2: Change name of AttributeList to StringVector/StringList
+  StringList     metadataV;
 
   BatchQuery();
   ~BatchQuery();

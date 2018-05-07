@@ -22,10 +22,12 @@
 *
 * Author: Fermín Galán
 */
+#include <string>
+#include <vector>
 
 #include "gtest/gtest.h"
-#include "testInit.h"
-#include "unittest.h"
+#include "mongo/client/dbclient.h"
+
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -34,15 +36,33 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoNotifyContextAvailability.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/commonMocks.h"
+#include "unittests/testInit.h"
+#include "unittests/unittest.h"
 
-#include "commonMocks.h"
 
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::BSONElement;
+using mongo::OID;
+using mongo::DBException;
+using mongo::BSONObjBuilder;
+using mongo::BSONNULL;
 using ::testing::_;
 using ::testing::Throw;
 using ::testing::Return;
 
-extern void setMongoConnectionForUnitTest(DBClientBase*);
+
+
+extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+
+
 
 /* ****************************************************************************
 *
@@ -521,8 +541,9 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtNnt_Ok)
   EXPECT_EQ(0, res.responseCode.details.size());
 
   utExit();
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -530,7 +551,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtNnt_Ok)
 */
 TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_At0_Ok)
 {
-    HttpStatusCode           ms;
+    HttpStatusCode                     ms;
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 

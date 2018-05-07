@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "rapidjson/document.h"
 
 #include "common/errorMessages.h"
@@ -29,23 +31,21 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
-#include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseEntityVector.h"
-#include "jsonParseV2/parseAttributeList.h"
+#include "jsonParseV2/parseStringList.h"
 #include "jsonParseV2/parseScopeVector.h"
-
-using namespace rapidjson;
+#include "jsonParseV2/parseBatchUpdate.h"
 
 
 
 /* ****************************************************************************
 *
-* parseBatchUpdate - 
+* parseBatchUpdate -
 */
 std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
 {
-  Document   document;
-  OrionError oe;
+  rapidjson::Document  document;
+  OrionError           oe;
 
   document.Parse(ciP->payload);
 
@@ -95,14 +95,14 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
     return oe.toJson();
   }
 
-  for (Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
+  for (rapidjson::Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
   {
     std::string name   = iter->name.GetString();
-    std::string type   = jsonParseTypeNames[iter->value.GetType()];
 
     if (name == "entities")
     {
-      std::string r = parseEntityVector(ciP, iter, &burP->entities, true); // param 4: attributes are allowed in payload
+      // param 4 for parseEntityVector(): attributes are allowed in payload
+      std::string r = parseEntityVector(ciP, iter, &burP->entities, true);
 
       if (r != "OK")
       {
@@ -123,7 +123,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
         oe.fill(SccBadRequest, err, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
         return oe.toJson();
-      }     
+      }
     }
     else
     {

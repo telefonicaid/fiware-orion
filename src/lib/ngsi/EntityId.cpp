@@ -81,40 +81,26 @@ EntityId::EntityId
 * EntityId::render -
 *
 */
-std::string EntityId::render
-(
-  const std::string&  indent,
-  bool                comma,
-  bool                isInVector
-)
+std::string EntityId::render(bool comma, bool isInVector)
 {
   std::string  out              = "";
   char*        isPatternEscaped = htmlEscape(isPattern.c_str());
   char*        typeEscaped      = htmlEscape(type.c_str());
   char*        idEscaped        = htmlEscape(id.c_str());
 
-
-  std::string indent2 = indent;
-
-  if (isInVector)
-  {
-    indent2 += "  ";
-  }
-
-  out += (isInVector? indent + "{\n" : "");
-  out += indent2 + "\"type\" : \""      + typeEscaped      + "\","  + "\n";
-  out += indent2 + "\"isPattern\" : \"" + isPatternEscaped + "\","  + "\n";
-  out += indent2 + "\"id\" : \""        + idEscaped        + "\"";
+  out += (isInVector? "{" : "");
+  out = out + "\"type\":\""      + typeEscaped      + "\",";
+  out = out + "\"isPattern\":\"" + isPatternEscaped + "\",";
+  out = out + "\"id\":\""        + idEscaped        + "\"";
 
   if ((comma == true) && (isInVector == false))
   {
-    out += ",\n";
+    out += ",";
   }
   else
   {
-    out += "\n";
-    out += (isInVector? indent + "}" : "");
-    out += (comma == true)? ",\n" : (isInVector? "\n" : "");
+    out += (isInVector? "}" : "");
+    out += (comma == true)? "," : "";
   }
 
   free(typeEscaped);
@@ -140,8 +126,8 @@ std::string EntityId::toJson(void) const
   out += ",";
   out += JSON_VALUE("type", typeEscaped);
 
-  delete typeEscaped;
-  delete idEscaped;
+  free(typeEscaped);
+  free(idEscaped);
 
   return out;
 }
@@ -152,11 +138,7 @@ std::string EntityId::toJson(void) const
 *
 * EntityId::check -
 */
-std::string EntityId::check
-(
-  RequestType         requestType,
-  const std::string&  indent
-)
+std::string EntityId::check(RequestType requestType)
 {
   if (id == "")
   {
@@ -176,7 +158,7 @@ std::string EntityId::check
   if (isTrue(isPattern))
   {
     regex_t re;
-    if (regcomp(&re, id.c_str(), REG_EXTENDED) != 0)
+    if ((id.find('\0') != std::string::npos) || (regcomp(&re, id.c_str(), REG_EXTENDED) != 0))
     {
       return "invalid regex for entity id pattern";
     }

@@ -31,7 +31,7 @@
 
 /* ****************************************************************************
 *
-* constructorsAndRender - 
+* constructorsAndRender -
 *
 */
 TEST(UnsubscribeContextAvailabilityResponse, constructorsAndRender)
@@ -59,7 +59,7 @@ TEST(UnsubscribeContextAvailabilityResponse, constructorsAndRender)
 
 /* ****************************************************************************
 *
-* jsonRender - 
+* jsonRender -
 *
 */
 TEST(UnsubscribeContextAvailabilityResponse, jsonRender)
@@ -79,15 +79,15 @@ TEST(UnsubscribeContextAvailabilityResponse, jsonRender)
   ucasP->statusCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  out = ucasP->render("");
+  out = ucasP->render();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  
+
   // 2. Long and !OK statusCode
   ucasP->statusCode.fill(SccBadRequest, "no details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  out = ucasP->render("");
+  out = ucasP->render();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   free(ucasP);

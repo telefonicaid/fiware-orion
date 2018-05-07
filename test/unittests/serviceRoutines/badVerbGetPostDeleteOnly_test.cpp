@@ -22,36 +22,40 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "gtest/gtest.h"
 
 #include "serviceRoutines/badVerbGetPostDeleteOnly.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs - 
+* badVerbV -
 */
-static RestService rs[] = 
+static RestService badVerbV[] =
 {
-  { "*",      IndividualContextEntityAttribute,      5, { "ngsi10", "contextEntities", "*", "attributes", "*"  }, "", badVerbGetPostDeleteOnly                  },
-  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { IndividualContextEntityAttribute, 5, { "ngsi10", "contextEntities", "*", "attributes", "*" }, "", badVerbGetPostDeleteOnly },
+  { InvalidRequest,                   0, {                                                     }, "", NULL                     }
 };
 
 
 
 /* ****************************************************************************
 *
-* ok - 
+* ok -
 */
 TEST(badVerbGetPostDeleteOnly, ok)
 {
   ConnectionInfo  ci("/ngsi10/contextEntities/entityId01/attributes/temperature",  "PUT", "1.1");
-  std::string     expected = ""; // Bad verb gives no payload, only HTTP headers
+  std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
   std::string     out;
 
-  out = restService(&ci, rs);
+  serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, badVerbV);
+  out = orion::requestServe(&ci);
 
   EXPECT_EQ(expected, out);
   EXPECT_EQ("Allow", ci.httpHeader[0]);

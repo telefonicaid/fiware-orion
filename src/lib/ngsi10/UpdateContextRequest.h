@@ -1,5 +1,5 @@
-#ifndef UPDATE_CONTEXT_REQUEST_H
-#define UPDATE_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_NGSI10_UPDATECONTEXTREQUEST_H_
+#define SRC_LIB_NGSI10_UPDATECONTEXTREQUEST_H_
 
 /*
 *
@@ -59,8 +59,8 @@ typedef struct UpdateContextRequest
   UpdateContextRequest();
   UpdateContextRequest(const std::string& _contextProvider, EntityId* eP);
 
-  std::string        render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent);
-  std::string        check(ApiVersion apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError, int counter);
+  std::string        render(ApiVersion apiVersion, bool asJsonObject);
+  std::string        check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError);
   void               release(void);
   ContextAttribute*  attributeLookup(EntityId* eP, const std::string& attributeName);
 
@@ -97,4 +97,4 @@ typedef struct UpdateContextRequest
   void         fill(Entities* entities, const std::string& _updateActionType);
 } UpdateContextRequest;
 
-#endif
+#endif  // SRC_LIB_NGSI10_UPDATECONTEXTREQUEST_H_

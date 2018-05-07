@@ -95,7 +95,7 @@ std::string postEntities
 
   // 01. Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, "APPEND_STRICT");
-  
+
 
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP, NGSIV2_FLAVOUR_ONCREATE);

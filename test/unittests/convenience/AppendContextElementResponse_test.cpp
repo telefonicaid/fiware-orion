@@ -37,7 +37,7 @@
 
 /* ****************************************************************************
 *
-* render_json - 
+* render_json -
 */
 TEST(AppendContextElementResponse, render_json)
 {
@@ -50,24 +50,24 @@ TEST(AppendContextElementResponse, render_json)
   utInit();
 
   // 1. empty acer
-  out = acer.render(V1, false, AppendContextElement, "");
+  out = acer.render(V1, false, AppendContextElement);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // 2. errorCode 'active'
   acer.errorCode.fill(SccBadRequest, "very bad request");
-  out = acer.render(V1, false, AppendContextElement, "");
+  out = acer.render(V1, false, AppendContextElement);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
-}   
+}
 
 
 
 /* ****************************************************************************
 *
-* check_json - 
+* check_json -
 */
 TEST(AppendContextElementResponse, check_json)
 {
@@ -81,30 +81,30 @@ TEST(AppendContextElementResponse, check_json)
   utInit();
 
   // 1. predetected error
-  out = acer.check(V1, false, IndividualContextEntity, "", "PRE ERR");
+  out = acer.check(V1, false, IndividualContextEntity, "PRE ERR");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // 2. bad contextAttributeResponseVector
   car.contextAttributeVector.push_back(&ca);
   acer.contextAttributeResponseVector.push_back(&car);
-  out = acer.check(V1, false, IndividualContextEntity, "", "");
+  out = acer.check(V1, false, IndividualContextEntity, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // 3. OK
   ca.name = "NAME";
-  out = acer.check(V1, false, IndividualContextEntity, "", "");
+  out = acer.check(V1, false, IndividualContextEntity, "");
   EXPECT_EQ("OK", out);
 
   utExit();
-}  
+}
 
 
 
 /* ****************************************************************************
 *
-* release - 
+* release -
 */
 TEST(AppendContextElementResponse, release)
 {

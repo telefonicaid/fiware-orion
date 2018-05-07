@@ -1,4 +1,4 @@
-/*
+ /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 *
@@ -27,13 +27,14 @@
 
 #include "common/tag.h"
 #include "rest/ConnectionInfo.h"
+#include "ngsi/StatusCode.h"
 #include "rest/OrionError.h"
 
 
 
 /* ****************************************************************************
 *
-* OrionError::OrionError - 
+* OrionError::OrionError -
 */
 OrionError::OrionError()
 {
@@ -59,7 +60,7 @@ OrionError::OrionError(HttpStatusCode _code, const std::string& _details, const 
 
 /* ****************************************************************************
 *
-* OrionError::OrionError - 
+* OrionError::OrionError -
 */
 OrionError::OrionError(StatusCode& sc)
 {
@@ -72,14 +73,26 @@ OrionError::OrionError(StatusCode& sc)
 
 /* ****************************************************************************
 *
-* OrionError::fill - 
-*
+* OrionError::fill -
 */
 void OrionError::fill(HttpStatusCode _code, const std::string& _details, const std::string& _reasonPhrase)
 {
   code          = _code;
   reasonPhrase  = _reasonPhrase != ""? _reasonPhrase : httpStatusCodeString(code);
   details       = _details;
+}
+
+
+
+/* ****************************************************************************
+*
+* OrionError::fill -
+*/
+void OrionError::fill(const StatusCode& sc)
+{
+  code          = sc.code;
+  reasonPhrase  = (sc.reasonPhrase != "")? sc.reasonPhrase : httpStatusCodeString(code);
+  details       = sc.details;
 }
 
 
@@ -125,7 +138,18 @@ std::string OrionError::setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpS
 */
 std::string OrionError::toJson(void)
 {
-  return "{" + JSON_STR("error") + ":" + JSON_STR(reasonPhrase) + "," + JSON_STR("description") + ":" + JSON_STR(details) + "}";
+  std::string  out;
+  char*        reasonPhraseEscaped = htmlEscape(reasonPhrase.c_str());
+  char*        detailsEscaped = htmlEscape(details.c_str());
+
+  out += "{" + JSON_VALUE("error", reasonPhraseEscaped);
+  out += ",";
+  out += JSON_VALUE("description", detailsEscaped) + "}";
+
+  free(reasonPhraseEscaped);
+  free(detailsEscaped);
+
+  return out;
 }
 
 
@@ -137,24 +161,23 @@ std::string OrionError::toJson(void)
 */
 std::string OrionError::render(void)
 {
-  std::string  out           = "{\n";
-  std::string  indent        = "  ";
+  std::string  out           = "{";
 
   //
   // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here
   //
-  out += startTag(indent, "orionError", false);
-  out += valueTag(indent + "  ", "code",          code,         true);
-  out += valueTag(indent + "  ", "reasonPhrase",  reasonPhrase, details != "");
+  out += startTag("orionError", false);
+  out += valueTag("code",          code,         true);
+  out += valueTag("reasonPhrase",  reasonPhrase, details != "");
 
   if (details != "")
   {
-    out += valueTag(indent + "  ", "details",       details);
+    out += valueTag("details",       details);
   }
 
-  out += endTag(indent);
+  out += endTag();
 
-  out += "}\n";
+  out += "}";
 
   return out;
 }

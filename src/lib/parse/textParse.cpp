@@ -36,7 +36,7 @@
 
 /* ****************************************************************************
 *
-* textParseAttributeValue - 
+* textParseAttributeValue -
 */
 static std::string textParseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 {
@@ -75,7 +75,7 @@ static std::string textParseAttributeValue(ConnectionInfo* ciP, ContextAttribute
   // 3. Null ?
   else if ((strlen(ciP->payload) == 4) && ((strcmp(ciP->payload, "null") == 0) || (strcmp(ciP->payload, "Null") == 0) || (strcmp(ciP->payload, "NULL") == 0)))
   {
-    caP->valueType   = orion::ValueTypeNone;
+    caP->valueType   = orion::ValueTypeNull;
   }
 
   // 4. Is it a valid double?
@@ -98,7 +98,7 @@ static std::string textParseAttributeValue(ConnectionInfo* ciP, ContextAttribute
 
 /* ****************************************************************************
 *
-* textRequestTreat - 
+* textRequestTreat -
 */
 std::string textRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType)
 {
@@ -128,7 +128,7 @@ std::string textRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     alarmMgr.badInput(clientIp, "not supported content type: text/plain");
     break;
   }
-  
+
   return answer;
 }
 

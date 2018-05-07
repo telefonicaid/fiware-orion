@@ -247,13 +247,13 @@ echo
 01. POST /v2/subscriptions (without id/idpattern)
 =================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 94
+Content-Length: 96
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "subject entities element does not have id nor idPattern",
+    "description": "/entities/ vector item does not have /id/ nor /idPattern/",
     "error": "BadRequest"
 }
 
@@ -261,13 +261,13 @@ Date: REGEX(.*)
 02. POST /v2/subscriptions (subject entities not an array)
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 71
+Content-Length: 65
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "subject entities is not an array",
+    "description": "/entities/ is not an array",
     "error": "BadRequest"
 }
 
@@ -275,13 +275,13 @@ Date: REGEX(.*)
 03. POST /v2/subscriptions (both id and idPattern)
 ==================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 84
+Content-Length: 91
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "subject entities element has id and idPattern",
+    "description": "/entities/ vector item has both /id/ and /idPattern/",
     "error": "BadRequest"
 }
 

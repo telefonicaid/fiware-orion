@@ -567,12 +567,10 @@ void MetricsManager::release(void)
 
   for (serviceIter = metrics.begin(); serviceIter != metrics.end(); ++serviceIter)
   {
-    std::string                                              service  = serviceIter->first;
     std::map<std::string, std::map<std::string, uint64_t>*>* servMap  = serviceIter->second;
 
     for (subServiceIter = servMap->begin(); subServiceIter != servMap->end(); ++subServiceIter)
     {
-      std::string                       subService = subServiceIter->first;
       std::map<std::string, uint64_t>*  metricMap  = subServiceIter->second;
 
       metricMap->clear();

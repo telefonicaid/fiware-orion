@@ -180,7 +180,7 @@ Date: REGEX(.*)
 03. v1 APPEND_STRICT with attr2 -> OK
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 380
+Content-Length: 186
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -236,7 +236,7 @@ Date: REGEX(.*)
 05. v1 APPEND_STRICT with attr2 -> fails
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 342
+Content-Length: 224
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -286,7 +286,7 @@ Date: REGEX(.*)
 07. v1 APPEND_STRICT with attr2, attrs3 -> fails, but attr3 is added
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 690
+Content-Length: 388
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

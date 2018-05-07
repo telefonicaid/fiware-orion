@@ -57,7 +57,7 @@
 *   - note that '!exist=entity::type' and 'exist=entity::type' are not supported by convenience operations
 *     that use the standard operation UpdateContext as there is no restriction within UpdateContext.
 *   [ attributesFormat=object: makes no sense for this operation as StatusCode is returned ]
-*   
+*
 * 0. Take care of URI params
 * 1. Fill in UpdateContextRequest from UpdateContextAttributeRequest and URL-path components
 * 2. Call postUpdateContext standard service routine
@@ -77,11 +77,11 @@ std::string putIndividualContextEntityAttribute
   std::string  entityType    = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
   std::string  attributeName = compV[4];
   StatusCode   response;
-  
+
 
   // 1. Fill in UpdateContextRequest from UpdateContextAttributeRequest and URL-path components
   parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, "", "UPDATE");
-  
+
 
   // 2. Call postUpdateContext standard service routine
   postUpdateContext(ciP, components, compV, parseDataP);
@@ -92,7 +92,7 @@ std::string putIndividualContextEntityAttribute
 
 
   // 4. Cleanup and return result
-  TIMED_RENDER(answer = response.render("", false, false));
+  TIMED_RENDER(answer = response.render(false, false));
 
   response.release();
   parseDataP->upcr.res.release();  // This call to release() crashed the functional test

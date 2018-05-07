@@ -51,13 +51,7 @@ ProvidingApplication::ProvidingApplication()
 *
 * ProvidingApplication::check -
 */
-std::string ProvidingApplication::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string ProvidingApplication::check(void)
 {
   if (isEmpty())
   {
@@ -148,14 +142,14 @@ void ProvidingApplication::present(const std::string& indent)
 *
 * ProvidingApplication::render -
 */
-std::string ProvidingApplication::render(const std::string& indent, bool comma)
+std::string ProvidingApplication::render(bool comma)
 {
   if (string == "")
   {
     return "";
   }
 
-  return valueTag(indent, "providingApplication", string, comma);
+  return valueTag("providingApplication", string, comma);
 }
 
 

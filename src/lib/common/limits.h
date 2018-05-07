@@ -62,10 +62,10 @@
 /* ****************************************************************************
 *
 * Others -
-*
 */
 #define IP_LENGTH_MAX           15     // Based on xxx.xxx.xxx.xxx
-#define STRING_SIZE_FOR_INT     16     // Room enough for an integer
+#define STRING_SIZE_FOR_INT     16     // Room enough for a 32 bit integer
+#define STRING_SIZE_FOR_LONG    20     // Room enough for a 64 bit integer
 #define STRING_SIZE_FOR_DOUBLE  64     // Room enough for a double
 #define CORRELATOR_ID_SIZE      36     // Max size of a UUIDv4 string
 #define MAX_PORT                65535  // Max port number (== 0xFFFF)

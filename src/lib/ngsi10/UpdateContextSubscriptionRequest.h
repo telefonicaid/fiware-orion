@@ -1,5 +1,5 @@
-#ifndef UPDATE_CONTEXT_SUBSCRIPTION_REQUEST_H
-#define UPDATE_CONTEXT_SUBSCRIPTION_REQUEST_H
+#ifndef SRC_LIB_NGSI10_UPDATECONTEXTSUBSCRIPTIONREQUEST_H_
+#define SRC_LIB_NGSI10_UPDATECONTEXTSUBSCRIPTIONREQUEST_H_
 
 /*
 *
@@ -41,17 +41,17 @@
 
 /* ****************************************************************************
 *
-* UpdateContextSubscriptionRequest - 
+* UpdateContextSubscriptionRequest -
 */
 struct UpdateContextSubscriptionRequest : public SubscribeContextRequest
 {
-  SubscriptionId                 subscriptionId;         // Mandatory 
+  SubscriptionId                 subscriptionId;         // Mandatory
 
   UpdateContextSubscriptionRequest();  
-  std::string check(const std::string& indent, const std::string& predetectedError, int counter);
+  std::string check(const std::string& predetectedError, int counter);
   void        present(const std::string& indent);
   void        release(void);
   void        toNgsiv2Subscription(ngsiv2::SubscriptionUpdate* subUp);
 };
 
-#endif
+#endif  // SRC_LIB_NGSI10_UPDATECONTEXTSUBSCRIPTIONREQUEST_H_

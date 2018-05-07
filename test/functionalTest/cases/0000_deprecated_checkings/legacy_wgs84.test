@@ -207,7 +207,7 @@ orionCurl --url "$url" --payload "$payload"
 --REGEXPECT--
 1. Create entity corresponding to Madrid
 HTTP/1.1 200 OK
-Content-Length: 576
+Content-Length: 267
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -244,7 +244,7 @@ Date: REGEX(.*)
 
 2. Create entity corresponding to Alcobendas
 HTTP/1.1 200 OK
-Content-Length: 580
+Content-Length: 271
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -281,7 +281,7 @@ Date: REGEX(.*)
 
 3. Create entity corresponding to Leganes
 HTTP/1.1 200 OK
-Content-Length: 577
+Content-Length: 268
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -317,7 +317,7 @@ Date: REGEX(.*)
 }
 4: ++++++++++ Madrid in 13.5 kms ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1157
+Content-Length: 549
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -378,7 +378,7 @@ Date: REGEX(.*)
 }
 5: +++++++++++ Madrid in 15 kms +++++++++
 HTTP/1.1 200 OK
-Content-Length: 1725
+Content-Length: 818
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -464,7 +464,7 @@ Date: REGEX(.*)
 }
 6: ++++++++++++ Madrid out 13.5 kms ++++++++
 HTTP/1.1 200 OK
-Content-Length: 600
+Content-Length: 291
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

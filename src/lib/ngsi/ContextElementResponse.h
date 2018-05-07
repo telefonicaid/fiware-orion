@@ -31,7 +31,7 @@
 #include "common/globals.h"
 #include "ngsi/ContextElement.h"
 #include "ngsi/StatusCode.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -60,17 +60,16 @@ typedef struct ContextElementResponse
   ContextElementResponse(EntityId* eP, ContextAttribute* aP);
   ContextElementResponse(ContextElementResponse* cerP);
   ContextElementResponse(const mongo::BSONObj&  entityDoc,
-                         const AttributeList&   attrL,
+                         const StringList&      attrL,
                          bool                   includeEmpty = true,
                          ApiVersion             apiVersion   = V1);
   ContextElementResponse(ContextElement* ceP, bool useDefaultType = false);
 
-  std::string  render(ApiVersion          apiVersion,
-                      bool                asJsonObject,
-                      RequestType         requestType,
-                      const std::string&  indent,
-                      bool                comma               = false,
-                      bool                omitAttributeValues = false);
+  std::string  render(ApiVersion   apiVersion,
+                      bool         asJsonObject,
+                      RequestType  requestType,
+                      bool         comma               = false,
+                      bool         omitAttributeValues = false);
   std::string  toJson(RenderFormat                     renderFormat,
                       const std::vector<std::string>&  attrsFilter,
                       const std::vector<std::string>&  metadataFilter,
@@ -80,7 +79,6 @@ typedef struct ContextElementResponse
 
   std::string  check(ApiVersion          apiVersion,
                      RequestType         requestType,
-                     const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);
 

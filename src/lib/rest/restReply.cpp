@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"
 
 #include "common/MimeType.h"
+#include "common/limits.h"
 #include "ngsi/StatusCode.h"
 #include "metricsMgr/metricsMgr.h"
 
@@ -48,6 +49,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
 #include "rest/HttpStatusCode.h"
+#include "rest/HttpHeaders.h"
 #include "rest/mhd.h"
 #include "rest/OrionError.h"
 #include "rest/restReply.h"
@@ -60,11 +62,12 @@ static int replyIx = 0;
 
 /* ****************************************************************************
 *
-* restReply - 
+* restReply -
 */
 void restReply(ConnectionInfo* ciP, const std::string& answer)
 {
   MHD_Response*  response;
+
   uint64_t       answerLen = answer.length();
   std::string    spath     = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
 
@@ -100,19 +103,47 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     {
       MHD_add_response_header(response, "Content-Type", "text/plain");
     }
+  }
 
-    // At the present version, CORS is supported only for GET requests
-    if ((strlen(restAllowedOrigin) > 0) && (ciP->verb == GET))
+  // Check if CORS is enabled, the Origin header is present in the request and the response is not a bad verb response
+  if ((corsEnabled == true) && (ciP->httpHeaders.origin != "") && (ciP->httpStatusCode != SccBadVerb))
+  {
+    // Only GET method is supported for V1 API
+    if ((ciP->apiVersion == V2) || (ciP->apiVersion == V1 && ciP->verb == GET))
     {
+      bool originAllowed = true;
+
       // If any origin is allowed, the header is sent always with "any" as value
-      if (strcmp(restAllowedOrigin, "__ALL") == 0)
+      if (strcmp(corsOrigin, "__ALL") == 0)
       {
-        MHD_add_response_header(response, "Access-Control-Allow-Origin", "*");
+        MHD_add_response_header(response, ACCESS_CONTROL_ALLOW_ORIGIN, "*");
       }
       // If a specific origin is allowed, the header is only sent if the origins match
-      else if (strcmp(ciP->httpHeaders.origin.c_str(), restAllowedOrigin) == 0)
+      else if (strcmp(ciP->httpHeaders.origin.c_str(), corsOrigin) == 0)
       {
-        MHD_add_response_header(response, "Access-Control-Allow-Origin", restAllowedOrigin);
+        MHD_add_response_header(response, ACCESS_CONTROL_ALLOW_ORIGIN, corsOrigin);
+      }
+      // If there is no match, originAllowed flag is set to false
+      else
+      {
+        originAllowed = false;
+      }
+
+      // If the origin is not allowed, no headers are added to the response
+      if (originAllowed)
+      {
+        // Add Access-Control-Expose-Headers to the response
+        MHD_add_response_header(response, ACCESS_CONTROL_EXPOSE_HEADERS, CORS_EXPOSED_HEADERS);
+
+        if (ciP->verb == OPTIONS)
+        {
+          MHD_add_response_header(response, ACCESS_CONTROL_ALLOW_HEADERS, CORS_ALLOWED_HEADERS);
+
+          char maxAge[STRING_SIZE_FOR_INT];
+          snprintf(maxAge, sizeof(maxAge), "%d", corsMaxAge);
+
+          MHD_add_response_header(response, ACCESS_CONTROL_MAX_AGE, maxAge);
+        }
       }
     }
   }
@@ -127,9 +158,9 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
 *
 * tagGet - return a tag (request type) depending on the incoming request string
 *
-* This function is called only from restErrorReplyGet, but as the parameter 
+* This function is called only from restErrorReplyGet, but as the parameter
 * 'request' is simply 'forwarded' from restErrorReplyGet, the 'request' can
-* have various contents - for that the different strings of 'request'. 
+* have various contents - for that the different strings of 'request'.
 */
 static std::string tagGet(const std::string& request)
 {
@@ -168,13 +199,13 @@ static std::string tagGet(const std::string& request)
 
 /* ****************************************************************************
 *
-* restErrorReplyGet - 
+* restErrorReplyGet -
 *
 * This function renders an error reply depending on the 'request' type.
 * Many responses have different syntax and especially the tag in the reply
 * differs (registerContextResponse, discoverContextAvailabilityResponse, etc).
 *
-* Also, the function is called from more than one place, especially from 
+* Also, the function is called from more than one place, especially from
 * restErrorReply, but also from where the payload type is matched against the request URL.
 * Where the payload type is matched against the request URL, the incoming 'request' is a
 * request and not a response.
@@ -190,77 +221,77 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, co
    if (tag == "registerContextResponse")
    {
       RegisterContextResponse rcr("000000000000000000000000", errorCode);
-      reply =  rcr.render(indent);
+      reply =  rcr.render();
    }
    else if (tag == "discoverContextAvailabilityResponse")
    {
       DiscoverContextAvailabilityResponse dcar(errorCode);
-      reply =  dcar.render(indent);
+      reply =  dcar.render();
    }
    else if (tag == "subscribeContextAvailabilityResponse")
    {
       SubscribeContextAvailabilityResponse scar("000000000000000000000000", errorCode);
-      reply =  scar.render(indent);
+      reply =  scar.render();
    }
    else if (tag == "updateContextAvailabilitySubscriptionResponse")
    {
       UpdateContextAvailabilitySubscriptionResponse ucas(errorCode);
-      reply =  ucas.render(indent, 0);
+      reply =  ucas.render();
    }
    else if (tag == "unsubscribeContextAvailabilityResponse")
    {
       UnsubscribeContextAvailabilityResponse ucar(errorCode);
-      reply =  ucar.render(indent);
+      reply =  ucar.render();
    }
    else if (tag == "notifyContextAvailabilityResponse")
    {
       NotifyContextAvailabilityResponse ncar(errorCode);
-      reply =  ncar.render(indent);
+      reply =  ncar.render();
    }
 
    else if (tag == "queryContextResponse")
    {
       QueryContextResponse qcr(errorCode);
       bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-      reply =  qcr.render(ciP->apiVersion, asJsonObject, indent);
+      reply =  qcr.render(ciP->apiVersion, asJsonObject);
    }
    else if (tag == "subscribeContextResponse")
    {
       SubscribeContextResponse scr(errorCode);
-      reply =  scr.render(indent);
+      reply =  scr.render();
    }
    else if (tag == "updateContextSubscriptionResponse")
    {
       UpdateContextSubscriptionResponse ucsr(errorCode);
-      reply =  ucsr.render(indent);
+      reply =  ucsr.render();
    }
    else if (tag == "unsubscribeContextResponse")
    {
       UnsubscribeContextResponse uncr(errorCode);
-      reply =  uncr.render(indent);
+      reply =  uncr.render();
    }
    else if (tag == "updateContextResponse")
    {
       UpdateContextResponse ucr(errorCode);
       bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-      reply = ucr.render(ciP->apiVersion, asJsonObject, indent);
+      reply = ucr.render(ciP->apiVersion, asJsonObject);
    }
    else if (tag == "notifyContextResponse")
    {
       NotifyContextResponse ncr(errorCode);
-      reply =  ncr.render(indent);
+      reply =  ncr.render();
    }
    else if (tag == "StatusCode")
    {
      StatusCode sc(code, details);
-     reply = sc.render(indent);
+     reply = sc.render(false);
    }
    else
    {
       OrionError oe(errorCode);
 
       LM_T(LmtRest, ("Unknown tag: '%s', request == '%s'", tag.c_str(), request.c_str()));
-      
+
       ciP->httpStatusCode = oe.code;
       reply = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
    }

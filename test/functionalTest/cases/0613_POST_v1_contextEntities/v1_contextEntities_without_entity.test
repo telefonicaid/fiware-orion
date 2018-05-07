@@ -150,7 +150,7 @@ echo
 01. POST /v1/contextEntities without entityId in JSON payload and see it fail
 =============================================================================
 HTTP/1.1 200 OK
-Content-Length: 148
+Content-Length: 117
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -167,7 +167,7 @@ Date: REGEX(.*)
 02. POST /v1/contextEntities/EID with entityId:id=EID2 in JSON payload and see it fail
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 140
+Content-Length: 109
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -184,7 +184,7 @@ Date: REGEX(.*)
 03. POST /v1/contextEntities with entityId:id=EID in JSON payload OK
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 314
+Content-Length: 168
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -214,7 +214,7 @@ Date: REGEX(.*)
 04. POST /v1/contextEntities/EID without entityId in JSON payload OK
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 314
+Content-Length: 168
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -244,7 +244,7 @@ Date: REGEX(.*)
 05. POST /v1/contextEntities/type/T1/id/E1 with entityId:id=EID in JSON payload and see it fail
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 132
+Content-Length: 101
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -261,7 +261,7 @@ Date: REGEX(.*)
 06. POST /v1/contextEntities/type/T1/id/E1 without entityId in JSON payload OK
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 313
+Content-Length: 167
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

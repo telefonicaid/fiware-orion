@@ -167,7 +167,7 @@ echo
 00. Try to delete an attribute with TWO service-paths
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 125
+Content-Length: 108
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -182,7 +182,7 @@ Date: REGEX(.*)
 01. Create an entity E1/T1 with attributes A1, A2 and A3
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 584
+Content-Length: 256
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -224,7 +224,7 @@ Date: REGEX(.*)
 02. Query for E1/T1 and all its attributes (see all three of them)
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 587
+Content-Length: 259
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -266,7 +266,7 @@ Date: REGEX(.*)
 03. Remove E1/A2, using URI param entity::type=T1
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -280,7 +280,7 @@ Date: REGEX(.*)
 04. Query for E1/T1 and all its attributes (A2 should not be there)
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 483
+Content-Length: 222
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -317,7 +317,7 @@ Date: REGEX(.*)
 05. Try to remove E1/T2/A2 and see it fail
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 88
+Content-Length: 71
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -332,7 +332,7 @@ Date: REGEX(.*)
 06. Try to remove E1/T1/A2 again and see it fail
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 183
+Content-Length: 166
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -347,7 +347,7 @@ Date: REGEX(.*)
 07. Try to remove E1/T1/A1, with service-path /bad and see it fail
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 88
+Content-Length: 71
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -362,7 +362,7 @@ Date: REGEX(.*)
 08. Remove E1/A1, with service-path / and see it work
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -376,7 +376,7 @@ Date: REGEX(.*)
 09. Query for E1 and all its attributes (only A3 left)
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 379
+Content-Length: 185
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

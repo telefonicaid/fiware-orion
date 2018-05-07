@@ -33,8 +33,6 @@
 */
 int main(int argC, char* argV[])
 {
-  char* fName = "main";
-
   paConfig("trace levels", "0-255");
   paConfig("help file",     "/users/kzangeli/systems/parseArgs/parseTest3.help");
   paConfig("log to file",   (void*) TRUE);

@@ -30,7 +30,7 @@
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 TEST(MetadataVector, render)
 {
@@ -45,12 +45,12 @@ TEST(MetadataVector, render)
 
   mV.push_back(&m);
 
-  out = mV.render("");
+  out = mV.render(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   mV.push_back(&m2); 
-  out = mV.render("");
+  out = mV.render(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

@@ -1,10 +1,1 @@
-{
-  "subscribeError" : {
-    "subscriptionId" : "9212ce4b0c214479be429e2",
-    "errorCode" : {
-      "code" : "400",
-      "reasonPhrase" : "Bad Request",
-      "details" : "FORCED ERROR"
-    }
-  }
-}
+{"subscribeError":{"subscriptionId":"9212ce4b0c214479be429e2","errorCode":{"code":"400","reasonPhrase":"Bad Request","details":"FORCED ERROR"}}}

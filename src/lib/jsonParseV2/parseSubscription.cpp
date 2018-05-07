@@ -23,6 +23,10 @@
 * Author: Orion dev team
 */
 #include <regex.h>
+
+#include <string>
+#include <vector>
+#include <map>
 #include <algorithm>
 
 #include "rapidjson/document.h"
@@ -37,51 +41,67 @@
 #include "rest/Verb.h"
 #include "ngsi/Request.h"
 #include "parse/forbiddenChars.h"
+#include "jsonParseV2/badInput.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 #include "jsonParseV2/utilsParse.h"
+#include "jsonParseV2/parseEntitiesVector.h"
+#include "jsonParseV2/parseStringVector.h"
 #include "jsonParseV2/parseSubscription.h"
 
-using namespace rapidjson;
 
+
+/* ****************************************************************************
+*
+* USING
+*/
 using ngsiv2::SubscriptionUpdate;
 using ngsiv2::EntID;
+using rapidjson::Value;
 
-/* Prototypes */
-static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::string>* vec, const Value& attributes);
+
+
+/* ****************************************************************************
+*
+* Prototypes
+*/
 static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& notification);
 static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& subject);
-static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* eivP, const Value& entities);
 static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& condition);
-static std::string badInput(ConnectionInfo* ciP, const std::string& msg);
-static std::string parseDictionary(ConnectionInfo* ciP, std::map<std::string, std::string>& dict, const Value& object, const std::string& name);
+static std::string parseDictionary(ConnectionInfo*                      ciP,
+                                   std::map<std::string, std::string>&  dict,
+                                   const Value&                         object,
+                                   const std::string&                   name);
 
 
 
 /* ****************************************************************************
 *
 * parseSubscription -
-*
 */
 std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bool update)
 {
-  Document document;
+  rapidjson::Document document;
 
   document.Parse(ciP->payload);
 
   if (document.HasParseError())
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
+
     alarmMgr.badInput(clientIp, "JSON parse error");
     ciP->httpStatusCode = SccBadRequest;
+
     return oe.toJson();
   }
 
   if (!document.IsObject())
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
+
     alarmMgr.badInput(clientIp, "JSON parse error");
     ciP->httpStatusCode = SccBadRequest;
+
     return oe.toJson();
   }
 
@@ -162,13 +182,12 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   }
   else if (expiresOpt.given)
   {
-    std::string expires = expiresOpt.value;
-
-    int64_t eT = -1;
+    std::string  expires = expiresOpt.value;
+    int64_t      eT      = -1;
 
     if (expires.empty())
     {
-        eT = PERMANENT_SUBS_DATETIME;
+      eT = PERMANENT_EXPIRES_DATETIME;
     }
     else
     {
@@ -184,11 +203,11 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   }
   else if (!update)
   {
-    subsP->expires = PERMANENT_SUBS_DATETIME;
+    subsP->expires = PERMANENT_EXPIRES_DATETIME;
   }
 
   // Status field
-  Opt<std::string> statusOpt =  getStringOpt(document, "status");
+  Opt<std::string> statusOpt = getStringOpt(document, "status");
   if (!statusOpt.ok())
   {
     return badInput(ciP, statusOpt.error);
@@ -199,7 +218,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
 
     if ((statusString != "active") && (statusString != "inactive"))
     {
-      return badInput(ciP, "status is not valid (it has to be either active or inactive)");
+      return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_STATUS);
     }
     subsP->statusProvided = true;
     subsP->status = statusString;
@@ -216,9 +235,9 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     subsP->throttlingProvided = true;
     subsP->throttling = throttlingOpt.value;
   }
-  else if (!update) // throttling was not set and it is not update
+  else if (!update)  // throttling was not set and it is not update
   {
-    subsP->throttling = 0; // Default value if not provided at creation => no throttling
+    subsP->throttling = 0;  // Default value if not provided at creation => no throttling
   }
 
   return "OK";
@@ -233,7 +252,8 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
 */
 static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& subject)
 {
-  std::string r;
+  std::string  r;
+  bool         b;
 
   subsP->subjectProvided  = true;
 
@@ -248,20 +268,23 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
     return badInput(ciP, "no subject entities specified");
   }
 
-  r = parseEntitiesVector(ciP, &subsP->subject.entities, subject["entities"] );
-  if (r != "")
+  std::string errorString;
+  b = parseEntitiesVector(ciP, &subsP->subject.entities, subject["entities"], &errorString);
+  if (b == false)
   {
-    return r;
+    return badInput(ciP, errorString);
   }
 
   // Condition
   if (subject.HasMember("condition"))
   {
     const Value& condition = subject["condition"];
+
     if (!condition.IsObject())
     {
       return badInput(ciP, "condition is not an object");
     }
+
     if (condition.ObjectEmpty())
     {
       return badInput(ciP, "condition is empty");
@@ -281,160 +304,7 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
 
 /* ****************************************************************************
 *
-* parseEntitiesVector -
-*
-*/
-static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* eivP, const Value& entities)
-{
-  if (!entities.IsArray())
-  {
-    return badInput(ciP, "subject entities is not an array");
-  }
-
-  for (Value::ConstValueIterator iter = entities.Begin(); iter != entities.End(); ++iter)
-  {
-    if (!iter->IsObject())
-    {
-      return badInput(ciP, "subject entities element is not an object");
-    }
-
-    if (!iter->HasMember("id") && !iter->HasMember("idPattern"))
-    {
-      return badInput(ciP, "subject entities element does not have id nor idPattern");
-    }
-
-    if (iter->HasMember("id") && iter->HasMember("idPattern"))
-    {
-      return badInput(ciP, "subject entities element has id and idPattern");
-    }
-
-    if (iter->HasMember("type") && iter->HasMember("typePattern"))
-    {
-      return badInput(ciP, "subject entities element has type and typePattern");
-    }
-
-
-    std::string  id;
-    std::string  idPattern;
-    std::string  type;
-    std::string  typePattern;
-
-    {
-      Opt<std::string> idOpt = getStringOpt(*iter, "id", "subject entities element id");
-      if (!idOpt.ok())
-      {
-        return badInput(ciP, idOpt.error);
-      }
-      else if (idOpt.given)
-      {
-        if (idOpt.value.empty())
-        {
-          return badInput(ciP, "subject entities element id is empty");
-        }
-        if (forbiddenIdCharsV2(idOpt.value.c_str()))
-        {
-          return badInput(ciP, "forbidden characters in subject entities element id");
-        }
-        if (idOpt.value.length() > MAX_ID_LEN)
-        {
-          return badInput(ciP, "max id length exceeded");
-        }
-        id = idOpt.value;
-      }
-    }
-
-    {
-      Opt<std::string> idPatOpt = getStringOpt(*iter, "idPattern", "subject entities element idPattern");
-      if (!idPatOpt.ok())
-      {
-        return badInput(ciP, idPatOpt.error);
-      }
-      else if (idPatOpt.given)
-      {
-        if (idPatOpt.value.empty())
-        {
-          return badInput(ciP, "subject entities element idPattern is empty");
-        }
-
-        idPattern = idPatOpt.value;
-
-        // FIXME P5: Keep the regex and propagate to sub-cache
-        regex_t re;
-        if (regcomp(&re, idPattern.c_str(), REG_EXTENDED) != 0)
-        {
-          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTIDPATTERN);
-        }
-        regfree(&re);  // If regcomp fails it frees up itself
-      }
-    }
-
-    {
-      Opt<std::string> typeOpt = getStringOpt(*iter, "type", "subject entities element type");
-      if (!typeOpt.ok())
-      {
-        return badInput(ciP, typeOpt.error);
-      }
-      else if (typeOpt.given)
-      {
-        if (forbiddenIdCharsV2(typeOpt.value.c_str()))
-        {
-          return badInput(ciP, "forbidden characters in subject entities element type");
-        }
-        if (typeOpt.value.length() > MAX_ID_LEN)
-        {
-          return badInput(ciP, "max type length exceeded");
-        }
-        if (typeOpt.value.empty())
-        {
-          return badInput(ciP, ERROR_DESC_BAD_REQUEST_EMPTY_ENTTYPE);
-        }
-        type = typeOpt.value;
-      }
-    }
-
-    {
-      Opt<std::string> typePatOpt = getStringOpt(*iter, "typePattern", "subject entities element typePattern");
-      if (!typePatOpt.ok())
-      {
-        return badInput(ciP, typePatOpt.error);
-      }
-      else if (typePatOpt.given)
-      {
-        if (typePatOpt.value.empty())
-        {
-          return badInput(ciP, "subject entities element typePattern is empty");
-        }
-
-        typePattern = typePatOpt.value;
-
-        // FIXME P5: Keep the regex and propagate to sub-cache
-        regex_t re;
-        if (regcomp(&re, typePattern.c_str(), REG_EXTENDED) != 0)
-        {
-          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTTYPEPATTERN);
-        }
-        regfree(&re);  // If regcomp fails it frees up itself
-      }
-    }
-
-
-    EntID  eid(id, idPattern, type, typePattern);
-
-    if (std::find(eivP->begin(), eivP->end(), eid) == eivP->end()) // if not already included
-    {
-      eivP->push_back(eid);
-    }
-  }
-
-  return "";
-}
-
-
-
-/* ****************************************************************************
-*
 * parseNotification -
-*
 */
 static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& notification)
 {
@@ -524,14 +394,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // method -> verb
     {
-      Opt<std::string> methodOpt = getStringOpt(httpCustom, "method", "method httpCustom notification");
+      Opt<std::string>  methodOpt = getStringOpt(httpCustom, "method", "method httpCustom notification");
+      Verb              verb;
 
       if (!methodOpt.ok())
       {
         return badInput(ciP, methodOpt.error);
       }
-
-      Verb  verb;
 
       if (methodOpt.given)
       {
@@ -542,7 +411,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
           return badInput(ciP, "unknown method httpCustom notification");
         }
       }
-      else // not given by user, the default one will be used
+      else  // not given by user, the default one will be used
       {
         verb = NOVERB;
       }
@@ -553,6 +422,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     // payload
     {
       Opt<std::string> payloadOpt = getStringOpt(httpCustom, "payload", "payload httpCustom notification");
+
       if (!payloadOpt.ok())
       {
         return badInput(ciP, payloadOpt.error);
@@ -570,10 +440,12 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     if (httpCustom.HasMember("qs"))
     {
       const Value& qs = httpCustom["qs"];
+
       if (!qs.IsObject())
       {
         return badInput(ciP, "notification httpCustom qs is not an object");
       }
+
       if (qs.ObjectEmpty())
       {
         return badInput(ciP, "notification httpCustom qs is empty");
@@ -591,16 +463,21 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     if (httpCustom.HasMember("headers"))
     {
       const Value& headers = httpCustom["headers"];
+
       if (!headers.IsObject())
       {
         return badInput(ciP, "notification httpCustom headers is not an object");
       }
+
       if (headers.ObjectEmpty())
       {
         return badInput(ciP, "notification httpCustom headers is empty");
       }
 
-      std::string r = parseDictionary(ciP, subsP->notification.httpInfo.headers, headers, "notification httpCustom headers");
+      std::string r = parseDictionary(ciP,
+                                      subsP->notification.httpInfo.headers,
+                                      headers,
+                                      "notification httpCustom headers");
 
       if (r != "")
       {
@@ -615,18 +492,20 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     return badInput(ciP, "http notification is missing");
   }
 
+
   // Attributes
+  std::string errorString;
+
   if (notification.HasMember("attrs") && notification.HasMember("exceptAttrs"))
   {
     return badInput(ciP, "http notification has attrs and exceptAttrs");
   }
+
   if (notification.HasMember("attrs"))
   {
-    std::string r = parseAttributeList(ciP, &subsP->notification.attributes, notification["attrs"]);
-
-    if (r != "")
+    if (parseStringVector(&subsP->notification.attributes, notification["attrs"], "attrs", true, &errorString) == false)
     {
-      return r;
+      return badInput(ciP, errorString);
     }
 
     subsP->notification.blacklist = false;
@@ -634,11 +513,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   }
   else if (notification.HasMember("exceptAttrs"))
   {
-    std::string r = parseAttributeList(ciP, &subsP->notification.attributes, notification["exceptAttrs"]);
-
-    if (r != "")
+    if (parseStringVector(&subsP->notification.attributes,
+                          notification["exceptAttrs"],
+                          "exceptAttrs",
+                          true,
+                          &errorString) == false)
     {
-      return r;
+      return badInput(ciP, errorString);
     }
 
     if (subsP->notification.attributes.empty())
@@ -653,16 +534,15 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   // metadata
   if (notification.HasMember("metadata"))
   {
-    std::string r = parseAttributeList(ciP, &subsP->notification.metadata, notification["metadata"]);
-
-    if (r != "")
+    if (parseStringVector(&subsP->notification.metadata, notification["metadata"], "metadata", true, &errorString) == false)
     {
-      return r;
+      return badInput(ciP, errorString);
     }
   }
 
   // attrsFormat field
   Opt<std::string>  attrsFormatOpt = getStringOpt(notification, "attrsFormat");
+
   if (!attrsFormatOpt.ok())
   {
     return badInput(ciP, attrsFormatOpt.error);
@@ -674,12 +554,12 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     if (nFormat == NO_FORMAT)
     {
-      return badInput(ciP, "invalid attrsFormat (accepted values: legacy, normalized, keyValues, values)");
+      return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_ATTRSFORMAT);
     }
     subsP->attrsFormatProvided = true;
     subsP->attrsFormat = nFormat;
   }
-  else // Default value for creation
+  else  // Default value for creation
   {
     subsP->attrsFormatProvided = true;
     subsP->attrsFormat = DEFAULT_RENDER_FORMAT;  // Default format for NGSIv2: normalized
@@ -693,23 +573,27 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 /* ****************************************************************************
 *
 * parseNotifyConditionVector -
-*
 */
-static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::SubscriptionUpdate* subsP, const Value& condition)
+static std::string parseNotifyConditionVector
+(
+  ConnectionInfo*              ciP,
+  ngsiv2::SubscriptionUpdate*  subsP,
+  const Value&                 condition
+)
 {
   if (!condition.IsObject())
   {
-   return badInput(ciP, "condition is not an object");
+    return badInput(ciP, "condition is not an object");
   }
 
   // Attributes
   if (condition.HasMember("attrs"))
   {
-    std::string r = parseAttributeList(ciP, &subsP->subject.condition.attributes, condition["attrs"]);
+    std::string errorString;
 
-    if (r != "")
+    if (parseStringVector(&subsP->subject.condition.attributes, condition["attrs"], "attrs", true, &errorString) == false)
     {
-      return r;
+      return badInput(ciP, errorString);
     }
   }
 
@@ -721,6 +605,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
     {
       return badInput(ciP, "expression is not an object");
     }
+
     if (expression.ObjectEmpty())
     {
       return badInput(ciP, "expression is empty");
@@ -809,6 +694,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
         {
           return badInput(ciP, "geometry is empty");
         }
+
         subsP->subject.condition.expression.geometry = geometryOpt.value;
         nGeoItems++;
       }
@@ -828,6 +714,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
         {
           return badInput(ciP, "coords is empty");
         }
+
         subsP->subject.condition.expression.coords = coordsOpt.value;
         nGeoItems++;
       }
@@ -836,16 +723,19 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
     // georel
     {
       Opt<std::string> georelOpt = getStringOpt(expression, "georel");
+
       if (!georelOpt.ok())
       {
         return badInput(ciP, georelOpt.error);
       }
+
       if (georelOpt.given)
       {
         if (georelOpt.value.empty())
         {
           return badInput(ciP, "georel is empty");
         }
+
         subsP->subject.condition.expression.georel = georelOpt.value;
         nGeoItems++;
       }
@@ -853,16 +743,20 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
 
     if ((nGeoItems > 0) && (nGeoItems != 3))
     {
-      return badInput(ciP, "partial geo expression; geometry, georel and coords have to be provided together");
+      return badInput(ciP, ERROR_DESC_BAD_REQUEST_PARTIAL_GEOEXPRESSION);
     }
 
+    //
     // If geometry, coords and georel are filled, then attempt to create a filter scope
     // with them
+    //
     SubscriptionExpression subExpr = subsP->subject.condition.expression;
+
     if ((subExpr.georel != "") && (subExpr.geometry != "") && (subExpr.coords != ""))
     {
       Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
       std::string  err;
+
       if (scopeP->fill(V2, subExpr.geometry, subExpr.coords, subExpr.georel, &err) != 0)
       {
         delete scopeP;
@@ -879,53 +773,15 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
 
 /* ****************************************************************************
 *
-* parseAttributeList -
-*
-*/
-static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::string>* vec, const Value& attributes)
-{
-  if (!attributes.IsArray())
-  {
-    return badInput(ciP, "attrs is not an array");
-  }
-
-  for (Value::ConstValueIterator iter = attributes.Begin(); iter != attributes.End(); ++iter)
-  {
-    if (!iter->IsString())
-    {
-      return badInput(ciP, "attrs element is not a string");
-    }
-
-    std::string attrName = iter->GetString();
-
-    if (attrName.empty())
-    {
-      return badInput(ciP, "attrs element is empty");
-    }
-
-    if (forbiddenIdCharsV2(attrName.c_str()))
-    {
-      return badInput(ciP, "attrs element has forbidden char");
-    }
-
-    if (attrName.length() > MAX_ID_LEN)
-    {
-      return badInput(ciP, "max attribute length exceeded");
-    }
-
-    vec->push_back(attrName);
-  }
-
-  return "";
-}
-
-
-
-/* ****************************************************************************
-*
 * parseDictionary -
 */
-static std::string parseDictionary(ConnectionInfo* ciP, std::map<std::string, std::string>& dict, const Value& object, const std::string& name)
+static std::string parseDictionary
+(
+  ConnectionInfo*                      ciP,
+  std::map<std::string, std::string>&  dict,
+  const Value&                         object,
+  const std::string&                   name
+)
 {
   if (!object.IsObject())
   {
@@ -956,20 +812,4 @@ static std::string parseDictionary(ConnectionInfo* ciP, std::map<std::string, st
   }
 
   return "";
-}
-
-
-
-/* ****************************************************************************
-*
-* badInput -
-*/
-static std::string badInput(ConnectionInfo* ciP, const std::string& msg)
-{
-  alarmMgr.badInput(clientIp, msg);
-  OrionError oe(SccBadRequest, msg, "BadRequest");
-
-  ciP->httpStatusCode = oe.code;
-
-  return oe.toJson();
 }

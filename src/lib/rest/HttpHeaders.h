@@ -32,6 +32,44 @@
 
 
 
+/* ****************************************************************************
+*
+* HTTP Headers -
+*/
+#define ACCESS_CONTROL_ALLOW_ORIGIN   "Access-Control-Allow-Origin"
+#define ACCESS_CONTROL_ALLOW_HEADERS  "Access-Control-Allow-Headers"
+#define ACCESS_CONTROL_ALLOW_METHODS  "Access-Control-Allow-Methods"
+#define ACCESS_CONTROL_MAX_AGE        "Access-Control-Max-Age"
+#define ACCESS_CONTROL_EXPOSE_HEADERS "Access-Control-Expose-Headers"
+#define CONTENT_TYPE                  "Content-Type"
+#define FIWARE_CORRELATOR             "Fiware-Correlator"
+#define FIWARE_SERVICE                "Fiware-Service"
+#define FIWARE_SERVICEPATH            "Fiware-Servicepath"
+#define FIWARE_TOTAL_COUNT            "Fiware-Total-Count"
+#define NGSIV2_ATTRSFORMAT            "Ngsiv2-AttrsFormat"
+#define RESOURCE_LOCATION             "Location"
+#define X_AUTH_TOKEN                  "X-Auth-Token"
+#define X_REAL_IP                     "X-Real-IP"
+#define X_FORWARDED_FOR               "X-Forwarded-For"
+
+
+
+/* ****************************************************************************
+*
+* CORS Allowed Headers -
+*/
+#define CORS_ALLOWED_HEADERS CONTENT_TYPE ", " FIWARE_SERVICE ", " FIWARE_SERVICEPATH ", " NGSIV2_ATTRSFORMAT ", " FIWARE_CORRELATOR ", " X_FORWARDED_FOR ", " X_REAL_IP ", " X_AUTH_TOKEN
+
+
+
+/* ****************************************************************************
+*
+* CORS Exposed Headers -
+*/
+#define CORS_EXPOSED_HEADERS FIWARE_CORRELATOR ", " FIWARE_TOTAL_COUNT ", " RESOURCE_LOCATION
+
+
+
 // -----------------------------------------------------------------------------
 //
 // HttpAcceptHeader -
@@ -62,7 +100,7 @@ typedef struct HttpAcceptHeader
 
 /* ****************************************************************************
 *
-* HttpHeaders - 
+* HttpHeaders -
 */
 typedef struct HttpHeaders
 {
@@ -87,6 +125,7 @@ typedef struct HttpHeaders
   std::string   xrealIp;
   std::string   xforwardedFor;
   std::string   correlator;
+  std::string   ngsiv2AttrsFormat;
 
   bool          servicePathReceived;
 

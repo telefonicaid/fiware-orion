@@ -1,5 +1,5 @@
-#ifndef UPDATE_CONTEXT_AVAILABILITY_SUBSCRIPTION_RESPONSE_h
-#define UPDATE_CONTEXT_AVAILABILITY_SUBSCRIPTION_RESPONSE_h
+#ifndef SRC_LIB_NGSI9_UPDATECONTEXTAVAILABILITYSUBSCRIPTIONRESPONSE_H_
+#define SRC_LIB_NGSI9_UPDATECONTEXTAVAILABILITYSUBSCRIPTIONRESPONSE_H_
 
 /*
 *
@@ -49,8 +49,8 @@ typedef struct UpdateContextAvailabilitySubscriptionResponse
   UpdateContextAvailabilitySubscriptionResponse(StatusCode& _errorCode);
   ~UpdateContextAvailabilitySubscriptionResponse();
 
-  std::string render(const std::string& indent, int counter);
-  std::string check(const std::string& indent, const std::string& predetectedError, int counter);
+  std::string render(void);
+  std::string check(const std::string& predetectedError);
 } UpdateContextAvailabilitySubscriptionResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI9_UPDATECONTEXTAVAILABILITYSUBSCRIPTIONRESPONSE_H_

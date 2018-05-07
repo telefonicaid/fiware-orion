@@ -90,7 +90,7 @@ class Line
 public:
   ::std::vector<Point*> pointList;
 
-  Line();  
+  Line();
   void pointAdd(Point* p);
   void release(void);
 };
@@ -164,14 +164,14 @@ class Polygon
 
 /* ****************************************************************************
 *
-* Georel - 
+* Georel -
 */
 class Georel
 {
 public:
   Georel();
 
-  void         fill(Georel* georelP);         
+  void         fill(Georel* georelP);
   int          parse(const char* in, std::string* errorString);
 
   std::string  type;
@@ -183,7 +183,7 @@ public:
 
 /* ****************************************************************************
 *
-* Geometry - 
+* Geometry -
 */
 class Geometry
 {

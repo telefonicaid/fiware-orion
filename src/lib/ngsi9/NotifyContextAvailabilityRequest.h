@@ -1,5 +1,5 @@
-#ifndef NOTIFY_CONTEXT_AVAILABILITY_REQUEST_H
-#define NOTIFY_CONTEXT_AVAILABILITY_REQUEST_H
+#ifndef SRC_LIB_NGSI9_NOTIFYCONTEXTAVAILABILITYREQUEST_H_
+#define SRC_LIB_NGSI9_NOTIFYCONTEXTAVAILABILITYREQUEST_H_
 
 /*
 *
@@ -43,10 +43,10 @@ typedef struct NotifyContextAvailabilityRequest
 
   NotifyContextAvailabilityRequest();
 
-  std::string   render(const std::string& indent);
-  std::string   check(ApiVersion apiVersion, const std::string& indent, const std::string& predetectedError, int counter);
+  std::string   render(void);
+  std::string   check(ApiVersion apiVersion, const std::string& predetectedError);
   void          present(const std::string& indent);
   void          release(void);
 } NotifyContextAvailabilityRequest;
 
-#endif
+#endif  // SRC_LIB_NGSI9_NOTIFYCONTEXTAVAILABILITYREQUEST_H_

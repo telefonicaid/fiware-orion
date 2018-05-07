@@ -566,7 +566,7 @@ echo
 
 05. Query broker for E1/A1 (nothing found)
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -581,7 +581,7 @@ Date: REGEX(.*)
 
 06. Register an entity/attribute E1/A1 in broker, with CP1 as providing application
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 64
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -594,7 +594,7 @@ Date: REGEX(.*)
 
 07. Register an entity/attribute E1/A2 in broker, with CP2 as providing application
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 64
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -607,7 +607,7 @@ Date: REGEX(.*)
 
 08. Register an entity/attribute E1/A3 in broker, with CP3 as providing application
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 64
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -620,7 +620,7 @@ Date: REGEX(.*)
 
 09. Update/APPEND E1/A1(=CP1) in CP1
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -651,7 +651,7 @@ Date: REGEX(.*)
 
 10. Update/APPEND E1/A2(=CP2) in CP2
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -682,7 +682,7 @@ Date: REGEX(.*)
 
 11. Update/APPEND E1/A3(=CP3) in CP3
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -713,7 +713,7 @@ Date: REGEX(.*)
 
 12. Query broker for E1/A1 (will go to CP1 and it will work, A1=CP1 is returned)
 HTTP/1.1 200 OK
-Content-Length: 381
+Content-Length: 187
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -744,7 +744,7 @@ Date: REGEX(.*)
 
 13. Query broker for E1/A2 (will go to CP2 and it will work, A1=CP2 is returned)
 HTTP/1.1 200 OK
-Content-Length: 381
+Content-Length: 187
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -775,7 +775,7 @@ Date: REGEX(.*)
 
 14. Query broker for E1/A3 (will go to CP3 and it will work, A1=CP3 is returned)
 HTTP/1.1 200 OK
-Content-Length: 381
+Content-Length: 187
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -806,7 +806,7 @@ Date: REGEX(.*)
 
 15. Update/UPDATE E1/A1(=CP1-2) in CB (is forwarded to CP1 and now it is updated)
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -837,7 +837,7 @@ Date: REGEX(.*)
 
 16. Update/UPDATE E1/A2(=CP2-2) in CB (is forwarded to CP2 and now it is updated)
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -868,7 +868,7 @@ Date: REGEX(.*)
 
 17. Update/UPDATE E1/A3(=CP3-2) in CB (is forwarded to CP3 and now it is updated)
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -899,7 +899,7 @@ Date: REGEX(.*)
 
 18. Query broker for E1/A1 (will go to CP1 and it will work, A1=CP1-1 is returned)
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -930,7 +930,7 @@ Date: REGEX(.*)
 
 19. Query broker for E1/A2 (will go to CP2 and it will work, A2=CP2-2 is returned)
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -961,7 +961,7 @@ Date: REGEX(.*)
 
 20. Query broker for E1/A3 (will go to CP3 and it will work, A3=CP3-2 is returned)
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -992,7 +992,7 @@ Date: REGEX(.*)
 
 21. Update/UPDATE <E1/A1, E1/A2, E1/A3> = <CP1-3, CP2-3, CP3-3>) in CB (is forwarded to CP1, CP2, CP3 and now they are updated)
 HTTP/1.1 200 OK
-Content-Length: 586
+Content-Length: 258
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1033,7 +1033,7 @@ Date: REGEX(.*)
 
 22. Query broker for E1/A1 (will go to CP1 and it will work, A1=CP1-3 is returned)
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1064,7 +1064,7 @@ Date: REGEX(.*)
 
 23. Query broker for E1/A2 (will go to CP2 and it will work, A2=CP2-3 is returned)
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1095,7 +1095,7 @@ Date: REGEX(.*)
 
 24. Query broker for E1/A3 (will go to CP3 and it will work, A3=CP3-3 is returned)
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

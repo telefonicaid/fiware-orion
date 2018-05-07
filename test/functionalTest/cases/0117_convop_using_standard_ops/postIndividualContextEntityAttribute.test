@@ -193,7 +193,7 @@ echo
 01. POST /v1/contextEntities/E1/attributes/A1?entity::type=T1 (A1 == 1)
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -207,7 +207,7 @@ Date: REGEX(.*)
 02. POST /v1/contextEntities/E1/attributes/A2?entity::type=T2 (A2 == 2)
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -221,7 +221,7 @@ Date: REGEX(.*)
 03. Query CB for E1/T1 (E1/A1)
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 557
+Content-Length: 248
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -260,7 +260,7 @@ Date: REGEX(.*)
 04. Query CB for E1/T2 (E1/A2)
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 557
+Content-Length: 248
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -299,7 +299,7 @@ Date: REGEX(.*)
 05. POST /v1/contextEntities/E1/attributes/A3?entity::type=T1 (A3 == 3), service-path /e1/a3
 ============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -313,7 +313,7 @@ Date: REGEX(.*)
 06. POST /v1/contextEntities/E1/attributes/A4?entity::type=T1 (A4 == 4), service-path /e1/a4
 ============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -327,7 +327,7 @@ Date: REGEX(.*)
 07. POST /v1/contextEntities/E1/attributes/A5?entity::type=T1 (A5 == 5), service-path /e1/a5
 ============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -341,7 +341,7 @@ Date: REGEX(.*)
 08. Query CB for E1, service-path /e1/#
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 1607
+Content-Length: 700
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -430,7 +430,7 @@ Date: REGEX(.*)
 09. Query CB for E1, service-path /e1/a4
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 557
+Content-Length: 248
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

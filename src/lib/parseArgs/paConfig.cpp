@@ -129,23 +129,6 @@ char**     paValidLogLevels             = NULL;
 
 /* ****************************************************************************
 *
-* PaVars - 
-*/
-typedef struct PaVars
-{
-  char*      name;
-  int        value;
-  int        defVal;
-  PaType     type;
-  bool       preTreated;  /* all builtins for example */
-  PavCb      cb;
-  char*      info;
-} PaVars;
-
-
-
-/* ****************************************************************************
-*
 * paConfigCleanup - 
 */
 void paConfigCleanup(void)

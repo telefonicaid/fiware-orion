@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_NGSINOTIFY_QUEUEWORKERS_H
-#define SRC_LIB_NGSINOTIFY_QUEUEWORKERS_H
+#ifndef SRC_LIB_NGSINOTIFY_QUEUEWORKERS_H_
+#define SRC_LIB_NGSINOTIFY_QUEUEWORKERS_H_
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -38,4 +38,4 @@ private:
     int numberOfThreads;
 };
 
-#endif // SRC_LIB_NGSINOTIFY_QUEUEWORKERS_H
+#endif  // SRC_LIB_NGSINOTIFY_QUEUEWORKERS_H_

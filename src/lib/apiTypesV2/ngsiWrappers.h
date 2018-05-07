@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_APITYPESV2_NGSIWRAPPERS_H
-#define SRC_LIB_APITYPESV2_NGSIWRAPPERS_H
+#ifndef SRC_LIB_APITYPESV2_NGSIWRAPPERS_H_
+#define SRC_LIB_APITYPESV2_NGSIWRAPPERS_H_
 
 /*
 *
@@ -25,26 +25,29 @@
 *
 * Author: Fermin Galan
 */
-
-/* The aim of this module is to hold a set of wrapper functions needed
- * for transforming NGSIv1 into NGSIv2 types and viceversa. We need this
- * while both versions of the API coexist. However, at the end, this module
- * should be removed */
-
 #include <vector>
 #include <string>
 
 #include "apiTypesV2/Subscription.h"  // EntID
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/NotifyConditionVector.h"
+
+
+
+/* *****************************************************************************
+*
+* The aim of this module is to hold a set of wrapper functions needed
+* for transforming NGSIv1 into NGSIv2 types and viceversa. We need this
+* while both versions of the API coexist. However, at the end, this module
+* should be removed 
+*/
 
 
 
 /* ****************************************************************************
 *
 * attrsStdVector2NotifyConditionVector -
-*
 */
 extern void attrsStdVector2NotifyConditionVector(const std::vector<std::string>& attrs, NotifyConditionVector* ncVP);
 
@@ -53,8 +56,7 @@ extern void attrsStdVector2NotifyConditionVector(const std::vector<std::string>&
 /* ****************************************************************************
 *
 * entIdStdVector2EntityIdVector -
-*
 */
 extern void entIdStdVector2EntityIdVector(const std::vector<ngsiv2::EntID>& entitiesV, EntityIdVector* enVP);
 
-#endif // SRC_LIB_APITYPESV2_NGSIWRAPPERS_H
+#endif  // SRC_LIB_APITYPESV2_NGSIWRAPPERS_H_

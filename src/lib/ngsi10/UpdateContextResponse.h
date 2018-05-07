@@ -1,5 +1,5 @@
-#ifndef UPDATE_CONTEXT_RESPONSE_H
-#define UPDATE_CONTEXT_RESPONSE_H
+#ifndef SRC_LIB_NGSI10_UPDATECONTEXTRESPONSE_H_
+#define SRC_LIB_NGSI10_UPDATECONTEXTRESPONSE_H_
 
 /*
 *
@@ -50,8 +50,8 @@ typedef struct UpdateContextResponse
   UpdateContextResponse(StatusCode& _errorCode);
   ~UpdateContextResponse();
 
-  std::string   render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent);
-  std::string   check(ApiVersion apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError);
+  std::string   render(ApiVersion apiVersion, bool asJsonObject);
+  std::string   check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError);
   void          present(const std::string& indent);
   void          release(void);
   void          fill(UpdateContextResponse* upcrsP);
@@ -60,4 +60,4 @@ typedef struct UpdateContextResponse
   void          merge(UpdateContextResponse* upcrsP);
 } UpdateContextResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI10_UPDATECONTEXTRESPONSE_H_

@@ -133,7 +133,7 @@ echo
 01. Create a subscription on ngsi9 registrations
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -147,7 +147,7 @@ Date: REGEX(.*)
 02. Register a context immediatelly after the subscription: notification is generated
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -161,7 +161,7 @@ Date: REGEX(.*)
 03. Do a register context after subscription expiration: notification is not generated
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -176,7 +176,7 @@ Date: REGEX(.*)
 ===========================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 521
+Content-Length: 295
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json

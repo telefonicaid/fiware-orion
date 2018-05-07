@@ -1,9 +1,1 @@
-{
-  "subscribeError" : {
-    "errorCode" : {
-      "code" : "400",
-      "reasonPhrase" : "Bad Request",
-      "details" : "invalid payload: invalid isPattern value for entity: /false0/"
-    }
-  }
-}
+{"subscribeError":{"errorCode":{"code":"400","reasonPhrase":"Bad Request","details":"invalid payload: invalid isPattern value for entity: /false0/"}}}

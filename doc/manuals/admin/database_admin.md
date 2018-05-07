@@ -1,4 +1,4 @@
-#<a name="top"></a>Database administration 
+# <a name="top"></a>Database administration
 
 * [Introduction](#introduction)
 * [Backup](#backup)

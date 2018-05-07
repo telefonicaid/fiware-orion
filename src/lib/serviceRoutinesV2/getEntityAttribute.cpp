@@ -66,7 +66,8 @@ std::string getEntityAttribute
   std::string  answer;
   Attribute    attribute;
 
-  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL) || (forbiddenIdChars(ciP->apiVersion, compV[4].c_str() , NULL)))
+  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str(), NULL) ||
+      forbiddenIdChars(ciP->apiVersion, compV[4].c_str(), NULL))
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
@@ -76,7 +77,7 @@ std::string getEntityAttribute
   // 01. Fill in QueryContextRequest
   parseDataP->qcr.res.fill(compV[2], type, "false", EntityTypeEmptyOrNotEmpty, "");
   parseDataP->qcr.res.metadataList.fill(ciP->uriParam[URI_PARAM_METADATA]);
-  
+
 
   // 02. Call standard op postQueryContext
   postQueryContext(ciP, components, compV, parseDataP);
@@ -101,7 +102,7 @@ std::string getEntityAttribute
   }
   else if (attribute.oe.reasonPhrase == ERROR_NOT_FOUND)
   {
-    ciP->httpStatusCode = SccContextElementNotFound; // Attribute to be precise!
+    ciP->httpStatusCode = SccContextElementNotFound;  // Attribute to be precise!
   }
   else
   {

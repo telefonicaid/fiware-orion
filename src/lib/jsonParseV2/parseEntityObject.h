@@ -25,13 +25,13 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "rapidjson/document.h"
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
-
-using namespace rapidjson;
 
 
 
@@ -41,8 +41,13 @@ using namespace rapidjson;
 *
 * Using 'const Value::GenericValue*' for 'value' causes compilation problems in
 * some environments (in particular, at least in Debian 8.2 with gcc 4.9.2)
-*
 */
-extern std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator value, Entity* eP, bool attrsAllowed);
+extern std::string parseEntityObject
+(
+  ConnectionInfo*                        ciP,
+  rapidjson::Value::ConstValueIterator&  value,
+  Entity*                                eP,
+  bool                                   attrsAllowed
+);
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSEENTITYOBJECT_H_

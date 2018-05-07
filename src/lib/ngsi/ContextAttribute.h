@@ -92,14 +92,13 @@ public:
   std::string  getId() const;
   std::string  getLocation(ApiVersion apiVersion = V1) const;
 
-  std::string  render(ApiVersion          apiVersion,
-                      bool                asJsonObject,
-                      RequestType         request,
-                      const std::string&  indent,
-                      bool                comma = false,
-                      bool                omitValue = false);
-  std::string  renderAsJsonObject(ApiVersion apiVersion, RequestType request, const std::string& indent, bool comma, bool omitValue = false);
-  std::string  renderAsNameString(const std::string& indent, bool comma = false);
+  std::string  render(ApiVersion   apiVersion,
+                      bool         asJsonObject,
+                      RequestType  request,
+                      bool         comma = false,
+                      bool         omitValue = false);
+  std::string  renderAsJsonObject(ApiVersion apiVersion, RequestType request, bool comma, bool omitValue = false);
+  std::string  renderAsNameString(bool comma);
   std::string  toJson(bool                             isLastElement,
                       RenderFormat                     renderFormat,
                       const std::vector<std::string>&  metadataFilter,
@@ -115,7 +114,7 @@ public:
   std::string  getName(void);
 
   /* Used to render attribute value to BSON */
-  void valueBson(mongo::BSONObjBuilder& bsonAttr) const;
+  void valueBson(mongo::BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast) const;
 
   /* Helper method to be use in some places wher '%s' is needed */
   std::string  getValue(void) const;
@@ -125,7 +124,7 @@ public:
   bool              compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
 private:
-  void bsonAppendAttrValue(mongo::BSONObjBuilder& bsonAttr) const;
+  void bsonAppendAttrValue(mongo::BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast) const;
 
 } ContextAttribute;
 

@@ -431,7 +431,6 @@ int paParse
 )
 {
   char*  progNameCopy;
-  int    ix;
   int    s;
   FILE*  fP;
 
@@ -447,6 +446,8 @@ int paParse
   /*                                                      */
   if (argC > 1)
   {
+    int ix;
+
     strncpy(paCommandLine, argV[1], sizeof(paCommandLine));
     for (ix = 2; ix < argC; ix++)
     {
@@ -551,7 +552,7 @@ int paParse
     RETURN_ERROR("paLimitCheck");
   }
 
-  if ((s != -2) && ((s = paConfigActions(false)) == -1))
+  if ((s != -2) && (paConfigActions(false) == -1))
   {
     RETURN_ERROR("paConfigActions");
   }
@@ -625,11 +626,24 @@ int paParse
     }
   }
 
-  free(paiList);
-  free(paRcFileName);
-  free(paUsageProgName);
-
   return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* paCleanup - free allocated variables
+*/
+void paCleanup(void)
+{
+  free(paUsageProgName);
+  free(paRcFileName);
+  free(paiList);
+
+  paUsageProgName = NULL;
+  paRcFileName    = NULL;
+  paiList         = NULL;
 }
 
 

@@ -35,25 +35,68 @@
 #include "common/string.h"
 #include "common/limits.h"
 #include "common/errorMessages.h"
+
 #include "alarmMgr/alarmMgr.h"
 #include "metricsMgr/metricsMgr.h"
-
 #include "ngsi/ParseData.h"
+#include "mongoBackend/mongoSubCache.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 #include "parse/textParse.h"
+#include "serviceRoutines/badRequest.h"
+
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
-#include "rest/RestService.h"
 #include "rest/restReply.h"
 #include "rest/rest.h"
 #include "rest/uriParamNames.h"
-#include "mongoBackend/mongoSubCache.h"
+#include "rest/RestService.h"
 
 
 
 /* ****************************************************************************
 *
-* delayedRelease - 
+* service vectors - 
+*/
+static RestService*              getServiceV           = NULL;
+static RestService*              putServiceV           = NULL;
+static RestService*              postServiceV          = NULL;
+static RestService*              patchServiceV         = NULL;
+static RestService*              deleteServiceV        = NULL;
+static RestService*              optionsServiceV       = NULL;
+RestService*                     restBadVerbV          = NULL;
+
+
+
+/* ****************************************************************************
+*
+* serviceVectorsSet
+*/
+void serviceVectorsSet
+(
+  RestService*        _getServiceV,
+  RestService*        _putServiceV,
+  RestService*        _postServiceV,
+  RestService*        _patchServiceV,
+  RestService*        _deleteServiceV,
+  RestService*        _optionsServiceV,
+  RestService*        _restBadVerbV
+)
+{
+  getServiceV      = _getServiceV;
+  putServiceV      = _putServiceV;
+  postServiceV     = _postServiceV;
+  patchServiceV    = _patchServiceV;
+  deleteServiceV   = _deleteServiceV;
+  optionsServiceV  = _optionsServiceV;
+  restBadVerbV     = _restBadVerbV;
+}
+
+#include "serviceRoutinesV2/postRegistration.h"
+
+
+/* ****************************************************************************
+*
+* delayedRelease -
 */
 static void delayedRelease(JsonDelayedRelease* releaseP)
 {
@@ -92,7 +135,7 @@ static void delayedRelease(JsonDelayedRelease* releaseP)
 
 /* ****************************************************************************
 *
-* payloadParse - 
+* payloadParse -
 */
 std::string payloadParse
 (
@@ -115,6 +158,12 @@ std::string payloadParse
   {
     if (ciP->apiVersion == V2)
     {
+      //
+      // FIXME #3151: jsonRequestTreat should return 'bool' and accept an output parameter 'OrionError* oeP'.
+      //              Same same for all underlying JSON APIv2 parsing functions
+      //              Not sure the same thing can be done for 'jsonTreat' in the else-part, but this should AT LEAST
+      //              be fixed for V2.
+      //
       result = jsonRequestTreat(ciP, parseDataP, service->request, jsonReleaseP, compV);
     }
     else
@@ -147,7 +196,7 @@ std::string payloadParse
 
 /* ****************************************************************************
 *
-* tenantCheck - 
+* tenantCheck -
 *
 * This function used to be 'static', but as it is now used by MetricsMgr::serviceValid
 * it has been mede 'extern'.
@@ -161,7 +210,7 @@ std::string tenantCheck(const std::string& tenant)
   if (strlen(name) > SERVICE_NAME_MAX_LEN)
   {
     char numV1[STRING_SIZE_FOR_INT];
-    char numV2[STRING_SIZE_FOR_INT];
+    char numV2[STRING_SIZE_FOR_LONG];
 
     snprintf(numV1, sizeof(numV1), "%d",  SERVICE_NAME_MAX_LEN);
     snprintf(numV2, sizeof(numV2), "%lu", strlen(name));
@@ -192,7 +241,7 @@ std::string tenantCheck(const std::string& tenant)
 
 /* ****************************************************************************
 *
-* commonFilters - 
+* commonFilters -
 */
 static void commonFilters
 (
@@ -279,7 +328,7 @@ static void commonFilters
 
 /* ****************************************************************************
 *
-* scopeFilter - 
+* scopeFilter -
 */
 static void scopeFilter
 (
@@ -336,7 +385,7 @@ static void scopeFilter
 
 /* ****************************************************************************
 *
-* filterRelease - 
+* filterRelease -
 */
 static void filterRelease(ParseData* parseDataP, RequestType request)
 {
@@ -359,7 +408,7 @@ static void filterRelease(ParseData* parseDataP, RequestType request)
 
 /* ****************************************************************************
 *
-* compCheck - 
+* compCheck -
 */
 static bool compCheck(int components, const std::vector<std::string>& compV)
 {
@@ -377,7 +426,7 @@ static bool compCheck(int components, const std::vector<std::string>& compV)
 
 /* ****************************************************************************
 *
-* compErrorDetect - 
+* compErrorDetect -
 */
 static bool compErrorDetect
 (
@@ -387,7 +436,7 @@ static bool compErrorDetect
   OrionError*                      oeP
 )
 {
-  std::string  details; 
+  std::string  details;
 
   if ((apiVersion == V2) && (compV[1] == "entities"))
   {
@@ -435,7 +484,7 @@ static bool compErrorDetect
     oeP->fill(SccBadRequest, details);
     return true;  // means: this was an error, make the broker stop this request
   }
-  
+
   return false;  // No special error detected, let the broker continue with the request to detect the error later on
 }
 
@@ -444,8 +493,15 @@ static bool compErrorDetect
 /* ****************************************************************************
 *
 * restService -
+*
+* This function is called with the appropriate RestService vector, depending on the VERB used in the request.
+* If no matching service is found in this RestService vector, then a recursive call in made, using the "badVerb RestService vector",
+* to see if we have a matching bad-verb-service-routine.
+* If there is no badVerb RestService vector, then the "default error service routine "badRequest" is used.
+* And lastly, if there is a badVerb RestService vector, but still no service routine is found, then we create a "service not recognized"
+* response. See comments incrusted in the function as well.
 */
-std::string restService(ConnectionInfo* ciP, RestService* serviceV)
+static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 {
   std::vector<std::string>  compV;
   int                       components;
@@ -487,14 +543,10 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   //
   // Lookup the requested service
   //
+  
   for (unsigned int ix = 0; serviceV[ix].treat != NULL; ++ix)
   {
     if ((serviceV[ix].components != 0) && (serviceV[ix].components != components))
-    {
-      continue;
-    }
-
-    if ((ciP->method != serviceV[ix].verb) && (serviceV[ix].verb != "*"))
     {
       continue;
     }
@@ -503,14 +555,16 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     bool match = true;
     for (int compNo = 0; compNo < components; ++compNo)
     {
-      if (serviceV[ix].compV[compNo] == "*")
+      const char* component = serviceV[ix].compV[compNo].c_str();
+      
+      if ((component[0] == '*') && (component[1] == 0))
       {
         continue;
       }
 
       if (ciP->apiVersion == V1)
       {
-        if (strcasecmp(serviceV[ix].compV[compNo].c_str(), compV[compNo].c_str()) != 0)
+        if (strcasecmp(component, compV[compNo].c_str()) != 0)
         {
           match = false;
           break;
@@ -518,7 +572,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       }
       else
       {
-        if (strcmp(serviceV[ix].compV[compNo].c_str(), compV[compNo].c_str()) != 0)
+        if (strcmp(component, compV[compNo].c_str()) != 0)
         {
           match = false;
           break;
@@ -531,7 +585,11 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       continue;
     }
 
-    if ((ciP->payload != NULL) && (ciP->payloadSize != 0) && (ciP->payload[0] != 0) && (serviceV[ix].verb != "*"))
+
+    //
+    // If in restBadVerbV vector, no need to check the payload
+    //
+    if ((serviceV != restBadVerbV) && (ciP->payload != NULL) && (ciP->payloadSize != 0) && (ciP->payload[0] != 0))
     {
       std::string response;
       std::string spath = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
@@ -563,7 +621,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       }
     }
 
-    LM_T(LmtService, ("Treating service %s %s", serviceV[ix].verb.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
+    LM_T(LmtService, ("Treating service %s %s", ciP->method.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
     if (ciP->payloadSize == 0)
     {
       ciP->inMimeType = NOMIMETYPE;
@@ -600,7 +658,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       }
 
       compV.clear();
-        
+
       return response;
     }
 
@@ -610,19 +668,18 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     //
     // If we have gotten this far the Input is OK.
-    // Except for all the badVerb/badRequest, etc.
-    // A common factor for all these 'services' is that the verb is '*'
+    // Except for all the badVerb/badRequest, in the restBadVerbV vector.
     //
     // So, the 'Bad Input' alarm is cleared for this client.
     //
-    if (serviceV[ix].verb != "*")
+    if (serviceV != restBadVerbV)
     {
       alarmMgr.badInputReset(clientIp);
     }
 
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
 
-    filterRelease(&parseData, serviceV[ix].request);   
+    filterRelease(&parseData, serviceV[ix].request);
 
     if (jsonReqP != NULL)
     {
@@ -645,6 +702,32 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     return response;
   }
 
+  //
+  // No service routine found. Need to check bad-verb service vector.
+  // If there is no bad-verb service vector (restBadVerbV == NULL), then
+  // badRequest() is used as service routine ... 
+  //
+  if (restBadVerbV == NULL)
+  {
+    std::vector<std::string> cV;
+
+    return badRequest(ciP, 0, cV, NULL);
+  }
+
+  //
+  // ... but, if we have a non-NULL restBadVerbV, then we make a recursive call, using the
+  // restBadVerbV service vector.  But, only if the current service vector is NOT the restBadVerbV,
+  // of course. A situation like that would mean we are already in the recursive call and need to end
+  // the recursion and return an error  ...
+  //
+  if (serviceV != restBadVerbV)
+  {
+    return restService(ciP, restBadVerbV);
+  }
+
+  //
+  // ... and this here is the error that is returned. A 400 Bad Request with "service XXX not recognized" as payload
+  //
   std::string details = std::string("service '") + ciP->url + "' not recognized";
   alarmMgr.badInput(clientIp, details);
 
@@ -654,4 +737,25 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
   compV.clear();
   return answer;
+}
+
+
+
+namespace orion
+{
+/* ****************************************************************************
+*
+* orion::requestServe -
+*/
+std::string requestServe(ConnectionInfo* ciP)
+{
+  if      ((ciP->verb == GET)     && (getServiceV     != NULL))    return restService(ciP, getServiceV);
+  else if ((ciP->verb == POST)    && (postServiceV    != NULL))    return restService(ciP, postServiceV);
+  else if ((ciP->verb == PUT)     && (putServiceV     != NULL))    return restService(ciP, putServiceV);
+  else if ((ciP->verb == PATCH)   && (patchServiceV   != NULL))    return restService(ciP, patchServiceV);
+  else if ((ciP->verb == DELETE)  && (deleteServiceV  != NULL))    return restService(ciP, deleteServiceV);
+  else if ((ciP->verb == OPTIONS) && (optionsServiceV != NULL))    return restService(ciP, optionsServiceV);
+  else                                                             return restService(ciP, restBadVerbV);
+}
+
 }

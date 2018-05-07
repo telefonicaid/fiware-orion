@@ -27,7 +27,7 @@ import re
 from sys import argv
 
 header = []
-header.append('\s*Copyright( \(c\))? 201[3|4|5|6|7] Telefonica Investigacion y Desarrollo, S.A.U$')
+header.append('\s*Copyright( \(c\))? 201[3|4|5|6|7|8] Telefonica Investigacion y Desarrollo, S.A.U$')
 header.append('\s*$')
 header.append('\s*This file is part of Orion Context Broker.$')
 header.append('\s*$')
@@ -131,7 +131,7 @@ def ignore(root, file):
     files_names = ['.gitignore', '.valgrindrc', '.valgrindSuppressions', 'LICENSE',
                    'ContributionPolicy.txt', 'CHANGES_NEXT_RELEASE', 'compileInfo.h',
                    'unittests_that_fail_sporadically.txt', 'Vagrantfile', 'contextBroker.ubuntu',
-                   'mkdocs.yml', 'fiware-ngsiv2-reference.errata' ]
+                   'mkdocs.yml', 'fiware-ngsiv2-reference.errata', 'ServiceRoutines.txt' ]
     if file in files_names:
         return True
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \

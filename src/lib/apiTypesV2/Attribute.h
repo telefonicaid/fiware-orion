@@ -33,7 +33,15 @@
 #include "ngsi/ContextAttribute.h"
 #include "rest/OrionError.h"
 
+
+
+/* ****************************************************************************
+*
+* To avoid a problematic and not necessary include
+*/
 struct QueryContextResponse;
+
+
 
 /* ****************************************************************************
 *
@@ -41,7 +49,7 @@ struct QueryContextResponse;
 */
 class Attribute
 {
-public:
+ public:
   ContextAttribute*  pcontextAttribute;
   OrionError         oe;                    // Optional - mandatory if not 200-OK
 

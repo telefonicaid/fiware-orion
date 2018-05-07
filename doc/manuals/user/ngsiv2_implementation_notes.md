@@ -1,8 +1,9 @@
-#<a name="top"></a>NGSIv2 Implementation Notes
+# <a name="top"></a>NGSIv2 Implementation Notes
 
 * [Forbidden characters](#forbidden-characters)
 * [Custom payload decoding on notifications](#custom-payload-decoding-on-notifications)
 * [Option to disable custom notifications](#option-to-disable-custom-notifications)
+* [Non-modifiable headers in custom notifications](#non-modifiable-headers-in-custom-notifications)
 * [Limit to attributes for entity location](#limit-to-attributes-for-entity-location)
 * [Legacy attribute format in notifications](#legacy-attribute-format-in-notifications)
 * [Datetime support](#datetime-support)
@@ -14,6 +15,8 @@
 * [Notification throttling](#notification-throttling)
 * [Ordering between:$
  different attribute value types](#ordering-between-different-attribute-value-types)
+* [Initial notifications](#initial_notifications)
+* [Registrations](#registrations)
 * [Deprecated features](#deprecated-features)
 
 This document describes some considerations to take into account
@@ -48,6 +51,18 @@ In this case:
 
 * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
 * No `${...}` macro substitution is performed.
+
+[Top](#top)
+
+## Non-modifiable headers in custom notifications
+
+The following headers cannot be overwritten in custom notifications:
+
+* `Fiware-Correlator`
+* `Ngsiv2-AttrsFormat`
+
+Any attemp of doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be
+ignored.
 
 [Top](#top)
 
@@ -234,6 +249,43 @@ From lowest to highest:
 4. Object
 5. Array
 6. Boolean
+
+[Top](#top)
+
+## Initial notifications
+
+The NGSIv2 specification describes in section "Subscriptions" the rules that trigger notifications
+corresponding to a given subscription, based on updates to the entities covered by the subscription.
+Apart from that kind of regular notifications, Orion may send also an initial notification at
+subscription creation/update time. Check details in the document about [initial notifications](initial_notification.md)
+
+[Top](#top)
+
+## Registrations
+
+Orion implements registration management as described in the NGSIv2 specification, except
+for the following aspects:
+
+* `PATCH /v2/registration/<id>` is not implemented. Thus, registrations cannot be updated
+  directly. I.e., updates must be done deleting and re-creating the registration. Please
+  see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3007) about this.
+* `idPattern` and `typePattern` are not implemented. This is similar to NGSIv1 registrations,
+  where isPattern is not implemented.
+* The only valid `supportedForwardingMode` is `all`. Trying to use any other value will end
+  in a 501 Not Implemented error response. Please
+  see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3106) about this.
+* The `expression` field (within `dataProvided`) is not supported. The field is simply
+  ignored. Please see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3107) about it.
+* The `inactive` value for `status` is not supported. I.e., the field is stored/retrieved correctly,
+  but the registration is always active, even when the value is `inactive`. Please see
+  [this issue](https://github.com/telefonicaid/fiware-orion/issues/3108) about it.
+
+Orion implements an additional field `legacyForwarding` (within `provider`) not included in NGSIv2
+specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
+for forwarding requests associated to that registration. However, for the time being, NGSIv2-based
+forwarding has not been defined (see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3068)
+about it) so the only valid option is to always use `"legacyForwarding": true` (otherwise a 501 Not Implemented
+error response will be the result).
 
 [Top](#top)
 

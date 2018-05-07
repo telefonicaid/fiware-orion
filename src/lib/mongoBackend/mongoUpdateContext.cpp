@@ -57,6 +57,7 @@ HttpStatusCode mongoUpdateContext
   std::map<std::string, std::string>&   uriParams,    // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                    xauthToken,
   const std::string&                    fiwareCorrelator,
+  const std::string&                    ngsiV2AttrsFormat,
   ApiVersion                            apiVersion,
   Ngsiv2Flavour                         ngsiv2Flavour
 )
@@ -70,7 +71,7 @@ HttpStatusCode mongoUpdateContext
   {
     char lenV[STRING_SIZE_FOR_INT];
 
-    snprintf(lenV, sizeof(lenV), "%lu", servicePathV.size());
+    snprintf(lenV, sizeof(lenV), "%lu", (unsigned long) servicePathV.size());
 
     std::string details = std::string("service path length ") + lenV + " is greater than the one in update";
     alarmMgr.badInput(clientIp, details);
@@ -90,6 +91,7 @@ HttpStatusCode mongoUpdateContext
                             uriParams,
                             xauthToken,
                             fiwareCorrelator,
+                            ngsiV2AttrsFormat,
                             apiVersion,
                             ngsiv2Flavour);
     }

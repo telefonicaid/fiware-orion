@@ -37,15 +37,29 @@
 
 /* ****************************************************************************
 *
+* RegistrationId::RegistrationId -
+*/
+RegistrationId::RegistrationId()
+{
+}
+
+
+
+/* ****************************************************************************
+*
+* RegistrationId::RegistrationId -
+*/
+RegistrationId::RegistrationId(const std::string& regId) : string(regId)
+{
+}
+
+
+
+/* ****************************************************************************
+*
 * RegistrationId::check -
 */
-std::string RegistrationId::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string RegistrationId::check(void)
 {
   std::string out = "OK";
 
@@ -116,7 +130,7 @@ void RegistrationId::present(const std::string& indent)
 *
 * RegistrationId::render -
 */
-std::string RegistrationId::render(RequestType requestType, const std::string& indent, bool comma)
+std::string RegistrationId::render(RequestType requestType, bool comma)
 {
   if (string == "")
   {
@@ -131,7 +145,7 @@ std::string RegistrationId::render(RequestType requestType, const std::string& i
     }
   }
 
-  return valueTag(indent, "registrationId", string, comma);
+  return valueTag("registrationId", string, comma);
 }
 
 

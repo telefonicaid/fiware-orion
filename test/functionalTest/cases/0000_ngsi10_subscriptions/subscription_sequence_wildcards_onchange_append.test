@@ -231,7 +231,7 @@ echo
 01. Subscribe to OfficeRoom.* / Room
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 109
+Content-Length: 85
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -247,7 +247,7 @@ Date: REGEX(.*)
 02. Create OfficeRoom/Room/pressure
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 398
+Content-Length: 204
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -279,7 +279,7 @@ Date: REGEX(.*)
 03. 0.5 seconds later, update OfficeRoom/Room/pressure
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 398
+Content-Length: 204
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -311,7 +311,7 @@ Date: REGEX(.*)
 04. 0.5 seconds later, create OfficeRoom2/Room/pressure
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 399
+Content-Length: 205
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -343,7 +343,7 @@ Date: REGEX(.*)
 05. Add attribute 'temperature' to OfficeRoom/Room
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 402
+Content-Length: 208
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -375,7 +375,7 @@ Date: REGEX(.*)
 06. Unsubscribe
 ===============
 HTTP/1.1 200 OK
-Content-Length: 122
+Content-Length: 93
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -392,7 +392,7 @@ Date: REGEX(.*)
 07. Update OfficeRoom/Room/pressure and OfficeRoom2/Room/pressure
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 765
+Content-Length: 387
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -443,7 +443,7 @@ Date: REGEX(.*)
 ========================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 480
+Content-Length: 276
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
@@ -477,7 +477,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 480
+Content-Length: 276
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
@@ -511,7 +511,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 481
+Content-Length: 277
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
@@ -545,7 +545,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 600
+Content-Length: 329
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json

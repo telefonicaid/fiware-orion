@@ -44,7 +44,7 @@
 UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 {
   compoundValueP = NULL;
-  valueType = orion::ValueTypeNone;
+  valueType = orion::ValueTypeNotGiven;
 }
 
 
@@ -53,18 +53,17 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 *
 * render - 
 */
-std::string UpdateContextAttributeRequest::render(ApiVersion apiVersion, std::string indent)
+std::string UpdateContextAttributeRequest::render(ApiVersion apiVersion)
 {
   std::string out = "";
-  std::string indent2 = indent + "  ";
   bool        commaAfterContextValue = metadataVector.size() != 0;
 
-  out += startTag(indent);
-  out += valueTag(indent2, "type", type, true);
+  out += startTag();
+  out += valueTag("type", type, true);
 
   if (compoundValueP == NULL)
   {
-    out += valueTag(indent2, "contextValue", contextValue, true);
+    out += valueTag("contextValue", contextValue, true);
   }
   else
   {
@@ -75,13 +74,13 @@ std::string UpdateContextAttributeRequest::render(ApiVersion apiVersion, std::st
       isCompoundVector = true;
     }
 
-    out += startTag(indent + "  ", "value", isCompoundVector);
-    out += compoundValueP->render(apiVersion, indent + "    ");
-    out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
+    out += startTag("value", isCompoundVector);
+    out += compoundValueP->render(apiVersion);
+    out += endTag(commaAfterContextValue, isCompoundVector);
   }
 
-  out += metadataVector.render(indent2);
-  out += endTag(indent);
+  out += metadataVector.render(false);
+  out += endTag();
 
   return out;
 }
@@ -95,14 +94,11 @@ std::string UpdateContextAttributeRequest::render(ApiVersion apiVersion, std::st
 std::string UpdateContextAttributeRequest::check
 (
   ApiVersion          apiVersion,
-  std::string         indent,
   const std::string&  predetectedError
 )
 {
   StatusCode       response;
   std::string      res;
-
-  indent = "  ";
 
   if (predetectedError != "")
   {
@@ -117,9 +113,9 @@ std::string UpdateContextAttributeRequest::check
     return "OK";
   }
 
-  std::string out = response.render(indent);
+  std::string out = response.render(false);
 
-  out = "{\n" + out + "}\n";
+  out = "{" + out + "}";
 
   return out;
 }
@@ -130,7 +126,7 @@ std::string UpdateContextAttributeRequest::check
 *
 * present - 
 */
-void UpdateContextAttributeRequest::present(std::string indent)
+void UpdateContextAttributeRequest::present(const std::string&  indent)
 {
   LM_T(LmtPresent, ("%stype:         %s", 
 		    indent.c_str(), 

@@ -42,7 +42,7 @@ typedef struct NotifyConditionVector
 
   NotifyConditionVector();
 
-  std::string       render(const std::string& indent, bool comma);
+  std::string       render(bool comma);
   void              present(const std::string& indent);
   void              push_back(NotifyCondition* item);
   unsigned int      size(void) const;
@@ -50,7 +50,6 @@ typedef struct NotifyConditionVector
   void              fill(const NotifyConditionVector& nv);
 
   std::string       check(RequestType         requestType,
-                          const std::string&  indent,
                           const std::string&  predetectedError,
                           int                 counter);
 

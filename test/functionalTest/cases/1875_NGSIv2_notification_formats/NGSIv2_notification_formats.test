@@ -268,7 +268,7 @@ Date: REGEX(.*)
 02. Create NGSIv1 subscription for E1/A1 (A1, A2)
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 135
+Content-Length: 104
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -326,7 +326,7 @@ Date: REGEX(.*)
 ===========================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 570
+Content-Length: 299
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json

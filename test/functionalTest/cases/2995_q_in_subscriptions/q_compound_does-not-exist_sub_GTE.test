@@ -1,0 +1,237 @@
+# Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Q filter in subscription for GTE of non existing attribute compound item
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create subscription for entity E, attribute A with a filter q="t.'a.b'.'c.d'>=20"
+# 02. Create entity E1 with t.a.b.c.d == 20
+# 03. Make sure no notification has been sent
+# 04. Create entity E2 with t.'a.b'.'c.d' == 19
+# 05. Make sure no notification has been sent
+# 06. Create entity E3 with t.'a.b'.'c.d' == 20
+# 07. Make sure ONE notification has been sent
+#
+
+echo "01. Create subscription for entity E, attribute t with a filter q=t.'a.b'.'c.d'>=20"
+echo "==================================================================================="
+filter="t.'a.b'.'c.d'>=20"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern": "E.*"
+      }
+    ],
+    "condition": {
+      "attrs": [ "t" ],
+      "expression": { "q": "'$filter'" }
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E1 with t.a.b.c.d == 20"
+echo "========================================="
+payload='{
+  "id": "E1",
+  "t": {
+    "metadata": {},
+    "type": "StructuredData",
+    "value": {
+      "a": {
+        "b": {
+          "c": {
+            "d": 20
+          }
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Make sure no notification has been sent"
+echo "==========================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04. Create entity E2 with t.'a.b'.'c.d' == 19"
+echo "============================================="
+payload='{
+  "id": "E2",
+  "t": {
+    "metadata": {},
+    "type": "StructuredData",
+    "value": {
+      "a.b": {
+        "c.d": 19
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Make sure no notification has been sent"
+echo "==========================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "06. Create entity E3 with t.'a.b'.'c.d' == 20"
+echo "============================================="
+payload='{
+  "id": "E3",
+  "t": {
+    "metadata": {},
+    "type": "StructuredData",
+    "value": {
+      "a.b": {
+        "c.d": 20
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "07. Make sure ONE notification has been sent"
+echo "============================================"
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription for entity E, attribute t with a filter q=t.'a.b'.'c.d'>=20
+===================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity E1 with t.a.b.c.d == 20
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Make sure no notification has been sent
+===========================================
+
+
+04. Create entity E2 with t.'a.b'.'c.d' == 19
+=============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Make sure no notification has been sent
+===========================================
+
+
+06. Create entity E3 with t.'a.b'.'c.d' == 20
+=============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Make sure ONE notification has been sent
+============================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 152
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "id": "E3", 
+            "t": {
+                "metadata": {}, 
+                "type": "StructuredData", 
+                "value": {
+                    "a.b": {
+                        "c.d": 20
+                    }
+                }
+            }, 
+            "type": "Thing"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -274,37 +274,6 @@ static bool equalMetadata(const BSONObj& md1, const BSONObj& md2)
 
 /* ****************************************************************************
 *
-* attributeValueAbsent -
-*
-* Check that the attribute doesn't have any value
-*
-*/
-static bool attributeValueAbsent(ContextAttribute* caP, ApiVersion apiVersion)
-{
-  /* In v2, absent attribute means "null", which has different semantics */
-  return ((caP->valueType == orion::ValueTypeNone) && (apiVersion == V1));
-}
-
-
-
-/* ****************************************************************************
-*
-* attributeTypeAbsent -
-*
-* Check that the attribute doesn't have any type
-*
-*/
-static bool attributeTypeAbsent(ContextAttribute* caP)
-{
-  // FIXME P10: this is a temporal solution while the ContextAttribute class gets
-  // modified to include a "NoneType" or similar. Type "" should be allowed in NGSIv2
-  return caP->type == "";
-}
-
-
-
-/* ****************************************************************************
-*
 * changedAttr -
 */
 static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVersion apiVersion)
@@ -316,7 +285,7 @@ static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVers
   }
 
   /* No value in the request means that the value stays as it was before, so it is not a change */
-  if (caP->valueType == orion::ValueTypeNone && apiVersion != V2)
+  if (caP->valueType == orion::ValueTypeNotGiven)
   {
     return false;
   }
@@ -339,7 +308,7 @@ static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVers
     return caP->valueType != orion::ValueTypeString || caP->stringValue != getStringFieldF(attr, ENT_ATTRS_VALUE);
 
   case mongo::jstNULL:
-    return caP->valueType != orion::ValueTypeNone;
+    return caP->valueType != orion::ValueTypeNull;
 
   default:
     LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(attr, ENT_ATTRS_VALUE).type()));
@@ -394,7 +363,7 @@ static void appendMetadata
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->boolValue));
       return;
 
-    case orion::ValueTypeNone:
+    case orion::ValueTypeNull:
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mongo::BSONNULL));
       return;
 
@@ -434,7 +403,7 @@ static void appendMetadata
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mdP->boolValue));
       return;
 
-    case orion::ValueTypeNone:
+    case orion::ValueTypeNull:
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mongo::BSONNULL));
       return;
 
@@ -478,9 +447,9 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
   /* 1. Add value, if present in the request (it could be omitted in the case of updating only metadata).
    *    When the value of the attribute is empty (no update needed/wanted), then the value of the attribute is
    *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
-  if (!attributeValueAbsent(caP, apiVersion))
+  if (caP->valueType != orion::ValueTypeNotGiven)
   {
-    caP->valueBson(ab);
+    caP->valueBson(ab, getStringFieldF(attr, ENT_ATTRS_TYPE), ngsiv1Autocast && (apiVersion == V1));
   }
   else
   {
@@ -739,10 +708,9 @@ static bool updateAttribute
 
     actualUpdate = true;
 
+    std::string attrType;
     if (!caP->typeGiven && (apiVersion == V2))
     {
-      std::string attrType;
-
       if ((caP->compoundValueP == NULL) || (caP->compoundValueP->valueType != orion::ValueTypeVector))
       {
         attrType = defaultType(caP->valueType);
@@ -751,18 +719,17 @@ static bool updateAttribute
       {
         attrType = defaultType(orion::ValueTypeVector);
       }
-
-      newAttr.append(ENT_ATTRS_TYPE, attrType);
     }
     else
     {
-      newAttr.append(ENT_ATTRS_TYPE, caP->type);
+      attrType = caP->type;
     }
 
+    newAttr.append(ENT_ATTRS_TYPE, attrType);
     newAttr.append(ENT_ATTRS_CREATION_DATE, now);
     newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
-    caP->valueBson(newAttr);
+    caP->valueBson(newAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
     /* Custom metadata */
     BSONObj    md;
@@ -843,7 +810,7 @@ static bool appendAttribute
   BSONObjBuilder ab;
 
   /* 1. Value */
-  caP->valueBson(ab);
+  caP->valueBson(ab, caP->type, ngsiv1Autocast && (apiVersion == V1));
 
   /* 2. Type */
   if ((apiVersion == V2) && !caP->typeGiven)
@@ -1152,7 +1119,7 @@ static bool addTriggeredSubscriptions_withCache
     //           Perhaps CachedSubscription should include an AttributeList (cSubP->attributes)
     //           instead of its std::vector<std::string> ... ?
     //
-    AttributeList aList;
+    StringList aList;
 
     aList.fill(cSubP->attributes);
 
@@ -1712,7 +1679,7 @@ static bool addTriggeredSubscriptions
 static bool processOnChangeConditionForUpdateContext
 (
   ContextElementResponse*          notifyCerP,
-  const AttributeList&             attrL,
+  const StringList&                attrL,
   const std::vector<std::string>&  metadataV,
   std::string                      subId,
   RenderFormat                     renderFormat,
@@ -1770,6 +1737,7 @@ static bool processOnChangeConditionForUpdateContext
   // FIXME: we use a proper origin name
   ncr.originator.set("localhost");
 
+  ncr.subscriptionId.set(subId);
   getNotifier()->sendNotifyContextRequest(&ncr,
                                           httpInfo,
                                           tenant,
@@ -1842,9 +1810,13 @@ static void setPreviousValueMetadata(ContextElementResponse* notifyCerP)
         mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->numberValue);
         break;
 
-      case orion::ValueTypeNone:
+      case orion::ValueTypeNull:
         mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, "");
-        mdP->valueType = orion::ValueTypeNone;
+        mdP->valueType = orion::ValueTypeNull;
+        break;
+
+      case orion::ValueTypeNotGiven:
+        LM_E(("Runtime Error (value not given for metadata)"));
         break;
 
       default:
@@ -1968,7 +1940,7 @@ static bool processSubscriptions
      * before adding the subscription to the map.
      */
 
-    /* Check 1: timming (not expired and ok from throttling point of view) */
+    /* Check 1: timing (not expired and ok from throttling point of view) */
     if (tSubP->throttling != 1 && tSubP->lastNotification != 1)
     {
       long long  current               = getCurrentTime();
@@ -2082,7 +2054,7 @@ static bool processSubscriptions
     /* Send notification */
     LM_T(LmtSubCache, ("NOT ignored: %s", tSubP->cacheSubId.c_str()));
 
-    bool  notificationSent = false;
+    bool  notificationSent;
 
     notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
                                                                 tSubP->attrL,
@@ -2092,7 +2064,7 @@ static bool processSubscriptions
                                                                 tenant,
                                                                 xauthToken,
                                                                 fiwareCorrelator,
-                                                                tSubP->attrL.attributeV,
+                                                                tSubP->attrL.stringV,
                                                                 tSubP->httpInfo,
                                                                 tSubP->blacklist);
 
@@ -2270,12 +2242,7 @@ static void updateAttrInNotifyCer
 
     if (caP->name == targetAttr->name)
     {
-      //
-      // FIXME P6: https://github.com/telefonicaid/fiware-orion/issues/2587
-      // If an attribute has no value, then its value is not updated (neither is previousValue).
-      // However this may be problematic ... see the issue
-      //
-      if (targetAttr->valueType != orion::ValueTypeNone)
+      if (targetAttr->valueType != orion::ValueTypeNotGiven)
       {
         /* Store previous value (it may be necessary to render previousValue metadata) */
         if (caP->previousValue == NULL)
@@ -2675,6 +2642,7 @@ static bool processContextAttributeVector
   std::string                                     tenant,
   const std::vector<std::string>&                 servicePathV,
   ApiVersion                                      apiVersion,
+  bool                                            loopDetected,
   OrionError*                                     oe
 )
 {
@@ -2805,10 +2773,14 @@ static bool processContextAttributeVector
     }
   }
 
-  /* Add triggered ONCHANGE subscriptions */
+  /* Add triggered subscriptions */
   std::string err;
 
-  if (!addTriggeredSubscriptions(entityId, entityType, modifiedAttrs, subsToNotify, err, tenant, servicePathV))
+  if (loopDetected)
+  {
+    LM_W(("Notification loop detected for entity id <%s> type <%s>, skipping subscription triggering", entityId.c_str(), entityType.c_str()));
+  }
+  else if (!addTriggeredSubscriptions(entityId, entityType, modifiedAttrs, subsToNotify, err, tenant, servicePathV))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
     oe->fill(SccReceiverInternalError, err, "InternalServerError");
@@ -2853,6 +2825,7 @@ static bool createEntity
   std::string                      tenant,
   const std::vector<std::string>&  servicePathV,
   ApiVersion                       apiVersion,
+  const std::string&               fiwareCorrelator,
   OrionError*                      oe
 )
 {
@@ -2891,10 +2864,10 @@ static bool createEntity
     std::string     attrId = attrsV[ix]->getId();
     BSONObjBuilder  bsonAttr;
 
+    std::string attrType;
+
     if (!attrsV[ix]->typeGiven && (apiVersion == V2))
     {
-      std::string attrType;
-
       if ((attrsV[ix]->compoundValueP == NULL) || (attrsV[ix]->compoundValueP->valueType != orion::ValueTypeVector))
       {
         attrType = defaultType(attrsV[ix]->valueType);
@@ -2903,18 +2876,17 @@ static bool createEntity
       {
         attrType = defaultType(orion::ValueTypeVector);
       }
-
-      bsonAttr.append(ENT_ATTRS_TYPE, attrType);
     }
     else
     {
-      bsonAttr.append(ENT_ATTRS_TYPE, attrsV[ix]->type);
+      attrType = attrsV[ix]->type;
     }
 
+    bsonAttr.append(ENT_ATTRS_TYPE, attrType);
     bsonAttr.append(ENT_ATTRS_CREATION_DATE, now);
     bsonAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
-    attrsV[ix]->valueBson(bsonAttr);
+    attrsV[ix]->valueBson(bsonAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
     std::string effectiveName = dbDotEncode(attrsV[ix]->name);
     if (attrId.length() != 0)
@@ -2957,7 +2929,7 @@ static bool createEntity
     bsonId.append(ENT_ENTITY_TYPE, eP->type);
   }
 
-  bsonId.append(ENT_SERVICE_PATH, servicePathV[0] == ""? DEFAULT_SERVICE_PATH_UPDATES : servicePathV[0]);
+  bsonId.append(ENT_SERVICE_PATH, servicePathV[0] == ""? SERVICE_PATH_ROOT : servicePathV[0]);
 
   BSONObjBuilder insertedDoc;
 
@@ -2973,6 +2945,9 @@ static bool createEntity
     insertedDoc.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
                                           ENT_LOCATION_COORDS   << geoJson.obj()));
   }
+
+  // Correlator (for notification loop detection logic)
+  insertedDoc.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
 
   if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
   {
@@ -3052,7 +3027,7 @@ static void searchContextProviders
 {
   ContextRegistrationResponseVector  crrV;
   EntityIdVector                     enV;
-  AttributeList                      attrL;
+  StringList                         attrL;
   std::string                        err;
 
   /* Fill input data for registrationsQuery() */
@@ -3084,7 +3059,7 @@ static void searchContextProviders
   }
 
   /* Second CPr lookup (in the case some element stills not being found): looking in E-<null> registrations */
-  AttributeList attrNullList;
+  StringList attrNullList;
   if (someContextElementNotFound(*cerP))
   {
     if (registrationsQuery(enV, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
@@ -3150,7 +3125,8 @@ static void updateEntity
   bool*                           attributeAlreadyExistsError,
   std::string*                    attributeAlreadyExistsList,
   ApiVersion                      apiVersion,
-  const std::string&              fiwareCorrelator
+  const std::string&              fiwareCorrelator,
+  const std::string&              ngsiV2AttrsFormat
 )
 {
   // Used to accumulate error response information
@@ -3244,13 +3220,21 @@ static void updateEntity
   }
 
   /* Build CER used for notifying (if needed) */
-  AttributeList            emptyAttrL;
+  StringList               emptyAttrL;
   ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL);
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
   notifyCerP->contextElement.entityId.creDate = r.hasField(ENT_CREATION_DATE)     ? getIntOrLongFieldAsLongF(r, ENT_CREATION_DATE)     : -1;
   notifyCerP->contextElement.entityId.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getIntOrLongFieldAsLongF(r, ENT_MODIFICATION_DATE) : -1;
+
+  // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
+  // in addition, the request was sent due to a custom notification
+  bool loopDetected = false;
+  if ((ngsiV2AttrsFormat == "custom") && (r.hasField(ENT_LAST_CORRELATOR)))
+  {
+    loopDetected = (getStringFieldF(r, ENT_LAST_CORRELATOR) == fiwareCorrelator);
+  }
 
   if (!processContextAttributeVector(ceP,
                                      action,
@@ -3267,6 +3251,7 @@ static void updateEntity
                                      tenant,
                                      servicePathV,
                                      apiVersion,
+                                     loopDetected,
                                      &(responseP->oe)))
   {
     // The entity wasn't actually modified, so we don't need to update it and we can continue with the next one
@@ -3325,6 +3310,13 @@ static void updateEntity
     toUnset.append(ENT_LOCATION, 1);
   }
 
+  // Correlator (for notification loop detection logic). We don't touch toSet in the replace case, due to
+  // the way in which BSON is composed in that case (see below)
+  if (strcasecmp(action.c_str(), "replace") != 0)
+  {
+    toSet.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
+  }
+
   /* FIXME: I don't like the obj() step, but it seems to be the only possible way, let's wait for the answer to
    * http://stackoverflow.com/questions/29668439/get-number-of-fields-in-bsonobjbuilder-object */
   BSONObjBuilder  updatedEntity;
@@ -3337,7 +3329,10 @@ static void updateEntity
   {
     // toSet: { A1: { ... }, A2: { ... } }
     int now = getCurrentTime();
-    updatedEntity.append("$set", BSON(ENT_ATTRS << toSetObj << ENT_ATTRNAMES << toPushArr << ENT_MODIFICATION_DATE << now));
+    updatedEntity.append("$set", BSON(ENT_ATTRS             << toSetObj <<
+                                      ENT_ATTRNAMES         << toPushArr <<
+                                      ENT_MODIFICATION_DATE << now <<
+                                      ENT_LAST_CORRELATOR   << fiwareCorrelator));
 
     notifyCerP->contextElement.entityId.modDate = now;
   }
@@ -3488,7 +3483,7 @@ static bool contextElementPreconditionsCheck
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
       ContextAttribute* aP = ceP->contextAttributeVector[ix];
-      if (attributeValueAbsent(aP, apiVersion) && attributeTypeAbsent(aP) && (aP->metadataVector.size() == 0))
+      if (aP->valueType == orion::ValueTypeNotGiven && aP->type == "" && (aP->metadataVector.size() == 0))
       {
         ContextAttribute* ca = new ContextAttribute(aP);
 
@@ -3543,6 +3538,7 @@ void processContextElement
   std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                   xauthToken,
   const std::string&                   fiwareCorrelator,
+  const std::string&                   ngsiV2AttrsFormat,
   ApiVersion                           apiVersion,
   Ngsiv2Flavour                        ngsiv2Flavour
 )
@@ -3710,7 +3706,8 @@ void processContextElement
                  &attributeAlreadyExistsError,
                  &attributeAlreadyExistsList,
                  apiVersion,
-                 fiwareCorrelator);
+                 fiwareCorrelator,
+                 ngsiV2AttrsFormat);
   }
 
   /*
@@ -3780,7 +3777,7 @@ void processContextElement
       std::string  errDetail;
       int          now = getCurrentTime();
 
-      if (!createEntity(enP, ceP->contextAttributeVector, now, &errDetail, tenant, servicePathV, apiVersion, &(responseP->oe)))
+      if (!createEntity(enP, ceP->contextAttributeVector, now, &errDetail, tenant, servicePathV, apiVersion, fiwareCorrelator, &(responseP->oe)))
       {
         cerP->statusCode.fill(SccInvalidParameter, errDetail);
         // In this case, responseP->oe is not filled, as createEntity() deals internally with that

@@ -31,8 +31,6 @@
 
 #include "ngsi/ContextAttribute.h"
 
-using namespace rapidjson;
-
 
 
 /* ****************************************************************************
@@ -41,9 +39,9 @@ using namespace rapidjson;
 */
 extern std::string parseContextAttributeCompoundValue
 (
-  const Value::ConstMemberIterator&  node,
-  ContextAttribute*                  caP,
-  orion::CompoundValueNode*          parent
+  const rapidjson::Value::ConstMemberIterator&  node,
+  ContextAttribute*                             caP,
+  orion::CompoundValueNode*                     parent
 );
 
 
@@ -54,9 +52,9 @@ extern std::string parseContextAttributeCompoundValue
 */
 extern std::string parseContextAttributeCompoundValueStandAlone
 (
-  Document&            document,
-  ContextAttribute*    caP,
-  orion::ValueType     valueType
+  rapidjson::Document&  document,
+  ContextAttribute*     caP,
+  orion::ValueType      valueType
 );
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSECONTEXTATTRIBUTECOMPOUNDVALUE_H_

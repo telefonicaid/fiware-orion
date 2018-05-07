@@ -393,7 +393,7 @@ echo
 01. Update/APPEND E1/A1 in CB
 =============================
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -425,7 +425,7 @@ Date: REGEX(.*)
 02. Update/APPEND E1/A2+A4 in CP1
 =================================
 HTTP/1.1 200 OK
-Content-Length: 491
+Content-Length: 230
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -462,7 +462,7 @@ Date: REGEX(.*)
 03. Update/APPEND E1/A3+A5 in CP2
 =================================
 HTTP/1.1 200 OK
-Content-Length: 491
+Content-Length: 230
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -499,7 +499,7 @@ Date: REGEX(.*)
 04. Update/APPEND E1/A6 in CP3
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -531,7 +531,7 @@ Date: REGEX(.*)
 05. Register E1/A2+A4 for CP1
 =============================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -545,7 +545,7 @@ Date: REGEX(.*)
 06. Register E1/A3+A5 for CP2
 =============================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -559,7 +559,7 @@ Date: REGEX(.*)
 07. Register E1 for CP3
 =======================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -573,7 +573,7 @@ Date: REGEX(.*)
 08. Query CB for E1/A1+A2+A3+A4+A5+A6+A7
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 976
+Content-Length: 447
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -630,7 +630,7 @@ Date: REGEX(.*)
 09. Update/UPDATE E1/A1+A2+A3+A4+A5+A6+A7 in CB
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 1322
+Content-Length: 598
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -706,7 +706,7 @@ Date: REGEX(.*)
 10. Query CB for E1/A1+A2+A3+A4+A5+A6+A7
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 1001
+Content-Length: 472
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -763,7 +763,7 @@ Date: REGEX(.*)
 11. Query CP1 for E1/{}
 =======================
 HTTP/1.1 200 OK
-Content-Length: 517
+Content-Length: 256
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -800,7 +800,7 @@ Date: REGEX(.*)
 12. Query CP2 for E1/{}
 =======================
 HTTP/1.1 200 OK
-Content-Length: 517
+Content-Length: 256
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -837,7 +837,7 @@ Date: REGEX(.*)
 13. Query CP3 for E1/{}
 =======================
 HTTP/1.1 200 OK
-Content-Length: 396
+Content-Length: 202
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

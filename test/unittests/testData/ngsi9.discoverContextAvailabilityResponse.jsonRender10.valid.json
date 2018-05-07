@@ -1,9 +1,1 @@
-{
-  "contextRegistrationResponses" : [
-    {
-      "contextRegistration" : {
-        "providingApplication" : "http://tid.test.com/unitTest10"
-      }
-    }
-  ]
-}
+{"contextRegistrationResponses":[{"contextRegistration":{"providingApplication":"http://tid.test.com/unitTest10"}}]}

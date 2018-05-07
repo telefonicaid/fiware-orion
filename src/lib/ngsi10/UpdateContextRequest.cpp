@@ -42,17 +42,17 @@
 
 /* ****************************************************************************
 *
-* UpdateContextRequest::UpdateContextRequest - 
+* UpdateContextRequest::UpdateContextRequest -
 */
 UpdateContextRequest::UpdateContextRequest()
-{ 
+{
 }
 
 
 
 /* ****************************************************************************
 *
-* UpdateContextRequest::UpdateContextRequest - 
+* UpdateContextRequest::UpdateContextRequest -
 */
 UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, EntityId* eP)
 {
@@ -64,19 +64,19 @@ UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, 
 
 /* ****************************************************************************
 *
-* UpdateContextRequest::render - 
+* UpdateContextRequest::render -
 */
-std::string UpdateContextRequest::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
+std::string UpdateContextRequest::render(ApiVersion apiVersion, bool asJsonObject)
 {
   std::string  out = "";
 
   // JSON commas:
   // Both fields are MANDATORY, so, comma after "contextElementVector"
   //  
-  out += startTag(indent);
-  out += contextElementVector.render(apiVersion, asJsonObject, UpdateContext, indent + "  ", true);
-  out += updateActionType.render(indent + "  ", false);
-  out += endTag(indent, false);
+  out += startTag();
+  out += contextElementVector.render(apiVersion, asJsonObject, UpdateContext, true);
+  out += updateActionType.render(false);
+  out += endTag(false);
 
   return out;
 }
@@ -85,9 +85,9 @@ std::string UpdateContextRequest::render(ApiVersion apiVersion, bool asJsonObjec
 
 /* ****************************************************************************
 *
-* UpdateContextRequest::check - 
+* UpdateContextRequest::check -
 */
-std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject,  const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError)
 {
   std::string            res;
   UpdateContextResponse  response;
@@ -95,14 +95,14 @@ std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject
   if (predetectedError != "")
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
-    return response.render(apiVersion, asJsonObject, indent);
+    return response.render(apiVersion, asJsonObject);
   }
 
-  if (((res = contextElementVector.check(apiVersion, UpdateContext, indent, predetectedError, counter)) != "OK") ||
+  if (((res = contextElementVector.check(apiVersion, UpdateContext)) != "OK") ||
       ((res = updateActionType.check()) != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
-    return response.render(apiVersion, asJsonObject, indent);
+    return response.render(apiVersion, asJsonObject);
   }
 
   return "OK";
@@ -112,7 +112,7 @@ std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject
 
 /* ****************************************************************************
 *
-* UpdateContextRequest::release - 
+* UpdateContextRequest::release -
 */
 void UpdateContextRequest::release(void)
 {
@@ -123,7 +123,7 @@ void UpdateContextRequest::release(void)
 
 /* ****************************************************************************
 *
-* UpdateContextRequest::present - 
+* UpdateContextRequest::present -
 */
 void UpdateContextRequest::present(const std::string& indent)
 {
@@ -138,7 +138,7 @@ void UpdateContextRequest::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* UpdateContextRequest::fill - 
+* UpdateContextRequest::fill -
 */
 void UpdateContextRequest::fill
 (
@@ -164,7 +164,7 @@ void UpdateContextRequest::fill
 
 /* ****************************************************************************
 *
-* UpdateContextRequest::fill - 
+* UpdateContextRequest::fill -
 */
 void UpdateContextRequest::fill
 (
@@ -189,7 +189,7 @@ void UpdateContextRequest::fill
 
 /* ****************************************************************************
 *
-* UpdateContextRequest::fill - 
+* UpdateContextRequest::fill -
 */
 void UpdateContextRequest::fill
 (
@@ -226,7 +226,7 @@ void UpdateContextRequest::fill
 
 /* ****************************************************************************
 *
-* UpdateContextRequest::fill - 
+* UpdateContextRequest::fill -
 */
 void UpdateContextRequest::fill
 (
@@ -283,7 +283,7 @@ void UpdateContextRequest::fill
 
 /* ****************************************************************************
 *
-* UpdateContextRequest::fill - 
+* UpdateContextRequest::fill -
 */
 void UpdateContextRequest::fill(const Entity* entP, const std::string& _updateActionType)
 {
@@ -299,7 +299,7 @@ void UpdateContextRequest::fill(const Entity* entP, const std::string& _updateAc
 
 /* ****************************************************************************
 *
-* UpdateContextRequest::fill - 
+* UpdateContextRequest::fill -
 */
 void UpdateContextRequest::fill
 (
@@ -321,7 +321,7 @@ void UpdateContextRequest::fill
 
 /* ****************************************************************************
 *
-* UpdateContextRequest::fill - 
+* UpdateContextRequest::fill -
 *
 * Instead of copying the attributes, the created ContextElements will just point to
 * the already existing ContextAttributes and the original vector is then cleared to
@@ -355,14 +355,14 @@ void UpdateContextRequest::fill
 
 /* ****************************************************************************
 *
-* UpdateContextRequest::attributeLookup - 
+* UpdateContextRequest::attributeLookup -
 */
 ContextAttribute* UpdateContextRequest::attributeLookup(EntityId* eP, const std::string& attributeName)
 {
   for (unsigned int ceIx = 0; ceIx < contextElementVector.size(); ++ceIx)
   {
     EntityId* enP = &contextElementVector[ceIx]->entityId;
- 
+
     if ((enP->id != eP->id) || (enP->type != eP->type))
     {
       continue;

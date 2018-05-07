@@ -72,7 +72,6 @@ extern std::string jsonInvalidCharsTransformation(const std::string& input);
 */
 extern std::string startTag
 (
-  const std::string&  indent,
   const std::string&  key      = "",
   bool                isVector = false
 );
@@ -85,7 +84,6 @@ extern std::string startTag
 */
 extern std::string endTag
 (
-  const std::string&  indent,
   bool                comma      = false,
   bool                isVector   = false
 );
@@ -99,7 +97,6 @@ extern std::string endTag
 */
 extern std::string valueTag
 (
-  const std::string&  indent,
   const std::string&  key,
   const std::string&  value,
   bool                showComma           = false,
@@ -109,7 +106,6 @@ extern std::string valueTag
 
 extern std::string valueTag
 (
-  const std::string&  indent,
   const std::string&  key,
   int                 value,
   bool                showComma     = false
@@ -123,7 +119,6 @@ extern std::string valueTag
 */
 extern std::string startArray
 (
-  const std::string&  indent,
   const std::string&  key,
   bool                showKey = true
 );
@@ -134,6 +129,6 @@ extern std::string startArray
 *
 * endArray -
 */
-extern std::string endArray(const std::string& indent, const std::string& key);
+extern std::string endArray(const std::string& key);
 
 #endif  // SRC_LIB_COMMON_TAG_H_

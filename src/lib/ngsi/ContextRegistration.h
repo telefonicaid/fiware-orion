@@ -49,13 +49,12 @@ typedef struct ContextRegistration
   bool                                entityIdVectorPresent;                 // entityIdList present during parsing
 
   ContextRegistration();
-  std::string  render(const std::string& indent, bool comma, bool isInVector);
+  std::string  render(bool comma, bool isInVector);
   void         present(const std::string& indent, int ix);
   void         release();
 
   std::string  check(ApiVersion          apiVersion,
                      RequestType         requestType,
-                     const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);
 } ContextRegistration;

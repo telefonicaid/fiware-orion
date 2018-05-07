@@ -54,25 +54,24 @@ EntityTypeVector::EntityTypeVector()
 */
 std::string EntityTypeVector::render
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  bool                asJsonOut,
-  bool                collapsed,
-  const std::string&  indent,
-  bool                comma
+  ApiVersion  apiVersion,
+  bool        asJsonObject,
+  bool        asJsonOut,
+  bool        collapsed,
+  bool        comma
 )
 {
   std::string out  = "";
 
   if (vec.size() > 0)
   {
-    out += startTag(indent, "types", true);
+    out += startTag("types", true);
 
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
-      out += vec[ix]->render(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", ix != vec.size() - 1);
+      out += vec[ix]->render(apiVersion, asJsonObject, asJsonOut, collapsed, ix != vec.size() - 1);
     }
-    out += endTag(indent, comma, true);
+    out += endTag(comma, true);
   }
 
   return out;

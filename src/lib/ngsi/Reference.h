@@ -42,14 +42,11 @@ typedef struct Reference
   void          set(const std::string& value);
   std::string   get(void);
   bool          isEmpty(void);
-  std::string   render(const std::string& indent, bool comma);
+  std::string   render(bool comma);
   void          present(const std::string& indent);
   const char*   c_str();
 
-  std::string   check(RequestType         requestType,
-                      const std::string&  indent,
-                      const std::string&  predetectedError,
-                      int                 counter);
+  std::string   check(RequestType requestType);
 } Reference;
 
 #endif  // SRC_LIB_NGSI_REFERENCE_H_

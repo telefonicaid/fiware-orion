@@ -1,7 +1,1 @@
-"subscribeError" : {
-  "errorCode" : {
-    "code" : "400",
-    "reasonPhrase" : "Bad Request",
-    "details" : "detail"
-  }
-}
+"subscribeError":{"errorCode":{"code":"400","reasonPhrase":"Bad Request","details":"detail"}}

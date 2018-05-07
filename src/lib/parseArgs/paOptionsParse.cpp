@@ -341,7 +341,6 @@ int paOptionsParse(PaiArgument* paList, char* argV[], int argC)
   PA_M(("incoming arg list of %d args", argC));
   while (++argNo < argC)
   {
-    char  e[80];
     char  o[80];
     int   eee;
     int*  eP;
@@ -433,6 +432,8 @@ int paOptionsParse(PaiArgument* paList, char* argV[], int argC)
       if (strlen(argV[argNo]) != strlen(aP->option))
       {
         char tmp[128];
+        char e[80];
+
         snprintf(w, sizeof(w), "boolean option '%s' doesn't take parameters", paFullName(aP, e, sizeof(e)));
         snprintf(tmp, sizeof(tmp), "%c%s", argV[argNo][0], &argV[argNo][2]);
         LM_W(("Changing arg %d from '%s' to '%s'", argNo, argV[argNo], tmp));

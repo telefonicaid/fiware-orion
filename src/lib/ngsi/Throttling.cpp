@@ -49,13 +49,7 @@ int64_t Throttling::parse(void)
 *
 * Throttling::check -
 */
-std::string Throttling::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string Throttling::check(void)
 {
   // FIXME - make Throttling and Duration inherit from same class
   //         that implements the 'parse' method
@@ -132,12 +126,12 @@ void Throttling::present(const std::string& indent)
 *
 * Throttling::render -
 */
-std::string Throttling::render(const std::string& indent, bool comma)
+std::string Throttling::render(bool comma)
 {
   if (string == "")
   {
     return "";
   }
 
-  return valueTag(indent, "throttling", string, comma);
+  return valueTag("throttling", string, comma);
 }

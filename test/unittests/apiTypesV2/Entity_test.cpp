@@ -24,7 +24,7 @@
 */
 #include "apiTypesV2/Entity.h"
 #include "common/errorMessages.h"
-#include "unittest.h"
+#include "unittests/unittest.h"
 
 
 
@@ -50,13 +50,13 @@ TEST(Entity, present)
 }
 
 
+
 /* ****************************************************************************
 *
 * check
 */
 TEST(Entity, check)
 {
-
   utInit();
 
   Entity* enP         = new Entity();

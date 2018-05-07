@@ -45,7 +45,7 @@ void* startSenderThread(void* p)
     SenderThreadParams* params = (SenderThreadParams*) (*paramsV)[ix];
     char                portV[STRING_SIZE_FOR_INT];
     std::string         url;
-    
+
     snprintf(portV, sizeof(portV), "%d", params->port);
     url = params->ip + ":" + portV + params->resource;
 

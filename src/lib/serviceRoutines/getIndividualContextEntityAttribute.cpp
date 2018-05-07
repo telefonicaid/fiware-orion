@@ -103,7 +103,7 @@ std::string getIndividualContextEntityAttribute
 
 
   // 3. Fill in ContextAttributeResponse from QueryContextResponse
-  if (parseDataP->qcrs.res.contextElementResponseVector.size() != 0)  
+  if (parseDataP->qcrs.res.contextElementResponseVector.size() != 0)
   {
     response.contextAttributeVector.fill(&parseDataP->qcrs.res.contextElementResponseVector[0]->contextElement.contextAttributeVector);
     response.statusCode.fill(parseDataP->qcrs.res.contextElementResponseVector[0]->statusCode);
@@ -122,7 +122,7 @@ std::string getIndividualContextEntityAttribute
 
 
   // 5. Render the ContextAttributeResponse
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntityAttribute, ""));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntityAttribute));
 
 
   // 6. Cleanup and return result

@@ -1,4 +1,4 @@
-FROM centos:centos6.6
+FROM centos:centos7.4.1708
 
 MAINTAINER FIWARE Orion Context Broker Team. Telefónica I+D
 
@@ -113,6 +113,6 @@ RUN \
     rm -f /var/log/*log
 
 WORKDIR /
-ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice"]
+ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice", "-ngsiv1Autocast" ]
 EXPOSE 1026
 

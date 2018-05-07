@@ -22,9 +22,10 @@
 *
 * Author: Fermin Galan
 */
-
 #include "apiTypesV2/Entities.h"
-#include "unittest.h"
+#include "unittests/unittest.h"
+
+
 
 /* ****************************************************************************
 *
@@ -50,6 +51,7 @@ TEST(Entities, present)
 
   utExit();
 }
+
 
 
 /* ****************************************************************************

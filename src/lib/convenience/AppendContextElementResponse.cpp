@@ -54,30 +54,30 @@ AppendContextElementResponse::AppendContextElementResponse() : errorCode("errorC
 */
 std::string AppendContextElementResponse::render
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         requestType,
-  const std::string&  indent)
+  ApiVersion   apiVersion,
+  bool         asJsonObject,
+  RequestType  requestType
+)
 {
   std::string out = "";
 
-  out += startTag(indent);
+  out += startTag();
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(indent + "  ");
+    out += errorCode.render(false);
   }
   else
   {
     if (entity.id != "")
     {
-      out += entity.render(indent + "  ", true);
+      out += entity.render(true);
     }
 
-    out += contextAttributeResponseVector.render(apiVersion, asJsonObject, requestType, indent + "  ");
+    out += contextAttributeResponseVector.render(apiVersion, asJsonObject, requestType);
   }
 
-  out += endTag(indent);
+  out += endTag();
 
   return out;
 }
@@ -93,7 +93,6 @@ std::string AppendContextElementResponse::check
   ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
-  std::string         indent,
   const std::string&  predetectedError
 )
 {
@@ -103,7 +102,7 @@ std::string AppendContextElementResponse::check
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeResponseVector.check(apiVersion, asJsonObject, requestType, indent, "")) != "OK")
+  else if ((res = contextAttributeResponseVector.check(apiVersion, asJsonObject, requestType, "")) != "OK")
   {
     errorCode.fill(SccBadRequest, res);
   }
@@ -112,7 +111,7 @@ std::string AppendContextElementResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, requestType, indent);
+  return render(apiVersion, asJsonObject, requestType);
 }
 
 

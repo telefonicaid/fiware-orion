@@ -54,8 +54,35 @@ add_definitions(-DLM_ON)
 add_definitions(-fPIC)
 
 # Baseline compiler flags, any change here will affect all build types
-#set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror")
-set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -fno-var-tracking-assignments")
+
+#
+# FIXME P4: https://github.com/telefonicaid/fiware-orion/issues/2979
+#   'template class std::auto_ptr' is deprecated in gcc 6.3.0 of Ubuntu 17.04, so -Werror cannot be used alone, at least not for now.
+#
+#   The *real* fix would be to rewrite the part of the code producing these warnings, but for now,
+#   disabling the -Werror flag makes the problem go away (warnings will still be found and give errors in other distros).
+#
+#   One example of this warning (there are many warnings, but as in header files, just a few places):
+#
+#   mongoBackend/safeMongo.h:
+#   ----------------------------------------------------------------
+#     extern bool nextSafeOrError
+#     (
+#       const std::auto_ptr<mongo::DBClientCursor>&  cursor,
+#       ...
+#   ----------------------------------------------------------------
+#
+# A grep of 'std::auto_ptr<' in the header files show 7 hits, and 13 hits in cpp files
+#
+# In PR https://github.com/telefonicaid/fiware-orion/pull/3069, a workaround for Ubuntu is implemented.
+# This workaround consists of putting back the -Werror flag and instead solving the problem by
+# adding another flag: -Wno-deprecated-declarations
+#
+IF (${DISTRO} MATCHES "Ubuntu_17.*")
+ set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
+ELSE()
+  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -fno-var-tracking-assignments")
+ENDIF ()
 
 #
 # Platform checks
@@ -76,14 +103,27 @@ if (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
     add_definitions(-DDEBUG -DDEBUG_$ENV{USER} -DDEBUG_${USER})
 
     #
-    # Note that stack protection is activated only in debug compilation.
-    # This is due that this directive makes the compiler introduce code at the beginning/end of each functions,
-    # so it has a pretty big impact on performance
+    # OLD:
+    #   Note that stack protection is activated only in debug compilation.
+    #   This is due that this directive makes the compiler introduce code at the beginning/end of each functions,
+    #   so it has a pretty big impact on performance
     #
-    # Our unit tests don't pass the compilation with "stack protection", so we turn it off using
-    # remove_definitions().
+    #   Our unit tests don't pass the compilation with "stack protection", so we turn it off using
+    #   remove_definitions().
     #
-    add_definitions(-fstack-check -fstack-protector)
+    #add_definitions(-fstack-check -fstack-protector)
+    add_definitions(-fstack-protector)
+    #
+    # NEW:
+    #   The option -fstack-check makes valgrind report false positives (millions) in CentOS 6.
+    #   This makes the output impossible to use and we have decided to remove these two options (both of them).
+    #   The cause seems to be a bug in the compiler (gcc 4.4.7), fixed in some moment between that version 
+    #   and gcc 4.7.2 (see https://stackoverflow.com/questions/44758939/unexpected-valgrind-invalid-write-when-fstack-check-is-used
+    #   for more detail). However, we don't want to use a compiler that is not meant for CentOS 6,
+    #   which is the official distro for the context broker, so, we simply remove this option.
+    #   They may be reinstated once Orion context broker updates the official distro to be CentOS 7 (which uses gcc 4.8.5)
+    #  
+
     if (COVERAGE)
         MESSAGE("cmake: Coverage compilation")
         # LM_T macros introduce condition branchs which are not never traversed. Removing LM_T macros doesn't have 

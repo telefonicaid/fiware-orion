@@ -1,5 +1,5 @@
-#ifndef CONTEXT_SUBSCRIPTION_INFO_H
-#define CONTEXT_SUBSCRIPTION_INFO_H
+#ifndef SRC_LIB_NGSINOTIFY_CONTEXTSUBSCRIPTIONINFO_H_
+#define SRC_LIB_NGSINOTIFY_CONTEXTSUBSCRIPTIONINFO_H_
 
 /*
 *
@@ -27,7 +27,7 @@
 */
 #include "common/MimeType.h"
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 
 
 
@@ -38,7 +38,7 @@
 typedef struct ContextSubscriptionInfo
 {
   EntityIdVector  entityIdVector;
-  AttributeList   attributeList;
+  StringList      attributeList;
   std::string     url;
   MimeType        mimeType;
   int             lastNotification;
@@ -48,4 +48,4 @@ typedef struct ContextSubscriptionInfo
   void            release(void);
 } ContextSubscriptionInfo;
 
-#endif
+#endif  // SRC_LIB_NGSINOTIFY_CONTEXTSUBSCRIPTIONINFO_H_

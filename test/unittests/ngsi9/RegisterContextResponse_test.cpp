@@ -35,7 +35,7 @@
 
 /* ****************************************************************************
 *
-* constructors - 
+* constructors -
 *
 */
 TEST(RegisterContextResponse, constructors)
@@ -61,7 +61,8 @@ TEST(RegisterContextResponse, constructors)
   EXPECT_EQ("012345678901234567890123", rcr4.registrationId.get());
   EXPECT_EQ(SccBadRequest, rcr4.errorCode.code);
     
-  out = rcr5.check("", "", 0);
+  out = rcr5.check("", 0);
+
   EXPECT_EQ(expected5, out);
 
   rcr2.present("");
@@ -71,7 +72,7 @@ TEST(RegisterContextResponse, constructors)
 
 /* ****************************************************************************
 *
-* jsonRender - 
+* jsonRender -
 */
 TEST(RegisterContextResponse, jsonRender)
 {
@@ -81,33 +82,33 @@ TEST(RegisterContextResponse, jsonRender)
   const char*             filename2 = "ngsi9.registerContextResponse.registrationIdAndDuration.valid.json";
   const char*             filename3 = "ngsi9.registerContextResponse.registrationIdAndErrorCode.valid.json";
   const char*             filename4 = "ngsi9.registerContextResponse.registrationIdAndDurationAndErrorCode.valid.json";
-   
+
   utInit();
 
   // 1. Only registrationId
   rcr.registrationId.set("012345678901234567890123");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  rendered = rcr.render("");
+  rendered = rcr.render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   // 2. registrationId and duration
   rcr.duration.set("PT1S");
-  
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  rendered = rcr.render("");
+  rendered = rcr.render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   // 3. registrationId and errorCode
   rcr.duration.set("");
   rcr.errorCode.fill(SccBadRequest, "no details");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
-  rendered = rcr.render("");
+  rendered = rcr.render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
-  
+
   // 4. registrationId and duration and errorCode
   rcr.duration.set("PT2S");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename4)) << "Error getting test data from '" << filename4 << "'";
-  rendered = rcr.render("");
+  rendered = rcr.render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   utExit();

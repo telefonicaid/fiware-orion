@@ -135,7 +135,7 @@ echo
 01. Create region entity
 ========================
 HTTP/1.1 200 OK
-Content-Length: 517
+Content-Length: 256
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -172,7 +172,7 @@ Date: REGEX(.*)
 02. Create subscription
 =======================
 HTTP/1.1 200 OK
-Content-Length: 108
+Content-Length: 84
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -188,7 +188,7 @@ Date: REGEX(.*)
 03. Update not covered attribute with APPEND
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 517
+Content-Length: 256
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

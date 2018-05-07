@@ -22,26 +22,45 @@
 *
 * Author: Fermin Galan
 */
+#include <string>
+#include <vector>
+
 #include "gtest/gtest.h"
-#include "testInit.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
 #include "common/globals.h"
-
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubscribeContextAvailability.h"
 #include "ngsi9/SubscribeContextAvailabilityRequest.h"
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
-
 #include "ngsi/EntityId.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/unittest.h"
+#include "unittests/testInit.h"
 
-#include "unittest.h"
 
-extern void setMongoConnectionForUnitTest(DBClientBase*);
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::BSONElement;
+using mongo::OID;
+using mongo::DBException;
+using mongo::BSONObjBuilder;
+using ::testing::Return;
+using ::testing::Throw;
+using ::testing::_;
+
+
+extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+
+
 
 /* ****************************************************************************
 *
@@ -98,8 +117,8 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 *
 * prepareDatabase -
 */
-static void prepareDatabase(void) {
-
+static void prepareDatabase(void)
+{
     /* Set database */
     setupDatabase();
 
@@ -121,83 +140,68 @@ static void prepareDatabase(void) {
 
     BSONObj cr1 = BSON("providingApplication" << "http://cr1.com" <<
                        "entities" << BSON_ARRAY(
-                           BSON("id" << "E1" << "type" << "T1") <<
-                           BSON("id" << "E2" << "type" << "T2") <<
-                           BSON("id" << "E3" << "type" << "T3")
-                           ) <<
+                         BSON("id" << "E1" << "type" << "T1") <<
+                         BSON("id" << "E2" << "type" << "T2") <<
+                         BSON("id" << "E3" << "type" << "T3")) <<
                        "attrs" << BSON_ARRAY(
-                           BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                           BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                           BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                           )
-                       );
+                         BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
+                         BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
+                         BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
+
     BSONObj cr2 = BSON("providingApplication" << "http://cr2.com" <<
                        "entities" << BSON_ARRAY(
-                           BSON("id" << "E1" << "type" << "T1")
-                           ) <<
+                         BSON("id" << "E1" << "type" << "T1")) <<
                        "attrs" << BSON_ARRAY(
-                           BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                           BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")
-                           )
-                       );
+                         BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
+                         BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")));
+
     BSONObj cr3 = BSON("providingApplication" << "http://cr3.com" <<
                        "entities" << BSON_ARRAY(
-                           BSON("id" << "E2" << "type" << "T2")
-                           ) <<
+                         BSON("id" << "E2" << "type" << "T2")) <<
                        "attrs" << BSON_ARRAY(
-                           BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                           BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                           )
-                       );
+                         BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
+                         BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
 
     BSONObj cr4 = BSON("providingApplication" << "http://cr4.com" <<
                        "entities" << BSON_ARRAY(
-                           BSON("id" << "E1" << "type" << "T1bis")
-                           ) <<
+                         BSON("id" << "E1" << "type" << "T1bis")) <<
                        "attrs" << BSON_ARRAY(
-                           BSON("name" << "A1" << "type" << "TA1bis" << "isDomain" << "false")
-                           )
-                       );
+                         BSON("name" << "A1" << "type" << "TA1bis" << "isDomain" << "false")));
+
     BSONObj cr5 = BSON("providingApplication" << "http://cr5.com" <<
                        "entities" << BSON_ARRAY(
-                           BSON("id" << "E1")
-                           ) <<
+                         BSON("id" << "E1")) <<
                        "attrs" << BSON_ARRAY(
-                           BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")
-                           )
-                       );
+                         BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
 
     /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
     BSONObj reg1 = BSON(
                 "_id" << OID("51307b66f481db11bf860001") <<
                 "expiration" << 1879048191 <<
-                "contextRegistration" << BSON_ARRAY(cr1 << cr2)
-                );
+                "contextRegistration" << BSON_ARRAY(cr1 << cr2));
 
     BSONObj reg2 = BSON(
                 "_id" << OID("51307b66f481db11bf860002") <<
                 "expiration" << 1879048191 <<
-                "contextRegistration" << BSON_ARRAY(cr3)
-                );
+                "contextRegistration" << BSON_ARRAY(cr3));
 
     BSONObj reg3 = BSON(
                 "_id" << OID("51307b66f481db11bf860003") <<
                 "expiration" << 1879048191 <<
-                "contextRegistration" << BSON_ARRAY(cr4)
-                );
+                "contextRegistration" << BSON_ARRAY(cr4));
 
     BSONObj reg4 = BSON(
                 "_id" << OID("51307b66f481db11bf860004") <<
                 "expiration" << 1879048191 <<
-                "contextRegistration" << BSON_ARRAY(cr5)
-                );
+                "contextRegistration" << BSON_ARRAY(cr5));
 
     connection->insert(REGISTRATIONS_COLL, reg1);
     connection->insert(REGISTRATIONS_COLL, reg2);
     connection->insert(REGISTRATIONS_COLL, reg3);
     connection->insert(REGISTRATIONS_COLL, reg4);
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -207,8 +211,8 @@ static void prepareDatabase(void) {
 * to ease test for isPattern=true cases
 *
 */
-static void prepareDatabasePatternTrue(void) {
-
+static void prepareDatabasePatternTrue(void)
+{
   /* Set database */
   setupDatabase();
 
@@ -230,88 +234,72 @@ static void prepareDatabasePatternTrue(void) {
 
   BSONObj cr1 = BSON("providingApplication" << "http://cr1.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T") <<
-                         BSON("id" << "E2" << "type" << "T") <<
-                         BSON("id" << "E3" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T") <<
+                       BSON("id" << "E2" << "type" << "T") <<
+                       BSON("id" << "E3" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                         BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                         BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                         )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
+                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
+                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
+
   BSONObj cr2 = BSON("providingApplication" << "http://cr2.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T")
-                         ) <<
+                         BSON("id" << "E1" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
                          BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                         BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")
-                         )
-                     );
+                         BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")));
+
   BSONObj cr3 = BSON("providingApplication" << "http://cr3.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E2" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E2" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                         BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                         )
-                     );
+                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
+                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
 
   BSONObj cr4 = BSON("providingApplication" << "http://cr4.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E2" << "type" << "Tbis")
-                         ) <<
+                       BSON("id" << "E2" << "type" << "Tbis")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A2" << "type" << "TA2bis" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A2" << "type" << "TA2bis" << "isDomain" << "false")));
 
   BSONObj cr5 = BSON("providingApplication" << "http://cr5.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E3")
-                         ) <<
+                         BSON("id" << "E3")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false")));
 
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
   BSONObj reg1 = BSON(
               "_id" << "ff37" <<
               "expiration" << 1879048191 <<
               "subscriptions" << BSONArray() <<
-              "contextRegistration" << BSON_ARRAY(cr1 << cr2)
-              );
+              "contextRegistration" << BSON_ARRAY(cr1 << cr2));
 
   BSONObj reg2 = BSON(
               "_id" << "ee48" <<
               "expiration" << 1879048191 <<
               "subscriptions" << BSONArray() <<
-              "contextRegistration" << BSON_ARRAY(cr3)
-              );
+              "contextRegistration" << BSON_ARRAY(cr3));
 
   BSONObj reg3 = BSON(
               "_id" << "ee00" <<
               "expiration" << 1879048191 <<
               "subscriptions" << BSONArray() <<
-              "contextRegistration" << BSON_ARRAY(cr4)
-              );
+              "contextRegistration" << BSON_ARRAY(cr4));
 
   BSONObj reg4 = BSON(
               "_id" << "ff00" <<
               "expiration" << 1879048191 <<
               "subscriptions" << BSONArray() <<
-              "contextRegistration" << BSON_ARRAY(cr5)
-              );
+              "contextRegistration" << BSON_ARRAY(cr5));
 
   connection->insert(REGISTRATIONS_COLL, reg1);
   connection->insert(REGISTRATIONS_COLL, reg2);
   connection->insert(REGISTRATIONS_COLL, reg3);
   connection->insert(REGISTRATIONS_COLL, reg4);
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -319,15 +307,13 @@ static void prepareDatabasePatternTrue(void) {
 */
 TEST(mongoSubscribeContextAvailability, Ent1_Attr0_noPattern)
 {
-
     HttpStatusCode                       ms;
     SubscribeContextAvailabilityRequest  req;
     SubscribeContextAvailabilityResponse res;
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_,_))
-            .Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -370,7 +356,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_noPattern)
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
-    std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E5", C_STR_FIELD(ent0, "id"));
@@ -391,15 +377,13 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_noPattern)
 */
 TEST(mongoSubscribeContextAvailability, Ent1_Attr0_noPattern_JSON)
 {
-
     HttpStatusCode                       ms;
     SubscribeContextAvailabilityRequest  req;
     SubscribeContextAvailabilityResponse res;
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_,_))
-            .Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -469,8 +453,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_AttrN_noPattern)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_,_))
-            .Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -515,7 +498,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_AttrN_noPattern)
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
-    std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E5", C_STR_FIELD(ent0, "id"));
@@ -544,8 +527,7 @@ TEST(mongoSubscribeContextAvailability, EntN_Attr0_noPattern)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_,_))
-            .Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -621,8 +603,7 @@ TEST(mongoSubscribeContextAvailability, EntN_AttrN_noPattern)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_,_))
-            .Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -699,15 +680,13 @@ TEST(mongoSubscribeContextAvailability, EntN_AttrN_noPattern)
 */
 TEST(mongoSubscribeContextAvailability, Ent1_Attr0_pattern)
 {
-
     HttpStatusCode                       ms;
     SubscribeContextAvailabilityRequest  req;
     SubscribeContextAvailabilityResponse res;
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_,_))
-            .Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -750,7 +729,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_pattern)
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
-    std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("R.*", C_STR_FIELD(ent0, "id"));
@@ -793,8 +772,11 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsAll)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                    "http://notify.me",
+                                                                    "",
+                                                                    "no correlator",
+                                                                    NGSI_V1_LEGACY)).Times(1);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -837,7 +819,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsAll)
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
-    std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E3", C_STR_FIELD(ent0, "id"));
@@ -880,8 +862,11 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsAll_JSON)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                    "http://notify.me",
+                                                                    "",
+                                                                    "no correlator",
+                                                                    NGSI_V1_LEGACY)).Times(1);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -963,8 +948,11 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrOneSingle)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                    "http://notify.me",
+                                                                    "",
+                                                                    "no correlator",
+                                                                    NGSI_V1_LEGACY)).Times(1);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -1008,7 +996,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrOneSingle)
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
-    std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -1057,8 +1045,11 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrOneMulti)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                    "http://notify.me",
+                                                                    "",
+                                                                    "no correlator",
+                                                                    NGSI_V1_LEGACY)).Times(1);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -1102,7 +1093,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrOneMulti)
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
-    std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -1145,8 +1136,11 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsSubset)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                    "http://notify.me",
+                                                                    "",
+                                                                    "no correlator",
+                                                                    NGSI_V1_LEGACY)).Times(1);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -1191,7 +1185,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsSubset)
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
-    std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E3", C_STR_FIELD(ent0, "id"));
@@ -1243,8 +1237,11 @@ TEST(mongoSubscribeContextAvailability, noPatternSeveralCREs)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                    "http://notify.me",
+                                                                    "",
+                                                                    "no correlator",
+                                                                    NGSI_V1_LEGACY)).Times(1);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -1287,7 +1284,7 @@ TEST(mongoSubscribeContextAvailability, noPatternSeveralCREs)
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
-    std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -1336,8 +1333,11 @@ TEST(mongoSubscribeContextAvailability, noPatternSeveralRegistrations)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                    "http://notify.me",
+                                                                    "",
+                                                                    "no correlator",
+                                                                    NGSI_V1_LEGACY)).Times(1);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -1380,7 +1380,7 @@ TEST(mongoSubscribeContextAvailability, noPatternSeveralRegistrations)
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
-    std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E2", C_STR_FIELD(ent0, "id"));
@@ -1438,8 +1438,11 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiEntity)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                    "http://notify.me",
+                                                                    "",
+                                                                    "no correlator",
+                                                                    NGSI_V1_LEGACY)).Times(1);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -1533,8 +1536,11 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiAttr)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                    "http://notify.me",
+                                                                    "",
+                                                                    "no correlator",
+                                                                    NGSI_V1_LEGACY)).Times(1);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -1580,7 +1586,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiAttr)
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
-    std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -1635,8 +1641,11 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiEntityAttrs)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                    "http://notify.me",
+                                                                    "",
+                                                                    "no correlator",
+                                                                    NGSI_V1_LEGACY)).Times(1);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -1752,8 +1761,11 @@ TEST(mongoSubscribeContextAvailability, noPatternNoType)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                    "http://notify.me",
+                                                                    "",
+                                                                    "no correlator",
+                                                                    NGSI_V1_LEGACY)).Times(1);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -1796,7 +1808,7 @@ TEST(mongoSubscribeContextAvailability, noPatternNoType)
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
-    std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -1826,7 +1838,6 @@ TEST(mongoSubscribeContextAvailability, noPatternNoType)
 */
 TEST(mongoSubscribeContextAvailability, pattern0Attr)
 {
-
     HttpStatusCode                       ms;
     SubscribeContextAvailabilityRequest  req;
     SubscribeContextAvailabilityResponse res;
@@ -1853,8 +1864,11 @@ TEST(mongoSubscribeContextAvailability, pattern0Attr)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                    "http://notify.me",
+                                                                    "",
+                                                                    "no correlator",
+                                                                    NGSI_V1_LEGACY)).Times(1);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -1896,7 +1910,7 @@ TEST(mongoSubscribeContextAvailability, pattern0Attr)
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
-    std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E[2-3]", C_STR_FIELD(ent0, "id"));
@@ -1935,8 +1949,11 @@ TEST(mongoSubscribeContextAvailability, pattern1AttrSingle)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                    "http://notify.me",
+                                                                    "",
+                                                                    "no correlator",
+                                                                    NGSI_V1_LEGACY)).Times(1);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -1979,7 +1996,7 @@ TEST(mongoSubscribeContextAvailability, pattern1AttrSingle)
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
-    std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E[1-3]", C_STR_FIELD(ent0, "id"));
@@ -2026,8 +2043,11 @@ TEST(mongoSubscribeContextAvailability, pattern1AttrMulti)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                    "http://notify.me",
+                                                                    "",
+                                                                    "no correlator",
+                                                                    NGSI_V1_LEGACY)).Times(1);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -2070,7 +2090,7 @@ TEST(mongoSubscribeContextAvailability, pattern1AttrMulti)
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
-    std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E[1-2]", C_STR_FIELD(ent0, "id"));
@@ -2124,8 +2144,11 @@ TEST(mongoSubscribeContextAvailability, patternNAttr)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                    "http://notify.me",
+                                                                    "",
+                                                                    "no correlator",
+                                                                    NGSI_V1_LEGACY)).Times(1);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -2169,7 +2192,7 @@ TEST(mongoSubscribeContextAvailability, patternNAttr)
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
-    std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E[1-2]", C_STR_FIELD(ent0, "id"));
@@ -2234,8 +2257,11 @@ TEST(mongoSubscribeContextAvailability, patternNoType)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                    "http://notify.me",
+                                                                    "",
+                                                                    "no correlator",
+                                                                    NGSI_V1_LEGACY)).Times(1);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -2339,8 +2365,11 @@ TEST(mongoSubscribeContextAvailability, mixPatternAndNotPattern)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                    "http://notify.me",
+                                                                    "",
+                                                                    "no correlator",
+                                                                    NGSI_V1_LEGACY)).Times(1);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -2409,15 +2438,13 @@ TEST(mongoSubscribeContextAvailability, mixPatternAndNotPattern)
 */
 TEST(mongoSubscribeContextAvailability, defaultDuration)
 {
-
     HttpStatusCode                       ms;
     SubscribeContextAvailabilityRequest  req;
     SubscribeContextAvailabilityResponse res;
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_,_))
-            .Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -2459,7 +2486,7 @@ TEST(mongoSubscribeContextAvailability, defaultDuration)
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
-    std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E5", C_STR_FIELD(ent0, "id"));
@@ -2472,7 +2499,6 @@ TEST(mongoSubscribeContextAvailability, defaultDuration)
     /* Release mock */
     delete notifierMock;
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -2488,12 +2514,11 @@ TEST(mongoSubscribeContextAvailability, MongoDbInsertFail)
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, insert("utest.casubs",_,_,_))
+    ON_CALL(*connectionMock, insert("utest.casubs", _, _, _))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
-            .Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
@@ -2526,18 +2551,20 @@ TEST(mongoSubscribeContextAvailability, MongoDbInsertFail)
     std::string s2 = res.errorCode.details.substr(70+24, res.errorCode.details.size()-70-24);
     EXPECT_EQ("Database Error (collection: utest.casubs "
               "- insert(): { _id: ObjectId('", s1);
-    EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", entities: [ { id: \"E5\", type: \"T5\", isPattern: \"false\" } ], attrs: [], format: \"JSON\" } "
+    EXPECT_EQ("'), expiration: 1360236300, "
+              "reference: \"http://notify.me\", "
+              "entities: [ { id: \"E5\", type: \"T5\", isPattern: \"false\" } ], "
+              "attrs: [], format: \"JSON\" } "
               "- exception: boom!!)", s2);
 
     /* Restore real DB connection */
     setMongoConnectionForUnitTest(connectionDb);
 
-    /* Release mocks */    
+    /* Release mocks */
     delete notifierMock;
     delete connectionMock;
     delete timerMock;
 
     /* Check actual database has not been touched */
     ASSERT_EQ(0, connectionDb->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
-
 }

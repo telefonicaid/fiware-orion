@@ -1,5 +1,5 @@
-#ifndef NOTIFY_CONTEXT_RESPONSE_H
-#define NOTIFY_CONTEXT_RESPONSE_H
+#ifndef SRC_LIB_NGSI10_NOTIFYCONTEXTRESPONSE_H_
+#define SRC_LIB_NGSI10_NOTIFYCONTEXTRESPONSE_H_
 
 /*
 *
@@ -44,9 +44,9 @@ typedef struct NotifyContextResponse
   NotifyContextResponse();
   NotifyContextResponse(StatusCode& sc);
 
-  std::string   render(const std::string& indent);
+  std::string   render(void);
   void          present(const std::string& indent);
   void          release(void);
 } NotifyContextResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI10_NOTIFYCONTEXTRESPONSE_H_

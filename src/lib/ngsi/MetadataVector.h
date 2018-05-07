@@ -45,7 +45,7 @@ public:
 
   MetadataVector(void);
 
-  std::string     render(const std::string& indent, bool comma = false);
+  std::string     render(bool comma);
   std::string     toJson(bool                             isLastElement,
                          const std::vector<std::string>&  metadataFilter);
   std::string     check(ApiVersion apiVersion);

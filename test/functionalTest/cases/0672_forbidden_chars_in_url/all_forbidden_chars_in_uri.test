@@ -109,7 +109,7 @@ echo
 01. Test the forbidden character <
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 126
+Content-Length: 95
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -126,7 +126,7 @@ Date: REGEX(.*)
 02. Test the forbidden character >
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 126
+Content-Length: 95
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -143,7 +143,7 @@ Date: REGEX(.*)
 03. Test the forbidden character "
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 126
+Content-Length: 95
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -160,7 +160,7 @@ Date: REGEX(.*)
 04. Test the forbidden character '
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 126
+Content-Length: 95
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -177,7 +177,7 @@ Date: REGEX(.*)
 05. Test the forbidden character =
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 126
+Content-Length: 95
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -194,7 +194,7 @@ Date: REGEX(.*)
 06. Test the forbidden character ;
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 126
+Content-Length: 95
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -211,7 +211,7 @@ Date: REGEX(.*)
 07. Test the forbidden character (
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 126
+Content-Length: 95
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -228,7 +228,7 @@ Date: REGEX(.*)
 08. Test the forbidden character )
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 126
+Content-Length: 95
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -245,7 +245,7 @@ Date: REGEX(.*)
 09. Test without forbidden characters
 =====================================
 HTTP/1.1 400 Bad Request
-Content-Length: 119
+Content-Length: 88
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

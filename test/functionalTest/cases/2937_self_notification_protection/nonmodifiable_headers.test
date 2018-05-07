@@ -1,0 +1,138 @@
+# Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Non-modifiable headers in custom notifications
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create custom subscription attemping to change Fiware-Correlator and Ngsiv2-AttrsFormat
+# 02. Create entity to trigger subscription
+# 03. Dump accumulator and see Fiware-Correlator and Ngsiv2-AttrsFormat were not modified
+#
+
+
+echo "01. Create custom subscription attemping to change Fiware-Correlator and Ngsiv2-AttrsFormat"
+echo "==========================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "method": "PUT",
+      "payload": "{ %22A1%22: %22${A1}%22, %22A2%22: %22${A2}%22, %22A3%22: %22${A3}%22 }",
+      "headers":  { "Fiware-Correlator": "foo", "Ngsiv2-AttrsFormat": "bar" }
+    }
+  },
+  "throttling": 0
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity to trigger subscription"
+echo "========================================="
+payload='{
+  "id": "E1",
+  "type": "T1",
+  "A1": {
+    "value": 1
+  },
+  "A2": {
+    "value": 2
+  },
+  "A3": {
+    "value": 3
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --correlator MyCorrelator
+echo
+echo
+
+echo "03. Dump accumulator and see Fiware-Correlator and Ngsiv2-AttrsFormat were not modified"
+echo "======================================================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create custom subscription attemping to change Fiware-Correlator and Ngsiv2-AttrsFormat
+===========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity to trigger subscription
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: MyCorrelator
+Date: REGEX(.*)
+
+
+
+03. Dump accumulator and see Fiware-Correlator and Ngsiv2-AttrsFormat were not modified
+=======================================================================================
+PUT http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 35
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: text/plain; charset=utf-8
+Fiware-Correlator: MyCorrelator
+
+{
+    "A1": "1",
+    "A2": "2",
+    "A3": "3"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

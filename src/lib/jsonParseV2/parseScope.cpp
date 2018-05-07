@@ -22,16 +22,18 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "rapidjson/document.h"
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
+
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseScope.h"
 
-using namespace rapidjson;
-
+#include "common/errorMessages.h"
 
 
 /* ****************************************************************************
@@ -44,7 +46,7 @@ using namespace rapidjson;
 *          "coords": [ [40.418889,-3.691944] ]
 *        }
 */
-std::string parseScopeValueLocation(Value::ConstMemberIterator valueP, Scope* scopeP)
+std::string parseScopeValueLocation(rapidjson::Value::ConstMemberIterator valueP, Scope* scopeP)
 {
   // get value georel as a list of strings
   // get value geometry as a string
@@ -53,7 +55,8 @@ std::string parseScopeValueLocation(Value::ConstMemberIterator valueP, Scope* sc
   std::string geometryS;
   std::string coordsS;
 
-  for (Value::ConstMemberIterator iter = valueP->value.MemberBegin(); iter != valueP->value.MemberEnd(); ++iter)
+  rapidjson::Value::ConstMemberIterator iter;
+  for (iter = valueP->value.MemberBegin(); iter != valueP->value.MemberEnd(); ++iter)
   {
     std::string name = iter->name.GetString();
     std::string type = jsonParseTypeNames[iter->value.GetType()];
@@ -65,7 +68,7 @@ std::string parseScopeValueLocation(Value::ConstMemberIterator valueP, Scope* sc
         return "invalid JSON type for geometry (must be array)";
       }
 
-      for (Value::ConstValueIterator iter2 = iter->value.Begin(); iter2 != iter->value.End(); ++iter2)
+      for (rapidjson::Value::ConstValueIterator iter2 = iter->value.Begin(); iter2 != iter->value.End(); ++iter2)
       {
         std::string type = jsonParseTypeNames[iter2->GetType()];
         if (type != "String")
@@ -96,16 +99,17 @@ std::string parseScopeValueLocation(Value::ConstMemberIterator valueP, Scope* sc
         return "invalid JSON type for geometry (must be array)";
       }
 
-      for (Value::ConstValueIterator iter2 = iter->value.Begin(); iter2 != iter->value.End(); ++iter2)
+      for (rapidjson::Value::ConstValueIterator iter2 = iter->value.Begin(); iter2 != iter->value.End(); ++iter2)
       {
         std::string type = jsonParseTypeNames[iter2->GetType()];
+
         if (type != "Array")
         {
           return "only JSON Arrays allowed in coords list";
         }
 
-        Value::ConstValueIterator x = iter2->Begin();  // The first element in the array
-        Value::ConstValueIterator y = x + 1;           // The next element in the array
+        rapidjson::Value::ConstValueIterator x = iter2->Begin();  // The first element in the array
+        rapidjson::Value::ConstValueIterator y = x + 1;           // The next element in the array
 
         // Some sanity checks
         if (y != iter2->End() - 1)
@@ -123,6 +127,7 @@ std::string parseScopeValueLocation(Value::ConstMemberIterator valueP, Scope* sc
 
         // Adding coord
         char buf[STRING_SIZE_FOR_DOUBLE * 2 + 2];
+
         snprintf(buf, sizeof(buf), "%f,%f", x->GetDouble(), y->GetDouble());
         coordsS += buf;
 
@@ -140,6 +145,7 @@ std::string parseScopeValueLocation(Value::ConstMemberIterator valueP, Scope* sc
 
   std::string result;
   scopeP->fill(V2, geometryS, coordsS, georelS, &result);
+
   return result;
 }
 
@@ -149,7 +155,7 @@ std::string parseScopeValueLocation(Value::ConstMemberIterator valueP, Scope* sc
 *
 * parseScope - 
 */
-std::string parseScope(ConnectionInfo* ciP, Value::ConstValueIterator valueP, Scope* scopeP)
+std::string parseScope(ConnectionInfo* ciP, rapidjson::Value::ConstValueIterator valueP, Scope* scopeP)
 {
   std::string type  = jsonParseTypeNames[valueP->GetType()];
 
@@ -159,7 +165,8 @@ std::string parseScope(ConnectionInfo* ciP, Value::ConstValueIterator valueP, Sc
   }
 
   // Process scope type
-  Value::ConstMemberIterator iter = valueP->FindMember("type");
+  rapidjson::Value::ConstMemberIterator iter = valueP->FindMember("type");
+
   if (iter == valueP->MemberEnd())
   {
     return "scope without a type";
@@ -213,7 +220,7 @@ std::string parseScope(ConnectionInfo* ciP, Value::ConstValueIterator valueP, Sc
   {
     if (type != "String")
     {
-      return "invalid JSON type for scope value (must be string)";
+      return ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_SCOPE;
     }
 
     scopeP->value = iter->value.GetString();

@@ -127,7 +127,7 @@ static std::string attribute(const std::string& path, const std::string& value, 
   LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
 
   reqDataP->upcr.attributeP = new ContextAttribute("", "", "");
-  reqDataP->upcr.attributeP->valueType = orion::ValueTypeNone;
+  reqDataP->upcr.attributeP->valueType = orion::ValueTypeNotGiven;
   reqDataP->upcr.ceP->contextAttributeVector.push_back(reqDataP->upcr.attributeP);
 
   return "OK";
@@ -190,11 +190,6 @@ static std::string metadata(const std::string& path, const std::string& value, P
   LM_T(LmtParse, ("Creating a metadata"));
 
   reqDataP->upcr.contextMetadataP = new Metadata();
-
-  reqDataP->upcr.contextMetadataP->type  = "";
-  reqDataP->upcr.contextMetadataP->name  = "";
-  reqDataP->upcr.contextMetadataP->stringValue = "";
-
   reqDataP->upcr.attributeP->metadataVector.push_back(reqDataP->upcr.contextMetadataP);
 
   return "OK";
@@ -238,7 +233,7 @@ static std::string metadataValue(const std::string& path, const std::string& val
 {
   LM_T(LmtParse, ("Got a metadata value: '%s'", value.c_str()));
   reqDataP->upcr.contextMetadataP->stringValue = value;
-
+  reqDataP->upcr.contextMetadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 
@@ -253,9 +248,6 @@ static std::string domainMetadata(const std::string& path, const std::string& va
   LM_T(LmtParse, ("Creating a reg metadata"));
 
   reqDataP->upcr.domainMetadataP = new Metadata();
-  reqDataP->upcr.domainMetadataP->type  = "";
-  reqDataP->upcr.domainMetadataP->name  = "";
-  reqDataP->upcr.domainMetadataP->stringValue = "";
   reqDataP->upcr.ceP->domainMetadataVector.push_back(reqDataP->upcr.domainMetadataP);
 
   return "OK";
@@ -299,7 +291,7 @@ static std::string domainMetadataValue(const std::string& path, const std::strin
 {
   LM_T(LmtParse, ("Got a reg metadata value: '%s'", value.c_str()));
   reqDataP->upcr.domainMetadataP->stringValue = value;
-
+  reqDataP->upcr.domainMetadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 
@@ -386,7 +378,7 @@ void jsonUpcrRelease(ParseData* reqDataP)
 std::string jsonUpcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-  return reqData->upcr.res.check(ciP->apiVersion, asJsonObject, "", reqData->errorString, 0);
+  return reqData->upcr.res.check(ciP->apiVersion, asJsonObject, reqData->errorString);
 }
 
 

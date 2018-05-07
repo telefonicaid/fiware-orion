@@ -47,7 +47,7 @@
 
 /* ****************************************************************************
 *
-* TAG_ADD - 
+* TAG_ADD -
 */
 #define TAG_ADD_COUNTER(tag, counter) valueTag(indent2, tag, counter + 1, ciP->outtrue)
 #define TAG_ADD_STRING(tag, value)  valueTag(indent2, tag, value, ciP->outtrue)
@@ -57,7 +57,7 @@
 
 /* ****************************************************************************
 *
-* resetStatistics - 
+* resetStatistics -
 */
 static void resetStatistics(void)
 {
@@ -130,6 +130,8 @@ static void resetStatistics(void)
   noOfSimulatedNotifications                      = -1;
   noOfBatchQueryRequest                           = -1;
   noOfBatchUpdateRequest                          = -1;
+  noOfRegistrationRequest                         = -1;
+  noOfRegistrationsRequest                        = -1;
 
   QueueStatistics::reset();
 
@@ -167,7 +169,7 @@ std::string renderCounterStats(void)
 {
   JsonHelper js;
 
-  // FIXME: try to chose names closer to the ones used in API URLs  
+  // FIXME: try to chose names closer to the ones used in API URLs
   renderUsedCounter(&js, "jsonRequests",                              noOfJsonRequests);
   renderUsedCounter(&js, "registrations",                             noOfRegistrations);
   renderUsedCounter(&js, "registrationUpdates",                       noOfRegistrationUpdates);
@@ -210,6 +212,8 @@ std::string renderCounterStats(void)
   renderUsedCounter(&js, "entityByIdAttributeByNameIdAndType",        noOfEntityByIdAttributeByNameIdAndType);
   renderUsedCounter(&js, "batchQueryRequests",                        noOfBatchQueryRequest);
   renderUsedCounter(&js, "batchUpdateRequests",                       noOfBatchUpdateRequest);
+  renderUsedCounter(&js, "registrationRequest",                       noOfRegistrationRequest);
+  renderUsedCounter(&js, "registrationsRequest",                      noOfRegistrationsRequest);
   renderUsedCounter(&js, "logTraceRequests",                          noOfLogTraceRequests);
   renderUsedCounter(&js, "logLevelRequests",                          noOfLogLevelRequests);
 
@@ -238,7 +242,7 @@ std::string renderCounterStats(void)
 
 /* ****************************************************************************
 *
-* renderSemWaitStats - 
+* renderSemWaitStats -
 */
 std::string renderSemWaitStats(void)
 {
@@ -283,7 +287,7 @@ std::string renderNotifQueueStats(void)
 
 /* ****************************************************************************
 *
-* statisticsTreat - 
+* statisticsTreat -
 */
 std::string statisticsTreat
 (

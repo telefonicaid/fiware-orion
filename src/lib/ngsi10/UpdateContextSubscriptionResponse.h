@@ -1,5 +1,5 @@
-#ifndef UPDATE_CONTEXT_SUBSCRIPTION_RESPONSE_H
-#define UPDATE_CONTEXT_SUBSCRIPTION_RESPONSE_H
+#ifndef SRC_LIB_NGSI10_UPDATECONTEXTSUBSCRIPTIONRESPONSE_H_
+#define SRC_LIB_NGSI10_UPDATECONTEXTSUBSCRIPTIONRESPONSE_H_
 
 /*
 *
@@ -46,7 +46,7 @@ typedef struct UpdateContextSubscriptionResponse
   UpdateContextSubscriptionResponse(StatusCode& errorCode);
   ~UpdateContextSubscriptionResponse();
 
-  std::string render(const std::string& indent);
+  std::string render(void);
 } UpdateContextSubscriptionResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI10_UPDATECONTEXTSUBSCRIPTIONRESPONSE_H_

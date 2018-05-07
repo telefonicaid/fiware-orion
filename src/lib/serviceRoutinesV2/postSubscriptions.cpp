@@ -22,6 +22,8 @@
 *
 * Author: Orion dev team
 */
+#include <string>
+#include <vector>
 
 #include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/mongoCreateSubscription.h"
@@ -30,6 +32,7 @@
 #include "common/statistics.h"
 #include "rest/uriParamNames.h"
 #include "rest/OrionError.h"
+
 #include "serviceRoutinesV2/postSubscriptions.h"
 
 
@@ -53,12 +56,14 @@ extern std::string postSubscriptions
   {
     const size_t  MSG_SIZE        = 96;  // strlen(msg) + enough room for digits
     char          errMsg[MSG_SIZE];
+    ciP->httpStatusCode           = SccBadRequest;
 
-    snprintf(errMsg, MSG_SIZE, "max *one* service-path allowed for subscriptions (%zd given)", ciP->servicePathV.size());
+    snprintf(errMsg, MSG_SIZE, "max *one* service-path allowed for subscriptions (%lu given)",
+             (unsigned long) ciP->servicePathV.size());
     alarmMgr.badInput(clientIp, errMsg);
     scr.subscribeError.errorCode.fill(SccBadRequest, "max one service-path allowed for subscriptions");
 
-    TIMED_RENDER(answer = scr.render(""));
+    TIMED_RENDER(answer = scr.toJson());
     return answer;
   }
 

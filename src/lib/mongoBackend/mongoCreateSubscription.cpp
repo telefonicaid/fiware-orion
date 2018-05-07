@@ -145,11 +145,8 @@ std::string mongoCreateSubscription
   reqSemTake(__FUNCTION__, "ngsiv2 create subscription request", SemWriteOp, &reqSemTaken);
 
   BSONObjBuilder     b;
-  std::string        servicePath      = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
+  std::string        servicePath      = servicePathV[0] == "" ? SERVICE_PATH_ALL : servicePathV[0];
   bool               notificationDone = false;
-  long long          lastNotification = 0;
-  long long          lastFailure      = 0;
-  long long          lastSuccess      = 0;
   const std::string  subId            = setNewSubscriptionId(&b);
 
   // Build the BSON object to insert
@@ -165,6 +162,13 @@ std::string mongoCreateSubscription
   setBlacklist(sub, &b);
 
   std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
+
+  // We need to insert the csub in the cache before (potentially) sending the
+  // initial notification (have a look to issue #2974 for details)
+  if (!noCache)
+  {
+    insertInCache(sub, subId, tenant, servicePath, false, 0, 0, 0);
+  }
 
   setCondsAndInitialNotify(sub,
                            subId,
@@ -203,11 +207,6 @@ std::string mongoCreateSubscription
     oe->fill(SccReceiverInternalError, err);
 
     return "";
-  }
-
-  if (!noCache)
-  {
-    insertInCache(sub, subId, tenant, servicePath, false, lastNotification, lastFailure, lastSuccess);
   }
 
   reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);

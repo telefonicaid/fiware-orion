@@ -22,18 +22,20 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "logMsg/logMsg.h"
 
 #include "rest/OrionError.h"
 #include "rest/ConnectionInfo.h"
 
-#include "unittest.h"
+#include "unittests/unittest.h"
 
 
 
 /* ****************************************************************************
 *
-* all - 
+* all -
 */
 TEST(OrionError, all)
 {
@@ -69,14 +71,21 @@ TEST(OrionError, all)
   ci.outMimeType = JSON;
 
   out = e1.render();
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf,
+                                   sizeof(expectedBuf),
+                                   outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = e3.render();
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf,
+                                   sizeof(expectedBuf),
+                                   outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = e4.render();
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf,
+                                   sizeof(expectedBuf),
+                                   outfile3)) << "Error getting test data from '" << outfile3 << "'";
+
   EXPECT_STREQ(expectedBuf, out.c_str());
 }

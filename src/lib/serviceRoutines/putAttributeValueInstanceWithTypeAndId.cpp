@@ -42,7 +42,7 @@
 
 /* ****************************************************************************
 *
-* putAttributeValueInstanceWithTypeAndId - 
+* putAttributeValueInstanceWithTypeAndId -
 *
 * PUT /v1/contextEntities/type/{entity::type}/id/{entity::id}/attributes/{attribute::name}/{metaID}
 * PUT /ngsi10/contextEntities/type/{entity::type}/id/{entity::id}/attributes/{attribute::name}/{metaID}
@@ -84,7 +84,7 @@ std::string putAttributeValueInstanceWithTypeAndId
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
     response.fill(SccBadRequest, "non-matching entity::types in URL");
 
-    TIMED_RENDER(answer = response.render("", false, false));
+    TIMED_RENDER(answer = response.render(false, false));
 
     parseDataP->upcar.res.release();
     return answer;
@@ -97,9 +97,9 @@ std::string putAttributeValueInstanceWithTypeAndId
   if ((mP != NULL) && (mP->stringValue != metaID))
   {
     std::string details = "unmatching metadata ID value URI/payload: /" + metaID + "/ vs /" + mP->stringValue + "/";
-    
+
     response.fill(SccBadRequest, details);
-    TIMED_RENDER(answer = response.render("", false, false));
+    TIMED_RENDER(answer = response.render(false, false));
     parseDataP->upcar.res.release();
 
     return answer;
@@ -119,7 +119,7 @@ std::string putAttributeValueInstanceWithTypeAndId
 
 
   // 07. Render result
-  TIMED_RENDER(answer = response.render("", false, false));
+  TIMED_RENDER(answer = response.render(false, false));
 
 
   // 08. Cleanup and return result

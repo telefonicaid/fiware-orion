@@ -22,38 +22,47 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "gtest/gtest.h"
 
 #include "serviceRoutines/badVerbGetOnly.h"
 #include "serviceRoutines/versionTreat.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs - 
+* getV -
 */
-static RestService rs[] = 
+static RestService getV[] =
 {
-   { "GET",    VersionRequest,                        1, { "version"                                                }, "", versionTreat                              },
-   { "*",      VersionRequest,                        1, { "version"                                                }, "", badVerbGetOnly                            },
-   { "",       InvalidRequest,                        0, {                                                          }, "", NULL                                      }
+  { VersionRequest, 1, { "version" }, "", versionTreat   },
+  { InvalidRequest, 0, {           }, "", NULL           }
+};
+
+static RestService badVerbV[] =
+{
+  { VersionRequest, 1, { "version" }, "", badVerbGetOnly },
+  { InvalidRequest, 0, {           }, "", NULL           }
 };
 
 
 
 /* ****************************************************************************
 *
-* ok - 
+* ok -
 */
 TEST(badVerbGetOnly, ok)
 {
   ConnectionInfo  ci("/version",  "PUT", "1.1");
-  std::string     expected = ""; // Bad verb gives no payload, only HTTP headers
+  std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
   std::string     out;
 
-  out = restService(&ci, rs);
+  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
+  out = orion::requestServe(&ci);
 
   EXPECT_EQ(expected, out);
   EXPECT_EQ("Allow", ci.httpHeader[0]);

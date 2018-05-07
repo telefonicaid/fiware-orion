@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/badVerbPutDeleteOnly.h"
@@ -31,50 +33,63 @@
 #include "serviceRoutines/putAvailabilitySubscriptionConvOp.h"
 #include "serviceRoutines/deleteAvailabilitySubscriptionConvOp.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
-#include "unittest.h"
-
+#include "unittests/unittest.h"
 
 
 /* ****************************************************************************
 *
-* rs - 
+* service vectors -
 */
-static RestService rs[] = 
+static RestService postV[] =
 {
-  { "POST",   SubscribeContextAvailability, 2, { "ngsi9", "contextAvailabilitySubscriptions"      }, "subscribeContextAvailabilityRequest",          postSubscribeContextAvailability         },
-  { "*",      SubscribeContextAvailability, 2, { "ngsi9", "contextAvailabilitySubscriptions"      }, "",                                             badVerbPostOnly                          },
-
-  { "PUT",    Ngsi9SubscriptionsConvOp,     3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "updateContextAvailabilitySubscriptionRequest", putAvailabilitySubscriptionConvOp        },
-  { "DELETE", Ngsi9SubscriptionsConvOp,     3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "",                                             deleteAvailabilitySubscriptionConvOp     },
-  { "*",      Ngsi9SubscriptionsConvOp,     3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "",                                             badVerbPutDeleteOnly                     },
-
-  { "*",     InvalidRequest,                0, { "*", "*", "*", "*", "*", "*"                     }, "",                                 badRequest                                           },
-  { "",      InvalidRequest,                0, {                                                  }, "",                                 NULL                                                 }
+  { SubscribeContextAvailability,  2, { "ngsi9", "contextAvailabilitySubscriptions"      }, "",  postSubscribeContextAvailability  },
+  { InvalidRequest,                0, {                                                  }, "",    NULL                            }
 };
-     
+
+static RestService putV[] =
+{
+  { Ngsi9SubscriptionsConvOp, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "", putAvailabilitySubscriptionConvOp },
+  { InvalidRequest,           0, {                                                  }, "",    NULL                              }
+};
+
+static RestService deleteV[] =
+{
+  { Ngsi9SubscriptionsConvOp, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "", deleteAvailabilitySubscriptionConvOp },
+  { InvalidRequest,           0, {                                                  }, "",    NULL                              }
+};
+
+static RestService badVerbV[] =
+{
+  { SubscribeContextAvailability, 2, { "ngsi9", "contextAvailabilitySubscriptions"      }, "",    badVerbPostOnly                   },
+  { Ngsi9SubscriptionsConvOp,     3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "",    badVerbPutDeleteOnly              },
+  { InvalidRequest,               0, { "*", "*", "*", "*", "*", "*"                     }, "",    badRequest                        },
+  { InvalidRequest,               0, {                                                  }, "",    NULL                              }
+};
 
 
 
 /* ****************************************************************************
 *
-* put - 
-*
+* put -
 */
 TEST(putAvailabilitySubscriptionConvOp, put)
-{  
+{
   ConnectionInfo ci1("/ngsi9/contextAvailabilitySubscriptions",  "GET",  "1.1");
   ConnectionInfo ci2("/ngsi9/contextAvailabilitySubscriptions/012345678901234567890123",  "XVERB",   "1.1");
   std::string    out;
 
   utInit();
 
-  out = restService(&ci1, rs);
+  serviceVectorsSet(NULL, putV, postV, NULL, deleteV, NULL, badVerbV);
+  out = orion::requestServe(&ci1);
+
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci1.httpHeader[0]);
   EXPECT_EQ("POST",  ci1.httpHeaderValue[0]);
 
-  out = restService(&ci2, rs);
+  out = orion::requestServe(&ci2);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci2.httpHeader[0]);
   EXPECT_EQ("PUT, DELETE", ci2.httpHeaderValue[0]);

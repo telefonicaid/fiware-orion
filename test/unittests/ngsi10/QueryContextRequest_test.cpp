@@ -63,7 +63,7 @@
 
 /* ****************************************************************************
 *
-* ok_json - 
+* ok_json -
 */
 TEST(QueryContextRequest, ok_json)
 {
@@ -91,11 +91,11 @@ TEST(QueryContextRequest, ok_json)
   // With the data obtained, render, present and release methods are exercised
   //
   QueryContextRequest*  qcrP = &parseData.qcr.res;
-  
+
   qcrP->present(""); // No output
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  rendered = qcrP->render("");
+  rendered = qcrP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   qcrP->present("");
@@ -108,7 +108,7 @@ TEST(QueryContextRequest, ok_json)
 
 /* ****************************************************************************
 *
-* badIsPattern_json - 
+* badIsPattern_json -
 */
 TEST(QueryContextRequest, badIsPattern_json)
 {
@@ -134,7 +134,7 @@ TEST(QueryContextRequest, badIsPattern_json)
 
 /* ****************************************************************************
 *
-* emptyAttribute_json - 
+* emptyAttribute_json -
 */
 TEST(QueryContextRequest, emptyAttribute_json)
 {
@@ -160,7 +160,7 @@ TEST(QueryContextRequest, emptyAttribute_json)
 
 /* ****************************************************************************
 *
-* emptyAttributeExpression_json - 
+* emptyAttributeExpression_json -
 */
 TEST(QueryContextRequest, emptyAttributeExpression_json)
 {
@@ -290,7 +290,7 @@ TEST(QueryContextRequest, scopeGeolocationCircleZeroRadiusJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationPolygonOkJson - 
+* scopeGeolocationPolygonOkJson -
 */
 TEST(QueryContextRequest, scopeGeolocationPolygonOkJson)
 {
@@ -315,7 +315,7 @@ TEST(QueryContextRequest, scopeGeolocationPolygonOkJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationPolygonInvertedJson - 
+* scopeGeolocationPolygonInvertedJson -
 */
 TEST(QueryContextRequest, scopeGeolocationPolygonInvertedJson)
 {
@@ -340,7 +340,7 @@ TEST(QueryContextRequest, scopeGeolocationPolygonInvertedJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationPolygonInvertedBadValueJson - 
+* scopeGeolocationPolygonInvertedBadValueJson -
 */
 TEST(QueryContextRequest, scopeGeolocationPolygonInvertedBadValueJson)
 {
@@ -368,7 +368,7 @@ TEST(QueryContextRequest, scopeGeolocationPolygonInvertedBadValueJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationPolygonNoVerticesJson - 
+* scopeGeolocationPolygonNoVerticesJson -
 */
 TEST(QueryContextRequest, scopeGeolocationPolygonNoVerticesJson)
 {
@@ -396,7 +396,7 @@ TEST(QueryContextRequest, scopeGeolocationPolygonNoVerticesJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationPolygonOneVertexJson - 
+* scopeGeolocationPolygonOneVertexJson -
 */
 TEST(QueryContextRequest, scopeGeolocationPolygonOneVertexJson)
 {
@@ -424,7 +424,7 @@ TEST(QueryContextRequest, scopeGeolocationPolygonOneVertexJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationPolygonTwoVerticesJson - 
+* scopeGeolocationPolygonTwoVerticesJson -
 */
 TEST(QueryContextRequest, scopeGeolocationPolygonTwoVerticesJson)
 {

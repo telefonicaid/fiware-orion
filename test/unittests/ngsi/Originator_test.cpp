@@ -42,15 +42,15 @@ TEST(Originator, check)
 
   utInit();
 
-  checked = originator.check(RegisterContext, "", "", 0);
+  checked = originator.check();
   EXPECT_STREQ("OK", checked.c_str());
 
   originator.string = "String";
 
-  checked = originator.check(RegisterContext, "", "", 0);
+  checked = originator.check();
   EXPECT_STREQ("OK", checked.c_str());
 
-  checked = originator.check(RegisterContext, "", "", 0);
+  checked = originator.check();
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();
@@ -60,7 +60,7 @@ TEST(Originator, check)
 
 /* ****************************************************************************
 *
-* isEmptSetAndGet - 
+* isEmptSetAndGet -
 */
 TEST(Originator, isEmptySetAndGet)
 {
@@ -83,22 +83,22 @@ TEST(Originator, isEmptySetAndGet)
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 TEST(Originator, render)
 {
   Originator   originator;
-  std::string  out;  
+  std::string  out;
   const char*  outfile1 = "ngsi.originator.render.middle.json";
 
   utInit();
 
-  out = originator.render("");
+  out = originator.render(false);
   EXPECT_STREQ("", out.c_str());
 
   originator.string = "String";
 
-  out = originator.render("");
+  out = originator.render(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -130,7 +130,7 @@ TEST(Originator, present)
 
 /* ****************************************************************************
 *
-* c_str - 
+* c_str -
 */
 TEST(Originator, c_str)
 {

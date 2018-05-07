@@ -42,7 +42,7 @@
 
 /* ****************************************************************************
 *
-* getAttributeValueInstance - 
+* getAttributeValueInstance -
 *
 * GET /ngsi10/contextEntities/{entityId::id}/attributes/{attribute::name}/{metadata::ID-value}
 * GET /v1/contextEntities/{entityId::id}/attributes/{attribute::name}/{metadata::ID-value}
@@ -65,11 +65,11 @@
 * 6. Cleanup and return result
 *
 * FIXME P1
-* As the metadata ID matching is done outside mongoBackend, context provider forwarding 
+* As the metadata ID matching is done outside mongoBackend, context provider forwarding
 * is not supported. This problem could be solved adding the metadata ID value as a scope
 * in the restriction of the QueryContext.
 * Another option is to simply stop supporting this special metadata 'ID', however
-* I believe the iotBroker of NEC depends on this ... 
+* I believe the iotBroker of NEC depends on this ...
 */
 std::string getAttributeValueInstance
 (
@@ -112,7 +112,7 @@ std::string getAttributeValueInstance
   // 3. Fill in ContextAttributeResponse from QueryContextResponse.
   //    Special care with metadata named ID (and type 'xsd:string').
   //
-  if (parseDataP->qcrs.res.contextElementResponseVector.size() != 0)  
+  if (parseDataP->qcrs.res.contextElementResponseVector.size() != 0)
   {
     ContextElementResponse* cerP = parseDataP->qcrs.res.contextElementResponseVector[0];
 
@@ -157,7 +157,7 @@ std::string getAttributeValueInstance
 
 
   // 5. Render the ContextAttributeResponse
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntityAttribute, ""));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntityAttribute));
 
 
   // 6. Cleanup and return result

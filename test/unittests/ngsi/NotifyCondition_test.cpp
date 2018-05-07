@@ -33,7 +33,7 @@
 
 /* ****************************************************************************
 *
-* Creation - 
+* Creation -
 */
 TEST(NotifyCondition, Creation)
 {
@@ -51,7 +51,7 @@ TEST(NotifyCondition, Creation)
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 TEST(NotifyCondition, render)
 {
@@ -61,7 +61,7 @@ TEST(NotifyCondition, render)
 
   utInit();
 
-  out = nc.render("", false);
+  out = nc.render(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -90,7 +90,7 @@ TEST(NotifyCondition, present)
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 */
 TEST(NotifyCondition, check)
 {
@@ -99,11 +99,11 @@ TEST(NotifyCondition, check)
 
   utInit();
 
-  checked = nc.check(RegisterContext, "", "", 0);
+  checked = nc.check(RegisterContext, "", 0);
   EXPECT_STREQ("empty type for NotifyCondition", checked.c_str());
-  
+
   nc.type = "XXX";
-  checked = nc.check(RegisterContext, "", "", 0);
+  checked = nc.check(RegisterContext, "", 0);
   EXPECT_STREQ("invalid notify condition type: /XXX/", checked.c_str());
 
   nc.release();

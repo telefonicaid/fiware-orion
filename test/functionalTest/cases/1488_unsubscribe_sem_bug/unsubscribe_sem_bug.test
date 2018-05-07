@@ -53,7 +53,7 @@ echo
 01. Unsubscribe with empty ID first time
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 144
+Content-Length: 115
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -70,7 +70,7 @@ Date: REGEX(.*)
 02. Unsubscribe with empty ID second time (ensuring that semaphore releasing was ok first time)
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 144
+Content-Length: 115
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

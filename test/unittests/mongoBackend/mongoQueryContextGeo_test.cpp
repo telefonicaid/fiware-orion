@@ -22,7 +22,9 @@
 *
 * Author: Fermin Galan
 */
-#include "unittest.h"
+#include <string>
+
+#include "unittests/unittest.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -37,7 +39,19 @@
 
 #include "mongo/client/dbclient.h"
 
-extern void setMongoConnectionForUnitTest(DBClientBase*);
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+
+
+
+extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+
+
 
 /* ****************************************************************************
 *
@@ -62,78 +76,64 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * This function is called before every test, to populate some information in the
 * entities collection.
 */
-static void prepareDatabase(void) {
-
+static void prepareDatabase(void)
+{
   /* Set database */
   setupDatabase();
 
   DBClientBase* connection = getMongoConnection();
 
-  connection->createIndex("utest.entities", BSON("location.coords" << "2dsphere" ));
+  connection->createIndex("utest.entities", BSON("location.coords" << "2dsphere"));
 
   BSONObj A = BSON("_id" << BSON("id" << "A" << "type" << "Point") <<
-                     "attrNames" << BSON_ARRAY("pos" << "foo") <<
-                     "attrs" << BSON(
-                        "pos" << BSON("type" << "location" << "value" << "2, 3") <<
-                        "foo" << BSON("type" << "string" << "value" << "attr_A")
-                        ) <<
-                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(3.0 << 2.0))
-                    );
+                   "attrNames" << BSON_ARRAY("pos" << "foo") <<
+                   "attrs" << BSON(
+                     "pos" << BSON("type" << "location" << "value" << "2, 3") <<
+                     "foo" << BSON("type" << "string" << "value" << "attr_A")) <<
+                   "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(3.0 << 2.0)));
 
   BSONObj B = BSON("_id" << BSON("id" << "B" << "type" << "Point") <<
-                     "attrNames" << BSON_ARRAY("pos" << "foo") <<
-                     "attrs" << BSON(
-                        "pos" << BSON("type" << "location" << "value" << "5, 5") <<
-                        "foo" << BSON("type" << "string" << "value" << "attr_B")
-                        ) <<
-                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(5.0 << 5.0))
-                    );
+                   "attrNames" << BSON_ARRAY("pos" << "foo") <<
+                   "attrs" << BSON(
+                     "pos" << BSON("type" << "location" << "value" << "5, 5") <<
+                     "foo" << BSON("type" << "string" << "value" << "attr_B")) <<
+                   "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(5.0 << 5.0)));
 
   BSONObj C = BSON("_id" << BSON("id" << "C" << "type" << "Point") <<
-                     "attrNames" << BSON_ARRAY("pos" << "foo") <<
-                     "attrs" << BSON(
-                        "pos" << BSON("type" << "location" << "value" << "4, 7") <<
-                        "foo" << BSON("type" << "string" << "value" << "attr_C")
-                        ) <<
-                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(7.0 << 4.0))
-                    );
+                   "attrNames" << BSON_ARRAY("pos" << "foo") <<
+                   "attrs" << BSON(
+                     "pos" << BSON("type" << "location" << "value" << "4, 7") <<
+                     "foo" << BSON("type" << "string" << "value" << "attr_C")) <<
+                   "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(7.0 << 4.0)));
 
   // Entity D hasn't a location attribute (i.e. no location field). This entity will be never returned
   // when a geoscope is defined
   BSONObj D = BSON("_id" << BSON("id" << "D" << "type" << "Point") <<
-                     "attrNames" << BSON_ARRAY("pos" << "foo") <<
-                     "attrs" << BSON(
-                        "pos" << BSON("type" << "location" << "value" << "4, 7") <<
-                        "foo" << BSON("type" << "string" << "value" << "attr_C")
-                        )
-                    );
+                   "attrNames" << BSON_ARRAY("pos" << "foo") <<
+                   "attrs" << BSON(
+                     "pos" << BSON("type" << "location" << "value" << "4, 7") <<
+                     "foo" << BSON("type" << "string" << "value" << "attr_C")));
 
   BSONObj city1 = BSON("_id" << BSON("id" << "Madrid" << "type" << "City") <<
-                     "attrNames" << BSON_ARRAY("pos" << "foo") <<
-                     "attrs" << BSON(
-                        "pos" << BSON("type" << "location" << "value" << "40.418889, -3.691944") <<
-                        "foo" << BSON("type" << "string" << "value" << "attr_Mad")
-                        ) <<
-                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.691944 << 40.418889))
-                    );
+                       "attrNames" << BSON_ARRAY("pos" << "foo") <<
+                       "attrs" << BSON(
+                         "pos" << BSON("type" << "location" << "value" << "40.418889, -3.691944") <<
+                         "foo" << BSON("type" << "string" << "value" << "attr_Mad")) <<
+                       "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.691944 << 40.418889)));
 
   BSONObj city2 = BSON("_id" << BSON("id" << "Alcobendas" << "type" << "City") <<
-                     "attrNames" << BSON_ARRAY("pos" << "foo") <<
-                     "attrs" << BSON(
-                        "pos" << BSON("type" << "location" << "value" << "40.533333, -3.633333") <<
-                        "foo" << BSON("type" << "string" << "value" << "attr_Alc")
-                        ) <<
-                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.633333 << 40.533333))
-                    );
+                       "attrNames" << BSON_ARRAY("pos" << "foo") <<
+                       "attrs" << BSON(
+                         "pos" << BSON("type" << "location" << "value" << "40.533333, -3.633333") <<
+                         "foo" << BSON("type" << "string" << "value" << "attr_Alc")) <<
+                       "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.633333 << 40.533333)));
 
   BSONObj city3 = BSON("_id" << BSON("id" << "Leganes" << "type" << "City") <<
-                     "attrNames" << BSON_ARRAY("pos" << "foo") <<
-                     "attrs" << BSON(
-                        "pos" << BSON("type" << "location" << "value" << "40.316667, -3.75") <<
-                        "foo" << BSON("type" << "string" << "value" << "attr_Leg")
-                        ) <<
-                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.75 << 40.316667))
-                    );
+                       "attrNames" << BSON_ARRAY("pos" << "foo") <<
+                       "attrs" << BSON(
+                         "pos" << BSON("type" << "location" << "value" << "40.316667, -3.75") <<
+                         "foo" << BSON("type" << "string" << "value" << "attr_Leg")) <<
+                       "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.75 << 40.316667)));
 
   connection->insert(ENTITIES_COLL, A);
   connection->insert(ENTITIES_COLL, B);
@@ -151,14 +151,20 @@ static void prepareDatabase(void) {
 * getEntityIndex -
 *
 */
-int getEntityIndex(ContextElementResponseVector& v, std::string id) {
-    for (unsigned int ix = 0; ix < v.size(); ++ix) {
-        if (v[ix]->contextElement.entityId.id == id) {
-            return ix;
-        }
+int getEntityIndex(ContextElementResponseVector& v, const std::string& id)
+{
+  for (unsigned int ix = 0; ix < v.size(); ++ix)
+  {
+    if (v[ix]->contextElement.entityId.id == id)
+    {
+      return ix;
     }
-    return -1;
+  }
+
+  return -1;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -207,7 +213,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
 
     /* Context Element response # 1 */
     i = getEntityIndex(res.contextElementResponseVector, "Madrid");
-    ASSERT_TRUE(i >= 0);
+    ASSERT_GE(i, 0);
     EXPECT_EQ("Madrid", RES_CER(i).entityId.id);
     EXPECT_EQ("City", RES_CER(i).entityId.type);
     EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
@@ -228,7 +234,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
 
     /* Context Element response # 2 */
     i = getEntityIndex(res.contextElementResponseVector, "Leganes");
-    ASSERT_TRUE(i >= 0);
+    ASSERT_GE(i, 0);
     EXPECT_EQ("Leganes", RES_CER(i).entityId.id);
     EXPECT_EQ("City", RES_CER(i).entityId.type);
     EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
@@ -300,7 +306,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
     /* Context Element response # 1 */
 
     i = getEntityIndex(res.contextElementResponseVector, "Madrid");
-    ASSERT_TRUE(i >= 0);
+    ASSERT_GE(i, 0);
     EXPECT_EQ("Madrid", RES_CER(i).entityId.id);
     EXPECT_EQ("City", RES_CER(i).entityId.type);
     EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
@@ -321,7 +327,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
 
     /* Context Element response # 2 */
     i = getEntityIndex(res.contextElementResponseVector, "Alcobendas");
-    ASSERT_TRUE(i >= 0);
+    ASSERT_GE(i, 0);
     EXPECT_EQ("Alcobendas", RES_CER(i).entityId.id);
     EXPECT_EQ("City", RES_CER(i).entityId.type);
     EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
@@ -342,7 +348,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
 
     /* Context Element response # 3 */
     i = getEntityIndex(res.contextElementResponseVector, "Leganes");
-    ASSERT_TRUE(i >= 0);
+    ASSERT_GE(i, 0);
     EXPECT_EQ("Leganes", RES_CER(i).entityId.id);
     EXPECT_EQ("City", RES_CER(i).entityId.type);
     EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
@@ -415,7 +421,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleOut)
 
     /* Context Element response # 1 */
     i = getEntityIndex(res.contextElementResponseVector, "Alcobendas");
-    ASSERT_TRUE(i >= 0);
+    ASSERT_GE(i, 0);
     EXPECT_EQ("Alcobendas", RES_CER(i).entityId.id);
     EXPECT_EQ("City", RES_CER(i).entityId.type);
     EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
@@ -468,10 +474,23 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn1)
     sc.type = "FIWARE::Location";
     sc.areaType = orion::PolygonType;
     orion::Point p1, p2, p3, p4;
-    p1.latitudeSet("0"); p1.longitudeSet("0"); sc.polygon.vertexList.push_back(&p1);
-    p2.latitudeSet("0"); p2.longitudeSet("6"); sc.polygon.vertexList.push_back(&p2);
-    p3.latitudeSet("6"); p3.longitudeSet("6"); sc.polygon.vertexList.push_back(&p3);
-    p4.latitudeSet("6"); p4.longitudeSet("0"); sc.polygon.vertexList.push_back(&p4);
+
+    p1.latitudeSet("0");
+    p1.longitudeSet("0");
+    sc.polygon.vertexList.push_back(&p1);
+
+    p2.latitudeSet("0");
+    p2.longitudeSet("6");
+    sc.polygon.vertexList.push_back(&p2);
+
+    p3.latitudeSet("6");
+    p3.longitudeSet("6");
+    sc.polygon.vertexList.push_back(&p3);
+
+    p4.latitudeSet("6");
+    p4.longitudeSet("0");
+    sc.polygon.vertexList.push_back(&p4);
+
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -489,7 +508,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn1)
 
     /* Context Element response # 1 */
     i = getEntityIndex(res.contextElementResponseVector, "A");
-    ASSERT_TRUE(i >= 0);
+    ASSERT_GE(i, 0);
     EXPECT_EQ("A", RES_CER(i).entityId.id);
     EXPECT_EQ("Point", RES_CER(i).entityId.type);
     EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
@@ -510,7 +529,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn1)
 
     /* Context Element response # 2 */
     i = getEntityIndex(res.contextElementResponseVector, "B");
-    ASSERT_TRUE(i >= 0);
+    ASSERT_GE(i, 0);
     EXPECT_EQ("B", RES_CER(i).entityId.id);
     EXPECT_EQ("Point", RES_CER(i).entityId.type);
     EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
@@ -563,10 +582,23 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn2)
     sc.type = "FIWARE::Location";
     sc.areaType = orion::PolygonType;
     orion::Point p1, p2, p3, p4;
-    p1.latitudeSet("3"); p1.longitudeSet("8"); sc.polygon.vertexList.push_back(&p1);
-    p2.latitudeSet("11"); p2.longitudeSet("8"); sc.polygon.vertexList.push_back(&p2);
-    p3.latitudeSet("11"); p3.longitudeSet("3"); sc.polygon.vertexList.push_back(&p3);
-    p4.latitudeSet("3"); p4.longitudeSet("3"); sc.polygon.vertexList.push_back(&p4);
+
+    p1.latitudeSet("3");
+    p1.longitudeSet("8");
+    sc.polygon.vertexList.push_back(&p1);
+
+    p2.latitudeSet("11");
+    p2.longitudeSet("8");
+    sc.polygon.vertexList.push_back(&p2);
+
+    p3.latitudeSet("11");
+    p3.longitudeSet("3");
+    sc.polygon.vertexList.push_back(&p3);
+
+    p4.latitudeSet("3");
+    p4.longitudeSet("3");
+    sc.polygon.vertexList.push_back(&p4);
+
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -584,7 +616,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn2)
 
     /* Context Element response # 1 */
     i = getEntityIndex(res.contextElementResponseVector, "B");
-    ASSERT_TRUE(i >= 0);
+    ASSERT_GE(i, 0);
     EXPECT_EQ("B", RES_CER(i).entityId.id);
     EXPECT_EQ("Point", RES_CER(i).entityId.type);
     EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
@@ -605,11 +637,11 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn2)
 
     /* Context Element response # 2 */
     i = getEntityIndex(res.contextElementResponseVector, "C");
-    ASSERT_TRUE(i >= 0);
+    ASSERT_GE(i, 0);
     EXPECT_EQ("C", RES_CER(i).entityId.id);
     EXPECT_EQ("Point", RES_CER(i).entityId.type);
     EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());   
+    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("foo", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->type);
     EXPECT_EQ("attr_C", RES_CER_ATTR(i, 0)->stringValue);
@@ -658,9 +690,19 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn3)
     sc.type = "FIWARE::Location";
     sc.areaType = orion::PolygonType;
     orion::Point p1, p2, p3;
-    p1.latitudeSet("0"); p1.longitudeSet("0"); sc.polygon.vertexList.push_back(&p1);
-    p2.latitudeSet("0"); p2.longitudeSet("6"); sc.polygon.vertexList.push_back(&p2);
-    p3.latitudeSet("6"); p3.longitudeSet("0"); sc.polygon.vertexList.push_back(&p3);
+
+    p1.latitudeSet("0");
+    p1.longitudeSet("0");
+    sc.polygon.vertexList.push_back(&p1);
+
+    p2.latitudeSet("0");
+    p2.longitudeSet("6");
+    sc.polygon.vertexList.push_back(&p2);
+
+    p3.latitudeSet("6");
+    p3.longitudeSet("0");
+    sc.polygon.vertexList.push_back(&p3);
+
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -678,7 +720,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn3)
 
     /* Context Element response # 1 */
     i = getEntityIndex(res.contextElementResponseVector, "A");
-    ASSERT_TRUE(i >= 0);
+    ASSERT_GE(i, 0);
     EXPECT_EQ("A", RES_CER(i).entityId.id);
     EXPECT_EQ("Point", RES_CER(i).entityId.type);
     EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
@@ -731,10 +773,23 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut1)
     sc.type = "FIWARE::Location";
     sc.areaType = orion::PolygonType;
     orion::Point p1, p2, p3, p4;
-    p1.latitudeSet("3"); p1.longitudeSet("8"); sc.polygon.vertexList.push_back(&p1);
-    p2.latitudeSet("11"); p2.longitudeSet("8"); sc.polygon.vertexList.push_back(&p2);
-    p3.latitudeSet("11"); p3.longitudeSet("3"); sc.polygon.vertexList.push_back(&p3);
-    p4.latitudeSet("3"); p4.longitudeSet("3"); sc.polygon.vertexList.push_back(&p4);
+
+    p1.latitudeSet("3");
+    p1.longitudeSet("8");
+    sc.polygon.vertexList.push_back(&p1);
+
+    p2.latitudeSet("11");
+    p2.longitudeSet("8");
+    sc.polygon.vertexList.push_back(&p2);
+
+    p3.latitudeSet("11");
+    p3.longitudeSet("3");
+    sc.polygon.vertexList.push_back(&p3);
+
+    p4.latitudeSet("3");
+    p4.longitudeSet("3");
+    sc.polygon.vertexList.push_back(&p4);
+
     sc.polygon.invertedSet("true");
     req.restriction.scopeVector.push_back(&sc);
 
@@ -753,7 +808,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut1)
 
     /* Context Element response # 1 */
     i = getEntityIndex(res.contextElementResponseVector, "A");
-    ASSERT_TRUE(i >= 0);
+    ASSERT_GE(i, 0);
     EXPECT_EQ("A", RES_CER(i).entityId.id);
     EXPECT_EQ("Point", RES_CER(i).entityId.type);
     EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
@@ -806,9 +861,19 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut2)
     sc.type = "FIWARE::Location";
     sc.areaType = orion::PolygonType;
     orion::Point p1, p2, p3;
-    p1.latitudeSet("0"); p1.longitudeSet("0"); sc.polygon.vertexList.push_back(&p1);
-    p2.latitudeSet("0"); p2.longitudeSet("6"); sc.polygon.vertexList.push_back(&p2);
-    p3.latitudeSet("6"); p3.longitudeSet("0"); sc.polygon.vertexList.push_back(&p3);
+
+    p1.latitudeSet("0");
+    p1.longitudeSet("0");
+    sc.polygon.vertexList.push_back(&p1);
+
+    p2.latitudeSet("0");
+    p2.longitudeSet("6");
+    sc.polygon.vertexList.push_back(&p2);
+
+    p3.latitudeSet("6");
+    p3.longitudeSet("0");
+    sc.polygon.vertexList.push_back(&p3);
+
     sc.polygon.invertedSet("true");
     req.restriction.scopeVector.push_back(&sc);
 
@@ -827,7 +892,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut2)
 
     /* Context Element response # 1 */
     i = getEntityIndex(res.contextElementResponseVector, "B");
-    ASSERT_TRUE(i >= 0);
+    ASSERT_GE(i, 0);
     EXPECT_EQ("B", RES_CER(i).entityId.id);
     EXPECT_EQ("Point", RES_CER(i).entityId.type);
     EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
@@ -848,7 +913,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut2)
 
     /* Context Element response # 2 */
     i = getEntityIndex(res.contextElementResponseVector, "C");
-    ASSERT_TRUE(i >= 0);
+    ASSERT_GE(i, 0);
     EXPECT_EQ("C", RES_CER(i).entityId.id);
     EXPECT_EQ("Point", RES_CER(i).entityId.type);
     EXPECT_EQ("false", RES_CER(i).entityId.isPattern);

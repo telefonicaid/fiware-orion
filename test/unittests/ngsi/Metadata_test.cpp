@@ -30,7 +30,7 @@
 
 /* ****************************************************************************
 *
-* constructor - 
+* constructor -
 */
 TEST(Metadata, constructor)
 {
@@ -51,9 +51,8 @@ TEST(Metadata, constructor)
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 *
-* FIXME P4 - extra newline at the end of expected3json
 */
 TEST(Metadata, render)
 {
@@ -66,11 +65,11 @@ TEST(Metadata, render)
 
   utInit();
 
-  out = m1.render("");
+  out = m1.render(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = m2.render("");
+  out = m2.render(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -81,7 +80,7 @@ TEST(Metadata, render)
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 */
 TEST(Metadata, check)
 {
@@ -97,7 +96,7 @@ TEST(Metadata, check)
 
   checked = m2.check(V1);
   EXPECT_STREQ("missing metadata value", checked.c_str());
-  
+
   checked = m3.check(V1);
   EXPECT_STREQ("OK", checked.c_str());
 

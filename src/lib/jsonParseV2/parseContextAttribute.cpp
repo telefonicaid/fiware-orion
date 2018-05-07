@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "rapidjson/document.h"
 
 #include "logMsg/logMsg.h"
@@ -31,32 +33,33 @@
 #include "parse/CompoundValueNode.h"
 #include "parse/forbiddenChars.h"
 #include "alarmMgr/alarmMgr.h"
-#include "jsonParseV2/jsonParseTypeNames.h"
-#include "jsonParseV2/parseContextAttribute.h"
-#include "jsonParseV2/parseMetadataVector.h"
-#include "jsonParseV2/parseContextAttributeCompoundValue.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 
-using namespace rapidjson;
+#include "jsonParseV2/jsonParseTypeNames.h"
+#include "jsonParseV2/parseMetadataVector.h"
+#include "jsonParseV2/parseContextAttributeCompoundValue.h"
+#include "jsonParseV2/parseContextAttribute.h"
 
 
 
 /* ****************************************************************************
 *
-* parseContextAttributeObject - 
+* parseContextAttributeObject -
 */
-static std::string parseContextAttributeObject(const Value& start, ContextAttribute* caP, bool* compoundVector)
+static std::string parseContextAttributeObject
+(
+  const rapidjson::Value&  start,
+  ContextAttribute*        caP,
+  bool*                    compoundVector
+)
 {
-  int members = 0;
+  // This is NGSIv2 parsing and in NGSIv2, no value means implicit null. Note that
+  // valueTypeNotGiven will be overridden inside the 'for' block in case the attribute has an actual value
+  caP->valueType = orion::ValueTypeNull;
 
-  // valueTypeNone will be overridden inside the 'for' block in case the attribute has an actual value
-  caP->valueType = orion::ValueTypeNone;
-
-  for (Value::ConstMemberIterator iter = start.MemberBegin(); iter != start.MemberEnd(); ++iter)
+  for (rapidjson::Value::ConstMemberIterator iter = start.MemberBegin(); iter != start.MemberEnd(); ++iter)
   {
-    ++members;
-
     std::string name   = iter->name.GetString();
     std::string type   = jsonParseTypeNames[iter->value.GetType()];
 
@@ -95,18 +98,20 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
       }
       else if (type == "Null")
       {
-        caP->valueType    = orion::ValueTypeNone;
+        caP->valueType    = orion::ValueTypeNull;
       }
       else if (type == "Array")
       {
         //
         // FIXME P4: Here the attribute's valueType is set to ValueTypeVector, but normally all compounds have the
-        //           valueType set as Object in the attribute ... to later find its real type in compoundValueP->valueType.
+        //           valueType set as Object in the attribute ...
+        //           to later find its real type in compoundValueP->valueType.
         //           This seems to be needed later, so no 'fix' for now.
-        //           However, this should be looked into, and probably the attributes with coupound values should have the 
-        //           real type of its compound (Object|Vector), not always Object.
+        //           However, this should be looked into, and probably the attributes with compound values
+        //           should have the real type of its compound (Object|Vector), not always Object.
         //           This is really confusing ...
-        //           I guess this was to be able to easily compare for compound by checking "caP->valueType == orion::ValueTypeObject",
+        //           I guess this was to be able to easily compare for compound by checking
+        //           "caP->valueType == orion::ValueTypeObject",
         //           but it is equally easy to compare "caP->compoundValueP != NULL" instead.
         //
         caP->valueType  = orion::ValueTypeVector;
@@ -141,16 +146,11 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
         return r;
       }
     }
-    else // ERROR
+    else  // ERROR
     {
       LM_W(("Bad Input (unrecognized property for ContextAttribute - '%s')", name.c_str()));
       return "unrecognized property for context attribute";
     }
-  }
-
-  if (members == 0)
-  {
-    caP->valueType = orion::ValueTypeNone;
   }
 
   // Is it a date?
@@ -166,7 +166,6 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
     // Probably reseting stringValue is not needed, but let's do it for cleanliness
     caP->stringValue = "";
     caP->valueType   = orion::ValueTypeNumber;
-
   }
 
   return "OK";
@@ -176,9 +175,14 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
 
 /* ****************************************************************************
 *
-* parseContextAttribute - 
+* parseContextAttribute -
 */
-std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberIterator& iter, ContextAttribute* caP)
+std::string parseContextAttribute
+(
+  ConnectionInfo*                               ciP,
+  const rapidjson::Value::ConstMemberIterator&  iter,
+  ContextAttribute*                             caP
+)
 {
   std::string  name           = iter->name.GetString();
   std::string  type           = jsonParseTypeNames[iter->value.GetType()];
@@ -216,7 +220,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     else if (type == "Null")
     {
       caP->type        = "";
-      caP->valueType   = orion::ValueTypeNone;
+      caP->valueType   = orion::ValueTypeNull;
     }
     else if (type == "Array")
     {
@@ -294,11 +298,11 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
 
 /* ****************************************************************************
 *
-* parseContextAttribute - 
+* parseContextAttribute -
 */
 std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
 {
-  Document  document;
+  rapidjson::Document  document;
 
   document.Parse(ciP->payload);
 

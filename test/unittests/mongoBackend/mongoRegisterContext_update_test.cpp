@@ -22,9 +22,10 @@
 *
 * Author: Fermin Galan
 */
+#include <vector>
+
 #include "gtest/gtest.h"
-#include "testInit.h"
-#include "unittest.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -40,15 +41,30 @@
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/testInit.h"
+#include "unittests/unittest.h"
+#include "unittests/commonMocks.h"
 
-#include "commonMocks.h"
 
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::BSONElement;
+using mongo::OID;
+using mongo::DBException;
+using mongo::BSONObjBuilder;
 using ::testing::_;
 using ::testing::Throw;
 using ::testing::Return;
 
-extern void setMongoConnectionForUnitTest(DBClientBase*);
+
+
+extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
 
 /* ****************************************************************************
 *
@@ -89,46 +105,38 @@ static void prepareDatabase(void)
 
   BSONObj cr1 = BSON("providingApplication" << "http://cr1.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T1")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T1")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                         BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                         BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                         )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
+                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
+                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
+
   BSONObj cr2 = BSON("providingApplication" << "http://cr1.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T1")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T1")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")
-                         )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
+
   BSONObj cr3 = BSON("providingApplication" << "http://cr2.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T1")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T1")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")
-                         )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
 
   BSONObjBuilder reg1;
+
   reg1.appendElements(BSON(
                         "_id" << OID("51307b66f481db11bf860001") <<
                         "expiration" << 10000000 <<
                         "contextRegistration" << BSON_ARRAY(cr1) <<
-                        "servicePath" << "/"
-                        ));
+                        "servicePath" << "/"));
 
   BSONObjBuilder reg2;
   reg2.appendElements(BSON(
                         "_id" << OID("51307b66f481db11bf860002") <<
                         "expiration" << 20000000 <<
                         "contextRegistration" << BSON_ARRAY(cr2 << cr3) <<
-                        "servicePath" << "/"
-                        ));
+                        "servicePath" << "/"));
 
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
   BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860010") <<
@@ -148,8 +156,9 @@ static void prepareDatabase(void)
 
   connection->insert(SUBSCRIBECONTEXTAVAIL_COLL, sub1);
   connection->insert(SUBSCRIBECONTEXTAVAIL_COLL, sub2);
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -226,7 +235,7 @@ TEST(mongoRegisterContext_update, updateCase1)
   contextRegistration = contextRegistrationV[0].embeddedObject();
 
   EXPECT_STREQ("http://cr1.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-  entities = contextRegistration.getField("entities").Array();  
+  entities = contextRegistration.getField("entities").Array();
   ASSERT_EQ(1, entities.size());
   ent0 = entities[0].embeddedObject();
   EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -242,7 +251,7 @@ TEST(mongoRegisterContext_update, updateCase1)
   contextRegistration = contextRegistrationV[1].embeddedObject();
 
   EXPECT_STREQ("http://cr2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-  entities = contextRegistration.getField("entities").Array();  
+  entities = contextRegistration.getField("entities").Array();
   ASSERT_EQ(1, entities.size());
   ent0 = entities[0].embeddedObject();
   EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -262,7 +271,7 @@ TEST(mongoRegisterContext_update, updateCase1)
   EXPECT_EQ(SccOk, res.errorCode.code);
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
-  
+
   utExit();
 }
 
@@ -317,7 +326,7 @@ TEST(mongoRegisterContext_update, updateCase2)
     contextRegistration = contextRegistrationV[0].embeddedObject();
 
     EXPECT_STREQ("http://cr1.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -348,7 +357,7 @@ TEST(mongoRegisterContext_update, updateCase2)
     contextRegistration = contextRegistrationV[0].embeddedObject();
 
     EXPECT_STREQ("http://newurl.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -423,7 +432,7 @@ TEST(mongoRegisterContext_update, updateNotFound)
     contextRegistration = contextRegistrationV[0].embeddedObject();
 
     EXPECT_STREQ("http://cr1.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -454,7 +463,7 @@ TEST(mongoRegisterContext_update, updateNotFound)
     contextRegistration = contextRegistrationV[0].embeddedObject();
 
     EXPECT_STREQ("http://cr1.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -470,13 +479,13 @@ TEST(mongoRegisterContext_update, updateNotFound)
     contextRegistration = contextRegistrationV[1].embeddedObject();
 
     EXPECT_STREQ("http://cr2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
     EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
 
-    attrs = contextRegistration.getField("attrs").Array();    
+    attrs = contextRegistration.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     attr0 = attrs[0].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
@@ -538,15 +547,15 @@ TEST(mongoRegisterContext_update, updateWrongIdString)
     /* reg #1 (untouched) */
     reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ("51307b66f481db11bf860001", reg.getField("_id").OID().toString());
-    EXPECT_EQ(10000000, reg.getIntField("expiration")) << "wrong expiration (reg #1)";    
+    EXPECT_EQ(10000000, reg.getIntField("expiration")) << "wrong expiration (reg #1)";
 
     contextRegistrationV = reg.getField("contextRegistration").Array();
     ASSERT_EQ(1, contextRegistrationV.size());
     contextRegistration = contextRegistrationV[0].embeddedObject();
 
     EXPECT_STREQ("http://cr1.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
-    ASSERT_EQ(1, entities.size()) << "wrong number of entities in registration (reg #1, cr #1)";    
+    entities = contextRegistration.getField("entities").Array();
+    ASSERT_EQ(1, entities.size()) << "wrong number of entities in registration (reg #1, cr #1)";
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
     EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
@@ -576,13 +585,13 @@ TEST(mongoRegisterContext_update, updateWrongIdString)
     contextRegistration = contextRegistrationV[0].embeddedObject();
 
     EXPECT_STREQ("http://cr1.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
     EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
 
-    attrs = contextRegistration.getField("attrs").Array();    
+    attrs = contextRegistration.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     attr0 = attrs[0].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
@@ -592,13 +601,13 @@ TEST(mongoRegisterContext_update, updateWrongIdString)
     contextRegistration = contextRegistrationV[1].embeddedObject();
 
     EXPECT_STREQ("http://cr2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
     EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
 
-    attrs = contextRegistration.getField("attrs").Array();    
+    attrs = contextRegistration.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     attr0 = attrs[0].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
@@ -669,7 +678,7 @@ TEST(DISABLED_mongoRegisterContext_update, updateWrongIdNoHex)
     contextRegistration = contextRegistrationV[0].embeddedObject();
 
     EXPECT_STREQ("http://cr1.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -700,13 +709,13 @@ TEST(DISABLED_mongoRegisterContext_update, updateWrongIdNoHex)
     contextRegistration = contextRegistrationV[0].embeddedObject();
 
     EXPECT_STREQ("http://cr1.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
     EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
 
-    attrs = contextRegistration.getField("attrs").Array();    
+    attrs = contextRegistration.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     attr0 = attrs[0].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
@@ -716,13 +725,13 @@ TEST(DISABLED_mongoRegisterContext_update, updateWrongIdNoHex)
     contextRegistration = contextRegistrationV[1].embeddedObject();
 
     EXPECT_STREQ("http://cr2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
     EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
 
-    attrs = contextRegistration.getField("attrs").Array();    
+    attrs = contextRegistration.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     attr0 = attrs[0].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
@@ -750,14 +759,14 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
 {
     HttpStatusCode           ms;
     RegisterContextRequest   req;
-    RegisterContextResponse  res;   
+    RegisterContextResponse  res;
 
     utInit();
 
     /* Prepare mock */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, findOne("utest.registrations",_,_,_))
+    ON_CALL(*connectionMock, findOne("utest.registrations", _, _, _))
             .WillByDefault(Throw(e));
 
     /* Forge the request (from "inside" to "outside") */
@@ -794,12 +803,12 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
     /* Restore real DB connection */
     setMongoConnectionForUnitTest(connectionDb);
 
-    /* Release mock */    
+    /* Release mock */
     delete connectionMock;
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */   
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
     /* registrations collection: */
     ASSERT_EQ(2, connectionDb->count(REGISTRATIONS_COLL, BSONObj()));
@@ -848,13 +857,13 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
     contextRegistration = contextRegistrationV[0].embeddedObject();
 
     EXPECT_STREQ("http://cr1.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
     EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
 
-    attrs = contextRegistration.getField("attrs").Array();    
+    attrs = contextRegistration.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     attr0 = attrs[0].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
@@ -864,13 +873,13 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
     contextRegistration = contextRegistrationV[1].embeddedObject();
 
     EXPECT_STREQ("http://cr2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
     EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
 
-    attrs = contextRegistration.getField("attrs").Array();    
+    attrs = contextRegistration.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     attr0 = attrs[0].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
@@ -904,10 +913,18 @@ TEST(mongoRegisterContext_update, NotifyContextAvailability1)
   expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", "no correlator", NGSI_V1_LEGACY))
-          .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", "no correlator", NGSI_V1_LEGACY))
-          .Times(0);
+
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                  "http://notify1.me",
+                                                                  "",
+                                                                  "no correlator",
+                                                                  NGSI_V1_LEGACY)).Times(1);
+
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,
+                                                                  "http://notify2.me",
+                                                                  "",
+                                                                  "no correlator",
+                                                                  NGSI_V1_LEGACY)).Times(0);
   setNotifier(notifierMock);
 
   /* Forge the request (from "inside" to "outside") */
@@ -971,10 +988,19 @@ TEST(mongoRegisterContext_update, NotifyContextAvailability2)
   expectedNcar2.subscriptionId.set("51307b66f481db11bf860020");
 
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar1),"http://notify1.me", "", "no correlator", NGSI_V1_LEGACY))
-          .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar2),"http://notify2.me", "", "no correlator", NGSI_V1_LEGACY))
-          .Times(1);
+
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar1),
+                                                                  "http://notify1.me",
+                                                                  "",
+                                                                  "no correlator",
+                                                                  NGSI_V1_LEGACY)).Times(1);
+
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar2),
+                                                                  "http://notify2.me",
+                                                                  "",
+                                                                  "no correlator",
+                                                                  NGSI_V1_LEGACY)).Times(1);
+
   setNotifier(notifierMock);
 
   /* Forge the request (from "inside" to "outside") */
@@ -1022,7 +1048,7 @@ TEST(mongoRegisterContext_update, NotifyContextAvailability3)
   RegisterContextResponse  res;
 
   utInit(false, true);  // TimerMock only - NOT NotifierMock
-  
+
   /* Prepare mock */
   NotifyContextAvailabilityRequest expectedNcar;
   EntityId mockEn1("E5", "T5", "false");
@@ -1035,10 +1061,19 @@ TEST(mongoRegisterContext_update, NotifyContextAvailability3)
   expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", "no correlator", NGSI_V1_LEGACY))
-          .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", "no correlator", NGSI_V1_LEGACY))
-          .Times(0);
+
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                  "http://notify1.me",
+                                                                  "",
+                                                                  "no correlator",
+                                                                  NGSI_V1_LEGACY)).Times(1);
+
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,
+                                                                  "http://notify2.me",
+                                                                  "",
+                                                                  "no correlator",
+                                                                  NGSI_V1_LEGACY)).Times(0);
+
   setNotifier(notifierMock);
 
   /* Forge the request (from "inside" to "outside") */

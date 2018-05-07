@@ -22,12 +22,11 @@
 *
 * Author: Orion dev team
 */
+#include <string>
+
 #include "rapidjson/document.h"
 
-#include "utilsParse.h"
-
-using namespace rapidjson;
-using std::string;
+#include "jsonParseV2/utilsParse.h"
 
 
 
@@ -35,11 +34,18 @@ using std::string;
 *
 * getBoolAux -
 */
-static Opt<bool> getBoolAux(const Value& parent, const char* field, const string& description, bool optional)
+static Opt<bool> getBoolAux
+(
+  const rapidjson::Value&  parent,
+  const char*              field,
+  const std::string&       description,
+  bool                     optional
+)
 {
   if (parent.HasMember(field))
   {
-    const Value& value = parent[field];
+    const rapidjson::Value& value = parent[field];
+
     if (!value.IsBool())
     {
       return Opt<bool>((!description.empty() ? description : field) + " is not a bool");
@@ -83,32 +89,40 @@ extern Opt<bool> getBoolOpt(const rapidjson::Value& parent, const char* field, c
 *
 * getStringAux - 
 */
-static Opt<string> getStringAux(const Value& parent, const char* field, const string& description, bool optional)
+static Opt<std::string> getStringAux
+(
+  const rapidjson::Value&  parent,
+  const char*              field,
+  const std::string&       description,
+  bool optional
+)
 {
   if (parent.HasMember(field))
   {
-    const Value& value = parent[field];
+    const rapidjson::Value& value = parent[field];
+
     if (!value.IsString())
     {
-      return Opt<string>((!description.empty() ? description : field) + " is not a string");
+      return Opt<std::string>((!description.empty() ? description : field) + " is not a string");
     }
 
-    return Opt<string>(value.GetString(), true);
+    return Opt<std::string>(value.GetString(), true);
   }
   else if (!optional)
   {
-     return Opt<string>((!description.empty() ? description : field) + " is missing");
+     return Opt<std::string>((!description.empty() ? description : field) + " is missing");
   }
 
-  return Opt<string>("", false);
+  return Opt<std::string>("", false);
 }
+
 
 
 /* ****************************************************************************
 *
 * getStringMust - get a mandatory string from the rapidjson node
 */
-extern Opt<string> getStringMust(const rapidjson::Value& parent, const char* field, const std::string& description)
+extern Opt<std::string> getStringMust(const rapidjson::Value& parent, const char* field, const std::string& description)
 {
   return getStringAux(parent, field, description, false);
 }
@@ -119,7 +133,7 @@ extern Opt<string> getStringMust(const rapidjson::Value& parent, const char* fie
 *
 * getStringOpt - get an optional string from the rapidjson node
 */
-extern Opt<string> getStringOpt(const rapidjson::Value& parent, const char* field, const std::string& description)
+extern Opt<std::string> getStringOpt(const rapidjson::Value& parent, const char* field, const std::string& description)
 {
   return getStringAux(parent, field, description, true);
 }
@@ -130,11 +144,18 @@ extern Opt<string> getStringOpt(const rapidjson::Value& parent, const char* fiel
 *
 * getInt64Aux - 
 */
-static Opt<int64_t> getInt64Aux(const Value& parent, const char* field, const string& description, bool optional)
+static Opt<int64_t> getInt64Aux
+(
+  const rapidjson::Value&  parent,
+  const char*              field,
+  const std::string&       description,
+  bool                     optional
+)
 {
   if (parent.HasMember(field))
   {
-    const Value& value = parent[field];
+    const rapidjson::Value& value = parent[field];
+
     if (!value.IsInt64())
     {
       return Opt<int64_t>((!description.empty() ? description : field) + " is not an int");
@@ -149,6 +170,7 @@ static Opt<int64_t> getInt64Aux(const Value& parent, const char* field, const st
 
   return Opt<int64_t>(0, false);
 }
+
 
 
 /* ****************************************************************************

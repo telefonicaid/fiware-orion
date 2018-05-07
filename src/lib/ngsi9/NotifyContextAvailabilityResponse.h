@@ -1,5 +1,5 @@
-#ifndef NOTIFY_CONTEXT_AVAILABILITYRESPONSE_H
-#define NOTIFY_CONTEXT_AVAILABILITYRESPONSE_H
+#ifndef SRC_LIB_NGSI9_NOTIFYCONTEXTAVAILABILITYRESPONSE_H_
+#define SRC_LIB_NGSI9_NOTIFYCONTEXTAVAILABILITYRESPONSE_H_
 
 /*
 *
@@ -43,9 +43,9 @@ typedef struct NotifyContextAvailabilityResponse
   NotifyContextAvailabilityResponse();
   NotifyContextAvailabilityResponse(StatusCode& sc);
 
-  std::string   render(const std::string& indent);
+  std::string   render(void);
   void          present(const std::string& indent);
   void          release(void);
 } NotifyContextAvailabilityResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI9_NOTIFYCONTEXTAVAILABILITYRESPONSE_H_

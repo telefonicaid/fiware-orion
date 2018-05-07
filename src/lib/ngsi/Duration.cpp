@@ -58,13 +58,7 @@ Duration::Duration()
 *
 * Duration::check -
 */
-std::string Duration::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string Duration::check(void)
 {
   if (string == "")
   {
@@ -162,7 +156,7 @@ void Duration::present(const std::string& indent)
 *
 * Duration::render -
 */
-std::string Duration::render(const std::string& indent, bool comma)
+std::string Duration::render(bool comma)
 {
   if (string == "")
   {
@@ -174,7 +168,7 @@ std::string Duration::render(const std::string& indent, bool comma)
     return "";
   }
 
-  return valueTag(indent, "duration", string, comma);
+  return valueTag("duration", string, comma);
 }
 
 

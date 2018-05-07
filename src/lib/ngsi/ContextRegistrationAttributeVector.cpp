@@ -39,7 +39,7 @@
 *
 * ContextRegistrationAttributeVector::render -
 */
-std::string ContextRegistrationAttributeVector::render(const std::string& indent, bool comma)
+std::string ContextRegistrationAttributeVector::render(bool comma)
 {
   std::string out = "";
 
@@ -48,12 +48,12 @@ std::string ContextRegistrationAttributeVector::render(const std::string& indent
     return "";
   }
 
-  out += startTag(indent, "attributes", true);
+  out += startTag("attributes", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);
+    out += vec[ix]->render(ix != vec.size() - 1);
   }
-  out += endTag(indent, comma, true);
+  out += endTag(comma, true);
 
   return out;
 }

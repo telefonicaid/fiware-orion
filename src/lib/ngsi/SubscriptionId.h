@@ -46,15 +46,13 @@ typedef struct SubscriptionId
   std::string   get(void) const;
   const char*   c_str(void) const;
   bool          isEmpty(void);
-  std::string   render(RequestType container, const std::string& indent, bool comma = false);
+  std::string   render(RequestType container, bool comma);
+  std::string   toJson(RequestType container, bool comma);
   void          present(const std::string& indent);
   void          release(void);
   bool          rendered(RequestType container);
 
-  std::string   check(RequestType         requestType,
-                      const std::string&  indent,
-                      const std::string&  predetectedError,
-                      int                 counter);
+  std::string   check(void);
 } SubscriptionId;
 
 #endif  // SRC_LIB_NGSI_SUBSCRIPTIONID_H_

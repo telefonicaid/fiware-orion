@@ -101,14 +101,14 @@ extern std::string putAllEntitiesWithTypeAndId
   {
     alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, AllEntitiesWithTypeAndId, ""));
+    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, AllEntitiesWithTypeAndId));
     return answer;
   }
   else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
   {
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
-    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, AllEntitiesWithTypeAndId, ""));
+    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, AllEntitiesWithTypeAndId));
     return answer;
   }
 
@@ -126,7 +126,7 @@ extern std::string putAllEntitiesWithTypeAndId
 
 
   // 06. Cleanup and return result
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
 
   parseDataP->upcr.res.release();
   response.release();

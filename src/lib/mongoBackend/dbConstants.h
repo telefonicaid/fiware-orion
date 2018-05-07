@@ -44,7 +44,6 @@
 * Constant strings for field names in collection (first characters
 * are the code name: REG_, ENT_, CSUB_ and CASUB_)
 */
-#define REG_FWS_REGID                "fwdRegId"
 #define REG_CONTEXT_REGISTRATION     "contextRegistration"
 #define REG_PROVIDING_APPLICATION    "providingApplication"
 #define REG_ENTITIES                 "entities"
@@ -52,11 +51,15 @@
 #define REG_EXPIRATION               "expiration"
 #define REG_ENTITY_ID                "id"
 #define REG_ENTITY_TYPE              "type"
+#define REG_ENTITY_ISPATTERN         "isPattern"
+#define REG_ENTITY_ISTYPEPATTERN     "isTypePattern"
 #define REG_ATTRS_NAME               "name"
 #define REG_ATTRS_TYPE               "type"
 #define REG_ATTRS_ISDOMAIN           "isDomain"
 #define REG_SERVICE_PATH             "servicePath"
 #define REG_FORMAT                   "format"
+#define REG_DESCRIPTION              "description"
+#define REG_STATUS                   "status"
 
 #define ENT_ATTRS                    "attrs"
 #define ENT_ATTRNAMES                "attrNames"
@@ -76,6 +79,7 @@
 #define ENT_LOCATION                 "location"
 #define ENT_LOCATION_ATTRNAME        "attrName"
 #define ENT_LOCATION_COORDS          "coords"
+#define ENT_LAST_CORRELATOR          "lastCorrelator"
 
 #define CSUB_DESCRIPTION             "description"
 #define CSUB_EXPIRATION              "expiration"

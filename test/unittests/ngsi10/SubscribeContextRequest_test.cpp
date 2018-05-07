@@ -35,7 +35,7 @@
 
 /* ****************************************************************************
 *
-* ok_json - 
+* ok_json -
 */
 TEST(SubscribeContextRequest, ok_json)
 {
@@ -59,7 +59,7 @@ TEST(SubscribeContextRequest, ok_json)
   //
   // With the data obtained present and release methods are exercised
   //
-  SubscribeContextRequest*  scrP    = &parseData.scr.res;  
+  SubscribeContextRequest*  scrP    = &parseData.scr.res;
   scrP->present(""); // No output
   scrP->release();
 
@@ -70,7 +70,7 @@ TEST(SubscribeContextRequest, ok_json)
 
 /* ****************************************************************************
 *
-* badIsPattern_json - 
+* badIsPattern_json -
 */
 TEST(SubscribeContextRequest, badIsPattern_json)
 {
@@ -97,7 +97,7 @@ TEST(SubscribeContextRequest, badIsPattern_json)
 
 /* ****************************************************************************
 *
-* invalidDuration_json - 
+* invalidDuration_json -
 */
 TEST(SubscribeContextRequest, invalidDuration_json)
 {
@@ -124,7 +124,7 @@ TEST(SubscribeContextRequest, invalidDuration_json)
 
 /* ****************************************************************************
 *
-* scopeGeolocationCircleOkJson - 
+* scopeGeolocationCircleOkJson -
 */
 TEST(SubscribeContextRequest, scopeGeolocationCircleOkJson)
 {
@@ -149,7 +149,7 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleOkJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationCircleInvertedJson - 
+* scopeGeolocationCircleInvertedJson -
 */
 TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedJson)
 {
@@ -174,7 +174,7 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationCircleInvertedBadValueJson - 
+* scopeGeolocationCircleInvertedBadValueJson -
 */
 TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedBadValueJson)
 {
@@ -201,7 +201,7 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedBadValueJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationCircleZeroRadiusJson - 
+* scopeGeolocationCircleZeroRadiusJson -
 */
 TEST(SubscribeContextRequest, scopeGeolocationCircleZeroRadiusJson)
 {
@@ -228,7 +228,7 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleZeroRadiusJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationPolygonOkJson - 
+* scopeGeolocationPolygonOkJson -
 */
 TEST(SubscribeContextRequest, scopeGeolocationPolygonOkJson)
 {
@@ -253,7 +253,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonOkJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationPolygonInvertedJson - 
+* scopeGeolocationPolygonInvertedJson -
 */
 TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedJson)
 {
@@ -278,7 +278,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationPolygonInvertedBadValueJson - 
+* scopeGeolocationPolygonInvertedBadValueJson -
 */
 TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedBadValueJson)
 {
@@ -305,7 +305,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedBadValueJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationPolygonNoVerticesJson - 
+* scopeGeolocationPolygonNoVerticesJson -
 */
 TEST(SubscribeContextRequest, scopeGeolocationPolygonNoVerticesJson)
 {
@@ -332,7 +332,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonNoVerticesJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationPolygonOneVertexJson - 
+* scopeGeolocationPolygonOneVertexJson -
 */
 TEST(SubscribeContextRequest, scopeGeolocationPolygonOneVertexJson)
 {
@@ -359,7 +359,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonOneVertexJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationPolygonTwoVerticesJson - 
+* scopeGeolocationPolygonTwoVerticesJson -
 */
 TEST(SubscribeContextRequest, scopeGeolocationPolygonTwoVerticesJson)
 {

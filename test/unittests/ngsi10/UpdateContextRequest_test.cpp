@@ -44,7 +44,7 @@
 
 /* ****************************************************************************
 *
-* ok_json - 
+* ok_json -
 */
 TEST(UpdateContextRequest, ok_json)
 {
@@ -80,7 +80,7 @@ TEST(UpdateContextRequest, ok_json)
 
 /* ****************************************************************************
 *
-* badIsPattern_json - 
+* badIsPattern_json -
 */
 TEST(UpdateContextRequest, badIsPattern_json)
 {

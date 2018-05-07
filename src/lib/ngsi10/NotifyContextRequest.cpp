@@ -38,7 +38,7 @@
 *
 * NotifyContextRequest::render -
 */
-std::string NotifyContextRequest::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
+std::string NotifyContextRequest::render(ApiVersion apiVersion, bool asJsonObject)
 {
   std::string  out                                  = "";
   bool         contextElementResponseVectorRendered = contextElementResponseVector.size() != 0;
@@ -49,11 +49,11 @@ std::string NotifyContextRequest::render(ApiVersion apiVersion, bool asJsonObjec
   //   The only doubt here if whether originator should end in a comma.
   //   This doubt is taken care of by the variable 'contextElementResponseVectorRendered'
   //
-  out += startTag(indent);
-  out += subscriptionId.render(NotifyContext, indent + "  ", true);
-  out += originator.render(indent  + "  ", contextElementResponseVectorRendered);
-  out += contextElementResponseVector.render(apiVersion, asJsonObject, NotifyContext, indent  + "  ", false);
-  out += endTag(indent);
+  out += startTag();
+  out += subscriptionId.render(NotifyContext, true);
+  out += originator.render(contextElementResponseVectorRendered);
+  out += contextElementResponseVector.render(apiVersion, asJsonObject, NotifyContext, false);
+  out += endTag();
 
   return out;
 }
@@ -101,18 +101,18 @@ std::string NotifyContextRequest::toJson
 *
 * NotifyContextRequest::check
 */
-std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string& indent, const std::string& predetectedError)
+std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string& predetectedError)
 {
   std::string            res;
   NotifyContextResponse  response;
-   
+
   if (predetectedError != "")
   {
     response.responseCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = subscriptionId.check(QueryContext, indent, predetectedError, 0))                    != "OK") ||
-           ((res = originator.check(QueryContext, indent, predetectedError, 0))                        != "OK") ||
-           ((res = contextElementResponseVector.check(apiVersion, QueryContext, indent, predetectedError, 0)) != "OK"))
+  else if (((res = subscriptionId.check())                    != "OK") ||
+           ((res = originator.check())                        != "OK") ||
+           ((res = contextElementResponseVector.check(apiVersion, QueryContext, predetectedError, 0)) != "OK"))
   {
     response.responseCode.fill(SccBadRequest, res);
   }
@@ -121,7 +121,7 @@ std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string
     return "OK";
   }
 
-  return response.render(indent);
+  return response.render();
 }
 
 
@@ -152,7 +152,7 @@ void NotifyContextRequest::release(void)
 
 /* ****************************************************************************
 *
-* NotifyContextRequest::clone - 
+* NotifyContextRequest::clone -
 */
 NotifyContextRequest* NotifyContextRequest::clone(void)
 {

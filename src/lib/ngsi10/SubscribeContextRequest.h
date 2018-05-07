@@ -1,5 +1,5 @@
-#ifndef SUBSCRIBE_CONTEXT_REQUEST_H
-#define SUBSCRIBE_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_NGSI10_SUBSCRIBECONTEXTREQUEST_H_
+#define SRC_LIB_NGSI10_SUBSCRIBECONTEXTREQUEST_H_
 
 /*
 *
@@ -29,7 +29,7 @@
 
 #include "common/RenderFormat.h"
 #include "ngsi/Request.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Duration.h"
 #include "ngsi/NotifyConditionVector.h"
@@ -48,19 +48,19 @@
 typedef struct SubscribeContextRequest
 {
   EntityIdVector         entityIdVector;         // Mandatory
-  AttributeList          attributeList;          // Optional
+  StringList             attributeList;          // Optional
   Reference              reference;              // Mandatory
   Duration               duration;               // Optional
   Restriction            restriction;            // Optional
   NotifyConditionVector  notifyConditionVector;  // Optional
-  Throttling             throttling;             // Optional  
+  Throttling             throttling;             // Optional
 
   /* The number of restrictions */
   int                    restrictions;
 
   SubscribeContextRequest(): restrictions(0) {}
 
-  std::string  check(const std::string& indent, const std::string& predetectedError, int counter);
+  std::string  check(const std::string& predetectedError, int counter);
   void         present(const std::string& indent);
   void         release(void);
   void         toNgsiv2Subscription(ngsiv2::Subscription* sub);
@@ -68,4 +68,4 @@ typedef struct SubscribeContextRequest
   void         fill(EntityTypeInfo typeInfo);
 } SubscribeContextRequest;
 
-#endif
+#endif  // SRC_LIB_NGSI10_SUBSCRIBECONTEXTREQUEST_H_

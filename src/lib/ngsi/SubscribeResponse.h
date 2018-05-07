@@ -45,7 +45,7 @@ typedef struct SubscribeResponse
 
   SubscribeResponse();
 
-  std::string render(const std::string& indent, bool comma = false);
+  std::string render(bool comma);
 } SubscribeResponse;
 
 #endif  // SRC_LIB_NGSI_SUBSCRIBERESPONSE_H_

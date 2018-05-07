@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_COMMON_SYNCQOVERFLOW_H
-#define SRC_LIB_COMMON_SYNCQOVERFLOW_H
+#ifndef SRC_LIB_COMMON_SYNCQOVERFLOW_H_
+#define SRC_LIB_COMMON_SYNCQOVERFLOW_H_
 
 /*
 *
@@ -99,4 +99,5 @@ size_t SyncQOverflow<Data>::size() const
 
   return queue.size();
 }
-#endif // SRC_LIB_COMMON_SYNCQOVERFLOW_H
+
+#endif  // SRC_LIB_COMMON_SYNCQOVERFLOW_H_

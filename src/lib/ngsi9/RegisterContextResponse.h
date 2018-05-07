@@ -1,5 +1,5 @@
-#ifndef REGISTER_CONTEXT_RESPONSE_H
-#define REGISTER_CONTEXT_RESPONSE_H
+#ifndef SRC_LIB_NGSI9_REGISTERCONTEXTRESPONSE_H_
+#define SRC_LIB_NGSI9_REGISTERCONTEXTRESPONSE_H_
 
 /*
 *
@@ -50,10 +50,10 @@ typedef struct RegisterContextResponse
   RegisterContextResponse(const std::string& _registrationId, const std::string& _duration);
   RegisterContextResponse(const std::string& _registrationId, StatusCode& _errorCode);
 
-  std::string render(const std::string& indent);
-  std::string check(const std::string& indent, const std::string& predetectedError, int counter);
+  std::string render(void);
+  std::string check(const std::string& predetectedError, int counter);
   void        present(const std::string& indent);
   void        release(void);
 } RegisterContextResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI9_REGISTERCONTEXTRESPONSE_H_

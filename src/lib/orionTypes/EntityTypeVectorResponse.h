@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_UTILITY_ENTITYTYPEVECTORRESPONSE_H_
-#define SRC_LIB_UTILITY_ENTITYTYPEVECTORRESPONSE_H_
+#ifndef SRC_LIB_ORIONTYPES_ENTITYTYPEVECTORRESPONSE_H_
+#define SRC_LIB_ORIONTYPES_ENTITYTYPEVECTORRESPONSE_H_
 
 /*
 *
@@ -44,11 +44,10 @@ class EntityTypeVectorResponse
   EntityTypeVector  entityTypeVector;
   StatusCode        statusCode;
 
-  std::string       render(ApiVersion          apiVersion,
-                           bool                asJsonObject,
-                           bool                asJsonOut,
-                           bool                collapsed,
-                           const std::string&  indent);
+  std::string       render(ApiVersion  apiVersion,
+                           bool        asJsonObject,
+                           bool        asJsonOut,
+                           bool        collapsed);
   std::string       check(ApiVersion          apiVersion,
                           bool                asJsonObject,
                           bool                asJsonOut,
@@ -59,4 +58,4 @@ class EntityTypeVectorResponse
   std::string       toJson(bool values);
 };
 
-#endif  // SRC_LIB_UTILITY_ENTITYTYPEVECTORRESPONSE_H_
+#endif  // SRC_LIB_ORIONTYPES_ENTITYTYPEVECTORRESPONSE_H_

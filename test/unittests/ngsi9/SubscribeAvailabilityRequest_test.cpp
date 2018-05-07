@@ -57,7 +57,7 @@
 
 /* ****************************************************************************
 *
-* json_ok - 
+* json_ok -
 */
 TEST(SubscribeContextAvailabilityRequest, json_ok)
 {
@@ -84,7 +84,7 @@ TEST(SubscribeContextAvailabilityRequest, json_ok)
 
 /* ****************************************************************************
 *
-* json_badIsPattern - 
+* json_badIsPattern -
 */
 TEST(SubscribeContextAvailabilityRequest, json_badIsPattern)
 {
@@ -109,7 +109,7 @@ TEST(SubscribeContextAvailabilityRequest, json_badIsPattern)
 
 /* ****************************************************************************
 *
-* json_noEntityId - 
+* json_noEntityId -
 */
 TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
 {
@@ -136,7 +136,7 @@ TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
 
 /* ****************************************************************************
 *
-* json_badDuration - 
+* json_badDuration -
 */
 TEST(SubscribeContextAvailabilityRequest, json_badDuration)
 {

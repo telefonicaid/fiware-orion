@@ -208,7 +208,7 @@ echo
 01. CREATE E1/T1/A1/M1
 ======================
 HTTP/1.1 200 OK
-Content-Length: 550
+Content-Length: 241
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -247,7 +247,7 @@ Date: REGEX(.*)
 02. CREATE E1/T1/A1/M2
 ======================
 HTTP/1.1 200 OK
-Content-Length: 550
+Content-Length: 241
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -286,7 +286,7 @@ Date: REGEX(.*)
 03. CREATE E1/T2/A1/M1
 ======================
 HTTP/1.1 200 OK
-Content-Length: 550
+Content-Length: 241
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -325,7 +325,7 @@ Date: REGEX(.*)
 04. CREATE E1/T2/A1/M2
 ======================
 HTTP/1.1 200 OK
-Content-Length: 550
+Content-Length: 241
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -364,7 +364,7 @@ Date: REGEX(.*)
 05. Make sure all four are present
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 1662
+Content-Length: 690
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -452,7 +452,7 @@ Date: REGEX(.*)
 06. DELETE E1/T1/A1/M1
 ======================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -466,7 +466,7 @@ Date: REGEX(.*)
 07. DELETE E1//A1/M2
 ====================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -480,7 +480,7 @@ Date: REGEX(.*)
 08. Make sure only E1/T2/A1/M1 is left
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 769
+Content-Length: 363
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

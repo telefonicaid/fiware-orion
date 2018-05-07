@@ -29,7 +29,7 @@
 #include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Restriction.h"
 #include "ngsi10/QueryContextResponse.h"
@@ -77,12 +77,12 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 *
 * QueryContextRequest::QueryContextRequest
 */
-QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const AttributeList& _attributeList)
+QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const StringList& _attributeList)
 {
   contextProvider = _contextProvider;
 
   entityIdVector.push_back(new EntityId(eP));
-  
+
   attributeList.clone(_attributeList);
 
   restrictions = 0;
@@ -92,9 +92,9 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 
 /* ****************************************************************************
 *
-* QueryContextRequest::render - 
+* QueryContextRequest::render -
 */
-std::string QueryContextRequest::render(const std::string& indent)
+std::string QueryContextRequest::render(void)
 {
   std::string   out                      = "";
   bool          attributeListRendered    = attributeList.size() != 0;
@@ -102,11 +102,11 @@ std::string QueryContextRequest::render(const std::string& indent)
   bool          commaAfterAttributeList  = restrictionRendered;
   bool          commaAfterEntityIdVector = attributeListRendered || restrictionRendered;
 
-  out += startTag(indent);
-  out += entityIdVector.render(indent + "  ", commaAfterEntityIdVector);
-  out += attributeList.render( indent + "  ", commaAfterAttributeList);
-  out += restriction.render(   indent + "  ", restrictions, false);
-  out += endTag(indent);
+  out += startTag();
+  out += entityIdVector.render(commaAfterEntityIdVector);
+  out += attributeList.render(commaAfterAttributeList, "attributes");
+  out += restriction.render(restrictions, false);
+  out += endTag();
 
   return out;
 }
@@ -115,9 +115,9 @@ std::string QueryContextRequest::render(const std::string& indent)
 
 /* ****************************************************************************
 *
-* QueryContextRequest::check - 
+* QueryContextRequest::check -
 */
-std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError)
+std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError)
 {
   std::string           res;
   QueryContextResponse  response;
@@ -126,9 +126,9 @@ std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject,
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = entityIdVector.check(QueryContext, indent))                                 != "OK") ||
-           ((res = attributeList.check(QueryContext,  indent, predetectedError, 0))            != "OK") ||
-           ((res = restriction.check(QueryContext,    indent, predetectedError, restrictions)) != "OK"))
+  else if (((res = entityIdVector.check(QueryContext)) != "OK") ||
+           ((res = attributeList.check())              != "OK") ||
+           ((res = restriction.check(restrictions))    != "OK"))
   {
     alarmMgr.badInput(clientIp, res);
     response.errorCode.fill(SccBadRequest, res);
@@ -138,14 +138,14 @@ std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject,
     return "OK";
   }
 
-  return response.render(apiVersion, asJsonObject, indent);
+  return response.render(apiVersion, asJsonObject);
 }
 
 
 
 /* ****************************************************************************
 *
-* QueryContextRequest::present - 
+* QueryContextRequest::present -
 */
 void QueryContextRequest::present(const std::string& indent)
 {
@@ -158,7 +158,7 @@ void QueryContextRequest::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* QueryContextRequest::release - 
+* QueryContextRequest::release -
 */
 void QueryContextRequest::release(void)
 {
@@ -170,7 +170,7 @@ void QueryContextRequest::release(void)
 
 /* ****************************************************************************
 *
-* QueryContextRequest::fill - 
+* QueryContextRequest::fill -
 */
 void QueryContextRequest::fill(const std::string& entityId, const std::string& entityType, const std::string& attributeName)
 {
@@ -188,7 +188,7 @@ void QueryContextRequest::fill(const std::string& entityId, const std::string& e
 
 /* ****************************************************************************
 *
-* QueryContextRequest::fill - 
+* QueryContextRequest::fill -
 */
 void QueryContextRequest::fill
 (
@@ -208,7 +208,7 @@ void QueryContextRequest::fill
     Scope* scopeP = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
 
     scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
-      
+
     restriction.scopeVector.push_back(scopeP);
   }
 
@@ -222,10 +222,10 @@ void QueryContextRequest::fill
 
 /* ****************************************************************************
 *
-* QueryContextRequest::fill - 
+* QueryContextRequest::fill -
 *
 * NOTE
-* If the incoming bqP->entities.vec is empty, then one almighty entity::id is 
+* If the incoming bqP->entities.vec is empty, then one almighty entity::id is
 * added to the QueryContextRequest::entityIdVector, namely, idPattern .* with empty type,
 * matching ALL entities.
 *
@@ -242,7 +242,7 @@ void QueryContextRequest::fill(BatchQuery* bqP)
     entityIdVector.push_back(eP);
   }
 
-  attributeList.fill(bqP->attributeV.attributeV);
+  attributeList.fill(bqP->attributeV.stringV);
   restriction.scopeVector.fill(bqP->scopeV, false);  // false: DO NOT ALLOCATE NEW scopes - reference the 'old' ones
   bqP->scopeV.vec.clear();  // QueryContextRequest::restriction.scopeVector has taken over the Scopes from bqP
 }

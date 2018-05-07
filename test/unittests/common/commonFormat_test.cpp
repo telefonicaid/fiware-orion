@@ -31,7 +31,7 @@
 
 /* ****************************************************************************
 *
-* mimeTypeToString - 
+* mimeTypeToString -
 */
 TEST(commonMimeType, mimeTypeToString)
 {
@@ -39,7 +39,7 @@ TEST(commonMimeType, mimeTypeToString)
 
    mimeType = (char*) mimeTypeToString(JSON);
    EXPECT_STREQ("JSON", mimeType) << "bad string translation for JSON mimeType";
-   
+
    mimeType = (char*) mimeTypeToString(TEXT);
    EXPECT_STREQ("TEXT", mimeType) << "bad string translation for TEXT mimeType";
 
@@ -57,7 +57,7 @@ TEST(commonMimeType, mimeTypeToString)
 
 /* ****************************************************************************
 *
-* stringTomimeType - 
+* stringTomimeType -
 */
 TEST(commonMimeType, stringTomimeType)
 {
@@ -74,7 +74,7 @@ TEST(commonMimeType, stringTomimeType)
 
 /* ****************************************************************************
 *
-* mimeTypeParse - 
+* mimeTypeParse -
 */
 TEST(commonMimeType, mimeTypeParse)
 {

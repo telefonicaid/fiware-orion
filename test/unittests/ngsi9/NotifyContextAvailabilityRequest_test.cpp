@@ -35,7 +35,7 @@
 
 /* ****************************************************************************
 *
-* ok_json - 
+* ok_json -
 */
 TEST(NotifyContextAvailabilityRequest, ok_json)
 {
@@ -60,12 +60,12 @@ TEST(NotifyContextAvailabilityRequest, ok_json)
 
   const char*     outfile = "ngsi9.notifyContextAvailabilityRequest.ok.valid.json";
 
-  out = ncarP->render("");
+  out = ncarP->render();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ncarP->release();
-  
+
   utExit();
 }
 
@@ -73,7 +73,7 @@ TEST(NotifyContextAvailabilityRequest, ok_json)
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 *
 */
 TEST(NotifyContextAvailabilityRequest, check)
@@ -83,9 +83,9 @@ TEST(NotifyContextAvailabilityRequest, check)
 
   utInit();
 
-  out = ncr.check(V1, "", "", 0);
+  out = ncr.check(V1, "");
   EXPECT_EQ("OK", out);
-   
+
   utExit();
 }
 
@@ -93,7 +93,7 @@ TEST(NotifyContextAvailabilityRequest, check)
 
 /* ****************************************************************************
 *
-* json_render - 
+* json_render -
 */
 TEST(NotifyContextAvailabilityRequest, json_render)
 {
@@ -126,11 +126,11 @@ TEST(NotifyContextAvailabilityRequest, json_render)
 
   // Test 1. contextRegistrationResponseVector with ONE contextRegistrationResponse instance
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  rendered = ncarP->render("");
+  rendered = ncarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
-  
 
-  
+
+
   // Test 2. contextRegistrationResponseVector with TWO contextRegistrationResponse instances
   Metadata*                     mdP   = new Metadata("M01", "MType", "123");
   ContextRegistrationAttribute* craP  = new ContextRegistrationAttribute("CRA1", "CType", "false");
@@ -145,10 +145,10 @@ TEST(NotifyContextAvailabilityRequest, json_render)
   crrP->contextRegistration.registrationMetadataVector.push_back(mdP);
 
   crrP->contextRegistration.providingApplication.set("http://www.tid.es/NotifyContextAvailabilityRequestTest2");
-  
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  rendered = ncarP->render("");
+  rendered = ncarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
-  
+
   utExit();
 }

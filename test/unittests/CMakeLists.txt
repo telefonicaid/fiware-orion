@@ -95,6 +95,7 @@ SET (SOURCES
     common/commonSem_test.cpp
     common/commonStatistics_test.cpp
     common/commonWsStrip_test.cpp
+    common/commonMacroSubstitute_test.cpp
 
     ngsi9/RegisterContextRequest_test.cpp
     ngsi9/RegisterContextResponse_test.cpp
@@ -183,6 +184,7 @@ SET (SOURCES
     mongoBackend/mongoUpdateContextAvailabilitySubscription_test.cpp
     mongoBackend/mongoUpdateContextSubscription_test.cpp
     mongoBackend/mongoUpdateContext_test.cpp
+    mongoBackend/mongoUpdateContext_2_test.cpp
     mongoBackend/mongoUpdateContextGeo_test.cpp
     mongoBackend/mongoUpdateContext_withOnchangeSubscriptions_test.cpp
     mongoBackend/mongoUpdateContext_withOnchangeSubscriptionsNoCache_test.cpp
@@ -228,6 +230,7 @@ include_directories("${PROJECT_SOURCE_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 include_directories("${PROJECT_SOURCE_DIR}/src/app")
 include_directories("${PROJECT_SOURCE_DIR}/test/unittests")
+include_directories("${PROJECT_SOURCE_DIR}/test")
 
 # Lib directories
 # ------------------------------------------------------------

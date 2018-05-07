@@ -22,28 +22,43 @@
 *
 * Author: Fermin Galan
 */
+#include <string>
+#include <vector>
+
 #include "gtest/gtest.h"
-#include "testInit.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoGetSubscriptions.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/testInit.h"
+#include "unittests/commonMocks.h"
+#include "unittests/unittest.h"
 
-#include "commonMocks.h"
-#include "unittest.h"
 
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::OID;
 using ::testing::_;
 using ::testing::Throw;
 using ::testing::Return;
+using ngsiv2::Subscription;
+using ngsiv2::EntID;
 
-using namespace ngsiv2;
 
-extern void setMongoConnectionForUnitTest(DBClientBase*);
+
+extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+
+
 
 /* ****************************************************************************
 *
@@ -64,8 +79,8 @@ static const std::string SUB_OID3 = "51307b66f481db11bf860003";
 *
 * prepareDatabaseV1Subs -
 */
-static void prepareDatabaseV1Subs(void) {
-
+static void prepareDatabaseV1Subs(void)
+{
     /* Set database */
     setupDatabase();
 
@@ -75,12 +90,11 @@ static void prepareDatabaseV1Subs(void) {
     DBClientBase* connection = getMongoConnection();
 
     BSONObj sub1 = BSON("_id" << OID(SUB_OID1) <<
-                        "expiration" << 10000000 <<                        
+                        "expiration" << 10000000 <<
                         "reference" << "http://notify1.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
-                        "conditions" << BSON_ARRAY("AX1" << "AY1")
-                        );
+                        "conditions" << BSON_ARRAY("AX1" << "AY1"));
 
     BSONObj sub2 = BSON("_id" << OID(SUB_OID2) <<
                         "expiration" << 25000000 <<
@@ -90,8 +104,7 @@ static void prepareDatabaseV1Subs(void) {
                         "entities" << BSON_ARRAY(BSON("id" << "E.*" << "type" << "T2" << "isPattern" << "true")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
                         "conditions" << BSON_ARRAY("AX2" << "AY2") <<
-                        "throttling" << 5
-                        );
+                        "throttling" << 5);
 
     BSONObj sub3 = BSON("_id" << OID(SUB_OID3) <<
                         "expiration" << 20000000 <<
@@ -99,8 +112,7 @@ static void prepareDatabaseV1Subs(void) {
                         "reference" << "http://notify2.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E.*" << "type" << "T2" << "isPattern" << "true")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
-                        "conditions" << BSON_ARRAY("ZZ2" << "WW2")
-                        );
+                        "conditions" << BSON_ARRAY("ZZ2" << "WW2"));
 
     connection->insert(SUBSCRIBECONTEXT_COLL, sub1);
     connection->insert(SUBSCRIBECONTEXT_COLL, sub2);
@@ -178,7 +190,7 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
   EXPECT_EQ("A1", attrs[0]);
   EXPECT_EQ("A2", attrs[1]);
   EXPECT_EQ("http://notify2.me", s.notification.httpInfo.url);
-  EXPECT_EQ(24, s.notification.timesSent);;
+  EXPECT_EQ(24, s.notification.timesSent);
   EXPECT_EQ(20000000, s.notification.lastNotification);
   EXPECT_EQ(5, s.throttling);
   EXPECT_EQ(25000000, s.expires);
@@ -203,7 +215,7 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
   EXPECT_EQ("A1", attrs[0]);
   EXPECT_EQ("A2", attrs[1]);
   EXPECT_EQ("http://notify2.me", s.notification.httpInfo.url);
-  EXPECT_EQ(-1, s.notification.timesSent);;
+  EXPECT_EQ(-1, s.notification.timesSent);
   EXPECT_EQ(25000000, s.notification.lastNotification);
   EXPECT_EQ(-1, s.throttling);
   EXPECT_EQ(20000000, s.expires);
@@ -254,8 +266,8 @@ TEST(mongoGetSubscription, getSubscription)
   EXPECT_EQ("", s.subject.condition.expression.coords);
   attrs = s.notification.attributes;
   ASSERT_EQ(0, attrs.size());
-  EXPECT_EQ("http://notify1.me",s.notification.httpInfo.url);
-  EXPECT_EQ(-1, s.notification.timesSent);;
+  EXPECT_EQ("http://notify1.me", s.notification.httpInfo.url);
+  EXPECT_EQ(-1, s.notification.timesSent);
   EXPECT_EQ(-1, s.notification.lastNotification);
   EXPECT_EQ(-1, s.throttling);
   EXPECT_EQ(10000000, s.expires);
@@ -285,7 +297,7 @@ TEST(mongoGetSubscription, getSubscription)
   EXPECT_EQ("A1", attrs[0]);
   EXPECT_EQ("A2", attrs[1]);
   EXPECT_EQ("http://notify2.me", s.notification.httpInfo.url);
-  EXPECT_EQ(24, s.notification.timesSent);;
+  EXPECT_EQ(24, s.notification.timesSent);
   EXPECT_EQ(20000000, s.notification.lastNotification);
   EXPECT_EQ(5, s.throttling);
   EXPECT_EQ(25000000, s.expires);

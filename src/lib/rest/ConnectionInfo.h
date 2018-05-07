@@ -48,7 +48,7 @@ struct ParseData;
 
 /* ****************************************************************************
 *
-* ConnectionInfo - 
+* ConnectionInfo -
 */
 class ConnectionInfo
 {
@@ -124,6 +124,7 @@ public:
     else if (_method == "GET")     verb = GET;
     else if (_method == "DELETE")  verb = DELETE;
     else if (_method == "PATCH")   verb = PATCH;
+    else if (_method == "OPTIONS") verb = OPTIONS;
     else                           verb = NOVERB;
   }
 
@@ -183,7 +184,7 @@ public:
 
 /* ****************************************************************************
 *
-* uriParamOptionsParse - 
+* uriParamOptionsParse -
 */
 extern int uriParamOptionsParse(ConnectionInfo* ciP, const char* value);
 

@@ -33,11 +33,11 @@
 
 /* ****************************************************************************
 *
-* validOptions - 
+* validOptions -
 *
 * Text definitions OPT_* found in common/globals.h
 */
-static const char* validOptions[] = 
+static const char* validOptions[] =
 {
   OPT_COUNT,
   OPT_NORMALIZED,
@@ -54,7 +54,7 @@ static const char* validOptions[] =
 
 /* ****************************************************************************
 *
-* isValidOption - 
+* isValidOption -
 */
 static bool isValidOption(std::string item)
 {

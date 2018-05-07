@@ -212,7 +212,6 @@ std::string jsonInvalidCharsTransformation(const std::string& input)
 */
 std::string startTag
 (
-  const std::string&  indent,
   const std::string&  key,
   bool                isVector
 )
@@ -224,20 +223,20 @@ std::string startTag
 
   if (isVector && showKey)
   {
-    return indent + "\"" + key + "\" : [\n";
+    return "\"" + key + "\":[";
   }
   else if (isVector && !showKey)
   {
-    return indent + "[\n";
+    return "[";
   }
   else if (!isVector && showKey)
   {
-    return indent + "\"" + key + "\" : {\n";
+    return "\"" + key + "\":{";
   }
 
   // else: !isVector && !showKey
 
-  return indent + "{\n";
+  return "{";
 }
 
 
@@ -248,17 +247,14 @@ std::string startTag
 */
 std::string endTag
 (
-  const std::string&  indent,
   bool                comma,
   bool                isVector
 )
 {
-  std::string out = indent;
+  std::string out = "";
 
   out += isVector?  "]"  : "}";
   out += comma?     ","  : "";
-
-  out += "\n";
 
   return out;
 }
@@ -274,7 +270,6 @@ std::string endTag
 */
 std::string valueTag
 (
-  const std::string&  indent,
   const std::string&  key,
   const std::string&  unescapedValue,
   bool                showComma,
@@ -309,12 +304,12 @@ std::string valueTag
   {
     if (isVectorElement == true)
     {
-      std::string out = indent + effectiveValue + ",\n";
+      std::string out = effectiveValue + ",";
       return out;
     }
     else
     {
-      std::string out = indent + "\"" + key + "\" : " + effectiveValue + ",\n";
+      std::string out = "\"" + key + "\":" + effectiveValue + ",";
       return out;
     }
   }
@@ -322,12 +317,12 @@ std::string valueTag
   {
     if (isVectorElement == true)
     {
-      std::string out = indent + effectiveValue + "\n";
+      std::string out = effectiveValue;
       return out;
     }
     else
     {
-      std::string out = indent + "\"" + key + "\" : " + effectiveValue + "\n";
+      std::string out = "\"" + key + "\":" + effectiveValue;
       return out;
     }
   }
@@ -344,7 +339,6 @@ std::string valueTag
 */
 std::string valueTag
 (
-  const std::string&  indent,
   const std::string&  key,
   int                 value,
   bool                showComma
@@ -354,7 +348,7 @@ std::string valueTag
 
   snprintf(val, sizeof(val), "%d", value);
 
-  return valueTag(indent, key, val, showComma, false, false);
+  return valueTag(key, val, showComma, false, false);
 }
 
 

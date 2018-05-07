@@ -40,7 +40,7 @@
 *
 * parseMetadataVector - 
 */
-std::string parseMetadataVector(const Value::ConstMemberIterator& node, ContextAttribute* caP)
+std::string parseMetadataVector(const rapidjson::Value::ConstMemberIterator& node, ContextAttribute* caP)
 {
   std::string type   = jsonParseTypeNames[node->value.GetType()];
 
@@ -49,7 +49,7 @@ std::string parseMetadataVector(const Value::ConstMemberIterator& node, ContextA
     return "metadata not a JSON object";
   }
 
-  for (Value::ConstMemberIterator iter = node->value.MemberBegin(); iter != node->value.MemberEnd(); ++iter)
+  for (rapidjson::Value::ConstMemberIterator iter = node->value.MemberBegin(); iter != node->value.MemberEnd(); ++iter)
   {
     std::string  r;
     Metadata*    mP = new Metadata();

@@ -29,19 +29,19 @@
 
 /* ****************************************************************************
 *
-* all - 
+* all -
 */
 TEST(Verb, all)
 {
-   EXPECT_STREQ("GET",          verbName(GET));
-   EXPECT_STREQ("PUT",          verbName(PUT));
-   EXPECT_STREQ("POST",         verbName(POST));
-   EXPECT_STREQ("DELETE",       verbName(DELETE));
-   EXPECT_STREQ("PATCH",        verbName(PATCH));
-   EXPECT_STREQ("HEAD",         verbName(HEAD));
-   EXPECT_STREQ("OPTIONS",      verbName(OPTIONS));
-   EXPECT_STREQ("TRACE",        verbName(TRACE));
-   EXPECT_STREQ("CONNECT",      verbName(CONNECT));
-   EXPECT_STREQ("",             verbName(NOVERB));
-   EXPECT_STREQ("Unknown verb", verbName((Verb) 1234));
+  EXPECT_STREQ("GET",          verbName(GET));
+  EXPECT_STREQ("PUT",          verbName(PUT));
+  EXPECT_STREQ("POST",         verbName(POST));
+  EXPECT_STREQ("DELETE",       verbName(DELETE));
+  EXPECT_STREQ("PATCH",        verbName(PATCH));
+  EXPECT_STREQ("HEAD",         verbName(HEAD));
+  EXPECT_STREQ("OPTIONS",      verbName(OPTIONS));
+  EXPECT_STREQ("TRACE",        verbName(TRACE));
+  EXPECT_STREQ("CONNECT",      verbName(CONNECT));
+  EXPECT_STREQ("",             verbName(NOVERB));
+  EXPECT_STREQ("Unknown verb", verbName((Verb) 1234));
 }

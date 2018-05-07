@@ -34,11 +34,11 @@
 
 /* ****************************************************************************
 *
-* updateNoCompoundValue - 
+* updateNoCompoundValue -
 */
 TEST(compoundValue, updateNoCompoundValue)
 {
-  ParseData         reqData;  
+  ParseData         reqData;
   const char*       inFileJson  = "ngsi10.updateContextRequest.updateNoCompoundValue.valid.json";
   ConnectionInfo    ci("/ngsi10/updateContext", "POST", "1.1");
   ContextAttribute* caP;
@@ -52,7 +52,7 @@ TEST(compoundValue, updateNoCompoundValue)
   EXPECT_STREQ("OK", result.c_str());
   caP = reqData.upcr.res.contextElementVector[0]->contextAttributeVector[0];
   EXPECT_EQ("1", caP->stringValue);
-  
+
   utExit();
 }
 
@@ -64,7 +64,7 @@ TEST(compoundValue, updateNoCompoundValue)
 */
 TEST(compoundValue, updateUnknownPath)
 {
-  ParseData       reqData;  
+  ParseData       reqData;
   const char*     inFileJson  = "ngsi10.updateContextRequest.updateUnknownPath.invalid.json";
   const char*     outFileJson = "ngsi10.updateContextResponse.updateUnknownPath.valid.json";
   ConnectionInfo  ciJson("/ngsi10/updateContext", "POST", "1.1");
@@ -85,7 +85,7 @@ TEST(compoundValue, updateUnknownPath)
 
 /* ****************************************************************************
 *
-* updateOneStringJson - 
+* updateOneStringJson -
 */
 TEST(compoundValue, updateOneStringJson)
 {
@@ -114,7 +114,7 @@ TEST(compoundValue, updateOneStringJson)
 
   // Get root of compound value
   cvnRootP = caP->compoundValueP;
-  
+
   // The root pointer of the root must be the root itself
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
 
@@ -127,7 +127,7 @@ TEST(compoundValue, updateOneStringJson)
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
   EXPECT_EQ("/", cvnRootP->path);
-  
+
   // The child
   childP = cvnRootP->childV[0];
 
@@ -150,7 +150,7 @@ TEST(compoundValue, updateOneStringJson)
 
 /* ****************************************************************************
 *
-* updateTwoStringsJson - 
+* updateTwoStringsJson -
 */
 TEST(compoundValue, updateTwoStringsJson)
 {
@@ -177,7 +177,7 @@ TEST(compoundValue, updateTwoStringsJson)
 
   // Get root of compound value
   cvnRootP = caP->compoundValueP;
-  
+
   // The root pointer of the root must be the root itself
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
 
@@ -228,7 +228,7 @@ TEST(compoundValue, updateTwoStringsJson)
 
 /* ****************************************************************************
 *
-* updateTwoItemsSameNameInStructJson - 
+* updateTwoItemsSameNameInStructJson -
 */
 TEST(compoundValue, updateTwoItemsSameNameInStructJson)
 {
@@ -255,7 +255,7 @@ TEST(compoundValue, updateTwoItemsSameNameInStructJson)
 
 /* ****************************************************************************
 *
-* updateContextValueVectorOneItemJson - 
+* updateContextValueVectorOneItemJson -
 */
 TEST(compoundValue, updateContextValueVectorOneItemJson)
 {
@@ -275,13 +275,13 @@ TEST(compoundValue, updateContextValueVectorOneItemJson)
   EXPECT_STREQ("OK", result.c_str());
 
   caP = reqData.upcr.res.contextElementVector[0]->contextAttributeVector[0];
-  
+
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
   // Get root of compound value
   cvnRootP = caP->compoundValueP;
-  
+
   // The root pointer of the root must be the root itself
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
 
@@ -293,8 +293,8 @@ TEST(compoundValue, updateContextValueVectorOneItemJson)
 
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
-  EXPECT_EQ("/", cvnRootP->path);  
-  
+  EXPECT_EQ("/", cvnRootP->path);
+
   // The child
   childP = cvnRootP->childV[0];
 
@@ -317,7 +317,7 @@ TEST(compoundValue, updateContextValueVectorOneItemJson)
 
 /* ****************************************************************************
 *
-* updateContextValueVectorFiveItemsJson - 
+* updateContextValueVectorFiveItemsJson -
 */
 TEST(compoundValue, updateContextValueVectorFiveItemsJson)
 {
@@ -337,13 +337,13 @@ TEST(compoundValue, updateContextValueVectorFiveItemsJson)
   EXPECT_STREQ("OK", result.c_str());
 
   caP = reqData.upcr.res.contextElementVector[0]->contextAttributeVector[0];
-  
+
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
   // Get root of compound value
   cvnRootP = caP->compoundValueP;
-  
+
   // The root pointer of the root must be the root itself
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
 
@@ -355,8 +355,8 @@ TEST(compoundValue, updateContextValueVectorFiveItemsJson)
 
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
-  EXPECT_EQ("/", cvnRootP->path); 
-  
+  EXPECT_EQ("/", cvnRootP->path);
+
   // Child 1-5
   std::string value[] = { "1", "2", "3", "4", "5" };
   for (unsigned int childIx = 0; childIx < 5; ++childIx)
@@ -383,7 +383,7 @@ TEST(compoundValue, updateContextValueVectorFiveItemsJson)
 
 /* ****************************************************************************
 *
-* updateTwoStructsJson - 
+* updateTwoStructsJson -
 */
 TEST(compoundValue, updateTwoStructsJson)
 {
@@ -403,13 +403,13 @@ TEST(compoundValue, updateTwoStructsJson)
   EXPECT_STREQ("OK", result.c_str());
 
   caP = reqData.upcr.res.contextElementVector[0]->contextAttributeVector[0];
-  
+
 
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
   ci.outMimeType = JSON;
-  rendered = caP->render(V1, false, UpdateContext, "");
+  rendered = caP->render(V1, false, UpdateContext, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
@@ -419,7 +419,7 @@ TEST(compoundValue, updateTwoStructsJson)
 
   // Get root of compound value
   cvnRootP = caP->compoundValueP;
-  
+
   // The root pointer of the root must be the root itself
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
 
@@ -431,7 +431,7 @@ TEST(compoundValue, updateTwoStructsJson)
 
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
-  EXPECT_EQ("/", cvnRootP->path); 
+  EXPECT_EQ("/", cvnRootP->path);
 
   // Now, child struct 1
   structP = cvnRootP->childV[0];
@@ -532,7 +532,7 @@ TEST(compoundValue, updateTwoStructsJson)
 
 /* ****************************************************************************
 *
-* sixLevelsJson - 
+* sixLevelsJson -
 */
 TEST(compoundValue, sixLevelsJson)
 {
@@ -557,7 +557,7 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
   ci.outMimeType = JSON;
-  rendered = caP->render(V1, false, UpdateContext, "");
+  rendered = caP->render(V1, false, UpdateContext, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
@@ -585,7 +585,7 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
   EXPECT_EQ("/", cvnRootP->path);
-  
+
 
   // Now, child 1: level1
   level1 = cvnRootP->childV[0];
@@ -675,7 +675,7 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_EQ("/level1/level2/level3/item",       vitemP->path);
   EXPECT_EQ(4,                                  vitemP->level);
   EXPECT_EQ(0,                                  vitemP->siblingNo);
-  
+
   // /level1/level2/level3/item[0]/level
   childP = vitemP->childV[0];
 
@@ -764,7 +764,7 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_EQ("/level1/level2/level3/item",       vitemP->path);
   EXPECT_EQ(4,                                  vitemP->level);
   EXPECT_EQ(1,                                  vitemP->siblingNo);
-  
+
   // /level1/level2/level3/item[1]/level
   childP = vitemP->childV[0];
 
@@ -846,7 +846,7 @@ TEST(compoundValue, sixLevelsJson)
 
 /* ****************************************************************************
 *
-* updateOneStringAndOneVectorInSeparateContextValuesJson - 
+* updateOneStringAndOneVectorInSeparateContextValuesJson -
 */
 TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
 {
@@ -872,7 +872,7 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
 
   // Get root of compound value
   cvnRootP = caP->compoundValueP;
-  
+
   // The root pointer of the root must be the root itself
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
 
@@ -884,8 +884,8 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
 
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
-  EXPECT_EQ("/", cvnRootP->path);  
-  
+  EXPECT_EQ("/", cvnRootP->path);
+
   // The child
   childP = cvnRootP->childV[0];
 
@@ -902,7 +902,7 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
   EXPECT_EQ(0,                                 childP->siblingNo);
 
 
-  // 
+  //
   // Now the second ContextAttribute, that also has a Compound value
   //
   caP = reqData.upcr.res.contextElementVector[0]->contextAttributeVector[1];
@@ -912,7 +912,7 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
 
   // Get root of compound value
   cvnRootP = caP->compoundValueP;
-  
+
   // The root pointer of the root must be the root itself
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
 
@@ -924,8 +924,8 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
 
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
-  EXPECT_EQ("/", cvnRootP->path);  
-  
+  EXPECT_EQ("/", cvnRootP->path);
+
   // The children
   const char* value[] = { "I-0", "I-1", "I-2", "I-3" };
   for (unsigned int ix = 0; ix < 4; ++ix)
@@ -952,7 +952,7 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
 
 /* ****************************************************************************
 *
-* tenCompounds - 
+* tenCompounds -
 *
 */
 TEST(compoundValue, tenCompounds)
@@ -960,11 +960,11 @@ TEST(compoundValue, tenCompounds)
   ParseData                  reqData;
   UpdateContextRequest*      upcrP;
   std::string                rendered;
-   
+
   utInit();
 
   upcrP = &reqData.upcr.res;
-  rendered = upcrP->render(V1, false, "");
+  rendered = upcrP->render(V1, false);
 
   utExit();
 }
