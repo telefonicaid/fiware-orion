@@ -725,7 +725,6 @@ static bool updateAttribute
     {
       attrType = caP->type;
     }
-
     newAttr.append(ENT_ATTRS_TYPE, attrType);
     newAttr.append(ENT_ATTRS_CREATION_DATE, now);
     newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
@@ -741,7 +740,6 @@ static bool updateAttribute
       newAttr.append(ENT_ATTRS_MD, md);
     }
     newAttr.append(ENT_ATTRS_MDNAMES, mdNames);
-
     toSet->append(effectiveName, newAttr.obj());
     toPush->append(caP->name);
   }
@@ -2453,7 +2451,6 @@ static bool updateContextAttributeItem
       ca->found = false;
     }
   }
-  
   /* Check aspects related with location and date expiration */
   if (!processLocationAtUpdateAttribute(currentLocAttrName, targetAttr, geoJson, &err, apiVersion, oe)
    || !processDateExpirationAtUpdateAttribute(targetAttr, dateExpiration, replaceDate, &err, oe))
@@ -2469,6 +2466,8 @@ static bool updateContextAttributeItem
     alarmMgr.badInput(clientIp, err);
     return false;
   }
+
+
 
   updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == V2, NGSI_MD_ACTIONTYPE_UPDATE);
 
@@ -3216,7 +3215,6 @@ static void updateEntity
   std::string     locAttr = "";
   BSONObj         currentGeoJson;
   BSONObjBuilder  geoJson;
-  
   if (r.hasField(ENT_LOCATION))
   {
     BSONObj loc    = getObjectFieldF(r, ENT_LOCATION);
