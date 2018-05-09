@@ -54,15 +54,14 @@ extern bool processDateExpirationAtEntityCreation
 *
 * processDateExpirationAtUpdateAttribute -
 */
-//extern bool processDateExpirationAtUpdateAttribute
-//(
-//  std::string*             currentLocAttrName,
-//  const ContextAttribute*  targetAttr,
-//  mongo::BSONObjBuilder*   geoJson,
-//  std::string*             errDetail,
-//  ApiVersion               apiVersion,
-//  OrionError*              oe
-//);
+extern bool processDateExpirationAtUpdateAttribute
+(
+  const ContextAttribute*  targetAttr,
+  mongo::Date_t*           dateExpiration,
+  bool*                    replaceDate,
+  std::string*             errDetail,
+  OrionError*              oe
+);
 
 
 
@@ -70,15 +69,13 @@ extern bool processDateExpirationAtEntityCreation
 *
 * processDateExpirationAtAppendAttribute -
 */
-//extern bool processDateExpirationAtAppendAttribute
-//(
-//  std::string*             currentLocAttrName,
-//  const ContextAttribute*  targetAttr,
-//  bool                     actualAppend,
-//  mongo::BSONObjBuilder*   geoJson,
-//  std::string*             errDetail,
-//  ApiVersion               apiVersion,
-//  OrionError*              oe
-//);
+extern bool processDateExpirationAtAppendAttribute
+(
+  mongo::Date_t*           dateExpiration,
+  const ContextAttribute*  targetAttr,
+  bool                     actualAppend,
+  std::string*             errDetail,
+  OrionError*              oe
+);
 
 #endif  // SRC_LIB_MONGOBACKEND_DATEEXPIRATION_H_

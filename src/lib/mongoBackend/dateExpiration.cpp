@@ -69,7 +69,7 @@ static bool getDateExpiration
 {
   if ((caP->type == DATE_TYPE) || (caP->type == DATE_TYPE_ALT))
   {
-    *dateExpiration = mongo::Date_t(caP->numberValue);
+    *dateExpiration = mongo::Date_t(caP->numberValue*1000);
 
     return true;
   }
@@ -84,11 +84,11 @@ static bool getDateExpiration
 
 /* ****************************************************************************
 *
-* processLocationAtEntityCreation -
+* processDateExpirationAtEntityCreation -
 *
 * This function process the context attribute vector, searching for an attribute meaning
-* location. In that case, it fills geoJson. If a location attribute is not found, then
-* locAttr is filled with an empty string, i.e. "".
+* date expiration for the entity. In that case, it fills dateExpiration pointer. If a date expiration attribute is not found, then
+* dateExpiration is an empty pointer.
 *
 * This function always return true (no matter if the attribute was found or not), except in an
 * error situation, in which case errorDetail is filled.
@@ -126,220 +126,75 @@ bool processDateExpirationAtEntityCreation
 *
 * processDateExpirationAtUpdateAttribute -
 */
-//bool processDateExpirationAtUpdateAttribute
-//(
-//  std::string*                   currentLocAttrName,
-//  const ContextAttribute*        targetAttr,
-//  mongo::BSONObjBuilder*         geoJson,
-//  std::string*                   errDetail,
-//  ApiVersion                     apiVersion,
-//  OrionError*                    oe
-//)
-//{
-//  std::string subErr;
-//
-//  //
-//  // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
-//  // note that with the current logic, the name of the attribute meaning location
-//  // is preserved on a replace operation. By the moment, we can leave this as it is now
-//  // given that the logic in NGSIv2 for specifying location attributes is gogint to change
-//  // (the best moment to address this FIXME is probably once NGSIv1 has been deprecated and
-//  // removed from the code)
-//  //
-//  std::string locationString = targetAttr->getLocation(apiVersion);
-//
-//  /* Check that location (if any) is using the correct coordinates string (it only
-//   * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
-//  if ((locationString.length() > 0) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
-//  {
-//    *errDetail = "only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]";
-//    oe->fill(SccBadRequest, *errDetail, "BadRequest");
-//    return false;
-//  }
-//
-//  //
-//  // Case 1:
-//  //   update *to* location. There are 3 sub-cases
-//  //
-//  if (locationString.length() > 0)
-//  {
-//    //
-//    // Case 1a:
-//    //   no location yet -> the updated attribute becomes the location attribute */
-//    //
-//    if (*currentLocAttrName == "")
-//    {
-//      if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
-//      {
-//        *errDetail = "error parsing location attribute: " + subErr;
-//        oe->fill(SccBadRequest, *errDetail, "BadRequest");
-//        return false;
-//      }
-//
-//      *currentLocAttrName = targetAttr->name;
-//      return true;
-//    }
-//
-//    //
-//    // Case 1b:
-//    //   currently we have a loation but the attribute holding it is different from the target attribute -> error
-//    //
-//    if (*currentLocAttrName != targetAttr->name)
-//    {
-//      *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
-//                   " when another one has been previously defined [" + *currentLocAttrName + "]";
-//
-//      oe->fill(SccRequestEntityTooLarge,
-//               "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
-//               "NoResourcesAvailable");
-//
-//      return false;
-//    }
-//
-//    //
-//    // Case 1c:
-//    //   currently we have a location and the attribute holding it is the target attribute -> update the current location
-//    //   (note that the shape may change in the process, e.g. geo:point to geo:line)
-//    //
-//    if (*currentLocAttrName == targetAttr->name)
-//    {
-//      if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
-//      {
-//        *errDetail = "error parsing location attribute: " + subErr;
-//        oe->fill(SccBadRequest, *errDetail, "BadRequest");
-//        return false;
-//      }
-//      return true;
-//    }
-//  }
-//
-//  //
-//  // Case 2:
-//  //   update *to* no-location and the attribute previously holding it is the same than the target attribute
-//  //   The behaviour is differenet depending on NGSI version
-//  //
-//  else if (*currentLocAttrName == targetAttr->name)
-//  {
-//    if (apiVersion == V1)
-//    {
-//      /* In this case, no-location means that the target attribute doesn't have the "location" metadata. In order
-//       * to mantain backwards compabitibility, this is interpreted as a location update */
-//      if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
-//      {
-//        *errDetail = "error parsing location attribute: " + subErr;
-//        oe->fill(SccBadRequest, *errDetail, "BadRequest");
-//        return false;
-//      }
-//    }
-//    else  // v2
-//    {
-//      // Location is null-ified
-//      *currentLocAttrName = "";
-//    }
-//  }
-//
-//  return true;
-//}
+bool processDateExpirationAtUpdateAttribute
+(
+  const ContextAttribute*  targetAttr,
+  mongo::Date_t*           dateExpiration,
+  bool*                    replaceDate,
+  std::string*             errDetail,
+  OrionError*              oe
+)
+{
+
+  /*
+   * If the name of the target attribute is the date expiration
+   * check for a number value to be used in the mongo::Date_t constructor.
+   * If it is an empty value, is interpreted as a date expiration deletion and a NULL pointer is set
+   * If valid value, the replaceDate boolean is set to true, in order to manage the new date value
+    * in case of replace operation
+   */
+
+  if (targetAttr->name == ENT_EXPIRATION)
+  {
+    if (targetAttr->numberValue)
+    {
+	  if (!getDateExpiration(targetAttr, dateExpiration, errDetail))
+	  {
+	    oe->fill(SccBadRequest, *errDetail, "BadRequest");
+	    return false;
+	  }
+	  else
+	  {
+        *replaceDate = true;
+	  }
+    }
+    else
+    {
+      *dateExpiration = 0;
+    }
+  }
+
+  return true;
+}
 
 
 
 /* ****************************************************************************
 *
-* processLocationAtAppendAttribute -
+* processDateExpirationAtAppendAttribute -
 */
-//bool processDateExpirationAtAppendAttribute
-//(
-//  std::string*                   currentLocAttrName,
-//  const ContextAttribute*        targetAttr,
-//  bool                           actualAppend,
-//  mongo::BSONObjBuilder*         geoJson,
-//  std::string*                   errDetail,
-//  ApiVersion                     apiVersion,
-//  OrionError*                    oe
-//)
-//{
-//  std::string subErr;
-//  std::string locationString = targetAttr->getLocation(apiVersion);
-//
-//  /* Check that location (if any) is using the correct coordinates string (it only
-//     * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
-//  if ((locationString.length() > 0) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
-//  {
-//    *errDetail = "only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]";
-//    oe->fill(SccBadRequest, *errDetail, "BadRequest");
-//    return false;
-//  }
-//
-//  /* Case 1: append of new location attribute */
-//  if (actualAppend && (locationString.length() > 0))
-//  {
-//    /* Case 1a: there is a previous location attribute -> error */
-//    if (currentLocAttrName->length() != 0)
-//    {
-//      *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
-//                   " when another one has been previously defined [" + *currentLocAttrName + "]";
-//
-//      oe->fill(SccRequestEntityTooLarge,
-//               "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
-//               "NoResourcesAvailable");
-//
-//      return false;
-//    }
-//    /* Case 1b: there isn't any previous location attribute -> new attribute becomes the location attribute */
-//    else
-//    {
-//      if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
-//      {
-//        *errDetail = "error parsing location attribute for new attribute: " + subErr;
-//        oe->fill(SccBadRequest, *errDetail, "BadRequest");
-//        return false;
-//      }
-//      *currentLocAttrName = targetAttr->name;
-//    }
-//  }
-//  /* Case 2: append-as-update changing attribute type from no-location -> location */
-//  else if (!actualAppend && (locationString.length() > 0))
-//  {
-//    /* Case 2a: there is a previous (which different name) location attribute -> error */
-//    if (*currentLocAttrName != targetAttr->name)
-//    {
-//      *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
-//                   " when another one has been previously defined [" + *currentLocAttrName + "]";
-//
-//      oe->fill(SccRequestEntityTooLarge,
-//               "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
-//               "NoResourcesAvailable");
-//
-//      return false;
-//    }
-//
-//    /* Case 2b: there isn't any previous location attribute -> the updated attribute becomes the location attribute */
-//    if (*currentLocAttrName == "")
-//    {
-//      if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
-//      {
-//        *errDetail = "error parsing location attribute for existing attribute: " + subErr;
-//        oe->fill(SccBadRequest, *errDetail, "BadRequest");
-//        return false;
-//      }
-//      *currentLocAttrName = targetAttr->name;
-//    }
-//
-//    /* Case 2c: all pre-conditions ok -> update location with the new value */
-//    if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
-//    {
-//      *errDetail = "error parsing location attribute: " + subErr;
-//      oe->fill(SccBadRequest, *errDetail, "BadRequest");
-//      return false;
-//    }
-//    return true;
-//  }
-//  /* Check 3: in the case of append-as-update, type changes from location -> no-location for the current location
-//   * attribute, then remove location attribute */
-//  else if (!actualAppend && (locationString.length() == 0) && (*currentLocAttrName == targetAttr->name))
-//  {
-//    *currentLocAttrName = "";
-//  }
-//
-//  return true;
-//}
+bool processDateExpirationAtAppendAttribute
+(
+  mongo::Date_t*                 dateExpiration,
+  const ContextAttribute*        targetAttr,
+  bool                           actualAppend,
+  std::string*                   errDetail,
+  OrionError*                    oe
+)
+{
+  if (targetAttr->numberValue)
+  {
+  if (!getDateExpiration(targetAttr, dateExpiration, errDetail))
+    {
+      oe->fill(SccBadRequest, *errDetail, "BadRequest");
+      return false;
+    }
+  }
+  else
+  {
+    delete dateExpiration;
+    dateExpiration = NULL;
+  }
+
+  return true;
+}
