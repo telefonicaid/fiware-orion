@@ -1,0 +1,293 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Check old metadata ID related URLs now result in "service not found"
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create a base entity E/A/ID=ID1
+# 02. Service not found for GET /v1/contextEntities/E/attributes/A/ID1
+# 03. Service not found for GET /v1/contextEntities/type/T/id/E/attributes/A/ID1
+# 04. Service not found for POST /v1/contextEntities/type/T/id/E/attributes/A/ID1
+# 05. Service not found for PUT /v1/contextEntities/E/attributes/A/ID1
+# 06. Service not found for PUT /v1/contextEntities/type/T/id/E/attributes/A/ID1
+# 07. Service not found for DELETE /v1/contextEntities/E/attributes/A/ID1
+# 08. Service not found for DELETE /v1/contextEntities/type/T/id/E/attributes/A/ID1
+#
+
+echo "01. Create a base entity E/A/ID=ID1"
+echo "==================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E",
+      "attributes": [
+        {
+          "name": "A",
+          "type": "Text",
+          "value": "foo",
+          "metadatas": [
+            {
+              "name": "ID",
+              "type": "Text",
+              "value": "ID1"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url '/v1/updateContext' --payload "$payload"
+echo
+echo
+
+
+echo "02. Service not found for GET /v1/contextEntities/E/attributes/A/ID1"
+echo "===================================================================="
+orionCurl --url '/v1/contextEntities/E/attributes/A/ID1'
+echo
+echo
+
+
+echo "03. Service not found for GET /v1/contextEntities/type/T/id/E/attributes/A/ID1"
+echo "=============================================================================="
+orionCurl --url '/v1/contextEntities/type/T/id/E/attributes/A/ID1'
+echo
+echo
+
+
+echo "04. Service not found for POST /v1/contextEntities/type/T/id/E/attributes/A/ID1"
+echo "==============================================================================="
+payload='{
+  "value": 2
+}'
+orionCurl --url '/v1/contextEntities/type/T/id/E/attributes/A/ID1' --payload "$payload"
+echo
+echo
+
+
+echo "05. Service not found for PUT /v1/contextEntities/E/attributes/A/ID1"
+echo "===================================================================="
+payload='{
+  "value": 2
+}'
+orionCurl --url '/v1/contextEntities/E/attributes/A/ID1' --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "06. Service not found for PUT /v1/contextEntities/type/T/id/E/attributes/A/ID1"
+echo "=============================================================================="
+payload='{
+  "value": 2
+}'
+orionCurl --url '/v1/contextEntities/type/T/id/E/attributes/A/ID1' --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "07. Service not found for DELETE /v1/contextEntities/E/attributes/A/ID1"
+echo "======================================================================="
+orionCurl --url '/v1/contextEntities/E/attributes/A/ID1' -X DELETE
+echo
+echo
+
+
+echo "08. Service not found for DELETE /v1/contextEntities/type/T/id/E/attributes/A/ID1"
+echo "================================================================================="
+orionCurl --url '/v1/contextEntities/type/T/id/E/attributes/A/ID1' -X DELETE
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a base entity E/A/ID=ID1
+===================================
+HTTP/1.1 200 OK
+Content-Length: 240
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "ID",
+                                "type": "Text",
+                                "value": "ID1"
+                            }
+                        ],
+                        "name": "A",
+                        "type": "Text",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+02. Service not found for GET /v1/contextEntities/E/attributes/A/ID1
+====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 88
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "400",
+        "details": "service not found",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+03. Service not found for GET /v1/contextEntities/type/T/id/E/attributes/A/ID1
+==============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 88
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "400",
+        "details": "service not found",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+04. Service not found for POST /v1/contextEntities/type/T/id/E/attributes/A/ID1
+===============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 88
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "400",
+        "details": "service not found",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+05. Service not found for PUT /v1/contextEntities/E/attributes/A/ID1
+====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 88
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "400",
+        "details": "service not found",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+06. Service not found for PUT /v1/contextEntities/type/T/id/E/attributes/A/ID1
+==============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 88
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "400",
+        "details": "service not found",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+07. Service not found for DELETE /v1/contextEntities/E/attributes/A/ID1
+=======================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 88
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "400",
+        "details": "service not found",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+08. Service not found for DELETE /v1/contextEntities/type/T/id/E/attributes/A/ID1
+=================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 88
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "400",
+        "details": "service not found",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
