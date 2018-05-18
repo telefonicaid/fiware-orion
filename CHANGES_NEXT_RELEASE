@@ -1,2 +1,3 @@
 - Add: support for APIv2 notifications (POST /v2/op/notify), which opens up for true APIv2 federation (#2986)
 - Fix: bug when using "legacy" format for custom v2 notifications (#3154)
+- Add: transient entities functionality (new virtual attribute: dateExpired) (#3000)

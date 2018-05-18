@@ -98,9 +98,9 @@
 *
 * virtual attributes
 */
-#define DATE_CREATED   "dateCreated"
-#define DATE_MODIFIED  "dateModified"
-#define ALL_ATTRS      "*"
+#define DATE_CREATED    "dateCreated"
+#define DATE_MODIFIED   "dateModified"
+#define ALL_ATTRS       "*"
 
 
 

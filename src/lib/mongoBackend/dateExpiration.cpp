@@ -56,7 +56,7 @@ using orion::CompoundValueNode;
 * getDateExpiration -
 *
 * Get the ISO8601 Expiration Date information for the given
-* ContextAttribute provided as parameter.
+* ContextAttribute provided as parameter, in order to construct the corresponding Mongo Date_t object.
 *
 * It returns true, except in the case of error (in which in addition errDetail gets filled)
 */
@@ -87,8 +87,8 @@ static bool getDateExpiration
 * processDateExpirationAtEntityCreation -
 *
 * This function process the context attribute vector, searching for an attribute meaning
-* date expiration for the entity. In that case, it fills dateExpiration pointer. If a date expiration attribute is not found, then
-* dateExpiration is an empty pointer.
+* date expiration for the entity. In that case, it fills dateExpiration value.
+* If a date expiration attribute is not found dateExpiration keeps empty value set by the caller function.
 *
 * This function always return true (no matter if the attribute was found or not), except in an
 * error situation, in which case errorDetail is filled.
@@ -105,7 +105,7 @@ bool processDateExpirationAtEntityCreation
   {
     const ContextAttribute* caP = caV[ix];
 
-    if (caP->name != ENT_EXPIRATION)
+    if (caP->name != DATE_EXPIRES)
     {
       continue;
     }
@@ -137,14 +137,14 @@ bool processDateExpirationAtUpdateAttribute
 {
 
   /*
-   * If the name of the target attribute is the date expiration
-   * check for a number value to be used in the mongo::Date_t constructor.
-   * If it is an empty value, is interpreted as a date expiration deletion and a NULL pointer is set
-   * If valid value, the replaceDate boolean is set to true, in order to manage the new date value
-    * in case of replace operation
+   * If the name of the target attribute is the date expiration,
+   * check for a number value that will be used in the mongo::Date_t constructor.
+   * If it is an empty value, is interpreted as a date expiration deletion and the ACTUAL date value
+   * is set to 0, in order to signal the caller function.
+   * If valid value, also replaceDate boolean is set to true, in order to manage the new date value
+   * in case the update is a replace operation.
    */
-
-  if (targetAttr->name == ENT_EXPIRATION)
+  if (targetAttr->name == DATE_EXPIRES)
   {
     if (targetAttr->numberValue)
     {
@@ -192,8 +192,7 @@ bool processDateExpirationAtAppendAttribute
   }
   else
   {
-    delete dateExpiration;
-    dateExpiration = NULL;
+    *dateExpiration = 0;
   }
 
   return true;

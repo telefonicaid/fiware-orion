@@ -1870,6 +1870,22 @@ static void setDateModifiedAttribute(ContextElementResponse* notifyCerP)
 
 /* ****************************************************************************
 *
+* setDateModifiedAttribute -
+*/
+//static void setDateExpirationAttribute(ContextElementResponse* notifyCerP)
+//{
+//  if (notifyCerP->contextElement.entityId.modDate != 0)
+//  {
+//    ContextAttribute* caP = new ContextAttribute(DATE_EXPIRES, DATE_TYPE, notifyCerP->contextElement.entityId.modDate);
+//    notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+//  }
+//}
+
+
+
+
+/* ****************************************************************************
+*
 * setDateCreatedMetadata -
 */
 static void setDateCreatedMetadata(ContextElementResponse* notifyCerP)
@@ -2413,7 +2429,7 @@ static bool updateContextAttributeItem
   std::string*              currentLocAttrName,
   BSONObjBuilder*           geoJson,
   mongo::Date_t*            dateExpiration,
-  bool*                     replaceDate,
+  bool*                     replaceDateExpiration,
   bool                      isReplace,
   ApiVersion                apiVersion,
   OrionError*               oe
@@ -2453,7 +2469,7 @@ static bool updateContextAttributeItem
   }
   /* Check aspects related with location and date expiration */
   if (!processLocationAtUpdateAttribute(currentLocAttrName, targetAttr, geoJson, &err, apiVersion, oe)
-   || !processDateExpirationAtUpdateAttribute(targetAttr, dateExpiration, replaceDate, &err, oe))
+   || !processDateExpirationAtUpdateAttribute(targetAttr, dateExpiration, replaceDateExpiration, &err, oe))
   {
     std::string details = std::string("action: UPDATE") +
                           " - entity: [" + eP->toString() + "]" +
@@ -2600,9 +2616,9 @@ static bool deleteContextAttributeItem
     }
 
     /* Check aspects related to date expiration.
-     * If the target attr is date expiration, delete the relative pointer
-     */
-    if (targetAttr->name == ENT_EXPIRATION){
+     * If the target attr is date expiration, nullifying dateExpiration ACTUAL value is the way
+     * of specifying that date expiration field is no longer used */
+    if (targetAttr->name == DATE_EXPIRES){
       *dateExpiration = 0;
     }
 
@@ -2653,7 +2669,7 @@ static bool processContextAttributeVector
   std::string*                                    currentLocAttrName,
   BSONObjBuilder*                                 geoJson,
   mongo::Date_t*                                  dateExpiration,
-  bool*                                           replaceDate,
+  bool*                                           replaceDateExpiration,
   std::string                                     tenant,
   const std::vector<std::string>&                 servicePathV,
   ApiVersion                                      apiVersion,
@@ -2701,7 +2717,7 @@ static bool processContextAttributeVector
                                       currentLocAttrName,
                                       geoJson,
 									  dateExpiration,
-									  replaceDate,
+									  replaceDateExpiration,
                                       strcasecmp(action.c_str(), "replace") == 0,
                                       apiVersion,
                                       oe))
@@ -3229,7 +3245,7 @@ static void updateEntity
    * in order to know that the date is a new one, coming from the input request
    */
   mongo::Date_t  currentDateExpiration;
-  bool replaceDate = false;
+  bool replaceDateExpiration = false;
 
   if (r.hasField(ENT_EXPIRATION))
   {
@@ -3295,7 +3311,7 @@ static void updateEntity
                                      &locAttr,
                                      &geoJson,
 									 &currentDateExpiration,
-                                     &replaceDate,
+                                     &replaceDateExpiration,
                                      tenant,
                                      servicePathV,
                                      apiVersion,
@@ -3364,7 +3380,7 @@ static void updateEntity
   {
     toSet.appendDate(ENT_EXPIRATION, currentDateExpiration);
   }
-  else if(!replaceDate)
+  else if(!replaceDateExpiration)
   {
     toUnset.append(ENT_EXPIRATION, 1);
   }
@@ -3393,20 +3409,20 @@ static void updateEntity
     // This avoids strange behavior like as for the location, as reported in the #1142 issue
     // In order to enable easy append management of fields (e.g. location, dateExpiration),
     // it could be better to use a BSONObjBuilder instead the BSON stream macro below.
-    if (replaceDate)
+    if (replaceDateExpiration)
     {
       updatedEntity.append("$set", BSON(ENT_ATTRS                   << toSetObj <<
-    	                                ENT_ATTRNAMES               << toPushArr <<
-    	                                ENT_MODIFICATION_DATE       << now <<
-										ENT_EXPIRATION              << currentDateExpiration <<
-    	                                ENT_LAST_CORRELATOR         << fiwareCorrelator));
+                                        ENT_ATTRNAMES               << toPushArr <<
+                                        ENT_MODIFICATION_DATE       << now <<
+                                        ENT_EXPIRATION              << currentDateExpiration <<
+                                        ENT_LAST_CORRELATOR         << fiwareCorrelator));
     }
     else
     {
       updatedEntity.append("$set", BSON(ENT_ATTRS                   << toSetObj <<
-    	    	                        ENT_ATTRNAMES               << toPushArr <<
-    	    	                        ENT_MODIFICATION_DATE       << now <<
-    	    	                        ENT_LAST_CORRELATOR         << fiwareCorrelator));
+                                        ENT_ATTRNAMES               << toPushArr <<
+                                        ENT_MODIFICATION_DATE       << now <<
+                                        ENT_LAST_CORRELATOR         << fiwareCorrelator));
       updatedEntity.append("$unset", toUnsetObj);
     }
 

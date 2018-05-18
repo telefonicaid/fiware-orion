@@ -578,13 +578,22 @@ bool collectionCreateIndex
 
   try
   {
+    /**
+     * Differently from other indexes, a TTL index must contain the "expireAfterSeconds" field set to 0
+     * in the query issued to Mongo DB, in order to be defined with an "expireAt" behaviour.
+     * This filed is implemented in the Mongo driver with the Index Spec class.
+     */
     if (isTTL)
+    {
       connection->createIndex(col.c_str(), IndexSpec().addKeys(indexes).expireAfterSeconds(0));
+    }
     else
+    {
       connection->createIndex(col.c_str(), indexes);
-    releaseMongoConnection(connection);
-    TIME_STAT_MONGO_COMMAND_WAIT_STOP();
-    LM_I(("Database Operation Successful (createIndex: %s)", indexes.toString().c_str()));
+      releaseMongoConnection(connection);
+      TIME_STAT_MONGO_COMMAND_WAIT_STOP();
+      LM_I(("Database Operation Successful (createIndex: %s)", indexes.toString().c_str()));
+    }
   }
   catch (const std::exception &e)
   {

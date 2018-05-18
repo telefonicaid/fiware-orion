@@ -680,10 +680,11 @@ bool mongoExpirationCapable(void)
   int mayor;
   int minor;
 
-  /* TTL (Time To Live) indexes was introduced in MongoDB 2.2 */
+  /* TTL (Time To Live) indexes was introduced in MongoDB 2.2,
+   *  although the expireAfterSeconds: 0 usage is not shown in documentation until 2.4 */
   mongoVersionGet(&mayor, &minor);
 
-  return ((mayor == 2) && (minor >= 2)) || (mayor > 2);
+  return ((mayor == 2) && (minor >= 4)) || (mayor > 2);
 }
 
 
@@ -720,7 +721,7 @@ void ensureDateExpirationIndex(const std::string& tenant)
     std::string err;
 
     collectionCreateIndex(getEntitiesCollectionName(tenant), BSON(index << 1), true, &err);
-    LM_T(LmtMongo, ("ensuring 2dsphere index on %s (tenant %s)", index.c_str(), tenant.c_str()));
+    LM_T(LmtMongo, ("ensuring TTL date expiration index on %s (tenant %s)", index.c_str(), tenant.c_str()));
   }
 }
 /* ****************************************************************************
