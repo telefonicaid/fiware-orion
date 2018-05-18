@@ -25,5 +25,6 @@ Orion Context Broker: Installation & Administration Manual.
 * [Upgrading from previous to 0.21.0](admin/upgrading_crossing_0-21-0.md)
 * [Upgrading from previous to 1.3.0](admin/upgrading_crossing_1-3-0.md)
 * [Upgrading from previous to 1.5.0](admin/upgrading_crossing_1-5-0.md)
+* [Upgrading from previous to 1.14.0](admin/upgrading_crossing_1-14-0.md)
 * [Sanity check procedures](sanity_check.md)
 * [Diagnosis procedures](diagnosis.md)
