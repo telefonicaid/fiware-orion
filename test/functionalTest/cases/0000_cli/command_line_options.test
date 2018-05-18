@@ -77,5 +77,8 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-logForHumans' (human readible log to screen)]
                       [option '-disableMetrics' (turn off the 'metrics' feature)]
                       [option '-insecureNotif' (allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates)]
+                      [option '-mqttHost' <MQTT broker hostname>]
+                      [option '-mqttPort' <MQTT broker port, default: 1883>]
+                      [option '-mqttKeepAlive' <keep alive period for MQTT broker connection, default: 60>]
 
 --TEARDOWN--
