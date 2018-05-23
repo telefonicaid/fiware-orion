@@ -198,9 +198,9 @@ def fix_entity(entity, attrs_with_md_id):
 ##########################
 # Main program starts here
 
-#autofix = None
+autofix = None
 #autofix = 'as_new_attrs'
-autofix = 'as_metadata'
+#autofix = 'as_metadata'
 
 if len(sys.argv) != 2:
     print "invalid number of arguments, please check https://fiware-orion.readthedocs.io/en/master/admin/upgrading_crossing_1-14-0/index.html"
