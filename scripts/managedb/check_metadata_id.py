@@ -31,6 +31,7 @@ from time import sleep
 
 ATTRS = 'attrs'
 ATTRNAMES = 'attrNames'
+MD = 'md'
 
 def flatten(_id):
     """
@@ -168,10 +169,12 @@ def fix_entity(entity, attrs_with_md_id):
             'type': 'string',   # This is the hardwired type used for metadata ID in Orion <= 1.13.0
             'value': md_id
         }
-        if 'md' in new_attrs[base_name].keys():
-            new_attrs[base_name]['md']['id'] = new_md_id
+        if MD in new_attrs[base_name].keys():
+            new_attrs[base_name][MD]['id'] = new_md_id
         else:
-            new_attrs[base_name]['md'] = {'id': new_md_id}
+            new_attrs[base_name][MD] = {'id': new_md_id}
+
+        check_attrs.append(base_name)
 
         entity_touched = True
 
@@ -195,7 +198,9 @@ def fix_entity(entity, attrs_with_md_id):
 ##########################
 # Main program starts here
 
-autofix = None
+#autofix = None
+#autofix = 'as_new_attrs'
+autofix = 'as_metadata'
 
 if len(sys.argv) != 2:
     print "invalid number of arguments, please check https://fiware-orion.readthedocs.io/en/master/admin/upgrading_crossing_1-14-0/index.html"
@@ -291,7 +296,7 @@ print '  * entities w/ at least one attr w/ more than one ID:                %d'
 print '  * entities w/ at least one attr w/ md ID all them w/ single md ID:  %d' % counter_analysis['single']
 print '- documents processed:                                                %d' % processed
 print '  * untouched:                                                        %d' % counter_update['untouched']
-print '  * changed: entities w/ at least one attr w/ more than one ID:       %d' % counter_update['changed']
+print '  * changed:                                                          %d' % counter_update['changed']
 print '  * attempt to change but error:                                      %d' % counter_update['error']
 
 if need_fix:
