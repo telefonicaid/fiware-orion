@@ -1,2 +1,3 @@
 - Add: support for APIv2 notifications (POST /v2/op/notify), which opens up for true APIv2 federation (#2986)
+- Fix: bug having entities without attibutes AND matching registrations made the attr-less entity not be returned by GET /v2/entities (#3176)
 - Fix: bug when using "legacy" format for custom v2 notifications (#3154)
