@@ -947,7 +947,7 @@ to keep your client decoupled from implementation details.
 
 # Group Entities
 
-### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]
+### List Entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]
 
 Retrieves a list of entities that match different criteria by id, type, pattern matching (either id or type)
 and/or those which match a query or geographical query (see [Simple Query Language](#simple_query_language) and 
@@ -1067,7 +1067,7 @@ Response code:
          }
         ]
 
-### Create entity [POST /v2/entities{?options}]
+### Create Entity [POST /v2/entities{?options}]
 
 The payload is an object representing the entity to be created. The object follows
 the JSON entity representation format (described in a "JSON Entity Representation" section).
@@ -1116,7 +1116,7 @@ Response:
 
 ## Entity by ID [/v2/entities/{entityId}{?type,attrs,options}]
 
-### Retrieve entity [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]
+### Retrieve Entity [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]
 
 The response is an object representing the entity identified by the ID. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section).
@@ -1176,7 +1176,7 @@ Response:
           }
         }
 
-### Retrieve entity attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]
+### Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]
 
 This request is similar to retreiving the whole entity, however this one omits the `id` and `type`
 fields.
@@ -1237,7 +1237,7 @@ Response:
           }
         }
 
-### Update or append entity attributes [POST /v2/entities/{entityId}/attrs{?type,options}]
+### Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs{?type,options}]
 
 The request payload is an object representing the attributes to append or update. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section), except
@@ -1280,7 +1280,7 @@ Response:
 
 + Response 204
 
-### Update existing entity attributes [PATCH /v2/entities/{entityId}/attrs{?type,options}]
+### Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs{?type,options}]
 
 The request payload is an object representing the attributes to update. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section), except
@@ -1354,7 +1354,7 @@ Response:
 
 + Response 204
 
-### Remove entity [DELETE /v2/entities/{entityId}{?type}]
+### Remove Entity [DELETE /v2/entities/{entityId}{?type}]
 
 Delete the entity.
 
@@ -1403,7 +1403,7 @@ Response:
           "metadata": {}
         }
 
-### Update attribute data [PUT /v2/entities/{entityId}/attrs/{attrName}{?type}]
+### Update Attribute Data [PUT /v2/entities/{entityId}/attrs/{attrName}{?type}]
 
 The request payload is an object representing the new attribute data. Previous attribute data
 is replaced by the one in the request. The object follows the JSON representation for attributes
@@ -1435,7 +1435,7 @@ Response:
 + Response 200
 
 
-### Remove a single attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}{?type}]
+### Remove a Single Attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}{?type}]
 
 Removes an entity attribute.
 
@@ -1458,7 +1458,7 @@ Response:
 
 ## By Entity ID [/v2/entities/{entityId}/attrs/{attrName}/value?{type}]
 
-### Get attribute value [GET /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
+### Get Attribute Value [GET /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
 
 This operation returns the `value` property with the value of the attribute.
 
@@ -1493,7 +1493,7 @@ Response:
           "country": "Spain"
         }
 
-### Update attribute value [PUT /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
+### Update Attribute Value [PUT /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
 
 The request payload is the new attribute value.
 
@@ -1538,7 +1538,7 @@ Response:
 
 ## Entity types [/v2/types{?limit,offset,options}]
 
-### Retrieve entity types [GET /v2/types/{?limit,offset,options}]
+### List Entity Types [GET /v2/types/{?limit,offset,options}]
 
 If the `values` option is not in use, this operation returns a JSON array with the entity types.
 Each element is a JSON object with information about the type:
@@ -1734,7 +1734,7 @@ Notification rules are as follow:
 
 ## Subscription List [/v2/subscriptions]
 
-### Retrieve subscriptions [GET /v2/subscriptions{?limit,offset,options}]
+### List Subscriptions [GET /v2/subscriptions{?limit,offset,options}]
 
 Returns a list of all the subscriptions present in the system.
 
@@ -1795,7 +1795,7 @@ Response:
         ]
 
 
-### Create a new subscription [POST /v2/subscriptions]
+### Create Subscription [POST /v2/subscriptions]
 
 Creates a new subscription.
 The subscription is represented by a JSON object as described at the beginning of this section.
@@ -1843,7 +1843,7 @@ Response:
 
 ## Subscription By ID [/v2/subscriptions/{subscriptionId}]
 
-### Retrieve subscription [GET /v2/subscriptions/{subscriptionId}]
+### Retrieve Subscription [GET /v2/subscriptions/{subscriptionId}]
 
 The response is the subscription represented by a JSON object as described at the beginning of this
 section.
@@ -1891,7 +1891,7 @@ Response:
         }
 
 
-### Update subscription [PATCH /v2/subscriptions/{subscriptionId}]
+### Update Subscription [PATCH /v2/subscriptions/{subscriptionId}]
 
 Only the fields included in the request are updated in the subscription.
 
@@ -2001,9 +2001,9 @@ Not present if registration has never had a successful notification.
 
 ## Registration list [/v2/registrations]
 
-### Retrieve registrations [GET /v2/registrations{?limit,offset,options}]
+### List Registrations [GET /v2/registrations{?limit,offset,options}]
 
-Lists all the registrations present in the system.
+Lists all the context provider registrations present in the system.
 
 + Parameters
     + limit: 10 (optional, number) - Limit the number of registrations to be retrieved
@@ -2053,9 +2053,9 @@ Response:
           }
         ]
 
-### Create a new context provider registration [POST /v2/registrations]
+### Create Registration [POST /v2/registrations]
 
-Creates a new registration. This is typically used for binding context sources
+Creates a new context provider registration. This is typically used for binding context sources
 as providers of certain data.
 The registration is represented by a JSON object as described at the beginning of this section.
 
@@ -2095,7 +2095,7 @@ Response:
 
 ## Registration By ID [/v2/registrations/{registrationId}]
 
-### Retrieve context provider registration [GET /v2/registrations/{registrationId}]
+### Retrieve Registration [GET /v2/registrations/{registrationId}]
 
 The response is the registration represented by a JSON object as described at the beginning of this
 section.
@@ -2141,7 +2141,7 @@ Response:
             }
       }      
 
-### Update context provider registration [PATCH /v2/registrations/{registrationId}]
+### Update Registration [PATCH /v2/registrations/{registrationId}]
 
 Only the fields included in the request are updated in the registration.
 
@@ -2162,9 +2162,9 @@ Response:
 
 + Response 204
 
-### Delete context provider registration [DELETE /v2/registrations/{registrationId}]
+### Delete Registration [DELETE /v2/registrations/{registrationId}]
 
-Cancels registration.
+Cancels a context provider registration.
 
 Response:
 
