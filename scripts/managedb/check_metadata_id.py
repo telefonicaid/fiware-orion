@@ -1,6 +1,6 @@
 #!/usr/bin/python
-# -*- coding: latin-1 -*-
-# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+# -*- coding: utf-8 -*-
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -19,6 +19,9 @@
 #
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
+
+# Hint: use 'PYTHONIOENCODING=utf8 python check_metadata_id.py' if you are going to redirect the output of this
+# script to a file
 
 
 __author__ = 'fermin'
@@ -138,7 +141,7 @@ def fix_entity(entity, attrs_with_md_id):
                 # ...and add the new one (temperature:ID1). Previous check of temperature:ID1 is not already
                 # in the list: that will be an unsolvable situation
                 if new_name in new_attrnames:
-                    print "     * ERROR: attribute <{}> already exist in entity. Cannot be automatically fixed".format(new_name)
+                    print "     * ERROR: attribute <0> already exist in entity. Cannot be automatically fixed".format(new_name)
                     return 'error'
                 else:
                     new_attrnames.append(new_name)
@@ -189,7 +192,7 @@ def fix_entity(entity, attrs_with_md_id):
         if update_ok(check_doc, check_attrs):
             return 'changed'
         else:
-            print '     * ERROR: document <{}> change attempt failed!'.format(json.dumps(check_doc['_id']))
+            print '     * ERROR: document <0> change attempt failed!'.format(json.dumps(check_doc['_id']))
             return 'error'
     else:
         return 'untouched'
@@ -264,12 +267,14 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
 
     attrs_with_md_id = extract_attr_with_md_id(doc[ATTRS])
     if len(attrs_with_md_id.keys()) > 0:
-        print '- {}: entity {} ({}): metadata ID detected'.format(processed, json.dumps(doc['_id']),
-                                                                  date2string(doc['modDate']))
+        print '- {0}: entity {1} ({2}): metadata ID detected'.format(processed, json.dumps(doc['_id']),
+                                                                     date2string(doc['modDate']))
 
         max_number_of_ids = 0
         for attr in attrs_with_md_id.keys():
-            print '     {}: [ {} ]'.format(attr, ', '.join(attrs_with_md_id[attr]))
+            # We have found that some times attrs containts non-ASCII characters and printing can be problematic
+            # if we don't use .encode('utf-8')
+            print '     {0}: [ {1} ]'.format(attr.encode('utf-8'), ', '.join(attrs_with_md_id[attr]).encode('utf-8'))
             if len(attrs_with_md_id[attr]) > max_number_of_ids:
                 max_number_of_ids = len(attrs_with_md_id[attr])
 
