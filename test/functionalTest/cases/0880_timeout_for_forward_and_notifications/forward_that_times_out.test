@@ -182,7 +182,7 @@ Date: REGEX(.*)
 05. Query E1/T1/A1 on CB (provoking forward to accumulator)
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 105
+Content-Length: 116
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -190,7 +190,7 @@ Date: REGEX(.*)
 {
     "errorCode": {
         "code": "404",
-        "details": "error forwarding query",
+        "details": "invalid context provider response",
         "reasonPhrase": "No context element found"
     }
 }
