@@ -274,7 +274,7 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
         for attr in attrs_with_md_id.keys():
             # We have found that some times attrs containts non-ASCII characters and printing can be problematic
             # if we don't use .encode('utf-8')
-            print '     {0}: [ {1} ]'.format(attr.encode('utf-8'), ', '.join(attrs_with_md_id[attr]).encode('utf-8'))
+            print '     <{0}>: [ <{1}> ]'.format(attr.encode('utf-8'), ', '.join(attrs_with_md_id[attr]).encode('utf-8'))
             if len(attrs_with_md_id[attr]) > max_number_of_ids:
                 max_number_of_ids = len(attrs_with_md_id[attr])
 
