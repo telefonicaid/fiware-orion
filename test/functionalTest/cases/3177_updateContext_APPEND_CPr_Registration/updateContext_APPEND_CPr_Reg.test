@@ -60,9 +60,9 @@ orionCurl --url "/v1/registry/registerContext" --payload "$payload"
 REG_ID=$(echo "$_response" | grep registrationId | awk -F\" '{ print $4}')
 
 #
-# 02. Create an entity in CB with POST /v2/op/update (better than the NGSIv1 variant you show in your example).
+# 02. Creating an entity in CB with actionType APPEND by using NGSIv1 .
 #
-echo "02. Create an entity in CB with POST /v2/op/update (better than the NGSIv1 variant you show in your example)."
+echo "02. Creating an entity in CB with actionType APPEND by using NGSIv1."
 echo "========================================================================"
 payload='{
     "contextElements": [
@@ -129,7 +129,7 @@ Date: REGEX(.*)
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
-02. Create an entity in CB with POST /v2/op/update (better than the NGSIv1 variant you show in your example). 
+02. Creating an entity in CB with actionType APPEND by using NGSIv1. 
 ========================================================================
 HTTP/1.1 200 OK
 Content-Length: 204
