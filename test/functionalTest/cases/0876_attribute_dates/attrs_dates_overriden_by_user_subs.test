@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Entity dates overriden by the user (subscription/notification cases)
+Attribute dates overriden by the user (subscription/notification cases)
 
 --SHELL-INIT--
 dbInit CB
@@ -37,7 +37,7 @@ accumulatorStart --pretty-print
 # user provided dateModified doesn't match the filter, but this is the way CB works now
 # (and it is documented in NGSIv2 implementation notes). Maybe in the future this could change.
 #
-# 01. Create sub E.*/T with filter dateModified<2049-01-01
+# 01. Create sub E.*/T with filter mq dateModified<2049-01-01
 # 02. Create entity E1/T with user provided dateModified in a far away future (should not trigger notif) [*]
 # 03. Create entity E2/T without user provided dateModified (should trigger notif)
 # 04. Dump & reset accumulator: see E2 notif [but also notif E1, with autoprovided dateModified]
@@ -47,17 +47,16 @@ accumulatorStart --pretty-print
 # 07. Dump & reset accumulator: see E2 notif [but also E1, with autoprovided dateModified]
 #
 # 08. Create sub E.*/T with filter dateModified<2049-01-01
-# 09. Dump & reset accumulator: see csub initial notif with E2 [but also E1 is included, with user provided dateModified]
+# 09. Dump & reset accumulator: see csub initial notif with E2 [but also E1 is included, with autoprovided dateModified]
 #
-# 10. Sanity check: E2 has dateModified in a far away future [even if non-initial notifications are not using it]
-# 11. Delete user dateModified from E1 (should not trigger notif) & reset accumulator
-# 12. Modify E1 (should trigger 2 notif)
-# 13. Modify E2 (should trigger 2 notif)
-# 14. Dump & reset accumulator: 2 notif E1 and 2 for E2
+# 10. Remove user dateModified from E1 (should not trigger notif) & reset accumulator
+# 11. Modify E1 (should trigger 2 notif)
+# 12. Modify E2 (should trigger 2 notif)
+# 13. Dump & reset accumulator: 2 notif E1 and 2 for E2
 #
 
-echo "01. Create sub E.*/T with filter dateModified<2049-01-01"
-echo "========================================================"
+echo "01. Create sub E.*/T with filter mq dateModified<2049-01-01"
+echo "==========================================================="
 payload='{
     "subject": {
         "entities": [
@@ -68,13 +67,13 @@ payload='{
         ],
         "condition": {
             "expression": {
-              "q": "dateCreated<2049-01-01"
+              "mq": "A.dateCreated<2049-01-01"
             }
          }
     },
     "notification": {
         "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"},
-        "attrs": [ "dateModified", "*" ]
+        "metadata": [ "dateModified", "*" ]
     }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -89,11 +88,13 @@ payload='{
   "type": "T",
   "A": {
     "value": "foo",
-    "type": "Text"
-  },
-  "dateModified": {
-    "value": "2051-01-01T00:00:00",
-    "type": "DateTime"
+    "type": "Text",
+    "metadata": {
+      "dateModified": {
+        "value": "2051-01-01T00:00:00",
+        "type": "DateTime"
+      }
+    }
   }
 }'
 orionCurl --url '/v2/entities' --payload "$payload"
@@ -170,13 +171,13 @@ payload='{
         ],
         "condition": {
             "expression": {
-              "q": "dateCreated<2049-01-01"
+              "mq": "A.dateCreated<2049-01-01"
             }
          }
     },
     "notification": {
         "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"},
-        "attrs": [ "dateModified", "*" ]
+        "metadata": [ "dateModified", "*" ]
     }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -184,30 +185,29 @@ echo
 echo
 
 
-echo "09. Dump & reset accumulator: see csub initial notif with E2 [but also E1 is included, with user provided dateModified]"
-echo "======================================================================================================================="
+echo "09. Dump & reset accumulator: see csub initial notif with E2 [but also E1 is included, with autoprovided dateModified]"
+echo "======================================================================================================================"
 accumulatorDump
 accumulatorReset
 echo
 echo
 
 
-echo "10. Sanity check: E1 has dateModified in a far away future [even if non-initial notifications are not using it]"
-echo "==============================================================================================================="
-orionCurl --url '/v2/entities/E1/attrs'
-echo
-echo
-
-
-echo "11. Delete user dateModified from E1 (should not trigger notif) & reset accumulator"
+echo "10. Remove user dateModified from E1 (should not trigger notif) & reset accumulator"
 echo "==================================================================================="
-orionCurl --url '/v2/entities/E1/attrs/dateModified' -X DELETE
+payload='{
+  "A": {
+    "value": "bar",
+    "type": "Text"
+  }
+}'
+orionCurl --url '/v2/entities/E1/attrs' --payload "$payload"
 accumulatorReset
 echo
 echo
 
 
-echo "12. Modify E1 (should trigger 2 notifs)"
+echo "11. Modify E1 (should trigger 2 notifs)"
 echo "======================================="
 payload='{
   "A": {
@@ -220,7 +220,7 @@ echo
 echo
 
 
-echo "13. Modify E2 (should trigger 2 notifs)"
+echo "12. Modify E2 (should trigger 2 notifs)"
 echo "======================================="
 payload='{
   "A": {
@@ -233,7 +233,7 @@ echo
 echo
 
 
-echo "14. Dump & reset accumulator: 2 notif E1 and 2 for E2"
+echo "13. Dump & reset accumulator: 2 notif E1 and 2 for E2"
 echo "====================================================="
 accumulatorDump
 accumulatorReset
@@ -242,8 +242,8 @@ echo
 
 
 --REGEXPECT--
-01. Create sub E.*/T with filter dateModified<2049-01-01
-========================================================
+01. Create sub E.*/T with filter mq dateModified<2049-01-01
+===========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -276,7 +276,7 @@ Date: REGEX(.*)
 ==============================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 291
+Content-Length: 331
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -288,14 +288,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A": {
-                "metadata": {},
+                "metadata": {
+                    "dateModified": {
+                        "type": "DateTime",
+                        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                    }
+                },
                 "type": "Text",
                 "value": "foo"
-            },
-            "dateModified": {
-                "metadata": {},
-                "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
             },
             "id": "E1",
             "type": "T"
@@ -306,7 +306,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 208
+Content-Length: 262
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -318,14 +318,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A": {
-                "metadata": {},
+                "metadata": {
+                    "dateModified": {
+                        "type": "DateTime",
+                        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                    }
+                },
                 "type": "Text",
                 "value": "foo"
-            },
-            "dateModified": {
-                "metadata": {},
-                "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
             },
             "id": "E2",
             "type": "T"
@@ -358,7 +358,7 @@ Date: REGEX(.*)
 ========================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 291
+Content-Length: 262
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -370,14 +370,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A": {
-                "metadata": {},
+                "metadata": {
+                    "dateModified": {
+                        "type": "DateTime",
+                        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                    }
+                },
                 "type": "Text",
                 "value": "bar"
-            },
-            "dateModified": {
-                "metadata": {},
-                "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
             },
             "id": "E1",
             "type": "T"
@@ -388,7 +388,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 208
+Content-Length: 262
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -400,14 +400,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A": {
-                "metadata": {},
+                "metadata": {
+                    "dateModified": {
+                        "type": "DateTime",
+                        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                    }
+                },
                 "type": "Text",
                 "value": "bar"
-            },
-            "dateModified": {
-                "metadata": {},
-                "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
             },
             "id": "E2",
             "type": "T"
@@ -428,11 +428,11 @@ Date: REGEX(.*)
 
 
 
-09. Dump & reset accumulator: see csub initial notif with E2 [but also E1 is included, with user provided dateModified]
-=======================================================================================================================
+09. Dump & reset accumulator: see csub initial notif with E2 [but also E1 is included, with autoprovided dateModified]
+======================================================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 279
+Content-Length: 470
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -444,21 +444,26 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A": {
-                "metadata": {},
+                "metadata": {
+                    "dateModified": {
+                        "type": "DateTime",
+                        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                    }
+                },
                 "type": "Text",
                 "value": "bar"
-            },
-            "dateModified": {
-                "metadata": {},
-                "type": "DateTime",
-                "value": "2051-01-01T00:00:00.00Z"
             },
             "id": "E1",
             "type": "T"
         },
         {
             "A": {
-                "metadata": {},
+                "metadata": {
+                    "dateModified": {
+                        "type": "DateTime",
+                        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                    }
+                },
                 "type": "Text",
                 "value": "bar"
             },
@@ -471,29 +476,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-10. Sanity check: E1 has dateModified in a far away future [even if non-initial notifications are not using it]
-===============================================================================================================
-HTTP/1.1 200 OK
-Content-Length: 132
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "A": {
-        "metadata": {},
-        "type": "Text",
-        "value": "bar"
-    },
-    "dateModified": {
-        "metadata": {},
-        "type": "DateTime",
-        "value": "2051-01-01T00:00:00.00Z"
-    }
-}
-
-
-11. Delete user dateModified from E1 (should not trigger notif) & reset accumulator
+10. Remove user dateModified from E1 (should not trigger notif) & reset accumulator
 ===================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -502,7 +485,7 @@ Date: REGEX(.*)
 
 
 
-12. Modify E1 (should trigger 2 notifs)
+11. Modify E1 (should trigger 2 notifs)
 =======================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -511,7 +494,7 @@ Date: REGEX(.*)
 
 
 
-13. Modify E2 (should trigger 2 notifs)
+12. Modify E2 (should trigger 2 notifs)
 =======================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -520,11 +503,11 @@ Date: REGEX(.*)
 
 
 
-14. Dump & reset accumulator: 2 notif E1 and 2 for E2
+13. Dump & reset accumulator: 2 notif E1 and 2 for E2
 =====================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 208
+Content-Length: 262
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -536,14 +519,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A": {
-                "metadata": {},
+                "metadata": {
+                    "dateModified": {
+                        "type": "DateTime",
+                        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                    }
+                },
                 "type": "Text",
                 "value": "zzz"
-            },
-            "dateModified": {
-                "metadata": {},
-                "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
             },
             "id": "E1",
             "type": "T"
@@ -554,7 +537,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 291
+Content-Length: 400
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -566,14 +549,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A": {
-                "metadata": {},
+                "metadata": {
+                    "dateModified": {
+                        "type": "DateTime",
+                        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                    }
+                },
                 "type": "Text",
                 "value": "zzz"
-            },
-            "dateModified": {
-                "metadata": {},
-                "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
             },
             "id": "E1",
             "type": "T"
@@ -584,7 +567,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 208
+Content-Length: 262
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -596,14 +579,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A": {
-                "metadata": {},
+                "metadata": {
+                    "dateModified": {
+                        "type": "DateTime",
+                        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                    }
+                },
                 "type": "Text",
                 "value": "zzz"
-            },
-            "dateModified": {
-                "metadata": {},
-                "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
             },
             "id": "E2",
             "type": "T"
@@ -614,7 +597,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 291
+Content-Length: 400
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -626,14 +609,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A": {
-                "metadata": {},
+                "metadata": {
+                    "dateModified": {
+                        "type": "DateTime",
+                        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                    }
+                },
                 "type": "Text",
                 "value": "zzz"
-            },
-            "dateModified": {
-                "metadata": {},
-                "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
             },
             "id": "E2",
             "type": "T"
