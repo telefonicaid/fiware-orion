@@ -100,13 +100,13 @@ def check_attrs(attrs, attr_names):
 
     # All in attrs is in attr_names
     for attr in attrs.keys():
-        if base_name(attr) not in attr_names:
+        if base_name(attr).replace('=','.') not in attr_names:
             r.append('     * ERROR: base name of attr <{0}> in attrs keymap cannot be found in attrNames list'.format(attr.encode('utf-8')))
 
     # All in attr_names is in attrs
     for attr in attr_names:
         # map() used to get only the first token in attrs keys
-        if attr not in map(lambda x: x.split('()')[0], attrs.keys()):
+        if attr not in map(lambda x: x.split('()')[0].replace('=','.'), attrs.keys()):
             r.append('     * ERROR: attr <{0}> in attrName list cannot be found in attrs keymap'.format(attr.encode('utf-8')))
 
     return r
