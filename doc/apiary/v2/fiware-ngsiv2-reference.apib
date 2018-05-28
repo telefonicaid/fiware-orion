@@ -2353,3 +2353,48 @@ Response code:
             }
           }
         ]
+
+
+### Notify [POST /v2/op/notify{?options}]
+
+This operation is intended to consume a notification payload so that all the entity data included by such notification is persisted, overwriting if necessary.
+This operation is useful when one NGSIv2 endpoint is subscribed to another NGSIv2 endpoint (federation scenarios). 
+The request payload must be an NGSIv2 notification payload. 
+The behaviour must be exactly the same as `POST /v2/op/update` with `actionType` equals to `APPEND`. 
+
+Response code:
+
+* Successful operation uses 200 OK
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+  more details.
+
++ Parameters
+    + options (optional, string) - Options dictionary
+      + Members
+          + keyValues - when used, the request payload uses the `keyValues` simplified entity
+            representation. See "Simplified Entity Representation" section for details.
+
++ Request (application/json)
+
+        {
+          "subscriptionId": "5aeb0ee97d4ef10a12a0262f",
+          "data": [{
+            "type": "Room",
+            "id": "DC_S1-D41",
+            "temperature": {
+              "value": 35.6,
+              "type": "Number"
+            }
+          },
+          {
+            "type": "Room",
+            "id": "Boe-Idearium",
+            "temperature": {
+              "value": 22.5,
+              "type": "Number"
+            }
+          }]
+        }
+
++ Response 200 (application/json)
+
