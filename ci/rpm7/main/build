@@ -1,0 +1,344 @@
+#!/bin/bash
+
+path='/opt/fiware-orion'
+url_src='https://github.com/telefonicaid/fiware-orion'
+url_dst='https://nexus.lab.fiware.org/repository/el'
+releasever=7
+basearch='x86_64'
+
+function _usage()
+{
+  echo -n "Usage: build [options]
+  Options:
+    -H   --show          show help for functional test
+    -b   --branch        choose branch/tag to build, if not - source from /opt/fiware-orion will be used
+    -s   --source        repo to clone, if not - default from https://github.com/telefonicaid/fiware-orion
+    -M   --make          cmake/make
+    -S   --split         split make/cmake to stages
+    -I   --install       make install
+    -E   --execute       run (rerun) test stand with 2 orions
+    -u   --unit          run unit test
+    -f   --functional    run functional test
+    -n   --nightly       build rpm nightly
+    -r   --release       build rpm release
+    -t   --testing       build rpm testing
+    -U   --upload        upload rpm, REPO_USER and REPO_PASSWORD ENV variables should be provided
+    -F   --fix           fix for jenkins
+    -D   --db            start mongodb
+
+  Examples:
+    build -MIDufb master - clone from master, make, make install, run mongo, execute unit and functional tests
+    build -MIDFSf - get source from mounted folder, make, make install special for functional tests, execute FIX, functional test
+"
+  exit 0
+}
+
+function _fix_jenkins()
+{
+    echo "Builder: fix jenkins"
+    cp ${path}/test/functionalTest/testHarness.sh /tmp/builder/bu/testHarness.sh
+
+    sed $'/DISABLED=(/s/$/\\\n          \'test\/functionalTest\/cases\/0000_ipv6_support\/ipv4_ipv6_both.test\' \\\/1' ${path}/test/functionalTest/testHarness.sh > /tmp/ft.tmp && mv -f /tmp/ft.tmp ${path}/test/functionalTest/testHarness.sh
+    sed $'/DISABLED=(/s/$/\\\n          \'test\/functionalTest\/cases\/1048_subscription_cache\/three_subscriptions.test\' \\\/1' ${path}/test/functionalTest/testHarness.sh > /tmp/ft.tmp && mv -f /tmp/ft.tmp ${path}/test/functionalTest/testHarness.sh
+    sed $'/DISABLED=(/s/$/\\\n          \'test\/functionalTest\/cases\/2145_sem_status_operation\/get_admin_sem_request.test\' \\\/1' ${path}/test/functionalTest/testHarness.sh > /tmp/ft.tmp && mv -f /tmp/ft.tmp ${path}/test/functionalTest/testHarness.sh
+
+    chmod +x ${path}/test/functionalTest/testHarness.sh
+}
+
+function _unfix_jenkins()
+{
+    echo "Builder: revert jenkins"
+    mv -f /tmp/builder/bu/testHarness.sh ${path}/test/functionalTest/testHarness.sh
+}
+
+
+function _fix()
+{
+    echo "Builder: fix makefile"
+    mv -f ${path}/makefile /tmp/builder/bu/
+    cp /opt/archive/makefile ${path}/
+}
+
+function _unfix()
+{
+    echo "Builder: revert makefile"
+    mv -f /tmp/builder/bu/makefile ${path}/makefile
+}
+
+function _show()
+{
+    echo -n "Builder: run this commands
+. scripts/testEnv.sh
+"
+}
+
+function _execute()
+{
+    killall contextBroker
+    killall mongod
+
+    sleep 3
+
+    mongod --dbpath /data/db1 --port 20001 --quiet --nojournal&
+    mongod --dbpath /data/db2 --port 20002 --quiet --nojournal&
+
+    sleep 3
+
+    contextBroker -port 30001 -dbhost localhost:20001 -pidpath cb1.pid &
+    contextBroker -port 30002 -dbhost localhost:20002 -pidpath cb2.pid &
+
+    while true; do sleep 3; done
+}
+
+[ $# = 0 ] && _usage
+
+reset=true
+
+for arg in "$@"
+do
+    if [ -n "$reset" ]; then
+      unset reset
+      set --
+    fi
+    case "$arg" in
+       --execute) set -- "$@" -E ;;
+       --help)    set -- "$@" -h ;;
+       --branch)    set -- "$@" -b ;;
+       --source)    set -- "$@" -s ;;
+       --clone) set -- "$@" -C ;;
+       --make)  set -- "$@" -M ;;
+       --split) set -- "$@" -S ;;
+       --install) set -- "$@" -I ;;
+       --unit) set -- "$@" -u ;;
+       --functional) set -- "$@" -f ;;
+       --nightly) set -- "$@" -n ;;
+       --release) set - "$@" -r ;;
+       --testing) set - "$@" -t ;;
+       --upload) set - "$@" -U ;;
+       --fix) set -- "$@" -F ;;
+       --show) set -- "$@" -S ;;
+       --db) set -- "$@" -D ;;
+       *)  set -- "$@" "$arg" ;;
+    esac
+done
+
+while getopts ":hb:s:MIufnrtUFHDES:" opt; do
+    case ${opt} in
+        h)  _usage ;;
+        b)  branch=$OPTARG ;;
+        s)  source=$OPTARG ;;
+        M)  make=true;;
+        S)  split=$OPTARG;;
+        I)  install=true;;
+        u)  unit=true ;;
+        f)  functional=true ;;
+        n)  nightly=true ;;
+        r)  release=true ;;
+        t)  testing=true ;;
+        U)  upload=true ;;
+        F)  fix=true ;;
+        H)  show=true ;;
+        D)  database=true ;;
+        E)  execute=true ;;
+        *) _usage ;;
+        :)
+        echo "option -$OPTARG requires an argument"
+        usage
+        ;;
+    esac
+done
+shift $((OPTIND-1))
+
+echo "================================================================="
+echo "                             CHECKS                              "
+echo "================================================================="
+
+echo "Builder: check if credentials exists, if upload on"
+if [ -n "${upload}" ]; then
+    if [ -z "${REPO_USER}" ] || [ -z "${REPO_PASSWORD}" ]; then
+        echo "Builder: failed, REPO_USER or REPO_PASSWORD env variables not set"; exit 1;
+    fi
+fi
+
+echo "Builder: check if target folder can be created"
+mkdir -p ${path} > /dev/null 2>&1
+if [ ! -d "${path}" ]; then echo "Builder: failed, not enough permissions"; exit 1; fi
+
+echo "Builder: check if source exists, if branch is empty"
+if [ -z "${branch}" ] && [ ! -f ${path}/LICENSE ]; then echo "Builder: failed, source code not found"; exit 1; fi
+
+
+echo "================================================================="
+echo "                             PREPARE                             "
+echo "================================================================="
+
+echo "Builder: create temp folders"
+rm -Rf /tmp/builder || true && mkdir -p /tmp/builder/{db1,db2,db,bu}
+
+if [ -n "${database}" ]; then
+    echo "Builder: starting Mongo"
+    mongod --dbpath /tmp/builder/db  --nojournal --quiet > /dev/null 2>&1 &
+    sleep 3
+    export MONGO_HOST=localhost
+fi
+
+if [ -n "${branch}" ]; then
+    echo "================================================================="
+    echo "                             CLONE                               "
+    echo "================================================================="
+
+    echo "Builder: cloning branch: "${branch}
+    if [ -n "${source}" ]; then url_src=${source}; fi
+    echo "Builder: cloning from: "${url_src}
+    git clone -b ${branch} ${url_src} ${path}
+    chown -R root:root ${path}
+
+fi
+
+if [ -n "${make}" ] && [ -z "${split}" ]; then
+    echo "================================================================="
+    echo "                        BUILD                                    "
+    echo "================================================================="
+
+    _fix
+    echo "Builder: build"
+    cd ${path} && make build
+    if [ $? -ne 0 ]; then echo "Builder: make failed"; exit 1; fi
+    _unfix
+
+fi
+
+if [ -n "${make}" ] && [ -n "${split}" ]; then
+    echo "================================================================="
+    echo "                        BUILD_SPLIT                              "
+    echo "================================================================="
+
+    _fix
+    echo "Builder: build"
+    cd ${path} && make build_${split}
+    if [ $? -ne 0 ]; then echo "Builder: make failed"; exit 1; fi
+    _unfix
+
+fi
+
+if [ -n "${install}" ]; then
+    echo "================================================================="
+    echo "                        INSTALL                                  "
+    echo "================================================================="
+
+    _fix
+    cd ${path} && make install
+    if [ $? -ne 0 ]; then echo "Builder: installation failed"; exit 1; fi
+    _unfix
+
+fi
+
+if [ -n "${execute}" ]; then
+    echo "================================================================="
+    echo "                        EXECUTE                                  "
+    echo "================================================================="
+
+      _execute
+    exit 0
+
+fi
+
+if [ -n "${unit}" ]; then
+    echo "================================================================="
+    echo "                       UNIT TESTS                                "
+    echo "================================================================="
+
+    _fix
+    cd ${path} && make unit
+    if [ $? -ne 0 ]; then echo "Builder: unit test failed"; exit 1; fi
+    _unfix
+fi
+
+if [ -n "${functional}" ]; then
+    echo "================================================================="
+    echo "                    FUNCTIONAL TESTS                             "
+    echo "================================================================="
+
+    if [ -n "${fix}" ]; then _fix_jenkins; fi
+
+    _fix
+
+    cd ${path}
+    . scripts/testEnv.sh
+
+    make functional INSTALL_DIR=~
+    if [ $? -ne 0 ]; then status=false; else status=true; fi
+
+    _unfix
+
+    if [ -n "${fix}" ]; then _unfix_jenkins; fi
+
+    if ! ${status}; then echo "Builder: functional test failed"; exit 1; fi
+fi
+
+if [ -n "${nightly}" ]; then
+    echo "================================================================="
+    echo "                   BUILDING NIGHTLY RPM                          "
+    echo "================================================================="
+
+    export BROKER_RELEASE=$(date "+%Y%m%d")
+
+    cd ${path}/src/app/contextBroker
+
+    version=$(cat version.h | grep ORION_VERSION | awk '{ print $3}' | sed 's/"//g' | sed 's/-next//g')
+    sed -i "s/ORION_VERSION .*/ORION_VERSION \"$version\"/g" version.h
+
+    cd ${path}
+    git reset --hard
+    make rpm
+
+    pack='nightly'
+fi
+
+if [ -n "${release}" ]; then
+    echo "================================================================="
+    echo "                     BUILDING RELEASE RPM                        "
+    echo "================================================================="
+
+    export BROKER_RELEASE=1
+
+    cd ${path}
+    git reset --hard
+    make rpm
+
+    pack='release'
+fi
+
+if [ -n "${testing}" ]; then
+    echo "================================================================="
+    echo "                     BUILDING TESTING RPM                        "
+    echo "================================================================="
+
+    export BROKER_RELEASE=$(date "+%Y%m%d%H%M")
+
+    cd ${path}/src/app/contextBroker
+    git reset --hard
+
+    version=$(cat version.h | grep ORION_VERSION | awk '{ print $3}' | sed 's/"//g' | sed 's/-next//g')
+    sed -i "s/ORION_VERSION .*/ORION_VERSION \"$version\"/g" version.h
+
+    cd ${path}
+    make rpm
+
+    pack='testing'
+fi
+
+if [ -n "${upload}" ]; then
+    echo "================================================================="
+    echo "                     UPLOADING RPMS                              "
+    echo "================================================================="
+
+    cd ${path}/rpm/RPMS/x86_64
+    for file in $(ls); do
+      echo "Builder: uploading ${file}"
+      curl -v -u ${REPO_USER}:${REPO_PASSWORD} --upload-file ${file} ${url_dst}/${releasever}/${basearch}/${pack}/${file};
+      if !(curl --output /dev/null --silent --head --fail ${url_dst}/${releasever}/${basearch}/${pack}/${file}); then echo "UPLOAD FAILED!"; exit 1; fi
+   done
+fi
+
+if [ -n "${show}" ]; then _show; fi
