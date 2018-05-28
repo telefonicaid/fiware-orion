@@ -261,8 +261,6 @@ Please have a look if you want to get more in deep detail.
 
 [Top](#top)
 
-[Top](#top)
-
 ## Scope functionality
 
 Orion implements a `scope` field in the `POST /v2/op/update` operation (you can see
