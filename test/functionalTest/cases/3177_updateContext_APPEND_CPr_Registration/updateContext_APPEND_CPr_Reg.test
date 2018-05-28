@@ -1,4 +1,4 @@
-# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -25,15 +25,14 @@ updateContext actionType APPEND with Context Provider Registration
 
 --SHELL-INIT--
 dbInit CB
+dbInit CP1
 brokerStart CB
+brokerStart CP1
 
 --SHELL--
 
-#
-# 01. Register CP.
-#
-echo "01. Register CP."
-echo "========================================================================"
+echo "01. Register CP1 .01"
+echo "===================="
 payload='{
   "contextRegistrations": [
     {
@@ -51,19 +50,17 @@ payload='{
           "isDomain": "false"
         }
       ],
-      "providingApplication": "${Context_Provider_URL}"
+      "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
     }
   ],
-  "duration": "PT1H"
+  "duration": "P1M"
 }'
-orionCurl --url "/v1/registry/registerContext" --payload "$payload"
-REG_ID=$(echo "$_response" | grep registrationId | awk -F\" '{ print $4}')
+orionCurl --url /v1/registry/registerContext --payload "$payload"
+echo
+echo
 
-#
-# 02. Creating an entity in CB with actionType APPEND by using NGSIv1 .
-#
-echo "02. Creating an entity in CB with actionType APPEND by using NGSIv1."
-echo "========================================================================"
+echo "02. Creating an entity in CB with actionType APPEND by using NGSIv1 .02"
+echo "======================================================================="
 payload='{
     "contextElements": [
         {
@@ -73,21 +70,20 @@ payload='{
             "attributes": [
                 {
                     "name": "temperature",
-					"type": "degree",
-					"value": "12"
-     			}
+		    "type": "degree",
+		    "value": "12"
+     		}
             ]
         }
     ],
     "updateAction": "APPEND"
 }'
-orionCurl --url "/v1/updateContext" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo 
 
-#
-# 03. Query to CP: see nothing (that's ensures the APPEND wasn't forwarded).
-#
-echo "03. Query to CP: see nothing (that's ensures the APPEND wasn't forwarded)."
-echo "========================================================================"
+echo "03. Query to CP: see nothing (that's ensures the APPEND wasn't forwarded) .03"
+echo "============================================================================="
 payload='{
     "entities": [
         {
@@ -95,15 +91,17 @@ payload='{
             "isPattern": "false",
             "id": "Floor1"
         }
+    ],
+    "attributes": [
+        "temperature"
     ]
 }'
-orionCurl --url "/v1/queryContext" --payload "$payload"
+orionCurl --url /v1/queryContext --payload "$payload" --port $CP1_PORT
+echo
+echo
 
-#
-# 04. Query to CB: see the entity (it was created locally).
-#
-echo "04. Query to CB: see the entity (it was created locally)."
-echo "========================================================================"
+echo "04. Query to CB: see the entity (it was created locally) .04"
+echo "============================================================"
 payload='{
     "entities": [
         {
@@ -111,13 +109,19 @@ payload='{
             "isPattern": "false",
             "id": "Floor1"
         }
+    ],
+    "attributes": [
+        "temperature"
     ]
 }'
-orionCurl --url "/v1/queryContext" --payload "$payload"
+orionCurl --url /v1/queryContext --payload "$payload"
+echo
+echo
+
 
 --REGEXPECT--
 01. Register CP. 
-========================================================================
+================
 HTTP/1.1 200 OK
 Content-Length: 63
 Content-Type: application/json
@@ -125,12 +129,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "PT1H",
+    "duration": "P1M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
+
 02. Creating an entity in CB with actionType APPEND by using NGSIv1. 
-========================================================================
+====================================================================
 HTTP/1.1 200 OK
 Content-Length: 204
 Content-Type: application/json
@@ -162,7 +167,7 @@ Date: REGEX(.*)
 
 
 03. Query to CP: see nothing (that's ensures the APPEND wasn't forwarded). 
-========================================================================
+==========================================================================
 HTTP/1.1 200 OK
 Content-Length: 70
 Content-Type: application/json
@@ -176,8 +181,9 @@ Date: REGEX(.*)
     }
 }
 
+
 04. Query to CB: see the entity (it was created locally). 
-========================================================================
+=========================================================
 HTTP/1.1 200 OK
 Content-Length: 206
 Content-Type: application/json
@@ -207,6 +213,9 @@ Date: REGEX(.*)
     ]
 }
 
+
 --TEARDOWN--
 brokerStop CB
+brokerStop CP1
 dbDrop CB
+dbDrop CP1
