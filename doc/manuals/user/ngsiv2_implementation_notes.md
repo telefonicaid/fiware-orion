@@ -7,6 +7,8 @@
 * [Limit to attributes for entity location](#limit-to-attributes-for-entity-location)
 * [Legacy attribute format in notifications](#legacy-attribute-format-in-notifications)
 * [Datetime support](#datetime-support)
+* [`dateModified` and `dateCreated` attributes](#datemodified-and-datecreated-attributes)
+* [`dateModified` and `dateCreated` metadata](#datemodified-and-datecreated-metadata)
 * [Scope functionality](#scope-functionality)
 * [Error responses](#error-responses)
 * [Subscription payload validations](#subscription-payload-validations)
@@ -132,6 +134,132 @@ timezone (which is the best default option, as clients/receivers may be running 
 future (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2663)).
 
 The string "ISO8601" as type for attributes and metadata is also supported. The effect is the same as when using "DateTime".
+
+[Top](#top)
+
+## `dateModified` and `dateCreated` attributes
+
+Section "Attribute names restrictions" establishes that system/builtin attribute names cannot be used as user attribute names. Thus,
+`dateCreated` and `dateModified` (which are system/builtin attributes) cannot be used as user attribute names.
+
+However, due to legacy reasons, Orion doesn't reject attemps of using these attribute with 400 Bad Request errors. **You are
+strongly encouraged to not use dateCreate/dateModified as attribute names** but, if you at the end need to do so, take into account
+the following information.
+
+You can use dateModified/dateCreated attributes at creation/update time, eg:
+
+```
+POST /v2/entities
+
+{
+  "id": "FutureEntity",
+  "type": "T",
+  ...
+  "dateModified": {
+      "type": "DateTime".
+      "value": "2050-01-01T00:00:00Z"
+  }
+}
+```
+
+Retrieval of such attribute using GET API operations will return the value you created/updated. You don't need to use
+`?attrs=dateModified,...` in this case. Eg:
+
+```
+GET /v2/entities/FutureEntity/attrs
+```
+
+```
+{
+  ...
+  "dateModified": {
+      "type": "DateTime".
+      "value": "2050-01-01T00:00:00Z"
+  }
+}
+```
+
+However, when included in notifications, the value is not the one provided by the user (*), but the real
+one corresponding to entity modification/creation stored internally by Orion, eg (assuming the last update
+for that entity was sent at 11:16:05 at May 28th, 2018):
+
+```
+POST /notify
+
+{
+    "data": [
+        {
+            "dateModified": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "2018-05-28T11:16:05Z"
+            },
+            "id": "FutureEntity",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "5b082dc2c17960f8773dd74d"
+}
+```
+
+(*) Exception: initial notification uses the value provided by the user. However, this is probably a side
+effect of [this issue](https://github.com/telefonicaid/fiware-orion/issues/3182).
+
+
+In addition, filters will use the real modification/creation date as stored internally by Orion. For instance,
+the following filter will not retrieve any result (even when user provided 2050-01-01T00:00:00Z as dateModified, which
+would match the filter condition):
+
+```
+GET /v2/entities?q=dateModified>2030-01-01T00:00:00Z
+```
+
+This behaviour is assessed by the functional test entity_dates_overriden_by_user.test
+and entity_dates_overriden_by_user_subs.test cases included in
+[cases/0876_entity_dates directory](https://github.com/telefonicaid/fiware-orion/tree/master/test/functionalTest/cases/0876_entity_dates).
+Please have a look if you want to get more in deep detail.
+
+[Top](#top)
+
+## `dateModified` and `dateCreated` metadata
+
+Section "Metadata names restrictions" establishes that system/builtin metadata names cannot be used as user metadta names. Thus,
+`dateCreated` and `dateModified` (which are system/builtin metadata) cannot be used as user metadadta names.
+
+However, due to legacy reasons, Orion doesn't reject attemps of using these metadata with 400 Bad Request errors. **You are
+strongly encouraged to not use dateCreate/dateModified as metadata names** but, if you at the end need to do so, take into account
+the following information.
+
+You can use dateModified/dateCreated metadata at creation/update time, eg:
+
+```
+POST /v2/entities
+
+{
+  "id": "FutureEntity",
+  "type": "T",
+  ...
+  "futureAttr": {
+      "value": 42,
+      "type": "Number",
+      "dateModified": {
+          "type": "DateTime".
+           "value": "2050-01-01T00:00:00Z"
+      }
+  }
+}
+```
+
+However, they are ignored. Orion will keep attribute creation/modification internally and always using them in GET responses,
+notifications and filter.
+
+
+This behaviour is assessed by the functional test attrs_dates_overriden_by_user.test
+and attrs_dates_overriden_by_user_subs.test cases included in
+[cases/0876_attribute_dates directory](https://github.com/telefonicaid/fiware-orion/tree/master/test/functionalTest/cases/0876_attribute_dates).
+Please have a look if you want to get more in deep detail.
+
+[Top](#top)
 
 [Top](#top)
 
