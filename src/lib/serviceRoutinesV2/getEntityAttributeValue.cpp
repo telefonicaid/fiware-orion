@@ -105,8 +105,7 @@ std::string getEntityAttributeValue
       // Do not use attribute name, change to 'value'
       attribute.pcontextAttribute->name = "value";
 
-      TIMED_RENDER(answer = attribute.render(ciP->apiVersion,
-                                             ciP->httpHeaders.accepted("text/plain"),
+      TIMED_RENDER(answer = attribute.render(ciP->httpHeaders.accepted("text/plain"),
                                              ciP->httpHeaders.accepted("application/json"),
                                              ciP->httpHeaders.outformatSelect(),
                                              &(ciP->outMimeType),
