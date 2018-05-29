@@ -89,7 +89,7 @@ Date: REGEX(.*)
 02. See the entity using POST /v1/queryContext and make sure the metadata value-vector is correctly rendered
 ============================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 551
+Content-Length: 260
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

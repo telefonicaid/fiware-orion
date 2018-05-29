@@ -22,8 +22,10 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+#include <vector>
+
 #include "gtest/gtest.h"
-#include "testInit.h"
 
 #include "ngsi/Restriction.h"
 #include "ngsi/Reference.h"
@@ -33,11 +35,14 @@
 #include "cache/SubscriptionCache.h"
 #include "cache/subCache.h"
 
-#include "unittest.h"
+#include "unittests/unittest.h"
+#include "unittests/testInit.h"
 
-using namespace orion;
+
 
 extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+
+
 
 /* ****************************************************************************
 *
@@ -57,7 +62,7 @@ TEST(cache, SubscriptionCache)
   EntityInfo*               ei1 = new EntityInfo();
   EntityInfo*               ei2 = new EntityInfo();
   NotifyCondition*          ncP = new NotifyCondition();
-  
+
   subscriptionCacheInit("utest");
 
   attributeV.push_back("attr1");
@@ -78,7 +83,18 @@ TEST(cache, SubscriptionCache)
   ncP->condValueList.push_back("attr3");
   nv.push_back(ncP);
 
-  subP = new Subscription("utest", "/spath", "012345678901234567890123", entityIdInfos, attributeV, 5, -1, restriction, nv, "REFERENCE", 0, JSON);
+  subP = new Subscription("utest",
+                          "/spath",
+                          "012345678901234567890123",
+                          entityIdInfos,
+                          attributeV,
+                          5,
+                          -1,
+                          restriction,
+                          nv,
+                          "REFERENCE",
+                          0,
+                          JSON);
 
   subCache->insert(subP);
 
@@ -114,7 +130,19 @@ TEST(cache, SubscriptionCache)
   ASSERT_EQ(0, subV.size());
   subV.clear();
 
-  subP = new Subscription("utest", "/spath", "012345678901234567890124", entityIdInfos, attributeV, 5, -1, restriction, nv, "REFERENCE", 0, JSON);
+  subP = new Subscription("utest",
+                          "/spath",
+                          "012345678901234567890124",
+                          entityIdInfos,
+                          attributeV,
+                          5,
+                          -1,
+                          restriction,
+                          nv,
+                          "REFERENCE",
+                          0,
+                          JSON);
+
   subCache->insert(subP);
 
   subCache->lookup("utest", "/spath", "E10", "", "attr3", &subV);
@@ -123,5 +151,5 @@ TEST(cache, SubscriptionCache)
   EXPECT_EQ("012345678901234567890124", subV[1]->subscriptionId);
   subV.clear();
 
-  utExit();  
+  utExit();
 }

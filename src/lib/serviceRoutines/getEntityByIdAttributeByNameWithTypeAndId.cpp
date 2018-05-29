@@ -101,14 +101,14 @@ std::string getEntityByIdAttributeByNameWithTypeAndId
     parseDataP->dcars.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
 
-    TIMED_RENDER(answer = parseDataP->dcars.res.render(""));
+    TIMED_RENDER(answer = parseDataP->dcars.res.render());
   }
   else if ((entityTypeFromUriParam != entityType) && (entityTypeFromUriParam != ""))
   {
     parseDataP->dcars.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
 
-    TIMED_RENDER(answer = parseDataP->dcars.res.render(""));
+    TIMED_RENDER(answer = parseDataP->dcars.res.render());
   }
   else
   {
@@ -116,7 +116,7 @@ std::string getEntityByIdAttributeByNameWithTypeAndId
     parseDataP->dcar.res.fill(entityId, entityType, typeInfo, attributeName);
 
 
-    // 04. Call standard operation 
+    // 04. Call standard operation
     answer = postDiscoverContextAvailability(ciP, components, compV, parseDataP);
   }
 

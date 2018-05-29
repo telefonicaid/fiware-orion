@@ -286,7 +286,7 @@ echo
 01. Update/UPDATE E1/A1=1 and see it fail (PUT /v1/contextEntities/E1/attributes)
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 116
+Content-Length: 85
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -303,7 +303,7 @@ Date: REGEX(.*)
 02. Update/APPEND E1/A1=10 (POST /v1/updateContext)
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 375
+Content-Length: 181
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -335,7 +335,7 @@ Date: REGEX(.*)
 03. Update/UPDATE E1/A1=1 and see it work (PUT /v1/contextEntities/E1/attributes)
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 253
+Content-Length: 122
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -362,7 +362,7 @@ Date: REGEX(.*)
 04. Query CB for E1/A1
 ======================
 HTTP/1.1 200 OK
-Content-Length: 376
+Content-Length: 182
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -394,7 +394,7 @@ Date: REGEX(.*)
 05. Update/APPEND E2/A2=1 in CP1
 ================================
 HTTP/1.1 200 OK
-Content-Length: 376
+Content-Length: 182
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -426,7 +426,7 @@ Date: REGEX(.*)
 06. Register E2/A2 in CB with CP1 as providing application
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -440,7 +440,7 @@ Date: REGEX(.*)
 07. Update/UPDATE E2/A2=22 in CB, making it being forwarded to CP1 (PUT /v1/contextEntities/E2/attributes)
 ==========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 254
+Content-Length: 123
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -467,7 +467,7 @@ Date: REGEX(.*)
 08. Query CP1 for E2/A2
 =======================
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -499,7 +499,7 @@ Date: REGEX(.*)
 09. Query CP1 for E2/A2, with URI param attributesFormat=object
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 358
+Content-Length: 177
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -530,7 +530,7 @@ Date: REGEX(.*)
 10. Update/APPEND E3/A1=1 in CB, with type EEE in standard payload
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -562,7 +562,7 @@ Date: REGEX(.*)
 11. Update/APPEND E3/A1=13, in CB, with type E sent via URI param entity::type=EEE
 ==================================================================================
 HTTP/1.1 200 OK
-Content-Length: 254
+Content-Length: 123
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -589,7 +589,7 @@ Date: REGEX(.*)
 12. Query CB for E3/A1, E3 of type 'EEE'
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 381
+Content-Length: 187
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

@@ -31,7 +31,7 @@
 
 /* ****************************************************************************
 *
-* constructorsAndRender - 
+* constructorsAndRender -
 *
 */
 TEST(UnsubscribeContextResponse, constructorsAndRender)
@@ -58,7 +58,7 @@ TEST(UnsubscribeContextResponse, constructorsAndRender)
 
 /* ****************************************************************************
 *
-* jsonRender - 
+* jsonRender -
 */
 TEST(UnsubscribeContextResponse, jsonRender)
 {
@@ -77,7 +77,7 @@ TEST(UnsubscribeContextResponse, jsonRender)
   uncrP->statusCode.fill(SccBadRequest, "details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
-  out = uncrP->render("");
+  out = uncrP->render();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -86,7 +86,7 @@ TEST(UnsubscribeContextResponse, jsonRender)
   uncrP->statusCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
-  out = uncrP->render("");
+  out = uncrP->render();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   delete uncrP;

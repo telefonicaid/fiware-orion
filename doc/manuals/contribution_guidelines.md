@@ -19,28 +19,38 @@ planning to contribute to the code you should read this document and get familia
 Note that contribution workflows themselves (e.g. pull requests, etc.) are described in another document 
 ([FIWARE Development Guidelines](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Developer_Guidelines)).
 
+## Pull Request protocol
+
+As explained in ([FIWARE Development Guidelines](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Developer_Guidelines)) 
+contributions are done using a pull request (PR). The detailed "protocol" used in such PR is described below:
+
+* Direct commits to master branch (even single-line modifications) are not allowed. Every modification has to come as a PR
+* In case the PR is implementing/fixing a numbered issue, the issue number has to be referenced in the body of the PR at creation time
+* Anybody is welcome to provide comments to the PR (either direct comments or using the review feature offered by Github)
+* Use *code line comments* instead of *general comments*, for traceability reasons (see comments lifecycle below)
+* Comments lifecycle
+  * Comment is created, initiating a *comment thread*
+  * New comments can be added as responses to the original one, starting a discussion
+  * After discussion, the comment thread ends in one of the following ways:
+    * `Fixed in <commit hash>` in case the discussion involves a fix in the PR branch (which commit hash is 
+       included as reference)
+    * `NTC`, if finally nothing needs to be done (NTC = Nothing To Change)
+ * PR can be merged when the following conditions are met:
+    * All comment threads are closed
+    * All the participants in the discussion have provided a `LGTM` general comment (LGTM = Looks good to me)
+ * Self-merging is not allowed (except in rare and justified circumstances)
+
+Some additional remarks to take into account when contributing with new PRs:
+
+* PR must include not only code contributions, but their corresponding pieces of documentation (new or modifications to existing one) and tests
+* PR modifications must pass full regression based on existing test (unit, functional, memory, e2e) in addition to whichever new test added due to the new functionality
+* PR should be of an appropriated size that makes review achievable. Too large PRs could be closed with a "please, redo the work in smaller pieces" without any further discussing
+
 ## Filesystem layout guidelines
 
 ### Directory layout
 
-* **src**: contains the source code, with the following subdirectories
-* **app**: contains the code for applications (each application in a separate subdirectory). The main application, the Orion context broker, resides in the **contextBroker** directory.
-* **lib**: contains code libraries (each library in a separate subdirectory)
-* **test**: contains tests. There are several subdirectories (each subdirectory corresponding to a different test 
-  suite/procedure), but the most important ones for the time being are: 
-  * **unittest**: contains unit tests
-  * **functionalTest**: contains functional end-to-end tests based on the “test harness” engine
-  * **acceptance**: contains functional end-to-end test based on the Behave (NGSIv2) or Lettuce (NGSIv1) Python  
-    frameworks.
-* **scripts**: contains utility scripts (e.g. scripts included in the Orion RPM along with Orion binary itself,
-  scripts used by the test frameworks, etc.)
-* **doc**: contains documentation, with the following subdirectories:
-  * **apiary**: for apiary-based documentation
-  * **manuals**: for markdown based documentation
-* **rpm**: contains files for RPM building
-* **etc**: scripts that are installed under etc/ (typically, included in RPM package)
-* **docker**: contains the docker files
-* **archive**: contains older files that is no longer used but that we don’t want to remove yet.
+For a detailed explanation of the directory structure, see [this section in the Development Manual](devel/directoryStructure.md).
 
 ### File layout for source code files 
 
@@ -149,7 +159,7 @@ descriptive list of its parameters, and its return values.
 
 Example:
 
-```    
+```
 /* ****************************************************************************
 *
 * parseUrl - parse a URL and return its pieces
@@ -425,7 +435,7 @@ directly or indirectly are forced to have that construct as well.
 
 #### S2 (Object action naming convention):
 
-*Rule*: “objectAction” SHOULD be used, eg.:
+*Rule*: "objectAction" SHOULD be used, eg.:
 
 ```
 listInit()
@@ -439,6 +449,9 @@ initList()
 resetList()
 findList()
 ```
+
+This rule is applied to variable names, function names and even file names (for files which
+contain only one external function so the name of the file is the name of the function).
 
 *Rationale*: a set of functions are ‘grouped’ thanks to their prefix (“object”, in the example: “list”).
 
@@ -667,7 +680,7 @@ X:X(int _i, float _f):  i(_i), f(_f)
 Y:Y(const std::string& _fooName, const std::string& _myLongFooName):
   fooName(_fooName),
   myLongFooName(_myLongFooName)
-{            
+{
 }
 ```
 
@@ -712,6 +725,28 @@ In C++ it gets a a bit weird and it is better to avoid this by adding a helper v
 The difference between "C pointers" and "C++ references" is minimal, but really, it depends on the implementation of the compiler.
 See [this question](https://stackoverflow.com/questions/44239212/how-do-c-compilers-actually-pass-literal-constant-in-reference-parameters) and 
 [this one](https://stackoverflow.com/questions/2936805/how-do-c-compilers-actually-pass-reference-parameters) in stackoverflow, for discussions on this. 
+
+*How to check*: manually
+
+#### S15 (Error output parameter at the end)
+
+*Rule*: in the case a function uses an output parameter to potencially provide error output to the caller, that
+parameter SHOULD be declared at the end of the parameters list, e.g.:
+
+```
++void mongoRegistrationGet
+(
+  ngsiv2::Registration*  regP,
+  const std::string&     regId,
+  const std::string&     tenant,
+  const std::string&     servicePath,
+  OrionError*            oeP
+);
+
+void myFunction(const std::string s, std::string* err);
+```
+
+*Rationale*: the code gets more ordered this way.
 
 *How to check*: manually
 

@@ -28,7 +28,7 @@
 
 /* ****************************************************************************
 *
-* httpStatusCodeString - 
+* httpStatusCodeString -
 */
 std::string httpStatusCodeString(HttpStatusCode code)
 {
@@ -45,7 +45,7 @@ std::string httpStatusCodeString(HttpStatusCode code)
   case SccContentLengthRequired:             return "Content Length Required";
   case SccRequestEntityTooLarge:             return "Request Entity Too Large";
   case SccUnsupportedMediaType:              return "Unsupported Media Type";
-  case SccInvalidModification:               return "Invalid Modification"; 
+  case SccInvalidModification:               return "Invalid Modification";
   case SccSubscriptionIdNotFound:            return "subscriptionId does not correspond to an active subscription"; // FI-WARE
   case SccMissingParameter:                  return "parameter missing in the request";                             // FI-WARE
   case SccInvalidParameter:                  return "request parameter is invalid/not allowed";                     // FI-WARE

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_APITYPESV2_HTTPINFO_H
-#define SRC_LIB_APITYPESV2_HTTPINFO_H
+#ifndef SRC_LIB_APITYPESV2_HTTPINFO_H_
+#define SRC_LIB_APITYPESV2_HTTPINFO_H_
 
 /*
 *
@@ -35,7 +35,6 @@
 
 namespace ngsiv2
 {
-
 /* ****************************************************************************
 *
 * HttpInfo - 
@@ -45,17 +44,16 @@ struct HttpInfo
   std::string                         url;
   Verb                                verb;
   std::map<std::string, std::string>  qs;      // URI parameters
-  std::map<std::string, std::string>  headers; 
+  std::map<std::string, std::string>  headers;
   std::string                         payload;
   bool                                custom;
 
   HttpInfo();
-  HttpInfo(const std::string& _url);
+  explicit HttpInfo(const std::string& _url);
 
   std::string  toJson();
   void         fill(const mongo::BSONObj& bo);
 };
-
 }
 
-#endif // SRC_LIB_APITYPESV2_HTTPINFO_H
+#endif  // SRC_LIB_APITYPESV2_HTTPINFO_H_

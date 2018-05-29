@@ -157,7 +157,7 @@ echo
 01. Set up entities
 ===================
 HTTP/1.1 200 OK
-Content-Length: 410
+Content-Length: 207
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -190,7 +190,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 411
+Content-Length: 208
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -223,7 +223,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 412
+Content-Length: 209
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -256,7 +256,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 412
+Content-Length: 209
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -291,7 +291,7 @@ Date: REGEX(.*)
 02. Query types on / (returns: T - [a, b])
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 180
+Content-Length: 95
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -316,7 +316,7 @@ Date: REGEX(.*)
 03. Query types on /# (returns: T - [a, b, c, d, e])
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 219
+Content-Length: 107
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -329,11 +329,13 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                "e",
-                "d",
-                "c",
-                "b",
-                "a"
+#SORT_START
+                "e"REGEX(,?)
+                "d"REGEX(,?)
+                "c"REGEX(,?)
+                "b"REGEX(,?)
+                "a"REGEX(,?)
+#SORT_END
             ],
             "name": "T"
         }
@@ -344,7 +346,7 @@ Date: REGEX(.*)
 04. Query types on /A (returns: T - [b, c])
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 180
+Content-Length: 95
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -369,7 +371,7 @@ Date: REGEX(.*)
 05. Query types on /A/# (returns: T - [b, c, d, e])
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 206
+Content-Length: 103
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -382,10 +384,12 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                "e",
-                "d",
-                "c",
-                "b"
+#SORT_START
+                "e"REGEX(,?)
+                "d"REGEX(,?)
+                "c"REGEX(,?)
+                "b"REGEX(,?)
+#SORT_END
             ],
             "name": "T"
         }
@@ -396,7 +400,7 @@ Date: REGEX(.*)
 06. Query types on /A/A1 (returns: T- [c, d])
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 180
+Content-Length: 95
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -421,7 +425,7 @@ Date: REGEX(.*)
 07. Query types on /A/A1/# (returns: T - [c, d])
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 180
+Content-Length: 95
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

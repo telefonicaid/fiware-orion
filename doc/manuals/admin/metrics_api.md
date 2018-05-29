@@ -1,4 +1,4 @@
-#<a name="top"></a>Metrics API
+# <a name="top"></a>Metrics API
 
 * [Introduction](#introduction)
 * [Operations](#operations)

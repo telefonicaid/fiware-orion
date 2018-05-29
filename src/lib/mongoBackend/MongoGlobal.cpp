@@ -49,7 +49,7 @@
 #include "apiTypesV2/HttpInfo.h"
 
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/ContextElementResponseVector.h"
 #include "ngsi/Duration.h"
 #include "ngsi/Restriction.h"
@@ -104,7 +104,91 @@ static bool                 multitenant;
 
 /* ****************************************************************************
 *
-* mongoMultitenant - 
+* DelayedRelease -
+*
+* This structure is used simply to hold the vector of 'ContextElementResponse'
+* for the delaying of release() of these structures.
+* This was invented to overcome the fact that 'thread_local' is not supported by the
+* older compiler in Centos 6. Initially, the following construct was used:
+*
+*  thread_local std::vector<ContextElementResponse*>  cerVector;
+*
+* And this works just fine in Ubuntu 17.04, but it fails to compile in CentOS 6.
+*
+* For more info about this, see github issue #2994
+*/
+typedef struct DelayedRelease
+{
+  std::vector<ContextElementResponse*>  cerVector;
+} DelayedRelease;
+
+static __thread DelayedRelease* delayedReleaseP = NULL;
+
+
+
+/* ****************************************************************************
+*
+* WORKAROUND_2994 - see github issue #2994
+*/
+#define WORKAROUND_2994 1
+
+
+
+
+#ifdef WORKAROUND_2994
+/* ****************************************************************************
+*
+* delayedReleaseAdd -
+*/
+static void delayedReleaseAdd(const ContextElementResponseVector& cerV)
+{
+  if (delayedReleaseP == NULL)
+  {
+    delayedReleaseP = new DelayedRelease();
+  }
+
+  for (unsigned int ix = 0; ix < cerV.size(); ++ix)
+  {
+    delayedReleaseP->cerVector.push_back(cerV[ix]);
+  }
+}
+#endif
+
+
+
+/* ****************************************************************************
+*
+* delayedReleaseExecute -
+*
+* NOTE
+*   This function doesn't depend on WORKAROUND_2994 being defined, as delayedReleaseP
+*   will be NULL if WORKAROUND_2994 is not defined and its action is null and void, if so.
+*   'delayedReleaseExecute()' is called in rest/rest.cpp and with this 'idea', that file doesn't
+*   need to know about the WORKAROUND_2994 definition.
+*/
+void delayedReleaseExecute(void)
+{
+  if (delayedReleaseP == NULL)
+  {
+    return;
+  }
+
+  for (unsigned int ix = 0; ix < delayedReleaseP->cerVector.size(); ++ix)
+  {
+    delayedReleaseP->cerVector[ix]->release();
+    delete delayedReleaseP->cerVector[ix];
+  }
+
+  delayedReleaseP->cerVector.clear();
+  delete delayedReleaseP;
+  delayedReleaseP = NULL;
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoMultitenant -
 */
 bool mongoMultitenant(void)
 {
@@ -666,7 +750,7 @@ bool includedEntity(EntityId en, const EntityIdVector& entityIdV)
 *
 * includedAttribute -
 */
-bool includedAttribute(const ContextRegistrationAttribute& attr, const AttributeList& attrsV)
+bool includedAttribute(const ContextRegistrationAttribute& attr, const StringList& attrsV)
 {
   //
   // This is the case in which the discoverAvailabilityRequest doesn't include attributes,
@@ -750,7 +834,7 @@ BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
    *
    * More information on: http://stackoverflow.com/questions/24243276/include-regex-elements-in-bsonarraybuilder
    *
-   */  
+   */
 
   //
   // Note that by construction servicePath vector must have at least one element. Note that the
@@ -940,6 +1024,16 @@ static std::string sortCriteria(const std::string& sortToken)
     return ENT_MODIFICATION_DATE;
   }
 
+  if (sortToken == ENT_ENTITY_ID)
+  {
+    return std::string("_id.") + ENT_ENTITY_ID;
+  }
+
+  if (sortToken == ENT_ENTITY_TYPE)
+  {
+    return std::string("_id.") + ENT_ENTITY_TYPE;
+  }
+
   return std::string(ENT_ATTRS) + "." + sortToken + "." + ENT_ATTRS_VALUE;
 }
 
@@ -1121,8 +1215,8 @@ static bool isCustomAttr(std::string attrName)
 bool entitiesQuery
 (
   const EntityIdVector&            enV,
-  const AttributeList&             attrL,
-  const AttributeList&             metadataList,
+  const StringList&                attrL,
+  const StringList&                metadataList,
   const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
@@ -1515,7 +1609,7 @@ void pruneContextElements(const ContextElementResponseVector& oldCerV, ContextEl
 {
   for (unsigned int ix = 0; ix < oldCerV.size(); ++ix)
   {
-    ContextElementResponse* cerP = oldCerV[ix];
+    ContextElementResponse* cerP    = oldCerV[ix];
     ContextElementResponse* newCerP = new ContextElementResponse();
 
     /* Note we cannot use the ContextElement::fill() method, given that it also copies the ContextAttributeVector. The side-effect
@@ -1589,7 +1683,7 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
 *
 * processAttribute -
 */
-static void processAttribute(ContextRegistrationResponse* crr, const AttributeList& attrL, const BSONObj& attribute)
+static void processAttribute(ContextRegistrationResponse* crr, const StringList& attrL, const BSONObj& attribute)
 {
   ContextRegistrationAttribute attr(
     getStringFieldF(attribute, REG_ATTRS_NAME),
@@ -1616,7 +1710,7 @@ static void processContextRegistrationElement
 (
   BSONObj                             cr,
   const EntityIdVector&               enV,
-  const AttributeList&                attrL,
+  const StringList&                   attrL,
   ContextRegistrationResponseVector*  crrV,
   MimeType                            mimeType
 )
@@ -1684,7 +1778,7 @@ static void processContextRegistrationElement
 bool registrationsQuery
 (
   const EntityIdVector&               enV,
-  const AttributeList&                attrL,
+  const StringList&                   attrL,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
   const std::string&                  tenant,
@@ -1933,9 +2027,9 @@ EntityIdVector subToEntityIdVector(const BSONObj& sub)
 * Extract the attribute list from a BSON document (in the format of the csubs/casub
 * collection)
 */
-AttributeList subToAttributeList(const BSONObj& sub)
+StringList subToAttributeList(const BSONObj& sub)
 {
-  AttributeList             attrL;
+  StringList                attrL;
   std::vector<BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
 
   for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
@@ -1998,7 +2092,7 @@ static void setOnSubscriptionMetadata(ContextElementResponseVector* cerVP)
 static bool processOnChangeConditionForSubscription
 (
   const EntityIdVector&            enV,
-  const AttributeList&             attrL,
+  const StringList&                attrL,
   const std::vector<std::string>&  metadataV,
   ConditionValueList*              condValues,
   const std::string&               subId,
@@ -2016,8 +2110,8 @@ static bool processOnChangeConditionForSubscription
   std::string                   err;
   NotifyContextRequest          ncr;
   ContextElementResponseVector  rawCerV;
-  AttributeList                 emptyList;
-  AttributeList                 metadataList;
+  StringList                    emptyList;
+  StringList                    metadataList;
 
   metadataList.fill(metadataV);
   if (!blacklist && !entitiesQuery(enV, attrL, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
@@ -2037,7 +2131,13 @@ static bool processOnChangeConditionForSubscription
 
   /* Prune "not found" CERs */
   pruneContextElements(rawCerV, &ncr.contextElementResponseVector);
+
+#ifdef WORKAROUND_2994
+  delayedReleaseAdd(rawCerV);
+  rawCerV.vec.clear();
+#else
   rawCerV.release();
+#endif
 
 #if 0
   // FIXME #920: disabled for the moment, maybe to be removed in the end
@@ -2064,7 +2164,12 @@ static bool processOnChangeConditionForSubscription
 
       if (!entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, false, tenant, servicePathV))
       {
+#ifdef WORKAROUND_2994
+        delayedReleaseAdd(rawCerV);
+        rawCerV.vec.clear();
+#else
         rawCerV.release();
+#endif
         ncr.contextElementResponseVector.release();
 
         return false;
@@ -2072,7 +2177,13 @@ static bool processOnChangeConditionForSubscription
 
       /* Prune "not found" CERs */
       pruneContextElements(rawCerV, &allCerV);
+
+#ifdef WORKAROUND_2994
+      delayedReleaseAdd(rawCerV);
+      rawCerV.vec.clear();
+#else
       rawCerV.release();
+#endif
 
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
@@ -2126,7 +2237,7 @@ static BSONArray processConditionVector
 (
   NotifyConditionVector*           ncvP,
   const EntityIdVector&            enV,
-  const AttributeList&             attrL,
+  const StringList&                attrL,
   const std::vector<std::string>&  metadataV,
   const std::string&               subId,
   const HttpInfo&                  httpInfo,
@@ -2216,7 +2327,7 @@ BSONArray processConditionVector
 {
   NotifyConditionVector ncV;
   EntityIdVector        enV;
-  AttributeList         attrL;
+  StringList            attrL;
 
   attrsStdVector2NotifyConditionVector(condAttributesV, &ncV);
   entIdStdVector2EntityIdVector(entitiesV, &enV);
@@ -2287,7 +2398,7 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
 bool processAvailabilitySubscription
 (
   const EntityIdVector& enV,
-  const AttributeList&  attrL,
+  const StringList&     attrL,
   const std::string&    subId,
   const std::string&    notifyUrl,
   RenderFormat          renderFormat,

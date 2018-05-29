@@ -27,6 +27,7 @@
 #include "rapidjson/document.h"
 
 #include "logMsg/logMsg.h"
+#include "common/limits.h"
 #include "ngsi/ContextAttribute.h"
 #include "parse/CompoundValueNode.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
@@ -36,7 +37,7 @@
 
 /* ****************************************************************************
 *
-* stringToCompoundType - 
+* stringToCompoundType -
 */
 static orion::ValueType stringToCompoundType(std::string nodeType)
 {
@@ -46,7 +47,7 @@ static orion::ValueType stringToCompoundType(std::string nodeType)
   else if (nodeType == "False")   return orion::ValueTypeBoolean;
   else if (nodeType == "Object")  return orion::ValueTypeObject;
   else if (nodeType == "Array")   return orion::ValueTypeVector;
-  else if (nodeType == "Null")    return orion::ValueTypeNone;
+  else if (nodeType == "Null")    return orion::ValueTypeNull;
 
   return orion::ValueTypeString;
 }
@@ -55,20 +56,20 @@ static orion::ValueType stringToCompoundType(std::string nodeType)
 
 /* ****************************************************************************
 *
-* parseContextAttributeCompoundValue - 
+* parseContextAttributeCompoundValue -
 */
 std::string parseContextAttributeCompoundValue
 (
-  const Value::ConstValueIterator&   node,
-  ContextAttribute*                  caP,
-  orion::CompoundValueNode*          parent
-)  
+  const rapidjson::Value::ConstValueIterator&   node,
+  ContextAttribute*                             caP,
+  orion::CompoundValueNode*                     parent
+)
 {
   if (node->IsObject())
   {
     int counter  = 0;
 
-    for (Value::ConstMemberIterator iter = node->MemberBegin(); iter != node->MemberEnd(); ++iter)
+    for (rapidjson::Value::ConstMemberIterator iter = node->MemberBegin(); iter != node->MemberEnd(); ++iter)
     {
       std::string                nodeType = jsonParseTypeNames[iter->value.GetType()];
       orion::CompoundValueNode*  cvnP     = new orion::CompoundValueNode();
@@ -96,7 +97,7 @@ std::string parseContextAttributeCompoundValue
       }
       else if (nodeType == "Null")
       {
-        cvnP->valueType = orion::ValueTypeNone;
+        cvnP->valueType = orion::ValueTypeNull;
       }
       else if (nodeType == "Object")
       {
@@ -110,7 +111,7 @@ std::string parseContextAttributeCompoundValue
       }
 
       parent->childV.push_back(cvnP);
-        
+
       //
       // Recursive call if Object or Array
       //
@@ -126,11 +127,11 @@ std::string parseContextAttributeCompoundValue
   {
     int counter  = 0;
 
-    for (Value::ConstValueIterator iter = node->Begin(); iter != node->End(); ++iter)
+    for (rapidjson::Value::ConstValueIterator iter = node->Begin(); iter != node->End(); ++iter)
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[4];
+      char                       itemNo[STRING_SIZE_FOR_INT];
 
       snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
@@ -156,7 +157,7 @@ std::string parseContextAttributeCompoundValue
       }
       else if (nodeType == "Null")
       {
-        cvnP->valueType = orion::ValueTypeNone;
+        cvnP->valueType = orion::ValueTypeNull;
       }
       else if (nodeType == "Object")
       {
@@ -191,16 +192,16 @@ std::string parseContextAttributeCompoundValue
 
 /* ****************************************************************************
 *
-* parseContextAttributeCompoundValue - 
+* parseContextAttributeCompoundValue -
 */
 std::string parseContextAttributeCompoundValue
 (
-  const Value::ConstMemberIterator&  node,
-  ContextAttribute*                  caP,
-  orion::CompoundValueNode*          parent
+  const rapidjson::Value::ConstMemberIterator&  node,
+  ContextAttribute*                             caP,
+  orion::CompoundValueNode*                     parent
 )
 {
-  std::string type   = jsonParseTypeNames[node->value.GetType()];
+  std::string type = jsonParseTypeNames[node->value.GetType()];
 
   if (caP->compoundValueP == NULL)
   {
@@ -229,11 +230,11 @@ std::string parseContextAttributeCompoundValue
   {
     int counter  = 0;
 
-    for (Value::ConstValueIterator iter = node->value.Begin(); iter != node->value.End(); ++iter)
+    for (rapidjson::Value::ConstValueIterator iter = node->value.Begin(); iter != node->value.End(); ++iter)
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[4];
+      char                       itemNo[STRING_SIZE_FOR_INT];
 
       snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
@@ -285,7 +286,8 @@ std::string parseContextAttributeCompoundValue
   {
     int counter  = 0;
 
-    for (Value::ConstMemberIterator iter = node->value.MemberBegin(); iter != node->value.MemberEnd(); ++iter)
+    rapidjson::Value::ConstMemberIterator iter;
+    for (iter = node->value.MemberBegin(); iter != node->value.MemberEnd(); ++iter)
     {
       std::string                nodeType = jsonParseTypeNames[iter->value.GetType()];
       orion::CompoundValueNode*  cvnP     = new orion::CompoundValueNode();
@@ -322,7 +324,7 @@ std::string parseContextAttributeCompoundValue
       }
 
       parent->childV.push_back(cvnP);
-        
+
       //
       // Recursive call if Object or Array
       //
@@ -342,13 +344,13 @@ std::string parseContextAttributeCompoundValue
 
 /* ****************************************************************************
 *
-* parseContextAttributeCompoundValueStandAlone - 
+* parseContextAttributeCompoundValueStandAlone -
 */
 std::string parseContextAttributeCompoundValueStandAlone
 (
-  Document&            document,
-  ContextAttribute*    caP,
-  orion::ValueType     valueType
+  rapidjson::Document&  document,
+  ContextAttribute*     caP,
+  orion::ValueType      valueType
 )
 {
   caP->compoundValueP            = new orion::CompoundValueNode();
@@ -370,11 +372,11 @@ std::string parseContextAttributeCompoundValueStandAlone
   {
     int counter  = 0;
 
-    for (Value::ConstValueIterator iter = document.Begin(); iter != document.End(); ++iter)
+    for (rapidjson::Value::ConstValueIterator iter = document.Begin(); iter != document.End(); ++iter)
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[4];
+      char                       itemNo[STRING_SIZE_FOR_INT];
 
       snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
@@ -400,7 +402,7 @@ std::string parseContextAttributeCompoundValueStandAlone
       }
       else if (nodeType == "Null")
       {
-        cvnP->valueType = orion::ValueTypeNone;
+        cvnP->valueType = orion::ValueTypeNull;
       }
       else if (nodeType == "Object")
       {
@@ -434,7 +436,7 @@ std::string parseContextAttributeCompoundValueStandAlone
   {
     int counter  = 0;
 
-    for (Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
+    for (rapidjson::Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
     {
       std::string                nodeType = jsonParseTypeNames[iter->value.GetType()];
       orion::CompoundValueNode*  cvnP     = new orion::CompoundValueNode();
@@ -461,7 +463,7 @@ std::string parseContextAttributeCompoundValueStandAlone
       }
       else if (nodeType == "Null")
       {
-        cvnP->valueType = orion::ValueTypeNone;
+        cvnP->valueType = orion::ValueTypeNull;
       }
       else if (nodeType == "Object")
       {
@@ -475,7 +477,7 @@ std::string parseContextAttributeCompoundValueStandAlone
       }
 
       parent->childV.push_back(cvnP);
-        
+
       //
       // Start recursive calls if Object or Array
       //

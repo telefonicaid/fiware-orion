@@ -1,4 +1,4 @@
-#<a name="top"></a>FIWARE NGSI APIv2 Walkthrough
+# <a name="top"></a>FIWARE NGSI APIv2 Walkthrough
 
 * [Introduction](#introduction)
 * [Before starting...](#before-starting)
@@ -37,7 +37,7 @@ such as the temperature of a car). Some remarks to take into account in order to
 Context availability management (information not about the entities themselves, but about the providers of
 that information) has not been yet developed in the current candidate version for NGSIv2 (although a
 section about that exists at the end of this document, as a placeholder to include this information in the
-future). You need to use NGSIv1 is you want to use this functionality. See
+future). You need to use NGSIv1 if you want to use this functionality. See
 [NGSIv1 walkthrough](walkthrough_apiv1.md) for more details.
 
 Before starting (or if you get lost in the middle and
@@ -131,12 +131,6 @@ command:
 # ./accumulator-server.py --port 1028 --url /accumulate --host ::1 --pretty-print -v
 ```
 
-The accumulator-server.py is also part of the contextBroker-test package (see
-[optional packages section in how to install](../admin/install.md#optional-packages)).
-The script is located at `/usr/share/contextBroker/tests/accumulator-server.py` after
-installation. However, if you only need the accumulator-server.py it's easier to
-just download it from GitHub, as suggested above.
-
 [Top](#top)
 
 ### Issuing commands to the broker
@@ -195,14 +189,14 @@ Regarding \[headers\] you have to include the following ones:
     you want to receive in the response. You should explicitly specify JSON.
 
 ```
-curl ... --header 'Accept: application/json' ...
+curl ... -H 'Accept: application/json' ...
 ```
 
 -   Only in the case of using payload in the request (i.e. POST, PUT or PATCH),
     you have to use Context-Type header to specify the format (JSON).
 
 ```
-curl ... --header 'Content-Type: application/json' ...
+curl ... -H 'Content-Type: application/json' ...
 ```
 
 Some additional remarks:
@@ -257,7 +251,7 @@ creation time, temperature and pressure of Room1 are 23 ºC and 720 mmHg
 respectively.
 
 ```
-curl localhost:1026/v2/entities -s -S --header 'Content-Type: application/json' -d @- <<EOF
+curl localhost:1026/v2/entities -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "id": "Room1",
   "type": "Room",
@@ -290,7 +284,7 @@ Next, let's create Room2 in a similar way (in this case, setting
 temperature and pressure to 21 ºC and 711 mmHg respectively).
 
 ```
-curl localhost:1026/v2/entities -s -S --header 'Content-Type: application/json' -d @- <<EOF
+curl localhost:1026/v2/entities -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "id": "Room2",
   "type": "Room",
@@ -322,16 +316,14 @@ graphical user interface). The `GET /v2/entities/{id}` request is used in
 this case, e.g. to get context information for Room1:
 
 ```
-curl localhost:1026/v2/entities/Room1?type=Room -s -S  \
-    --header 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/entities/Room1?type=Room -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 Actually, you don't need to specify the type, as in this case there is no
 ambiguity using just the ID, so you can also do:
 
 ```
-curl localhost:1026/v2/entities/Room1 -s -S  \
-    --header 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/entities/Room1 -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 In both cases,the response includes all the attributes belonging to Room1 and we can
@@ -360,8 +352,7 @@ You can use the `keyValues` option in order to get a more compact and brief repr
 
 
 ```
-curl localhost:1026/v2/entities/Room1?options=keyValues -s -S  \
-    --header 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/entities/Room1?options=keyValues -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 which response is:
@@ -381,7 +372,7 @@ values. In this case, `attrs` URL parameter needs to be used to specify the orde
 
 ```
 curl 'localhost:1026/v2/entities/Room1?options=values&attrs=temperature,pressure' -s -S  \
-    --header 'Accept: application/json' | python -mjson.tool
+    -H 'Accept: application/json' | python -mjson.tool
 ```
 
 which response is
@@ -399,7 +390,7 @@ Request:
 
 ```
 curl 'localhost:1026/v2/entities/Room1?options=values&attrs=pressure,temperature' -s -S  \
-    --header 'Accept: application/json' | python -mjson.tool
+    -H 'Accept: application/json' | python -mjson.tool
 ```
 
 Response:
@@ -416,8 +407,7 @@ You can also request a single attribute, using the `GET /v2/entities/{id}/attrs/
 get only the temperature:
 
 ```
-curl localhost:1026/v2/entities/Room1/attrs/temperature -s -S  \
-    --header 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/entities/Room1/attrs/temperature -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 whose response is as follows:
@@ -435,8 +425,7 @@ you need to use `Accept: text/plain` as the value of the attribute is of that ki
 
 
 ```
-curl localhost:1026/v2/entities/Room1/attrs/temperature/value -s -S  \
-    --header 'Accept: text/plain' | python -mjson.tool
+curl localhost:1026/v2/entities/Room1/attrs/temperature/value -s -S -H 'Accept: text/plain' | python -mjson.tool
 ```
 
 whose response is simply:
@@ -451,8 +440,7 @@ non-existing entity or attribute, as shown in the following cases below.
 Request:
 
 ```
-curl localhost:1026/v2/entities/Room5 -s -S  \
-    --header 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/entities/Room5 -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 Response:
@@ -467,8 +455,7 @@ Response:
 Request:
 
 ```
-curl localhost:1026/v2/entities/Room1/attrs/humidity -s -S  \
-    --header 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/entities/Room1/attrs/humidity -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 Response:
@@ -489,7 +476,7 @@ In both cases, the HTTP response code (not shown) is 404 Not Found.
 You can get all the entities using the `GET /v2/entities` operation
 
 ```
-curl localhost:1026/v2/entities -s -S --header 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/entities -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 In our case, both Room1 and Room2 will be returned:
@@ -538,8 +525,7 @@ particular:
   you can use:
 
 ```
-curl localhost:1026/v2/entities?type=Room -s -S  \
-    --header 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/entities?type=Room -s -S  -H 'Accept: application/json' | python -mjson.tool
 ```
 
 * You can filter using entity id patterns, using the `idPattern` URL parameter
@@ -548,8 +534,7 @@ curl localhost:1026/v2/entities?type=Room -s -S  \
   (in this case retrieving Room2) you can use (note the `-g` in curl command line
   to avoid problems with brackets):
 ```
-curl localhost:1026/v2/entities?idPattern=^Room[2-5] -g -s -S  \
-    --header 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/entities?idPattern=^Room[2-5] -g -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 * You can filter using attribute filters, using the `q` URL parameter. For
@@ -558,8 +543,7 @@ curl localhost:1026/v2/entities?idPattern=^Room[2-5] -g -s -S  \
   For example, to get all entities whose temperature is greater than 22 (in this case
   retriving Room1) you can use:
 ```
-curl 'localhost:1026/v2/entities?q=temperature>22' -s -S  \
-    --header 'Accept: application/json' | python -mjson.tool
+curl 'localhost:1026/v2/entities?q=temperature>22' -s -S  -H 'Accept: application/json' | python -mjson.tool
 ```
 
 * You can filter by geographical location. This is an advanced topic, described in
@@ -584,8 +568,7 @@ given moment wants to set the temperature and pressure of Room1 to 26.5
 ºC and 763 mmHg respectively, so it issues the following request:
 
 ```
-curl localhost:1026/v2/entities/Room1/attrs -s -S --header 'Content-Type: application/json' \
-     -X PATCH -d @- <<EOF
+curl localhost:1026/v2/entities/Room1/attrs -s -S -H 'Content-Type: application/json' -X PATCH -d @- <<EOF
 {
   "temperature": {
     "value": 26.5,
@@ -615,9 +598,7 @@ For example, to update Room1 temperature to 28.4 (note that the Content-Type her
 which corresponds to the value `28.4` - no JSON involved here ...):
 
 ```
-curl localhost:1026/v2/entities/Room1/attrs/temperature/value -s -S \
-    --header 'Content-Type: text/plain' \
-    -X PUT -d 28.5
+curl localhost:1026/v2/entities/Room1/attrs/temperature/value -s -S -H 'Content-Type: text/plain' -X PUT -d 28.5
 ```
 
 Finally, the `PUT /v2/entities/{id}/attrs` operation can be use to replace all the attributes
@@ -656,8 +637,7 @@ is used. Let's consider the following example (note we are using `-v` to get the
 header in the response, as explained later on):
 
 ```
-curl -v localhost:1026/v2/subscriptions -s -S --header 'Content-Type: application/json' \
-    -d @- <<EOF
+curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "description": "A subscription to get info about Room1",
   "subject": {
@@ -796,21 +776,13 @@ Fiware-Correlator: 3451e5c2-226d-11e6-aaf0-d48564c29d20
 Orion Context Broker notifies context subscriptions using the POST
 HTTP method (on the URL for the subscription). The payload includes
 a reference to the subscription ID and a `data` vector, with the
-actual data for the entities. Note that the the entity representation
+actual data for the entities. Note that the entity representation
 format is the same as the one used by the responses to the
 `GET /v2/entities` operation.
 
 You may wonder why accumulator-server.py is getting this message if you
-don't actually do any update. This is because the Orion Context Broker
-considers the transition from "non existing subscription" to
-"subscribed" as a change.
-
-NGSI specification is not clear on if an initial notification has to
-be sent in this case or not. On one hand, some developers have told us
-that it might be useful to know the initial values before starting to
-receive notifications due to actual changes. On the other hand, an
-application can get the initial status using synchronous queries. Thus, this
-behavior could be changed in a later version. What's your opinion? :)
+don't actually do any update. This is due to the *initial notification*,
+which details are described [here](initial_notification.md).
 
 Now, do the following exercise, based on what you know from [update
 entity](#update-entity): oerform the following four updates in sequence, letting
@@ -838,13 +810,13 @@ list is too large) or `GET /v2/subscriptions/{subId}` (to get a single
 subscription). In addition, subscriptions can be updated using the `PATCH /v2/subscription/{subId}`
 operation. Finally, they can be deleted using the `DELETE /v2/subscriptions/{subId}` operation.
 
-Some aditional considerations:
+Some additional considerations:
 
 * Subscriptions can be paused. In order to do that, just set the `status` attribute
   to "inactive" (if you want to resume subscription, set it back to "active"):
 ```
 curl localhost:1026/v2/subscriptions/57458eb60962ef754e7c0998 -s -S \
-    -X PATCH --header 'Content-Type: application/json' -d @- <<EOF
+    -X PATCH -H 'Content-Type: application/json' -d @- <<EOF
 {
   "status": "inactive"
 }
@@ -867,7 +839,7 @@ that exist in Orion Context Broker in a given moment. For example, let's assume
 we have 3 entities of type Room and 2 entities of type Car:
 
 ```
-curl localhost:1026/v2/types -s -S --header 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/types -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 The response will be:
@@ -925,7 +897,7 @@ If you only need the list of entity types (without extra attribute details),
 you can use:
 
 ```
-curl localhost:1026/v2/types?options=values -s -S --header 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/types?options=values -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 and get:
@@ -944,7 +916,7 @@ In addition, you can use the following operation to get detailed
 information of a single type:
 
 ```
-curl localhost:1026/v2/types/Room -s -S --header 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/types/Room -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 The response will be:
@@ -981,8 +953,7 @@ For example, to create Room3 (temperature 21.2 and pressure 722) and Room4
 (temperature 31.8 and pressure 712) you can use:
 
 ```
-curl -v localhost:1026/v2/op/update -s -S --header 'Content-Type: application/json' \
-    -d @- <<EOF
+curl -v localhost:1026/v2/op/update -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "actionType": "APPEND",
   "entities": [
@@ -1021,8 +992,7 @@ UPDATE to change an attribute in one entity (temperature in Room3) and another
 attribute in other (pressure in Room4), leaving the other attributes untouched.
 
 ```
-curl -v localhost:1026/v2/op/update -s -S --header 'Content-Type: application/json' \
-    -d @- <<EOF
+curl -v localhost:1026/v2/op/update -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "actionType": "UPDATE",
   "entities": [
@@ -1061,8 +1031,7 @@ whose temperature is greater than 40 and that are located withon 20 km from the 
 following operation could be used:
 
 ```
-curl -v localhost:1026/v2/op/query -s -S --header 'Content-Type: application/json' \
-    -d @- <<EOF
+curl -v localhost:1026/v2/op/query -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "entities": [
     {
@@ -1104,10 +1073,80 @@ future* (see [NGSIv2 implementation notes](ngsiv2_implementation_notes.md#scope-
 
 ## Context availability management
 
-The current NGSIv2 specification doesn't cover this functionality. It will be
-defined in a future NGSIv2 release candidate.
+While context management is about *entities and attributes* (creating, updating, retrieving, etc.),
+context availability management is about the *source of the entities and attributes*. The basic concept
+in context availability management is the *registration* resource. A registration contains information about a source of
+information (named a "context provider") and whose entities and attributes are provided by that source.
 
-In the meanwhile, you can use context availability management, described
-[as part of the walkthrough for NGSIv1](walkthrough_apiv1.md#context-availability-management-using-ngsi9).
+Let's illustrate with an example, creating a simple registration. We are stating that the attributes temperature and
+pressure of Room5 are provided by a context provider in the URL http://mysensors.com/Rooms:
+
+```
+curl -v localhost:1026/v2/registrations -s -S -H 'Content-Type: application/json' -d @-  <<EOF
+{
+  "description": "Registration for Room5",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "Room5",
+        "type": "Room"
+      }
+    ],
+    "attrs": [
+      "temperature",
+      "pressure"
+    ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://mysensors.com/Rooms"
+    },
+    "legacyForwarding": true
+  }
+}
+EOF
+```
+
+The response corresponding to that request uses 201 Created as HTTP response code.
+In addition, it contains a `Location header` which holds the registration ID: a
+24 hexadecimal number used for updating and deleting the registration.
+Write it down because you will need it later in this tutorial.
+
+```
+< HTTP/1.1 201 Created
+< Connection: Keep-Alive
+< Content-Length: 0
+< Location: /v2/registrations/5a82be3d093af1b94ac0f730
+< Fiware-Correlator: e4f0f334-10a8-11e8-ab6e-000c29173617
+< Date: Tue, 13 Feb 2018 10:30:21 GMT
+```
+
+You may retrieve the list of existing registration using the following registration:
+
+```
+curl localhost:1026/v2/registrations -s -S -H 'Accept: application/json' | python -mjson.tool
+```
+
+In this particular case, you will retrieve only one (as you have created only one before) but note that the
+response uses `[...]` so a full list could be there.
+
+In addition, you may retrieve a single registration using the following request (replace `5a82be3d093af1b94ac0f730`
+by the actual registration ID in your case):
+
+```
+curl localhost:1026/v2/registrations/5a82be3d093af1b94ac0f730 -s -S -H 'Accept: application/json' | python -mjson.tool
+```
+
+Orion not only stores information about sources of entities/attributes in the form of registrations, but also
+uses these registrations to implement query/update forwarding. In other words, while a registration is in place,
+Orion uses that information to solve queries/updates in entities that aren't managed locally. However, this is an
+advanced topic out of the scope of this tutorial. Please have a look at the [context providers and request forwarding documentation](context_providers.md) for details.
+
+Finally, you can delete an existing registration with the following request (replace `5a82be3d093af1b94ac0f730` by the actual
+registration ID in your case):
+
+```
+curl -X DELETE localhost:1026/v2/registrations/5a82be3d093af1b94ac0f730 -s -S -H 'Accept: application/json' | python -mjson.tool
+```
 
 [Top](#top)

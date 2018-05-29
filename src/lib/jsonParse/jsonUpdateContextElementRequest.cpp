@@ -61,7 +61,6 @@ static std::string contextAttribute(const std::string& path, const std::string& 
 {
   LM_T(LmtParse, ("Got an attribute"));
   reqData->ucer.attributeP = new ContextAttribute();
-  reqData->ucer.attributeP->valueType = orion::ValueTypeNone;
   reqData->ucer.res.contextAttributeVector.push_back(reqData->ucer.attributeP);
   return "OK";
 }
@@ -157,6 +156,7 @@ static std::string contextMetadataValue(const std::string& path, const std::stri
 {
   LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
   reqData->ucer.metadataP->stringValue = value;
+  reqData->ucer.metadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 
@@ -217,7 +217,7 @@ void jsonUcerRelease(ParseData* reqData)
 std::string jsonUcerCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-  return reqData->ucer.res.check(ciP->apiVersion, asJsonObject, UpdateContextElement, "", reqData->errorString);
+  return reqData->ucer.res.check(ciP->apiVersion, asJsonObject, UpdateContextElement, reqData->errorString);
 }
 
 

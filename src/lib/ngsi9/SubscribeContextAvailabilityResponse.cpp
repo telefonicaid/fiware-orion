@@ -34,7 +34,7 @@
 
 /* ****************************************************************************
 *
-* SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse - 
+* SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse -
 */
 SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse() : errorCode("errorCode")
 {
@@ -55,7 +55,7 @@ SubscribeContextAvailabilityResponse::~SubscribeContextAvailabilityResponse()
 
 /* ****************************************************************************
 *
-* SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse - 
+* SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse -
 */
 SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(const std::string& _subscriptionId, const std::string& _duration) : errorCode("errorCode")
 {
@@ -67,7 +67,7 @@ SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(const
 
 /* ****************************************************************************
 *
-* SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse - 
+* SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse -
 */
 SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(const std::string& _subscriptionId, StatusCode& _errorCode) : errorCode("errorCode")
 {
@@ -80,23 +80,23 @@ SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(const
 
 /* ****************************************************************************
 *
-* SubscribeContextAvailabilityResponse::render - 
+* SubscribeContextAvailabilityResponse::render -
 */
-std::string SubscribeContextAvailabilityResponse::render(const std::string& indent)
+std::string SubscribeContextAvailabilityResponse::render(void)
 {
   std::string  out                = "";
   bool         durationRendered   = !duration.isEmpty();
   bool         errorCodeRendered  = (errorCode.code != SccNone);
 
-  out += startTag(indent);
+  out += startTag();
 
-  out += subscriptionId.render(RtSubscribeContextAvailabilityResponse, indent + "  ", durationRendered || errorCodeRendered);
-  out += duration.render(indent + "  ", errorCodeRendered);
+  out += subscriptionId.render(RtSubscribeContextAvailabilityResponse, durationRendered || errorCodeRendered);
+  out += duration.render(errorCodeRendered);
 
   if (errorCodeRendered)
-     out += errorCode.render(indent + "  ", false);
+     out += errorCode.render(false);
 
-  out += endTag(indent);
+  out += endTag();
   
   return out;
-}  
+}

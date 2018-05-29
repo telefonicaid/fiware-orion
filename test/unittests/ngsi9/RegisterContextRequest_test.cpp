@@ -74,7 +74,7 @@
 
 /* ****************************************************************************
 *
-* json_ok - 
+* json_ok -
 */
 TEST(RegisterContextRequest, json_ok)
 {
@@ -95,7 +95,7 @@ TEST(RegisterContextRequest, json_ok)
   std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", &reqP);
   EXPECT_EQ("OK", result) << "this test should be OK";
 
-  out = rcrP->render("");
+  out = rcrP->render();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   reqP->release(&parseData);
@@ -105,7 +105,7 @@ TEST(RegisterContextRequest, json_ok)
 
 /* ****************************************************************************
 *
-* json_noContextRegistration - 
+* json_noContextRegistration -
 */
 TEST(RegisterContextRequest, json_noContextRegistration)
 {
@@ -129,7 +129,7 @@ TEST(RegisterContextRequest, json_noContextRegistration)
 
 /* ****************************************************************************
 *
-* json_noProvidingApplication - 
+* json_noProvidingApplication -
 */
 TEST(RegisterContextRequest, json_noProvidingApplication)
 {
@@ -152,7 +152,7 @@ TEST(RegisterContextRequest, json_noProvidingApplication)
 
 /* ****************************************************************************
 *
-* json_emptyProvidingApplication - 
+* json_emptyProvidingApplication -
 */
 TEST(RegisterContextRequest, json_emptyProvidingApplication)
 {
@@ -175,7 +175,7 @@ TEST(RegisterContextRequest, json_emptyProvidingApplication)
 
 /* ****************************************************************************
 *
-* json_entityIdWithIsPatternTrue - 
+* json_entityIdWithIsPatternTrue -
 */
 TEST(RegisterContextRequest, json_entityIdWithIsPatternTrue)
 {
@@ -198,7 +198,7 @@ TEST(RegisterContextRequest, json_entityIdWithIsPatternTrue)
 
 /* ****************************************************************************
 *
-* json_invalidIsPatternString - 
+* json_invalidIsPatternString -
 */
 TEST(RegisterContextRequest, json_invalidIsPatternString)
 {
@@ -220,7 +220,7 @@ TEST(RegisterContextRequest, json_invalidIsPatternString)
 
 /* ****************************************************************************
 *
-* json_overwriteEntityIdType - 
+* json_overwriteEntityIdType -
 */
 TEST(RegisterContextRequest, json_overwriteEntityIdType)
 {
@@ -241,7 +241,7 @@ TEST(RegisterContextRequest, json_overwriteEntityIdType)
 
 /* ****************************************************************************
 *
-* json_badContextRegistrationAttributeIsDomain - 
+* json_badContextRegistrationAttributeIsDomain -
 */
 TEST(RegisterContextRequest, json_badContextRegistrationAttributeIsDomain)
 {
@@ -264,7 +264,7 @@ TEST(RegisterContextRequest, json_badContextRegistrationAttributeIsDomain)
 
 /* ****************************************************************************
 *
-* json_reregistration - 
+* json_reregistration -
 */
 TEST(RegisterContextRequest, json_reregistration)
 {

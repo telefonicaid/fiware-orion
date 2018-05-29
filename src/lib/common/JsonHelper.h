@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_COMMON_JSONHELPER_H
-#define SRC_LIB_COMMON_JSONHELPER_H
+#ifndef SRC_LIB_COMMON_JSONHELPER_H_
+#define SRC_LIB_COMMON_JSONHELPER_H_
 
 /*
 *
@@ -41,13 +41,14 @@ public:
   void        addNumber(const std::string& key, long long value);
   void        addFloat(const std::string& key, float value);
   void        addDate(const std::string& key, long long timestamp);
+  void        addBool(const std::string& key, bool b);
+
   std::string str();
 
 private:
  std::ostringstream ss;
  bool               empty;
 };
-
 
 
 
@@ -95,4 +96,4 @@ std::string vectorToJson(std::vector<std::string> &list);
 */
 extern std::string objectToJson(std::map<std::string, std::string>& list);
 
-#endif // SRC_LIB_COMMON_JSONHELPER_H
+#endif  // SRC_LIB_COMMON_JSONHELPER_H_

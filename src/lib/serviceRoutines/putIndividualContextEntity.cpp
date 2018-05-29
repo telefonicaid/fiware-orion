@@ -42,7 +42,7 @@
 
 /* ****************************************************************************
 *
-* putIndividualContextEntity - 
+* putIndividualContextEntity -
 *
 * Corresponding Standard Operation: UpdateContext/UPDATE
 *
@@ -88,7 +88,7 @@ std::string putIndividualContextEntity
 
   // And, set the UpdateActionType to UPDATE
   parseDataP->upcr.res.updateActionType.set("UPDATE");
-  
+
 
   // 03. Call postUpdateContext standard service routine
   postUpdateContext(ciP, components, compV, parseDataP);
@@ -99,7 +99,7 @@ std::string putIndividualContextEntity
 
 
   // 05. Cleanup and return result
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
 
 
   response.release();

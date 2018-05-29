@@ -101,16 +101,17 @@ void QueryContextResponseVector::present(void)
       EntityId*               eP   = &ceP->entityId;
 
 
-      LM_T(LmtPresent, ("  entity %0d: { '%s', '%s', '%s' }", 
-			eIx, eP->id.c_str(),  
-			eP->type.c_str(),  
-			eP->isPattern.c_str()));
+      LM_T(LmtPresent, ("  entity %0d: { '%s', '%s', '%s' }",
+                        eIx, eP->id.c_str(),
+                        eP->type.c_str(),
+                        eP->isPattern.c_str()));
+
       for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); ++aIx)
       {
         ContextAttribute* aP = ceP->contextAttributeVector[aIx];
-        LM_T(LmtPresent, ("  attribute %02d: %s: %s", 
-			  aIx, aP->name.c_str(), 
-        aP->getValue().c_str()));
+        LM_T(LmtPresent, ("  attribute %02d: %s: %s",
+                          aIx, aP->name.c_str(),
+                          aP->getValue().c_str()));
       }
     }
 
@@ -121,7 +122,7 @@ void QueryContextResponseVector::present(void)
 
 /* ****************************************************************************
 *
-* QueryContextResponseVector::render - 
+* QueryContextResponseVector::render -
 */
 std::string QueryContextResponseVector::render(ApiVersion apiVersion, bool asJsonObject, bool details, const std::string& detailsString)
 {
@@ -130,10 +131,10 @@ std::string QueryContextResponseVector::render(ApiVersion apiVersion, bool asJso
 
   //
   // Here we have a vector of QueryContextResponse.
-  // What we need is ONE QueryContextResponse, so, we'll take all the 
+  // What we need is ONE QueryContextResponse, so, we'll take all the
   // contextElementResponses from each of the QueryContextResponses in the vector and
   // move them to ONE QueryContextResponse (responseP)
-  // 
+  //
   // [ This might give me some problems with freeing the memory afterwards ...]
   //
 
@@ -221,7 +222,7 @@ std::string QueryContextResponseVector::render(ApiVersion apiVersion, bool asJso
       {
         targetCerP->contextElement.contextAttributeVector.push_back(&cerP->contextElement.contextAttributeVector);
       }
-      else  // Not found so we will have to create a new ContextElementResponse 
+      else  // Not found so we will have to create a new ContextElementResponse
       {
         ContextElementResponse* newCerP = new ContextElementResponse(cerP);
 
@@ -231,7 +232,7 @@ std::string QueryContextResponseVector::render(ApiVersion apiVersion, bool asJso
     }
   }
 
-  answer = responseP->render(apiVersion, asJsonObject, "");
+  answer = responseP->render(apiVersion, asJsonObject);
   responseP->release();
   delete responseP;
 
@@ -242,16 +243,16 @@ std::string QueryContextResponseVector::render(ApiVersion apiVersion, bool asJso
 
 /* ****************************************************************************
 *
-* QueryContextResponseVector::populate - 
+* QueryContextResponseVector::populate -
 */
 void QueryContextResponseVector::populate(QueryContextResponse* responseP)
 {
   //
   // We have a vector of QueryContextResponse.
-  // What we need is ONE QueryContextResponse, so, we'll take all the 
+  // What we need is ONE QueryContextResponse, so, we'll take all the
   // contextElementResponses from each of the QueryContextResponses in the vector and
   // move them to ONE QueryContextResponse (responseP)
-  // 
+  //
 
   if (vec.size() == 0)
   {
@@ -313,7 +314,7 @@ void QueryContextResponseVector::populate(QueryContextResponse* responseP)
       {
         targetCerP->contextElement.contextAttributeVector.push_back(&cerP->contextElement.contextAttributeVector);
       }
-      else  // Not found so we will have to create a new ContextElementResponse 
+      else  // Not found so we will have to create a new ContextElementResponse
       {
         ContextElementResponse* newCerP = new ContextElementResponse(cerP);
 

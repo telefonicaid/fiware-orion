@@ -22,9 +22,10 @@
 *
 * Author: Fermin Galan
 */
-
 #include "orionTypes/QueryContextResponseVector.h"
-#include "unittest.h"
+#include "unittests/unittest.h"
+
+
 
 /* ****************************************************************************
 *
@@ -32,7 +33,6 @@
 */
 TEST(QueryContextResponseVector, present)
 {
-
   QueryContextResponse       qcr;
 
   utInit();

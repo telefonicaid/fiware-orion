@@ -77,7 +77,7 @@ echo
 01. Update/APPEND E1//A1
 ========================
 HTTP/1.1 200 OK
-Content-Length: 381
+Content-Length: 187
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -109,7 +109,7 @@ Date: REGEX(.*)
 02. Delete E1//A1, using Convop DELETE /v1/contextEntities/E1
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

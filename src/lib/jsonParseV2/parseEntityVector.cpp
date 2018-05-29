@@ -40,9 +40,15 @@
 
 /* ****************************************************************************
 *
-* parseEntityVector - 
+* parseEntityVector -
 */
-std::string parseEntityVector(ConnectionInfo* ciP, const Value::ConstMemberIterator& iter, Entities* evP, bool attributesAllowed)
+std::string parseEntityVector
+(
+  ConnectionInfo*                               ciP,
+  const rapidjson::Value::ConstMemberIterator&  iter,
+  Entities*                                     evP,
+  bool                                          attributesAllowed
+)
 {
   std::string type = jsonParseTypeNames[iter->value.GetType()];
 
@@ -51,18 +57,21 @@ std::string parseEntityVector(ConnectionInfo* ciP, const Value::ConstMemberItera
     return "not a JSON array";
   }
 
-  for (Value::ConstValueIterator iter2 = iter->value.Begin(); iter2 != iter->value.End(); ++iter2)
+  for (rapidjson::Value::ConstValueIterator iter2 = iter->value.Begin(); iter2 != iter->value.End(); ++iter2)
   {
-
     std::string  r;
     Entity*      eP = new Entity();
 
     evP->vec.push_back(eP);
 
-    // FIXME P5: is the logic of this function correct? I mean, parseEntityObject() could result in error, so the push_back maybe
-    // should be done after the parseEntityObject() call (and delete the eP just before return r). Or maybe it doesn't matter... as in the
-    // case of error the error is propagated back to result in an OrionError and the evP is not actually used (and properly destroyed during
+    //
+    // FIXME P5: is the logic of this function correct?
+    // I mean, parseEntityObject() could result in error, so the push_back maybe
+    // should be done after the parseEntityObject() call (and delete the eP just before return r).
+    // Or maybe it doesn't matter... as in the case of error, the error is propagated back to result in
+    // an OrionError and the evP is not actually used (and properly destroyed during
     // the release step)
+    //
     r = parseEntityObject(ciP, iter2, eP, attributesAllowed);
     if (r != "OK")
     {

@@ -29,7 +29,7 @@
 #include "ngsi/StatusCode.h"
 #include "ngsi/Request.h"
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/Restriction.h"
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
@@ -48,7 +48,7 @@ DiscoverContextAvailabilityRequest::DiscoverContextAvailabilityRequest()
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityRequest::release - 
+* DiscoverContextAvailabilityRequest::release -
 */
 void DiscoverContextAvailabilityRequest::release(void)
 {
@@ -61,9 +61,9 @@ void DiscoverContextAvailabilityRequest::release(void)
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityRequest::check - 
+* DiscoverContextAvailabilityRequest::check -
 */
-std::string DiscoverContextAvailabilityRequest::check(const std::string& indent, const std::string& predetectedError)
+std::string DiscoverContextAvailabilityRequest::check(const std::string& predetectedError)
 {
   DiscoverContextAvailabilityResponse  response;
   std::string                          res;
@@ -76,23 +76,23 @@ std::string DiscoverContextAvailabilityRequest::check(const std::string& indent,
   {
     response.errorCode.fill(SccContextElementNotFound);
   }
-  else if (((res = entityIdVector.check(DiscoverContextAvailability, indent))                                                      != "OK") ||
-           ((res = attributeList.check(DiscoverContextAvailability, indent, predetectedError, restrictions))                       != "OK") ||
-           ((restrictions != 0) && ((res = restriction.check(DiscoverContextAvailability, indent, predetectedError, restrictions)) != "OK")))
+  else if (((res = entityIdVector.check(DiscoverContextAvailability))       != "OK") ||
+           ((res = attributeList.check())                                   != "OK") ||
+           ((restrictions != 0) && ((res = restriction.check(restrictions)) != "OK")))
   {
     response.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";
 
-  return response.render(indent);
+  return response.render();
 }
 
 
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityRequest::present - 
+* DiscoverContextAvailabilityRequest::present -
 */
 void DiscoverContextAvailabilityRequest::present(const std::string& indent)
 {
@@ -105,7 +105,7 @@ void DiscoverContextAvailabilityRequest::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityRequest::fill - 
+* DiscoverContextAvailabilityRequest::fill -
 */
 void DiscoverContextAvailabilityRequest::fill
 (
@@ -128,7 +128,7 @@ void DiscoverContextAvailabilityRequest::fill
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityRequest::fill - 
+* DiscoverContextAvailabilityRequest::fill -
 */
 void DiscoverContextAvailabilityRequest::fill(const std::string& entityId, const std::string& entityType)
 {
@@ -141,7 +141,7 @@ void DiscoverContextAvailabilityRequest::fill(const std::string& entityId, const
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityRequest::fill - 
+* DiscoverContextAvailabilityRequest::fill -
 */
 void DiscoverContextAvailabilityRequest::fill
 (
@@ -160,7 +160,7 @@ void DiscoverContextAvailabilityRequest::fill
     Scope* scopeP = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
 
     scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
-      
+
     restriction.scopeVector.push_back(scopeP);
   }
 

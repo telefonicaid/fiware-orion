@@ -25,11 +25,11 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "rapidjson/document.h"
 
 #include "ngsi/ContextAttribute.h"
-
-using namespace rapidjson;
 
 
 
@@ -39,8 +39,8 @@ using namespace rapidjson;
 */
 extern std::string parseMetadataVector
 (
-  const Value::ConstMemberIterator&  node,
-  ContextAttribute*                  caP
+  const rapidjson::Value::ConstMemberIterator&  node,
+  ContextAttribute*                             caP
 );
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSEMETADATAVECTOR_H_

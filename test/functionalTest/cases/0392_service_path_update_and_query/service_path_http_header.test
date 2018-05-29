@@ -84,7 +84,7 @@ echo
 --REGEXPECT--
 +++++ 0. OK
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -98,7 +98,7 @@ Date: REGEX(.*)
 
 +++++ 1. Path-Component more than 50 chars
 HTTP/1.1 200 OK
-Content-Length: 140
+Content-Length: 109
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -113,7 +113,7 @@ Date: REGEX(.*)
 
 +++++ 2. Too many levels in path
 HTTP/1.1 200 OK
-Content-Length: 136
+Content-Length: 105
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -128,7 +128,7 @@ Date: REGEX(.*)
 
 +++++ 3: bad char in component
 HTTP/1.1 200 OK
-Content-Length: 158
+Content-Length: 127
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -143,7 +143,7 @@ Date: REGEX(.*)
 
 +++++ 4: service path must start with a '/'
 HTTP/1.1 200 OK
-Content-Length: 174
+Content-Length: 143
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -158,7 +158,7 @@ Date: REGEX(.*)
 
 +++++ 5: four service paths
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -183,7 +183,7 @@ Service Path 3: '/home/kz/4'
 
 +++++ 7: eleven service paths
 HTTP/1.1 200 OK
-Content-Length: 168
+Content-Length: 137
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

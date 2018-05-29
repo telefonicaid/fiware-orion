@@ -56,6 +56,7 @@
 #include "apiTypesV2/BatchQuery.h"
 #include "apiTypesV2/BatchUpdate.h"
 #include "apiTypesV2/SubscriptionUpdate.h"
+#include "apiTypesV2/Registration.h"
 
 
 
@@ -445,7 +446,7 @@ typedef struct ParseData
   BatchUpdateData                             bu;
 
   ngsiv2::SubscriptionUpdate                  subsV2;
-
+  ngsiv2::Registration                        reg;
 } ParseData;
 
 #endif  // SRC_LIB_NGSI_PARSEDATA_H_

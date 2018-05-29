@@ -51,7 +51,7 @@ ContextRegistration::ContextRegistration()
 *
 * ContextRegistration::render -
 */
-std::string ContextRegistration::render(const std::string& indent, bool comma, bool isInVector)
+std::string ContextRegistration::render(bool comma, bool isInVector)
 {
   std::string out = "";
 
@@ -62,12 +62,12 @@ std::string ContextRegistration::render(const std::string& indent, bool comma, b
   // All, except providingApplication of course :-)
   //
 
-  out += startTag(indent, !isInVector? "contextRegistration" : "");
-  out += entityIdVector.render(indent + "  ", true);
-  out += contextRegistrationAttributeVector.render(indent + "  ", true);
-  out += registrationMetadataVector.render(indent + "  ", true);
-  out += providingApplication.render(indent + "  ", false);
-  out += endTag(indent, comma);
+  out += startTag(!isInVector? "contextRegistration" : "");
+  out += entityIdVector.render(true);
+  out += contextRegistrationAttributeVector.render(true);
+  out += registrationMetadataVector.render(true);
+  out += providingApplication.render(false);
+  out += endTag(comma);
 
   return out;
 }
@@ -82,14 +82,13 @@ std::string ContextRegistration::check
 (
   ApiVersion          apiVersion,
   RequestType         requestType,
-  const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
 )
 {
   std::string res;
 
-  if ((res = entityIdVector.check(requestType, indent)) != "OK")
+  if ((res = entityIdVector.check(requestType)) != "OK")
   {
     return res;
   }
@@ -104,7 +103,7 @@ std::string ContextRegistration::check
     return res;
   }
 
-  if ((res = providingApplication.check(requestType, indent, predetectedError, counter)) != "OK")
+  if ((res = providingApplication.check()) != "OK")
   {
     return res;
   }

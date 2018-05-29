@@ -1,4 +1,4 @@
-#<a name="top"></a>Orion Context Broker
+# <a name="top"></a>Orion Context Broker
 
 <!-- Documentation badge line is processed by release.sh. Thus, if the structure of the URL changes,
      release.sh needs to be changed also -->
@@ -16,7 +16,7 @@
 * [API Walkthrough](#api-walkthrough)
 * [API Reference Documentation](#api-reference-documentation)
 * [Testing](#testing)
-    * [Ent-to-end tests](#ent-to-end-tests)
+    * [End-to-end tests](#end-to-end-tests)
     * [Unit Tests](#unit-tests)
 * [Advanced topics](#advanced-topics)
 * [License](#license)
@@ -42,9 +42,9 @@ For documentation previous to Orion 0.23.0 please check the manuals at FIWARE pu
 
 ## GEi overall description
 
-Orion is a C++ implementation of the NGSI9/10 REST API binding developed as a part of the FIWARE platform.
+Orion is a C++ implementation of the NGSIv2 REST API binding developed as a part of the FIWARE platform.
 
-Orion Context Broker allows you to manage all the whole lifecycle of context information including updates, queries, registrations and subscriptions. It is an NGSI9/10 server implementation to manage context information and its availability. Using the Orion Context Broker, you are able to register context elements and manage them through updates and queries. In addition, you can subscribe to context information so when some condition occurs (e.g. the context elements have changed) you receive a notification. These usage scenarios and the Orion Context Broker features are described in this document.
+Orion Context Broker allows you to manage the entire lifecycle of context information including updates, queries, registrations and subscriptions. It is an NGSIv2 server implementation to manage context information and its availability. Using the Orion Context Broker, you are able to create context elements and manage them through updates and queries. In addition, you can subscribe to context information so when some condition occurs (e.g. the context elements have changed) you receive a notification. These usage scenarios and the Orion Context Broker features are described in this documentation.
 
 If this is your first contact with the Orion Context Broker, it is highly recommended to have a look to the brief [Quick Start guide](doc/manuals/quick_start_guide.md).
 
@@ -129,7 +129,7 @@ Please have a look at the [Quick Start guide](doc/manuals/quick_start_guide.md) 
 
 ## Testing
 
-### Ent-to-end tests
+### End-to-end tests
 
 The functional_test makefile target is used for running end-to-end tests:
 
@@ -153,6 +153,8 @@ Please have a look to the section [on building the source code](doc/manuals/admi
 * [Installation and administration](doc/manuals/admin/README.md)
 * Container-based deployment
   * [Docker](docker/README.md)
+  * [Docker Swarm and HA](docker/docker_swarm.md)
+* [Development Manual](doc/manuals/devel/README.md)
 * [Sample code contributions](doc/manuals/code_contributions.md)
 * [Contribution guidelines](doc/manuals/contribution_guidelines.md), especially important if you plan to contribute with code
   to Orion Context Broker
@@ -168,7 +170,7 @@ Orion Context Broker is licensed under Affero General Public License (GPL) versi
 
 ## Support
 
-Ask your thorough programmming questions using [stackoverflow](http://stackoverflow.com/questions/ask)
+Ask your thorough programming questions using [stackoverflow](http://stackoverflow.com/questions/ask)
 and your general questions on [FIWARE Q&A](https://ask.fiware.org). In both cases please use the tag `fiware-orion`
 
 [Top](#top)

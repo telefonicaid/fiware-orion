@@ -170,7 +170,7 @@ echo
 01. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 21 secs
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 137
+Content-Length: 106
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -187,7 +187,7 @@ Date: REGEX(.*)
 02. Sleep 11 secs to let the cache refresh from DB - one cache insert comes from the refresh
 ============================================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
+Content-Length: 92
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -269,7 +269,7 @@ Date: REGEX(.*)
 ============================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 475
+Content-Length: 271
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -303,7 +303,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 479
+Content-Length: 275
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json

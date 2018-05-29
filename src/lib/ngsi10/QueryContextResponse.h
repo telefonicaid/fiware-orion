@@ -1,5 +1,5 @@
-#ifndef QUERY_CONTEXT_RESPONSE_H
-#define QUERY_CONTEXT_RESPONSE_H
+#ifndef SRC_LIB_NGSI10_QUERYCONTEXTRESPONSE_H_
+#define SRC_LIB_NGSI10_QUERYCONTEXTRESPONSE_H_
 
 /*
 *
@@ -36,7 +36,7 @@
 
 /* ****************************************************************************
 *
-* QueryContextResponse - 
+* QueryContextResponse -
 *
 * NOTE
 * Both contextElementResponseV and statusCode are optional, but a response
@@ -52,12 +52,12 @@ typedef struct QueryContextResponse
   QueryContextResponse(StatusCode& _errorCode);
   ~QueryContextResponse();
 
-  std::string            render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent);
-  std::string            check(ApiVersion apiVersion, bool asJsonObject, const std::string&  indent, const std::string&  predetectedError);
+  std::string            render(ApiVersion apiVersion, bool asJsonObject);
+  std::string            check(ApiVersion apiVersion, bool asJsonObject, const std::string&  predetectedError);
   void                   present(const std::string& indent, const std::string& caller);
-  void                   release(void);  
+  void                   release(void);
   void                   fill(QueryContextResponse* qcrsP);
   QueryContextResponse*  clone(void);
 } QueryContextResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI10_QUERYCONTEXTRESPONSE_H_

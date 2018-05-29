@@ -22,9 +22,9 @@
 *
 * Author: Fermin Galan
 */
-
 #include "orionTypes/QueryContextRequestVector.h"
-#include "unittest.h"
+#include "unittests/unittest.h"
+
 
 
 /* ****************************************************************************

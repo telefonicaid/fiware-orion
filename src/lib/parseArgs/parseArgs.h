@@ -275,6 +275,14 @@ extern int paParse
 
 /* ****************************************************************************
 *
+* paCleanup - free allocated variables
+*/
+extern void paCleanup(void);
+
+
+
+/* ****************************************************************************
+*
 * paConfig -
 */
 // extern int paConfig(const char* item, const void* value, const void* value2 = NULL);

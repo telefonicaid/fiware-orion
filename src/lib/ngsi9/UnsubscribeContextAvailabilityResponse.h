@@ -1,5 +1,5 @@
-#ifndef UNSUBSCRIBE_CONTEXT_AVAILABILITY_RESPONSE_H
-#define UNSUBSCRIBE_CONTEXT_AVAILABILITY_RESPONSE_H
+#ifndef SRC_LIB_NGSI9_UNSUBSCRIBECONTEXTAVAILABILITYRESPONSE_H_
+#define SRC_LIB_NGSI9_UNSUBSCRIBECONTEXTAVAILABILITYRESPONSE_H_
 
 /*
 *
@@ -46,7 +46,7 @@ typedef struct UnsubscribeContextAvailabilityResponse
   UnsubscribeContextAvailabilityResponse(SubscriptionId _subscriptionId);
   ~UnsubscribeContextAvailabilityResponse();
 
-  std::string render(const std::string& indent);
+  std::string render(void);
 } UnsubscribeContextAvailabilityResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI9_UNSUBSCRIBECONTEXTAVAILABILITYRESPONSE_H_

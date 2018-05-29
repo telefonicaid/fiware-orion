@@ -41,9 +41,9 @@ using namespace ngsiv2;
 
 /* ****************************************************************************
 *
-* SubscribeContextRequest::check - 
+* SubscribeContextRequest::check -
 */
-std::string SubscribeContextRequest::check(const std::string& indent, const std::string& predetectedError, int counter)
+std::string SubscribeContextRequest::check(const std::string& predetectedError, int counter)
 {
   SubscribeContextResponse response;
   std::string              res;
@@ -51,17 +51,17 @@ std::string SubscribeContextRequest::check(const std::string& indent, const std:
   /* First, check optional fields only in the case they are present */
   /* Second, check the other (mandatory) fields */
 
-  if (((res = entityIdVector.check(SubscribeContext, indent))                                   != "OK") ||
-      ((res = attributeList.check(SubscribeContext, indent, predetectedError, counter))         != "OK") ||
-      ((res = reference.check(SubscribeContext, indent, predetectedError, counter))             != "OK") ||
-      ((res = duration.check(SubscribeContext, indent, predetectedError, counter))              != "OK") ||
-      ((res = restriction.check(SubscribeContext, indent, predetectedError, restrictions))      != "OK") ||
-      ((res = notifyConditionVector.check(SubscribeContext, indent, predetectedError, counter)) != "OK") ||
-      ((res = throttling.check(SubscribeContext, indent, predetectedError, counter))            != "OK"))
+  if (((res = entityIdVector.check(SubscribeContext))                                   != "OK") ||
+      ((res = attributeList.check())                                                    != "OK") ||
+      ((res = reference.check(SubscribeContext))                                        != "OK") ||
+      ((res = duration.check())                                                         != "OK") ||
+      ((res = restriction.check(restrictions))                                          != "OK") ||
+      ((res = notifyConditionVector.check(SubscribeContext, predetectedError, counter)) != "OK") ||
+      ((res = throttling.check())                                                       != "OK"))
   {
     alarmMgr.badInput(clientIp, res);
     response.subscribeError.errorCode.fill(SccBadRequest, std::string("invalid payload: ") + res);
-    return response.render(indent);
+    return response.render();
   }
 
   return "OK";
@@ -71,7 +71,7 @@ std::string SubscribeContextRequest::check(const std::string& indent, const std:
 
 /* ****************************************************************************
 *
-* SubscribeContextRequest::present - 
+* SubscribeContextRequest::present -
 */
 void SubscribeContextRequest::present(const std::string& indent)
 {
@@ -88,7 +88,7 @@ void SubscribeContextRequest::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* SubscribeContextRequest::release - 
+* SubscribeContextRequest::release -
 *
 * Old versions of this method also include a 'restriction.release()' call. However, now each time
 * a SubscribeContextRequest is created, the method toNgsiv2Subscription() is used on it and the
@@ -100,12 +100,12 @@ void SubscribeContextRequest::present(const std::string& indent)
 *  sub->restriction = restriction;
 *
 * After doing this, we have TWO vectors pointing to the same scopes.
-*  
+*
 */
 void SubscribeContextRequest::release(void)
 {
   entityIdVector.release();
-  attributeList.release();  
+  attributeList.release();
   notifyConditionVector.release();
 }
 
@@ -113,7 +113,7 @@ void SubscribeContextRequest::release(void)
 
 /* ****************************************************************************
 *
-* SubscribeContextRequest::fill - 
+* SubscribeContextRequest::fill -
 */
 void SubscribeContextRequest::fill(EntityTypeInfo typeInfo)
 {
@@ -122,7 +122,7 @@ void SubscribeContextRequest::fill(EntityTypeInfo typeInfo)
     Scope* scopeP = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
 
     scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
-      
+
     restriction.scopeVector.push_back(scopeP);
   }
 }
@@ -199,7 +199,7 @@ void SubscribeContextRequest::toNgsiv2Subscription(Subscription* sub)
   sub->descriptionProvided            = false;
   sub->attrsFormat                    = NGSI_V1_LEGACY;
   sub->notification.blacklist         = false;
-  sub->notification.httpInfo.custom   = false;  
+  sub->notification.httpInfo.custom   = false;
 
   sub->notification.metadata.clear();
 }

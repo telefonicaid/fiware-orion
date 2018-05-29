@@ -1,5 +1,5 @@
-#ifndef NOTIFY_CONTEXT_REQUEST_H
-#define NOTIFY_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_NGSI10_NOTIFYCONTEXTREQUEST_H_
+#define SRC_LIB_NGSI10_NOTIFYCONTEXTREQUEST_H_
 
 /*
 *
@@ -45,15 +45,15 @@ typedef struct NotifyContextRequest
   Originator                    originator;                    // Mandatory
   ContextElementResponseVector  contextElementResponseVector;  // Optional
 
-  std::string   render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent);
+  std::string   render(ApiVersion apiVersion, bool asJsonObject);
   std::string   toJson(RenderFormat                     renderFormat,
                        const std::vector<std::string>&  attrsFilter,
                        const std::vector<std::string>&  metadataFilter,
                        bool                             blacklist = false);
-  std::string   check(ApiVersion apiVersion, const std::string& indent, const std::string& predetectedError);
+  std::string   check(ApiVersion apiVersion, const std::string& predetectedError);
   void          present(const std::string& indent);
   void          release(void);
   NotifyContextRequest* clone(void);
 } NotifyContextRequest;
 
-#endif
+#endif  // SRC_LIB_NGSI10_NOTIFYCONTEXTREQUEST_H_

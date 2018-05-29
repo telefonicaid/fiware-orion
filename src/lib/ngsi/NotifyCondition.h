@@ -48,12 +48,11 @@ typedef struct NotifyCondition
   NotifyCondition();
   NotifyCondition(NotifyCondition* ncP);
 
-  std::string   render(const std::string& indent, bool notLastInVector);
+  std::string   render(bool notLastInVector);
   void          present(const std::string& indent, int ix);
   void          release(void);
 
   std::string   check(RequestType         requestType,
-                      const std::string&  indent,
                       const std::string&  predetectedError,
                       int                 counter);
 } NotifyCondition;

@@ -131,7 +131,7 @@ echo
 01. Update/APPEND an entity with type Room and id Room, Attribute temperature
 =============================================================================
 HTTP/1.1 200 OK
-Content-Length: 572
+Content-Length: 263
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -170,7 +170,7 @@ Date: REGEX(.*)
 02. Query with convop GET /v1/contextEntities/Room
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 441
+Content-Length: 242
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -205,7 +205,7 @@ Date: REGEX(.*)
 03. Query with convop GET /v1/contextEntities/Room/attributes/temperature
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 319
+Content-Length: 177
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -235,7 +235,7 @@ Date: REGEX(.*)
 04. Query with convop GET /v1/contextEntities/Room/attributes/temperature/ID
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 319
+Content-Length: 177
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -265,7 +265,7 @@ Date: REGEX(.*)
 05. Query with convop GET /v1/contextEntities/type/Room/id/Room
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 441
+Content-Length: 242
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -300,7 +300,7 @@ Date: REGEX(.*)
 06. Query with convop GET /v1/contextEntities/type/Room/id/Room/attributes/temperature
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 319
+Content-Length: 177
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -330,7 +330,7 @@ Date: REGEX(.*)
 07. Query with convop GET /v1/contextEntities/type/Room/id/Room/attributes/temperature/backup
 =============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 319
+Content-Length: 177
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -360,7 +360,7 @@ Date: REGEX(.*)
 08. Query with convop GET /v1/contextEntityTypes/Room
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 574
+Content-Length: 265
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -399,7 +399,7 @@ Date: REGEX(.*)
 09. Query with convop GET /v1/contextEntityTypes/Room/attributes/temperature
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 574
+Content-Length: 265
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

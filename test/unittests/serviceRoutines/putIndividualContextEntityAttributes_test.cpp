@@ -22,25 +22,33 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/putIndividualContextEntityAttributes.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
-#include "unittest.h"
+#include "unittests/unittest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs - 
+* service vectors -
 */
-static RestService rs[] = 
+static RestService putV[] =
 {
-  { "PUT",    IndividualContextEntityAttributes,     4, { "ngsi10", "contextEntities", "*", "attributes"       }, "", putIndividualContextEntityAttributes      },
-  { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
-  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { IndividualContextEntityAttributes, 4, { "ngsi10", "contextEntities", "*", "attributes" }, "", putIndividualContextEntityAttributes },
+  { InvalidRequest,                    0, {                                                }, "", NULL                                 }
+};
+
+static RestService badVerbV[] =
+{
+  { InvalidRequest,   0, { "*", "*", "*", "*", "*", "*"                   }, "", badRequest                           },
+  { InvalidRequest,   0, {                                                }, "", NULL                                 }
 };
 
 
@@ -58,15 +66,21 @@ TEST(putIndividualContextEntityAttributes, notFound)
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf,
+                                   sizeof(testBuf),
+                                   infile)) << "Error getting test data from '" << infile << "'";
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf,
+                                   sizeof(expectedBuf),
+                                   outfile)) << "Error getting test data from '" << outfile << "'";
 
   ci.outMimeType    = JSON;
   ci.inMimeType     = JSON;
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
 
-  out             = restService(&ci, rs);
+  serviceVectorsSet(NULL, putV, NULL, NULL, NULL, NULL, badVerbV);
+  out = orionServe(&ci1);
 
   EXPECT_STREQ(expectedBuf, out.c_str());
 

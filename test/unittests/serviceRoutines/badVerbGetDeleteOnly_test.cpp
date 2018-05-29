@@ -22,40 +22,53 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "gtest/gtest.h"
 
 #include "serviceRoutines/badVerbGetDeleteOnly.h"
 #include "serviceRoutines/statisticsTreat.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs - 
+* rs -
 */
-static RestService rs[] = 
+static RestService getV[] =
 {
-  { "GET",    StatisticsRequest, 1, { "statistics" }, "", statisticsTreat      },
-  { "DELETE", StatisticsRequest, 1, { "statistics" }, "", statisticsTreat      },
-  { "*",      StatisticsRequest, 1, { "statistics" }, "", badVerbGetDeleteOnly },
+  { StatisticsRequest, 1, { "statistics" }, "", statisticsTreat      },
+  { InvalidRequest,    0, {              }, "", NULL                 }
+};
 
-  { "",       InvalidRequest,    0, {              }, "", NULL                 }
+static RestService deleteV[] =
+{
+  { StatisticsRequest, 1, { "statistics" }, "", statisticsTreat      },
+  { InvalidRequest,    0, {              }, "", NULL                 }
+};
+
+static RestService badVerbV[] =
+{
+  { StatisticsRequest, 1, { "statistics" }, "", badVerbGetDeleteOnly },
+  { InvalidRequest,    0, {              }, "", NULL                 }
 };
 
 
 
 /* ****************************************************************************
 *
-* ok - 
+* ok -
 */
 TEST(badVerbGetDeleteOnly, ok)
 {
   ConnectionInfo  ci("/statistics",  "PUT", "1.1");
-  std::string     expected = ""; // Bad verb gives no payload, only HTTP headers
+  std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
   std::string     out;
 
-  out = restService(&ci, rs);
+  serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);
+  out = orion::requestServe(&ci);
 
   EXPECT_EQ(expected, out);
   EXPECT_EQ("Allow",       ci.httpHeader[0]);

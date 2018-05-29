@@ -1,0 +1,558 @@
+# Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Self notification protection multi-hop case
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+dbInit CP2
+brokerStart CB
+brokerStart CP1
+brokerStart CP2
+
+--SHELL--
+
+#
+# 01. Create sub1 at CB1 to notify entity E attribute A to CB2 (inactive)
+# 02. Create sub2 at CB2 to notify entity E attribute A to CB3 (inactive)
+# 03. Create sub3 at CB3 to notify entity E attribute A to CB1 (inactive)
+# 04. Create entity E at CB1 with A = foo
+# 05. Create entity E at CB2 with A = foo
+# 06. Create entity E at CB3 with A = foo
+# 07. Activate sub1 at CB1
+# 08. Activate sub2 at CB2
+# 09. Activate sub3 at CB3
+# 10. Update entity at CB1, thus triggering CB1->CB2->CB3 notifications
+# 11. Wait for a while and check timesSent:1 for all the subscriptions in each CB
+# 12. Get entity E with value boomxxx at CB1
+# 13. Get entity E with value boomx at CB2
+# 14. Get entity E with value boomxx at CB3
+# 15. Check the warning about loop detection in the log
+#
+
+echo "01. Create sub1 at CB1 to notify entity E attribute A to CB2 (inactive)"
+echo "======================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E"
+      }
+    ],
+    "condition": {
+      "attrs": [ "A" ]
+    }
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:'${CP1_PORT}'/v2/entities/E/attrs",
+      "headers": {
+        "Content-type": "application/json"
+      },
+      "payload": "%7B %22A%22: %7B %22value%22: %22${A}x%22 %2C %22type%22: %22Text%22 %7D %7D"
+    }
+  },
+  "status": "inactive"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+SUB1_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. Create sub1 at CB2 to notify entity E attribute A to CB3 (inactive)"
+echo "======================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E"
+      }
+    ],
+    "condition": {
+      "attrs": [ "A" ]
+    }
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:'${CP2_PORT}'/v2/entities/E/attrs",
+      "headers": {
+        "Content-type": "application/json"
+      },
+      "payload": "%7B %22A%22: %7B %22value%22: %22${A}x%22 %2C %22type%22: %22Text%22 %7D %7D"
+    }
+  },
+  "status": "inactive"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload" --port ${CP1_PORT}
+echo
+echo
+
+SUB2_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "03. Create sub1 at CB3 to notify entity E attribute A to CB1 (inactive)"
+echo "======================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E"
+      }
+    ],
+    "condition": {
+      "attrs": [ "A" ]
+    }
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:'${CB_PORT}'/v2/entities/E/attrs",
+      "headers": {
+        "Content-type": "application/json"
+      },
+      "payload": "%7B %22A%22: %7B %22value%22: %22${A}x%22 %2C %22type%22: %22Text%22 %7D %7D"
+    }
+  },
+  "status": "inactive"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload" --port ${CP2_PORT}
+echo
+echo
+
+SUB3_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "04. Create entity E at CB1 with A = foo"
+echo "======================================="
+payload='{
+  "id": "E",
+  "type": "Thing",
+  "A": {
+    "value": "foo",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Create entity E at CB2 with A = foo"
+echo "======================================="
+payload='{
+  "id": "E",
+  "type": "Thing",
+  "A": {
+    "value": "foo",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port ${CP1_PORT}
+echo
+echo
+
+
+echo "06. Create entity E at CB3 with A = foo"
+echo "======================================="
+payload='{
+  "id": "E",
+  "type": "Thing",
+  "A": {
+    "value": "foo",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port ${CP2_PORT}
+echo
+echo
+
+
+echo "07. Activate sub1 at CB1"
+echo "========================"
+payload='{
+  "status": "active"
+}'
+orionCurl -X PATCH --url /v2/subscriptions/$SUB1_ID --payload "$payload"
+echo
+echo
+
+
+echo "08. Activate sub2 at CB2"
+echo "========================"
+payload='{
+  "status": "active"
+}'
+orionCurl -X PATCH --url /v2/subscriptions/$SUB2_ID --payload "$payload" --port ${CP1_PORT}
+echo
+echo
+
+
+echo "09. Activate sub3 at CB3"
+echo "========================"
+payload='{
+  "status": "active"
+}'
+orionCurl -X PATCH --url /v2/subscriptions/$SUB3_ID --payload "$payload" --port ${CP2_PORT}
+echo
+echo
+
+
+echo "10. Update entity at CB1, thus triggering CB1->CB2->CB3 notifications"
+echo "====================================================================="
+payload='{
+  "A": {
+    "value": "boom",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo "11. Wait for a while and check timesSent:1 for all the subscriptions in each CB"
+echo "==============================================================================="
+sleep 5s
+orionCurl --url /v2/subscriptions/$SUB1_ID
+echo
+echo
+orionCurl --url /v2/subscriptions/$SUB2_ID --port ${CP1_PORT}
+echo
+echo
+orionCurl --url /v2/subscriptions/$SUB3_ID --port ${CP2_PORT}
+echo
+echo
+
+
+echo "12. Get entity E with value boomx at CB1"
+echo "========================================"
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo "13. Get entity E with value boomx at CB2"
+echo "========================================"
+orionCurl --url /v2/entities/E --port ${CP1_PORT}
+echo
+echo
+
+
+echo "14. Get entity E with value boomx at CB3"
+echo "========================================"
+orionCurl --url /v2/entities/E --port ${CP2_PORT}
+echo
+echo
+
+
+echo "15. Check the warning about loop detection in the log"
+echo "====================================================="
+egrep 'WARN' /tmp/contextBroker.log
+echo
+echo
+
+
+--REGEXPECT--
+01. Create sub1 at CB1 to notify entity E attribute A to CB2 (inactive)
+=======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create sub1 at CB2 to notify entity E attribute A to CB3 (inactive)
+=======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create sub1 at CB3 to notify entity E attribute A to CB1 (inactive)
+=======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create entity E at CB1 with A = foo
+=======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create entity E at CB2 with A = foo
+=======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Create entity E at CB3 with A = foo
+=======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Activate sub1 at CB1
+========================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Activate sub2 at CB2
+========================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. Activate sub3 at CB3
+========================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. Update entity at CB1, thus triggering CB1->CB2->CB3 notifications
+=====================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+11. Wait for a while and check timesSent:1 for all the subscriptions in each CB
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 469
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "httpCustom": {
+            "headers": {
+                "Content-type": "application/json"
+            },
+            "payload": "%7B %22A%22: %7B %22value%22: %22${A}x%22 %2C %22type%22: %22Text%22 %7D %7D",
+            "url": "http://localhost:REGEX(\d+)/v2/entities/E/attrs"
+        },
+        "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [
+                "A"
+            ]
+        },
+        "entities": [
+            {
+                "id": "E"
+            }
+        ]
+    }
+}
+
+
+HTTP/1.1 200 OK
+Content-Length: 469
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "httpCustom": {
+            "headers": {
+                "Content-type": "application/json"
+            },
+            "payload": "%7B %22A%22: %7B %22value%22: %22${A}x%22 %2C %22type%22: %22Text%22 %7D %7D",
+            "url": "http://localhost:REGEX(\d+)/v2/entities/E/attrs"
+        },
+        "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [
+                "A"
+            ]
+        },
+        "entities": [
+            {
+                "id": "E"
+            }
+        ]
+    }
+}
+
+
+HTTP/1.1 200 OK
+Content-Length: 469
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "httpCustom": {
+            "headers": {
+                "Content-type": "application/json"
+            },
+            "payload": "%7B %22A%22: %7B %22value%22: %22${A}x%22 %2C %22type%22: %22Text%22 %7D %7D",
+            "url": "http://localhost:REGEX(\d+)/v2/entities/E/attrs"
+        },
+        "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [
+                "A"
+            ]
+        },
+        "entities": [
+            {
+                "id": "E"
+            }
+        ]
+    }
+}
+
+
+12. Get entity E with value boomx at CB1
+========================================
+HTTP/1.1 200 OK
+Content-Length: 77
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Text",
+        "value": "boomxxx"
+    },
+    "id": "E",
+    "type": "Thing"
+}
+
+
+13. Get entity E with value boomx at CB2
+========================================
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Text",
+        "value": "boomx"
+    },
+    "id": "E",
+    "type": "Thing"
+}
+
+
+14. Get entity E with value boomx at CB3
+========================================
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Text",
+        "value": "boomxx"
+    },
+    "id": "E",
+    "type": "Thing"
+}
+
+
+15. Check the warning about loop detection in the log
+=====================================================
+REGEX(.*) msg=Notification loop detected for entity id <E> type <Thing>, skipping subscription triggering
+
+
+--TEARDOWN--
+brokerStop CP1
+brokerStop CP2
+brokerStop CP3
+dbDrop CP1
+dbDrop CP2
+dbDrop CP3

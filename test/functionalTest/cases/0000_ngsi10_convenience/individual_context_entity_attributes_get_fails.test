@@ -34,7 +34,7 @@ orionCurl --url "/v1/contextEntities/entity01/attributes"
 --REGEXPECT--
 +++++ 1. get an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 230
+Content-Length: 170
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

@@ -18,14 +18,17 @@ and subscriptions.
 
 ## Editors
 
-José Manuel Cantera Fonseca (Telefónica I+D), Fermín Galán Márquez (Telefónica I+D),
+José Manuel Cantera Fonseca (FIWARE Foundation e.V., formerly with Telefónica I+D), 
+Fermín Galán Márquez (Telefónica España, formerly with Telefónica I+D),
 Tobias Jacobs (NEC).
   
 ## Acknowledgements
 
 The editors would like to express their gratitude to the following people who actively
 contributed to this specification:
-Juan José Hierro (Telefónica I+D), Marcos Reyes (Telefónica I+D), Ken Zangelin (Telefónica I+D),
+Juan José Hierro (FIWARE Foundation e.V., formerly with Telefónica I+D), 
+Marcos Reyes (Telefónica España, formerly with Telefónica I+D), 
+Ken Zangelin (APInf, formerly with Telefónica I+D),
 Iván Arias León (Telefónica I+D), Carlos Romero Brox (Telefónica I+D),
 Antonio José López Navarro (Telefónica I+D),  Marc Capdevielle (Orange), Gilles Privat (Orange), 
 Sergio García Gómez (Telefónica I+D), Martin Bauer (NEC).
@@ -45,7 +48,7 @@ In addition, note that a list of currently open discussions is available at
 
 ## Copyright
 
-Copyright (c) 2011-2016 Telecom Italia, Telefónica I+D and NEC. 
+Copyright (c) 2011-2017 Telecom Italia, Telefónica I+D and NEC. 
 
 ## License
 
@@ -447,9 +450,10 @@ The value of `orderBy` can be:
 * The keyword `geo:distance` to order results by distance to a reference geometry when a "near"
   (`georel=near`) spatial relationship is used. 
 
-* A comma-separated list of attributes (including system/builtin attributes), e.g. `temperature,!humidity`.
-  Results are ordered by the first attribute. On ties, the results are ordered by the second
-  attribute and so on. A "!" before the attribute name means that the order is reversed.
+* A comma-separated list of attributes (including system/builtin attributes), `id` (for entity
+  ID), and `type` (for entity type), e.g. `temperature,!humidity`. Results are ordered by the first
+  field. On ties, the results are ordered by the second field and so on. A "!" before
+  the field name means that the order is reversed.
 
 ## Error Responses
 
@@ -612,7 +616,7 @@ might be useful in understanding the format.
 The Simple Query Language provides a simplified syntax to retrieve entities which match a set of
 conditions.
 A query is composed by a list of statements separated by the ';' character.
-Each statement express a matching condition.
+Each statement expresses a matching condition.
 The query returns all the entities that match all the matching conditions (AND logical operator). 
 
 There are two kinds of statements: *unary statements* and *binary statements*.
@@ -664,7 +668,7 @@ The list of operators (and the format of the values they use) is as follows:
       entities with an attribute named `color` but whose value is `white` do not match.
     + A range, specified as a minimum and a maximum, separated by `..`, e.g. `temperature==10..20`.
       For an entity to match, it must contain the *target property* (temperature),
-      and the *target property value* must be in the interval between the minimum and maximum
+      and the *target property value* must be between the upper and lower limits
       of the range (both included). Ranges can only be used with *target properties* that represent
       dates (in ISO8601 format), numbers or strings.
 + **Unequal**: `!=`. This operator accepts the following types of right-hand side:
@@ -678,7 +682,7 @@ The list of operators (and the format of the values they use) is as follows:
       attribute `color` is set to `white` will match.
     + A range, specified as a minimum and maximum separated by `..`, e.g. `temperature!=10..20`.
       For an entity to match, it must contain the *target property* (temperature) and the
-      *target property value* must **not** be in the interval between the minimum and the maximum
+      *target property value* must **not** be between the upper and lower limits
       (both included). Ranges can only be used with elements *target properties* that represent dates
       (in ISO8601 format), numbers or strings.
 + **Greater than**: `>`. The right-hand side must be a single element, e.g. `temperature>42`.
@@ -709,7 +713,7 @@ The list of operators (and the format of the values they use) is as follows:
 
 The symbol `:` can be used instead of `==`.
 
-In the case of equal or unequal, if s string to match includes a `,`, you can use simple quote
+In case of equal or unequal, if the string to match includes a `,`, you can use single quote
 (`'`) to disable the special meaning of the comma,  e.g: `color=='light,green','deep,blue'`.
 The first example would match a color with the exact value 'light,green' OR 'deep,blue'. The
 simple quote syntax can be also used to force string interpretation in filters, e.g.
@@ -1029,20 +1033,20 @@ Response code:
 + Parameters
     + id: Boe_Idearium (optional, string) - A comma-separated list of elements.
       Retrieve entities whose ID matches one of the elements in the list.
-      Incompatible with idPattern.
+      Incompatible with `idPattern`.
     
     + type: Room (optional, string) -  comma-separated list of elements.
       Retrieve entities whose type matches one of the elements in the list.
       Incompatible with `typePattern`.
 
     + idPattern: Bode_.* (optional, string) - A correctly formated regular expression.
-      Retrieve entities whose ID matches the regular expression. Incompatible with id.
+      Retrieve entities whose ID matches the regular expression. Incompatible with `id`.
 
     + typePattern: Room_.* (optional, string) - A correctly formated regular expression.
       Retrieve entities whose type matches the regular expression. Incompatible with `type`.
     
     + q: temperature>40 (optional, string) - A query expression, composed of a list of statements
-      separated by `;`, i.e., q=statement;statements;statement.
+      separated by `;`, i.e., q=statement1;statement2;statement3.
       See [Simple Query Language specification](#simple_query_language). 
 
     + mq: temperature.accuracy<0.9 (optional, string) - A query expression for attribute metadata,
@@ -1255,7 +1259,7 @@ Response:
 
 + Parameters
     + entityId (required, string) - Id of the entity to be retrieved
-    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
       entities with the same entity id.
     + attrs: temperature,humidity (optional, string) - Comma-separated list of attribute names whose
       data are to be included in the response. The attributes are retrieved in the order specified
@@ -1395,7 +1399,7 @@ Response:
 
 + Parameters 
     + entityId (required, string) - Id of the entity in question.
-    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
       entities with the same entity id.
     + options (optional, string) - Operations options
         + Members
@@ -1427,7 +1431,7 @@ Response:
 
 + Parameters 
     + entityId (required, string) - Id of the entity to be deleted
-    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
       entities with the same entity id.
 
 + Response 204
@@ -1450,7 +1454,7 @@ Response:
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Id of the entity
-    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
       entities with the same entity id.
     + attrName: temperature (required, string) - Name of the attribute to be retrieved.
     + metadata: accuracy (optional, string) - A list of metadata names to include in the response.
@@ -1508,7 +1512,7 @@ Response:
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Id of the entity.
-    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
     entities with the same entity id.
     + attrName: temperature (required, string) - Attribute name.
 
@@ -1526,7 +1530,7 @@ This operation returns the `value` property with the value of the attribute.
 * If attribute value is JSON Array or Object:
   * If `Accept` header can be expanded to `application/json` or `text/plain` return the value as a JSON with a
     response type of application/json or text/plain (whichever is the first in `Accept` header or
-    `application/json` in the case of `Accept: */*`).
+    `application/json` in case of `Accept: */*`).
   * Else return a HTTP error "406 Not Acceptable: accepted MIME types: application/json, text/plain"
 * If attribute value is a string, number, null or boolean:
   * If `Accept` header can be expanded to text/plain return the value as text. In case of a string, citation
@@ -1541,7 +1545,7 @@ Response:
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Id of the entity in question
-    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
       entities with the same entity id.
     + attrName: address (required, string) - Name of the attribute to be retrieved.
 
@@ -1580,7 +1584,7 @@ Response:
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Id of the entity to be updated.
-    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
       entities with the same entity id.
     + attrName: address (required, string) - Attribute name.
 
@@ -1728,7 +1732,7 @@ A `subject` contains the following subfields:
 
 + `entities`: A list of objects, each one composed of the following subfields:
   + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
-     time, but at least one of them must be present.
+     time, but one of them must be present.
   + `type` or `typePattern`: Type or type pattern of the affected entities. Both cannot be used at
      the same time. If omitted, it means "any entity type".
 + `condition`: Condition to trigger notifications. This field is optional and it may contain two
@@ -1806,8 +1810,8 @@ Response:
   more details.
 
 + Parameters
-    + limit: 10 (optional, number) - Limit the number of types to be retrieved
-    + offset: 20 (optional, number) - Skip a number of records
+    + limit: 10 (optional, number) - Limit the number of subscriptions to be retrieved
+    + offset: 20 (optional, number) - Skip a number of subscriptions
     + options (optional, string) - Options dictionary
       + Members
           + count - when used, the total number of subscriptions is returned in the HTTP header
@@ -1990,36 +1994,89 @@ Response:
 
 # Group Registrations
 
-Context Registration allows to associate external services to context data. One of the main
-use cases of this functionality is the association of Context Providers.
+A Context Registration allows to bind external context information sources so that they can
+play the role of providers
+of certain subsets (entities, attributes) of the context information space, including those located
+at specific geographical areas.
+A compliant Context Information provider shall expose an NGSIv2 interface, in particular:
+
+* Query by entity type(s), entity id(s), geoquery and attribute and/or metadata projection
+(`attrs` or `metadata` parameter). (See `GET /v2/entities`)
+* Update entity attributes (See `PATCH /v2/entities/<entityId>/attrs`)
+
+When the entities or attributes covered by an active registered provider are subject of a query or
+update operation, and the registrations allow to forward requests, 
+implementations must forward a request to such a registered context provider so that it can provide
+the requested data or update it.
+The forwarding algorithm and precise implementation details are work to be completed
+in a future version of this specification. (*TODO*)
 
 A context registration is represented by a JSON object with the following fields:
 
-+ `id`       : Unique identifier assigned to the registration. Automatically generated at creation
-  time.
-+ `subject`  : Object that describes the subject of the registration.
-+ `callback` : URL which denotes the end-point of the registered service. It is optional, as it can
-  be undefined under certain conditions, for instance, transient unavailability of the provider.
-+ `metadata` : An optional JSON object which allows to associate extra metadata properties to the
-  registration.
-  It must follow the same representation conventions as context attribute metadata
-  (See JSON Attribute Representation). 
-+ `duration` : Duration of the registration in ISO8601 format. Default duration is infinite.
++ `id` : Unique identifier assigned to the registration. Automatically generated at creation time.
++ `description` : Description given to this registration. Optional. 
++ `provider` : Object that describes the context source registered. Mandatory. 
++ `dataProvided` : Object that describes the data provided by this source. Mandatory. 
++ `status`: Enumerated field which captures the current status of this registration:
+Either `active` (for active registrations) or `inactive` (for inactive registrations).
+  If this field is not provided at registration creation time, new registrations are created with
+  the `active` status, which may be changed by clients afterwards. For expired registrations, this
+  attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`).
+  Also, for registrations experiencing problems with forwarding operations, the status is set to `failed`.
+  As soon as the forwarding operations start working again, the status is changed back to `active`.
++ `expires` : Registration expiration date in ISO8601 format. Permanent registrations must omit this field.
++ `forwardingInformation`: Information related to the forwarding operations made against the provider.
+Automatically provided by the implementation. 
 
-A `subject` contains the following subfields:
+The `provider` field contains the following subfields:
++ `http` : It is used to convey parameters for providers that deliver information through the HTTP protocol.
+(Only protocol supported nowadays).
+It must contain a subfield named `url` with the URL that serves as the endpoint that offers the providing interface.
+The endpoint must *not* include the protocol
+specific part (for instance `/v2/entities`). 
++ `supportedForwardingMode` : It is used to convey the forwarding mode supported by this context provider. By default `all`. 
+Allowed values are:
+    + `none` : This provider does not support request forwarding.
+    + `query` : This provider only supports request forwarding to query data.
+    + `update` : This provider only supports request forwarding to update data.
+    + `all` : This provider supports both query and update forwarding requests. (Default value)
+
+The `dataProvided` field contains the following subfields:
 
 + `entities`: A list of objects, each one composed of the following subfields:
     + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
-      time, but at least one of them must be present.
+      time, but one of them must be present.
     + `type` or `typePattern`: Type or pattern of the affected entities. Both cannot be used at
       the same time. If omitted, it means "any entity type".
-+ `attributes`: List of attributes to be provided (if not specified, all attributes).
++ `attrs`: List of attributes to be provided (if not specified, all attributes).
++ `expression`: By means of a filtering expression, allows to express what is the scope of the data provided.
+Currently only geographical scopes are supported through the following subterms:
+    + `georel` : Any of the geographical relationships as specified by the Geoqueries section of this specification. 
+    + `geometry` : Any of the supported geometries as specified by the Geoqueries section of this specification. 
+    + `coords` : String representation of coordinates as specified by the Geoqueries section of this specification. 
+
+The `forwardingInformation` field contains the following subfields:
+
++ `timesSent` (not editable, only present in GET operations): Number of request forwardings sent due to this registration.
++ `lastForwarding` (not editable, only present in GET operations): Last forwarding timestamp in ISO8601 format.
++ `lastFailure` (not editable, only present in GET operations): Last failure timestamp in ISO8601 format.
+Not present if registration has never had a problem with forwarding.
++ `lastSuccess` (not editable, only present in GET operations): Timestamp in ISO8601 format for last successful request forwarding.
+Not present if registration has never had a successful notification.
 
 ## Registration list [/v2/registrations]
 
-### Retrieve registrations [GET /v2/registrations]
+### Retrieve registrations [GET /v2/registrations{?limit,offset,options}]
 
 Lists all the registrations present in the system.
+
++ Parameters
+    + limit: 10 (optional, number) - Limit the number of registrations to be retrieved
+    + offset: 20 (optional, number) - Skip a number of registrations
+    + options (optional, string) - Options dictionary
+      + Members
+          + count - when used, the total number of registrations is returned in the HTTP header
+            `Fiware-Total-Count`
 
 Response:
 
@@ -2032,36 +2089,39 @@ Response:
         [
           {
             "id": "abcdefg",
-            "subject": {
+            "description": "Example Context Source",
+            "dataProvided": {
               "entities": [
                 {
                   "id": "Bcn_Welt",
                   "type": "Room"
                 }
               ],
-              "attributes": [
+              "attrs": [
                 "temperature"
               ]
             },
-            "callback": "http://weather.example.com/ngsi",
-            "metadata": {
-              "providingService": {
-                 "value": "weather.example.com",
-                 "type": "Text"
-               },
-              "providingAuthority": {
-                 "value": "AEMET - Spain",
-                 "type": "Text"
-               }
+            "provider": {
+              "http": {
+                "url": "http://contextsource.example.org"
+              },
+              "supportedForwardingMode": "all"
             },
-            "duration": "PT1M"
+            "expires": "2017-10-31T12:00:00",
+            "status": "active",
+            "forwardingInformation": {
+              "timesSent": 12,
+              "lastForwarding": "2017-10-06T16:00:00.00Z",
+              "lastSuccess": "2017-10-06T16:00:00.00Z",
+              "lastFailure": "2017-10-05T16:00:00.00Z"
+            }
           }
         ]
 
 ### Create a new context provider registration [POST /v2/registrations]
 
-Creates a new registration. This is typically used for associating context providers
-to certain data.
+Creates a new registration. This is typically used for binding context sources
+as providers of certain data.
 The registration is represented by a JSON object as described at the beginning of this section.
 
 Response:
@@ -2073,24 +2133,23 @@ Response:
 + Request (application/json)
 
         {
-          "subject": {
+          "description": "Relative Humidity Context Source",
+          "dataProvided": {
             "entities": [
               {
                 "id": "room2",
                 "type": "Room"
               }
             ],
-            "attributes": [
-              "humidity"
+            "attrs": [
+              "relativeHumidity"
             ]
           },
-          "callback":  "http://localhost:1234",
-          "metadata" : {
-            "provider": {
-              "value": "example.com"
+          "provider": {
+            "http":{ 
+              "url": "http://localhost:1234"
             }
-          },
-          "duration": "PT1M"
+          }
         }
 
 + Response 201
@@ -2117,22 +2176,35 @@ Response:
 
 + Response 200 (application/json)
 
-        {
-          "id": "abcde",
-          "subject": {
-            "entities": [
-              {
-                "id": "room2",
-                "type": "Room"
-              }
-            ],
-            "attributes": [
-              "humidity"
-            ]
-          },
-          "callback":  "http://localhost:1234",
-          "duration": "PT1M"
-        }
+      {
+            "id": "abcdefg",
+            "description": "Example Context Source",
+            "dataProvided": {
+              "entities": [
+                {
+                  "id": "Bcn_Welt",
+                  "type": "Room"
+                }
+              ],
+              "attrs": [
+                "temperature"
+              ]
+            },
+            "provider": {
+              "http": {
+                "url": "http://contextsource.example.org"
+              },
+              "supportedForwardingMode": "all"
+            },
+            "expires": "2017-10-31T12:00:00",
+            "status": "failed",
+            "forwardingInformation": {
+              "timesSent": 12,
+              "lastForwarding": "2017-10-06T16:00:00.00Z",
+              "lastFailure": "2017-10-06T16:00:00.00Z",
+              "lastSuccess": "2017-10-05T18:25:00.00Z",
+            }
+      }      
 
 ### Update context provider registration [PATCH /v2/registrations/{registrationId}]
 
@@ -2150,7 +2222,7 @@ Response:
 + Request (application/json)
 
         {
-          "duration": "PT1M"
+            "expires": "2017-10-04T00:00:00"
         }
 
 + Response 204
@@ -2250,7 +2322,7 @@ The payload may contain the following elements (all of them optional):
 + `entities`: a list of entites to search for. Each element is represented by a JSON object with the
   following elements:
     + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
-      time, but at least one of them must be present.
+      time, but one of them must be present.
     + `type` or `typePattern`: Type or type pattern of the entities to search for. Both cannot be used at
       the same time. If omitted, it means "any entity type".
 + `attributes`: a list of attribute names to search for. If omitted, it means "all attributes".
@@ -2355,12 +2427,12 @@ operation. The payload is an object with two properties:
 
 + `actionType`, to specify the kind of register action to do: either CREATE, UPDATE, or DELETE.
 + `registrations`, an array of registrations, each one specified using the JSON registration 
-  representation format (described above). In the case of CREATE operation, the registration `id`
+  representation format (described above). In case of CREATE operation, the registration `id`
   must not be included.
 
 Response:
 
-* Successful operation uses 200 OK. In addition, in the case of successful CREATE, a list of IDs is
+* Successful operation uses 200 OK. In addition, in case of successful CREATE, a list of IDs is
   returned, each one corresponding to the ID of the element in the request payload and in that same
   order.
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
@@ -2420,7 +2492,7 @@ The payload may contain the following elements (all of them optional):
 + `entities`: a list of entites to search for. Each entity is represented by a JSON object with the
   following elements:
     + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
-      time, but at least one of them must be present.
+      time, but one of them must be present.
     + `type` or `typePattern`: Type or type pattern of the entities to search for. Both cannot be used at
       the same time. If omitted, it means "any entity type".
 + `attributes`: a list of attribute names to search for. If omitted, it means "all attributes".

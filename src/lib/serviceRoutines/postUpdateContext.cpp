@@ -61,7 +61,7 @@ static char* jsonPayloadClean(const char* payload)
 
 /* ****************************************************************************
 *
-* forwardsPending - 
+* forwardsPending -
 */
 static bool forwardsPending(UpdateContextResponse* upcrsP)
 {
@@ -72,11 +72,11 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
     for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
     {
       ContextAttribute* aP  = cerP->contextElement.contextAttributeVector[aIx];
-      
+
       if (aP->providingApplication.get() != "")
       {
         return true;
-      }      
+      }
     }
   }
 
@@ -87,7 +87,7 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 
 /* ****************************************************************************
 *
-* updateForward - 
+* updateForward -
 *
 * An entity/attribute has been found on some context provider.
 * We need to forward the update request to the context provider, indicated in upcrsP->contextProvider
@@ -137,7 +137,13 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   ciP->outMimeType  = JSON;
 
-  TIMED_RENDER(payload = upcrP->render(ciP->apiVersion, asJsonObject, ""));
+  //
+  // FIXME: Forwards are done using NGSIv1 only, for now
+  //        This will hopefully change soon ...
+  //        Once we implement forwards in NGSIv2, this render() should be like this:
+  //        TIMED_RENDER(payload = upcrP->render(ciP->apiVersion, asJsonObject, ""));
+  //
+  TIMED_RENDER(payload = upcrP->render(V1, asJsonObject));
 
   ciP->outMimeType  = outMimeType;
   cleanPayload      = (char*) payload.c_str();
@@ -207,8 +213,8 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   //
   // NOTE
   // When coming from a convenience operation, such as GET /v1/contextEntities/EID/attributes/attrName,
-  // the verb/method in ciP is GET. However, the parsing function expects a POST, as if it came from a 
-  // POST /v1/updateContext. 
+  // the verb/method in ciP is GET. However, the parsing function expects a POST, as if it came from a
+  // POST /v1/updateContext.
   // So, here we change the verb/method for POST.
   //
   ParseData parseData;
@@ -249,7 +255,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
     upcrsP->errorCode.fill(SccContextElementNotFound);
   }
 
-  
+
   //
   // 7. Freeing memory
   //
@@ -261,7 +267,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
 /* ****************************************************************************
 *
-* foundAndNotFoundAttributeSeparation - 
+* foundAndNotFoundAttributeSeparation -
 *
 * Examine the response from mongo to find out what has really happened ...
 *
@@ -321,7 +327,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
       cerP->statusCode.fill(SccOk);
 
       //
-      // And, pushing to NotFound-vector 
+      // And, pushing to NotFound-vector
       //
       notFoundV.push_back(notFoundCerP);
 
@@ -380,7 +386,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     }
   }
 
-  
+
   //
   // Add entityId::id to details if Not Found and only one element in response.
   // And, if 0 elements in response, take entityId::id from the request.
@@ -397,7 +403,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     }
   }
 }
-  
+
 
 
 /* ****************************************************************************
@@ -459,13 +465,14 @@ std::string postUpdateContext
     upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
     alarmMgr.badInput(clientIp, "more than one service path for an update request");
 
-    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject, ""));
+    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject));
     upcrP->release();
+
     return answer;
   }
   else if (ciP->servicePathV[0] == "")
   {
-    ciP->servicePathV[0] = DEFAULT_SERVICE_PATH_UPDATES;
+    ciP->servicePathV[0] = SERVICE_PATH_ROOT;
   }
 
   std::string res = servicePathCheck(ciP->servicePathV[0].c_str());
@@ -473,7 +480,7 @@ std::string postUpdateContext
   {
     upcrsP->errorCode.fill(SccBadRequest, res);
 
-    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject, ""));
+    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject));
 
     upcrP->release();
     return answer;
@@ -485,9 +492,18 @@ std::string postUpdateContext
   //
   upcrsP->errorCode.fill(SccOk);
   attributesToNotFound(upcrP);
-  
+
   HttpStatusCode httpStatusCode;
-  TIMED_MONGO(httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->httpHeaders.correlator, ciP->apiVersion, ngsiV2Flavour));
+  TIMED_MONGO(httpStatusCode = mongoUpdateContext(upcrP,
+                                                  upcrsP,
+                                                  ciP->tenant,
+                                                  ciP->servicePathV,
+                                                  ciP->uriParam,
+                                                  ciP->httpHeaders.xauthToken,
+                                                  ciP->httpHeaders.correlator,
+                                                  ciP->httpHeaders.ngsiv2AttrsFormat,
+                                                  ciP->apiVersion,
+                                                  ngsiV2Flavour));
 
   if (ciP->httpStatusCode != SccCreated)
   {
@@ -506,7 +522,7 @@ std::string postUpdateContext
   bool forwarding = forwardsPending(upcrsP);
   if (forwarding == false)
   {
-    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject, ""));
+    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject));
 
     upcrP->release();
     return answer;
@@ -546,7 +562,7 @@ std::string postUpdateContext
   //
   // 05. Forwards necessary - sort parts in outgoing requestV
   //     requestV is a vector of UpdateContextRequests and each Context Provider
-  //     will have a slot in the vector. 
+  //     will have a slot in the vector.
   //     When a ContextElementResponse is found in the output from mongoUpdateContext, a
   //     UpdateContextRequest is to be found/created and inside that UpdateContextRequest
   //     a ContextElement for the Entity of the ContextElementResponse.
@@ -573,7 +589,7 @@ std::string postUpdateContext
       for (unsigned int aIx = 0; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
       {
         ContextAttribute* aP = cerP->contextElement.contextAttributeVector[aIx];
-        
+
         //
         // 0. If the attribute is 'not-found' - just add the attribute to the outgoing response
         //
@@ -719,7 +735,7 @@ std::string postUpdateContext
   {
     // Note that v2 case doesn't use an actual response (so no need to waste time rendering it).
     // We render in the v1 case only
-    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, ""));
+    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject));
   }
 
   //

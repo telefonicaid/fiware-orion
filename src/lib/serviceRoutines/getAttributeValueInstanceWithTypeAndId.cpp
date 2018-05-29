@@ -43,7 +43,7 @@
 
 /* ****************************************************************************
 *
-* getAttributeValueInstanceWithTypeAndId - 
+* getAttributeValueInstanceWithTypeAndId -
 *
 * GET /v1/contextEntities/type/{entity::type}/id/{entity::id}/attributes/{attribute::name}/{metaID}
 *
@@ -104,7 +104,7 @@ std::string getAttributeValueInstanceWithTypeAndId
   {
     response.statusCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
-  }  
+  }
   else if ((entityTypeFromParam != "") && (entityTypeFromParam != entityTypeFromPath))
   {
     response.statusCode.fill(SccBadRequest, "non-matching entity::types in URL");
@@ -124,7 +124,7 @@ std::string getAttributeValueInstanceWithTypeAndId
     response.fill(&parseDataP->qcrs.res, entityId, entityTypeFromPath, attributeName, metaID);
   }
 
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, AttributeValueInstance, ""));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, AttributeValueInstance));
 
   parseDataP->qcr.res.release();
   parseDataP->qcrs.res.release();

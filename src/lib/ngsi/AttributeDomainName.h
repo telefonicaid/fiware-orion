@@ -42,15 +42,12 @@ typedef struct AttributeDomainName
   void          set(const std::string& value);
   std::string   get(void);
   bool          isEmpty(void);
-  std::string   render(const std::string& indent, bool comma = false);
+  std::string   render(bool comma);
   void          present(const std::string& indent);
   const char*   c_str();
   void          release(void);
   void          fill(const AttributeDomainName& adn);
-  std::string   check(RequestType         requestType,
-                      const std::string&  indent,
-                      const std::string&  predetectedError,
-                      int                 counter);
+  std::string   check(void);
 } AttributeDomainName;
 
 #endif  // SRC_LIB_NGSI_ATTRIBUTEDOMAINNAME_H_

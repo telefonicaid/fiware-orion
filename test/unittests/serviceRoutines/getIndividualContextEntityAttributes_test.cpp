@@ -22,32 +22,40 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
+#include "unittests/unittest.h"
+
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/getIndividualContextEntityAttributes.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
-
-#include "unittest.h"
+#include "rest/rest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs - 
+* service vectors -
 */
-static RestService rs[] = 
+static RestService getV[] =
 {
-  { "GET",    IndividualContextEntityAttributes,     4, { "ngsi10", "contextEntities", "*", "attributes"       }, "", getIndividualContextEntityAttributes      },
-  { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
-  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { IndividualContextEntityAttributes, 4, { "ngsi10", "contextEntities", "*", "attributes" }, "", getIndividualContextEntityAttributes },
+  { InvalidRequest,                    0, {                                                }, "", NULL                                 }
+};
+
+static RestService badVerbV[] =
+{
+  { InvalidRequest,   0, { "*", "*", "*", "*", "*", "*"                   }, "", badRequest                           },
+  { InvalidRequest,   0, {                                                }, "", NULL                                 }
 };
 
 
 
 /* ****************************************************************************
 *
-* notFound - 
+* notFound -
 */
 TEST(getIndividualContextEntityAttributes, notFound)
 {
@@ -58,9 +66,13 @@ TEST(getIndividualContextEntityAttributes, notFound)
   utInit();
 
   ci.outMimeType = JSON;
-  out            = restService(&ci, rs);
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
+  out = orionServe(&ci);
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf,
+                                   sizeof(expectedBuf),
+                                   outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

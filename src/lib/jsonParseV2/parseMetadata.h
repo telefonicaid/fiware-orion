@@ -25,11 +25,11 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "rapidjson/document.h"
 
 #include "ngsi/Metadata.h"
-
-using namespace rapidjson;
 
 
 
@@ -37,6 +37,6 @@ using namespace rapidjson;
 *
 * parseMetadata - 
 */
-extern std::string parseMetadata(const Value& iter, Metadata* caP);
+extern std::string parseMetadata(const rapidjson::Value& iter, Metadata* caP);
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSEMETADATA_H_

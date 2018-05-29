@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <sys/types.h>
 
+#include <string>
+
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -42,7 +44,16 @@
 #include "alarmMgr/alarmMgr.h"
 #include "logSummary/logSummary.h"
 
-#include "unittest.h"
+#include "unittests/unittest.h"
+
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using ::testing::_;
+
 
 
 /* ****************************************************************************
@@ -56,6 +67,7 @@ int           subCacheInterval      = 10;
 unsigned int  cprForwardLimit       = 1000;
 bool          noCache               = false;
 bool          insecureNotif         = false;
+bool          ngsiv1Autocast        = false;
 char          fwdHost[64];
 char          notificationMode[64];
 bool          simulatedNotification;
@@ -67,14 +79,13 @@ char          rplSet[64];
 char          dbName[64];
 char          user[64];
 char          pwd[64];
-long          dbTimeout;
+int64_t       dbTimeout;
 int           dbPoolSize;
 int           writeConcern;
 char          gtest_filter[1024];
 char          gtest_output[1024];
 
-// we don't need the full descriptions for unit test binary
-#define  NULL_DESC ""
+
 
 /* ****************************************************************************
 *
@@ -82,16 +93,16 @@ char          gtest_output[1024];
 */
 PaArgument paArgs[] =
 {
-  { "-dbhost",         dbHost,        "DB_HOST",        PaString, PaOpt, (int64_t) "localhost",  PaNL,   PaNL,  NULL_DESC },
-  { "-rplSet",         rplSet,        "RPL_SET",        PaString, PaOpt, (int64_t) "",           PaNL,   PaNL,  NULL_DESC },
-  { "-dbuser",         user,          "DB_USER",        PaString, PaOpt, (int64_t) "",           PaNL,   PaNL,  NULL_DESC },
-  { "-dbpwd",          pwd,           "DB_PASSWORD",    PaString, PaOpt, (int64_t) "",           PaNL,   PaNL,  NULL_DESC },
-  { "-db",             dbName,        "DB",             PaString, PaOpt, (int64_t) "orion",      PaNL,   PaNL,  NULL_DESC },
-  { "-dbTimeout",      &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,                  PaNL,   PaNL,  NULL_DESC },
-  { "-dbPoolSize",     &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,                     1,      10000, NULL_DESC },
-  { "-writeConcern",   &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,                      0,      1,     NULL_DESC },
-  { "--gtest_filter=", gtest_filter,  "",               PaString, PaOpt, (int64_t) "",           PaNL,   PaNL,  NULL_DESC },
-  { "--gtest_output=", gtest_output,  "",               PaString, PaOpt, (int64_t) "",           PaNL,   PaNL,  NULL_DESC },
+  { "-dbhost",         dbHost,        "DB_HOST",        PaString, PaOpt, (int64_t) "localhost",  PaNL, PaNL,  "" },
+  { "-rplSet",         rplSet,        "RPL_SET",        PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
+  { "-dbuser",         user,          "DB_USER",        PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
+  { "-dbpwd",          pwd,           "DB_PASSWORD",    PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
+  { "-db",             dbName,        "DB",             PaString, PaOpt, (int64_t) "orion",      PaNL, PaNL,  "" },
+  { "-dbTimeout",      &dbTimeout,    "DB_TIMEOUT",     PaInt64,  PaOpt, 10000,                  PaNL, PaNL,  "" },
+  { "-dbPoolSize",     &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,                     1,    10000, "" },
+  { "-writeConcern",   &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,                      0,    1,     "" },
+  { "--gtest_filter=", gtest_filter,  "",               PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
+  { "--gtest_output=", gtest_output,  "",               PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
 
   PA_END_OF_ARGS
 };

@@ -30,7 +30,7 @@
 
 /* ****************************************************************************
 *
-* jsonRender - 
+* jsonRender -
 */
 TEST(UpdateContextResponse, jsonRender)
 {
@@ -77,7 +77,7 @@ TEST(UpdateContextResponse, jsonRender)
   ucrP->errorCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  out = ucrP->render(V1, false, "");
+  out = ucrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -85,7 +85,7 @@ TEST(UpdateContextResponse, jsonRender)
   // Test 02. UpdateContextResponse::errorCode NOT OK and contextElementResponseVector filled id (with details)
   ucrP->errorCode.fill(SccBadRequest, "no details");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  out = ucrP->render(V1, false, "");
+  out = ucrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
   ucrP->errorCode.fill(SccOk); // Cleanup
 
@@ -97,9 +97,9 @@ TEST(UpdateContextResponse, jsonRender)
   cerP->contextElement.entityId.fill("E01", "EType", "false");
   cerP->statusCode.fill(SccOk);
   ucrP->contextElementResponseVector.push_back(cerP);
-  
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
-  out = ucrP->render(V1, false, "");
+  out = ucrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -109,7 +109,7 @@ TEST(UpdateContextResponse, jsonRender)
   cerP->contextElement.domainMetadataVector.push_back(mdP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename4)) << "Error getting test data from '" << filename4 << "'";
-  out = ucrP->render(V1, false, "");
+  out = ucrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -120,19 +120,19 @@ TEST(UpdateContextResponse, jsonRender)
   cerP->contextElement.contextAttributeVector.push_back(caP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename5)) << "Error getting test data from '" << filename5 << "'";
-  out = ucrP->render(V1, false, "");
+  out = ucrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  
+
 
   // Test 06. ContextElement: +entityId -attributeDomainName +contextAttributeVector +domainMetadataVector
   mdP = new Metadata("md6", "string", "FIN6");
   cerP->contextElement.domainMetadataVector.push_back(mdP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename6)) << "Error getting test data from '" << filename6 << "'";
-  out = ucrP->render(V1, false, "");
+  out = ucrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
-  
+
 
   // Test 07. ContextElement: +entityId +attributeDomainName -contextAttributeVector -domainMetadataVector
   cerP->contextElement.domainMetadataVector.release();
@@ -140,7 +140,7 @@ TEST(UpdateContextResponse, jsonRender)
   cerP->contextElement.attributeDomainName.set("AttrDomain");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename7)) << "Error getting test data from '" << filename7 << "'";
-  out = ucrP->render(V1, false, "");
+  out = ucrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -148,9 +148,9 @@ TEST(UpdateContextResponse, jsonRender)
   // Test 08. ContextElement: +entityId +attributeDomainName -contextAttributeVector +domainMetadataVector
   mdP = new Metadata("md8", "string", "FIN8");
   cerP->contextElement.domainMetadataVector.push_back(mdP);
-  
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename8)) << "Error getting test data from '" << filename8 << "'";
-  out = ucrP->render(V1, false, "");
+  out = ucrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -161,7 +161,7 @@ TEST(UpdateContextResponse, jsonRender)
   cerP->contextElement.contextAttributeVector.push_back(caP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename9)) << "Error getting test data from '" << filename9 << "'";
-  out = ucrP->render(V1, false, "");
+  out = ucrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -171,7 +171,7 @@ TEST(UpdateContextResponse, jsonRender)
   cerP->contextElement.domainMetadataVector.push_back(mdP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename10)) << "Error getting test data from '" << filename10 << "'";
-  out = ucrP->render(V1, false, "");
+  out = ucrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -181,7 +181,7 @@ TEST(UpdateContextResponse, jsonRender)
   cerP->contextElement.contextAttributeVector.push_back(caP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename11)) << "Error getting test data from '" << filename11 << "'";
-  out = ucrP->render(V1, false, "");
+  out = ucrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -191,7 +191,7 @@ TEST(UpdateContextResponse, jsonRender)
   cerP->contextElement.domainMetadataVector.push_back(mdP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename12)) << "Error getting test data from '" << filename12 << "'";
-  out = ucrP->render(V1, false, "");
+  out = ucrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -204,7 +204,7 @@ TEST(UpdateContextResponse, jsonRender)
   ucrP->contextElementResponseVector.push_back(cerP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename13)) << "Error getting test data from '" << filename13 << "'";
-  out = ucrP->render(V1, false, "");
+  out = ucrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -30,7 +32,7 @@
 #include "ngsi/Request.h"
 #include "rest/ConnectionInfo.h"
 
-#include "unittest.h"
+#include "unittests/unittest.h"
 
 
 
@@ -40,21 +42,25 @@
 */
 TEST(jsonRequest, jsonTreat)
 {
-   ConnectionInfo  ci("/ngsi9/registerContext", "POST", "1.1");
-   ParseData       parseData;
-   std::string     out;
-   const char*     outfile1 = "orion.jsonRequest.jsonTreat.valid.json";
+  ConnectionInfo  ci("/ngsi9/registerContext", "POST", "1.1");
+  ParseData       parseData;
+  std::string     out;
+  const char*     outfile1 = "orion.jsonRequest.jsonTreat.valid.json";
 
-   utInit();
+  utInit();
 
-   ci.outMimeType  = JSON;
-   ci.apiVersion   = V1;
-   out  = jsonTreat("non-empty content", &ci, &parseData, InvalidRequest, "", NULL);
-   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-   EXPECT_STREQ(expectedBuf, out.c_str());
+  ci.outMimeType  = JSON;
+  ci.apiVersion   = V1;
 
-   out  = jsonTreat("", &ci, &parseData, InvalidRequest, "", NULL);
-   EXPECT_STREQ("OK", out.c_str());
+  out  = jsonTreat("non-empty content", &ci, &parseData, InvalidRequest, "", NULL);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf,
+                                   sizeof(expectedBuf),
+                                   outfile1)) << "Error getting test data from '" << outfile1 << "'";
 
-   utExit();
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  out  = jsonTreat("", &ci, &parseData, InvalidRequest, "", NULL);
+  EXPECT_STREQ("OK", out.c_str());
+
+  utExit();
 }

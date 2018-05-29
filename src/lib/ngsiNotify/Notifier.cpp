@@ -52,8 +52,8 @@
 Notifier::~Notifier (void)
 {
   // FIXME: This destructor is needed to avoid warning message.
-  // Compilation fails when a warning occurs, and it is enabled 
-  // compilation option -Werror "warnings being treated as errors" 
+  // Compilation fails when a warning occurs, and it is enabled
+  // compilation option -Werror "warnings being treated as errors"
   LM_T(LmtNotImplemented, ("Notifier destructor is not implemented"));
 }
 
@@ -76,11 +76,20 @@ void Notifier::sendNotifyContextRequest
 )
 {
   pthread_t                         tid;
-  std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncrP, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blackList);
+  std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncrP,
+                                                                          httpInfo,
+                                                                          tenant,
+                                                                          xauthToken,
+                                                                          fiwareCorrelator,
+                                                                          renderFormat,
+                                                                          attrsOrder,
+                                                                          metadataFilter,
+                                                                          blackList);
 
   if (!paramsV->empty()) // al least one param, an empty vector means an error occurred
   {
     int ret = pthread_create(&tid, NULL, startSenderThread, paramsV);
+
     if (ret != 0)
     {
       LM_E(("Runtime Error (error creating thread: %d)", ret));
@@ -115,7 +124,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
 )
 {
     /* Render NotifyContextAvailabilityRequest */
-    std::string payload = ncar->render("");
+    std::string payload = ncar->render();
 
     /* Parse URL */
     std::string  host;
@@ -143,7 +152,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
     params->protocol         = protocol;
     params->verb             = "POST";
     params->tenant           = tenant;
-    params->resource         = uriPath;   
+    params->resource         = uriPath;
     params->content_type     = content_type;
     params->content          = payload;
     params->mimeType         = JSON;
@@ -171,7 +180,6 @@ void Notifier::sendNotifyContextAvailabilityRequest
 /* ****************************************************************************
 *
 * buildSenderParamsCustom -
-*
 */
 static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 (
@@ -215,32 +223,51 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     //
     // 2. URL
     //
-    macroSubstitute(&url, httpInfo.url, ce);
+    if (macroSubstitute(&url, httpInfo.url, ce) == false)
+    {
+      // Warning already logged in macroSubstitute()
+      return paramsV;  // empty vector
+    }
 
 
     //
     // 3. Payload
     //
-
     if (httpInfo.payload == "")
     {
       NotifyContextRequest   ncr;
       ContextElementResponse cer;
 
-      cer.contextElement = ce;
-      ncr.subscriptionId = subscriptionId;
+      cer.contextElement  = ce;
+      cer.statusCode.code = SccOk;
+
+      ncr.subscriptionId  = subscriptionId;
       ncr.contextElementResponseVector.push_back(&cer);
-      payload  = ncr.toJson(renderFormat, attrsOrder, metadataFilter);
+
+      if (renderFormat == NGSI_V1_LEGACY)
+      {
+        payload = ncr.render(V1, false);
+      }
+      else
+      {
+        payload  = ncr.toJson(renderFormat, attrsOrder, metadataFilter);
+      }
+
       mimeType = "application/json";
     }
     else
     {
-      macroSubstitute(&payload, httpInfo.payload, ce);
+      if (macroSubstitute(&payload, httpInfo.payload, ce) == false)
+      {
+        // Warning already logged in macroSubstitute()
+        return paramsV;  // empty vector
+      }
+
       char* pload  = curl_unescape(payload.c_str(), payload.length());
       payload      = std::string(pload);
       renderFormat = NGSI_V2_CUSTOM;
       mimeType     = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
-      free(pload);
+      curl_free(pload);
     }
 
 
@@ -252,8 +279,12 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       std::string key   = it->first;
       std::string value = it->second;
 
-      macroSubstitute(&key,   it->first, ce);
-      macroSubstitute(&value, it->second, ce);
+      if ((macroSubstitute(&key, it->first, ce) == false) || (macroSubstitute(&value, it->second, ce) == false))
+      {
+        // Warning already logged in macroSubstitute()
+        return paramsV;  // empty vector
+      }
+
       if ((value == "") || (key == ""))
       {
         // To avoid e.g '?a=&b=&c='
@@ -271,8 +302,11 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       std::string key   = it->first;
       std::string value = it->second;
 
-      macroSubstitute(&key,   it->first, ce);
-      macroSubstitute(&value, it->second, ce);
+      if ((macroSubstitute(&key, it->first, ce) == false) || (macroSubstitute(&value, it->second, ce) == false))
+      {
+        // Warning already logged in macroSubstitute()
+        return paramsV;  // empty vector
+      }
 
       if (key == "")
       {
@@ -280,6 +314,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         continue;
       }
 
+      std::transform(key.begin(), key.end(), key.begin(), ::tolower);
       headers[key] = value;
     }
 
@@ -295,7 +330,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     if (!parseUrl(url, host, port, uriPath, protocol))
     {
       LM_E(("Runtime Error (not sending NotifyContextRequest: malformed URL: '%s')", httpInfo.url.c_str()));
-      return paramsV;  //empty vector
+      return paramsV;  // empty vector
     }
 
 
@@ -321,7 +356,6 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       }
     }
 
-
     SenderThreadParams*  params = new SenderThreadParams();
 
     params->ip               = host;
@@ -339,6 +373,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     params->fiwareCorrelator = fiwareCorrelator;
     params->extraHeaders     = headers;
     params->registration     = false;
+    params->subscriptionId   = subscriptionId.get();
 
     paramsV->push_back(params);
   }
@@ -369,7 +404,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     Verb                              verb    = httpInfo.verb;
     std::vector<SenderThreadParams*>* paramsV = NULL;
 
-
     if ((verb == NOVERB) || (verb == UNKNOWNVERB) || disableCusNotif)
     {
       // Default verb/method (or the one in case of disabled custom notifications) is POST
@@ -393,15 +427,15 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     //
     if (httpInfo.custom && !disableCusNotif)
     {
-        return buildSenderParamsCustom(ncrP->subscriptionId,
-                       ncrP->contextElementResponseVector,
-                       httpInfo,
-                       tenant,
-                       xauthToken,
-                       fiwareCorrelator,
-                       renderFormat,
-                       attrsOrder,
-                       metadataFilter);
+      return buildSenderParamsCustom(ncrP->subscriptionId,
+                                     ncrP->contextElementResponseVector,
+                                     httpInfo,
+                                     tenant,
+                                     xauthToken,
+                                     fiwareCorrelator,
+                                     renderFormat,
+                                     attrsOrder,
+                                     metadataFilter);
     }
 
     paramsV = new std::vector<SenderThreadParams*>();
@@ -444,7 +478,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     std::string payloadString;
     if (renderFormat == NGSI_V1_LEGACY)
     {
-      payloadString = ncrP->render(ci.apiVersion, ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON, "");
+      bool asJsonObject = (ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON);
+      payloadString = ncrP->render(ci.apiVersion, asJsonObject);
     }
     else
     {

@@ -38,7 +38,7 @@
 
 /* ****************************************************************************
 *
-* QueryContextResponse::QueryContextResponse - 
+* QueryContextResponse::QueryContextResponse -
 */
 QueryContextResponse::QueryContextResponse()
 {
@@ -49,7 +49,7 @@ QueryContextResponse::QueryContextResponse()
 
 /* ****************************************************************************
 *
-* QueryContextResponse::QueryContextResponse - 
+* QueryContextResponse::QueryContextResponse -
 */
 QueryContextResponse::QueryContextResponse(StatusCode& _errorCode)
 {
@@ -61,7 +61,7 @@ QueryContextResponse::QueryContextResponse(StatusCode& _errorCode)
 
 /* ****************************************************************************
 *
-* QueryContextResponse::QueryContextResponse - 
+* QueryContextResponse::QueryContextResponse -
 */
 QueryContextResponse::QueryContextResponse(EntityId* eP, ContextAttribute* aP)
 {
@@ -69,7 +69,7 @@ QueryContextResponse::QueryContextResponse(EntityId* eP, ContextAttribute* aP)
   ContextAttribute*       caP  = new ContextAttribute(aP);
 
   cerP->contextElement.entityId.fill(eP);
-  cerP->contextElement.contextAttributeVector.push_back(caP);  
+  cerP->contextElement.contextAttributeVector.push_back(caP);
   cerP->statusCode.fill(SccOk);
 
   contextElementResponseVector.push_back(cerP);
@@ -92,13 +92,13 @@ QueryContextResponse::~QueryContextResponse()
 
 /* ****************************************************************************
 *
-* QueryContextResponse::render - 
+* QueryContextResponse::render -
 */
-std::string QueryContextResponse::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
+std::string QueryContextResponse::render(ApiVersion apiVersion, bool asJsonObject)
 {
   std::string  out               = "";
   bool         errorCodeRendered = false;
-  
+
   //
   // 01. Decide whether errorCode should be rendered
   //
@@ -122,18 +122,18 @@ std::string QueryContextResponse::render(ApiVersion apiVersion, bool asJsonObjec
 
 
   //
-  // 02. render 
+  // 02. render
   //
-  out += startTag(indent);
+  out += startTag();
 
   if (contextElementResponseVector.size() > 0)
   {
-    out += contextElementResponseVector.render(apiVersion, asJsonObject, QueryContext, indent + "  ", errorCodeRendered);
+    out += contextElementResponseVector.render(apiVersion, asJsonObject, QueryContext, errorCodeRendered);
   }
 
   if (errorCodeRendered == true)
   {
-    out += errorCode.render(indent + "  ");
+    out += errorCode.render(false);
   }
 
 
@@ -147,10 +147,10 @@ std::string QueryContextResponse::render(ApiVersion apiVersion, bool asJsonObjec
   {
     LM_W(("Internal Error (Both error-code and response vector empty)"));
     errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
-    out += errorCode.render(indent + "  ");
+    out += errorCode.render(false);
   }
 
-  out += endTag(indent);
+  out += endTag();
 
   return out;
 }
@@ -161,7 +161,7 @@ std::string QueryContextResponse::render(ApiVersion apiVersion, bool asJsonObjec
 *
 * QueryContextResponse::check -
 */
-std::string QueryContextResponse::check(ApiVersion apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError)
+std::string QueryContextResponse::check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError)
 {
   std::string  res;
 
@@ -169,7 +169,7 @@ std::string QueryContextResponse::check(ApiVersion apiVersion, bool asJsonObject
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextElementResponseVector.check(apiVersion, QueryContext, indent, predetectedError, 0)) != "OK")
+  else if ((res = contextElementResponseVector.check(apiVersion, QueryContext, predetectedError, 0)) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     errorCode.fill(SccBadRequest, res);
@@ -179,7 +179,7 @@ std::string QueryContextResponse::check(ApiVersion apiVersion, bool asJsonObject
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, indent);
+  return render(apiVersion, asJsonObject);
 }
 
 
@@ -211,7 +211,7 @@ void QueryContextResponse::release(void)
 
 /* ****************************************************************************
 *
-* QueryContextResponse::fill - 
+* QueryContextResponse::fill -
 */
 void QueryContextResponse::fill(QueryContextResponse* qcrsP)
 {
@@ -231,7 +231,7 @@ void QueryContextResponse::fill(QueryContextResponse* qcrsP)
 
 /* ****************************************************************************
 *
-* QueryContextResponse::clone - 
+* QueryContextResponse::clone -
 */
 QueryContextResponse* QueryContextResponse::clone(void)
 {

@@ -125,7 +125,6 @@ static std::string attribute(const std::string& path, const std::string& value, 
 {
   LM_T(LmtParse, ("Creating an attribute"));
   parseDataP->qcrs.attributeP = new ContextAttribute();
-  parseDataP->qcrs.attributeP->valueType = orion::ValueTypeNone;
   parseDataP->qcrs.cerP->contextElement.contextAttributeVector.push_back(parseDataP->qcrs.attributeP);
   return "OK";
 }
@@ -221,6 +220,7 @@ static std::string attributeMetadataValue(const std::string& path, const std::st
 {
   LM_T(LmtParse, ("Got an attributeMetadata value: '%s'", value.c_str()));
   parseDataP->qcrs.metadataP->stringValue = value;
+  parseDataP->qcrs.metadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 
@@ -274,6 +274,7 @@ static std::string domainMetadataValue(const std::string& path, const std::strin
 {
   LM_T(LmtParse, ("Got a domainMetadata value: '%s'", value.c_str()));
   parseDataP->qcrs.domainMetadataP->stringValue = value;
+  parseDataP->qcrs.domainMetadataP->valueType =orion::ValueTypeString;
   return "OK";
 }
 
@@ -446,7 +447,7 @@ void jsonQcrsRelease(ParseData* reqDataP)
 std::string jsonQcrsCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-  return reqDataP->qcrs.res.check(ciP->apiVersion,asJsonObject, "", reqDataP->errorString);
+  return reqDataP->qcrs.res.check(ciP->apiVersion,asJsonObject, reqDataP->errorString);
 }
 
 

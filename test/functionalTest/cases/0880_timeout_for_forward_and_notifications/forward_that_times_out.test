@@ -142,7 +142,7 @@ echo
 01. Register E1/T1/A1 on CB with accumulator as ContextProvider
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -156,7 +156,7 @@ Date: REGEX(.*)
 02. Update/UPDATE E1/T1/A1 on CB (provoking forward to accumulator)
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 137
+Content-Length: 106
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -182,7 +182,7 @@ Date: REGEX(.*)
 05. Query E1/T1/A1 on CB (provoking forward to accumulator)
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 136
+Content-Length: 105
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

@@ -136,6 +136,15 @@ grep "tests" MANIFEST > MANIFEST.broker-tests
 
 %changelog
 
+
+# The contextBroker-test package is still taken into account, although it is very old and probably obsolete. If we
+# recover it in the future, dependencies and so on need to be reviewed. The following fragment (removed from
+# install documentation) could be useful:
+#
+#    The contextBroker-test package (optional) depends on the following packages: python, python-flask, 
+#    python-jinja2, curl, libxml2, libxslt, nc, mongo-10gen and contextBroker. The mongo-10gen dependency needs 
+#    to configure MongoDB repository, check [this piece of documentation about that](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/).
+#
 %package tests
 Requires: %{name}, python, python-flask, python-jinja2, nc, curl, libxml2, mongo-10gen 
 Summary: Test suite for %{name}
@@ -164,6 +173,57 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Mon Apr 16 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.13.0-1
+- Add: support for GET /v2/registrations (#3005)
+- Add: support for GET /v2/registrations/<registration-id> (#3008)
+- Add: support for POST /v2/registrations to create registrations in APIv2 (#3004)
+- Add: support for DELETE /v2/registrations/<registration-id> (#3006)
+- Add: support for CORS requests for /v2/registrations and /v2/registrations/<registration-id> (#3049)
+- Hardening: refactor request routing logic (#3109, step 1)
+- Bug that may lead contextBroker to crash when passing null character "\u0000" with ID parameter in query context payload (#3119)
+- Add: CORS Preflight Requests support for /version (#3066)
+- Deprecated: ID metadata (and associated NGSIv1 operations)
+
+* Wed Feb 21 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.12.0-1
+- Add: support for entity id and type in orderBy parameter (#2934)
+- Add: NGSIv1 autocast for numbers, booleans and dates (using flag -ngsiv1Autocast) (#3112)
+
+* Wed Feb 14 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.11.0-1
+- Reference distribution changed from RHEL/CentOS 6 to RHEL/CentOS 7
+- Add: new BROKER_LOG_LEVEL variable at /etc/config/contextBroker to set log level
+- Add: new GENERATE_COREDUMP variable at /etc/config/contextBroker to enable core generation and archiving (useful for debugging)
+- Add: handler for SIGHUP termination signal
+- Fix: using SIGTERM instead of SIGHUP for stopping broker in init.d service script
+- Fix: Invalid description in POST /op/query error response (#2991)
+- Fix: Bug that may cause contextBroker to crash when passing inappropriate parameter in query context payload (#3055)
+- Fix: Correct treatment of PID-file (#3075)
+
+* Mon Dec 11 2017 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.10.0-1
+- Add: CORS Preflight Requests support for all NGSIv2 resources, -corsMaxAge switch, CORS exposed headers (#501, #3030)
+- Fix: null not working in q/mq filter in subscriptions (#2998)
+- Fix: case-sensitive header duplication (e.g. "Content-Type" and "Content-type") in custom notifications (#2893)
+- Fix: bug in GTE and LTE operations in query filters (q/mq), both for GET operations and subscriptions (#2995)
+- Fix: Wrong "max one service-path allowed for subscriptions" in NGSIv2 subscription operation (#2948)
+
+* Thu Oct 19 2017 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.9.0-1
+- Add: release_date and doc fields are added to the GET /version output to align with FIWARE scheme (#2970)
+- Fix: missing lastSuccess/lastFailure associated to initial notification on subscription creation some times when csub cache is in use (#2974)
+- Fix: several invalid memory accesses (based on a workaround, not a definitive solution, see issue #2994)
+- Fix: broken JSON due to unscaped quotes (") in NGSIv2 error description field (#2955)
+- Hardening: NGSIv1 responses don't use pretty-print JSON format any longer, as NGSIv2 responses work (potentially saving around 50% size) (#2760)
+
+* Mon Sep 11 2017 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.8.0-1
+- Add: self-notification loop protection, based on Fiware-Correlator and Ngsiv2-AttrsFormat headers and lastCorrelator field at DB (#2937)
+- Add: Fiware-Correlator and NgsiV2-AttrsFormat headers cannot be overwritten by the custom notification logic (#2937)
+- Fix: several invalid memory accesses
+- Fix: bug in parseArg lib that may cause problem printing the error message for wrong CLI usage (#2926)
+- Fix: bug in variable substitution of custom notifications that limited the size of the payload of a custom notification to 1024 bytes (new limit: 8MB)
+- Fix: bug in custom notifications making counters and timestamps not being updated (affected subscription fields: lastSuccess, lastFailure, lastNotifiction, count)
+- Fix: "request payload too large" (>1MB) as Bad Input alarm (WARN log level)
+- Hardening: Several changes in argument passing in mongoBackend library to add 'const' in references to objects that are not altered by the function
+- Hardening: Several changes in argument passing in mongoBackend library to avoid passing entire objects on the stack, from "X x" to "const X& x"
+- Hardening: Mongo driver migrated to legacy-1.1.2 (several bugfixes in the legacy-1.0.7 to legacy-1.1.2 delta)
+
 * Wed Feb 08 2017 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.7.0-1
 - Add: HTTPS native notifications (#706), fixing at the same time issue #2844
 - Add: new option to accept self-signed certifications used by HTTPS notification endpoints: -insecureNotif (#706)
@@ -917,7 +977,7 @@ fi
 - REST interface for changing log and trace levels
 - Memory leak fixes
 
-* Mon Jun 04 2013 Fermín Galán <fermin@tid.es> 0.3.0-1 (FIWARE-2.3.3-1)
+* Tue Jun 04 2013 Fermín Galán <fermin@tid.es> 0.3.0-1 (FIWARE-2.3.3-1)
 - CLI argument -logAppend
 - Handlers for SIGUSR1 and SIGUSR2 signals to stop/resume logging
 - Handlers for SIGTERM and SIGINT signals for smart exiting

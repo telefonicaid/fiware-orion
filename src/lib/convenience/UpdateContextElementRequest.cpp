@@ -39,14 +39,14 @@
 *
 * render - 
 */
-std::string UpdateContextElementRequest::render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, std::string indent)
+std::string UpdateContextElementRequest::render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType)
 {
   std::string out = "";
 
-  out += startTag(indent);
-  out += attributeDomainName.render(indent + "  ", true);
-  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType, indent + "  ");
-  out += endTag(indent);
+  out += startTag();
+  out += attributeDomainName.render(true);
+  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType);
+  out += endTag();
 
   return out;
 }
@@ -72,7 +72,6 @@ std::string UpdateContextElementRequest::check
   ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
-  std::string         indent,
   const std::string&  predetectedError     // Predetected Error, normally during parsing
 )
 {
@@ -92,7 +91,7 @@ std::string UpdateContextElementRequest::check
     return "OK";
   }
 
-  return response.render(apiVersion, asJsonObject, requestType, indent);
+  return response.render(apiVersion, asJsonObject, requestType);
 }
 
 
@@ -101,7 +100,7 @@ std::string UpdateContextElementRequest::check
 *
 * present - 
 */
-void UpdateContextElementRequest::present(std::string indent)
+void UpdateContextElementRequest::present(const std::string&  indent)
 {
   attributeDomainName.present(indent);
   contextAttributeVector.present(indent);

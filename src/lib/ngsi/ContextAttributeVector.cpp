@@ -290,13 +290,12 @@ std::string ContextAttributeVector::toJson
 */
 std::string ContextAttributeVector::render
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         request,
-  const std::string&  indent,
-  bool                comma,
-  bool                omitValue,
-  bool                attrsAsName
+  ApiVersion   apiVersion,
+  bool         asJsonObject,
+  RequestType  request,
+  bool         comma,
+  bool         omitValue,
+  bool         attrsAsName
 )
 {
   std::string out = "";
@@ -338,35 +337,35 @@ std::string ContextAttributeVector::render
     // 2. Now it's time to render
     // Note that in the case of attribute as name, we have to use a vector, thus using
     // attrsAsName variable as value for isVector parameter
-    out += startTag(indent, "attributes", attrsAsName);
+    out += startTag("attributes", attrsAsName);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       if (attrsAsName)
       {
-        out += vec[ix]->renderAsNameString(indent + "  ", ix != vec.size() - 1);
+        out += vec[ix]->renderAsNameString(ix != vec.size() - 1);
       }
       else
       {
-        out += vec[ix]->render(apiVersion, asJsonObject, request, indent + "  ", ix != vec.size() - 1, omitValue);
+        out += vec[ix]->render(apiVersion, asJsonObject, request, ix != vec.size() - 1, omitValue);
       }
     }
-    out += endTag(indent, comma, attrsAsName);
+    out += endTag(comma, attrsAsName);
   }
   else
   {
-    out += startTag(indent, "attributes", true);
+    out += startTag("attributes", true);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       if (attrsAsName)
       {
-        out += vec[ix]->renderAsNameString(indent + "  ", ix != vec.size() - 1);
+        out += vec[ix]->renderAsNameString(ix != vec.size() - 1);
       }
       else
       {
-        out += vec[ix]->render(apiVersion, asJsonObject, request, indent + "  ", ix != vec.size() - 1, omitValue);
+        out += vec[ix]->render(apiVersion, asJsonObject, request, ix != vec.size() - 1, omitValue);
       }
     }
-    out += endTag(indent, comma, true);
+    out += endTag(comma, true);
   }
 
   return out;
@@ -433,6 +432,8 @@ void ContextAttributeVector::push_back(ContextAttributeVector* aVec)
     vec.push_back(new ContextAttribute((*aVec)[ix]));
   }
 }
+
+
 
 /* ****************************************************************************
 *

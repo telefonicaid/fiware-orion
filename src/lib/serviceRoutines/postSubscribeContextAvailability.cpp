@@ -39,7 +39,7 @@
 
 /* ****************************************************************************
 *
-* postSubscribeContextAvailability - 
+* postSubscribeContextAvailability -
 */
 std::string postSubscribeContextAvailability
 (
@@ -50,14 +50,14 @@ std::string postSubscribeContextAvailability
 )
 {
   SubscribeContextAvailabilityResponse  scar;
-  std::string                           answer;  
+  std::string                           answer;
 
   TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContextAvailability(&parseDataP->scar.res,
                                                                       &scar,
                                                                       ciP->uriParam,
                                                                       ciP->httpHeaders.correlator,
                                                                       ciP->tenant));
-  TIMED_RENDER(answer = scar.render(""));
+  TIMED_RENDER(answer = scar.render());
 
   return answer;
 }

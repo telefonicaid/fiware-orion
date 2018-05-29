@@ -25,6 +25,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"

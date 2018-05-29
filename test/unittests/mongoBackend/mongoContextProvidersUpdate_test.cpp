@@ -22,11 +22,13 @@
 *
 * Author: Fermin Galan
 */
-#include "unittest.h"
+#include <string>
+#include <vector>
+
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContext.h"
@@ -36,9 +38,28 @@
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/unittest.h"
 
-extern void setMongoConnectionForUnitTest(DBClientBase*);
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::BSONElement;
+using mongo::OID;
+using mongo::DBException;
+using mongo::BSONObjBuilder;
+using mongo::BSONNULL;
+
+
+
+extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+
+
 
 /* ****************************************************************************
 *
@@ -88,14 +109,14 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 *
 */
 
+
+
 /* ****************************************************************************
 *
 * findAttr -
-*
 */
 static bool findAttr(std::vector<BSONElement> attrs, std::string name)
 {
-
   for (unsigned int ix = 0; ix < attrs.size(); ++ix)
   {
     if (attrs[ix].str() == name)
@@ -103,9 +124,10 @@ static bool findAttr(std::vector<BSONElement> attrs, std::string name)
       return true;
     }
   }
-  return false;
 
+  return false;
 }
+
 
 
 /* ****************************************************************************
@@ -140,75 +162,55 @@ static void prepareDatabase(void)
                      "entities" << BSON_ARRAY(
                        BSON("id" << "E1" << "type" << "T1") <<
                        BSON("id" << "E2" << "type" << "T2") <<
-                       BSON("id" << "E3" << "type" << "T3")
-                       ) <<
+                       BSON("id" << "E3" << "type" << "T3")) <<
                      "attrs" << BSON_ARRAY(
                        BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
                        BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                       )
-                     );
+                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
+
   BSONObj cr2 = BSON("providingApplication" << "http://cr2.com" <<
                      "entities" << BSON_ARRAY(
-                       BSON("id" << "E1" << "type" << "T1")
-                       ) <<
+                       BSON("id" << "E1" << "type" << "T1")) <<
                      "attrs" << BSON_ARRAY(
                        BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                       BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")
-                       )
-                     );
+                       BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")));
+
   BSONObj cr3 = BSON("providingApplication" << "http://cr3.com" <<
                      "entities" << BSON_ARRAY(
-                       BSON("id" << "E2" << "type" << "T2")
-                       ) <<
+                       BSON("id" << "E2" << "type" << "T2")) <<
                      "attrs" << BSON_ARRAY(
                        BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                       )
-                     );
+                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
 
   BSONObj cr4 = BSON("providingApplication" << "http://cr4.com" <<
                      "entities" << BSON_ARRAY(
-                       BSON("id" << "E1" << "type" << "T1bis")
-                       ) <<
+                       BSON("id" << "E1" << "type" << "T1bis")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A1" << "type" << "TA1bis" << "isDomain" << "false")
-                       )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1bis" << "isDomain" << "false")));
 
   BSONObj cr5 = BSON("providingApplication" << "http://cr5.com" <<
                      "entities" << BSON_ARRAY(
-                       BSON("id" << "E1")
-                       ) <<
+                       BSON("id" << "E1")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")
-                       )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
 
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
-  BSONObj reg1 = BSON(
-        "_id" << OID("51307b66f481db11bf860001") <<
-        "expiration" << 1879048191 <<
-        "contextRegistration" << BSON_ARRAY(cr1 << cr2)
-        );
 
-  BSONObj reg2 = BSON(
-        "_id" << OID("51307b66f481db11bf860002") <<
-        "expiration" << 1879048191 <<
-        "contextRegistration" << BSON_ARRAY(cr3)
-        );
+  BSONObj reg1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr1 << cr2));
 
-  BSONObj reg3 = BSON(
-        "_id" << OID("51307b66f481db11bf860003") <<
-        "expiration" << 1879048191 <<
-        "contextRegistration" << BSON_ARRAY(cr4)
-        );
+  BSONObj reg2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr3));
 
-  BSONObj reg4 = BSON(
-        "_id" << OID("51307b66f481db11bf860004") <<
-        "expiration" << 1879048191 <<
-        "contextRegistration" << BSON_ARRAY(cr5)
-        );
+  BSONObj reg3 = BSON("_id" << OID("51307b66f481db11bf860003") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr4));
+
+  BSONObj reg4 = BSON("_id" << OID("51307b66f481db11bf860004") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr5));
 
   connection->insert(REGISTRATIONS_COLL, reg1);
   connection->insert(REGISTRATIONS_COLL, reg2);
@@ -226,7 +228,6 @@ static void prepareDatabase(void)
 */
 static void prepareDatabasePatternTrue(void)
 {
-
   /* Set database */
   setupDatabase();
 
@@ -250,85 +251,67 @@ static void prepareDatabasePatternTrue(void)
                      "entities" << BSON_ARRAY(
                        BSON("id" << "E1" << "type" << "T") <<
                        BSON("id" << "E2" << "type" << "T") <<
-                       BSON("id" << "E3" << "type" << "T")
-                       ) <<
+                       BSON("id" << "E3" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
                        BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
                        BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                       )
-                     );
+                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
+
   BSONObj cr2 = BSON("providingApplication" << "http://cr2.com" <<
                      "entities" << BSON_ARRAY(
-                       BSON("id" << "E1" << "type" << "T")
-                       ) <<
+                       BSON("id" << "E1" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
                        BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                       BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")
-                       )
-                     );
+                       BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")));
+
   BSONObj cr3 = BSON("providingApplication" << "http://cr3.com" <<
                      "entities" << BSON_ARRAY(
-                       BSON("id" << "E2" << "type" << "T")
-                       ) <<
+                       BSON("id" << "E2" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
                        BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                       )
-                     );
+                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
 
   BSONObj cr4 = BSON("providingApplication" << "http://cr4.com" <<
                      "entities" << BSON_ARRAY(
-                       BSON("id" << "E2" << "type" << "Tbis")
-                       ) <<
+                       BSON("id" << "E2" << "type" << "Tbis")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A2" << "type" << "TA2bis" << "isDomain" << "false")
-                       )
-                     );
+                       BSON("name" << "A2" << "type" << "TA2bis" << "isDomain" << "false")));
 
   BSONObj cr5 = BSON("providingApplication" << "http://cr5.com" <<
                      "entities" << BSON_ARRAY(
-                       BSON("id" << "E3")
-                       ) <<
+                       BSON("id" << "E3")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false")
-                       )
-                     );
+                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false")));
 
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
-  BSONObj reg1 = BSON(
-        "_id" << "ff37" <<
-        "expiration" << 1879048191 <<
-        "subscriptions" << BSONArray() <<
-        "contextRegistration" << BSON_ARRAY(cr1 << cr2)
-        );
 
-  BSONObj reg2 = BSON(
-        "_id" << "ff48" <<
-        "expiration" << 1879048191 <<
-        "subscriptions" << BSONArray() <<
-        "contextRegistration" << BSON_ARRAY(cr3)
-        );
+  BSONObj reg1 = BSON("_id" << "ff37" <<
+                      "expiration" << 1879048191 <<
+                      "subscriptions" << BSONArray() <<
+                      "contextRegistration" << BSON_ARRAY(cr1 << cr2));
 
-  BSONObj reg3 = BSON(
-        "_id" << "ff80" <<
-        "expiration" << 1879048191 <<
-        "subscriptions" << BSONArray() <<
-        "contextRegistration" << BSON_ARRAY(cr4)
-        );
+  BSONObj reg2 = BSON("_id" << "ff48" <<
+                      "expiration" << 1879048191 <<
+                      "subscriptions" << BSONArray() <<
+                      "contextRegistration" << BSON_ARRAY(cr3));
 
-  BSONObj reg4 = BSON(
-        "_id" << "ff90" <<
-        "expiration" << 1879048191 <<
-        "subscriptions" << BSONArray() <<
-        "contextRegistration" << BSON_ARRAY(cr5)
-        );
+  BSONObj reg3 = BSON("_id" << "ff80" <<
+                      "expiration" << 1879048191 <<
+                      "subscriptions" << BSONArray() <<
+                      "contextRegistration" << BSON_ARRAY(cr4));
+
+  BSONObj reg4 = BSON("_id" << "ff90" <<
+                      "expiration" << 1879048191 <<
+                      "subscriptions" << BSONArray() <<
+                      "contextRegistration" << BSON_ARRAY(cr5));
 
   connection->insert(REGISTRATIONS_COLL, reg1);
   connection->insert(REGISTRATIONS_COLL, reg2);
   connection->insert(REGISTRATIONS_COLL, reg3);
   connection->insert(REGISTRATIONS_COLL, reg4);
 }
+
+
 
 /* ****************************************************************************
 *
@@ -337,7 +320,6 @@ static void prepareDatabasePatternTrue(void)
 */
 static void prepareDatabaseSeveralCprs(void)
 {
-
   /* Set database */
   setupDatabase();
 
@@ -360,76 +342,57 @@ static void prepareDatabaseSeveralCprs(void)
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("A1") <<
                      "attrs" << BSON(
-                        "A1" << BSON("type" << "T" << "value" << "1")
-                        )
-                    );
+                       "A1" << BSON("type" << "T" << "value" << "1")));
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("A3") <<
                      "attrs" << BSON(
-                        "A3" << BSON("type" << "T" << "value" << "3")
-                        )
-                    );
+                       "A3" << BSON("type" << "T" << "value" << "3")));
 
   BSONObj cr1 = BSON("providingApplication" << "http://cpr2.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A2" << "type" << "T" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A2" << "type" << "T" << "isDomain" << "false")));
+
   BSONObj cr2 = BSON("providingApplication" << "http://cpr3.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E2" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E2" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A4" << "type" << "T" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A4" << "type" << "T" << "isDomain" << "false")));
+
   BSONObj cr3 = BSON("providingApplication" << "http://cpr2.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E3" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E3" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A5" << "type" << "T" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A5" << "type" << "T" << "isDomain" << "false")));
+
   BSONObj cr4 = BSON("providingApplication" << "http://cpr1.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E4" << "type" << "T")
-                         ) <<
-                     "attrs" << BSONArray()
-                     );
+                       BSON("id" << "E4" << "type" << "T")) <<
+                     "attrs" << BSONArray());
 
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
   BSONObjBuilder reg1;
-  reg1.appendElements(BSON(
-                        "_id" << OID("51307b66f481db11bf860001") <<
-                        "expiration" << 1879048191 <<
-                        "contextRegistration" << BSON_ARRAY(cr1)
-                        ));
+
+  reg1.appendElements(BSON("_id" << OID("51307b66f481db11bf860001") <<
+                           "expiration" << 1879048191 <<
+                           "contextRegistration" << BSON_ARRAY(cr1)));
 
   BSONObjBuilder reg2;
-  reg2.appendElements(BSON(
-                        "_id" << OID("51307b66f481db11bf860002") <<
-                        "expiration" << 1879048191 <<
-                        "contextRegistration" << BSON_ARRAY(cr2)
-                        ));
+  reg2.appendElements(BSON("_id" << OID("51307b66f481db11bf860002") <<
+                           "expiration" << 1879048191 <<
+                           "contextRegistration" << BSON_ARRAY(cr2)));
 
   BSONObjBuilder reg3;
-  reg3.appendElements(BSON(
-                        "_id" << OID("51307b66f481db11bf860003") <<
-                        "expiration" << 1879048191 <<
-                        "contextRegistration" << BSON_ARRAY(cr3)
-                        ));
+  reg3.appendElements(BSON("_id" << OID("51307b66f481db11bf860003") <<
+                           "expiration" << 1879048191 <<
+                           "contextRegistration" << BSON_ARRAY(cr3)));
 
   BSONObjBuilder reg4;
-  reg4.appendElements(BSON(
-                        "_id" << OID("51307b66f481db11bf860004") <<
-                        "expiration" << 1879048191 <<
-                        "contextRegistration" << BSON_ARRAY(cr4)
-                        ));
+  reg4.appendElements(BSON("_id" << OID("51307b66f481db11bf860004") <<
+                           "expiration" << 1879048191 <<
+                           "contextRegistration" << BSON_ARRAY(cr4)));
 
   connection->insert(ENTITIES_COLL, en1);
   connection->insert(ENTITIES_COLL, en2);
@@ -437,7 +400,6 @@ static void prepareDatabaseSeveralCprs(void)
   connection->insert(REGISTRATIONS_COLL, reg2.obj());
   connection->insert(REGISTRATIONS_COLL, reg3.obj());
   connection->insert(REGISTRATIONS_COLL, reg4.obj());
-
 }
 
 
@@ -471,7 +433,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsAll)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -480,10 +442,10 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsAll)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  ASSERT_EQ(1,res.contextElementResponseVector.size());
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
   EXPECT_EQ("E3", RES_CER(0).entityId.id);
   EXPECT_EQ("T3", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);  
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
   EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
   EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
@@ -519,7 +481,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneSingle)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -582,7 +544,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneMulti)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -643,7 +605,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsSubset)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -710,7 +672,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -776,7 +738,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntity)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -785,7 +747,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntity)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  ASSERT_EQ(2,res.contextElementResponseVector.size());
+  ASSERT_EQ(2, res.contextElementResponseVector.size());
   EXPECT_EQ("E1", RES_CER(0).entityId.id);
   EXPECT_EQ("T1", RES_CER(0).entityId.type);
   EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
@@ -839,7 +801,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -935,7 +897,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1058,7 +1020,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoType)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1123,7 +1085,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern0Attr)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1161,7 +1123,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern1AttrSingle)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1201,7 +1163,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern1AttrMulti)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1243,7 +1205,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternNAttr)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1281,11 +1243,11 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternFail)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
-  //TBD
+  // TBD
 
   utExit();
 }
@@ -1325,7 +1287,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternNoType)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1369,11 +1331,11 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, mixPatternAndNotPattern)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
-  //TBD
+  // TBD
 
   utExit();
 }
@@ -1436,7 +1398,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1567,7 +1529,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   ASSERT_EQ(1, attrNames.size());
   BSONObj a1 = attrs.getField("A1").embeddedObject();
   EXPECT_TRUE(findAttr(attrNames, "A1"));
-  EXPECT_STREQ("T",C_STR_FIELD(a1, "type"));
+  EXPECT_STREQ("T", C_STR_FIELD(a1, "type"));
   EXPECT_STREQ("10", C_STR_FIELD(a1, "value"));
   EXPECT_EQ(1360232700, a1.getIntField("modDate"));
 
@@ -1581,7 +1543,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   ASSERT_EQ(1, attrNames.size());
   BSONObj a3 = attrs.getField("A3").embeddedObject();
   EXPECT_TRUE(findAttr(attrNames, "A3"));
-  EXPECT_STREQ("T",C_STR_FIELD(a3, "type"));
+  EXPECT_STREQ("T", C_STR_FIELD(a3, "type"));
   EXPECT_STREQ("30", C_STR_FIELD(a3, "value"));
   EXPECT_EQ(1360232700, a3.getIntField("modDate"));
 
@@ -1613,7 +1575,7 @@ TEST(mongoContextProvidersUpdateRequest, notFoundUpdate)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1622,7 +1584,7 @@ TEST(mongoContextProvidersUpdateRequest, notFoundUpdate)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  ASSERT_EQ(1,res.contextElementResponseVector.size());
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
 
   /* Context Element response # 1 */
   EXPECT_EQ("E1", RES_CER(0).entityId.id);
@@ -1668,7 +1630,7 @@ TEST(mongoContextProvidersUpdateRequest, notFoundDelete)
   req.updateActionType.set("DELETE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1677,7 +1639,7 @@ TEST(mongoContextProvidersUpdateRequest, notFoundDelete)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  ASSERT_EQ(1,res.contextElementResponseVector.size());
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
 
   /* Context Element response # 1 */
   EXPECT_EQ("E1", RES_CER(0).entityId.id);

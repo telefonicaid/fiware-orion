@@ -33,7 +33,7 @@
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 TEST(NotifyConditionVector, render)
 {
@@ -41,22 +41,22 @@ TEST(NotifyConditionVector, render)
   NotifyConditionVector  ncV;
   std::string            out;
   const char*            outfile1 = "ngsi.notifyConditionVector.render.middle.json";
-  
+
   utInit();
 
-  out = ncV.render("", false);
+  out = ncV.render(false);
   EXPECT_STREQ("", out.c_str());
 
   ncP->type = "Type";
   ncV.push_back(ncP);
 
-  out = ncV.render("", false);
+  out = ncV.render(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ncV.release();
 
-  out = ncV.render("", false);
+  out = ncV.render(false);
   EXPECT_STREQ("", out.c_str());
 
   utExit();
@@ -66,7 +66,7 @@ TEST(NotifyConditionVector, render)
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 */
 TEST(NotifyConditionVector, check)
 {
@@ -75,20 +75,20 @@ TEST(NotifyConditionVector, check)
   std::string            checked;
   std::string            expected2 = "invalid notify condition type: /Type/";
   std::string            expected3 = "empty type for NotifyCondition";
-  
+
   utInit();
 
-  checked = ncV.check(RegisterContext, "", "", 0);
+  checked = ncV.check(RegisterContext, "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   nc.type = "Type";
   ncV.push_back(&nc);
 
-  checked = ncV.check(RegisterContext, "", "", 0);
+  checked = ncV.check(RegisterContext, "", 0);
   EXPECT_STREQ(expected2.c_str(), checked.c_str());
 
   nc.type = "";
-  checked = ncV.check(RegisterContext, "", "", 0);
+  checked = ncV.check(RegisterContext, "", 0);
   EXPECT_STREQ(expected3.c_str(), checked.c_str());
 
   utExit();
@@ -104,7 +104,7 @@ TEST(NotifyConditionVector, present)
 {
   NotifyCondition        nc;
   NotifyConditionVector  ncV;
-  
+
   utInit();
 
   nc.type = "Type";
@@ -119,7 +119,7 @@ TEST(NotifyConditionVector, present)
 
 /* ****************************************************************************
 *
-* get - 
+* get -
 */
 TEST(NotifyConditionVector, get)
 {

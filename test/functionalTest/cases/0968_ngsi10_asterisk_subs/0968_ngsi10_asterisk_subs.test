@@ -77,7 +77,7 @@ echo
 01. Create subscription with invalid regex
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 190
+Content-Length: 141
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

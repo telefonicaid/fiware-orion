@@ -33,6 +33,7 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/rest.h"
 #include "rest/restReply.h"
 #include "rest/OrionError.h"
 #include "serviceRoutinesV2/badVerbGetDeletePatchOnly.h"
@@ -55,11 +56,16 @@ std::string badVerbAllNotDelete
   OrionError   oe(SccBadVerb, ERROR_DESC_BAD_VERB);
 
   ciP->httpHeader.push_back("Allow");
-  ciP->httpHeaderValue.push_back("GET, PATCH, POST, PUT");
+  std::string headerValue = "GET, PATCH, POST, PUT";
+  // OPTIONS verb is only available for V2 API
+  if ((corsEnabled == true) && (ciP->apiVersion == V2))
+  {
+    headerValue = headerValue + ", OPTIONS";
+  }
+  ciP->httpHeaderValue.push_back(headerValue);
   ciP->httpStatusCode = SccBadVerb;
 
   alarmMgr.badInput(clientIp, details);
 
   return (ciP->apiVersion == V1 || ciP->apiVersion == NO_VERSION)? "" :  oe.smartRender(ciP->apiVersion);
 }
-

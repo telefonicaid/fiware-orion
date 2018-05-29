@@ -221,7 +221,7 @@ Date: REGEX(.*)
 05. Get sorted by age: User4, User3, User1, User2
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 2375
+Content-Length: 1093
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -347,7 +347,7 @@ Date: REGEX(.*)
 06. Get sorted by age in reverse order: User2, User1, User3, User4
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 2375
+Content-Length: 1093
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -473,7 +473,7 @@ Date: REGEX(.*)
 07. Get sorted by name, then age: User4, User3, User1, User2
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 2375
+Content-Length: 1093
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -599,7 +599,7 @@ Date: REGEX(.*)
 08. Get sorted by reverse name, then age: User1, User2, User4, User3
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 2375
+Content-Length: 1093
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -725,7 +725,7 @@ Date: REGEX(.*)
 09. Get sorted by name, then reserve age: User3, User4, User2, User1
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 2375
+Content-Length: 1093
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

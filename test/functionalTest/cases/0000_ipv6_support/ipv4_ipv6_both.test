@@ -21,20 +21,20 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-IPv6 IPv4 Both 
+IPv6 IPv4 Both
 
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart --pretty-print 0.0.0.0 ${LISTENER_PORT}
-accumulatorStart --pretty-print :: ${LISTENER2_PORT}
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+accumulatorStart --pretty-print ::1 ${LISTENER2_PORT}
 
 --SHELL--
 echo "1: ++++++++++++++++++++"
-orionCurl --url "/version" --host "[::1]" -g 2> /dev/null
+orionCurl --url "/version" --noPayloadCheck --host "[::1]" -g 2> /dev/null
 
 echo "2: ++++++++++++++++++++"
-orionCurl --url "/version" --host "127.0.0.1" -g 2> /dev/null
+orionCurl --url "/version" --noPayloadCheck --host "127.0.0.1" -g 2> /dev/null
 
 echo "3: ++++++++++++++++++++"
 url="/v1/subscribeContext"
@@ -136,15 +136,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "compile_time": "REGEX(.*)",
-        "compiled_by": "REGEX(.*)",
-        "compiled_in": "REGEX(.*)",
-        "git_hash": "REGEX(([0-9a-f]{40}|nogitversion))",
-        "uptime": "REGEX(.*)",
-        "version": "REGEX(.*)"
-    }
+"orion" : {
+  "version" : "REGEX(.*)",
+  "uptime" : "REGEX(.*)",
+  "git_hash" : "REGEX(([0-9a-f]{40}|nogitversion))",
+  "compile_time" : "REGEX(.*)",
+  "compiled_by" : "REGEX(.*)",
+  "compiled_in" : "REGEX(.*)",
+  "release_date" : "REGEX(.*)",
+  "doc" : "REGEX(.*)
 }
+}
+
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: REGEX(\d+)
@@ -153,18 +156,21 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "compile_time": "REGEX(.*)",
-        "compiled_by": "REGEX(.*)",
-        "compiled_in": "REGEX(.*)",
-        "git_hash": "REGEX(([0-9a-f]{40}|nogitversion))",
-        "uptime": "REGEX(.*)",
-        "version": "REGEX(.*)"
-    }
+"orion" : {
+  "version" : "REGEX(.*)",
+  "uptime" : "REGEX(.*)",
+  "git_hash" : "REGEX(([0-9a-f]{40}|nogitversion))",
+  "compile_time" : "REGEX(.*)",
+  "compiled_by" : "REGEX(.*)",
+  "compiled_in" : "REGEX(.*)",
+  "release_date" : "REGEX(.*)",
+  "doc" : "REGEX(.*)
 }
+}
+
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 109
+Content-Length: 85
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -177,7 +183,7 @@ Date: REGEX(.*)
 }
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 109
+Content-Length: 85
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -190,7 +196,7 @@ Date: REGEX(.*)
 }
 5: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 514
+Content-Length: 253
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -225,7 +231,7 @@ Date: REGEX(.*)
 6: ++++++++++++++++++++
 POST http://::1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 483
+Content-Length: 279
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: ::1:REGEX(\d+)
 Accept: application/json
@@ -260,7 +266,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 7: ++++++++++++++++++++
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 483
+Content-Length: 279
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json

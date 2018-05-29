@@ -38,13 +38,7 @@
 *
 * AttributeDomainName::check - 
 */
-std::string AttributeDomainName::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string AttributeDomainName::check(void)
 {
   // FIXME P3: AttributeDomainName::check always returns "OK"
   return "OK";
@@ -112,14 +106,14 @@ void AttributeDomainName::present(const std::string& indent)
 *
 * AttributeDomainName::render - 
 */
-std::string AttributeDomainName::render(const std::string& indent, bool comma)
+std::string AttributeDomainName::render(bool comma)
 {
   if (string == "")
   {
     return "";
   }
 
-  return valueTag(indent, "attributeDomainName", string, comma);
+  return valueTag("attributeDomainName", string, comma);
 }
 
 

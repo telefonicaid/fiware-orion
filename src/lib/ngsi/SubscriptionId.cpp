@@ -61,13 +61,7 @@ SubscriptionId::SubscriptionId(const std::string& subId)
 *
 * SubscriptionId::check -
 */
-std::string SubscriptionId::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string SubscriptionId::check(void)
 {
   std::string out = "OK";
 
@@ -147,9 +141,9 @@ void SubscriptionId::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* SubscriptionId::render -
+* SubscriptionId::toJson -
 */
-std::string SubscriptionId::render(RequestType container, const std::string& indent, bool comma)
+std::string SubscriptionId::toJson(RequestType container, bool comma)
 {
   std::string xString = string;
 
@@ -175,7 +169,41 @@ std::string SubscriptionId::render(RequestType container, const std::string& ind
     }
   }
 
-  return valueTag(indent, "subscriptionId", xString, comma);
+  return xString;
+}
+
+
+/* ****************************************************************************
+*
+* SubscriptionId::render -
+*/
+std::string SubscriptionId::render(RequestType container, bool comma)
+{
+  std::string xString = string;
+
+  if (xString == "")
+  {
+    if ((container == RtSubscribeContextAvailabilityResponse)          ||
+        (container == RtUpdateContextAvailabilitySubscriptionResponse) ||
+        (container == RtUnsubscribeContextAvailabilityResponse)        ||
+        (container == NotifyContextAvailability)                       ||
+        (container == UpdateContextSubscription)                       ||
+        (container == UnsubscribeContext)                              ||
+        (container == RtUnsubscribeContextResponse)                    ||
+        (container == NotifyContext)                                   ||
+        (container == RtSubscribeResponse)                             ||
+        (container == RtSubscribeError))
+    {
+      // subscriptionId is Mandatory
+      xString = "000000000000000000000000";
+    }
+    else
+    {
+      return "";  // subscriptionId is Optional
+    }
+  }
+
+  return valueTag("subscriptionId", xString, comma);
 }
 
 

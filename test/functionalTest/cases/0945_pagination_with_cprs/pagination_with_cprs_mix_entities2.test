@@ -231,7 +231,7 @@ echo
 01. Create en1, en2/t, en3/t, en4/t in CB (with a small delay to have different creDates)
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 387
+Content-Length: 193
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -261,7 +261,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 387
+Content-Length: 193
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -291,7 +291,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 387
+Content-Length: 193
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -321,7 +321,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 387
+Content-Length: 193
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -353,7 +353,7 @@ Date: REGEX(.*)
 02. Create en4/ping in CP1
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 390
+Content-Length: 196
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -385,7 +385,7 @@ Date: REGEX(.*)
 03. Register en4/ping in CB
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -399,7 +399,7 @@ Date: REGEX(.*)
 04. Query all
 =============
 HTTP/1.1 200 OK
-Content-Length: 1570
+Content-Length: 757
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -490,7 +490,7 @@ Date: REGEX(.*)
 05. Query offset=0, limit=1
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 388
+Content-Length: 194
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -522,7 +522,7 @@ Date: REGEX(.*)
 06. Query offset=0, limit=2
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 858
+Content-Length: 413
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -577,7 +577,7 @@ Date: REGEX(.*)
 07. Query offset=0, limit=3
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 1214
+Content-Length: 585
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -650,7 +650,7 @@ Date: REGEX(.*)
 08. Query offset=0, limit=4
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 1570
+Content-Length: 757
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -741,7 +741,7 @@ Date: REGEX(.*)
 09. Query offset=0, limit=5
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 1570
+Content-Length: 757
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -832,7 +832,7 @@ Date: REGEX(.*)
 10. Query offset=1, limit=1
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 502
+Content-Length: 241
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

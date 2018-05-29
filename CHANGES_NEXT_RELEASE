@@ -1,3 +1,2 @@
-- Hardening: Mongo driver migrated to legacy-1.1.2 (several bugfixes in the legacy-1.0.7 to legacy-1.1.2 delta)
-- Hardening: Several changes in argument passing in mongoBackend library to avoid passing entire objects on the stack, from "X x" to "const X& x"
-- Hardening: Several changes in argument passing in mongoBackend library to add 'const' in references to objects that are not altered by the function
+- Add: support for APIv2 notifications (POST /v2/op/notify), which opens up for true APIv2 federation (#2986)
+- Fix: bug when using "legacy" format for custom v2 notifications (#3154)

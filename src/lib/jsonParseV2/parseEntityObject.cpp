@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "rapidjson/document.h"
 
 #include "common/errorMessages.h"
@@ -29,19 +31,24 @@
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
 #include "parse/forbiddenChars.h"
-#include "jsonParseV2/jsonParseTypeNames.h"
-#include "jsonParseV2/parseEntityObject.h"
-#include "jsonParseV2/parseContextAttribute.h"
 
-using namespace rapidjson;
+#include "jsonParseV2/jsonParseTypeNames.h"
+#include "jsonParseV2/parseContextAttribute.h"
+#include "jsonParseV2/parseEntityObject.h"
 
 
 
 /* ****************************************************************************
 *
-* parseEntityObject - 
+* parseEntityObject -
 */
-std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator valueP, Entity* eP, bool attrsAllowed)
+std::string parseEntityObject
+(
+  ConnectionInfo*                        ciP,
+  rapidjson::Value::ConstValueIterator&  valueP,
+  Entity*                                eP,
+  bool                                   attrsAllowed
+)
 {
   std::string type  = jsonParseTypeNames[valueP->GetType()];
 
@@ -60,7 +67,7 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
     return "nor /id/ nor /idPattern/ present";
   }
 
-  for (Value::ConstMemberIterator iter = valueP->MemberBegin(); iter != valueP->MemberEnd(); ++iter)
+  for (rapidjson::Value::ConstMemberIterator iter = valueP->MemberBegin(); iter != valueP->MemberEnd(); ++iter)
   {
     std::string name  = iter->name.GetString();
     std::string type  = jsonParseTypeNames[iter->value.GetType()];
@@ -141,8 +148,9 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
       {
         return "no attributes allowed in Entity in this payload";
       }
-      
+
       ContextAttribute* caP = new ContextAttribute();
+
       r = parseContextAttribute(ciP, iter, caP);
       if (r == "OK")
       {

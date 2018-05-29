@@ -67,7 +67,7 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, B
     {
       b.append(child->boolValue);
     }
-    else if (child->valueType == orion::ValueTypeNone)
+    else if (child->valueType == orion::ValueTypeNull)
     {
       b.appendNull();
     }
@@ -84,6 +84,10 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, B
 
       compoundValueBson(child->childV, bo);
       b.append(bo.obj());
+    }
+    else if (child->valueType == orion::ValueTypeNotGiven)
+    {
+      LM_E(("Runtime Error (value not given in compound value)"));
     }
     else
     {
@@ -117,7 +121,7 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, B
     {
       b.append(effectiveName, child->boolValue);
     }
-    else if (child->valueType == orion::ValueTypeNone)
+    else if (child->valueType == orion::ValueTypeNull)
     {
       b.appendNull(effectiveName);
     }
@@ -134,6 +138,10 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, B
 
       compoundValueBson(child->childV, bo);
       b.append(effectiveName, bo.obj());
+    }
+    else if (child->valueType == orion::ValueTypeNotGiven)
+    {
+      LM_E(("Runtime Error (value not given in compound value)"));
     }
     else
     {

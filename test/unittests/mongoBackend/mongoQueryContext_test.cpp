@@ -22,7 +22,9 @@
 *
 * Author: Fermin Galan
 */
-#include "unittest.h"
+#include <string>
+
+#include "unittests/unittest.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -37,9 +39,29 @@
 
 #include "mongo/client/dbclient.h"
 
-using namespace orion;
 
-extern void setMongoConnectionForUnitTest(DBClientBase*);
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::BSONNULL;
+using mongo::DBException;
+using orion::ValueTypeString;
+using orion::ValueTypeNumber;
+using orion::ValueTypeBoolean;
+using orion::ValueTypeNull;
+using ::testing::Throw;
+using ::testing::_;
+
+
+
+extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+
+
 
 /* ****************************************************************************
 *
@@ -130,6 +152,8 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 *
 */
 
+
+
 /* ****************************************************************************
 *
 * prepareDatabase -
@@ -137,8 +161,8 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * This function is called before every test, to populate some information in the
 * entities collection.
 */
-static void prepareDatabase(void) {
-
+static void prepareDatabase(void)
+{
   /* Set database */
   setupDatabase();
 
@@ -167,45 +191,37 @@ static void prepareDatabase(void) {
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
                      "attrNames" << BSON_ARRAY("A1" << "A2") <<
                      "attrs" << BSON(
-                        "A1" << BSON("type" << "TA1" << "value" << "val1") <<
-                        "A2" << BSON("type" << "TA2" << "value" << "val2")
-                        )
-                    );
+                       "A1" << BSON("type" << "TA1" << "value" << "val1") <<
+                       "A2" << BSON("type" << "TA2" << "value" << "val2")));
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2") <<
                      "attrNames" << BSON_ARRAY("A2" << "A3") <<
                      "attrs" << BSON(
-                        "A2" << BSON("type" << "TA2" << "value" << "val2bis") <<
-                        "A3" << BSON("type" << "TA3" << "value" << "val3")
-                        )
-                    );
+                       "A2" << BSON("type" << "TA2" << "value" << "val2bis") <<
+                       "A3" << BSON("type" << "TA3" << "value" << "val3")));
 
   BSONObj en4 = BSON("_id" << BSON("id" << "E4" << "type" << "T4") <<
                      "attrNames" << BSONArray() <<
-                     "attrs" << BSONObj()
-                    );
+                     "attrs" << BSONObj());
 
   BSONObj en5 = BSON("_id" << BSON("id" << "E1" << "type" << "T1bis") <<
                      "attrNames" << BSON_ARRAY("A1") <<
                      "attrs" << BSON(
-                        "A1" << BSON("type" << "TA1" << "value" << "val1bis")
-                        )
-                    );
+                       "A1" << BSON("type" << "TA1" << "value" << "val1bis")));
 
   BSONObj en6 = BSON("_id" << BSON("id" << "E1") <<
                      "attrNames" << BSON_ARRAY("A1") <<
                      "attrs" << BSON(
-                        "A1" << BSON("type" << "TA1" << "value" << "val1bis1")
-                        )
-                    );
+                       "A1" << BSON("type" << "TA1" << "value" << "val1bis1")));
 
   connection->insert(ENTITIES_COLL, en1);
   connection->insert(ENTITIES_COLL, en2);
   connection->insert(ENTITIES_COLL, en4);
   connection->insert(ENTITIES_COLL, en5);
   connection->insert(ENTITIES_COLL, en6);
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -214,8 +230,8 @@ static void prepareDatabase(void) {
 * This is a variant of populateDatabase function in which all entities have the same type,
 * to ease test for isPattern=true cases
 */
-static void prepareDatabasePatternTrue(void) {
-
+static void prepareDatabasePatternTrue(void)
+{
   /* Set database */
   setupDatabase();
 
@@ -241,46 +257,38 @@ static void prepareDatabasePatternTrue(void) {
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("A1" << "A2") <<
                      "attrs" << BSON(
-                        "A1" << BSON("type" << "TA1" << "value" << "val1") <<
-                        "A2" << BSON("type" << "TA2" << "value" << "val2")
-                        )
-                    );
+                       "A1" << BSON("type" << "TA1" << "value" << "val1") <<
+                       "A2" << BSON("type" << "TA2" << "value" << "val2")));
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("A2" << "A3") <<
                      "attrs" << BSON(
-                        "A2" << BSON("type" << "TA2" << "value" << "val2bis") <<
-                        "A3" << BSON("type" << "TA3" << "value" << "val3")
-                        )
-                    );
+                       "A2" << BSON("type" << "TA2" << "value" << "val2bis") <<
+                       "A3" << BSON("type" << "TA3" << "value" << "val3")));
 
   BSONObj en4 = BSON("_id" << BSON("id" << "E4" << "type" << "T") <<
                      "attrNames" << BSONArray() <<
-                     "attrs" << BSONObj()
-                    );
+                     "attrs" << BSONObj());
 
   BSONObj en5 = BSON("_id" << BSON("id" << "E1" << "type" << "Tbis") <<
                      "attrNames" << BSON_ARRAY("A4" << "A5") <<
                      "attrs" << BSON(
-                        "A4" << BSON("type" << "TA4" << "value" << "val4") <<
-                        "A5" << BSON("type" << "TA5" << "value" << "val5")
-                        )
-                    );
+                       "A4" << BSON("type" << "TA4" << "value" << "val4") <<
+                       "A5" << BSON("type" << "TA5" << "value" << "val5")));
 
   BSONObj en6 = BSON("_id" << BSON("id" << "E2") <<
                      "attrNames" << BSON_ARRAY("A2") <<
                      "attrs" << BSON(
-                        "A2" << BSON("type" << "TA2" << "value" << "val2bis1")
-                        )
-                    );
+                       "A2" << BSON("type" << "TA2" << "value" << "val2bis1")));
 
   connection->insert(ENTITIES_COLL, en1);
   connection->insert(ENTITIES_COLL, en2);
   connection->insert(ENTITIES_COLL, en4);
   connection->insert(ENTITIES_COLL, en5);
   connection->insert(ENTITIES_COLL, en6);
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -289,8 +297,8 @@ static void prepareDatabasePatternTrue(void) {
 * This function is called before every test, to populate some information in the
 * entities collection.
 */
-static void prepareDatabaseWithAttributeIds(void) {
-
+static void prepareDatabaseWithAttributeIds(void)
+{
     /* Start with the base entities */
     prepareDatabase();
 
@@ -300,25 +308,22 @@ static void prepareDatabaseWithAttributeIds(void) {
     BSONObj en1 = BSON("_id" << BSON("id" << "E10" << "type" << "T") <<
                        "attrNames" << BSON_ARRAY("A1" << "A2") <<
                        "attrs" << BSON(
-                          "A1()ID1" << BSON("type" << "TA1" << "value" << "A") <<
-                          "A1()ID2" << BSON("type" << "TA1" << "value" << "B") <<
-                          "A2"      << BSON("type" << "TA2" << "value" << "D")
-                          )
-                      );
+                         "A1()ID1" << BSON("type" << "TA1" << "value" << "A") <<
+                         "A1()ID2" << BSON("type" << "TA1" << "value" << "B") <<
+                         "A2"      << BSON("type" << "TA2" << "value" << "D")));
 
     BSONObj en2 = BSON("_id" << BSON("id" << "E11" << "type" << "T") <<
                        "attrNames" << BSON_ARRAY("A1" << "A2") <<
                        "attrs" << BSON(
-                          "A1()ID1" << BSON("type" << "TA1" << "value" << "E") <<
-                          "A1()ID2" << BSON("type" << "TA1" << "value" << "F") <<
-                          "A2"      << BSON("type" << "TA2" << "value" << "H")
-                          )
-                      );
+                         "A1()ID1" << BSON("type" << "TA1" << "value" << "E") <<
+                         "A1()ID2" << BSON("type" << "TA1" << "value" << "F") <<
+                         "A2"      << BSON("type" << "TA2" << "value" << "H")));
 
     connection->insert(ENTITIES_COLL, en1);
     connection->insert(ENTITIES_COLL, en2);
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -327,8 +332,8 @@ static void prepareDatabaseWithAttributeIds(void) {
 * This function is called before every test, to populate some information in the
 * entities collection.
 */
-static void prepareDatabaseWithCustomMetadata(void) {
-
+static void prepareDatabaseWithCustomMetadata(void)
+{
     /* Start with the base entities */
     prepareDatabase();
 
@@ -338,38 +343,26 @@ static void prepareDatabaseWithCustomMetadata(void) {
     BSONObj en1 = BSON("_id" << BSON("id" << "E10" << "type" << "T") <<
                        "attrNames" << BSON_ARRAY("A1" << "A2") <<
                        "attrs" << BSON(
-                          "A1" << BSON("type" << "TA1" << "value" << "A" <<
-                               "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << "1") <<
-                                            "MD2" << BSON("type" << "TMD2" << "value" << "2")
-                                            ) <<
-                               "mdNames" << BSON_ARRAY("MD1" << "MD2")
-                               ) <<
-                          "A2" << BSON("type" << "TA2" << "value" << "C" <<
-                               "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << "5") <<
-                                            "MD2" << BSON("type" << "TMD2" << "value" << "6")
-                                           ) <<
-                               "mdNames" << BSON_ARRAY("MD1" << "MD2")
-                               )
-                          )
-                      );
+                         "A1" << BSON("type" << "TA1" << "value" << "A" <<
+                                      "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << "1") <<
+                                                   "MD2" << BSON("type" << "TMD2" << "value" << "2")) <<
+                                      "mdNames" << BSON_ARRAY("MD1" << "MD2")) <<
+                         "A2" << BSON("type" << "TA2" << "value" << "C" <<
+                                      "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << "5") <<
+                                                   "MD2" << BSON("type" << "TMD2" << "value" << "6")) <<
+                                      "mdNames" << BSON_ARRAY("MD1" << "MD2"))));
 
     BSONObj en2 = BSON("_id" << BSON("id" << "E11" << "type" << "T") <<
                        "attrNames" << BSON_ARRAY("A1" << "A2") <<
                        "attrs" << BSON(
-                           "A1" << BSON("type" << "TA1" << "value" << "D" <<
-                                "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << "7") <<
-                                             "MD2" << BSON("type" << "TMD2" << "value" << "8")
-                                            ) <<
-                                "mdNames" << BSON_ARRAY("MD1" << "MD2")
-                                ) <<
-                           "A2" << BSON("type" << "TA2" << "value" << "F" <<
-                                "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << "11") <<
-                                             "MD2" << BSON("type" << "TMD2" << "value" << "12")
-                                            ) <<
-                                "mdNames" << BSON_ARRAY("MD1" << "MD2")
-                                )
-                          )
-                      );
+                         "A1" << BSON("type" << "TA1" << "value" << "D" <<
+                                      "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << "7") <<
+                                                   "MD2" << BSON("type" << "TMD2" << "value" << "8")) <<
+                                      "mdNames" << BSON_ARRAY("MD1" << "MD2")) <<
+                         "A2" << BSON("type" << "TA2" << "value" << "F" <<
+                                      "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << "11") <<
+                                                   "MD2" << BSON("type" << "TMD2" << "value" << "12")) <<
+                                      "mdNames" << BSON_ARRAY("MD1" << "MD2"))));
 
     connection->insert(ENTITIES_COLL, en1);
     connection->insert(ENTITIES_COLL, en2);
@@ -380,8 +373,8 @@ static void prepareDatabaseWithCustomMetadata(void) {
 * prepareDatabaseWithAttributeCustomMetadataNative -
 *
 */
-static void prepareDatabaseWithCustomMetadataNative(void) {
-
+static void prepareDatabaseWithCustomMetadataNative(void)
+{
     /* Start with the base entities */
     prepareDatabase();
 
@@ -391,40 +384,28 @@ static void prepareDatabaseWithCustomMetadataNative(void) {
     BSONObj en1 = BSON("_id" << BSON("id" << "E10" << "type" << "T") <<
                        "attrNames" << BSON_ARRAY("A1" << "A2") <<
                        "attrs" << BSON(
-                          "A1" << BSON("type" << "TA1" << "value" << "A" <<
-                               "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << "val1") <<
-                                            "MD2" << BSON("type" << "TMD2" << "value" << 2.1) <<
-                                            "MD3" << BSON("type" << "TMD3" << "value" << false) <<
-                                            "MD4" << BSON("type" << "TMD4" << "value" << BSONNULL)
-                                           ) <<
-                               "mdNames" << BSON_ARRAY("MD1" << "MD2" << "MD3" << "MD4")
-                               ) <<
-                          "A2" << BSON("type" << "TA2" << "value" << "C" <<
-                               "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << false) <<
-                                            "MD2" << BSON("type" << "TMD2" << "value" << 6.5)
-                                           ) <<
-                               "mdNames" << BSON_ARRAY("MD1" << "MD2")
-                               )
-                          )
-                      );
+                         "A1" << BSON("type" << "TA1" << "value" << "A" <<
+                                      "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << "val1") <<
+                                                   "MD2" << BSON("type" << "TMD2" << "value" << 2.1) <<
+                                                   "MD3" << BSON("type" << "TMD3" << "value" << false) <<
+                                                   "MD4" << BSON("type" << "TMD4" << "value" << BSONNULL)) <<
+                                      "mdNames" << BSON_ARRAY("MD1" << "MD2" << "MD3" << "MD4")) <<
+                         "A2" << BSON("type" << "TA2" << "value" << "C" <<
+                                      "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << false) <<
+                                                   "MD2" << BSON("type" << "TMD2" << "value" << 6.5)) <<
+                                      "mdNames" << BSON_ARRAY("MD1" << "MD2"))));
 
     BSONObj en2 = BSON("_id" << BSON("id" << "E11" << "type" << "T") <<
                        "attrNames" << BSON_ARRAY("A1" << "A2") <<
                        "attrs" << BSON(
-                           "A1" << BSON("type" << "TA1" << "value" << "D" <<
-                                "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << "x") <<
-                                             "MD2" << BSON("type" << "TMD2" << "value" << 8.7)
-                                            ) <<
-                                "mdNames" << BSON_ARRAY("MD1" << "MD2")
-                                ) <<
-                           "A2" << BSON("type" << "TA2" << "value" << "F" <<
-                                "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << true) <<
-                                             "MD2" << BSON("type" << "TMD2" << "value" << "val2")
-                                            ) <<
-                                "mdNames" << BSON_ARRAY("MD1" << "MD2")
-                                )
-                          )
-                      );
+                         "A1" << BSON("type" << "TA1" << "value" << "D" <<
+                                      "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << "x") <<
+                                                   "MD2" << BSON("type" << "TMD2" << "value" << 8.7)) <<
+                                      "mdNames" << BSON_ARRAY("MD1" << "MD2")) <<
+                         "A2" << BSON("type" << "TA2" << "value" << "F" <<
+                                      "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << true) <<
+                                                   "MD2" << BSON("type" << "TMD2" << "value" << "val2")) <<
+                                      "mdNames" << BSON_ARRAY("MD1" << "MD2"))));
 
     connection->insert(ENTITIES_COLL, en1);
     connection->insert(ENTITIES_COLL, en2);
@@ -435,7 +416,7 @@ static void prepareDatabaseWithCustomMetadataNative(void) {
 * prepareDatabaseWithServicePath -
 *
 */
-static void prepareDatabaseWithServicePath(const std::string modifier)
+static void prepareDatabaseWithServicePath(const std::string& modifier)
 {
   /* Set database */
   setupDatabase();
@@ -460,20 +441,59 @@ static void prepareDatabaseWithServicePath(const std::string modifier)
    *
    */
 
-  BSONObj e01 = BSON("_id" << BSON("id" << "E1"  << "type" << "T" << "servicePath" << "/home")       << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a1")));
-  BSONObj e02 = BSON("_id" << BSON("id" << "E2"  << "type" << "T" << "servicePath" << "/home/kz")    << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a2")));
-  BSONObj e03 = BSON("_id" << BSON("id" << "E3"  << "type" << "T" << "servicePath" << "/home/fg")    << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a3")));
-  BSONObj e04 = BSON("_id" << BSON("id" << "E4"  << "type" << "T" << "servicePath" << "/home/kz/e4") << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a4")));
-  BSONObj e05 = BSON("_id" << BSON("id" << "E5"  << "type" << "T" << "servicePath" << "/home/kz/e5") << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a5")));
-  BSONObj e06 = BSON("_id" << BSON("id" << "E6"  << "type" << "T" << "servicePath" << "/home/fg/e6") << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a6")));
-  BSONObj e07 = BSON("_id" << BSON("id" << "E7"  << "type" << "T" << "servicePath" << "/home2")      << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a7")));
-  BSONObj e08 = BSON("_id" << BSON("id" << "E8"  << "type" << "T" << "servicePath" << "/home2/kz")   << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a8")));
-  BSONObj e09 = BSON("_id" << BSON("id" << "E9"  << "type" << "T" << "servicePath" << "")            << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a9")));
-  BSONObj e10 = BSON("_id" << BSON("id" << "E10" << "type" << "T")                                   << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a10")));
+  BSONObj e01 = BSON("_id" << BSON("id" << "E1"  << "type" << "T" << "servicePath" << "/home")       <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a1")));
 
-  BSONObj e11 = BSON("_id" << BSON("id" << "E11" << "type" << "T" << "servicePath" << "/home3/e11")   << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a11")));
-  BSONObj e12 = BSON("_id" << BSON("id" << "E12" << "type" << "T" << "servicePath" << "/home3/e12")   << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a12")));
-  BSONObj e13 = BSON("_id" << BSON("id" << "E13" << "type" << "T" << "servicePath" << "/home3/e13")   << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a13")));
+  BSONObj e02 = BSON("_id" << BSON("id" << "E2"  << "type" << "T" << "servicePath" << "/home/kz")    <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a2")));
+
+  BSONObj e03 = BSON("_id" << BSON("id" << "E3"  << "type" << "T" << "servicePath" << "/home/fg")    <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a3")));
+
+  BSONObj e04 = BSON("_id" << BSON("id" << "E4"  << "type" << "T" << "servicePath" << "/home/kz/e4") <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a4")));
+
+  BSONObj e05 = BSON("_id" << BSON("id" << "E5"  << "type" << "T" << "servicePath" << "/home/kz/e5") <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a5")));
+
+  BSONObj e06 = BSON("_id" << BSON("id" << "E6"  << "type" << "T" << "servicePath" << "/home/fg/e6") <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a6")));
+
+  BSONObj e07 = BSON("_id" << BSON("id" << "E7"  << "type" << "T" << "servicePath" << "/home2")      <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a7")));
+
+  BSONObj e08 = BSON("_id" << BSON("id" << "E8"  << "type" << "T" << "servicePath" << "/home2/kz")   <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a8")));
+
+  BSONObj e09 = BSON("_id" << BSON("id" << "E9"  << "type" << "T" << "servicePath" << "")            <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a9")));
+
+  BSONObj e10 = BSON("_id" << BSON("id" << "E10" << "type" << "T")                                   <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a10")));
+
+
+  BSONObj e11 = BSON("_id" << BSON("id" << "E11" << "type" << "T" << "servicePath" << "/home3/e11")   <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a11")));
+
+  BSONObj e12 = BSON("_id" << BSON("id" << "E12" << "type" << "T" << "servicePath" << "/home3/e12")   <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a12")));
+
+  BSONObj e13 = BSON("_id" << BSON("id" << "E13" << "type" << "T" << "servicePath" << "/home3/e13")   <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a13")));
+
 
   connection->insert(ENTITIES_COLL, e01);
   connection->insert(ENTITIES_COLL, e02);
@@ -494,19 +514,33 @@ static void prepareDatabaseWithServicePath(const std::string modifier)
 
   if (modifier == "patternNoType")
   {
-    BSONObj e = BSON("_id" << BSON("id" << "E" << "type" << "OOO" << "servicePath" << "/home/kz/123")   << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "ae_1")));
+    BSONObj e = BSON("_id" << BSON("id" << "E" << "type" << "OOO" << "servicePath" << "/home/kz/123") <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "ae_1")));
+
     connection->insert(ENTITIES_COLL, e);
   }
   else if (modifier == "noPatternNoType")
   {
-    BSONObj e = BSON("_id" << BSON("id" << "E3" << "type" << "OOO" << "servicePath" << "/home/fg/124")  << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "ae_2")));
+    BSONObj e = BSON("_id" << BSON("id" << "E3" << "type" << "OOO" << "servicePath" << "/home/fg/124") <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "ae_2")));
+
     connection->insert(ENTITIES_COLL, e);
   }
   else if (modifier == "IdenticalEntitiesButDifferentServicePaths")
   {
-    BSONObj ie1 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/01")   << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "ie_01")));
-    BSONObj ie2 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/02")   << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "ie_02")));
-    BSONObj ie3 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/03")   << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "ie_03")));
+    BSONObj ie1 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/01") <<
+                       "attrNames" << BSON_ARRAY("A1") <<
+                       "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "ie_01")));
+
+    BSONObj ie2 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/02") <<
+                       "attrNames" << BSON_ARRAY("A1") <<
+                       "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "ie_02")));
+
+    BSONObj ie3 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/03") <<
+                       "attrNames" << BSON_ARRAY("A1") <<
+                       "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "ie_03")));
 
     connection->insert(ENTITIES_COLL, ie1);
     connection->insert(ENTITIES_COLL, ie2);
@@ -537,12 +571,29 @@ static void prepareDatabaseForPagination(void)
    *
    */
 
-  BSONObj e01 = BSON("_id" << BSON("id" << "E1"  << "type" << "T") << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a1")));
-  BSONObj e02 = BSON("_id" << BSON("id" << "E2"  << "type" << "T") << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a2")));
-  BSONObj e03 = BSON("_id" << BSON("id" << "E3"  << "type" << "T") << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a3")));
-  BSONObj e04 = BSON("_id" << BSON("id" << "E4"  << "type" << "T") << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a4")));
-  BSONObj e05 = BSON("_id" << BSON("id" << "E5"  << "type" << "T") << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a5")));
-  BSONObj e06 = BSON("_id" << BSON("id" << "E6"  << "type" << "T") << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a6")));
+  BSONObj e01 = BSON("_id" << BSON("id" << "E1"  << "type" << "T") <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a1")));
+
+  BSONObj e02 = BSON("_id" << BSON("id" << "E2"  << "type" << "T") <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a2")));
+
+  BSONObj e03 = BSON("_id" << BSON("id" << "E3"  << "type" << "T") <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a3")));
+
+  BSONObj e04 = BSON("_id" << BSON("id" << "E4"  << "type" << "T") <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a4")));
+
+  BSONObj e05 = BSON("_id" << BSON("id" << "E5"  << "type" << "T") <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a5")));
+
+  BSONObj e06 = BSON("_id" << BSON("id" << "E6"  << "type" << "T") <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a6")));
 
   connection->insert(ENTITIES_COLL, e01);
   connection->insert(ENTITIES_COLL, e02);
@@ -557,8 +608,8 @@ static void prepareDatabaseForPagination(void)
 * prepareDatabaseDifferentNativeTypes -
 *
 */
-static void prepareDatabaseDifferentNativeTypes(void) {
-
+static void prepareDatabaseDifferentNativeTypes(void)
+{
   /* Set database */
   setupDatabase();
 
@@ -584,18 +635,16 @@ static void prepareDatabaseDifferentNativeTypes(void) {
                         "A3" << BSON("type" << "T" << "value" << false) <<
                         "A4" << BSON("type" << "T" << "value" << BSON("x" << "a" << "y" << "b")) <<
                         "A5" << BSON("type" << "T" << "value" << BSON_ARRAY("x1" << "x2")) <<
-                        "A6" << BSON("type" << "T" << "value" << BSONNULL)
-                        )
-                    );
+                        "A6" << BSON("type" << "T" << "value" << BSONNULL)));
 
   connection->insert(ENTITIES_COLL, en1);
-
 }
+
+
 
 /* ****************************************************************************
 *
 * paginationDetails -
-*
 */
 TEST(mongoQueryContextRequest, paginationDetails)
 {
@@ -1594,14 +1643,15 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
- 
+
   utExit();
 }
+
+
 
 /* ****************************************************************************
 *
 * queryWithIdenticalEntitiesButDifferentServicePaths_case4 -
-*
 */
 TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePaths_case4)
 {
@@ -1727,8 +1777,8 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_2levels)
   EXPECT_EQ("ae_1", RES_CER_ATTR(3, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(3).code);
   EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(3).details.size());  
-  
+  EXPECT_EQ(0, RES_CER_STATUS(3).details.size());
+
   utExit();
 }
 
@@ -2451,12 +2501,11 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrSingle)
 */
 TEST(mongoQueryContextRequest, queryNEnt1AttrMulti)
 {
-
     utInit();
 
     HttpStatusCode         ms;
     QueryContextRequest   req;
-    QueryContextResponse  res;  
+    QueryContextResponse  res;
 
     /* Prepare database */
     prepareDatabase();
@@ -2608,7 +2657,7 @@ TEST(mongoQueryContextRequest, query1Ent0AttrFail)
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
     EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
-    EXPECT_EQ(0,res.contextElementResponseVector.size());
+    EXPECT_EQ(0, res.contextElementResponseVector.size());
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
@@ -2648,7 +2697,7 @@ TEST(mongoQueryContextRequest, query1Ent1AttrFail)
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
     EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
-    EXPECT_EQ(0,res.contextElementResponseVector.size());
+    EXPECT_EQ(0, res.contextElementResponseVector.size());
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
@@ -2689,7 +2738,7 @@ TEST(mongoQueryContextRequest, query1EntWA0AttrFail)
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
     EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
-    EXPECT_EQ(0,res.contextElementResponseVector.size());
+    EXPECT_EQ(0, res.contextElementResponseVector.size());
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
@@ -3106,10 +3155,10 @@ TEST(mongoQueryContextRequest, queryCustomMetadataNative)
     EXPECT_EQ("MD3", RES_CER_ATTR(0, 0)->metadataVector[2]->name);
     EXPECT_EQ("TMD3", RES_CER_ATTR(0, 0)->metadataVector[2]->type);
     EXPECT_FALSE(RES_CER_ATTR(0, 0)->metadataVector[2]->boolValue);
-    EXPECT_EQ(orion::ValueTypeBoolean, RES_CER_ATTR(0, 0)->metadataVector[2]->valueType);    
+    EXPECT_EQ(orion::ValueTypeBoolean, RES_CER_ATTR(0, 0)->metadataVector[2]->valueType);
     EXPECT_EQ("MD4", RES_CER_ATTR(0, 0)->metadataVector[3]->name);
     EXPECT_EQ("TMD4", RES_CER_ATTR(0, 0)->metadataVector[3]->type);
-    EXPECT_EQ(orion::ValueTypeNone, RES_CER_ATTR(0, 0)->metadataVector[3]->valueType);
+    EXPECT_EQ(orion::ValueTypeNull, RES_CER_ATTR(0, 0)->metadataVector[3]->valueType);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -3397,7 +3446,7 @@ TEST(mongoQueryContextRequest, queryPatternFail)
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
     EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
-    EXPECT_EQ(0,res.contextElementResponseVector.size());
+    EXPECT_EQ(0, res.contextElementResponseVector.size());
 
     utExit();
 }
@@ -3909,7 +3958,7 @@ TEST(mongoQueryContextRequest, queryNativeTypes)
 
     EXPECT_EQ("A6", RES_CER_ATTR(0, 5)->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 5)->type);
-    EXPECT_EQ(ValueTypeNone, RES_CER_ATTR(0, 5)->valueType);
+    EXPECT_EQ(ValueTypeNull, RES_CER_ATTR(0, 5)->valueType);
     EXPECT_EQ(0, RES_CER_ATTR(0, 5)->metadataVector.size());
 
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
@@ -3938,7 +3987,7 @@ TEST(mongoQueryContextRequest, mongoDbQueryFail)
     /* Prepare mock */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, _query(_,_,_,_,_,_,_))
+    ON_CALL(*connectionMock, _query(_, _, _, _, _, _, _))
             .WillByDefault(Throw(e));
 
     /* Set MongoDB connection */
@@ -3958,12 +4007,13 @@ TEST(mongoQueryContextRequest, mongoDbQueryFail)
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
     EXPECT_EQ("Database Error (collection: utest.entities - "
-              "query(): { query: { $or: [ { _id.id: \"E1\", _id.type: \"T1\" } ], _id.servicePath: { $in: [ /^/.*/, null ] } }, orderby: { creDate: 1 } } - "
+              "query(): { query: { $or: [ { _id.id: \"E1\", _id.type: \"T1\" } ], "
+              "_id.servicePath: { $in: [ /^/.*/, null ] } }, orderby: { creDate: 1 } } - "
               "exception: boom!!)", res.errorCode.details);
-    EXPECT_EQ(0,res.contextElementResponseVector.size());    
+    EXPECT_EQ(0, res.contextElementResponseVector.size());
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
-    res.contextElementResponseVector.release();    
+    res.contextElementResponseVector.release();
 
     /* Restore real DB connection */
     setMongoConnectionForUnitTest(connectionDb);

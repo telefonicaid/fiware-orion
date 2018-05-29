@@ -33,12 +33,19 @@
 #include "mongoBackend/safeMongo.h"
 #include "apiTypesV2/HttpInfo.h"
 
-using namespace mongo;
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::BSONObj;
+using mongo::BSONElement;
+
 
 
 namespace ngsiv2
 {
-
 /* ****************************************************************************
 *
 * HttpInfo::HttpInfo - 
@@ -142,5 +149,4 @@ void HttpInfo::fill(const BSONObj& bo)
     }
   }
 }
-
 }

@@ -24,6 +24,7 @@
 */
 #include <string>
 #include <vector>
+#include <map>
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
@@ -34,8 +35,9 @@
 #include "rest/uriParamNames.h"
 #include "alarmMgr/alarmMgr.h"
 #include "parse/forbiddenChars.h"
-#include "apiTypesV2/Entity.h"
 #include "ngsi10/QueryContextResponse.h"
+
+#include "apiTypesV2/Entity.h"
 
 
 
@@ -43,9 +45,8 @@
 *
 * Entity::Entity - 
 */
-Entity::Entity(): typeGiven(false), renderId(true), creDate(0), modDate(0)
+Entity::Entity(): isTypePattern(false), typeGiven(false), renderId(true), creDate(0), modDate(0)
 {
-
 }
 
 
@@ -58,6 +59,7 @@ Entity::~Entity()
 {
   release();
 }
+
 
 
 /* ****************************************************************************
@@ -88,9 +90,9 @@ std::string Entity::render
   else if (uriParamOptions[OPT_VALUES]        == true)  { renderFormat = NGSI_V2_VALUES;        }
   else if (uriParamOptions[OPT_UNIQUE_VALUES] == true)  { renderFormat = NGSI_V2_UNIQUE_VALUES; }
 
-  std::string out;
-  std::vector<std::string> metadataFilter;
-  std::vector<std::string> attrsFilter;
+  std::string               out;
+  std::vector<std::string>  metadataFilter;
+  std::vector<std::string>  attrsFilter;
 
   if (uriParam[URI_PARAM_METADATA] != "")
   {
@@ -260,15 +262,9 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
 */
 void Entity::present(const std::string& indent)
 {
-  LM_T(LmtPresent, ("%sid:        %s", 
-		    indent.c_str(), 
-		    id.c_str()));
-  LM_T(LmtPresent, ("%stype:      %s", 
-		    indent.c_str(), 
-		    type.c_str()));
-  LM_T(LmtPresent, ("%sisPattern: %s", 
-		    indent.c_str(), 
-		    isPattern.c_str()));
+  LM_T(LmtPresent, ("%sid:        %s", indent.c_str(), id.c_str()));
+  LM_T(LmtPresent, ("%stype:      %s", indent.c_str(), type.c_str()));
+  LM_T(LmtPresent, ("%sisPattern: %s", indent.c_str(), isPattern.c_str()));
 
   attributeVector.present(indent + "  ");
 }
@@ -299,9 +295,14 @@ void Entity::fill
   attributeVector.fill(aVec);
 }
 
+
+
+/* ****************************************************************************
+*
+* Entity::fill -
+*/
 void Entity::fill(QueryContextResponse* qcrsP)
 {
-
   if (qcrsP->errorCode.code == SccContextElementNotFound)
   {
     oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
@@ -313,20 +314,27 @@ void Entity::fill(QueryContextResponse* qcrsP)
     //
     oe.fill(qcrsP->errorCode.code, qcrsP->errorCode.details, qcrsP->errorCode.reasonPhrase);
   }
-  else if (qcrsP->contextElementResponseVector.size() > 1) // qcrsP->errorCode.code == SccOk
+  else if (qcrsP->contextElementResponseVector.size() > 1)  // qcrsP->errorCode.code == SccOk
   {
-      //
-      // If there are more than one entity, we return an error
-      //
-      oe.fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
+    //
+    // If there are more than one entity, we return an error
+    //
+    oe.fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
   }
   else
   {
     ContextElement* ceP = &qcrsP->contextElementResponseVector[0]->contextElement;
-    fill(ceP->entityId.id, ceP->entityId.type, ceP->entityId.isPattern, &ceP->contextAttributeVector,
-         ceP->entityId.creDate, ceP->entityId.modDate);
+
+    fill(ceP->entityId.id,
+         ceP->entityId.type,
+         ceP->entityId.isPattern,
+         &ceP->contextAttributeVector,
+         ceP->entityId.creDate,
+         ceP->entityId.modDate);
   }
 }
+
+
 
 /* ****************************************************************************
 *
@@ -337,12 +345,13 @@ void Entity::release(void)
   attributeVector.release();
 }
 
+
+
 /* ****************************************************************************
 *
 * Entity::hideIdAndType
 *
-*  Changes the attribute controlling if id and type
-*  are rendered in the JSON
+* Changes the attribute controlling if id and type are rendered in the JSON
 */
 void Entity::hideIdAndType(bool hide)
 {

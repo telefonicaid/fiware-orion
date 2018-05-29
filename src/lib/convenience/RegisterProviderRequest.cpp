@@ -57,7 +57,7 @@ RegisterProviderRequest::RegisterProviderRequest()
 *
 * RegisterProviderRequest::render - 
 */
-std::string RegisterProviderRequest::render(std::string indent)
+std::string RegisterProviderRequest::render(void)
 {
   std::string  out                            = "";
   bool         durationRendered               = duration.get() != "";
@@ -68,12 +68,12 @@ std::string RegisterProviderRequest::render(std::string indent)
   bool         commaAfterDuration             = commaAfterProvidingApplication || providingApplicationRendered;
   bool         commaAfterMetadataVector       = commaAfterDuration || durationRendered;
 
-  out += startTag(indent);
-  out += metadataVector.render(      indent + "  ", commaAfterMetadataVector);
-  out += duration.render(            indent + "  ", commaAfterDuration);
-  out += providingApplication.render(indent + "  ", commaAfterProvidingApplication);
-  out += registrationId.render(RegisterContext, indent + "  ", commaAfterRegistrationId);
-  out += endTag(indent, false);
+  out += startTag();
+  out += metadataVector.render(commaAfterMetadataVector);
+  out += duration.render(commaAfterDuration);
+  out += providingApplication.render(commaAfterProvidingApplication);
+  out += registrationId.render(RegisterContext, commaAfterRegistrationId);
+  out += endTag(false);
 
   return out;
 }
@@ -88,7 +88,6 @@ std::string RegisterProviderRequest::check
 (
   ApiVersion          apiVersion,
   RequestType         requestType,
-  std::string         indent,
   const std::string&  predetectedError
 )
 {
@@ -99,10 +98,10 @@ std::string RegisterProviderRequest::check
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = metadataVector.check(apiVersion))                        != "OK") ||
-           ((res = duration.check(requestType, indent, "", 0))              != "OK") ||
-           ((res = providingApplication.check(requestType, indent, "", 0))  != "OK") ||
-           ((res = registrationId.check(requestType, indent, "", 0))        != "OK"))
+  else if (((res = metadataVector.check(apiVersion)) != "OK") ||
+           ((res = duration.check())                 != "OK") ||
+           ((res = providingApplication.check())     != "OK") ||
+           ((res = registrationId.check())           != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
   }
@@ -114,7 +113,7 @@ std::string RegisterProviderRequest::check
   std::string details = std::string("RegisterProviderRequest Error: '") + res + "'";
   alarmMgr.badInput(clientIp, details);
 
-  return response.render(indent);
+  return response.render();
 }
 
 
@@ -123,7 +122,7 @@ std::string RegisterProviderRequest::check
 *
 * RegisterProviderRequest::present - 
 */
-void RegisterProviderRequest::present(std::string indent)
+void RegisterProviderRequest::present(const std::string&  indent)
 {
   LM_T(LmtPresent, ("%sRegisterProviderRequest:\n", indent.c_str()));
   metadataVector.present("Registration", indent + "  ");

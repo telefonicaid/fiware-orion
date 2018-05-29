@@ -191,7 +191,7 @@ Date: REGEX(.*)
 07. GET entities of type Juridica - see 2 results
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 744
+Content-Length: 366
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

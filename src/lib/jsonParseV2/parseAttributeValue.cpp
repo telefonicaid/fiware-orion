@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "rapidjson/document.h"
 
 #include "common/errorMessages.h"
@@ -29,10 +31,9 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
-#include "jsonParseV2/parseAttributeValue.h"
-#include "jsonParseV2/parseContextAttributeCompoundValue.h"
 
-using namespace rapidjson;
+#include "jsonParseV2/parseContextAttributeCompoundValue.h"
+#include "jsonParseV2/parseAttributeValue.h"
 
 
 
@@ -42,8 +43,8 @@ using namespace rapidjson;
 */
 std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 {
-  Document    document;
-  OrionError  oe;
+  rapidjson::Document  document;
+  OrionError           oe;
 
   document.Parse(ciP->payload);
 
@@ -51,7 +52,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
   {
     alarmMgr.badInput(clientIp, "JSON parse error");
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
-    ciP->httpStatusCode = SccBadRequest;;
+    ciP->httpStatusCode = SccBadRequest;
     return oe.toJson();
   }
 
@@ -60,7 +61,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
   {
     alarmMgr.badInput(clientIp, "JSON parse error");
     oe.fill(SccBadRequest, "Neither JSON Object nor JSON Array for attribute::value", "BadRequest");
-    ciP->httpStatusCode = SccBadRequest;;
+    ciP->httpStatusCode = SccBadRequest;
     return oe.toJson();
   }
 

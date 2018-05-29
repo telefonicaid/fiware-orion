@@ -35,6 +35,6 @@
 *
 * macroSubstitute - 
 */
-extern void macroSubstitute(std::string* sP, const std::string& in, const ContextElement& ce);
+extern bool macroSubstitute(std::string* sP, const std::string& in, const ContextElement& ce);
 
 #endif  // SRC_LIB_COMMON_MACROSUBSTITUTE_H_

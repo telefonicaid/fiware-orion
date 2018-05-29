@@ -44,13 +44,12 @@ typedef struct ContextRegistrationResponse
 
   ContextRegistrationResponse();
 
-  std::string  render(const std::string& indent, bool comma = false);
+  std::string  render(bool comma);
   void         present(const std::string& indent);
   void         release(void);
 
   std::string  check(ApiVersion          apiVersion,
                      RequestType         requestType,
-                     const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);
 } ContextRegistrationResponse;

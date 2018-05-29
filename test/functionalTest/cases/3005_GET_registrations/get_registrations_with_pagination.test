@@ -1,0 +1,493 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET list of registrations with pagination
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Register entity E1/A1
+# 02. Register entity E2/A1
+# 03. Register entity E3/A1
+# 04. Register entity E4/A1
+# 05. GET all four registrations, as the default result (with 'count' parameter)
+# 06. GET the first two registrations (offset: default=0, limit 2)
+# 07. GET second and third registrations (offset: 1, limit 2)
+# 08. GET only the fourth registration (offset: 3, limit: default=20)
+# 09. GET no registration (offset: 5)
+#
+
+echo "01. Register entity E1/A1"
+echo "========================="
+payload='{
+   "description": "located in CP1",
+   "dataProvided": {
+     "entities": [
+       {
+         "id": "E1",
+         "type": "T1"
+       }
+     ],
+     "attrs": [ "A1" ]
+   },
+   "provider": {
+     "http": {
+       "url": "http://localhost:'${CP1_PORT}'/v2"
+     },
+     "legacyForwarding": true
+   },
+   "status": "active"
+}'
+orionCurl --url /v2/registrations --payload "$payload" --servicePath /a1/e1
+echo
+echo
+
+
+echo "02. Register entity E2/A1"
+echo "========================="
+payload='{
+   "description": "located in CP1",
+   "dataProvided": {
+     "entities": [
+       {
+         "id": "E2",
+         "type": "T1"
+       }
+     ],
+     "attrs": [ "A1" ]
+   },
+   "provider": {
+     "http": {
+       "url": "http://localhost:'${CP1_PORT}'/v2"
+     },
+     "legacyForwarding": true
+   },
+   "status": "active"
+}'
+orionCurl --url /v2/registrations --payload "$payload" --servicePath /a1/e2
+echo
+echo
+
+
+echo "03. Register entity E3/A1"
+echo "========================="
+payload='{
+   "description": "located in CP1",
+   "dataProvided": {
+     "entities": [
+       {
+         "id": "E3",
+         "type": "T1"
+       }
+     ],
+     "attrs": [ "A1" ]
+   },
+   "provider": {
+     "http": {
+       "url": "http://localhost:'${CP1_PORT}'/v2"
+     },
+     "legacyForwarding": true
+   },
+   "status": "active"
+}'
+orionCurl --url /v2/registrations --payload "$payload" --servicePath /a1/e3
+echo
+echo
+
+
+echo "04. Register entity E4/A1"
+echo "========================="
+payload='{
+   "description": "located in CP1",
+   "dataProvided": {
+     "entities": [
+       {
+         "id": "E4",
+         "type": "T1"
+       }
+     ],
+     "attrs": [ "A1" ]
+   },
+   "provider": {
+     "http": {
+       "url": "http://localhost:'${CP1_PORT}'/v2"
+     },
+     "legacyForwarding": true
+   },
+   "status": "active"
+}'
+orionCurl --url /v2/registrations --payload "$payload" --servicePath /a1/e1
+echo
+echo
+
+
+echo "05. GET all four registrations, as the default result (with 'count' parameter)"
+echo "=============================================================================="
+orionCurl --url "/v2/registrations?options=count"
+echo
+echo
+
+
+echo "06. GET the first two registrations (offset: default=0, limit 2)"
+echo "================================================================"
+orionCurl --url "/v2/registrations?limit=2"
+echo
+echo
+
+
+echo "07. GET second and third registrations (offset: 1, limit 2)"
+echo "==========================================================="
+orionCurl --url "/v2/registrations?offset=1&limit=2"
+echo
+echo
+
+
+echo "08. GET only the fourth registration (offset: 3, limit: default=20)"
+echo "==================================================================="
+orionCurl --url "/v2/registrations?offset=3"
+echo
+echo
+
+
+echo "09. GET no registration (offset: 5)"
+echo "==================================="
+orionCurl --url "/v2/registrations?offset=5"
+echo
+echo
+
+
+--REGEXPECT--
+01. Register entity E1/A1
+=========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Register entity E2/A1
+=========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Register entity E3/A1
+=========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Register entity E4/A1
+=========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. GET all four registrations, as the default result (with 'count' parameter)
+==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 1057
+Content-Type: application/json
+Fiware-Total-Count: 4
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "dataProvided": {
+            "attrs": [
+                "A1"
+            ],
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T1"
+                }
+            ]
+        },
+        "description": "located in CP1",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "provider": {
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/v2"
+            },
+            "legacyForwarding": true,
+            "supportedForwardingMode": "all"
+        },
+        "status": "active"
+    },
+    {
+        "dataProvided": {
+            "attrs": [
+                "A1"
+            ],
+            "entities": [
+                {
+                    "id": "E2",
+                    "type": "T1"
+                }
+            ]
+        },
+        "description": "located in CP1",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "provider": {
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/v2"
+            },
+            "legacyForwarding": true,
+            "supportedForwardingMode": "all"
+        },
+        "status": "active"
+    },
+    {
+        "dataProvided": {
+            "attrs": [
+                "A1"
+            ],
+            "entities": [
+                {
+                    "id": "E3",
+                    "type": "T1"
+                }
+            ]
+        },
+        "description": "located in CP1",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "provider": {
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/v2"
+            },
+            "legacyForwarding": true,
+            "supportedForwardingMode": "all"
+        },
+        "status": "active"
+    },
+    {
+        "dataProvided": {
+            "attrs": [
+                "A1"
+            ],
+            "entities": [
+                {
+                    "id": "E4",
+                    "type": "T1"
+                }
+            ]
+        },
+        "description": "located in CP1",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "provider": {
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/v2"
+            },
+            "legacyForwarding": true,
+            "supportedForwardingMode": "all"
+        },
+        "status": "active"
+    }
+]
+
+
+06. GET the first two registrations (offset: default=0, limit 2)
+================================================================
+HTTP/1.1 200 OK
+Content-Length: 529
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "dataProvided": {
+            "attrs": [
+                "A1"
+            ],
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T1"
+                }
+            ]
+        },
+        "description": "located in CP1",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "provider": {
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/v2"
+            },
+            "legacyForwarding": true,
+            "supportedForwardingMode": "all"
+        },
+        "status": "active"
+    },
+    {
+        "dataProvided": {
+            "attrs": [
+                "A1"
+            ],
+            "entities": [
+                {
+                    "id": "E2",
+                    "type": "T1"
+                }
+            ]
+        },
+        "description": "located in CP1",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "provider": {
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/v2"
+            },
+            "legacyForwarding": true,
+            "supportedForwardingMode": "all"
+        },
+        "status": "active"
+    }
+]
+
+
+07. GET second and third registrations (offset: 1, limit 2)
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 529
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "dataProvided": {
+            "attrs": [
+                "A1"
+            ],
+            "entities": [
+                {
+                    "id": "E2",
+                    "type": "T1"
+                }
+            ]
+        },
+        "description": "located in CP1",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "provider": {
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/v2"
+            },
+            "legacyForwarding": true,
+            "supportedForwardingMode": "all"
+        },
+        "status": "active"
+    },
+    {
+        "dataProvided": {
+            "attrs": [
+                "A1"
+            ],
+            "entities": [
+                {
+                    "id": "E3",
+                    "type": "T1"
+                }
+            ]
+        },
+        "description": "located in CP1",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "provider": {
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/v2"
+            },
+            "legacyForwarding": true,
+            "supportedForwardingMode": "all"
+        },
+        "status": "active"
+    }
+]
+
+
+08. GET only the fourth registration (offset: 3, limit: default=20)
+===================================================================
+HTTP/1.1 200 OK
+Content-Length: 265
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "dataProvided": {
+            "attrs": [
+                "A1"
+            ],
+            "entities": [
+                {
+                    "id": "E4",
+                    "type": "T1"
+                }
+            ]
+        },
+        "description": "located in CP1",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "provider": {
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/v2"
+            },
+            "legacyForwarding": true,
+            "supportedForwardingMode": "all"
+        },
+        "status": "active"
+    }
+]
+
+
+09. GET no registration (offset: 5)
+===================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

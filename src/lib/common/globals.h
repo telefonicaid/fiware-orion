@@ -26,7 +26,7 @@
 * Author: Ken Zangelin
 */
 #include <stdint.h>
-
+#include <limits.h>
 #include <string>
 
 #include "common/Timer.h"
@@ -42,10 +42,10 @@
 #define FIWARE_LOCATION_DEPRECATED  "FIWARE_Location"   // Deprecated (but still supported) in Orion 0.16.0
 #define FIWARE_LOCATION_V2          "FIWARE::Location::NGSIv2"
 
-#define EARTH_RADIUS_METERS     6371000
+#define EARTH_RADIUS_METERS         6371000
 
-#define LOCATION_WGS84          "WGS84"
-#define LOCATION_WGS84_LEGACY   "WSG84"    /* We fixed the right string at 0.17.0, but the old one needs to be mantained */
+#define LOCATION_WGS84              "WGS84"
+#define LOCATION_WGS84_LEGACY       "WSG84"    // We fixed the right string at 0.17.0, but the old one needs to be mantained
 
 
 
@@ -90,6 +90,7 @@
 #define DEFAULT_ATTR_NULL_TYPE    "None"
 #define DATE_TYPE                 "DateTime"
 #define DATE_TYPE_ALT             "ISO8601"
+#define NUMBER_TYPE_ALT           "Quantity"
 
 
 
@@ -128,7 +129,8 @@
 #define OPT_DATE_MODIFIED   DATE_MODIFIED
 #define OPT_NO_ATTR_DETAIL  "noAttrDetail"
 
- 
+
+
 /* ****************************************************************************
 *
 * NGSIv2 "flavours" to tune some behaviours in mongoBackend -
@@ -166,13 +168,12 @@ typedef enum ApiVersion
 
 
 /* ****************************************************************************
- * Future date to represent permanent subscriptions.
- * High enough to make the subscription "permanent" but leaving room for
- * some (sloppy) increments, without causing overflow and accidental subscription
- * inactivation.
- *
+*
+* PERMANENT_EXPIRES_DATETIME - date for permanent subscriptions/registrations
 */
-#define PERMANENT_SUBS_DATETIME ((int64_t) 9e18)
+#define PERMANENT_EXPIRES_DATETIME  LLONG_MAX
+
+
 
 /* ****************************************************************************
 *
@@ -185,6 +186,7 @@ typedef enum ApiVersion
 #ifndef MAX
 #  define MAX(a, b)     ((a) > (b)? (a) : (b))
 #endif
+
 
 
 /* ****************************************************************************
@@ -220,6 +222,7 @@ extern bool               checkIdv1;
 extern bool               disableCusNotif;
 
 extern bool               insecureNotif;
+extern bool               ngsiv1Autocast;
 
 extern struct             mosquitto *mosq;  // FIXME PoC: probably not in this file
 
@@ -353,7 +356,16 @@ extern void correlatorIdSet(const char* corrId);
 * It return false in the case of a 'degenerate' box
 *
 */
-extern bool orderCoordsForBox(double* minLat, double* maxLat, double* minLon, double* maxLon, double lat1, double lat2, double lon1, double lon2);
+extern bool orderCoordsForBox
+(
+  double* minLat,
+  double* maxLat,
+  double* minLon,
+  double* maxLon,
+  double lat1,
+  double lat2,
+  double lon1,
+  double lon2
+);
 
 #endif  // SRC_LIB_COMMON_GLOBALS_H_
-	

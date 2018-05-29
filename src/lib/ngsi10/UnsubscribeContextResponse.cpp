@@ -66,14 +66,14 @@ UnsubscribeContextResponse::~UnsubscribeContextResponse()
 *
 * UnsubscribeContextResponse::render - 
 */
-std::string UnsubscribeContextResponse::render(const std::string& indent)
+std::string UnsubscribeContextResponse::render(void)
 {
   std::string out = "";
 
-  out += startTag(indent);
-  out += subscriptionId.render(RtUnsubscribeContextResponse, indent + "  ", true);
-  out += statusCode.render(indent + "  ", false);
-  out += endTag(indent);
+  out += startTag();
+  out += subscriptionId.render(RtUnsubscribeContextResponse, true);
+  out += statusCode.render(false);
+  out += endTag();
 
   return out;
 }

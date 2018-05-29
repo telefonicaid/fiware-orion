@@ -22,11 +22,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "unittest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "rest/ConnectionInfo.h"
+
+#include "unittests/unittest.h"
+
+
 
 extern int servicePathCheck(ConnectionInfo* ciP, const char* path);
 extern int servicePathSplit(ConnectionInfo* ciP);
@@ -35,7 +37,7 @@ extern int servicePathSplit(ConnectionInfo* ciP);
 
 /* ****************************************************************************
 *
-* rest.servicePathCheck - 
+* rest.servicePathCheck -
 */
 TEST(rest, servicePathCheck)
 {
@@ -79,7 +81,7 @@ TEST(rest, servicePathCheck)
 
 /* ****************************************************************************
 *
-* rest.servicePathSplit - 
+* rest.servicePathSplit -
 */
 TEST(rest, servicePathSplit)
 {
@@ -135,6 +137,6 @@ TEST(rest, servicePathSplit)
   ci5.apiVersion = V1;
   r = servicePathSplit(&ci5);
   EXPECT_EQ(-1, r);
-  EXPECT_EQ(168, ci5.answer.size());
+  EXPECT_EQ(137, ci5.answer.size());
   LM_M(("---- 5 -----"));
 }

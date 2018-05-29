@@ -1,8 +1,8 @@
- 
+
 # User & Programmer's Manual
- 
+
  Orion Context Broker: User & Programmer's Manual
- 
+
 ## Table of Contents
 
   * [API Walkthrough (v2)](walkthrough_apiv2.md)
@@ -19,12 +19,16 @@
   * [Updating registrations and subscriptions](updating_regs_and_subs.md)
   * [Context broker federation](federation.md)
   * [Forbidden characters](forbidden_characters.md)
-  * [Using regular expressions in payloads](user/regex_in_payload.md)
+  * [Using regular expressions in payloads](regex_in_payload.md)
+  * [Initial notification](initial_notification.md)
   * [Duration (for registration and subscriptions)](duration.md)
   * [Using empty types](empty_types.md)
   * [Mixing standard and convenience operations](std_conv_mix.md)
   * [HTTP and NGSI response codes](http_and_ngsi_sc.md)
   * [Security considerations](security.md)
   * [Known Limitations](known_limitations.md)
-  * [Considerations on NGSIv1 and NGSIv2 coexistence](v1_v2_coexistence.md)
+  * [CORS](cors.md)
+  * [NGSIv1 Autocast](ngsiv1autocast.md)
+  * [Docker](docker.md)
   * [NGSIv2 Implementation Notes](ngsiv2_implementation_notes.md)
+  * [Considerations on NGSIv1 and NGSIv2 coexistence](v1_v2_coexistence.md)

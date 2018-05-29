@@ -1,4 +1,4 @@
-#<a name="top"></a>FIWARE NGSI APIv1 Walkthrough
+# <a name="top"></a>FIWARE NGSI APIv1 Walkthrough
 
 * [Introduction](#introduction)
 * [Before starting...](#before-starting)
@@ -156,8 +156,6 @@ command:
 # chmod a+x accumulator-server.py
 # ./accumulator-server.py --port 1028 --url /accumulate --host ::1 -v
 ```
-
-The accumulator-server.py is also part of the contextBroker-test package (see [optional packages section in how to install](../admin/install.md#optional-packages)). The script is located at `/usr/share/contextBroker/tests/accumulator-server.py` after installation. However, if you only need the accumulator-server.py it uses to be simpler just downloading it from GitHub, as suggested above.
 
 [Top](#top)
 
@@ -1102,16 +1100,8 @@ Currently, the originator is always "localhost". We will look into a
 more flexible way of using this in a later version.
 
 You may wonder why accumulator-server.py is getting this message if you
-don't actually do any update. This is because the Orion Context Broker
-considers the transition from "non existing subscription" to
-"subscribed" as a change.
-
-NGSI specification is not clear on if an initial notifyContextRequest has to
-be sent in this case or not. On one hand, some developers have told us
-that it might be useful to know the initial values before starting to
-receive notifications due to actual changes. On the other hand, an
-application can get the initial status using queryContext. Thus, this
-behavior could be changed in a later version. What's your opinion? :)
+don't actually do any update. This is due to the *initial notification*,
+which details are described [here](initial_notification.md).
 
 Now, do the following exercise, based on what you know from [update
 context](#update-context-elements): Do the following 4
@@ -3186,7 +3176,7 @@ The response is as follows:
                 ],
                 "entities": [
                     {
-                        "id": "Room1",
+                        "id": "Room2",
                         "isPattern": "false",
                         "type": ""
                     }
@@ -3205,7 +3195,7 @@ The response is as follows:
                 ],
                 "entities": [
                     {
-                        "id": "Room1",
+                        "id": "Room2",
                         "isPattern": "false",
                         "type": ""
                     }

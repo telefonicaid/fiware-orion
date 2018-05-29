@@ -34,7 +34,7 @@
 
 /* ****************************************************************************
 *
-* tree - 
+* tree -
 */
 TEST(CompoundValueNode, tree)
 {
@@ -77,12 +77,12 @@ TEST(CompoundValueNode, tree)
 
 /* ****************************************************************************
 *
-* typeName - 
+* typeName -
 */
 TEST(CompoundValueNode, typeName)
 {
-  orion::ValueType  type[]     = { orion::ValueTypeUnknown, orion::ValueTypeObject, orion::ValueTypeVector, orion::ValueTypeString };
-  const char*       expected[] = { "Unknown",               "Object",               "Vector",               "String"               };
+  orion::ValueType  type[]     = { orion::ValueTypeNotGiven, orion::ValueTypeObject, orion::ValueTypeVector, orion::ValueTypeString };
+  const char*       expected[] = { "NotGiven",               "Object",               "Vector",               "String"               };
 
   utInit();
 
@@ -126,9 +126,9 @@ TEST(CompoundValueNode, vectorInvalidAndOk)
   EXPECT_STREQ("OK", tree->error.c_str());
 
   std::string rendered;
-  
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
-  rendered = tree->render(V1, "");
+  rendered = tree->render(V1);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   tree->shortShow("");
@@ -172,9 +172,9 @@ TEST(CompoundValueNode, structInvalidAndOk)
   EXPECT_STREQ("OK", tree->error.c_str());
 
   std::string rendered;
-  
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
-  rendered = tree->render(V1, "");
+  rendered = tree->render(V1);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   tree->shortShow("");

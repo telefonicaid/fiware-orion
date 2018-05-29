@@ -61,7 +61,7 @@ static char* jsonPayloadClean(const char* payload)
 
 /* ****************************************************************************
 *
-* queryForward - 
+* queryForward -
 *
 * An entity/attribute has been found on some context provider.
 * We need to forward the query request to the context provider, indicated in qcrsP->contextProvider
@@ -88,7 +88,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   if (parseUrl(qcrP->contextProvider, ip, port, prefix, protocol) == false)
   {
     std::string details = std::string("invalid providing application '") + qcrP->contextProvider + "'";
-      
+
     alarmMgr.badInput(clientIp, details);
 
     //
@@ -104,7 +104,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   // 2. Render the string of the request we want to forward
   //
   std::string  payload;
-  TIMED_RENDER(payload = qcrP->render(""));
+  TIMED_RENDER(payload = qcrP->render());
 
   char* cleanPayload = (char*) payload.c_str();;
 
@@ -174,8 +174,8 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   //
   // NOTE
   // When coming from a convenience operation, such as GET /v1/contextEntities/EID/attributes/attrName,
-  // the verb/method in ciP is GET. However, the parsing function expects a POST, as if it came from a 
-  // POST /v1/queryContext. 
+  // the verb/method in ciP is GET. However, the parsing function expects a POST, as if it came from a
+  // POST /v1/queryContext.
   // So, here we change the verb/method for POST.
   //
   ParseData parseData;
@@ -222,7 +222,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
     qcrsP->errorCode.fill(SccContextElementNotFound);
   }
 
-  
+
   //
   // 7. Freeing memory
   //
@@ -234,7 +234,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
 
 /* ****************************************************************************
 *
-* forwardsPending - 
+* forwardsPending -
 */
 static bool forwardsPending(QueryContextResponse* qcrsP)
 {
@@ -250,11 +250,11 @@ static bool forwardsPending(QueryContextResponse* qcrsP)
     for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
     {
       ContextAttribute* aP  = cerP->contextElement.contextAttributeVector[aIx];
-      
+
       if (aP->providingApplication.get() != "")
       {
         return true;
-      }      
+      }
     }
   }
 
@@ -357,10 +357,10 @@ std::string postQueryContext
   //
   // Now, the request is 'simple' if all providingApplicationLists of the ContextElements are empty and
   // no ContextAttribute has any providingApplication.
-  //  
+  //
   if (forwardsPending(qcrsP) == false)
   {
-    TIMED_RENDER(answer = qcrsP->render(ciP->apiVersion, asJsonObject, ""));
+    TIMED_RENDER(answer = qcrsP->render(ciP->apiVersion, asJsonObject));
 
     qcrP->release();
     return answer;
@@ -409,7 +409,7 @@ std::string postQueryContext
     for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
     {
       ContextAttribute*    aP  = cerP->contextElement.contextAttributeVector[aIx];
-      
+
       //
       // An empty providingApplication means the attribute is local
       // In such a case, the response is already in our hand, we just need to copy it to responseV
@@ -492,7 +492,7 @@ std::string postQueryContext
   // do the forward in a separate shell. Better to do it inside the current thread.
   //
   // If providingApplication is empty then that part of the query has been performed already, locally.
-  // 
+  //
   //
   QueryContextResponse* qP;
 

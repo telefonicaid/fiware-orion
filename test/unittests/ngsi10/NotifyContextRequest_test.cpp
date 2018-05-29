@@ -38,7 +38,7 @@
 
 /* ****************************************************************************
 *
-* json_ok - 
+* json_ok -
 */
 TEST(NotifyContextRequest, json_ok)
 {
@@ -54,7 +54,7 @@ TEST(NotifyContextRequest, json_ok)
   ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  
+
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
@@ -68,7 +68,7 @@ TEST(NotifyContextRequest, json_ok)
   //
   ncrP->present("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  rendered = ncrP->render(V1, false, "");
+  rendered = ncrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   ncrP->release();
@@ -80,7 +80,7 @@ TEST(NotifyContextRequest, json_ok)
 
 /* ****************************************************************************
 *
-* json_badIsPattern - 
+* json_badIsPattern -
 */
 TEST(NotifyContextRequest, json_badIsPattern)
 {
@@ -107,7 +107,7 @@ TEST(NotifyContextRequest, json_badIsPattern)
 
 /* ****************************************************************************
 *
-* Constructor - 
+* Constructor -
 */
 TEST(NotifyContextResponse, Constructor)
 {
@@ -131,7 +131,7 @@ TEST(NotifyContextResponse, Constructor)
 
 /* ****************************************************************************
 *
-* json_render - 
+* json_render -
 */
 TEST(NotifyContextRequest, json_render)
 {
@@ -140,18 +140,18 @@ TEST(NotifyContextRequest, json_render)
   const char*              filename3  = "ngsi10.notifyContextRequest.jsonRender3.valid.json";
   NotifyContextRequest*    ncrP;
   ContextElementResponse*  cerP;
-  std::string              rendered;  
+  std::string              rendered;
 
   utInit();
-  
-  // Preparation 
+
+  // Preparation
   ncrP = new NotifyContextRequest();
   ncrP->subscriptionId.set("012345678901234567890123");
   ncrP->originator.set("http://www.tid.es/NotifyContextRequestUnitTest");
 
   // 1. Without ContextResponseList
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  rendered = ncrP->render(V1, false, "");
+  rendered = ncrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
@@ -162,7 +162,7 @@ TEST(NotifyContextRequest, json_render)
   cerP->statusCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  rendered = ncrP->render(V1, false, "");
+  rendered = ncrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
@@ -173,7 +173,7 @@ TEST(NotifyContextRequest, json_render)
   cerP->statusCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
-  rendered = ncrP->render(V1, false, "");
+  rendered = ncrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   utExit();

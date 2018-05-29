@@ -82,7 +82,7 @@ echo
 01. Create entity E using NGSIv1 without type in entity, attribute and metadata
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 539
+Content-Length: 230
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -121,7 +121,7 @@ Date: REGEX(.*)
 02. Get entity using NGSIv1 operation
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 409
+Content-Length: 210
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

@@ -53,9 +53,9 @@ TEST(UnsubscribeContextAvailabilityRequest, constructorAndCheck)
   EXPECT_EQ("", ucar1.subscriptionId.get());
   EXPECT_EQ("012345678901234567890123", ucar2.subscriptionId.get());
 
-  std::string   out;  
+  std::string   out;
 
-  out = ucar2.check("", "", 0);
+  out = ucar2.check("");
   EXPECT_EQ("OK", out);
 
   utExit();
@@ -65,7 +65,7 @@ TEST(UnsubscribeContextAvailabilityRequest, constructorAndCheck)
 
 /* ****************************************************************************
 *
-* badSubscriptionId_json - 
+* badSubscriptionId_json -
 */
 TEST(UnsubscribeContextAvailabilityRequest, badSubscriptionId_json)
 {
@@ -78,7 +78,7 @@ TEST(UnsubscribeContextAvailabilityRequest, badSubscriptionId_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  
+
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
   lmTraceLevelSet(LmtDump, true);

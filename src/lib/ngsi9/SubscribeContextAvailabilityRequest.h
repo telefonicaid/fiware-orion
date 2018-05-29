@@ -1,5 +1,5 @@
-#ifndef SUBSCRIBE_CONTEXT_AVAILABILITY_REQUEST_H
-#define SUBSCRIBE_CONTEXT_AVAILABILITY_REQUEST_H
+#ifndef SRC_LIB_NGSI9_SUBSCRIBECONTEXTAVAILABILITYREQUEST_H_
+#define SRC_LIB_NGSI9_SUBSCRIBECONTEXTAVAILABILITYREQUEST_H_
 
 /*
 *
@@ -27,7 +27,7 @@
 */
 #include <string>
 
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Duration.h"
 #include "ngsi/Reference.h"
@@ -55,7 +55,7 @@
 typedef struct SubscribeContextAvailabilityRequest
 {
   EntityIdVector         entityIdVector;    // Mandatory
-  AttributeList          attributeList;     // Optional
+  StringList             attributeList;     // Optional
   Reference              reference;         // Mandatory
   Duration               duration;          // Optional
   Restriction            restriction;       // Optional
@@ -64,12 +64,12 @@ typedef struct SubscribeContextAvailabilityRequest
   int                    restrictions;
 
   SubscribeContextAvailabilityRequest();
-  std::string  render(const std::string& indent);
-  std::string  check(const std::string& indent, const std::string& predetectedError, int counter);
+  std::string  render(void);
+  std::string  check(const std::string& predetectedError);
   void         release(void);
   void         present(const std::string& indent);
 
   void         fill(EntityTypeInfo typeInfo);
 } SubscribeContextAvailabilityRequest;
 
-#endif
+#endif  // SRC_LIB_NGSI9_SUBSCRIBECONTEXTAVAILABILITYREQUEST_H_

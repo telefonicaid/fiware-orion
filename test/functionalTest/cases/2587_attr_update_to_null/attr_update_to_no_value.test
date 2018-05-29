@@ -1,0 +1,312 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Update attr to no value (equals null)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01.  Create entity with six attrs value X and type T1
+# 02 . Get entity and see six attrs value X and type T1
+# 03a. Update attr A with no value and type T2 using PATCH on entity
+# 03b. Update attr B with no value and type T2 using POST on entity
+# 03c. Update attr C with no value and type T2 using PUT on attr
+# 03d. Update attr D with no value and type T2 using batch update UPDATE
+# 03e. Update attr E with no value and type T2 using batch update APPEND
+# 04.  Get entity and see five attrs with null value and type T2 and one with X value and type T1
+#
+
+echo "01. Create entity with six attrs value X and type T1"
+echo "===================================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": "X",
+    "type": "T1"
+  },
+  "B": {
+    "value": "X",
+    "type": "T1"
+  },
+  "C": {
+    "value": "X",
+    "type": "T1"
+  },
+  "D": {
+    "value": "X",
+    "type": "T1"
+  },
+  "E": {
+    "value": "X",
+    "type": "T1"
+  },
+  "F": {
+    "value": "X",
+    "type": "T1"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Get entity and see six attrs value X and type T1"
+echo "===================================================="
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo "03a. Update attr A with no value and type T2 using PATCH on entity"
+echo "=================================================================="
+payload='{
+  "A": {
+    "type": "T2"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "03b. Update attr B with no value and type T2 using POST on entity"
+echo "================================================================="
+payload='{
+  "B": {
+    "type": "T2"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload" -X POST
+echo
+echo
+
+
+echo "03c. Update attr C with no value and type T2 using PUT on attr"
+echo "=============================================================="
+payload='{
+  "type": "T2"
+}'
+orionCurl --url /v2/entities/E/attrs/C --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "03d. Update attr D with no value and type T2 using batch update UPDATE"
+echo "======================================================================"
+payload='{
+  "actionType": "UPDATE",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E",
+      "D": {
+         "type": "T2"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "03d. Update attr E with no value and type T2 using batch update APPEND"
+echo "======================================================================"
+payload='{
+  "actionType": "APPEND",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E",
+      "E": {
+         "type": "T2"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "04. Get entity and see five attrs with null value and type T2 and one with X value and type T1"
+echo "=============================================================================================="
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity with six attrs value X and type T1
+====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Get entity and see six attrs value X and type T1
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 285
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": "T1",
+        "value": "X"
+    },
+    "B": {
+        "metadata": {},
+        "type": "T1",
+        "value": "X"
+    },
+    "C": {
+        "metadata": {},
+        "type": "T1",
+        "value": "X"
+    },
+    "D": {
+        "metadata": {},
+        "type": "T1",
+        "value": "X"
+    },
+    "E": {
+        "metadata": {},
+        "type": "T1",
+        "value": "X"
+    },
+    "F": {
+        "metadata": {},
+        "type": "T1",
+        "value": "X"
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+03a. Update attr A with no value and type T2 using PATCH on entity
+==================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03b. Update attr B with no value and type T2 using POST on entity
+=================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03c. Update attr C with no value and type T2 using PUT on attr
+==============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03d. Update attr D with no value and type T2 using batch update UPDATE
+======================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03d. Update attr E with no value and type T2 using batch update APPEND
+======================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Get entity and see five attrs with null value and type T2 and one with X value and type T1
+==============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 290
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": "T2",
+        "value": null
+    },
+    "B": {
+        "metadata": {},
+        "type": "T2",
+        "value": null
+    },
+    "C": {
+        "metadata": {},
+        "type": "T2",
+        "value": null
+    },
+    "D": {
+        "metadata": {},
+        "type": "T2",
+        "value": null
+    },
+    "E": {
+        "metadata": {},
+        "type": "T2",
+        "value": null
+    },
+    "F": {
+        "metadata": {},
+        "type": "T1",
+        "value": "X"
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

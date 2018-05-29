@@ -30,17 +30,17 @@
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 TEST(ErrorCode, render)
 {
-  ErrorCode    e1; 
+  ErrorCode    e1;
   std::string  out;
   const char*  outfile1 = "ngsi.errorCode.render1.middle.json";
 
   utInit();
 
-  out = e1.render("");
+  out = e1.render();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -51,7 +51,7 @@ TEST(ErrorCode, render)
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 */
 TEST(ErrorCode, check)
 {

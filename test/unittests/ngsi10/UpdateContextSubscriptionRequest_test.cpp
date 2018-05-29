@@ -44,7 +44,7 @@
 
 /* ****************************************************************************
 *
-* badLength_json - 
+* badLength_json -
 */
 TEST(UpdateContextSubscriptionRequest, badLength_json)
 {
@@ -52,10 +52,10 @@ TEST(UpdateContextSubscriptionRequest, badLength_json)
   ConnectionInfo  ci("", "POST", "1.1");
   std::string     out;
   const char*     infile   = "ngsi10.updateContextSubscriptionRequest.badLength.invalid.json";
-  const char*     outfile1 = "ngsi10.updateContextSubscriptionRequest.badLength.expected1.valid.json";  
+  const char*     outfile1 = "ngsi10.updateContextSubscriptionRequest.badLength.expected1.valid.json";
   const char*     outfile3 = "ngsi10.updateContextSubscriptionRequest.badLength.expected3.valid.json";
   const char*     outfile4 = "ngsi10.updateContextSubscriptionRequest.badLength.expected4.valid.json";
-  
+
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
@@ -73,16 +73,16 @@ TEST(UpdateContextSubscriptionRequest, badLength_json)
   // With the data obtained, render, present and release methods are exercised
   //
   UpdateContextSubscriptionRequest*  ucsrP = &parseData.ucsr.res;
-  
+
   ucsrP->present(""); // No output
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
-  out  = ucsrP->check("", "FORCED ERROR", 0);
+  out  = ucsrP->check("FORCED ERROR", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ucsrP->duration.set("XXXYYYZZZ");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
-  out  = ucsrP->check("", "", 0);
+  out  = ucsrP->check("", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ucsrP->present("");
@@ -95,7 +95,7 @@ TEST(UpdateContextSubscriptionRequest, badLength_json)
 
 /* ****************************************************************************
 *
-* invalidDuration_json - 
+* invalidDuration_json -
 */
 TEST(UpdateContextSubscriptionRequest, invalidDuration_json)
 {
@@ -103,7 +103,7 @@ TEST(UpdateContextSubscriptionRequest, invalidDuration_json)
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     infile   = "ngsi10.updateContextSubscriptionRequest.duration.invalid.json";
   const char*     outfile  = "ngsi10.updateContextSubscriptionResponse.invalidDuration.valid.json";
-  
+
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
@@ -122,7 +122,7 @@ TEST(UpdateContextSubscriptionRequest, invalidDuration_json)
 
 /* ****************************************************************************
 *
-* scopeGeolocationCircleOkJson - 
+* scopeGeolocationCircleOkJson -
 */
 TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleOkJson)
 {
@@ -147,7 +147,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleOkJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationCircleInvertedJson - 
+* scopeGeolocationCircleInvertedJson -
 */
 TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedJson)
 {
@@ -172,7 +172,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationCircleInvertedBadValueJson - 
+* scopeGeolocationCircleInvertedBadValueJson -
 */
 TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedBadValueJson)
 {
@@ -200,7 +200,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedBadValueJso
 
 /* ****************************************************************************
 *
-* scopeGeolocationCircleZeroRadiusJson - 
+* scopeGeolocationCircleZeroRadiusJson -
 */
 TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleZeroRadiusJson)
 {
@@ -228,7 +228,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleZeroRadiusJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationPolygonOkJson - 
+* scopeGeolocationPolygonOkJson -
 */
 TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonOkJson)
 {
@@ -253,7 +253,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonOkJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationPolygonInvertedJson - 
+* scopeGeolocationPolygonInvertedJson -
 */
 TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedJson)
 {
@@ -278,7 +278,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationPolygonInvertedBadValueJson - 
+* scopeGeolocationPolygonInvertedBadValueJson -
 */
 TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedBadValueJson)
 {
@@ -306,7 +306,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedBadValueJs
 
 /* ****************************************************************************
 *
-* scopeGeolocationPolygonNoVerticesJson - 
+* scopeGeolocationPolygonNoVerticesJson -
 */
 TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonNoVerticesJson)
 {
@@ -334,7 +334,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonNoVerticesJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationPolygonOneVertexJson - 
+* scopeGeolocationPolygonOneVertexJson -
 */
 TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonOneVertexJson)
 {
@@ -362,7 +362,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonOneVertexJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationPolygonTwoVerticesJson - 
+* scopeGeolocationPolygonTwoVerticesJson -
 */
 TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonTwoVerticesJson)
 {

@@ -60,24 +60,48 @@ SubscribeContextResponse::SubscribeContextResponse(StatusCode& errorCode)
 
 /* ****************************************************************************
 *
-* SubscribeContextResponse::render - 
+* SubscribeContextResponse::toJson -
 */
-std::string SubscribeContextResponse::render(const std::string& indent)
+std::string SubscribeContextResponse::toJson(void)
 {
-  std::string out     = "";
+  std::string out = "";
 
-  out += startTag(indent);
+  out += "{";
 
   if (subscribeError.errorCode.code == SccNone)
   {
-    out += subscribeResponse.render(indent + "  ", false);
+    out += subscribeResponse.render(false);
   }
   else
   {
-    out += subscribeError.render(SubscribeContext, indent + "  ", false);
+    out += subscribeError.toJson(SubscribeContext, false);
   }
 
-  out += endTag(indent, false);
+  out +=  "}";
+
+  return out;
+}
+
+/* ****************************************************************************
+*
+* SubscribeContextResponse::render - 
+*/
+std::string SubscribeContextResponse::render(void)
+{
+  std::string out     = "";
+
+  out += startTag();
+
+  if (subscribeError.errorCode.code == SccNone)
+  {
+    out += subscribeResponse.render(false);
+  }
+  else
+  {
+    out += subscribeError.render(SubscribeContext, false);
+  }
+
+  out += endTag(false);
 
   return out;
 }

@@ -28,10 +28,11 @@
 #include <sys/stat.h>
 #include <stdio.h>
 #include <unistd.h>      // needed for read function in Debian 7
-#include <string>
 #include <string.h>
 
-#include "testDataFromFile.h"
+#include <string>
+
+#include "unittests/testDataFromFile.h"
 
 
 
@@ -83,7 +84,17 @@ std::string testDataFromFile(char* buffer, int bufSize, const char* fileName)
     return std::string("stat(") + path + "): " + strerror(errno);
 
   if (sBuf.st_size > bufSize)
-    return std::string("buffer too small (") + toString(bufSize) + " bytes): " + toString(sBuf.st_size) + " bytes needed to hold the content of " + path;
+  {
+    std::string error;
+
+    error  = std::string("buffer too small (");
+    error += toString(bufSize) + " bytes): ";
+    error += toString(sBuf.st_size);
+    error += " bytes needed to hold the content of ";
+    error += path;
+
+    return error;
+  }
 
   if ((fd = open(path, O_RDONLY)) == -1)
     return std::string("open(") + path + "): " + strerror(errno);
@@ -95,8 +106,8 @@ std::string testDataFromFile(char* buffer, int bufSize, const char* fileName)
 
   if (nb != sBuf.st_size)
     return std::string("bad size read from ") + path;
-  
+
   buffer[nb] = 0;
-  
+
   return "OK";
 }

@@ -27,12 +27,20 @@
 */
 #include <string>
 #include <vector>
+#include <map>
 
 #include "apiTypesV2/EntityVector.h"
 #include "rest/OrionError.h"
 
 
+
+/* ****************************************************************************
+*
+* To avoid a problematic and not necessary include
+*/
 struct QueryContextResponse;
+
+
 
 /* ****************************************************************************
 *
@@ -40,7 +48,7 @@ struct QueryContextResponse;
 */
 class Entities
 {
-public:
+ public:
   EntityVector  vec;          // Optional - mandatory if 200-OK
   OrionError    oe;           // Optional - mandatory if not 200-OK
 
@@ -49,6 +57,7 @@ public:
 
   std::string  render(std::map<std::string, bool>&         uriParamOptions,
                       std::map<std::string, std::string>&  uriParam);
+
   std::string  check(ApiVersion apiVersion, RequestType requestType);
   void         present(const std::string& indent);
   void         release(void);

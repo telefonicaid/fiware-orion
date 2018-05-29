@@ -69,7 +69,7 @@ orionCurl --url "/v1/contextEntities/Room1"
 --REGEXPECT--
 +++++ 1. creating base entity +++++
 HTTP/1.1 200 OK
-Content-Length: 763
+Content-Length: 358
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -115,7 +115,7 @@ Date: REGEX(.*)
 }
 +++++ 2. delete an attribute by valueID +++++
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -126,7 +126,7 @@ Date: REGEX(.*)
 }
 +++++ 3. lookup the entity +++++
 HTTP/1.1 200 OK
-Content-Length: 442
+Content-Length: 243
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

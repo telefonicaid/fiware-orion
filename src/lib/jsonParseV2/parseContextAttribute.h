@@ -25,11 +25,11 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "rapidjson/document.h"
 
 #include "rest/ConnectionInfo.h"
-
-using namespace rapidjson;
 
 
 
@@ -37,7 +37,12 @@ using namespace rapidjson;
 *
 * parseContextAttribute - 
 */
-extern std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberIterator& iter, ContextAttribute* caP);
+extern std::string parseContextAttribute
+(
+  ConnectionInfo*                               ciP,
+  const rapidjson::Value::ConstMemberIterator&  iter,
+  ContextAttribute*                             caP
+);
 
 
 

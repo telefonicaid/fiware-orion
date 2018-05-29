@@ -38,13 +38,7 @@
 *
 * Originator::check -
 */
-std::string Originator::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string Originator::check(void)
 {
   return "OK";
 }
@@ -108,14 +102,14 @@ void Originator::present(const std::string& indent)
 *
 * Originator::render -
 */
-std::string Originator::render(const std::string& indent, bool comma)
+std::string Originator::render(bool comma)
 {
   if (string == "")
   {
     return "";
   }
 
-  return valueTag(indent, "originator", string, comma);
+  return valueTag("originator", string, comma);
 }
 
 

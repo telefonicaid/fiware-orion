@@ -1,5 +1,5 @@
-#ifndef UNSUBSCRIBE_CONTEXT_RESPONSE_H
-#define UNSUBSCRIBE_CONTEXT_RESPONSE_H
+#ifndef SRC_LIB_NGSI10_UNSUBSCRIBECONTEXTRESPONSE_H_
+#define SRC_LIB_NGSI10_UNSUBSCRIBECONTEXTRESPONSE_H_
 
 /*
 *
@@ -49,8 +49,8 @@ typedef struct UnsubscribeContextResponse
   UnsubscribeContextResponse(StatusCode& statusCode);
   ~UnsubscribeContextResponse();
 
-  std::string     render(const std::string& indent);
+  std::string     render(void);
   void            release(void);
 } UnsubscribeContextResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI10_UNSUBSCRIBECONTEXTRESPONSE_H_

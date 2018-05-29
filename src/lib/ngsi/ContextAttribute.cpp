@@ -45,6 +45,7 @@
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/compoundValueBson.h"
+#include "mongoBackend/dbFieldEncoding.h"
 
 using namespace mongo;
 using namespace orion;
@@ -56,24 +57,72 @@ using namespace orion;
 * ContextAttribute::bsonAppendAttrValue -
 *
 */
-void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr) const
+void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast) const
 {
-  switch (valueType)
+  std::string effectiveStringValue = stringValue;
+  bool        effectiveBoolValue   = boolValue;
+  double      effectiveNumberValue = numberValue;
+  ValueType   effectiveValueType   = valueType;
+
+  // Checking for ValueTypeString is an additional safety measure (ensuring that the attribute came from NGSIv1 in plain text)
+  if ((autocast) && (effectiveValueType == ValueTypeString))
+  {
+    // Autocast only for selected attribute types
+    if ((attrType == DEFAULT_ATTR_NUMBER_TYPE) || (attrType == NUMBER_TYPE_ALT))
+    {
+      if (str2double(effectiveStringValue.c_str(), &effectiveNumberValue))
+      {
+        effectiveValueType = ValueTypeNumber;
+      }
+      // Note that if str2double() fails, we keep ValueTypeString and everything works like without autocast
+    }
+    if (attrType == DEFAULT_ATTR_BOOL_TYPE)
+    {
+      // Note that we cannot use isTrue() or isFalse() functions, as they consider also 0 and 1 as
+      // valid true/false values and JSON spec mandates exactly true or false
+      if (effectiveStringValue == "true")
+      {
+        effectiveBoolValue = true;
+        effectiveValueType = ValueTypeBoolean;
+      }
+      else if (effectiveStringValue == "false")
+      {
+        effectiveBoolValue = false;
+        effectiveValueType = ValueTypeBoolean;
+      }
+      // Note that if above checks fail, we keep ValueTypeString and everything works like without autocast
+    }
+    if ((attrType == DATE_TYPE) || (attrType == DATE_TYPE_ALT))
+    {
+      effectiveNumberValue = parse8601Time(effectiveStringValue);
+      if (effectiveNumberValue != -1)
+      {
+        effectiveValueType = ValueTypeNumber;
+      }
+      // Note that if parse8601Time() fails, we keep ValueTypeString and everything works like without autocast
+    }
+  }
+
+  switch (effectiveValueType)
   {
     case ValueTypeString:
-      bsonAttr.append(ENT_ATTRS_VALUE, stringValue);
+      bsonAttr.append(ENT_ATTRS_VALUE, effectiveStringValue);
       break;
 
     case ValueTypeNumber:
-      bsonAttr.append(ENT_ATTRS_VALUE, numberValue);
+      bsonAttr.append(ENT_ATTRS_VALUE, effectiveNumberValue);
       break;
 
     case ValueTypeBoolean:
-      bsonAttr.append(ENT_ATTRS_VALUE, boolValue);
+      bsonAttr.append(ENT_ATTRS_VALUE, effectiveBoolValue);
       break;
 
-    case ValueTypeNone:
+    case ValueTypeNull:
       bsonAttr.appendNull(ENT_ATTRS_VALUE);
+      break;
+
+    case ValueTypeNotGiven:
+      LM_E(("Runtime Error (value not given in compound value)"));
       break;
 
     default:
@@ -82,17 +131,18 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr) const
 }
 
 
+
 /* ****************************************************************************
 *
 * ContextAttribute::valueBson -
 *
 * Used to render attribute value to BSON, appended into the bsonAttr builder
 */
-void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr) const
+void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast) const
 {
   if (compoundValueP == NULL)
   {
-    bsonAppendAttrValue(bsonAttr);
+    bsonAppendAttrValue(bsonAttr, attrType, autocast);
   }
   else
   {
@@ -124,10 +174,14 @@ void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr) const
       // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
       bsonAttr.append(ENT_ATTRS_VALUE, compoundValueP->boolValue);
     }
-    else if (compoundValueP->valueType == ValueTypeNone)
+    else if (compoundValueP->valueType == ValueTypeNull)
     {
       // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
       bsonAttr.appendNull(ENT_ATTRS_VALUE);
+    }
+    else if (compoundValueP->valueType == ValueTypeNotGiven)
+    {
+      LM_E(("Runtime Error (value not given in compound value)"));
     }
     else
     {
@@ -159,7 +213,8 @@ ContextAttribute::ContextAttribute()
   name                  = "";
   type                  = "";
   stringValue           = "";
-  valueType             = orion::ValueTypeString;
+  numberValue           = 0;
+  valueType             = orion::ValueTypeNotGiven;
   compoundValueP        = NULL;
   found                 = false;
   skip                  = false;
@@ -266,6 +321,7 @@ ContextAttribute::ContextAttribute
   name                  = _name;
   type                  = _type;
   stringValue           = std::string(_value);
+  numberValue           = 0;
   valueType             = orion::ValueTypeString;
   compoundValueP        = NULL;
   found                 = _found;
@@ -303,6 +359,7 @@ ContextAttribute::ContextAttribute
   name                  = _name;
   type                  = _type;
   stringValue           = _value;
+  numberValue           = 0;
   valueType             = orion::ValueTypeString;
   compoundValueP        = NULL;
   found                 = _found;
@@ -377,6 +434,7 @@ ContextAttribute::ContextAttribute
   name                  = _name;
   type                  = _type;
   boolValue             = _value;
+  numberValue           = 0;
   valueType             = orion::ValueTypeBoolean;
   compoundValueP        = NULL;
   found                 = _found;
@@ -410,6 +468,7 @@ ContextAttribute::ContextAttribute
   name                  = _name;
   type                  = _type;
   compoundValueP        = _compoundValueP->clone();
+  numberValue           = 0;
   found                 = false;
   valueType             = orion::ValueTypeObject;  // FIXME P6: Could be ValueTypeVector ...
   skip                  = false;
@@ -487,19 +546,18 @@ std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
 */
 std::string ContextAttribute::renderAsJsonObject
 (
-  ApiVersion          apiVersion,
-  RequestType         request,
-  const std::string&  indent,
-  bool                comma,
-  bool                omitValue
+  ApiVersion   apiVersion,
+  RequestType  request,
+  bool         comma,
+  bool         omitValue
 )
 {
   std::string  out                    = "";
   bool         commaAfterContextValue = metadataVector.size() != 0;
   bool         commaAfterType         = !omitValue || commaAfterContextValue;
 
-  out += startTag(indent, name, false);
-  out += valueTag(indent + "  ", "type",         type,  commaAfterType);
+  out += startTag(name, false);
+  out += valueTag("type",         type,  commaAfterType);
 
   if (compoundValueP == NULL)
   {
@@ -531,9 +589,13 @@ std::string ContextAttribute::renderAsJsonObject
         }
         break;
 
-      case ValueTypeNone:
+      case ValueTypeNull:
         effectiveValue = "null";
         withoutQuotes  = true;
+        break;
+
+      case ValueTypeNotGiven:
+        LM_E(("Runtime Error (value not given in compound value)"));
         break;
 
       default:
@@ -545,9 +607,9 @@ std::string ContextAttribute::renderAsJsonObject
       // renderAsJsonObject is used in v1 only.
       // => we only need to care about stringValue (not boolValue, numberValue nor nullValue)
       //
-      out += valueTag(indent + "  ", "value",
-                            (request != RtUpdateContextResponse)? effectiveValue : "",
-                            commaAfterContextValue, false, withoutQuotes);
+      out += valueTag("value",
+                      (request != RtUpdateContextResponse)? effectiveValue : "",
+                      commaAfterContextValue, false, withoutQuotes);
     }
   }
   else
@@ -559,41 +621,45 @@ std::string ContextAttribute::renderAsJsonObject
       isCompoundVector = true;
     }
 
-    out += startTag(indent + "  ", "value", isCompoundVector);
-    out += compoundValueP->render(apiVersion, indent + "    ");
-    out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
+    out += startTag("value", isCompoundVector);
+    out += compoundValueP->render(apiVersion);
+    out += endTag(commaAfterContextValue, isCompoundVector);
   }
 
   if (omitValue == false)
   {
-    out += metadataVector.render(indent + "  ", false);
+    out += metadataVector.render(false);
   }
 
-  out += endTag(indent, comma);
+  out += endTag(comma);
 
   return out;
 }
+
+
 
 /* ****************************************************************************
 *
 * renderAsNameString -
 */
-std::string ContextAttribute::renderAsNameString(const std::string& indent, bool comma)
+std::string ContextAttribute::renderAsNameString(bool comma)
 {
   std::string  out = "";
 
   if (comma)
   {
-    out += indent + "\"" + name + "\",\n";
+    out += "\"" + name + "\",";
   }
   else
   {
-    out += indent + "\"" + name + "\"\n";
+    out += "\"" + name + "\"";
   }
 
   return out;
 
 }
+
+
 
 /* ****************************************************************************
 *
@@ -601,12 +667,11 @@ std::string ContextAttribute::renderAsNameString(const std::string& indent, bool
 */
 std::string ContextAttribute::render
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         request,
-  const std::string&  indent,
-  bool                comma,
-  bool                omitValue
+  ApiVersion   apiVersion,
+  bool         asJsonObject,
+  RequestType  request,
+  bool         comma,
+  bool         omitValue
 )
 {
   std::string  out                    = "";
@@ -616,12 +681,12 @@ std::string ContextAttribute::render
 
   if (asJsonObject)
   {
-    return renderAsJsonObject(apiVersion, request, indent, comma, omitValue);
+    return renderAsJsonObject(apiVersion, request, comma, omitValue);
   }
 
-  out += startTag(indent);
-  out += valueTag(indent + "  ", "name", name,  true);  // attribute.type is always rendered
-  out += valueTag(indent + "  ", "type", type,  commaAfterType);
+  out += startTag();
+  out += valueTag("name", name,  true);  // attribute.type is always rendered
+  out += valueTag("type", type,  commaAfterType);
 
   if (compoundValueP == NULL)
   {
@@ -653,17 +718,20 @@ std::string ContextAttribute::render
         }
         break;
 
-      case ValueTypeNone:
+      case ValueTypeNull:
         effectiveValue = "null";
         withoutQuotes  = true;
+        break;
+
+      case ValueTypeNotGiven:
+        LM_E(("Runtime Error (value not given in compound value)"));
         break;
 
       default:
         LM_E(("Runtime Error (unknown value type: %d)", valueType));
       }
 
-      out += valueTag(indent + "  ",
-                      "value",
+      out += valueTag("value",
                       (request != RtUpdateContextResponse)? effectiveValue : "",
                       commaAfterContextValue,
                       false,
@@ -672,7 +740,7 @@ std::string ContextAttribute::render
     }
     else if (request == RtUpdateContextResponse)
     {
-      out += valueTag(indent + "  ", "value", "", commaAfterContextValue);
+      out += valueTag("value", "", commaAfterContextValue);
     }
   }
   else
@@ -684,13 +752,13 @@ std::string ContextAttribute::render
       isCompoundVector = true;
     }
 
-    out += startTag(indent + "  ", "value", isCompoundVector);
-    out += compoundValueP->render(apiVersion, indent + "    ");
-    out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
+    out += startTag("value", isCompoundVector);
+    out += compoundValueP->render(apiVersion);
+    out += endTag(commaAfterContextValue, isCompoundVector);
   }
 
-  out += metadataVector.render(indent + "  ", false);
-  out += endTag(indent, comma);
+  out += metadataVector.render(false);
+  out += endTag(comma);
 
   return out;
 }
@@ -701,9 +769,7 @@ std::string ContextAttribute::render
 *
 * toJson -
 *
-* FIXME: Refactor this method in order to simplify
-*        the code paths of the rendering process
-*
+* FIXME: Refactor this method in order to simplify the code paths of the rendering process
 */
 std::string ContextAttribute::toJson
 (
@@ -735,11 +801,11 @@ std::string ContextAttribute::toJson
     {
       if (compoundValueP->isObject())
       {
-        out += "{" + compoundValueP->toJson(true) + "}";
+        out += "{" + compoundValueP->toJson(true, true) + "}";
       }
       else if (compoundValueP->isVector())
       {
-        out += "[" + compoundValueP->toJson(true) + "]";
+        out += "[" + compoundValueP->toJson(true, true) + "]";
       }
     }
     else if (valueType == orion::ValueTypeNumber)
@@ -761,9 +827,13 @@ std::string ContextAttribute::toJson
     {
       out += (boolValue == true)? "true" : "false";
     }
-    else if (valueType == orion::ValueTypeNone)
+    else if (valueType == orion::ValueTypeNull)
     {
       out += "null";
+    }
+    else if (valueType == orion::ValueTypeNotGiven)
+    {
+      LM_E(("Runtime Error (value not given in compound value)"));
     }
   }
   else  // Render mode: normalized 
@@ -796,11 +866,11 @@ std::string ContextAttribute::toJson
     {
       if (compoundValueP->isObject())
       {
-        out += JSON_STR("value") + ":{" + compoundValueP->toJson(true) + "}";
+        out += JSON_STR("value") + ":{" + compoundValueP->toJson(true, true) + "}";
       }
       else if (compoundValueP->isVector())
       {
-        out += JSON_STR("value") + ":[" + compoundValueP->toJson(true) + "]";
+        out += JSON_STR("value") + ":[" + compoundValueP->toJson(true, true) + "]";
       }
     }
     else if (valueType == orion::ValueTypeNumber)
@@ -822,9 +892,13 @@ std::string ContextAttribute::toJson
     {
       out += JSON_VALUE_BOOL("value", boolValue);
     }
-    else if (valueType == orion::ValueTypeNone)
+    else if (valueType == orion::ValueTypeNull)
     {
       out += JSON_STR("value") + ":" + "null";
+    }
+    else if (valueType == orion::ValueTypeNotGiven)
+    {
+      LM_E(("Runtime Error (value not given in compound value)"));
     }
     else
     {
@@ -906,9 +980,13 @@ std::string ContextAttribute::toJsonAsValue
         out = buf;
         break;
 
-      case orion::ValueTypeNone:
+      case orion::ValueTypeNull:
         snprintf(buf, sizeof(buf), "%s", "null");
         out = buf;
+        break;
+
+      case orion::ValueTypeNotGiven:
+        LM_E(("Runtime Error (value not given in compound value)"));
         break;
 
       default:
@@ -939,11 +1017,11 @@ std::string ContextAttribute::toJsonAsValue
 
       if (compoundValueP->isVector())
       {
-        out = "[" + compoundValueP->toJson(true) + "]";
+        out = "[" + compoundValueP->toJson(true, true) + "]";
       }
       else  // Object
       {
-        out = "{" + compoundValueP->toJson(false) + "}";
+        out = "{" + compoundValueP->toJson(false, true) + "}";
       }
     }
   }
@@ -1069,9 +1147,13 @@ void ContextAttribute::present(const std::string& indent, int ix)
 			indent.c_str(), 
 			(boolValue == false)? "false" : "true"));
     }
-    else if (valueType == orion::ValueTypeNone)
+    else if (valueType == orion::ValueTypeNull)
     {
       LM_T(LmtPresent, ("%s  No Value", indent.c_str()));
+    }
+    else if (valueType == orion::ValueTypeNotGiven)
+    {
+      LM_E(("Runtime Error (value not given in compound value)"));
     }
     else
     {
@@ -1134,6 +1216,8 @@ std::string ContextAttribute::getName(void)
   return name;
 }
 
+
+
 /* ****************************************************************************
 *
 * ContextAttribute::getValue -
@@ -1154,8 +1238,12 @@ std::string ContextAttribute::getValue(void) const
     return boolValue ? "true" : "false";
     break;
 
-  case orion::ValueTypeNone:
+  case orion::ValueTypeNull:
     return "null";
+    break;
+
+  case orion::ValueTypeNotGiven:    
+    return "<not given>";
     break;
 
   default:
@@ -1213,7 +1301,7 @@ bool ContextAttribute::compoundItemExists(const std::string& compoundPath, orion
 
     for (unsigned int cIx = 0; cIx < current->childV.size(); ++cIx)
     {
-      if (current->childV[cIx]->name == compoundPathV[ix])
+      if (dbDotEncode(current->childV[cIx]->name) == compoundPathV[ix])
       {
         current = current->childV[cIx];
         found   = true;

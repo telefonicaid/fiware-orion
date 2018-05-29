@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_APITYPESV2_SUBSCRIPTION_H
-#define SRC_LIB_APITYPESV2_SUBSCRIPTION_H
+#ifndef SRC_LIB_APITYPESV2_SUBSCRIPTION_H_
+#define SRC_LIB_APITYPESV2_SUBSCRIPTION_H_
 
 /*
 *
@@ -30,6 +30,7 @@
 
 #include "ngsi/Duration.h"
 #include "ngsi/Throttling.h"
+#include "apiTypesV2/EntID.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 #include "ngsi/Restriction.h"
@@ -37,36 +38,10 @@
 
 namespace ngsiv2
 {
-
-struct EntID
-{
-  std::string id;
-  std::string idPattern;
-  std::string type;
-  std::string typePattern;
-  std::string toJson();
-
-  EntID(const std::string& idA, const std::string& idPatternA,
-        const std::string& typeA, const std::string& typePatternA):
-    id(idA),
-    idPattern(idPatternA),
-    type(typeA),
-    typePattern(typePatternA)
-  {}
-
-  EntID()
-  {}
-
-};
-
-inline bool operator==(const EntID& lhs, const EntID& rhs)
-{
-  return (lhs.id   == rhs.id)   && (lhs.idPattern   == rhs.idPattern)
-      && (lhs.type == rhs.type) && (lhs.typePattern == rhs.typePattern);
-}
-
-inline bool operator!=(const EntID& lhs, const EntID& rhs){ return !(lhs == rhs); }
-
+/* ****************************************************************************
+*
+* Notification -
+*/
 struct Notification
 {
   std::vector<std::string> attributes;
@@ -76,8 +51,8 @@ struct Notification
   long long                lastNotification;
   HttpInfo                 httpInfo;
   std::string              toJson(const std::string& attrsFormat);
-  int                      lastFailure;
-  int                      lastSuccess;
+  int                      lastFailure;  // FIXME P4: should be long long, like lastNotification
+  int                      lastSuccess;  // FIXME P4: should be long long, like lastNotification
   Notification():
     attributes(),
     blacklist(false),
@@ -91,15 +66,23 @@ struct Notification
 
 
 
+/* ****************************************************************************
+*
+* Condition -
+*/
 struct Condition
 {
-  std::vector<std::string> attributes;
-  SubscriptionExpression   expression;
-  std::string toJson();
+  std::vector<std::string>  attributes;
+  SubscriptionExpression    expression;
+  std::string               toJson();
 };
 
 
 
+/* ****************************************************************************
+*
+* Subject -
+*/
 struct Subject
 {
   std::vector<EntID> entities;
@@ -108,25 +91,28 @@ struct Subject
 };
 
 
+
+/* ****************************************************************************
+*
+* Subscription -
+*/
 struct Subscription
 {
-  std::string  id;
-  std::string  description;
-  bool         descriptionProvided;
-  Subject      subject;
-  long long    expires;
-  std::string  status;
-  Notification notification;
-  long long    throttling;
-  RenderFormat attrsFormat;
-  Restriction  restriction;
-  std::string  toJson();
+  std::string   id;
+  std::string   description;
+  bool          descriptionProvided;
+  Subject       subject;
+  long long     expires;
+  std::string   status;
+  Notification  notification;
+  long long     throttling;
+  RenderFormat  attrsFormat;
+  Restriction   restriction;
+  std::string   toJson();
 
   ~Subscription();
 };
 
+}  // end namespace
 
-
-} // end namespace
-
-#endif // SRC_LIB_APITYPESV2_SUBSCRIPTION_H
+#endif  // SRC_LIB_APITYPESV2_SUBSCRIPTION_H_

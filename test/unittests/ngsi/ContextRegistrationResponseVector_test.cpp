@@ -44,7 +44,7 @@ TEST(ContextRegistrationResponseVector, all)
   crr.contextRegistration.providingApplication.set("10.1.1.1://nada");
 
   // Empty vector gives empty rendered result
-  rendered = crrV.render("");
+  rendered = crrV.render(false);
   EXPECT_EQ("", rendered);
 
   crrV.push_back(&crr);
@@ -53,18 +53,18 @@ TEST(ContextRegistrationResponseVector, all)
   crrV.present("");
 
   // check OK
-  rendered = crrV.check(V1, RegisterContext, "", "", 0);
+  rendered = crrV.check(V1, RegisterContext, "", 0);
   EXPECT_EQ("OK", rendered);
 
   // Now telling the crr that we've found an instance of '<entityIdList></entityIdList>
   // but without any entities inside the vector
   crr.contextRegistration.entityIdVectorPresent = true;
-  rendered = crrV.check(V1, RegisterContext, "", "", 0);
+  rendered = crrV.check(V1, RegisterContext, "", 0);
   EXPECT_EQ("Empty entityIdVector", rendered);
 
   EntityId             eId;   // Empty ID
 
   crr.contextRegistration.entityIdVector.push_back(&eId);
-  rendered = crrV.check(V1, RegisterContext, "", "", 0);
+  rendered = crrV.check(V1, RegisterContext, "", 0);
   EXPECT_EQ("empty entityId:id", rendered);
 }

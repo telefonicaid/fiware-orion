@@ -1,4 +1,4 @@
-#<a name="top"></a>Performance tuning
+# <a name="top"></a>Performance tuning
 
 * [MongoDB configuration](#mongodb-configuration)
 * [Database indexes](#database-indexes)
@@ -7,26 +7,26 @@
 * [HTTP server tuning](#http-server-tuning)
 * [Orion thread model and its implications](#orion-thread-model-and-its-implications)
 * [File descriptors sizing](#file-descriptors-sizing)
-* [Identifying bootlenecks looking at semWait statistics](#identifying-bootlenecks-looking-at-semwait-statistics)
-* [Log impact in performance](#log-impact-in-performance)
-* [Metrics impact in performance](#metrics-impact-in-performance)
-* [Mutex policy impact in performance](#mutex-policy-impact-in-performance)
+* [Identifying bottlenecks looking at semWait statistics](#identifying-bottlenecks-looking-at-semwait-statistics)
+* [Log impact on performance](#log-impact-on-performance)
+* [Metrics impact on performance](#metrics-impact-on-performance)
+* [Mutex policy impact on performance](#mutex-policy-impact-on-performance)
 * [Outgoing HTTP connections timeout](#outgoing-http-connections-timeout)
 * [Subscription cache](#subscription-cache)
 * [Geo-subscription performance considerations](#geo-subscription-performance-considerations)
 
 ##  MongoDB configuration
 
-Since version 0.21.0, Orion supports MongoDB 2.6, 3.0 and 3.2 without difference from a functional
-point of view. However, MongoDB 2.6 implements a per-collection lock, while MongoDB 3.0/3.2 (when configured
-to use WireTiger storage engine) implements per-document lock. Thus, the lock system in MongoDB 3.0/3.2
+Since version 0.21.0, Orion supports MongoDB 2.6, 3.0, 3.2 and 3.4 without difference from a functional
+point of view. However, MongoDB 2.6 implements a per-collection lock, while MongoDB 3.0/3.2/3.4 (when configured
+to use WireTiger storage engine) implements per-document lock. Thus, the lock system in MongoDB 3.0/3.2/3.4
 (with WireTiger) is less restrictive than the one used by MongoDB 2.6.
 
-From a performance point of view, it is recommended to use MongoDB 3.0/3.2 with WireTiger, especially
+From a performance point of view, it is recommended to use MongoDB 3.0/3.2/3.4 with WireTiger, especially
 in update-intensive scenarios.
 
 In addition, take into account the following information from the official MongoDB documentation, as it may have
-impact in performance:
+impact on performance:
 
 * Check that ulimit settings in your system are ok. MongoDB provides [the following recomendations](https://docs.mongodb.org/manual/reference/ulimit)
   As described in that document, in RHEL/CentOS you have to create a /etc/security/limits.d/99-mongodb-nproc.conf file,
@@ -240,7 +240,7 @@ From [libcurl email discussion about this topic](https://curl.haxx.se/mail/track
 
 [Top](#top)
 
-## Identifying bootlenecks looking at semWait statistics
+## Identifying bottlenecks looking at semWait statistics
 
 The [semWait section](statistics.md#semwait-block) in the statistics operation output includes valuable
 information that can be used to detect potential bottlenecks.
@@ -258,14 +258,14 @@ information that can be used to detect potential bottlenecks.
 * **request**. An abnormally high value in this metric means that threads wait too much before entering
   the internal logic module that processes the request. In that case, consider to use the "none" policy
   (note that the value of this metric is always 0 if "none" policy is used). Have a look at
-  [the section on mutex policy](#mutex-policy-impact-in-performance).
+  [the section on mutex policy](#mutex-policy-impact-on-performance).
 
 Other metrics (timeStat, transaction and subCache) are for internal low-level semaphores. These metrics
 are mainly for Orion developers, to help to identify bugs in the code. Their values shouldn't be too high.
 
 [Top](#top)
 
-## Log impact in performance
+## Log impact on performance
 
 [Logs](logs.md) can have a severe impact on performance. Thus, in high level scenarios, it is recommended to use `-logLevel`
 ERROR or WARN. We have found in some situations that the saving between `-logLevel WARN` and `-logLevel INFO`
@@ -273,9 +273,9 @@ can be around 50% in performance.
 
 [Top](#top)
 
-## Metrics impact in performance
+## Metrics impact on performance
 
-Metrics measurement may have an impact in performance, as system calls and semaphores are involved. You can disable
+Metrics measurement may have an impact on performance, as system calls and semaphores are involved. You can disable
 this feature (thus improving performance) using the `-disableMetrics` [CLI parameter](cli.md).
 
 [Top](#top)

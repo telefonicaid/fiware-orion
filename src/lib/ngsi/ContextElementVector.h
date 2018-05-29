@@ -42,17 +42,13 @@ typedef struct ContextElementVector
 
   void             push_back(ContextElement* item);
   unsigned int     size(void);
-  std::string      render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, const std::string& indent, bool comma);
+  std::string      render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType,bool comma);
   void             present(const std::string& indent);
   void             release(void);
   ContextElement*  lookup(EntityId* eP);
   ContextElement*  operator[](unsigned int ix) const;
 
-  std::string      check(ApiVersion          apiVersion,
-                         RequestType         requestType,
-                         const std::string&  indent,
-                         const std::string&  predetectedError,
-                         int                 counter);
+  std::string      check(ApiVersion apiVersion, RequestType requestType);
 } ContextElementVector;
 
 #endif  // SRC_LIB_NGSI_CONTEXTELEMENTVECTOR_H_

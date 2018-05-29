@@ -26,7 +26,7 @@ Bad Input On Notification Error
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0-255 IPv4 -subCacheIval 5
-accumulatorStart --pretty-print 0.0.0.0 ${LISTENER_PORT}
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 --SHELL--
 
@@ -244,7 +244,7 @@ Date: REGEX(.*)
 
 04. Check log-file to make sure the Bad Input alarm is active
 =============================================================
-Raising alarm BadInput 0.0.0.0: Invalid URL parsing notification url
+Raising alarm BadInput REGEX((0.0.0.0|127.0.0.1)): Invalid URL parsing notification url
 
 
 05. Create a valid subscription for E1/A1
@@ -259,8 +259,8 @@ Date: REGEX(.*)
 
 06. Check log-file to make sure the Bad Input alarm is reset
 ============================================================
-Raising alarm BadInput 0.0.0.0: Invalid URL parsing notification url
-Releasing alarm BadInput 0.0.0.0
+Raising alarm BadInput REGEX((0.0.0.0|127.0.0.1)): Invalid URL parsing notification url
+Releasing alarm BadInput REGEX((0.0.0.0|127.0.0.1))
 
 
 07. Corrupt reference in subscription (using mongo)

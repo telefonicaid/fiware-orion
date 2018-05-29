@@ -46,7 +46,7 @@
 *
 * postEntity -
 *
-* POST /v2/entities/{entityId}
+* POST /v2/entities/{entityId}/attrs
 *
 * Payload In:  Entity
 * Payload Out: None
@@ -76,17 +76,17 @@ std::string postEntity
     return oe.toJson();
   }
 
-  if (ciP->uriParamOptions["append"] == true) // pure-append
+  if (ciP->uriParamOptions["append"] == true)  // pure-append
   {
     op     = "APPEND_STRICT";
     flavor = NGSIV2_FLAVOUR_ONUPDATE;
   }
   else
   {
-    op     = "APPEND";   // append or update
+    op     = "APPEND";  // append or update
     flavor = NGSIV2_FLAVOUR_ONAPPEND;
   }
-  
+
   // Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, op);
 
@@ -95,7 +95,8 @@ std::string postEntity
 
   // Any error in the response?
   std::string answer = "";
-  if (parseDataP->upcrs.res.oe.code != SccNone )
+
+  if (parseDataP->upcrs.res.oe.code != SccNone)
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
     ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;

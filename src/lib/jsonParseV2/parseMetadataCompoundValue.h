@@ -31,8 +31,6 @@
 
 #include "ngsi/Metadata.h"
 
-using namespace rapidjson;
-
 
 
 /* ****************************************************************************
@@ -41,9 +39,9 @@ using namespace rapidjson;
 */
 extern std::string parseMetadataCompoundValue
 (
-  const Value::ConstMemberIterator&  node,
-  Metadata*                          mdP,
-  orion::CompoundValueNode*          parent
+  const rapidjson::Value::ConstMemberIterator&  node,
+  Metadata*                                     mdP,
+  orion::CompoundValueNode*                     parent
 );
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSEMETADATACOMPOUNDVALUE_H_

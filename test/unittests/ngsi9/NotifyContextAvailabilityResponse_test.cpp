@@ -34,18 +34,18 @@
 
 /* ****************************************************************************
 *
-* all - 
+* all -
 */
 TEST(NotifyContextAvailabilityResponse, all)
 {
   StatusCode                         sc(SccBadRequest, "status details");
   NotifyContextAvailabilityResponse  ncr1;
   NotifyContextAvailabilityResponse  ncr2(sc);
-  
+
   EXPECT_EQ(ncr1.responseCode.code, SccOk);
   EXPECT_EQ(ncr2.responseCode.code, SccBadRequest);
 
-  ncr1.render("");
+  ncr1.render();
   ncr1.present("");
   ncr1.release();
 }

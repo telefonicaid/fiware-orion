@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_UTILITY_ENTITYTYPERESPONSE_H_
-#define SRC_LIB_UTILITY_ENTITYTYPERESPONSE_H_
+#ifndef SRC_LIB_ORIONTYPES_ENTITYTYPERESPONSE_H_
+#define SRC_LIB_ORIONTYPES_ENTITYTYPERESPONSE_H_
 
 /*
 *
@@ -47,8 +47,7 @@ class EntityTypeResponse
   std::string   render(ApiVersion          apiVersion,
                        bool                asJsonObject,
                        bool                asJsonOut,
-                       bool                collapsed,
-                       const std::string&  indent);
+                       bool                collapsed);
   std::string   toJson(void);
   std::string   check(ApiVersion          apiVersion,
                       bool                asJsonObject,
@@ -59,4 +58,4 @@ class EntityTypeResponse
   void          release(void);
 };
 
-#endif  // SRC_LIB_UTILITY_ENTITYTYPERESPONSE_H_
+#endif  // SRC_LIB_ORIONTYPES_ENTITYTYPERESPONSE_H_

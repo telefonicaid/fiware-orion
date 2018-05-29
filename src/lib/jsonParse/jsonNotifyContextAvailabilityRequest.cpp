@@ -232,6 +232,7 @@ static std::string attributeMetadataValue(const std::string& path, const std::st
 {
   LM_T(LmtParse, ("Got an attributeMetadataValue: '%s'", value.c_str()));
   parseDataP->ncar.attributeMetadataP->stringValue = value;
+  parseDataP->ncar.attributeMetadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 
@@ -286,6 +287,7 @@ static std::string registrationMetadataValue(const std::string& path, const std:
 {
   LM_T(LmtParse, ("Got a registrationMetadataValue: '%s'", value.c_str()));
   parseDataP->ncar.regMetadataP->stringValue = value;
+  parseDataP->ncar.regMetadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 
@@ -382,7 +384,7 @@ void jsonNcarRelease(ParseData* parseDataP)
 */
 std::string jsonNcarCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
-  return parseDataP->ncar.res.check(ciP->apiVersion, "", parseDataP->errorString, 0);
+  return parseDataP->ncar.res.check(ciP->apiVersion, parseDataP->errorString);
 }
 
 

@@ -134,7 +134,7 @@ Date: REGEX(.*)
 03. Update entity at SP /
 =========================
 HTTP/1.1 200 OK
-Content-Length: 380
+Content-Length: 186
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

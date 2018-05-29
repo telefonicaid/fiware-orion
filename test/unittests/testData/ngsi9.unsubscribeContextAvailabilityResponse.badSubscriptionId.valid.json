@@ -1,8 +1,1 @@
-{
-  "subscriptionId" : "12345",
-  "statusCode" : {
-    "code" : "400",
-    "reasonPhrase" : "Bad Request",
-    "details" : "bad length - 24 chars expected"
-  }
-}
+{"subscriptionId":"12345","statusCode":{"code":"400","reasonPhrase":"Bad Request","details":"bad length - 24 chars expected"}}

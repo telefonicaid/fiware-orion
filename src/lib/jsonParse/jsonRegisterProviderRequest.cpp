@@ -90,6 +90,7 @@ static std::string contextMetadataValue(const std::string& path, const std::stri
 {
   LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
   reqData->rpr.metadataP->stringValue = value;
+  reqData->rpr.metadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 
@@ -185,7 +186,7 @@ void jsonRprRelease(ParseData* reqData)
 */
 std::string jsonRprCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->rpr.res.check(ciP->apiVersion, ContextEntitiesByEntityId, "", reqData->errorString);
+  return reqData->rpr.res.check(ciP->apiVersion, ContextEntitiesByEntityId, reqData->errorString);
 }
 
 

@@ -49,7 +49,7 @@ NotifyConditionVector::NotifyConditionVector()
 *
 * NotifyConditionVector::render -
 */
-std::string NotifyConditionVector::render(const std::string& indent, bool comma)
+std::string NotifyConditionVector::render(bool comma)
 {
   std::string out = "";
 
@@ -58,12 +58,12 @@ std::string NotifyConditionVector::render(const std::string& indent, bool comma)
     return "";
   }
 
-  out += startTag(indent, "notifyConditions", true);
+  out += startTag("notifyConditions", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);
+    out += vec[ix]->render(ix != vec.size() - 1);
   }
-  out += endTag(indent, comma, true);
+  out += endTag(comma, true);
 
   return out;
 }
@@ -77,7 +77,6 @@ std::string NotifyConditionVector::render(const std::string& indent, bool comma)
 std::string NotifyConditionVector::check
 (
   RequestType         requestType,
-  const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
 )
@@ -86,7 +85,7 @@ std::string NotifyConditionVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(requestType, predetectedError, counter)) != "OK")
     {
       return res;
     }

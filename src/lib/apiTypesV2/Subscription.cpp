@@ -22,7 +22,6 @@
 *
 * Author: Orion dev team
 */
-
 #include <string>
 #include <sstream>
 #include <vector>
@@ -37,199 +36,170 @@
 
 namespace ngsiv2
 {
+/* ****************************************************************************
+*
+* Subscription::~Subscription -
+*/
+Subscription::~Subscription()
+{
+  unsigned int sz = restriction.scopeVector.size();
 
-  /* ****************************************************************************
-  *
-  * Subscription::~Subscription -
-  */
-  Subscription::~Subscription()
+  if (sz > 0)
   {
-    unsigned int sz = restriction.scopeVector.size();
-
-    if (sz > 0)
+    for (unsigned i = 0; i != sz; i++ )
     {
-      for (unsigned i = 0; i != sz; i++ )
-      {
-        restriction.scopeVector[i]->release();
-        delete restriction.scopeVector[i];
-      }
-      restriction.scopeVector.vec.clear();
+      restriction.scopeVector[i]->release();
+      delete restriction.scopeVector[i];
     }
+    restriction.scopeVector.vec.clear();
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* Subscription::toJson -
+*/
+std::string Subscription::toJson(void)
+{
+  JsonHelper jh;
+
+  jh.addString("id", this->id);
+
+  if (this->description != "")
+  {
+    jh.addString("description", this->description);
   }
 
-
-  /* ****************************************************************************
-  *
-  * Subscription::toJson -
-  */
-  std::string Subscription::toJson()
+  if (this->expires != PERMANENT_EXPIRES_DATETIME)
   {
-    JsonHelper jh;
-
-    jh.addString("id", this->id);
-
-    if (this->description != "")
-    {
-      jh.addString("description", this->description);
-    }
-
-    if (this->expires != PERMANENT_SUBS_DATETIME)
-    {
-      jh.addDate("expires", this->expires);
-    }
-
-    if ((this->notification.lastFailure > 0) && (this->notification.lastFailure > this->notification.lastSuccess))
-    {
-      jh.addString("status", "failed");
-    }
-    else
-    {
-      jh.addString("status", this->status);
-    }
-
-    jh.addRaw("subject", this->subject.toJson());
-    jh.addRaw("notification", this->notification.toJson(renderFormatToString(this->attrsFormat, true, true)));
-
-    if (this->throttling > 0)
-    {
-      jh.addNumber("throttling", this->throttling);
-    }
-
-    return jh.str();
+    jh.addDate("expires", this->expires);
   }
 
-
-
-  /* ****************************************************************************
-  *
-  * Notification::toJson -
-  *
-  * FIXME P2: we should move 'attrsFormat' from Subject class to Notification
-  * class, to avoid passing attrsFormat as argument
-  */
-  std::string Notification::toJson(const std::string& attrsFormat)
+  if ((this->notification.lastFailure > 0) && (this->notification.lastFailure > this->notification.lastSuccess))
   {
-    JsonHelper jh;
-
-    if (this->timesSent > 0)
-    {
-      jh.addNumber("timesSent", this->timesSent);
-    }
-
-    if (this->lastNotification > 0)
-    {
-      jh.addDate("lastNotification", this->lastNotification);
-    }
-
-    if (!this->blacklist)
-    {
-      jh.addRaw("attrs", vectorToJson(this->attributes));
-    }
-    else
-    {
-      jh.addRaw("exceptAttrs", vectorToJson(this->attributes));
-    }
-
-    jh.addString("attrsFormat", attrsFormat);
-
-    if (this->httpInfo.custom)
-    {
-      jh.addRaw("httpCustom", this->httpInfo.toJson());
-    }
-    else
-    {
-      jh.addRaw("http", this->httpInfo.toJson());
-    }
-
-    if (this->metadata.size() > 0)
-    {
-      jh.addRaw("metadata", vectorToJson(this->metadata));
-    }
-
-    if (this->lastFailure > 0)
-    {
-      jh.addDate("lastFailure", this->lastFailure);
-    }
-
-    if (this->lastSuccess > 0)
-    {
-      jh.addDate("lastSuccess", this->lastSuccess);
-    }
-
-    return jh.str();
+    jh.addString("status", "failed");
+  }
+  else
+  {
+    jh.addString("status", this->status);
   }
 
+  jh.addRaw("subject", this->subject.toJson());
+  jh.addRaw("notification", this->notification.toJson(renderFormatToString(this->attrsFormat, true, true)));
 
-
-  /* ****************************************************************************
-  *
-  * Subject::toJson -
-  */
-  std::string Subject::toJson()
+  if (this->throttling > 0)
   {
-    JsonHelper jh;
-
-    jh.addRaw("entities", vectorToJson(this->entities));
-    jh.addRaw("condition", this->condition.toJson());
-
-    return jh.str();
+    jh.addNumber("throttling", this->throttling);
   }
 
+  return jh.str();
+}
 
 
-  /* ****************************************************************************
-  *
-  * Condition::toJson -
-  */
-  std::string Condition::toJson()
+
+/* ****************************************************************************
+*
+* Notification::toJson -
+*
+* FIXME P2: we should move 'attrsFormat' from Subject class to Notification
+* class, to avoid passing attrsFormat as argument
+*/
+std::string Notification::toJson(const std::string& attrsFormat)
+{
+  JsonHelper jh;
+
+  if (this->timesSent > 0)
   {
-    JsonHelper jh;
+    jh.addNumber("timesSent", this->timesSent);
+  }
 
+  if (this->lastNotification > 0)
+  {
+    jh.addDate("lastNotification", this->lastNotification);
+  }
+
+  if (!this->blacklist)
+  {
     jh.addRaw("attrs", vectorToJson(this->attributes));
-
-    JsonHelper jhe;
-
-    if (this->expression.q        != "")  jhe.addString("q",        this->expression.q);
-    if (this->expression.mq       != "")  jhe.addString("mq",       this->expression.mq);
-    if (this->expression.geometry != "")  jhe.addString("geometry", this->expression.geometry);
-    if (this->expression.coords   != "")  jhe.addString("coords",   this->expression.coords);
-    if (this->expression.georel   != "")  jhe.addString("georel",   this->expression.georel);
-
-    std::string expressionString = jhe.str();
-
-    if (expressionString != "{}")         jh.addRaw("expression", expressionString);
-
-    return jh.str();
   }
-
-
-
-  /* ****************************************************************************
-  *
-  * EntID::toJson -
-  */
-  std::string EntID::toJson()
+  else
   {
-    JsonHelper jh;
-
-    if (!this->id.empty())
-    {
-        jh.addString("id", this->id);
-    }
-    if (!this->idPattern.empty())
-    {
-      jh.addString("idPattern", this->idPattern);
-    }
-    if (!this->type.empty())
-    {
-      jh.addString("type", this->type);
-    }
-    if (!this->typePattern.empty())
-    {
-      jh.addString("typePattern", this->typePattern);
-    }
-
-    return jh.str();
+    jh.addRaw("exceptAttrs", vectorToJson(this->attributes));
   }
 
-} // end namespace
+  jh.addString("attrsFormat", attrsFormat);
+
+  if (this->httpInfo.custom)
+  {
+    jh.addRaw("httpCustom", this->httpInfo.toJson());
+  }
+  else
+  {
+    jh.addRaw("http", this->httpInfo.toJson());
+  }
+
+  if (this->metadata.size() > 0)
+  {
+    jh.addRaw("metadata", vectorToJson(this->metadata));
+  }
+
+  if (this->lastFailure > 0)
+  {
+    jh.addDate("lastFailure", this->lastFailure);
+  }
+
+  if (this->lastSuccess > 0)
+  {
+    jh.addDate("lastSuccess", this->lastSuccess);
+  }
+
+  return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* Subject::toJson -
+*/
+std::string Subject::toJson()
+{
+  JsonHelper jh;
+
+  jh.addRaw("entities", vectorToJson(this->entities));
+  jh.addRaw("condition", this->condition.toJson());
+
+  return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* Condition::toJson -
+*/
+std::string Condition::toJson()
+{
+  JsonHelper jh;
+
+  jh.addRaw("attrs", vectorToJson(this->attributes));
+
+  JsonHelper jhe;
+
+  if (this->expression.q        != "")  jhe.addString("q",        this->expression.q);
+  if (this->expression.mq       != "")  jhe.addString("mq",       this->expression.mq);
+  if (this->expression.geometry != "")  jhe.addString("geometry", this->expression.geometry);
+  if (this->expression.coords   != "")  jhe.addString("coords",   this->expression.coords);
+  if (this->expression.georel   != "")  jhe.addString("georel",   this->expression.georel);
+
+  std::string expressionString = jhe.str();
+
+  if (expressionString != "{}")         jh.addRaw("expression", expressionString);
+
+  return jh.str();
+}
+
+
+}  // end namespace

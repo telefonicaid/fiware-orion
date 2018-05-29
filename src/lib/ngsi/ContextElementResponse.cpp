@@ -31,7 +31,7 @@
 #include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ContextElementResponse.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi10/QueryContextResponse.h"
 
 #include "mongoBackend/dbConstants.h"
@@ -96,7 +96,7 @@ ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP)
 * get implemented.
 *
 */
-static bool includedAttribute(const ContextAttribute& attr, const AttributeList& attrsV)
+static bool includedAttribute(const ContextAttribute& attr, const StringList& attrsV)
 {
   //
   // This is the case in which the queryContextRequest doesn't include attributes,
@@ -132,7 +132,7 @@ static bool includedAttribute(const ContextAttribute& attr, const AttributeList&
 ContextElementResponse::ContextElementResponse
 (
   const mongo::BSONObj&  entityDoc,
-  const AttributeList&   attrL,
+  const StringList&   attrL,
   bool                   includeEmpty,
   ApiVersion             apiVersion
 )
@@ -218,7 +218,7 @@ ContextElementResponse::ContextElementResponse
 
       case jstNULL:
         caP = new ContextAttribute(ca.name, ca.type, "");
-        caP->valueType = orion::ValueTypeNone;
+        caP->valueType = orion::ValueTypeNull;
         break;
 
       case Object:
@@ -327,17 +327,16 @@ std::string ContextElementResponse::render
   ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
-  const std::string&  indent,
   bool                comma,
   bool                omitAttributeValues
 )
 {
   std::string out = "";
 
-  out += startTag(indent);
-  out += contextElement.render(apiVersion, asJsonObject, requestType, indent + "  ", true, omitAttributeValues);
-  out += statusCode.render(indent + "  ", false);
-  out += endTag(indent, comma, false);
+  out += startTag();
+  out += contextElement.render(apiVersion, asJsonObject, requestType, true, omitAttributeValues);
+  out += statusCode.render(false);
+  out += endTag(comma, false);
 
   return out;
 }
@@ -385,19 +384,18 @@ std::string ContextElementResponse::check
 (
   ApiVersion          apiVersion,
   RequestType         requestType,
-  const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
 )
 {
   std::string res;
 
-  if ((res = contextElement.check(apiVersion, requestType, indent, predetectedError, counter)) != "OK")
+  if ((res = contextElement.check(apiVersion, requestType)) != "OK")
   {
     return res;
   }
 
-  if ((res = statusCode.check(requestType, indent, predetectedError, counter)) != "OK")
+  if ((res = statusCode.check()) != "OK")
   {
     return res;
   }

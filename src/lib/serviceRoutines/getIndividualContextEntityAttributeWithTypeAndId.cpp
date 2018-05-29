@@ -135,7 +135,7 @@ std::string getIndividualContextEntityAttributeWithTypeAndId
 
 
   // 07. Cleanup and return result
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, RtContextAttributeResponse, ""));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, RtContextAttributeResponse));
 
 
   parseDataP->qcr.res.release();

@@ -32,7 +32,7 @@
 
 /* ****************************************************************************
 *
-* json_render - 
+* json_render -
 */
 TEST(QueryContextResponse, json_render)
 {
@@ -67,9 +67,9 @@ TEST(QueryContextResponse, json_render)
   cerP->contextElement.entityId.fill("E01", "EType", "false");
   cerP->statusCode.fill(SccOk);
   qcrP->contextElementResponseVector.push_back(cerP);
-  
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  out = qcrP->render(V1, false, "");
+  out = qcrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -78,7 +78,7 @@ TEST(QueryContextResponse, json_render)
   cerP->contextElement.domainMetadataVector.push_back(mdP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  out = qcrP->render(V1, false, "");
+  out = qcrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -89,7 +89,7 @@ TEST(QueryContextResponse, json_render)
   cerP->contextElement.contextAttributeVector.push_back(caP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
-  out = qcrP->render(V1, false, "");
+  out = qcrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -99,7 +99,7 @@ TEST(QueryContextResponse, json_render)
   cerP->contextElement.domainMetadataVector.push_back(mdP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename4)) << "Error getting test data from '" << filename4 << "'";
-  out = qcrP->render(V1, false, "");
+  out = qcrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -110,7 +110,7 @@ TEST(QueryContextResponse, json_render)
   cerP->contextElement.attributeDomainName.set("AttrDomain");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename5)) << "Error getting test data from '" << filename5 << "'";
-  out = qcrP->render(V1, false, "");
+  out = qcrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -118,9 +118,9 @@ TEST(QueryContextResponse, json_render)
   // 6. ContextElement: +entityId +attributeDomainName -contextAttributeVector +domainMetadataVector
   mdP = new Metadata("md6", "string", "FIN6");
   cerP->contextElement.domainMetadataVector.push_back(mdP);
-  
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename6)) << "Error getting test data from '" << filename6 << "'";
-  out = qcrP->render(V1, false, "");
+  out = qcrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -131,7 +131,7 @@ TEST(QueryContextResponse, json_render)
   cerP->contextElement.contextAttributeVector.push_back(caP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename7)) << "Error getting test data from '" << filename7 << "'";
-  out = qcrP->render(V1, false, "");
+  out = qcrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -141,7 +141,7 @@ TEST(QueryContextResponse, json_render)
   cerP->contextElement.domainMetadataVector.push_back(mdP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename8)) << "Error getting test data from '" << filename8 << "'";
-  out = qcrP->render(V1, false, "");
+  out = qcrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -151,7 +151,7 @@ TEST(QueryContextResponse, json_render)
   cerP->contextElement.contextAttributeVector.push_back(caP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename9)) << "Error getting test data from '" << filename9 << "'";
-  out = qcrP->render(V1, false, "");
+  out = qcrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -161,9 +161,9 @@ TEST(QueryContextResponse, json_render)
   cerP->contextElement.domainMetadataVector.push_back(mdP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename10)) << "Error getting test data from '" << filename10 << "'";
-  out = qcrP->render(V1, false, "");
+  out = qcrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
-  
+
 
 
   // 11. QueryContextResponse::contextElementResponseVector of TWO responses
@@ -174,7 +174,7 @@ TEST(QueryContextResponse, json_render)
   qcrP->contextElementResponseVector.push_back(cerP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename11)) << "Error getting test data from '" << filename11 << "'";
-  out = qcrP->render(V1, false, "");
+  out = qcrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -184,7 +184,7 @@ TEST(QueryContextResponse, json_render)
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename12)) << "Error getting test data from '" << filename12 << "'";
   qcrP->errorCode.code = SccNone;
-  out = qcrP->render(V1, false, "");
+  out = qcrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -192,13 +192,13 @@ TEST(QueryContextResponse, json_render)
   qcrP->errorCode.fill(SccBadRequest, "no details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename13)) << "Error getting test data from '" << filename13 << "'";
-  out = qcrP->render(V1, false, "");
+  out = qcrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // 14. contextElementResponseVector is released and the render method should give an almost empty response
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename14)) << "Error getting test data from '" << filename14 << "'";
   qcrP->contextElementResponseVector.release();
-  out = qcrP->render(V1, false, "");
+  out = qcrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 

@@ -37,15 +37,15 @@ TEST(Duration, check)
   Duration     d;
   std::string  out;
 
-  out = d.check(RegisterContext, "", "", 0);
+  out = d.check();
   EXPECT_STREQ("OK", out.c_str());
 
   d.set("PT1S");
-  out = d.check(RegisterContext, "", "", 0);
+  out = d.check();
   EXPECT_STREQ("OK", out.c_str());
 
   d.set("PT1A");
-  out = d.check(RegisterContext, "", "", 0);
+  out = d.check();
   EXPECT_STREQ("syntax error in duration string", out.c_str());
 }
 

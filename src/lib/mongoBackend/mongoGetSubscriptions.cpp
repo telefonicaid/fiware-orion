@@ -254,7 +254,7 @@ void mongoListSubscriptions
   OrionError*                          oe,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   tenant,
-  const std::string&                   servicePath,
+  const std::string&                   servicePath,  // FIXME P4: vector of strings and not just a single string? See #3100
   int                                  limit,
   int                                  offset,
   long long*                           count
@@ -274,13 +274,10 @@ void mongoListSubscriptions
   std::string                    err;
   Query                          q;
 
-  if (!servicePath.empty() && servicePath != "/#")
+  // FIXME P6: This here is a bug ... See #3099 for more info
+  if (!servicePath.empty() && (servicePath != "/#"))
   {
     q = Query(BSON(CSUB_SERVICE_PATH << servicePath));
-  }
-  else
-  {
-    q = Query();
   }
 
   q.sort(BSON("_id" << 1));
@@ -383,7 +380,6 @@ void mongoGetSubscription
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
-  unsigned int n = 0;
   if (moreSafe(cursor))
   {
     BSONObj r;
@@ -396,7 +392,7 @@ void mongoGetSubscription
       *oe = OrionError(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
       return;
     }
-    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", n, r.toString().c_str()));
+    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
     setNewSubscriptionId(sub, r);
     setDescription(sub, r);

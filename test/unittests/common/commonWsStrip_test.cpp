@@ -31,7 +31,7 @@
 
 /* ****************************************************************************
 *
-* all - 
+* all -
 */
 TEST(commonWsStrip, all)
 {
@@ -39,9 +39,9 @@ TEST(commonWsStrip, all)
   char* dirty = strdup(" \t\n  X\n\t  Y  \t\n   ");
   s = wsStrip(dirty);
   EXPECT_STREQ(s, "X\n\t  Y");
-  
+
   free(dirty);
-  
+
   dirty = strdup("                     ");
   s = wsStrip(dirty);
   EXPECT_STREQ(s, "");

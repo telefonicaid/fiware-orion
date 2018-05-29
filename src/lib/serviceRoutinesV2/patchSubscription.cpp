@@ -23,6 +23,7 @@
 * Author: Orion dev team
 */
 #include <string>
+#include <vector>
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
@@ -64,7 +65,7 @@ std::string patchSubscription
 
   OrionError beError;
   //
-  // If a string-filter is present, it is parsed in 
+  // If a string-filter is present, it is parsed in
   // jsonParseV2/parseSubscription.cpp, function parseNotifyConditionVector() and
   // the resulting StringFilter object resides in a Scope in parseDataP->subsV2.restriction.scopeVector
   //

@@ -60,6 +60,7 @@ void BatchQuery::present(const std::string& indent)
   entities.present(indent);
   attributeV.present(indent);
   scopeV.present(indent);
+  metadataV.present(indent);
 }
 
 
@@ -73,5 +74,5 @@ void BatchQuery::release(void)
   entities.release();
   attributeV.release();
   scopeV.release();
+  metadataV.release();
 }
- 

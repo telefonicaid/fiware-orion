@@ -41,17 +41,14 @@ typedef struct ConditionValueList
 {
   std::vector<std::string>  vec;
 
-  std::string  render(const std::string& indent, bool comma);
+  std::string  render(bool comma);
   void         present(const std::string& indent);
   void         release(void);
   void         push_back(const std::string& attributeName);
   unsigned int size(void);
   void         fill(ConditionValueList& cvlP);
 
-  std::string  check(RequestType         requestType,
-                     const std::string&  indent,
-                     const std::string&  predetectedError,
-                     int                 counter);
+  std::string  check(void);
 
   std::string operator[] (unsigned int ix) const;
 

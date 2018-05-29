@@ -86,7 +86,7 @@ static const char* compoundRootV[] =
 * Also, it returns the root of the compound (found in 'compoundValueRootV') and also
 * the 'rest' of the path, i.e. its relative path inside the compound.
 *
-* If the path doesn't belong to any compond, FALSE is returned.
+* If the path doesn't belong to any compound, FALSE is returned.
 */
 static bool isCompoundPath(const char* path)
 {
@@ -378,7 +378,7 @@ static std::string jsonParse
 
   boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;
   int                         noOfChildren = subtree.size();
-  if ((isCompoundPath(path.c_str()) == true) && (nodeValue == "") && (noOfChildren != 0))
+  if ((isCompoundPath(path.c_str()) == true) && (nodeValue == "") && (noOfChildren != 0) && (treated == true))
   {
 
     LM_T(LmtCompoundValue, ("Calling eatCompound for '%s'", path.c_str()));

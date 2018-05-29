@@ -175,9 +175,9 @@ Date: REGEX(.*)
 
 07. grep in log-file
 ====================
-Raising alarm BadInput 0.0.0.0: service '/v2/noService' not found
-Releasing alarm BadInput 0.0.0.0
-Raising alarm BadInput 0.0.0.0: bad verb for url '/v2/entities', method 'PROUST'
+Raising alarm BadInput REGEX((0.0.0.0|127.0.0.1)): service '/v2/noService' not found
+Releasing alarm BadInput REGEX((0.0.0.0|127.0.0.1))
+Raising alarm BadInput REGEX((0.0.0.0|127.0.0.1)): bad verb for url '/v2/entities', method 'PROUST'
 
 
 --TEARDOWN--

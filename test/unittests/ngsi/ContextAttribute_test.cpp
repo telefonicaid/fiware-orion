@@ -33,7 +33,7 @@
 
 /* ****************************************************************************
 *
-* checkOne - 
+* checkOne -
 */
 TEST(ContextAttribute, checkOne)
 {
@@ -51,7 +51,7 @@ TEST(ContextAttribute, checkOne)
 
   res     = caP->check(V1, RegisterContext);
   EXPECT_TRUE(res == "OK");
-  
+
   caP->stringValue = "Algun valor cualquiera"; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
   res     = caP->check(V1, RegisterContext);
   EXPECT_TRUE(res == "OK");
@@ -63,7 +63,7 @@ TEST(ContextAttribute, checkOne)
 
 /* ****************************************************************************
 *
-* checkVector - 
+* checkVector -
 */
 TEST(ContextAttribute, checkVector)
 {
@@ -92,7 +92,7 @@ TEST(ContextAttribute, checkVector)
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 TEST(ContextAttribute, render)
 {
@@ -102,7 +102,7 @@ TEST(ContextAttribute, render)
 
   utInit();
 
-  out = caP->render(V1, false, UpdateContext, "");
+  out = caP->render(V1, false, UpdateContext, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -113,7 +113,7 @@ TEST(ContextAttribute, render)
 
 /* ****************************************************************************
 *
-* present - 
+* present -
 */
 TEST(ContextAttribute, present)
 {
@@ -131,7 +131,7 @@ TEST(ContextAttribute, present)
 
 /* ****************************************************************************
 *
-* copyMetadatas - 
+* copyMetadatas -
 */
 TEST(ContextAttribute, copyMetadatas)
 {
