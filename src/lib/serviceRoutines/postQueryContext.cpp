@@ -75,7 +75,7 @@ static char* jsonPayloadClean(const char* payload)
 * 7. Freeing memory
 *
 */
-static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryContextResponse* qcrsP)
+static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryContextResponse* qcrsP)
 {
   std::string     ip;
   std::string     protocol;
@@ -95,8 +95,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
     //  Somehow, if we accepted this providing application, it is the brokers fault ...
     //  SccBadRequest should have been returned before, when it was registered!
     //
-    qcrsP->errorCode.fill(SccContextElementNotFound, "");
-    return;
+    return false;
   }
 
 
@@ -143,9 +142,8 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
 
   if (r != 0)
   {
-    qcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding query");
     LM_W(("Runtime Error (error forwarding 'Query' to providing application)"));
-    return;
+    return false;
   }
 
   LM_T(LmtCPrForwardRequestPayload, ("forward queryContext response payload: %s", out.c_str()));
@@ -167,8 +165,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
     // It is not in the orion broker though, so 404 is returned
     //
     LM_W(("Other Error (context provider response to QueryContext is empty)"));
-    qcrsP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
-    return;
+    return false;
   }
 
   //
@@ -196,10 +193,9 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   if (s != "OK")
   {
     LM_W(("Internal Error (error parsing reply from prov app: %s)", errorMsg.c_str()));
-    qcrsP->errorCode.fill(SccContextElementNotFound, "");
     parseData.qcr.res.release();
     parseData.qcrs.res.release();
-    return;
+    return false;
   }
 
 
@@ -217,17 +213,14 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
     qcrsP->errorCode.fill(SccOk);
   }
 
-  if ((qcrsP->contextElementResponseVector.size() == 1) && (qcrsP->contextElementResponseVector[0]->statusCode.code == SccContextElementNotFound))
-  {
-    qcrsP->errorCode.fill(SccContextElementNotFound);
-  }
-
 
   //
   // 7. Freeing memory
   //
   parseData.qcr.res.release();
   parseData.qcrs.res.release();
+
+  return true;
 }
 
 
@@ -406,70 +399,80 @@ std::string postQueryContext
       requestV.push_back(requestP);
     }
 
-    for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
+    //
+    // What if the Attribute Vector of the ContextElementResponse is empty?
+    // For now, just push it into localQcrsP, but only if its local, i.e. its contextElement.providingApplicationList is empty
+    //
+    if ((cerP->contextElement.contextAttributeVector.size() == 0) && (cerP->contextElement.providingApplicationList.size() == 0))
     {
-      ContextAttribute*    aP  = cerP->contextElement.contextAttributeVector[aIx];
-
-      //
-      // An empty providingApplication means the attribute is local
-      // In such a case, the response is already in our hand, we just need to copy it to responseV
-      //
-      if (aP->providingApplication.get() == "")
+      localQcrsP->contextElementResponseVector.push_back(new ContextElementResponse(eP, NULL));
+    }
+    else
+    {
+      for (unsigned int aIx = 0; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
       {
-        if (aP->found == false)
+        ContextAttribute*    aP  = cerP->contextElement.contextAttributeVector[aIx];
+
+        //
+        // An empty providingApplication means the attribute is local
+        // In such a case, the response is already in our hand, we just need to copy it to responseV
+        //
+        if (aP->providingApplication.get() == "")
         {
-          continue;  // Non-found pairs of entity/attribute are thrown away
+          if (aP->found == false)
+          {
+            continue;  // Non-found pairs of entity/attribute are thrown away
+          }
+
+
+          //
+          // So, where can we put this attribute?
+          // If we find a suitable existing contextElementResponse, we put it there,
+          // otherwise, we have to create a new contextElementResponse.
+          //
+          ContextElementResponse* contextElementResponseP = localQcrsP->contextElementResponseVector.lookup(eP);
+
+          if (contextElementResponseP == NULL)
+          {
+            contextElementResponseP = new ContextElementResponse(eP, aP);
+            localQcrsP->contextElementResponseVector.push_back(contextElementResponseP);
+          }
+          else
+          {
+            contextElementResponseP->contextElement.contextAttributeVector.push_back(new ContextAttribute(aP));
+          }
+
+          continue;
         }
 
 
         //
-        // So, where can we put this attribute?
-        // If we find a suitable existing contextElementResponse, we put it there,
-        // otherwise, we have to create a new contextElementResponse.
+        // Not a local attribute - aP->providingApplication is not empty
         //
-        ContextElementResponse* contextElementResponseP = localQcrsP->contextElementResponseVector.lookup(eP);
+        QueryContextRequest* requestP = requestV.lookup(aP->providingApplication.get(), eP);
 
-        if (contextElementResponseP == NULL)
+        if (requestP == NULL)
         {
-          contextElementResponseP = new ContextElementResponse(eP, aP);
-          localQcrsP->contextElementResponseVector.push_back(contextElementResponseP);
+          requestP = new QueryContextRequest(aP->providingApplication.get(), eP, aP->name);
+          requestV.push_back(requestP);
         }
         else
         {
-          contextElementResponseP->contextElement.contextAttributeVector.push_back(new ContextAttribute(aP));
-        }
+          EntityId* entityP = new EntityId(eP);
+          bool      pushed;
 
-        continue;
-      }
+          requestP->attributeList.push_back_if_absent(aP->name);
 
-
-      //
-      // Not a local attribute - aP->providingApplication is not empty
-      //
-      QueryContextRequest* requestP = requestV.lookup(aP->providingApplication.get(), eP);
-
-      if (requestP == NULL)
-      {
-        requestP = new QueryContextRequest(aP->providingApplication.get(), eP, aP->name);
-        requestV.push_back(requestP);
-      }
-      else
-      {
-        EntityId* entityP = new EntityId(eP);
-        bool      pushed;
-
-        requestP->attributeList.push_back_if_absent(aP->name);
-
-        pushed = requestP->entityIdVector.push_back_if_absent(entityP);
-        if (pushed == false)
-        {
-          entityP->release();
-          delete entityP;
+          pushed = requestP->entityIdVector.push_back_if_absent(entityP);
+          if (pushed == false)
+          {
+            entityP->release();
+            delete entityP;
+          }
         }
       }
     }
   }
-
 
   //
   // Any local results in localQcrsP?
@@ -484,6 +487,7 @@ std::string postQueryContext
   {
     delete localQcrsP;
   }
+
 
   //
   // Now, forward the Query requests, each in a separate thread (to be implemented) and
@@ -506,12 +510,20 @@ std::string postQueryContext
 
     qP = new QueryContextResponse();
     qP->errorCode.fill(SccOk);
-    queryForward(ciP, requestV[fIx], qP);
 
-    //
-    // Now, each ContextElementResponse of qP should be tested to see whether there
-    // is already an existing ContextElementResponse in responseV
-    responseV.push_back(qP);
+    if (queryForward(ciP, requestV[fIx], qP) == true)
+    {
+      //
+      // Each ContextElementResponse of qP should be tested to see whether there
+      // is already an existing ContextElementResponse in responseV
+      //
+      responseV.push_back(qP);
+    }
+    else
+    {
+      qP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
+      responseV.push_back(qP);
+    }
   }
 
   std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
