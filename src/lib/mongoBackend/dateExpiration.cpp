@@ -135,7 +135,6 @@ bool processDateExpirationAtUpdateAttribute
   OrionError*              oe
 )
 {
-
   /*
    * If the name of the target attribute is the date expiration,
    * check for a number value that will be used in the mongo::Date_t constructor.
@@ -148,15 +147,15 @@ bool processDateExpirationAtUpdateAttribute
   {
     if (targetAttr->numberValue)
     {
-	  if (!getDateExpiration(targetAttr, dateExpiration, errDetail))
-	  {
-	    oe->fill(SccBadRequest, *errDetail, "BadRequest");
-	    return false;
-	  }
-	  else
-	  {
+      if (!getDateExpiration(targetAttr, dateExpiration, errDetail))
+      {
+        oe->fill(SccBadRequest, *errDetail, "BadRequest");
+        return false;
+      }
+      else
+      {
         *replaceDate = true;
-	  }
+      }
     }
     else
     {

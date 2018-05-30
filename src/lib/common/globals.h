@@ -106,6 +106,14 @@
 
 /* ****************************************************************************
 *
+* Transient entity attribute -
+*/
+#define DATE_EXPIRES "dateExpires"
+
+
+
+/* ****************************************************************************
+*
 * Render modes - 
 */
 #define RENDER_MODE_NORMALIZED    "normalized"

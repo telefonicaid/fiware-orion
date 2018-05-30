@@ -1870,22 +1870,6 @@ static void setDateModifiedAttribute(ContextElementResponse* notifyCerP)
 
 /* ****************************************************************************
 *
-* setDateModifiedAttribute -
-*/
-//static void setDateExpirationAttribute(ContextElementResponse* notifyCerP)
-//{
-//  if (notifyCerP->contextElement.entityId.modDate != 0)
-//  {
-//    ContextAttribute* caP = new ContextAttribute(DATE_EXPIRES, DATE_TYPE, notifyCerP->contextElement.entityId.modDate);
-//    notifyCerP->contextElement.contextAttributeVector.push_back(caP);
-//  }
-//}
-
-
-
-
-/* ****************************************************************************
-*
 * setDateCreatedMetadata -
 */
 static void setDateCreatedMetadata(ContextElementResponse* notifyCerP)
@@ -2469,7 +2453,7 @@ static bool updateContextAttributeItem
   }
   /* Check aspects related with location and date expiration */
   if (!processLocationAtUpdateAttribute(currentLocAttrName, targetAttr, geoJson, &err, apiVersion, oe)
-   || !processDateExpirationAtUpdateAttribute(targetAttr, dateExpiration, replaceDateExpiration, &err, oe))
+    || !processDateExpirationAtUpdateAttribute(targetAttr, dateExpiration, replaceDateExpiration, &err, oe))
   {
     std::string details = std::string("action: UPDATE") +
                           " - entity: [" + eP->toString() + "]" +
@@ -2618,7 +2602,7 @@ static bool deleteContextAttributeItem
     /* Check aspects related to date expiration.
      * If the target attr is date expiration, nullifying dateExpiration ACTUAL value is the way
      * of specifying that date expiration field is no longer used */
-    if (targetAttr->name == DATE_EXPIRES){
+    if (targetAttr->name == DATE_EXPIRES) {
       *dateExpiration = 0;
     }
 
@@ -2716,8 +2700,8 @@ static bool processContextAttributeVector
                                       entityModified,
                                       currentLocAttrName,
                                       geoJson,
-									  dateExpiration,
-									  replaceDateExpiration,
+                                      dateExpiration,
+                                      replaceDateExpiration,
                                       strcasecmp(action.c_str(), "replace") == 0,
                                       apiVersion,
                                       oe))
@@ -2738,7 +2722,7 @@ static bool processContextAttributeVector
                                       entityModified,
                                       currentLocAttrName,
                                       geoJson,
-									  dateExpiration,
+                                      dateExpiration,
                                       apiVersion,
                                       oe))
       {
@@ -2756,7 +2740,7 @@ static bool processContextAttributeVector
                                       toUnset,
                                       entityModified,
                                       currentLocAttrName,
-									  dateExpiration,
+                                      dateExpiration,
                                       &deletedAttributesCounter,
                                       apiVersion,
                                       oe))
@@ -3249,7 +3233,7 @@ static void updateEntity
 
   if (r.hasField(ENT_EXPIRATION))
   {
-   currentDateExpiration = getField(r, ENT_EXPIRATION).date();
+    currentDateExpiration = getField(r, ENT_EXPIRATION).date();
   }
   //
   // Before calling processContextAttributeVector and actually do the work, let's check if the
@@ -3310,7 +3294,7 @@ static void updateEntity
                                      cerP,
                                      &locAttr,
                                      &geoJson,
-									 &currentDateExpiration,
+                                     &currentDateExpiration,
                                      &replaceDateExpiration,
                                      tenant,
                                      servicePathV,
@@ -3380,7 +3364,7 @@ static void updateEntity
   {
     toSet.appendDate(ENT_EXPIRATION, currentDateExpiration);
   }
-  else if(!replaceDateExpiration)
+  else if (!replaceDateExpiration)
   {
     toUnset.append(ENT_EXPIRATION, 1);
   }
@@ -3403,7 +3387,7 @@ static void updateEntity
   if (strcasecmp(action.c_str(), "replace") == 0)
   {
     // toSet: { A1: { ... }, A2: { ... } }
-	BSONObjBuilder replaceSet;
+    BSONObjBuilder replaceSet;
     int            now = getCurrentTime();
 
     // This avoids strange behavior like as for the location, as reported in the #1142 issue
