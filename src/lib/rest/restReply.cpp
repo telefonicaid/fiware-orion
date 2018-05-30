@@ -97,11 +97,11 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   {
     if (ciP->outMimeType == JSON)
     {
-      MHD_add_response_header(response, "Content-Type", "application/json");
+      MHD_add_response_header(response, CONTENT_TYPE, "application/json");
     }
     else if (ciP->outMimeType == TEXT)
     {
-      MHD_add_response_header(response, "Content-Type", "text/plain");
+      MHD_add_response_header(response, CONTENT_TYPE, "text/plain");
     }
   }
 

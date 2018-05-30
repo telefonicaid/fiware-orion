@@ -33,6 +33,7 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/HttpHeaders.h"
 #include "rest/rest.h"
 #include "rest/OrionError.h"
 #include "serviceRoutines/badVerbGetDeleteOnly.h"
@@ -54,7 +55,7 @@ std::string badVerbGetDeleteOnly
   std::string  details = std::string("bad verb for url '") + ciP->url + "', method '" + ciP->method + "'";
   OrionError   oe(SccBadVerb, ERROR_DESC_BAD_VERB);
 
-  ciP->httpHeader.push_back("Allow");
+  ciP->httpHeader.push_back(ALLOW);
   std::string headerValue = "GET, DELETE";
   //OPTIONS verb is only available for V2 API
   if ((corsEnabled == true) && (ciP->apiVersion == V2))

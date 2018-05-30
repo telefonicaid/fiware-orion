@@ -33,6 +33,7 @@
 #include "mongoBackend/mongoGetSubscriptions.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/HttpHeaders.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
 #include "serviceRoutinesV2/getAllSubscriptions.h"
@@ -81,7 +82,7 @@ std::string getAllSubscriptions
 
   if ((ciP->uriParamOptions["count"]))
   {
-    ciP->httpHeader.push_back("Fiware-Total-Count");
+    ciP->httpHeader.push_back(FIWARE_TOTAL_COUNT);
     ciP->httpHeaderValue.push_back(toString(count));
   }
 

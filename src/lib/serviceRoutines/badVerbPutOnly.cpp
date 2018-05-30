@@ -33,6 +33,7 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/HttpHeaders.h"
 #include "rest/OrionError.h"
 #include "serviceRoutines/badVerbPutOnly.h"
 
@@ -53,7 +54,7 @@ std::string badVerbPutOnly
   std::string  details = std::string("bad verb for url '") + ciP->url + "', method '" + ciP->method + "'";
   OrionError   oe(SccBadVerb, ERROR_DESC_BAD_VERB);
 
-  ciP->httpHeader.push_back("Allow");
+  ciP->httpHeader.push_back(ALLOW);
   ciP->httpHeaderValue.push_back("PUT");
   ciP->httpStatusCode = SccBadVerb;
 

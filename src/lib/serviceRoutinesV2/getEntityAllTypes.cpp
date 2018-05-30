@@ -29,6 +29,7 @@
 #include "common/clockFunctions.h"
 
 #include "rest/ConnectionInfo.h"
+#include "rest/HttpHeaders.h"
 #include "ngsi/ParseData.h"
 #include "serviceRoutinesV2/getEntityAllTypes.h"
 #include "orionTypes/EntityTypeVectorResponse.h"
@@ -90,7 +91,7 @@ std::string getEntityAllTypes
     char cVec[64];
 
     snprintf(cVec, sizeof(cVec), "%u", totalTypes);
-    ciP->httpHeader.push_back("Fiware-Total-Count");
+    ciP->httpHeader.push_back(FIWARE_TOTAL_COUNT);
     ciP->httpHeaderValue.push_back(cVec);
   }
 

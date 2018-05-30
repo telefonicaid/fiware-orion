@@ -30,6 +30,7 @@
 #include "ngsi/ParseData.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "common/statistics.h"
+#include "rest/HttpHeaders.h"
 #include "rest/uriParamNames.h"
 #include "rest/OrionError.h"
 
@@ -87,7 +88,7 @@ extern std::string postSubscriptions
   else
   {
     std::string location = "/v2/subscriptions/" + subsID;
-    ciP->httpHeader.push_back("Location");
+    ciP->httpHeader.push_back(RESOURCE_LOCATION);
     ciP->httpHeaderValue.push_back(location);
 
     ciP->httpStatusCode = SccCreated;
