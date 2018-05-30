@@ -244,7 +244,7 @@ if [ -n "${functional}" ]; then
 
     _fix
 
-    cd ${path} make functional INSTALL_DIR=~
+    cd ${path} && make functional INSTALL_DIR=~
     if [ $? -ne 0 ]; then status=false; else status=true; fi
 
     _unfix
