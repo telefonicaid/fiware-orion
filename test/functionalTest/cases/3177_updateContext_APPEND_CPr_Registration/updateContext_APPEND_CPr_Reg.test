@@ -31,8 +31,8 @@ brokerStart CP1
 
 --SHELL--
 
-echo "01. Register CP1 .01"
-echo "===================="
+echo "01. Register CP1."
+echo "================="
 payload='{
   "contextRegistrations": [
     {
@@ -59,8 +59,8 @@ orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
-echo "02. Creating an entity in CB with actionType APPEND by using NGSIv1 .02"
-echo "======================================================================="
+echo "02. Creating an entity in CB with actionType APPEND by using NGSIv1."
+echo "===================================================================="
 payload='{
     "contextElements": [
         {
@@ -70,9 +70,9 @@ payload='{
             "attributes": [
                 {
                     "name": "temperature",
-		    "type": "degree",
-		    "value": "12"
-     		}
+                    "type": "degree",
+                    "value": "12"
+                }
             ]
         }
     ],
@@ -80,10 +80,10 @@ payload='{
 }'
 orionCurl --url /v1/updateContext --payload "$payload"
 echo
-echo 
+echo
 
-echo "03. Query to CP: see nothing (that's ensures the APPEND wasn't forwarded) .03"
-echo "============================================================================="
+echo "03. Query to CP: see nothing (that's ensures the APPEND wasn't forwarded)."
+echo "=========================================================================="
 payload='{
     "entities": [
         {
@@ -100,8 +100,8 @@ orionCurl --url /v1/queryContext --payload "$payload" --port $CP1_PORT
 echo
 echo
 
-echo "04. Query to CB: see the entity (it was created locally) .04"
-echo "============================================================"
+echo "04. Query to CB: see the entity (it was created locally)."
+echo "========================================================="
 payload='{
     "entities": [
         {
@@ -120,10 +120,10 @@ echo
 
 
 --REGEXPECT--
-01. Register CP. 
-================
+01. Register CP1.
+=================
 HTTP/1.1 200 OK
-Content-Length: 63
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -134,10 +134,10 @@ Date: REGEX(.*)
 }
 
 
-02. Creating an entity in CB with actionType APPEND by using NGSIv1. 
+02. Creating an entity in CB with actionType APPEND by using NGSIv1.
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 204
+Content-Length: 205
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -166,7 +166,7 @@ Date: REGEX(.*)
 }
 
 
-03. Query to CP: see nothing (that's ensures the APPEND wasn't forwarded). 
+03. Query to CP: see nothing (that's ensures the APPEND wasn't forwarded).
 ==========================================================================
 HTTP/1.1 200 OK
 Content-Length: 70
@@ -182,10 +182,10 @@ Date: REGEX(.*)
 }
 
 
-04. Query to CB: see the entity (it was created locally). 
+04. Query to CB: see the entity (it was created locally).
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 206
+Content-Length: 207
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
