@@ -182,7 +182,7 @@ std::string Entity::check(RequestType requestType)
   ssize_t  len;
   char     errorMsg[128];
 
-  if ((len = strlen(id.c_str()) < MIN_ID_LEN) && (requestType != EntityRequest))
+  if (((len = strlen(id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
   {
     snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
@@ -233,7 +233,7 @@ std::string Entity::check(RequestType requestType)
 
   if (!((requestType == BatchQueryRequest) || (requestType == BatchUpdateRequest && !typeGiven)))
   {
-    if ((len = strlen(type.c_str()) < MIN_ID_LEN))
+    if ( (len = strlen(type.c_str())) < MIN_ID_LEN)
     {
       snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
       alarmMgr.badInput(clientIp, errorMsg);
