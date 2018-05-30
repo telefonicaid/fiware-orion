@@ -24,15 +24,11 @@ prepare:
 	rm -Rf BUILD || true
 	mkdir -p  BUILD || true
 	mkdir -p /tmp/builder/logs || true
-	./scripts/build/compileInfo.sh
-
-	@echo '------------------------------------------------------------------------------'
-
-build: prepare
-	@echo '------------------------------- make build -----------------------------------'
-
-	cd BUILD && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=True -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
-	cd BUILD && make -j$(CPU_COUNT)
+	./scripts/build/compileInfo.sh --release	rm -Rf BUILD || true
+	mkdir -p  BUILD || true
+	mkdir -p /tmp/builder/logs || true
+	./scripts/build/compileInfo.sh --release
+	. scripts/testEnv.sh
 
 	@echo '------------------------------------------------------------------------------'
 
