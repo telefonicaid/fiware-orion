@@ -11,8 +11,8 @@ script: true
 jobs:
   include:
     - stage: unit
-      before_script: docker run -t --rm -v $(pwd):/opt/fiware-orion fiware/orion-ci:rpm7 build -MS unit
+      before_script: docker run -t --rm -v $(pwd):/opt/fiware-orion fiware/orion-ci:rpm7 build -M unit
       script: docker run -t --rm -v $(pwd):/opt/fiware-orion fiware/orion-ci:rpm7 build -IDu
     - stage: functional
-      before_script: docker run -t --rm -v $(pwd):/opt/fiware-orion fiware/orion-ci:rpm7 build -MS functional
+      before_script: docker run -t --rm -v $(pwd):/opt/fiware-orion fiware/orion-ci:rpm7 build -M functional
       script: docker run -t --rm -v $(pwd):/opt/fiware-orion fiware/orion-ci:rpm7 build -IDFf
