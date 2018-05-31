@@ -10,24 +10,25 @@ function _usage()
 {
   echo -n "Usage: build [options]
   Options:
-    -H   --show          show help for functional test
-    -b   --branch        choose branch/tag to build, if not - source from /opt/fiware-orion will be used
-    -s   --source        repo to clone, if not - default from https://github.com/telefonicaid/fiware-orion
-    -M   --make          cmake/make, choose stage (unit/functional)
+    -h   --help          show help
+    -H   --show          show the list of necessary commands that should be executed before starting functional tests manually
+    -b   --branch        specify branch/tag to build, if not specified - the source from /opt/fiware-orion will be used
+    -s   --source        specify repository to clone, if not specified - default repo (https://github.com/telefonicaid/fiware-orion) will be used
+    -M   --make          cmake/make, stage (unit/functional) should be specified
     -I   --install       make install
     -E   --execute       run (rerun) test stand with 2 orions
-    -u   --unit          run unit test
-    -f   --functional    run functional test
+    -u   --unit          run unit tests
+    -f   --functional    run functional tests
     -n   --nightly       build rpm nightly
     -r   --release       build rpm release
     -t   --testing       build rpm testing
     -U   --upload        upload rpm, REPO_USER and REPO_PASSWORD ENV variables should be provided
-    -F   --fix           fix for jenkins (disable ipv6 test)
+    -F   --fix           execute fix for jenkins (disable ipv6 test)
     -D   --db            start mongodb
 
   Examples:
-    build -M unit -IDufb master - clone from master, make for unit nesting, make install, run mongo, execute unit and functional tests
-    build -M functional -IDFSf - get source from mounted folder, make for functional testing, make install, execute FIX, functional test
+    build -M unit -IDufb master - clone from master, make (for unit testing), make install, run mongo, execute unit and functional tests
+    build -M functional -IDFSf - get source from mounted folder, make (for functional testing), make install, execute FIX, functional test
 "
   exit 0
 }
@@ -62,9 +63,8 @@ function _unfix()
 
 function _show()
 {
-    echo -n "Builder: run this commands
-. scripts/testEnv.sh
-"
+    echo "Builder: run this commands"
+    echo ". scripts/testEnv.sh"
 }
 
 function _execute()
@@ -146,7 +146,7 @@ echo "================================================================="
 echo "                             CHECKS                              "
 echo "================================================================="
 
-echo "Builder: check if credentials exists, if upload on"
+echo "Builder: if upload is on, check if credentials exists"
 if [ -n "${upload}" ]; then
     if [ -z "${REPO_USER}" ] || [ -z "${REPO_PASSWORD}" ]; then
         echo "Builder: failed, REPO_USER or REPO_PASSWORD env variables not set"; exit 1;
@@ -156,8 +156,9 @@ fi
 echo "Builder: check if target folder can be created"
 mkdir -p ${path} > /dev/null 2>&1
 if [ ! -d "${path}" ]; then echo "Builder: failed, not enough permissions"; exit 1; fi
+cd ${path}
 
-echo "Builder: check if source exists, if branch is empty"
+echo "Builder: if branch is empty, check if source exists"
 if [ -z "${branch}" ] && [ ! -f ${path}/LICENSE ]; then echo "Builder: failed, source code not found"; exit 1; fi
 
 
@@ -195,7 +196,7 @@ if [ -n "${make}" ]; then
 
     _fix
     echo "Builder: build ${make}"
-    cd ${path} && make build_${make}
+    make build_${make}
     if [ $? -ne 0 ]; then echo "Builder: make failed"; exit 1; fi
     _unfix
 
@@ -207,7 +208,7 @@ if [ -n "${install}" ]; then
     echo "================================================================="
 
     _fix
-    cd ${path} && make install
+    make install
     if [ $? -ne 0 ]; then echo "Builder: installation failed"; exit 1; fi
     _unfix
 
@@ -229,7 +230,7 @@ if [ -n "${unit}" ]; then
     echo "================================================================="
 
     _fix
-    cd ${path} && make unit
+    make unit
     if [ $? -ne 0 ]; then echo "Builder: unit test failed"; exit 1; fi
     _unfix
 
@@ -244,7 +245,7 @@ if [ -n "${functional}" ]; then
 
     _fix
 
-    cd ${path} && make functional INSTALL_DIR=~
+    make functional INSTALL_DIR=~
     if [ $? -ne 0 ]; then status=false; else status=true; fi
 
     _unfix
@@ -260,14 +261,13 @@ if [ -n "${nightly}" ]; then
     echo "================================================================="
 
     export BROKER_RELEASE=$(date "+%Y%m%d")
+    git reset --hard
 
     cd ${path}/src/app/contextBroker
-
     version=$(cat version.h | grep ORION_VERSION | awk '{ print $3}' | sed 's/"//g' | sed 's/-next//g')
     sed -i "s/ORION_VERSION .*/ORION_VERSION \"$version\"/g" version.h
-
     cd ${path}
-    git reset --hard
+
     make rpm
 
     pack='nightly'
@@ -279,9 +279,8 @@ if [ -n "${release}" ]; then
     echo "================================================================="
 
     export BROKER_RELEASE=1
-
-    cd ${path}
     git reset --hard
+
     make rpm
 
     pack='release'
@@ -293,14 +292,13 @@ if [ -n "${testing}" ]; then
     echo "================================================================="
 
     export BROKER_RELEASE=$(date "+%Y%m%d%H%M")
-
-    cd ${path}/src/app/contextBroker
     git reset --hard
 
+    cd ${path}/src/app/contextBroker
     version=$(cat version.h | grep ORION_VERSION | awk '{ print $3}' | sed 's/"//g' | sed 's/-next//g')
     sed -i "s/ORION_VERSION .*/ORION_VERSION \"$version\"/g" version.h
-
     cd ${path}
+
     make rpm
 
     pack='testing'
