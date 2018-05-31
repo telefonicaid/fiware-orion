@@ -43,7 +43,7 @@ TEST(UpdateContextRequestVector, present)
   ce.contextAttributeVector.push_back(&ca);
 
   ucr.contextElementVector.push_back(&ce);
-  ucr.updateActionType.set("UPDATE");
+  ucr.updateActionType = ActionTypeUpdate;
 
   ucrV.push_back(&ucr);
   ucrV.present("");

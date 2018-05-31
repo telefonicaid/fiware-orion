@@ -321,7 +321,7 @@ echo
 echo "11. Update/UPDATE E1/T1/A1+A2+A3+A4+A5 in CB"
 echo "============================================"
 payload='{
-  "actionType": "UPDATE",
+  "actionType": "update",
   "entities":
   [
     {

@@ -37,7 +37,7 @@ brokerStart CB
 echo "01. Update using md value with forbidden chars and see error"
 echo "============================================================"
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities":
   [
     {

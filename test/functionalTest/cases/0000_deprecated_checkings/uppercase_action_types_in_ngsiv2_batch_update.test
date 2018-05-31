@@ -1,0 +1,347 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Uppercase action types in NGSIv2 batch update
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. POST /v2/op/update APPEND: A=foo
+# 02. GET /v2/entities/E, see A=foo
+# 03. POST /v2/op/update APPEND_STRICT: B=foo
+# 04. GET /v2/entities/E, see A=foo, B=foo
+# 05. POST /v2/op/update UPDATE: A=bar
+# 06. GET /v2/entities/E, see A=bar, B=foo
+# 07. POST /v2/op/update REPLACE: C=zzz D=zzz
+# 08. GET /v2/entities/E, see C=zzz, D=zzz
+# 09. POST /v2/op/update DELETE C
+# 10. GET /v2/entities/E, see D=zzz
+#
+
+echo "01. POST /v2/op/update APPEND: A=foo"
+echo "===================================="
+payload='{
+  "actionType": "APPEND",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E",
+      "A": {
+         "type": "Text",
+         "value": "foo"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "02. GET /v2/entities/E, see A=foo"
+echo "================================="
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo "03. POST /v2/op/update APPEND_STRICT: B=foo"
+echo "==========================================="
+payload='{
+  "actionType": "APPEND_STRICT",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E",
+      "B": {
+         "type": "Text",
+         "value": "foo"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "04. GET /v2/entities/E, see A=foo, B=foo"
+echo "========================================"
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo "05. POST /v2/op/update UPDATE: A=bar"
+echo "===================================="
+payload='{
+  "actionType": "UPDATE",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E",
+      "A": {
+         "type": "Text",
+         "value": "bar"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "06. GET /v2/entities/E, see A=bar, B=foo"
+echo "========================================"
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo "07. POST /v2/op/update REPLACE: C=zzz D=zzz"
+echo "==========================================="
+payload='{
+  "actionType": "REPLACE",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E",
+      "C": {
+         "type": "Text",
+         "value": "zzz"
+      },
+      "D": {
+         "type": "Text",
+         "value": "zzz"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "08. GET /v2/entities/E, see C=zzz, D=zzz"
+echo "========================================"
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo "09. POST /v2/op/update DELETE C"
+echo "==============================="
+payload='{
+  "actionType": "DELETE",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E",
+      "C": {
+         "type": "Text",
+         "value": ""
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "10. GET /v2/entities/E, see D=zzz"
+echo "================================="
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/op/update APPEND: A=foo
+====================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. GET /v2/entities/E, see A=foo
+=================================
+HTTP/1.1 200 OK
+Content-Length: 69
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Text",
+        "value": "foo"
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+03. POST /v2/op/update APPEND_STRICT: B=foo
+===========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. GET /v2/entities/E, see A=foo, B=foo
+========================================
+HTTP/1.1 200 OK
+Content-Length: 117
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Text",
+        "value": "foo"
+    },
+    "B": {
+        "metadata": {},
+        "type": "Text",
+        "value": "foo"
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+05. POST /v2/op/update UPDATE: A=bar
+====================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. GET /v2/entities/E, see A=bar, B=foo
+========================================
+HTTP/1.1 200 OK
+Content-Length: 117
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Text",
+        "value": "bar"
+    },
+    "B": {
+        "metadata": {},
+        "type": "Text",
+        "value": "foo"
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+07. POST /v2/op/update REPLACE: C=zzz D=zzz
+===========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. GET /v2/entities/E, see C=zzz, D=zzz
+========================================
+HTTP/1.1 200 OK
+Content-Length: 117
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "C": {
+        "metadata": {},
+        "type": "Text",
+        "value": "zzz"
+    },
+    "D": {
+        "metadata": {},
+        "type": "Text",
+        "value": "zzz"
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+09. POST /v2/op/update DELETE C
+===============================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. GET /v2/entities/E, see D=zzz
+=================================
+HTTP/1.1 200 OK
+Content-Length: 69
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "D": {
+        "metadata": {},
+        "type": "Text",
+        "value": "zzz"
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

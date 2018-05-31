@@ -69,7 +69,7 @@ std::string postBatchUpdate
   UpdateContextRequest*  upcrP  = &parseDataP->upcr.res;
   Entities               entities;
 
-  upcrP->fill(&buP->entities, buP->updateActionType.get());
+  upcrP->fill(&buP->entities, buP->updateActionType);
   buP->release();  // upcrP just 'took over' the data from buP, buP is no longer needed
   parseDataP->upcr.res.present("");
 

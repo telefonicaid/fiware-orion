@@ -98,7 +98,7 @@ std::string putAttributeValueInstance
 
 
   // 02. Fill in UpdateContextRequest
-  parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, metaID, "UPDATE");
+  parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, metaID, ActionTypeUpdate);
 
   // 03. Call postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);

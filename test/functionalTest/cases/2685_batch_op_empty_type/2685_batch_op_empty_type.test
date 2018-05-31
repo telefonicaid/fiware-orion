@@ -38,7 +38,7 @@ brokerStart CB
 echo "01. Update using empty entity type"
 echo "=================================="
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities":
   [
     {

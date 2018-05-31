@@ -156,7 +156,6 @@ SET (SOURCES
     ngsi/SubscribeError_test.cpp
     ngsi/SubscriptionId_test.cpp
     ngsi/Throttling_test.cpp
-    ngsi/UpdateActionType_test.cpp
 
     orionTypes/EntityType_test.cpp
     orionTypes/EntityTypeResponse_test.cpp

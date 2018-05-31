@@ -41,7 +41,7 @@ brokerStart CB
 echo "01. Update using attr type with not plain ASCII and see error"
 echo "============================================================="
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities":
   [
     {
@@ -62,7 +62,7 @@ echo
 echo "02. Update using empty attr type and see error"
 echo "=============================================="
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities":
   [
     {
@@ -83,7 +83,7 @@ echo
 echo "03. Update using attr type exceding length and see error"
 echo "========================================================"
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities":
   [
     {
@@ -104,7 +104,7 @@ echo
 echo "04. Update using attr type with forbidden chars and see error"
 echo "============================================================="
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities":
   [
     {
