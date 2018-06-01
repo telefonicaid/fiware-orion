@@ -52,7 +52,6 @@ struct UpdateContextAttributeRequest;
 typedef struct UpdateContextRequest
 {
   ContextElementVector    contextElementVector;  // Mandatory
-  //UpdateActionType        updateActionType;      // Mandatory
   ActionType              updateActionType;      // Mandatory
 
   std::string             contextProvider;       // Not part of the payload - used internally only

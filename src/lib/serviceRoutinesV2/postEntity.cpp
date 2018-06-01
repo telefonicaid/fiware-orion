@@ -63,7 +63,6 @@ std::string postEntity
 )
 {
   Entity*        eP  = &parseDataP->ent.res;
-  //std::string    op  = ciP->uriParam["op"];
   ActionType     op;
   Ngsiv2Flavour  flavor;
 
