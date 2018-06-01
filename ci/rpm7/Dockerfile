@@ -1,6 +1,10 @@
 FROM centos:centos7
 
 ADD mongodb.repo /etc/yum.repos.d/
+ADD build.sh /opt/bin/
+ADD makefile /opt/archive/
+
+RUN ln -s /opt/bin/build.sh /usr/local/bin/build
 
 RUN yum -y install epel-release \
 &&  yum -y install \
@@ -56,3 +60,7 @@ RUN curl -L ftp://repositories.lab.fiware.org/gmock-1.5.0.tar.bz2 | tar xjC /opt
   &&  make install \
   &&  ldconfig \
   &&  rm -Rf /opt/gmock-1.5.0
+
+WORKDIR /opt/
+
+CMD ["/usr/local/bin/build", "-h"]

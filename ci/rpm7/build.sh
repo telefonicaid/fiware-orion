@@ -23,7 +23,7 @@ function _usage()
     -r   --release       build rpm release
     -t   --testing       build rpm testing
     -U   --upload        upload rpm, REPO_USER and REPO_PASSWORD ENV variables should be provided
-    -F   --fix           execute fix for jenkins (disable ipv6 test)
+    -F   --fix           execute fix for jenkins and travis (disable ipv6 test)
     -D   --db            start mongodb
 
   Examples:
