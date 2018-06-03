@@ -58,7 +58,7 @@ class Entities
   std::string  render(std::map<std::string, bool>&         uriParamOptions,
                       std::map<std::string, std::string>&  uriParam);
 
-  std::string  check(ApiVersion apiVersion, RequestType requestType);
+  std::string  check(RequestType requestType);
   void         present(const std::string& indent);
   void         release(void);
   void         fill(QueryContextResponse* qcrsP);

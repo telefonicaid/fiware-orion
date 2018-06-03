@@ -86,8 +86,7 @@ std::string getEntityAttribute
   // 03. Render entity attribute response
   attribute.fill(&parseDataP->qcrs.res, compV[4]);
 
-  TIMED_RENDER(answer = attribute.render(ciP->apiVersion,
-                                         ciP->httpHeaders.accepted("text/plain"),
+  TIMED_RENDER(answer = attribute.render(ciP->httpHeaders.accepted("text/plain"),
                                          ciP->httpHeaders.accepted("application/json"),
                                          ciP->httpHeaders.outformatSelect(),
                                          &(ciP->outMimeType),

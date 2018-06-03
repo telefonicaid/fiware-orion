@@ -382,7 +382,7 @@ std::string postQueryContext
   {
     ContextElementResponse* cerP  = qcrsP->contextElementResponseVector[ix];
     EntityId*               eP    = &cerP->contextElement.entityId;
-    
+
     //
     // If a Context Provider has been registered with an empty attribute list for
     // the EntityId in this ContextElement, then the ContextElement has this Context Provider

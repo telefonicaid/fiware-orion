@@ -80,8 +80,8 @@ TEST(Entities, check)
   Entities ens2;
   ens2.vec.push_back(enP);
 
-  EXPECT_EQ("OK", ens1.check(V1, EntitiesRequest));
-  EXPECT_EQ("No Entity ID", ens2.check(V1, EntitiesRequest));
+  EXPECT_EQ("OK", ens1.check(EntitiesRequest));
+  EXPECT_EQ("entity id length: 0, min length supported: 1", ens2.check(EntitiesRequest));
 
   utExit();
 }

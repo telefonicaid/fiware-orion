@@ -38,7 +38,6 @@ brokerStart CB 0
 echo "01. POST /v2/registrations"
 echo "=========================="
 payload='{
-  "id": "5aeb13827d4ef10a12a02630",
   "dataProvided": {
     "entities": [
       {

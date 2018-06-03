@@ -164,5 +164,5 @@ std::string parseEntityObject
     }
   }
 
-  return eP->check(ciP->apiVersion, ciP->requestType);
+  return eP->check(ciP->requestType);
 }
