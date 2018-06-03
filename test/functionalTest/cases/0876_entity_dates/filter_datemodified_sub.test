@@ -32,12 +32,12 @@ accumulatorStart --pretty-print
 
 #
 # 01. Create entity E1
-# 02. At t_0: Create subscription with q: dateModified>t_2
+# 02. At t_0: Create subscription with q: dateModified>t_4
 # 03. At t_1: modify entity E1 (not notif)
 # 04. At t_2: modify entity E1 (not notif)
-# 05. At t_3: modify entity E1 (notif)
-# 06. At t_4: modify entity E1 (notif)
-# 07. Get accumulator dump (2 notifications), for t_3 and t_4
+# 05. At t_5: modify entity E1 (notif)
+# 06. At t_6: modify entity E1 (notif)
+# 07. Get accumulator dump (2 notifications), for t_5 and t_6
 #
 
 echo "01. Create entity E1"
@@ -51,12 +51,11 @@ orionCurl --url /v2/entities?options=keyValues --payload "$payload"
 echo
 echo
 
-
 T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
-T_2=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z" --date="2seconds")
+T_4=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z" --date="4seconds")
 
 
-echo "02. At t_0: Create subscription with q: dateModified>t_2"
+echo "02. At t_0: Create subscription with q: dateModified>t_4"
 echo "========================================================"
 payload='
 {
@@ -70,7 +69,7 @@ payload='
         "condition": {
             "attrs": [ ],
             "expression": {
-               "q": "dateModified>'$T_2'"
+               "q": "dateModified>'$T_4'"
             }
          }
     },
@@ -108,9 +107,9 @@ echo
 echo
 
 
-echo "05. At t_3: modify entity E1 (notif)"
+echo "05. At t_5: modify entity E1 (notif)"
 echo "===================================="
-sleep 1s
+sleep 3s
 payload='{
   "A": "t_3"
 }'
@@ -119,7 +118,7 @@ echo
 echo
 
 
-echo "06. At t_4: modify entity E1 (notif)"
+echo "06. At t_6: modify entity E1 (notif)"
 echo "===================================="
 sleep 1s
 payload='{
@@ -130,7 +129,7 @@ echo
 echo
 
 
-echo "07. Get accumulator dump (2 notifications), for t_3 and t_4"
+echo "07. Get accumulator dump (2 notifications), for t_5 and t_6"
 echo "==========================================================="
 accumulatorDump
 echo
@@ -148,7 +147,7 @@ Date: REGEX(.*)
 
 
 
-02. At t_0: Create subscription with q: dateModified>t_2
+02. At t_0: Create subscription with q: dateModified>t_4
 ========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -176,7 +175,7 @@ Date: REGEX(.*)
 
 
 
-05. At t_3: modify entity E1 (notif)
+05. At t_5: modify entity E1 (notif)
 ====================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -185,7 +184,7 @@ Date: REGEX(.*)
 
 
 
-06. At t_4: modify entity E1 (notif)
+06. At t_6: modify entity E1 (notif)
 ====================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -194,7 +193,7 @@ Date: REGEX(.*)
 
 
 
-07. Get accumulator dump (2 notifications), for t_3 and t_4
+07. Get accumulator dump (2 notifications), for t_5 and t_6
 ===========================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /

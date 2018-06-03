@@ -83,6 +83,7 @@ echo
 
 # Sleep > 3 seconds to get a cache refresh
 sleep 3.5
+valgrindSleep 1
 
 
 echo "03. GET subscription, see error stats in notification field"

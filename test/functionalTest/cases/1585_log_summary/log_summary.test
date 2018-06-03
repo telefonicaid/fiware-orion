@@ -25,7 +25,7 @@ Log Summary
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPv4 -logSummary 3 
+brokerStart CB 0 IPv4 -logSummary 5
 
 --SHELL--
 
@@ -83,7 +83,7 @@ echo
 
 echo "05. Sleep 3 secs, awaiting a log summary report"
 echo "==============================================="
-sleep 3
+sleep 5
 echo
 echo
 
@@ -104,7 +104,7 @@ echo
 
 echo "08. Sleep 3 secs, awaiting a second log summary"
 echo "==============================================="
-sleep 3
+sleep 5
 echo
 echo
 
@@ -125,7 +125,7 @@ echo
 
 echo "11. Sleep 3 secs, awaiting a second log summary"
 echo "==============================================="
-sleep 3
+sleep 5
 echo
 echo
 
