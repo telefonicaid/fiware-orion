@@ -177,12 +177,12 @@ std::string Entity::render
 *
 * Entity::check - 
 */
-std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
+std::string Entity::check(RequestType requestType)
 {
   ssize_t  len;
   char     errorMsg[128];
 
-  if (((apiVersion == V2) && (len = strlen(id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
+  if (((len = strlen(id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
   {
     snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
@@ -216,7 +216,7 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
   // Check for forbidden chars for "id", but not if "id" is a pattern
   if (isPattern == "false")
   {
-    if (forbiddenIdChars(apiVersion, id.c_str()))
+    if (forbiddenIdChars(V2, id.c_str()))
     {
       alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID);
       return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
@@ -233,7 +233,7 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
 
   if (!((requestType == BatchQueryRequest) || (requestType == BatchUpdateRequest && !typeGiven)))
   {
-    if ((apiVersion == V2) && ((len = strlen(type.c_str())) < MIN_ID_LEN))
+    if ( (len = strlen(type.c_str())) < MIN_ID_LEN)
     {
       snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
       alarmMgr.badInput(clientIp, errorMsg);
@@ -244,14 +244,14 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
   // Check for forbidden chars for "type", but not if "type" is a pattern
   if (isTypePattern == false)
   {
-    if (forbiddenIdChars(apiVersion, type.c_str()))
+    if (forbiddenIdChars(V2, type.c_str()))
     {
       alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE);
       return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
     }
   }
 
-  return attributeVector.check(apiVersion, requestType);
+  return attributeVector.check(V2, requestType);
 }
 
 
