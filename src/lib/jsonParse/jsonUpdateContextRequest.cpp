@@ -389,7 +389,6 @@ std::string jsonUpcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 */
 void jsonUpcrPresent(ParseData* reqDataP)
 {
-  // FIXME PR: leftover?
   if (!lmTraceIsSet(LmtPresent))
     return;
 
