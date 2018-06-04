@@ -130,7 +130,7 @@ std::string postEntities
       location += "?type=none";
     }
 
-    ciP->httpHeader.push_back(RESOURCE_LOCATION);
+    ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
     ciP->httpHeaderValue.push_back(location);
     ciP->httpStatusCode = SccCreated;
   }

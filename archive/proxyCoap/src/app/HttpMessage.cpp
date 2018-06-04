@@ -74,13 +74,13 @@ HttpMessage::HttpMessage(std::string theMessage)
       else
       {
         // Get other headers
-        int temp = line.find(CONTENT_LENGTH);
+        int temp = line.find(HTTP_CONTENT_LENGTH);
         if (temp >= 0)
         {
           _contentLength = atoi(line.substr(pos + 2).c_str());
         }
 
-        temp = line.find(CONTENT_TYPE);
+        temp = line.find(HTTP_CONTENT_TYPE);
         if (temp >= 0)
         {
           _contentType = line.substr(pos + 2);

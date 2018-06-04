@@ -500,29 +500,29 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 
   LM_T(LmtHttpHeaders, ("HTTP Header:   %s: %s", key.c_str(), value));
 
-  if      (strcasecmp(key.c_str(), USER_AGENT) == 0)        headerP->userAgent      = value;
-  else if (strcasecmp(key.c_str(), HOST) == 0)              headerP->host           = value;
-  else if (strcasecmp(key.c_str(), ACCEPT) == 0)
+  if      (strcasecmp(key.c_str(), HTTP_USER_AGENT) == 0)        headerP->userAgent      = value;
+  else if (strcasecmp(key.c_str(), HTTP_HOST) == 0)              headerP->host           = value;
+  else if (strcasecmp(key.c_str(), HTTP_ACCEPT) == 0)
   {
     headerP->accept = value;
     acceptParse(ciP, value);  // Any errors are flagged in ciP->acceptHeaderError and taken care of later
   }
-  else if (strcasecmp(key.c_str(), EXPECT) == 0)            headerP->expect         = value;
-  else if (strcasecmp(key.c_str(), CONNECTION) == 0)        headerP->connection     = value;
-  else if (strcasecmp(key.c_str(), CONTENT_TYPE) == 0)      headerP->contentType    = value;
-  else if (strcasecmp(key.c_str(), CONTENT_LENGTH) == 0)    headerP->contentLength  = atoi(value);
-  else if (strcasecmp(key.c_str(), ORIGIN) == 0)            headerP->origin         = value;
-  else if (strcasecmp(key.c_str(), FIWARE_SERVICE) == 0)
+  else if (strcasecmp(key.c_str(), HTTP_EXPECT) == 0)            headerP->expect         = value;
+  else if (strcasecmp(key.c_str(), HTTP_CONNECTION) == 0)        headerP->connection     = value;
+  else if (strcasecmp(key.c_str(), HTTP_CONTENT_TYPE) == 0)      headerP->contentType    = value;
+  else if (strcasecmp(key.c_str(), HTTP_CONTENT_LENGTH) == 0)    headerP->contentLength  = atoi(value);
+  else if (strcasecmp(key.c_str(), HTTP_ORIGIN) == 0)            headerP->origin         = value;
+  else if (strcasecmp(key.c_str(), HTTP_FIWARE_SERVICE) == 0)
   {
     headerP->tenant = value;
     toLowercase((char*) headerP->tenant.c_str());
   }
-  else if (strcasecmp(key.c_str(), X_AUTH_TOKEN) == 0)        headerP->xauthToken         = value;
-  else if (strcasecmp(key.c_str(), X_REAL_IP) == 0)           headerP->xrealIp            = value;
-  else if (strcasecmp(key.c_str(), X_FORWARDED_FOR) == 0)     headerP->xforwardedFor      = value;
-  else if (strcasecmp(key.c_str(), FIWARE_CORRELATOR) == 0)   headerP->correlator         = value;
-  else if (strcasecmp(key.c_str(), NGSIV2_ATTRSFORMAT) == 0)  headerP->ngsiv2AttrsFormat  = value;
-  else if (strcasecmp(key.c_str(), FIWARE_SERVICEPATH) == 0)
+  else if (strcasecmp(key.c_str(), HTTP_X_AUTH_TOKEN) == 0)        headerP->xauthToken         = value;
+  else if (strcasecmp(key.c_str(), HTTP_X_REAL_IP) == 0)           headerP->xrealIp            = value;
+  else if (strcasecmp(key.c_str(), HTTP_X_FORWARDED_FOR) == 0)     headerP->xforwardedFor      = value;
+  else if (strcasecmp(key.c_str(), HTTP_FIWARE_CORRELATOR) == 0)   headerP->correlator         = value;
+  else if (strcasecmp(key.c_str(), HTTP_NGSIV2_ATTRSFORMAT) == 0)  headerP->ngsiv2AttrsFormat  = value;
+  else if (strcasecmp(key.c_str(), HTTP_FIWARE_SERVICEPATH) == 0)
   {
     headerP->servicePath         = value;
     headerP->servicePathReceived = true;
@@ -1291,7 +1291,7 @@ static int connectionTreat
 
     correlatorIdSet(ciP->httpHeaders.correlator.c_str());
 
-    ciP->httpHeader.push_back(FIWARE_CORRELATOR);
+    ciP->httpHeader.push_back(HTTP_FIWARE_CORRELATOR);
     ciP->httpHeaderValue.push_back(ciP->httpHeaders.correlator);
 
     if ((ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE) && (ciP->apiVersion == V2))

@@ -91,7 +91,7 @@ std::string getEntityAllTypes
     char cVec[64];
 
     snprintf(cVec, sizeof(cVec), "%u", totalTypes);
-    ciP->httpHeader.push_back(FIWARE_TOTAL_COUNT);
+    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
     ciP->httpHeaderValue.push_back(cVec);
   }
 

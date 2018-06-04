@@ -54,7 +54,7 @@ std::string badVerbAllFour
   std::string  details = std::string("bad verb for url '") + ciP->url + "', method '" + ciP->method + "'";
   OrionError   oe(SccBadVerb, ERROR_DESC_BAD_VERB);
 
-  ciP->httpHeader.push_back(ALLOW);
+  ciP->httpHeader.push_back(HTTP_ALLOW);
   ciP->httpHeaderValue.push_back("POST, GET, PUT, DELETE");
   ciP->httpStatusCode = SccBadVerb;
 

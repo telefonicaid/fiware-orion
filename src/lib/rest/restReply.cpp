@@ -97,11 +97,11 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   {
     if (ciP->outMimeType == JSON)
     {
-      MHD_add_response_header(response, CONTENT_TYPE, "application/json");
+      MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/json");
     }
     else if (ciP->outMimeType == TEXT)
     {
-      MHD_add_response_header(response, CONTENT_TYPE, "text/plain");
+      MHD_add_response_header(response, HTTP_CONTENT_TYPE, "text/plain");
     }
   }
 
@@ -116,12 +116,12 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
       // If any origin is allowed, the header is sent always with "any" as value
       if (strcmp(corsOrigin, "__ALL") == 0)
       {
-        MHD_add_response_header(response, ACCESS_CONTROL_ALLOW_ORIGIN, "*");
+        MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
       }
       // If a specific origin is allowed, the header is only sent if the origins match
       else if (strcmp(ciP->httpHeaders.origin.c_str(), corsOrigin) == 0)
       {
-        MHD_add_response_header(response, ACCESS_CONTROL_ALLOW_ORIGIN, corsOrigin);
+        MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_ORIGIN, corsOrigin);
       }
       // If there is no match, originAllowed flag is set to false
       else
@@ -133,16 +133,16 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
       if (originAllowed)
       {
         // Add Access-Control-Expose-Headers to the response
-        MHD_add_response_header(response, ACCESS_CONTROL_EXPOSE_HEADERS, CORS_EXPOSED_HEADERS);
+        MHD_add_response_header(response, HTTP_ACCESS_CONTROL_EXPOSE_HEADERS, CORS_EXPOSED_HEADERS);
 
         if (ciP->verb == OPTIONS)
         {
-          MHD_add_response_header(response, ACCESS_CONTROL_ALLOW_HEADERS, CORS_ALLOWED_HEADERS);
+          MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_HEADERS, CORS_ALLOWED_HEADERS);
 
           char maxAge[STRING_SIZE_FOR_INT];
           snprintf(maxAge, sizeof(maxAge), "%d", corsMaxAge);
 
-          MHD_add_response_header(response, ACCESS_CONTROL_MAX_AGE, maxAge);
+          MHD_add_response_header(response, HTTP_ACCESS_CONTROL_MAX_AGE, maxAge);
         }
       }
     }

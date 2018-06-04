@@ -55,7 +55,7 @@ std::string badVerbGetDeleteOnly
   std::string  details = std::string("bad verb for url '") + ciP->url + "', method '" + ciP->method + "'";
   OrionError   oe(SccBadVerb, ERROR_DESC_BAD_VERB);
 
-  ciP->httpHeader.push_back(ALLOW);
+  ciP->httpHeader.push_back(HTTP_ALLOW);
   std::string headerValue = "GET, DELETE";
   //OPTIONS verb is only available for V2 API
   if ((corsEnabled == true) && (ciP->apiVersion == V2))
