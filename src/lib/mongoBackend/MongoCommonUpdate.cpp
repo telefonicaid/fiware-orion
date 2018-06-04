@@ -3418,7 +3418,7 @@ static void updateEntity
   /* To finish with this entity processing, search for CPrs in not found attributes and
    * add the corresponding ContextElementResponse to the global response */
    
-  if ((strcasecmp(action.c_str(), "update") == 0) || (strcasecmp(action.c_str(), "replace") == 0))
+  if ((action == ActionTypeUpdate) || (action == ActionTypeReplace))
   {
     searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
   }
