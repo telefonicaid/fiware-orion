@@ -3417,13 +3417,19 @@ static void updateEntity
 
   /* To finish with this entity processing, search for CPrs in not found attributes and
    * add the corresponding ContextElementResponse to the global response */
-  searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
-
+   
+  if ((strcasecmp(action.c_str(), "update") == 0) || (strcasecmp(action.c_str(), "replace") == 0))
+  {
+    searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
+  }
+  
   // StatusCode may be set already (if so, we keep the existing value)
+  
   if (cerP->statusCode.code == SccNone)
   {
     cerP->statusCode.fill(SccOk);
   }
+  
   responseP->contextElementResponseVector.push_back(cerP);
 }
 

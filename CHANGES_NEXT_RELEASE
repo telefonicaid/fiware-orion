@@ -2,3 +2,4 @@
 - Fix: bug having entities without attibutes AND matching registrations made the attr-less entity not be returned by GET /v2/entities (#3176)
 - Fix: bug when using "legacy" format for custom v2 notifications (#3154)
 - Add: camelCase actionTypes in POST /v2/op/update (append, appendStrict, update, delete and replace) (#2721)
+- Fix: check for providers is done only in UPDATE or REPLACE actionType case in update entity logic (#2874)
