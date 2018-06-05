@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Attribute dates overriden by the user
+Attribute dates overridden by the user
 
 --SHELL-INIT--
 dbInit CB
