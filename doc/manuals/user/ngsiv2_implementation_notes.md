@@ -181,7 +181,7 @@ GET /v2/entities/FutureEntity/attrs
 ```
 
 However, when included in notifications, the value is not the one provided by the user (*), but the real
-one corresponding to entity modification/creation stored internally by Orion, eg (assuming the last update
+one corresponding to entity modification/creation stored internally by Orion, e.g. (assuming the last update
 for that entity was sent at 11:16:05 at May 28th, 2018):
 
 ```
