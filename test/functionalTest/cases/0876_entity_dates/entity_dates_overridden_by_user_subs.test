@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Entity dates overriden by the user (subscription/notification cases)
+Entity dates overridden by the user (subscription/notification cases)
 
 --SHELL-INIT--
 dbInit CB
