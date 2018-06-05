@@ -116,6 +116,13 @@ std::string Entity::render
     attributeVector.push_back(caP);
   }
 
+ // Add special attributes with the service path
+  if (std::find(attrsFilter.begin(), attrsFilter.end(), SERVICE_PATH) != attrsFilter.end())
+  {
+    ContextAttribute* caP = new ContextAttribute(SERVICE_PATH, DEFAULT_ATTR_STRING_TYPE, servicePath);
+    attributeVector.push_back(caP);
+  }
+
   if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
   {
     out = "[";

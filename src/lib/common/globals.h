@@ -100,6 +100,7 @@
 */
 #define DATE_CREATED   "dateCreated"
 #define DATE_MODIFIED  "dateModified"
+#define SERVICE_PATH   "servicePath"
 #define ALL_ATTRS      "*"
 
 

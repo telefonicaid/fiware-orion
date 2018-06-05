@@ -160,11 +160,12 @@ void Entities::fill(QueryContextResponse* qcrsP)
     {
       Entity*         eP  = new Entity();
 
-      eP->id        = ceP->entityId.id;
-      eP->type      = ceP->entityId.type;
-      eP->isPattern = ceP->entityId.isPattern;
-      eP->creDate   = ceP->entityId.creDate;
-      eP->modDate   = ceP->entityId.modDate;
+      eP->id          = ceP->entityId.id;
+      eP->type        = ceP->entityId.type;
+      eP->isPattern   = ceP->entityId.isPattern;
+      eP->creDate     = ceP->entityId.creDate;
+      eP->modDate     = ceP->entityId.modDate;
+      eP->servicePath = ceP->entityId.servicePath;
 
       eP->attributeVector.fill(&ceP->contextAttributeVector);
       vec.push_back(eP);
