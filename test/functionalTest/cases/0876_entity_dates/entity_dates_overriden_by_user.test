@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Entity dates overriden by the user
+Entity dates overridden by the user
 
 --SHELL-INIT--
 dbInit CB
@@ -30,7 +30,7 @@ brokerStart CB
 --SHELL--
 
 #
-# Steps 4 to 7 are weird, but this is the way CB works now (and it is documented in
+# Steps 4 to 7 are weird, but this is the way CB works right now (and it is documented in
 # NGSIv2 implementation notes). Maybe in the future could change.
 #
 # 01. Create entity with user provide dateCreated and dateModified in a far away future
