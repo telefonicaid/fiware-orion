@@ -304,6 +304,6 @@ you are highly encouraged to use `attrs` instead (i.e. `attrs=dateModified,*`).
 
 * `POST /v2/op/update` accepts the same action types as NGSIv1, that is `APPEND`, `APPEND_STRICT`,
 `UPDATE`, `DELETE` and `REPLACE`. However, they shouldn't be used, preferring always the following counterparts:
-`append`, `appendStrict`, `update`, `delete and `replace`.
+`append`, `appendStrict`, `update`, `delete` and `replace`.
 
 [Top](#top)
