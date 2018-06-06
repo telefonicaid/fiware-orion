@@ -13,14 +13,3 @@ For now it supports:
 * file compliance check
 
 Style, payload and file compliance are combined in one 'optional' test.
-
-## Prerequisites
-These variables should be defined:
-* enable_unit - to enable unit testing
-* enable_functional - to enable functional testing
-* enable_optional - to enable optional testing
-
-These variables should be 'true' to enable testing.
-
-## TODO
-This CI should be extended to prepare Orion binaries and Docker images.
