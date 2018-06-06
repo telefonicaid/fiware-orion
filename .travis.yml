@@ -3,16 +3,20 @@ language: cpp
 services:
   - docker
 env:
-before_install:
-  - docker pull fiware/orion-ci:rpm7
+before_install: true
 install: true
 before_script: true
 script: true
 jobs:
   include:
+    - stage: optional
+      if: enable_optional = true
+      script: ci/rpm7/build.sh -o -p $(pwd)
     - stage: unit
+      if: enable_unit = true
       before_script: docker run -t --rm -v $(pwd):/opt/fiware-orion fiware/orion-ci:rpm7 build -M unit
       script: docker run -t --rm -v $(pwd):/opt/fiware-orion fiware/orion-ci:rpm7 build -IDu
     - stage: functional
+      if: enable_functional = true
       before_script: docker run -t --rm -v $(pwd):/opt/fiware-orion fiware/orion-ci:rpm7 build -M functional
       script: docker run -t --rm -v $(pwd):/opt/fiware-orion fiware/orion-ci:rpm7 build -IDFf

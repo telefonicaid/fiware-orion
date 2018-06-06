@@ -1,6 +1,26 @@
 #!/bin/bash
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+#
+# Author: Dmitrii Demin
 
-path='/opt/fiware-orion'
 url_src='https://github.com/telefonicaid/fiware-orion'
 url_dst='https://nexus.lab.fiware.org/repository/el'
 releasever=7
@@ -11,12 +31,12 @@ function _usage()
   echo -n "Usage: build [options]
   Options:
     -h   --help          show help
-    -H   --show          show the list of necessary commands that should be executed before starting functional tests manually
     -b   --branch        specify branch/tag to build, if not specified - the source from /opt/fiware-orion will be used
     -s   --source        specify repository to clone, if not specified - default repo (https://github.com/telefonicaid/fiware-orion) will be used
+    -p   --path          specify path to use as home, if not specified - /opt/fiware-orion will be used
     -M   --make          cmake/make, stage (unit/functional) should be specified
     -I   --install       make install
-    -E   --execute       run (rerun) test stand with 2 orions
+    -o   --optional      run style, payload, file_compliance checks
     -u   --unit          run unit tests
     -f   --functional    run functional tests
     -n   --nightly       build rpm nightly
@@ -24,11 +44,13 @@ function _usage()
     -t   --testing       build rpm testing
     -U   --upload        upload rpm, REPO_USER and REPO_PASSWORD ENV variables should be provided
     -F   --fix           execute fix for jenkins and travis (disable ipv6 test)
+    -E   --execute       run (rerun) test stand with 2 orions
     -D   --db            start mongodb
+    -S   --show          show the list of necessary commands that should be executed before starting functional tests manually
 
   Examples:
-    build -M unit -IDufb master - clone from master, make (for unit testing), make install, run mongo, execute unit and functional tests
-    build -M functional -IDFSf - get source from mounted folder, make (for functional testing), make install, execute FIX, functional test
+    build -M unit -IDu -b master   clone from master, make (for unit testing), make install, run mongo, execute unit tests
+    build -M functional -IDFf      get source from mounted folder, make (for functional testing), make install, run mongo, execute FIX, functional test
 "
   exit 0
 }
@@ -46,7 +68,6 @@ function _unfix_jenkins()
     echo "Builder: revert jenkins"
     mv -f /tmp/builder/bu/testHarness.sh ${path}/test/functionalTest/testHarness.sh
 }
-
 
 function _fix()
 {
@@ -81,8 +102,6 @@ function _execute()
 
     contextBroker -port 30001 -dbhost localhost:20001 -pidpath cb1.pid &
     contextBroker -port 30002 -dbhost localhost:20002 -pidpath cb2.pid &
-
-    while true; do sleep 3; done
 }
 
 [ $# = 0 ] && _usage
@@ -96,13 +115,13 @@ do
       set --
     fi
     case "$arg" in
-       --execute) set -- "$@" -E ;;
-       --help)    set -- "$@" -h ;;
-       --branch)    set -- "$@" -b ;;
-       --source)    set -- "$@" -s ;;
-       --clone) set -- "$@" -C ;;
-       --make)  set -- "$@" -M ;;
+       --help) set -- "$@" -h ;;
+       --branch) set -- "$@" -b ;;
+       --source) set -- "$@" -s ;;
+       --path) set -- "$@" -p ;;
+       --make) set -- "$@" -M ;;
        --install) set -- "$@" -I ;;
+       --optional) set -- "$@" -o ;;
        --unit) set -- "$@" -u ;;
        --functional) set -- "$@" -f ;;
        --nightly) set -- "$@" -n ;;
@@ -110,19 +129,23 @@ do
        --testing) set - "$@" -t ;;
        --upload) set - "$@" -U ;;
        --fix) set -- "$@" -F ;;
-       --show) set -- "$@" -S ;;
+       --execute) set -- "$@" -E ;;
        --db) set -- "$@" -D ;;
-       *)  set -- "$@" "$arg" ;;
+       --show) set -- "$@" -S ;;
+       *) set -- "$@" "$arg" ;;
+
     esac
 done
 
-while getopts ":hb:s:M:IufnrtUFHDE" opt; do
+while getopts ":hb:s:p:M:IoufnrtUFEDH" opt; do
     case ${opt} in
         h)  _usage ;;
         b)  branch=$OPTARG ;;
         s)  source=$OPTARG ;;
+        p)  path=$OPTARG ;;
         M)  make=$OPTARG;;
         I)  install=true;;
+        o)  optional=true ;;
         u)  unit=true ;;
         f)  functional=true ;;
         n)  nightly=true ;;
@@ -130,9 +153,9 @@ while getopts ":hb:s:M:IufnrtUFHDE" opt; do
         t)  testing=true ;;
         U)  upload=true ;;
         F)  fix=true ;;
-        H)  show=true ;;
-        D)  database=true ;;
         E)  execute=true ;;
+        D)  database=true ;;
+        H)  show=true ;;
         *) _usage ;;
         :)
         echo "option -$OPTARG requires an argument"
@@ -154,6 +177,7 @@ if [ -n "${upload}" ]; then
 fi
 
 echo "Builder: check if target folder can be created"
+if [ -z "${path}" ]; then path='/opt/fiware-orion'; fi
 mkdir -p ${path} > /dev/null 2>&1
 if [ ! -d "${path}" ]; then echo "Builder: failed, not enough permissions"; exit 1; fi
 cd ${path}
@@ -224,6 +248,27 @@ if [ -n "${execute}" ]; then
 
 fi
 
+if [ -n "${optional}" ]; then
+    echo "================================================================="
+    echo "                       OPTIONAL TESTS                            "
+    echo "================================================================="
+
+    status=true
+
+    make files_compliance
+    if [ $? -ne 0 ]; then status=false; fi
+
+    make payload_check
+    if [ $? -ne 0 ]; then status=false; fi
+
+    make style
+    if [ $? -ne 0 ]; then status=false; fi
+    rm -Rf LINT*
+
+    if ! ${status}; then echo "Builder: optional test failed"; fi
+
+fi
+
 if [ -n "${unit}" ]; then
     echo "================================================================="
     echo "                       UNIT TESTS                                "
@@ -253,6 +298,7 @@ if [ -n "${functional}" ]; then
     if [ -n "${fix}" ]; then _unfix_jenkins; fi
 
     if ! ${status}; then echo "Builder: functional test failed"; exit 1; fi
+
 fi
 
 if [ -n "${nightly}" ]; then
@@ -271,6 +317,7 @@ if [ -n "${nightly}" ]; then
     make rpm
 
     pack='nightly'
+
 fi
 
 if [ -n "${release}" ]; then
@@ -284,6 +331,7 @@ if [ -n "${release}" ]; then
     make rpm
 
     pack='release'
+
 fi
 
 if [ -n "${testing}" ]; then
@@ -302,6 +350,7 @@ if [ -n "${testing}" ]; then
     make rpm
 
     pack='testing'
+
 fi
 
 if [ -n "${upload}" ]; then
@@ -315,6 +364,7 @@ if [ -n "${upload}" ]; then
       curl -v -u ${REPO_USER}:${REPO_PASSWORD} --upload-file ${file} ${url_dst}/${releasever}/${basearch}/${pack}/${file};
       if !(curl --output /dev/null --silent --head --fail ${url_dst}/${releasever}/${basearch}/${pack}/${file}); then echo "UPLOAD FAILED!"; exit 1; fi
    done
+
 fi
 
 if [ -n "${show}" ]; then _show; fi
