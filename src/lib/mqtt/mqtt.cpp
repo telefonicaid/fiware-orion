@@ -42,19 +42,6 @@ unsigned short   mqttKeepAlivePeriod;
 
 /* ****************************************************************************
 *
-* mqttOnPublishCallback -
-* 
-*/
-void mqttOnPublishCallback(struct mosquitto *mosq, void *userdata, int mid)
-{
-  //FIXME: Do we have a usecase for the callback? To be resolved during second PR
-  LM_W(("PoC: in the publish callback"));
-}
-
-
-
-/* ****************************************************************************
-*
 * mqttInit -
 *
 */
@@ -97,6 +84,20 @@ void mqttInit (
 
 /* ****************************************************************************
 *
+* mqttOnPublishCallback -
+* 
+*/
+void mqttOnPublishCallback(struct mosquitto *mosq, void *userdata, int mid)
+{
+  /* FIXME: We don't assign message ids to the published notifications and therefore we have 
+   * no way to tell which notification a callback log belongs to. - Planned for second MQTT PR. */
+  LM_I(("MQTT notification successfully published on %s:%d", mqttHostname, mqttPortNumber));
+}
+
+
+
+/* ****************************************************************************
+*
 * sendMqttNotification -
 *
 */
@@ -104,10 +105,15 @@ int sendMqttNotification(const std::string& content)
 {
   const char* msg = content.c_str();
 
-  // FIXME: unhardwire QoS, unhardwire retain - Planned for second MQTT PR
-  mosquitto_publish(mosq, NULL, "orion", (int) strlen(msg), msg, 0, false);
-
-  LM_I(("MQTT notification sent to %s:%d", mqttHostname, mqttPortNumber));
+  // FIXME: unhardwire QoS, retain and topic - Planned for second MQTT PR
+  int resultCode = mosquitto_publish(mosq, NULL, "orion", (int) strlen(msg), msg, 0, false);
+  if (resultCode != MOSQ_ERR_SUCCESS)
+  {
+    LM_E(("Failed to send MQTT notification (%d): %s", resultCode, mosquitto_strerror(resultCode)));
+  }
+  else {
+    LM_I(("MQTT notification sent to %s:%d", mqttHostname, mqttPortNumber));
+  }
 
   return 0;
 }
@@ -133,4 +139,5 @@ void mqttCleanup(void)
   }
   mosquitto_loop_stop(mosq, false);
   mosquitto_destroy(mosq);
+  mosquitto_lib_cleanup();
 }

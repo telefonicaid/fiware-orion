@@ -36,6 +36,14 @@ RUN \
     make && \
     make install && \
     ldconfig && \
+    # Install mosquitto from source
+    curl -kOL4 http://mosquitto.org/files/source/mosquitto-1.5.tar.gz && \
+    tar xvf mosquitto-1.5.tar.gz && \
+    cd mosquitto-1.5.tar.gz && \
+    make && \
+    make install && \
+    echo '/usr/local/lib' | tee /etc/ld.so.conf.d/99mosquitto.conf
+    ldconfig
     # Install mongodb driver from source
     curl -kOL https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz && \
     tar xfz legacy-1.1.2.tar.gz && \
