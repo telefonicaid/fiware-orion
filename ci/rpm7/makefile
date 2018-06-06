@@ -46,9 +46,6 @@ prepare:
 	rm -Rf BUILD || true
 	mkdir -p  BUILD || true
 	mkdir -p /tmp/builder/logs || true
-	./scripts/build/compileInfo.sh --release	rm -Rf BUILD || true
-	mkdir -p  BUILD || true
-	mkdir -p /tmp/builder/logs || true
 	./scripts/build/compileInfo.sh --release
 	. scripts/testEnv.sh
 
