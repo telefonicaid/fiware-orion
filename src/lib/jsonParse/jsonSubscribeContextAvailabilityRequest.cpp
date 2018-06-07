@@ -317,5 +317,4 @@ void jsonScarPresent(ParseData* reqDataP)
     return;
   }
 
-  reqDataP->scar.res.present("");
 }

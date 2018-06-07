@@ -437,5 +437,4 @@ void jsonNcrPresent(ParseData* parseDataP)
     return;
 
   LM_T(LmtPresent,("\n\n"));
-  parseDataP->ncr.res.present("");
 }

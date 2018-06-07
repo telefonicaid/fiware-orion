@@ -581,5 +581,4 @@ void jsonScrPresent(ParseData* parseDataP)
     return;
   }
 
-  parseDataP->scr.res.present("");
 }

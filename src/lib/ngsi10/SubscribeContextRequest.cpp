@@ -71,23 +71,6 @@ std::string SubscribeContextRequest::check(const std::string& predetectedError, 
 
 /* ****************************************************************************
 *
-* SubscribeContextRequest::present -
-*/
-void SubscribeContextRequest::present(const std::string& indent)
-{
-  entityIdVector.present(indent + "  ");
-  attributeList.present(indent + "  ");
-  reference.present(indent + "  ");
-  duration.present(indent + "  ");
-  restriction.present(indent + "  ");
-  notifyConditionVector.present(indent + "  ");
-  throttling.present(indent + "  ");
-}
-
-
-
-/* ****************************************************************************
-*
 * SubscribeContextRequest::release -
 *
 * Old versions of this method also include a 'restriction.release()' call. However, now each time

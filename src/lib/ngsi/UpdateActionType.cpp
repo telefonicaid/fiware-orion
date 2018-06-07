@@ -94,26 +94,6 @@ std::string UpdateActionType::get(void)
 
 /* ****************************************************************************
 *
-* UpdateActionType::present - 
-*/
-void UpdateActionType::present(const std::string& indent)
-{
-  if (string != "")
-  {
-    LM_T(LmtPresent, ("%sUpdateActionType: %s\n", 
-		      indent.c_str(), 
-		      string.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNo UpdateActionType\n", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * UpdateActionType::render - 
 */
 std::string UpdateActionType::render(bool comma)

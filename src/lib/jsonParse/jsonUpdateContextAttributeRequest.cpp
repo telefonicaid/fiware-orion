@@ -184,6 +184,4 @@ void jsonUpcarPresent(ParseData* reqData)
   }
 
   LM_T(LmtPresent, ("\n\n"));
-  reqData->upcar.res.present("");
 }
-

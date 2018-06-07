@@ -489,5 +489,4 @@ void jsonUcsrPresent(ParseData* parseDataP)
     return;
   }
 
-  parseDataP->ucsr.res.present("");
 }

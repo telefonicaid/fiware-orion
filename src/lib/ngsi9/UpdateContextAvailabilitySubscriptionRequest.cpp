@@ -77,21 +77,6 @@ std::string UpdateContextAvailabilitySubscriptionRequest::render(void)
 
 /* ****************************************************************************
 *
-* UpdateContextAvailabilitySubscriptionRequest::present -
-*/
-void UpdateContextAvailabilitySubscriptionRequest::present(const std::string& indent)
-{
-   entityIdVector.present(indent + "  ");
-   attributeList.present(indent + "  ");
-   duration.present(indent + "  ");
-   restriction.present(indent + "  ");
-   subscriptionId.present(indent + "  ");
-}
-
-
-
-/* ****************************************************************************
-*
 * UpdateContextAvailabilitySubscriptionRequest::check -
 */
 std::string UpdateContextAvailabilitySubscriptionRequest::check(const std::string& predetectedError, int counter)

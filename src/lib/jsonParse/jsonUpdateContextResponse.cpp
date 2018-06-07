@@ -461,5 +461,4 @@ void jsonUpcrsPresent(ParseData* reqDataP)
     return;
 
   LM_T(LmtPresent, ("UpdateContextResponse:"));
-  reqDataP->upcrs.res.present("  ");
 }

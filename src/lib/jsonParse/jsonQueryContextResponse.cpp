@@ -462,5 +462,4 @@ void jsonQcrsPresent(ParseData* reqDataP)
     return;
 
   LM_T(LmtPresent, ("QueryContextResponse:"));
-  reqDataP->qcrs.res.present("  ", "jsonQcrsPresent");
 }

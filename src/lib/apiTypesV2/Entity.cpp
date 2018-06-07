@@ -258,21 +258,6 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
 
 /* ****************************************************************************
 *
-* Entity::present - 
-*/
-void Entity::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%sid:        %s", indent.c_str(), id.c_str()));
-  LM_T(LmtPresent, ("%stype:      %s", indent.c_str(), type.c_str()));
-  LM_T(LmtPresent, ("%sisPattern: %s", indent.c_str(), isPattern.c_str()));
-
-  attributeVector.present(indent + "  ");
-}
-
-
-
-/* ****************************************************************************
-*
 * Entity::fill - 
 */
 void Entity::fill

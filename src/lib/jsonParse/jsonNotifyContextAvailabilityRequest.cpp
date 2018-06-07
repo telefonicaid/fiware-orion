@@ -399,5 +399,4 @@ void jsonNcarPresent(ParseData* parseDataP)
     return;
 
   LM_T(LmtPresent,("\n\n"));
-  parseDataP->ncar.res.present("");
 }

@@ -219,14 +219,3 @@ std::string jsonUcerCheck(ParseData* reqData, ConnectionInfo* ciP)
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
   return reqData->ucer.res.check(ciP->apiVersion, asJsonObject, UpdateContextElement, reqData->errorString);
 }
-
-
-
-/* ****************************************************************************
-*
-* ucerPresent - 
-*/
-void jsonUcerPresent(ParseData* reqData)
-{
-  reqData->ucer.res.present("");
-}

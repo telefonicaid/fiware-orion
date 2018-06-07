@@ -123,21 +123,6 @@ void UpdateContextRequest::release(void)
 
 /* ****************************************************************************
 *
-* UpdateContextRequest::present -
-*/
-void UpdateContextRequest::present(const std::string& indent)
-{
-//  if (!lmTraceIsSet(LmtDump))
-//    return;
-
-  contextElementVector.present(indent);
-  updateActionType.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
 * UpdateContextRequest::fill -
 */
 void UpdateContextRequest::fill

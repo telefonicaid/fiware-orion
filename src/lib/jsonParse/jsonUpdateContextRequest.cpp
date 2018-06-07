@@ -394,6 +394,4 @@ void jsonUpcrPresent(ParseData* reqDataP)
 
   LM_T(LmtPresent, ("\n\n"));
 
-  reqDataP->upcr.res.contextElementVector.present("");
-  reqDataP->upcr.res.updateActionType.present("");
 }

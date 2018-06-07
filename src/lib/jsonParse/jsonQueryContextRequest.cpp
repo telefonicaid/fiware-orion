@@ -785,5 +785,4 @@ void jsonQcrPresent(ParseData* reqDataP)
     return;
 
   LM_T(LmtPresent, ("\n\n"));
-  reqDataP->qcr.res.present("");
 }

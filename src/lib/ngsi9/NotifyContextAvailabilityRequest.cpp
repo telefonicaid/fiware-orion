@@ -95,18 +95,6 @@ std::string NotifyContextAvailabilityRequest::check(ApiVersion apiVersion, const
 
 /* ****************************************************************************
 *
-* NotifyContextAvailabilityRequest::present -
-*/
-void NotifyContextAvailabilityRequest::present(const std::string& indent)
-{
-  subscriptionId.present(indent);
-  contextRegistrationResponseVector.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
 * NotifyContextAvailabilityRequest::release -
 */
 void NotifyContextAvailabilityRequest::release(void)

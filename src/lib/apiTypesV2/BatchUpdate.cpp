@@ -55,18 +55,6 @@ BatchUpdate::~BatchUpdate()
 
 /* ****************************************************************************
 *
-* BatchUpdate::present - 
-*/
-void BatchUpdate::present(const std::string& indent)
-{
-  updateActionType.present(indent);
-  entities.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
 * BatchUpdate::release - 
 */
 void BatchUpdate::release(void)

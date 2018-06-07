@@ -207,20 +207,6 @@ void EntityInfo::release(void)
 
 /* ****************************************************************************
 *
-* EntityInfo::present -
-*/
-void EntityInfo::present(const std::string& prefix)
-{
-  LM_T(LmtPresent, ("%sid:        %s", prefix.c_str(), entityId.c_str()));
-  LM_T(LmtPresent, ("%sisPattern: %s", prefix.c_str(), FT(isPattern)));
-  LM_T(LmtPresent, ("%stype:      %s", prefix.c_str(), entityType.c_str()));
-  LM_T(LmtPresent, ("%sisTypePattern: %s", prefix.c_str(), FT(isTypePattern)));
-}
-
-
-
-/* ****************************************************************************
-*
 * SubCache -
 */
 typedef struct SubCache

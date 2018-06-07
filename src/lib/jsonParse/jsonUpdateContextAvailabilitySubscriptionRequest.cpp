@@ -313,5 +313,4 @@ void jsonUcasPresent(ParseData* reqDataP)
   }
 
   printf("jsonUcasPresent\n");
-  reqDataP->ucas.res.present("");
 }

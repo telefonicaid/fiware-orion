@@ -447,7 +447,4 @@ void jsonRcrPresent(ParseData* reqDataP)
 
   LM_T(LmtPresent,("\n\n"));
 
-  reqDataP->rcr.res.contextRegistrationVector.present("");
-  reqDataP->rcr.res.duration.present("");
-  reqDataP->rcr.res.registrationId.present("");
 }
