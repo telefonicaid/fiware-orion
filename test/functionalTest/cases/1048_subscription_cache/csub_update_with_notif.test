@@ -32,9 +32,9 @@ accumulatorStart --pretty-print
 
 #
 # Note that we use sleep in three places to give the DB time to sync with regards to
-# the cache (WAIT_TIME = 1.5 * subCacheIval)
+# the cache (WAIT_TIME = 1.5 seconds)
 #
-# Under valgrind we need to sleep a little longer
+# Under valgrind we need to sleep a little longer (2 seconds)
 #
 WAIT_TIME=1.5s
 if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
