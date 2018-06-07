@@ -1,15 +1,17 @@
 ## Overview
-Travis integration is prepared to check pull request with different tests. It uses docker images as clean environment with all build dependencies onboard. 
-Such an approach reduces time because it uses pull command instead of compiling dependencies and does not require "clean" operations. Depending on 
-current Orion test logic, unit and functional testing should be executed separately, so travis build is divided into stages. 'Optional' test
-does not depend on 3rd party tools and does not use binaries of Orion, so it can be executed directly. 
+Travis is enabled in this repository so each pull request is checked before being allowed to merge.
+The system is based on fiware/orion-ci:rpm7  which is built from master branch each time a new PR lands in master,
+providing a clean environment with all build dependencies onboard. The Dockerfile used to build this docker is available
+in the ci/rpm7 directory.
+
+The Travis checks are divided into stages, which are described in "Supported tests" section
 
 ## Supported tests
-For now it supports:
+Current version of CI supports:
+* file compliance check
+* payload check
+* style check
 * unit test
 * function test
-* style check
-* payload check
-* file compliance check
 
-Style, payload and file compliance are combined in one 'optional' test.
+File compliance, payload and style checks are combined in one 'compliance' test.

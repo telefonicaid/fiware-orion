@@ -9,7 +9,7 @@ before_script: true
 script: true
 jobs:
   include:
-    - stage: optional
+    - stage: compliance
       script: ci/rpm7/build.sh -o -p $(pwd)
     - stage: unit
       before_script: docker run -t --rm -v $(pwd):/opt/fiware-orion fiware/orion-ci:rpm7 build -M unit

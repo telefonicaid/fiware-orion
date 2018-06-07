@@ -36,7 +36,7 @@ function _usage()
     -p   --path          specify path to use as home, if not specified - /opt/fiware-orion will be used
     -M   --make          cmake/make, stage (unit/functional) should be specified
     -I   --install       make install
-    -o   --optional      run style, payload, file_compliance checks
+    -c   --compliance    run file_compliance, payload and style checks
     -u   --unit          run unit tests
     -f   --functional    run functional tests
     -n   --nightly       build rpm nightly
@@ -57,6 +57,7 @@ function _usage()
 
 function _fix_jenkins()
 {
+    # FIXME: ipv6 should be enabled for testing
     echo "Builder: fix jenkins"
     cp ${path}/test/functionalTest/testHarness.sh /tmp/builder/bu/testHarness.sh
     sed $'/DISABLED=(/s/$/\\\n          \'test\/functionalTest\/cases\/0000_ipv6_support\/ipv4_ipv6_both.test\' \\\/1' ${path}/test/functionalTest/testHarness.sh > /tmp/ft.tmp && mv -f /tmp/ft.tmp ${path}/test/functionalTest/testHarness.sh
@@ -121,7 +122,7 @@ do
        --path) set -- "$@" -p ;;
        --make) set -- "$@" -M ;;
        --install) set -- "$@" -I ;;
-       --optional) set -- "$@" -o ;;
+       --compliance) set -- "$@" -c ;;
        --unit) set -- "$@" -u ;;
        --functional) set -- "$@" -f ;;
        --nightly) set -- "$@" -n ;;
@@ -137,7 +138,7 @@ do
     esac
 done
 
-while getopts ":hb:s:p:M:IoufnrtUFEDH" opt; do
+while getopts ":hb:s:p:M:IcufnrtUFEDH" opt; do
     case ${opt} in
         h)  _usage ;;
         b)  branch=$OPTARG ;;
@@ -145,7 +146,7 @@ while getopts ":hb:s:p:M:IoufnrtUFEDH" opt; do
         p)  path=$OPTARG ;;
         M)  make=$OPTARG;;
         I)  install=true;;
-        o)  optional=true ;;
+        c)  compliance=true ;;
         u)  unit=true ;;
         f)  functional=true ;;
         n)  nightly=true ;;
@@ -248,9 +249,9 @@ if [ -n "${execute}" ]; then
 
 fi
 
-if [ -n "${optional}" ]; then
+if [ -n "${compliance}" ]; then
     echo "================================================================="
-    echo "                       OPTIONAL TESTS                            "
+    echo "                       COMPLIANCE TESTS                          "
     echo "================================================================="
 
     status=true
@@ -265,7 +266,7 @@ if [ -n "${optional}" ]; then
     if [ $? -ne 0 ]; then status=false; fi
     rm -Rf LINT*
 
-    if ! ${status}; then echo "Builder: optional test failed"; fi
+    if ! ${status}; then echo "Builder: compliance test failed"; fi
 
 fi
 
