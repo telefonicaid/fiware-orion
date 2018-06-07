@@ -122,14 +122,6 @@ static void* logSummary(void* vP)
     if (biRaisedNew   < 0)  { biRaisedNew   = LONG_MAX - biRaisedInLastSummary   + biRaised;   }
     if (biReleasedNew < 0)  { biReleasedNew = LONG_MAX - biReleasedInLastSummary + biReleased; }
 
-    //
-    // No log summary if everything is ZERO
-    //
-    if (deRaised + deReleased + neRaised + neReleased + biRaised + biReleased == 0)
-    {
-      continue;
-    }
-
     LM_S(("Transactions: %lu (new: %lu)", transactionsNow, diff));
 
     LM_S(("DB status: %s, raised: (total: %d, new: %d), released: (total: %d, new: %d)",
