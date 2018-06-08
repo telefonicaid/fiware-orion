@@ -49,6 +49,7 @@
 #include "metricsMgr/metricsMgr.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"
+#include "rest/HttpHeaders.h"
 #include "rest/rest.h"
 #include "serviceRoutines/versionTreat.h"
 
@@ -169,7 +170,7 @@ static void httpHeaderAdd
 
   // Fiware-Correlator and Ngsiv2-AttrsFormat cannot be overwritten, so we don't
   // search in extraHeaders in these cases
-  if ((headerName != "Fiware-Correlator") && (headerName != "Ngsiv2-AttrsFormat"))
+  if ((headerName != HTTP_FIWARE_CORRELATOR) && (headerName != HTTP_NGSIV2_ATTRSFORMAT))
   {
     std::map<std::string, std::string>::const_iterator it;
     it = extraHeaders.find(headerNameLowerCase);
@@ -412,7 +413,7 @@ int httpRequestSendWithCurl
   // ----- User Agent
   char        cvBuf[CURL_VERSION_MAX_LENGTH];
   char        userAgentHeaderValue[HTTP_HEADER_USER_AGENT_MAX_LENGTH];
-  std::string userAgentHeaderName = "User-Agent";
+  std::string userAgentHeaderName = HTTP_USER_AGENT;
 
   snprintf(userAgentHeaderValue, sizeof(userAgentHeaderValue), "orion/%s libcurl/%s", versionGet(), curlVersionGet(cvBuf, sizeof(cvBuf)));
   LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (userAgentHeaderName + ": " + userAgentHeaderValue).c_str()));
@@ -420,7 +421,7 @@ int httpRequestSendWithCurl
 
   // ----- Host
   char        hostHeaderValue[HTTP_HEADER_HOST_MAX_LENGTH];
-  std::string hostHeaderName = "Host";
+  std::string hostHeaderName = HTTP_HOST;
 
   snprintf(hostHeaderValue, sizeof(hostHeaderValue), "%s:%d", ip.c_str(), (int) port);
   LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (hostHeaderName + ": " + hostHeaderValue).c_str()));
@@ -429,22 +430,19 @@ int httpRequestSendWithCurl
   // ----- Tenant
   if (tenant != "")
   {
-    std::string fiwareServiceHeaderName  = "fiware-service";
     std::string fiwareServiceHeaderValue = tenant;
-    httpHeaderAdd(&headers, fiwareServiceHeaderName, fiwareServiceHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+    httpHeaderAdd(&headers, HTTP_FIWARE_SERVICE, fiwareServiceHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
   }
 
   // ----- Service-Path
-  std::string fiwareServicePathHeaderName  = "Fiware-ServicePath";
   std::string fiwareServicePathHeaderValue =  (servicePath.empty())? "/" : servicePath;
-  httpHeaderAdd(&headers, fiwareServicePathHeaderName, fiwareServicePathHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+  httpHeaderAdd(&headers, HTTP_FIWARE_SERVICEPATH, fiwareServicePathHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- X-Auth-Token
   if (xauthToken != "")
   {
-    std::string xauthTokenHeaderName  = "X-Auth-Token";
     std::string xauthTokenHeaderValue = xauthToken;
-    httpHeaderAdd(&headers, xauthTokenHeaderName, xauthTokenHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+    httpHeaderAdd(&headers, HTTP_X_AUTH_TOKEN, xauthTokenHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
   }
 
   // ----- Accept
@@ -454,17 +452,16 @@ int httpRequestSendWithCurl
     acceptedFormats = acceptFormat;
   }
 
-  std::string acceptHeaderName  = "Accept";
   std::string acceptHeaderValue = acceptedFormats;
-  httpHeaderAdd(&headers, acceptHeaderName, acceptHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+  httpHeaderAdd(&headers, HTTP_ACCEPT, acceptHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Expect
-  httpHeaderAdd(&headers, "Expect", " ", &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+  httpHeaderAdd(&headers, HTTP_EXPECT, " ", &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Content-length
   std::stringstream contentLengthStringStream;
   contentLengthStringStream << content.size();
-  std::string contentLengthHeaderName  = "Content-length";
+  std::string contentLengthHeaderName  = HTTP_CONTENT_LENGTH;
   std::string contentLengthHeaderValue = contentLengthStringStream.str();
 
   LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (contentLengthHeaderName + ": " + contentLengthHeaderValue).c_str()));
@@ -482,23 +479,21 @@ int httpRequestSendWithCurl
 
 
   // ----- Content-type
-  std::string contentTypeHeaderName  = "Content-type";
   std::string contentTypeHeaderValue = content_type;
 
-  httpHeaderAdd(&headers, contentTypeHeaderName, contentTypeHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+  httpHeaderAdd(&headers, HTTP_CONTENT_TYPE, contentTypeHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // Fiware-Correlator
-  std::string correlationHeaderName  = "Fiware-Correlator";
   std::string correlationHeaderValue = fiwareCorrelation;
-  httpHeaderAdd(&headers, correlationHeaderName, correlationHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+  httpHeaderAdd(&headers, HTTP_FIWARE_CORRELATOR, correlationHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // Notify Format
   if ((ngsiv2AttrFormat != "") && (ngsiv2AttrFormat != "JSON") && (ngsiv2AttrFormat != "legacy"))
   {
-    std::string nFormatHeaderName  = "Ngsiv2-AttrsFormat";
+    std::string nFormatHeaderName  = HTTP_NGSIV2_ATTRSFORMAT;
     std::string nFormatHeaderValue = ngsiv2AttrFormat;
 
-    httpHeaderAdd(&headers, nFormatHeaderName, nFormatHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+    httpHeaderAdd(&headers, HTTP_NGSIV2_ATTRSFORMAT, nFormatHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
   }
 
   // Extra headers
