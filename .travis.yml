@@ -15,5 +15,8 @@ jobs:
       before_script: docker run -t --rm -v $(pwd):/opt/fiware-orion fiware/orion-ci:rpm7 build -M unit
       script: docker run -t --rm -v $(pwd):/opt/fiware-orion fiware/orion-ci:rpm7 build -IDu
     - stage: functional
-      before_script: docker run -t --rm -v $(pwd):/opt/fiware-orion fiware/orion-ci:rpm7 build -M functional
-      script: docker run -t --rm -v $(pwd):/opt/fiware-orion fiware/orion-ci:rpm7 build -IDFf
+      before_script:
+        - echo '{"ipv6":true,"fixed-cidr-v6":"2001:db8:1::/64"}' | sudo tee /etc/docker/daemon.json
+        - sudo service docker restart
+        - docker run -t --rm -v $(pwd):/opt/fiware-orion fiware/orion-ci:rpm7 build -M functional
+      script: docker run -t --rm -v $(pwd):/opt/fiware-orion fiware/orion-ci:rpm7 build -IDf

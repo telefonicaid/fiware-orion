@@ -43,7 +43,7 @@ function _usage()
     -r   --release       build rpm release
     -t   --testing       build rpm testing
     -U   --upload        upload rpm, REPO_USER and REPO_PASSWORD ENV variables should be provided
-    -F   --fix           execute fix for jenkins and travis (disable ipv6 test)
+    -F   --fix           execute fix for jenkins (disable ipv6 test)
     -E   --execute       run (rerun) test stand with 2 orions
     -D   --db            start mongodb
     -S   --show          show the list of necessary commands that should be executed before starting functional tests manually
@@ -57,7 +57,7 @@ function _usage()
 
 function _fix_jenkins()
 {
-    # FIXME: ipv6 should be enabled for testing
+    # FIXME: ipv4_ipv6_both.test is disabled as IPV6 is disabled in CI environment. This should be fixed.
     echo "Builder: fix jenkins"
     cp ${path}/test/functionalTest/testHarness.sh /tmp/builder/bu/testHarness.sh
     sed $'/DISABLED=(/s/$/\\\n          \'test\/functionalTest\/cases\/0000_ipv6_support\/ipv4_ipv6_both.test\' \\\/1' ${path}/test/functionalTest/testHarness.sh > /tmp/ft.tmp && mv -f /tmp/ft.tmp ${path}/test/functionalTest/testHarness.sh
