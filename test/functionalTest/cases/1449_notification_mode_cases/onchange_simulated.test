@@ -148,7 +148,7 @@ Date: REGEX(.*)
 04. Get statistics (one simulated notification)
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 78
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
