@@ -32,6 +32,9 @@
 #include "ngsi10/QueryContextResponse.h"
 #include "apiTypesV2/Attribute.h"
 
+// FIXME PR: used only to debug, to include LM_E
+#include "logMsg/logMsg.h"
+
 
 
 /* ****************************************************************************
@@ -144,6 +147,7 @@ void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
 
     if (pcontextAttribute == NULL)
     {
+      LM_E(("FGM: not found attribute checkpoint #1"));
       oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
     }
   }
