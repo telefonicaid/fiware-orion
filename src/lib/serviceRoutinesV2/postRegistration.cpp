@@ -32,6 +32,7 @@
 #include "common/clockFunctions.h"
 #include "common/string.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/HttpHeaders.h"
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Registration.h"
@@ -98,7 +99,7 @@ std::string postRegistration
   {
     std::string location = "/v2/registrations/" + regId;
 
-    ciP->httpHeader.push_back("Location");
+    ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
     ciP->httpHeaderValue.push_back(location);
 
     ciP->httpStatusCode = SccCreated;

@@ -40,6 +40,7 @@
 #include "orionTypes/QueryContextRequestVector.h"
 #include "orionTypes/QueryContextResponseVector.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/HttpHeaders.h"
 #include "rest/httpRequestSend.h"
 #include "rest/uriParamNames.h"
 #include "rest/OrionError.h"
@@ -335,7 +336,7 @@ std::string postQueryContext
     char cV[32];
 
     snprintf(cV, sizeof(cV), "%llu", *countP);
-    ciP->httpHeader.push_back("Fiware-Total-Count");
+    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
     ciP->httpHeaderValue.push_back(cV);
   }
 
