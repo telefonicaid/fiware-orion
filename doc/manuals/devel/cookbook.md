@@ -246,6 +246,22 @@ brokerStart CP4
 brokerStart CP5  
 ```
 
+We have found problems with test files using "ASCII text, with CRLF line terminators" format (which is the
+typical one used by Microsoft Windows and Mac), eg:
+
+```
+$ file path/to/sample_test.test
+path/to/sample_test.test: ASCII text, with CRLF line terminators
+```
+
+Thus, it is advisable to ensure file uses regular ASCII format. Some tools like [`dos2unix`](http://freshmeat.sourceforge.net/projects/dos2unix) can be used
+to do the automatic conversion. At the end you should have something like this:
+
+```
+$ file path/to/sample_test.test
+path/to/sample_test.test: ASCII text
+```
+
 ### SHELL Section
 The broker is started in the SHELL-INIT section and this section is where curl commands (and other commands) are executed to send requests to Orion and perform the functional test.  
 

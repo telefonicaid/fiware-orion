@@ -725,6 +725,7 @@ static bool updateAttribute
     {
       attrType = caP->type;
     }
+
     newAttr.append(ENT_ATTRS_TYPE, attrType);
     newAttr.append(ENT_ATTRS_CREATION_DATE, now);
     newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
@@ -740,6 +741,7 @@ static bool updateAttribute
       newAttr.append(ENT_ATTRS_MD, md);
     }
     newAttr.append(ENT_ATTRS_MDNAMES, mdNames);
+
     toSet->append(effectiveName, newAttr.obj());
     toPush->append(caP->name);
   }
@@ -2467,8 +2469,6 @@ static bool updateContextAttributeItem
     return false;
   }
 
-
-
   updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == V2, NGSI_MD_ACTIONTYPE_UPDATE);
 
   return true;
@@ -2602,7 +2602,8 @@ static bool deleteContextAttributeItem
     /* Check aspects related to date expiration.
      * If the target attr is date expiration, nullifying dateExpiration ACTUAL value is the way
      * of specifying that date expiration field is no longer used */
-    if (targetAttr->name == DATE_EXPIRES) {
+    if (targetAttr->name == DATE_EXPIRES)
+    {
       *dateExpiration = 0;
     }
 
@@ -3215,6 +3216,7 @@ static void updateEntity
   std::string     locAttr = "";
   BSONObj         currentGeoJson;
   BSONObjBuilder  geoJson;
+
   if (r.hasField(ENT_LOCATION))
   {
     BSONObj loc    = getObjectFieldF(r, ENT_LOCATION);
@@ -3235,6 +3237,7 @@ static void updateEntity
   {
     currentDateExpiration = getField(r, ENT_EXPIRATION).date();
   }
+  
   //
   // Before calling processContextAttributeVector and actually do the work, let's check if the
   // request is of type 'append-only' and if we have any problem with attributes already existing.
@@ -3492,13 +3495,19 @@ static void updateEntity
 
   /* To finish with this entity processing, search for CPrs in not found attributes and
    * add the corresponding ContextElementResponse to the global response */
-  searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
+
+  if ((strcasecmp(action.c_str(), "update") == 0) || (strcasecmp(action.c_str(), "replace") == 0))
+  {
+    searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
+  }
 
   // StatusCode may be set already (if so, we keep the existing value)
+
   if (cerP->statusCode.code == SccNone)
   {
     cerP->statusCode.fill(SccOk);
   }
+
   responseP->contextElementResponseVector.push_back(cerP);
 }
 

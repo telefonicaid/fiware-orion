@@ -70,7 +70,7 @@ class Entity
                       std::map<std::string, std::string>&  uriParam,
                       bool                                 comma = false);
 
-  std::string  check(ApiVersion apiVersion, RequestType requestType);
+  std::string  check(RequestType requestType);
   void         present(const std::string& indent);
   void         release(void);
 

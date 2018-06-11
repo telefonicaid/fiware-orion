@@ -30,8 +30,6 @@
 #include "common/globals.h"
 #include "logMsg/logMsg.h"
 #include "ngsi/ContextAttribute.h"
-#include "parse/CompoundValueNode.h"
-#include "rest/OrionError.h"
 
 // FIXME P5: the following could be not necessary if we optimize the valueBson() thing. See
 // the next FIXME P5 comment in this file
@@ -105,15 +103,15 @@ bool processDateExpirationAtEntityCreation
   {
     const ContextAttribute* caP = caV[ix];
 
-    if (caP->name != DATE_EXPIRES)
+    if (caP->name == DATE_EXPIRES)
     {
-      continue;
-    }
+      if (!getDateExpiration(caP, dateExpiration, errDetail))
+      {
+        oe->fill(SccBadRequest, *errDetail, "BadRequest");
+        return false;
+      }
 
-    if (!getDateExpiration(caP, dateExpiration, errDetail))
-    {
-      oe->fill(SccBadRequest, *errDetail, "BadRequest");
-      return false;
+      return true;
     }
   }
 
@@ -125,6 +123,13 @@ bool processDateExpirationAtEntityCreation
 /* ****************************************************************************
 *
 * processDateExpirationAtUpdateAttribute -
+*
+* If the name of the target attribute is the date expiration,
+* check for a number value that will be used in the mongo::Date_t constructor.
+* If it is an empty value, is interpreted as a date expiration deletion and the ACTUAL date value
+* is set to 0, in order to signal the caller function.
+* If valid value, also replaceDate boolean is set to true, in order to manage the new date value
+* in case the update is a replace operation.
 */
 bool processDateExpirationAtUpdateAttribute
 (
@@ -135,14 +140,6 @@ bool processDateExpirationAtUpdateAttribute
   OrionError*              oe
 )
 {
-  /*
-   * If the name of the target attribute is the date expiration,
-   * check for a number value that will be used in the mongo::Date_t constructor.
-   * If it is an empty value, is interpreted as a date expiration deletion and the ACTUAL date value
-   * is set to 0, in order to signal the caller function.
-   * If valid value, also replaceDate boolean is set to true, in order to manage the new date value
-   * in case the update is a replace operation.
-   */
   if (targetAttr->name == DATE_EXPIRES)
   {
     if (targetAttr->numberValue)
