@@ -106,23 +106,6 @@ TEST(UpdateContextElementRequest, check_json)
 
 /* ****************************************************************************
 *
-* present - just exercise the code
-*/
-TEST(UpdateContextElementRequest, present)
-{
-  UpdateContextElementRequest     ucer;
-  ContextAttribute                ca("caName", "caType", "caValue");
-
-  ucer.attributeDomainName.set("ADN");
-  ucer.contextAttributeVector.push_back(&ca);
-
-  ucer.present("");
-}
-
-
-
-/* ****************************************************************************
-*
 * release -
 */
 TEST(UpdateContextElementRequest, release)

@@ -29,33 +29,6 @@
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(Entities, present)
-{
-  utInit();
-
-  Entity* enP    = new Entity();
-  enP->id        = "E";
-  enP->type      = "T";
-  enP->isPattern = "false";
-
-  ContextAttribute* caP = new ContextAttribute("A", "T", "val");
-  enP->attributeVector.push_back(caP);
-
-  Entities ens;
-  ens.vec.push_back(enP);
-  ens.oe.fill(SccNone, "Lorem ipsum", "FooError");
-
-  ens.present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * check
 */
 TEST(Entities, check)

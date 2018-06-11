@@ -102,24 +102,6 @@ TEST(ContextAttributeResponseVector, check_json)
 
 /* ****************************************************************************
 *
-* present - just exercise the code
-*/
-TEST(ContextAttributeResponseVector, present)
-{
-  ContextAttributeResponseVector  carV;
-  ContextAttribute                ca("caName", "caType", "caValue");
-  ContextAttributeResponse        car;
-
-  car.contextAttributeVector.push_back(&ca);
-  carV.push_back(&car);
-
-  carV.present("");
-}
-
-
-
-/* ****************************************************************************
-*
 * getAndSize -
 */
 TEST(ContextAttributeResponseVector, getAndSize)

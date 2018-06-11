@@ -98,7 +98,7 @@ TEST(RegisterContextRequest, json_ok)
   out = rcrP->render();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  reqP->release(&parseData);
+  //reqP->release(&parseData);
 }
 
 

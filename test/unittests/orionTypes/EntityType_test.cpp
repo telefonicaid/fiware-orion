@@ -29,23 +29,6 @@
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(EntityType, present)
-{
-  utInit();
-
-  EntityType et("myType");
-
-  et.present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * check
 */
 TEST(EntityType, check)

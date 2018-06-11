@@ -65,19 +65,6 @@ TEST(Restriction, check)
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(Restriction, present)
-{
-  Restriction   restriction;
-
-  restriction.present("");
-}
-
-
-
-/* ****************************************************************************
-*
 * render - 
 */
 TEST(Restriction, render)

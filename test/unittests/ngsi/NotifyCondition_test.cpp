@@ -72,24 +72,6 @@ TEST(NotifyCondition, render)
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(NotifyCondition, present)
-{
-  NotifyCondition  nc;
-
-  utInit();
-
-  nc.present("", -1);
-  nc.present("", 0);
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * check -
 */
 TEST(NotifyCondition, check)

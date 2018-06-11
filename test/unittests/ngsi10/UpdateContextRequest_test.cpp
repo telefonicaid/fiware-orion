@@ -70,7 +70,7 @@ TEST(UpdateContextRequest, ok_json)
    //
    UpdateContextRequest*  upcrP = &reqData.upcr.res;
 
-   upcrP->present(""); // No output
+//   upcrP->present(""); // No output
    upcrP->release();
 
    utExit();
@@ -100,7 +100,7 @@ TEST(UpdateContextRequest, badIsPattern_json)
 
    std::string out = jsonTreat(testBuf, &ci, &parseData, UpdateContext, "updateContextRequest", &reqP);
    EXPECT_STREQ(expectedBuf, out.c_str());
-   reqP->release(&parseData);
+//   reqP->release(&parseData);
 
    utExit();
 }

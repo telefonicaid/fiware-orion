@@ -113,24 +113,6 @@ TEST(ContextAttribute, render)
 
 /* ****************************************************************************
 *
-* present -
-*/
-TEST(ContextAttribute, present)
-{
-  // Just to exercise all the code ..
-  ContextAttribute*  caP = new ContextAttribute("NAME", "TYPE", "VALUE");
-
-  utInit();
-
-  caP->present("", 0);
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * copyMetadatas -
 */
 TEST(ContextAttribute, copyMetadatas)
