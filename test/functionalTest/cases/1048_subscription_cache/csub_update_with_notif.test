@@ -274,7 +274,7 @@ Date: REGEX(.*)
         },
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
-        "timesSent": 2
+        "timesSent": REGEX((1|2))
     },
     "status": "active",
     "subject": {
