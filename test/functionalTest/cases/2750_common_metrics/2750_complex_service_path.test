@@ -36,6 +36,11 @@ brokerStart CB
 # 04. Send a GET /v2/entities without service path (/# is used as service path)
 # 05. Ask for Metrics, see A1 and A2 as service paths, as well as two 'root service path'
 #
+# NOTE
+# Under valgrind, a GET /version is issued to the broker initially, to check it's alive.
+# This "screws" the statistics a little (especially as the /version payload is big and not with a fixed size)
+# and some REGEX have been necessary for this test to run both as normal functest and under valgrind
+#
 
 echo "01. Send a GET /v2/entities with service path /A1/#"
 echo "==================================================="
@@ -120,7 +125,7 @@ Date: REGEX(.*)
 05. Ask for Metrics, see A1 and A2 as service paths, as well as two 'root service path'
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 842
+Content-Length: REGEX((842|850))
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -140,14 +145,14 @@ Date: REGEX(.*)
                     "serviceTime": REGEX(.*)
                 },
                 "root-subserv": {
-                    "incomingTransactionResponseSize": 4,
-                    "incomingTransactions": 2,
+                    "incomingTransactionResponseSize": REGEX(\d+),
+                    "incomingTransactions": REGEX((2|3)),
                     "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
-                "incomingTransactionResponseSize": 8,
-                "incomingTransactions": 4,
+                "incomingTransactionResponseSize": REGEX(\d+),
+                "incomingTransactions": REGEX((4|5)),
                 "serviceTime": REGEX(.*)
             }
         }
@@ -165,14 +170,14 @@ Date: REGEX(.*)
                 "serviceTime": REGEX(.*)
             },
             "root-subserv": {
-                "incomingTransactionResponseSize": 4,
-                "incomingTransactions": 2,
+                "incomingTransactionResponseSize": REGEX(\d+),
+                "incomingTransactions": REGEX((2|3)),
                 "serviceTime": REGEX(.*)
             }
         },
         "sum": {
-            "incomingTransactionResponseSize": 8,
-            "incomingTransactions": 4,
+            "incomingTransactionResponseSize": REGEX(\d+),
+            "incomingTransactions": REGEX((4|5)),
             "serviceTime": REGEX(.*)
         }
     }

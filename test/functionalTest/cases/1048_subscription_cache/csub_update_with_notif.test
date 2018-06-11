@@ -25,16 +25,24 @@ Cache sub behaviour after update context operation
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPv4 -subCacheIval 1
+brokerStart CB 0 IPv4 -subCacheIval 2
 accumulatorStart --pretty-print
 
 --SHELL--
 
 #
-# Note we use sleep in some point to let time the DB to sync with regards to
-# cache timeSent value (WAIT_TIME = 1.5 * subCacheIval)
+# Note that we use sleep in three places to give the DB time to sync with regards to
+# the cache (WAIT_TIME = 1.5 seconds)
+#
+# Under valgrind we need to sleep a little longer (2 seconds)
 #
 WAIT_TIME=1.5s
+if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
+then
+  WAIT_TIME=2s
+fi
+
+
 #
 # 01. Create subscription
 # 02. Create entity (triggers notification)
