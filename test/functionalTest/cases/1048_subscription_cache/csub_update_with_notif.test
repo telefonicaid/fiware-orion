@@ -32,14 +32,14 @@ accumulatorStart --pretty-print
 
 #
 # Note that we use sleep in three places to give the DB time to sync with regards to
-# the cache (WAIT_TIME = 1.5 seconds)
+# the cache (WAIT_TIME = 2.5 seconds)
 #
-# Under valgrind we need to sleep a little longer (2 seconds)
+# Under valgrind we need to sleep a little longer (3 seconds)
 #
-WAIT_TIME=1.5s
+WAIT_TIME=2.5s
 if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
 then
-  WAIT_TIME=2s
+  WAIT_TIME=3s
 fi
 
 
@@ -274,7 +274,7 @@ Date: REGEX(.*)
         },
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
-        "timesSent": REGEX((1|2))
+        "timesSent": 2
     },
     "status": "active",
     "subject": {
