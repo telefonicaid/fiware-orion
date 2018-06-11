@@ -178,17 +178,20 @@ bool processDateExpirationAtAppendAttribute
   OrionError*                    oe
 )
 {
-  if (targetAttr->numberValue)
+  if (targetAttr->name == DATE_EXPIRES)
   {
-  if (!getDateExpiration(targetAttr, dateExpiration, errDetail))
+    if (targetAttr->numberValue)
     {
-      oe->fill(SccBadRequest, *errDetail, "BadRequest");
-      return false;
+      if (!getDateExpiration(targetAttr, dateExpiration, errDetail))
+      {
+        oe->fill(SccBadRequest, *errDetail, "BadRequest");
+        return false;
+      }
     }
-  }
-  else
-  {
-    *dateExpiration = 0;
+    else
+    {
+      *dateExpiration = 0;
+    }
   }
 
   return true;
