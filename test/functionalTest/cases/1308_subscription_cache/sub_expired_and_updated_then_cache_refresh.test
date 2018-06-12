@@ -237,7 +237,7 @@ Date: REGEX(.*)
     "ids": "REGEX(.*)",
     "inserts": 1,
     "items": 1,
-    "refresh": REGEX((0|1)),
+    "refresh": REGEX((0|1|2)),
     "removes": 0,
     "updates": 0
 }
@@ -342,7 +342,7 @@ Date: REGEX(.*)
     "ids": "REGEX(.*)",
     "inserts": REGEX((2|3|4)),
     "items": 1,
-    "refresh": REGEX((0|2|3)),
+    "refresh": REGEX((0|2|3|4)),
     "removes": 1,
     "updates": 1
 }

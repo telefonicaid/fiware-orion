@@ -85,6 +85,9 @@ echo
 echo
 
 
+valgrindSleep 3
+
+
 echo "03. Query CP1, see 'CheckInCP1'"
 echo "==============================="
 orionCurl --url /v2/entities --port $CP1_PORT
@@ -115,6 +118,9 @@ echo
 echo
 
 
+valgrindSleep 3
+
+
 echo "05. Query CP2, see 'CheckInCP1'"
 echo "==============================="
 orionCurl --url /v2/entities --port $CP2_PORT
@@ -138,6 +144,9 @@ payload='{
 orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
+
+
+valgrindSleep 3
 
 
 echo "07. Query CP1, see 2 entities"

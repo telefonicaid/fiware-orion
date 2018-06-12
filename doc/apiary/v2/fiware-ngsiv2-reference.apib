@@ -80,7 +80,6 @@ The FIWARE NGSI (Next Generation Service Interface) API defines
   update operations
 * a **context availability interface** for exchanging information on how to obtain context
   information (whether to separate the two interfaces is currently under discussion).
-* a set of typical **roles** played by NGSI-compliant components
 
 ## Terminology
 
@@ -104,28 +103,6 @@ For example, a context entity with id *sensor-365* could have the
 type *temperatureSensor*.
 
 Each entity is uniquely identified by the combination of its id and type.
-
-#### Context Elements
-
-*(Note: the distinction between context entities and context elements 
-is still under discussion; therefore the notion of context elements
-currently only appears in this section.)*
-
-A context element is a data object (e.g. JSON object; see the section
-on JSON representation below) that contains information about a
-specific context entity. Consequently, a context element has a
-mandatory property `id` in order to identify the context entity it
-refers to. It furthermore can contain an optional property `type`
-to describe the type of the entity. Further properties can be used
-to represent more information about the entity (see the **context
-attributes** section below).
-
-It is important to understand that the relationship between entities and context elements is
-one-to-many.
-This means that:
-* each context element refers to exactly one entity
-* there can be several context elements referring to the same entity. 
-The context elements can for example contain different pieces of information about the entity.
 
 #### Context Attributes 
 
@@ -158,48 +135,6 @@ above. Similar to attributes, each piece of metadata has:
  * a **metadata value** containing the actual metadata
 
 Note that in NGSI it is not foreseen that metadata may contain nested metadata.
-
-#### Restrictions and Operation Scopes
-
-(placeholder to describe restrictions and operation scopes)
-
-#### Context Queries
-
-(placeholder for describing what a context query is, and some hints on how this
-is typically done in the REST interface)
-
-#### Context Subscriptions
-
-(placeholder for describing the concept of context subscriptions)
-
-#### Context Updates
-
-(placeholder for describing updates)
-
-### Exchanging Context Availability Information
-
-(placeholder on some introduction of what context availability information is)
-
-#### Context Registrations
-
-(placeholder for describing what a context registration is and what it is used for)
-
-#### Context Discovery
-
-(placehoder for describing what discovery does)
-
-#### Context Availability Subscription
-
-(placeholder for describing context availability subscriptions)
-
-#### Registering Context Availability Information
-
-(placeholder for describing the operation of registering context)
-
-### Roles of FIWARE NGSI components
-
-(placeholder to describe roles like context provider, context producer,
-context broker, context registry, context consumer)
 
 ## MIME Types
 
@@ -1012,7 +947,7 @@ to keep your client decoupled from implementation details.
 
 # Group Entities
 
-### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]
+### List Entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]
 
 Retrieves a list of entities that match different criteria by id, type, pattern matching (either id or type)
 and/or those which match a query or geographical query (see [Simple Query Language](#simple_query_language) and 
@@ -1132,7 +1067,7 @@ Response code:
          }
         ]
 
-### Create entity [POST /v2/entities{?options}]
+### Create Entity [POST /v2/entities{?options}]
 
 The payload is an object representing the entity to be created. The object follows
 the JSON entity representation format (described in a "JSON Entity Representation" section).
@@ -1181,7 +1116,7 @@ Response:
 
 ## Entity by ID [/v2/entities/{entityId}{?type,attrs,options}]
 
-### Retrieve entity [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]
+### Retrieve Entity [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]
 
 The response is an object representing the entity identified by the ID. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section).
@@ -1241,7 +1176,7 @@ Response:
           }
         }
 
-### Retrieve entity attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]
+### Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]
 
 This request is similar to retreiving the whole entity, however this one omits the `id` and `type`
 fields.
@@ -1302,7 +1237,7 @@ Response:
           }
         }
 
-### Update or append entity attributes [POST /v2/entities/{entityId}/attrs{?type,options}]
+### Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs{?type,options}]
 
 The request payload is an object representing the attributes to append or update. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section), except
@@ -1345,7 +1280,7 @@ Response:
 
 + Response 204
 
-### Update existing entity attributes [PATCH /v2/entities/{entityId}/attrs{?type,options}]
+### Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs{?type,options}]
 
 The request payload is an object representing the attributes to update. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section), except
@@ -1419,7 +1354,7 @@ Response:
 
 + Response 204
 
-### Remove entity [DELETE /v2/entities/{entityId}{?type}]
+### Remove Entity [DELETE /v2/entities/{entityId}{?type}]
 
 Delete the entity.
 
@@ -1468,7 +1403,7 @@ Response:
           "metadata": {}
         }
 
-### Update attribute data [PUT /v2/entities/{entityId}/attrs/{attrName}{?type}]
+### Update Attribute Data [PUT /v2/entities/{entityId}/attrs/{attrName}{?type}]
 
 The request payload is an object representing the new attribute data. Previous attribute data
 is replaced by the one in the request. The object follows the JSON representation for attributes
@@ -1500,7 +1435,7 @@ Response:
 + Response 200
 
 
-### Remove a single attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}{?type}]
+### Remove a Single Attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}{?type}]
 
 Removes an entity attribute.
 
@@ -1523,7 +1458,7 @@ Response:
 
 ## By Entity ID [/v2/entities/{entityId}/attrs/{attrName}/value?{type}]
 
-### Get attribute value [GET /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
+### Get Attribute Value [GET /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
 
 This operation returns the `value` property with the value of the attribute.
 
@@ -1558,7 +1493,7 @@ Response:
           "country": "Spain"
         }
 
-### Update attribute value [PUT /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
+### Update Attribute Value [PUT /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
 
 The request payload is the new attribute value.
 
@@ -1603,7 +1538,7 @@ Response:
 
 ## Entity types [/v2/types{?limit,offset,options}]
 
-### Retrieve entity types [GET /v2/types/{?limit,offset,options}]
+### List Entity Types [GET /v2/types/{?limit,offset,options}]
 
 If the `values` option is not in use, this operation returns a JSON array with the entity types.
 Each element is a JSON object with information about the type:
@@ -1799,7 +1734,7 @@ Notification rules are as follow:
 
 ## Subscription List [/v2/subscriptions]
 
-### Retrieve subscriptions [GET /v2/subscriptions{?limit,offset,options}]
+### List Subscriptions [GET /v2/subscriptions{?limit,offset,options}]
 
 Returns a list of all the subscriptions present in the system.
 
@@ -1860,7 +1795,7 @@ Response:
         ]
 
 
-### Create a new subscription [POST /v2/subscriptions]
+### Create Subscription [POST /v2/subscriptions]
 
 Creates a new subscription.
 The subscription is represented by a JSON object as described at the beginning of this section.
@@ -1908,7 +1843,7 @@ Response:
 
 ## Subscription By ID [/v2/subscriptions/{subscriptionId}]
 
-### Retrieve subscription [GET /v2/subscriptions/{subscriptionId}]
+### Retrieve Subscription [GET /v2/subscriptions/{subscriptionId}]
 
 The response is the subscription represented by a JSON object as described at the beginning of this
 section.
@@ -1956,7 +1891,7 @@ Response:
         }
 
 
-### Update subscription [PATCH /v2/subscriptions/{subscriptionId}]
+### Update Subscription [PATCH /v2/subscriptions/{subscriptionId}]
 
 Only the fields included in the request are updated in the subscription.
 
@@ -2066,9 +2001,9 @@ Not present if registration has never had a successful notification.
 
 ## Registration list [/v2/registrations]
 
-### Retrieve registrations [GET /v2/registrations{?limit,offset,options}]
+### List Registrations [GET /v2/registrations{?limit,offset,options}]
 
-Lists all the registrations present in the system.
+Lists all the context provider registrations present in the system.
 
 + Parameters
     + limit: 10 (optional, number) - Limit the number of registrations to be retrieved
@@ -2118,9 +2053,9 @@ Response:
           }
         ]
 
-### Create a new context provider registration [POST /v2/registrations]
+### Create Registration [POST /v2/registrations]
 
-Creates a new registration. This is typically used for binding context sources
+Creates a new context provider registration. This is typically used for binding context sources
 as providers of certain data.
 The registration is represented by a JSON object as described at the beginning of this section.
 
@@ -2160,7 +2095,7 @@ Response:
 
 ## Registration By ID [/v2/registrations/{registrationId}]
 
-### Retrieve context provider registration [GET /v2/registrations/{registrationId}]
+### Retrieve Registration [GET /v2/registrations/{registrationId}]
 
 The response is the registration represented by a JSON object as described at the beginning of this
 section.
@@ -2206,7 +2141,7 @@ Response:
             }
       }      
 
-### Update context provider registration [PATCH /v2/registrations/{registrationId}]
+### Update Registration [PATCH /v2/registrations/{registrationId}]
 
 Only the fields included in the request are updated in the registration.
 
@@ -2227,9 +2162,9 @@ Response:
 
 + Response 204
 
-### Delete context provider registration [DELETE /v2/registrations/{registrationId}]
+### Delete Registration [DELETE /v2/registrations/{registrationId}]
 
-Cancels registration.
+Cancels a context provider registration.
 
 Response:
 
@@ -2418,200 +2353,3 @@ Response code:
             }
           }
         ]
-
-
-### Register [POST /v2/op/register]
-
-This operation allows to create, update and/or delete several registrations in a single batch
-operation. The payload is an object with two properties:
-
-+ `actionType`, to specify the kind of register action to do: either CREATE, UPDATE, or DELETE.
-+ `registrations`, an array of registrations, each one specified using the JSON registration 
-  representation format (described above). In case of CREATE operation, the registration `id`
-  must not be included.
-
-Response:
-
-* Successful operation uses 200 OK. In addition, in case of successful CREATE, a list of IDs is
-  returned, each one corresponding to the ID of the element in the request payload and in that same
-  order.
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
-
-+ Request (application/json)
-
-        {
-          "actionType": "CREATE",
-          "registrations": [
-            {
-              "subject": {
-                "entities": [
-                  {
-                    "type": "Room"
-                  }
-                ],
-                "attributes": [
-                  "humidity"
-                ]
-              },
-              "callback": "http://localhost:1234",
-              "duration": "PT1M"
-            },
-            {
-              "subject": {
-                "entities": [
-                  {
-                    "type": "Car"
-                  }
-                ],
-                "attributes": [
-                  "speed"
-                ]
-              },
-              "callback": "http://localhost:5678",
-              "duration": "PT1M"
-            }
-          ]
-        }
-
-+ Response 200
-
-        [
-          "abcd",
-          "efgh"
-        ]
-
-
-### Discover [POST /v2/op/discover/{?limit,offset,options}]
-
-The response payload is an Array that contains one object per matching registration.
-The registrations follow the JSON registration representation format (described in a section above).
-
-The payload may contain the following elements (all of them optional):
-
-+ `entities`: a list of entites to search for. Each entity is represented by a JSON object with the
-  following elements:
-    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
-      time, but one of them must be present.
-    + `type` or `typePattern`: Type or type pattern of the entities to search for. Both cannot be used at
-      the same time. If omitted, it means "any entity type".
-+ `attributes`: a list of attribute names to search for. If omitted, it means "all attributes".
-+ `scopes`: a list of scopes to restrict the results of the query. Each scope is represented by a
-  JSON object with a `type` (a JSON string) and a `value` (whose type depends on the `type`
-  property). The different available scopes are described elsewhere.
-
-Response code:
-
-* Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
-
-+ Parameters
-    + limit: 10 (optional, number) - Limit the number of registrations to be retrieved.
-    + offset: 22 (optional, number) - Skip a number of registrations.
-    + options (optional, string) - Options dictionary.
-        + Members
-          + count - when used, the total number of registrations is returned in the response as the
-            HTTP header `Fiware-Total-Count`.
-
-
-+ Request (application/json)
-
-        {
-          "entities": [
-            {
-              "idPattern": ".*",
-              "type": "myFooType"
-            },
-            {
-              "id": "myBar",
-              "type": "myBarType"
-            }
-          ],
-          "attributes": [
-            "temperature",
-            "humidity"
-          ],
-          "scopes": [
-            {
-              "type": "FIWARE::Filter::Foo",
-              "value": "Bar"
-            }
-          ]
-        }
-
-+ Response 200 (application/json)
-
-        [
-          {
-            "id": "abcde",
-            "subject": {
-              "entities": [
-                {
-                  "id": "Foo",
-                  "type": "myFooType"
-                }
-              ],
-              "attributes": [
-                "humidity"
-              ]
-            },
-            "callback": "http://localhost:1234",
-            "duration": "PT1M"
-          },
-          {
-            "id": "efgh",
-            "subject": {
-              "entities": [
-                {
-                  "id": "myBar",
-                  "type": "myBarType"
-                }
-              ],
-              "attributes": [
-                "speed"
-              ]
-            },
-            "callback": "http://localhost:5678",
-            "duration": "PT1M"
-          }
-        ]
-
-# Group OMA-NGSI Operations
-
-(The need/usefulness of these operations is currently under discussion)
-
-For the sake of completeness here is an enumeration of the OMA-NGSI (9 & 10) operations. These
-operations will be supported under the 'v2' resource as well.
-
-### subscribeContext [POST /v2/subscribeContext]
-
-(Not needed, as it is covered by the RESTful POST /v2/subscriptions operation)
-
-### updateContextSubscription [POST /v2/updateContextSubscription]
-
-(Not needed, as it is covered by the RESTful PATCH /v2/subscriptions operation)
-
-### unsubscribeContext [POST /v2/unsubscribeContext]
-
-(Not needed, as it is covered by the RESTful DELETE /v2/subscriptions operation)
-
-### notifyContext [POST /v2/notifyContext]
-
-(The payload of the v2 notifyContext should be described)
-
-### subscribeContextAvailability [POST /v2/subscribeContextAvailability]
-
-(Not needed as POJ RPC, but we need to define a RESTful operation for this, analogous to the NGSI10 one)
-
-### updateContextAvailabilitySubscription [POST /v2/updateContextAvailabilitySubscription]
-
-(Not needed as POJ RPC, but we need to define a RESTful operation for this, analogous to the NGSI10 one)
-
-### unsubscribeContextAvailability [POST /v2/unsubscribeContextAvailability]
-
-(Not needed as POJ RPC, but we need to define a RESTful operation for this, analogous to the NGSI10 one)
-
-### notifyContextAvailability [POST /v2/notifyContextAvailability]
-
-(The payload of the v2 notifyContextAvailability should be described)

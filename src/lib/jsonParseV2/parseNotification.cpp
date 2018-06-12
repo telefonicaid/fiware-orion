@@ -41,7 +41,7 @@
 
 /* ****************************************************************************
 *
-* parseContextElementResponse - 
+* parseContextElementResponse -
 */
 static bool parseContextElementResponse
 (
@@ -66,11 +66,12 @@ static bool parseContextElementResponse
   //   This is because we're using an old V1 type for notifications (NotifyContextRequest).
   //   If we instead create a *new* type for V2 notifications we could use parseEntityObject(), without any problem.
   //
-  //   However, we can still use parseEntityObject(), it's just that we need to convert the Entity into an EntityId afterwards.
+  //   However, we can still use parseEntityObject(), it's just that we need to convert
+  //   the Entity into an EntityId afterwards.
   //
   std::string     r;
   Entity          entity;
-  
+
   if ((r = parseEntityObject(ciP, iter, &entity, true)) != "OK")
   {
     oeP->fill(SccBadRequest, r);
@@ -88,7 +89,7 @@ static bool parseContextElementResponse
 
 /* ****************************************************************************
 *
-* parseNotificationData - 
+* parseNotificationData -
 */
 static bool parseNotificationData
 (
@@ -117,7 +118,7 @@ static bool parseNotificationData
       return false;
     }
   }
-  
+
   return true;
 }
 
@@ -125,7 +126,7 @@ static bool parseNotificationData
 
 /* ****************************************************************************
 *
-* parseNotificationNormalized - 
+* parseNotificationNormalized -
 */
 static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextRequest* ncrP, OrionError* oeP)
 {
@@ -236,7 +237,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
 
 /* ****************************************************************************
 *
-* parseNotification - 
+* parseNotification -
 */
 std::string parseNotification(ConnectionInfo* ciP, NotifyContextRequest* ncrP)
 {

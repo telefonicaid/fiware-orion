@@ -75,13 +75,13 @@ std::string EntityVector::render
 *
 * EntityVector::check -
 */
-std::string EntityVector::check(ApiVersion apiVersion, RequestType requestType)
+std::string EntityVector::check(RequestType requestType)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion, requestType)) != "OK")
+    if ((res = vec[ix]->check(requestType)) != "OK")
     {
       alarmMgr.badInput(clientIp, "invalid vector of Entity");
       return res;

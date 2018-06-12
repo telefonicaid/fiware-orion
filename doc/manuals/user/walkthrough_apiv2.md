@@ -37,7 +37,7 @@ such as the temperature of a car). Some remarks to take into account in order to
 Context availability management (information not about the entities themselves, but about the providers of
 that information) has not been yet developed in the current candidate version for NGSIv2 (although a
 section about that exists at the end of this document, as a placeholder to include this information in the
-future). You need to use NGSIv1 is you want to use this functionality. See
+future). You need to use NGSIv1 if you want to use this functionality. See
 [NGSIv1 walkthrough](walkthrough_apiv1.md) for more details.
 
 Before starting (or if you get lost in the middle and

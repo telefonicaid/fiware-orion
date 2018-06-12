@@ -172,6 +172,7 @@ orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
+valgrindSleep 1
 
 echo "08. Query CP1, see all entites"
 echo "=============================="
