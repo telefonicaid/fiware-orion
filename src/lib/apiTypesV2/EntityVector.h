@@ -45,7 +45,6 @@ typedef struct EntityVector
                        std::map<std::string, std::string>&  uriParam);
 
   std::string   check(ApiVersion apiVersion, RequestType requestType);
-  void          present(const std::string& indent);
   void          push_back(Entity* item);
   unsigned int  size(void);
   Entity*       lookup(const std::string& name, const std::string& type, const std::string& isPattern);

@@ -49,7 +49,6 @@ typedef struct ContextRegistrationAttribute
   ContextRegistrationAttribute();
   ContextRegistrationAttribute(const std::string& _name, const std::string& _type, const std::string& _isDomain = "");
   std::string     render(bool comma);
-  void            present(int ix, const std::string& indent);
   void            release(void);
 
   std::string     check(ApiVersion apiVersion);

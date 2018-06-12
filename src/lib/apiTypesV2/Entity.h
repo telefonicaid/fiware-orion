@@ -71,7 +71,6 @@ class Entity
                       bool                                 comma = false);
 
   std::string  check(ApiVersion apiVersion, RequestType requestType);
-  void         present(const std::string& indent);
   void         release(void);
 
   void         fill(const std::string&       id,

@@ -169,19 +169,3 @@ std::string jsonUpcarCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
   return reqData->upcar.res.check(ciP->apiVersion, reqData->errorString);
 }
-
-
-
-/* ****************************************************************************
-*
-* jsonUpcarPresent -
-*/
-void jsonUpcarPresent(ParseData* reqData)
-{
-  if (!lmTraceIsSet(LmtPresent))
-  {
-    return;
-  }
-
-  LM_T(LmtPresent, ("\n\n"));
-}

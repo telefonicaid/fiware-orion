@@ -62,12 +62,4 @@ extern void jsonQcrsRelease(ParseData* reqDataP);
 */
 extern std::string jsonQcrsCheck(ParseData* reqDataP, ConnectionInfo* ciP);
 
-
-
-/* ****************************************************************************
-*
-* jsonQcrsPresent - 
-*/
-extern void jsonQcrsPresent(ParseData* reqDataP);
-
 #endif  // SRC_LIB_JSONPARSE_JSONQUERYCONTEXTRESPONSE_H_

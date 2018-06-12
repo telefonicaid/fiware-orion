@@ -51,7 +51,6 @@ typedef struct UpdateContextAttributeRequest
   UpdateContextAttributeRequest();
   std::string  render(ApiVersion apiVersion);
   std::string  check(ApiVersion apiVersion, const std::string& preError);
-  void         present(const std::string&  indent);
   void         release();
 } UpdateContextAttributeRequest;
 

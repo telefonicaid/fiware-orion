@@ -386,17 +386,3 @@ std::string jsonNcarCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
   return parseDataP->ncar.res.check(ciP->apiVersion, parseDataP->errorString);
 }
-
-
-
-/* ****************************************************************************
-*
-* jsonNcarPresent -
-*/
-void jsonNcarPresent(ParseData* parseDataP)
-{
-  if (!lmTraceIsSet(LmtPresent))
-    return;
-
-  LM_T(LmtPresent,("\n\n"));
-}

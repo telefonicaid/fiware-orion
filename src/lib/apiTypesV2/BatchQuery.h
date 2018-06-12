@@ -50,7 +50,6 @@ class BatchQuery
   BatchQuery();
   ~BatchQuery();
 
-  void           present(const std::string& indent);
   void           release(void);
 };
 

@@ -67,7 +67,6 @@ typedef struct SubscribeContextAvailabilityRequest
   std::string  render(void);
   std::string  check(const std::string& predetectedError);
   void         release(void);
-  void         present(const std::string& indent);
 
   void         fill(EntityTypeInfo typeInfo);
 } SubscribeContextAvailabilityRequest;

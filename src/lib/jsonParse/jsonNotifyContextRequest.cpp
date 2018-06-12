@@ -424,17 +424,3 @@ std::string jsonNcrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
   return parseDataP->ncr.res.check(ciP->apiVersion, parseDataP->errorString);
 }
-
-
-
-/* ****************************************************************************
-*
-* jsonNcrPresent -
-*/
-void jsonNcrPresent(ParseData* parseDataP)
-{
-  if (!lmTraceIsSet(LmtPresent))
-    return;
-
-  LM_T(LmtPresent,("\n\n"));
-}

@@ -63,12 +63,4 @@ extern void jsonUcarRelease(ParseData* reqDataP);
 */
 extern std::string jsonUcarCheck(ParseData* reqDataP, ConnectionInfo* ciP);
 
-
-
-/* ****************************************************************************
-*
-* jsonUcarPresent - 
-*/
-extern void jsonUcarPresent(ParseData* reqDataP);
-
 #endif  // SRC_LIB_JSONPARSE_JSONUNSUBSCRIBECONTEXTAVAILABILITYREQUEST_H_

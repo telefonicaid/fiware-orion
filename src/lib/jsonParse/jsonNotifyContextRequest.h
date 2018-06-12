@@ -62,12 +62,4 @@ extern void jsonNcrRelease(ParseData* reqDataP);
 */
 extern std::string jsonNcrCheck(ParseData* reqDataP, ConnectionInfo* ciP);
 
-
-
-/* ****************************************************************************
-*
-* jsonNcrPresent - 
-*/
-extern void jsonNcrPresent(ParseData* reqDataP);
-
 #endif  // SRC_LIB_JSONPARSE_JSONNOTIFYCONTEXTREQUEST_H_

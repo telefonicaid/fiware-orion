@@ -59,7 +59,6 @@ class Entities
                       std::map<std::string, std::string>&  uriParam);
 
   std::string  check(ApiVersion apiVersion, RequestType requestType);
-  void         present(const std::string& indent);
   void         release(void);
   void         fill(QueryContextResponse* qcrsP);
 };

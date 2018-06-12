@@ -51,7 +51,6 @@ typedef struct Throttling
   std::string        check(void);
 
   int64_t            parse(void);
-  void               present(const std::string& indent);
 } Throttling;
 
 #endif  // SRC_LIB_NGSI_THROTTLING_H_

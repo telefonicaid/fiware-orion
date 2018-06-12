@@ -565,20 +565,3 @@ std::string jsonScrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
   s = parseDataP->scr.res.check(parseDataP->errorString, 0);
   return s;
 }
-
-
-
-/* ****************************************************************************
-*
-* jsonScrPresent -
-*/
-void jsonScrPresent(ParseData* parseDataP)
-{
-  printf("jsonScrPresent\n");
-
-  if (!lmTraceIsSet(LmtPresent))
-  {
-    return;
-  }
-
-}

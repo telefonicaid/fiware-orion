@@ -301,20 +301,3 @@ std::string jsonScarCheck(ParseData* reqData, ConnectionInfo* ciP)
   s = reqData->scar.res.check(reqData->errorString);
   return s;
 }
-
-
-
-/* ****************************************************************************
-*
-* jsonScarPresent - 
-*/
-void jsonScarPresent(ParseData* reqDataP)
-{
-  printf("jsonScarPresent\n");
-
-  if (!lmTraceIsSet(LmtPresent))
-  {
-    return;
-  }
-
-}

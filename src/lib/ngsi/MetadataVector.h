@@ -50,7 +50,6 @@ public:
                          const std::vector<std::string>&  metadataFilter);
   std::string     check(ApiVersion apiVersion);
 
-  void            present(const std::string& metadataType, const std::string& indent);
   void            push_back(Metadata* item);
   unsigned int    size(void) const;
   Metadata*       lookupByName(const std::string& _name);
