@@ -746,6 +746,8 @@ static bool updateAttribute
   }
   else
   {
+    LM_E(("FGM: attrs: <%s>", attrs.toString().c_str()));
+    LM_E(("FGM: effectiveName <%s>", effectiveName.c_str()));
     if (!attrs.hasField(effectiveName.c_str()))
     {
       return false;
