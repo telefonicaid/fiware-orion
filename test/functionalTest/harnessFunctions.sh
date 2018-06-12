@@ -145,7 +145,7 @@ function dbInit()
   fi
 
   dMsg "database to drop: <$db>" 
-  echo 'db.dropDatabase()' | mongo $host:$port/$db --quiet
+  echo 'db.dropDatabase()' | mongo mongodb://$host:$port/$db --quiet
 }
 
 
@@ -186,9 +186,9 @@ function dbList
 
   if [ "$name" != "" ]
   then
-    echo show dbs | mongo $host:$port --quiet | grep "$name" | awk '{ print $1 }'
+    echo show dbs | mongo mongodb://$host:$port --quiet | grep "$name" | awk '{ print $1 }'
   else
-    echo show dbs | mongo $host:$port --quiet | awk '{ print $1 }'
+    echo show dbs | mongo mongodb://$host:$port --quiet | awk '{ print $1 }'
   fi
 }
 
@@ -212,7 +212,7 @@ function dbResetAll()
     port="27017"
   fi
   
-  all=$(echo show dbs | mongo $host:$port --quiet | grep ftest | awk '{ print $1 }')
+  all=$(echo show dbs | mongo mongodb://$host:$port --quiet | grep ftest | awk '{ print $1 }')
   for db in $all
   do
     dbDrop $db
@@ -914,7 +914,7 @@ function mongoCmd()
 
   db=$1
   cmd=$2
-  echo $cmd | mongo $host:$port/$db | tail -n 2 | head -n 1
+  echo $cmd | mongo mongodb://$host:$port/$db | tail -n 2 | head -n 1
 }
 
 # ------------------------------------------------------------------------------
@@ -969,7 +969,7 @@ function dbInsertEntity()
     port="27017"
   fi
 
-  echo "$jsCode ; $ent ; $doc ; $cmd" | mongo $host:$port/$db
+  echo "$jsCode ; $ent ; $doc ; $cmd" | mongo mongodb://$host:$port/$db
 }
 
 
