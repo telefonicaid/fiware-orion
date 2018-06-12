@@ -72,7 +72,7 @@ SET (SOURCES
     serviceRoutines/badVerbGetPostDeleteOnly_test.cpp
     serviceRoutines/badVerbGetDeleteOnly_test.cpp
     serviceRoutines/badVerbGetPutDeleteOnly_test.cpp
-    serviceRoutines/putIndividualContextEntityAttribute_test.cpp
+#    serviceRoutines/putIndividualContextEntityAttribute_test.cpp
     serviceRoutines/putSubscriptionConvOp_test.cpp
     serviceRoutines/versionTreat_test.cpp
     serviceRoutines/exitTreat_test.cpp
