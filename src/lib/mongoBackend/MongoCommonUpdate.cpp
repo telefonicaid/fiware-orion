@@ -2846,7 +2846,7 @@ static bool createEntity
   const std::vector<std::string>&  servicePathV,
   ApiVersion                       apiVersion,
   const std::string&               fiwareCorrelator,
-  OrionError*                      oe
+  OrionError*                      oeP
 )
 {
   LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName(tenant).c_str()));
@@ -2863,7 +2863,7 @@ static bool createEntity
       "Attributes with same name with ID and not ID at the same time "
       "in the same entity are forbidden: entity: [" + eP->toString() + "]";
 
-    oe->fill(SccInvalidModification, *errDetail, "Unprocessable");
+    oeP->fill(SccInvalidModification, *errDetail, "Unprocessable");
     return false;
   }
 
@@ -2871,7 +2871,7 @@ static bool createEntity
   std::string     locAttr;
   BSONObjBuilder  geoJson;
 
-  if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion, oe))
+  if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion, oeP))
   {
     // oe->fill() already managed by processLocationAtEntityCreation()
     return false;
@@ -2880,9 +2880,9 @@ static bool createEntity
   /* Search for a potential date expiration attribute */
   mongo::Date_t dateExpiration;
 
-  if (!processDateExpirationAtEntityCreation(attrsV, &dateExpiration, errDetail, oe))
+  if (!processDateExpirationAtEntityCreation(attrsV, &dateExpiration, errDetail, oeP))
   {
-    // oe->fill() already managed by processLocationAtEntityCreation()
+    // oeP->fill() already managed by processLocationAtEntityCreation()
     return false;
   }
 
@@ -2987,7 +2987,7 @@ static bool createEntity
 
   if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
   {
-    oe->fill(SccReceiverInternalError, *errDetail, "InternalError");
+    oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
     return false;
   }
 
