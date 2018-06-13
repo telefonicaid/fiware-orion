@@ -711,15 +711,7 @@ std::string postUpdateContext
     // one used by the calling postBatchUpdate() function at serviceRoutineV2 library
     if (fails == response.contextElementResponseVector.size())
     {
-      // If all CER result in error, then it isn't a partial update, but a regular NotFound
-      if (ciP->apiVersion == V1)
-      {
-        parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_CONTEXT_ELEMENT, ERROR_NOT_FOUND);
-      }
-      else
-      {
-        parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
-      }
+      parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
     }
     else if (fails > 0)
     {
@@ -728,6 +720,10 @@ std::string postUpdateContext
 
       // If some CER (but not all) fails, then it is a partial update
       parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "Attributes that were not updated: { " + failing + " }", "PartialUpdate");
+    }
+    else {  // fails == 0
+      // No fail in this case, so invalidate any posible OrionError filled by mongoBackend on the mongoUpdateContext ste
+      parseDataP->upcrs.res.oe.fill(SccNone, "");
     }
 
   }
