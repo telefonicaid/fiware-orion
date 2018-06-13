@@ -2,3 +2,4 @@
 - Fix: bug having entities without attibutes AND matching registrations made the attr-less entity not be returned by GET /v2/entities (#3176)
 - Fix: bug when using "legacy" format for custom v2 notifications (#3154)
 - Fix: check for providers is done only in UPDATE or REPLACE actionType case in update entity logic (#2874)
+- Fix: wrong 404 Not Found responses when updating attribute using NGSIv2 and CB forwards it correctly (#2871)

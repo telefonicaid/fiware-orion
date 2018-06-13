@@ -746,8 +746,6 @@ static bool updateAttribute
   }
   else
   {
-    LM_E(("FGM: attrs: <%s>", attrs.toString().c_str()));
-    LM_E(("FGM: effectiveName <%s>", effectiveName.c_str()));
     if (!attrs.hasField(effectiveName.c_str()))
     {
       return false;
@@ -2446,7 +2444,6 @@ static bool updateContextAttributeItem
                             " - offending attribute: " + targetAttr->getName();
 
       cerP->statusCode.fill(SccInvalidParameter, details);
-      LM_E(("FGM: not found attribute checkpoint #2"));
       oe->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
 
       /* Although 'ca' has been already pushed into cerP, the pointer is still valid, of course */
@@ -2609,7 +2606,6 @@ static bool deleteContextAttributeItem
                           " - attribute not found";
 
     cerP->statusCode.fill(SccInvalidParameter, details);
-    LM_E(("FGM: not found attribute checkpoint #3"));
     oe->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
 
     alarmMgr.badInput(clientIp, "attribute to be deleted is not found");
