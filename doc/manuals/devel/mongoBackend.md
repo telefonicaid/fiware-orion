@@ -126,7 +126,6 @@ _MB-03: mongoUpdate APPEND/APPEND_STRICT case with existing entity_
 
 * When the control is returned to `updateEntity()`, `collectionUpdate()` in the `connectionOperations` module is invoked to actually update the entity in the database (steps 11 and 12).
 * The next step is to send the notifications triggered by the update operation, which is done by `processSubscriptions()` (step 13). More details on this in (diagram [MD-01](#flow-md-01)).
-* The current version of Orion (as of May 2017) calls `searchContextProviders()`, like in **Case 1**. This shouldn't be done in the "APPEND"/"APPEND_STRICT" cases, as these types of requests are always processed locally and should **not** be forwarded to context providers. The fix is pending (see [this issue](https://github.com/telefonicaid/fiware-orion/issues/2874)).
 * If the request semaphore was taken in step 2, then it is released before returning (step 14).
 
 Case 4: action type is "APPEND" or "APPEND_STRICT" and the entity is not found.
@@ -161,7 +160,6 @@ _MB-05: mongoUpdate DELETE not remove entity_
 * Once the processing of the attributes is done, `processContextAttributeVector()` calls `addTriggeredSubscriptions()` in order to detect subscriptions triggered by the update operation (step 10). More details on this later.
 * When the control is returned to `updateEntity()`, `collectionUpdate()` in the `connectionOperations` module is invoked to update the entity in the database (steps 11 and 12).
 * The next step is to send notifications triggered by the update operation, by invoking `processSubscriptions()` (step 13). More details on this in (diagram [MD-01](#flow-md-01)).
-* The current version of Orion (as of May 2017) calls `searchContextProviders()`, like in **Case 1**. This shouldn't be done in the "DELETE" case, as this type of requests are always processed locally and should **not** be forwarded to context providers. The fix is pending  (see [this issue](https://github.com/telefonicaid/fiware-orion/issues/2874)).
 * If the request semaphore was taken in step 2, then it is released before returning (step 14). 
 
 Case 6: action type is "DELETE" to remove an entity
