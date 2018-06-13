@@ -36,7 +36,7 @@ accumulatorStart --pretty-print
 # in steps 1 and 2
 #
 # 01. Create registration directly in DB
-# 02. Create entity direclty in DB
+# 02. Create entity directly in DB
 # 03. Update turn attribute using PATCH on entity
 # 04. Update turn attribute using PUT on attribute
 # 05. Update turn attribute using batch update
@@ -75,7 +75,7 @@ echo
 echo
 
 
-echo "02. Create entity direclty in DB"
+echo "02. Create entity directly in DB"
 echo "================================"
 doc='{
   "_id":ObjectId("5b1ff2ee49597334c9b5efc7"),
@@ -188,7 +188,7 @@ echo
 WriteResult({ "nInserted" : 1 })
 
 
-02. Create entity direclty in DB
+02. Create entity directly in DB
 ================================
 WriteResult({ "nInserted" : 1 })
 

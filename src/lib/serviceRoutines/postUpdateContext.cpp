@@ -721,8 +721,9 @@ std::string postUpdateContext
       // If some CER (but not all) fails, then it is a partial update
       parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "Attributes that were not updated: { " + failing + " }", "PartialUpdate");
     }
-    else {  // fails == 0
-      // No fail in this case, so invalidate any posible OrionError filled by mongoBackend on the mongoUpdateContext ste
+    else  // fails == 0
+    {
+      // No failure, so invalidate any possible OrionError filled by mongoBackend on the mongoUpdateContext step
       parseDataP->upcrs.res.oe.fill(SccNone, "");
     }
 
