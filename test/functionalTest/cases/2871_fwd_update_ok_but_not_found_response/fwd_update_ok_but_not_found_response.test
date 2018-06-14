@@ -132,9 +132,8 @@ echo
 
 echo "05. Update turn attribute using batch update"
 echo "============================================"
-# FIXME: UPDATE -> update once PR #3197 gets merged
 payload='{
-  "actionType": "UPDATE",
+  "actionType": "update",
   "entities": [
     {
       "id": "entity1",
