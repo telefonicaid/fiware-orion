@@ -82,7 +82,7 @@ std::string deleteAttributeValueInstance
   entityType    = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
 
   // 02. Fill in UpdateContextRequest
-  parseDataP->upcr.res.fill(entityId, entityType, "false", attributeName, metaId, "DELETE");
+  parseDataP->upcr.res.fill(entityId, entityType, "false", attributeName, metaId, ActionTypeDelete);
 
   // 03. Call postUpdateContext standard service routine
   postUpdateContext(ciP, components, compV, parseDataP);

@@ -41,7 +41,7 @@ brokerStart CB 0
 echo "01. Create E1/T1/A1=1,A2=1, using POST /v2/op/update with APPEND"
 echo "================================================================"
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities": [
     {
       "id": "E1",
@@ -70,7 +70,7 @@ echo
 echo "03. Modify A1=3, using POST /v2/op/update with UPDATE"
 echo "====================================================="
 payload='{
-  "actionType": "UPDATE",
+  "actionType": "update",
   "entities": [
     {
       "id": "E1",
@@ -96,7 +96,7 @@ echo
 echo "05. Try to UPDATE non-existing attribute A3, see error"
 echo "======================================================"
 payload='{
-  "actionType": "UPDATE",
+  "actionType": "update",
   "entities": [
     {
       "id": "E1",

@@ -87,7 +87,7 @@ std::string putIndividualContextEntity
   parseDataP->upcr.res.fill(&parseDataP->ucer.res, entityId, entityType);
 
   // And, set the UpdateActionType to UPDATE
-  parseDataP->upcr.res.updateActionType.set("UPDATE");
+  parseDataP->upcr.res.updateActionType = ActionTypeUpdate;
 
 
   // 03. Call postUpdateContext standard service routine

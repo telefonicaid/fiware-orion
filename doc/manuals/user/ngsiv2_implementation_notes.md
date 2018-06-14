@@ -421,8 +421,14 @@ have been needed in the end. Thus, there is changed functionality that doesn't a
 NGSIv2 stable specification document but that Orion still supports
 (as [deprecated functionality](../deprecated.md)) in order to keep backward compability.
 
-In particular, the usage of `dateCreated` and `dateModified` in the `options` parameter (introduced
+In particular:
+
+* The usage of `dateCreated` and `dateModified` in the `options` parameter (introduced
 in stable RC-2016.05 and removed in RC-2016.10.) is still supported, e.g. `options=dateModified`. However,
 you are highly encouraged to use `attrs` instead (i.e. `attrs=dateModified,*`).
+
+* `POST /v2/op/update` accepts the same action types as NGSIv1, that is `APPEND`, `APPEND_STRICT`,
+`UPDATE`, `DELETE` and `REPLACE`. However, they shouldn't be used, preferring always the following counterparts:
+`append`, `appendStrict`, `update`, `delete` and `replace`.
 
 [Top](#top)

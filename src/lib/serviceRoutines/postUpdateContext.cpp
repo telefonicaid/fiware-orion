@@ -619,7 +619,7 @@ std::string postUpdateContext
         if (reqP == NULL)
         {
           reqP = new UpdateContextRequest(aP->providingApplication.get(), &cerP->contextElement.entityId);
-          reqP->updateActionType.set("UPDATE");
+          reqP->updateActionType = ActionTypeUpdate;
           requestV.push_back(reqP);
         }
 

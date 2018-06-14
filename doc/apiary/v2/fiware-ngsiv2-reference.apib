@@ -48,7 +48,7 @@ In addition, note that a list of currently open discussions is available at
 
 ## Copyright
 
-Copyright (c) 2011-2017 Telecom Italia, Telefónica I+D and NEC. 
+Copyright (c) 2011-2018 Telecom Italia, Telefónica I+D and NEC.
 
 ## License
 
@@ -2184,8 +2184,8 @@ Response:
 This operation allows to create, update and/or delete several entities in a single batch operation.
 The payload is an object with two properties:
 
-+ `actionType`, to specify the kind of update action to do: either APPEND, APPEND_STRICT, UPDATE,
-  DELETE, or REPLACE.
++ `actionType`, to specify the kind of update action to do: either `append`, `appendStrict`, `update`,
+  `delete`, or `replace`.
 + `entities`, an array of entities, each entity specified using the JSON entity representation format
   (described in the section "JSON Entity Representation").
 
@@ -2193,14 +2193,14 @@ This operation is split in as many individual operations as entities in the `ent
 the `actionType` is executed for each one of them. Depending on the `actionType`, a mapping with
 regular non-batch operations can be done:
 
-* APPEND: maps to `POST /v2/entities` (if the entity does not already exist) or `POST /v2/entities/<id>/attrs`
+* `append`: maps to `POST /v2/entities` (if the entity does not already exist) or `POST /v2/entities/<id>/attrs`
   (if the entity already exists).
-* APPEND_STRICT: maps to `POST /v2/entities` (if the entity does not already exist) or
+* `appendStrict`: maps to `POST /v2/entities` (if the entity does not already exist) or
   `POST /v2/entities/<id>/attrs?options=append` (if the entity already exists).
-* UPDATE: maps to `PATCH /v2/entities/<id>/attrs`.
-* DELETE: maps to `DELETE /v2/entities/<id>/attrs/<attrName>` on every attribute included in the entity or
+* `update`: maps to `PATCH /v2/entities/<id>/attrs`.
+* `delete`: maps to `DELETE /v2/entities/<id>/attrs/<attrName>` on every attribute included in the entity or
   to `DELETE /v2/entities/<id>` if no attribute were included in the entity.
-* REPLACE: maps to `PUT /v2/entities/<id>/attrs`.
+* `replace`: maps to `PUT /v2/entities/<id>/attrs`.
 
 Response:
 
@@ -2211,7 +2211,7 @@ Response:
 + Request (application/json)
 
         {
-          "actionType": "APPEND",
+          "actionType": "append",
           "entities": [
             {
               "type": "Room",

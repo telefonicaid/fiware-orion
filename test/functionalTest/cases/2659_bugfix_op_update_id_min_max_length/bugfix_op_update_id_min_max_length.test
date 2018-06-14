@@ -39,7 +39,7 @@ brokerStart CB
 echo "01. Update using empty entity id and see error"
 echo "=============================================="
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities":
   [
     {
@@ -64,7 +64,7 @@ echo
 echo "02. Update using entity id exceding length and see error"
 echo "========================================================"
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities":
   [
     {

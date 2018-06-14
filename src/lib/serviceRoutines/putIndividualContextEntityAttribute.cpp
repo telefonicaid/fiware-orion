@@ -80,7 +80,7 @@ std::string putIndividualContextEntityAttribute
 
 
   // 1. Fill in UpdateContextRequest from UpdateContextAttributeRequest and URL-path components
-  parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, "", "UPDATE");
+  parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, "", ActionTypeUpdate);
 
 
   // 2. Call postUpdateContext standard service routine

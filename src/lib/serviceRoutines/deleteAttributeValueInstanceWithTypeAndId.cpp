@@ -96,7 +96,7 @@ std::string deleteAttributeValueInstanceWithTypeAndId
 
 
   // 03. Fill in UpdateContextRequest
-  parseDataP->upcr.res.fill(entityId, entityTypeFromPath, "false", attributeName, metaId, "DELETE");
+  parseDataP->upcr.res.fill(entityId, entityTypeFromPath, "false", attributeName, metaId, ActionTypeDelete);
 
 
   // 04. Call postUpdateContext standard service routine

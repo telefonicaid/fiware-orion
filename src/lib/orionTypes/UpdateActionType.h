@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_ORIONTYPES_UPDATE_ACTION_TYPE_H
+#define SRC_LIB_ORIONTYPES_UPDATE_ACTION_TYPE_H
+
 /*
 *
-* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -20,45 +23,53 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Fermin Galan
 */
+
 #include <string>
-#include <vector>
 
-#include "logMsg/traceLevels.h"
-#include "logMsg/logMsg.h"
-
-#include "alarmMgr/alarmMgr.h"
-#include "rest/OrionError.h"
-#include "apiTypesV2/BatchUpdate.h"
+#include "common/globals.h"
 
 
 
 /* ****************************************************************************
 *
-* BatchUpdate::BatchUpdate - 
+* actionTypes enum (and rendering functions) -
 */
-BatchUpdate::BatchUpdate()
+typedef enum ActionType
 {
-}
+  ActionTypeUpdate,
+  ActionTypeAppend,
+  ActionTypeAppendStrict,
+  ActionTypeDelete,
+  ActionTypeReplace,
+  ActionTypeUnknown
+} ActionType;
 
 
 
 /* ****************************************************************************
 *
-* BatchUpdate::~BatchUpdate - 
+* actionTypeString -
 */
-BatchUpdate::~BatchUpdate()
-{
-}
+extern std::string actionTypeString(ApiVersion apiVersion, ActionType action);
 
 
 
 /* ****************************************************************************
 *
-* BatchUpdate::release - 
+* parseActionTypeV1 -
 */
-void BatchUpdate::release(void)
-{
-  entities.release();
-}
+extern ActionType parseActionTypeV1(const std::string& action);
+
+
+
+/* ****************************************************************************
+*
+* parseActionTypeV2 -
+*/
+extern ActionType parseActionTypeV2(const std::string& actionType);
+
+
+
+#endif // SRC_LIB_ORIONTYPES_UPDATE_ACTION_TYPE_H

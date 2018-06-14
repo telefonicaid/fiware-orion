@@ -38,7 +38,7 @@ brokerStart CB
 echo "01. Update using entity type with not plain ASCII and see error"
 echo "==============================================================="
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities":
   [
     {
