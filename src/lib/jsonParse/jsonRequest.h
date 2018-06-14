@@ -46,7 +46,6 @@ typedef struct JsonRequest
   JsonNode*        parseVector;
   RequestInit      init;
   RequestCheck     check;
-  RequestPresent   present;
   RequestRelease   release;
 } JsonRequest;
 
