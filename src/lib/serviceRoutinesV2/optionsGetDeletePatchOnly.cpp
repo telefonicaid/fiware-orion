@@ -49,7 +49,7 @@ std::string optionsGetDeletePatchOnly
 {
   if (isOriginAllowedForCORS(ciP->httpHeaders.origin))
   {
-    ciP->httpHeader.push_back(ACCESS_CONTROL_ALLOW_METHODS);
+    ciP->httpHeader.push_back(HTTP_ACCESS_CONTROL_ALLOW_METHODS);
     ciP->httpHeaderValue.push_back("GET, DELETE, PATCH, OPTIONS");
   }
   ciP->httpStatusCode = SccOk;

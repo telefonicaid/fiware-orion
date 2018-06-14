@@ -44,8 +44,8 @@ typedef struct EntityVector
   std::string   render(std::map<std::string, bool>&         uriParamOptions,
                        std::map<std::string, std::string>&  uriParam);
 
-  std::string   check(RequestType requestType);
-  void          present(const std::string& indent);
+
+  std::string   check(RequestType requestType); 
   void          push_back(Entity* item);
   unsigned int  size(void);
   Entity*       lookup(const std::string& name, const std::string& type, const std::string& isPattern);

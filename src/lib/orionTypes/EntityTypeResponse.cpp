@@ -99,19 +99,6 @@ std::string EntityTypeResponse::check
 
 /* ****************************************************************************
 *
-* EntityTypeResponse::present -
-*/
-void EntityTypeResponse::present(const std::string& indent)
-{
-  LM_T(LmtPresent,("%sEntityTypeResponse:\n", indent.c_str()));
-  entityType.present(indent + "  ");
-  statusCode.present(indent + "  ");
-}
-
-
-
-/* ****************************************************************************
-*
 * EntityTypeResponse::release -
 */
 void EntityTypeResponse::release(void)

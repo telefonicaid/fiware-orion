@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "rest/HttpHeaders.h"
+
 #include <stdlib.h>  // atoi
 #include <sstream>   // istringstream
 
@@ -72,13 +74,13 @@ HttpMessage::HttpMessage(std::string theMessage)
       else
       {
         // Get other headers
-        int temp = line.find("Content-Length");
+        int temp = line.find(HTTP_CONTENT_LENGTH);
         if (temp >= 0)
         {
           _contentLength = atoi(line.substr(pos + 2).c_str());
         }
 
-        temp = line.find("Content-Type");
+        temp = line.find(HTTP_CONTENT_TYPE);
         if (temp >= 0)
         {
           _contentType = line.substr(pos + 2);

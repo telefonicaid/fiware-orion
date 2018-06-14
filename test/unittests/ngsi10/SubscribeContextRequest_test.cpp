@@ -60,7 +60,6 @@ TEST(SubscribeContextRequest, ok_json)
   // With the data obtained present and release methods are exercised
   //
   SubscribeContextRequest*  scrP    = &parseData.scr.res;
-  scrP->present(""); // No output
   scrP->release();
 
   utExit();

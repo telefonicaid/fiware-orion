@@ -102,21 +102,3 @@ TEST(Metadata, check)
 
   utExit();
 }
-
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code
-*/
-TEST(Metadata, present)
-{
-  Metadata     m4("Name", "Type", "Value");
-
-  utInit();
-
-  m4.present("Test", 0, "");
-  m4.release();
-
-  utExit();
-}

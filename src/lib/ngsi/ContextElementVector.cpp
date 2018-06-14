@@ -80,22 +80,6 @@ std::string ContextElementVector::render
 
 /* ****************************************************************************
 *
-* ContextElementVector::present -
-*/
-void ContextElementVector::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%lu ContextElements", (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent, ix);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextElementVector::release -
 */
 void ContextElementVector::release(void)

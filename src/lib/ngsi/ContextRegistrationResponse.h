@@ -45,7 +45,6 @@ typedef struct ContextRegistrationResponse
   ContextRegistrationResponse();
 
   std::string  render(bool comma);
-  void         present(const std::string& indent);
   void         release(void);
 
   std::string  check(ApiVersion          apiVersion,

@@ -112,19 +112,3 @@ TEST(StatusCode, check)
 
   utExit();
 }
-
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code
-*/
-TEST(StatusCode, present)
-{
-  StatusCode    sc(SccOk, "");
-  std::string   out;
-
-  utInit();
-  sc.present("");
-  utExit();
-}

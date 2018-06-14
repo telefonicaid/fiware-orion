@@ -381,20 +381,3 @@ std::string jsonUpcrCheck(ParseData* reqData, ConnectionInfo* ciP)
   return reqData->upcr.res.check(ciP->apiVersion, asJsonObject, reqData->errorString);
 }
 
-
-
-/* ****************************************************************************
-*
-* jsonUpcrPresent - 
-*/
-void jsonUpcrPresent(ParseData* reqDataP)
-{
-  if (!lmTraceIsSet(LmtPresent))
-    return;
-
-  LM_T(LmtPresent, ("\n\n"));
-
-  reqDataP->upcr.res.contextElementVector.present("");
-
-  LM_T(LmtPresent, ("ActionType: %s", actionTypeString(V1, reqDataP->upcr.res.updateActionType).c_str()));
-}

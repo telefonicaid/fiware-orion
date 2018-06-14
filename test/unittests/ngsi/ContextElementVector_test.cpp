@@ -53,21 +53,3 @@ TEST(ContextElementVector, render)
 
   ceV.release();
 }
-
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code ...
-*/
-TEST(ContextElementVector, present)
-{
-  ContextElement        ce;
-  EntityId              eId("E_ID", "E_TYPE");
-  ContextElementVector  ceV;
-
-  ce.entityId = eId;
-  ceV.push_back(&ce);
-
-  ceV.present("  ");
-}

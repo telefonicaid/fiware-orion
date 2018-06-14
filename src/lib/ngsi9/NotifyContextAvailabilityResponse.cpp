@@ -79,19 +79,6 @@ std::string NotifyContextAvailabilityResponse::render(void)
 
 /* ****************************************************************************
 *
-* NotifyContextAvailabilityResponse::present -
-*/
-void NotifyContextAvailabilityResponse::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%sNotifyContextAvailabilityResponse:", indent.c_str()));
-  responseCode.present(indent + "  ");
-  LM_T(LmtPresent, ("\n"));
-}
-
-
-
-/* ****************************************************************************
-*
 * NotifyContextAvailabilityResponse::release -
 */
 void NotifyContextAvailabilityResponse::release(void)

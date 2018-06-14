@@ -138,7 +138,6 @@ SET (SOURCES
     ngsi/Duration_test.cpp
     ngsi/AttributeExpression_test.cpp
     ngsi/ContextElementVector_test.cpp
-    ngsi/ContextRegistration_test.cpp
     ngsi/ContextRegistrationResponse_test.cpp
     ngsi/ContextRegistrationResponseVector_test.cpp
     ngsi/EntityId_test.cpp
@@ -161,9 +160,6 @@ SET (SOURCES
     orionTypes/EntityTypeResponse_test.cpp
     orionTypes/EntityTypeVector_test.cpp
     orionTypes/EntityTypeVectorResponse_test.cpp
-    orionTypes/QueryContextRequestVector_test.cpp
-    orionTypes/QueryContextResponseVector_test.cpp
-    orionTypes/UpdateContextRequestVector_test.cpp
 
     apiTypesV2/Entities_test.cpp
     apiTypesV2/Entity_test.cpp  

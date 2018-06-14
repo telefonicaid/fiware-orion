@@ -62,12 +62,4 @@ extern void jsonUcerRelease(ParseData* reqData);
 */
 extern std::string jsonUcerCheck(ParseData* reqData, ConnectionInfo* ciP);
 
-
-
-/* ****************************************************************************
-*
-* ucerPresent - 
-*/
-extern void jsonUcerPresent(ParseData* reqData);
-
 #endif  // SRC_LIB_JSONPARSE_JSONUPDATECONTEXTELEMENTREQUEST_H_

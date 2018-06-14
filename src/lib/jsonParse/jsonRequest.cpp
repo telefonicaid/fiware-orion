@@ -63,8 +63,7 @@
 
 
 #define FUNCS(prefix) json##prefix##ParseVector, json##prefix##Init,    \
-                      json##prefix##Check,       json##prefix##Present, \
-                      json##prefix##Release
+                      json##prefix##Check,       json##prefix##Release
 
 
 

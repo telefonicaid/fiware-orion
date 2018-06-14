@@ -144,19 +144,6 @@ std::string UpdateContextResponse::check
 
 /* ****************************************************************************
 *
-* UpdateContextResponse::present -
-*/
-void UpdateContextResponse::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%sUpdateContextResponse", indent.c_str()));
-  contextElementResponseVector.present(indent + "  ");
-  errorCode.present(indent + "  ");
-}
-
-
-
-/* ****************************************************************************
-*
 * UpdateContextResponse::release -
 */
 void UpdateContextResponse::release(void)

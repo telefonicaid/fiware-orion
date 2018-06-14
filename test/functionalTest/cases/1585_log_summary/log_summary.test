@@ -18,14 +18,16 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+# NOT VALGRIND READY ...
+# The log summary is heavily dependent on the timing, which is totally off under valgrind ...
+
 
 --NAME--
 Log Summary
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPv4 -logSummary 3 
+brokerStart CB 0 IPv4 -logSummary 5
 
 --SHELL--
 
@@ -83,7 +85,7 @@ echo
 
 echo "05. Sleep 3 secs, awaiting a log summary report"
 echo "==============================================="
-sleep 3
+sleep 5
 echo
 echo
 
@@ -104,7 +106,7 @@ echo
 
 echo "08. Sleep 3 secs, awaiting a second log summary"
 echo "==============================================="
-sleep 3
+sleep 5
 echo
 echo
 
@@ -125,7 +127,7 @@ echo
 
 echo "11. Sleep 3 secs, awaiting a second log summary"
 echo "==============================================="
-sleep 3
+sleep 5
 echo
 echo
 

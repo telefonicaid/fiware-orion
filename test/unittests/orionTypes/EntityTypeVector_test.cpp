@@ -29,25 +29,6 @@
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(EntityTypeVector, present)
-{
-  utInit();
-
-  EntityType et("myType");
-  EntityTypeVector etV;
-  etV.vec.push_back(&et);
-
-  etV.present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * check
 */
 TEST(EntityTypeVector, check)

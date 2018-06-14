@@ -70,9 +70,7 @@ TEST(UpdateContextRequest, ok_json)
    //
    UpdateContextRequest*  upcrP = &reqData.upcr.res;
 
-   upcrP->present(""); // No output
    upcrP->release();
-
    utExit();
 }
 

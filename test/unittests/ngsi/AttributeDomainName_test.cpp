@@ -54,12 +54,5 @@ TEST(AttributeDomainName, ok)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  // Just to exercise the code
-  adn.present("");
-  adn.set("");
-  adn.present("");
-  out = adn.render(false);
-  EXPECT_STREQ("", out.c_str());
-
   utExit();
 }

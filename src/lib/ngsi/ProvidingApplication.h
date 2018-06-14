@@ -48,7 +48,6 @@ typedef struct ProvidingApplication
   MimeType      getMimeType(void);
   bool          isEmpty(void);
   std::string   render(bool comma);
-  void          present(const std::string& indent);
   const char*   c_str(void);
   void          release(void);
 

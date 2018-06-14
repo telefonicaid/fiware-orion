@@ -45,7 +45,6 @@ typedef struct NotifyContextAvailabilityRequest
 
   std::string   render(void);
   std::string   check(ApiVersion apiVersion, const std::string& predetectedError);
-  void          present(const std::string& indent);
   void          release(void);
 } NotifyContextAvailabilityRequest;
 

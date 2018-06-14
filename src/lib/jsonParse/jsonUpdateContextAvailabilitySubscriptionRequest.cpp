@@ -298,20 +298,3 @@ std::string jsonUcasCheck(ParseData* reqData, ConnectionInfo* ciP)
   s = reqData->ucas.res.check(reqData->errorString, 0);
   return s;
 }
-
-
-
-/* ****************************************************************************
-*
-* jsonUcasPresent - 
-*/
-void jsonUcasPresent(ParseData* reqDataP)
-{
-  if (!lmTraceIsSet(LmtPresent))
-  {
-    return;
-  }
-
-  printf("jsonUcasPresent\n");
-  reqDataP->ucas.res.present("");
-}

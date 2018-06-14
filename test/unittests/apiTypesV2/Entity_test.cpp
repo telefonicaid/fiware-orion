@@ -30,29 +30,6 @@
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(Entity, present)
-{
-  utInit();
-
-  Entity* enP    = new Entity();
-  enP->id        = "E";
-  enP->type      = "T";
-  enP->isPattern = "false";
-
-  ContextAttribute* caP = new ContextAttribute("A", "T", "val");
-  enP->attributeVector.push_back(caP);
-
-  enP->present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * check
 */
 TEST(Entity, check)

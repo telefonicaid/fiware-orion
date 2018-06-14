@@ -44,7 +44,6 @@ typedef struct Restriction
   ScopeVector          scopeVector;           // Optional
 
   std::string   render(int restrictions, bool comma);
-  void          present(const std::string& indent);
   void          release();
   void          fill(Restriction* rP);
 

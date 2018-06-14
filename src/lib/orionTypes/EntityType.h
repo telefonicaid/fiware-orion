@@ -52,7 +52,6 @@ class EntityType
                        bool        collapsed,
                        bool        comma = false,
                        bool        typeNameBefore = false);
-  void          present(const std::string& indent);
   void          release(void);
   std::string   toJson(bool includeType = false);
 };

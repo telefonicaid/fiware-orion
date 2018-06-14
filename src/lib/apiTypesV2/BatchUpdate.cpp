@@ -56,19 +56,6 @@ BatchUpdate::~BatchUpdate()
 
 /* ****************************************************************************
 *
-* BatchUpdate::present - 
-*/
-void BatchUpdate::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%s  ActionType: %s", indent.c_str(), actionTypeString(V1, updateActionType).c_str()));
-
-  entities.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
 * BatchUpdate::release - 
 */
 void BatchUpdate::release(void)

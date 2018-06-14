@@ -145,19 +145,6 @@ std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject,
 
 /* ****************************************************************************
 *
-* QueryContextRequest::present -
-*/
-void QueryContextRequest::present(const std::string& indent)
-{
-  entityIdVector.present(indent);
-  attributeList.present(indent);
-  restriction.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
 * QueryContextRequest::release -
 */
 void QueryContextRequest::release(void)

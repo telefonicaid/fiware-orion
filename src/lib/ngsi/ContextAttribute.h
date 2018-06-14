@@ -109,7 +109,6 @@ public:
                              MimeType         outFormatSelection,
                              MimeType*        outMimeTypeP,
                              HttpStatusCode*  scP);
-  void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  getName(void);
 

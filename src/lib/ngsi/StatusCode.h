@@ -62,7 +62,6 @@ typedef struct StatusCode
   void         fill(StatusCode* scP);
   void         fill(const StatusCode& sc);
   void         fill(const struct UpdateContextResponse& ucrs);
-  void         present(const std::string& indent);
   void         release(void);
   void         keyNameSet(const std::string& _tag);
 

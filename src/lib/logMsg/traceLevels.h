@@ -63,7 +63,6 @@ typedef enum TraceLevels
   LmtParse    = 40,
   LmtParsedPayload,
   LmtParseCheck,
-  LmtPresent,
   LmtNew,
   LmtTreat = 45,
   LmtDump,

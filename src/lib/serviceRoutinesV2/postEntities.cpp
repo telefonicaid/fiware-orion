@@ -28,10 +28,11 @@
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
-#include "rest/ConnectionInfo.h"
-#include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
+#include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
+#include "rest/HttpHeaders.h"
 #include "rest/OrionError.h"
 #include "serviceRoutinesV2/postEntities.h"
 #include "serviceRoutines/postUpdateContext.h"
@@ -129,7 +130,7 @@ std::string postEntities
       location += "?type=none";
     }
 
-    ciP->httpHeader.push_back("Location");
+    ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
     ciP->httpHeaderValue.push_back(location);
     ciP->httpStatusCode = SccCreated;
   }

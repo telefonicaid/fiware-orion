@@ -122,6 +122,7 @@ orionCurl --url /v1/subscribeContext --payload "$payload" --tenant t2
 echo
 echo
 
+valgrindSleep 2
 
 echo "04. Create s01/A w/o tenant"
 echo "==========================="
@@ -155,6 +156,7 @@ orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --tenant t
 echo
 echo
 
+valgrindSleep 2
 
 echo "07. Dump accumulator1 - see s01/A"
 echo "================================="

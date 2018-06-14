@@ -448,18 +448,3 @@ std::string jsonUpcrsCheck(ParseData* reqDataP, ConnectionInfo* ciP)
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
   return reqDataP->upcrs.res.check(ciP->apiVersion, asJsonObject, reqDataP->errorString);
 }
-
-
-
-/* ****************************************************************************
-*
-* jsonUpcrsPresent -
-*/
-void jsonUpcrsPresent(ParseData* reqDataP)
-{
-  if (!lmTraceIsSet(LmtPresent))
-    return;
-
-  LM_T(LmtPresent, ("UpdateContextResponse:"));
-  reqDataP->upcrs.res.present("  ");
-}

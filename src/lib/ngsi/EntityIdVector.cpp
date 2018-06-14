@@ -103,22 +103,6 @@ std::string EntityIdVector::check(RequestType requestType)
 
 /* ****************************************************************************
 *
-* EntityIdVector::present -
-*/
-void EntityIdVector::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%lu EntityIds:\n", (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent, ix);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * EntityIdVector::lookup - find a matching entity in the entity-vector
 */
 EntityId* EntityIdVector::lookup(const std::string& id, const std::string& type, const std::string& isPattern)

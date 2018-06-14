@@ -63,12 +63,4 @@ extern void jsonUcasRelease(ParseData* reqDataP);
 */
 extern std::string jsonUcasCheck(ParseData* reqDataP, ConnectionInfo* ciP);
 
-
-
-/* ****************************************************************************
-*
-* jsonUcasPresent - 
-*/
-extern void jsonUcasPresent(ParseData* reqDataP);
-
 #endif  // SRC_LIB_JSONPARSE_JSONUPDATECONTEXTAVAILABILITYSUBSCRIPTIONREQUEST_H_

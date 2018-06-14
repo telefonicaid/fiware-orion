@@ -121,26 +121,6 @@ const char* SubscriptionId::c_str(void) const
 
 /* ****************************************************************************
 *
-* SubscriptionId::present -
-*/
-void SubscriptionId::present(const std::string& indent)
-{
-  if (string != "")
-  {
-    LM_T(LmtPresent, ("%sSubscriptionId: %s\n", 
-		      indent.c_str(), 
-		      string.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNo SubscriptionId\n", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * SubscriptionId::toJson -
 */
 std::string SubscriptionId::toJson(RequestType container, bool comma)
