@@ -64,7 +64,6 @@ typedef struct UpdateContextRequest
   void               release(void);
   ContextAttribute*  attributeLookup(EntityId* eP, const std::string& attributeName);
 
-  void         present(const std::string& indent);
 
   void         fill(const UpdateContextElementRequest* ucerP,
                     const std::string&                 entityId,

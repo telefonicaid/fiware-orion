@@ -128,19 +128,6 @@ std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string
 
 /* ****************************************************************************
 *
-* NotifyContextRequest::present -
-*/
-void NotifyContextRequest::present(const std::string& indent)
-{
-  subscriptionId.present(indent);
-  originator.present(indent);
-  contextElementResponseVector.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
 * NotifyContextRequest::release -
 */
 void NotifyContextRequest::release(void)

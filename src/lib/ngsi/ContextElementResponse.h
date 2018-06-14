@@ -74,7 +74,6 @@ typedef struct ContextElementResponse
                       const std::vector<std::string>&  attrsFilter,
                       const std::vector<std::string>&  metadataFilter,
                       bool blacklist = false);
-  void         present(const std::string& indent, int ix);
   void         release(void);
 
   std::string  check(ApiVersion          apiVersion,

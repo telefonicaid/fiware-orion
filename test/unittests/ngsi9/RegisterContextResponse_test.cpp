@@ -65,7 +65,6 @@ TEST(RegisterContextResponse, constructors)
 
   EXPECT_EQ(expected5, out);
 
-  rcr2.present("");
 }
 
 

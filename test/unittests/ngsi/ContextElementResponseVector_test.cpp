@@ -83,29 +83,3 @@ TEST(ContextElementResponseVector, render)
 
   utExit();
 }
-
-
-
-/* ****************************************************************************
-*
-* present -
-*
-* Just to exercise the code, nothing to be expected here ...
-*/
-TEST(ContextElementResponseVector, present)
-{
-  ContextElementResponseVector  cerv;
-  ContextElementResponse        cer;
-
-  utInit();
-
-  cer.contextElement.entityId.id         = "ID";
-  cer.contextElement.entityId.type       = "Type";
-  cer.contextElement.entityId.isPattern  = "false";
-  cer.statusCode.fill(SccOk, "details");
-  cerv.push_back(&cer);
-
-  cerv.present("");
-
-  utExit();
-}

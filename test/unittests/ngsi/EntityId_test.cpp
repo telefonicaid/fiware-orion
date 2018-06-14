@@ -46,21 +46,3 @@ TEST(EntityId, render)
 
   utExit();
 }
-
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code
-*/
-TEST(EntityId, present)
-{
-  EntityId     eId;
-
-  utInit();
-
-  eId.present("", -1);
-  eId.present("", 0);
-
-  utExit();
-}

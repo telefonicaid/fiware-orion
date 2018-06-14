@@ -105,27 +105,6 @@ TEST(RestrictionString, render)
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(RestrictionString, present)
-{
-  RestrictionString   restrictionString;
-
-  utInit();
-
-  restrictionString.set("");
-  restrictionString.present("");
-
-  restrictionString.set("STR");
-  restrictionString.present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * c_str -
 */
 TEST(RestrictionString, c_str)

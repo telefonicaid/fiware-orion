@@ -86,18 +86,6 @@ std::string ContextRegistrationResponse::check
 
 /* ****************************************************************************
 *
-* ContextRegistrationResponse::present -
-*/
-void ContextRegistrationResponse::present(const std::string& indent)
-{
-  contextRegistration.present(indent, -1);
-  errorCode.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextRegistrationResponse::release -
 */
 void ContextRegistrationResponse::release(void)

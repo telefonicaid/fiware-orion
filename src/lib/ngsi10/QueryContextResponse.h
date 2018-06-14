@@ -54,7 +54,6 @@ typedef struct QueryContextResponse
 
   std::string            render(ApiVersion apiVersion, bool asJsonObject);
   std::string            check(ApiVersion apiVersion, bool asJsonObject, const std::string&  predetectedError);
-  void                   present(const std::string& indent, const std::string& caller);
   void                   release(void);
   void                   fill(QueryContextResponse* qcrsP);
   QueryContextResponse*  clone(void);

@@ -771,19 +771,3 @@ std::string jsonQcrCheck(ParseData* reqDataP, ConnectionInfo* ciP)
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
   return reqDataP->qcr.res.check(ciP->apiVersion, asJsonObject, reqDataP->errorString);
 }
-
-
-
-
-/* ****************************************************************************
-*
-* jsonQcrPresent -
-*/
-void jsonQcrPresent(ParseData* reqDataP)
-{
-  if (!lmTraceIsSet(LmtPresent))
-    return;
-
-  LM_T(LmtPresent, ("\n\n"));
-  reqDataP->qcr.res.present("");
-}

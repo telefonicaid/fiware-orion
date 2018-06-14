@@ -74,22 +74,6 @@ std::string ContextRegistrationResponseVector::render(bool comma)
 
 /* ****************************************************************************
 *
-* ContextRegistrationResponseVector::present -
-*/
-void ContextRegistrationResponseVector::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%lu ContextRegistrationResponses", (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextRegistrationResponseVector::release -
 */
 void ContextRegistrationResponseVector::release(void)

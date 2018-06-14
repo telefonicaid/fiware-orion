@@ -120,24 +120,3 @@ TEST(UpdateActionType, render)
 
   utExit();
 }
-
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code
-*/
-TEST(UpdateActionType, present)
-{
-  UpdateActionType   uat;
-
-  utInit();
-
-  uat.set("Append");
-  uat.present("");
-
-  uat.set("");
-  uat.present("");
-
-  utExit();
-}

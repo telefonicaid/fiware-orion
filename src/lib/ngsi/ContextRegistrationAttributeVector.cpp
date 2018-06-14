@@ -83,22 +83,6 @@ std::string ContextRegistrationAttributeVector::check(ApiVersion apiVersion)
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttributeVector::present -
-*/
-void ContextRegistrationAttributeVector::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%lu ContextRegistrationAttributes", (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(ix, indent);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextRegistrationAttributeVector::push_back -
 */
 void ContextRegistrationAttributeVector::push_back(ContextRegistrationAttribute* item)

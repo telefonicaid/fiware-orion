@@ -98,24 +98,6 @@ std::string NotifyConditionVector::check
 
 /* ****************************************************************************
 *
-* NotifyConditionVector::present -
-*/
-void NotifyConditionVector::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%s%lu NotifyConditions", 
-		    indent.c_str(), 
-		    (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent, ix);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * NotifyConditionVector::push_back -
 */
 void NotifyConditionVector::push_back(NotifyCondition* item)

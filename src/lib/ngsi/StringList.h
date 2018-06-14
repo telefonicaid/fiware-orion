@@ -45,7 +45,6 @@ typedef struct StringList
   void         fill(const std::string& commaSeparatedList);
   std::string  render(bool comma, const std::string& fieldName);
   std::string  toString(void);
-  void         present(const std::string& indent);
   void         release(void);
   bool         lookup(const std::string& string) const;
   void         push_back(const std::string& string);

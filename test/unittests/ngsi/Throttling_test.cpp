@@ -109,24 +109,3 @@ TEST(Throttling, render)
 
   utExit();
 }
-
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code
-*/
-TEST(Throttling, present)
-{
-  Throttling   t;
-
-  utInit();
-
-  t.set("PT1S");
-  t.present("");
-
-  t.set("");
-  t.present("");
-
-  utExit();
-}

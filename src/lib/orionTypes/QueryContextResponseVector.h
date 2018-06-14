@@ -43,7 +43,6 @@ typedef struct QueryContextResponseVector
   unsigned int           size(void);
   void                   push_back(QueryContextResponse* item);
   void                   release(void);
-  void                   present(void);
   std::string            render(ApiVersion apiVersion, bool asJsonObject, bool details, const std::string& detailsString);
   void                   populate(QueryContextResponse* responseP);
 

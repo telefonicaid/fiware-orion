@@ -63,12 +63,4 @@ extern void jsonUcsrRelease(ParseData* reqDataP);
 */
 extern std::string jsonUcsrCheck(ParseData* reqDataP, ConnectionInfo* ciP);
 
-
-
-/* ****************************************************************************
-*
-* jsonUcsrPresent - 
-*/
-extern void jsonUcsrPresent(ParseData* reqDataP);
-
 #endif  // SRC_LIB_JSONPARSE_JSONUPDATECONTEXTSUBSCRIPTIONREQUEST_H_

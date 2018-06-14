@@ -101,27 +101,6 @@ TEST(ContextAttributeResponse, check_json)
 
 /* ****************************************************************************
 *
-* present - just exercise the code
-*/
-TEST(ContextAttributeResponse, present)
-{
-  ContextAttribute          ca("caName", "caType", "caValue");
-  ContextAttributeResponse  car;
-
-  utInit();
-
-  car.contextAttributeVector.push_back(&ca);
-  car.statusCode.fill(SccOk);
-
-  car.present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * release - just exercise the code
 */
 TEST(ContextAttributeResponse, release)

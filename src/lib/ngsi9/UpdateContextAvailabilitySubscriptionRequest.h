@@ -55,7 +55,6 @@ typedef struct UpdateContextAvailabilitySubscriptionRequest
   UpdateContextAvailabilitySubscriptionRequest();
 
   std::string     render(void);
-  void            present(const std::string& indent);
   std::string     check(const std::string& predetectedError, int counter);
   void            release(void);
 } UpdateContextAvailabilitySubscriptionRequest;

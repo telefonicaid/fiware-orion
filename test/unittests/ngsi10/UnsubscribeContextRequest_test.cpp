@@ -57,7 +57,6 @@ TEST(UnsubscribeContextRequest, badSubscriptionId_json)
 
   UnsubscribeContextRequest*  ucrP = &reqData.uncr.res;
 
-  ucrP->present("");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   out = ucrP->render();

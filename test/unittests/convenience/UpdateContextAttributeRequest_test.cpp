@@ -104,22 +104,6 @@ TEST(UpdateContextAttributeRequest, check_json)
 
 /* ****************************************************************************
 *
-* present - just exercise the code
-*/
-TEST(UpdateContextAttributeRequest, present)
-{
-  UpdateContextAttributeRequest  ucar;
-  Metadata                       mdata("name", "type", "value");
-
-  ucar.metadataVector.push_back(&mdata);
-
-  ucar.present("");
-}
-
-
-
-/* ****************************************************************************
-*
 * release -
 */
 TEST(UpdateContextAttributeRequest, release)

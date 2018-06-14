@@ -53,20 +53,6 @@ BatchQuery::~BatchQuery()
 
 /* ****************************************************************************
 *
-* BatchQuery::present - 
-*/
-void BatchQuery::present(const std::string& indent)
-{
-  entities.present(indent);
-  attributeV.present(indent);
-  scopeV.present(indent);
-  metadataV.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
 * BatchQuery::release - 
 */
 void BatchQuery::release(void)

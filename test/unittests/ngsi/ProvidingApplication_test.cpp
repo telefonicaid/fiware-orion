@@ -59,25 +59,6 @@ TEST(ProvidingApplication, render)
 
 /* ****************************************************************************
 *
-* present - just to exercise the code ...
-*/
-TEST(ProvidingApplication, present)
-{
-  ProvidingApplication  pa;
-
-  utInit();
-
-  pa.present("");
-  pa.set("PA");
-  pa.present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * c_str - 
 */
 TEST(ProvidingApplication, c_str)

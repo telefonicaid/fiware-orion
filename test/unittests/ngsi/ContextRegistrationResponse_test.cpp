@@ -76,20 +76,3 @@ TEST(ContextRegistrationResponse, check)
 
   utExit();
 }
-
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code
-*/
-TEST(ContextRegistrationResponse, present)
-{
-  ContextRegistrationResponse  crr;
-
-  utInit();
-
-  crr.present("");
-
-  utExit();
-}

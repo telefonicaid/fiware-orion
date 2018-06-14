@@ -48,7 +48,6 @@ typedef struct SubscriptionId
   bool          isEmpty(void);
   std::string   render(RequestType container, bool comma);
   std::string   toJson(RequestType container, bool comma);
-  void          present(const std::string& indent);
   void          release(void);
   bool          rendered(RequestType container);
 

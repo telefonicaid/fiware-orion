@@ -47,7 +47,6 @@ class BatchUpdate
   BatchUpdate();
   ~BatchUpdate();
 
-  void              present(const std::string& indent);
   void              release(void);
 };
 

@@ -55,7 +55,6 @@ class Duration
   bool          isEmpty(void);
   std::string   render(bool comma);
   int64_t       parse(void);
-  void          present(const std::string& indent);
   void          release(void);
 
   std::string   check(void);

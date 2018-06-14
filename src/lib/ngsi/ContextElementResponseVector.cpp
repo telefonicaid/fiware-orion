@@ -130,24 +130,6 @@ std::string ContextElementResponseVector::check
 
 /* ****************************************************************************
 *
-* ContextElementResponseVector::present -
-*/
-void ContextElementResponseVector::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%s%lu ContextElementResponses", 
-		    indent.c_str(), 
-		    (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent + "  ", ix);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextElementResponseVector::push_back -
 */
 void ContextElementResponseVector::push_back(ContextElementResponse* item)
