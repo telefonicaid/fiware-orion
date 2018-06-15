@@ -128,6 +128,7 @@
 #define OPT_DATE_CREATED    DATE_CREATED
 #define OPT_DATE_MODIFIED   DATE_MODIFIED
 #define OPT_NO_ATTR_DETAIL  "noAttrDetail"
+#define OPT_UPSERT          "upsert"
 
 
 

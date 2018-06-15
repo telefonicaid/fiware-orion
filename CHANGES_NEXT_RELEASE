@@ -1,0 +1,1 @@
+- Add: upsert option for the POST /v2/entities operation (#3215)
