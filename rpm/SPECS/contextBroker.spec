@@ -173,6 +173,14 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Fri Jun 15 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.14.0-1
+- Add: support for APIv2 notifications (POST /v2/op/notify), which opens up for true APIv2 federation (#2986)
+- Add: camelCase actionTypes in POST /v2/op/update (append, appendStrict, update, delete and replace) (#2721)
+- Fix: bug having entities without attibutes AND matching registrations made the attr-less entity not be returned by GET /v2/entities (#3176)
+- Fix: bug when using "legacy" format for custom v2 notifications (#3154)
+- Fix: check for providers is done only in UPDATE or REPLACE actionType case in update entity logic (#2874)
+- Fix: wrong 404 Not Found responses when updating attribute using NGSIv2 and CB forwards it correctly (#2871)
+
 * Mon Apr 16 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.13.0-1
 - Add: support for GET /v2/registrations (#3005)
 - Add: support for GET /v2/registrations/<registration-id> (#3008)
