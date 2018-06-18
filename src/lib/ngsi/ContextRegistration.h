@@ -50,7 +50,6 @@ typedef struct ContextRegistration
 
   ContextRegistration();
   std::string  render(bool comma, bool isInVector);
-  void         present(const std::string& indent, int ix);
   void         release();
 
   std::string  check(ApiVersion          apiVersion,

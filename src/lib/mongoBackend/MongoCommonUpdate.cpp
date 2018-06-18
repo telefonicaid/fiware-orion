@@ -44,6 +44,7 @@
 #include "apiTypesV2/HttpInfo.h"
 #include "alarmMgr/alarmMgr.h"
 #include "orionTypes/OrionValueType.h"
+#include "orionTypes/UpdateActionType.h"
 #include "cache/subCache.h"
 #include "rest/StringFilter.h"
 #include "ngsi/Scope.h"
@@ -2233,7 +2234,7 @@ static void updateAttrInNotifyCer
   ContextElementResponse* notifyCerP,
   ContextAttribute*       targetAttr,
   bool                    useDefaultType,
-  std::string             actionType
+  const std::string&      actionType
 )
 {
   /* Try to find the attribute in the notification CER */
@@ -2642,7 +2643,7 @@ static bool deleteContextAttributeItem
 static bool processContextAttributeVector
 (
   ContextElement*                                 ceP,
-  std::string                                     action,
+  ActionType                                      action,
   std::map<std::string, TriggeredSubscription*>&  subsToNotify,
   ContextElementResponse*                         notifyCerP,
   BSONObj&                                        attrs,
@@ -2687,7 +2688,7 @@ static bool processContextAttributeVector
     /* actualUpdate could be changed to false in the "update" case (or "append as update"). For "delete" and
      * "append" it would keep the true value untouched */
     bool actualUpdate = true;
-    if ((strcasecmp(action.c_str(), "update")) == 0 || (strcasecmp(action.c_str(), "replace")) == 0)
+    if ((action == ActionTypeUpdate) || (action == ActionTypeReplace))
     {
       if (!updateContextAttributeItem(cerP,
                                       ca,
@@ -2703,14 +2704,14 @@ static bool processContextAttributeVector
                                       geoJson,
                                       dateExpiration,
                                       replaceDateExpiration,
-                                      strcasecmp(action.c_str(), "replace") == 0,
+                                      action == ActionTypeReplace,
                                       apiVersion,
                                       oe))
       {
         return false;
       }
     }
-    else if ((strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "append_strict") == 0))
+    else if ((action == ActionTypeAppend) || (action == ActionTypeAppendStrict))
     {
       if (!appendContextAttributeItem(cerP,
                                       attrs,
@@ -2730,7 +2731,7 @@ static bool processContextAttributeVector
         return false;
       }
     }
-    else if (strcasecmp(action.c_str(), "delete") == 0)
+    else if (action == ActionTypeDelete)
     {
       if (!deleteContextAttributeItem(cerP,
                                       ca,
@@ -2751,13 +2752,13 @@ static bool processContextAttributeVector
     }
     else
     {
-      std::string details = std::string("unknown actionType: '") + action + "'";
+      std::string details = std::string("unknown actionType");
 
       cerP->statusCode.fill(SccInvalidParameter, details);
       oe->fill(SccBadRequest, details, "BadRequest");
 
       // If we reach this point, there's a BUG in the parse layer checks
-      LM_E(("Runtime Error (unknown actionType '%s')", action.c_str()));
+      LM_E(("Runtime Error (unknown actionType)"));
       return false;
     }
 
@@ -2777,7 +2778,7 @@ static bool processContextAttributeVector
    * #1 process DELETE A-ID1 and node #2 process DELETE A-ID2, each one thinking than the
    * other A-IDx copy will be there at the end, thus nobody includes it in the toPull array
    */
-  if (strcasecmp(action.c_str(), "delete") == 0)
+  if (action == ActionTypeDelete)
   {
     std::map<std::string, unsigned int>::iterator it;
 
@@ -3152,7 +3153,7 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 static void updateEntity
 (
   const BSONObj&                  r,
-  const std::string&              action,
+  ActionType                      action,
   const std::string&              tenant,
   const std::vector<std::string>& servicePathV,
   const std::string&              xauthToken,
@@ -3186,7 +3187,7 @@ static void updateEntity
   cerP->contextElement.entityId.fill(entityId, entityType, "false");
 
   /* If the vector of Context Attributes is empty and the operation was DELETE, then delete the entity */
-  if (strcasecmp(action.c_str(), "delete") == 0 && ceP->contextAttributeVector.size() == 0)
+  if ((action == ActionTypeDelete) && (ceP->contextAttributeVector.size() == 0))
   {
     LM_T(LmtServicePath, ("Removing entity"));
     removeEntity(entityId, entityType, cerP, tenant, entitySPath, &(responseP->oe));
@@ -3242,7 +3243,7 @@ static void updateEntity
   // Before calling processContextAttributeVector and actually do the work, let's check if the
   // request is of type 'append-only' and if we have any problem with attributes already existing.
   //
-  if (strcasecmp(action.c_str(), "append_strict") == 0)
+  if (action == ActionTypeAppendStrict)
   {
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
@@ -3313,7 +3314,7 @@ static void updateEntity
     //
     searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
 
-    if (!(attributeAlreadyExistsError && (strcasecmp(action.c_str(), "append_strict") == 0)))
+    if (!(attributeAlreadyExistsError && (action == ActionTypeAppendStrict)))
     {
       // Note that CER generation in the case of attributeAlreadyExistsError has its own logic at
       // processContextElement() function so we need to skip this addition or we will get duplicated
@@ -3336,7 +3337,7 @@ static void updateEntity
   /* Compose the final update on database */
   LM_T(LmtServicePath, ("Updating the attributes of the ContextElement"));
 
-  if (strcasecmp(action.c_str(), "replace") != 0)
+  if (action != ActionTypeReplace)
   {
     int now = getCurrentTime();
     toSet.append(ENT_MODIFICATION_DATE, now);
@@ -3363,7 +3364,7 @@ static void updateEntity
 
   // We don't touch toSet in the replace case, due to
   // the way in which BSON is composed in that case (see below)
-  if (currentDateExpiration && (strcasecmp(action.c_str(), "replace") != 0))
+  if (currentDateExpiration && (action != ActionTypeReplace))
   {
     toSet.appendDate(ENT_EXPIRATION, currentDateExpiration);
   }
@@ -3374,7 +3375,7 @@ static void updateEntity
 
   // Correlator (for notification loop detection logic). We don't touch toSet in the replace case, due to
   // the way in which BSON is composed in that case (see below)
-  if (strcasecmp(action.c_str(), "replace") != 0)
+  if (action != ActionTypeReplace)
   {
     toSet.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
   }
@@ -3387,7 +3388,7 @@ static void updateEntity
   BSONArray       toPushArr   = toPush.arr();
   BSONArray       toPullArr   = toPull.arr();
 
-  if (strcasecmp(action.c_str(), "replace") == 0)
+  if (action == ActionTypeReplace)
   {
     // toSet: { A1: { ... }, A2: { ... } }
     BSONObjBuilder replaceSet;
@@ -3495,8 +3496,7 @@ static void updateEntity
 
   /* To finish with this entity processing, search for CPrs in not found attributes and
    * add the corresponding ContextElementResponse to the global response */
-
-  if ((strcasecmp(action.c_str(), "update") == 0) || (strcasecmp(action.c_str(), "replace") == 0))
+  if ((action == ActionTypeUpdate) || (action == ActionTypeReplace))
   {
     searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
   }
@@ -3521,7 +3521,7 @@ static bool contextElementPreconditionsCheck
 (
   ContextElement*         ceP,
   UpdateContextResponse*  responseP,
-  const std::string&      action,
+  ActionType              action,
   ApiVersion              apiVersion
 )
 {
@@ -3558,10 +3558,10 @@ static bool contextElementPreconditionsCheck
 
   /* Check that UPDATE or APPEND is not used with empty attributes (i.e. no value, no type, no metadata) */
   /* Only wanted for API version v1                                                                      */
-  if (((strcasecmp(action.c_str(), "update") == 0) ||
-       (strcasecmp(action.c_str(), "append") == 0) ||
-       (strcasecmp(action.c_str(), "append_strict") == 0) ||
-       (strcasecmp(action.c_str(), "replace") == 0)) && (apiVersion == V1))
+  if (((action == ActionTypeUpdate) ||
+       (action == ActionTypeAppend) ||
+       (action == ActionTypeAppendStrict) ||
+       (action == ActionTypeReplace)) && (apiVersion == V1))
   {
     // FIXME: Careful, in V2, this check is not wanted ...
 
@@ -3572,7 +3572,7 @@ static bool contextElementPreconditionsCheck
       {
         ContextAttribute* ca = new ContextAttribute(aP);
 
-        std::string details = std::string("action: ") + action +
+        std::string details = std::string("action: ") + actionTypeString(apiVersion, action) +
             " - entity: [" + enP->toString(true) + "]" +
             " - offending attribute: " + aP->name +
             " - empty attribute not allowed in APPEND or UPDATE";
@@ -3617,7 +3617,7 @@ void processContextElement
 (
   ContextElement*                      ceP,
   UpdateContextResponse*               responseP,
-  const std::string&                   action,
+  ActionType                           action,
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
@@ -3814,7 +3814,7 @@ void processContextElement
     /* All the attributes existing in the request are added to the response with 'found' set to false
      * in the of UPDATE/DELETE and true in the case of APPEND
      */
-    bool foundValue = (strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "append_strict") == 0);
+    bool foundValue = ((action == ActionTypeAppend) || (action == ActionTypeAppendStrict));
 
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
@@ -3825,7 +3825,7 @@ void processContextElement
       cerP->contextElement.contextAttributeVector.push_back(ca);
     }
 
-    if ((strcasecmp(action.c_str(), "update") == 0) || (strcasecmp(action.c_str(), "replace") == 0))
+    if ((action == ActionTypeUpdate) || (action == ActionTypeReplace))
     {
       /* In the case of UPDATE or REPLACE we look for context providers */
       searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
@@ -3849,7 +3849,7 @@ void processContextElement
         }
       }
     }
-    else if (strcasecmp(action.c_str(), "delete") == 0)
+    else if (action == ActionTypeDelete)
     {
       cerP->statusCode.fill(SccContextElementNotFound);
 

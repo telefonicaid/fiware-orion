@@ -85,7 +85,7 @@ HttpStatusCode mongoUpdateContext
     {
       processContextElement(requestP->contextElementVector[ix],
                             responseP,
-                            requestP->updateActionType.get(),
+                            requestP->updateActionType,
                             tenant,
                             servicePathV,
                             uriParams,

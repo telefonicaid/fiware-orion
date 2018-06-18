@@ -109,24 +109,6 @@ std::string StringList::check(void)
 
 /* ****************************************************************************
 *
-* StringList::present -
-*/
-void StringList::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%String List",    indent.c_str()));
-
-  for (unsigned int ix = 0; ix < stringV.size(); ++ix)
-  {
-    LM_T(LmtPresent, ("%s  %s", 
-		      indent.c_str(), 
-			  stringV[ix].c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * StringList::release -
 */
 void StringList::release(void)

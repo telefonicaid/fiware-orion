@@ -81,10 +81,6 @@ TEST(ContextElement, check)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  // present
-  ce2P->present("", -1);
-  ce2P->present("", 1);
-
   mP->name  = "";
   EXPECT_EQ("missing metadata name", ceVectorP->check(V1, UpdateContext));
 

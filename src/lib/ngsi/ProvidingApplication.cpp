@@ -120,26 +120,6 @@ MimeType ProvidingApplication::getMimeType(void)
 
 /* ****************************************************************************
 *
-* ProvidingApplication::present -
-*/
-void ProvidingApplication::present(const std::string& indent)
-{
-  if (string != "")
-  {
-    LM_T(LmtPresent, ("%sProvidingApplication: %s\n", 
-		      indent.c_str(), 
-		      string.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNo ProvidingApplication\n", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * ProvidingApplication::render -
 */
 std::string ProvidingApplication::render(bool comma)

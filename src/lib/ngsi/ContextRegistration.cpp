@@ -120,31 +120,6 @@ std::string ContextRegistration::check
 
 /* ****************************************************************************
 *
-* ContextRegistration::present -
-*/
-void ContextRegistration::present(const std::string& indent, int ix)
-{
-  if (ix != -1)
-  {
-    LM_T(LmtPresent, ("%sContext Registration %d:\n", 
-		      indent.c_str(), 
-		      ix));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%scontext registration:\n", indent.c_str()));
-  }
-
-  entityIdVector.present(indent + "  ");
-  contextRegistrationAttributeVector.present(indent + "  ");
-  registrationMetadataVector.present("Registration", indent + "  ");
-  providingApplication.present(indent + "  ");
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextRegistration::release -
 */
 void ContextRegistration::release(void)

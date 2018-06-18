@@ -188,13 +188,3 @@ std::string jsonRprCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
   return reqData->rpr.res.check(ciP->apiVersion, ContextEntitiesByEntityId, reqData->errorString);
 }
-
-
-/* ****************************************************************************
-*
-* jsonRprPresent -
-*/
-void jsonRprPresent(ParseData* reqData)
-{
-  reqData->rpr.res.present("");
-}

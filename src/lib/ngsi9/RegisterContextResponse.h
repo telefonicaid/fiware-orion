@@ -52,7 +52,6 @@ typedef struct RegisterContextResponse
 
   std::string render(void);
   std::string check(const std::string& predetectedError, int counter);
-  void        present(const std::string& indent);
   void        release(void);
 } RegisterContextResponse;
 

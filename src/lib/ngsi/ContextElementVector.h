@@ -43,7 +43,6 @@ typedef struct ContextElementVector
   void             push_back(ContextElement* item);
   unsigned int     size(void);
   std::string      render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType,bool comma);
-  void             present(const std::string& indent);
   void             release(void);
   ContextElement*  lookup(EntityId* eP);
   ContextElement*  operator[](unsigned int ix) const;

@@ -186,7 +186,7 @@ Regarding the strategy used in `processContextAttributeVector()` to implement en
 * `toPush`: attributes that need to be added to the entity `attrsName` field in the database (list of attribute names), using the [`$addToSet`](https://docs.mongodb.com/manual/reference/operator/update/addToSet) and [`$each`](https://docs.mongodb.com/manual/reference/operator/update/each) operators.
 * `toPull`: attributes that need to be removed from the `attrsName` field in the database (list of attribute names), using the [`$pullAll` operator](https://docs.mongodb.com/manual/reference/operator/update/pullAll).
 * `locAttr` and `geoJson` are related to modifications in the geolocation information associated to the entity (entity `location` field in the database).
-
+* `dateExpiration` and `replaceDateExpiration` are related to modifications in the TTL expiration date information associated to a transient entity (entity `expDate` field in the database).
 The update is based on "deltas" rather than setting the whole `attrs` and `attrsName` due to the fact that updates can be done concurrently in the database to the same entity (by different request threads in the same CB process or by different CB processes running in different nodes in active-active configurations) and `attrs/attrsName` set by one thread could ruin `attrs/attrsName` for the other thread.
 
 These variables are returned to `updateEntity()` as output parameters, to be used in the entity update operation on the database (as shown in the diagrams above)
@@ -698,6 +698,7 @@ A semaphore system is used to protect connection usage. Have a look at [this sep
 
 * `MongoCommonSubscription`: common functions used by several other modules related to the subscription logic. Most of the functions of this module are set-functions to fill fields in `Subscriptions` objects.
 * `location`: functions related to location management in the database.
+* `dateExpiration`: functions related to TTL expiration date management in the database.
 * `mongoSubCache`: functions used by the [cache](sourceCode.md#srclibcache) library to interact with the database.
 * `compoundResponses` and `compoundValueBson`: modules that help in the conversion between BSON data and internal types (mainly in the [ngsi](sourceCode.md#srclibngsi) library) and viceversa.
 * `TriggeredSubscription`: helper class used by subscription logic (both context and context availability subscriptions) in order to encapsulate the information related to triggered subscriptions on context or registration creation/update.

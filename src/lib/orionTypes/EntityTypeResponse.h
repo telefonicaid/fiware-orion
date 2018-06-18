@@ -54,7 +54,6 @@ class EntityTypeResponse
                       bool                asJsonOut,
                       bool                collapsed,
                       const std::string&  predetectedError);
-  void          present(const std::string& indent);
   void          release(void);
 };
 

@@ -51,7 +51,6 @@ typedef struct ContextElementResponseVector
                                   const std::vector<std::string>&  attrsFilter,
                                   const std::vector<std::string>&  metadataFilter,
                                   bool                             blacklist = false);
-  void                     present(const std::string& indent);
   void                     push_back(ContextElementResponse* item);
   unsigned int             size(void) const;
   ContextElementResponse*  lookup(EntityId* eP, HttpStatusCode code = SccNone);

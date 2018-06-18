@@ -98,18 +98,6 @@ std::string UpdateContextElementRequest::check
 
 /* ****************************************************************************
 *
-* present - 
-*/
-void UpdateContextElementRequest::present(const std::string&  indent)
-{
-  attributeDomainName.present(indent);
-  contextAttributeVector.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
 * release - 
 */
 void UpdateContextElementRequest::release(void)

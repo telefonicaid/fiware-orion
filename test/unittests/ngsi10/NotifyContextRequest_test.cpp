@@ -66,7 +66,6 @@ TEST(NotifyContextRequest, json_ok)
   //
   // With the data obtained, render, present and release methods are exercised
   //
-  ncrP->present("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   rendered = ncrP->render(V1, false);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
@@ -117,7 +116,6 @@ TEST(NotifyContextResponse, Constructor)
   utInit();
 
   EXPECT_EQ(SccOk, ncr.responseCode.code);
-  ncr.present("");
   ncr.release();
 
   StatusCode ec(SccOk, "4");

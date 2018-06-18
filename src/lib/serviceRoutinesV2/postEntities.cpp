@@ -95,7 +95,7 @@ std::string postEntities
   }
 
   // 01. Fill in UpdateContextRequest
-  parseDataP->upcr.res.fill(eP, "APPEND_STRICT");
+  parseDataP->upcr.res.fill(eP, ActionTypeAppendStrict);
 
 
   // 02. Call standard op postUpdateContext

@@ -102,22 +102,6 @@ std::string EntityTypeVector::check(ApiVersion apiVersion, const std::string& pr
 
 /* ****************************************************************************
 *
-* EntityTypeVector::present -
-*/
-void EntityTypeVector::present(const std::string& indent)
-{
-  LM_T(LmtPresent,("%lu items in entityTypeVector", (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * EntityTypeVector::push_back -
 */
 void EntityTypeVector::push_back(EntityType* item)

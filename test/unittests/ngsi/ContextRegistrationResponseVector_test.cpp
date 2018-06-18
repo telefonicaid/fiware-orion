@@ -49,9 +49,6 @@ TEST(ContextRegistrationResponseVector, all)
 
   crrV.push_back(&crr);
 
-  // presenting - just to exercise the code
-  crrV.present("");
-
   // check OK
   rendered = crrV.check(V1, RegisterContext, "", 0);
   EXPECT_EQ("OK", rendered);

@@ -79,7 +79,7 @@ std::string deleteIndividualContextEntityAttribute
 
 
   // 1. Fill in UpdateContextRequest from URL-path components
-  parseDataP->upcr.res.fill(entityId, entityType, "false", attributeName, "", "DELETE");
+  parseDataP->upcr.res.fill(entityId, entityType, "false", attributeName, "", ActionTypeDelete);
 
 
   // 2. Call postUpdateContext standard service routine

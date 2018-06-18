@@ -303,8 +303,8 @@ static std::string domainMetadataValue(const std::string& path, const std::strin
 */
 static std::string updateAction(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got a registration id: '%s'", value.c_str()));
-  reqDataP->upcr.res.updateActionType.set(value);
+  LM_T(LmtParse, ("Got an updateAction: '%s'", value.c_str()));
+  reqDataP->upcr.res.updateActionType = parseActionTypeV1(value);
 
   return "OK";
 }
@@ -381,19 +381,3 @@ std::string jsonUpcrCheck(ParseData* reqData, ConnectionInfo* ciP)
   return reqData->upcr.res.check(ciP->apiVersion, asJsonObject, reqData->errorString);
 }
 
-
-
-/* ****************************************************************************
-*
-* jsonUpcrPresent - 
-*/
-void jsonUpcrPresent(ParseData* reqDataP)
-{
-  if (!lmTraceIsSet(LmtPresent))
-    return;
-
-  LM_T(LmtPresent, ("\n\n"));
-
-  reqDataP->upcr.res.contextElementVector.present("");
-  reqDataP->upcr.res.updateActionType.present("");
-}

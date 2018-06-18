@@ -106,18 +106,6 @@ std::string ContextAttributeResponse::check
 
 /* ****************************************************************************
 *
-* present - 
-*/
-void ContextAttributeResponse::present(const std::string&  indent)
-{
-  contextAttributeVector.present(indent);
-  statusCode.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
 * release - 
 */
 void ContextAttributeResponse::release(void)

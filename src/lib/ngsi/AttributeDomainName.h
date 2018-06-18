@@ -43,7 +43,6 @@ typedef struct AttributeDomainName
   std::string   get(void);
   bool          isEmpty(void);
   std::string   render(bool comma);
-  void          present(const std::string& indent);
   const char*   c_str();
   void          release(void);
   void          fill(const AttributeDomainName& adn);

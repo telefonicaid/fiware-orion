@@ -407,21 +407,6 @@ std::string ContextElementResponse::check
 
 /* ****************************************************************************
 *
-* ContextElementResponse::present - 
-*/
-void ContextElementResponse::present(const std::string& indent, int ix)
-{
-  LM_T(LmtPresent, ("%sContextElementResponse %d:", 
-		    indent.c_str(), 
-		    ix));
-  contextElement.present(indent + "  ", ix);
-  statusCode.present(indent + "  ");
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextElementResponse::fill - 
 */
 void ContextElementResponse::fill(QueryContextResponse* qcrP, const std::string& entityId, const std::string& entityType)

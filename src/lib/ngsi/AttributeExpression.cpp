@@ -84,24 +84,6 @@ std::string AttributeExpression::get(void)
 
 /* ****************************************************************************
 *
-* AttributeExpression::present - 
-*/
-void AttributeExpression::present(const std::string& indent)
-{
-  if (string != "")
-  {
-    LM_T(LmtPresent, ("%sAttributeExpression: %s", indent.c_str(), string.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNo AttributeExpression", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * AttributeExpression::render - 
 */
 std::string AttributeExpression::render(bool comma)

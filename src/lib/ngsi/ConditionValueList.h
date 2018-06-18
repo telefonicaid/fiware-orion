@@ -42,7 +42,6 @@ typedef struct ConditionValueList
   std::vector<std::string>  vec;
 
   std::string  render(bool comma);
-  void         present(const std::string& indent);
   void         release(void);
   void         push_back(const std::string& attributeName);
   unsigned int size(void);

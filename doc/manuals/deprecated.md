@@ -73,7 +73,7 @@ The following table provides information about the last Orion version supporting
 | `dateCreated` and `dateModified` in `options` URI parameter                | Not yet defined                           | Not yet defined                 |
 | `/ngsi10` and `/ngsi9` URL prefixes                                        | Not yet defined                           | Not yet defined                 |
 | `location` metadata to specify entity location                             | Not yet defined                           | Not yet defined                 |
-| `id` metadata (and associated NGSIv1 operations)                           | 1.14.0                                    | Not yet defined                 |
+| `id` metadata (and associated NGSIv1 operations)                           | Not yet defined                           | Not yet defined                 |
 | XML API                                                                    | 0.28.0                                    | February 29th, 2016             |
 | ONTIMEINTERVAL subscription                                                | 0.28.0                                    | February 29th, 2016             |
 | CLI `--silent`                                                             | 0.28.0                                    | February 29th, 2016             |

@@ -85,25 +85,3 @@ TEST(ContextElementResponse, render)
 
    utExit();
 }
-
-
-/* ****************************************************************************
-*
-* present -
-*/
-TEST(ContextElementResponse, present)
-{
-   ContextElementResponse cer;
-
-   utInit();
-
-   cer.contextElement.entityId.id         = "ID";
-   cer.contextElement.entityId.type       = "Type";
-   cer.contextElement.entityId.isPattern  = "false";
-
-   cer.statusCode.fill(SccOk, "details");
-
-   cer.present("", 0);
-
-   utExit();
-}

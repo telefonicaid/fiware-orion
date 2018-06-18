@@ -53,22 +53,6 @@ TEST(Duration, check)
 
 /* ****************************************************************************
 *
-* present - 
-*/
-TEST(Duration, present)
-{
-  Duration     d;
-
-  d.present("");
-
-  d.set("PT1S");
-  d.present("");
-}
-
-
-
-/* ****************************************************************************
-*
 * isEmpty - 
 */
 TEST(Duration, isEmpty)
