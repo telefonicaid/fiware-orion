@@ -3,6 +3,7 @@
 * [Adding a command line parameter](#adding-a-command-line-parameter)
 * [Adding a REST service](#adding-a-rest-service)
 * [Adding a Functional Test Case](#adding-a-functional-test-case)
+* [Debug a Functional Test Case](#debug-a-functional-test-case)
 * [Catching a '405 Method Not Allowed'](#catching-a-405-method-not-allowed)
 * [Fixing a memory leak](#fixing-a-memory-leak)
 
@@ -377,6 +378,53 @@ dbDrop t1
 ```
 
 Note that `t1` is used and not `T1`. This is because Orion converts tenants to all lowercase.
+
+[Top](#top)
+
+## Debug a Functional Test Case
+
+Sometimes you have the need of debugging a test case (i.e., a .test file). Maybe is an existing .test
+that has started to fail due to some modification in the code. Or maybe is a bug that has been reported
+as a new .test (the preferred way to report new bugs! :)
+
+Whatever the case, it may be useful to run Orion under a debugger (e.g. [`gdb`](https://www.gnu.org/software/gdb) or any of its [graphical front-ends](https://sourceware.org/gdb/wiki/GDB%20Front%20Ends))
+with that test as "input". In this way you can set breakpoints, use step-by-step execution, inspects 
+function call stack and variables, etc. as the program logic is executed.
+
+The procedure is easy. Let's assume your test is `test_to_debug.test`. First, edit that file in order 
+to comment out any `brokerStart` and `brokerStop` line. In some cases it is also a good idea to
+comment out `dbDrop` lines, so you can have a look to the DB after .test ends.
+
+Next, start contextBroker process under your debugger. The exact procedure depends on the particular
+debugger or debugger front-end being used, so we are not going into the details here. However, it is
+important to use the following CLI parameters for contextBroker, as they correspond to the port and 
+database used by the function test framework:
+
+```
+-db ftest -port 9999
+```
+
+In addition, the following other CLI parameters may be useful in execution under debugger:
+
+```
+-fg                  (to run in foreground)
+-logLevel INFO       (to have useful information in /tmp/contextBroker.log file)
+-httpTimeout 100000  (to avoid problems with timeout, e.g. due to you are holding in a breakpoint for a long time)
+-reqTimeout 0        (also to avoid problems with timeouts)
+-noCache             (in some cases, cache management adds "noise" to logs; this flag disables it)
+```
+
+Finally, execute the functional test for `test_to_debug.test`:  
+
+```
+CB_MAX_TRIES=1 /path/to/testHarness.sh /path/to/test_to_debug.test
+```
+
+The test will start execution using the contextBroker process under debugger. For instance, if you
+have set a breakpoint in a place traversed by the .test cases, the execution will stop there.
+
+Once you have ended, remember to restore the `brokerStart`, `brokerStop` and (maybe) `dbDrop` lines
+in the .test file.
 
 [Top](#top)
 
