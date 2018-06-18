@@ -58,7 +58,7 @@ commands that require root privilege):
         cd mosquitto-1.5
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
-        echo "/usr/local/lib" | sudo tee /etc/ld.so.conf.d/99local.conf # tell runtime loader to look into /usr/local/lib
+        echo "/usr/local/lib" | sudo tee /etc/ld.so.conf.d/mosquitto.conf # tell runtime loader to look into /usr/local/lib
         sudo ldconfig      # Update /etc/ld.so.cache with the new library files in /usr/local/lib
 
 * Install Google Test/Mock from sources (there are RPM packages for this, but they do not work with the current CMakeLists.txt configuration). Previously the URL was http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 but Google removed that package in late August 2016 and it is no longer working.

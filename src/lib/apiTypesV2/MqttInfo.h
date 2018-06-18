@@ -58,4 +58,4 @@ struct MqttInfo
 
 }
 
-#endif // SRC_LIB_APITYPESV2_MQTTINFO_H
+#endif  // SRC_LIB_APITYPESV2_MQTTINFO_H

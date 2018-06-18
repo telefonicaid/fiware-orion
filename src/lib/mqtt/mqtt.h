@@ -43,7 +43,8 @@ extern unsigned short   mqttKeepAlivePeriod;
 *
 * mqttInit - 
 */
-extern void mqttInit (
+extern void mqttInit 
+(
   const char*    _mqttHost,
   unsigned short _mqttPort,
   unsigned short _mqttKeepAlive

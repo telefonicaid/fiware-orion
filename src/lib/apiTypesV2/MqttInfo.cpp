@@ -33,7 +33,6 @@
 #include "mongoBackend/safeMongo.h"
 #include "apiTypesV2/MqttInfo.h"
 
-using namespace mongo;
 
 
 namespace ngsiv2

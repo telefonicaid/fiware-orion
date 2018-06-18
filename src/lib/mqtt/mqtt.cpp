@@ -42,6 +42,20 @@ unsigned short   mqttKeepAlivePeriod;
 
 /* ****************************************************************************
 *
+* mqttOnPublishCallback -
+* 
+*/
+void mqttOnPublishCallback(struct mosquitto *mosq, void *userdata, int mid)
+{
+  /* FIXME: We don't assign message ids to the published notifications and therefore we have 
+   * no way to tell which notification a callback log belongs to. - Planned for second MQTT PR. */
+  LM_I(("MQTT notification successfully published on %s:%d", mqttHostname, mqttPortNumber));
+}
+
+
+
+/* ****************************************************************************
+*
 * mqttInit -
 *
 */
@@ -78,20 +92,6 @@ void mqttInit (
 
   // Starts the client loop in its own thread. The client loop processes the network traffic
   mosquitto_loop_start(mosq);
-}
-
-
-
-/* ****************************************************************************
-*
-* mqttOnPublishCallback -
-* 
-*/
-void mqttOnPublishCallback(struct mosquitto *mosq, void *userdata, int mid)
-{
-  /* FIXME: We don't assign message ids to the published notifications and therefore we have 
-   * no way to tell which notification a callback log belongs to. - Planned for second MQTT PR. */
-  LM_I(("MQTT notification successfully published on %s:%d", mqttHostname, mqttPortNumber));
 }
 
 
