@@ -2605,7 +2605,7 @@ static bool deleteContextAttributeItem
      * of specifying that date expiration field is no longer used */
     if (targetAttr->name == DATE_EXPIRES)
     {
-      *dateExpiration = 0;
+      *dateExpiration = NO_EXPIRATION_DATE;
     }
 
     ca->found = true;
@@ -2879,7 +2879,7 @@ static bool createEntity
   }
 
   /* Search for a potential date expiration attribute */
-  mongo::Date_t dateExpiration;
+  mongo::Date_t dateExpiration = NO_EXPIRATION_DATE ;
 
   if (!processDateExpirationAtEntityCreation(attrsV, &dateExpiration, errDetail, oeP))
   {
@@ -2978,7 +2978,7 @@ static bool createEntity
   }
 
   /* Add date expiration in the case it was found */
-  if (dateExpiration)
+  if (dateExpiration != NO_EXPIRATION_DATE)
   {
     insertedDoc.appendDate(ENT_EXPIRATION, dateExpiration);
   }
@@ -3228,11 +3228,11 @@ static void updateEntity
 
   /* Is the entity using date expiration? In that case, we fill the currentdateExpiration attribute with that information.
    * In any case, if the request contains a new date expiration, this will become the current one
-   * The replaceDate boolean is used in case of replace operation,
+   * The replaceDateExpiration boolean is used in case of replace operation,
    * in order to know that the date is a new one, coming from the input request
    */
-  mongo::Date_t  currentDateExpiration;
-  bool replaceDateExpiration = false;
+  mongo::Date_t currentDateExpiration = NO_EXPIRATION_DATE;
+  bool replaceDateExpiration          = false;
 
   if (r.hasField(ENT_EXPIRATION))
   {
@@ -3364,7 +3364,7 @@ static void updateEntity
 
   // We don't touch toSet in the replace case, due to
   // the way in which BSON is composed in that case (see below)
-  if (currentDateExpiration && (action != ActionTypeReplace))
+  if ((currentDateExpiration != NO_EXPIRATION_DATE) && (action != ActionTypeReplace))
   {
     toSet.appendDate(ENT_EXPIRATION, currentDateExpiration);
   }

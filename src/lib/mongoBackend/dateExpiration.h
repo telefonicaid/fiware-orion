@@ -36,6 +36,15 @@
 
 
 
+/* ***************************************************************************
+*
+* Constant strings for date expiration
+*
+*/
+#define NO_EXPIRATION_DATE 0
+
+
+
 /* ****************************************************************************
 *
 * processDateExpirationAtEntityCreation -

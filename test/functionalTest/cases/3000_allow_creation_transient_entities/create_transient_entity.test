@@ -38,7 +38,7 @@ brokerStart CB
 #
 
 echo "01. POST /v2/entities with dateExpires attribute (expired ISO8601 date value)"
-echo "====================================================================="
+echo "============================================================================="
 payload='{
     "id": "E1",
     "type": "T1",
@@ -53,7 +53,7 @@ echo
 
 
 echo "02. GET /v2/entities (see if entity is still present, expired but not yet removed)"
-echo "====================================================================="
+echo "=================================================================================="
 orionCurl --url "/v2/entities"
 sleep 60
 echo
@@ -61,14 +61,14 @@ echo
 
 
 echo "03. GET /v2/entities after 60 seconds (default removal interval of mongo TTL thread)"
-echo "====================================================================="
+echo "===================================================================================="
 orionCurl --url "/v2/entities"
 echo
 echo
 
 --REGEXPECT--
 01. POST /v2/entities with dateExpires attribute (expired ISO8601 date value)
-=====================================================================
+=============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T1
@@ -78,7 +78,7 @@ Date: REGEX(.*)
 
 
 02. GET /v2/entities (see if entity is still present, expired but not yet removed)
-=====================================================================
+==================================================================================
 HTTP/1.1 200 OK
 Content-Length: 107
 Content-Type: application/json
@@ -99,7 +99,7 @@ Date: REGEX(.*)
 
 
 03. GET /v2/entities after 60 seconds (default removal interval of mongo TTL thread)
-=====================================================================
+====================================================================================
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json

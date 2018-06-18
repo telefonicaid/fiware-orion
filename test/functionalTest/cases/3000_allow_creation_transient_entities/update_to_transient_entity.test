@@ -38,7 +38,7 @@ brokerStart CB
 #
 
 echo "01. POST /v2/entities without dateExpires attribute, create regular entity"
-echo "====================================================================="
+echo "=========================================================================="
 payload='{
     "id": "E1",
     "type": "T1"
@@ -49,7 +49,7 @@ echo
 
 
 echo "02. POST /v2/entities/E1/attrs, add dateExpires attribute, the entity becomes transient"
-echo "====================================================================="
+echo "======================================================================================="
 payload='{
     "dateExpires":{
          "type": "DateTime",
@@ -63,14 +63,14 @@ echo
 
 
 echo "03. GET /v2/entities after 60 seconds and check if the entity was removed"
-echo "====================================================================="
+echo "========================================================================="
 orionCurl --url "/v2/entities"
 echo
 echo
 
 --REGEXPECT--
 01. POST /v2/entities without dateExpires attribute, create regular entity
-=====================================================================
+==========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T1
@@ -80,7 +80,7 @@ Date: REGEX(.*)
 
 
 02. POST /v2/entities/E1/attrs, add dateExpires attribute, the entity becomes transient
-=====================================================================
+=======================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -89,7 +89,7 @@ Date: REGEX(.*)
 
 
 03. GET /v2/entities after 60 seconds and check if the entity was removed
-=====================================================================
+=========================================================================
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json

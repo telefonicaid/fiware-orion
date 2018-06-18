@@ -38,7 +38,7 @@ brokerStart CB
 #
 
 echo "01. POST /v2/entities with dateExpires attribute, create transient entity"
-echo "====================================================================="
+echo "========================================================================="
 payload='{
     "id": "E1",
     "type": "T1",
@@ -53,7 +53,7 @@ echo
 
 
 echo "02. DELETE /v2/entities/E1/attrs/dateExpires attribute, the entity becomes regular"
-echo "====================================================================="
+echo "=================================================================================="
 orionCurl --url /v2/entities/E1/attrs/dateExpires -X DELETE
 sleep 60
 echo
@@ -61,14 +61,14 @@ echo
 
 
 echo "03. GET /V2/entities after 60 seconds the entity became regular, then is still present"
-echo "====================================================================="
+echo "======================================================================================"
 orionCurl --url "/v2/entities"
 echo
 echo
 
 --REGEXPECT--
 01. POST /v2/entities with dateExpires attribute, create transient entity
-=====================================================================
+=========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T1
@@ -78,7 +78,7 @@ Date: REGEX(.*)
 
 
 02. DELETE /v2/entities/E1/attrs/dateExpires attribute, the entity becomes regular
-=====================================================================
+==================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -87,7 +87,7 @@ Date: REGEX(.*)
 
 
 03. GET /V2/entities after 60 seconds the entity became regular, then is still present
-=====================================================================
+======================================================================================
 HTTP/1.1 200 OK
 Content-Length: 25
 Content-Type: application/json

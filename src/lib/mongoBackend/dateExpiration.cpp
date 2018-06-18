@@ -156,7 +156,7 @@ bool processDateExpirationAtUpdateAttribute
     }
     else
     {
-      *dateExpiration = 0;
+      *dateExpiration = NO_EXPIRATION_DATE;
     }
   }
 
