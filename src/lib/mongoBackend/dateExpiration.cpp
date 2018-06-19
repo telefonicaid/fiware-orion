@@ -142,7 +142,7 @@ bool processDateExpirationAtUpdateAttribute
 {
   if (targetAttr->name == DATE_EXPIRES)
   {
-    if (targetAttr->numberValue)
+    if (targetAttr->numberValue != NO_EXPIRATION_DATE)
     {
       if (!getDateExpiration(targetAttr, dateExpiration, errDetail))
       {
@@ -180,7 +180,7 @@ bool processDateExpirationAtAppendAttribute
 {
   if (targetAttr->name == DATE_EXPIRES)
   {
-    if (targetAttr->numberValue)
+    if (targetAttr->numberValue != NO_EXPIRATION_DATE)
     {
       if (!getDateExpiration(targetAttr, dateExpiration, errDetail))
       {
