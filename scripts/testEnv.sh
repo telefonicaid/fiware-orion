@@ -51,6 +51,8 @@ export MAXIMUM_WAIT=${MAXIMUM_WAIT:-30}
 # o LISTENER2_PORT - port where a second listening (test) application listens for connections
 # o LISTENER3_PORT - port where a third listening (test) application listens for connections
 #
+# o MQTT_PORT      - port where an MQTT (test) application connects to an MQTT broker
+#
 export CB_PORT=${CB_PORT:-9999}
 export CP1_PORT=${CP1_PORT:-9801}
 export CP2_PORT=${CP2_PORT:-9802}
@@ -61,6 +63,15 @@ export LISTENER_PORT=${LISTENER_PORT:-9997}
 export LISTENER2_PORT=${LISTENER2_PORT:-9977}
 export LISTENER3_PORT=${LISTENER3_PORT:-9957}
 
+
+
+# -----------------------------------------------------------------------------
+#
+# MQTT Broker configuration for harness tests
+#
+export MQTT_HOST=${MQTT_HOST:-localhost}
+export MQTT_PORT=${MQTT_PORT:-1883}
+export MQTT_TOPIC=${MQTT_TOPIC:-accumulate_mqtt}
 
 
 # -----------------------------------------------------------------------------

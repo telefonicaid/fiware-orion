@@ -117,7 +117,7 @@ if verbose:
     print "pretty: " + str(pretty)
 
 pid     = str(os.getpid())
-pidfile = "/tmp/accumulator.mqtt." + str(port) + ".pid"
+pidfile = "/tmp/mqtt.accumulator." + str(port) + ".pid"
 
 #
 # If an accumulator process is already running, it is killed.
