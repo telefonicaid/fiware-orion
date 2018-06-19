@@ -12,7 +12,7 @@ no way of recovering it**. Ensure the information you set in a transient entity 
 In addition, **have a look to the [backward compatibility considerations section](#backward-compatibility-considerations)
 in the case you are already using attributes with the exact name `dateExpires`**.
 
-## The `dateExpired` attribute
+## The `dateExpires` attribute
 
 Transient entities are based in the `dateExpires` attribute. This is an attribute of `DateTime` type,
 according to the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/). 
