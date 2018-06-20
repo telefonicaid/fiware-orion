@@ -135,7 +135,7 @@ bool processDateExpirationAtUpdateAttribute
 (
   const ContextAttribute*  targetAttr,
   mongo::Date_t*           dateExpiration,
-  bool*                    replaceDate,
+  bool*                    dateExpirationInPayload,
   std::string*             errDetail,
   OrionError*              oe
 )
@@ -151,7 +151,7 @@ bool processDateExpirationAtUpdateAttribute
       }
       else
       {
-        *replaceDate = true;
+        *dateExpirationInPayload = true;
       }
     }
     else

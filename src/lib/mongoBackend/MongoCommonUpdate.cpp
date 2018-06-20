@@ -2416,7 +2416,7 @@ static bool updateContextAttributeItem
   std::string*              currentLocAttrName,
   BSONObjBuilder*           geoJson,
   mongo::Date_t*            dateExpiration,
-  bool*                     replaceDateExpiration,
+  bool*                     dateExpirationInPayload,
   bool                      isReplace,
   ApiVersion                apiVersion,
   OrionError*               oe
@@ -2456,7 +2456,7 @@ static bool updateContextAttributeItem
   }
   /* Check aspects related with location and date expiration */
   if (!processLocationAtUpdateAttribute(currentLocAttrName, targetAttr, geoJson, &err, apiVersion, oe)
-    || !processDateExpirationAtUpdateAttribute(targetAttr, dateExpiration, replaceDateExpiration, &err, oe))
+    || !processDateExpirationAtUpdateAttribute(targetAttr, dateExpiration, dateExpirationInPayload, &err, oe))
   {
     std::string details = std::string("action: UPDATE") +
                           " - entity: [" + eP->toString() + "]" +
@@ -2655,7 +2655,7 @@ static bool processContextAttributeVector
   std::string*                                    currentLocAttrName,
   BSONObjBuilder*                                 geoJson,
   mongo::Date_t*                                  dateExpiration,
-  bool*                                           replaceDateExpiration,
+  bool*                                           dateExpirationInPayload,
   std::string                                     tenant,
   const std::vector<std::string>&                 servicePathV,
   ApiVersion                                      apiVersion,
@@ -2703,7 +2703,7 @@ static bool processContextAttributeVector
                                       currentLocAttrName,
                                       geoJson,
                                       dateExpiration,
-                                      replaceDateExpiration,
+                                      dateExpirationInPayload,
                                       action == ActionTypeReplace,
                                       apiVersion,
                                       oe))
@@ -3232,7 +3232,7 @@ static void updateEntity
    * in order to know that the date is a new one, coming from the input request
    */
   mongo::Date_t currentDateExpiration = NO_EXPIRATION_DATE;
-  bool replaceDateExpiration          = false;
+  bool dateExpirationInPayload          = false;
 
   if (r.hasField(ENT_EXPIRATION))
   {
@@ -3299,7 +3299,7 @@ static void updateEntity
                                      &locAttr,
                                      &geoJson,
                                      &currentDateExpiration,
-                                     &replaceDateExpiration,
+                                     &dateExpirationInPayload,
                                      tenant,
                                      servicePathV,
                                      apiVersion,
@@ -3368,7 +3368,7 @@ static void updateEntity
   {
     toSet.appendDate(ENT_EXPIRATION, currentDateExpiration);
   }
-  else if (!replaceDateExpiration)
+  else if (!dateExpirationInPayload)
   {
     toUnset.append(ENT_EXPIRATION, 1);
   }
@@ -3397,7 +3397,7 @@ static void updateEntity
     // This avoids strange behavior like as for the location, as reported in the #1142 issue
     // In order to enable easy append management of fields (e.g. location, dateExpiration),
     // it could be better to use a BSONObjBuilder instead the BSON stream macro below.
-    if (replaceDateExpiration)
+    if (dateExpirationInPayload)
     {
       updatedEntity.append("$set", BSON(ENT_ATTRS                   << toSetObj <<
                                         ENT_ATTRNAMES               << toPushArr <<
