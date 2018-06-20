@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_JSONPARSEV2_PARSESCOPEVECTOR_H_
-#define SRC_LIB_JSONPARSEV2_PARSESCOPEVECTOR_H_
+#ifndef SRC_LIB_JSONPARSEV2_PARSEEXPRESSION_H_
+#define SRC_LIB_JSONPARSEV2_PARSEEXPRESSION_H_
 
 /*
 *
-* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,26 +23,27 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Fermín Galán
 */
 #include <string>
 
 #include "rapidjson/document.h"
-
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ScopeVector.h"
+#include "apiTypesV2/SubscriptionUpdate.h"
 
 
 
 /* ****************************************************************************
 *
-* parseScopeVector - 
+* parseExpression -
 */
-extern std::string parseScopeVector
+extern std::string parseExpression
 (
-  ConnectionInfo*                               ciP,
-  const rapidjson::Value::ConstMemberIterator&  iter,
-  ScopeVector*                                  svP
+  const rapidjson::Value&      expression,
+  ScopeVector*                 svP,
+  ngsiv2::SubscriptionUpdate*  subsP
 );
 
-#endif  // SRC_LIB_JSONPARSEV2_PARSESCOPEVECTOR_H_
+#endif // SRC_LIB_JSONPARSEV2_PARSEEXPRESSION_H_
+

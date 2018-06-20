@@ -9,7 +9,6 @@
 * [Datetime support](#datetime-support)
 * [`dateModified` and `dateCreated` attributes](#datemodified-and-datecreated-attributes)
 * [`dateModified` and `dateCreated` metadata](#datemodified-and-datecreated-metadata)
-* [Scope functionality](#scope-functionality)
 * [Error responses](#error-responses)
 * [Subscription payload validations](#subscription-payload-validations)
 * [`actionType` metadata](#actiontype-metadata)
@@ -257,14 +256,6 @@ This behaviour is assessed by the functional test `attrs_dates_overriden_by_user
 and `attrs_dates_overriden_by_user_subs.test` cases included in
 [`cases/0876_attribute_dates directory`](https://github.com/telefonicaid/fiware-orion/tree/master/test/functionalTest/cases/0876_attribute_dates).
 Please have a look, if you need a more detailed description.
-
-[Top](#top)
-
-## Scope functionality
-
-Orion implements a `scope` field in the `POST /v2/op/update` operation (you can see
-[an example in the NGSIv2 walkthrough](walkthrough_apiv2.md#batch-operations)). However, note that this syntax is
-somewhat experimental and it hasn't been consolidated in the NGSIv2 specification.
 
 [Top](#top)
 

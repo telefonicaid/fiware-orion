@@ -1,0 +1,2 @@
+- Add: "expression" field in POST /v2/op/query (#2706)
+- Remove: "scopes" field in POST /v2/op/query (#2706)

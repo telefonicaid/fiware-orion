@@ -1047,27 +1047,15 @@ curl -v localhost:1026/v2/op/query -s -S -H 'Content-Type: application/json' -d 
     "temperature",
     "pressure"
   ],
-  "scopes": [
-    {
-      "type": "FIWARE::StringQuery",
-      "value": "temperature>40"
-    },
-    {
-      "type" : "FIWARE::Location::NGSIv2",
-      "value" : {
-        "georel": [ "near", "maxDistance:20000" ],
-        "geometry": "point",
-        "coords": [ [40.31,-3.75] ]
-      }
-    }
-  ]
+  "expression": {
+    "q": "temperature>40",
+    "georel": "near;maxDistance:20000",
+    "geometry": "point",
+    "coord": "40,31,-3.75"
+  }
 }
 EOF
 ```
-
-The syntax for the `scope` field above has not been fully consolidated in the NGSIv2 specification
-yet. For the moment, that syntax is in beta status. Thus, *use it with care as it may change in the
-future* (see [NGSIv2 implementation notes](ngsiv2_implementation_notes.md#scope-functionality)).
 
 [Top](#top)
 

@@ -33,8 +33,8 @@
 #include "ngsi/Request.h"
 #include "jsonParseV2/parseEntityVector.h"
 #include "jsonParseV2/parseStringList.h"
-#include "jsonParseV2/parseScopeVector.h"
 #include "jsonParseV2/parseBatchQuery.h"
+#include "jsonParseV2/parseExpression.h"
 
 
 
@@ -74,7 +74,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 
     return oe.toJson();
   }
-  else if (!document.HasMember("entities") && !document.HasMember("attributes") && !document.HasMember("scopes"))
+  else if (!document.HasMember("entities") && !document.HasMember("attributes") && !document.HasMember("expression"))
   {
     alarmMgr.badInput(clientIp, "Invalid JSON payload, no relevant fields found");
     oe.fill(SccBadRequest, "Invalid JSON payload, no relevant fields found", "BadRequest");
@@ -114,9 +114,9 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
         return oe.toJson();
       }
     }
-    else if (name == "scopes")
+    else if (name == "expression")
     {
-      std::string r = parseScopeVector(ciP, iter, &bqrP->scopeV);
+      std::string r = parseExpression(iter->value, &bqrP->scopeV, NULL);
 
       if (r != "OK")
       {
