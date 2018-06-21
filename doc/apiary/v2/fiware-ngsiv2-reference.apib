@@ -1935,7 +1935,7 @@ of certain subsets (entities, attributes) of the context information space, incl
 at specific geographical areas.
 
 A NGSIv2 server implementation may implement query or update forwarding to context information sources. In
-particular, some of the following forwarding mechanism could be implemented (not exahustive list):
+particular, some of the following forwarding mechanisms could be implemented (not exahustive list):
 
 * Legacy forwarding (based on NGSIv1 operations)
 * NGSI Context Source Forwarding Specification
@@ -1957,7 +1957,7 @@ Either `active` (for active registrations) or `inactive` (for inactive registrat
   As soon as the forwarding operations start working again, the status is changed back to `active`.
 + `expires` : Registration expiration date in ISO8601 format. Permanent registrations must omit this field.
 + `forwardingInformation`: Information related to the forwarding operations made against the provider.
-Automatically provided by the implementation, in the case such implementation support forwarding capabilities.
+Automatically provided by the implementation, in the case such implementation supports forwarding capabilities.
 
 The `provider` field contains the following subfields:
 + `http` : It is used to convey parameters for providers that deliver information through the HTTP protocol.
