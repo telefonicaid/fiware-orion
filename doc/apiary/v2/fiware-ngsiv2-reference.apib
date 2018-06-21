@@ -396,30 +396,30 @@ If present, the error payload is a JSON object including the following fields:
 
 + `error` (required, string): a textual description of the error.
 + `description` (optional, string): additional information about the error.
-+ `affectedItems` (optional, array[string]): a list of elements affected by the error.
-  Depending on the operation, it may refer to entities, registrations or subscriptions.
 
-All NGSIv2 server implementations must use the following HTTP response codes and `error` texts.
-However, the particular text used for `description` field is an implementation specific aspect.
+All NGSIv2 server implementations must use the following HTTP response codes and `error` texts
+described in this section. However, the particular text used for `description` field is
+an implementation specific aspect.
 
-Error list (HTTP response code in parenthesis):
+NGSIv2 `error` reporting is as follows:
 
-* ParseError            (`400`). The incoming JSON payload cannot be parsed.
-* BadRequest            (`400`). The incoming request is invalid in this context.
-* NotFound              (`404`). The resource (entity, subscription, etc.) referred in the request
-  has not been found.
-* TooManyResults        (`409`). There are several results that match with the resource 
-  identification
-  used in the request.
-* ContentLengthRequired (`411`). Zero/No Content-Length in PUT/POST/PATCH request.
-* RequestEntityTooLarge (`413`). Payload is too large. The specific limit to consider a payload too large depends
-                                 on the particular implementation.
-* UnsupportedMediaType  (`415`). Request content type is not supported.
-* InvalidModification   (`422`). Some piece of information is missing in payload.
-* NotSupportedQuery     (`422`). The implementation does not support the query issued.
-* NoResourcesAvailable  (`413`). There are no server resources to fulfill the client request. 
-
-New error codes may be defined in new iterations of this specification.
++ If the incoming JSON payload cannot be parsed then `ParseError` (`400`) is return.
++ Request error which only depends on the request itself (i.e. it does not depend on the NGSIv2 server status),
+  either in the URL parameters or in the payload, results in `BadRequest`(`400`).
+  + Exception: incoming JSON payload errors, which have another `error` message (see previous bullet).
++ Attemp to exceed spatial index limit results in `NoResourceAvailable` (`413`). See "Geospatial properties of entities"
+  section for details.
++ Ambiguety due to the request may refer to several resources, e.g. attempt to update an entity providing only its ID
+  and several entities with that ID exist, results in `TooManyResults` (`409`).
++ If the resource identified by the request is not found then `NotFound` (`404`) is return.
++ Errors due to the request plus state combination but not exclusively from the request
+  (e.g. POST with `options=append` on an existing attribute) results in `Unprocessable` (`422`).
+  + Exception: the request plus state conditions that lead to 404, 409 or 413 errors, as described in previous bullets.
++ HTTP layer errors use the following:
+  + HTTP 405 Method Not Allowed corresponds to `MethodNotAlowed` (`405`)
+  + HTTP 411 Length Required corresponds to `ContentLengthRequired` (`411`)
+  + HTTP 413 Request Entity Too Large corresponds to `RequestEntityTooLarge` (`413`)
+  + HTTP 415 Unsupported Media Type corresponds to `UnsupportedMediaType` (`415`)
 
 ## Geospatial properties of entities
 
