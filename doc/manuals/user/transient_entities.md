@@ -13,7 +13,7 @@ in the case you are already using attributes with the exact name `dateExpires`**
 ## The `dateExpires` attribute
 
 The expiration timestamp of an entity is defined by means of the `dateExpires` attribute. This is an 
-attribute of `DateTime` type, according to the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable). Its value is the datetime when the entity will expire.
+attribute of `DateTime` type, according to the [NGSIv2 specification](https://fiware.github.io/specifications/ngsiv2/stable/). Its value is the datetime when the entity will expire.
 
 ## Valid transitions
 
