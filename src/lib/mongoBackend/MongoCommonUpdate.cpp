@@ -688,12 +688,12 @@ static bool updateAttribute
   BSONObjBuilder*     toSet,
   BSONArrayBuilder*   toPush,
   ContextAttribute*   caP,
-  bool&               actualUpdate,
+  bool*               actualUpdate,
   bool                isReplace,
   ApiVersion          apiVersion
 )
 {
-  actualUpdate = false;
+  *actualUpdate = false;
 
   /* Attributes with metadata ID are stored as <attrName>()<ID> in the attributes embedded document */
   std::string effectiveName = dbDotEncode(caP->name);
@@ -707,7 +707,7 @@ static bool updateAttribute
     BSONObjBuilder newAttr;
     int            now = getCurrentTime();
 
-    actualUpdate = true;
+    *actualUpdate = true;
 
     std::string attrType;
     if (!caP->typeGiven && (apiVersion == V2))
@@ -755,8 +755,8 @@ static bool updateAttribute
     BSONObj newAttr;
     BSONObj attr = getObjectFieldF(attrs, effectiveName);
 
-    actualUpdate = mergeAttrInfo(attr, caP, &newAttr, apiVersion);
-    if (actualUpdate)
+    *actualUpdate = mergeAttrInfo(attr, caP, &newAttr, apiVersion);
+    if (*actualUpdate)
     {
       const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
       toSet->append(composedName, newAttr);
@@ -789,7 +789,7 @@ static bool appendAttribute
   BSONObjBuilder*     toSet,
   BSONArrayBuilder*   toPush,
   ContextAttribute*   caP,
-  bool&               actualUpdate,
+  bool*               actualUpdate,
   ApiVersion          apiVersion
 )
 {
@@ -853,7 +853,7 @@ static bool appendAttribute
   toSet->append(composedName, ab.obj());
   toPush->append(caP->name);
 
-  actualUpdate = true;
+  *actualUpdate = true;
   return true;
 }
 
@@ -2410,8 +2410,8 @@ static bool updateContextAttributeItem
   EntityId*                 eP,
   BSONObjBuilder*           toSet,
   BSONArrayBuilder*         toPush,
-  bool&                     actualUpdate,
-  bool&                     entityModified,
+  bool*                     actualUpdate,
+  bool*                     entityModified,
   std::string*              currentLocAttrName,
   BSONObjBuilder*           geoJson,
   bool                      isReplace,
@@ -2424,7 +2424,7 @@ static bool updateContextAttributeItem
   if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace, apiVersion))
   {
     // Attribute was found
-    entityModified = actualUpdate || entityModified;
+    *entityModified = (*actualUpdate) || (*entityModified);
   }
   else
   {
@@ -2488,8 +2488,8 @@ static bool appendContextAttributeItem
   EntityId*                 eP,
   BSONObjBuilder*           toSet,
   BSONArrayBuilder*         toPush,
-  bool&                     actualUpdate,
-  bool&                     entityModified,
+  bool*                     actualUpdate,
+  bool*                     entityModified,
   std::string*              currentLocAttrName,
   BSONObjBuilder*           geoJson,
   ApiVersion                apiVersion,
@@ -2517,7 +2517,7 @@ static bool appendContextAttributeItem
 
   bool actualAppend = appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, apiVersion);
 
-  entityModified = actualUpdate || entityModified;
+  *entityModified = (*actualUpdate) || (*entityModified);
 
   /* Check aspects related with location */
   if (!processLocationAtAppendAttribute(currentLocAttrName, targetAttr, actualAppend, geoJson,
@@ -2560,7 +2560,7 @@ static bool deleteContextAttributeItem
   ContextElementResponse*               notifyCerP,
   EntityId*                             eP,
   BSONObjBuilder*                       toUnset,
-  bool&                                 entityModified,
+  bool*                                 entityModified,
   std::string*                          currentLocAttrName,
   std::map<std::string, unsigned int>*  deletedAttributesCounter,
   ApiVersion                            apiVersion,
@@ -2570,7 +2570,7 @@ static bool deleteContextAttributeItem
   if (deleteAttribute(attrs, toUnset, deletedAttributesCounter, targetAttr))
   {
     deleteAttrInNotifyCer(notifyCerP, targetAttr);
-    entityModified = true;
+    *entityModified = true;
 
     /* Check aspects related with location */
     if (targetAttr->getLocation(apiVersion).length() > 0)
@@ -2682,8 +2682,8 @@ static bool processContextAttributeVector
                                       eP,
                                       toSet,
                                       toPush,
-                                      actualUpdate,
-                                      entityModified,
+                                      &actualUpdate,
+                                      &entityModified,
                                       currentLocAttrName,
                                       geoJson,
                                       action == ActionTypeReplace,
@@ -2702,8 +2702,8 @@ static bool processContextAttributeVector
                                       eP,
                                       toSet,
                                       toPush,
-                                      actualUpdate,
-                                      entityModified,
+                                      &actualUpdate,
+                                      &entityModified,
                                       currentLocAttrName,
                                       geoJson,
                                       apiVersion,
@@ -2721,7 +2721,7 @@ static bool processContextAttributeVector
                                       notifyCerP,
                                       eP,
                                       toUnset,
-                                      entityModified,
+                                      &entityModified,
                                       currentLocAttrName,
                                       &deletedAttributesCounter,
                                       apiVersion,
