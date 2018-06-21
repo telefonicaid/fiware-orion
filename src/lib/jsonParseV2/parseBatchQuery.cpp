@@ -74,7 +74,8 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 
     return oe.toJson();
   }
-  else if (!document.HasMember("entities") && !document.HasMember("attributes") && !document.HasMember("expression"))
+  else if (!document.HasMember("entities") && !document.HasMember("attributes")
+           && !document.HasMember("attrs") && !document.HasMember("expression"))
   {
     alarmMgr.badInput(clientIp, "Invalid JSON payload, no relevant fields found");
     oe.fill(SccBadRequest, "Invalid JSON payload, no relevant fields found", "BadRequest");
@@ -101,9 +102,23 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
         return oe.toJson();
       }
     }
+    // This is deprecated: use "expression" "q" unary operator and "attrs" instead
     else if (name == "attributes")
     {
       std::string r = parseStringList(ciP, iter, &bqrP->attributeV, name);
+
+      if (r != "OK")
+      {
+        alarmMgr.badInput(clientIp, r);
+        oe.fill(SccBadRequest, r, "BadRequest");
+        ciP->httpStatusCode = SccBadRequest;
+
+        return oe.toJson();
+      }
+    }
+    else if (name == "attrs")
+    {
+      std::string r = parseStringList(ciP, iter, &bqrP->attrsV, name);
 
       if (r != "OK")
       {

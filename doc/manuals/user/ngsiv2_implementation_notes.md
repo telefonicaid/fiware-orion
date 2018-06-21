@@ -422,4 +422,8 @@ you are highly encouraged to use `attrs` instead (i.e. `attrs=dateModified,*`).
 `UPDATE`, `DELETE` and `REPLACE`. However, they shouldn't be used, preferring always the following counterparts:
 `append`, `appendStrict`, `update`, `delete` and `replace`.
 
+* `attributes` field in `POST /v2/op/query` is deprecated. It is a combination of `attrs` (to select
+which attributes to include in the response to the query) and unary attribute filter in `q` within
+`expression` (to return only entities which have these attributes). Use them instead.
+
 [Top](#top)

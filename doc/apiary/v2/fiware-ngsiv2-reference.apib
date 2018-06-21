@@ -2260,7 +2260,7 @@ The payload may contain the following elements (all of them optional):
       time, but one of them must be present.
     + `type` or `typePattern`: Type or type pattern of the entities to search for. Both cannot be used at
       the same time. If omitted, it means "any entity type".
-+ `attributes`: a list of attribute names to search for. If omitted, it means "all attributes".
++ `attrs`: List of attributes to be provided (if not specified, all attributes).
 + `expression`: an expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see "List
    entities" operation above about this field).
    The different available scopes are described elsewhere.
@@ -2303,7 +2303,7 @@ Response code:
               "type": "P-9873-K"
             }
           ],
-          "attributes": [
+          "attrs": [
             "temperature",
             "humidity"
           ],

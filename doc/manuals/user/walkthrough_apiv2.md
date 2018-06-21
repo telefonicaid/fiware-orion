@@ -1043,7 +1043,7 @@ curl -v localhost:1026/v2/op/query -s -S -H 'Content-Type: application/json' -d 
       "type": "Car"
     }
   ],
-  "attributes": [
+  "attrs": [
     "temperature",
     "pressure"
   ],

@@ -1,0 +1,348 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Attrs field in POST /v2/op/query
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E1 with attributes A, B, C
+# 02. Create entity E2 with attributes B, C
+# 03. Create entity E3 with attribute C
+# 04. Query attrs: A, without q: E1-A, E2-none, E3-none
+# 05. Query attrs: A, with q=A: E1-A
+# 06. Query attrs: C, with q=A: E1-C
+# 07. Query attrs: A, with q=!A: E2-none, E3-none
+# 08. Query attrs: C, with q=!A: E2-C, E3-C
+#
+
+
+echo "01. Create entity E1 with attributes A, B, C"
+echo "============================================"
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A": {
+    "value": "1A",
+    "type": "Text"
+  },
+  "B": {
+    "value": "1B",
+    "type": "Text"
+  },
+  "C": {
+    "value": "1C",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E2 with attributes B, C"
+echo "========================================="
+payload='{
+  "id": "E2",
+  "type": "T",
+  "B": {
+    "value": "2B",
+    "type": "Text"
+  },
+  "C": {
+    "value": "2C",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity E3 with attribute C"
+echo "====================================="
+payload='{
+  "id": "E3",
+  "type": "T",
+  "C": {
+    "value": "3C",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Query attrs: A, without q: E1-A, E2-none, E3-none"
+echo "====================================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "T"
+    }
+  ],
+  "attrs": [ "A" ]
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "05. Query attrs: A, with q=A: E1-A"
+echo "=================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "T"
+    }
+  ],
+  "attrs": [ "A" ],
+  "expression": {
+    "q": "A"
+  }
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "06. Query attrs: C, with q=A: E1-C"
+echo "=================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "T"
+    }
+  ],
+  "attrs": [ "C" ],
+  "expression": {
+    "q": "A"
+  }
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "07. Query attrs: A, with q=!A: E2-none, E3-none"
+echo "==============================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "T"
+    }
+  ],
+  "attrs": [ "A" ],
+  "expression": {
+    "q": "!A"
+  }
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "08. Query attrs: C, with q=!A: E2-C, E3-C"
+echo "========================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "T"
+    }
+  ],
+  "attrs": [ "C" ],
+  "expression": {
+    "q": "!A"
+  }
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with attributes A, B, C
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity E2 with attributes B, C
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create entity E3 with attribute C
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Query attrs: A, without q: E1-A, E2-none, E3-none
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 117
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A": {
+            "metadata": {},
+            "type": "Text",
+            "value": "1A"
+        },
+        "id": "E1",
+        "type": "T"
+    },
+    {
+        "id": "E2",
+        "type": "T"
+    },
+    {
+        "id": "E3",
+        "type": "T"
+    }
+]
+
+
+05. Query attrs: A, with q=A: E1-A
+==================================
+HTTP/1.1 200 OK
+Content-Length: 71
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A": {
+            "metadata": {},
+            "type": "Text",
+            "value": "1A"
+        },
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+06. Query attrs: C, with q=A: E1-C
+==================================
+HTTP/1.1 200 OK
+Content-Length: 71
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "C": {
+            "metadata": {},
+            "type": "Text",
+            "value": "1C"
+        },
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+07. Query attrs: A, with q=!A: E2-none, E3-none
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 47
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E2",
+        "type": "T"
+    },
+    {
+        "id": "E3",
+        "type": "T"
+    }
+]
+
+
+08. Query attrs: C, with q=!A: E2-C, E3-C
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "C": {
+            "metadata": {},
+            "type": "Text",
+            "value": "2C"
+        },
+        "id": "E2",
+        "type": "T"
+    },
+    {
+        "C": {
+            "metadata": {},
+            "type": "Text",
+            "value": "3C"
+        },
+        "id": "E3",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+
