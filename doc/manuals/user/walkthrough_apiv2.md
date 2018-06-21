@@ -1051,7 +1051,7 @@ curl -v localhost:1026/v2/op/query -s -S -H 'Content-Type: application/json' -d 
     "q": "temperature>40",
     "georel": "near;maxDistance:20000",
     "geometry": "point",
-    "coord": "40,31,-3.75"
+    "coords": "40,31,-3.75"
   }
 }
 EOF
