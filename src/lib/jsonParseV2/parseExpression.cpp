@@ -23,6 +23,8 @@
 * Author: Fermín Galán
 */
 
+#include <string>
+
 #include "jsonParseV2/parseExpression.h"
 
 #include "jsonParseV2/utilsParse.h"

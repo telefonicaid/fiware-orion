@@ -45,5 +45,4 @@ extern std::string parseExpression
   ngsiv2::SubscriptionUpdate*  subsP
 );
 
-#endif // SRC_LIB_JSONPARSEV2_PARSEEXPRESSION_H_
-
+#endif  // SRC_LIB_JSONPARSEV2_PARSEEXPRESSION_H_
