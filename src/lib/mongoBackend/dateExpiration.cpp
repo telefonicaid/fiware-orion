@@ -128,7 +128,7 @@ bool processDateExpirationAtEntityCreation
 * check for a number value that will be used in the mongo::Date_t constructor.
 * If it is an empty value, is interpreted as a date expiration deletion and the ACTUAL date value
 * is set to 0, in order to signal the caller function.
-* If valid value, also replaceDate boolean is set to true, in order to manage the new date value
+* If valid value, also dateExpirationInPayload boolean is set to true, in order to manage the new date value
 * in case the update is a replace operation.
 */
 bool processDateExpirationAtUpdateAttribute

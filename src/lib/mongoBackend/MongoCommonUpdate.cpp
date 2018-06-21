@@ -3228,7 +3228,7 @@ static void updateEntity
 
   /* Is the entity using date expiration? In that case, we fill the currentdateExpiration attribute with that information.
    * In any case, if the request contains a new date expiration, this will become the current one
-   * The replaceDateExpiration boolean is used in case of replace operation,
+   * The dateExpirationInPayload boolean is used in case of replace operation,
    * in order to know that the date is a new one, coming from the input request
    */
   mongo::Date_t currentDateExpiration = NO_EXPIRATION_DATE;

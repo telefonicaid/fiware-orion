@@ -186,7 +186,7 @@ Regarding the strategy used in `processContextAttributeVector()` to implement en
 * `toPush`: attributes that need to be added to the entity `attrsName` field in the database (list of attribute names), using the [`$addToSet`](https://docs.mongodb.com/manual/reference/operator/update/addToSet) and [`$each`](https://docs.mongodb.com/manual/reference/operator/update/each) operators.
 * `toPull`: attributes that need to be removed from the `attrsName` field in the database (list of attribute names), using the [`$pullAll` operator](https://docs.mongodb.com/manual/reference/operator/update/pullAll).
 * `locAttr` and `geoJson` are related to modifications in the geolocation information associated to the entity (entity `location` field in the database).
-* `dateExpiration` and `replaceDateExpiration` are related to modifications in the TTL expiration date information associated to a transient entity (entity `expDate` field in the database).
+* `dateExpiration` and `dateExpirationInPayload` are related to modifications in the TTL expiration date information associated to a transient entity (entity `expDate` field in the database).
 
 The update is based on "deltas" rather than setting the whole `attrs` and `attrsName` due to the fact that updates can be done concurrently in the database to the same entity (by different request threads in the same CB process or by different CB processes running in different nodes in active-active configurations) and `attrs/attrsName` set by one thread could ruin `attrs/attrsName` for the other thread.
 
