@@ -10,7 +10,6 @@
 * [`dateModified` and `dateCreated` attributes](#datemodified-and-datecreated-attributes)
 * [`dateModified` and `dateCreated` metadata](#datemodified-and-datecreated-metadata)
 * [Scope functionality](#scope-functionality)
-* [Error responses](#error-responses)
 * [Subscription payload validations](#subscription-payload-validations)
 * [`actionType` metadata](#actiontype-metadata)
 * [`noAttrDetail` option](#noattrdetail-option)
@@ -265,14 +264,6 @@ Please have a look, if you need a more detailed description.
 Orion implements a `scope` field in the `POST /v2/op/update` operation (you can see
 [an example in the NGSIv2 walkthrough](walkthrough_apiv2.md#batch-operations)). However, note that this syntax is
 somewhat experimental and it hasn't been consolidated in the NGSIv2 specification.
-
-[Top](#top)
-
-## Error responses
-
-The error response rules defined in https://github.com/telefonicaid/fiware-orion/issues/1286 takes precedence over
-the ones described in "Error Responses" section in the NGSIv2 specification. In particular, Orion Context
-Broker never responds with "InvalidModification (422)", using "Unprocessable (422)" instead.
 
 [Top](#top)
 
