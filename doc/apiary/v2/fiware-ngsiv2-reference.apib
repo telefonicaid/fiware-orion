@@ -1075,7 +1075,7 @@ the JSON entity representation format (described in a "JSON Entity Representatio
 Response:
 
 * Successful operation uses 201 Created (if upsert option is not used) or 204 No Content (if
-  upsert option is used). Reponse includes a `Location` header with the URL of the
+  upsert option is used). Response includes a `Location` header with the URL of the
   created entity.
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
@@ -1107,10 +1107,16 @@ Response:
       + Members
           + keyValues - when used, the request payload uses the `keyValues` simplified entity
             representation. See "Simplified Entity Representation" section for details.
-          + upsert - when used, entity is updated if already exits (otherwise this situation causes
-            a 422 Unprocessable Entity error).
+          + upsert - when used, entity is updated if already exits. If upsert is not used and
+            the entity already exist a 422 Unprocessable Entity error is returned.
 
-+ Response 201 204
++ Response 201
+
+    + Headers
+
+            Location: /v2/entities/Bcn-Welt?type=Room
+
++ Response 204
 
     + Headers
 
