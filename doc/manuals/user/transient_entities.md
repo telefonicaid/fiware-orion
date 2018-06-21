@@ -1,22 +1,19 @@
 # Transient Entities
 
-Orion Context Broker implements *transient entities*. A transient entity is like any other entity 
-(i.e. it has id/type, a set of attributes, etc.) but with a limited lifetime, so when a given
-time has come, the entity is automatically deleted from the context managed by Orion.
+A transient entity is a regular entity (i.e. it has id/type, a set of attributes, etc.) but with a expiration timestamp. When such point in time is reached the entity is automatically deleted from the context managed by Orion.
 
 Thus, a first and very important piece of advice: **be careful if you use transient entities as once
 the expiration time has come, the entity will be automatically deleted from database and there is
-no way of recovering it**. Ensure the information you set in a transient entity is actually "transient"
-(i.e. it is not important after the lifetime of the entity has passed and it gets expired).
+no way of recovering it**. Ensure the information you set in a transient entity  is not relevant once 
+the entity has expired (i.e. deleted).
 
 In addition, **have a look to the [backward compatibility considerations section](#backward-compatibility-considerations)
 in the case you are already using attributes with the exact name `dateExpires`**.
 
 ## The `dateExpires` attribute
 
-Transient entities are based in the `dateExpires` attribute. This is an attribute of `DateTime` type,
-according to the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/). 
-Its value is the datetime when the entity will expire.
+The expiration timestamp of an entity is defined by means of the `dateExpires` attribute. This is an 
+attribute of `DateTime` type, according to the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable). Its value is the datetime when the entity will expire.
 
 ## Valid transitions
 
@@ -37,7 +34,7 @@ POST /v2/entities
 }
 ```
 
-creates an entity that will expire at July 7th, 2028 at 21:35.
+creates an entity that will expire at July 7th, 2028 at 21:35 UTC.
 
 Additional considerations:
 
@@ -60,7 +57,7 @@ POST /v2/entities/t2/attrs
 }
 ```
 
-will make that entity to expire on October 12th, 2028 at 14:23.
+will make that entity to expire on October 12th, 2028 at 14:23 UTC.
 
 Additional considerations:
 
@@ -82,7 +79,7 @@ PUT /v2/entities/t2/attrs/dateExpires
 }
 ```
 
-will change expiration date to December 31th, 2028 at 23:59.
+will change expiration date to December 31th, 2028 at 23:59 UTC.
 
 Additional considerations:
 
@@ -91,7 +88,7 @@ Otherwise a 400 Bad Request would be returned.
 
 * If `dateExpires` is set in the past, the entity gets automatically expired
 
-### Remove `dateExpired`attribute from entity
+### Remove `dateExpires` attribute from entity
 
 Finally, you can remove `dateExpires` attribute from a transient entity:
 
