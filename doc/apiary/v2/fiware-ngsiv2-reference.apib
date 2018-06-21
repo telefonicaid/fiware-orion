@@ -282,34 +282,34 @@ meaning:
 * `geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`. They have special semantics
   related with entity location. See "Geospatial properties of entities" section.
 
-## System/builtin Attributes
+## Builtin Attributes
 
 There are entity properties that are not directly modifiable by NGSIv2 clients, but that can be
 rendered by NGSIv2 servers to provide extra information. From a representation point of view, they
 are just like regular attributes, with name, value and type.
 
-System/builtin attributes are not rendered by default. In order to render a specific attribute, add its
+Builtin attributes are not rendered by default. In order to render a specific attribute, add its
 name to the `attrs` parameter in URLs (or payload field in POST /v2/op/query operation) or
 subscription (`attrs` sub-field within `notification`).
 
-The list of system/builtin attributes is as follows:
+The list of builtin attributes is as follows:
 * `dateCreated` (type: `DateTime`): entity creation date as an ISO 8601 string.
 * `dateModified` (type: `DateTime`): entity modification date as an ISO 8601 string.
 
 Like regular attributes, they can be  used in `q` filters and in `orderBy`.
 However, they cannot be used in resource URLs.
 
-## System/builtin Metadata
+## Builtin Metadata
 
 Some attribute properties are not directly modifiable by NGSIv2 clients, but they can be
 rendered by NGSIv2 servers to provide extra information. From a representational point of view, they
 are just like regular metadata, with name, value, and type.
 
-System/builtin metadata are not rendered by default. In order to render a specific metadata, add its
+Builtin metadata are not rendered by default. In order to render a specific metadata, add its
 name to the `metadata` URL parameter (or payload field in POST /v2/op/query operation) or
 subscription (`metadata` sub-field within `notification`).
 
-The list of system/builtin metadata is as follows:
+The list of builtin metadata is as follows:
 
 * `dateCreated` (type: `DateTime`): attribute creation date as an ISO 8601 string.
 
@@ -362,7 +362,7 @@ The following strings must not be used as attribute names:
 * `geo:distance`, as it would conflict with the string used in `orderBy` for proximity to
   center point.
 
-* System/builtin attribute names (see specific section on "System/builtin Attributes")
+* Builtin attribute names (see specific section on "Builtin Attributes")
 
 * `*`, as it has a special meaning as "all the custom/user attributes" (see section on
   "Filtering out attributes and metadata").
@@ -371,7 +371,7 @@ The following strings must not be used as attribute names:
 
 The following strings must not be used as metadata names:
 
-* System/builtin metadata names (see specific section on "System/builtin Metadata")
+* Builtin metadata names (see specific section on "Builtin Metadata")
 
 * `*`, as it has a special meaning as "all the custom/user metadata" (see section on
   "Filtering out attributes and metadata").
@@ -385,7 +385,7 @@ The value of `orderBy` can be:
 * The keyword `geo:distance` to order results by distance to a reference geometry when a "near"
   (`georel=near`) spatial relationship is used. 
 
-* A comma-separated list of attributes (including system/builtin attributes), `id` (for entity
+* A comma-separated list of attributes (including builtin attributes), `id` (for entity
   ID), and `type` (for entity type), e.g. `temperature,!humidity`. Results are ordered by the first
   field. On ties, the results are ordered by the second field and so on. A "!" before
   the field name means that the order is reversed.
@@ -752,21 +752,21 @@ to specify the list of attributes that must be included in the response. In a si
 that must be included in the response.
 
 By default, if `attrs` is omitted (or `metadata` is omitted) then all the attributes (all the
-metadata) are included, except system/builtin attributes (metadata). In order to include
-system/builtin attributes (metadata) they have to be explicitly included in `attrs` (`metadata`).
+metadata) are included, except builtin attributes (metadata). In order to include
+builtin attributes (metadata) they have to be explicitly included in `attrs` (`metadata`).
 
 E.g. to include only attributes A and B:
 
 `attrs=A,B`
 
-Note that including *only* system/builtin attributes (metadata) will avoid any user-defined
-attribute (metadata). If you want to include system/builtin attributes (metadata) *and* user-defined
+Note that including *only* builtin attributes (metadata) will avoid any user-defined
+attribute (metadata). If you want to include builtin attributes (metadata) *and* user-defined
 attributes (metadata) at the same time then
 
 * The user-defined attributes (metadata) have to be explictly included, e.g. to include the user-defined
-  attributes A and B along with the system/builtin attribute `dateModified`, use: `attrs=dateModified,A,B`.
+  attributes A and B along with the builtin attribute `dateModified`, use: `attrs=dateModified,A,B`.
 * The special value `*` can be used as an alias meaning "all user-defined attributes (metadata)", e.g.,
-  to include all the user-defined attributes along with the system/builtin attribute `dateModified`
+  to include all the user-defined attributes along with the builtin attribute `dateModified`
   use: `attrs=dateModified,*`.
 
 Note that the `attrs` and `metadata` fields can be used also in subscriptions (as sub-fields of `notification`)
