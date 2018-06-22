@@ -57,6 +57,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
 #include "mongoBackend/location.h"
+#include "mongoBackend/dateExpiration.h"
 #include "mongoBackend/compoundValueBson.h"
 #include "mongoBackend/MongoCommonUpdate.h"
 
@@ -2414,6 +2415,8 @@ static bool updateContextAttributeItem
   bool&                     entityModified,
   std::string*              currentLocAttrName,
   BSONObjBuilder*           geoJson,
+  mongo::Date_t*            dateExpiration,
+  bool*                     dateExpirationInPayload,
   bool                      isReplace,
   ApiVersion                apiVersion,
   OrionError*               oe
@@ -2451,9 +2454,9 @@ static bool updateContextAttributeItem
       ca->found = false;
     }
   }
-
-  /* Check aspects related with location */
-  if (!processLocationAtUpdateAttribute(currentLocAttrName, targetAttr, geoJson, &err, apiVersion, oe))
+  /* Check aspects related with location and date expiration */
+  if (!processLocationAtUpdateAttribute(currentLocAttrName, targetAttr, geoJson, &err, apiVersion, oe)
+    || !processDateExpirationAtUpdateAttribute(targetAttr, dateExpiration, dateExpirationInPayload, &err, oe))
   {
     std::string details = std::string("action: UPDATE") +
                           " - entity: [" + eP->toString() + "]" +
@@ -2492,6 +2495,7 @@ static bool appendContextAttributeItem
   bool&                     entityModified,
   std::string*              currentLocAttrName,
   BSONObjBuilder*           geoJson,
+  mongo::Date_t*            dateExpiration,
   ApiVersion                apiVersion,
   OrionError*               oe
 )
@@ -2521,7 +2525,8 @@ static bool appendContextAttributeItem
 
   /* Check aspects related with location */
   if (!processLocationAtAppendAttribute(currentLocAttrName, targetAttr, actualAppend, geoJson,
-                                        &err, apiVersion, oe))
+                                        &err, apiVersion, oe)
+      || !processDateExpirationAtAppendAttribute(dateExpiration, targetAttr, actualAppend, &err, oe))
   {
     std::string details = std::string("action: APPEND") +
                           " - entity: [" + eP->toString() + "]" +
@@ -2562,6 +2567,7 @@ static bool deleteContextAttributeItem
   BSONObjBuilder*                       toUnset,
   bool&                                 entityModified,
   std::string*                          currentLocAttrName,
+  mongo::Date_t*                        dateExpiration,
   std::map<std::string, unsigned int>*  deletedAttributesCounter,
   ApiVersion                            apiVersion,
   OrionError*                           oe
@@ -2592,6 +2598,14 @@ static bool deleteContextAttributeItem
     if (*currentLocAttrName == targetAttr->name)
     {
       *currentLocAttrName = "";
+    }
+
+    /* Check aspects related to date expiration.
+     * If the target attr is date expiration, nullifying dateExpiration ACTUAL value is the way
+     * of specifying that date expiration field is no longer used */
+    if (targetAttr->name == DATE_EXPIRES)
+    {
+      *dateExpiration = NO_EXPIRATION_DATE;
     }
 
     ca->found = true;
@@ -2640,6 +2654,8 @@ static bool processContextAttributeVector
   ContextElementResponse*                         cerP,
   std::string*                                    currentLocAttrName,
   BSONObjBuilder*                                 geoJson,
+  mongo::Date_t*                                  dateExpiration,
+  bool*                                           dateExpirationInPayload,
   std::string                                     tenant,
   const std::vector<std::string>&                 servicePathV,
   ApiVersion                                      apiVersion,
@@ -2686,6 +2702,8 @@ static bool processContextAttributeVector
                                       entityModified,
                                       currentLocAttrName,
                                       geoJson,
+                                      dateExpiration,
+                                      dateExpirationInPayload,
                                       action == ActionTypeReplace,
                                       apiVersion,
                                       oe))
@@ -2706,6 +2724,7 @@ static bool processContextAttributeVector
                                       entityModified,
                                       currentLocAttrName,
                                       geoJson,
+                                      dateExpiration,
                                       apiVersion,
                                       oe))
       {
@@ -2723,6 +2742,7 @@ static bool processContextAttributeVector
                                       toUnset,
                                       entityModified,
                                       currentLocAttrName,
+                                      dateExpiration,
                                       &deletedAttributesCounter,
                                       apiVersion,
                                       oe))
@@ -2827,7 +2847,7 @@ static bool createEntity
   const std::vector<std::string>&  servicePathV,
   ApiVersion                       apiVersion,
   const std::string&               fiwareCorrelator,
-  OrionError*                      oe
+  OrionError*                      oeP
 )
 {
   LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName(tenant).c_str()));
@@ -2836,6 +2856,7 @@ static bool createEntity
    * invoke ensureLocationIndex() in anycase, given that it is harmless in the case the collection and index already
    * exits (see docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/) */
   ensureLocationIndex(tenant);
+  ensureDateExpirationIndex(tenant);
 
   if (!legalIdUsage(attrsV))
   {
@@ -2843,7 +2864,7 @@ static bool createEntity
       "Attributes with same name with ID and not ID at the same time "
       "in the same entity are forbidden: entity: [" + eP->toString() + "]";
 
-    oe->fill(SccInvalidModification, *errDetail, "Unprocessable");
+    oeP->fill(SccInvalidModification, *errDetail, "Unprocessable");
     return false;
   }
 
@@ -2851,9 +2872,18 @@ static bool createEntity
   std::string     locAttr;
   BSONObjBuilder  geoJson;
 
-  if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion, oe))
+  if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion, oeP))
   {
     // oe->fill() already managed by processLocationAtEntityCreation()
+    return false;
+  }
+
+  /* Search for a potential date expiration attribute */
+  mongo::Date_t dateExpiration = NO_EXPIRATION_DATE ;
+
+  if (!processDateExpirationAtEntityCreation(attrsV, &dateExpiration, errDetail, oeP))
+  {
+    // oeP->fill() already managed by processLocationAtEntityCreation()
     return false;
   }
 
@@ -2947,12 +2977,18 @@ static bool createEntity
                                           ENT_LOCATION_COORDS   << geoJson.obj()));
   }
 
+  /* Add date expiration in the case it was found */
+  if (dateExpiration != NO_EXPIRATION_DATE)
+  {
+    insertedDoc.appendDate(ENT_EXPIRATION, dateExpiration);
+  }
+
   // Correlator (for notification loop detection logic)
   insertedDoc.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
 
   if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
   {
-    oe->fill(SccReceiverInternalError, *errDetail, "InternalError");
+    oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
     return false;
   }
 
@@ -3190,6 +3226,19 @@ static void updateEntity
     currentGeoJson = getObjectFieldF(loc, ENT_LOCATION_COORDS);
   }
 
+  /* Is the entity using date expiration? In that case, we fill the currentdateExpiration attribute with that information.
+   * In any case, if the request contains a new date expiration, this will become the current one
+   * The dateExpirationInPayload boolean is used in case of replace operation,
+   * in order to know that the date is a new one, coming from the input request
+   */
+  mongo::Date_t currentDateExpiration = NO_EXPIRATION_DATE;
+  bool dateExpirationInPayload          = false;
+
+  if (r.hasField(ENT_EXPIRATION))
+  {
+    currentDateExpiration = getField(r, ENT_EXPIRATION).date();
+  }
+  
   //
   // Before calling processContextAttributeVector and actually do the work, let's check if the
   // request is of type 'append-only' and if we have any problem with attributes already existing.
@@ -3249,6 +3298,8 @@ static void updateEntity
                                      cerP,
                                      &locAttr,
                                      &geoJson,
+                                     &currentDateExpiration,
+                                     &dateExpirationInPayload,
                                      tenant,
                                      servicePathV,
                                      apiVersion,
@@ -3311,6 +3362,17 @@ static void updateEntity
     toUnset.append(ENT_LOCATION, 1);
   }
 
+  // We don't touch toSet in the replace case, due to
+  // the way in which BSON is composed in that case (see below)
+  if ((currentDateExpiration != NO_EXPIRATION_DATE) && (action != ActionTypeReplace))
+  {
+    toSet.appendDate(ENT_EXPIRATION, currentDateExpiration);
+  }
+  else if (!dateExpirationInPayload)
+  {
+    toUnset.append(ENT_EXPIRATION, 1);
+  }
+
   // Correlator (for notification loop detection logic). We don't touch toSet in the replace case, due to
   // the way in which BSON is composed in that case (see below)
   if (action != ActionTypeReplace)
@@ -3329,11 +3391,28 @@ static void updateEntity
   if (action == ActionTypeReplace)
   {
     // toSet: { A1: { ... }, A2: { ... } }
-    int now = getCurrentTime();
-    updatedEntity.append("$set", BSON(ENT_ATTRS             << toSetObj <<
-                                      ENT_ATTRNAMES         << toPushArr <<
-                                      ENT_MODIFICATION_DATE << now <<
-                                      ENT_LAST_CORRELATOR   << fiwareCorrelator));
+    BSONObjBuilder replaceSet;
+    int            now = getCurrentTime();
+
+    // This avoids strange behavior like as for the location, as reported in the #1142 issue
+    // In order to enable easy append management of fields (e.g. location, dateExpiration),
+    // it could be better to use a BSONObjBuilder instead the BSON stream macro below.
+    if (dateExpirationInPayload)
+    {
+      updatedEntity.append("$set", BSON(ENT_ATTRS                   << toSetObj <<
+                                        ENT_ATTRNAMES               << toPushArr <<
+                                        ENT_MODIFICATION_DATE       << now <<
+                                        ENT_EXPIRATION              << currentDateExpiration <<
+                                        ENT_LAST_CORRELATOR         << fiwareCorrelator));
+    }
+    else
+    {
+      updatedEntity.append("$set", BSON(ENT_ATTRS                   << toSetObj <<
+                                        ENT_ATTRNAMES               << toPushArr <<
+                                        ENT_MODIFICATION_DATE       << now <<
+                                        ENT_LAST_CORRELATOR         << fiwareCorrelator));
+      updatedEntity.append("$unset", toUnsetObj);
+    }
 
     notifyCerP->contextElement.entityId.modDate = now;
   }
