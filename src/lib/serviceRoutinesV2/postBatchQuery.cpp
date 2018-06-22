@@ -68,14 +68,15 @@ std::string postBatchQuery
   std::string           answer;
 
   //
-  // This request does not support (it ignores) the URI parameter 'metadata'.
-  // Instead the metadata filter comes inside the payload.
-  // To pass the metadata filter to the rendering function, the same mechanism as for URI param is used here.
+  // This request does not support (it ignores) the URI parameters 'attrs' and 'metadata'
+  // Instead the attr/metadata filter comes inside the payload.
+  // To pass the attr/metadata filter to the rendering function, the same mechanism as for URI param is used here.
   // This is a little bit ugly as we 'fool' the render method to believe that the filter came via URI param.
   // However, the implementation is cleaner and no more code is needed for this, just to set the
   // URI param with the value of the metadata filter from the payload.
   //
   ciP->uriParam[URI_PARAM_METADATA] = bqP->metadataV.toString();
+  ciP->uriParam[URI_PARAM_ATTRS]    = bqP->attrsV.toString();
 
   qcrP->fill(bqP);
   bqP->release();  // qcrP just 'took over' the data from bqP, bqP no longer needed

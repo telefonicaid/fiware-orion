@@ -33,7 +33,6 @@
 #include "ngsi/Request.h"
 #include "jsonParseV2/parseEntityVector.h"
 #include "jsonParseV2/parseStringList.h"
-#include "jsonParseV2/parseScopeVector.h"
 #include "jsonParseV2/parseBatchUpdate.h"
 #include "orionTypes/UpdateActionType.h"
 

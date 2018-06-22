@@ -123,16 +123,10 @@ payload='{
   "attributes": [
     "A1"
   ],
-  "scopes": [
-    {
-      "type": "FIWARE::StringQuery::Metadata",
-      "value": "A1.M1==2"
-    },
-    {
-      "type": "FIWARE::StringQuery",
-      "value": "A1==1"
-    }
-  ]
+  "expression": {
+    "mq": "A1.M1==2",
+    "q": "A1==1"
+  }
 }'
 orionCurl --url /v2/op/query --payload "$payload"
 echo
