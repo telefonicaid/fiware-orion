@@ -1,13 +1,13 @@
 # Update action types
 
 Both `POST /v1/updateContext` (NGSIv1) and `POST /v2/op/update` use an `actionType` field.
-This field allows the following values:
+Its value is as follows:
 
-* [APPEND](#append)
-* [APPEND_STRICT](#append_strict)
-* [UPDATE](#update)
-* [DELETE](#delete)
-* [REPLACE](#replace)
+* [`append`](#append) (NGSIv2) or `APPEND` (NGSIv1)
+* [`appendStrict`](#appendstrict) (NGSIv2) or `APPEND_STRICT` (NGSIv1)
+* [`update`](#update) (NGSIv2) or `UPDATE` (NGSIv1)
+* [`delete`](#delete) (NGSIv2) or `DELETE` (NGSIv1)
+* [`replace`](#replace) (NGSIv2) or `REPLACE` (NGSIv1)
 
 The actionType values are described in following subsections. 
 In the case of NGSIv2, equivalences to RESTful operations are described as well
@@ -15,30 +15,30 @@ In the case of NGSIv2, equivalences to RESTful operations are described as well
 Similar equivalences exist as convenicence operations in the case of NGSIv1 (the 
 [final example](#example-about-creation-and-removal-of-attributes-in-ngsiv1) illustrates them).
 
-## APPEND
+## `append`
 
 This action type is used for creation of entities, creation of attributes in existing entities
-and for updating existing attributes in existing entities. In the latter case, it is equal to UPDATE.
+and for updating existing attributes in existing entities. In the latter case, it is equal to `update`.
 
 In NGSIv2 it maps to `POST /v2/entities` (if the entity does not already exist)
 or `POST /v2/entities/<id>/attrs` (if the entity already exists).
 
-## APPEND_STRICT
+## `appendStrict`
 
 This action type is used for creation of entities or attributes in existing entities.
-Attempts to use it to update already existing attributes (as APPEND allows) will result in an error.
+Attempts to use it to update already existing attributes (as  `append` allows) will result in an error.
 
 In NGSIv2 it maps to `POST /v2/entities` (if the entity does not already exist)
 or `POST /v2/entities/<id>/attrs?options=append` (if the entity already exists).
 
-## UPDATE
+## `update`
 
 This action type is used for modification of already existing attributes. Attempts to use it to create
-new entities or attributes (as APPEND or APPEND_STRICT allow) will result in an error.
+new entities or attributes (as `append` or `appendStrict` allow) will result in an error.
 
 In NGSIv2 it maps to `PATCH /v2/entities/<id>/attrs`.
 
-## DELETE
+## `delete`
 
 This action type is used for removal of attributes in existing entities (but without removing the
 entity itself) or for deletion of entities.
@@ -46,7 +46,7 @@ entity itself) or for deletion of entities.
 In NGSIv2 it maps to `DELETE /v2/entities/<id>/attrs/<attrName>` on every attribute included
 in the entity or to `DELETE /v2/entities/<id>` if the entity has no attributes.
 
-## REPLACE
+## `replace`
 
 This action type is used for replacement of attributes in existing entities, i.e. all the existing attributes are
 removed and the ones included in the request are added.
