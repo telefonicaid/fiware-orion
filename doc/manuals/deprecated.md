@@ -15,7 +15,8 @@ not mantained or evolved any longer. In particular:
 
 A list of deprecated features and the version in which they were deprecated follows:
 
-
+* Usage of that is `APPEND`, `APPEND_STRICT`, `UPDATE`, `DELETE` and `REPLACE` in `POST /v2/op/update` is
+  deprecated in Orion 1.14.0. Use `append`, `appendStrict`, `update`, `delete` and `replace` counterparts.
 * Metadata ID is deprecated in Orion 1.13.0. On the one hand, this functionality is not compatible with the
   NGSIv2 JSON representation format (attribute names are used as keys in a JSON object, so names cannot be
   duplicated). On the other hand, IDs can easily be implemented using prefixes/suffixes in attribute names,
@@ -70,6 +71,7 @@ The following table provides information about the last Orion version supporting
 
 | **Removed feature**                                                        | **Last Orion version supporting feature** | **That version release date**   |
 |----------------------------------------------------------------------------|-------------------------------------------|---------------------------------|
+| `APPEND`, `UPDATE`, etc. action types in `POST /v2/op/update`              | Not yet defined                           | Not yet defined                 |
 | `dateCreated` and `dateModified` in `options` URI parameter                | Not yet defined                           | Not yet defined                 |
 | `/ngsi10` and `/ngsi9` URL prefixes                                        | Not yet defined                           | Not yet defined                 |
 | `location` metadata to specify entity location                             | Not yet defined                           | Not yet defined                 |

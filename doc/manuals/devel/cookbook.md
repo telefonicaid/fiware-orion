@@ -161,7 +161,7 @@ The `entity id`, `attribute name`, and `metadata name` (all part of the URL path
 All service routines that modify/create entities/attributes/metadata rely on the NGSIv1 service routine `postUpdateContext()`, and `putMetadata()` is no exception. So, what needs to be done in `putMetadata()` is to build a `UpdateContextRequest` object using the parameters of `putMetadata()` and call `postUpdateContext()`. Something like this:
 
 ```
-  parseDataP->upcr.res.fill(entityId, attributeName, metadataName, "APPEND");  
+  parseDataP->upcr.res.fill(entityId, attributeName, metadataName, ActionTypeAppend);
   postUpdateContext(ciP, components, compV, parseDataP, NGSIV2_FLAVOUR_ONAPPEND);    
 ```
 
