@@ -40,15 +40,16 @@ accumulatorStart --pretty-print
 # 03. Update turn attribute using PATCH on entity
 # 04. Update turn attribute using PUT on attribute
 # 05. Update turn attribute using batch update
-# 06. Update turn attribute using NGSIv1 update
-# 07. Dump accumulator and see four forwarded updates
+# 06. Update turn attribute using PUT on attribute value
+# 07. Update turn attribute using NGSIv1 update
+# 08. Dump accumulator and see four forwarded updates
 #
 
 echo "01. Create registration directly in DB"
 echo "======================================"
 doc='{
    "_id":ObjectId("5b1ff2ee49597334c9b5efc7"),
-   "expiration":NumberLong(1531412462),
+   "expiration":NumberLong(1845053934),
    "servicePath":"/ss1",
    "format":"JSON",
    "contextRegistration":[
@@ -78,28 +79,58 @@ echo
 echo "02. Create entity directly in DB"
 echo "================================"
 doc='{
-  "_id":ObjectId("5b1ff2ee49597334c9b5efc7"),
-  "expiration":NumberLong(1531412462),
-  "servicePath":"/ss1",
-  "format":"JSON",
-  "contextRegistration":[
-    {
-      "entities":[
-        {
-          "id":"entity1",
-          "type":"device"
-        }
-      ],
-      "attrs":[
-        {
-          "name":"turn",
-          "type":"string",
-          "isDomain":"false"
-        }
-      ],
-      "providingApplication":"http://localhost:9997/bug2871"
-    }
-  ]
+        "_id": {
+                "id": "entity1",
+                "type": "device",
+                "servicePath": "/ss1"
+        },
+        "attrNames": [
+                "power",
+                "turn_status",
+                "turn_info",
+                "TimeInstant"
+        ],
+        "attrs": {
+                "power": {
+                        "type": "float",
+                        "creDate": 1528820462,
+                        "modDate": 1528820462,
+                        "value": " ",
+                        "mdNames": []
+                },
+                "turn_status": {
+                        "value": "PENDING",
+                        "type": "commandStatus",
+                        "md": {
+                                "TimeInstant": {
+                                        "type": "DateTime",
+                                        "value": 1528820541
+                                }
+                        },
+                        "mdNames": [
+                                "TimeInstant"
+                        ],
+                        "creDate": 1528820462,
+                        "modDate": 1528820541
+                },
+                "turn_info": {
+                        "type": "commandResult",
+                        "creDate": 1528820462,
+                        "modDate": 1528820462,
+                        "value": " ",
+                        "mdNames": []
+                },
+                "TimeInstant": {
+                        "value": 1528820541,
+                        "type": "DateTime",
+                        "mdNames": [],
+                        "creDate": 1528820462,
+                        "modDate": 1528820541
+                }
+        },
+        "creDate": 1528820462,
+        "modDate": 1528820541,
+        "lastCorrelator": "c8bcef8a-6e5c-11e8-a06c-0242ac11000b"
 }'
 mongoCmd ${CB_DB_NAME} "db.entities.insert($doc)"
 echo
@@ -150,7 +181,15 @@ echo
 echo
 
 
-echo "06. Update turn attribute using NGSIv1 update"
+echo "06. Update turn attribute using PUT on attribute value"
+echo "======================================================"
+payload='"lololo"'
+orionCurl --url /v2/entities/entity1/attrs/turn/value?type=device --payload "$payload" --servicePath /ss1 --in text/plain --out json -X PUT
+echo
+echo
+
+
+echo "07. Update turn attribute using NGSIv1 update"
 echo "============================================="
 payload='{
   "contextElements": [
@@ -162,7 +201,7 @@ payload='{
       {
         "name": "turn",
         "type": "string",
-        "value": "lololo"
+        "value": "lululu"
       }
       ]
     }
@@ -174,7 +213,7 @@ echo
 echo
 
 
-echo "07. Dump accumulator and see four forwarded updates"
+echo "08. Dump accumulator and see five forwarded updates"
 echo "==================================================="
 accumulatorDump
 echo
@@ -219,7 +258,16 @@ Date: REGEX(.*)
 
 
 
-06. Update turn attribute using NGSIv1 update
+06. Update turn attribute using PUT on attribute value
+======================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Update turn attribute using NGSIv1 update
 =============================================
 HTTP/1.1 200 OK
 Content-Length: 200
@@ -251,7 +299,7 @@ Date: REGEX(.*)
 }
 
 
-07. Dump accumulator and see four forwarded updates
+08. Dump accumulator and see five forwarded updates
 ===================================================
 POST http://localhost:REGEX(\d+)/bug2871/updateContext
 Fiware-Servicepath: /ss1
@@ -336,6 +384,33 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/bug2871/updateContext
 Fiware-Servicepath: /ss1
+Content-Length: 156
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextElements": [
+        {
+            "attributes": [
+                {
+                    "name": "turn",
+                    "type": "",
+                    "value": "lololo"
+                }
+            ],
+            "id": "entity1",
+            "isPattern": "false",
+            "type": "device"
+        }
+    ],
+    "updateAction": "UPDATE"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/bug2871/updateContext
+Fiware-Servicepath: /ss1
 Content-Length: 162
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
@@ -350,7 +425,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                 {
                     "name": "turn",
                     "type": "string",
-                    "value": "lololo"
+                    "value": "lululu"
                 }
             ],
             "id": "entity1",

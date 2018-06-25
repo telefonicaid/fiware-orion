@@ -244,9 +244,10 @@ void mongoInit
   // only the first operation will succeed, all other operations will have no effect."
   //
   ensureLocationIndex("");
+  ensureDateExpirationIndex("");
   if (mtenant)
   {
-    /* We get tenant database names and apply ensure the location index in each one */
+    /* We get tenant database names and apply ensure the location and date expiration indexes in each one */
     std::vector<std::string> orionDbs;
 
     getOrionDatabases(&orionDbs);
@@ -256,6 +257,7 @@ void mongoInit
       std::string orionDb = orionDbs[ix];
       std::string tenant = orionDb.substr(dbName.length() + 1);   // + 1 for the "_" in "orion_tenantA"
       ensureLocationIndex(tenant);
+      ensureDateExpirationIndex(tenant);
     }
   }
 }
@@ -671,6 +673,24 @@ bool mongoLocationCapable(void)
 
 /* ***************************************************************************
 *
+* mongoExpirationCapable -
+*/
+bool mongoExpirationCapable(void)
+{
+  int mayor;
+  int minor;
+
+  /* TTL (Time To Live) indexes was introduced in MongoDB 2.2,
+   *  although the expireAfterSeconds: 0 usage is not shown in documentation until 2.4 */
+  mongoVersionGet(&mayor, &minor);
+
+  return ((mayor == 2) && (minor >= 4)) || (mayor > 2);
+}
+
+
+
+/* ***************************************************************************
+*
 * ensureLocationIndex -
 */
 void ensureLocationIndex(const std::string& tenant)
@@ -681,13 +701,29 @@ void ensureLocationIndex(const std::string& tenant)
     std::string index = ENT_LOCATION "." ENT_LOCATION_COORDS;
     std::string err;
 
-    collectionCreateIndex(getEntitiesCollectionName(tenant), BSON(index << "2dsphere"), &err);
+    collectionCreateIndex(getEntitiesCollectionName(tenant), BSON(index << "2dsphere"), false, &err);
     LM_T(LmtMongo, ("ensuring 2dsphere index on %s (tenant %s)", index.c_str(), tenant.c_str()));
   }
 }
 
 
 
+/* ****************************************************************************
+ *
+ * ensureDateExpirationIndex -
+ */
+void ensureDateExpirationIndex(const std::string& tenant)
+{
+  /* Ensure index for entity expiration, in the case of using 2.4 */
+  if (mongoExpirationCapable())
+  {
+    std::string index = ENT_EXPIRATION;
+    std::string err;
+
+    collectionCreateIndex(getEntitiesCollectionName(tenant), BSON(index << 1), true, &err);
+    LM_T(LmtMongo, ("ensuring TTL date expiration index on %s (tenant %s)", index.c_str(), tenant.c_str()));
+  }
+}
 /* ****************************************************************************
 *
 * matchEntity -

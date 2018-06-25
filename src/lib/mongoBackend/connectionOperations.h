@@ -141,6 +141,7 @@ extern bool collectionCreateIndex
 (
   const std::string&     col,
   const mongo::BSONObj&  indexes,
+  const bool&            isTTL,
   std::string*           err
 );
 
