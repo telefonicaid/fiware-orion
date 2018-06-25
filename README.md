@@ -10,6 +10,7 @@
 
 * [Introduction](#introduction)
 * [GEi overall description](#gei-overall-description)
+* [Introductory presentations](#introductory-presentations)
 * [Build and Install](#build-and-install)
 * [Running](#running)
 * [API Overview](#api-overview)
@@ -47,6 +48,13 @@ Orion is a C++ implementation of the NGSIv2 REST API binding developed as a part
 Orion Context Broker allows you to manage the entire lifecycle of context information including updates, queries, registrations and subscriptions. It is an NGSIv2 server implementation to manage context information and its availability. Using the Orion Context Broker, you are able to create context elements and manage them through updates and queries. In addition, you can subscribe to context information so when some condition occurs (e.g. the context elements have changed) you receive a notification. These usage scenarios and the Orion Context Broker features are described in this documentation.
 
 If this is your first contact with the Orion Context Broker, it is highly recommended to have a look to the brief [Quick Start guide](doc/manuals/quick_start_guide.md).
+
+[Top](#top)
+
+## Introductory presentations
+
+* Orion Context Broker [(en)](https://www.slideshare.net/fermingalan/orioncontextbroker20180615) [(jp)](https://www.slideshare.net/fisuda/orioncontextbroker-20180615)
+* NGSIv2 Overview for Developers That Already Know NGSIv1 [(en)](https://www.slideshare.net/fermingalan/orioncontextbrokerngsiv2overviewfordevelopersthatalreadyknowngsiv120180615) [(jp)](https://www.slideshare.net/fisuda/orioncontextbroker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20180615)
 
 [Top](#top)
 

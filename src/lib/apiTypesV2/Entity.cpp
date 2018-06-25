@@ -99,9 +99,9 @@ std::string Entity::render
     stringSplit(uriParam[URI_PARAM_METADATA], ',', metadataFilter);
   }
 
-  if (uriParam[URI_PARAM_ATTRIBUTES] != "")
+  if (uriParam[URI_PARAM_ATTRS] != "")
   {
-    stringSplit(uriParam[URI_PARAM_ATTRIBUTES], ',', attrsFilter);
+    stringSplit(uriParam[URI_PARAM_ATTRS], ',', attrsFilter);
   }
 
   // Add special attributes representing entity dates

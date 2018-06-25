@@ -1,7 +1,7 @@
 # Management REST interface
 
 ## Log and Trace levels
-Apart from the NGSI 9/10 interface, Orion Context Broker exposes a REST
+Apart from the NGSI interface, Orion Context Broker exposes a REST
 API for management that allows to change the log level and the trace levels
 (whose initial value is set using `-t` and `-logLevel` command line options).
 
@@ -44,6 +44,28 @@ curl --request PUT <host>:<port>/log/trace/t1-t2,t3-t4
 a trace level, a GET /log/trace must be issued first and after that the
 complete trace string to be sent in the PUT request can be assembled.
 
+### Tracelevel related with input/output payloads
+
+The following traceleves are particularly useful in order to make Orion
+print input/output payload in traces:
+
+```
+/* Input/Output payloads (180-199) */
+  LmtServiceInputPayload = 180,
+  LmtServiceOutPayload,
+  LmtClientInputPayload,
+  LmtClientOutputPayload = 183,  // Very important for harness test notification_different_sizes
+  LmtPartialPayload,
+  LmtClientOutputPayloadDump,
+  LmtCPrForwardRequestPayload,
+  LmtCPrForwardResponsePayload,
+```
+
+Thus, you can enable all them using:
+
+```
+curl --request PUT <host>:<port>/log/trace/180-199
+```
 
 ## Semaphores
 Another useful (especially if the broker stops responding correctly) REST API is

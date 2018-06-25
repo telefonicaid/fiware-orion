@@ -61,6 +61,8 @@
 *   - geometry
 *   - coords
 *   - georel
+*   - attrs
+*   - metadata
 *   - options=keyValues
 *   - type=TYPE
 *   - type=TYPE1,TYPE2,...TYPEN

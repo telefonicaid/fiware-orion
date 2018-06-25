@@ -52,6 +52,7 @@ SET (SOURCES
     compoundResponses.cpp
     location.cpp
     compoundValueBson.cpp
+    dateExpiration.cpp
 )
 
 SET (HEADERS
@@ -88,6 +89,7 @@ SET (HEADERS
     compoundResponses.h
     location.h
     compoundValueBson.h
+    dateExpiration.h
 )
 
 

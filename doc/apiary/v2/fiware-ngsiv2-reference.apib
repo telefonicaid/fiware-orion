@@ -2269,10 +2269,9 @@ The payload may contain the following elements (all of them optional):
       time, but one of them must be present.
     + `type` or `typePattern`: Type or type pattern of the entities to search for. Both cannot be used at
       the same time. If omitted, it means "any entity type".
-+ `attributes`: a list of attribute names to search for. If omitted, it means "all attributes".
-+ `scopes`: a list of scopes to restrict the result of the query. Each scope is represented by a
-   JSON object with a `type` (a JSON string) and `value` (whose type depends on the `type`
-   property).
++ `attrs`: List of attributes to be provided (if not specified, all attributes).
++ `expression`: an expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see "List
+   entities" operation above about this field).
    The different available scopes are described elsewhere.
 + `metadata`: a list of metadata names to include in the response.
    See "Filtering out attributes and metadata" section for more detail.
@@ -2306,23 +2305,20 @@ Response code:
           "entities": [
             {
               "idPattern": ".*",
-              "type": "myFooType"
+              "type": "Room"
             },
             {
-              "id": "myBar",
-              "type": "myBarType"
+              "id": "Car",
+              "type": "P-9873-K"
             }
           ],
-          "attributes": [
+          "attrs": [
             "temperature",
             "humidity"
           ],
-          "scopes": [
-            {
-              "type": "FIWARE::...",
-              "value": "..."
-            }
-          ],
+          "expression": {
+             "q": "temperature>20"
+          },
           "metadata": [
             "accuracy",
             "timestamp"
@@ -2351,9 +2347,9 @@ Response code:
           {
             "type": "Car",
             "id": "P-9873-K",
-            "speed": {
-              "value": 100,
-              "type": "number",
+            "temperature": {
+              "value": 40,
+              "type": "Number",
               "accuracy": 2,
               "timestamp": {
                 "value": "2015-06-04T07:20:27.378Z",

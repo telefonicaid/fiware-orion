@@ -9,7 +9,6 @@
 * [Datetime support](#datetime-support)
 * [`dateModified` and `dateCreated` attributes](#datemodified-and-datecreated-attributes)
 * [`dateModified` and `dateCreated` metadata](#datemodified-and-datecreated-metadata)
-* [Scope functionality](#scope-functionality)
 * [Error responses](#error-responses)
 * [Subscription payload validations](#subscription-payload-validations)
 * [`actionType` metadata](#actiontype-metadata)
@@ -260,14 +259,6 @@ Please have a look, if you need a more detailed description.
 
 [Top](#top)
 
-## Scope functionality
-
-Orion implements a `scope` field in the `POST /v2/op/update` operation (you can see
-[an example in the NGSIv2 walkthrough](walkthrough_apiv2.md#batch-operations)). However, note that this syntax is
-somewhat experimental and it hasn't been consolidated in the NGSIv2 specification.
-
-[Top](#top)
-
 ## Error responses
 
 The error response rules defined in https://github.com/telefonicaid/fiware-orion/issues/1286 takes precedence over
@@ -430,5 +421,9 @@ you are highly encouraged to use `attrs` instead (i.e. `attrs=dateModified,*`).
 * `POST /v2/op/update` accepts the same action types as NGSIv1, that is `APPEND`, `APPEND_STRICT`,
 `UPDATE`, `DELETE` and `REPLACE`. However, they shouldn't be used, preferring always the following counterparts:
 `append`, `appendStrict`, `update`, `delete` and `replace`.
+
+* `attributes` field in `POST /v2/op/query` is deprecated. It is a combination of `attrs` (to select
+which attributes to include in the response to the query) and unary attribute filter in `q` within
+`expression` (to return only entities which have these attributes). Use them instead.
 
 [Top](#top)

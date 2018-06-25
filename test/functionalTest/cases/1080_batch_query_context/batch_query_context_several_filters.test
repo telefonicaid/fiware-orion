@@ -166,20 +166,12 @@ payload='{
     }
   ],
   "attributes": [ ],
-  "scopes": [
-    {
-      "type": "FIWARE::StringQuery",
-      "value": "A>25"
-    },
-    {
-      "type" : "FIWARE::Location::NGSIv2",
-      "value" : {
-        "georel": [ "near", "maxDistance:13500" ],
-        "geometry": "point",
-        "coords": [ [40.418889, -3.691944] ]
-      }
-    }
-  ]
+  "expression": {
+    "q": "A>25",
+    "georel": "near;maxDistance:13500",
+    "geometry": "point",
+    "coords": "40.418889, -3.691944"
+  }
 }
 '
 orionCurl --url '/v2/op/query' --payload "$payload"
