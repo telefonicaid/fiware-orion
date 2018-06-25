@@ -397,21 +397,21 @@ If present, the error payload is a JSON object including the following fields:
 + `error` (required, string): a textual description of the error.
 + `description` (optional, string): additional information about the error.
 
-All NGSIv2 server implementations must use the following HTTP response codes and `error` texts
+All NGSIv2 server implementations must use the following HTTP status codes and `error` texts
 described in this section. However, the particular text used for `description` field is
 an implementation specific aspect.
 
 NGSIv2 `error` reporting is as follows:
 
-+ If the incoming JSON payload cannot be parsed then `ParseError` (`400`) is return.
-+ Request error which only depends on the request itself (i.e. it does not depend on the NGSIv2 server status),
++ If the incoming JSON payload cannot be parsed then `ParseError` (`400`) is returned.
++ Errors which are only caused by request itself (i.e. they do not depend on the NGSIv2 server status),
   either in the URL parameters or in the payload, results in `BadRequest`(`400`).
   + Exception: incoming JSON payload errors, which have another `error` message (see previous bullet).
 + Attemp to exceed spatial index limit results in `NoResourceAvailable` (`413`). See "Geospatial properties of entities"
   section for details.
-+ Ambiguety due to the request may refer to several resources, e.g. attempt to update an entity providing only its ID
++ Ambiguity due to the request may refer to several resources, e.g. attempt to update an entity providing only its ID
   and several entities with that ID exist, results in `TooManyResults` (`409`).
-+ If the resource identified by the request is not found then `NotFound` (`404`) is return.
++ If the resource identified by the request is not found then `NotFound` (`404`) is returned.
 + Errors due to the request plus state combination but not exclusively from the request
   (e.g. POST with `options=append` on an existing attribute) results in `Unprocessable` (`422`).
   + Exception: the request plus state conditions that lead to 404, 409 or 413 errors, as described in previous bullets.
