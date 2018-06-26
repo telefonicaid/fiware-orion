@@ -9,7 +9,6 @@
 * [Datetime support](#datetime-support)
 * [`dateModified` and `dateCreated` attributes](#datemodified-and-datecreated-attributes)
 * [`dateModified` and `dateCreated` metadata](#datemodified-and-datecreated-metadata)
-* [Error responses](#error-responses)
 * [Subscription payload validations](#subscription-payload-validations)
 * [`actionType` metadata](#actiontype-metadata)
 * [`noAttrDetail` option](#noattrdetail-option)
@@ -256,14 +255,6 @@ This behaviour is assessed by the functional test `attrs_dates_overriden_by_user
 and `attrs_dates_overriden_by_user_subs.test` cases included in
 [`cases/0876_attribute_dates directory`](https://github.com/telefonicaid/fiware-orion/tree/master/test/functionalTest/cases/0876_attribute_dates).
 Please have a look, if you need a more detailed description.
-
-[Top](#top)
-
-## Error responses
-
-The error response rules defined in https://github.com/telefonicaid/fiware-orion/issues/1286 takes precedence over
-the ones described in "Error Responses" section in the NGSIv2 specification. In particular, Orion Context
-Broker never responds with "InvalidModification (422)", using "Unprocessable (422)" instead.
 
 [Top](#top)
 
