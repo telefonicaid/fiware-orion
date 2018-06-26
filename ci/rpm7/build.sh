@@ -32,27 +32,23 @@ function _usage()
   Options:
     -h   --help          show help
     -b   --branch        specify branch/tag to build, if not specified - the source from /opt/fiware-orion will be used
-    -s   --source        specify repository to clone, if not specified - default repo (https://github.com/telefonicaid/fiware-orion) will be used
+    -S   --source        specify repository to clone, if not specified - default repo (https://github.com/telefonicaid/fiware-orion) will be used
     -p   --path          specify path to use as home, if not specified - /opt/fiware-orion will be used
-    -M   --make          cmake/make, stage (unit/functional) should be specified
-    -I   --install       make install
-    -c   --compliance    run file_compliance, payload and style checks
-    -u   --unit          run unit tests
-    -f   --functional    run functional tests
-    -n   --nightly       build rpm nightly
-    -r   --release       build rpm release
-    -t   --testing       build rpm testing
-    -U   --upload        upload rpm, REPO_USER and REPO_PASSWORD ENV variables should be provided
-    -F   --fix           execute fix for jenkins (disable ipv6 test)
-    -E   --execute       run (rerun) test stand with 2 orions
-    -D   --db            start mongodb
-    -S   --show          show the list of necessary commands that should be executed before starting functional tests manually
+    -s   --stage         specify stage (unit/functional/compliance) to use
+    -m   --make          cmake/make (works with unit/functional stage only)
+    -i   --install       make install (works with unit/functional stage only)
+    -d   --db            start mongodb
+    -t   --test          run unit/functional/compliance test (depends on the defined stage)
+    -r   --rpm           specify rpm (nightly, release, testing) to build
+    -u   --upload        upload rpm, REPO_USER and REPO_PASSWORD ENV variables should be provided
+    -f   --fix           execute fix for jenkins (disable ipv6 test)
+    -e   --execute       run (rerun) test stand with 2 orions
+    -H   --show          show the list of necessary commands that should be executed before starting functional tests manually
 
   Examples:
-    build -M unit -IDu -b master   clone from master, make (for unit testing), make install, run mongo, execute unit tests
-    build -M functional -IDFf      get source from mounted folder, make (for functional testing), make install, run mongo, execute FIX, functional test
+    build -s unit -midt -b master    clone from master, make (for unit testing), make install, run mongo, execute unit tests
+    build -s functional -midtf       get source from mounted folder, make (for functional testing), make install, run mongo, execute FIX, functional test
 "
-  exit 0
 }
 
 function _fix_jenkins()
@@ -74,7 +70,7 @@ function _fix()
 {
     echo "Builder: fix makefile"
     mv -f ${path}/makefile /tmp/builder/bu/
-    cp /opt/archive/makefile ${path}/
+    cp ci/rpm7/makefile ${path}/
 }
 
 function _unfix()
@@ -118,57 +114,48 @@ do
     case "$arg" in
        --help) set -- "$@" -h ;;
        --branch) set -- "$@" -b ;;
-       --source) set -- "$@" -s ;;
+       --source) set -- "$@" -S ;;
        --path) set -- "$@" -p ;;
-       --make) set -- "$@" -M ;;
-       --install) set -- "$@" -I ;;
-       --compliance) set -- "$@" -c ;;
-       --unit) set -- "$@" -u ;;
-       --functional) set -- "$@" -f ;;
-       --nightly) set -- "$@" -n ;;
-       --release) set - "$@" -r ;;
-       --testing) set - "$@" -t ;;
-       --upload) set - "$@" -U ;;
-       --fix) set -- "$@" -F ;;
-       --execute) set -- "$@" -E ;;
-       --db) set -- "$@" -D ;;
-       --show) set -- "$@" -S ;;
+       --stage) set -- "$@" -s ;;
+       --make) set -- "$@" -m ;;
+       --install) set -- "$@" -i ;;
+       --db) set -- "$@" -d ;;
+       --test) set -- "$@" -t ;;
+       --rpm) set -- "$@" -r ;;
+       --upload) set - "$@" -u ;;
+       --fix) set -- "$@" -f ;;
+       --execute) set -- "$@" -e ;;
+       --show) set -- "$@" -H ;;
        *) set -- "$@" "$arg" ;;
-
     esac
 done
 
-while getopts ":hb:s:p:M:IcufnrtUFEDH" opt; do
+while getopts ":hb:S:p:s:midtr:ufeH" opt; do
     case ${opt} in
-        h)  _usage ;;
+        h)  _usage; exit 0 ;;
         b)  branch=$OPTARG ;;
-        s)  source=$OPTARG ;;
+        S)  source=$OPTARG ;;
         p)  path=$OPTARG ;;
-        M)  make=$OPTARG;;
-        I)  install=true;;
-        c)  compliance=true ;;
-        u)  unit=true ;;
-        f)  functional=true ;;
-        n)  nightly=true ;;
-        r)  release=true ;;
-        t)  testing=true ;;
-        U)  upload=true ;;
-        F)  fix=true ;;
-        E)  execute=true ;;
-        D)  database=true ;;
+        s)  stage=$OPTARG ;;
+        m)  make=true;;
+        i)  install=true;;
+        d)  database=true ;;
+        t)  test=true ;;
+        r)  rpm=$OPTARG ;;
+        u)  upload=true ;;
+        f)  fix=true ;;
+        e)  execute=true ;;
         H)  show=true ;;
         *) _usage ;;
         :)
         echo "option -$OPTARG requires an argument"
-        usage
+        _usage; exit 1
         ;;
     esac
 done
 shift $((OPTIND-1))
 
-echo "================================================================="
-echo "                             CHECKS                              "
-echo "================================================================="
+echo "===================================== CHECKS ==========================================="
 
 echo "Builder: if upload is on, check if credentials exists"
 if [ -n "${upload}" ]; then
@@ -176,6 +163,9 @@ if [ -n "${upload}" ]; then
         echo "Builder: failed, REPO_USER or REPO_PASSWORD env variables not set"; exit 1;
     fi
 fi
+
+echo "Builder: check if stage/rpm defined"
+if [[ -z "${stage}" && -z "${rpm}" ]]; then echo "Builder: failed, stage/rpm not defined"; fi
 
 echo "Builder: check if target folder can be created"
 if [ -z "${path}" ]; then path='/opt/fiware-orion'; fi
@@ -186,10 +176,7 @@ cd ${path}
 echo "Builder: if branch is empty, check if source exists"
 if [ -z "${branch}" ] && [ ! -f ${path}/LICENSE ]; then echo "Builder: failed, source code not found"; exit 1; fi
 
-
-echo "================================================================="
-echo "                             PREPARE                             "
-echo "================================================================="
+echo "===================================== PREPARE =========================================="
 
 echo "Builder: create temp folders"
 rm -Rf /tmp/builder || true && mkdir -p /tmp/builder/{db1,db2,db,bu}
@@ -202,9 +189,7 @@ if [ -n "${database}" ]; then
 fi
 
 if [ -n "${branch}" ]; then
-    echo "================================================================="
-    echo "                         CLONE                                   "
-    echo "================================================================="
+    echo "===================================== CLONE ============================================"
 
     echo "Builder: cloning branch: "${branch}
     if [ -n "${source}" ]; then url_src=${source}; fi
@@ -215,46 +200,40 @@ if [ -n "${branch}" ]; then
 fi
 
 if [ -n "${make}" ]; then
-    echo "================================================================="
-    echo "                        BUILD                                    "
-    echo "================================================================="
+    echo "===================================== MAKE ============================================="
 
     _fix
-    echo "Builder: build ${make}"
-    make build_${make}
+    echo "Builder: build ${stage}"
+    make build_${stage}
     if [ $? -ne 0 ]; then echo "Builder: make failed"; exit 1; fi
     _unfix
 
 fi
 
 if [ -n "${install}" ]; then
-    echo "================================================================="
-    echo "                        INSTALL                                  "
-    echo "================================================================="
+    echo "===================================== INSTALL =========================================="
 
     _fix
-    make install
+    echo "Builder: install ${stage}"
+    make install_${stage}
     if [ $? -ne 0 ]; then echo "Builder: installation failed"; exit 1; fi
     _unfix
 
 fi
 
 if [ -n "${execute}" ]; then
-    echo "================================================================="
-    echo "                        EXECUTE                                  "
-    echo "================================================================="
+    echo "===================================== EXECUTE =========================================="
 
     _execute
     exit 0
 
 fi
 
-if [ -n "${compliance}" ]; then
-    echo "================================================================="
-    echo "                       COMPLIANCE TESTS                          "
-    echo "================================================================="
+if [ -n "${test}" ] && [ "${stage}" = "compliance" ]; then
+    echo "===================================== COMPLIANCE TESTS ================================="
 
     status=true
+    _fix
 
     make files_compliance
     if [ $? -ne 0 ]; then status=false; fi
@@ -263,17 +242,16 @@ if [ -n "${compliance}" ]; then
     if [ $? -ne 0 ]; then status=false; fi
 
     make style
-    if [ $? -ne 0 ]; then status=false; fi
+    if [ "$(cat LINT | grep 'Total errors found' | awk '{ print $4 }')" != "0" ]; then  status=false; fi
     rm -Rf LINT*
 
     if ! ${status}; then echo "Builder: compliance test failed"; fi
+    _unfix
 
 fi
 
-if [ -n "${unit}" ]; then
-    echo "================================================================="
-    echo "                       UNIT TESTS                                "
-    echo "================================================================="
+if [ -n "${test}" ] && [ "${stage}" = "unit" ]; then
+    echo "===================================== UNIT TESTS ======================================="
 
     _fix
     make unit
@@ -282,10 +260,8 @@ if [ -n "${unit}" ]; then
 
 fi
 
-if [ -n "${functional}" ]; then
-    echo "================================================================="
-    echo "                    FUNCTIONAL TESTS                             "
-    echo "================================================================="
+if [ -n "${test}" ] && [ "${stage}" = "functional" ]; then
+    echo "===================================== FUNCTIONAL TESTS ================================="
 
     if [ -n "${fix}" ]; then _fix_jenkins; fi
 
@@ -302,62 +278,56 @@ if [ -n "${functional}" ]; then
 
 fi
 
-if [ -n "${nightly}" ]; then
-    echo "================================================================="
-    echo "                   BUILDING NIGHTLY RPM                          "
-    echo "================================================================="
+if [ -n "${rpm}" ]; then
+    echo "===================================== BUILDING RPM ====================================="
+    echo "Builder: ${rpm} rpm"
 
-    export BROKER_RELEASE=$(date "+%Y%m%d")
-    git reset --hard
+    if [ "$rpm" = "nightly" ]; then
 
-    cd ${path}/src/app/contextBroker
-    version=$(cat version.h | grep ORION_VERSION | awk '{ print $3}' | sed 's/"//g' | sed 's/-next//g')
-    sed -i "s/ORION_VERSION .*/ORION_VERSION \"$version\"/g" version.h
-    cd ${path}
+        export BROKER_RELEASE=$(date "+%Y%m%d")
+        git reset --hard && git clean -qfdx
 
-    make rpm
+        cd ${path}/src/app/contextBroker
+        version=$(cat version.h | grep ORION_VERSION | awk '{ print $3}' | sed 's/"//g' | sed 's/-next//g')
+        sed -i "s/ORION_VERSION .*/ORION_VERSION \"$version\"/g" version.h
+        cd ${path}
 
-    pack='nightly'
+        make rpm
 
-fi
+        pack='nightly'
 
-if [ -n "${release}" ]; then
-    echo "================================================================="
-    echo "                     BUILDING RELEASE RPM                        "
-    echo "================================================================="
+    fi
 
-    export BROKER_RELEASE=1
-    git reset --hard
+    if [ "${rpm}" = "release" ]; then
 
-    make rpm
+        export BROKER_RELEASE=1
+        git reset --hard && git clean -qfdx
 
-    pack='release'
+        make rpm
 
-fi
+        pack='release'
 
-if [ -n "${testing}" ]; then
-    echo "================================================================="
-    echo "                     BUILDING TESTING RPM                        "
-    echo "================================================================="
+    fi
 
-    export BROKER_RELEASE=$(date "+%Y%m%d%H%M")
-    git reset --hard
+    if [ "${rpm}" = "testing" ]; then
 
-    cd ${path}/src/app/contextBroker
-    version=$(cat version.h | grep ORION_VERSION | awk '{ print $3}' | sed 's/"//g' | sed 's/-next//g')
-    sed -i "s/ORION_VERSION .*/ORION_VERSION \"$version\"/g" version.h
-    cd ${path}
+        export BROKER_RELEASE=$(date "+%Y%m%d%H%M")
+        git reset --hard && git clean -qfdx
 
-    make rpm
+        cd ${path}/src/app/contextBroker
+        version=$(cat version.h | grep ORION_VERSION | awk '{ print $3}' | sed 's/"//g' | sed 's/-next//g')
+        sed -i "s/ORION_VERSION .*/ORION_VERSION \"$version\"/g" version.h
+        cd ${path}
 
-    pack='testing'
+        make rpm
 
+        pack='testing'
+
+    fi
 fi
 
 if [ -n "${upload}" ]; then
-    echo "================================================================="
-    echo "                     UPLOADING RPMS                              "
-    echo "================================================================="
+    echo "===================================== UPLOADING RPMS ==================================="
 
     cd ${path}/rpm/RPMS/x86_64
     for file in $(ls); do
