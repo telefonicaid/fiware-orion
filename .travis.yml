@@ -5,6 +5,8 @@ language: minimal
 services:
   - docker
 env:
+  global:
+    - IMAGE=fiware/orion-ci:rpm7
   matrix:
     - TEST=compliance
     - TEST=unit
@@ -12,8 +14,9 @@ env:
 before_install: true
 install: true
 before_script:
-  - echo '{"ipv6":true,"fixed-cidr-v6":"2001:db8:1::/64"}' | sudo tee /etc/docker/daemon.json
-  - sudo service docker restart
-  - docker pull fiware/orion-ci:rpm7
+  - if [ "$TEST" != "compliance" ]; then echo '{"ipv6":true,"fixed-cidr-v6":"2001:db8:1::/64"}' | sudo tee /etc/docker/daemon.json; fi
+  - if [ "$TEST" != "compliance" ]; then sudo service docker restart; fi
+  - if [ "$TEST" != "compliance" ]; then docker pull $IMAGE; fi
+  - if [ "$TEST" != "compliance" ]; then docker run -t --rm -v $(pwd):/opt/fiware-orion $IMAGE build -ms $TEST; fi
 script:
-  - if [ "$TEST" = "compliance" ]; then ci/rpm7/build.sh -s compliance -tp $(pwd); else docker run -t --rm -v $(pwd):/opt/fiware-orion fiware/orion-ci:rpm7 build -s $TEST -midt; fi
+  - if [ "$TEST" != "compliance" ]; then docker run -t --rm -v $(pwd):/opt/fiware-orion $IMAGE build -idts $TEST; else ci/rpm7/build.sh -s compliance -tp $(pwd); fi
