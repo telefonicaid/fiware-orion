@@ -137,8 +137,8 @@ The string "ISO8601" as type for attributes and metadata is also supported. The 
 
 ## `dateModified` and `dateCreated` attributes
 
-The section "Attribute names restrictions" establishes that system/builtin attribute names cannot be used as user 
-attribute names. Thus, `dateCreated` and `dateModified` (which are system/builtin attributes) cannot be used as user 
+The section "Attribute names restrictions" establishes that builtin attribute names cannot be used as user
+attribute names. Thus, `dateCreated` and `dateModified` (which are builtin attributes) cannot be used as user
 attribute names.
 
 However, due to legacy reasons, Orion doesn't reject attempts of using these attribute with 400 Bad Request errors. **You are
@@ -221,8 +221,8 @@ Please have a look, if you need a more detailed description.
 
 ## `dateModified` and `dateCreated` metadata
 
-The section "Metadata name restrictions" establishes that system/builtin metadata names cannot be used as user metadta 
-names. Thus, `dateCreated` and `dateModified` (which are system/builtin metadata) cannot be used as user metadata names.
+The section "Metadata name restrictions" establishes that builtin metadata names cannot be used as user metadta
+names. Thus, `dateCreated` and `dateModified` (which are builtin metadata) cannot be used as user metadata names.
 
 However, due to legacy reasons, Orion doesn't reject attempts of using these metadata with 400 Bad Request errors. **You are
 strongly encouraged to not use dateCreate/dateModified as metadata names** but, if you at the end need to do so, take into 
@@ -298,7 +298,7 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 
 ## `actionType` metadata
 
-From NGSIv2 specification section ""System/builtin in metadata"", regarding `actionType` metadata:
+From NGSIv2 specification section "Builtin metadata", regarding `actionType` metadata:
 
 > Its value depend on the request operation type: `update` for updates,
 > `append` for creation and `delete` for deletion. Its type is always `Text`.
