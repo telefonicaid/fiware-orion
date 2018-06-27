@@ -1,9 +1,7 @@
 if: branch = master and type IN (pull_request)
 dist: trusty
-sudo: required
+sudo: false
 language: minimal
-services:
-  - docker
 env:
   global:
     - IMAGE=fiware/orion-ci:rpm7
@@ -19,4 +17,4 @@ before_script:
   - if [ "$TEST" != "compliance" ]; then docker pull $IMAGE; fi
   - if [ "$TEST" != "compliance" ]; then docker run -t --rm -v $(pwd):/opt/fiware-orion $IMAGE build -ms $TEST; fi
 script:
-  - if [ "$TEST" != "compliance" ]; then docker run -t --rm -v $(pwd):/opt/fiware-orion $IMAGE build -idts $TEST; else ci/rpm7/build.sh -s compliance -tp $(pwd); fi
+  - if [ "$TEST" != "compliance" ]; then docker run -t --rm -v $(pwd):/opt/fiware-orion $IMAGE build -idqts $TEST; else ci/rpm7/build.sh -s compliance -tp $(pwd); fi
