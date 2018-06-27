@@ -282,34 +282,34 @@ meaning:
 * `geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`. They have special semantics
   related with entity location. See "Geospatial properties of entities" section.
 
-## System/builtin Attributes
+## Builtin Attributes
 
 There are entity properties that are not directly modifiable by NGSIv2 clients, but that can be
 rendered by NGSIv2 servers to provide extra information. From a representation point of view, they
 are just like regular attributes, with name, value and type.
 
-System/builtin attributes are not rendered by default. In order to render a specific attribute, add its
+Builtin attributes are not rendered by default. In order to render a specific attribute, add its
 name to the `attrs` parameter in URLs (or payload field in POST /v2/op/query operation) or
 subscription (`attrs` sub-field within `notification`).
 
-The list of system/builtin attributes is as follows:
+The list of builtin attributes is as follows:
 * `dateCreated` (type: `DateTime`): entity creation date as an ISO 8601 string.
 * `dateModified` (type: `DateTime`): entity modification date as an ISO 8601 string.
 
 Like regular attributes, they can be  used in `q` filters and in `orderBy`.
 However, they cannot be used in resource URLs.
 
-## System/builtin Metadata
+## Builtin Metadata
 
 Some attribute properties are not directly modifiable by NGSIv2 clients, but they can be
 rendered by NGSIv2 servers to provide extra information. From a representational point of view, they
 are just like regular metadata, with name, value, and type.
 
-System/builtin metadata are not rendered by default. In order to render a specific metadata, add its
+Builtin metadata are not rendered by default. In order to render a specific metadata, add its
 name to the `metadata` URL parameter (or payload field in POST /v2/op/query operation) or
 subscription (`metadata` sub-field within `notification`).
 
-The list of system/builtin metadata is as follows:
+The list of builtin metadata is as follows:
 
 * `dateCreated` (type: `DateTime`): attribute creation date as an ISO 8601 string.
 
@@ -362,7 +362,7 @@ The following strings must not be used as attribute names:
 * `geo:distance`, as it would conflict with the string used in `orderBy` for proximity to
   center point.
 
-* System/builtin attribute names (see specific section on "System/builtin Attributes")
+* Builtin attribute names (see specific section on "Builtin Attributes")
 
 * `*`, as it has a special meaning as "all the custom/user attributes" (see section on
   "Filtering out attributes and metadata").
@@ -371,7 +371,7 @@ The following strings must not be used as attribute names:
 
 The following strings must not be used as metadata names:
 
-* System/builtin metadata names (see specific section on "System/builtin Metadata")
+* Builtin metadata names (see specific section on "Builtin Metadata")
 
 * `*`, as it has a special meaning as "all the custom/user metadata" (see section on
   "Filtering out attributes and metadata").
@@ -385,7 +385,7 @@ The value of `orderBy` can be:
 * The keyword `geo:distance` to order results by distance to a reference geometry when a "near"
   (`georel=near`) spatial relationship is used. 
 
-* A comma-separated list of attributes (including system/builtin attributes), `id` (for entity
+* A comma-separated list of attributes (including builtin attributes), `id` (for entity
   ID), and `type` (for entity type), e.g. `temperature,!humidity`. Results are ordered by the first
   field. On ties, the results are ordered by the second field and so on. A "!" before
   the field name means that the order is reversed.
@@ -396,30 +396,30 @@ If present, the error payload is a JSON object including the following fields:
 
 + `error` (required, string): a textual description of the error.
 + `description` (optional, string): additional information about the error.
-+ `affectedItems` (optional, array[string]): a list of elements affected by the error.
-  Depending on the operation, it may refer to entities, registrations or subscriptions.
 
-All NGSIv2 server implementations must use the following HTTP response codes and `error` texts.
-However, the particular text used for `description` field is an implementation specific aspect.
+All NGSIv2 server implementations must use the following HTTP status codes and `error` texts
+described in this section. However, the particular text used for `description` field is
+an implementation specific aspect.
 
-Error list (HTTP response code in parenthesis):
+NGSIv2 `error` reporting is as follows:
 
-* ParseError            (`400`). The incoming JSON payload cannot be parsed.
-* BadRequest            (`400`). The incoming request is invalid in this context.
-* NotFound              (`404`). The resource (entity, subscription, etc.) referred in the request
-  has not been found.
-* TooManyResults        (`409`). There are several results that match with the resource 
-  identification
-  used in the request.
-* ContentLengthRequired (`411`). Zero/No Content-Length in PUT/POST/PATCH request.
-* RequestEntityTooLarge (`413`). Payload is too large. The specific limit to consider a payload too large depends
-                                 on the particular implementation.
-* UnsupportedMediaType  (`415`). Request content type is not supported.
-* InvalidModification   (`422`). Some piece of information is missing in payload.
-* NotSupportedQuery     (`422`). The implementation does not support the query issued.
-* NoResourcesAvailable  (`413`). There are no server resources to fulfill the client request. 
-
-New error codes may be defined in new iterations of this specification.
++ If the incoming JSON payload cannot be parsed then `ParseError` (`400`) is returned.
++ Errors which are only caused by request itself (i.e. they do not depend on the NGSIv2 server status),
+  either in the URL parameters or in the payload, results in `BadRequest`(`400`).
+  + Exception: incoming JSON payload errors, which have another `error` message (see previous bullet).
++ Attemp to exceed spatial index limit results in `NoResourceAvailable` (`413`). See "Geospatial properties of entities"
+  section for details.
++ Ambiguity due to the request may refer to several resources, e.g. attempt to update an entity providing only its ID
+  and several entities with that ID exist, results in `TooManyResults` (`409`).
++ If the resource identified by the request is not found then `NotFound` (`404`) is returned.
++ Errors due to the request plus state combination but not exclusively from the request
+  (e.g. POST with `options=append` on an existing attribute) results in `Unprocessable` (`422`).
+  + Exception: the request plus state conditions that lead to 404, 409 or 413 errors, as described in previous bullets.
++ HTTP layer errors use the following:
+  + HTTP 405 Method Not Allowed corresponds to `MethodNotAlowed` (`405`)
+  + HTTP 411 Length Required corresponds to `ContentLengthRequired` (`411`)
+  + HTTP 413 Request Entity Too Large corresponds to `RequestEntityTooLarge` (`413`)
+  + HTTP 415 Unsupported Media Type corresponds to `UnsupportedMediaType` (`415`)
 
 ## Geospatial properties of entities
 
@@ -752,21 +752,21 @@ to specify the list of attributes that must be included in the response. In a si
 that must be included in the response.
 
 By default, if `attrs` is omitted (or `metadata` is omitted) then all the attributes (all the
-metadata) are included, except system/builtin attributes (metadata). In order to include
-system/builtin attributes (metadata) they have to be explicitly included in `attrs` (`metadata`).
+metadata) are included, except builtin attributes (metadata). In order to include
+builtin attributes (metadata) they have to be explicitly included in `attrs` (`metadata`).
 
 E.g. to include only attributes A and B:
 
 `attrs=A,B`
 
-Note that including *only* system/builtin attributes (metadata) will avoid any user-defined
-attribute (metadata). If you want to include system/builtin attributes (metadata) *and* user-defined
+Note that including *only* builtin attributes (metadata) will avoid any user-defined
+attribute (metadata). If you want to include builtin attributes (metadata) *and* user-defined
 attributes (metadata) at the same time then
 
 * The user-defined attributes (metadata) have to be explictly included, e.g. to include the user-defined
-  attributes A and B along with the system/builtin attribute `dateModified`, use: `attrs=dateModified,A,B`.
+  attributes A and B along with the builtin attribute `dateModified`, use: `attrs=dateModified,A,B`.
 * The special value `*` can be used as an alias meaning "all user-defined attributes (metadata)", e.g.,
-  to include all the user-defined attributes along with the system/builtin attribute `dateModified`
+  to include all the user-defined attributes along with the builtin attribute `dateModified`
   use: `attrs=dateModified,*`.
 
 Note that the `attrs` and `metadata` fields can be used also in subscriptions (as sub-fields of `notification`)
@@ -1074,7 +1074,8 @@ the JSON entity representation format (described in a "JSON Entity Representatio
 
 Response:
 
-* Successful operation uses 201 Created. Reponse includes a `Location` header with the URL of the
+* Successful operation uses 201 Created (if upsert option is not used) or 204 No Content (if
+  upsert option is used). Response includes a `Location` header with the URL of the
   created entity.
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
@@ -1106,8 +1107,16 @@ Response:
       + Members
           + keyValues - when used, the request payload uses the `keyValues` simplified entity
             representation. See "Simplified Entity Representation" section for details.
+          + upsert - when used, entity is updated if already exits. If upsert is not used and
+            the entity already exist a `422 Unprocessable Entity` error is returned.
 
 + Response 201
+
+    + Headers
+
+            Location: /v2/entities/Bcn-Welt?type=Room
+
++ Response 204
 
     + Headers
 

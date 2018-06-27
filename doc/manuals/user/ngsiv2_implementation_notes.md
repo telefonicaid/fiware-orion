@@ -9,7 +9,6 @@
 * [Datetime support](#datetime-support)
 * [`dateModified` and `dateCreated` attributes](#datemodified-and-datecreated-attributes)
 * [`dateModified` and `dateCreated` metadata](#datemodified-and-datecreated-metadata)
-* [Error responses](#error-responses)
 * [Subscription payload validations](#subscription-payload-validations)
 * [`actionType` metadata](#actiontype-metadata)
 * [`noAttrDetail` option](#noattrdetail-option)
@@ -138,8 +137,8 @@ The string "ISO8601" as type for attributes and metadata is also supported. The 
 
 ## `dateModified` and `dateCreated` attributes
 
-The section "Attribute names restrictions" establishes that system/builtin attribute names cannot be used as user 
-attribute names. Thus, `dateCreated` and `dateModified` (which are system/builtin attributes) cannot be used as user 
+The section "Attribute names restrictions" establishes that builtin attribute names cannot be used as user
+attribute names. Thus, `dateCreated` and `dateModified` (which are builtin attributes) cannot be used as user
 attribute names.
 
 However, due to legacy reasons, Orion doesn't reject attempts of using these attribute with 400 Bad Request errors. **You are
@@ -222,8 +221,8 @@ Please have a look, if you need a more detailed description.
 
 ## `dateModified` and `dateCreated` metadata
 
-The section "Metadata name restrictions" establishes that system/builtin metadata names cannot be used as user metadta 
-names. Thus, `dateCreated` and `dateModified` (which are system/builtin metadata) cannot be used as user metadata names.
+The section "Metadata name restrictions" establishes that builtin metadata names cannot be used as user metadta
+names. Thus, `dateCreated` and `dateModified` (which are builtin metadata) cannot be used as user metadata names.
 
 However, due to legacy reasons, Orion doesn't reject attempts of using these metadata with 400 Bad Request errors. **You are
 strongly encouraged to not use dateCreate/dateModified as metadata names** but, if you at the end need to do so, take into 
@@ -256,14 +255,6 @@ This behaviour is assessed by the functional test `attrs_dates_overriden_by_user
 and `attrs_dates_overriden_by_user_subs.test` cases included in
 [`cases/0876_attribute_dates directory`](https://github.com/telefonicaid/fiware-orion/tree/master/test/functionalTest/cases/0876_attribute_dates).
 Please have a look, if you need a more detailed description.
-
-[Top](#top)
-
-## Error responses
-
-The error response rules defined in https://github.com/telefonicaid/fiware-orion/issues/1286 takes precedence over
-the ones described in "Error Responses" section in the NGSIv2 specification. In particular, Orion Context
-Broker never responds with "InvalidModification (422)", using "Unprocessable (422)" instead.
 
 [Top](#top)
 
@@ -307,7 +298,7 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 
 ## `actionType` metadata
 
-From NGSIv2 specification section ""System/builtin in metadata"", regarding `actionType` metadata:
+From NGSIv2 specification section "Builtin metadata", regarding `actionType` metadata:
 
 > Its value depend on the request operation type: `update` for updates,
 > `append` for creation and `delete` for deletion. Its type is always `Text`.

@@ -66,6 +66,7 @@ static bool legalEntityLength(Entity* eP, const std::string& servicePath)
 *
 * URI parameters:
 *   options=keyValues
+*   options=upsert
 *
 * 01. Fill in UpdateContextRequest
 * 02. Call standard op postUpdateContext
@@ -80,7 +81,8 @@ std::string postEntities
   ParseData*                 parseDataP
 )
 {
-  Entity*  eP = &parseDataP->ent.res;
+  Entity*   eP = &parseDataP->ent.res;
+  bool  upsert = ciP->uriParamOptions[OPT_UPSERT];
 
   if (!legalEntityLength(eP, ciP->httpHeaders.servicePath))
   {
@@ -94,12 +96,28 @@ std::string postEntities
     return out;
   }
 
-  // 01. Fill in UpdateContextRequest
-  parseDataP->upcr.res.fill(eP, ActionTypeAppendStrict);
+  // Set some aspects depending on upsert or not upsert
+  ActionType      actionType;
+  Ngsiv2Flavour   ngsiv2flavour;
+  HttpStatusCode  sccCodeOnSuccess;
+  if (upsert)
+  {
+    actionType       = ActionTypeAppend;
+    ngsiv2flavour    = NGSIV2_NO_FLAVOUR;
+    sccCodeOnSuccess = SccNoContent;
+  }
+  else
+  {
+    actionType       = ActionTypeAppendStrict;
+    ngsiv2flavour    = NGSIV2_FLAVOUR_ONCREATE;
+    sccCodeOnSuccess = SccCreated;
+  }
 
+  // 01. Fill in UpdateContextRequest
+  parseDataP->upcr.res.fill(eP, actionType);
 
   // 02. Call standard op postUpdateContext
-  postUpdateContext(ciP, components, compV, parseDataP, NGSIV2_FLAVOUR_ONCREATE);
+  postUpdateContext(ciP, components, compV, parseDataP, ngsiv2flavour);
 
   //
   // 03. Check error - 3 different ways to get an error from postUpdateContext ... :-(
@@ -132,7 +150,7 @@ std::string postEntities
 
     ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
     ciP->httpHeaderValue.push_back(location);
-    ciP->httpStatusCode = SccCreated;
+    ciP->httpStatusCode = sccCodeOnSuccess;
   }
 
   // 04. Cleanup and return result
