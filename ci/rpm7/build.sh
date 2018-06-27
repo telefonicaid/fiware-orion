@@ -114,7 +114,8 @@ function _fix()
 {
     echo "Builder: fix makefile"
     mv -f ${path}/makefile /tmp/builder/bu/
-    cp /opt/archive/makefile ${path}/
+    if [ ! -f "${path}/ci/rpm7/makefile" ]; then tp="/opt/archive/makefile"; else tp="${path}/ci/rpm7/makefile"; fi
+    cp ${tp} ${path}/
 }
 
 function _unfix()
