@@ -2,3 +2,4 @@
 - Add: "attrs" field in POST /v2/op/query (making "attributes" obsolete) (#2604)
 - Add: "expression" field in POST /v2/op/query (#2706)
 - Remove: "scopes" field in POST /v2/op/query (#2706)
+- Fix: large integer wrong rendering in responses (#2603)
