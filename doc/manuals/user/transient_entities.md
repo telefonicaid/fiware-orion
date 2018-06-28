@@ -105,6 +105,9 @@ so your transient entities may remain in the database up to 60 seconds (or a bit
 expiration date (see [MongoDB documentation](https://docs.mongodb.com/manual/core/index-ttl/#timing-of-the-delete-operation)
 for more details).
 
+The default sleep interval for the TTL monitor thread can be changed in MongoDB, but that topic is out of the scope of this
+document. Have a look to [this link](http://hassansin.github.io/working-with-mongodb-ttl-index#ttlmonitor-sleep-interval) for more detail.
+
 **Once a transient entity is removed, it cannot be recovered.**
 
 ## Backward compatibility considerations
