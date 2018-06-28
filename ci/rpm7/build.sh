@@ -281,6 +281,7 @@ fi
 if [ -n "${test}" ] && [ "${stage}" = "compliance" ]; then
     echo "===================================== COMPLIANCE TESTS ================================="
 
+    status=true
     _fix
 
     make files_compliance
@@ -290,7 +291,7 @@ if [ -n "${test}" ] && [ "${stage}" = "compliance" ]; then
     if [ $? -ne 0 ]; then status=false; fi
 
     make style
-    if [ $? -ne 0 ]; then status=false; else status=true; fi
+    if [ $? -ne 0 ]; then status=false; fi
     rm -Rf LINT*
 
     _unfix
