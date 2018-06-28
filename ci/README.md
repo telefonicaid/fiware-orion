@@ -17,6 +17,12 @@ Current version of CI supports:
 File compliance, payload and style checks are combined in one 'compliance' test.
 
 ## Changes in tests
-Special function named _fix_tests is created in build.sh to reduce the time that is spent on function tests because of travis time limits.
-This tests changed:
-* 3000_allow_creation_transient_entities
+
+There is an special function in build.sh script named `_fix_tests()` which purpose is to do some on-the-fly adaptations
+in order to make functional test to work under travis. In particular:
+
+* Test under `3000_allow_creation_transient_entities` reduce internal wait delay from 60 to 3 seconds. In addition, MongoDB
+  TTL monitor thread sleep interval is changed to 3 seconds by configuration. This is needed to reduce the testing time, so
+  it can fix in the 50 minutes hard limit used by travis.
+
+The work done by `_fix_tests` is rolled-back by the `_unfix_tests()` function.

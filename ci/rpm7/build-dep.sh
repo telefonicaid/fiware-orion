@@ -69,6 +69,8 @@ curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.t
 && make install \
 && rm -Rf /opt/gmock-1.5.0
 
+# FIXME: the MQTT notification work is yet ongoing, so this is not needed yet. It should be aligned
+# which the same procedure described in "Build from source" documentation
 #curl -L http://mosquitto.org/files/source/mosquitto-1.5.tar.gz | tar xzC /opt/ \
 #  && cd /opt/mosquitto-1.5 \
 #  && make \
