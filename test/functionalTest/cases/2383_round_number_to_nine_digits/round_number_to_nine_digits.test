@@ -76,7 +76,7 @@ Date: REGEX(.*)
 02. Get entity, getting the 7 digits
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 135
+Content-Length: 131
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

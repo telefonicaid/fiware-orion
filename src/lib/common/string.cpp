@@ -1024,6 +1024,7 @@ unsigned int decimalDigits(double d)
 */
 template <> std::string toString(double f)
 {
+#if 0
   std::ostringstream ss;
 
   unsigned int digits = decimalDigits(f);
@@ -1035,6 +1036,51 @@ template <> std::string toString(double f)
   ss << f;
 
   return ss.str();
+#else
+
+  // This is a quick fix, while discussion on https://github.com/apinf/fiware-orion/pull/32 continues
+
+  char  buf[STRING_SIZE_FOR_DOUBLE];
+  int bufSize = sizeof(buf);
+
+  long long  intPart   = (long long) f;
+  double     diff      = f - intPart;
+  bool       isInteger = false;
+
+  // abs value for 'diff'
+  diff = (diff < 0)? -diff : diff;
+
+  if (diff > 0.9999999998)
+  {
+    intPart += 1;
+    isInteger = true;
+  }
+  else if (diff < 0.000000001)  // it is considered an integer
+  {
+    isInteger = true;
+  }
+
+  if (isInteger)
+  {
+    snprintf(buf, bufSize, "%lld", intPart);
+  }
+  else
+  {
+    snprintf(buf, bufSize, "%.9f", f);
+
+    // Clear out any unwanted trailing zeroes
+    char* last = &buf[strlen(buf) - 1];
+
+    while ((*last == '0') && (last != buf))
+    {
+      *last = 0;
+      --last;
+    }
+  }
+
+  return std::string(buf);
+
+#endif
 }
 
 
