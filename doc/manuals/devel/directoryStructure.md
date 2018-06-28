@@ -26,4 +26,5 @@ scripts used for testing and release making are found under `scripts/`.
 * **rpm**: contains files for RPM building
 * **etc**: scripts that are installed under etc/ (typically, included in RPM package)
 * **docker**: contains the docker files
+* **ci**: contains files required by Orion's CI process
 * **archive**: contains older files that is no longer in use but that we don't feel comfortable removing just yet
