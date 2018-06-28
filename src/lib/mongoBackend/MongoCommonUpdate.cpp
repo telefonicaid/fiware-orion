@@ -2879,7 +2879,7 @@ static bool createEntity
   }
 
   /* Search for a potential date expiration attribute */
-  mongo::Date_t dateExpiration = NO_EXPIRATION_DATE ;
+  mongo::Date_t dateExpiration = NO_EXPIRATION_DATE;
 
   if (!processDateExpirationAtEntityCreation(attrsV, &dateExpiration, errDetail, oeP))
   {
@@ -3238,7 +3238,7 @@ static void updateEntity
   {
     currentDateExpiration = getField(r, ENT_EXPIRATION).date();
   }
-  
+
   //
   // Before calling processContextAttributeVector and actually do the work, let's check if the
   // request is of type 'append-only' and if we have any problem with attributes already existing.
