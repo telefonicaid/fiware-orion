@@ -1,4 +1,4 @@
-# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,80 +21,66 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Round numbers to 9 digits
+Large integers must be returned with the exact value they were given
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255
+brokerStart CB
 
 --SHELL--
 
 #
-# 01. Create entity with GPS coordinates (7 digits)
-# 02. Get entity, getting the 7 digits
+# 01. Creating entity with integer attribute of 0x7FFFFFFF (2147483647)
+# 02. Get entity
 #
 
-echo "01. Create entity with GPS coordinates (7 digits)"
-echo "================================================="
+echo "01. Creating entity with integer attribute of 0x7FFFFFFF (2147483647)"
+echo "====================================================================="
 payload='{
-    "id": "E",
-    "type": "T",
-    "location": {
-        "value": {
-            "type": "Point",
-            "coordinates": [
-                -42.5124478,
-                -22.3006726
-            ]
-        },
-        "type": "geo:json"
-    }
+  "id": "E",
+  "bigInt": {
+    "value": 2147483647
+  }
 }'
 orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
-echo "02. Get entity, getting the 7 digits"
-echo "===================================="
+echo "02. Get entity"
+echo "=============="
 orionCurl --url /v2/entities/E
 echo
 echo
 
 
 --REGEXPECT--
-01. Create entity with GPS coordinates (7 digits)
-=================================================
+01. Creating entity with integer attribute of 0x7FFFFFFF (2147483647)
+=====================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E?type=T
+Location: /v2/entities/E?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-02. Get entity, getting the 7 digits
-====================================
+02. Get entity
+==============
 HTTP/1.1 200 OK
-Content-Length: 131
+Content-Length: 85
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "id": "E",
-    "location": {
+    "bigInt": {
         "metadata": {},
-        "type": "geo:json",
-        "value": {
-            "coordinates": [
-                -42.5124478,
-                -22.3006726
-            ],
-            "type": "Point"
-        }
+        "type": "Number",
+        "value": 2147483647
     },
-    "type": "T"
+    "id": "E",
+    "type": "Thing"
 }
 
 
