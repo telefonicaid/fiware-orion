@@ -387,6 +387,12 @@ for the following aspects:
   but the registration is always active, even when the value is `inactive`. Please see
   [this issue](https://github.com/telefonicaid/fiware-orion/issues/3108) about it.
 
+According to NGSIv2 specification:
+
+> A NGSIv2 server implementation may implement query or update forwarding to context information sources.
+
+The way in which Orion implements such forwarding is as follows:
+
 Orion implements an additional field `legacyForwarding` (within `provider`) not included in NGSIv2
 specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
 for forwarding requests associated to that registration. However, for the time being, NGSIv2-based
