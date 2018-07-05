@@ -2396,7 +2396,6 @@ static bool deleteContextAttributeItem
   BSONArrayBuilder*                     toPull,
   std::string*                          currentLocAttrName,
   bool*                                 entityModified,
-  std::string*                          currentLocAttrName,
   mongo::Date_t*                        dateExpiration,
   ApiVersion                            apiVersion,
   OrionError*                           oe
@@ -2571,7 +2570,6 @@ static bool processContextAttributeVector
                                       toPull,
                                       currentLocAttrName,
                                       &entityModified,
-                                      currentLocAttrName,
                                       dateExpiration,
                                       apiVersion,
                                       oe))
