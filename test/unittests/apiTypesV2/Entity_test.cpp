@@ -30,29 +30,6 @@
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(Entity, present)
-{
-  utInit();
-
-  Entity* enP    = new Entity();
-  enP->id        = "E";
-  enP->type      = "T";
-  enP->isPattern = "false";
-
-  ContextAttribute* caP = new ContextAttribute("A", "T", "val");
-  enP->attributeVector.push_back(caP);
-
-  enP->present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * check
 */
 TEST(Entity, check)
@@ -68,26 +45,26 @@ TEST(Entity, check)
   ContextAttribute* caP = new ContextAttribute("A", "T", "val");
   enP->attributeVector.push_back(caP);
 
-  EXPECT_EQ("OK", enP->check(V1, EntitiesRequest));
+  EXPECT_EQ("OK", enP->check(EntitiesRequest));
 
   enP->id = "";
-  EXPECT_EQ("No Entity ID", enP->check(V1, EntitiesRequest));
+  EXPECT_EQ("entity id length: 0, min length supported: 1", enP->check(EntitiesRequest));
 
   enP->id = "E<1>";
-  EXPECT_EQ(ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, enP->check(V1, EntitiesRequest));
+  EXPECT_EQ(ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, enP->check(EntitiesRequest));
   enP->isPattern = "true";
-  EXPECT_EQ("OK", enP->check(V1, EntitiesRequest));
+  EXPECT_EQ("OK", enP->check(EntitiesRequest));
   enP->id        = "E";
   enP->isPattern = "false";
 
   enP->type = "T<1>";
-  EXPECT_EQ(ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, enP->check(V1, EntitiesRequest));
+  EXPECT_EQ(ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, enP->check(EntitiesRequest));
   enP->isTypePattern  = true;
-  EXPECT_EQ("OK", enP->check(V1, EntitiesRequest));
+  EXPECT_EQ("OK", enP->check(EntitiesRequest));
   enP->type = "T";
 
   enP->isPattern = "<false>";
-  EXPECT_EQ("Invalid value for isPattern", enP->check(V1, EntitiesRequest));
+  EXPECT_EQ("Invalid value for isPattern", enP->check(EntitiesRequest));
 
   utExit();
 }

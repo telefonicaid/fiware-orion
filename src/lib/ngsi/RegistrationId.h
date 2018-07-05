@@ -46,7 +46,6 @@ typedef struct RegistrationId
   std::string   get(void) const;
   bool          isEmpty(void);
   std::string   render(RequestType requestType, bool comma);
-  void          present(const std::string& indent);
   void          release(void);
 
   std::string   check(void);

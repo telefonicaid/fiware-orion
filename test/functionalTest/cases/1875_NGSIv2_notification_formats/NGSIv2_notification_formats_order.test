@@ -52,6 +52,7 @@ orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
+valgrindSleep 1
 
 echo "02. Create NGSIv2 subscription for E1 format default attr-order set to A3-A1-A2"
 echo "==============================================================================="
@@ -105,6 +106,8 @@ orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
+
+valgrindSleep 1
 
 echo "04. Dump accumulator to see the notifications"
 echo "============================================="

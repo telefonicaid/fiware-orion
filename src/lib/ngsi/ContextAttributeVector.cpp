@@ -352,24 +352,6 @@ std::string ContextAttributeVector::check(ApiVersion apiVersion, RequestType req
 
 /* ****************************************************************************
 *
-* ContextAttributeVector::present - 
-*/
-void ContextAttributeVector::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%s%lu ContextAttributes", 
-		    indent.c_str(), 
-		    (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent + "  ", ix);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextAttributeVector::push_back - 
 */
 void ContextAttributeVector::push_back(ContextAttribute* item)

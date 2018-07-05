@@ -423,7 +423,7 @@ echo
 echo "15. Update/UPDATE All seven attributes plus a few not found"
 echo "==========================================================="
 payload='{
-  "actionType": "UPDATE",
+  "actionType": "update",
   "entities": [
     {
       "type": "T1",

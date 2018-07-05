@@ -99,9 +99,9 @@ std::string Entity::render
     stringSplit(uriParam[URI_PARAM_METADATA], ',', metadataFilter);
   }
 
-  if (uriParam[URI_PARAM_ATTRIBUTES] != "")
+  if (uriParam[URI_PARAM_ATTRS] != "")
   {
-    stringSplit(uriParam[URI_PARAM_ATTRIBUTES], ',', attrsFilter);
+    stringSplit(uriParam[URI_PARAM_ATTRS], ',', attrsFilter);
   }
 
   // Add special attributes representing entity dates
@@ -177,12 +177,12 @@ std::string Entity::render
 *
 * Entity::check - 
 */
-std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
+std::string Entity::check(RequestType requestType)
 {
   ssize_t  len;
   char     errorMsg[128];
 
-  if (((apiVersion == V2) && (len = strlen(id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
+  if (((len = strlen(id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
   {
     snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
@@ -216,7 +216,7 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
   // Check for forbidden chars for "id", but not if "id" is a pattern
   if (isPattern == "false")
   {
-    if (forbiddenIdChars(apiVersion, id.c_str()))
+    if (forbiddenIdChars(V2, id.c_str()))
     {
       alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID);
       return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
@@ -233,7 +233,7 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
 
   if (!((requestType == BatchQueryRequest) || (requestType == BatchUpdateRequest && !typeGiven)))
   {
-    if ((apiVersion == V2) && ((len = strlen(type.c_str())) < MIN_ID_LEN))
+    if ( (len = strlen(type.c_str())) < MIN_ID_LEN)
     {
       snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
       alarmMgr.badInput(clientIp, errorMsg);
@@ -244,29 +244,14 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
   // Check for forbidden chars for "type", but not if "type" is a pattern
   if (isTypePattern == false)
   {
-    if (forbiddenIdChars(apiVersion, type.c_str()))
+    if (forbiddenIdChars(V2, type.c_str()))
     {
       alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE);
       return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
     }
   }
 
-  return attributeVector.check(apiVersion, requestType);
-}
-
-
-
-/* ****************************************************************************
-*
-* Entity::present - 
-*/
-void Entity::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%sid:        %s", indent.c_str(), id.c_str()));
-  LM_T(LmtPresent, ("%stype:      %s", indent.c_str(), type.c_str()));
-  LM_T(LmtPresent, ("%sisPattern: %s", indent.c_str(), isPattern.c_str()));
-
-  attributeVector.present(indent + "  ");
+  return attributeVector.check(V2, requestType);
 }
 
 

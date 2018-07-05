@@ -94,22 +94,6 @@ std::string ContextAttributeResponseVector::check
 
 /* ****************************************************************************
 *
-* ContextAttributeResponseVector::present - 
-*/
-void ContextAttributeResponseVector::present(const std::string&  indent)
-{
-  LM_T(LmtPresent, ("%lu ContextAttributeResponses", (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent + "  ");
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextAttributeResponseVector::push_back - 
 */
 void ContextAttributeResponseVector::push_back(ContextAttributeResponse* item)

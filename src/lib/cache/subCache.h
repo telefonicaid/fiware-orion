@@ -83,7 +83,6 @@ struct EntityInfo
 
   bool          match(const std::string& idPattern, const std::string& type);
   void          release(void);
-  void          present(const std::string& prefix);
 };
 
 
@@ -174,22 +173,6 @@ extern void subCacheItemDestroy(CachedSubscription* cSubP);
 * subCacheItems - 
 */
 extern int subCacheItems(void);
-
-
-
-/* ****************************************************************************
-*
-* subCacheEntryPresent -
-*/
-extern void subCacheEntryPresent(CachedSubscription* cSubP);
-
-
-
-/* ****************************************************************************
-*
-* subCachePresent - 
-*/
-extern void subCachePresent(const char* title);
 
 
 

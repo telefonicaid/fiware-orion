@@ -48,7 +48,7 @@ In addition, note that a list of currently open discussions is available at
 
 ## Copyright
 
-Copyright (c) 2011-2017 Telecom Italia, Telefónica I+D and NEC. 
+Copyright (c) 2011-2018 Telecom Italia, Telefónica I+D and NEC.
 
 ## License
 
@@ -80,7 +80,6 @@ The FIWARE NGSI (Next Generation Service Interface) API defines
   update operations
 * a **context availability interface** for exchanging information on how to obtain context
   information (whether to separate the two interfaces is currently under discussion).
-* a set of typical **roles** played by NGSI-compliant components
 
 ## Terminology
 
@@ -104,28 +103,6 @@ For example, a context entity with id *sensor-365* could have the
 type *temperatureSensor*.
 
 Each entity is uniquely identified by the combination of its id and type.
-
-#### Context Elements
-
-*(Note: the distinction between context entities and context elements 
-is still under discussion; therefore the notion of context elements
-currently only appears in this section.)*
-
-A context element is a data object (e.g. JSON object; see the section
-on JSON representation below) that contains information about a
-specific context entity. Consequently, a context element has a
-mandatory property `id` in order to identify the context entity it
-refers to. It furthermore can contain an optional property `type`
-to describe the type of the entity. Further properties can be used
-to represent more information about the entity (see the **context
-attributes** section below).
-
-It is important to understand that the relationship between entities and context elements is
-one-to-many.
-This means that:
-* each context element refers to exactly one entity
-* there can be several context elements referring to the same entity. 
-The context elements can for example contain different pieces of information about the entity.
 
 #### Context Attributes 
 
@@ -158,48 +135,6 @@ above. Similar to attributes, each piece of metadata has:
  * a **metadata value** containing the actual metadata
 
 Note that in NGSI it is not foreseen that metadata may contain nested metadata.
-
-#### Restrictions and Operation Scopes
-
-(placeholder to describe restrictions and operation scopes)
-
-#### Context Queries
-
-(placeholder for describing what a context query is, and some hints on how this
-is typically done in the REST interface)
-
-#### Context Subscriptions
-
-(placeholder for describing the concept of context subscriptions)
-
-#### Context Updates
-
-(placeholder for describing updates)
-
-### Exchanging Context Availability Information
-
-(placeholder on some introduction of what context availability information is)
-
-#### Context Registrations
-
-(placeholder for describing what a context registration is and what it is used for)
-
-#### Context Discovery
-
-(placehoder for describing what discovery does)
-
-#### Context Availability Subscription
-
-(placeholder for describing context availability subscriptions)
-
-#### Registering Context Availability Information
-
-(placeholder for describing the operation of registering context)
-
-### Roles of FIWARE NGSI components
-
-(placeholder to describe roles like context provider, context producer,
-context broker, context registry, context consumer)
 
 ## MIME Types
 
@@ -347,34 +282,34 @@ meaning:
 * `geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`. They have special semantics
   related with entity location. See "Geospatial properties of entities" section.
 
-## System/builtin Attributes
+## Builtin Attributes
 
 There are entity properties that are not directly modifiable by NGSIv2 clients, but that can be
 rendered by NGSIv2 servers to provide extra information. From a representation point of view, they
 are just like regular attributes, with name, value and type.
 
-System/builtin attributes are not rendered by default. In order to render a specific attribute, add its
+Builtin attributes are not rendered by default. In order to render a specific attribute, add its
 name to the `attrs` parameter in URLs (or payload field in POST /v2/op/query operation) or
 subscription (`attrs` sub-field within `notification`).
 
-The list of system/builtin attributes is as follows:
+The list of builtin attributes is as follows:
 * `dateCreated` (type: `DateTime`): entity creation date as an ISO 8601 string.
 * `dateModified` (type: `DateTime`): entity modification date as an ISO 8601 string.
 
 Like regular attributes, they can be  used in `q` filters and in `orderBy`.
 However, they cannot be used in resource URLs.
 
-## System/builtin Metadata
+## Builtin Metadata
 
 Some attribute properties are not directly modifiable by NGSIv2 clients, but they can be
 rendered by NGSIv2 servers to provide extra information. From a representational point of view, they
 are just like regular metadata, with name, value, and type.
 
-System/builtin metadata are not rendered by default. In order to render a specific metadata, add its
+Builtin metadata are not rendered by default. In order to render a specific metadata, add its
 name to the `metadata` URL parameter (or payload field in POST /v2/op/query operation) or
 subscription (`metadata` sub-field within `notification`).
 
-The list of system/builtin metadata is as follows:
+The list of builtin metadata is as follows:
 
 * `dateCreated` (type: `DateTime`): attribute creation date as an ISO 8601 string.
 
@@ -427,7 +362,7 @@ The following strings must not be used as attribute names:
 * `geo:distance`, as it would conflict with the string used in `orderBy` for proximity to
   center point.
 
-* System/builtin attribute names (see specific section on "System/builtin Attributes")
+* Builtin attribute names (see specific section on "Builtin Attributes")
 
 * `*`, as it has a special meaning as "all the custom/user attributes" (see section on
   "Filtering out attributes and metadata").
@@ -436,7 +371,7 @@ The following strings must not be used as attribute names:
 
 The following strings must not be used as metadata names:
 
-* System/builtin metadata names (see specific section on "System/builtin Metadata")
+* Builtin metadata names (see specific section on "Builtin Metadata")
 
 * `*`, as it has a special meaning as "all the custom/user metadata" (see section on
   "Filtering out attributes and metadata").
@@ -450,7 +385,7 @@ The value of `orderBy` can be:
 * The keyword `geo:distance` to order results by distance to a reference geometry when a "near"
   (`georel=near`) spatial relationship is used. 
 
-* A comma-separated list of attributes (including system/builtin attributes), `id` (for entity
+* A comma-separated list of attributes (including builtin attributes), `id` (for entity
   ID), and `type` (for entity type), e.g. `temperature,!humidity`. Results are ordered by the first
   field. On ties, the results are ordered by the second field and so on. A "!" before
   the field name means that the order is reversed.
@@ -461,30 +396,30 @@ If present, the error payload is a JSON object including the following fields:
 
 + `error` (required, string): a textual description of the error.
 + `description` (optional, string): additional information about the error.
-+ `affectedItems` (optional, array[string]): a list of elements affected by the error.
-  Depending on the operation, it may refer to entities, registrations or subscriptions.
 
-All NGSIv2 server implementations must use the following HTTP response codes and `error` texts.
-However, the particular text used for `description` field is an implementation specific aspect.
+All NGSIv2 server implementations must use the following HTTP status codes and `error` texts
+described in this section. However, the particular text used for `description` field is
+an implementation specific aspect.
 
-Error list (HTTP response code in parenthesis):
+NGSIv2 `error` reporting is as follows:
 
-* ParseError            (`400`). The incoming JSON payload cannot be parsed.
-* BadRequest            (`400`). The incoming request is invalid in this context.
-* NotFound              (`404`). The resource (entity, subscription, etc.) referred in the request
-  has not been found.
-* TooManyResults        (`409`). There are several results that match with the resource 
-  identification
-  used in the request.
-* ContentLengthRequired (`411`). Zero/No Content-Length in PUT/POST/PATCH request.
-* RequestEntityTooLarge (`413`). Payload is too large. The specific limit to consider a payload too large depends
-                                 on the particular implementation.
-* UnsupportedMediaType  (`415`). Request content type is not supported.
-* InvalidModification   (`422`). Some piece of information is missing in payload.
-* NotSupportedQuery     (`422`). The implementation does not support the query issued.
-* NoResourcesAvailable  (`413`). There are no server resources to fulfill the client request. 
-
-New error codes may be defined in new iterations of this specification.
++ If the incoming JSON payload cannot be parsed then `ParseError` (`400`) is returned.
++ Errors which are only caused by request itself (i.e. they do not depend on the NGSIv2 server status),
+  either in the URL parameters or in the payload, results in `BadRequest`(`400`).
+  + Exception: incoming JSON payload errors, which have another `error` message (see previous bullet).
++ Attemp to exceed spatial index limit results in `NoResourceAvailable` (`413`). See "Geospatial properties of entities"
+  section for details.
++ Ambiguity due to the request may refer to several resources, e.g. attempt to update an entity providing only its ID
+  and several entities with that ID exist, results in `TooManyResults` (`409`).
++ If the resource identified by the request is not found then `NotFound` (`404`) is returned.
++ Errors due to the request plus state combination but not exclusively from the request
+  (e.g. POST with `options=append` on an existing attribute) results in `Unprocessable` (`422`).
+  + Exception: the request plus state conditions that lead to 404, 409 or 413 errors, as described in previous bullets.
++ HTTP layer errors use the following:
+  + HTTP 405 Method Not Allowed corresponds to `MethodNotAlowed` (`405`)
+  + HTTP 411 Length Required corresponds to `ContentLengthRequired` (`411`)
+  + HTTP 413 Request Entity Too Large corresponds to `RequestEntityTooLarge` (`413`)
+  + HTTP 415 Unsupported Media Type corresponds to `UnsupportedMediaType` (`415`)
 
 ## Geospatial properties of entities
 
@@ -817,21 +752,21 @@ to specify the list of attributes that must be included in the response. In a si
 that must be included in the response.
 
 By default, if `attrs` is omitted (or `metadata` is omitted) then all the attributes (all the
-metadata) are included, except system/builtin attributes (metadata). In order to include
-system/builtin attributes (metadata) they have to be explicitly included in `attrs` (`metadata`).
+metadata) are included, except builtin attributes (metadata). In order to include
+builtin attributes (metadata) they have to be explicitly included in `attrs` (`metadata`).
 
 E.g. to include only attributes A and B:
 
 `attrs=A,B`
 
-Note that including *only* system/builtin attributes (metadata) will avoid any user-defined
-attribute (metadata). If you want to include system/builtin attributes (metadata) *and* user-defined
+Note that including *only* builtin attributes (metadata) will avoid any user-defined
+attribute (metadata). If you want to include builtin attributes (metadata) *and* user-defined
 attributes (metadata) at the same time then
 
 * The user-defined attributes (metadata) have to be explictly included, e.g. to include the user-defined
-  attributes A and B along with the system/builtin attribute `dateModified`, use: `attrs=dateModified,A,B`.
+  attributes A and B along with the builtin attribute `dateModified`, use: `attrs=dateModified,A,B`.
 * The special value `*` can be used as an alias meaning "all user-defined attributes (metadata)", e.g.,
-  to include all the user-defined attributes along with the system/builtin attribute `dateModified`
+  to include all the user-defined attributes along with the builtin attribute `dateModified`
   use: `attrs=dateModified,*`.
 
 Note that the `attrs` and `metadata` fields can be used also in subscriptions (as sub-fields of `notification`)
@@ -1012,7 +947,7 @@ to keep your client decoupled from implementation details.
 
 # Group Entities
 
-### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]
+### List Entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]
 
 Retrieves a list of entities that match different criteria by id, type, pattern matching (either id or type)
 and/or those which match a query or geographical query (see [Simple Query Language](#simple_query_language) and 
@@ -1132,14 +1067,15 @@ Response code:
          }
         ]
 
-### Create entity [POST /v2/entities{?options}]
+### Create Entity [POST /v2/entities{?options}]
 
 The payload is an object representing the entity to be created. The object follows
 the JSON entity representation format (described in a "JSON Entity Representation" section).
 
 Response:
 
-* Successful operation uses 201 Created. Reponse includes a `Location` header with the URL of the
+* Successful operation uses 201 Created (if upsert option is not used) or 204 No Content (if
+  upsert option is used). Response includes a `Location` header with the URL of the
   created entity.
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
@@ -1171,8 +1107,16 @@ Response:
       + Members
           + keyValues - when used, the request payload uses the `keyValues` simplified entity
             representation. See "Simplified Entity Representation" section for details.
+          + upsert - when used, entity is updated if already exits. If upsert is not used and
+            the entity already exist a `422 Unprocessable Entity` error is returned.
 
 + Response 201
+
+    + Headers
+
+            Location: /v2/entities/Bcn-Welt?type=Room
+
++ Response 204
 
     + Headers
 
@@ -1181,7 +1125,7 @@ Response:
 
 ## Entity by ID [/v2/entities/{entityId}{?type,attrs,options}]
 
-### Retrieve entity [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]
+### Retrieve Entity [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]
 
 The response is an object representing the entity identified by the ID. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section).
@@ -1241,7 +1185,7 @@ Response:
           }
         }
 
-### Retrieve entity attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]
+### Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]
 
 This request is similar to retreiving the whole entity, however this one omits the `id` and `type`
 fields.
@@ -1302,7 +1246,7 @@ Response:
           }
         }
 
-### Update or append entity attributes [POST /v2/entities/{entityId}/attrs{?type,options}]
+### Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs{?type,options}]
 
 The request payload is an object representing the attributes to append or update. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section), except
@@ -1345,7 +1289,7 @@ Response:
 
 + Response 204
 
-### Update existing entity attributes [PATCH /v2/entities/{entityId}/attrs{?type,options}]
+### Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs{?type,options}]
 
 The request payload is an object representing the attributes to update. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section), except
@@ -1419,7 +1363,7 @@ Response:
 
 + Response 204
 
-### Remove entity [DELETE /v2/entities/{entityId}{?type}]
+### Remove Entity [DELETE /v2/entities/{entityId}{?type}]
 
 Delete the entity.
 
@@ -1468,7 +1412,7 @@ Response:
           "metadata": {}
         }
 
-### Update attribute data [PUT /v2/entities/{entityId}/attrs/{attrName}{?type}]
+### Update Attribute Data [PUT /v2/entities/{entityId}/attrs/{attrName}{?type}]
 
 The request payload is an object representing the new attribute data. Previous attribute data
 is replaced by the one in the request. The object follows the JSON representation for attributes
@@ -1500,7 +1444,7 @@ Response:
 + Response 200
 
 
-### Remove a single attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}{?type}]
+### Remove a Single Attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}{?type}]
 
 Removes an entity attribute.
 
@@ -1523,7 +1467,7 @@ Response:
 
 ## By Entity ID [/v2/entities/{entityId}/attrs/{attrName}/value?{type}]
 
-### Get attribute value [GET /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
+### Get Attribute Value [GET /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
 
 This operation returns the `value` property with the value of the attribute.
 
@@ -1558,7 +1502,7 @@ Response:
           "country": "Spain"
         }
 
-### Update attribute value [PUT /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
+### Update Attribute Value [PUT /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
 
 The request payload is the new attribute value.
 
@@ -1603,7 +1547,7 @@ Response:
 
 ## Entity types [/v2/types{?limit,offset,options}]
 
-### Retrieve entity types [GET /v2/types/{?limit,offset,options}]
+### List Entity Types [GET /v2/types/{?limit,offset,options}]
 
 If the `values` option is not in use, this operation returns a JSON array with the entity types.
 Each element is a JSON object with information about the type:
@@ -1799,7 +1743,7 @@ Notification rules are as follow:
 
 ## Subscription List [/v2/subscriptions]
 
-### Retrieve subscriptions [GET /v2/subscriptions{?limit,offset,options}]
+### List Subscriptions [GET /v2/subscriptions{?limit,offset,options}]
 
 Returns a list of all the subscriptions present in the system.
 
@@ -1860,7 +1804,7 @@ Response:
         ]
 
 
-### Create a new subscription [POST /v2/subscriptions]
+### Create Subscription [POST /v2/subscriptions]
 
 Creates a new subscription.
 The subscription is represented by a JSON object as described at the beginning of this section.
@@ -1908,7 +1852,7 @@ Response:
 
 ## Subscription By ID [/v2/subscriptions/{subscriptionId}]
 
-### Retrieve subscription [GET /v2/subscriptions/{subscriptionId}]
+### Retrieve Subscription [GET /v2/subscriptions/{subscriptionId}]
 
 The response is the subscription represented by a JSON object as described at the beginning of this
 section.
@@ -1956,7 +1900,7 @@ Response:
         }
 
 
-### Update subscription [PATCH /v2/subscriptions/{subscriptionId}]
+### Update Subscription [PATCH /v2/subscriptions/{subscriptionId}]
 
 Only the fields included in the request are updated in the subscription.
 
@@ -1998,18 +1942,14 @@ A Context Registration allows to bind external context information sources so th
 play the role of providers
 of certain subsets (entities, attributes) of the context information space, including those located
 at specific geographical areas.
-A compliant Context Information provider shall expose an NGSIv2 interface, in particular:
 
-* Query by entity type(s), entity id(s), geoquery and attribute and/or metadata projection
-(`attrs` or `metadata` parameter). (See `GET /v2/entities`)
-* Update entity attributes (See `PATCH /v2/entities/<entityId>/attrs`)
+A NGSIv2 server implementation may implement query or update forwarding to context information sources. In
+particular, some of the following forwarding mechanisms could be implemented (not exahustive list):
 
-When the entities or attributes covered by an active registered provider are subject of a query or
-update operation, and the registrations allow to forward requests, 
-implementations must forward a request to such a registered context provider so that it can provide
-the requested data or update it.
-The forwarding algorithm and precise implementation details are work to be completed
-in a future version of this specification. (*TODO*)
+* Legacy forwarding (based on NGSIv1 operations)
+* NGSI Context Source Forwarding Specification
+
+Please check the corresponding specification in order to get the details.
 
 A context registration is represented by a JSON object with the following fields:
 
@@ -2026,7 +1966,7 @@ Either `active` (for active registrations) or `inactive` (for inactive registrat
   As soon as the forwarding operations start working again, the status is changed back to `active`.
 + `expires` : Registration expiration date in ISO8601 format. Permanent registrations must omit this field.
 + `forwardingInformation`: Information related to the forwarding operations made against the provider.
-Automatically provided by the implementation. 
+Automatically provided by the implementation, in the case such implementation supports forwarding capabilities.
 
 The `provider` field contains the following subfields:
 + `http` : It is used to convey parameters for providers that deliver information through the HTTP protocol.
@@ -2066,9 +2006,9 @@ Not present if registration has never had a successful notification.
 
 ## Registration list [/v2/registrations]
 
-### Retrieve registrations [GET /v2/registrations{?limit,offset,options}]
+### List Registrations [GET /v2/registrations{?limit,offset,options}]
 
-Lists all the registrations present in the system.
+Lists all the context provider registrations present in the system.
 
 + Parameters
     + limit: 10 (optional, number) - Limit the number of registrations to be retrieved
@@ -2118,9 +2058,9 @@ Response:
           }
         ]
 
-### Create a new context provider registration [POST /v2/registrations]
+### Create Registration [POST /v2/registrations]
 
-Creates a new registration. This is typically used for binding context sources
+Creates a new context provider registration. This is typically used for binding context sources
 as providers of certain data.
 The registration is represented by a JSON object as described at the beginning of this section.
 
@@ -2160,7 +2100,7 @@ Response:
 
 ## Registration By ID [/v2/registrations/{registrationId}]
 
-### Retrieve context provider registration [GET /v2/registrations/{registrationId}]
+### Retrieve Registration [GET /v2/registrations/{registrationId}]
 
 The response is the registration represented by a JSON object as described at the beginning of this
 section.
@@ -2206,7 +2146,7 @@ Response:
             }
       }      
 
-### Update context provider registration [PATCH /v2/registrations/{registrationId}]
+### Update Registration [PATCH /v2/registrations/{registrationId}]
 
 Only the fields included in the request are updated in the registration.
 
@@ -2227,9 +2167,9 @@ Response:
 
 + Response 204
 
-### Delete context provider registration [DELETE /v2/registrations/{registrationId}]
+### Delete Registration [DELETE /v2/registrations/{registrationId}]
 
-Cancels registration.
+Cancels a context provider registration.
 
 Response:
 
@@ -2249,8 +2189,8 @@ Response:
 This operation allows to create, update and/or delete several entities in a single batch operation.
 The payload is an object with two properties:
 
-+ `actionType`, to specify the kind of update action to do: either APPEND, APPEND_STRICT, UPDATE,
-  DELETE, or REPLACE.
++ `actionType`, to specify the kind of update action to do: either `append`, `appendStrict`, `update`,
+  `delete`, or `replace`.
 + `entities`, an array of entities, each entity specified using the JSON entity representation format
   (described in the section "JSON Entity Representation").
 
@@ -2258,14 +2198,14 @@ This operation is split in as many individual operations as entities in the `ent
 the `actionType` is executed for each one of them. Depending on the `actionType`, a mapping with
 regular non-batch operations can be done:
 
-* APPEND: maps to `POST /v2/entities` (if the entity does not already exist) or `POST /v2/entities/<id>/attrs`
+* `append`: maps to `POST /v2/entities` (if the entity does not already exist) or `POST /v2/entities/<id>/attrs`
   (if the entity already exists).
-* APPEND_STRICT: maps to `POST /v2/entities` (if the entity does not already exist) or
+* `appendStrict`: maps to `POST /v2/entities` (if the entity does not already exist) or
   `POST /v2/entities/<id>/attrs?options=append` (if the entity already exists).
-* UPDATE: maps to `PATCH /v2/entities/<id>/attrs`.
-* DELETE: maps to `DELETE /v2/entities/<id>/attrs/<attrName>` on every attribute included in the entity or
+* `update`: maps to `PATCH /v2/entities/<id>/attrs`.
+* `delete`: maps to `DELETE /v2/entities/<id>/attrs/<attrName>` on every attribute included in the entity or
   to `DELETE /v2/entities/<id>` if no attribute were included in the entity.
-* REPLACE: maps to `PUT /v2/entities/<id>/attrs`.
+* `replace`: maps to `PUT /v2/entities/<id>/attrs`.
 
 Response:
 
@@ -2276,7 +2216,7 @@ Response:
 + Request (application/json)
 
         {
-          "actionType": "APPEND",
+          "actionType": "append",
           "entities": [
             {
               "type": "Room",
@@ -2325,10 +2265,9 @@ The payload may contain the following elements (all of them optional):
       time, but one of them must be present.
     + `type` or `typePattern`: Type or type pattern of the entities to search for. Both cannot be used at
       the same time. If omitted, it means "any entity type".
-+ `attributes`: a list of attribute names to search for. If omitted, it means "all attributes".
-+ `scopes`: a list of scopes to restrict the result of the query. Each scope is represented by a
-   JSON object with a `type` (a JSON string) and `value` (whose type depends on the `type`
-   property).
++ `attrs`: List of attributes to be provided (if not specified, all attributes).
++ `expression`: an expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see "List
+   entities" operation above about this field).
    The different available scopes are described elsewhere.
 + `metadata`: a list of metadata names to include in the response.
    See "Filtering out attributes and metadata" section for more detail.
@@ -2362,23 +2301,20 @@ Response code:
           "entities": [
             {
               "idPattern": ".*",
-              "type": "myFooType"
+              "type": "Room"
             },
             {
-              "id": "myBar",
-              "type": "myBarType"
+              "id": "Car",
+              "type": "P-9873-K"
             }
           ],
-          "attributes": [
+          "attrs": [
             "temperature",
             "humidity"
           ],
-          "scopes": [
-            {
-              "type": "FIWARE::...",
-              "value": "..."
-            }
-          ],
+          "expression": {
+             "q": "temperature>20"
+          },
           "metadata": [
             "accuracy",
             "timestamp"
@@ -2407,9 +2343,9 @@ Response code:
           {
             "type": "Car",
             "id": "P-9873-K",
-            "speed": {
-              "value": 100,
-              "type": "number",
+            "temperature": {
+              "value": 40,
+              "type": "Number",
               "accuracy": 2,
               "timestamp": {
                 "value": "2015-06-04T07:20:27.378Z",
@@ -2418,200 +2354,3 @@ Response code:
             }
           }
         ]
-
-
-### Register [POST /v2/op/register]
-
-This operation allows to create, update and/or delete several registrations in a single batch
-operation. The payload is an object with two properties:
-
-+ `actionType`, to specify the kind of register action to do: either CREATE, UPDATE, or DELETE.
-+ `registrations`, an array of registrations, each one specified using the JSON registration 
-  representation format (described above). In case of CREATE operation, the registration `id`
-  must not be included.
-
-Response:
-
-* Successful operation uses 200 OK. In addition, in case of successful CREATE, a list of IDs is
-  returned, each one corresponding to the ID of the element in the request payload and in that same
-  order.
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
-
-+ Request (application/json)
-
-        {
-          "actionType": "CREATE",
-          "registrations": [
-            {
-              "subject": {
-                "entities": [
-                  {
-                    "type": "Room"
-                  }
-                ],
-                "attributes": [
-                  "humidity"
-                ]
-              },
-              "callback": "http://localhost:1234",
-              "duration": "PT1M"
-            },
-            {
-              "subject": {
-                "entities": [
-                  {
-                    "type": "Car"
-                  }
-                ],
-                "attributes": [
-                  "speed"
-                ]
-              },
-              "callback": "http://localhost:5678",
-              "duration": "PT1M"
-            }
-          ]
-        }
-
-+ Response 200
-
-        [
-          "abcd",
-          "efgh"
-        ]
-
-
-### Discover [POST /v2/op/discover/{?limit,offset,options}]
-
-The response payload is an Array that contains one object per matching registration.
-The registrations follow the JSON registration representation format (described in a section above).
-
-The payload may contain the following elements (all of them optional):
-
-+ `entities`: a list of entites to search for. Each entity is represented by a JSON object with the
-  following elements:
-    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
-      time, but one of them must be present.
-    + `type` or `typePattern`: Type or type pattern of the entities to search for. Both cannot be used at
-      the same time. If omitted, it means "any entity type".
-+ `attributes`: a list of attribute names to search for. If omitted, it means "all attributes".
-+ `scopes`: a list of scopes to restrict the results of the query. Each scope is represented by a
-  JSON object with a `type` (a JSON string) and a `value` (whose type depends on the `type`
-  property). The different available scopes are described elsewhere.
-
-Response code:
-
-* Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
-
-+ Parameters
-    + limit: 10 (optional, number) - Limit the number of registrations to be retrieved.
-    + offset: 22 (optional, number) - Skip a number of registrations.
-    + options (optional, string) - Options dictionary.
-        + Members
-          + count - when used, the total number of registrations is returned in the response as the
-            HTTP header `Fiware-Total-Count`.
-
-
-+ Request (application/json)
-
-        {
-          "entities": [
-            {
-              "idPattern": ".*",
-              "type": "myFooType"
-            },
-            {
-              "id": "myBar",
-              "type": "myBarType"
-            }
-          ],
-          "attributes": [
-            "temperature",
-            "humidity"
-          ],
-          "scopes": [
-            {
-              "type": "FIWARE::Filter::Foo",
-              "value": "Bar"
-            }
-          ]
-        }
-
-+ Response 200 (application/json)
-
-        [
-          {
-            "id": "abcde",
-            "subject": {
-              "entities": [
-                {
-                  "id": "Foo",
-                  "type": "myFooType"
-                }
-              ],
-              "attributes": [
-                "humidity"
-              ]
-            },
-            "callback": "http://localhost:1234",
-            "duration": "PT1M"
-          },
-          {
-            "id": "efgh",
-            "subject": {
-              "entities": [
-                {
-                  "id": "myBar",
-                  "type": "myBarType"
-                }
-              ],
-              "attributes": [
-                "speed"
-              ]
-            },
-            "callback": "http://localhost:5678",
-            "duration": "PT1M"
-          }
-        ]
-
-# Group OMA-NGSI Operations
-
-(The need/usefulness of these operations is currently under discussion)
-
-For the sake of completeness here is an enumeration of the OMA-NGSI (9 & 10) operations. These
-operations will be supported under the 'v2' resource as well.
-
-### subscribeContext [POST /v2/subscribeContext]
-
-(Not needed, as it is covered by the RESTful POST /v2/subscriptions operation)
-
-### updateContextSubscription [POST /v2/updateContextSubscription]
-
-(Not needed, as it is covered by the RESTful PATCH /v2/subscriptions operation)
-
-### unsubscribeContext [POST /v2/unsubscribeContext]
-
-(Not needed, as it is covered by the RESTful DELETE /v2/subscriptions operation)
-
-### notifyContext [POST /v2/notifyContext]
-
-(The payload of the v2 notifyContext should be described)
-
-### subscribeContextAvailability [POST /v2/subscribeContextAvailability]
-
-(Not needed as POJ RPC, but we need to define a RESTful operation for this, analogous to the NGSI10 one)
-
-### updateContextAvailabilitySubscription [POST /v2/updateContextAvailabilitySubscription]
-
-(Not needed as POJ RPC, but we need to define a RESTful operation for this, analogous to the NGSI10 one)
-
-### unsubscribeContextAvailability [POST /v2/unsubscribeContextAvailability]
-
-(Not needed as POJ RPC, but we need to define a RESTful operation for this, analogous to the NGSI10 one)
-
-### notifyContextAvailability [POST /v2/notifyContextAvailability]
-
-(The payload of the v2 notifyContextAvailability should be described)

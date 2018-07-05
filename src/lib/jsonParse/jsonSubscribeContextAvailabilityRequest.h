@@ -63,12 +63,4 @@ extern void jsonScarRelease(ParseData* reqDataP);
 */
 extern std::string jsonScarCheck(ParseData* reqDataP, ConnectionInfo* ciP);
 
-
-
-/* ****************************************************************************
-*
-* jsonScarPresent - 
-*/
-extern void jsonScarPresent(ParseData* reqDataP);
-
 #endif  // SRC_LIB_JSONPARSE_JSONSUBSCRIBECONTEXTAVAILABILITYREQUEST_H_

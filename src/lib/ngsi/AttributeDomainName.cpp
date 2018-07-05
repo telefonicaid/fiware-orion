@@ -86,24 +86,6 @@ std::string AttributeDomainName::get(void)
 
 /* ****************************************************************************
 *
-* AttributeDomainName::present - 
-*/
-void AttributeDomainName::present(const std::string& indent)
-{
-  if (string != "")
-  {
-    LM_T(LmtPresent, ("%sAttributeDomainName: %s", indent.c_str(), string.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNo AttributeDomainName", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * AttributeDomainName::render - 
 */
 std::string AttributeDomainName::render(bool comma)

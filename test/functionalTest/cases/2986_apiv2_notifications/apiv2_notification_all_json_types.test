@@ -83,6 +83,9 @@ echo
 echo
 
 
+valgrindSleep 1
+
+
 echo "03. Query CP1, see 'E1' with all attributes correct"
 echo "==================================================="
 orionCurl --url /v2/entities?options=keyValues --port $CP1_PORT

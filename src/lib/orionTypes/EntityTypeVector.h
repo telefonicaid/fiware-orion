@@ -43,7 +43,6 @@ class EntityTypeVector
 
   EntityTypeVector();
 
-  void          present(const std::string& indent);
   void          push_back(EntityType* item);
   unsigned int  size(void);
   void          release(void);

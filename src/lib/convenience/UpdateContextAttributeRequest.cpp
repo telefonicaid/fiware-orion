@@ -124,23 +124,6 @@ std::string UpdateContextAttributeRequest::check
 
 /* ****************************************************************************
 *
-* present - 
-*/
-void UpdateContextAttributeRequest::present(const std::string&  indent)
-{
-  LM_T(LmtPresent, ("%stype:         %s", 
-		    indent.c_str(), 
-		    type.c_str()));
-  LM_T(LmtPresent, ("%scontextValue: %s", 
-		    indent.c_str(), 
-		    contextValue.c_str()));
-  metadataVector.present("ContextMetadata", indent);
-}
-
-
-
-/* ****************************************************************************
-*
 * release - 
 */
 void UpdateContextAttributeRequest::release(void)

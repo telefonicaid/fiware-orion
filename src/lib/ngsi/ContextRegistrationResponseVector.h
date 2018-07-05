@@ -43,7 +43,6 @@ typedef struct ContextRegistrationResponseVector
   void                          push_back(ContextRegistrationResponse* item);
   unsigned int                  size(void) const;
   std::string                   render(bool comma);
-  void                          present(const std::string& indent);
   void                          release(void);
 
   ContextRegistrationResponse*  operator[](unsigned int ix) const;

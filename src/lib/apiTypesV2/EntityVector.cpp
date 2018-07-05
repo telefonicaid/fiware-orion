@@ -75,13 +75,13 @@ std::string EntityVector::render
 *
 * EntityVector::check -
 */
-std::string EntityVector::check(ApiVersion apiVersion, RequestType requestType)
+std::string EntityVector::check(RequestType requestType)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion, requestType)) != "OK")
+    if ((res = vec[ix]->check(requestType)) != "OK")
     {
       alarmMgr.badInput(clientIp, "invalid vector of Entity");
       return res;
@@ -89,22 +89,6 @@ std::string EntityVector::check(ApiVersion apiVersion, RequestType requestType)
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityVector::present -
-*/
-void EntityVector::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%lu Entities:\n", (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent + "  ");
-  }
 }
 
 

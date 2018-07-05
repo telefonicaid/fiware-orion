@@ -57,7 +57,6 @@ typedef struct AppendContextElementRequest
   AppendContextElementRequest();
 
   std::string  render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType);
-  void         present(const std::string&  indent);
   void         release();
   std::string  check(ApiVersion          apiVersion,
                      bool                asJsonObject,

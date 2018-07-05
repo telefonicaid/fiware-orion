@@ -128,35 +128,6 @@ std::string NotifyCondition::check
 
 /* ****************************************************************************
 *
-* NotifyCondition::present -
-*/
-void NotifyCondition::present(const std::string& indent, int ix)
-{
-  std::string indent2 = indent + "  ";
-
-  if (ix == -1)
-  {
-    LM_T(LmtPresent, ("%sNotify Condition:", 
-		      indent2.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNotify Condition %d:", 
-		      indent2.c_str(), 
-		      ix));
-  }
-
-  LM_T(LmtPresent, ("%stype: %s", 
-		    indent2.c_str(), 
-		    type.c_str()));
-  condValueList.present(indent2);
-  restriction.present(indent2);
-}
-
-
-
-/* ****************************************************************************
-*
 * NotifyCondition::release -
 */
 void NotifyCondition::release(void)

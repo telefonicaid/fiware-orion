@@ -382,29 +382,6 @@ std::string Metadata::check(ApiVersion apiVersion)
 
 /* ****************************************************************************
 *
-* Metadata::present -
-*/
-void Metadata::present(const std::string& metadataType, int ix, const std::string& indent)
-{
-  LM_T(LmtPresent, ("%s%s Metadata %d:",   
-		    indent.c_str(), 
-		    metadataType.c_str(), 
-		    ix));
-  LM_T(LmtPresent, ("%s  Name:     %s", 
-		    indent.c_str(), 
-		    name.c_str()));
-  LM_T(LmtPresent, ("%s  Type:     %s", 
-		    indent.c_str(), 
-		    type.c_str()));
-  LM_T(LmtPresent, ("%s  Value:    %s", 
-		    indent.c_str(), 
-		    stringValue.c_str()));
-}
-
-
-
-/* ****************************************************************************
-*
 * release -
 */
 void Metadata::release(void)

@@ -120,22 +120,6 @@ std::string RegisterProviderRequest::check
 
 /* ****************************************************************************
 *
-* RegisterProviderRequest::present - 
-*/
-void RegisterProviderRequest::present(const std::string&  indent)
-{
-  LM_T(LmtPresent, ("%sRegisterProviderRequest:\n", indent.c_str()));
-  metadataVector.present("Registration", indent + "  ");
-  duration.present(indent + "  ");
-  providingApplication.present(indent + "  ");
-  registrationId.present(indent + "  ");
-  LM_T(LmtPresent, ("\n"));
-}
-
-
-
-/* ****************************************************************************
-*
 * RegisterProviderRequest::release - 
 */
 void RegisterProviderRequest::release(void)

@@ -104,27 +104,6 @@ TEST(SubscriptionId, setGetAndIsEmpty)
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(SubscriptionId, present)
-{
-  SubscriptionId  sId;
-
-  utInit();
-
-  sId.set("SUB_123");
-  sId.present("");
-
-  sId.set("");
-  sId.present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * render
 */
 TEST(SubscriptionId, render)

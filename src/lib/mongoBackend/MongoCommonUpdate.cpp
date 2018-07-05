@@ -44,6 +44,7 @@
 #include "apiTypesV2/HttpInfo.h"
 #include "alarmMgr/alarmMgr.h"
 #include "orionTypes/OrionValueType.h"
+#include "orionTypes/UpdateActionType.h"
 #include "cache/subCache.h"
 #include "rest/StringFilter.h"
 #include "ngsi/Scope.h"
@@ -56,6 +57,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
 #include "mongoBackend/location.h"
+#include "mongoBackend/dateExpiration.h"
 #include "mongoBackend/compoundValueBson.h"
 #include "mongoBackend/MongoCommonUpdate.h"
 
@@ -686,12 +688,12 @@ static bool updateAttribute
   BSONObjBuilder*     toSet,
   BSONArrayBuilder*   toPush,
   ContextAttribute*   caP,
-  bool&               actualUpdate,
+  bool*               actualUpdate,
   bool                isReplace,
   ApiVersion          apiVersion
 )
 {
-  actualUpdate = false;
+  *actualUpdate = false;
 
   std::string effectiveName = dbDotEncode(caP->name);
 
@@ -700,7 +702,7 @@ static bool updateAttribute
     BSONObjBuilder newAttr;
     int            now = getCurrentTime();
 
-    actualUpdate = true;
+    *actualUpdate = true;
 
     std::string attrType;
     if (!caP->typeGiven && (apiVersion == V2))
@@ -748,8 +750,8 @@ static bool updateAttribute
     BSONObj newAttr;
     BSONObj attr = getObjectFieldF(attrs, effectiveName);
 
-    actualUpdate = mergeAttrInfo(attr, caP, &newAttr, apiVersion);
-    if (actualUpdate)
+    *actualUpdate = mergeAttrInfo(attr, caP, &newAttr, apiVersion);
+    if (*actualUpdate)
     {
       const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
       toSet->append(composedName, newAttr);
@@ -780,7 +782,7 @@ static bool appendAttribute
   BSONObjBuilder*     toSet,
   BSONArrayBuilder*   toPush,
   ContextAttribute*   caP,
-  bool&               actualUpdate,
+  bool*               actualUpdate,
   ApiVersion          apiVersion
 )
 {
@@ -839,7 +841,7 @@ static bool appendAttribute
   toSet->append(composedName, ab.obj());
   toPush->append(caP->name);
 
-  actualUpdate = true;
+  *actualUpdate = true;
   return true;
 }
 
@@ -2077,7 +2079,7 @@ static void updateAttrInNotifyCer
   ContextElementResponse* notifyCerP,
   ContextAttribute*       targetAttr,
   bool                    useDefaultType,
-  std::string             actionType
+  const std::string&      actionType
 )
 {
   /* Try to find the attribute in the notification CER */
@@ -2254,10 +2256,12 @@ static bool updateContextAttributeItem
   EntityId*                 eP,
   BSONObjBuilder*           toSet,
   BSONArrayBuilder*         toPush,
-  bool&                     actualUpdate,
-  bool&                     entityModified,
+  bool*                     actualUpdate,
+  bool*                     entityModified,
   std::string*              currentLocAttrName,
   BSONObjBuilder*           geoJson,
+  mongo::Date_t*            dateExpiration,
+  bool*                     dateExpirationInPayload,
   bool                      isReplace,
   ApiVersion                apiVersion,
   OrionError*               oe
@@ -2268,7 +2272,7 @@ static bool updateContextAttributeItem
   if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace, apiVersion))
   {
     // Attribute was found
-    entityModified = actualUpdate || entityModified;
+    *entityModified = (*actualUpdate) || (*entityModified);
   }
   else
   {
@@ -2295,9 +2299,9 @@ static bool updateContextAttributeItem
       ca->found = false;
     }
   }
-
-  /* Check aspects related with location */
-  if (!processLocationAtUpdateAttribute(currentLocAttrName, targetAttr, geoJson, &err, apiVersion, oe))
+  /* Check aspects related with location and date expiration */
+  if (!processLocationAtUpdateAttribute(currentLocAttrName, targetAttr, geoJson, &err, apiVersion, oe)
+    || !processDateExpirationAtUpdateAttribute(targetAttr, dateExpiration, dateExpirationInPayload, &err, oe))
   {
     std::string details = std::string("action: UPDATE") +
                           " - entity: [" + eP->toString() + "]" +
@@ -2332,10 +2336,11 @@ static bool appendContextAttributeItem
   EntityId*                 eP,
   BSONObjBuilder*           toSet,
   BSONArrayBuilder*         toPush,
-  bool&                     actualUpdate,
-  bool&                     entityModified,
+  bool*                     actualUpdate,
+  bool*                     entityModified,
   std::string*              currentLocAttrName,
   BSONObjBuilder*           geoJson,
+  mongo::Date_t*            dateExpiration,
   ApiVersion                apiVersion,
   OrionError*               oe
 )
@@ -2344,11 +2349,12 @@ static bool appendContextAttributeItem
 
   bool actualAppend = appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, apiVersion);
 
-  entityModified = actualUpdate || entityModified;
+  *entityModified = (*actualUpdate) || (*entityModified);
 
   /* Check aspects related with location */
   if (!processLocationAtAppendAttribute(currentLocAttrName, targetAttr, actualAppend, geoJson,
-                                        &err, apiVersion, oe))
+                                        &err, apiVersion, oe)
+      || !processDateExpirationAtAppendAttribute(dateExpiration, targetAttr, actualAppend, &err, oe))
   {
     std::string details = std::string("action: APPEND") +
                           " - entity: [" + eP->toString() + "]" +
@@ -2388,8 +2394,10 @@ static bool deleteContextAttributeItem
   EntityId*                             eP,
   BSONObjBuilder*                       toUnset,
   BSONArrayBuilder*                     toPull,
-  bool&                                 entityModified,
   std::string*                          currentLocAttrName,
+  bool*                                 entityModified,
+  std::string*                          currentLocAttrName,
+  mongo::Date_t*                        dateExpiration,
   ApiVersion                            apiVersion,
   OrionError*                           oe
 )
@@ -2397,7 +2405,7 @@ static bool deleteContextAttributeItem
   if (deleteAttribute(attrs, toUnset, toPull, targetAttr))
   {
     deleteAttrInNotifyCer(notifyCerP, targetAttr);
-    entityModified = true;
+    *entityModified = true;
 
     /* Check aspects related with location */
     if (targetAttr->getLocation(apiVersion).length() > 0)
@@ -2419,6 +2427,14 @@ static bool deleteContextAttributeItem
     if (*currentLocAttrName == targetAttr->name)
     {
       *currentLocAttrName = "";
+    }
+
+    /* Check aspects related to date expiration.
+     * If the target attr is date expiration, nullifying dateExpiration ACTUAL value is the way
+     * of specifying that date expiration field is no longer used */
+    if (targetAttr->name == DATE_EXPIRES)
+    {
+      *dateExpiration = NO_EXPIRATION_DATE;
     }
 
     ca->found = true;
@@ -2456,7 +2472,7 @@ static bool deleteContextAttributeItem
 static bool processContextAttributeVector
 (
   ContextElement*                                 ceP,
-  std::string                                     action,
+  ActionType                                      action,
   std::map<std::string, TriggeredSubscription*>&  subsToNotify,
   ContextElementResponse*                         notifyCerP,
   BSONObj&                                        attrs,
@@ -2467,6 +2483,8 @@ static bool processContextAttributeVector
   ContextElementResponse*                         cerP,
   std::string*                                    currentLocAttrName,
   BSONObjBuilder*                                 geoJson,
+  mongo::Date_t*                                  dateExpiration,
+  bool*                                           dateExpirationInPayload,
   std::string                                     tenant,
   const std::vector<std::string>&                 servicePathV,
   ApiVersion                                      apiVersion,
@@ -2498,7 +2516,7 @@ static bool processContextAttributeVector
     /* actualUpdate could be changed to false in the "update" case (or "append as update"). For "delete" and
      * "append" it would keep the true value untouched */
     bool actualUpdate = true;
-    if ((strcasecmp(action.c_str(), "update")) == 0 || (strcasecmp(action.c_str(), "replace")) == 0)
+    if ((action == ActionTypeUpdate) || (action == ActionTypeReplace))
     {
       if (!updateContextAttributeItem(cerP,
                                       ca,
@@ -2508,18 +2526,20 @@ static bool processContextAttributeVector
                                       eP,
                                       toSet,
                                       toPush,
-                                      actualUpdate,
-                                      entityModified,
+                                      &actualUpdate,
+                                      &entityModified,
                                       currentLocAttrName,
                                       geoJson,
-                                      strcasecmp(action.c_str(), "replace") == 0,
+                                      dateExpiration,
+                                      dateExpirationInPayload,
+                                      action == ActionTypeReplace,
                                       apiVersion,
                                       oe))
       {
         return false;
       }
     }
-    else if ((strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "append_strict") == 0))
+    else if ((action == ActionTypeAppend) || (action == ActionTypeAppendStrict))
     {
       if (!appendContextAttributeItem(cerP,
                                       attrs,
@@ -2528,17 +2548,18 @@ static bool processContextAttributeVector
                                       eP,
                                       toSet,
                                       toPush,
-                                      actualUpdate,
-                                      entityModified,
+                                      &actualUpdate,
+                                      &entityModified,
                                       currentLocAttrName,
                                       geoJson,
+                                      dateExpiration,
                                       apiVersion,
                                       oe))
       {
         return false;
       }
     }
-    else if (strcasecmp(action.c_str(), "delete") == 0)
+    else if (action == ActionTypeDelete)
     {
       if (!deleteContextAttributeItem(cerP,
                                       ca,
@@ -2548,8 +2569,10 @@ static bool processContextAttributeVector
                                       eP,
                                       toUnset,
                                       toPull,
-                                      entityModified,
                                       currentLocAttrName,
+                                      &entityModified,
+                                      currentLocAttrName,
+                                      dateExpiration,
                                       apiVersion,
                                       oe))
       {
@@ -2558,13 +2581,13 @@ static bool processContextAttributeVector
     }
     else
     {
-      std::string details = std::string("unknown actionType: '") + action + "'";
+      std::string details = std::string("unknown actionType");
 
       cerP->statusCode.fill(SccInvalidParameter, details);
       oe->fill(SccBadRequest, details, "BadRequest");
 
       // If we reach this point, there's a BUG in the parse layer checks
-      LM_E(("Runtime Error (unknown actionType '%s')", action.c_str()));
+      LM_E(("Runtime Error (unknown actionType)"));
       return false;
     }
 
@@ -2630,7 +2653,7 @@ static bool createEntity
   const std::vector<std::string>&  servicePathV,
   ApiVersion                       apiVersion,
   const std::string&               fiwareCorrelator,
-  OrionError*                      oe
+  OrionError*                      oeP
 )
 {
   LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName(tenant).c_str()));
@@ -2639,14 +2662,24 @@ static bool createEntity
    * invoke ensureLocationIndex() in anycase, given that it is harmless in the case the collection and index already
    * exits (see docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/) */
   ensureLocationIndex(tenant);
+  ensureDateExpirationIndex(tenant);
 
   /* Search for a potential location attribute */
   std::string     locAttr;
   BSONObjBuilder  geoJson;
 
-  if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion, oe))
+  if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion, oeP))
   {
     // oe->fill() already managed by processLocationAtEntityCreation()
+    return false;
+  }
+
+  /* Search for a potential date expiration attribute */
+  mongo::Date_t dateExpiration = NO_EXPIRATION_DATE;
+
+  if (!processDateExpirationAtEntityCreation(attrsV, &dateExpiration, errDetail, oeP))
+  {
+    // oeP->fill() already managed by processLocationAtEntityCreation()
     return false;
   }
 
@@ -2735,12 +2768,18 @@ static bool createEntity
                                           ENT_LOCATION_COORDS   << geoJson.obj()));
   }
 
+  /* Add date expiration in the case it was found */
+  if (dateExpiration != NO_EXPIRATION_DATE)
+  {
+    insertedDoc.appendDate(ENT_EXPIRATION, dateExpiration);
+  }
+
   // Correlator (for notification loop detection logic)
   insertedDoc.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
 
   if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
   {
-    oe->fill(SccReceiverInternalError, *errDetail, "InternalError");
+    oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
     return false;
   }
 
@@ -2905,7 +2944,7 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 static void updateEntity
 (
   const BSONObj&                  r,
-  const std::string&              action,
+  ActionType                      action,
   const std::string&              tenant,
   const std::vector<std::string>& servicePathV,
   const std::string&              xauthToken,
@@ -2939,7 +2978,7 @@ static void updateEntity
   cerP->contextElement.entityId.fill(entityId, entityType, "false");
 
   /* If the vector of Context Attributes is empty and the operation was DELETE, then delete the entity */
-  if (strcasecmp(action.c_str(), "delete") == 0 && ceP->contextAttributeVector.size() == 0)
+  if ((action == ActionTypeDelete) && (ceP->contextAttributeVector.size() == 0))
   {
     LM_T(LmtServicePath, ("Removing entity"));
     removeEntity(entityId, entityType, cerP, tenant, entitySPath, &(responseP->oe));
@@ -2978,11 +3017,24 @@ static void updateEntity
     currentGeoJson = getObjectFieldF(loc, ENT_LOCATION_COORDS);
   }
 
+  /* Is the entity using date expiration? In that case, we fill the currentdateExpiration attribute with that information.
+   * In any case, if the request contains a new date expiration, this will become the current one
+   * The dateExpirationInPayload boolean is used in case of replace operation,
+   * in order to know that the date is a new one, coming from the input request
+   */
+  mongo::Date_t currentDateExpiration = NO_EXPIRATION_DATE;
+  bool dateExpirationInPayload          = false;
+
+  if (r.hasField(ENT_EXPIRATION))
+  {
+    currentDateExpiration = getField(r, ENT_EXPIRATION).date();
+  }
+
   //
   // Before calling processContextAttributeVector and actually do the work, let's check if the
   // request is of type 'append-only' and if we have any problem with attributes already existing.
   //
-  if (strcasecmp(action.c_str(), "append_strict") == 0)
+  if (action == ActionTypeAppendStrict)
   {
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
@@ -3037,6 +3089,8 @@ static void updateEntity
                                      cerP,
                                      &locAttr,
                                      &geoJson,
+                                     &currentDateExpiration,
+                                     &dateExpirationInPayload,
                                      tenant,
                                      servicePathV,
                                      apiVersion,
@@ -3051,7 +3105,7 @@ static void updateEntity
     //
     searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
 
-    if (!(attributeAlreadyExistsError && (strcasecmp(action.c_str(), "append_strict") == 0)))
+    if (!(attributeAlreadyExistsError && (action == ActionTypeAppendStrict)))
     {
       // Note that CER generation in the case of attributeAlreadyExistsError has its own logic at
       // processContextElement() function so we need to skip this addition or we will get duplicated
@@ -3074,7 +3128,7 @@ static void updateEntity
   /* Compose the final update on database */
   LM_T(LmtServicePath, ("Updating the attributes of the ContextElement"));
 
-  if (strcasecmp(action.c_str(), "replace") != 0)
+  if (action != ActionTypeReplace)
   {
     int now = getCurrentTime();
     toSet.append(ENT_MODIFICATION_DATE, now);
@@ -3099,9 +3153,20 @@ static void updateEntity
     toUnset.append(ENT_LOCATION, 1);
   }
 
+  // We don't touch toSet in the replace case, due to
+  // the way in which BSON is composed in that case (see below)
+  if ((currentDateExpiration != NO_EXPIRATION_DATE) && (action != ActionTypeReplace))
+  {
+    toSet.appendDate(ENT_EXPIRATION, currentDateExpiration);
+  }
+  else if (!dateExpirationInPayload)
+  {
+    toUnset.append(ENT_EXPIRATION, 1);
+  }
+
   // Correlator (for notification loop detection logic). We don't touch toSet in the replace case, due to
   // the way in which BSON is composed in that case (see below)
-  if (strcasecmp(action.c_str(), "replace") != 0)
+  if (action != ActionTypeReplace)
   {
     toSet.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
   }
@@ -3114,14 +3179,31 @@ static void updateEntity
   BSONArray       toPushArr   = toPush.arr();
   BSONArray       toPullArr   = toPull.arr();
 
-  if (strcasecmp(action.c_str(), "replace") == 0)
+  if (action == ActionTypeReplace)
   {
     // toSet: { A1: { ... }, A2: { ... } }
-    int now = getCurrentTime();
-    updatedEntity.append("$set", BSON(ENT_ATTRS             << toSetObj <<
-                                      ENT_ATTRNAMES         << toPushArr <<
-                                      ENT_MODIFICATION_DATE << now <<
-                                      ENT_LAST_CORRELATOR   << fiwareCorrelator));
+    BSONObjBuilder replaceSet;
+    int            now = getCurrentTime();
+
+    // This avoids strange behavior like as for the location, as reported in the #1142 issue
+    // In order to enable easy append management of fields (e.g. location, dateExpiration),
+    // it could be better to use a BSONObjBuilder instead the BSON stream macro below.
+    if (dateExpirationInPayload)
+    {
+      updatedEntity.append("$set", BSON(ENT_ATTRS                   << toSetObj <<
+                                        ENT_ATTRNAMES               << toPushArr <<
+                                        ENT_MODIFICATION_DATE       << now <<
+                                        ENT_EXPIRATION              << currentDateExpiration <<
+                                        ENT_LAST_CORRELATOR         << fiwareCorrelator));
+    }
+    else
+    {
+      updatedEntity.append("$set", BSON(ENT_ATTRS                   << toSetObj <<
+                                        ENT_ATTRNAMES               << toPushArr <<
+                                        ENT_MODIFICATION_DATE       << now <<
+                                        ENT_LAST_CORRELATOR         << fiwareCorrelator));
+      updatedEntity.append("$unset", toUnsetObj);
+    }
 
     notifyCerP->contextElement.entityId.modDate = now;
   }
@@ -3205,13 +3287,18 @@ static void updateEntity
 
   /* To finish with this entity processing, search for CPrs in not found attributes and
    * add the corresponding ContextElementResponse to the global response */
-  searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
+  if ((action == ActionTypeUpdate) || (action == ActionTypeReplace))
+  {
+    searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
+  }
 
   // StatusCode may be set already (if so, we keep the existing value)
+
   if (cerP->statusCode.code == SccNone)
   {
     cerP->statusCode.fill(SccOk);
   }
+
   responseP->contextElementResponseVector.push_back(cerP);
 }
 
@@ -3225,7 +3312,7 @@ static bool contextElementPreconditionsCheck
 (
   ContextElement*         ceP,
   UpdateContextResponse*  responseP,
-  const std::string&      action,
+  ActionType              action,
   ApiVersion              apiVersion
 )
 {
@@ -3261,10 +3348,10 @@ static bool contextElementPreconditionsCheck
 
   /* Check that UPDATE or APPEND is not used with empty attributes (i.e. no value, no type, no metadata) */
   /* Only wanted for API version v1                                                                      */
-  if (((strcasecmp(action.c_str(), "update") == 0) ||
-       (strcasecmp(action.c_str(), "append") == 0) ||
-       (strcasecmp(action.c_str(), "append_strict") == 0) ||
-       (strcasecmp(action.c_str(), "replace") == 0)) && (apiVersion == V1))
+  if (((action == ActionTypeUpdate) ||
+       (action == ActionTypeAppend) ||
+       (action == ActionTypeAppendStrict) ||
+       (action == ActionTypeReplace)) && (apiVersion == V1))
   {
     // FIXME: Careful, in V2, this check is not wanted ...
 
@@ -3275,7 +3362,7 @@ static bool contextElementPreconditionsCheck
       {
         ContextAttribute* ca = new ContextAttribute(aP);
 
-        std::string details = std::string("action: ") + action +
+        std::string details = std::string("action: ") + actionTypeString(apiVersion, action) +
             " - entity: [" + enP->toString(true) + "]" +
             " - offending attribute: " + aP->name +
             " - empty attribute not allowed in APPEND or UPDATE";
@@ -3320,7 +3407,7 @@ void processContextElement
 (
   ContextElement*                      ceP,
   UpdateContextResponse*               responseP,
-  const std::string&                   action,
+  ActionType                           action,
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
@@ -3517,7 +3604,7 @@ void processContextElement
     /* All the attributes existing in the request are added to the response with 'found' set to false
      * in the of UPDATE/DELETE and true in the case of APPEND
      */
-    bool foundValue = (strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "append_strict") == 0);
+    bool foundValue = ((action == ActionTypeAppend) || (action == ActionTypeAppendStrict));
 
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
@@ -3528,7 +3615,7 @@ void processContextElement
       cerP->contextElement.contextAttributeVector.push_back(ca);
     }
 
-    if ((strcasecmp(action.c_str(), "update") == 0) || (strcasecmp(action.c_str(), "replace") == 0))
+    if ((action == ActionTypeUpdate) || (action == ActionTypeReplace))
     {
       /* In the case of UPDATE or REPLACE we look for context providers */
       searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
@@ -3552,7 +3639,7 @@ void processContextElement
         }
       }
     }
-    else if (strcasecmp(action.c_str(), "delete") == 0)
+    else if (action == ActionTypeDelete)
     {
       cerP->statusCode.fill(SccContextElementNotFound);
 

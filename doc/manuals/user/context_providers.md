@@ -168,3 +168,6 @@ Some additional comments:
 -   You should include entity type in the query/update in order for the ContextBroker to be able to
     forward to Context Providers. Otherwise you may encounter problems, like the one described in this
     [post at StackOverflow](https://stackoverflow.com/questions/48163972/orion-cb-doesnt-update-lazy-attributes-on-iot-agent).
+-   At the present moment, Context Broker is not able to include compound attributes in forwarded updates. A
+    blank (`""`) if forwarded for them instead. Please have a look to 
+    [the following issue](https://github.com/telefonicaid/fiware-orion/issues/3162) for more information.    

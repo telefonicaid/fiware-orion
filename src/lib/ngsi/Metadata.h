@@ -90,7 +90,6 @@ typedef struct Metadata
 
   std::string  render(bool comma);
   std::string  toJson(bool isLastElement);
-  void         present(const std::string& metadataType, int ix, const std::string& indent);
   void         release(void);
   void         fill(const struct Metadata& md);
   std::string  toStringValue(void) const;

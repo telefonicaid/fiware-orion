@@ -125,30 +125,6 @@ std::string ContextRegistrationAttribute::check(ApiVersion apiVersion)
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttribute::present -
-*/
-void ContextRegistrationAttribute::present(int ix, const std::string& indent)
-{
-  LM_T(LmtPresent, ("%sAttribute %d:\n",    
-		    indent.c_str(), 
-		    ix));
-  LM_T(LmtPresent, ("%s  Name:       %s\n", 
-		    indent.c_str(), 
-		    name.c_str()));
-  LM_T(LmtPresent, ("%s  Type:       %s\n", 
-		    indent.c_str(), 
-		    type.c_str()));
-  LM_T(LmtPresent, ("%s  isDomain:   %s\n", 
-		    indent.c_str(), 
-		    isDomain.c_str()));
-
-  metadataVector.present("Attribute", indent + "  ");
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextRegistrationAttribute::release -
 */
 void ContextRegistrationAttribute::release(void)

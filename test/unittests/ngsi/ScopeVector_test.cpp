@@ -88,25 +88,6 @@ TEST(ScopeVector, check)
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(ScopeVector, present)
-{
-  ScopeVector   sV;
-  Scope         scope("Type", "Value");
-
-  utInit();
-
-  sV.push_back(&scope);
-  sV.present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * getAndSize -
 */
 TEST(ScopeVector, getAndSize)

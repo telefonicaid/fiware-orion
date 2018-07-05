@@ -123,7 +123,7 @@ echo
 echo "03d. Update attr D with value null and type T2 using batch update UPDATE"
 echo "========================================================================"
 payload='{
-  "actionType": "UPDATE",
+  "actionType": "update",
   "entities":
   [
     {
@@ -144,7 +144,7 @@ echo
 echo "03d. Update attr E with value null and type T2 using batch update APPEND"
 echo "========================================================================"
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities":
   [
     {

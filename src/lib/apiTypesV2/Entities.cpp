@@ -79,21 +79,9 @@ std::string Entities::render
 *   The 'check' method is normally only used to check that incoming payload is correct.
 *   For now (at least), the Entities type is only used as outgoing payload ...
 */
-std::string Entities::check(ApiVersion apiVersion, RequestType requestType)
+std::string Entities::check(RequestType requestType)
 {
-  return vec.check(apiVersion, requestType);
-}
-
-
-
-/* ****************************************************************************
-*
-* Entities::present -
-*/
-void Entities::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%s%d Entities:", indent.c_str(), vec.size()));
-  vec.present(indent + "  ");
+  return vec.check(requestType);
 }
 
 

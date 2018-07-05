@@ -186,19 +186,6 @@ std::string QueryContextResponse::check(ApiVersion apiVersion, bool asJsonObject
 
 /* ****************************************************************************
 *
-* QueryContextResponse::present -
-*/
-void QueryContextResponse::present(const std::string& indent, const std::string& caller)
-{
-  LM_T(LmtPresent, ("QueryContextResponse presented by %s", caller.c_str()));
-  contextElementResponseVector.present(indent + "  ");
-  errorCode.present(indent + "  ");
-}
-
-
-
-/* ****************************************************************************
-*
 * QueryContextResponse::release -
 */
 void QueryContextResponse::release(void)

@@ -71,13 +71,13 @@ echo
 01. Update with actionType dfgdf and see error
 ==============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 129
+Content-Length: 127
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid update action type: right ones are: APPEND, APPEND_STRICT, DELETE, REPLACE, UPDATE",
+    "description": "invalid update action type: right ones are: append, appendStric, delete, replace, update",
     "error": "BadRequest"
 }
 

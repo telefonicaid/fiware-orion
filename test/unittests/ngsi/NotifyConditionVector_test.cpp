@@ -98,27 +98,6 @@ TEST(NotifyConditionVector, check)
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(NotifyConditionVector, present)
-{
-  NotifyCondition        nc;
-  NotifyConditionVector  ncV;
-
-  utInit();
-
-  nc.type = "Type";
-  ncV.push_back(&nc);
-
-  ncV.present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * get -
 */
 TEST(NotifyConditionVector, get)

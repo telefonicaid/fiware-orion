@@ -207,39 +207,6 @@ void EntityId::fill(const struct EntityId* eidP, bool useDefaultType)
 
 /* ****************************************************************************
 *
-* EntityId::present - 
-*/
-void EntityId::present(const std::string& indent, int ix)
-{
-  if (ix == -1)
-  {
-    LM_T(LmtPresent, ("%sEntity Id:",       indent.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sEntity Id %d:",       
-		      indent.c_str(), 
-		      ix));
-  }
-
-  LM_T(LmtPresent, ("%s  Id:         '%s'", 
-		    indent.c_str(), 
-		    id.c_str()));
-  LM_T(LmtPresent, ("%s  Type:       '%s'", 
-		    indent.c_str(), 
-		    type.c_str()));
-  LM_T(LmtPresent, ("%s  isPattern:  '%s'", 
-		    indent.c_str(), 
-		    isPattern.c_str()));
-  LM_T(LmtPresent, ("%s  isTypePttern:  '%s'",
-            indent.c_str(),
-            isTypePattern? "true" : "false"));
-}
-
-
-
-/* ****************************************************************************
-*
 * release -
 */
 void EntityId::release(void)

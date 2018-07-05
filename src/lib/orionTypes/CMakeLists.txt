@@ -30,6 +30,7 @@ SET (SOURCES
     QueryContextResponseVector.cpp
     UpdateContextRequestVector.cpp
     OrionValueType.cpp
+    UpdateActionType.cpp
 )
 
 SET (HEADERS
@@ -42,6 +43,7 @@ SET (HEADERS
     QueryContextResponseVector.h
     UpdateContextRequestVector.h
     OrionValueType.h
+    UpdateActionType.h
 )
 
 

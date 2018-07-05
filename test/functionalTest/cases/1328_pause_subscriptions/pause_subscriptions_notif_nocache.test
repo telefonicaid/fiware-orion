@@ -129,6 +129,7 @@ sleep $WAIT_TIME
 
 echo '06. Check subscription timesSent value (1)'
 echo "=========================================="
+valgrindSleep 1
 orionCurl --url /v2/subscriptions/$id1
 echo
 echo

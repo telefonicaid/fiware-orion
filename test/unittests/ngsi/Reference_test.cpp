@@ -75,27 +75,6 @@ TEST(Reference, isEmptySetAndGet)
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(Reference, present)
-{
-  Reference   reference;
-
-  utInit();
-
-  reference.set("");
-  reference.present("");
-
-  reference.set("STR");
-  reference.present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * render -
 */
 TEST(Reference, render)

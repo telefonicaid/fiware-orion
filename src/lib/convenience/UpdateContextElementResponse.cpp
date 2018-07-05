@@ -201,16 +201,3 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
     }
   }
 }
-
-
-
-/* ****************************************************************************
-*
-* present - 
-*/
-void UpdateContextElementResponse::present(const std::string& indent)
-{
-  LM_T(LmtPresent,("%sUpdateContextElementResponse:", indent.c_str()));
-  contextAttributeResponseVector.present(indent + "  ");
-  errorCode.present(indent + "  ");
-}

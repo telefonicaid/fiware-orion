@@ -128,18 +128,6 @@ std::string EntityType::check(ApiVersion apiVersion, const std::string&  predete
 
 /* ****************************************************************************
 *
-* EntityType::present -
-*/
-void EntityType::present(const std::string& indent)
-{
-  LM_T(LmtPresent,("%stype:   %s", indent.c_str(), type.c_str()));
-  contextAttributeVector.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
 * EntityType::release -
 */
 void EntityType::release(void)

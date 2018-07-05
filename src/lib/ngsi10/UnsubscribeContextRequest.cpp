@@ -70,17 +70,6 @@ std::string UnsubscribeContextRequest::check()
 
 /* ****************************************************************************
 *
-* UnsubscribeContextRequest::present - 
-*/
-void UnsubscribeContextRequest::present(const std::string& indent)
-{
-   subscriptionId.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
 * UnsubscribeContextRequest::release - 
 */
 void UnsubscribeContextRequest::release(void)

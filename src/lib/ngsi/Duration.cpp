@@ -136,24 +136,6 @@ int64_t Duration::parse(void)
 
 /* ****************************************************************************
 *
-* Duration::present
-*/
-void Duration::present(const std::string& indent)
-{
-  if (string != "")
-  {
-    LM_T(LmtPresent, ("%sDuration: %s\n", indent.c_str(), string.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNo Duration\n", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * Duration::render -
 */
 std::string Duration::render(bool comma)

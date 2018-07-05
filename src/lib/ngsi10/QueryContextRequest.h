@@ -63,7 +63,6 @@ typedef struct QueryContextRequest
 
   std::string   render(void);
   std::string   check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError);
-  void          present(const std::string& indent);
   void          release(void);
   void          fill(const std::string& entityId, const std::string& entityType, const std::string& attributeName);
   void          fill(const std::string&  entityId,

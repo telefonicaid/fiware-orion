@@ -62,9 +62,6 @@ TEST(ConditionValueList, ok)
   out = cvList.check();
   EXPECT_STREQ("empty condValue name", out.c_str());
 
-  // Just to exercise the code
-  cvList.present("");
-
   cvList.release();
   EXPECT_EQ(0, cvList.size());
 }

@@ -109,27 +109,6 @@ TEST(Originator, render)
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(Originator, present)
-{
-  Originator   originator;
-
-  utInit();
-
-  originator.set("");
-  originator.present("");
-
-  originator.set("STR");
-  originator.present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * c_str -
 */
 TEST(Originator, c_str)

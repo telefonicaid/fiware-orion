@@ -162,7 +162,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     caP->metadataVector.push_back(mdP);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -292,7 +292,7 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     caP->metadataVector.push_back(mdP);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -409,7 +409,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "2, -4");
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -514,7 +514,7 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("DELETE");
+    req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -619,7 +619,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     ca2P->metadataVector.push_back(md2P);
     ceP->contextAttributeVector.push_back(ca2P);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -738,7 +738,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     caP->metadataVector.push_back(mdP);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -848,7 +848,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
     caP->metadataVector.push_back(mdP);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -959,7 +959,7 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     caP->metadataVector.push_back(mdP);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -1072,7 +1072,7 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     caP->metadataVector.push_back(mdP);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -1185,7 +1185,7 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     caP->metadataVector.push_back(mdP);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -1295,7 +1295,7 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "invalid");
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -1405,7 +1405,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     caP->metadataVector.push_back(mdP);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -1517,7 +1517,7 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     caP->metadataVector.push_back(mdP);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("DELETE");
+    req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();

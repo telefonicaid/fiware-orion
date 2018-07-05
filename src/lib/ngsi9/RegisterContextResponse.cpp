@@ -153,19 +153,6 @@ std::string RegisterContextResponse::check(const std::string& predetectedError, 
 
 /* ****************************************************************************
 *
-* present - 
-*/
-void RegisterContextResponse::present(const std::string& indent)
-{
-   registrationId.present(indent);
-   duration.present(indent);
-   errorCode.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
 * release - 
 */
 void RegisterContextResponse::release(void)

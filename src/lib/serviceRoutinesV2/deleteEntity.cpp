@@ -85,7 +85,7 @@ std::string deleteEntity
   }
 
   // Fill in UpdateContextRequest
-  parseDataP->upcr.res.fill(eP, "DELETE");
+  parseDataP->upcr.res.fill(eP, ActionTypeDelete);
 
   // Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);

@@ -54,7 +54,6 @@ typedef struct ContextAttributeResponse
   std::string render(ApiVersion   apiVersion,
                      bool         asJsonObject,
                      RequestType  request);
-  void        present(const std::string&  indent);
   void        release(void);
   std::string check(ApiVersion          apiVersion,
                     bool                asJsonObject,

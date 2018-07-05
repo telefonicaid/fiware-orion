@@ -58,7 +58,6 @@ typedef struct ContextElement
                       const std::vector<std::string>&  attrsFilter,
                       const std::vector<std::string>&  metadataFilter,
                       bool                             blacklist = false) const;
-  void         present(const std::string& indent, int ix);
   void         release(void);
   void         fill(const struct ContextElement& ce);
   void         fill(ContextElement* ceP, bool useDefaultType = false);

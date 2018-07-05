@@ -33,6 +33,7 @@ accumulatorStart --pretty-print
 #
 # Note we use sleep in some point to let time the DB to sync with regards to
 # cache timeSent value (WAIT_TIME = 1.5 * subCacheIval)
+# [ Under VALGRIND we need to sleep a little more ]
 #
 WAIT_TIME=1.5s
 #
@@ -71,6 +72,7 @@ echo
 echo
 id1=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
+valgrindSleep 1
 
 echo '02. Create entity (triggers notification)'
 echo "========================================="
@@ -85,6 +87,8 @@ payload='
 orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
+
+
 sleep $WAIT_TIME
 
 
@@ -117,7 +121,10 @@ payload='
 orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload"
 echo
 echo
+
+
 sleep $WAIT_TIME
+valgrindSleep 2
 
 
 echo "09. Accumulator dump"

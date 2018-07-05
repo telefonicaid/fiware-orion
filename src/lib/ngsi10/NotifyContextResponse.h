@@ -45,7 +45,6 @@ typedef struct NotifyContextResponse
   NotifyContextResponse(StatusCode& sc);
 
   std::string   render(void);
-  void          present(const std::string& indent);
   void          release(void);
 } NotifyContextResponse;
 

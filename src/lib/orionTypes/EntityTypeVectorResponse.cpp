@@ -103,22 +103,6 @@ std::string EntityTypeVectorResponse::check
 
 /* ****************************************************************************
 *
-* EntityTypeVectorResponse::present -
-*/
-void EntityTypeVectorResponse::present(const std::string& indent)
-{
-  LM_T(LmtPresent,("%s%d items in EntityTypeVectorResponse:\n",
-		  indent.c_str(),
-		  entityTypeVector.size()));
-
-  entityTypeVector.present(indent + "  ");
-  statusCode.present(indent + "  ");
-}
-
-
-
-/* ****************************************************************************
-*
 * EntityTypeVectorResponse::release -
 */
 void EntityTypeVectorResponse::release(void)

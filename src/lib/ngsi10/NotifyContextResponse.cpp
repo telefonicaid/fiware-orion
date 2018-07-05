@@ -79,19 +79,6 @@ std::string NotifyContextResponse::render(void)
 
 /* ****************************************************************************
 *
-* NotifyContextResponse::present - 
-*/
-void NotifyContextResponse::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%sNotifyContextResponse:", indent.c_str()));
-  responseCode.present(indent + "  ");
-  LM_T(LmtPresent, ("\n"));
-}
-
-
-
-/* ****************************************************************************
-*
 * NotifyContextResponse::release - 
 */
 void NotifyContextResponse::release(void)

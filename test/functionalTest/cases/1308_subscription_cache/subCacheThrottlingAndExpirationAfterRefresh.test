@@ -194,9 +194,9 @@ Date: REGEX(.*)
 
 {
     "ids": "REGEX([0-9a-f]{24})",
-    "inserts": REGEX((1|2)),
+    "inserts": REGEX((1|2|3)),
     "items": 1,
-    "refresh": REGEX((0|1|2)),
+    "refresh": REGEX((0|1|2|3)),
     "removes": 0,
     "updates": 0
 }

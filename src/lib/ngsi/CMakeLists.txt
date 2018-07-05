@@ -58,7 +58,6 @@ SET (SOURCES
     SubscribeError.cpp
     SubscriptionId.cpp
     Throttling.cpp
-    UpdateActionType.cpp
 )
 
 SET (HEADERS
@@ -96,7 +95,6 @@ SET (HEADERS
     SubscribeResponse.h
     SubscriptionId.h
     Throttling.h
-    UpdateActionType.h
 )
 
 

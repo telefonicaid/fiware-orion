@@ -108,26 +108,6 @@ std::string RegistrationId::get(void) const
 
 /* ****************************************************************************
 *
-* RegistrationId::present -
-*/
-void RegistrationId::present(const std::string& indent)
-{
-  if (string != "")
-  {
-    LM_T(LmtPresent, ("%sRegistrationId: %s\n", 
-		      indent.c_str(), 
-		      string.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNo RegistrationId\n", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * RegistrationId::render -
 */
 std::string RegistrationId::render(RequestType requestType, bool comma)

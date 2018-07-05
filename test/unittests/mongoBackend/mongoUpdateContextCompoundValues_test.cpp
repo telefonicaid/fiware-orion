@@ -305,7 +305,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1)
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", cv);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -388,7 +388,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2)
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", cv);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -471,7 +471,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
     ceP->contextAttributeVector.push_back(ca1P);
     ceP->contextAttributeVector.push_back(ca2P);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -566,7 +566,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValu
     ceP->contextAttributeVector.push_back(ca1P);
     ceP->contextAttributeVector.push_back(ca2P);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -657,7 +657,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1Native)
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", cv);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -742,7 +742,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2Native)
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", cv);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -826,7 +826,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
     ceP->contextAttributeVector.push_back(ca1P);
     ceP->contextAttributeVector.push_back(ca2P);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -923,7 +923,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValu
     ceP->contextAttributeVector.push_back(ca1P);
     ceP->contextAttributeVector.push_back(ca2P);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -1016,7 +1016,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1)
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", cv);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -1106,7 +1106,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2)
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", cv);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -1196,7 +1196,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1PlusSimpleValu
     ceP->contextAttributeVector.push_back(ca1P);
     ceP->contextAttributeVector.push_back(ca2P);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -1298,7 +1298,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2PlusSimpleValu
     ceP->contextAttributeVector.push_back(ca1P);
     ceP->contextAttributeVector.push_back(ca2P);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -1396,7 +1396,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundObject)
     ContextAttribute* caP = new ContextAttribute("AX", "TAX", cv);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -1476,7 +1476,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundObjectToSimple)
     ContextAttribute* caP = new ContextAttribute("AX", "TAX", "new_value");
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -1555,7 +1555,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundObje
     ContextAttribute* caP = new ContextAttribute("AX", "TAX", cv);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -1635,7 +1635,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundObjectToSimp
     ContextAttribute* caP = new ContextAttribute("AX", "TAX", "new_value");
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -1715,7 +1715,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundVector)
     ContextAttribute* caP = new ContextAttribute("AX", "TAX", cv);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -1797,7 +1797,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundVectorToSimple)
     ContextAttribute* caP = new ContextAttribute("AX", "TAX", "new_value");
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -1876,7 +1876,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundVect
     ContextAttribute* caP = new ContextAttribute("AX", "TAX", cv);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -1958,7 +1958,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundVectorToSimp
     ContextAttribute* caP = new ContextAttribute("AX", "TAX", "new_value");
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
