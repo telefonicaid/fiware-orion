@@ -3320,7 +3320,7 @@ static bool contextElementPreconditionsCheck
   /* Checking there aren't duplicate attributes */
   for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
   {
-    std::string name = ceP->contextAttributeVector[ix]->name;    
+    std::string name = ceP->contextAttributeVector[ix]->name;
     for (unsigned int jx = ix + 1; jx < ceP->contextAttributeVector.size(); ++jx)
     {
       if (name == ceP->contextAttributeVector[jx]->name)
