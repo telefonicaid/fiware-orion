@@ -159,6 +159,8 @@ std::string ContextAttributeVector::toJson
     return "";
   }
 
+  // Check if dateExipres has to be rendered or not
+  bool includeDateExpires = (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_EXPIRES) != attrsFilter.end());
 
   //
   // Pass 1 - count the total number of attributes valid for rendering.
@@ -183,6 +185,11 @@ std::string ContextAttributeVector::toJson
         continue;
       }
 
+      if ((vec[ix]->name == DATE_EXPIRES) && !includeDateExpires)
+      {
+        continue;
+      }
+
       if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
         if (uniqueMap[vec[ix]->stringValue] == true)
@@ -203,6 +210,11 @@ std::string ContextAttributeVector::toJson
   {
     for (std::vector<std::string>::const_iterator it = attrsFilter.begin(); it != attrsFilter.end(); ++it)
     {
+      if ((*it == DATE_EXPIRES) && !includeDateExpires)
+      {
+        continue;
+      }
+
       if (lookup(*it) != NULL)
       {
         ++validAttributes;
@@ -237,6 +249,11 @@ std::string ContextAttributeVector::toJson
         continue;
       }
 
+      if ((vec[ix]->name == DATE_EXPIRES) && !includeDateExpires)
+      {
+        continue;
+      }
+
       ++renderedAttributes;
 
       if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
@@ -262,6 +279,11 @@ std::string ContextAttributeVector::toJson
       ContextAttribute* caP = lookup(*it);
       if (caP != NULL)
       {
+        if ((caP->name == DATE_EXPIRES) && !includeDateExpires)
+        {
+          continue;
+        }
+
         ++renderedAttributes;
         out += caP->toJson(renderedAttributes == validAttributes, renderFormat, metadataFilter);
       }
