@@ -17,6 +17,7 @@
  different attribute value types](#ordering-between-different-attribute-value-types)
 * [Initial notifications](#initial_notifications)
 * [Registrations](#registrations)
+* [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
 
 This document describes some considerations to take into account
@@ -399,6 +400,13 @@ for forwarding requests associated to that registration. However, for the time b
 forwarding has not been defined (see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3068)
 about it) so the only valid option is to always use `"legacyForwarding": true` (otherwise a 501 Not Implemented
 error response will be the result).
+
+[Top](#top)
+
+## `keyValues` not supported in `POST /v2/op/notify`
+
+The current Orion implementation doesn't support `keyValues` option in `POST /v2/op/notify` operation. If you attempt
+to use it you would get a 400 Bad Request error.
 
 [Top](#top)
 
