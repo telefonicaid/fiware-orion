@@ -98,9 +98,17 @@
 *
 * virtual attributes
 */
-#define DATE_CREATED   "dateCreated"
-#define DATE_MODIFIED  "dateModified"
-#define ALL_ATTRS      "*"
+#define DATE_CREATED    "dateCreated"
+#define DATE_MODIFIED   "dateModified"
+#define ALL_ATTRS       "*"
+
+
+
+/* ****************************************************************************
+*
+* Transient entity attribute -
+*/
+#define DATE_EXPIRES "dateExpires"
 
 
 
@@ -128,6 +136,7 @@
 #define OPT_DATE_CREATED    DATE_CREATED
 #define OPT_DATE_MODIFIED   DATE_MODIFIED
 #define OPT_NO_ATTR_DETAIL  "noAttrDetail"
+#define OPT_UPSERT          "upsert"
 
 
 

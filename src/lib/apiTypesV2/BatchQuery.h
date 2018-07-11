@@ -43,7 +43,8 @@ class BatchQuery
 {
  public:
   Entities       entities;
-  StringList     attributeV;
+  StringList     attributeV;  // Deprecated
+  StringList     attrsV;
   ScopeVector    scopeV;
   StringList     metadataV;
 
