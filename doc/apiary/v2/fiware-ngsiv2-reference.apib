@@ -293,8 +293,13 @@ name to the `attrs` parameter in URLs (or payload field in POST /v2/op/query ope
 subscription (`attrs` sub-field within `notification`).
 
 The list of builtin attributes is as follows:
+
 * `dateCreated` (type: `DateTime`): entity creation date as an ISO 8601 string.
+
 * `dateModified` (type: `DateTime`): entity modification date as an ISO 8601 string.
+
+* `dateExpires` (type: `DateTime`): entity expiration date as an ISO 8601 string. How the server
+  controls entity expiration is an implementation specific aspect.
 
 Like regular attributes, they can be  used in `q` filters and in `orderBy`.
 However, they cannot be used in resource URLs.

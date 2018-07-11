@@ -1,6 +1,7 @@
 # Transient Entities
 
-A transient entity is a regular entity (i.e. it has id/type, a set of attributes, etc.) but with a expiration timestamp. When such point in time is reached the entity is automatically deleted from the context managed by Orion.
+A transient entity is a regular entity (i.e. it has id/type, a set of attributes, etc.) but with a expiration timestamp.
+When such point in time is reached the entity is automatically deleted from the context managed by Orion.
 
 Thus, a first and very important piece of advice: **be careful if you use transient entities as once
 the expiration time has come, the entity will be automatically deleted from database and there is
@@ -12,8 +13,14 @@ in the case you are already using attributes with the exact name `dateExpires`**
 
 ## The `dateExpires` attribute
 
-The expiration timestamp of an entity is defined by means of the `dateExpires` attribute. This is an 
-attribute of `DateTime` type, according to the [NGSIv2 specification](https://fiware.github.io/specifications/ngsiv2/stable/). Its value is the datetime when the entity will expire.
+The expiration timestamp of an entity is defined by means of the `dateExpires` NGSIv2 builtin attribute. This is an
+attribute of `DateTime` type, according to the [NGSIv2 specification](https://fiware.github.io/specifications/ngsiv2/stable/).
+Its value is the datetime when the entity will expire.
+
+As any other NGSIv2 builtin attribute, `dateExpires` is not shown by default, you need to use `attrs` URI parameter (in GET
+based queries) or `"attrs"` field (in `POST /v2/op/query`) in order to get it. Please have a look to sections "Builtin Attributes"
+and "Filtering out attributes and metadata" in the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable)
+for more details.
 
 ## Valid transitions
 
@@ -112,13 +119,20 @@ document. Have a look to [this link](http://hassansin.github.io/working-with-mon
 
 ## Backward compatibility considerations
 
-Transient entity were introduced in Orion 1.15.0. Up to Orion 1.14.0 `dateExpires` is interpreted as an attribute without
-any special semantic. So, what would happen in the case you are already using an attribute named `dateExpires` 
-in your application before upgrading to Orion 1.15.0?
+Transient entity were introduced in Orion 1.15.0. Up to Orion 1.14.0 `dateExpires` is interpreted as a regular
+attribute without any special semantic. So, what would happen in the case you are already using an attribute
+named `dateExpires` in your application before upgrading to Orion 1.15.0?
 
-Existing entities using `dateExpires` will keep using it in the same way until the attribute gets updated. 
-That is, if `dateExpires` is not a `DateTime` (e.g. a number, a regular string, etc.) it will keep with the same value (e.g. in GET operations, etc.). If `dateExpires` is a `DateTime` that datetime will not be interpreted as an expiration date (i.e. the
-entity will not be deleted after the datetime passes).
+Existing entities using `dateExpires` will keep using it in the same way until the attribute gets updated.
+That is, if `dateExpires` is not a `DateTime` (e.g. a number, a regular string, etc.) it will keep with
+the same value (e.g. in GET operations, etc.). If `dateExpires` is a `DateTime` that datetime will not be
+interpreted as an expiration date (i.e. the entity will not be deleted after the datetime passes).
 
-However, once `dateExpires` attribute get updated for first time, it will start to mean an expiration date on the given 
-entity, with the behaviour described in previous section. Please, **take this into account in the case you were implementing client-side expiration based on the value of that attribute, as your entities could be automatically deleted in an unwanted way**.
+However, even in the case the attribute would keep its previous value without any special semantic, note
+that `dataExpires` becomes a builtin attribute, so it is not shown except if explicetly requested with
+`attrs` URI parameter (in GET based queries) or `"attrs"` field (in `POST /v2/op/query`).
+
+Once `dateExpires` attribute get updated for first time, it will start to mean an expiration date on the given
+entity, with the behaviour described in previous section. Please, **take this into account in the case
+you were implementing client-side expiration based on the value of that attribute, as your entities could
+be automatically deleted in an unwanted way**.
