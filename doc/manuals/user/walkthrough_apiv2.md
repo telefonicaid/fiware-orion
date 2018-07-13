@@ -994,7 +994,7 @@ attribute in other (pressure in Room4), leaving the other attributes untouched.
 ```
 curl -v localhost:1026/v2/op/update -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
-  "actionType": "udpate",
+  "actionType": "update",
   "entities": [
     {
       "type": "Room",
