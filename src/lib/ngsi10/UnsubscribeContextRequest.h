@@ -41,7 +41,6 @@ typedef struct UnsubscribeContextRequest
 
   std::string     render(void);
   std::string     check(void);
-  void            present(const std::string& indent);
   void            release(void);
 } UnsubscribeContextRequest;
 

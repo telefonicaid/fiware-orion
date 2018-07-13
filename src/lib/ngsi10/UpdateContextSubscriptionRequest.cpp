@@ -83,21 +83,6 @@ std::string UpdateContextSubscriptionRequest::check(const std::string& predetect
 
 /* ****************************************************************************
 *
-* UpdateContextSubscriptionRequest::present - 
-*/
-void UpdateContextSubscriptionRequest::present(const std::string& indent)
-{
-  duration.present(indent);
-  restriction.present(indent);
-  subscriptionId.present(indent);
-  notifyConditionVector.present(indent);
-  throttling.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
 * UpdateContextSubscriptionRequest::release - 
 */
 void UpdateContextSubscriptionRequest::release(void)

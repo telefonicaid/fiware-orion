@@ -955,7 +955,7 @@ For example, to create Room3 (temperature 21.2 and pressure 722) and Room4
 ```
 curl -v localhost:1026/v2/op/update -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities": [
     {
       "type": "Room",
@@ -987,14 +987,14 @@ EOF
 ```
 
 The response uses HTTP response code 204 No Content. In this case we are using
-APPEND `actionType`, which is for adding entities and attribute. We can also use
-UPDATE to change an attribute in one entity (temperature in Room3) and another
+`append` `actionType`, which is for adding entities and attribute. We can also use
+`update` to change an attribute in one entity (temperature in Room3) and another
 attribute in other (pressure in Room4), leaving the other attributes untouched.
 
 ```
 curl -v localhost:1026/v2/op/update -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
-  "actionType": "UPDATE",
+  "actionType": "update",
   "entities": [
     {
       "type": "Room",
@@ -1017,7 +1017,7 @@ curl -v localhost:1026/v2/op/update -s -S -H 'Content-Type: application/json' -d
 EOF
 ```
 
-Apart from APPEND and UPDATE, there are other action types: DELETE, APPEND_STRICT, etc. Check out
+Apart from `append` and `update`, there are other action types: `delete`, `appendStrict`, etc. Check out
 [this section](update_action_types.md) for details.
 
 Finally, the `POST /v2/op/query` allows to retrieve entities matching a query condition
@@ -1043,31 +1043,19 @@ curl -v localhost:1026/v2/op/query -s -S -H 'Content-Type: application/json' -d 
       "type": "Car"
     }
   ],
-  "attributes": [
+  "attrs": [
     "temperature",
     "pressure"
   ],
-  "scopes": [
-    {
-      "type": "FIWARE::StringQuery",
-      "value": "temperature>40"
-    },
-    {
-      "type" : "FIWARE::Location::NGSIv2",
-      "value" : {
-        "georel": [ "near", "maxDistance:20000" ],
-        "geometry": "point",
-        "coords": [ [40.31,-3.75] ]
-      }
-    }
-  ]
+  "expression": {
+    "q": "temperature>40",
+    "georel": "near;maxDistance:20000",
+    "geometry": "point",
+    "coords": "40,31,-3.75"
+  }
 }
 EOF
 ```
-
-The syntax for the `scope` field above has not been fully consolidated in the NGSIv2 specification
-yet. For the moment, that syntax is in beta status. Thus, *use it with care as it may change in the
-future* (see [NGSIv2 implementation notes](ngsiv2_implementation_notes.md#scope-functionality)).
 
 [Top](#top)
 

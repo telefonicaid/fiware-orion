@@ -53,7 +53,6 @@ class EntityTypeVectorResponse
                           bool                asJsonOut,
                           bool                collapsed,
                           const std::string&  predetectedError);
-  void              present(const std::string& indent);
   void              release(void);
   std::string       toJson(bool values);
 };

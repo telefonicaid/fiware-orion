@@ -88,18 +88,6 @@ std::string Entities::check(RequestType requestType)
 
 /* ****************************************************************************
 *
-* Entities::present -
-*/
-void Entities::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%s%d Entities:", indent.c_str(), vec.size()));
-  vec.present(indent + "  ");
-}
-
-
-
-/* ****************************************************************************
-*
 * Entities::release -
 */
 void Entities::release(void)

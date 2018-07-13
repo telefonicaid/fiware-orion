@@ -255,28 +255,6 @@ std::string StatusCode::check(void)
 
 /* ****************************************************************************
 *
-* StatusCode::present -
-*/
-void StatusCode::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%s%s:", 
-		    indent.c_str(), 
-        keyName.c_str()));
-  LM_T(LmtPresent, ("%s  Code:            %d",   
-		    indent.c_str(), 
-		    code));
-  LM_T(LmtPresent, ("%s  ReasonPhrase:    '%s'", 
-		    indent.c_str(), 
-		    reasonPhrase.c_str()));
-  LM_T(LmtPresent, ("%s  Detail:          '%s'", 
-		    indent.c_str(), 
-		    details.c_str()));
-}
-
-
-
-/* ****************************************************************************
-*
 * release -
 */
 void StatusCode::release(void)

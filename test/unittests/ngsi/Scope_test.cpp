@@ -86,21 +86,3 @@ TEST(Scope, check)
 
   utExit();
 }
-
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code
-*/
-TEST(Scope, present)
-{
-  Scope   scope("Type", "Value");
-
-  utInit();
-
-  scope.present("", -1);
-  scope.present("", 0);
-
-  utExit();
-}

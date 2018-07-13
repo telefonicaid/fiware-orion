@@ -9,6 +9,7 @@
   * [API Walkthrough](walkthrough_apiv1.md)
   * [Pagination](pagination.md)
   * [Geolocation ](geolocation.md)
+  * [Transient Entities](transient_entities.md)
   * [Structured values for attributes](structured_attribute_valued.md)
   * [Context Providers registration and request forwarding](context_providers.md)
   * [Attribute metadata](metadata.md)

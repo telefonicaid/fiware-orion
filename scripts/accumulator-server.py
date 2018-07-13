@@ -207,16 +207,18 @@ def bad_response():
     r.data = '{"name":"ENTITY_NOT_FOUND","message":"The entity with the requested id [qa_name_01] was not found."}'
     return r
 
-@app.route("/v1/updateContext", methods=['POST'])
-@app.route("/v1/queryContext", methods=['POST'])
-@app.route(server_url, methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH'])
-def record():
+
+def record_request(request):
+    """
+    Common function used by serveral route methods to save request content
+
+    :param request: the request to save
+    """
 
     global ac, t0, times
     s = ''
-    send_continue = False
 
-    # First notification? Then, set reference datetime. Otherwise, add the
+    # First request? Then, set reference datetime. Otherwise, add the
     # timedelta to the list
     if (t0 == ''):
         t0 = datetime.now()
@@ -225,9 +227,9 @@ def record():
         delta = datetime.now() - t0
         # Python 2.7 could use delta.total_seconds(), but we use this formula
         # for backward compatibility with Python 2.6
-        t = (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10**6) / 10**6
+        t = (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10 ** 6) / 10 ** 6
         times.append(trunc(round(t)))
-        #times.append(t)
+        # times.append(t)
 
     # Store verb and URL
     #
@@ -246,7 +248,7 @@ def record():
             params = k + '=' + request.args[k]
         else:
             params += '&' + k + '=' + request.args[k]
- 
+
     if (params == ''):
         s += '\n'
     else:
@@ -255,8 +257,6 @@ def record():
     # Store headers
     for h in request.headers.keys():
         s += h + ': ' + request.headers[h] + '\n'
-        if ((h == 'Expect') and (request.headers[h] == '100-continue')):
-            send_continue = True
 
     # Store payload
     if ((request.data is not None) and (len(request.data) != 0)):
@@ -264,7 +264,7 @@ def record():
         if pretty == True:
             raw = json.loads(request.data)
             s += json.dumps(raw, indent=4, sort_keys=True)
-            s +='\n'
+            s += '\n'
         else:
             s += request.data
 
@@ -277,10 +277,49 @@ def record():
     if verbose:
         print s
 
-    if send_continue:
+
+def send_continue(request):
+    """
+    Inspect request header in order to look if we have to continue or not
+
+    :param request: the request to look
+    :return: true if we  have to continue, false otherwise
+    """
+
+    for h in request.headers.keys():
+        if ((h == 'Expect') and (request.headers[h] == '100-continue')):
+            send_continue = True
+
+    return False
+
+
+@app.route("/v1/updateContext", methods=['POST'])
+@app.route("/v1/queryContext", methods=['POST'])
+@app.route(server_url, methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH'])
+def record():
+
+    # Store request
+    record_request(request)
+
+    if send_continue(request):
         return Response(status=100)
     else:
         return Response(status=200)
+
+
+@app.route("/bug2871/updateContext", methods=['POST'])
+def record_2871():
+
+    # Store request
+    record_request(request)
+
+    if send_continue(request):
+        return Response(status=100)
+    else:
+        # Ad hoc response related with issue #2871, see https://github.com/telefonicaid/fiware-orion/issues/2871
+        r = Response(status=200)
+        r.data = '{"contextResponses":[{"contextElement":{"attributes":[{"name":"turn","type":"string","value":""}],"id":"entity1","isPattern":false,"type":"device"},"statusCode":{"code":200,"reasonPhrase":"OK"}}]}'
+        return r
 
 
 @app.route('/dump', methods=['GET'])

@@ -73,18 +73,6 @@ std::string Restriction::check(int counter)
 
 /* ****************************************************************************
 *
-* Restriction::present -
-*/
-void Restriction::present(const std::string& indent)
-{
-  attributeExpression.present(indent);
-  scopeVector.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
 * Restriction::render -
 */
 std::string Restriction::render(int restrictions, bool comma)

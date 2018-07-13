@@ -50,7 +50,6 @@ typedef struct RegisterProviderRequest
 
   std::string  render(void);
   std::string  check(ApiVersion apiVersion, RequestType requestType, const std::string& preError);
-  void         present(const std::string&  indent);
   void         release();
 } RegisterProviderRequest;
 

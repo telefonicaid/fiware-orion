@@ -74,8 +74,6 @@ TEST(UpdateContextSubscriptionRequest, badLength_json)
   //
   UpdateContextSubscriptionRequest*  ucsrP = &parseData.ucsr.res;
 
-  ucsrP->present(""); // No output
-
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   out  = ucsrP->check("FORCED ERROR", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
@@ -85,7 +83,6 @@ TEST(UpdateContextSubscriptionRequest, badLength_json)
   out  = ucsrP->check("", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  ucsrP->present("");
   ucsrP->release();
 
   utExit();

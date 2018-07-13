@@ -29,25 +29,6 @@
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(EntityTypeResponse, present)
-{
-  utInit();
-
-  EntityTypeResponse etRes;
-  etRes.statusCode.fill(SccOk);
-  etRes.entityType.type = "myType";
-
-  etRes.present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * check
 */
 TEST(EntityTypeResponse, check)

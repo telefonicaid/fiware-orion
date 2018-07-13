@@ -82,7 +82,7 @@ echo
 echo "05. Batch Update without 'entities' (which is mandatory)"
 echo "========================================================"
 payload='{
-  "actionType": "UPDATE"
+  "actionType": "update"
 }'
 orionCurl --url /v2/op/update --payload "$payload"
 echo
@@ -92,7 +92,7 @@ echo
 echo "06. Batch Update with unrecognized item 'foo'"
 echo "============================================="
 payload='{
-  "actionType": "UPDATE",
+  "actionType": "update",
   "entities": [
     {
       "id": "E",
@@ -109,7 +109,7 @@ echo
 echo "07. Batch Update with empty entity vector"
 echo "========================================="
 payload='{
-  "actionType": "UPDATE",
+  "actionType": "update",
   "entities": [
   ],
 }'
@@ -121,7 +121,7 @@ echo
 echo "08. Batch Update with entity without 'id'"
 echo "========================================="
 payload='{
-  "actionType": "UPDATE",
+  "actionType": "update",
   "entities": [
     {
       "type": "T"
@@ -136,7 +136,7 @@ echo
 echo "09. Batch Update with entity with unknown field (and no options=keyValues)"
 echo "=========================================================================="
 payload='{
-  "actionType": "UPDATE",
+  "actionType": "update",
   "entities": [
     {
       "id": "E",

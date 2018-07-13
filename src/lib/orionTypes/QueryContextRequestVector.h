@@ -46,7 +46,6 @@ typedef struct QueryContextRequestVector
   void                  push_back(QueryContextRequest* item);
   QueryContextRequest*  lookup(const std::string& contextProvider, EntityId* eP);
   void                  release(void);
-  void                  present(void);
   QueryContextRequest*  operator[](unsigned int ix) const;
 
 } QueryContextRequestVector;

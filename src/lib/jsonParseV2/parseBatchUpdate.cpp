@@ -33,8 +33,8 @@
 #include "ngsi/Request.h"
 #include "jsonParseV2/parseEntityVector.h"
 #include "jsonParseV2/parseStringList.h"
-#include "jsonParseV2/parseScopeVector.h"
 #include "jsonParseV2/parseBatchUpdate.h"
+#include "orionTypes/UpdateActionType.h"
 
 
 
@@ -115,15 +115,18 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
     }
     else if (name == "actionType")
     {
-      burP->updateActionType.set(iter->value.GetString());
-      std::string err = burP->updateActionType.check();
-      if (err != "OK")
+      ActionType actionType;
+      if ((actionType = parseActionTypeV2(iter->value.GetString())) == ActionTypeUnknown)
       {
-        alarmMgr.badInput(clientIp, err);
-        oe.fill(SccBadRequest, err, "BadRequest");
+        std::string details = "invalid update action type: right ones are: append, appendStric, delete, replace, update";
+
+        alarmMgr.badInput(clientIp, details);
+        oe.fill(SccBadRequest, details, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
+
         return oe.toJson();
       }
+      burP->updateActionType = actionType;
     }
     else
     {

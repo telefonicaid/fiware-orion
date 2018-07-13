@@ -2,6 +2,7 @@
 *~
 *.bak
 .*
+!.travis.yml
 *.autosave
 BUILD_*
 ToDo

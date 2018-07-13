@@ -122,26 +122,6 @@ TEST(AppendContextElementRequest, check_json)
 
 /* ****************************************************************************
 *
-* present - just exercise the code
-*/
-TEST(AppendContextElementRequest, present)
-{
-   AppendContextElementRequest  acer;
-   std::string                  out;
-   ContextAttribute             ca("caName", "caType", "121");
-   Metadata                     md("mdName", "mdType", "122");
-
-   acer.attributeDomainName.set("ADN");
-   acer.contextAttributeVector.push_back(&ca);
-   acer.domainMetadataVector.push_back(&md);
-
-   acer.present("");
-}
-
-
-
-/* ****************************************************************************
-*
 * release - just exercise the code
 */
 TEST(AppendContextElementRequest, release)

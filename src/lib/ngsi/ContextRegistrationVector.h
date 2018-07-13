@@ -43,7 +43,6 @@ typedef struct ContextRegistrationVector
   void                  push_back(ContextRegistration* item);
   unsigned int          size(void);
   std::string           render(bool comma);
-  void                  present(const std::string& indent);
   void                  release(void);
 
   std::string           check(ApiVersion          apiVersion,

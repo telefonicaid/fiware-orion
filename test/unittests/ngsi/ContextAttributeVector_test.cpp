@@ -46,20 +46,7 @@ TEST(ContextAttributeVector, render)
   out = cav.render(V1, false, UpdateContextAttribute, "");
   EXPECT_STREQ("", out.c_str());
 
-  // Just to exercise the code ...
-  cav.present("");
-
   utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* present - 
-*/
-TEST(ContextAttributeVector, present)
-{
 }
 
 

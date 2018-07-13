@@ -49,7 +49,6 @@ typedef struct RegisterContextRequest
 
   std::string   render(void);
   std::string   check(ApiVersion apiVersion, const std::string& predetectedError, int counter);
-  void          present(void);
   void          release(void);
   void          fill(RegisterProviderRequest& rpr, const std::string& entityId, const std::string& entityType, const std::string& attributeName);
 } RegisterContextRequest;

@@ -431,23 +431,3 @@ std::string jsonRcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
   return reqData->rcr.res.check(ciP->apiVersion, reqData->errorString, 0);
 }
-
-
-
-/* ****************************************************************************
-*
-* jsonRcrPresent - 
-*/
-void jsonRcrPresent(ParseData* reqDataP)
-{
-  if (!lmTraceIsSet(LmtPresent))
-  {
-    return;
-  }
-
-  LM_T(LmtPresent,("\n\n"));
-
-  reqDataP->rcr.res.contextRegistrationVector.present("");
-  reqDataP->rcr.res.duration.present("");
-  reqDataP->rcr.res.registrationId.present("");
-}

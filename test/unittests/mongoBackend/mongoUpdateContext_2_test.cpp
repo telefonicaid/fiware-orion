@@ -429,7 +429,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     caP->metadataVector.push_back(&md);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -611,7 +611,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val2");
     ceP->contextAttributeVector.push_back(ca2P);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -795,7 +795,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     caP->metadataVector.push_back(&md);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -981,7 +981,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     ContextAttribute* ca2P = new ContextAttribute("A3", "TA3", "new_val3");
     ceP->contextAttributeVector.push_back(ca2P);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -1174,7 +1174,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     caP->metadataVector.push_back(&md);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -1353,7 +1353,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -1531,7 +1531,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     caP->metadataVector.push_back(&md);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("DELETE");
+    req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -1708,7 +1708,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "");
     ceP->contextAttributeVector.push_back(ca2P);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("DELETE");
+    req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -1885,7 +1885,7 @@ TEST(mongoUpdateContextRequest, appendCreateEntWithMd)
     caP->metadataVector.push_back(&md2);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -1984,7 +1984,7 @@ TEST(mongoUpdateContextRequest, appendMdAllExisting)
     caP->metadataVector.push_back(&md);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2079,7 +2079,7 @@ TEST(mongoUpdateContextRequest, updateMdAllExisting)
     caP->metadataVector.push_back(&md);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2174,7 +2174,7 @@ TEST(mongoUpdateContextRequest, appendMdAllNew)
     caP->metadataVector.push_back(&md);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2273,7 +2273,7 @@ TEST(mongoUpdateContextRequest, updateMdAllNew)
     caP->metadataVector.push_back(&md);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2374,7 +2374,7 @@ TEST(mongoUpdateContextRequest, appendMdSomeNew)
     caP->metadataVector.push_back(&md2);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2478,7 +2478,7 @@ TEST(mongoUpdateContextRequest, updateMdSomeNew)
     caP->metadataVector.push_back(&md2);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2580,7 +2580,7 @@ TEST(mongoUpdateContextRequest, appendValueAndMd)
     caP->metadataVector.push_back(&md);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2675,7 +2675,7 @@ TEST(mongoUpdateContextRequest, updateValueAndMd)
     caP->metadataVector.push_back(&md);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2771,7 +2771,7 @@ TEST(mongoUpdateContextRequest, appendMdNoActualChanges)
     caP->metadataVector.push_back(&md);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2866,7 +2866,7 @@ TEST(mongoUpdateContextRequest, updateMdNoActualChanges)
     caP->metadataVector.push_back(&md);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2965,7 +2965,7 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     ce2P->contextAttributeVector.push_back(ca2P);
     req.contextElementVector.push_back(ce1P);
     req.contextElementVector.push_back(ce2P);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -3128,7 +3128,7 @@ TEST(mongoUpdateContextRequest, notExistFilter)
 
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Set filter */
     uriParams[URI_PARAM_NOT_EXIST] = "entity::type";
@@ -3291,7 +3291,7 @@ TEST(mongoUpdateContextRequest, createNativeTypes)
     ceP->contextAttributeVector.push_back(ca3P);
     ceP->contextAttributeVector.push_back(ca4P);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -3500,7 +3500,7 @@ TEST(mongoUpdateContextRequest, updateNativeTypes)
     ce2P->contextAttributeVector.push_back(ca3P);
     req.contextElementVector.push_back(ce2P);
 
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", V2);
@@ -3673,7 +3673,7 @@ TEST(mongoUpdateContextRequest, preservingNativeTypes)
     ContextAttribute* caP = new ContextAttribute("A1", "T", "new_s");
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -3783,7 +3783,7 @@ TEST(mongoUpdateContextRequest, createMdNativeTypes)
     caP->metadataVector.push_back(&md4);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -3993,7 +3993,7 @@ TEST(mongoUpdateContextRequest, updateMdNativeTypes)
     caP->metadataVector.push_back(&md3);
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -4103,7 +4103,7 @@ TEST(mongoUpdateContextRequest, preservingMdNativeTypes)
     ContextAttribute* caP = new ContextAttribute("A1", "T", "new_s");
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -4206,7 +4206,7 @@ TEST(mongoUpdateContextRequest, replace)
     ce2P->contextAttributeVector.push_back(ca3P);
     req.contextElementVector.push_back(ce1P);
     req.contextElementVector.push_back(ce2P);
-    req.updateActionType.set("REPLACE");
+    req.updateActionType = ActionTypeReplace;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -4370,7 +4370,7 @@ TEST(mongoUpdateContextRequest, tooManyEntitiesNGSIv2)
   ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val1");
   ceP->contextAttributeVector.push_back(caP);
   req.contextElementVector.push_back(ceP);
-  req.updateActionType.set("UPDATE");
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library (note the 2 to activate NGSIv2 special behaviours) */
   ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", V2);
@@ -4520,7 +4520,7 @@ TEST(mongoUpdateContextRequest, onlyOneEntityNGSIv2)
   ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val1");
   ceP->contextAttributeVector.push_back(caP);
   req.contextElementVector.push_back(ceP);
-  req.updateActionType.set("UPDATE");
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library (note the 2 to activate NGSIv2 special behaviours) */
   ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", V2);
@@ -4726,7 +4726,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -4755,7 +4755,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
               "- update(): <{ _id.id: \"E1\", _id.type: \"T1\", "
               "_id.servicePath: { $in: [ /^/.*/, null ] } },"
               "{ $set: { attrs.A1: { value: \"new_val\", type: \"TA1\", mdNames: [], "
-              "modDate: 1360232700 }, modDate: 1360232700, lastCorrelator: \"\" }, $unset: { location: 1 } }> "
+              "modDate: 1360232700 }, modDate: 1360232700, lastCorrelator: \"\" }, $unset: { location: 1, expDate: 1 } }> "
               "- exception: boom!!)", RES_CER_STATUS(0).details);
 
     /* Restore real DB connection */
@@ -4796,7 +4796,7 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -4852,7 +4852,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_3levels)
   ContextAttribute* caP = new ContextAttribute("A1", "TA1", "kz01-modified");
   ceP->contextAttributeVector.push_back(caP);
   req.contextElementVector.push_back(ceP);
-  req.updateActionType.set("UPDATE");
+  req.updateActionType = ActionTypeUpdate;
   servicePathVector.clear();
   servicePathVector.push_back("/home/kz/01");
 
@@ -4950,7 +4950,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_3levels)
   ContextAttribute* caP = new ContextAttribute("A2", "TA2", "new");
   ceP->contextAttributeVector.push_back(caP);
   req.contextElementVector.push_back(ceP);
-  req.updateActionType.set("APPEND");
+  req.updateActionType = ActionTypeAppend;
   servicePathVector.clear();
   servicePathVector.push_back("/home/kz/01");
 
@@ -5054,7 +5054,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_2levels)
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "fg");
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
     servicePathVector.clear();
     servicePathVector.push_back("/home/fg");
 
@@ -5171,7 +5171,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_3levels)
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "fg");
     ceP->contextAttributeVector.push_back(caP);
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    req.updateActionType = ActionTypeAppend;
     servicePathVector.clear();
     servicePathVector.push_back("/home/fg/01");
 
@@ -5286,7 +5286,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion_3levels)
     ContextElement* ceP = new ContextElement();
     ceP->entityId.fill("E1", "T1", "false");
     req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("DELETE");
+    req.updateActionType = ActionTypeDelete;
     servicePathVector.clear();
     servicePathVector.push_back("/home/kz/01");
 
@@ -5363,7 +5363,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
   ContextAttribute* caP = new ContextAttribute("A1", "TA1", "kz01");
   ceP->contextAttributeVector.push_back(caP);
   ucReq.contextElementVector.push_back(ceP);
-  ucReq.updateActionType.set("APPEND");
+  ucReq.updateActionType = ActionTypeAppend;
   servicePathVector.clear();
   servicePathVector.push_back("/home/kz");
   servicePathVector.push_back("/home/fg");

@@ -61,7 +61,6 @@ UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, 
 }
 
 
-
 /* ****************************************************************************
 *
 * UpdateContextRequest::render -
@@ -75,12 +74,11 @@ std::string UpdateContextRequest::render(ApiVersion apiVersion, bool asJsonObjec
   //  
   out += startTag();
   out += contextElementVector.render(apiVersion, asJsonObject, UpdateContext, true);
-  out += updateActionType.render(false);
+  out += valueTag("updateAction", actionTypeString(apiVersion, updateActionType), false);
   out += endTag(false);
 
   return out;
 }
-
 
 
 /* ****************************************************************************
@@ -98,8 +96,7 @@ std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject
     return response.render(apiVersion, asJsonObject);
   }
 
-  if (((res = contextElementVector.check(apiVersion, UpdateContext)) != "OK") ||
-      ((res = updateActionType.check()) != "OK"))
+  if ((res = contextElementVector.check(apiVersion, UpdateContext)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
     return response.render(apiVersion, asJsonObject);
@@ -117,21 +114,6 @@ std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject
 void UpdateContextRequest::release(void)
 {
   contextElementVector.release();
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextRequest::present -
-*/
-void UpdateContextRequest::present(const std::string& indent)
-{
-//  if (!lmTraceIsSet(LmtDump))
-//    return;
-
-  contextElementVector.present(indent);
-  updateActionType.present(indent);
 }
 
 
@@ -157,7 +139,7 @@ void UpdateContextRequest::fill
 
   contextElementVector.push_back(ceP);
 
-  updateActionType.set("UPDATE");  // Coming from an UpdateContextElementRequest (PUT), must be UPDATE
+  updateActionType = ActionTypeUpdate;  // Coming from an UpdateContextElementRequest (PUT), must be UPDATE
 }
 
 
@@ -182,7 +164,7 @@ void UpdateContextRequest::fill
   ceP->domainMetadataVector.fill((MetadataVector*) &acerP->domainMetadataVector);
 
   contextElementVector.push_back(ceP);
-  updateActionType.set("APPEND");  // Coming from an AppendContextElementRequest (POST), must be APPEND
+  updateActionType = ActionTypeAppend;  // Coming from an AppendContextElementRequest (POST), must be APPEND
 }
 
 
@@ -198,7 +180,7 @@ void UpdateContextRequest::fill
   const std::string& isPattern,
   const std::string& attributeName,
   const std::string& metaID,
-  const std::string& _updateActionType
+  ActionType         _updateActionType
 )
 {
   ContextElement* ceP = new ContextElement();
@@ -206,7 +188,7 @@ void UpdateContextRequest::fill
   ceP->entityId.fill(entityId, entityType, isPattern);
   contextElementVector.push_back(ceP);
 
-  updateActionType.set(_updateActionType);
+  updateActionType = _updateActionType;
 
   if (attributeName != "")
   {
@@ -235,7 +217,7 @@ void UpdateContextRequest::fill
   const std::string&                   entityType,
   const std::string&                   attributeName,
   const std::string&                   metaID,
-  const std::string&                   _updateActionType
+  ActionType                           _updateActionType
 )
 {
   ContextElement*   ceP = new ContextElement();
@@ -276,7 +258,7 @@ void UpdateContextRequest::fill
     }
   }
 
-  updateActionType.set(_updateActionType);
+  updateActionType = _updateActionType;
 }
 
 
@@ -285,14 +267,14 @@ void UpdateContextRequest::fill
 *
 * UpdateContextRequest::fill -
 */
-void UpdateContextRequest::fill(const Entity* entP, const std::string& _updateActionType)
+void UpdateContextRequest::fill(const Entity* entP, ActionType _updateActionType)
 {
   ContextElement*  ceP = new ContextElement(entP->id, entP->type, "false");
 
   ceP->contextAttributeVector.fill((ContextAttributeVector*) &entP->attributeVector);
 
   contextElementVector.push_back(ceP);
-  updateActionType.set(_updateActionType);
+  updateActionType = _updateActionType;
 }
 
 
@@ -305,7 +287,7 @@ void UpdateContextRequest::fill
 (
   const std::string&   entityId,
   ContextAttribute*    attributeP,
-  const std::string&   _updateActionType,
+  ActionType           _updateActionType,
   const std::string&   type
 )
 {
@@ -314,7 +296,7 @@ void UpdateContextRequest::fill
 
   ceP->contextAttributeVector.push_back(aP);
   contextElementVector.push_back(ceP);
-  updateActionType.set(_updateActionType);
+  updateActionType = _updateActionType;
 }
 
 
@@ -329,11 +311,11 @@ void UpdateContextRequest::fill
 */
 void UpdateContextRequest::fill
 (
-  Entities*           entities,
-  const std::string&  _updateActionType
+  Entities*    entities,
+  ActionType  _updateActionType
 )
 {
-  updateActionType.set(_updateActionType);
+  updateActionType = _updateActionType;
 
   for (unsigned int eIx = 0; eIx < entities->vec.size(); ++eIx)
   {

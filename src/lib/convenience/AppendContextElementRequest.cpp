@@ -123,19 +123,6 @@ std::string AppendContextElementRequest::check
 
 /* ****************************************************************************
 *
-* present - 
-*/
-void AppendContextElementRequest::present(const std::string&  indent)
-{
-  attributeDomainName.present(indent);
-  contextAttributeVector.present(indent);
-  domainMetadataVector.present("Domain", indent);
-}
-
-
-
-/* ****************************************************************************
-*
 * release - 
 */
 void AppendContextElementRequest::release(void)

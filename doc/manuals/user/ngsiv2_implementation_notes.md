@@ -9,8 +9,6 @@
 * [Datetime support](#datetime-support)
 * [`dateModified` and `dateCreated` attributes](#datemodified-and-datecreated-attributes)
 * [`dateModified` and `dateCreated` metadata](#datemodified-and-datecreated-metadata)
-* [Scope functionality](#scope-functionality)
-* [Error responses](#error-responses)
 * [Subscription payload validations](#subscription-payload-validations)
 * [`actionType` metadata](#actiontype-metadata)
 * [`noAttrDetail` option](#noattrdetail-option)
@@ -19,6 +17,7 @@
  different attribute value types](#ordering-between-different-attribute-value-types)
 * [Initial notifications](#initial_notifications)
 * [Registrations](#registrations)
+* [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
 
 This document describes some considerations to take into account
@@ -139,8 +138,8 @@ The string "ISO8601" as type for attributes and metadata is also supported. The 
 
 ## `dateModified` and `dateCreated` attributes
 
-The section "Attribute names restrictions" establishes that system/builtin attribute names cannot be used as user 
-attribute names. Thus, `dateCreated` and `dateModified` (which are system/builtin attributes) cannot be used as user 
+The section "Attribute names restrictions" establishes that builtin attribute names cannot be used as user
+attribute names. Thus, `dateCreated` and `dateModified` (which are builtin attributes) cannot be used as user
 attribute names.
 
 However, due to legacy reasons, Orion doesn't reject attempts of using these attribute with 400 Bad Request errors. **You are
@@ -223,8 +222,8 @@ Please have a look, if you need a more detailed description.
 
 ## `dateModified` and `dateCreated` metadata
 
-The section "Metadata name restrictions" establishes that system/builtin metadata names cannot be used as user metadta 
-names. Thus, `dateCreated` and `dateModified` (which are system/builtin metadata) cannot be used as user metadata names.
+The section "Metadata name restrictions" establishes that builtin metadata names cannot be used as user metadta
+names. Thus, `dateCreated` and `dateModified` (which are builtin metadata) cannot be used as user metadata names.
 
 However, due to legacy reasons, Orion doesn't reject attempts of using these metadata with 400 Bad Request errors. **You are
 strongly encouraged to not use dateCreate/dateModified as metadata names** but, if you at the end need to do so, take into 
@@ -257,22 +256,6 @@ This behaviour is assessed by the functional test `attrs_dates_overriden_by_user
 and `attrs_dates_overriden_by_user_subs.test` cases included in
 [`cases/0876_attribute_dates directory`](https://github.com/telefonicaid/fiware-orion/tree/master/test/functionalTest/cases/0876_attribute_dates).
 Please have a look, if you need a more detailed description.
-
-[Top](#top)
-
-## Scope functionality
-
-Orion implements a `scope` field in the `POST /v2/op/update` operation (you can see
-[an example in the NGSIv2 walkthrough](walkthrough_apiv2.md#batch-operations)). However, note that this syntax is
-somewhat experimental and it hasn't been consolidated in the NGSIv2 specification.
-
-[Top](#top)
-
-## Error responses
-
-The error response rules defined in https://github.com/telefonicaid/fiware-orion/issues/1286 takes precedence over
-the ones described in "Error Responses" section in the NGSIv2 specification. In particular, Orion Context
-Broker never responds with "InvalidModification (422)", using "Unprocessable (422)" instead.
 
 [Top](#top)
 
@@ -316,7 +299,7 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 
 ## `actionType` metadata
 
-From NGSIv2 specification section ""System/builtin in metadata"", regarding `actionType` metadata:
+From NGSIv2 specification section "Builtin metadata", regarding `actionType` metadata:
 
 > Its value depend on the request operation type: `update` for updates,
 > `append` for creation and `delete` for deletion. Its type is always `Text`.
@@ -405,12 +388,25 @@ for the following aspects:
   but the registration is always active, even when the value is `inactive`. Please see
   [this issue](https://github.com/telefonicaid/fiware-orion/issues/3108) about it.
 
+According to NGSIv2 specification:
+
+> A NGSIv2 server implementation may implement query or update forwarding to context information sources.
+
+The way in which Orion implements such forwarding is as follows:
+
 Orion implements an additional field `legacyForwarding` (within `provider`) not included in NGSIv2
 specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
 for forwarding requests associated to that registration. However, for the time being, NGSIv2-based
 forwarding has not been defined (see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3068)
 about it) so the only valid option is to always use `"legacyForwarding": true` (otherwise a 501 Not Implemented
 error response will be the result).
+
+[Top](#top)
+
+## `keyValues` not supported in `POST /v2/op/notify`
+
+The current Orion implementation doesn't support `keyValues` option in `POST /v2/op/notify` operation. If you attempt
+to use it you would get a 400 Bad Request error.
 
 [Top](#top)
 
@@ -421,8 +417,18 @@ have been needed in the end. Thus, there is changed functionality that doesn't a
 NGSIv2 stable specification document but that Orion still supports
 (as [deprecated functionality](../deprecated.md)) in order to keep backward compability.
 
-In particular, the usage of `dateCreated` and `dateModified` in the `options` parameter (introduced
+In particular:
+
+* The usage of `dateCreated` and `dateModified` in the `options` parameter (introduced
 in stable RC-2016.05 and removed in RC-2016.10.) is still supported, e.g. `options=dateModified`. However,
 you are highly encouraged to use `attrs` instead (i.e. `attrs=dateModified,*`).
+
+* `POST /v2/op/update` accepts the same action types as NGSIv1, that is `APPEND`, `APPEND_STRICT`,
+`UPDATE`, `DELETE` and `REPLACE`. However, they shouldn't be used, preferring always the following counterparts:
+`append`, `appendStrict`, `update`, `delete` and `replace`.
+
+* `attributes` field in `POST /v2/op/query` is deprecated. It is a combination of `attrs` (to select
+which attributes to include in the response to the query) and unary attribute filter in `q` within
+`expression` (to return only entities which have these attributes). Use them instead.
 
 [Top](#top)

@@ -41,7 +41,6 @@ typedef struct ContextRegistrationAttributeVector
   std::vector<ContextRegistrationAttribute*>  vec;
 
   std::string                      render(bool comma);
-  void                             present(const std::string& indent);
   void                             push_back(ContextRegistrationAttribute* item);
   unsigned int                     size(void);
   void                             release();

@@ -89,31 +89,6 @@ std::string ScopeVector::check(void)
 
 /* ****************************************************************************
 *
-* ScopeVector::present -
-*/
-void ScopeVector::present(const std::string& indent)
-{
-  if (vec.size() == 0)
-  {
-    LM_T(LmtPresent, ("%sNo scopes", indent.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%s%lu Scopes:", 
-		      indent.c_str(), 
-		      (uint64_t) vec.size()));
-  }
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent + "  ", ix);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * ScopeVector::push_back -
 */
 void ScopeVector::push_back(Scope* item)

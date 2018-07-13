@@ -90,19 +90,3 @@ std::string jsonUncrCheck(ParseData* parseData, ConnectionInfo* ciP)
 {
   return parseData->uncr.res.check();
 }
-
-
-
-/* ****************************************************************************
-*
-* jsonUncrPresent - 
-*/
-void jsonUncrPresent(ParseData* parseDataP)
-{
-  if (!lmTraceIsSet(LmtPresent))
-    return;
-
-  LM_T(LmtPresent,("\n\n"));
-
-  parseDataP->uncr.res.subscriptionId.present("");
-}

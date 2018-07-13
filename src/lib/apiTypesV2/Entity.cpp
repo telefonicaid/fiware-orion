@@ -99,12 +99,13 @@ std::string Entity::render
     stringSplit(uriParam[URI_PARAM_METADATA], ',', metadataFilter);
   }
 
-  if (uriParam[URI_PARAM_ATTRIBUTES] != "")
+  if (uriParam[URI_PARAM_ATTRS] != "")
   {
-    stringSplit(uriParam[URI_PARAM_ATTRIBUTES], ',', attrsFilter);
+    stringSplit(uriParam[URI_PARAM_ATTRS], ',', attrsFilter);
   }
 
   // Add special attributes representing entity dates
+  // Note 'uriParamOptions[DATE_CREATED/DATE_MODIFIED] ||' is needed due to backward compability
   if ((creDate != 0) && (uriParamOptions[DATE_CREATED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end())))
   {
     ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, creDate);
@@ -252,21 +253,6 @@ std::string Entity::check(RequestType requestType)
   }
 
   return attributeVector.check(V2, requestType);
-}
-
-
-
-/* ****************************************************************************
-*
-* Entity::present - 
-*/
-void Entity::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%sid:        %s", indent.c_str(), id.c_str()));
-  LM_T(LmtPresent, ("%stype:      %s", indent.c_str(), type.c_str()));
-  LM_T(LmtPresent, ("%sisPattern: %s", indent.c_str(), isPattern.c_str()));
-
-  attributeVector.present(indent + "  ");
 }
 
 

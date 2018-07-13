@@ -117,21 +117,6 @@ void SubscribeContextAvailabilityRequest::release(void)
 
 /* ****************************************************************************
 *
-* SubscribeContextAvailabilityRequest::present -
-*/
-void SubscribeContextAvailabilityRequest::present(const std::string& indent)
-{
-   entityIdVector.present(indent);
-   attributeList.present(indent);
-   reference.present(indent);
-   duration.present(indent);
-   restriction.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
 * SubscribeContextAvailabilityRequest::fill -
 */
 void SubscribeContextAvailabilityRequest::fill(EntityTypeInfo typeInfo)

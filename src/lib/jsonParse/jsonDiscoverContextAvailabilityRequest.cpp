@@ -259,23 +259,6 @@ std::string jsonDcarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
-* jsonDcarPresent - 
-*/
-void jsonDcarPresent(ParseData* reqDataP)
-{
-  if (!lmTraceIsSet(LmtPresent))
-  {
-    return;
-  }
-
-  LM_T(LmtPresent,("\n\n"));
-  reqDataP->dcar.res.present("");
-}
-
-
-
-/* ****************************************************************************
-*
 * dcarParseVector - 
 */
 JsonNode jsonDcarParseVector[] =
