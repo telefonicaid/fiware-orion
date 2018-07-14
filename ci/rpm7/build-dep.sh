@@ -43,12 +43,13 @@ yum -y install \
   python-flask \
   rpm-build \
   scons \
-  tar
+  tar \
+  cyrus-sasl-devel
 
 curl -L https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz | tar xzC /opt/ \
 && cd /opt/mongo-cxx-driver-legacy-1.1.2 \
-&& scons --disable-warnings-as-errors \
-&& scons install --disable-warnings-as-errors --prefix=/usr/local \
+&& scons --disable-warnings-as-errors --use-sasl-client --ssl \
+&& scons install --disable-warnings-as-errors --prefix=/usr/local --use-sasl-client --ssl \
 && rm -Rf /opt/mongo-cxx-driver-legacy-1.1.2
 
 curl -L https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz | tar xzC /opt/ \
