@@ -41,6 +41,6 @@
 *
 * API Documentation - The link to the the GEri documentation, either in the gh-pages (.github.io/) inside the fiware organization in GitHub or ReadTheDocs manual.
 */
-#define API_DOC                               "https://fiware-orion.readthedocs.org/en/1.15.0/"
+#define API_DOC                               "https://fiware-orion.readthedocs.org/en/master/"
 
 #endif  // SRC_LIB_COMMON_DEFAULTVALUES_H_
