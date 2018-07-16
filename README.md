@@ -4,7 +4,7 @@
      release.sh needs to be changed also -->
 
 [![License badge](https://img.shields.io/badge/license-AGPL-blue.svg)](https://opensource.org/licenses/AGPL-3.0)
-[![Documentation badge](https://readthedocs.org/projects/fiware-orion/badge/?version=latest)](http://fiware-orion.readthedocs.io/en/latest/?badge=latest)
+[![Documentation badge](https://readthedocs.org/projects/fiware-orion/badge/?version=1.15.0)](http://fiware-orion.readthedocs.io/en/1.15.0/?badge=1.15.0)
 [![Docker badge](https://img.shields.io/docker/pulls/fiware/orion.svg)](https://hub.docker.com/r/fiware/orion/)
 [![Support badge]( https://img.shields.io/badge/support-sof-yellowgreen.svg)](http://stackoverflow.com/questions/tagged/fiware-orion)
 
