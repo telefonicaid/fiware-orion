@@ -251,7 +251,7 @@ function brokerStopAwait
 
   sleep .5
 
-  # Check CB NOT running fine
+  # Make sure that is CB is NOT running
   curl -s localhost:${port}/version | grep version > /dev/null
   result=$?
   if [ "$result" == "0" ]
@@ -283,10 +283,12 @@ function brokerStopAwait
 #
 function brokerStartAwait
 {
+  result=0
+
+  # If BROKER_AWAIT_SLEEP_TIME is set, then we just sleep instead of using 'nc'
   if [ "$BROKER_AWAIT_SLEEP_TIME" != "" ]
   then
     sleep $BROKER_AWAIT_SLEEP_TIME
-    result=0
     return
   fi
 
@@ -304,7 +306,6 @@ function brokerStartAwait
     then
       vMsg The orion context broker has started, listening on port $port
       echo "Broker started after $loopNo checks" >> /tmp/brokerStartCounter
-      sleep 1
       break;
     fi
 
@@ -313,12 +314,14 @@ function brokerStartAwait
     loopNo=$loopNo+1
   done
 
-  sleep .5
+  if [ $loopNo == 100 ]
+  then
+    echo "The context broker didn't start!"
+    result=1
+    return
+  fi
 
-  # Check that CB started
-  curl -s localhost:${port}/version | grep version >> /tmp/brokerStartCounter
-  result=$?
-  echo "result: $result" >> /tmp/brokerStartCounter
+  sleep .5
 }
 
 
@@ -417,27 +420,25 @@ function localBrokerStart()
   #
   if [ "$VALGRIND" == "" ] || [ "$port" != "$CB_PORT" ]; then
     $CB_START_CMD
-    # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-    sleep 1
-    # FIXME: brokerStartAwait $port  instead of sleep 1?
   else
     #
     # Important: the -v flag must be present so that the text "X errors in context Y of Z" is present in the output
     #
     valgrind -v --leak-check=full --track-origins=yes --trace-children=yes $CB_START_CMD > /tmp/valgrind.out 2>&1 &
-    
-    # Waiting for valgrind to start (sleep a maximum of 10 secs)
-    brokerStartAwait $port
-    if [ "$result" != 0 ]
-    then
-      echo "Unable to start contextBroker"
-      exit 1
-    fi
+  fi
+
+  # Waiting for broker/valgrind to start
+  brokerStartAwait $port
+  if [ "$result" != 0 ]
+  then
+    echo "Unable to start contextBroker"
+    exit 1
   fi
 
   # Test to see whether we have a broker running on $port. If not raise an error
-  running_broker=$(ps -fe | grep contextBroker | grep $port | wc -l)
-  if [ $running_broker -ne 1 ]; then
+  brokerPidLines=$(ps -fe | grep contextBroker | grep $port | wc -l)
+  if [ $brokerPidLines != 1 ]
+  then
     echo "Unable to start contextBroker"
     exit 1
   fi
@@ -445,7 +446,7 @@ function localBrokerStart()
   ps=$(ps aux | grep contextBroker)
   dMsg $ps
 
-  # Some times (specially when using remote DB) CB needs some time to connect DB and
+  # Sometimes (especially when using remote DB) CB needs some time to connect DB and
   # the test execution needs to a guard time. The righ value for CB_WAIT_AFTER_START
   # needs to be find empirically (it seems that when DB is localhost this time is
   # not needed at all)
@@ -487,18 +488,23 @@ function localBrokerStop
   fi
 
   # Test to see if we have a broker running on $port if so kill it!
-  running_broker=$(ps -fe | grep contextBroker | grep $port | wc -l)
-  if [ $running_broker -ne 0 ]; then
+  brokerPidLines=$(ps -fe | grep contextBroker | grep $port | wc -l)
+  if [ $brokerPidLines != 0 ]
+  then
     kill $(ps -fe | grep contextBroker | grep $port | awk '{print $2}') 2> /dev/null
+
     # Wait some time so the broker can finish properly
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep $port | wc -l)
-    if [ $running_broker -ne 0 ]; then
+    sleep .5
+    brokerPidLines=$(ps -fe | grep contextBroker | grep $port | wc -l)
+
+    if [ $brokerPidLines != 0 ]
+    then
       # If the broker refuses to stop politely, kill the process by brute force
       kill -9 $(ps -fe | grep contextBroker | grep $port | awk '{print $2}') 2> /dev/null
-      sleep 1
-      running_broker=$(ps -fe | grep contextBroker | grep $port | wc -l)
-      if [ $running_broker -ne 0 ]; then
+      sleep .5
+      brokerPidLines=$(ps -fe | grep contextBroker | grep $port | wc -l)
+      if [ $brokerPidLines != 0 ]
+      then
         echo "Existing contextBroker is immortal, can not be killed!"
         exit 1
       fi
@@ -534,10 +540,11 @@ function brokerStart()
     elif [ "$1" == "-cache" ];               then noCache=OFF;
     elif [ "$1" == "-notificationMode" ] || [ "$1" == "--notificationMode" ]
     then
-        notificationModeGiven=TRUE
-        xParams="$xParams $1 $2"
-        shift
-    else xParams=$xParams' '$1
+      notificationModeGiven=TRUE
+      xParams="$xParams $1 $2"
+      shift
+    else
+      xParams=$xParams' '$1
     fi
     shift
   done
@@ -550,17 +557,17 @@ function brokerStart()
     fi
   fi
 
- # Not given notificationMode but not forbidden, use default
- if [ "$notificationModeGiven" == "FALSE" ]  &&  [ "$CB_THREADPOOL" == "ON" ]
- then
+  # Not given notificationMode but not forbidden, use default
+  if [ "$notificationModeGiven" == "FALSE" ]  &&  [ "$CB_THREADPOOL" == "ON" ]
+  then
     xParams=$xParams' -notificationMode threadpool:200:20'
- fi
+  fi
 
- if [ "$role" == "" ]
- then
+  if [ "$role" == "" ]
+  then
     echo "No role given as first parameter for brokerStart"
     return
- fi
+  fi
 
   if [ "$traceLevels" == "" ]
   then
@@ -604,8 +611,6 @@ function brokerStop
   then
     pidFile=$CB_PID_FILE
     port=$CB_PORT
-    vMsg pidFile: $pidFile
-    vMsg port: $port
   elif [ "$role" == "CP1" ]
   then
     pidFile=$CP1_PID_FILE
@@ -628,19 +633,16 @@ function brokerStop
     port=$CP5_PORT
   fi
 
-  if [ "$VALGRIND" == "" ]; then
+  if [ "$VALGRIND" == "" ]
+  then
     vMsg "killing with PID from pidFile"
     kill $(cat $pidFile 2> /dev/null) 2> /dev/null
     vMsg "should be dead"
-    if [ -f /tmp/orion_${port}.pid ]
-    then
-      rm -f /tmp/orion_${port}.pid 2> /dev/null
-    fi
+    rm -f /tmp/orion_${port}.pid 2> /dev/null
   else
     curl localhost:${port}/exit/harakiri 2> /dev/null >> ${TEST_BASENAME}.valgrind.stop.out
     # Waiting for valgrind to terminate (sleep a max of 10)
-    brokerStopAwait $port  # FIXME
-    # sleep 4
+    brokerStopAwait $port
   fi
 }
 
@@ -755,8 +757,6 @@ function accumulatorStart()
 #
 function accumulatorDump()
 {
-  # FIXME P6: Argument processing in this is ugly... needs a cleanup
-
   valgrindSleep 2
 
   if [ "$1" == "IPV6" ]
@@ -899,7 +899,6 @@ function valgrindSleep()
 #
 function mongoCmd()
 {
-
   host="${CB_DATABASE_HOST}"
   if [ "$host" == "" ]
   then
@@ -917,11 +916,13 @@ function mongoCmd()
   echo $cmd | mongo mongodb://$host:$port/$db | tail -n 2 | head -n 1
 }
 
+
+
 # ------------------------------------------------------------------------------
 #
 # dbInsertEntity -
 #
-# Insert a crafted entity which and "inflated" attribute. The database is pased
+# Insert a crafted entity with an "inflated" attribute. The database is passed
 # as first argument and the id of the entity as second. The size of the "inflated"
 # attribute is the third argument x 10.
 #
@@ -931,8 +932,8 @@ function dbInsertEntity()
   entId=$2
   size=$3
 
-  # This is a JavaScript code that generates a string variable which length is the
-  # one in the argument x 10
+  # This is a JavaScript code that generates a string variable whose length is the
+  # third argument multiplicated by 10
   jsCode="s = \"\"; for (var i = 0; i < $size ; i++) { s += \"0123456789\"; }"
 
   ent="entity = \"$entId\""

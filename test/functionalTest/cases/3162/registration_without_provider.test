@@ -1,4 +1,4 @@
-# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,30 +21,60 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-statistics
+BUG 
 
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "+++++ 1. statistics in JSON"
-orionCurl --url /statistics
+
+#
+# 01. Create entity E1 without attributes
+# 02. Append new geo:box attribute (attr3) -> OK
+#
+
+echo "01. Create entity E1 without attributes"
+echo "======================================="
+payload='{
+  "id": "E1"
+}'
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
+
+echo "02. Append new geo:box attribute (attr3) -> OK"
+echo "=============================================="
+payload='{
+  "attr3": {
+    "value": [ "-1, 1", "2, 2" ],
+    "type": "geo:box"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X POST
+echo
+echo
+
+
 --REGEXPECT--
-+++++ 1. statistics in JSON
-HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
+01. Create entity E1 without attributes
+=======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "measuring_interval_in_secs": REGEX(1?\d),
-    "uptime_in_secs": REGEX(1?\d)
-}
+
+
+02. Append new geo:box attribute (attr3) -> OK
+==============================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
 
 
 --TEARDOWN--

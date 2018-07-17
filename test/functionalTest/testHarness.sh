@@ -144,6 +144,10 @@ function usage()
   echo
   echo "* Please note that if a directory is passed as parameter, its entire path must be given, not only the directory-name"
   echo "* If a file is passed as parameter, its entire file-name must be given, including '.test'"
+  echo ""
+  echo "Env Vars:"
+  echo "CB_SKIP_LIST:        default value for option --skipList"
+  echo "CB_SKIP_FUNC_TESTS:  list of names of func tests to skip"
   echo
   exit $1
 }
@@ -900,6 +904,18 @@ do
     if [ "$hit" == "" ]
     then
       # Test case not found in ix-list, so it is not executed
+      continue
+    fi
+  fi
+
+  if [ "$CB_SKIP_FUNC_TESTS" != "" ]
+  then
+    hit=$(echo ' '$CB_SKIP_FUNC_TESTS' ' | grep ' '$testFile' ')
+    if [ "$hit" != "" ]
+    then
+      # Test case found in skip-list, so it is skipped
+      skipV[$skips]=$testNo': '$testFile
+      skips=$skips+1
       continue
     fi
   fi

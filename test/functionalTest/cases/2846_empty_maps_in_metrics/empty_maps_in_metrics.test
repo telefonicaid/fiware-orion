@@ -35,21 +35,6 @@ brokerStart CB
 # 03. GET metrics and reset metrics at the same time
 # 04. GET metrics, see no 'emptied reported items'
 #
-# NOTE
-# Under valgrind, a GET /version is issued to the broker initially, to check it's alive.
-# This "screws" the statistics a little (especially as the /version payload is big and not with a fixed size)
-# and some REGEX have been necessary for this test to run both as normal functest and under valgrind
-#
-# An extra call to GET /version is done initially to make the metrics similar in func test and under valgrind
-#
-
-
-echo "00. GET /version"
-echo "================"
-orionCurl --url /version
-echo
-echo
-
 
 echo "01. Ask for trace levels, using tenant t1"
 echo "========================================="
@@ -80,28 +65,6 @@ echo
 
 
 --REGEXPECT--
-00. GET /version
-================
-HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "orion": {
-        "compile_time": "REGEX(.*)",
-        "compiled_by": "REGEX(.*)",
-        "compiled_in": "REGEX(.*)",
-        "doc": "REGEX(.*)",
-        "git_hash": "REGEX(([0-9a-f]{40}|nogitversion))",
-        "release_date": "REGEX(.*)",
-        "uptime": "REGEX(.*)",
-        "version": "REGEX(.*)"
-    }
-}
-
-
 01. Ask for trace levels, using tenant t1
 =========================================
 HTTP/1.1 200 OK
@@ -131,27 +94,13 @@ Date: REGEX(.*)
 03. GET metrics and reset metrics at the same time
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 916
+Content-Length: 678
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "services": {
-        "default-service": {
-            "subservs": {
-                "root-subserv": {
-                    "incomingTransactionResponseSize": REGEX(\d+),
-                    "incomingTransactions": REGEX((1|2)),
-                    "serviceTime": REGEX(.*)
-                }
-            },
-            "sum": {
-                "incomingTransactionResponseSize": REGEX(\d+),
-                "incomingTransactions": REGEX((1|2)),
-                "serviceTime": REGEX(.*)
-            }
-        },
         "t1": {
             "subservs": {
                 "root-subserv": {
@@ -185,13 +134,13 @@ Date: REGEX(.*)
         "subservs": {
             "root-subserv": {
                 "incomingTransactionResponseSize": REGEX(\d+),
-                "incomingTransactions": REGEX((3|4)),
+                "incomingTransactions": 2,
                 "serviceTime": REGEX(.*)
             }
         },
         "sum": {
             "incomingTransactionResponseSize": REGEX(\d+),
-            "incomingTransactions": REGEX((3|4)),
+            "incomingTransactions": 2,
             "serviceTime": REGEX(.*)
         }
     }
