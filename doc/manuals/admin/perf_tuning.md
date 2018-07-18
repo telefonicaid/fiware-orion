@@ -17,12 +17,7 @@
 
 ##  MongoDB configuration
 
-Since version 0.21.0, Orion supports MongoDB 2.6, 3.0, 3.2 and 3.4 without difference from a functional
-point of view. However, MongoDB 2.6 implements a per-collection lock, while MongoDB 3.0/3.2/3.4 (when configured
-to use WireTiger storage engine) implements per-document lock. Thus, the lock system in MongoDB 3.0/3.2/3.4
-(with WireTiger) is less restrictive than the one used by MongoDB 2.6.
-
-From a performance point of view, it is recommended to use MongoDB 3.0/3.2/3.4 with WireTiger, especially
+From a performance point of view, it is recommended to use MongoDB 3.4 with WireTiger, especially
 in update-intensive scenarios.
 
 In addition, take into account the following information from the official MongoDB documentation, as it may have
