@@ -205,6 +205,7 @@ HttpStatusCode mongoEntityTypesValues
   /* Compose query based on this aggregation command:
    *
    * db.runCommand({aggregate: "entities",
+   *                cursor: {},
    *                pipeline: [ {$match: { "_id.servicePath": /.../ } },
    *                            {$group: {_id: "$_id.type"} },
    *                            {$sort: {_id: 1} }
@@ -216,6 +217,7 @@ HttpStatusCode mongoEntityTypesValues
   BSONObj result;
   BSONObj spQuery = fillQueryServicePath(servicePathV);
   BSONObj cmd     = BSON("aggregate" << COL_ENTITIES <<
+                         "cursor" << BSONObj() <<
                          "pipeline"  << BSON_ARRAY(
                            BSON("$match" << BSON(C_ID_SERVICEPATH << spQuery)) <<
                            BSON("$group" << BSON("_id" << CS_ID_ENTITY)) <<
@@ -234,7 +236,7 @@ HttpStatusCode mongoEntityTypesValues
   // Processing result to build response
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> resultsArray = getFieldF(result, "result").Array();
+  std::vector<BSONElement> resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
 
   if (resultsArray.size() == 0)
   {
@@ -324,6 +326,7 @@ HttpStatusCode mongoEntityTypes
   /* Compose query based on this aggregation command:
    *
    * db.runCommand({aggregate: "entities",
+   *                cursor: {},
    *                pipeline: [ {$match: { "_id.servicePath": /.../ } },
    *                            {$project: {_id: 1, "attrNames": 1} },
    *                            {$project: { "attrNames"
@@ -370,6 +373,7 @@ HttpStatusCode mongoEntityTypes
           S_ATTRNAMES))));
 
   BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
+                     "cursor" << BSONObj() <<
                      "pipeline" << BSON_ARRAY(
                                               BSON("$match" << BSON(C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
                                               BSON("$project" << BSON("_id" << 1 << ENT_ATTRNAMES << 1)) <<
@@ -391,7 +395,7 @@ HttpStatusCode mongoEntityTypes
   // Processing result to build response
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> resultsArray = getFieldF(result, "result").Array();
+  std::vector<BSONElement> resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
 
   if (resultsArray.size() == 0)
   {
@@ -584,6 +588,7 @@ HttpStatusCode mongoAttributesForEntityType
   /* Compose query based on this aggregation command:
    *
    * db.runCommand({aggregate: "entities",
+   *                cursor: {},
    *                pipeline: [ {$match: { "_id.type": "TYPE" , "_id.servicePath": /.../ } },
    *                            {$project: {_id: 1, "attrNames": 1} },
    *                            {$unwind: "$attrNames"},
@@ -599,6 +604,7 @@ HttpStatusCode mongoAttributesForEntityType
   BSONObj result;
   BSONObj cmd =
     BSON("aggregate" << COL_ENTITIES <<
+         "cursor" << BSONObj() <<
          "pipeline" << BSON_ARRAY(
            BSON("$match" << BSON(C_ID_ENTITY << entityType <<
                                  C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
@@ -621,7 +627,7 @@ HttpStatusCode mongoAttributesForEntityType
   /* Processing result to build response */
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> resultsArray = getFieldF(result, "result").Array();
+  std::vector<BSONElement> resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
 
   responseP->entityType.count = countEntities(tenant, servicePathV, entityType);
 
