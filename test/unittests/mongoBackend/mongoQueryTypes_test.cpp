@@ -908,6 +908,7 @@ TEST(mongoQueryTypes, queryAllDbException)
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("Database Error (collection: utest "
             "- runCommand(): { aggregate: \"entities\", "
+            "cursor: {}, "
             "pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, "
             "{ $project: { _id: 1, attrNames: 1 } }, "
             "{ $project: { attrNames: { $cond: [ { $eq: [ \"$attrNames\", [] ] }, [ null ], \"$attrNames\" ] } } }, "
@@ -959,6 +960,7 @@ TEST(mongoQueryTypes, queryAllGenericException)
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("Database Error (collection: utest "
             "- runCommand(): { aggregate: \"entities\", "
+            "cursor: {}, "
             "pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, "
             "{ $project: { _id: 1, attrNames: 1 } }, "
             "{ $project: { attrNames: { $cond: [ { $eq: [ \"$attrNames\", [] ] }, "
@@ -1463,6 +1465,7 @@ TEST(mongoQueryTypes, queryGivenTypeDbException)
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("Database Error (collection: utest "
             "- runCommand(): { aggregate: \"entities\", "
+            "cursor: {}, "
             "pipeline: [ { $match: { _id.type: \"Car\", _id.servicePath: { $in: [ /^/.*/, null ] } } }, "
             "{ $project: { _id: 1, attrNames: 1 } }, { $unwind: \"$attrNames\" }, "
             "{ $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, "
@@ -1511,6 +1514,7 @@ TEST(mongoQueryTypes, queryGivenTypeGenericException)
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("Database Error (collection: utest "
             "- runCommand(): { aggregate: \"entities\", "
+            "cursor: {}, "
             "pipeline: [ { $match: { _id.type: \"Car\", "
             "_id.servicePath: { $in: [ /^/.*/, null ] } } }, "
             "{ $project: { _id: 1, attrNames: 1 } }, "
