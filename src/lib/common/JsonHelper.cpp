@@ -224,13 +224,13 @@ void JsonHelper::addNumber(const std::string& key, long long value)
 
 /* ****************************************************************************
 *
-* JsonHelper::addFloat -
+* JsonHelper::addNumber -
 *
 * FIXME P4: This method is to be removed, the float version of addNumber()
 *           should be used instead.
 *           See issue #3058
 */
-void JsonHelper::addFloat(const std::string& key, float  value)
+void JsonHelper::addNumber(const std::string& key, float  value)
 {
   unsigned int oldPrecision = ss.precision();
   ss << std::fixed << std::setprecision(decimalDigits(value));
