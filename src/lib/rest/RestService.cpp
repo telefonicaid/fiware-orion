@@ -65,6 +65,38 @@ static RestService*              deleteServiceV        = NULL;
 static RestService*              optionsServiceV       = NULL;
 RestService*                     restBadVerbV          = NULL;
 
+/* *****************************************************************************
+*
+* restServiceGet -
+*
+* FIXME P2: Create a vector of service vectors, for faster access.
+*           E.g
+* RestService** serviceVV[7];
+* serviceVV[POST] = postServiceV;
+* serviceVV[GET]  = getServiceV;
+* etc.
+*
+* Then remove the switch to find the correct service vector, just do this:
+*
+* serviceV = restServiceVV[verb];
+* 
+*/
+RestService* restServiceGet(Verb verb)
+{
+  switch (verb)
+  {
+  case POST:       return postServiceV;
+  case PUT:        return putServiceV;
+  case GET:        return getServiceV;
+  case PATCH:      return patchServiceV;
+  case DELETE:     return deleteServiceV;
+  case OPTIONS:    return optionsServiceV;  // FIXME P8: if OPTIONS is allowed
+
+  default:
+    return NULL;
+  }
+}
+
 
 
 /* ****************************************************************************

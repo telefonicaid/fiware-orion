@@ -44,18 +44,20 @@
 #include "common/clockFunctions.h"
 #include "common/statistics.h"
 #include "common/tag.h"
+#include "common/limits.h"                // SERVICE_NAME_MAX_LEN
 
 #include "alarmMgr/alarmMgr.h"
 #include "metricsMgr/metricsMgr.h"
-
 #include "parse/forbiddenChars.h"
+
+#include "rest/Verb.h"
 #include "rest/HttpHeaders.h"
 #include "rest/RestService.h"
-#include "rest/rest.h"
 #include "rest/restReply.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
-#include "common/limits.h"  // SERVICE_NAME_MAX_LEN
+#include "rest/restServiceLookup.h"
+#include "rest/rest.h"
 
 
 
@@ -1239,6 +1241,22 @@ static int connectionTreat
       return MHD_NO;
     }
 
+    // LM_TMP(("--------------------- Serving request %s %s -----------------", method, url));
+
+    ciP->restServiceP = restServiceLookup(ciP->verb, ciP->url.c_str());
+    if (ciP->restServiceP == NULL)
+    {
+      char details[256];
+      snprintf(details, sizeof(details), "Invalid URL");
+
+      alarmMgr.badInput(clientIp, details);
+      OrionError oe(SccBadRequest, details);
+
+      ciP->httpStatusCode = oe.code;
+      restReply(ciP, oe.toJson());
+      return MHD_YES;
+    }
+
     ciP->transactionStart.tv_sec  = transactionStart.tv_sec;
     ciP->transactionStart.tv_usec = transactionStart.tv_usec;
 
@@ -1247,8 +1265,6 @@ static int connectionTreat
       clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);
     }
 
-    // LM_TMP(("--------------------- Serving request %s %s -----------------", method, url));
-    LM_T(LmtRequest, (""));
     // WARNING: This log message below is crucial for the correct function of the Behave tests - CANNOT BE REMOVED
     LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", method, url));
     *con_cls     = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls

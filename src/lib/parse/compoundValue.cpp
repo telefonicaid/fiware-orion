@@ -167,6 +167,12 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
   // is a part of a ContextAttribute.
   //
   if (strcmp(ciP->payloadWord, "updateContextAttributeRequest") == 0)
+#if 0
+    if ((ciP->requestType = AttributeValueInstance)              ||
+        (ciP->requestType = AttributeValueInstanceWithTypeAndId) ||
+        (ciP->requestType = IndividualContextEntityAttribute)    ||
+        (ciP->requestType = IndividualContextEntityAttributeWithTypeAndId))
+#endif
   {
     parseDataP->upcar.res.compoundValueP = ciP->compoundValueRoot;
   }
