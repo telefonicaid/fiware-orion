@@ -28,11 +28,6 @@ dbInit CB
 brokerStart CB 0 IPv4 -statSemWait -statTiming
 
 --SHELL--
-echo "+++++ 0. Version - just to make statitstics work also when under valgrind"
-orionCurl --url /version
-echo
-echo
-
 
 echo "+++++ 1. statistics in JSON"
 orionCurl --url /statistics
@@ -45,27 +40,6 @@ echo
 echo
 
 --REGEXPECT--
-+++++ 0. Version - just to make statitstics work also when under valgrind
-HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "orion": {
-        "compile_time": "REGEX(.*)",
-        "compiled_by": "REGEX(.*)",
-        "compiled_in": "REGEX(.*)",
-        "doc": "REGEX(.*)",
-        "git_hash": "REGEX(([0-9a-f]{40}|nogitversion))",
-        "release_date": "REGEX(.*)",
-        "uptime": "REGEX(.*)",
-        "version": "REGEX(.*)"
-    }
-}
-
-
 +++++ 1. statistics in JSON
 HTTP/1.1 200 OK
 Content-Length: REGEX(\d+)
@@ -84,14 +58,7 @@ Date: REGEX(.*)
         "timeStat": REGEX(.*.A*),
         "transaction": REGEX(.*.A*)
     },
-    "timing": {
-        "accumulated": {
-            "total": REGEX(.*.A*)
-        },
-        "last": {
-            "total": REGEX(.*.A*)
-        }
-    },
+    "timing": {},
     "uptime_in_secs": REGEX(1?\d)
 }
 
