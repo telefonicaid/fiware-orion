@@ -1,0 +1,1 @@
+- Hardening: Mongo driver now compiled using --use-sasl-client --ssl to enable proper DB authentication mechanisms
