@@ -359,7 +359,7 @@ static std::string metricsRender(std::map<std::string, uint64_t>* metricsMap)
     {
       float mValue = (float) totalServiceTime / (float) (incomingTransactions * 1000000);
 
-      jh.addFloat(METRIC_SERVICE_TIME, mValue);
+      jh.addNumber(METRIC_SERVICE_TIME, mValue);
       totalServiceTime     = 0;
       incomingTransactions = 0;
     }
@@ -368,7 +368,7 @@ static std::string metricsRender(std::map<std::string, uint64_t>* metricsMap)
     {
       if (value != 0)
       {
-        jh.addNumber(metric, value);
+        jh.addNumber(metric, (long long)value);
       }
     }
   }
