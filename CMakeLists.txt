@@ -219,6 +219,8 @@ SET (DYNAMIC_LIBS
     gcrypt
     ssl
     uuid
+    crypto
+    sasl2
 )
 
 #
