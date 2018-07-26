@@ -53,11 +53,7 @@ std::string badNgsi9Request
 
   alarmMgr.badInput(clientIp, details);
 
-  answer = restErrorReplyGet(ciP,
-                             "",
-                             ciP->payloadWord,
-                             SccBadRequest,
-                             "service not found");
+  restErrorReplyGet(ciP, SccBadRequest, "service not found", &answer);
 
   return answer;
 }

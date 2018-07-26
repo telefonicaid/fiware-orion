@@ -32,6 +32,7 @@
 
 #include "orionTypes/OrionValueType.h"
 #include "ngsi/ParseData.h"
+#include "rest/RestService.h"
 #include "parse/CompoundValueNode.h"
 #include "parse/compoundValue.h"
 
@@ -166,13 +167,12 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
   // ContextAttribute to point to by lastContextAttribute, as the whole payload
   // is a part of a ContextAttribute.
   //
-  if (strcmp(ciP->payloadWord, "updateContextAttributeRequest") == 0)
-#if 0
-    if ((ciP->requestType = AttributeValueInstance)              ||
-        (ciP->requestType = AttributeValueInstanceWithTypeAndId) ||
-        (ciP->requestType = IndividualContextEntityAttribute)    ||
-        (ciP->requestType = IndividualContextEntityAttributeWithTypeAndId))
-#endif
+  RequestType requestType = ciP->restServiceP->request;
+  
+  if ((requestType == AttributeValueInstance)                           ||
+      (requestType == AttributeValueInstanceWithTypeAndId)              ||
+      (requestType == IndividualContextEntityAttribute)                 ||
+      (requestType == IndividualContextEntityAttributeWithTypeAndId))
   {
     parseDataP->upcar.res.compoundValueP = ciP->compoundValueRoot;
   }

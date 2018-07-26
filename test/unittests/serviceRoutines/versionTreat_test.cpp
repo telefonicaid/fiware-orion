@@ -38,8 +38,8 @@
 */
 static RestService getV[] =
 {
-  { VersionRequest, 1, { "version" }, "", versionTreat  },
-  { InvalidRequest, 0, {           }, "", NULL          }
+  { VersionRequest, 1, { "version" }, versionTreat  },
+  { InvalidRequest, 0, {           }, NULL          }
 };
 
 
@@ -52,6 +52,10 @@ TEST(versionTreat, ok)
 {
   ConnectionInfo  ci("/version",  "GET", "1.1");
   std::string     out;
+  RestService     restService = { VersionRequest, 1, { "version" }, NULL };
+
+  ci.apiVersion   = V1;
+  ci.restServiceP = &restService;
 
   serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, NULL);
   out = orion::requestServe(&ci);

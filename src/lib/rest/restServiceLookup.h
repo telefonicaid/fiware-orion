@@ -26,7 +26,7 @@
 * Author: Ken Zangelin
 */
 #include "rest/RestService.h"
-#include "rest/Verb.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -34,6 +34,6 @@
 *
 * restServiceLookup -
 */
-extern RestService* restServiceLookup(Verb verb, const char* url);
+extern RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP);
 
 #endif

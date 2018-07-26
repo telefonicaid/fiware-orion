@@ -22,8 +22,10 @@
 *
 * Author: Ken Zangelin
 */
+#include "common/string.h"
+
+#include "rest/ConnectionInfo.h"
 #include "rest/RestService.h"
-#include "rest/Verb.h"
 #include "rest/restServiceLookup.h"
 
 
@@ -32,13 +34,68 @@
 *
 * restServiceLookup -
 */
-RestService* restServiceLookup(Verb verb, const char* url)
+RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
 {
-  RestService* serviceV = restServiceGet(verb);
+  RestService*              serviceV = restServiceGet(ciP->verb);
+  std::vector<std::string>  compV;
+  int                       components;
+  int                       serviceIx = 0;
 
-  //
-  // FIXME: Now lookup the URL in serviceV
-  //        This I have implemented somewhere, in one of the "3109 branches"
-  //        For now, just to compile, I return the first service in the vector
-  return &serviceV[0];
+  if (serviceV == NULL)
+  {
+    *badVerbP = true;
+    return NULL;  // Error taken care of later
+  }
+
+
+  // Split URI PATH into components
+  components = stringSplit(ciP->url.c_str(), '/', compV);
+
+  while (serviceV[serviceIx].request != InvalidRequest)
+  {
+    RestService* serviceP = &serviceV[serviceIx];
+
+    if (serviceP->components != components)
+    {
+      ++serviceIx;
+      continue;
+    }
+
+    bool match = true;
+    for (int compNo = 0; compNo < components; ++compNo)
+    {
+      const char* component = serviceP->compV[compNo].c_str();
+
+      if ((component[0] == '*') && (component[1] == 0))
+      {
+        continue;
+      }
+
+      if (ciP->apiVersion == V1)
+      {
+        if (strcasecmp(component, compV[compNo].c_str()) != 0)
+        {
+          match = false;
+          break;
+        }
+      }
+      else
+      {
+        if (strcmp(component, compV[compNo].c_str()) != 0)
+        {
+          match = false;
+          break;
+        }
+      }
+    }
+
+    if (match == true)
+    {
+      break;
+    }
+
+    ++serviceIx;
+  }
+
+  return &serviceV[serviceIx];
 }

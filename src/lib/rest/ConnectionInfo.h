@@ -80,7 +80,6 @@ public:
     compoundValueRoot      (NULL),
     httpStatusCode         (SccOk)
   {
-    memset(payloadWord, 0, sizeof(payloadWord));
   }
 
   ConnectionInfo(MimeType _outMimeType):
@@ -102,7 +101,6 @@ public:
     compoundValueRoot      (NULL),
     httpStatusCode         (SccOk)
   {
-    memset(payloadWord, 0, sizeof(payloadWord));
   }
 
   ConnectionInfo(std::string _url, std::string _method, std::string _version, MHD_Connection* _connection = NULL):
@@ -127,8 +125,6 @@ public:
     compoundValueRoot      (NULL),
     httpStatusCode         (SccOk)
   {
-
-    memset(payloadWord, 0, sizeof(payloadWord));
 
     if      (_method == "POST")    verb = POST;
     else if (_method == "PUT")     verb = PUT;
@@ -163,7 +159,6 @@ public:
   HttpHeaders                httpHeaders;
   char*                      payload;
   int                        payloadSize;
-  char                       payloadWord[64];
   std::string                answer;
   int                        callNo;
   ParseData*                 parseDataP;
