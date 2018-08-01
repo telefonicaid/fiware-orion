@@ -72,7 +72,10 @@ std::string Subscription::toJson(void)
     jh.addString("description", this->description);
   }
 
-  if (this->expires != PERMANENT_EXPIRES_DATETIME)
+  // Orion versions previous to 1.13.0 where using (int64_t) 9e18 as expiration for permanent
+  // subscriptions. Now we use PERMANENT_EXPIRES_DATETIME, whichs is larger, but we need to be prepared
+  // for these old documents in DB (more info in issue #3256)
+  if (this->expires < (int64_t) 9e18)
   {
     jh.addDate("expires", this->expires);
   }
