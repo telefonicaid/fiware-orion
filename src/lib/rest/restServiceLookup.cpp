@@ -41,12 +41,10 @@ RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
   int                       components;
   int                       serviceIx = 0;
 
-  if (serviceV == NULL)
+  if (serviceV == restBadVerbV)
   {
     *badVerbP = true;
-    return NULL;  // Error taken care of later
   }
-
 
   // Split URI PATH into components
   components = stringSplit(ciP->url.c_str(), '/', compV);
@@ -97,5 +95,5 @@ RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
     ++serviceIx;
   }
 
-  return &serviceV[serviceIx];
+  return (serviceV[serviceIx].request != InvalidRequest)? &serviceV[serviceIx] : &restBadVerbV[104];
 }

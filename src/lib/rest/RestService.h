@@ -69,6 +69,14 @@ typedef struct RestService
 
 /* ****************************************************************************
 *
+*  restBadVerbV -
+*/
+extern RestService* restBadVerbV;
+
+
+
+/* ****************************************************************************
+*
 * payloadParse -
 */
 extern std::string payloadParse
@@ -105,6 +113,14 @@ extern void serviceVectorsSet
   RestService*        _optionsServiceV,
   RestService*        _restBadVerbV
 );
+
+
+
+/* ****************************************************************************
+*
+* restService -
+*/
+extern std::string restService(ConnectionInfo* ciP, RestService* serviceV);
 
 
 

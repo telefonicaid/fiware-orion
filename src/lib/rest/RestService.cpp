@@ -532,7 +532,7 @@ static bool compErrorDetect
 * And lastly, if there is a badVerb RestService vector, but still no service routine is found, then we create a "service not recognized"
 * response. See comments incrusted in the function as well.
 */
-static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
+std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 {
   std::vector<std::string>  compV;
   int                       components;
@@ -576,7 +576,9 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   //
   for (unsigned int ix = 0; serviceV[ix].treat != NULL; ++ix)
   {
-    if ((serviceV[ix].components != 0) && (serviceV[ix].components != components))
+    RestService* restServiceP = &serviceV[ix];
+
+    if ((restServiceP->components != 0) && (restServiceP->components != components))
     {
       continue;
     }
@@ -584,7 +586,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     bool match = true;
     for (int compNo = 0; compNo < components; ++compNo)
     {
-      const char* component = serviceV[ix].compV[compNo].c_str();
+      const char* component = restServiceP->compV[compNo].c_str();
       
       if ((component[0] == '*') && (component[1] == 0))
       {
@@ -627,7 +629,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       ciP->parseDataP = &parseData;
       metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_REQ_SIZE, ciP->payloadSize);
       LM_T(LmtPayload, ("Parsing payload '%s'", ciP->payload));
-      response = payloadParse(ciP, &parseData, &serviceV[ix], &jsonReqP, &jsonRelease, compV);
+      response = payloadParse(ciP, &parseData, restServiceP, &jsonReqP, &jsonRelease, compV);
       LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
 
       if (response != "OK")
@@ -655,7 +657,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     {
       ciP->inMimeType = NOMIMETYPE;
     }
-    statisticsUpdate(serviceV[ix].request, ciP->inMimeType);
+    statisticsUpdate(restServiceP->request, ciP->inMimeType);
 
     // Tenant to connectionInfo
     ciP->tenant = ciP->tenantFromHttpHeader;
@@ -692,8 +694,8 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     }
 
     LM_T(LmtTenant, ("tenant: '%s'", ciP->tenant.c_str()));
-    commonFilters(ciP, &parseData, &serviceV[ix]);
-    scopeFilter(ciP, &parseData, &serviceV[ix]);
+    commonFilters(ciP, &parseData, restServiceP);
+    scopeFilter(ciP, &parseData, restServiceP);
 
     //
     // If we have gotten this far the Input is OK.
@@ -706,9 +708,9 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       alarmMgr.badInputReset(clientIp);
     }
 
-    std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
+    std::string response = restServiceP->treat(ciP, components, compV, &parseData);
 
-    filterRelease(&parseData, serviceV[ix].request);
+    filterRelease(&parseData, restServiceP->request);
 
     if (jsonReqP != NULL)
     {
