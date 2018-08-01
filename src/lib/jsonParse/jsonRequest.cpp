@@ -204,8 +204,9 @@ std::string jsonTreat
 
     restErrorReplyGet(ciP, SccBadRequest, details, &errorReply);
     snprintf(reqTypeV, sizeof(reqTypeV), "%d", request);
-    std::string details2 = std::string("no request treating object found for RequestType ") + reqTypeV + " (" + requestType(request) + ")";
-    alarmMgr.badInput(clientIp, details2);
+
+    details = std::string("no request treating object found for RequestType ") + reqTypeV + " (" + requestType(request) + ")";
+    alarmMgr.badInput(clientIp, details);
 
     return errorReply;
   }

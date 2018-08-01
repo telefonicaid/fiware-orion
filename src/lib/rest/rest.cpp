@@ -1230,7 +1230,7 @@ ConnectionInfo* connectionTreatInit
     return NULL;
   }
 
-
+  //
   // Get API version
   //   Note that we need to get API version before MHD_get_connection_values() as the later
   //   function may result in an error after processing Accept headers (and the
@@ -1239,7 +1239,7 @@ ConnectionInfo* connectionTreatInit
   ciP->apiVersion = apiVersionGet(ciP->url.c_str());
 
 
-  // LM_TMP(("--------------------- Serving APIv%d request %s %s -----------------", ciP->apiVersion, method, url));
+  LM_TMP(("--------------------- Serving APIv%d request %s %s -----------------", ciP->apiVersion, method, url));
 
   ciP->transactionStart.tv_sec  = transactionStart.tv_sec;
   ciP->transactionStart.tv_usec = transactionStart.tv_usec;
@@ -1345,9 +1345,9 @@ ConnectionInfo* connectionTreatInit
     // Not ready to answer here - must wait until all payload has been read
     ciP->httpStatusCode = SccBadVerb;
 
-    std::vector<std::string> compV;
-
-    ciP->answer = ciP->restServiceP->treat(ciP, 0, compV, NULL);
+    ciP->restServiceP   = &restServiceForBadVerb;  // FIXME #3109-PR: Try to remove this, or make restServiceLookup return a dummy
+    // std::vector<std::string> compV;
+    // ciP->answer = ciP->restServiceP->treat(ciP, 0, compV, NULL);
   }
 
   if (urlCheck(ciP, ciP->url) == false)
