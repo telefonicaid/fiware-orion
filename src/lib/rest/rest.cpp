@@ -1247,6 +1247,8 @@ static int connectionTreat
 
 
     // Get API version
+    // FIXME #3109-PR: this assignment will be removed in a subsequent PR, where the function apiVersionGet() is used instead
+    //
     ciP->apiVersion = (url[2] == '2')? V2 : V1;  // If an APIv2 request, the URL starts with "/v2/". Only V2 requests.
 
     // LM_TMP(("--------------------- Serving APIv%d request %s %s -----------------", ciP->apiVersion, method, url));
@@ -1259,7 +1261,7 @@ static int connectionTreat
     {
       // Bad Verb is taken care of later
       ciP->httpStatusCode = SccBadVerb;
-      ciP->restServiceP   = &restServiceForBadVerb;  // FIXME PR: Try to remove this, or make restServiceLookup return a dummy
+      ciP->restServiceP   = &restServiceForBadVerb;  // FIXME #3109-PR: Try to remove this, or make restServiceLookup return a dummy
     }
 
     ciP->transactionStart.tv_sec  = transactionStart.tv_sec;
@@ -1290,7 +1292,7 @@ static int connectionTreat
     ciP->uriParam[URI_PARAM_PAGINATION_LIMIT]   = DEFAULT_PAGINATION_LIMIT;
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
 
-    // Note we need to get API version before MHD_get_connection_values() as the later
+    // Note that we need to get API version before MHD_get_connection_values() as the later
     // function may result in an error after processing Accept headers (and the
     // render for the error depends on API version)
     ciP->apiVersion = apiVersionGet(ciP->url.c_str());
