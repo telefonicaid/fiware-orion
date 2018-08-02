@@ -1340,16 +1340,6 @@ ConnectionInfo* connectionTreatInit
   bool badVerb = false;
   ciP->restServiceP = restServiceLookup(ciP, &badVerb);
 
-  if (badVerb)
-  {
-    // Not ready to answer here - must wait until all payload has been read
-    ciP->httpStatusCode = SccBadVerb;
-
-    ciP->restServiceP   = &restServiceForBadVerb;  // FIXME #3109-PR: Try to remove this, or make restServiceLookup return a dummy
-    // std::vector<std::string> compV;
-    // ciP->answer = ciP->restServiceP->treat(ciP, 0, compV, NULL);
-  }
-
   if (urlCheck(ciP, ciP->url) == false)
   {
     alarmMgr.badInput(clientIp, "error in URI path");
@@ -1370,6 +1360,15 @@ ConnectionInfo* connectionTreatInit
   if (ciP->httpStatusCode != SccOk)
   {
     alarmMgr.badInput(clientIp, "error in URI parameters");
+  }
+
+  if (badVerb)
+  {
+    std::vector<std::string> compV;
+
+    // Not ready to answer here - must wait until all payload has been read
+    ciP->httpStatusCode = SccBadVerb;
+    ciP->answer = ciP->restServiceP->treat(ciP, 0, compV, NULL);
   }
 
   return ciP;
