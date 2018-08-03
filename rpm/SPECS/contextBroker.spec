@@ -173,6 +173,9 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Mon Aug 06 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.15.1-1
+- Fix: GET /v2/subscriptions and GET /v2/subscriptions/{id} crashes for permanent subscriptions created before version 1.13.0 (#3256)
+
 * Mon Jul 16 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.15.0-1
 - Add: upsert option for the POST /v2/entities operation (#3215)
 - Add: transient entities functionality (new NGSIv2 builtin attribute: dateExpires) (#3000)
