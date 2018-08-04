@@ -1378,6 +1378,72 @@ ConnectionInfo* connectionTreatInit
 
 /* ****************************************************************************
 *
+* connectionTreatDataReceive - 
+*/
+static int connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload_data_size, const char* upload_data)
+{
+  size_t  dataLen = *upload_data_size;
+
+  //
+  // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
+  // just silently "eat" the entire message.
+  //
+  // The problem occurs when the broker is lied to and there aren't ciP->httpHeaders.contentLength
+  // bytes to read.
+  // When this happens, MHD blocks until it times out (MHD_OPTION_CONNECTION_TIMEOUT defaults to 5 seconds),
+  // and the broker isn't able to respond. MHD just closes the connection.
+  // Question asked in mhd mailing list.
+  //
+  // See github issue:
+  //   https://github.com/telefonicaid/fiware-orion/issues/2761
+  //
+  if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
+  {
+    //
+    // Errors can't be returned yet, postpone ...
+    //
+    *upload_data_size = 0;
+    return MHD_YES;
+  }
+
+  //
+  // First call with payload - use the thread variable "static_buffer" if possible,
+  // otherwise allocate a bigger buffer
+  //
+  // FIXME P1: This could be done in "Part I" instead, saving an "if" for each "Part II" call
+  //           Once we *really* look to scratch some efficiency, this change should be made.
+  //
+  if (ciP->payloadSize == 0)  // First call with payload
+  {
+    if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
+    {
+      ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
+    }
+    else
+    {
+      ciP->payload = static_buffer;
+    }
+  }
+
+  // Copy the chunk
+  LM_T(LmtPartialPayload, ("Got %d of payload of %d bytes", dataLen, ciP->httpHeaders.contentLength));
+  memcpy(&ciP->payload[ciP->payloadSize], upload_data, dataLen);
+
+  // Add to the size of the accumulated read buffer
+  ciP->payloadSize += *upload_data_size;
+
+  // Zero-terminate the payload
+  ciP->payload[ciP->payloadSize] = 0;
+
+  // Acknowledge the data and return
+  *upload_data_size = 0;
+  return MHD_YES;
+}
+
+
+
+/* ****************************************************************************
+*
 * connectionTreat -
 *
 * This is the MHD_AccessHandlerCallback function for MHD_start_daemon
@@ -1407,101 +1473,42 @@ static int connectionTreat
    void**           con_cls
 )
 {
-  int retVal;
-
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (*con_cls == NULL)
   {
+    int retVal;
     *con_cls = connectionTreatInit(connection, url, method, version, &retVal);
     return retVal;
   }
 
-  ConnectionInfo*        ciP         = (ConnectionInfo*) *con_cls;
-  size_t                 dataLen     = *upload_data_size;
 
-  //
   // 2. Data gathering calls
-  //
-  // 2-1. Data gathering calls, just wait
-  // 2-2. Last data gathering call, acknowledge the receipt of data
-  //
-  if (dataLen != 0)
+  ConnectionInfo* ciP = (ConnectionInfo*) *con_cls;
+
+  if (*upload_data_size != 0)
   {
-    //
-    // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
-    // just silently "eat" the entire message.
-    //
-    // The problem occurs when the broker is lied to and there aren't ciP->httpHeaders.contentLength
-    // bytes to read.
-    // When this happens, MHD blocks until it times out (MHD_OPTION_CONNECTION_TIMEOUT defaults to 5 seconds),
-    // and the broker isn't able to respond. MHD just closes the connection.
-    // Question asked in mhd mailing list.
-    //
-    // See github issue:
-    //   https://github.com/telefonicaid/fiware-orion/issues/2761
-    //
-    if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
-    {
-      //
-      // Errors can't be returned yet, postpone ...
-      //
-      *upload_data_size = 0;
-      return MHD_YES;
-    }
-
-    //
-    // First call with payload - use the thread variable "static_buffer" if possible,
-    // otherwise allocate a bigger buffer
-    //
-    // FIXME P1: This could be done in "Part I" instead, saving an "if" for each "Part II" call
-    //           Once we *really* look to scratch some efficiency, this change should be made.
-    //
-    if (ciP->payloadSize == 0)  // First call with payload
-    {
-      if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
-      {
-        ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
-      }
-      else
-      {
-        ciP->payload = static_buffer;
-      }
-    }
-
-    // Copy the chunk
-    LM_T(LmtPartialPayload, ("Got %d of payload of %d bytes", dataLen, ciP->httpHeaders.contentLength));
-    memcpy(&ciP->payload[ciP->payloadSize], upload_data, dataLen);
-
-    // Add to the size of the accumulated read buffer
-    ciP->payloadSize += *upload_data_size;
-
-    // Zero-terminate the payload
-    ciP->payload[ciP->payloadSize] = 0;
-
-    // Acknowledge the data and return
-    *upload_data_size = 0;
-    return MHD_YES;
+    return connectionTreatDataReceive(ciP, upload_data_size, upload_data);
   }
+
+
+  //
+  // The entire payload has been read and we are ready to serve the request.
+  //
+  // Before this point, MHD is not ready to respond tp the caller.
+  // Plenty of validity checks of the request are performed here, and error responses ar sent if errors found
+  // Finally, if all is OK, the request is served by calling the function orion::requestServe
+  //
+  lmTransactionSetSubservice(ciP->httpHeaders.servicePath.c_str());
 
   if (ciP->httpStatusCode != SccOk)
   {
-    // An error has occurred
+    // An error has occurred. Here we are ready to respond, as all data has been read
     restReply(ciP, ciP->answer);
     return MHD_YES;
   }
 
-
   //
-  // 3. Finally, serve the request (unless an error has occurred)
-  //
-  // URL and headers checks are delayed to the "third" MHD call, as no
-  // errors can be sent before all the request has been read
-  //
-  lmTransactionSetSubservice(ciP->httpHeaders.servicePath.c_str());
-
-  
-  //
-  // Here, if the incoming request was too big, return error about it
+  // If the incoming request was too big, return error about it
   //
   if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
   {
@@ -1530,18 +1537,15 @@ static int connectionTreat
 
 
   //
-  // Check that Accept Header values are acceptable
+  // Check that Accept Header values are valid
   //
   bool textAccepted = false;
+
   if (!acceptHeadersAcceptable(ciP, &textAccepted))
   {
-    OrionError oe(SccNotAcceptable, "");
+    OrionError oe(SccNotAcceptable, "acceptable MIME types: application/json, text/plain");
 
-    if (textAccepted)
-    {
-      oe.details = "acceptable MIME types: application/json, text/plain";
-    }
-    else
+    if (!textAccepted)
     {
       oe.details = "acceptable MIME types: application/json";
     }
@@ -1551,8 +1555,9 @@ static int connectionTreat
     restReply(ciP, oe.smartRender(ciP->apiVersion));
     return MHD_YES;
   }
+      
 
-
+      
   // Note that ciP->outMimeType is not set here.
   // Why?
   // If text/plain is asked for and accepted ('*/value' operations) but something goes wrong,
@@ -1561,13 +1566,9 @@ static int connectionTreat
   //
   if (ciP->httpHeaders.outformatSelect() == NOMIMETYPE)
   {
-    OrionError oe(SccNotAcceptable, "");
+    OrionError oe(SccNotAcceptable, "acceptable MIME types: application/json, text/plain");
 
-    if (textAccepted)
-    {
-      oe.details = "acceptable MIME types: application/json, text/plain";
-    }
-    else
+    if (!textAccepted)
     {
       oe.details = "acceptable MIME types: application/json";
     }
@@ -1590,19 +1591,17 @@ static int connectionTreat
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, details);
     restReply(ciP, oe.smartRender(ciP->apiVersion));
+
     return MHD_YES;
   }
 
 
   //
-  // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with two exceptions.
+  // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with the exception of log requests.
   //
-  // - Old log requests  (URL contains '/log/')
-  // - New log requests  (URL is exactly '/admin/log')
-  //
-  if (((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) &&
-      (ciP->httpHeaders.contentLength == 0) &&
-      ((strncasecmp(ciP->url.c_str(), "/log/", 5) != 0) && (strncasecmp(ciP->url.c_str(), "/admin/log", 10) != 0)))
+  if ((ciP->httpHeaders.contentLength == 0) &&
+      ((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) &&
+      ((ciP->restServiceP->request == LogTraceRequest) || (ciP->restServiceP->request == LogLevelRequest)))
   {
     std::string errorMsg;
 
@@ -1610,16 +1609,24 @@ static int connectionTreat
     ciP->httpStatusCode  = SccContentLengthRequired;
     restReply(ciP, errorMsg);
     alarmMgr.badInput(clientIp, errorMsg);
+    
+    return MHD_YES;
   }
-  else if (ciP->answer != "")
+
+  //
+  // If ciP->answer is non-empty, then an error has been detected
+  //
+  if (ciP->answer != "")
   {
     alarmMgr.badInput(clientIp, ciP->answer);
     restReply(ciP, ciP->answer);
+
+  return MHD_YES;
   }
-  else
-  {
-    orion::requestServe(ciP);
-  }
+
+  
+  // All is good. The request can be served.
+  orion::requestServe(ciP);
 
   return MHD_YES;
 }
