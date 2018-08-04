@@ -47,36 +47,33 @@
 *
 * service routine vectors -
 */
+#define RC   RegisterContext
+#define DCA  DiscoverContextAvailability
+
 RestService postV[] =
 {
-  { RegisterContext, 2, { "ngsi9", "registerContext" }, "registerContextRequest", postRegisterContext },
-  { InvalidRequest, 0, {}, "", NULL }
+  { RC,             2, { "ngsi9", "registerContext" }, postRegisterContext },
+  { InvalidRequest, 0, {}, NULL }
 };
 
 RestService badVerbs[] =
 {
-  { RegisterContext, 2, { "ngsi9", "registerContext" }, "registerContextRequest", badVerbPostOnly     },
-  { InvalidRequest, 0, {}, "", NULL }
+  { RC,             2, { "ngsi9", "registerContext" }, badVerbPostOnly     },
+  { InvalidRequest, 0, {}, NULL }
 };
-
-
-#define RC   RegisterContext
-#define DCA  DiscoverContextAvailability
-#define RCR  "registerContextRequest"
-#define DCAR "discoverContextAvailabilityRequest"
 
 RestService postV2[] =
 {
-  { RC,  2, { "ngsi9",  "registerContext"             }, RCR,  postRegisterContext             },
-  { DCA, 2, { "ngsi9",  "discoverContextAvailability" }, DCAR, postDiscoverContextAvailability },
-  { InvalidRequest, 0, {}, "", NULL }
+  { RC,             2, { "ngsi9",  "registerContext"             }, postRegisterContext             },
+  { DCA,            2, { "ngsi9",  "discoverContextAvailability" }, postDiscoverContextAvailability },
+  { InvalidRequest, 0, {}, NULL }
 };
 
 RestService badVerbs2[] =
 {
-  { DCA, 2, { "ngsi9",  "discoverContextAvailability" }, DCAR, badVerbPostOnly                 },
-  { RC,  2, { "ngsi9",  "registerContext"             }, RCR,  badVerbPostOnly                 },
-  { InvalidRequest, 0, {}, "", NULL }
+  { DCA,            2, { "ngsi9",  "discoverContextAvailability" }, badVerbPostOnly                 },
+  { RC,             2, { "ngsi9",  "registerContext"             }, badVerbPostOnly                 },
+  { InvalidRequest, 0, {}, NULL }
 };
 
 
@@ -144,10 +141,11 @@ TEST(RestService, noSuchServiceAndNotFound)
   ConnectionInfo ci("/ngsi9/discoverContextAvailability",  "POST", "1.1");
   ci.servicePathV.push_back("");
 
-  const char*    infile    = "ngsi9.discoverContextAvailabilityRequest.ok.valid.json";
-  const char*    outfile1  = "ngsi9.discoverContextAvailabilityRsponse.serviceNotRecognized.valid.json";
-  const char*    outfile2  = "ngsi9.discoverContextAvailabilityRsponse.notFound.valid.json";
+  const char*    infile      = "ngsi9.discoverContextAvailabilityRequest.ok.valid.json";
+  const char*    outfile1    = "ngsi9.discoverContextAvailabilityRsponse.serviceNotRecognized.valid.json";
+  const char*    outfile2    = "ngsi9.discoverContextAvailabilityRsponse.notFound.valid.json";
   std::string    out;
+  RestService    restService = { DiscoverContextAvailability, 2, { "ngsi9", "discoverContextAvailability" }, NULL };
 
   utInit();
 
@@ -163,6 +161,7 @@ TEST(RestService, noSuchServiceAndNotFound)
   ci.inMimeType     = JSON;
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
+  ci.restServiceP   = &restService;
 
   serviceVectorsSet(NULL, NULL, postV, NULL, NULL, NULL, badVerbs);
   out = orion::requestServe(&ci);

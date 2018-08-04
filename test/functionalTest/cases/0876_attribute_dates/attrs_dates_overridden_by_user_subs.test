@@ -33,9 +33,9 @@ accumulatorStart --pretty-print
 #
 # (Test focuses on dateModified, but dateCreated is expected to work in a similar way)
 #
-# E1 notifications in steps 1 to 9 should not happen (they has been marked with [*]), as the
-# user provided dateModified doesn't match the filter, but this is the way CB works now
-# (and it is documented in NGSIv2 implementation notes). Maybe in the future this could change.
+# E1 notifications in steps 1 to 9 should not happen (they have been marked with [*]), as the
+# user-provided 'dateModified' doesn't match the filter, but this is the way CB works now
+# (and it is documented in NGSIv2 implementation notes). Maybe in the future this will change.
 #
 # 01. Create sub E.*/T with filter mq dateModified<2049-01-01
 # 02. Create entity E1/T with user provided dateModified in a far away future (should not trigger notif) [*]
@@ -507,7 +507,7 @@ Date: REGEX(.*)
 =====================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 262
+Content-Length: REGEX((400|262))
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -537,7 +537,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 400
+Content-Length: REGEX((400|262))
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -567,7 +567,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 262
+Content-Length: REGEX((400|262))
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -597,7 +597,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 400
+Content-Length: REGEX((400|262))
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)

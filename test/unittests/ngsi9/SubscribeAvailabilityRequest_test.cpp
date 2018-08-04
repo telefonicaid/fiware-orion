@@ -73,7 +73,7 @@ TEST(SubscribeContextAvailabilityRequest, json_ok)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   lmTraceLevelSet(LmtDump, true);
-  std::string result = jsonTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, NULL);
   lmTraceLevelSet(LmtDump, false);
   EXPECT_EQ("OK", result) << "this test should be OK";
 
@@ -99,7 +99,7 @@ TEST(SubscribeContextAvailabilityRequest, json_badIsPattern)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, NULL);
   EXPECT_EQ("OK", result);
 
   utExit();
@@ -126,7 +126,7 @@ TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  std::string out = jsonTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
+  std::string out = jsonTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -153,7 +153,7 @@ TEST(SubscribeContextAvailabilityRequest, json_badDuration)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  std::string out = jsonTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
+  std::string out = jsonTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

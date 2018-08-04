@@ -38,8 +38,8 @@
 */
 static RestService optionsV[] =
 {
-  { EntitiesRequest,  2, { "v2", "entities" }, "", optionsGetPostOnly },
-  { InvalidRequest,   0, {                  }, "", NULL               }
+  { EntitiesRequest,  2, { "v2", "entities" }, optionsGetPostOnly },
+  { InvalidRequest,   0, {                  }, NULL               }
 };
 
 

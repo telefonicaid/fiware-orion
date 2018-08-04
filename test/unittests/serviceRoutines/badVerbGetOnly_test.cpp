@@ -39,14 +39,14 @@
 */
 static RestService getV[] =
 {
-  { VersionRequest, 1, { "version" }, "", versionTreat   },
-  { InvalidRequest, 0, {           }, "", NULL           }
+  { VersionRequest, 1, { "version" }, versionTreat   },
+  { InvalidRequest, 0, {           }, NULL           }
 };
 
 static RestService badVerbV[] =
 {
-  { VersionRequest, 1, { "version" }, "", badVerbGetOnly },
-  { InvalidRequest, 0, {           }, "", NULL           }
+  { VersionRequest, 1, { "version" }, badVerbGetOnly },
+  { InvalidRequest, 0, {           }, NULL           }
 };
 
 
@@ -60,8 +60,12 @@ TEST(badVerbGetOnly, ok)
   ConnectionInfo  ci("/version",  "PUT", "1.1");
   std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
   std::string     out;
+  RestService     restService = { VersionRequest, 1, { "version", }, NULL };
 
   serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
+
+  ci.restServiceP = &restService;
+
   out = orion::requestServe(&ci);
 
   EXPECT_EQ(expected, out);

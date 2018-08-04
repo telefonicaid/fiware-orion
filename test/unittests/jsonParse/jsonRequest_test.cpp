@@ -31,6 +31,7 @@
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/RestService.h"
 
 #include "unittests/unittest.h"
 
@@ -46,20 +47,22 @@ TEST(jsonRequest, jsonTreat)
   ParseData       parseData;
   std::string     out;
   const char*     outfile1 = "orion.jsonRequest.jsonTreat.valid.json";
+  RestService     restService = { InvalidRequest, 2, { "ngsi9", "registerContext" }, NULL };
 
   utInit();
 
   ci.outMimeType  = JSON;
   ci.apiVersion   = V1;
+  ci.restServiceP = &restService;
 
-  out  = jsonTreat("non-empty content", &ci, &parseData, InvalidRequest, "", NULL);
+  out  = jsonTreat("non-empty content", &ci, &parseData, InvalidRequest, NULL);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf,
                                    sizeof(expectedBuf),
                                    outfile1)) << "Error getting test data from '" << outfile1 << "'";
 
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out  = jsonTreat("", &ci, &parseData, InvalidRequest, "", NULL);
+  out  = jsonTreat("", &ci, &parseData, InvalidRequest, NULL);
   EXPECT_STREQ("OK", out.c_str());
 
   utExit();

@@ -63,13 +63,9 @@ std::string putAvailabilitySubscriptionConvOp
   if (subscriptionId != ucasP->subscriptionId.get())
   {
     std::string out;
+    std::string details = std::string("unmatching subscriptionId URI/payload: /") + subscriptionId + "/ vs /" + ucasP->subscriptionId.get() + "/";
 
-    out = restErrorReplyGet(ciP,
-                            "",
-                            "updateContextAvailabilitySubscription",
-                            SccBadRequest,
-                            std::string("unmatching subscriptionId URI/payload: /") +
-                            subscriptionId + "/ vs /" + ucasP->subscriptionId.get() + "/");
+    restErrorReplyGet(ciP, SccBadRequest, details, &out);
     return out;
   }
 
