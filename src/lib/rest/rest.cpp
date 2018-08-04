@@ -1599,9 +1599,11 @@ static int connectionTreat
   //
   // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with the exception of log requests.
   //
+
   if ((ciP->httpHeaders.contentLength == 0) &&
       ((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) &&
-      ((ciP->restServiceP->request == LogTraceRequest) || (ciP->restServiceP->request == LogLevelRequest)))
+      (ciP->restServiceP->request != LogTraceRequest) &&
+      (ciP->restServiceP->request != LogLevelRequest))
   {
     std::string errorMsg;
 
