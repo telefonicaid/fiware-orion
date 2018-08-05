@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include <time.h>
 #include <sys/time.h>
+
 #include <string>
 #include <vector>
 #include <map>
@@ -149,6 +150,8 @@ public:
   MimeType                   inMimeType;
   MimeType                   outMimeType;
   std::string                url;
+  int                        urlComponents;
+  std::vector<std::string>   urlCompV;
   std::string                method;
   std::string                version;
   std::string                charset;

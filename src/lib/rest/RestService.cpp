@@ -534,12 +534,11 @@ static bool compErrorDetect
 */
 std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 {
-  std::vector<std::string>  compV;
-  int                       components;
   JsonRequest*              jsonReqP   = NULL;
   ParseData                 parseData;
   JsonDelayedRelease        jsonRelease;
 
+  // FIXME P2: this empty url check seems not necessary ... 
   if ((ciP->url.length() == 0) || ((ciP->url.length() == 1) && (ciP->url.c_str()[0] == '/')))
   {
     OrionError  error(SccBadRequest, "The Orion Context Broker is a REST service, not a 'web page'");
@@ -553,16 +552,11 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
   ciP->httpStatusCode = SccOk;
 
-
-  //
-  // Split URI PATH into components
-  //
-  components = stringSplit(ciP->url, '/', compV);
-  if (!compCheck(components, compV))
+  if (!compCheck(ciP->urlComponents, ciP->urlCompV))
   {
     OrionError oe;
 
-    if (compErrorDetect(ciP->apiVersion, components, compV, &oe))
+    if (compErrorDetect(ciP->apiVersion, ciP->urlComponents, ciP->urlCompV, &oe))
     {
       alarmMgr.badInput(clientIp, oe.details);
       ciP->httpStatusCode = SccBadRequest;

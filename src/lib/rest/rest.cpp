@@ -1239,7 +1239,7 @@ ConnectionInfo* connectionTreatInit
   ciP->apiVersion = apiVersionGet(ciP->url.c_str());
 
 
-  LM_TMP(("--------------------- Serving APIv%d request %s %s -----------------", ciP->apiVersion, method, url));
+  // LM_TMP(("--------------------- Serving APIv%d request %s %s -----------------", ciP->apiVersion, method, url));
 
   ciP->transactionStart.tv_sec  = transactionStart.tv_sec;
   ciP->transactionStart.tv_usec = transactionStart.tv_usec;
@@ -1599,11 +1599,10 @@ static int connectionTreat
   //
   // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with the exception of log requests.
   //
-
   if ((ciP->httpHeaders.contentLength == 0) &&
       ((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) &&
-      (ciP->restServiceP->request != LogTraceRequest) &&
-      (ciP->restServiceP->request != LogLevelRequest))
+      (strncasecmp(ciP->url.c_str(), "/log/", 5) != 0) &&
+      (strncasecmp(ciP->url.c_str(), "/admin/log", 10) != 0))
   {
     std::string errorMsg;
 

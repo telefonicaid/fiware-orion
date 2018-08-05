@@ -37,8 +37,6 @@
 RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
 {
   RestService*              serviceV = restServiceGet(ciP->verb);
-  std::vector<std::string>  compV;
-  int                       components;
   int                       serviceIx = 0;
 
   if (serviceV == restBadVerbV)
@@ -47,20 +45,20 @@ RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
   }
 
   // Split URI PATH into components
-  components = stringSplit(ciP->url.c_str(), '/', compV);
+  ciP->urlComponents = stringSplit(ciP->url.c_str(), '/', ciP->urlCompV);
 
   while (serviceV[serviceIx].request != InvalidRequest)
   {
     RestService* serviceP = &serviceV[serviceIx];
 
-    if (serviceP->components != components)
+    if (serviceP->components != ciP->urlComponents)
     {
       ++serviceIx;
       continue;
     }
 
     bool match = true;
-    for (int compNo = 0; compNo < components; ++compNo)
+    for (int compNo = 0; compNo < ciP->urlComponents; ++compNo)
     {
       const char* component = serviceP->compV[compNo].c_str();
 
@@ -71,7 +69,7 @@ RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
 
       if (ciP->apiVersion == V1)
       {
-        if (strcasecmp(component, compV[compNo].c_str()) != 0)
+        if (strcasecmp(component, ciP->urlCompV[compNo].c_str()) != 0)
         {
           match = false;
           break;
@@ -79,7 +77,7 @@ RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
       }
       else
       {
-        if (strcmp(component, compV[compNo].c_str()) != 0)
+        if (strcmp(component, ciP->urlCompV[compNo].c_str()) != 0)
         {
           match = false;
           break;
