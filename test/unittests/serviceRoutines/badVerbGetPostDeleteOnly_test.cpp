@@ -36,10 +36,13 @@
 *
 * badVerbV -
 */
+#define ICEA   IndividualContextEntityAttribute
+#define IR     InvalidRequest
+
 static RestService badVerbV[] =
 {
-  { IndividualContextEntityAttribute, 5, { "ngsi10", "contextEntities", "*", "attributes", "*" }, "", badVerbGetPostDeleteOnly },
-  { InvalidRequest,                   0, {                                                     }, "", NULL                     }
+  { ICEA, 5, { "ngsi10", "contextEntities", "*", "attributes", "*" }, badVerbGetPostDeleteOnly },
+  { IR,   0, {                                                     }, NULL                     }
 };
 
 
@@ -53,6 +56,15 @@ TEST(badVerbGetPostDeleteOnly, ok)
   ConnectionInfo  ci("/ngsi10/contextEntities/entityId01/attributes/temperature",  "PUT", "1.1");
   std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
   std::string     out;
+  RestService     restService =
+    {
+      VersionRequest,
+      5, { "ngsi10", "contextEntities", "entityId01", "attributes", "temperature" },
+      NULL
+    };
+
+  ci.apiVersion   = V1;
+  ci.restServiceP = &restService;
 
   serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, badVerbV);
   out = orion::requestServe(&ci);

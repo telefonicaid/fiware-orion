@@ -62,7 +62,7 @@ TEST(RegisterProviderRequest, json_ok)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile1)) << "Error getting test data from '" << inFile1 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile1)) << "Error getting test data from '" << outFile1 << "'";
 
-  result = jsonTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, "registerProviderRequest", NULL);
+  result = jsonTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, NULL);
   EXPECT_EQ("OK", result) << "this test should be OK";
 
   rendered = reqData.rpr.res.render();
@@ -90,7 +90,7 @@ TEST(RegisterProviderRequest, json_ok)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile2)) << "Error getting test data from '" << inFile2 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile4)) << "Error getting test data from '" << outFile4 << "'";
 
-  result = jsonTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, "registerProviderRequest", NULL);
+  result = jsonTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, NULL);
   EXPECT_EQ("OK", result);
   rendered = reqData.rpr.res.render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());

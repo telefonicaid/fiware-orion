@@ -30,6 +30,7 @@
 #include "ngsi/ParseData.h"
 #include "common/globals.h"
 #include "jsonParse/jsonRequest.h"
+#include "rest/RestService.h"
 
 #include "unittest.h"
 
@@ -78,7 +79,7 @@ TEST(DiscoverContextAvailabilityRequest, ok_json)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
   lmTraceLevelSet(LmtDump, true);
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
   EXPECT_EQ("OK", result) << "this test should be OK";
   lmTraceLevelSet(LmtDump, false);
 }
@@ -100,7 +101,7 @@ TEST(DiscoverContextAvailabilityRequest, okNoRestrictions_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
   EXPECT_EQ("OK", result) << "OK with no Restriction";
 }
 
@@ -123,7 +124,7 @@ TEST(DiscoverContextAvailabilityRequest, noEntityIdList_json)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
 
   EXPECT_STREQ(expectedBuf, result.c_str());
 }
@@ -147,7 +148,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyEntityIdList_json)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
 
   EXPECT_STREQ(expectedBuf, result.c_str());
 }
@@ -171,7 +172,7 @@ TEST(DiscoverContextAvailabilityRequest, invalidIsPatternValue_json)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
 
   EXPECT_STREQ(expectedBuf, result.c_str());
 }
@@ -188,13 +189,15 @@ TEST(DiscoverContextAvailabilityRequest, unsupportedAttributeForEntityId_json)
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.unsupportedAttributeForEntityId.invalid.json";
   const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.unsupportedAttributeForEntityId.valid.json";
   ConnectionInfo  ci("", "POST", "1.1");
+  RestService     restService = { DiscoverContextAvailability, 1, { "" }, NULL };
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  ci.inMimeType   = JSON;
+  ci.outMimeType  = JSON;
+  ci.restServiceP = &restService;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
   EXPECT_STREQ(expectedBuf, result.c_str());
@@ -217,7 +220,7 @@ TEST(DiscoverContextAvailabilityRequest, twoEntityIdIds_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
 
   EXPECT_EQ("OK", result) << "invalid 'isPattern' value";
 }
@@ -239,7 +242,7 @@ TEST(DiscoverContextAvailabilityRequest, entityIdTwoTypes_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
 
   EXPECT_EQ("OK", result) << "invalid 'isPattern' value";
 }
@@ -261,7 +264,7 @@ TEST(DiscoverContextAvailabilityRequest, entityIdTwoIsPatterns_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
 
   EXPECT_EQ("OK", result) << "invalid 'isPattern' value";
 }
@@ -283,7 +286,7 @@ TEST(DiscoverContextAvailabilityRequest, twoEntityIdTypes_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
 
   EXPECT_EQ("OK", result) << "invalid 'isPattern' value";
 }
@@ -307,7 +310,7 @@ TEST(DiscoverContextAvailabilityRequest, overrideEntityIdIsPattern_json)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
@@ -330,7 +333,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyEntityIdId_json)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
@@ -353,7 +356,7 @@ TEST(DiscoverContextAvailabilityRequest, noEntityIdId_json)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
@@ -375,7 +378,7 @@ TEST(DiscoverContextAvailabilityRequest, noAttributeExpression_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
 
   EXPECT_EQ(expect, result) << "noAttributeExpression";
 }
@@ -398,7 +401,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyAttributeExpression_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
 
   EXPECT_EQ(expect, result) << "Empty Attribute Expression";
 }
@@ -422,7 +425,7 @@ TEST(DiscoverContextAvailabilityRequest, noScopeType_json)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
@@ -445,7 +448,7 @@ TEST(DiscoverContextAvailabilityRequest, noScopeValue_json)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
@@ -468,7 +471,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyScopeType_json)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
@@ -491,7 +494,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyScopeValue_json)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
@@ -506,13 +509,15 @@ TEST(DiscoverContextAvailabilityRequest, parseError_json)
   ParseData       reqData;
   const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.parseError.invalid.json";
   ConnectionInfo  ci("", "POST", "1.1");
+  RestService     restService = { InvalidRequest, 1, { "" }, NULL };
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
+  ci.restServiceP = &restService;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
   EXPECT_NE("OK", result) << "Parse Error not detected";
 }
 
@@ -535,6 +540,6 @@ TEST(DiscoverContextAvailabilityRequest, emptyAttributeName_json)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 }

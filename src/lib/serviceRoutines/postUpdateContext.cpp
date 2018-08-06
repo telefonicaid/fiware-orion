@@ -224,7 +224,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   parseData.upcrs.res.errorCode.fill(SccOk);
 
-  s = jsonTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, "updateContextResponse", NULL);
+  s = jsonTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, NULL);
 
   if (s != "OK")
   {

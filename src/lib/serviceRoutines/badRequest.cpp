@@ -53,11 +53,7 @@ std::string badRequest
 
   alarmMgr.badInput(ciP->ip, details);
 
-  answer = restErrorReplyGet(ciP,
-                             "",
-                             ciP->payloadWord,
-                             SccBadRequest,
-                             "service not found");
+  restErrorReplyGet(ciP, SccBadRequest, "service not found", &answer);
 
   return answer;
 }

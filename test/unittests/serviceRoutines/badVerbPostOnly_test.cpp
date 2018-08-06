@@ -38,8 +38,8 @@
 */
 static RestService badVerbV[] =
 {
-  { RegisterContext, 2, { "ngsi9",  "registerContext" }, "", badVerbPostOnly },
-  { InvalidRequest,  0, {                             }, "", NULL            }
+  { RegisterContext, 2, { "ngsi9",  "registerContext" }, badVerbPostOnly },
+  { InvalidRequest,  0, {                             }, NULL            }
 };
 
 
@@ -53,6 +53,9 @@ TEST(badVerbPostOnly, ok)
   ConnectionInfo ci("/ngsi9/registerContext",  "PUT", "1.1");
   std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
   std::string     out;
+  RestService     restService = { RegisterContext, 2, { "ngsi9", "registerContext" }, NULL };
+
+  ci.restServiceP = &restService;
 
   serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, badVerbV);
   out = orion::requestServe(&ci);

@@ -33,7 +33,7 @@
 *
 * ORION_REST_SERVICE_END - End marker for the Rest Service array
 */
-#define ORION_REST_SERVICE_END  { InvalidRequest,  0, {}, "", NULL }
+#define ORION_REST_SERVICE_END  { InvalidRequest,  0, {}, NULL }
 
 
 

@@ -344,7 +344,6 @@ static const char* validLogLevels[] =
 *   RequestType   request     - The type of the request
 *   int           components  - Number of components in the following URL component vector
 *   std::string   compV       - Component vector of the URL
-*   std::string   payloadWord - first word in the payload for the request (to verify that the payload matches the URL). If empty, no check is performed)
 *   RestTreat     treat       - Function pointer to the function to treat the incoming REST request
 *
 */
