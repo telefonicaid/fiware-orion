@@ -109,7 +109,7 @@ process_page(res.json())
 # Number of batches
 pages = count / page_size
 for i in range(0, pages):
-    offset = (i + 1) * 10
+    offset = (i + 1) * page_size
     res = requests.get('%s/v2/entities?offset=%s&limit=%s' % (cb_endpoint, str(offset), str(page_size)),
                        headers=headers, verify=False)
     if res.status_code != 200:
