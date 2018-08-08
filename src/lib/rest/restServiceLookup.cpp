@@ -28,6 +28,8 @@
 #include "rest/RestService.h"
 #include "rest/restServiceLookup.h"
 
+#include "serviceRoutines/postDiscoverContextAvailability.h"
+#include "serviceRoutines/badVerbPostOnly.h"
 
 
 /* ****************************************************************************
@@ -36,16 +38,13 @@
 */
 RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
 {
-  RestService*              serviceV = restServiceGet(ciP->verb);
-  int                       serviceIx = 0;
-
-  if (serviceV == restBadVerbV)
-  {
-    *badVerbP = true;
-  }
+  Verb          verb      = (*badVerbP == false)? ciP->verb : NOVERB;
+  RestService*  serviceV  = restServiceVectorGet(verb);
+  int           serviceIx = 0;
+  bool          match     = false;
 
   // Split URI PATH into components
-  ciP->urlComponents = stringSplit(ciP->url.c_str(), '/', ciP->urlCompV);
+  ciP->urlComponents = stringSplit(ciP->url.c_str(), '/', ciP->urlCompV, true);
 
   while (serviceV[serviceIx].request != InvalidRequest)
   {
@@ -57,7 +56,7 @@ RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
       continue;
     }
 
-    bool match = true;
+    match = true;
     for (int compNo = 0; compNo < ciP->urlComponents; ++compNo)
     {
       const char* component = serviceP->compV[compNo].c_str();
@@ -93,5 +92,28 @@ RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
     ++serviceIx;
   }
 
-  return (serviceV[serviceIx].request != InvalidRequest)? &serviceV[serviceIx] : &restBadVerbV[104];
+  if (match == true)
+  {
+    if (serviceV == restBadVerbV)
+    {
+      ciP->httpStatusCode = SccBadVerb;
+      ciP->badVerb        = true;
+    }
+
+    return &serviceV[serviceIx];
+  }
+
+  //
+  // Not found?
+  // Recursive call with bad verb service vector
+  // But only one recursive call !
+  //
+
+  if (*badVerbP == false)
+  {
+    *badVerbP = true;
+    return restServiceLookup(ciP, badVerbP);
+  }
+
+  return &restBadVerbV[104];  // FIXME 02: 99.9% sure we never get here, but if ... Change the 104 service for a fixed one
 }

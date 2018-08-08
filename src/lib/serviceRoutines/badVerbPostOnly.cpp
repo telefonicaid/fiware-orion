@@ -67,5 +67,6 @@ std::string badVerbPostOnly
 
   alarmMgr.badInput(clientIp, details);
 
-  return (ciP->apiVersion == V1 || ciP->apiVersion == NO_VERSION)? "" :  oe.smartRender(ciP->apiVersion);
+  ciP->answer = oe.smartRender(ciP->apiVersion);
+  return ciP->answer;
 }

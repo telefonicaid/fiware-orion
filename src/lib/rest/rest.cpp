@@ -1303,11 +1303,12 @@ ConnectionInfo* connectionTreatInit
     // FIXME P4:
     // Supposedly, we aren't ready to respond to the HTTP request at this early stage, before reading the content.
     // However, tests have shown that the broker hangs if the response is delayed until later calls ...
-    // 
+    //
     //
     restReply(ciP, ciP->answer);  // to not hang on too big payloads
     return ciP;
   }
+
 
   //
   // Transaction starts here
@@ -1338,6 +1339,7 @@ ConnectionInfo* connectionTreatInit
 
   // Lookup Rest Service
   bool badVerb = false;
+
   ciP->restServiceP = restServiceLookup(ciP, &badVerb);
 
   if (urlCheck(ciP, ciP->url) == false)
@@ -1352,23 +1354,38 @@ ConnectionInfo* connectionTreatInit
   {
     alarmMgr.badInput(clientIp, "invalid mime-type in Content-Type http-header");
   }
-  else
+  //
+  // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with the exception of log requests.
+  //
+  else if ((ciP->httpHeaders.contentLength == 0) &&
+      ((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) &&
+      (strncasecmp(ciP->url.c_str(), "/log/", 5) != 0) &&
+      (strncasecmp(ciP->url.c_str(), "/admin/log", 10) != 0))
   {
-    ciP->inMimeType = mimeTypeParse(ciP->httpHeaders.contentType, NULL);
-  }
+    std::string errorMsg;
 
-  if (ciP->httpStatusCode != SccOk)
-  {
-    alarmMgr.badInput(clientIp, "error in URI parameters");
-  }
+    restErrorReplyGet(ciP, SccContentLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request", &errorMsg);
+    ciP->httpStatusCode  = SccContentLengthRequired;
+    restReply(ciP, errorMsg);  // OK to respond as no payload
+    alarmMgr.badInput(clientIp, errorMsg);
 
-  if (badVerb)
+    return ciP;
+  }
+  else if (ciP->badVerb == true)
   {
     std::vector<std::string> compV;
 
     // Not ready to answer here - must wait until all payload has been read
     ciP->httpStatusCode = SccBadVerb;
-    ciP->answer = ciP->restServiceP->treat(ciP, 0, compV, NULL);
+  }
+  else
+  {
+    ciP->inMimeType = mimeTypeParse(ciP->httpHeaders.contentType, NULL);
+
+    if (ciP->httpStatusCode != SccOk)
+    {
+      alarmMgr.badInput(clientIp, "error in URI parameters");
+    }
   }
 
   return ciP;
@@ -1378,7 +1395,7 @@ ConnectionInfo* connectionTreatInit
 
 /* ****************************************************************************
 *
-* connectionTreatDataReceive - 
+* connectionTreatDataReceive -
 */
 static int connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload_data_size, const char* upload_data)
 {
@@ -1482,6 +1499,7 @@ static int connectionTreat
   }
 
 
+
   // 2. Data gathering calls
   ConnectionInfo* ciP = (ConnectionInfo*) *con_cls;
 
@@ -1500,9 +1518,10 @@ static int connectionTreat
   //
   lmTransactionSetSubservice(ciP->httpHeaders.servicePath.c_str());
 
-  if (ciP->httpStatusCode != SccOk)
+  if ((ciP->httpStatusCode != SccOk) && (ciP->httpStatusCode != SccBadVerb))
   {
     // An error has occurred. Here we are ready to respond, as all data has been read
+    // However, if badVerb, then the service routine needs to execute to add the "Allow" HTTP header
     restReply(ciP, ciP->answer);
     return MHD_YES;
   }
@@ -1555,9 +1574,9 @@ static int connectionTreat
     restReply(ciP, oe.smartRender(ciP->apiVersion));
     return MHD_YES;
   }
-      
 
-      
+
+  //
   // Note that ciP->outMimeType is not set here.
   // Why?
   // If text/plain is asked for and accepted ('*/value' operations) but something goes wrong,
@@ -1597,24 +1616,6 @@ static int connectionTreat
 
 
   //
-  // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with the exception of log requests.
-  //
-  if ((ciP->httpHeaders.contentLength == 0) &&
-      ((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) &&
-      (strncasecmp(ciP->url.c_str(), "/log/", 5) != 0) &&
-      (strncasecmp(ciP->url.c_str(), "/admin/log", 10) != 0))
-  {
-    std::string errorMsg;
-
-    restErrorReplyGet(ciP, SccContentLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request", &errorMsg);
-    ciP->httpStatusCode  = SccContentLengthRequired;
-    restReply(ciP, errorMsg);
-    alarmMgr.badInput(clientIp, errorMsg);
-    
-    return MHD_YES;
-  }
-
-  //
   // If ciP->answer is non-empty, then an error has been detected
   //
   if (ciP->answer != "")
@@ -1622,12 +1623,30 @@ static int connectionTreat
     alarmMgr.badInput(clientIp, ciP->answer);
     restReply(ciP, ciP->answer);
 
-  return MHD_YES;
+    return MHD_YES;
   }
 
-  
-  // All is good. The request can be served.
-  orion::requestServe(ciP);
+
+  //
+  // If error detected, just call treat function and respond to caller
+  //
+  if (ciP->httpStatusCode != SccOk)
+  {
+    ciP->answer = ciP->restServiceP->treat(ciP, ciP->urlComponents, ciP->urlCompV, NULL);
+
+    // Bad Verb in API v1 should have empty payload
+    if ((ciP->apiVersion == V1) && (ciP->httpStatusCode == SccBadVerb))
+    {
+      ciP->answer = "";
+    }
+
+    restReply(ciP, ciP->answer);
+  }
+  else
+  {
+    // All is good. The request can be served.
+    orion::requestServe(ciP);
+  }
 
   return MHD_YES;
 }

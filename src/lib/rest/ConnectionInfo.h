@@ -65,6 +65,7 @@ public:
   ConnectionInfo():
     connection             (NULL),
     verb                   (NOVERB),
+    badVerb                (false),
     inMimeType             (JSON),
     outMimeType            (JSON),
     tenant                 (""),
@@ -86,6 +87,7 @@ public:
   ConnectionInfo(MimeType _outMimeType):
     connection             (NULL),
     verb                   (NOVERB),
+    badVerb                (false),
     inMimeType             (JSON),
     outMimeType            (_outMimeType),
     tenant                 (""),
@@ -107,6 +109,7 @@ public:
   ConnectionInfo(std::string _url, std::string _method, std::string _version, MHD_Connection* _connection = NULL):
     connection             (_connection),
     verb                   (NOVERB),
+    badVerb                (false),
     inMimeType             (JSON),
     outMimeType            (JSON),
     url                    (_url),
@@ -133,13 +136,19 @@ public:
     else if (_method == "DELETE")  verb = DELETE;
     else if (_method == "PATCH")   verb = PATCH;
     else if (_method == "OPTIONS") verb = OPTIONS;
-    else                           verb = NOVERB;
+    else
+    {
+      badVerb = true;
+      verb    = NOVERB;
+    }
   }
 
   ~ConnectionInfo()
   {
     if (compoundValueRoot != NULL)
+    {
       delete compoundValueRoot;
+    }
 
     servicePathV.clear();
     httpHeaders.release();
@@ -147,6 +156,7 @@ public:
 
   MHD_Connection*            connection;
   Verb                       verb;
+  bool                       badVerb;
   MimeType                   inMimeType;
   MimeType                   outMimeType;
   std::string                url;

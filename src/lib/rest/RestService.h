@@ -38,9 +38,9 @@
 
 /* *****************************************************************************
 *
-* restServiceGet -
+* restServiceVectorGet -
 */
-extern RestService* restServiceGet(Verb verb);
+extern RestService* restServiceVectorGet(Verb verb);
 
 
 
