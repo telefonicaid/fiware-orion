@@ -80,7 +80,8 @@ subscription triggering. That cache consumes RAM space and if you are using an a
 may crash due to memory outage. It would be extremely rare to have that situation in a real usage case (we have been able to
 reproduce the situation only in a laboratory setup) but, if happens, then disable cache usage with the `-noCache` CLI switch.
 
-As a reference, in our lab tests in a machine with X RAM, Orion crashed when the number of subscriptions got higher than Y.
+As a reference, in our lab tests in a machine with Orion 1.13.0 running with X RAM, Orion crashed when the number 
+of subscriptions got higher than Y.
 
 There is [an issue in the repository](https://github.com/telefonicaid/fiware-orion/issues/2780) about improvements related with this.
 
