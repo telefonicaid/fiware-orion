@@ -85,6 +85,7 @@ static unsigned int              connMemory;
 static unsigned int              maxConns;
 static unsigned int              threadPoolSize;
 static unsigned int              mhdConnectionTimeout  = 0;
+static int                       reqNo                 = 1;
 
 
 
@@ -634,6 +635,7 @@ static void requestCompleted
     metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
   }
 
+
   if (metricsMgr.isOn() && (ciP->transactionStart.tv_sec != 0))
   {
     struct timeval  end;
@@ -1130,7 +1132,330 @@ static bool acceptHeadersAcceptable(ConnectionInfo* ciP, bool* textAcceptedP)
 
 
 
+/* ****************************************************************************
+*
+* restServiceForBadVerb - dummy instance
+*/
 RestService restServiceForBadVerb;
+
+
+
+/* ****************************************************************************
+*
+* connectionTreatInit -
+*/
+ConnectionInfo* connectionTreatInit
+(
+  MHD_Connection*  connection,
+  const char*      url,
+  const char*      method,
+  const char*      version,
+  int*             retValP
+)
+{
+  struct timeval   transactionStart;
+  ConnectionInfo*  ciP;
+
+  *retValP = MHD_YES;  // Only MHD_NO if allocatin of ConnectionInfo fails
+
+  // Create point in time for transaction metrics
+  if (metricsMgr.isOn())
+  {
+    if (gettimeofday(&transactionStart, NULL) == -1)
+    {
+      transactionStart.tv_sec  = 0;
+      transactionStart.tv_usec = 0;
+    }
+  }
+
+  //
+  // First thing to do on a new connection, set correlator to N/A.
+  // After reading HTTP headers, the correlator id either changes due to encountering a
+  // Fiware-Correlator HTTP Header, or, if no HTTP header with Fiware-Correlator is found,
+  // a new correlator is generated.
+  //
+  correlatorIdSet("N/A");
+
+  //
+  // IP Address and port of caller
+  //
+  char            ip[32];
+  unsigned short  port = 0;
+
+  const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
+
+  if (mciP != NULL)
+  {
+    struct sockaddr* addr = (struct sockaddr*) mciP->client_addr;
+
+    port = (addr->sa_data[0] << 8) + addr->sa_data[1];
+    snprintf(ip, sizeof(ip), "%d.%d.%d.%d",
+             addr->sa_data[2] & 0xFF,
+             addr->sa_data[3] & 0xFF,
+             addr->sa_data[4] & 0xFF,
+             addr->sa_data[5] & 0xFF);
+    snprintf(clientIp, sizeof(clientIp), "%s", ip);
+  }
+  else
+  {
+    port = 0;
+    snprintf(ip, sizeof(ip), "IP unknown");
+  }
+
+
+  //
+  // Reset time measuring?
+  //
+  if (timingStatistics)
+  {
+    memset(&threadLastTimeStat, 0, sizeof(threadLastTimeStat));
+  }
+
+
+  //
+  // ConnectionInfo
+  //
+  // FIXME P1: ConnectionInfo could be a thread variable (like the static_buffer),
+  // as long as it is properly cleaned up between calls.
+  // We would save the call to new/free for each and every request.
+  // Once we *really* look to scratch some efficiency, this change should be made.
+  //
+  // Also, is ciP->ip really used?
+  //
+  if ((ciP = new ConnectionInfo(url, method, version, connection)) == NULL)
+  {
+    LM_E(("Runtime Error (error allocating ConnectionInfo)"));
+    // No METRICS here ... Without ConnectionInfo we have no service/subService ...
+    *retValP = MHD_NO;
+    return NULL;
+  }
+
+  //
+  // Get API version
+  //   Note that we need to get API version before MHD_get_connection_values() as the later
+  //   function may result in an error after processing Accept headers (and the
+  //   render for the error depends on API version)
+  //
+  ciP->apiVersion = apiVersionGet(ciP->url.c_str());
+
+
+  // LM_TMP(("--------------------- Serving APIv%d request %s %s -----------------", ciP->apiVersion, method, url));
+
+  ciP->transactionStart.tv_sec  = transactionStart.tv_sec;
+  ciP->transactionStart.tv_usec = transactionStart.tv_usec;
+
+  if (timingStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);
+  }
+
+  // WARNING: This log message below is crucial for the correct function of the Behave tests - CANNOT BE REMOVED
+  LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", method, url));
+  ciP->port    = port;
+  ciP->ip      = ip;
+  ciP->callNo  = reqNo;
+
+  ++reqNo;
+
+
+  //
+  // URI parameters
+  //
+  // FIXME P1: We might not want to do all these assignments, they are not used in all requests ...
+  //           Once we *really* look to scratch some efficiency, this change should be made.
+  //
+  ciP->uriParam[URI_PARAM_PAGINATION_OFFSET]  = DEFAULT_PAGINATION_OFFSET;
+  ciP->uriParam[URI_PARAM_PAGINATION_LIMIT]   = DEFAULT_PAGINATION_LIMIT;
+  ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
+
+  MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
+
+  if (ciP->httpHeaders.accept == "")  // No Accept: given, treated as */*
+  {
+    ciP->httpHeaders.accept = "*/*";
+    acceptParse(ciP, "*/*");
+  }
+
+  char correlator[CORRELATOR_ID_SIZE + 1];
+  if (ciP->httpHeaders.correlator == "")
+  {
+    correlatorGenerate(correlator);
+    ciP->httpHeaders.correlator = correlator;
+  }
+
+  correlatorIdSet(ciP->httpHeaders.correlator.c_str());
+
+  ciP->httpHeader.push_back(HTTP_FIWARE_CORRELATOR);
+  ciP->httpHeaderValue.push_back(ciP->httpHeaders.correlator);
+
+  if ((ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE) && (ciP->apiVersion == V2))
+  {
+    char details[256];
+    snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
+
+    alarmMgr.badInput(clientIp, details);
+    OrionError oe(SccRequestEntityTooLarge, details);
+
+    ciP->httpStatusCode = oe.code;
+    ciP->answer = oe.smartRender(ciP->apiVersion);
+
+    //
+    // FIXME P4:
+    // Supposedly, we aren't ready to respond to the HTTP request at this early stage, before reading the content.
+    // However, tests have shown that the broker hangs if the response is delayed until later calls ...
+    //
+    //
+    restReply(ciP, ciP->answer);  // to not hang on too big payloads
+    return ciP;
+  }
+
+
+  //
+  // Transaction starts here
+  //
+  lmTransactionStart("from", "", ip, port, url);  // Incoming REST request starts
+
+  /* X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides ip.
+     X-Real-IP takes preference over X-Forwarded-For, if both appear */
+  if (ciP->httpHeaders.xrealIp != "")
+  {
+    lmTransactionSetFrom(ciP->httpHeaders.xrealIp.c_str());
+  }
+  else if (ciP->httpHeaders.xforwardedFor != "")
+  {
+    lmTransactionSetFrom(ciP->httpHeaders.xforwardedFor.c_str());
+  }
+  else
+  {
+    lmTransactionSetFrom(ip);
+  }
+
+  char tenant[DB_AND_SERVICE_NAME_MAX_LEN];
+
+  ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
+  ciP->outMimeType          = mimeTypeSelect(ciP);
+
+  MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
+
+  // Lookup Rest Service
+  bool badVerb = false;
+
+  ciP->restServiceP = restServiceLookup(ciP, &badVerb);
+
+  if (urlCheck(ciP, ciP->url) == false)
+  {
+    alarmMgr.badInput(clientIp, "error in URI path");
+  }
+  else if (servicePathSplit(ciP) != 0)
+  {
+    alarmMgr.badInput(clientIp, "error in ServicePath http-header");
+  }
+  else if (contentTypeCheck(ciP) != 0)
+  {
+    alarmMgr.badInput(clientIp, "invalid mime-type in Content-Type http-header");
+  }
+  //
+  // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with the exception of log requests.
+  //
+  else if ((ciP->httpHeaders.contentLength == 0) &&
+      ((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) &&
+      (strncasecmp(ciP->url.c_str(), "/log/", 5) != 0) &&
+      (strncasecmp(ciP->url.c_str(), "/admin/log", 10) != 0))
+  {
+    std::string errorMsg;
+
+    restErrorReplyGet(ciP, SccContentLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request", &errorMsg);
+    ciP->httpStatusCode  = SccContentLengthRequired;
+    restReply(ciP, errorMsg);  // OK to respond as no payload
+    alarmMgr.badInput(clientIp, errorMsg);
+
+    return ciP;
+  }
+  else if (ciP->badVerb == true)
+  {
+    std::vector<std::string> compV;
+
+    // Not ready to answer here - must wait until all payload has been read
+    ciP->httpStatusCode = SccBadVerb;
+  }
+  else
+  {
+    ciP->inMimeType = mimeTypeParse(ciP->httpHeaders.contentType, NULL);
+
+    if (ciP->httpStatusCode != SccOk)
+    {
+      alarmMgr.badInput(clientIp, "error in URI parameters");
+    }
+  }
+
+  return ciP;
+}
+
+
+
+/* ****************************************************************************
+*
+* connectionTreatDataReceive -
+*/
+static int connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload_data_size, const char* upload_data)
+{
+  size_t  dataLen = *upload_data_size;
+
+  //
+  // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
+  // just silently "eat" the entire message.
+  //
+  // The problem occurs when the broker is lied to and there aren't ciP->httpHeaders.contentLength
+  // bytes to read.
+  // When this happens, MHD blocks until it times out (MHD_OPTION_CONNECTION_TIMEOUT defaults to 5 seconds),
+  // and the broker isn't able to respond. MHD just closes the connection.
+  // Question asked in mhd mailing list.
+  //
+  // See github issue:
+  //   https://github.com/telefonicaid/fiware-orion/issues/2761
+  //
+  if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
+  {
+    //
+    // Errors can't be returned yet, postpone ...
+    //
+    *upload_data_size = 0;
+    return MHD_YES;
+  }
+
+  //
+  // First call with payload - use the thread variable "static_buffer" if possible,
+  // otherwise allocate a bigger buffer
+  //
+  // FIXME P1: This could be done in "Part I" instead, saving an "if" for each "Part II" call
+  //           Once we *really* look to scratch some efficiency, this change should be made.
+  //
+  if (ciP->payloadSize == 0)  // First call with payload
+  {
+    if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
+    {
+      ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
+    }
+    else
+    {
+      ciP->payload = static_buffer;
+    }
+  }
+
+  // Copy the chunk
+  LM_T(LmtPartialPayload, ("Got %d of payload of %d bytes", dataLen, ciP->httpHeaders.contentLength));
+  memcpy(&ciP->payload[ciP->payloadSize], upload_data, dataLen);
+
+  // Add to the size of the accumulated read buffer
+  ciP->payloadSize += *upload_data_size;
+
+  // Zero-terminate the payload
+  ciP->payload[ciP->payloadSize] = 0;
+
+  // Acknowledge the data and return
+  *upload_data_size = 0;
+  return MHD_YES;
+}
 
 
 
@@ -1153,7 +1478,6 @@ RestService restServiceForBadVerb;
 * Call 2: *con_cls != NULL  AND  *upload_data_size != 0
 * Call 3: *con_cls != NULL  AND  *upload_data_size == 0
 */
-static int reqNo       = 1;
 static int connectionTreat
 (
    void*            cls,
@@ -1166,305 +1490,44 @@ static int connectionTreat
    void**           con_cls
 )
 {
-  ConnectionInfo*        ciP         = (ConnectionInfo*) *con_cls;
-  size_t                 dataLen     = *upload_data_size;
-
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
-  if (ciP == NULL)
+  if (*con_cls == NULL)
   {
-    struct timeval transactionStart;
-
-    // Create point in time for transaction metrics
-    if (metricsMgr.isOn())
-    {
-      if (gettimeofday(&transactionStart, NULL) == -1)
-      {
-        transactionStart.tv_sec  = 0;
-        transactionStart.tv_usec = 0;
-      }
-    }
-
-    //
-    // First thing to do on a new connection, set correlator to N/A.
-    // After reading HTTP headers, the correlator id either changes due to encountering a
-    // Fiware-Correlator HTTP Header, or, if no HTTP header with Fiware-Correlator is found,
-    // a new correlator is generated.
-    //
-    correlatorIdSet("N/A");
-
-    //
-    // IP Address and port of caller
-    //
-    char            ip[32];
-    unsigned short  port = 0;
-
-    const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
-
-    if (mciP != NULL)
-    {
-      struct sockaddr* addr = (struct sockaddr*) mciP->client_addr;
-
-      port = (addr->sa_data[0] << 8) + addr->sa_data[1];
-      snprintf(ip, sizeof(ip), "%d.%d.%d.%d",
-               addr->sa_data[2] & 0xFF,
-               addr->sa_data[3] & 0xFF,
-               addr->sa_data[4] & 0xFF,
-               addr->sa_data[5] & 0xFF);
-      snprintf(clientIp, sizeof(clientIp), "%s", ip);
-    }
-    else
-    {
-      port = 0;
-      snprintf(ip, sizeof(ip), "IP unknown");
-    }
-
-
-    //
-    // Reset time measuring?
-    //
-    if (timingStatistics)
-    {
-      memset(&threadLastTimeStat, 0, sizeof(threadLastTimeStat));
-    }
-
-
-    //
-    // ConnectionInfo
-    //
-    // FIXME P1: ConnectionInfo could be a thread variable (like the static_buffer),
-    // as long as it is properly cleaned up between calls.
-    // We would save the call to new/free for each and every request.
-    // Once we *really* look to scratch some efficiency, this change should be made.
-    //
-    // Also, is ciP->ip really used?
-    //
-    if ((ciP = new ConnectionInfo(url, method, version, connection)) == NULL)
-    {
-      LM_E(("Runtime Error (error allocating ConnectionInfo)"));
-      // No METRICS here ... Without ConnectionInfo we have no service/subService ...
-      return MHD_NO;
-    }
-
-
-    // Get API version
-    // FIXME #3109-PR: this assignment will be removed in a subsequent PR, where the function apiVersionGet() is used instead
-    //
-    ciP->apiVersion = (url[2] == '2')? V2 : V1;  // If an APIv2 request, the URL starts with "/v2/". Only V2 requests.
-
-    // LM_TMP(("--------------------- Serving APIv%d request %s %s -----------------", ciP->apiVersion, method, url));
-
-    // Lookup Rest Service
-    bool badVerb = false;
-    ciP->restServiceP = restServiceLookup(ciP, &badVerb);
-
-    if (badVerb)
-    {
-      // Bad Verb is taken care of later
-      ciP->httpStatusCode = SccBadVerb;
-      ciP->restServiceP   = &restServiceForBadVerb;  // FIXME #3109-PR: Try to remove this, or make restServiceLookup return a dummy
-    }
-
-    ciP->transactionStart.tv_sec  = transactionStart.tv_sec;
-    ciP->transactionStart.tv_usec = transactionStart.tv_usec;
-
-    if (timingStatistics)
-    {
-      clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);
-    }
-
-    // WARNING: This log message below is crucial for the correct function of the Behave tests - CANNOT BE REMOVED
-    LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", method, url));
-    *con_cls     = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
-    ciP->port    = port;
-    ciP->ip      = ip;
-    ciP->callNo  = reqNo;
-
-    ++reqNo;
-
-
-    //
-    // URI parameters
-    //
-    // FIXME P1: We might not want to do all these assignments, they are not used in all requests ...
-    //           Once we *really* look to scratch some efficiency, this change should be made.
-    //
-    ciP->uriParam[URI_PARAM_PAGINATION_OFFSET]  = DEFAULT_PAGINATION_OFFSET;
-    ciP->uriParam[URI_PARAM_PAGINATION_LIMIT]   = DEFAULT_PAGINATION_LIMIT;
-    ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
-
-    // Note that we need to get API version before MHD_get_connection_values() as the later
-    // function may result in an error after processing Accept headers (and the
-    // render for the error depends on API version)
-    ciP->apiVersion = apiVersionGet(ciP->url.c_str());
-
-    MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
-
-    if (ciP->httpHeaders.accept == "")  // No Accept: given, treated as */*
-    {
-      ciP->httpHeaders.accept = "*/*";
-      acceptParse(ciP, "*/*");
-    }
-
-    char correlator[CORRELATOR_ID_SIZE + 1];
-    if (ciP->httpHeaders.correlator == "")
-    {
-      correlatorGenerate(correlator);
-      ciP->httpHeaders.correlator = correlator;
-    }
-
-    correlatorIdSet(ciP->httpHeaders.correlator.c_str());
-
-    ciP->httpHeader.push_back(HTTP_FIWARE_CORRELATOR);
-    ciP->httpHeaderValue.push_back(ciP->httpHeaders.correlator);
-
-    if ((ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE) && (ciP->apiVersion == V2))
-    {
-      char details[256];
-      snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
-
-      alarmMgr.badInput(clientIp, details);
-      OrionError oe(SccRequestEntityTooLarge, details);
-
-      ciP->httpStatusCode = oe.code;
-      restReply(ciP, oe.smartRender(ciP->apiVersion));
-      return MHD_YES;
-    }
-
-    //
-    // Transaction starts here
-    //
-    lmTransactionStart("from", "", ip, port, url);  // Incoming REST request starts
-
-    /* X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides ip.
-       X-Real-IP takes preference over X-Forwarded-For, if both appear */
-    if (ciP->httpHeaders.xrealIp != "")
-    {
-      lmTransactionSetFrom(ciP->httpHeaders.xrealIp.c_str());
-    }
-    else if (ciP->httpHeaders.xforwardedFor != "")
-    {
-      lmTransactionSetFrom(ciP->httpHeaders.xforwardedFor.c_str());
-    }
-    else
-    {
-      lmTransactionSetFrom(ip);
-    }
-
-    char tenant[DB_AND_SERVICE_NAME_MAX_LEN];
-
-    ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
-    ciP->outMimeType          = mimeTypeSelect(ciP);
-
-    MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
-
-    return MHD_YES;
+    int retVal;
+    *con_cls = connectionTreatInit(connection, url, method, version, &retVal);
+    return retVal;
   }
 
 
-  //
+
   // 2. Data gathering calls
-  //
-  // 2-1. Data gathering calls, just wait
-  // 2-2. Last data gathering call, acknowledge the receipt of data
-  //
-  if (dataLen != 0)
+  ConnectionInfo* ciP = (ConnectionInfo*) *con_cls;
+
+  if (*upload_data_size != 0)
   {
-    //
-    // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
-    // just silently "eat" the entire message.
-    //
-    // The problem occurs when the broker is lied to and there aren't ciP->httpHeaders.contentLength
-    // bytes to read.
-    // When this happens, MHD blocks until it times out (MHD_OPTION_CONNECTION_TIMEOUT defaults to 5 seconds),
-    // and the broker isn't able to respond. MHD just closes the connection.
-    // Question asked in mhd mailing list.
-    //
-    // See github issue:
-    //   https://github.com/telefonicaid/fiware-orion/issues/2761
-    //
-    if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
-    {
-      //
-      // Errors can't be returned yet, postpone ...
-      //
-      *upload_data_size = 0;
-      return MHD_YES;
-    }
-
-    //
-    // First call with payload - use the thread variable "static_buffer" if possible,
-    // otherwise allocate a bigger buffer
-    //
-    // FIXME P1: This could be done in "Part I" instead, saving an "if" for each "Part II" call
-    //           Once we *really* look to scratch some efficiency, this change should be made.
-    //
-    if (ciP->payloadSize == 0)  // First call with payload
-    {
-      if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
-      {
-        ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
-      }
-      else
-      {
-        ciP->payload = static_buffer;
-      }
-    }
-
-    // Copy the chunk
-    LM_T(LmtPartialPayload, ("Got %d of payload of %d bytes", dataLen, ciP->httpHeaders.contentLength));
-    memcpy(&ciP->payload[ciP->payloadSize], upload_data, dataLen);
-
-    // Add to the size of the accumulated read buffer
-    ciP->payloadSize += *upload_data_size;
-
-    // Zero-terminate the payload
-    ciP->payload[ciP->payloadSize] = 0;
-
-    // Acknowledge the data and return
-    *upload_data_size = 0;
-    return MHD_YES;
+    return connectionTreatDataReceive(ciP, upload_data_size, upload_data);
   }
 
+
   //
-  // 3. Finally, serve the request (unless an error has occurred)
+  // The entire payload has been read and we are ready to serve the request.
   //
-  // URL and headers checks are delayed to the "third" MHD call, as no
-  // errors can be sent before all the request has been read
+  // Before this point, MHD is not ready to respond tp the caller.
+  // Plenty of validity checks of the request are performed here, and error responses ar sent if errors found
+  // Finally, if all is OK, the request is served by calling the function orion::requestServe
   //
   lmTransactionSetSubservice(ciP->httpHeaders.servicePath.c_str());
 
-  if (urlCheck(ciP, ciP->url) == false)
+  if ((ciP->httpStatusCode != SccOk) && (ciP->httpStatusCode != SccBadVerb))
   {
-    alarmMgr.badInput(clientIp, "error in URI path");
-    restReply(ciP, ciP->answer);
-    return MHD_YES;
-  }
-  else if (servicePathSplit(ciP) != 0)
-  {
-    alarmMgr.badInput(clientIp, "error in ServicePath http-header");
-    restReply(ciP, ciP->answer);
-    return MHD_YES;
-  }
-  else if (contentTypeCheck(ciP) != 0)
-  {
-    alarmMgr.badInput(clientIp, "invalid mime-type in Content-Type http-header");
-    restReply(ciP, ciP->answer);
-    return MHD_YES;
-  }
-  else
-  {
-    ciP->inMimeType = mimeTypeParse(ciP->httpHeaders.contentType, NULL);
-  }
-
-  if (ciP->httpStatusCode != SccOk)
-  {
-    alarmMgr.badInput(clientIp, "error in URI parameters");
+    // An error has occurred. Here we are ready to respond, as all data has been read
+    // However, if badVerb, then the service routine needs to execute to add the "Allow" HTTP header
     restReply(ciP, ciP->answer);
     return MHD_YES;
   }
 
   //
-  // Here, if the incoming request was too big, return error about it
+  // If the incoming request was too big, return error about it
   //
   if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
   {
@@ -1493,18 +1556,15 @@ static int connectionTreat
 
 
   //
-  // Check that Accept Header values are acceptable
+  // Check that Accept Header values are valid
   //
   bool textAccepted = false;
+
   if (!acceptHeadersAcceptable(ciP, &textAccepted))
   {
-    OrionError oe(SccNotAcceptable, "");
+    OrionError oe(SccNotAcceptable, "acceptable MIME types: application/json, text/plain");
 
-    if (textAccepted)
-    {
-      oe.details = "acceptable MIME types: application/json, text/plain";
-    }
-    else
+    if (!textAccepted)
     {
       oe.details = "acceptable MIME types: application/json";
     }
@@ -1516,6 +1576,7 @@ static int connectionTreat
   }
 
 
+  //
   // Note that ciP->outMimeType is not set here.
   // Why?
   // If text/plain is asked for and accepted ('*/value' operations) but something goes wrong,
@@ -1524,13 +1585,9 @@ static int connectionTreat
   //
   if (ciP->httpHeaders.outformatSelect() == NOMIMETYPE)
   {
-    OrionError oe(SccNotAcceptable, "");
+    OrionError oe(SccNotAcceptable, "acceptable MIME types: application/json, text/plain");
 
-    if (textAccepted)
-    {
-      oe.details = "acceptable MIME types: application/json, text/plain";
-    }
-    else
+    if (!textAccepted)
     {
       oe.details = "acceptable MIME types: application/json";
     }
@@ -1553,34 +1610,41 @@ static int connectionTreat
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, details);
     restReply(ciP, oe.smartRender(ciP->apiVersion));
+
     return MHD_YES;
   }
 
 
   //
-  // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with two exceptions.
+  // If ciP->answer is non-empty, then an error has been detected
   //
-  // - Old log requests  (URL contains '/log/')
-  // - New log requests  (URL is exactly '/admin/log')
-  //
-  if (((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) &&
-      (ciP->httpHeaders.contentLength == 0) &&
-      ((strncasecmp(ciP->url.c_str(), "/log/", 5) != 0) && (strncasecmp(ciP->url.c_str(), "/admin/log", 10) != 0)))
-  {
-    std::string errorMsg;
-
-    restErrorReplyGet(ciP, SccContentLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request", &errorMsg);
-    ciP->httpStatusCode  = SccContentLengthRequired;
-    restReply(ciP, errorMsg);
-    alarmMgr.badInput(clientIp, errorMsg);
-  }
-  else if (ciP->answer != "")
+  if (ciP->answer != "")
   {
     alarmMgr.badInput(clientIp, ciP->answer);
+    restReply(ciP, ciP->answer);
+
+    return MHD_YES;
+  }
+
+
+  //
+  // If error detected, just call treat function and respond to caller
+  //
+  if (ciP->httpStatusCode != SccOk)
+  {
+    ciP->answer = ciP->restServiceP->treat(ciP, ciP->urlComponents, ciP->urlCompV, NULL);
+
+    // Bad Verb in API v1 should have empty payload
+    if ((ciP->apiVersion == V1) && (ciP->httpStatusCode == SccBadVerb))
+    {
+      ciP->answer = "";
+    }
+
     restReply(ciP, ciP->answer);
   }
   else
   {
+    // All is good. The request can be served.
     orion::requestServe(ciP);
   }
 

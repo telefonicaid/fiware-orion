@@ -57,7 +57,8 @@ std::string badVerbGetPostOnly
 
   ciP->httpHeader.push_back(HTTP_ALLOW);
   std::string headerValue = "POST, GET";
-  //OPTIONS verb is only available for V2 API
+
+  // OPTIONS verb is only available for V2 API, and only if CORS is enabled
   if ((corsEnabled == true) && (ciP->apiVersion == V2))
   {
     headerValue = headerValue + ", OPTIONS";

@@ -65,38 +65,6 @@ SET (SOURCES
     testInit.cpp
     unittest.cpp
 
-    serviceRoutines/badVerbGetOnly_test.cpp
-    serviceRoutines/badVerbPostOnly_test.cpp
-    serviceRoutines/badVerbAllFour_test.cpp
-    serviceRoutines/badVerbGetPostOnly_test.cpp
-    serviceRoutines/badVerbGetPostDeleteOnly_test.cpp
-    serviceRoutines/badVerbGetDeleteOnly_test.cpp
-    serviceRoutines/badVerbGetPutDeleteOnly_test.cpp
-    serviceRoutines/putIndividualContextEntityAttribute_test.cpp
-    serviceRoutines/putSubscriptionConvOp_test.cpp
-    serviceRoutines/versionTreat_test.cpp
-    serviceRoutines/exitTreat_test.cpp
-    serviceRoutines/statisticsTreat_test.cpp
-    serviceRoutines/putAvailabilitySubscriptionConvOp_test.cpp
-
-    convenience/Convenience_test.cpp
-    convenience/AppendContextElementRequest_test.cpp
-    convenience/AppendContextElementResponse_test.cpp
-    convenience/ContextAttributeResponse_test.cpp
-    convenience/ContextAttributeResponseVector_test.cpp
-    convenience/UpdateContextAttributeRequest_test.cpp
-    convenience/UpdateContextElementRequest_test.cpp
-    convenience/UpdateContextElementResponse_test.cpp
-    convenience/RegisterProviderRequest_test.cpp
-    common/commonFormat_test.cpp
-    common/commonGlobals_test.cpp
-    common/commonString_test.cpp
-    common/commonTag_test.cpp
-    common/commonSem_test.cpp
-    common/commonStatistics_test.cpp
-    common/commonWsStrip_test.cpp
-    common/commonMacroSubstitute_test.cpp
-
     ngsi9/RegisterContextRequest_test.cpp
     ngsi9/RegisterContextResponse_test.cpp
     ngsi9/DiscoverContextAvailabilityRequest_test.cpp
@@ -203,6 +171,38 @@ SET (SOURCES
     rest/restReply_test.cpp
     rest/RestService_test.cpp
     rest/rest_test.cpp
+
+    # serviceRoutines/badVerbGetOnly_test.cpp
+    # serviceRoutines/badVerbPostOnly_test.cpp
+    # serviceRoutines/badVerbAllFour_test.cpp
+    # serviceRoutines/badVerbGetPostOnly_test.cpp
+    # serviceRoutines/badVerbGetPostDeleteOnly_test.cpp
+    # serviceRoutines/badVerbGetDeleteOnly_test.cpp
+    # serviceRoutines/badVerbGetPutDeleteOnly_test.cpp
+    # serviceRoutines/putIndividualContextEntityAttribute_test.cpp
+    # serviceRoutines/putSubscriptionConvOp_test.cpp
+    # serviceRoutines/versionTreat_test.cpp
+    # serviceRoutines/exitTreat_test.cpp
+    # serviceRoutines/statisticsTreat_test.cpp
+    # serviceRoutines/putAvailabilitySubscriptionConvOp_test.cpp
+
+    # convenience/Convenience_test.cpp
+    # convenience/AppendContextElementRequest_test.cpp
+    # convenience/AppendContextElementResponse_test.cpp
+    # convenience/ContextAttributeResponse_test.cpp
+    # convenience/ContextAttributeResponseVector_test.cpp
+    # convenience/UpdateContextAttributeRequest_test.cpp
+    # convenience/UpdateContextElementRequest_test.cpp
+    # convenience/UpdateContextElementResponse_test.cpp
+    # convenience/RegisterProviderRequest_test.cpp
+    # common/commonFormat_test.cpp
+    # common/commonGlobals_test.cpp
+    # common/commonString_test.cpp
+    # common/commonTag_test.cpp
+    # common/commonSem_test.cpp
+    # common/commonStatistics_test.cpp
+    # common/commonWsStrip_test.cpp
+    # common/commonMacroSubstitute_test.cpp
 )
 
 SET (HEADERS

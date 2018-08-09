@@ -69,7 +69,7 @@ RestService*                     restBadVerbV          = NULL;
 
 /* *****************************************************************************
 *
-* restServiceGet -
+* restServiceVectorGet -
 *
 * FIXME P2: Create a vector of service vectors, for faster access.
 *           E.g
@@ -83,7 +83,7 @@ RestService*                     restBadVerbV          = NULL;
 * serviceV = restServiceVV[verb];
 * 
 */
-RestService* restServiceGet(Verb verb)
+RestService* restServiceVectorGet(Verb verb)
 {
   switch (verb)
   {
@@ -532,14 +532,13 @@ static bool compErrorDetect
 * And lastly, if there is a badVerb RestService vector, but still no service routine is found, then we create a "service not recognized"
 * response. See comments incrusted in the function as well.
 */
-static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
+std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 {
-  std::vector<std::string>  compV;
-  int                       components;
   JsonRequest*              jsonReqP   = NULL;
   ParseData                 parseData;
   JsonDelayedRelease        jsonRelease;
 
+  // FIXME P2: this empty url check seems not necessary ... 
   if ((ciP->url.length() == 0) || ((ciP->url.length() == 1) && (ciP->url.c_str()[0] == '/')))
   {
     OrionError  error(SccBadRequest, "The Orion Context Broker is a REST service, not a 'web page'");
@@ -551,18 +550,11 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     return std::string("Empty URL");
   }
 
-  ciP->httpStatusCode = SccOk;
-
-
-  //
-  // Split URI PATH into components
-  //
-  components = stringSplit(ciP->url, '/', compV);
-  if (!compCheck(components, compV))
+  if (!compCheck(ciP->urlComponents, ciP->urlCompV))
   {
     OrionError oe;
 
-    if (compErrorDetect(ciP->apiVersion, components, compV, &oe))
+    if (compErrorDetect(ciP->apiVersion, ciP->urlComponents, ciP->urlCompV, &oe))
     {
       alarmMgr.badInput(clientIp, oe.details);
       ciP->httpStatusCode = SccBadRequest;
@@ -572,108 +564,23 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   }
 
   //
-  // Lookup the requested service
+  // Check the payload, if any
   //
-  for (unsigned int ix = 0; serviceV[ix].treat != NULL; ++ix)
+  if ((ciP->payload != NULL) && (ciP->payloadSize != 0) && (ciP->payload[0] != 0))
   {
-    if ((serviceV[ix].components != 0) && (serviceV[ix].components != components))
+    std::string response;
+    std::string spath = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
+
+    ciP->parseDataP = &parseData;
+    metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_REQ_SIZE, ciP->payloadSize);
+    LM_T(LmtPayload, ("Parsing payload '%s'", ciP->payload));
+
+    response = payloadParse(ciP, &parseData, ciP->restServiceP, &jsonReqP, &jsonRelease, ciP->urlCompV);
+    LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
+
+    if (response != "OK")
     {
-      continue;
-    }
-
-    bool match = true;
-    for (int compNo = 0; compNo < components; ++compNo)
-    {
-      const char* component = serviceV[ix].compV[compNo].c_str();
-      
-      if ((component[0] == '*') && (component[1] == 0))
-      {
-        continue;
-      }
-
-      if (ciP->apiVersion == V1)
-      {
-        if (strcasecmp(component, compV[compNo].c_str()) != 0)
-        {
-          match = false;
-          break;
-        }
-      }
-      else
-      {
-        if (strcmp(component, compV[compNo].c_str()) != 0)
-        {
-          match = false;
-          break;
-        }
-      }
-    }
-
-    if (match == false)
-    {
-      continue;
-    }
-
-
-    //
-    // If in restBadVerbV vector, no need to check the payload
-    //
-    if ((serviceV != restBadVerbV) && (ciP->payload != NULL) && (ciP->payloadSize != 0) && (ciP->payload[0] != 0))
-    {
-      std::string response;
-      std::string spath = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
-
-      LM_T(LmtParsedPayload, ("Parsing payload for URL '%s', method '%s', service vector index: %d", ciP->url.c_str(), ciP->method.c_str(), ix));
-      ciP->parseDataP = &parseData;
-      metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_REQ_SIZE, ciP->payloadSize);
-      LM_T(LmtPayload, ("Parsing payload '%s'", ciP->payload));
-      response = payloadParse(ciP, &parseData, &serviceV[ix], &jsonReqP, &jsonRelease, compV);
-      LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
-
-      if (response != "OK")
-      {
-        alarmMgr.badInput(clientIp, response);
-        restReply(ciP, response);
-
-        if (jsonReqP != NULL)
-        {
-          jsonReqP->release(&parseData);
-        }
-
-        if (ciP->apiVersion == V2)
-        {
-          delayedRelease(&jsonRelease);
-        }
-
-        compV.clear();
-        return response;
-      }
-    }
-
-    LM_T(LmtService, ("Treating service %s %s", ciP->method.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
-    if (ciP->payloadSize == 0)
-    {
-      ciP->inMimeType = NOMIMETYPE;
-    }
-    statisticsUpdate(serviceV[ix].request, ciP->inMimeType);
-
-    // Tenant to connectionInfo
-    ciP->tenant = ciP->tenantFromHttpHeader;
-    lmTransactionSetService(ciP->tenant.c_str());
-
-    //
-    // A tenant string must not be longer than 50 characters and may only contain
-    // underscores and alphanumeric characters.
-    //
-    std::string result;
-    if ((ciP->tenant != "") && ((result = tenantCheck(ciP->tenant)) != "OK"))
-    {
-      OrionError  oe(SccBadRequest, result);
-
-      std::string  response = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
-
-      alarmMgr.badInput(clientIp, result);
-
+      alarmMgr.badInput(clientIp, response);
       restReply(ciP, response);
 
       if (jsonReqP != NULL)
@@ -686,29 +593,35 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
         delayedRelease(&jsonRelease);
       }
 
-      compV.clear();
-
       return response;
     }
+  }
 
-    LM_T(LmtTenant, ("tenant: '%s'", ciP->tenant.c_str()));
-    commonFilters(ciP, &parseData, &serviceV[ix]);
-    scopeFilter(ciP, &parseData, &serviceV[ix]);
+  LM_T(LmtService, ("Treating service %s %s", ciP->method.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
+  if (ciP->payloadSize == 0)
+  {
+    ciP->inMimeType = NOMIMETYPE;
+  }
+  statisticsUpdate(ciP->restServiceP->request, ciP->inMimeType);
 
-    //
-    // If we have gotten this far the Input is OK.
-    // Except for all the badVerb/badRequest, in the restBadVerbV vector.
-    //
-    // So, the 'Bad Input' alarm is cleared for this client.
-    //
-    if (serviceV != restBadVerbV)
-    {
-      alarmMgr.badInputReset(clientIp);
-    }
+  // Tenant to connectionInfo
+  ciP->tenant = ciP->tenantFromHttpHeader;
+  lmTransactionSetService(ciP->tenant.c_str());
 
-    std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
+  //
+  // A tenant string must not be longer than 50 characters and may only contain
+  // underscores and alphanumeric characters.
+  //
+  std::string result;
+  if ((ciP->tenant != "") && ((result = tenantCheck(ciP->tenant)) != "OK"))
+  {
+    OrionError  oe(SccBadRequest, result);
 
-    filterRelease(&parseData, serviceV[ix].request);
+    std::string  response = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+
+    alarmMgr.badInput(clientIp, result);
+
+    restReply(ciP, response);
 
     if (jsonReqP != NULL)
     {
@@ -720,53 +633,42 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       delayedRelease(&jsonRelease);
     }
 
-    compV.clear();
-
-    if (response == "DIE")
-    {
-      orionExitFunction(0, "Received a 'DIE' request on REST interface");
-    }
-
-    restReply(ciP, response);
     return response;
   }
 
-  //
-  // No service routine found. Need to check bad-verb service vector.
-  // If there is no bad-verb service vector (restBadVerbV == NULL), then
-  // badRequest() is used as service routine ... 
-  //
-  if (restBadVerbV == NULL)
-  {
-    std::vector<std::string> cV;
+  LM_T(LmtTenant, ("tenant: '%s'", ciP->tenant.c_str()));
+  commonFilters(ciP, &parseData, ciP->restServiceP);
+  scopeFilter(ciP, &parseData, ciP->restServiceP);
 
-    return badRequest(ciP, 0, cV, NULL);
+  //
+  // If we have gotten this far the Input is OK.
+  // Except for all the badVerb/badRequest, in the restBadVerbV vector.
+  //
+  // So, the 'Bad Input' alarm is cleared for this client.
+  //
+  alarmMgr.badInputReset(clientIp);
+
+  std::string response = ciP->restServiceP->treat(ciP, ciP->urlComponents, ciP->urlCompV, &parseData);
+
+  filterRelease(&parseData, ciP->restServiceP->request);
+
+  if (jsonReqP != NULL)
+  {
+    jsonReqP->release(&parseData);
   }
 
-  //
-  // ... but, if we have a non-NULL restBadVerbV, then we make a recursive call, using the
-  // restBadVerbV service vector.  But, only if the current service vector is NOT the restBadVerbV,
-  // of course. A situation like that would mean we are already in the recursive call and need to end
-  // the recursion and return an error  ...
-  //
-  if (serviceV != restBadVerbV)
+  if (ciP->apiVersion == V2)
   {
-    return restService(ciP, restBadVerbV);
+    delayedRelease(&jsonRelease);
   }
 
-  //
-  // ... and this here is the error that is returned. A 400 Bad Request with "service XXX not recognized" as payload
-  //
-  std::string  details = std::string("service '") + ciP->url + "' not recognized";
-  std::string  answer;
+  if (response == "DIE")
+  {
+    orionExitFunction(0, "Received a 'DIE' request on REST interface");
+  }
 
-  restErrorReplyGet(ciP, SccBadRequest, "service not found", &answer);
-  alarmMgr.badInput(clientIp, details);
-  ciP->httpStatusCode = SccBadRequest;
-  restReply(ciP, answer);
-
-  compV.clear();
-  return answer;
+  restReply(ciP, response);
+  return response;
 }
 
 

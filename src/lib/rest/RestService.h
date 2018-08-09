@@ -38,9 +38,9 @@
 
 /* *****************************************************************************
 *
-* restServiceGet -
+* restServiceVectorGet -
 */
-extern RestService* restServiceGet(Verb verb);
+extern RestService* restServiceVectorGet(Verb verb);
 
 
 
@@ -64,6 +64,14 @@ typedef struct RestService
   std::string   compV[10];        // Vector of URL path components. E.g. { "v2", "entities" }
   RestTreat     treat;            // service function pointer
 } RestService;
+
+
+
+/* ****************************************************************************
+*
+*  restBadVerbV -
+*/
+extern RestService* restBadVerbV;
 
 
 
@@ -105,6 +113,14 @@ extern void serviceVectorsSet
   RestService*        _optionsServiceV,
   RestService*        _restBadVerbV
 );
+
+
+
+/* ****************************************************************************
+*
+* restService -
+*/
+extern std::string restService(ConnectionInfo* ciP, RestService* serviceV);
 
 
 

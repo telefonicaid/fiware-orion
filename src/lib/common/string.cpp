@@ -161,8 +161,13 @@ bool getIPv6Port(const std::string& in, std::string& outIp, std::string& outPort
 /* ****************************************************************************
 *
 * stringSplit - 
+*
+* the parameter 'skipLastComponentIfEmpty', if TRUE is meant for url parsing.
+* Without this parameter set to TRUE, the URL path "/v2/entities/" that clearly has 2 components,
++ would be interpreted as THREE components; "v2", "entities" and "" (the empty string that comes after the last "/".
++ this is, called with a delimiter of '/', of course.
 */
-int stringSplit(const std::string& in, char delimiter, std::vector<std::string>& outV)
+int stringSplit(const std::string& in, char delimiter, std::vector<std::string>& outV, bool skipLastComponentIfEmpty)
 {
   char* s          = strdup(in.c_str());
   char* toFree     = s;
@@ -197,10 +202,19 @@ int stringSplit(const std::string& in, char delimiter, std::vector<std::string>&
     ++s;
   }
 
-
   // 4. pick up all components
   for (int ix = 0; ix < components; ix++)
   {
+    // is last component empty?
+    if (skipLastComponentIfEmpty == true)
+    {
+      if ((ix == components - 1) && (*start == 0))
+      {
+        components -= 1;
+        break;
+      }
+    }
+
     outV.push_back(start);
     start = &start[strlen(start) + 1];
   }

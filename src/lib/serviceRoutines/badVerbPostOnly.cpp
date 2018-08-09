@@ -57,7 +57,7 @@ std::string badVerbPostOnly
 
   ciP->httpHeader.push_back(HTTP_ALLOW);
   std::string headerValue = "POST";
-  //OPTIONS verb is only available for V2 API
+  // OPTIONS verb is only available for V2 API
   if ((corsEnabled == true) && (ciP->apiVersion == V2))
   {
     headerValue = headerValue + ", OPTIONS";
@@ -67,5 +67,6 @@ std::string badVerbPostOnly
 
   alarmMgr.badInput(clientIp, details);
 
-  return (ciP->apiVersion == V1 || ciP->apiVersion == NO_VERSION)? "" :  oe.smartRender(ciP->apiVersion);
+  ciP->answer = oe.smartRender(ciP->apiVersion);
+  return ciP->answer;
 }
