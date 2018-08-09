@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/limits.h"
+#include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
 #include "ngsi/ParseData.h"
