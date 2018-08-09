@@ -201,7 +201,7 @@ std::string jsonTreat
     std::string  errorReply;
     char         reqTypeV[STRING_SIZE_FOR_INT];
 
-    restErrorReplyGet(ciP, SccBadRequest, "service not found", &errorReply);
+    restErrorReplyGet(ciP, SccBadRequest, SERVICE_NOT_FOUND, &errorReply);
     snprintf(reqTypeV, sizeof(reqTypeV), "%d", request);
 
     std::string details = std::string("no request treating object found for RequestType ") + reqTypeV + " (" + requestType(request) + ")";

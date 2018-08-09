@@ -48,7 +48,7 @@
 
 #define ERROR_PARSE                                   "ParseError"
 #define ERROR_DESC_PARSE                              "Errors found in incoming JSON buffer"
-
+#define SERVICE_NOT_FOUND                             "service not found"
 #define ERROR_BAD_REQUEST                             "BadRequest"
 #define ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI       "invalid character in URI"
 #define ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID        "entity id length: 0, min length supported: "      STR(MIN_ID_LEN)
