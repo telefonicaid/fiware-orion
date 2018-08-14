@@ -1,0 +1,78 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+#####
+#
+# Configuration file for orion-broker
+#
+#####
+
+# BROKER_USER - Who to run orion-broker as. Note that you may need to use root if you want
+# to run Orion in a privileged port (<1024)
+BROKER_USER=orion
+
+# BROKER_PORT - the port/socket where orion-broker will listen for connections
+BROKER_PORT=1026
+
+# BROKER_LOG_DIR - Where to log to
+BROKER_LOG_DIR=/var/log/contextBroker
+
+# BROKER_LOG_LEVEL - Log File Level
+BROKER_LOG_LEVEL=WARN
+
+# BROKER_PID_FILE - Where to store the pid for orion-broker
+BROKER_PID_FILE=/var/run/contextBroker/contextBroker.pid
+
+## Database configuration for orion-broker
+BROKER_DATABASE_HOST=localhost
+BROKER_DATABASE_NAME=orion
+
+## Replica set configuration. Note that if you set this parameter, the BROKER_DATABASE_HOST
+## is interpreted as the list of host (or host:port) separated by commas to use as
+## replica set seed list (single element lists are also allowed). If BROKER_DATABASE_RPL_SET
+## parameter is unset, Orion CB assumes that the BROKER_DATABASE_HOST is an stand-alone
+## mongod instance
+#BROKER_DATABASE_RPLSET=orion_rs
+
+# Database authentication (not needed if MongoDB doesn't use --auth)
+#BROKER_DATABASE_USER=orion
+#BROKER_DATABASE_PASSWORD=orion
+
+# Use the following variable if you need extra ops
+#BROKER_EXTRA_OPS="-t 0-255"
+# We need to start the CB with log append mode to not overwrite previous logs and logrotate work correctly
+BROKER_EXTRA_OPS="-multiservice -logAppend"
+
+#### ADVANCED CONFIGURATION AREA ####
+
+# The next environment variable generates, if it is defined as 'true', an archive in the 
+# path /var/cb_cores with the core file and the logs when the process crash (the directory is
+# automatically created if it doesn't previously exist). Use this parameter for debug purposes.
+# In addition, take into account the following:
+#   * BROKER_USER is ignored and contextBroker will be started by root user
+#   * It is assumed bzip2 tool installed in the system
+#   * Core generation requires CB to be launched with -fg and put in background at shell level
+#     (i.e. "with ending &"). Note this is different from regular CB launch (i.e. not using -fg).
+#     Check /etc/init.d/contextBroker for details
+#   * The file names have the next format: /var/cb_cores/CB_core_yyyymmdd_HHMMSS.tar.bz2, e.g. /var/cb_cores/CB_core_220180108_151502.tar.bz2
+#   * To avoid filling the disk only the last 8 cores and logs are maintained.
+#   * Have a look to the coredump_watcher.sh script (can be found at Orion repo at https://github.com/telefonicaid/fiware-orion/tree/master/scripts),
+#     which can be used to send an email whenever a new core file is generated
+GENERATE_COREDUMP=false

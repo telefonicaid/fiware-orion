@@ -1,0 +1,427 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+URL Parse
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. GET /ngsi-ld/v1/entities
+# 02. GET /ngsi-ld/v1/entities/E1
+# 03. GET /ngsi-ld/v1/subscriptions
+# 04. GET /ngsi-ld/v1/subscriptions/S1
+# 05. GET /ngsi-ld/v1/registrations
+# 06. GET /ngsi-ld/v1/registrations/R1
+#
+# 07. POST /ngsi-ld/v1/entities
+# 08. POST /ngsi-ld/v1/entities/E1/attrs
+# 09. POST /ngsi-ld/v1/subscriptions
+# 10. POST /ngsi-ld/v1/registrations
+#
+# 11. PATCH /ngsi-ld/v1/entities/E1/attrs
+# 12. PATCH /ngsi-ld/v1/subscriptions/S1
+# 13. PATCH /ngsi-ld/v1/registrations/R1
+#
+# 14. DELETE /ngsi-ld/v1/entities/E1
+# 15. DELETE /ngsi-ld/v1/entities/E1/attrs/A1
+# 16. DELETE /ngsi-ld/v1/subscriptions/S1
+# 17. DELETE /ngsi-ld/v1/registrations/R1
+#
+
+echo "01. GET /ngsi-ld/v1/entities"
+echo "============================"
+orionCurl --url /ngsi-ld/v1/entities
+echo
+echo
+
+
+echo "02. GET /ngsi-ld/v1/entities/E1"
+echo "==============================="
+orionCurl --url /ngsi-ld/v1/entities/E1
+echo
+echo
+
+
+echo "03. GET /ngsi-ld/v1/subscriptions"
+echo "================================="
+orionCurl --url /ngsi-ld/v1/subscriptions
+echo
+echo
+
+
+echo "04. GET /ngsi-ld/v1/subscriptions/S1"
+echo "===================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/S1
+echo
+echo
+
+
+echo "05. GET /ngsi-ld/v1/registrations"
+echo "================================="
+orionCurl --url /ngsi-ld/v1/registrations
+echo
+echo
+
+
+echo "06. GET /ngsi-ld/v1/registrations/R1"
+echo "===================================="
+orionCurl --url /ngsi-ld/v1/registrations/R1
+echo
+echo
+
+
+echo "07. POST /ngsi-ld/v1/entities"
+echo "============================="
+payload='{
+  "id": "E2",
+  "type": "A",
+  "name": "John"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "08. POST /ngsi-ld/v1/entities/E1/attrs"
+echo "======================================"
+payload='{
+  "value": 12
+}'
+orionCurl --url /ngsi-ld/v1/entities/E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "09. POST /ngsi-ld/v1/subscriptions"
+echo "=================================="
+payload='{
+  "status": "off"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "10. POST /ngsi-ld/v1/registrations"
+echo "=================================="
+payload='{
+  "expiration": "now"
+}'
+orionCurl --url /ngsi-ld/v1/registrations --payload "$payload"
+echo
+echo
+
+
+echo "11. PATCH /ngsi-ld/v1/entities/E1/attrs"
+echo "======================================="
+payload='{
+}'
+orionCurl --url /ngsi-ld/v1/entities/E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "12. PATCH /ngsi-ld/v1/subscriptions/S1"
+echo "======================================"
+payload='{
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/S1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "13. PATCH /ngsi-ld/v1/registrations/R1"
+echo "======================================"
+payload='{
+}'
+orionCurl --url /ngsi-ld/v1/registrations/R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "14. DELETE /ngsi-ld/v1/entities/E1"
+echo "=================================="
+payload='{
+}'
+orionCurl --url /ngsi-ld/v1/entities/E1 --payload "$payload" -X DELETE
+echo
+echo
+
+
+echo "15. DELETE /ngsi-ld/v1/entities/E1/attrs/A1"
+echo "==========================================="
+payload='{
+}'
+orionCurl --url /ngsi-ld/v1/entities/E1/attrs/A1 --payload "$payload" -X DELETE
+echo
+echo
+
+
+echo "16. DELETE /ngsi-ld/v1/subscriptions/S1"
+echo "======================================="
+payload='{
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/S1 --payload "$payload" -X DELETE
+echo
+echo
+
+
+echo "17. DELETE /ngsi-ld/v1/registrations/R1"
+echo "======================================="
+payload='{
+}'
+orionCurl --url /ngsi-ld/v1/registrations/R1 --payload "$payload" -X DELETE
+echo
+echo
+
+
+--REGEXPECT--
+01. GET /ngsi-ld/v1/entities
+============================
+HTTP/1.1 501 Not Implemented
+Content-Length: 70
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "GET /ngsi-ld/v1/entities",
+    "error": "not implemented"
+}
+
+
+02. GET /ngsi-ld/v1/entities/E1
+===============================
+HTTP/1.1 501 Not Implemented
+Content-Length: 72
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "GET /ngsi-ld/v1/entities/*",
+    "error": "not implemented"
+}
+
+
+03. GET /ngsi-ld/v1/subscriptions
+=================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "GET /ngsi-ld/v1/subscriptions",
+    "error": "not implemented"
+}
+
+
+04. GET /ngsi-ld/v1/subscriptions/S1
+====================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 77
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "GET /ngsi-ld/v1/subscriptions/*",
+    "error": "not implemented"
+}
+
+
+05. GET /ngsi-ld/v1/registrations
+=================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "GET /ngsi-ld/v1/registrations",
+    "error": "not implemented"
+}
+
+
+06. GET /ngsi-ld/v1/registrations/R1
+====================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 77
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "GET /ngsi-ld/v1/registrations/*",
+    "error": "not implemented"
+}
+
+
+07. POST /ngsi-ld/v1/entities
+=============================
+HTTP/1.1 501 Not Implemented
+Content-Length: 71
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "POST /ngsi-ld/v1/entities",
+    "error": "not implemented"
+}
+
+
+08. POST /ngsi-ld/v1/entities/E1/attrs
+======================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 79
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "POST /ngsi-ld/v1/entities/*/attrs",
+    "error": "not implemented"
+}
+
+
+09. POST /ngsi-ld/v1/subscriptions
+==================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 76
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "POST /ngsi-ld/v1/subscriptions",
+    "error": "not implemented"
+}
+
+
+10. POST /ngsi-ld/v1/registrations
+==================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 76
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "POST /ngsi-ld/v1/registrations",
+    "error": "not implemented"
+}
+
+
+11. PATCH /ngsi-ld/v1/entities/E1/attrs
+=======================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 80
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "PATCH /ngsi-ld/v1/entities/*/attrs",
+    "error": "not implemented"
+}
+
+
+12. PATCH /ngsi-ld/v1/subscriptions/S1
+======================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 79
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "PATCH /ngsi-ld/v1/subscriptions/*",
+    "error": "not implemented"
+}
+
+
+13. PATCH /ngsi-ld/v1/registrations/R1
+======================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 79
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "PATCH /ngsi-ld/v1/registrations/*",
+    "error": "not implemented"
+}
+
+
+14. DELETE /ngsi-ld/v1/entities/E1
+==================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "DELETE /ngsi-ld/v1/entities/*",
+    "error": "not implemented"
+}
+
+
+15. DELETE /ngsi-ld/v1/entities/E1/attrs/A1
+===========================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 82
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "DELETE /ngsi-ld/v1/entities/*/attrs/*",
+    "error": "not implemented"
+}
+
+
+16. DELETE /ngsi-ld/v1/subscriptions/S1
+=======================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 79
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "DELETE /ngsi-ld/v1/subscriptions/*",
+    "error": "not implemented"
+}
+
+
+17. DELETE /ngsi-ld/v1/registrations/R1
+=======================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 79
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "DELETE /ngsi-ld/v1/registrations/*",
+    "error": "not implemented"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -53,6 +53,10 @@
 struct ParseData;
 struct RestService;
 
+#ifdef ORIONLD
+struct OrionLdRestService;
+#endif  
+
 
 
 /* ****************************************************************************
@@ -198,6 +202,13 @@ public:
 
   // Timing
   struct timespec           reqStartTime;
+
+#ifdef ORIONLD
+  OrionLdRestService*       serviceP;
+  char*                     responsePayload;
+  char*                     urlPath;
+  char*                     wildcard[2];
+#endif  
 };
 
 

@@ -24,6 +24,7 @@
 
 
 date
+BROKER=${BROKER:-contextBroker}
 testStartTime=$(date +%s.%2N)
 MAX_TRIES=${CB_MAX_TRIES:-3}
 echo $testStartTime > /tmp/brokerStartCounter
@@ -827,7 +828,7 @@ function runTest()
     fileCleanup $filename $keep $path
   else
     file=$(basename $path .test)
-    cp /tmp/contextBroker.log $file.contextBroker.log
+    cp /tmp/$BROKER.log $file.$BROKER.log
     runTestStatus="test-failed"
   fi
 }
@@ -851,7 +852,7 @@ function testDisabled
 
       #
       # NOTE: In a non-disabled test, running inside the valgrind test suite, the function 'localBrokerStart()' (from harnessFunctions.sh)
-      #       redirects the output of "valgrind contextBroker" to the file /tmp/valgrind.out.
+      #       redirects the output of "valgrind $BROKER" to the file /tmp/valgrind.out.
       #       Later, the valgrind test suite uses the existence of this file (/tmp/valgrind.out) to detect errors in the valgrind execution.
       #       But, in the case of a disabled func test, we will not start the test case. and thus we will not reach 'localBrokerStart()', so the
       #       file will not be created and an error will be flagged by the valgrind test suite.

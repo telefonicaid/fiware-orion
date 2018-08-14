@@ -50,6 +50,10 @@
 #include "metricsMgr/metricsMgr.h"
 #include "parse/forbiddenChars.h"
 
+#ifdef ORIONLD
+#include "orionld/rest/orionldMhdConnection.h"
+#endif
+
 #include "rest/Verb.h"
 #include "rest/HttpHeaders.h"
 #include "rest/RestService.h"
@@ -107,7 +111,7 @@ static void correlatorGenerate(char* buffer)
 *
 * uriArgumentGet -
 */
-static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val)
+int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val)
 {
   ConnectionInfo*  ciP   = (ConnectionInfo*) cbDataP;
   std::string      key   = ckey;
@@ -495,7 +499,7 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
 *
 * httpHeaderGet -
 */
-static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* value)
+int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* value)
 {
   ConnectionInfo*  ciP     = (ConnectionInfo*) cbDataP;
   HttpHeaders*     headerP = &ciP->httpHeaders;
@@ -569,6 +573,7 @@ static void requestCompleted
   MHD_RequestTerminationCode  toe
 )
 {
+  LM_TMP(("---------------------- REQUEST COMPLETED -------------------------"));
   ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
   std::string      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
   struct timespec  reqEndTime;
@@ -1156,7 +1161,7 @@ ConnectionInfo* connectionTreatInit
   struct timeval   transactionStart;
   ConnectionInfo*  ciP;
 
-  *retValP = MHD_YES;  // Only MHD_NO if allocatin of ConnectionInfo fails
+  *retValP = MHD_YES;  // Only MHD_NO if allocation of ConnectionInfo fails
 
   // Create point in time for transaction metrics
   if (metricsMgr.isOn())
@@ -1490,6 +1495,39 @@ static int connectionTreat
    void**           con_cls
 )
 {
+#ifdef ORIONLD
+  //
+  // NGSI-LD requests implement a different URL parsing algorithm, a different payload parse algorithm, etc.
+  // A complete new set of functions are used for NGSI-LD, so ...
+  //
+  if (url[5] == '-')  // URL indicates an /ngsi-ld request
+  {
+    //
+    // Seems like an NGSI-LD request, but, let's make sure
+    //
+    if ((url[0] == '/') && (url[1] == 'n') && (url[2] == 'g') && (url[3] == 's') && (url[4] == 'i') && (url[6] == 'l') && (url[7] == 'd') && (url[8] == '/') && (url[9] == 'v') && (url[10] == '1') && (url[11] == '/'))
+    {
+      if      (*con_cls == NULL)        return orionldMhdConnectionInit(connection, url, method, version, con_cls);
+      else if (*upload_data_size != 0)  return orionldMhdConnectionPayloadRead((ConnectionInfo*) *con_cls, upload_data_size, upload_data);
+      LM_TMP(("The entire message has been read"));
+
+      //
+      // The entire message has been read, we're allowed to respond.
+      //
+      // If any error has been encountered during stage I and II (init + payload-read), then ciP->httpStatusCode has been set to != SccOk (200)
+      // and, optionally a payload tree hangs under ciP->response.
+      // No need to call the stage III function if this is the case.
+      //
+
+      // Mark the request as "finished", by setting upload_data_size to 0
+      *upload_data_size = 0;
+
+      // Then treat the request
+      return orionldMhdConnectionTreat((ConnectionInfo*) *con_cls);
+    }
+  }
+#endif  
+
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (*con_cls == NULL)
   {

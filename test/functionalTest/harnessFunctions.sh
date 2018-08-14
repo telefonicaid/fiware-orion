@@ -373,7 +373,7 @@ function localBrokerStart()
     IPvOption="-ipv6"
   fi
 
-  CB_START_CMD_PREFIX="contextBroker -harakiri"
+  CB_START_CMD_PREFIX="$BROKER -harakiri"
   if [ "$role" == "CB" ]
   then
     port=$CB_PORT
@@ -431,19 +431,19 @@ function localBrokerStart()
   brokerStartAwait $port
   if [ "$result" != 0 ]
   then
-    echo "Unable to start contextBroker"
+    echo "Unable to start $BROKER"
     exit 1
   fi
 
   # Test to see whether we have a broker running on $port. If not raise an error
-  brokerPidLines=$(ps -fe | grep contextBroker | grep $port | wc -l)
+  brokerPidLines=$(ps -fe | grep $BROKER | grep $port | wc -l)
   if [ $brokerPidLines != 1 ]
   then
-    echo "Unable to start contextBroker"
+    echo "Unable to start $BROKER"
     exit 1
   fi
 
-  ps=$(ps aux | grep contextBroker)
+  ps=$(ps aux | grep $BROKER)
   dMsg $ps
 
   # Sometimes (especially when using remote DB) CB needs some time to connect DB and
@@ -488,24 +488,24 @@ function localBrokerStop
   fi
 
   # Test to see if we have a broker running on $port if so kill it!
-  brokerPidLines=$(ps -fe | grep contextBroker | grep $port | wc -l)
+  brokerPidLines=$(ps -fe | grep $BROKER | grep $port | wc -l)
   if [ $brokerPidLines != 0 ]
   then
-    kill $(ps -fe | grep contextBroker | grep $port | awk '{print $2}') 2> /dev/null
+    kill $(ps -fe | grep $BROKER | grep $port | awk '{print $2}') 2> /dev/null
 
     # Wait some time so the broker can finish properly
     sleep .5
-    brokerPidLines=$(ps -fe | grep contextBroker | grep $port | wc -l)
+    brokerPidLines=$(ps -fe | grep $BROKER | grep $port | wc -l)
 
     if [ $brokerPidLines != 0 ]
     then
       # If the broker refuses to stop politely, kill the process by brute force
-      kill -9 $(ps -fe | grep contextBroker | grep $port | awk '{print $2}') 2> /dev/null
+      kill -9 $(ps -fe | grep $BROKER | grep $port | awk '{print $2}') 2> /dev/null
       sleep .5
-      brokerPidLines=$(ps -fe | grep contextBroker | grep $port | wc -l)
+      brokerPidLines=$(ps -fe | grep $BROKER | grep $port | wc -l)
       if [ $brokerPidLines != 0 ]
       then
-        echo "Existing contextBroker is immortal, can not be killed!"
+        echo "Existing $BROKER is immortal, can not be killed!"
         exit 1
       fi
     fi

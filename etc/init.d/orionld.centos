@@ -1,0 +1,210 @@
+#!/bin/bash
+
+#
+# contextBroker         Start/Stop the Context Broker
+#
+# chkconfig: 2345 99 60
+# description: Orion Context Broker
+### BEGIN INIT INFO
+# Provides: contextBroker
+# Required-Start: $local_fs $syslog
+# Required-Stop: $local_fs $syslog
+# Default-Start:  345
+# Default-Stop: 90
+# Short-Description: run contextBroker
+# Description: The Orion Context Broker is an implementation of the NGSI9 and NGSI10 interfaces.
+# Using these interfaces, clients can do several operations:
+# * Register context producer applications, e.g. a temperature sensor within a room.
+# * Update context information, e.g. send updates of temperature.
+# * Being notified when changes on context information take place (e.g. the
+#   temperature has changed) or with a given frecuency (e.g. get the temperature
+#   each minute).
+# * Query context information. The Orion Context Broker stores context information
+#   updated from applications, so queries are resolved based on that information.
+### END INIT INFO
+
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+[[ $(id -u) -ne 0 ]] && echo "User root must execute this script" && exit 1
+
+. /etc/rc.d/init.d/functions
+
+PARAM=$1
+NAME=contextBroker
+EXECUTABLE=/usr/bin/${NAME}
+
+# Load the environment
+if [[ -f /etc/sysconfig/${NAME} ]]; then
+    . /etc/sysconfig/${NAME}
+else
+   echo "Configuration file /etc/sysconfig/${NAME} not found"
+   echo "Please read the documentation for information on setting up ${NAME}"
+   exit 1
+fi
+
+if [[ -z "${BROKER_DATABASE_HOST}" ]] &&  [[ "${PARAM}" != "stop" ]]; then
+    echo "Database configuration incomplete for the ${NAME}"
+    echo "Edit /etc/sysconfig/${NAME} with the relevant settings"
+    exit 1
+fi
+
+# Note that some parameters are not always included
+
+# Mandatory parameters
+BROKER_OPTS="-port ${BROKER_PORT} \
+   -logDir ${BROKER_LOG_DIR} \
+   -logLevel ${BROKER_LOG_LEVEL} \
+   -pidpath ${BROKER_PID_FILE} \
+   -dbhost ${BROKER_DATABASE_HOST} \
+   -db ${BROKER_DATABASE_NAME} \
+   ${BROKER_EXTRA_OPS}"
+
+# Optional parameters
+if [[ ! -z "${BROKER_DATABASE_USER}" ]]; then
+   BROKER_OPTS="${BROKER_OPTS} -dbuser ${BROKER_DATABASE_USER}"
+fi
+
+if [[ ! -z "${BROKER_DATABASE_PASSWORD}" ]]; then
+   BROKER_OPTS="${BROKER_OPTS} -dbpwd ${BROKER_DATABASE_PASSWORD}"
+fi
+
+if [[ ! -z "${BROKER_DATABASE_RPLSET}" ]]; then
+    BROKER_OPTS="${BROKER_OPTS} -rplSet ${BROKER_DATABASE_RPLSET}"
+fi
+
+broker_start()
+{
+    printf "%-50s" "Starting ${NAME}..."
+    if [[ -x ${EXECUTABLE} ]]; then
+        # logs are always managed by CB and written to file inside directory BROKER_LOG_DIR (see /etc/sysconfig/contextBroker) and rotated by logrotate
+        BROKER_STDERR_LOG=${BROKER_LOG_DIR}/${NAME}-error.log
+        su $BROKER_USER -c "${EXECUTABLE} ${BROKER_OPTS} 1>/dev/null 2>${BROKER_STDERR_LOG}"
+        sleep 2 # wait some time to let contextbroker start
+        PID=$(cat ${BROKER_PID_FILE})
+        if [[ -z "${PID}" ]]; then
+            printf "%s" "pidfile not found"
+            printf "%s\n" "$(failure)"
+            exit 1
+        else
+            printf "%s\n" "$(success)"
+        fi
+    else
+        printf "%s\n" "Fail - missing ${EXECUTABLE} executable"
+        exit 1
+    fi
+
+}
+
+rotate_cores ()
+{
+    cd /var/cb_cores
+    STR_DATE=$(date +"%Y%m%d_%H%M%S")
+    if [[ $(ls core* 2>/dev/null | wc -l) -gt 0 ]]; then 
+        cp ${BROKER_LOG_DIR}/contextBroker.log . 
+        tar jcf CB_core_${STR_DATE}.tar.bz2 core* contextBroker.log
+        rm -f core* contextBroker.log
+    fi
+
+    TOTAL=$(ls CB_core_* 2>/dev/null | wc -l)
+    KEEP_CORE=8
+    if [[ ${TOTAL} -gt ${KEEP_CORE} ]]; then
+        rm -f $(ls -tr 2>/dev/null |  head -$((${TOTAL} - ${KEEP_CORE})))
+    fi
+
+}
+
+broker_coredump_start()
+{
+    printf "%-50s" "Starting ${NAME}..."
+    if [[ -x ${EXECUTABLE} ]]; then
+        mkdir -p /var/cb_cores &> /dev/null
+        cd /var/cb_cores
+        rotate_cores &
+        ulimit -c unlimited
+        ulimit -n 10240
+        ${EXECUTABLE} ${BROKER_OPTS} -fg &> /dev/null &
+        sleep 2 # wait some time to let the contextbroker start        
+        PID=$(cat ${BROKER_PID_FILE})
+        if [[ -z "${PID}" ]]; then
+            printf "%s" "pidfile not found"
+            printf "%s\n" "$(failure)"
+            exit 1
+        else
+            printf "%s\n" "$(success)"
+        fi
+    else
+        printf "%s\n" "Fail - missing ${EXECUTABLE} executable"
+        exit 1
+    fi
+
+}
+
+broker_stop()
+{
+    printf "%-50s" "Stopping $NAME..."
+    if [ -f "${BROKER_PID_FILE}" ]; then
+        kill $(cat ${BROKER_PID_FILE}) 2> /dev/null
+        rm -f ${BROKER_PID_FILE}
+        printf "%s\n" "$(success)"
+    else
+        printf "%s\n" "$(failure)"
+    fi
+}
+
+broker_status()
+{
+    status -p ${BROKER_PID_FILE} ${EXECUTABLE}
+}
+
+
+case ${PARAM} in
+
+    'start')
+        status -p ${BROKER_PID_FILE} ${EXECUTABLE} && exit 0
+        if [[ ! -z ${GENERATE_COREDUMP} && ${GENERATE_COREDUMP} == "true" ]]; then
+            echo "Starting with coredump generation..."
+            broker_coredump_start
+        else
+            echo "Starting..."
+            broker_start
+        fi
+        ;;
+
+    'stop')
+        echo "Stopping..."
+        status -p ${BROKER_PID_FILE} ${EXECUTABLE} || exit 0
+        broker_stop
+        ;;
+
+    'restart')
+        broker_stop
+        if [[ ! -z ${GENERATE_COREDUMP} && ${GENERATE_COREDUMP} == "true" ]]; then
+            broker_coredump_start
+        else
+            broker_start
+        fi
+        ;;
+
+    'status')
+        broker_status
+        ;;
+
+esac

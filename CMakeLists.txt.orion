@@ -21,7 +21,7 @@
 #
 # Project name and basic prerequisities
 #
-PROJECT(orionld)
+PROJECT(contextBroker)
 cmake_minimum_required(VERSION 2.6)
 
 #
@@ -50,7 +50,6 @@ execute_process(COMMAND            sh ../scripts/build/osDistro.sh
 #             The important ones: LM_W, LM_E, LM_X, LM_I are all kept as is ]
 #         comment the following line
 add_definitions(-DLM_ON)
-add_definitions(-DORIONLD)
 
 add_definitions(-fPIC)
 
@@ -172,8 +171,6 @@ SET (ORION_LIBS
     serviceRoutinesV2
     ngsiNotify
     rest          # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o; jsonRequestTreat from payloadParse@RestService.cpp.o;
-    orionld_rest
-    orionld_serviceRoutines
     jsonParse
     jsonParseV2
     rest          # this is repeated for linking str2Verb from parseSubscription@parseSubscription.cpp.o;
@@ -209,7 +206,7 @@ SET (BOOST_MT
     boost_regex-mt
 )
 
-# Static libs common to orionld and unitTest binaries
+# Static libs common to contextBroker and unitTest binaries
 SET (COMMON_STATIC_LIBS
     microhttpd.a
     mongoclient.a
@@ -285,14 +282,12 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/jsonParse)
   ADD_SUBDIRECTORY(src/lib/jsonParseV2)
   ADD_SUBDIRECTORY(src/lib/rest)
-  ADD_SUBDIRECTORY(src/lib/orionld/rest)
-  ADD_SUBDIRECTORY(src/lib/orionld/serviceRoutines)
   ADD_SUBDIRECTORY(src/lib/mongoBackend)
   ADD_SUBDIRECTORY(src/lib/cache)
   ADD_SUBDIRECTORY(src/lib/alarmMgr)
   ADD_SUBDIRECTORY(src/lib/metricsMgr)
   ADD_SUBDIRECTORY(src/lib/logSummary)
-  ADD_SUBDIRECTORY(src/app/orionld)
+  ADD_SUBDIRECTORY(src/app/contextBroker)
 else ()
     MESSAGE("cmake: NOT OK")
 endif (error EQUAL 0)
