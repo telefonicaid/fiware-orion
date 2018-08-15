@@ -22,10 +22,22 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplifiedVector
-#include "orionld/rest/orionldServiceInit.h"       // Own Interface
+#include "logMsg/logMsg.h"
+
+#include "rest/ConnectionInfo.h"
+#include "orionld/rest/temporaryErrorPayloads.h"
+#include "orionld/serviceRoutines/orionldBadVerb.h"
 
 
 
+// -----------------------------------------------------------------------------
+//
+// orionldBadVerb -
+//
+void orionldBadVerb(ConnectionInfo* ciP)
+{
+  LM_TMP(("Implement badVerb!!!!!"));
 
-
+  ciP->responsePayload = (char*) notFoundPayload;
+  ciP->httpStatusCode  = SccContextElementNotFound;
+}

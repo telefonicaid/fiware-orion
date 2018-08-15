@@ -21,6 +21,7 @@
 SET (SOURCES
     orionld.cpp
     orionRestServices.cpp
+    orionldRestServices.cpp
 )
 
 SET (HEADERS

@@ -24,7 +24,7 @@
 */
 #include "logMsg/logMsg.h"
 
-#include "orionld/rest/RestServiceLd.h"
+#include "orionld/rest/OrionLdRestService.h"
 #include "orionld/rest/orionldServiceLookup.h"
 
 

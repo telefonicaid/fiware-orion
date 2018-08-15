@@ -21,8 +21,13 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    orionldMhdConnection.cpp
+    orionldMhdConnectionInit.cpp
+    orionldMhdConnectionPayloadRead.cpp
+    orionldMhdConnectionTreat.cpp
+    orionldServiceInit.cpp
     orionldServiceLookup.cpp
+    orionldServiceInitPresent.cpp
+    temporaryErrorPayloads.cpp
 )
 
 # Include directories

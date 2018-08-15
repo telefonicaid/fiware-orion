@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_REST_RESTSERVICELD_H_
-#define SRC_LIB_ORIONLD_REST_RESTSERVICELD_H_
+#ifndef SRC_LIB_ORIONLD_REST_ORIONLDSERVICEINITPRESENT_H_
+#define SRC_LIB_ORIONLD_REST_ORIONLDSERVICEINITPRESENT_H_
 
 /*
 *
@@ -25,26 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
+#include "orionld/rest/OrionLdRestService.h"    // OrionLdRestServiceVector
 
 
 
 /* ****************************************************************************
 *
-* ServiceRoutine -
+* orionldServiceInitPresent - 
 */
-typedef bool (*ServiceRoutine)(ConnectionInfo* ciP);
+extern void orionldServiceInitPresent(void);
 
-
-
-/* ****************************************************************************
-*
-* RestServiceLd -
-*/
-typedef struct RestServiceLd
-{
-  const char*     url;
-  ServiceRoutine  serviceRoutine;
-} RestServiceLd;
-
-#endif  // SRC_LIB_REST_RESTSERVICELD_H_
+#endif  // SRC_LIB_ORIONLD_REST_ORIONLDSERVICEINITPRESENT_H_

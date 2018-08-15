@@ -106,6 +106,7 @@
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
+#include "orionld/orionldRestServices.h"
 
 using namespace orion;
 
@@ -1041,7 +1042,7 @@ int main(int argC, char* argV[])
                           NULL);
   }
 
-  orionLdServiceInit();
+  orionLdServiceInit(restServiceVV, 9);
   // orionLdServiceInitPresent();
   
   LM_I(("Startup completed"));

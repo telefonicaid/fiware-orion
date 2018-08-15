@@ -1,3 +1,5 @@
+#ifndef SRC_APP_ORIONLD_ORIONLDRESTSERVICES_H_
+#define SRC_APP_ORIONLD_ORIONLDRESTSERVICES_H_
 /*
 *
 * Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
@@ -22,10 +24,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplifiedVector
-#include "orionld/rest/orionldServiceInit.h"       // Own Interface
 
 
 
+// -----------------------------------------------------------------------------
+//
+// restServiceVV -
+//
+extern OrionLdRestServiceSimplifiedVector restServiceVV[9];
 
-
+#endif  // SRC_APP_ORIONLD_ORIONLDRESTSERVICES_H_

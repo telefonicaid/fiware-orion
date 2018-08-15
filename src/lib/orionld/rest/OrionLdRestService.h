@@ -37,6 +37,51 @@ typedef bool (*ServiceRoutine)(ConnectionInfo* ciP);
 
 
 
+/* ****************************************************************************
+*
+* OrionldServiceRoutine -
+*/
+typedef bool (*OrionldServiceRoutine)(ConnectionInfo* ciP);
+
+
+
+/* ****************************************************************************
+*
+* OrionLdRestServiceSimplified -
+*
+* This struct is a simplified OrionLdRestService.
+* To create an OrionLd service, all that is needed is the URL and the service routine.
+* In the initialization stage, the URL is parsed and data is taken out of it to make
+* the URL parse (service routine lookup) faster.
+* A lot faster actually, as string comparisons are avoided and instead integers are compared.
+*
+* The info extracted from this initialization stage, plus the url and service routine, is 
+* stored in the "real" OrionLdRestService struct, which is used during lookup of URL->service-routine.
+* The struct OrionLdRestServiceSimplified is no longer used after the creation of the OrionLdRestService items.
+* However, the URL is not copied to the OrionLdRestService items, but just pointed to from OrionLdRestService to
+* OrionLdRestServiceSimplified, so, the OrionLdRestServiceSimplified vectors must stay intact during
+* the entire lifetime of the broker.
+*/
+typedef struct OrionLdRestServiceSimplified
+{
+  const char*            url;
+  OrionldServiceRoutine  serviceRoutine;
+} OrionLdRestServiceSimplified;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// OrionLdRestServiceSimplifiedVector -
+//
+typedef struct OrionLdRestServiceSimplifiedVector
+{
+  OrionLdRestServiceSimplified*  serviceV;
+  int                            services;
+} OrionLdRestServiceSimplifiedVector;
+
+
+
 // -----------------------------------------------------------------------------
 //
 // OrionLdRestService -
@@ -72,4 +117,4 @@ typedef struct OrionLdRestServiceVector
   int                  services;
 } OrionLdRestServiceVector;
 
-#endif  // SRC_LIB_REST_ORIOMLDRESTSERVICE_H_
+#endif  // SRC_LIB_ORIONLD_REST_ORIONLDRESTSERVICE_H_

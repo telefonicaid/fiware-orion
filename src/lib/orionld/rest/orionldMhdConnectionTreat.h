@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_REST_ORIONLDMHDCONNECTIONTREAT_H_
+#define SRC_LIB_ORIONLD_REST_ORIONLDMHDCONNECTIONTREAT_H_
+
 /*
 *
 * Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
@@ -22,10 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplifiedVector
-#include "orionld/rest/orionldServiceInit.h"       // Own Interface
+#include "rest/ConnectionInfo.h"
 
 
 
+/* ****************************************************************************
+*
+* orionldMhdConnectionTreat - 
+*/
+extern int orionldMhdConnectionTreat(ConnectionInfo*  ciP);
 
-
+#endif  // SRC_LIB_ORIONLD_REST_ORIONLDMHDCONNECTIONTREAT_H_

@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_REST_ORIONLDMHDCONNECTIONPAYLOADREAD_H_
+#define SRC_LIB_ORIONLD_REST_ORIONLDMHDCONNECTIONPAYLOADREAD_H_
+
 /*
 *
 * Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
@@ -22,10 +25,19 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplifiedVector
-#include "orionld/rest/orionldServiceInit.h"       // Own Interface
+#include "rest/ConnectionInfo.h"
 
 
 
+/* ****************************************************************************
+*
+* orionldMhdConnectionPayloadRead - 
+*/
+extern int orionldMhdConnectionPayloadRead
+(
+  ConnectionInfo*  ciP,
+  size_t*          upload_data_size,
+  const char*      upload_data
+);
 
-
+#endif  // SRC_LIB_ORIONLD_REST_ORIONLDMHDCONNECTIONPAYLOADREAD_H_

@@ -51,7 +51,9 @@
 #include "parse/forbiddenChars.h"
 
 #ifdef ORIONLD
-#include "orionld/rest/orionldMhdConnection.h"
+#include "orionld/rest/orionldMhdConnectionInit.h"
+#include "orionld/rest/orionldMhdConnectionPayloadRead.h"
+#include "orionld/rest/orionldMhdConnectionTreat.h"
 #endif
 
 #include "rest/Verb.h"

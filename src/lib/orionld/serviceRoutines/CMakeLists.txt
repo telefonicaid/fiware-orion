@@ -38,6 +38,7 @@ SET (SOURCES
     orionldPatchEntity.cpp
     orionldPatchSubscription.cpp
     orionldPatchRegistration.cpp
+    orionldBadVerb.cpp
 )
 
 # Include directories

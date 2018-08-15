@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_REST_ORIONLDSERVICEINIT_H_
+#define SRC_LIB_ORIONLD_REST_ORIONLDSERVICEINIT_H_
+
 /*
 *
 * Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
@@ -23,9 +26,23 @@
 * Author: Ken Zangelin
 */
 #include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplifiedVector
-#include "orionld/rest/orionldServiceInit.h"       // Own Interface
 
 
 
+// -----------------------------------------------------------------------------
+//
+// orionldRestServiceV -
+//
+extern OrionLdRestServiceVector orionldRestServiceV[9];
 
 
+
+// -----------------------------------------------------------------------------
+//
+// orionLdServiceInit -
+//
+// This function converts the RestServiceLd vectors to OrionLdRestService vectors
+//
+extern void orionLdServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int vecItems);
+
+#endif  // SRC_LIB_ORIONLD_REST_ORIONLDSERVICEINIT_H_
