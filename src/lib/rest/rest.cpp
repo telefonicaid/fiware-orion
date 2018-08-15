@@ -573,7 +573,6 @@ static void requestCompleted
   MHD_RequestTerminationCode  toe
 )
 {
-  LM_TMP(("---------------------- REQUEST COMPLETED -------------------------"));
   ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
   std::string      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
   struct timespec  reqEndTime;
@@ -1509,7 +1508,6 @@ static int connectionTreat
     {
       if      (*con_cls == NULL)        return orionldMhdConnectionInit(connection, url, method, version, con_cls);
       else if (*upload_data_size != 0)  return orionldMhdConnectionPayloadRead((ConnectionInfo*) *con_cls, upload_data_size, upload_data);
-      LM_TMP(("The entire message has been read"));
 
       //
       // The entire message has been read, we're allowed to respond.

@@ -104,12 +104,10 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     if (ciP->outMimeType == JSON)
     {
       MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/json");
-      LM_TMP(("Adding HTTP header HTTP_CONTENT_TYPE: application/json"));
     }
     else if (ciP->outMimeType == TEXT)
     {
       MHD_add_response_header(response, HTTP_CONTENT_TYPE, "text/plain");
-      LM_TMP(("Adding HTTP header HTTP_CONTENT_TYPE: text/plain"));
     }
   }
 
@@ -156,7 +154,6 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     }
   }
 
-  LM_TMP(("Queueing response"));
   MHD_queue_response(ciP->connection, ciP->httpStatusCode, response);
   MHD_destroy_response(response);
 }

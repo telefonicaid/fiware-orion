@@ -21,13 +21,14 @@
 # iot_support at tid dot es
 #
 # Author: Ken Zangelin
-
+#
 
 date
-BROKER=${BROKER:-contextBroker}
+export BROKER=${BROKER:-contextBroker}
 testStartTime=$(date +%s.%2N)
 MAX_TRIES=${CB_MAX_TRIES:-3}
 echo $testStartTime > /tmp/brokerStartCounter
+
 
 
 # -----------------------------------------------------------------------------
