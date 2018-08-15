@@ -35,9 +35,13 @@
 //
 bool orionldDeleteAttribute(ConnectionInfo* ciP)
 {
+  char response[1024];
+
   LM_TMP(("In orionldDeleteAttribute"));
 
-  ciP->responsePayload = (char*) "{ \"error\": \"not implemented\", \"details\": \"DELETE /ngsi-ld/v1/entities/*/attrs/*\" }";
+  snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"DELETE /ngsi-ld/v1/entities/*/attrs/*\", \"entityId\": \"%s\", \"attribute\": \"%s\" }\n",
+           ciP->wildcard[0], ciP->wildcard[1]);
+  ciP->responsePayload = strdup(response);  // This is temporary, will leak, but not important
   ciP->httpStatusCode  = SccNotImplemented;
 
   return true;

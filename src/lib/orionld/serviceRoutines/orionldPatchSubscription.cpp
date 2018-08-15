@@ -35,9 +35,12 @@
 //
 bool orionldPatchSubscription(ConnectionInfo* ciP)
 {
+  char response[1024];
+
   LM_TMP(("In orionldPatchSubscription"));
 
-  ciP->responsePayload = (char*) "{ \"error\": \"not implemented\", \"details\": \"PATCH /ngsi-ld/v1/subscriptions/*\" }\n";
+  snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"PATCH /ngsi-ld/v1/subscriptions/*\", \"subscriptionId\": \"%s\" }\n", ciP->wildcard[0]);
+  ciP->responsePayload = strdup(response);  // This is temporary, will leak, but not important  
   ciP->httpStatusCode  = SccNotImplemented;
 
   return true;

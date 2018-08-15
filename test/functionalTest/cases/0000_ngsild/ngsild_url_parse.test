@@ -62,7 +62,7 @@ echo
 
 echo "02. GET /ngsi-ld/v1/entities/E1"
 echo "==============================="
-orionCurl --url /ngsi-ld/v1/entities/E1
+orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/list/of/entities/E1.xxx'
 echo
 echo
 
@@ -112,7 +112,7 @@ echo "======================================"
 payload='{
   "value": 12
 }'
-orionCurl --url /ngsi-ld/v1/entities/E1/attrs --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/list/of/entities/E1.xxx/attrs --payload "$payload"
 echo
 echo
 
@@ -141,7 +141,7 @@ echo "11. PATCH /ngsi-ld/v1/entities/E1/attrs"
 echo "======================================="
 payload='{
 }'
-orionCurl --url /ngsi-ld/v1/entities/E1/attrs --payload "$payload" -X PATCH
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/list/of/entities/E1.xxx/attrs --payload "$payload" -X PATCH
 echo
 echo
 
@@ -168,7 +168,7 @@ echo "14. DELETE /ngsi-ld/v1/entities/E1"
 echo "=================================="
 payload='{
 }'
-orionCurl --url /ngsi-ld/v1/entities/E1 --payload "$payload" -X DELETE
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/list/of/entities/E1.xxx --payload "$payload" -X DELETE
 echo
 echo
 
@@ -177,7 +177,7 @@ echo "15. DELETE /ngsi-ld/v1/entities/E1/attrs/A1"
 echo "==========================================="
 payload='{
 }'
-orionCurl --url /ngsi-ld/v1/entities/E1/attrs/A1 --payload "$payload" -X DELETE
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/list/of/entities/E1.xxx/attrs/http://a.b.c/list/of/attributes/A1.xxx --payload "$payload" -X DELETE
 echo
 echo
 
@@ -217,12 +217,13 @@ Date: REGEX(.*)
 02. GET /ngsi-ld/v1/entities/E1
 ===============================
 HTTP/1.1 501 Not Implemented
-Content-Length: 72
+Content-Length: 124
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "GET /ngsi-ld/v1/entities/*",
+    "entityId": "http://a.b.c/list/of/entities/E1.xxx",
     "error": "not implemented"
 }
 
@@ -243,13 +244,14 @@ Date: REGEX(.*)
 04. GET /ngsi-ld/v1/subscriptions/S1
 ====================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 77
+Content-Length: 101
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "GET /ngsi-ld/v1/subscriptions/*",
-    "error": "not implemented"
+    "error": "not implemented",
+    "subscriptionId": "S1"
 }
 
 
@@ -269,13 +271,14 @@ Date: REGEX(.*)
 06. GET /ngsi-ld/v1/registrations/R1
 ====================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 77
+Content-Length: 101
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "GET /ngsi-ld/v1/registrations/*",
-    "error": "not implemented"
+    "error": "not implemented",
+    "registrationId": "R1"
 }
 
 
@@ -295,12 +298,13 @@ Date: REGEX(.*)
 08. POST /ngsi-ld/v1/entities/E1/attrs
 ======================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 79
+Content-Length: 131
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "POST /ngsi-ld/v1/entities/*/attrs",
+    "entityId": "http://a.b.c/list/of/entities/E1.xxx",
     "error": "not implemented"
 }
 
@@ -334,12 +338,13 @@ Date: REGEX(.*)
 11. PATCH /ngsi-ld/v1/entities/E1/attrs
 =======================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 80
+Content-Length: 132
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "PATCH /ngsi-ld/v1/entities/*/attrs",
+    "entityId": "http://a.b.c/list/of/entities/E1.xxx",
     "error": "not implemented"
 }
 
@@ -347,38 +352,41 @@ Date: REGEX(.*)
 12. PATCH /ngsi-ld/v1/subscriptions/S1
 ======================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 79
+Content-Length: 103
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "PATCH /ngsi-ld/v1/subscriptions/*",
-    "error": "not implemented"
+    "error": "not implemented",
+    "subscriptionId": "S1"
 }
 
 
 13. PATCH /ngsi-ld/v1/registrations/R1
 ======================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 79
+Content-Length: 103
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "PATCH /ngsi-ld/v1/registrations/*",
-    "error": "not implemented"
+    "error": "not implemented",
+    "registrationId": "R1"
 }
 
 
 14. DELETE /ngsi-ld/v1/entities/E1
 ==================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 74
+Content-Length: 127
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "DELETE /ngsi-ld/v1/entities/*",
+    "entityId": "http://a.b.c/list/of/entities/E1.xxx",
     "error": "not implemented"
 }
 
@@ -386,12 +394,14 @@ Date: REGEX(.*)
 15. DELETE /ngsi-ld/v1/entities/E1/attrs/A1
 ===========================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 82
+Content-Length: 190
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
+    "attribute": "http://a.b.c/list/of/attributes/A1.xxx",
     "details": "DELETE /ngsi-ld/v1/entities/*/attrs/*",
+    "entityId": "http://a.b.c/list/of/entities/E1.xxx",
     "error": "not implemented"
 }
 
@@ -399,26 +409,28 @@ Date: REGEX(.*)
 16. DELETE /ngsi-ld/v1/subscriptions/S1
 =======================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 79
+Content-Length: 104
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "DELETE /ngsi-ld/v1/subscriptions/*",
-    "error": "not implemented"
+    "error": "not implemented",
+    "subscriptionId": "S1"
 }
 
 
 17. DELETE /ngsi-ld/v1/registrations/R1
 =======================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 79
+Content-Length: 104
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "DELETE /ngsi-ld/v1/registrations/*",
-    "error": "not implemented"
+    "error": "not implemented",
+    "registrationId": "R1"
 }
 
 

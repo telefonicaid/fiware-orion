@@ -35,9 +35,12 @@
 //
 bool orionldDeleteEntity(ConnectionInfo* ciP)
 {
+  char response[1024];
+
   LM_TMP(("In orionldDeleteEntity"));
 
-  ciP->responsePayload = (char*) "{ \"error\": \"not implemented\", \"details\": \"DELETE /ngsi-ld/v1/entities/*\" }";
+  snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"DELETE /ngsi-ld/v1/entities/*\", \"entityId\": \"%s\" }\n", ciP->wildcard[0]);
+  ciP->responsePayload = strdup(response);  // This is temporary, will leak, but not important
   ciP->httpStatusCode  = SccNotImplemented;
 
   return true;

@@ -35,9 +35,12 @@
 //
 bool orionldPatchEntity(ConnectionInfo* ciP)
 {
+  char response[1024];
+
   LM_TMP(("In orionldPatchEntity"));
 
-  ciP->responsePayload = (char*) "{ \"error\": \"not implemented\", \"details\": \"PATCH /ngsi-ld/v1/entities/*/attrs\" }\n";
+  snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"PATCH /ngsi-ld/v1/entities/*/attrs\", \"entityId\": \"%s\" }\n", ciP->wildcard[0]);
+  ciP->responsePayload = strdup(response);  // This is temporary, will leak, but not important
   ciP->httpStatusCode  = SccNotImplemented;
 
   return true;
