@@ -103,10 +103,12 @@
 #include "logSummary/logSummary.h"
 
 #include "orionld/rest/orionldMhdConnection.h"  // orionLdServiceInit
+#include "orionld/context/orionldContextAdd.h"  // orionldContextFreeAll
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
 #include "orionld/orionldRestServices.h"
+#include "orionld/rest/orionldServiceInit.h"
 
 using namespace orion;
 
@@ -537,6 +539,8 @@ void exitFunc(void)
   curl_context_cleanup();
   curl_global_cleanup();
 
+  orionldContextFreeAll();
+
   if (unlink(pidPath) != 0)
   {
     LM_T(LmtSoftError, ("error removing PID file '%s': %s", pidPath, strerror(errno)));
@@ -720,7 +724,6 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
   char* mode;
   char* first_colon;
   int   flds_num;
-
   errno = 0;
   // notifModeArg is a char[64], pretty sure not a huge input to break sscanf
   // cppcheck-suppress invalidscanf
@@ -1042,7 +1045,7 @@ int main(int argC, char* argV[])
                           NULL);
   }
 
-  orionLdServiceInit(restServiceVV, 9);
+  orionldServiceInit(restServiceVV, 9);
   // orionLdServiceInitPresent();
   
   LM_I(("Startup completed"));

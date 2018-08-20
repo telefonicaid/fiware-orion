@@ -22,6 +22,14 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kjson/kjBufferCreate.h"                     // kjBufferCreate
+#include "kjson/kjParse.h"                            // kjParse
+#include "kjson/kjRender.h"                           // kjRender
+#include "kjson/kjFree.h"                             // kjFree
+}
+
 #include "rest/ConnectionInfo.h"                      // ConnectionInfo
 #include "rest/restReply.h"                           // restReply
 
@@ -41,16 +49,51 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 {
   LM_TMP(("Read all the payload - treating the request!"));
 
-  // If no error predetected, lookup the service and call it
+  // If no error predetected, lookup the service and call its service routine
   if (ciP->httpStatusCode == SccOk)
   {
     if ((ciP->verb == POST) || (ciP->verb == GET) || (ciP->verb == DELETE) || (ciP->verb == PATCH))
       ciP->serviceP = orionldServiceLookup(ciP, &orionldRestServiceV[ciP->verb]);
 
+    
+    if (ciP->payload != NULL)
+    {
+      LM_TMP(("parsing the payload '%s'", ciP->payload));
+
+      // FIXME P6: Do we really need to allocate a kjsonP for every request?
+      ciP->kjsonP = kjBufferCreate();      
+      if (ciP->kjsonP == NULL)
+        LM_X(1, ("Out of memory"));
+
+      ciP->kjsonP->spacesPerIndent   = 0;
+      ciP->kjsonP->nlString          = (char*) "";
+      ciP->kjsonP->stringBeforeColon = (char*) "";
+      ciP->kjsonP->stringAfterColon  = (char*) "";
+      
+      ciP->requestTopP = kjParse(ciP->kjsonP, ciP->payload);
+      LM_TMP(("After kjParse"));
+      if (ciP->requestTopP == NULL)
+        LM_X(1, ("JSON parse error"));
+      LM_TMP(("All good - payload parsed"));
+    }
+
     if (ciP->serviceP != NULL)
     {
       LM_TMP(("Calling the service routine"));
-      ciP->serviceP->serviceRoutine(ciP);
+      bool b = ciP->serviceP->serviceRoutine(ciP);
+      LM_TMP(("service routine done"));
+
+      if (b == false)
+      {
+        //
+        // If the service routine failed (returned FALSE), but no HTTP status code is set,
+        // The HTTP status code defaults to 400
+        //
+        if (ciP->httpStatusCode == SccOk)
+        {
+          ciP->httpStatusCode = SccBadRequest;
+        }
+      }
     }
     else
     {
@@ -59,26 +102,45 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   }
 
 
-#if 0
   // Is there a KJSON response tree to render?
-  if (ciP->jsonResponseTree != NULL)
-    ciP->responsePayload = kjsonRender(ciP->jsonResponseTree);
-#endif
+  if (ciP->responseTopP != NULL)
+  {
+    LM_TMP(("Rendering KJSON response tree"));
+    ciP->responsePayload          = (char*) malloc(1024);
+    ciP->responsePayloadAllocated = true;
+    kjRender(ciP->kjsonP, ciP->responseTopP, ciP->responsePayload, 1024);
+  }
 
-  LM_TMP(("Responding"));
-  ciP->outMimeType = JSON;  // ALL responses have payload
-  
   if (ciP->responsePayload != NULL)
   {
     LM_TMP(("Responding with '%s'", ciP->responsePayload));
+    ciP->outMimeType = JSON;
     restReply(ciP, ciP->responsePayload);
   }
   else
   {
-    restReply(ciP, genericErrorPayload);
+    LM_TMP(("Responding without payload"));
+    restReply(ciP, "");
   }
 
-  LM_TMP(("Read all the payload"));
+#if 0  // FIXME P9: Fix the leaks!!!
+  if (ciP->requestTopP != NULL)
+  {
+    LM_TMP(("Calling kjFree on request"));
+    kjFree(ciP->requestTopP);
+    LM_TMP(("kjFree'd request"));
+  }
+  
+  if (ciP->responseTopP != NULL)
+  {
+    LM_TMP(("Calling kjFree on response"));
+    kjFree(ciP->responseTopP);
+    LM_TMP(("kjFree'd response"));
+  }
+#endif
+
+  free(ciP->kjsonP);
+  ciP->kjsonP = NULL;
 
   return MHD_YES;
 }

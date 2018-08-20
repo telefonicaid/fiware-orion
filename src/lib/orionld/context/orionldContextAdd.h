@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_REST_ORIONLDSERVICEINIT_H_
-#define SRC_LIB_ORIONLD_REST_ORIONLDSERVICEINIT_H_
+#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
 
 /*
 *
@@ -25,24 +25,29 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplifiedVector
+#include "logMsg/logMsg.h"
+
+extern "C"
+{
+#include "kjson/kjParse.h"                              // kjParse
+}
+
+#include "rest/ConnectionInfo.h"
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldContextAdd -
+//
+extern bool orionldContextAdd(ConnectionInfo* ciP, char* url);
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldRestServiceV -
+// orionldContextFreeAll -
 //
-extern OrionLdRestServiceVector orionldRestServiceV[9];
+extern void orionldContextFreeAll(void);
 
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldServiceInit -
-//
-// This function converts the RestServiceLd vectors to OrionLdRestService vectors
-//
-extern void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int vecItems);
-
-#endif  // SRC_LIB_ORIONLD_REST_ORIONLDSERVICEINIT_H_
+#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_

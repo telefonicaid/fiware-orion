@@ -43,6 +43,12 @@
 #include "rest/mhd.h"
 #include "rest/Verb.h"
 #include "rest/HttpHeaders.h"
+#ifdef ORIONLD
+extern "C"
+{
+#include "kjson/kjson.h"
+}
+#endif  
 
 
 
@@ -84,8 +90,18 @@ public:
     inCompoundValue        (false),
     compoundValueP         (NULL),
     compoundValueRoot      (NULL),
-    httpStatusCode         (SccOk)
-  {
+    httpStatusCode         (SccOk),
+#ifdef ORIONLD
+    serviceP                  (NULL),
+    responsePayload           (NULL),
+    responsePayloadAllocated  (false),
+    urlPath                   (NULL),
+    wildcard                  { NULL, NULL},
+    kjsonP                    (NULL),
+    requestTopP               (NULL),
+    responseTopP              (NULL)
+#endif
+    {
   }
 
   ConnectionInfo(MimeType _outMimeType):
@@ -106,7 +122,17 @@ public:
     inCompoundValue        (false),
     compoundValueP         (NULL),
     compoundValueRoot      (NULL),
-    httpStatusCode         (SccOk)
+    httpStatusCode         (SccOk),
+#ifdef ORIONLD
+    serviceP                  (NULL),
+    responsePayload           (NULL),
+    responsePayloadAllocated  (false),
+    urlPath                   (NULL),
+    wildcard                  { NULL, NULL},
+    kjsonP                    (NULL),
+    requestTopP               (NULL),
+    responseTopP              (NULL)
+#endif
   {
   }
 
@@ -131,7 +157,17 @@ public:
     inCompoundValue        (false),
     compoundValueP         (NULL),
     compoundValueRoot      (NULL),
-    httpStatusCode         (SccOk)
+    httpStatusCode         (SccOk),
+#ifdef ORIONLD
+    serviceP                  (NULL),
+    responsePayload           (NULL),
+    responsePayloadAllocated  (false),
+    urlPath                   (NULL),
+    wildcard                  { NULL, NULL},
+    kjsonP                    (NULL),
+    requestTopP               (NULL),
+    responseTopP              (NULL)
+#endif
   {
 
     if      (_method == "POST")    verb = POST;
@@ -206,8 +242,12 @@ public:
 #ifdef ORIONLD
   OrionLdRestService*       serviceP;
   char*                     responsePayload;
+  bool                      responsePayloadAllocated;
   char*                     urlPath;
   char*                     wildcard[2];
+  Kjson*                    kjsonP;
+  KjNode*                   requestTopP;
+  KjNode*                   responseTopP;
 #endif  
 };
 

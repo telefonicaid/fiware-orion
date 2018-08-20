@@ -24,9 +24,61 @@
 */
 #include <microhttpd.h>
 
+extern "C"
+{
+#include "kjson/kjInit.h"                             // kjInit
+}
+
 #include "orionld/rest/OrionLdRestService.h"          // OrionLdRestService
 #include "orionld/rest/temporaryErrorPayloads.h"      // Temporary Error Payloads
 #include "orionld/rest/orionldMhdConnection.h"        // Own Interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// libLogBuffer -
+//
+thread_local char libLogBuffer[1024 * 8];
+
+
+
+// -----------------------------------------------------------------------------
+//
+// libLogFunction -
+//
+static void libLogFunction
+(
+  int          severity,              // 1: Error, 2: Warning, 3: Info, 4: Verbose, 5: Trace
+  int          level,                 // Trace level || Error code || Info Code
+  const char*  fileName,
+  int          lineNo,
+  const char*  functionName,
+  const char*  format,
+  ...
+)
+{
+  va_list  args;
+
+  /* "Parse" the varible arguments */
+  va_start(args, format);
+  
+  /* Print message to variable */
+  vsnprintf(libLogBuffer, sizeof(libLogBuffer), format, args);
+  // LM_TMP(("In: libLogBuffer == '%s' (%s[%d]). Severity=%d", libLogBuffer, fileName, lineNo, severity));
+  va_end(args);
+
+  if (severity == 1)
+    lmOut(libLogBuffer, 'E', fileName, lineNo, functionName, 0, NULL);
+  else if (severity == 2)
+    lmOut(libLogBuffer, 'W', fileName, lineNo, functionName, 0, NULL);
+  else if (severity == 3)
+    lmOut(libLogBuffer, 'I', fileName, lineNo, functionName, 0, NULL);
+  else if (severity == 4)
+    lmOut(libLogBuffer, 'V', fileName, lineNo, functionName, 0, NULL);
+  else if (severity == 5)
+    lmOut(libLogBuffer, 'T', fileName, lineNo, functionName, level, NULL);
+}
 
 
 
@@ -105,11 +157,11 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 
 // -----------------------------------------------------------------------------
 //
-// orionLdServiceInit -
+// orionldServiceInit -
 //
 // This function converts the OrionLdRestServiceSimplified vectors to OrionLdRestService vectors
 //
-void orionLdServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int vecItems)
+void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int vecItems)
 {
   int svIx;  // Service Vector Index
 
@@ -136,4 +188,6 @@ void orionLdServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
       restServicePrepare(&orionldRestServiceV[svIx].serviceV[sIx], &restServiceVV[svIx].serviceV[sIx]);
     }
   }
+
+  kjInit(libLogFunction);
 }

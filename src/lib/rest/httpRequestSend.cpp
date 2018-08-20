@@ -115,7 +115,7 @@ size_t writeMemoryCallback(void* contents, size_t size, size_t nmemb, void* user
   mem->size += realsize;
   mem->memory[mem->size] = 0;
 
-  return realsize;
+ return realsize;
 }
 
 

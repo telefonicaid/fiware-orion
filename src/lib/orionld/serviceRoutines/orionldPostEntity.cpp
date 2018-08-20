@@ -37,7 +37,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 {
   char response[1024];
 
-  LM_TMP(("In orionldPostEntity"));
+  LM_TMP(("In orionldPostEntities: request tree at %p", ciP->requestTopP));
 
   snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"POST /ngsi-ld/v1/entities/*/attrs\", \"entityId\": \"%s\" }\n", ciP->wildcard[0]);
   ciP->responsePayload = strdup(response);  // This is temporary, will leak, but not important

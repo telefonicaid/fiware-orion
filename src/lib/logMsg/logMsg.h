@@ -41,8 +41,8 @@
 #include <string>               /* std::string                               */
 
 #include "common/globals.h"     /* transactionIdSet,correlatorIdSet          */
-
 #include "common/limits.h"      // FIXME: this should be removed if this library wants to be generic again
+
 
 
 /******************************************************************************

@@ -251,18 +251,12 @@ do                                                \
 * SUB -          value for subtracting levels
 * TRACE_LEVELS - number of trace levels
 */
-
-// The LINE_MAX definition concflicts with sys/syslimits.h
-#ifdef LINE_MAX
-#undef LINE_MAX
-#endif
-
 #define DELIMITER        ','
 #define ADD              0
 #define SUB              1
 #define TRACE_LEVELS     256
 #define FDS_MAX          2
-#define LINE_MAX         (32 * 1024)
+#define LM_LINE_MAX      (32 * 1024)
 #define TEXT_MAX         512
 #define FORMAT_LEN       1024
 #define FORMAT_DEF       "TYPE:DATE:TID:EXEC/FILE[LINE] FUNC: TEXT"
@@ -1931,13 +1925,13 @@ LmStatus lmAux(char* a)
 char* lmTextGet(const char* format, ...)
 {
   va_list  args;
-  char*    vmsg = (char*) calloc(1, LINE_MAX);
+  char*    vmsg = (char*) calloc(1, LM_LINE_MAX);
 
   /* "Parse" the varible arguments */
   va_start(args, format);
 
   /* Print message to variable */
-  vsnprintf(vmsg, LINE_MAX, format, args);
+  vsnprintf(vmsg, LM_LINE_MAX, format, args);
   va_end(args);
 
   return vmsg;
@@ -2286,7 +2280,7 @@ LmStatus lmOut
   POINTER_CHECK(text);
 
   int   i;
-  char* line = (char*) calloc(1, LINE_MAX);
+  char* line = (char*) calloc(1, LM_LINE_MAX);
   int   sz;
   char* format = (char*) calloc(1, FORMAT_LEN + 1);
   char* tmP;
@@ -2351,11 +2345,11 @@ LmStatus lmOut
     {
       if (text[1] != ':')
       {
-        snprintf(line, LINE_MAX, "R: %s\n%c", text, 0);
+        snprintf(line, LM_LINE_MAX, "R: %s\n%c", text, 0);
       }
       else
       {
-        snprintf(line, LINE_MAX, "%s\n%c", text, 0);
+        snprintf(line, LM_LINE_MAX, "%s\n%c", text, 0);
       }
     }
     else
@@ -2366,19 +2360,19 @@ LmStatus lmOut
         continue;
       }
 
-      if ((strlen(format) + strlen(text) + strlen(line)) > LINE_MAX)
+      if ((strlen(format) + strlen(text) + strlen(line)) > LM_LINE_MAX)
       {
-        snprintf(line, LINE_MAX, "%s[%d]: %s\n%c", file, lineNo, "LM ERROR: LINE TOO LONG", 0);
+        snprintf(line, LM_LINE_MAX, "%s[%d]: %s\n%c", file, lineNo, "LM ERROR: LINE TOO LONG", 0);
       }
       else
       {
-        snprintf(line, LINE_MAX, format, text);
+        snprintf(line, LM_LINE_MAX, format, text);
       }
     }
 
     if (stre != NULL)
     {
-      strncat(line, stre, LINE_MAX - strlen(stre) - 1);
+      strncat(line, stre, LM_LINE_MAX - strlen(stre) - 1);
     }
 
     sz = strlen(line);
@@ -2766,10 +2760,10 @@ LmStatus lmReopen(int index)
 
   while (true)
   {
-    char* line = (char*) calloc(1, LINE_MAX);
+    char* line = (char*) calloc(1, LM_LINE_MAX);
     int   len;
 
-    if (fgets(line, LINE_MAX, fP) == NULL)
+    if (fgets(line, LM_LINE_MAX, fP) == NULL)
     {
       s = LmsFgets;
       free(line);
@@ -2871,7 +2865,7 @@ int64_t lmLogLineGet
 )
 {
   static FILE*  fP     = NULL;
-  char*         line   = (char*) calloc(1, LINE_MAX);
+  char*         line   = (char*) calloc(1, LM_LINE_MAX);
   char*         lineP  = line;
   char*         delimiter;
   int64_t       ret;
@@ -2924,7 +2918,7 @@ int64_t lmLogLineGet
     }
   }
 
-  if (fgets(line, LINE_MAX, fP) == NULL)
+  if (fgets(line, LM_LINE_MAX, fP) == NULL)
   {
     fclose(fP);
     fP = NULL;
@@ -3039,7 +3033,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
 
   LineRemove* lrV;
   void*       initialLrv;
-  char*       line = (char*) calloc(1, LINE_MAX);
+  char*       line = (char*) calloc(1, LM_LINE_MAX);
   int         i;
   int         j = 0;
   FILE*       fP;
@@ -3091,7 +3085,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
 
   i = 0;
   oldOffset = 0;
-  while (fgets(line, LINE_MAX, fP) != NULL)
+  while (fgets(line, LM_LINE_MAX, fP) != NULL)
   {
     lrV[i].type   = (line[1] == ':')? line[0] : 'h';
     lrV[i].offset = oldOffset;
@@ -3175,14 +3169,14 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
   {
     if (lrV[i].remove == false)
     {
-      char*  line  = (char*) calloc(1, LINE_MAX);
+      char*  line  = (char*) calloc(1, LM_LINE_MAX);
 
       if (fseek(fP, lrV[i].offset, SEEK_SET) != 0)
       {
         CLEANUP("fseek", LmsFseek);
       }
 
-      if (fgets(line, LINE_MAX, fP) == NULL)
+      if (fgets(line, LM_LINE_MAX, fP) == NULL)
       {
         break;
       }

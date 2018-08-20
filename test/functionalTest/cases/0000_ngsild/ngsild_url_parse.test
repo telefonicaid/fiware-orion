@@ -100,7 +100,7 @@ echo "============================="
 payload='{
   "id": "E2",
   "type": "A",
-  "name": "John"
+  "name": { "value": "John" }
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
 echo
@@ -284,15 +284,11 @@ Date: REGEX(.*)
 
 07. POST /ngsi-ld/v1/entities
 =============================
-HTTP/1.1 501 Not Implemented
-Content-Length: 71
-Content-Type: application/json
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/E2
 Date: REGEX(.*)
 
-{
-    "details": "POST /ngsi-ld/v1/entities",
-    "error": "not implemented"
-}
 
 
 08. POST /ngsi-ld/v1/entities/E1/attrs

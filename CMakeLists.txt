@@ -174,6 +174,8 @@ SET (ORION_LIBS
     rest          # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o; jsonRequestTreat from payloadParse@RestService.cpp.o;
     orionld_rest
     orionld_serviceRoutines
+    orionld_context
+    orionld_common
     jsonParse
     jsonParseV2
     rest          # this is repeated for linking str2Verb from parseSubscription@parseSubscription.cpp.o;
@@ -213,6 +215,7 @@ SET (BOOST_MT
 SET (COMMON_STATIC_LIBS
     microhttpd.a
     mongoclient.a
+    kjson.a
 )
 
 SET (DYNAMIC_LIBS
@@ -242,6 +245,7 @@ endif (UNIT_TEST)
 # Common include
 #
 include_directories("/usr/include")
+include_directories("${PROJECT_SOURCE_DIR}/..")
 
 #
 # Library directories
@@ -252,7 +256,10 @@ if ("${BUILD_ARCH}" STREQUAL "x86_64")
 else (NOT "${BUILD_ARCH}" STREQUAL "x86_64")
     link_directories("/usr/lib")
 endif ("${BUILD_ARCH}" STREQUAL "x86_64")
+
 link_directories("/usr/lib/x86_64-linux-gnu")
+link_directories("${PROJECT_SOURCE_DIR}/../kjson")
+
 #
 # Enabling test harness
 #
@@ -287,6 +294,8 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/rest)
   ADD_SUBDIRECTORY(src/lib/orionld/rest)
   ADD_SUBDIRECTORY(src/lib/orionld/serviceRoutines)
+  ADD_SUBDIRECTORY(src/lib/orionld/common)
+  ADD_SUBDIRECTORY(src/lib/orionld/context)
   ADD_SUBDIRECTORY(src/lib/mongoBackend)
   ADD_SUBDIRECTORY(src/lib/cache)
   ADD_SUBDIRECTORY(src/lib/alarmMgr)

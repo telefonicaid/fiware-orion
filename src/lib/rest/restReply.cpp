@@ -86,6 +86,12 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   {
     metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
     LM_E(("Runtime Error (MHD_create_response_from_buffer FAILED)"));
+
+#ifdef ORIONLD
+    if (ciP->responsePayloadAllocated == true)
+      free(ciP->responsePayload);
+#endif    
+
     return;
   }
 
@@ -156,6 +162,11 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
 
   MHD_queue_response(ciP->connection, ciP->httpStatusCode, response);
   MHD_destroy_response(response);
+
+#ifdef ORIONLD
+    if (ciP->responsePayloadAllocated == true)
+      free(ciP->responsePayload);
+#endif    
 }
 
 

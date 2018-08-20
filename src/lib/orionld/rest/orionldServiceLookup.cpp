@@ -86,8 +86,10 @@ OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestService
   requestPrepare(ciP->urlPath, cSumV, &cSums, &sLen);
   LM_TMP(("Request prepared: strlen(%s): %d", ciP->urlPath, sLen));
   LM_TMP(("Request prepared: cSums: %d", cSums));
+#if 0
   for (int ix = 0; ix < cSums; ix++)
     LM_TMP(("Request prepared: cSumV[%d]: %d", ix, cSumV[ix]));
+#endif
 
   LM_TMP(("---------------- orionldServiceLookup ------------------"));
   LM_TMP(("%d Services for verb %s", serviceV->services, verbName(ciP->verb)));
