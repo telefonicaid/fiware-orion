@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
-
 /*
 *
 * Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,27 +22,14 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/kjParse.h"                              // kjParse
-}
-
-#include "rest/ConnectionInfo.h"
+#include "orionld/context/OrionldContext.h"
+#include "orionld/context/orionldContextList.h"
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldContextAdd -
+// orionLdContextList
 //
-extern bool orionldContextAdd(ConnectionInfo* ciP, char* url, char** detailsP);
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldContextFreeAll -
-//
-extern void orionldContextFreeAll(void);
-
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+OrionldContext* orionldContextHead = NULL;
+OrionldContext* orionldContextTail = NULL;

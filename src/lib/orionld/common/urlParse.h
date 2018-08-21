@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+#ifndef SRC_LIB_ORIONLD_COMMON_URLPARSE_H_
+#define SRC_LIB_ORIONLD_COMMON_URLPARSE_H_
 
 /*
 *
@@ -25,27 +25,22 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/kjParse.h"                              // kjParse
-}
-
-#include "rest/ConnectionInfo.h"
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldContextAdd -
+// urlParse - move to common/urlParse.cpp
 //
-extern bool orionldContextAdd(ConnectionInfo* ciP, char* url, char** detailsP);
-
-
-
-// -----------------------------------------------------------------------------
+// 1. Find ':', copy left-hand-side to 'protocol'
+// 2. Make sure "//" comes after ':'
+// 3. Copy all uptil (not including) the next '/' to 'ip'
+// 4. Optionally, a :<port number>
+// 5. Make *urlPathPP point to the rest
 //
-// orionldContextFreeAll -
+// NOTE
+//   The called MUST make sure 'protocol' and 'ip' have enough room
 //
-extern void orionldContextFreeAll(void);
+extern bool urlParse(char* url, char* protocol, int protocolSize, char* ip, int ipSize, short* portP, char** urlPathPP, char** detailsPP);
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_URLPARSE_H_

@@ -68,6 +68,7 @@ static void libLogFunction
   // LM_TMP(("In: libLogBuffer == '%s' (%s[%d]). Severity=%d", libLogBuffer, fileName, lineNo, severity));
   va_end(args);
 
+#if 0  
   if (severity == 1)
     lmOut(libLogBuffer, 'E', fileName, lineNo, functionName, 0, NULL);
   else if (severity == 2)
@@ -78,6 +79,7 @@ static void libLogFunction
     lmOut(libLogBuffer, 'V', fileName, lineNo, functionName, 0, NULL);
   else if (severity == 5)
     lmOut(libLogBuffer, 'T', fileName, lineNo, functionName, level, NULL);
+#endif
 }
 
 

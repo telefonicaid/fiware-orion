@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
-
 /*
 *
 * Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,27 +22,39 @@
 *
 * Author: Ken Zangelin
 */
+#include "logMsg/logMsg.h"                                // LM_*
+
 extern "C"
 {
-#include "kjson/kjParse.h"                              // kjParse
+#include "kjson/KjNode.h"                                 // KjNode
 }
 
-#include "rest/ConnectionInfo.h"
-
-
-
-// ----------------------------------------------------------------------------
-//
-// orionldContextAdd -
-//
-extern bool orionldContextAdd(ConnectionInfo* ciP, char* url, char** detailsP);
+#include "orionld/context/OrionldContext.h"               // OrionldContext
+#include "orionld/context/orionldContextList.h"           // orionldContextHead
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextFreeAll -
+// orionldContextLookup -
 //
-extern void orionldContextFreeAll(void);
+OrionldContext* orionldContextLookup(char* url)
+{
+  OrionldContext* contextP = orionldContextHead;
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+  while (contextP != NULL)
+  {
+    LM_TMP(("Comparing '%s' with '%s'", contextP->url, url));
+    if (strcmp(contextP->url, url) == 0)
+    {
+      LM_TMP(("Found it!"));
+      return contextP;
+    }
+
+    contextP = contextP->next;
+    LM_TMP(("No match. Next context at %p", contextP));
+  }
+
+  LM_TMP(("NOT Found"));
+  return NULL;
+}  

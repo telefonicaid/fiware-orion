@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTLIST_H_
+#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTLIST_H_
 
 /*
 *
@@ -25,27 +25,15 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/kjParse.h"                              // kjParse
-}
-
-#include "rest/ConnectionInfo.h"
+#include "orionld/context/OrionldContext.h"
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldContextAdd -
+// orionLdContextList
 //
-extern bool orionldContextAdd(ConnectionInfo* ciP, char* url, char** detailsP);
+extern OrionldContext* orionldContextHead;
+extern OrionldContext* orionldContextTail;
 
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldContextFreeAll -
-//
-extern void orionldContextFreeAll(void);
-
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTLIST_H_

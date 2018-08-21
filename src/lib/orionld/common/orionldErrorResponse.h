@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+#ifndef SRC_LIB_ORIONLD_COMMON_ORIONLDERRORRESPONSE_H_
+#define SRC_LIB_ORIONLD_COMMON_ORIONLDERRORRESPONSE_H_
 
 /*
 *
@@ -25,27 +25,36 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/kjParse.h"                              // kjParse
-}
-
 #include "rest/ConnectionInfo.h"
-
-
-
-// ----------------------------------------------------------------------------
-//
-// orionldContextAdd -
-//
-extern bool orionldContextAdd(ConnectionInfo* ciP, char* url, char** detailsP);
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextFreeAll -
+// OrionldResponseErrorType -
 //
-extern void orionldContextFreeAll(void);
+typedef enum OrionldResponseErrorType
+{
+  OrionldInvalidRequest,
+  OrionldBadRequestData,
+  OrionldAlreadyExists,
+  OrionldOperationNotSupported,
+  OrionldResourceNotFound,
+  OrionldInternalError
+} OrionldResponseErrorType;
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldErrorResponseCreate -
+//
+extern void orionldErrorResponseCreate
+(
+  ConnectionInfo*           ciP,
+  OrionldResponseErrorType  errorType,
+  const char*               title,
+  const char*               details
+);
+
+#endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDERRORRESPONSE_H_

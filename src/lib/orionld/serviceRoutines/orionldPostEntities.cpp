@@ -33,32 +33,8 @@ extern "C"
 #include "rest/ConnectionInfo.h"
 #include "orionld/context/orionldContextAdd.h"            // Add a context to the context list
 #include "orionld/common/orionldErrorResponse.h"          // orionldErrorResponseCreate
+#include "orionld/common/SCOMPARE.h"                      // SCOMPAREx
 #include "orionld/serviceRoutines/orionldPostEntities.h"  // Own interface
-
-
-
-#define SCOMPARE2(s, c0, c1)                                             \
-  ((s[0] == c0) && (s[1] == c1))
-#define SCOMPARE3(s, c0, c1, c2)                                         \
-  ((s[0] == c0) && (s[1] == c1) && (s[2] == c2))
-#define SCOMPARE4(s, c0, c1, c2, c3)                                     \
-  ((s[0] == c0) && (s[1] == c1) && (s[2] == c2) && (s[3] == c3))
-#define SCOMPARE5(s, c0, c1, c2, c3, c4)                                 \
-  ((s[0] == c0) && (s[1] == c1) && (s[2] == c2) && (s[3] == c3) && (s[4] == c4))
-#define SCOMPARE6(s, c0, c1, c2, c3, c4, c5)                             \
-  ((s[0] == c0) && (s[1] == c1) && (s[2] == c2) && (s[3] == c3) && (s[4] == c4) && (s[5] == c5))
-#define SCOMPARE7(s, c0, c1, c2, c3, c4, c5, c6)                         \
-  ((s[0] == c0) && (s[1] == c1) && (s[2] == c2) && (s[3] == c3) && (s[4] == c4) && (s[5] == c5) && (s[6] == c6))
-#define SCOMPARE8(s, c0, c1, c2, c3, c4, c5, c6, c7)                     \
-  ((s[0] == c0) && (s[1] == c1) && (s[2] == c2) && (s[3] == c3) && (s[4] == c4) && (s[5] == c5) && (s[6] == c6) && (s[7] == c7))
-#define SCOMPARE9(s, c0, c1, c2, c3, c4, c5, c6, c7, c8)                 \
-  ((s[0] == c0) && (s[1] == c1) && (s[2] == c2) && (s[3] == c3) && (s[4] == c4) && (s[5] == c5) && (s[6] == c6) && (s[7] == c7) && (s[8] == c8))
-#define SCOMPARE10(s, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9)            \
-  ((s[0] == c0) && (s[1] == c1) && (s[2] == c2) && (s[3] == c3) && (s[4] == c4) && (s[5] == c5) && (s[6] == c6) && (s[7] == c7) && (s[8] == c8) && (s[9] == c9))
-#define SCOMPARE11(s, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10)       \
-  ((s[0] == c0) && (s[1] == c1) && (s[2] == c2) && (s[3] == c3) && (s[4] == c4) && (s[5] == c5) && (s[6] == c6) && (s[7] == c7) && (s[8] == c8) && (s[9] == c9) && (s[10] == c10))
-#define SCOMPARE12(s, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11)  \
-  ((s[0] == c0) && (s[1] == c1) && (s[2] == c2) && (s[3] == c3) && (s[4] == c4) && (s[5] == c5) && (s[6] == c6) && (s[7] == c7) && (s[8] == c8) && (s[9] == c9) && (s[10] == c10) && (s[11] == c11))
 
 
 
@@ -66,17 +42,17 @@ extern "C"
 //
 // DUPLICATE_CHECK -
 //
-#define DUPLICATE_CHECK(nodeP, pointer, what)                                                   \
-do                                                                                              \
-{                                                                                               \
-  if (pointer != NULL)                                                                          \
-  {                                                                                             \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", "entity id");    \
-    return false;                                                                               \
-  }                                                                                             \
-                                                                                                \
-  pointer = nodeP;                                                                              \
-                                                                                                \
+#define DUPLICATE_CHECK(nodeP, pointer, what)                                                     \
+do                                                                                                \
+{                                                                                                 \
+  if (pointer != NULL)                                                                            \
+  {                                                                                               \
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", "entity id");      \
+    return false;                                                                                 \
+  }                                                                                               \
+                                                                                                  \
+  pointer = nodeP;                                                                                \
+                                                                                                  \
 } while (0)
 
 
@@ -85,14 +61,14 @@ do                                                                              
 //
 // OBJECT_CHECK -
 //
-#define OBJECT_CHECK(nodeP, what)                                                               \
-do                                                                                              \
-{                                                                                               \
-  if (nodeP->type != KjObject)                                                                  \
-  {                                                                                             \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON object", what);          \
-    return false;                                                                               \
-  }                                                                                             \
+#define OBJECT_CHECK(nodeP, what)                                                                 \
+do                                                                                                \
+{                                                                                                 \
+  if (nodeP->type != KjObject)                                                                    \
+  {                                                                                               \
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON object", what);            \
+    return false;                                                                                 \
+  }                                                                                               \
 } while (0)
 
 
@@ -101,14 +77,14 @@ do                                                                              
 //
 // STRING_CHECK -
 //
-#define STRING_CHECK(nodeP, what)                                                               \
-do                                                                                              \
-{                                                                                               \
-  if (nodeP->type != KjString)                                                                  \
-  {                                                                                             \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON string", what);          \
-    return false;                                                                               \
-  }                                                                                             \
+#define STRING_CHECK(nodeP, what)                                                                 \
+do                                                                                                \
+{                                                                                                 \
+  if (nodeP->type != KjString)                                                                    \
+  {                                                                                               \
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON string", what);            \
+    return false;                                                                                 \
+  }                                                                                               \
 } while (0)
 
 
@@ -117,14 +93,31 @@ do                                                                              
 //
 // ARRAY_CHECK -
 //
-#define ARRAY_CHECK(nodeP, what)                                                                \
-do                                                                                              \
-{                                                                                               \
-  if (nodeP->type != KjArray)                                                                   \
-  {                                                                                             \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON array", what);           \
-    return false;                                                                               \
-  }                                                                                             \
+#define ARRAY_CHECK(nodeP, what)                                                                  \
+do                                                                                                \
+{                                                                                                 \
+  if (nodeP->type != KjArray)                                                                     \
+  {                                                                                               \
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON array", what);             \
+    return false;                                                                                 \
+  }                                                                                               \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// ARRAY_OR_STRING_CHECK -
+//
+#define ARRAY_OR_STRING_CHECK(nodeP, what)                                                        \
+do                                                                                                \
+{                                                                                                 \
+  if ((nodeP->type != KjArray) && (nodeP->type != KjString))                                      \
+  {                                                                                               \
+    LM_TMP(("the node is a '%s'", kjValueType(nodeP->type)));                                     \
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON array nor string", what);  \
+    return false;                                                                                 \
+  }                                                                                               \
 } while (0)
 
 
@@ -149,15 +142,15 @@ void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, co
 //
 // contextItemNodeTreat -
 //
-static bool contextItemNodeTreat(ConnectionInfo* ciP, KjNode* contextItemNodeP)
+static bool contextItemNodeTreat(ConnectionInfo* ciP, char* url)
 {
-  STRING_CHECK(contextItemNodeP, "@context-item");
-        
-  bool b = orionldContextAdd(ciP, contextItemNodeP->value.s);
+  char* details = NULL;
+
+  bool b = orionldContextAdd(ciP, url, &details);
   if (b == false)
   {
-    LM_E(("Invalid context '%s'", contextItemNodeP->value.s));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", NULL);
+    LM_E(("Invalid context '%s': %s", url, details));
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", details);
     return false;
   }
 
@@ -197,7 +190,7 @@ static bool payloadCheck(ConnectionInfo* ciP, KjNode** idNodePP, KjNode** typeNo
     else if (SCOMPARE9(kNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
     {
       DUPLICATE_CHECK(kNodeP, contextNodeP, "context");
-      ARRAY_CHECK(kNodeP, "@context");
+      ARRAY_OR_STRING_CHECK(kNodeP, "@context");
     }
     
     kNodeP = kNodeP->next;
@@ -331,17 +324,67 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     }
     else if (kNodeP == contextNodeP)
     {
-      KjNode* contextItemNodeP = kNodeP->children;
+      //
+      // In the first implementation of ngsi-ld, the allowed payloads for the @context member are:
+      //
+      // 1. An array of URL strings:
+      //    "@context": [
+      //      "http://...",
+      //      "http://...",
+      //      "http://..."
+      //    }
+      //
+      // 2. A single URL string:
+      //    "@context": "http://..."
+      //
+      // As the payload is already parsed, what needs to be done here is to call orionldContextAdd() for each of these URLs
+      //
+      // The content of these "Context URLs" can be:
+      //
+      // 1. An object with a single member '@context' that is an object containing key-values:
+      //    "@context" {
+      //      "Property": "http://...",
+      //      "XXX";      ""
+      //    }
+      //
+      // 2. An object with a single member '@context', that is a vector of URL strings (https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld):
+      //    {
+      //      "@context": [
+      //        "http://...",
+      //        "http://...",
+      //        "http://..."
+      //      }
+      //    }
+      //
+      LM_TMP(("Got a @context, of type %s", kjValueType(kNodeP->type)));
 
-      LM_TMP(("Got a @context"));
-
-      while (contextItemNodeP != NULL)
+      if (kNodeP->type == KjString)
       {
-        LM_TMP(("Treating context item of type %s", kjValueType(contextItemNodeP->type)));
-        if (contextItemNodeTreat(ciP, contextItemNodeP) == false)
+        LM_TMP(("The context is a STRING"));
+        if (contextItemNodeTreat(ciP, kNodeP->value.s) == false)
           return false;
-
-        contextItemNodeP = contextItemNodeP->next;
+      }
+      else if (kNodeP->type == KjArray)
+      {
+        LM_TMP(("The context is a VECTOR OF STRINGS"));
+        for (KjNode* contextItemNodeP = kNodeP->children; contextItemNodeP != NULL; contextItemNodeP = contextItemNodeP->next)
+        {
+          if (contextItemNodeTreat(ciP, contextItemNodeP->value.s) == false)
+          {
+            return false;
+          }
+        }
+      }
+      else if (kNodeP->type == KjObject)
+      {
+        // FIXME: seems like an inline context - not supported for now
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", "inline contexts not supported in current version of orionld");
+        return false;
+      }
+      else
+      {
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", "invalid JSON type of @context member");
+        return false;
       }
     }
     else  // Must be an attribute

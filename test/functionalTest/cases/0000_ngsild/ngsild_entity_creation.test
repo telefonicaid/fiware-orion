@@ -213,13 +213,13 @@ Date: REGEX(.*)
 04. POST /ngsi-ld/v1/entities, with a '@context' that is not a vector - see error
 =================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 109
+Content-Length: 120
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "@context",
-    "title": "Not a JSON array",
+    "title": "Not a JSON array nor string",
     "type": "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData"
 }
 

@@ -128,6 +128,12 @@ typedef enum TraceLevels
   LmtNotImplemented,
   LmtCurlContext,
 
+#ifdef ORIONLD
+  LmtWriteCallback,
+  LmtRequestSend,
+  
+#endif
+
   LmtBug = 250
 } TraceLevels;
 

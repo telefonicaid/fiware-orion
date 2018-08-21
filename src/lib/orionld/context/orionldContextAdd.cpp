@@ -22,258 +22,36 @@
 *
 * Author: Ken Zangelin
 */
-#include <curl/curl.h>
-
 #include "logMsg/logMsg.h"
 
 extern "C"
 {
+#include "kjson/KjNode.h"                               // KjNode
 #include "kjson/kjParse.h"                              // kjParse
 #include "kjson/kjFree.h"                               // kjFree
 }
 
-#include "rest/ConnectionInfo.h"
-#include "orionld/context/OrionldContext.h"
-
-
-  
-// ----------------------------------------------------------------------------
-//
-// orionLdContextList
-//
-OrionldContext* orionLdContextHead = NULL;
-OrionldContext* orionLdContextTail = NULL;
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldContextLookup -
-//
-OrionldContext* orionldContextLookup(char* url)
-{
-  OrionldContext* contextP = orionLdContextHead;
-
-  while (contextP != NULL)
-  {
-    LM_TMP(("Comparing '%s' with '%s'", contextP->url, url));
-    if (strcmp(contextP->url, url) == 0)
-    {
-      LM_TMP(("Found it!"));
-      return contextP;
-    }
-
-    contextP = contextP->next;
-    LM_TMP(("No match. Next context at %p", contextP));
-  }
-
-  LM_TMP(("NOT Found"));
-  return NULL;
-}
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldContextItemLookup -
-//
-KjNode* orionldContextItemLookup(OrionldContext* contextP, char* itemName)
-{
-  //
-  // A context must be a tree object and inside the tree there must be only
-  // String values or Object values
-  //
-  KjNode* nodeP = contextP->tree->children;
-
-  while (nodeP != NULL)
-  {
-    if (strcmp(nodeP->name, itemName) == 0)
-      return nodeP;
-
-    nodeP = nodeP->next;
-  }
-
-  return NULL;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldContextItemLookup -
-//
-KjNode* orionldContextItemLookup(char* contextUrl, char* itemName)
-{
-  OrionldContext* contextP = orionldContextLookup(contextUrl);
-
-  if (contextP == NULL)
-    return NULL;
-
-  return orionldContextItemLookup(contextP, itemName);
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldContextItemLookup -
-//
-KjNode* orionldContextItemLookup(KjNode* contextVector, char* itemName)
-{
-  if (contextVector->type != KjArray)
-  {
-    LM_E(("Not an Array"));
-    return NULL;
-  }
-
-  KjNode* contextNodeP = contextVector->children;
-  KjNode* itemP;
-
-  while (contextNodeP != NULL)
-  {
-    OrionldContext* contextP = orionldContextLookup(contextNodeP->value.s);
-
-    if (contextP == NULL)
-      return NULL;
-
-    itemP = orionldContextItemLookup(contextP, itemName);
-    if (itemP != NULL)
-      return itemP;
-
-    contextNodeP = contextNodeP->next;
-  }
-
-  return NULL;
-}
+#include "rest/ConnectionInfo.h"                       // ConnectionInfo
+#include "orionld/common/SCOMPARE.h"                   // SCOMPAREx
+#include "orionld/common/orionldErrorResponse.h"       // orionldErrorResponse
+#include "orionld/common/urlParse.h"                   // urlParse
+#include "orionld/common/OrionldResponseBuffer.h"      // OrionldResponseBuffer
+#include "orionld/common/orionldRequestSend.h"         // orionldRequestSend
+#include "orionld/context/OrionldContext.h"            // OrionldContext
+#include "orionld/context/orionldContextList.h"        // orionldContextHead, orionldContextTail
+#include "orionld/context/orionldContextLookup.h"      // orionldContextLookup
+#include "orionld/context/orionldContextAdd.h"         // Own interface
 
 
 
 // ----------------------------------------------------------------------------
 //
-// ResponseBuffer -
+// orionldContextDownloadAndParse -
 //
-typedef struct ResponseBuffer
+// The returned buffer must be freed by the caller
+//
+static KjNode* orionldContextDownloadAndParse(ConnectionInfo* ciP, char* url, char** detailsPP)
 {
-  char*   buf;
-  size_t  used;
-  size_t  size;
-} ResponseBuffer;
-
-
-
-// -----------------------------------------------------------------------------
-//
-// writeCallback -
-//
-static size_t writeCallback(void* contents, size_t size, size_t members, void* userP)
-{
-  size_t           realSize = size * members;
-  ResponseBuffer*  rBuf     = (ResponseBuffer*) userP;
-
-  LM_TMP(("Got a chunk: %s", (char*) contents));
-
-  if (realSize + rBuf->used > rBuf->size)
-  {
-    rBuf->buf = (char*) realloc(rBuf->buf, rBuf->size + realSize + 1);
-    if (rBuf->buf == NULL)
-    {
-      LM_E(("Runtime Error (out of memory)"));
-      return 0;
-    }
-  }
-
-  memcpy(&rBuf->buf[rBuf->used], contents, realSize);
-  rBuf->used += realSize;
-  rBuf->size += realSize;
-  rBuf->buf[rBuf->size] = 0;
-
-  return realSize;
-}
-
-
-
-// ----------------------------------------------------------------------------
-//
-// orionldContextAdd -
-//
-bool orionldContextAdd(ConnectionInfo* ciP, char* url)
-{
-  LM_TMP(("Getting URL '%s' and adding it as a context", url));
-
-  LM_TMP(("But first, looking up '%s'", url));
-  if (orionldContextLookup(url) != NULL)
-  {
-    LM_TMP(("Context '%s' already cached", url));
-  }
-  LM_TMP(("looked up '%s'", url));
-
-  ResponseBuffer       httpResponse = { NULL, 0 };
-  CURLcode             cCode;
-  char*                ip;
-  char*                protocol;
-  char*                urlPath;
-  struct curl_context  cc;
-  char*                initialUrl = strdup(url);
-
-  // Extracting protocol (http|https) from URL
-  protocol = url;
-  while ((*url != ':') && (*url != 0))
-    ++url;
-
-  if (*url != ':')
-  {
-    LM_E(("Invalid URL, no protocol found"));
-    free(initialUrl);
-    return false;
-  }
-  *url = 0;  // Nulling out the end of the protocol
-  
-  // Checking that "//" comes after ':'
-  if ((url[1] != '/') || (url[2] != '/'))
-  {
-    LM_E(("Invalid URL, no '//' after ':'"));
-    free(initialUrl);
-    return false;
-  }
-  url += 3;  // Skip over the "://"
-
-  // Extracting IP from URL
-  ip = url;
-  while ((*url != '/') && (*url != 0))
-    ++url;
-
-  if (*url != '/')
-  {
-    LM_E(("Invalid URL, no IP found"));
-    free(initialUrl);
-    return false;
-  }
-  *url = 0;  // Nulling out the end of the IP (which is also the start of the URL PATH ...)
-
-  url += 1;  // Skip over the out-nulled '/'
-
-  urlPath = url;  // Initial '/' is missing ...
-
-  //
-  // Putting the missing initial '/' back where it belongs
-  //
-  int   size     = strlen(urlPath) + 1;
-  char* urlPath2 = (char*) malloc(size + 1);
-
-  snprintf(urlPath2, size, "/%s", urlPath);
-
-  LM_TMP(("protocol: %s", protocol));
-  LM_TMP(("IP:       %s", ip));
-  LM_TMP(("URL Path: %s", urlPath2));
-
-  get_curl_context(ip, &cc);
-  if (cc.curl == NULL)
-  {
-    LM_E(("Unable to obtain CURL context"));
-    free(initialUrl);
-    return false;
-  }
-
-  
   //
   // Prepare the httpResponse
   // Note that the buffer will be reallocated on demand by 'writeCallback'
@@ -281,110 +59,273 @@ bool orionldContextAdd(ConnectionInfo* ciP, char* url)
   // A smarter way here would be to use a thread local buffer and allocate only if that buffer
   // is not big enough
   //
-  httpResponse.buf  = (char*) malloc(1024);
-  httpResponse.size = 1024;
-  httpResponse.used = 0;
+  OrionldResponseBuffer  httpResponse;
   
+  httpResponse.buf       = (char*) malloc(1024);
+  httpResponse.size      = 1024;
+  httpResponse.used      = 0;
+  httpResponse.allocated = true;
 
-  //
-  // Prepare the CURL handle
-  //
-  curl_easy_setopt(cc.curl, CURLOPT_URL, initialUrl);                      // Set the URL Path
-  curl_easy_setopt(cc.curl, CURLOPT_CUSTOMREQUEST, "GET");                 // Set the HTTP verb
-  curl_easy_setopt(cc.curl, CURLOPT_FOLLOWLOCATION, 1L);                   // Allow redirection
-  // curl_easy_setopt(cc.curl, CURLOPT_HEADER, 1);                         // Activate include the header in the body output
-  // curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);               // Put headers in place
-  curl_easy_setopt(cc.curl, CURLOPT_WRITEFUNCTION, writeCallback);         // Callback function for writes
-  curl_easy_setopt(cc.curl, CURLOPT_WRITEDATA, &httpResponse);             // Custom data for response handling
-  curl_easy_setopt(cc.curl, CURLOPT_TIMEOUT_MS, 5000);                     // 5 second timeout
-
-  LM_TMP(("Calling curl_easy_perform for GET %s", urlPath2));
-  cCode = curl_easy_perform(cc.curl);
-  LM_TMP(("curl_easy_perform returned %d", cCode));
-  if (cCode != CURLE_OK)
+  if (httpResponse.buf == NULL)
   {
-    release_curl_context(&cc);
-    LM_E(("curl_easy_perform error %d", cCode));
-    free(urlPath2);
-    free(httpResponse.buf);
-    free(initialUrl);
-    return false;
+    *detailsPP = (char*) "out of memory";
+    return NULL;
   }
 
-  // Got data in httpResponse.buf
-  LM_TMP(("Got response: %s", httpResponse.buf));
+  if (orionldRequestSend(&httpResponse, url, 5000, detailsPP) == false)
+  {
+    // detailsPP filled in by orionldRequestSend()
+    // httpResponse.buf freed by orionldRequestSend()
+    LM_E(("orionldRequestSend failed: %s", *detailsPP));
+    return NULL;
+  }
 
-  // Remove garbage at end of payload?
-  char* endP = &httpResponse.buf[httpResponse.used];
-  while ((*endP != '}') && (endP > httpResponse.buf))
+  // <TMP>
+  for (unsigned int ix = 0; ix < strlen(httpResponse.buf); ix++)
   {
-    --endP;
+    if ((httpResponse.buf[ix] == '\n') || (httpResponse.buf[ix] == '\r'))
+      httpResponse.buf[ix] = ' ';
   }
-  if (*endP == '}')
-  {
-    endP[1] = 0;
-  }
+  LM_TMP(("Downloaded payload: %s", httpResponse.buf));
+  // </TMP>
 
   // Now parse the payload
   KjNode* tree = kjParse(ciP->kjsonP, httpResponse.buf);
 
-  release_curl_context(&cc);
-  free(urlPath2);
+  // And then we can free the httpResponse buffer
   free(httpResponse.buf);
 
   if (tree == NULL)
   {
-    LM_E(("Error parsing context"));
-    free(initialUrl);
-    return false;
+    *detailsPP = (char*) "Error parsing context";
+    LM_E(("kjParse returned NULL"));
+    return NULL;
   }
 
+  if ((tree->type != KjArray) && (tree->type != KjString) && (tree->type != KjObject))
+  {
+    kjFree(tree);
+    *detailsPP = (char*) "Invalid JSON type of response";
+    LM_E((*detailsPP));
+    return NULL;
+  }
+
+  return tree;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldContextAppend -
+//
+static bool orionldContextAppend(char* url, KjNode* tree, char** detailsPP)
+{
   OrionldContext* contextP = (OrionldContext*) malloc(sizeof(OrionldContext));
+
   if (contextP == NULL)
   {
-    LM_E(("Error allocating context"));
-    free(initialUrl);
+    *detailsPP = (char*) "out of memory";
     return false;
   }
   
-  contextP->url  = initialUrl;
+  contextP->url  = strdup(url);
   contextP->tree = tree;
   contextP->next = NULL;
 
   //
   // Appending new context to the list
   //
-  if (orionLdContextHead == NULL)
+  if (orionldContextHead == NULL)
   {
-    orionLdContextHead = contextP;
-    orionLdContextTail = contextP;
+    orionldContextHead = contextP;
+    orionldContextTail = contextP;
   }
   else
-    orionLdContextTail->next = contextP;
-  
+    orionldContextTail->next = contextP;
+
   return true;
 }
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// orionldContextFreeAll -
+// orionldContextAdd - download, parse and add a context (or various contexts) 
 //
-void orionldContextFreeAll(void)
+// After downloading the initial URL, the content of these "Context URLs" may be:
+//
+// 1. An object with a single member '@context' that is an object containing key-values:
+//    "@context" {
+//      "Property": "http://...",
+//      "XXX";      ""
+//    }
+//
+// 2. An object with a single member '@context', that is a vector of URL strings (https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld):
+//    {
+//      "@context": [
+//        "http://...",
+//        "http://...",
+//        "http://..."
+//      }
+//    }
+bool orionldContextAdd(ConnectionInfo* ciP, char* url, char** detailsPP)
 {
-  OrionldContext* contextP = orionLdContextHead;
+  LM_TMP(("********************* Getting URL '%s' and adding it as a context", url));
+  LM_TMP(("But first, looking up '%s'", url));
 
-  LM_TMP(("Freeing all context"));
-  while (contextP != NULL)
+  if (orionldContextLookup(url) != NULL)
   {
-    OrionldContext* next = contextP->next;
-
-    kjFree(contextP->tree);
-    free(contextP->url);
-    free(contextP);
-    contextP = next;
+    LM_TMP(("Context '%s' already cached", url));
+    return true;
   }
 
-  LM_TMP(("Freed all context"));
+  LM_TMP(("Downloading and parsing URL %s", url));
+  KjNode* tree = orionldContextDownloadAndParse(ciP, url, detailsPP);
+
+  if (tree == NULL)
+  {
+    // *detailsPP taken care of by orionldContextDownloadAndParse()
+    LM_E(("orionldContextDownloadAndParse returned NULL"));
+    return false;
+  }
+  LM_TMP(("tree is OK"));
+
+  //
+  // The resulting payload of downloading and parsing a context URL must be
+  // a JSON Object with one single field, called '@context'.
+  // This @context field can either be a JSON object, or a JSON Array
+  // If JSON Object, the contents of the object must be a list of key-values
+  // If JSON Array,  the contents of the array must be URL strings naming new contexts
+  //
+  // If it is an object, the list of key-values is the context and the URL is the 'name' of the context.
+  // If it is an array, the array itself (naming X contexts) is the context and the the URL is the 'name' of this "complex" context.
+  //
+
+  //
+  // Check that:
+  //   1. the resulting payload is a JSON object
+  //   2. with a single member,
+  //   3. called '@context'
+  //   4. that is either a JSON Object or a JSON Array
+  //
+
+  // 1. Is the resulting payload a JSON object?
+  if (tree->type != KjObject)
+  {
+    *detailsPP = (char*) "Invalid JSON type of payload for a context - must be a JSON Object";
+    return false;
+  }
+  LM_TMP(("the JSON type of the tree is Object - OK"));
+
+  // 2. Does it have one single member?
+  KjNode* contextP = tree->children;
+  if (contextP == NULL)
+  {
+    *detailsPP = (char*) "Invalid payload for a context - the payload is empty";
+    return false;
+  }
+  LM_TMP(("The tree has at least one child - OK"));
+  
+  if (contextP->next != NULL)
+  {
+    *detailsPP = (char*) "Invalid payload for a context - only one toplevel member allowed for contexts";
+    return false;
+  }
+  LM_TMP(("The tree has exactly one child - OK"));
+  LM_TMP(("Only member is named '%s' and is of type %s", contextP->name, kjValueType(contextP->type)));
+
+  // 3. Is the single member called '@context' ?
+  if (SCOMPARE9(contextP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
+  {
+    if ((contextP->type != KjObject) && (contextP->type != KjArray))
+    {
+      *detailsPP = (char*) "Invalid JSON type for the @context member - must be a JSON Object or a JSON Array";
+      return false;
+    }
+  }
+  else
+  {
+    *detailsPP = (char*) "Invalid payload for a context - the member '@context' not present";
+    return false;
+  }
+
+
+  //
+  // Creating a context for the initial URL
+  //
+  // This context can be either:
+  // - an object with key-values (a "leaf")
+  // - a vector of contexts (URL strings)
+  //
+  
+  if (orionldContextAppend(url, contextP, detailsPP) == false)
+    return false;
+
+  //
+  // Now, if the context was an Object, then we are done,
+  // But, if an Array, then we need to go further
+  //
+
+  // 4. Either an Object or an Array
+  if (contextP->type == KjObject)
+  {
+    LM_TMP(("*********************************** Was an object - we are dome here"));
+    return true;
+  }
+  else if (contextP->type != KjArray)
+  {
+    *detailsPP = (char*) "the '@context' field must be either a JDON Objevt or a JSON Array";
+    return false;
+  }
+
+  
+  LM_TMP(("Context is an array of strings (URLs) - download and create new contexts"));
+
+  // All items in the vector must be strings
+  for (KjNode* contextItemP = contextP->children; contextItemP != NULL; contextItemP = contextItemP->next)
+  {
+    LM_TMP(("URL in context array: %s", contextItemP->value.s));
+    if (contextItemP->type != KjString)
+    {
+      *detailsPP = (char*) "Non-string found in context vector";
+      LM_TMP((*detailsPP));
+      return false;
+    }
+
+    char  protocol[128];
+    char  ip[256];
+    short port;
+    char* urlPath;
+    
+    if (urlParse(contextItemP->value.s, protocol, sizeof(protocol), ip, sizeof(ip), &port, &urlPath, detailsPP) == false)
+    {
+      LM_E(("urlParse(%s): %s", contextItemP->value.s, *detailsPP));
+      *detailsPP = (char*) "invalid URL in context vector";  // overwriting the detailsPP from urlParse
+      LM_TMP((*detailsPP));
+      return false;
+    }
+  }
+
+  // Now go over the vector
+  for (KjNode* contextItemP = contextP->children; contextItemP != NULL; contextItemP = contextItemP->next)
+  {
+    char* url = contextItemP->value.s;
+        
+    LM_TMP(("Context is a string - meaning a new URL - download and create context: %s", url));
+
+    tree = orionldContextDownloadAndParse(ciP, url, detailsPP);
+    if (tree == NULL)
+    {
+      LM_TMP(("orionldContextDownloadAndParse failed: %s", *detailsPP));
+      return false;
+    }
+    if (orionldContextAppend(url, tree, detailsPP) == false)
+    {
+      LM_TMP((*detailsPP));
+      return false;
+    }
+  }
+      
+  return true;
 }

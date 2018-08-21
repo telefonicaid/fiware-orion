@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
-
 /*
 *
 * Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,20 +22,16 @@
 *
 * Author: Ken Zangelin
 */
+#include "logMsg/logMsg.h"
+
 extern "C"
 {
-#include "kjson/kjParse.h"                              // kjParse
+#include "kjson/kjFree.h"                               // kjFree
 }
 
-#include "rest/ConnectionInfo.h"
-
-
-
-// ----------------------------------------------------------------------------
-//
-// orionldContextAdd -
-//
-extern bool orionldContextAdd(ConnectionInfo* ciP, char* url, char** detailsP);
+#include "orionld/context/OrionldContext.h"            // OrionldContext
+#include "orionld/context/orionldContextList.h"        // orionldContextHead
+#include "orionld/context/orionldContextFree.h"        // Own interface
 
 
 
@@ -46,6 +39,20 @@ extern bool orionldContextAdd(ConnectionInfo* ciP, char* url, char** detailsP);
 //
 // orionldContextFreeAll -
 //
-extern void orionldContextFreeAll(void);
+void orionldContextFreeAll(void)
+{
+  OrionldContext* contextP = orionldContextHead;
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+  LM_TMP(("Freeing all context"));
+  while (contextP != NULL)
+  {
+    OrionldContext* next = contextP->next;
+
+    kjFree(contextP->tree);
+    free(contextP->url);
+    free(contextP);
+    contextP = next;
+  }
+
+  LM_TMP(("Freed all context"));
+}

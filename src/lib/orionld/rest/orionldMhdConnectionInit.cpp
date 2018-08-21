@@ -250,7 +250,9 @@ int orionldMhdConnectionInit
   // 8.  Check Accept header
   // 9.  Check URL path is OK
   // 10. Check Content-Type is accepted
-  
+  LM_TMP(("Content-Type: %s", ciP->httpHeaders.contentType.c_str()));
+  LM_TMP(("Accepted: %s", ciP->httpHeaders.accept.c_str()));
+
   // 11. Get URI parameters
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
 

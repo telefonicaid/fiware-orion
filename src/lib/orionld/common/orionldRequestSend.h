@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+#ifndef SRC_LIB_ORIONLD_COMOM_ORIONLDREQUESTSEND_H_
+#define SRC_LIB_ORIONLD_COMOM_ORIONLDREQUESTSEND_H_
 
 /*
 *
@@ -25,27 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/kjParse.h"                              // kjParse
-}
-
-#include "rest/ConnectionInfo.h"
-
-
-
-// ----------------------------------------------------------------------------
-//
-// orionldContextAdd -
-//
-extern bool orionldContextAdd(ConnectionInfo* ciP, char* url, char** detailsP);
+#include "orionld/common/OrionldResponseBuffer.h"
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextFreeAll -
+// orionldRequestSend - send a request and await its response
 //
-extern void orionldContextFreeAll(void);
+extern bool orionldRequestSend(OrionldResponseBuffer* rBufP, char* url, int tmoInMilliSeconds, char** detailsPP);
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+#endif  // SRC_LIB_ORIONLD_COMOM_ORIONLDREQUESTSEND_H_
