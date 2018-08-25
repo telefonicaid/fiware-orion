@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Parse Contexts - URI Expansion
+Parse Contexts - URI Expansion for Entity Type
 
 --SHELL-INIT--
 export BROKER=orionld

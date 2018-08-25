@@ -36,6 +36,11 @@ extern "C"
 #include "orionld/context/orionldContextItemLookup.h"     // Own interface
 
 
+// Temporarily removing all TMP traces in this file
+// #undef LM_TMP
+// #define LM_TMP(s)
+
+
 
 // -----------------------------------------------------------------------------
 //
@@ -55,9 +60,12 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
   // Also, if the context is NULL, then the default context is used in its place.
   //
   if (contextP == NULL)
+  {
+    LM_TMP(("context is NULL, using the default context '%s'", orionldDefaultContext.url));
     contextP = &orionldDefaultContext;
+  }
 
-  LM_TMP(("uriExpansion: Looking up '%s' in the context %s", itemName, contextP->url));
+  LM_TMP(("uriExpansion: Looking up '%s' in the context '%s'", itemName, contextP->url));
 
   if (contextP->tree->type == KjArray)
   {
@@ -98,9 +106,24 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
   else if (contextP->tree->type == KjObject)
   {
     LM_TMP(("uriExpansion: The context is of type Object"));
-    for (KjNode* contextItemP = contextP->tree->children; contextItemP != NULL; contextItemP = contextItemP->next)
+    int contextItemNo = 0;  // TMP
+    for (KjNode* contextItemP = contextP->tree->children->children; contextItemP != NULL; contextItemP = contextItemP->next)
     {
-      LM_TMP(("uriExpansion: Comparing '%s' to '%s'", contextItemP->name, itemName));
+      // <TMP>
+      LM_TMP(("contextItemNo: %d at %p (name: '%s')", contextItemNo, contextItemP, contextItemP->name));
+      ++contextItemNo;
+      // </TMP>
+      
+      //
+      // Skip members whose value starts with "@" - they are information, not translations
+      //
+      if ((contextItemP->type == KjString) && (contextItemP->value.s[0] == '@'))
+      {
+        LM_TMP(("Skipping '%s' with value '%s'", contextItemP->name, contextItemP->value.s));
+        continue;
+      }
+      
+      LM_TMP(("uriExpansion: looking for '%s', comparing with '%s'", itemName, contextItemP->name));
       if (strcmp(contextItemP->name, itemName) == 0)
       {
         LM_TMP(("uriExpansion: found it!"));
@@ -109,7 +132,7 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
     }
   }
 
-  LM_TMP(("uriExpansion: returning NULL :("));
+  LM_TMP(("uriExpansion: found no expansion: returning NULL :("));
   return NULL;
 }
 
