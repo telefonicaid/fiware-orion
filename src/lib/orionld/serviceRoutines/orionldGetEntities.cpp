@@ -22,10 +22,11 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"
-#include "orionld/serviceRoutines/orionldGetEntities.h"
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/serviceRoutines/orionldGetEntities.h"        // Own Interface
 
 
 
@@ -35,7 +36,7 @@
 //
 bool orionldGetEntities(ConnectionInfo* ciP)
 {
-  LM_TMP(("In orionldGetEntities"));
+  LM_T(LmtServiceRoutine, ("In orionldGetEntities"));
 
   ciP->responsePayload = (char*) "{ \"error\": \"not implemented\", \"details\": \"GET /ngsi-ld/v1/entities\" }\n";
   ciP->httpStatusCode  = SccNotImplemented;

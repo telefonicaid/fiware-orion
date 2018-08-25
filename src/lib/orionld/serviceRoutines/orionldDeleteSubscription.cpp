@@ -22,10 +22,11 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
+#include "logMsg/logMsg.h"                                      // LM_*
+#include "logMsg/traceLevels.h"                                 // Lmt*
 
-#include "rest/ConnectionInfo.h"
-#include "orionld/serviceRoutines/orionldDeleteSubscription.h"
+#include "rest/ConnectionInfo.h"                                // ConnectionInfo
+#include "orionld/serviceRoutines/orionldDeleteSubscription.h"  // Own Interface
 
 
 
@@ -37,7 +38,7 @@ bool orionldDeleteSubscription(ConnectionInfo* ciP)
 {
   char response[1024];
 
-  LM_TMP(("In orionldDeleteSubscription"));
+  LM_T(LmtServiceRoutine, ("In orionldDeleteSubscription"));
 
   snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"DELETE /ngsi-ld/v1/subscriptions/*\", \"subscriptionId\": \"%s\" }\n", ciP->wildcard[0]);
   ciP->responsePayload = strdup(response);  // This is temporary, will leak, but not important

@@ -24,6 +24,9 @@
 */
 #include <microhttpd.h>
 
+#include "logMsg/logMsg.h"                                  // LM_*
+#include "logMsg/traceLevels.h"                             // Lmt*
+
 extern "C"
 {
 #include "kjson/kjInit.h"                                   // kjInit
@@ -122,7 +125,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
       else if (serviceP->wildcards == 1)
         wildCardEnd = &serviceP->url[ix];
         
-      LM_TMP(("Found a wildcard in index %d of '%s'", ix, serviceP->url));
+      LM_T(LmtUrlParse, ("Found a wildcard in index %d of '%s'", ix, serviceP->url));
       serviceP->wildcards += 1;
       continue;
     }
@@ -154,7 +157,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     if (serviceP->matchForSecondWildcardLen != 0)
     {
       strncpy(serviceP->matchForSecondWildcard, wildCardStart, wildCardEnd - wildCardStart);
-      LM_TMP(("matchForSecondWildcard: %s", serviceP->matchForSecondWildcard));
+      LM_T(LmtUrlParse, ("matchForSecondWildcard: %s", serviceP->matchForSecondWildcard));
     }
   }
 }
@@ -177,7 +180,7 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   {
     // svIx is really the Verb (GET=0, POST=2, up to NOVERB=9. See src/lib/rest/Verb.h)
 
-    LM_TMP(("svIx: %d", svIx));
+    LM_T(LmtUrlParse, ("svIx: %d", svIx));
     if (restServiceVV[svIx].serviceV == NULL)
       continue;
 
@@ -190,7 +193,7 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
 
     for (sIx = 0; sIx < services; sIx++)
     {
-      LM_TMP(("sIx: %d", sIx));
+      LM_T(LmtUrlParse, ("sIx: %d", sIx));
       restServicePrepare(&orionldRestServiceV[svIx].serviceV[sIx], &restServiceVV[svIx].serviceV[sIx]);
     }
   }

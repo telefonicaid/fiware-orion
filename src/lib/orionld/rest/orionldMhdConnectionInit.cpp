@@ -22,15 +22,16 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                   // strlen
-#include <microhttpd.h>                               // MHD
+#include <string.h>                                         // strlen
+#include <microhttpd.h>                                     // MHD
 
-#include "logMsg/logMsg.h"                            // LM_*
+#include "logMsg/logMsg.h"                                  // LM_*
+#include "logMsg/traceLevels.h"                             // Lmt*
 
-#include "rest/Verb.h"                                // Verb
-#include "rest/ConnectionInfo.h"                      // ConnectionInfo
-#include "orionld/rest/temporaryErrorPayloads.h"      // Temporary Error Payloads
-#include "orionld/rest/orionldMhdConnectionInit.h"    // Own interface
+#include "rest/Verb.h"                                      // Verb
+#include "rest/ConnectionInfo.h"                            // ConnectionInfo
+#include "orionld/rest/temporaryErrorPayloads.h"            // Temporary Error Payloads
+#include "orionld/rest/orionldMhdConnectionInit.h"          // Own interface
 
 
 
@@ -178,7 +179,10 @@ int orionldMhdConnectionInit
   static int reqNo = 0;
 
   ++reqNo;
-  
+
+  //
+  // This call to LM_TMP should not be removed. Only commented out
+  //
   LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", reqNo, method, url));
 
   //
@@ -219,14 +223,14 @@ int orionldMhdConnectionInit
 
   if (ciP->urlPath[urlLen - 1] == '/')
   {
-    LM_TMP(("URI PATH ends in SLASH - removing it"));
+    LM_T(LmtUriPath, ("URI PATH ends in SLASH - removing it"));
     ciP->urlPath[urlLen - 1] = 0;
     urlLen -= 1;
 
     // Now check for a second '/'
     if (ciP->urlPath[urlLen - 1] == '/')
     {
-      LM_TMP(("URI PATH ends in DOUBLE SLASH - flagging error"));
+      LM_T(LmtUriPath, ("URI PATH ends in DOUBLE SLASH - flagging error"));
       ciP->responsePayload  = (char*) doubleSlashPayload;
       ciP->httpStatusCode   = SccBadRequest;
       return MHD_YES;
@@ -237,7 +241,7 @@ int orionldMhdConnectionInit
   ciP->verb = verbGet(method);
   if (ciP->verb == NOVERB)
   {
-    LM_TMP(("NOVERB for (%s)", method));
+    LM_T(LmtVerb, ("NOVERB for (%s)", method));
     ciP->responsePayload  = (char*) invalidVerbPayload;
     ciP->httpStatusCode   = SccBadRequest;
     return MHD_YES;
@@ -260,8 +264,8 @@ int orionldMhdConnectionInit
   // 8.  Check Accept header
   // 9.  Check URL path is OK
   // 10. Check Content-Type is accepted
-  LM_TMP(("Content-Type: %s", ciP->httpHeaders.contentType.c_str()));
-  LM_TMP(("Accepted: %s", ciP->httpHeaders.accept.c_str()));
+  LM_T(LmtHttpHeaders, ("Content-Type: %s", ciP->httpHeaders.contentType.c_str()));
+  LM_T(LmtHttpHeaders, ("Accepted: %s", ciP->httpHeaders.accept.c_str()));
 
   // 11. Get URI parameters
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
@@ -273,6 +277,6 @@ int orionldMhdConnectionInit
   // 22. Not found still? Return error
   // 23. Done - next step is to read the payload
   
-  LM_TMP(("Connection Init DONE"));
+  LM_T(LmtMhd, ("Connection Init DONE"));
   return MHD_YES;
 }

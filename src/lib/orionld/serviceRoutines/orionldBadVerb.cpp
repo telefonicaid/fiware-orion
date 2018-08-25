@@ -22,11 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"
-#include "orionld/rest/temporaryErrorPayloads.h"
-#include "orionld/serviceRoutines/orionldBadVerb.h"
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/rest/temporaryErrorPayloads.h"               // notFoundPayload
+#include "orionld/serviceRoutines/orionldBadVerb.h"            // Own Interface
 
 
 
@@ -36,7 +37,7 @@
 //
 void orionldBadVerb(ConnectionInfo* ciP)
 {
-  LM_TMP(("Implement badVerb!!!!!"));
+  LM_T(LmtServiceRoutine, ("Implement badVerb!!!!!"));
 
   ciP->responsePayload = (char*) notFoundPayload;
   ciP->httpStatusCode  = SccContextElementNotFound;

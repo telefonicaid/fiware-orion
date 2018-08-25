@@ -22,13 +22,14 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
+#include "logMsg/logMsg.h"                                   // LM_*
+#include "logMsg/traceLevels.h"                              // Lmt*
 
 extern "C"
 {
-#include "kjson/KjNode.h"                               // KjNode
-#include "kjson/kjParse.h"                              // kjParse
-#include "kjson/kjFree.h"                               // kjFree
+#include "kjson/KjNode.h"                                    // KjNode
+#include "kjson/kjParse.h"                                   // kjParse
+#include "kjson/kjFree.h"                                    // kjFree
 }
 
 #include "rest/ConnectionInfo.h"                             // ConnectionInfo
@@ -61,6 +62,7 @@ static bool orionldContextAppend(const char* url, KjNode* tree, char** detailsPP
   contextP->url  = strdup(url);
   contextP->tree = tree;
   contextP->next = NULL;
+
 
   //
   // Appending new context to the list
@@ -100,16 +102,16 @@ static bool orionldContextAppend(const char* url, KjNode* tree, char** detailsPP
 //    }
 bool orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsPP)
 {
-  LM_TMP(("********************* Getting URL '%s' and adding it as a context", url));
-  LM_TMP(("But first, looking up '%s'", url));
+  LM_T(LmtContext, ("********************* Getting URL '%s' and adding it as a context", url));
+  LM_T(LmtContext, ("But first, looking up '%s'", url));
 
   if (orionldContextLookup(url) != NULL)
   {
-    LM_TMP(("Context '%s' already cached", url));
+    LM_T(LmtContext, ("Context '%s' already cached", url));
     return true;
   }
 
-  LM_TMP(("Downloading and parsing URL %s", url));
+  LM_T(LmtContext, ("Downloading and parsing URL %s", url));
   KjNode* tree = orionldContextDownloadAndParse(ciP->kjsonP, url, detailsPP);
 
   if (tree == NULL)
@@ -118,7 +120,7 @@ bool orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsPP)
     LM_E(("orionldContextDownloadAndParse returned NULL"));
     return false;
   }
-  LM_TMP(("tree is OK"));
+  LM_T(LmtContext, ("tree is OK"));
 
   //
   // The resulting payload of downloading and parsing a context URL must be
@@ -145,7 +147,7 @@ bool orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsPP)
     *detailsPP = (char*) "Invalid JSON type of payload for a context - must be a JSON Object";
     return false;
   }
-  LM_TMP(("the JSON type of the tree is Object - OK"));
+  LM_T(LmtContext, ("the JSON type of the tree is Object - OK"));
 
   // 2. Does it have one single member?
   KjNode* contextP = tree->children;
@@ -154,15 +156,15 @@ bool orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsPP)
     *detailsPP = (char*) "Invalid payload for a context - the payload is empty";
     return false;
   }
-  LM_TMP(("The tree has at least one child - OK"));
+  LM_T(LmtContext, ("The tree has at least one child - OK"));
   
   if (contextP->next != NULL)
   {
     *detailsPP = (char*) "Invalid payload for a context - only one toplevel member allowed for contexts";
     return false;
   }
-  LM_TMP(("The tree has exactly one child - OK"));
-  LM_TMP(("Only member is named '%s' and is of type %s", contextP->name, kjValueType(contextP->type)));
+  LM_T(LmtContext, ("The tree has exactly one child - OK"));
+  LM_T(LmtContext, ("Only member is named '%s' and is of type %s", contextP->name, kjValueType(contextP->type)));
 
   // 3. Is the single member called '@context' ?
   if (SCOMPARE9(contextP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
@@ -188,7 +190,7 @@ bool orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsPP)
   // - a vector of contexts (URL strings)
   //
   
-  if (orionldContextAppend(url, contextP, detailsPP) == false)
+  if (orionldContextAppend(url, tree, detailsPP) == false)
     return false;
 
   //
@@ -199,7 +201,7 @@ bool orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsPP)
   // 4. Either an Object or an Array
   if (contextP->type == KjObject)
   {
-    LM_TMP(("*********************************** Was an object - we are done here"));
+    LM_T(LmtContext, ("*********************************** Was an object - we are done here"));
     return true;
   }
   else if (contextP->type != KjArray)
@@ -209,16 +211,16 @@ bool orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsPP)
   }
 
   
-  LM_TMP(("Context is an array of strings (URLs) - download and create new contexts"));
+  LM_T(LmtContext, ("Context is an array of strings (URLs) - download and create new contexts"));
 
   // All items in the vector must be strings
   for (KjNode* contextItemP = contextP->children; contextItemP != NULL; contextItemP = contextItemP->next)
   {
-    LM_TMP(("URL in context array: %s", contextItemP->value.s));
+    LM_T(LmtContext, ("URL in context array: %s", contextItemP->value.s));
     if (contextItemP->type != KjString)
     {
       *detailsPP = (char*) "Non-string found in context vector";
-      LM_TMP((*detailsPP));
+      LM_T(LmtContext, (*detailsPP));
       return false;
     }
 
@@ -231,7 +233,7 @@ bool orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsPP)
     {
       LM_E(("urlParse(%s): %s", contextItemP->value.s, *detailsPP));
       *detailsPP = (char*) "invalid URL in context vector";  // overwriting the detailsPP from urlParse
-      LM_TMP((*detailsPP));
+      LM_T(LmtContext, (*detailsPP));
       return false;
     }
   }
@@ -241,17 +243,17 @@ bool orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsPP)
   {
     char* url = contextItemP->value.s;
         
-    LM_TMP(("Context is a string - meaning a new URL - download and create context: %s", url));
+    LM_T(LmtContext, ("Context is a string - meaning a new URL - download and create context: %s", url));
 
     tree = orionldContextDownloadAndParse(ciP->kjsonP, url, detailsPP);
     if (tree == NULL)
     {
-      LM_TMP(("orionldContextDownloadAndParse failed: %s", *detailsPP));
+      LM_T(LmtContext, ("orionldContextDownloadAndParse failed: %s", *detailsPP));
       return false;
     }
     if (orionldContextAppend(url, tree, detailsPP) == false)
     {
-      LM_TMP((*detailsPP));
+      LM_T(LmtContext, (*detailsPP));
       return false;
     }
   }

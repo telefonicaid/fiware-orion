@@ -22,10 +22,11 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"
-#include "orionld/serviceRoutines/orionldPostRegistrations.h"
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/serviceRoutines/orionldPostRegistrations.h"  // Own Interface
 
 
 
@@ -35,7 +36,7 @@
 //
 bool orionldPostRegistrations(ConnectionInfo* ciP)
 {
-  LM_TMP(("In orionldPostRegistrations"));
+  LM_T(LmtServiceRoutine, ("In orionldPostRegistrations"));
 
   ciP->responsePayload = (char*) "{ \"error\": \"not implemented\", \"details\": \"POST /ngsi-ld/v1/cSourceRegistrations\" }\n";
   ciP->httpStatusCode  = SccNotImplemented;

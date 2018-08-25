@@ -22,16 +22,17 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
+#include "logMsg/logMsg.h"                                  // LM_*
+#include "logMsg/traceLevels.h"                             // Lmt*
 
 extern "C"
 {
-#include "kjson/KjNode.h"                              // KjNode
+#include "kjson/KjNode.h"                                   // KjNode
 }
 
-#include "orionld/context/OrionldContext.h"            // OrionldContext
-#include "orionld/context/orionldContextList.h"        // orionldContextHead
-#include "orionld/context/orionldContextPresent.h"     // Own interface
+#include "orionld/context/OrionldContext.h"                 // OrionldContext
+#include "orionld/context/orionldContextList.h"             // orionldContextHead
+#include "orionld/context/orionldContextPresent.h"          // Own interface
 
 
 
@@ -58,8 +59,8 @@ static void allCachedContextsPresent(void)
 //
 static void stringContextPresent(OrionldContext* contextP)
 {
-  LM_TMP(("String: %s:", contextP->url));
-  LM_TMP(("  %s", contextP->tree->value.s));
+  LM_T(LmtContextPresent, ("String: %s:", contextP->url));
+  LM_T(LmtContextPresent, ("  %s", contextP->tree->value.s));
 }
 
 
@@ -72,11 +73,11 @@ static void arrayContextPresent(OrionldContext* contextP)
 {
   KjNode* itemP;
     
-  LM_TMP(("Array: %s:", contextP->url));
+  LM_T(LmtContextPresent, ("Array: %s:", contextP->url));
 
   for (itemP = contextP->tree->children; itemP != NULL; itemP = itemP->next)
   {
-    LM_TMP(("  %s", itemP->value.s));
+    LM_T(LmtContextPresent, ("  %s", itemP->value.s));
   }
 }
 
@@ -88,20 +89,20 @@ static void arrayContextPresent(OrionldContext* contextP)
 //
 static void objectContextPresent(OrionldContext* contextP)
 {
-  LM_TMP(("Object: %s:", contextP->url));
+  LM_T(LmtContextPresent, ("Object: %s:", contextP->url));
 
   
   for (KjNode* nodeP = contextP->tree->children->children; nodeP != NULL; nodeP = nodeP->next)
   {
     if (nodeP->type == KjString)
-      LM_TMP(("  %s: %s", nodeP->name, nodeP->value.s));
+      LM_T(LmtContextPresent, ("  %s: %s", nodeP->name, nodeP->value.s));
     else if (nodeP->type == KjObject)
     {
-      LM_TMP(("  %s: {", nodeP->name));
+      LM_T(LmtContextPresent, ("  %s: {", nodeP->name));
 
       for (KjNode* childP = nodeP->children; childP != NULL; childP = childP->next)
-        LM_TMP(("    %s: %s", childP->name, childP->value.s));
-      LM_TMP(("  }"));
+        LM_T(LmtContextPresent, ("    %s: %s", childP->name, childP->value.s));
+      LM_T(LmtContextPresent, ("  }"));
     }
   }
 }
@@ -134,7 +135,7 @@ void orionLdContextPresent(OrionldContext* contextP)
     arrayContextPresent(contextP);
   else
   {
-    LM_TMP(("%s:", contextP->url));
-    LM_TMP(("  Invalid Type of tree for a context: %s", kjValueType(contextP->tree->type)));
+    LM_T(LmtContextPresent, ("%s:", contextP->url));
+    LM_T(LmtContextPresent, ("  Invalid Type of tree for a context: %s", kjValueType(contextP->tree->type)));
   }
 }

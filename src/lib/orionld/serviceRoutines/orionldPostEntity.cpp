@@ -22,10 +22,11 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"
-#include "orionld/serviceRoutines/orionldPostEntity.h"
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/serviceRoutines/orionldPostEntity.h"         // Own Interface
 
 
 
@@ -37,7 +38,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 {
   char response[1024];
 
-  LM_TMP(("In orionldPostEntities: request tree at %p", ciP->requestTopP));
+  LM_T(LmtServiceRoutine, ("In orionldPostEntities: request tree at %p", ciP->requestTopP));
 
   snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"POST /ngsi-ld/v1/entities/*/attrs\", \"entityId\": \"%s\" }\n", ciP->wildcard[0]);
   ciP->responsePayload = strdup(response);  // This is temporary, will leak, but not important

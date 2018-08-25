@@ -22,10 +22,11 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"
-#include "orionld/serviceRoutines/orionldGetRegistration.h"
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/serviceRoutines/orionldGetRegistration.h"    // Own Interface
 
 
 
@@ -37,7 +38,7 @@ bool orionldGetRegistration(ConnectionInfo* ciP)
 {
   char response[1024];
 
-  LM_TMP(("In orionldGetRegistration"));
+  LM_T(LmtServiceRoutine, ("In orionldGetRegistration"));
 
   snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"GET /ngsi-ld/v1/cSourceRegistrations/*\", \"registrationId\": \"%s\" }\n", ciP->wildcard[0]);
   ciP->responsePayload = strdup(response);  // This is temporary, will leak, but not important

@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include "logMsg/logMsg.h"                                // LM_*
+#include "logMsg/traceLevels.h"                           // Lmt*
 
 #include "rest/ConnectionInfo.h"                          // ConnectionInfo
 #include "orionld/rest/orionldMhdConnectionPayloadRead.h" // Own interface
@@ -50,7 +51,7 @@ int orionldMhdConnectionPayloadRead
 {
   size_t  dataLen = *upload_data_size;
 
-  LM_TMP(("Reading %d bytes of payload", dataLen));
+  LM_T(LmtMhd, ("Reading %d bytes of payload", dataLen));
 
   //
   // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
@@ -105,7 +106,7 @@ int orionldMhdConnectionPayloadRead
   // Acknowledge the data and return
   *upload_data_size = 0;
 
-  LM_TMP(("Got payload '%s'", ciP->payload));
+  LM_T(LmtMhd, ("Got payload '%s'", ciP->payload));
 
   return MHD_YES;
 }

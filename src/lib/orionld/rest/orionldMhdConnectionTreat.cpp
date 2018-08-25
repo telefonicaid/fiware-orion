@@ -22,22 +22,25 @@
 *
 * Author: Ken Zangelin
 */
+#include "logMsg/logMsg.h"                                  // LM_*
+#include "logMsg/traceLevels.h"                             // Lmt*
+
 extern "C"
 {
-#include "kjson/kjBufferCreate.h"                     // kjBufferCreate
-#include "kjson/kjParse.h"                            // kjParse
-#include "kjson/kjRender.h"                           // kjRender
-#include "kjson/kjFree.h"                             // kjFree
+#include "kjson/kjBufferCreate.h"                           // kjBufferCreate
+#include "kjson/kjParse.h"                                  // kjParse
+#include "kjson/kjRender.h"                                 // kjRender
+#include "kjson/kjFree.h"                                   // kjFree
 }
 
-#include "rest/ConnectionInfo.h"                      // ConnectionInfo
-#include "rest/restReply.h"                           // restReply
+#include "rest/ConnectionInfo.h"                            // ConnectionInfo
+#include "rest/restReply.h"                                 // restReply
 
-#include "orionld/serviceRoutines/orionldBadVerb.h"   // orionldBadVerb
-#include "orionld/rest/orionldServiceInit.h"          // orionldRestServiceV 
-#include "orionld/rest/orionldServiceLookup.h"        // orionldServiceLookup
-#include "orionld/rest/temporaryErrorPayloads.h"      // Temporary Error Payloads
-#include "orionld/rest/orionldMhdConnectionTreat.h"   // Own Interface
+#include "orionld/serviceRoutines/orionldBadVerb.h"         // orionldBadVerb
+#include "orionld/rest/orionldServiceInit.h"                // orionldRestServiceV 
+#include "orionld/rest/orionldServiceLookup.h"              // orionldServiceLookup
+#include "orionld/rest/temporaryErrorPayloads.h"            // Temporary Error Payloads
+#include "orionld/rest/orionldMhdConnectionTreat.h"         // Own Interface
 
 
 
@@ -47,7 +50,7 @@ extern "C"
 //
 int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 {
-  LM_TMP(("Read all the payload - treating the request!"));
+  LM_T(LmtMhd, ("Read all the payload - treating the request!"));
 
   // If no error predetected, lookup the service and call its service routine
   if (ciP->httpStatusCode == SccOk)
@@ -58,7 +61,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     
     if (ciP->payload != NULL)
     {
-      LM_TMP(("parsing the payload '%s'", ciP->payload));
+      LM_T(LmtPayloadParse, ("parsing the payload '%s'", ciP->payload));
 
       // FIXME P6: Do we really need to allocate a kjsonP for every request?
       ciP->kjsonP = kjBufferCreate();      
@@ -71,17 +74,17 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       ciP->kjsonP->stringAfterColon  = (char*) "";
       
       ciP->requestTopP = kjParse(ciP->kjsonP, ciP->payload);
-      LM_TMP(("After kjParse"));
+      LM_T(LmtPayloadParse, ("After kjParse"));
       if (ciP->requestTopP == NULL)
         LM_X(1, ("JSON parse error"));
-      LM_TMP(("All good - payload parsed"));
+      LM_T(LmtPayloadParse, ("All good - payload parsed"));
     }
 
     if (ciP->serviceP != NULL)
     {
-      LM_TMP(("Calling the service routine"));
+      LM_T(LmtServiceRoutine, ("Calling Service Routine %s", ciP->serviceP->url));
       bool b = ciP->serviceP->serviceRoutine(ciP);
-      LM_TMP(("service routine done"));
+      LM_T(LmtServiceRoutine,("service routine '%s' done", ciP->serviceP->url));
 
       if (b == false)
       {
@@ -105,7 +108,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   // Is there a KJSON response tree to render?
   if (ciP->responseTopP != NULL)
   {
-    LM_TMP(("Rendering KJSON response tree"));
+    LM_T(LmtJsonResponse, ("Rendering KJSON response tree"));
     ciP->responsePayload          = (char*) malloc(1024);
     ciP->responsePayloadAllocated = true;
     kjRender(ciP->kjsonP, ciP->responseTopP, ciP->responsePayload, 1024);
@@ -113,32 +116,33 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
   if (ciP->responsePayload != NULL)
   {
-    LM_TMP(("Responding with '%s'", ciP->responsePayload));
+    LM_T(LmtJsonResponse, ("Responding with '%s'", ciP->responsePayload));
     ciP->outMimeType = JSON;
     restReply(ciP, ciP->responsePayload);
   }
   else
   {
-    LM_TMP(("Responding without payload"));
+    LM_T(LmtJsonResponse, ("Responding without payload"));
     restReply(ciP, "");
   }
 
 #if 0  // FIXME P9: Fix the leaks!!!
   if (ciP->requestTopP != NULL)
   {
-    LM_TMP(("Calling kjFree on request"));
+    LM_T(LmtFree, ("Calling kjFree on request"));
     kjFree(ciP->requestTopP);
-    LM_TMP(("kjFree'd request"));
+    LM_T(LmtFree, ("kjFree'd request"));
   }
   
   if (ciP->responseTopP != NULL)
   {
-    LM_TMP(("Calling kjFree on response"));
+    LM_T(LmtFree, ("Calling kjFree on response"));
     kjFree(ciP->responseTopP);
-    LM_TMP(("kjFree'd response"));
+    LM_T(LmtFree, ("kjFree'd response"));
   }
 #endif
 
+  LM_T(LmtFree, ("Freeing ciP->kjsonP"));
   free(ciP->kjsonP);
   ciP->kjsonP = NULL;
 

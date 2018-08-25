@@ -116,25 +116,41 @@ typedef enum TraceLevels
   LmtCacheSem,
   LmtTimeStatSem,
 
-  /* Cache (210 - 230) */
+  /* Cache (210 - 212) */
   LmtSubCache = 210,
   LmtSubCacheMatch,
   LmtCacheSync,
 
-  /* Others (>=230) */
-  LmtCm = 230,
+  /* Others (215-220) */
+  LmtCm = 215,
   LmtRush,
   LmtSoftError,
   LmtNotImplemented,
   LmtCurlContext,
 
 #ifdef ORIONLD
-  LmtWriteCallback,
+  LmtWriteCallback = 221,
   LmtRequestSend,
-  
+  LmtPayloadCheck,
+  LmtContext,
+  LmtContextTreat,
+  LmtContextDownload,
+  LmtContextLookup,
+  LmtContextItemLookup,
+  LmtUriExpansion,
+  LmtCompoundCreation,
+  LmtErrorResponse,
+  LmtUriPath,
+  LmtVerb,
+  LmtServiceRoutine,
+  LmtServiceLookup,
+  LmtPayloadParse,
+  LmtJsonResponse,
+  LmtFree,
+  LmtContextPresent,
 #endif
 
-  LmtBug = 250
+  LmtBug = 255
 } TraceLevels;
 
 

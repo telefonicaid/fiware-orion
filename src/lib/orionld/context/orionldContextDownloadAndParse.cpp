@@ -71,15 +71,6 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
     return NULL;
   }
 
-  // <TMP>
-  for (unsigned int ix = 0; ix < strlen(httpResponse.buf); ix++)
-  {
-    if ((httpResponse.buf[ix] == '\n') || (httpResponse.buf[ix] == '\r'))
-      httpResponse.buf[ix] = ' ';
-  }
-  LM_TMP(("Downloaded payload: %s", httpResponse.buf));
-  // </TMP>
-
   // Now parse the payload
   KjNode* tree = kjParse(kjsonP, httpResponse.buf);
 

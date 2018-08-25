@@ -22,10 +22,11 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
+#include "logMsg/logMsg.h"                                      // LM_*
+#include "logMsg/traceLevels.h"                                 // Lmt*
 
-#include "rest/ConnectionInfo.h"
-#include "orionld/serviceRoutines/orionldDeleteAttribute.h"
+#include "rest/ConnectionInfo.h"                                // ConnectionInfo
+#include "orionld/serviceRoutines/orionldDeleteAttribute.h"     // Own Interface
 
 
 
@@ -37,7 +38,7 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
 {
   char response[1024];
 
-  LM_TMP(("In orionldDeleteAttribute"));
+  LM_T(LmtServiceRoutine, ("In orionldDeleteAttribute"));
 
   snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"DELETE /ngsi-ld/v1/entities/*/attrs/*\", \"entityId\": \"%s\", \"attribute\": \"%s\" }\n",
            ciP->wildcard[0], ciP->wildcard[1]);

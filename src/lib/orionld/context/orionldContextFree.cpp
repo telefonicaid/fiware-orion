@@ -22,16 +22,17 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
+#include "logMsg/logMsg.h"                                  // LM_*
+#include "logMsg/traceLevels.h"                             // Lmt*
 
 extern "C"
 {
-#include "kjson/kjFree.h"                               // kjFree
+#include "kjson/kjFree.h"                                   // kjFree
 }
 
-#include "orionld/context/OrionldContext.h"            // OrionldContext
-#include "orionld/context/orionldContextList.h"        // orionldContextHead
-#include "orionld/context/orionldContextFree.h"        // Own interface
+#include "orionld/context/OrionldContext.h"                 // OrionldContext
+#include "orionld/context/orionldContextList.h"             // orionldContextHead
+#include "orionld/context/orionldContextFree.h"             // Own interface
 
 
 
@@ -43,7 +44,7 @@ void orionldContextFreeAll(void)
 {
   OrionldContext* contextP = orionldContextHead;
 
-  LM_TMP(("Freeing all context"));
+  LM_T(LmtFree, ("Freeing all context"));
   while (contextP != NULL)
   {
     OrionldContext* next = contextP->next;
@@ -54,5 +55,5 @@ void orionldContextFreeAll(void)
     contextP = next;
   }
 
-  LM_TMP(("Freed all context"));
+  LM_T(LmtFree, ("Freed all context"));
 }

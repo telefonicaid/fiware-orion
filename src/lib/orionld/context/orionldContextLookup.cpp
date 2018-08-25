@@ -22,15 +22,16 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                // LM_*
+#include "logMsg/logMsg.h"                                  // LM_*
+#include "logMsg/traceLevels.h"                             // Lmt*
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                 // KjNode
+#include "kjson/KjNode.h"                                   // KjNode
 }
 
-#include "orionld/context/OrionldContext.h"               // OrionldContext
-#include "orionld/context/orionldContextList.h"           // orionldContextHead
+#include "orionld/context/OrionldContext.h"                 // OrionldContext
+#include "orionld/context/orionldContextList.h"             // orionldContextHead
 
 
 
@@ -44,17 +45,17 @@ OrionldContext* orionldContextLookup(const char* url)
 
   while (contextP != NULL)
   {
-    LM_TMP(("Comparing '%s' with '%s'", contextP->url, url));
+    LM_T(LmtContextLookup, ("Comparing '%s' with '%s'", contextP->url, url));
     if (strcmp(contextP->url, url) == 0)
     {
-      LM_TMP(("Found it!"));
+      LM_T(LmtContextLookup, ("Found it!"));
       return contextP;
     }
 
     contextP = contextP->next;
-    LM_TMP(("No match. Next context at %p", contextP));
+    LM_T(LmtContextLookup, ("No match. Next context at %p", contextP));
   }
 
-  LM_TMP(("NOT Found"));
+  LM_T(LmtContextLookup, ("NOT Found"));
   return NULL;
 }  

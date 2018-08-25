@@ -22,10 +22,11 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"
-#include "orionld/serviceRoutines/orionldGetSubscription.h"
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/serviceRoutines/orionldGetSubscription.h"    // Own Interface
 
 
 
@@ -37,7 +38,7 @@ bool orionldGetSubscription(ConnectionInfo* ciP)
 {
   char response[1024];
 
-  LM_TMP(("In orionldGetSubscription"));
+  LM_T(LmtServiceRoutine, ("In orionldGetSubscription"));
 
   snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"GET /ngsi-ld/v1/subscriptions/*\", \"subscriptionId\": \"%s\" }\n", ciP->wildcard[0]);
   ciP->responsePayload = strdup(response);  // This is temporary, will leak, but not important

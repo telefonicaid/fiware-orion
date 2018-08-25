@@ -22,11 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
+#include "logMsg/logMsg.h"                                // LM_*
+#include "logMsg/traceLevels.h"                           // Lmt*
 
-#include "rest/ConnectionInfo.h"
-#include "orionld/rest/OrionLdRestService.h"
-#include "orionld/rest/orionldServiceLookup.h"
+#include "rest/ConnectionInfo.h"                          // ConnectionInfo
+#include "orionld/rest/OrionLdRestService.h"              // OrionLdRestService
+#include "orionld/rest/orionldServiceLookup.h"            // Own interface
 
 
 
@@ -84,36 +85,36 @@ OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestService
   int cSums;
   int sLen;
 
-  LM_TMP(("Looking up service routine for %s %s", verbName(ciP->verb), ciP->urlPath));
+  LM_T(LmtServiceLookup, ("Looking up service routine for %s %s", verbName(ciP->verb), ciP->urlPath));
   requestPrepare(ciP->urlPath, cSumV, &cSums, &sLen);
-  LM_TMP(("Request prepared: strlen(%s): %d", ciP->urlPath, sLen));
-  LM_TMP(("Request prepared: cSums: %d", cSums));
+  LM_T(LmtServiceLookup, ("Request prepared: strlen(%s): %d", ciP->urlPath, sLen));
+  LM_T(LmtServiceLookup, ("Request prepared: cSums: %d", cSums));
 
 #if 0
   for (int ix = 0; ix < cSums; ix++)
-    LM_TMP(("Request prepared: cSumV[%d]: %d", ix, cSumV[ix]));
+    LM_T(LmtServiceLookup, ("Request prepared: cSumV[%d]: %d", ix, cSumV[ix]));
 #endif
 
-  LM_TMP(("---------------- orionldServiceLookup ------------------"));
-  LM_TMP(("%d Services for verb %s", serviceV->services, verbName(ciP->verb)));
+  LM_T(LmtServiceLookup, ("---------------- orionldServiceLookup ------------------"));
+  LM_T(LmtServiceLookup, ("%d Services for verb %s", serviceV->services, verbName(ciP->verb)));
   while (serviceIx < serviceV->services)
   {
     OrionLdRestService* serviceP = &serviceV->serviceV[serviceIx];
 
-    LM_TMP(("Comparing incoming '%s' to service '%s' (%d wildcards)", ciP->urlPath, serviceP->url, serviceP->wildcards));
+    LM_T(LmtServiceLookup, ("Comparing incoming '%s' to service '%s' (%d wildcards)", ciP->urlPath, serviceP->url, serviceP->wildcards));
 
     if (serviceP->wildcards == 0)
     {
-      LM_TMP(("No wildcard. Comparing strlens: %d vs %d", serviceP->charsBeforeFirstWildcard, sLen));
+      LM_T(LmtServiceLookup, ("No wildcard. Comparing strlens: %d vs %d", serviceP->charsBeforeFirstWildcard, sLen));
       if (serviceP->charsBeforeFirstWildcard == sLen)
       {
-        LM_TMP(("No wildcard. strlens match. Comparing cSums[%d]: %d vs %d", sLen, serviceP->charsBeforeFirstWildcardSum, cSumV[sLen - 1]));
+        LM_T(LmtServiceLookup, ("No wildcard. strlens match. Comparing cSums[%d]: %d vs %d", sLen, serviceP->charsBeforeFirstWildcardSum, cSumV[sLen - 1]));
         if (serviceP->charsBeforeFirstWildcardSum == cSumV[sLen - 1])
         {
-          LM_TMP(("Possible match. Not a complete strcmp of '%s' vs '%s'", &serviceP->url[12], &ciP->urlPath[12]));
+          LM_T(LmtServiceLookup, ("Possible match. Not a complete strcmp of '%s' vs '%s'", &serviceP->url[12], &ciP->urlPath[12]));
           if (strcmp(&serviceP->url[12], &ciP->urlPath[12]) == 0)
           {
-            LM_TMP(("******************* %s matches", serviceP->url));
+            LM_T(LmtServiceLookup, ("******************* %s matches", serviceP->url));
             return serviceP;
           }
         }
@@ -121,51 +122,51 @@ OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestService
     }
     else if (serviceP->wildcards == 1)
     {
-      LM_TMP(("One wildcard. Comparing strlens: %d vs %d", serviceP->charsBeforeFirstWildcard, sLen));
+      LM_T(LmtServiceLookup, ("One wildcard. Comparing strlens: %d vs %d", serviceP->charsBeforeFirstWildcard, sLen));
       
       if (serviceP->charsBeforeFirstWildcard < sLen)
       {
-        LM_TMP(("One wildcard. strlens OK. Comparing charsBeforeFirstWildcardSum: %d vs %d", serviceP->charsBeforeFirstWildcardSum, cSumV[serviceP->charsBeforeFirstWildcard - 1]));
+        LM_T(LmtServiceLookup, ("One wildcard. strlens OK. Comparing charsBeforeFirstWildcardSum: %d vs %d", serviceP->charsBeforeFirstWildcardSum, cSumV[serviceP->charsBeforeFirstWildcard - 1]));
         if (serviceP->charsBeforeFirstWildcardSum == cSumV[serviceP->charsBeforeFirstWildcard - 1])
         {
-          LM_TMP(("One wildcard. Possible match. Parcial strcmp of '%s' vs '%s' (%d bytes)", &serviceP->url[12], &ciP->urlPath[12], serviceP->charsBeforeFirstWildcard));
+          LM_T(LmtServiceLookup, ("One wildcard. Possible match. Parcial strcmp of '%s' vs '%s' (%d bytes)", &serviceP->url[12], &ciP->urlPath[12], serviceP->charsBeforeFirstWildcard));
           if (strncmp(&serviceP->url[12], &ciP->urlPath[12], serviceP->charsBeforeFirstWildcard) == 0)
           {
-            LM_TMP(("One wildcard. Possible match. "));
+            LM_T(LmtServiceLookup, ("One wildcard. Possible match. "));
             // Ending the same?
             if (serviceP->matchForSecondWildcardLen != 0)  // An ending to match
             {
               int indexOfIncomingUrlPath = 12 + sLen - serviceP->matchForSecondWildcardLen;
               
-              LM_TMP(("***************************************************************"));
-              LM_TMP(("Comparing string ends"));
-              LM_TMP(("Incoming URL Path: %s", ciP->urlPath));
-              LM_TMP(("Being compared to: %s", serviceP->url));
-              LM_TMP(("sLen == %d (strlen of incoming URL '%s'", sLen, ciP->urlPath));
-              LM_TMP(("Number of chars to compare: %d", serviceP->matchForSecondWildcardLen));
-              LM_TMP(("matchForSecondWildcardLen == %d", serviceP->matchForSecondWildcardLen));
-              LM_TMP(("Comparing string ends: index %d for Incoming URL Path", indexOfIncomingUrlPath));
-              LM_TMP(("Comparing string ends: string that the Service the Incoming URL Path is compared to: %s", serviceP->matchForSecondWildcard));
-              LM_TMP(("Comparing string ends: Number of chars in the string: %d", serviceP->matchForSecondWildcardLen));
-              LM_TMP(("Comparing string ends: End of Incoming URL Path: %s", &ciP->urlPath[indexOfIncomingUrlPath]));
+              LM_T(LmtServiceLookup, ("***************************************************************"));
+              LM_T(LmtServiceLookup, ("Comparing string ends"));
+              LM_T(LmtServiceLookup, ("Incoming URL Path: %s", ciP->urlPath));
+              LM_T(LmtServiceLookup, ("Being compared to: %s", serviceP->url));
+              LM_T(LmtServiceLookup, ("sLen == %d (strlen of incoming URL '%s'", sLen, ciP->urlPath));
+              LM_T(LmtServiceLookup, ("Number of chars to compare: %d", serviceP->matchForSecondWildcardLen));
+              LM_T(LmtServiceLookup, ("matchForSecondWildcardLen == %d", serviceP->matchForSecondWildcardLen));
+              LM_T(LmtServiceLookup, ("Comparing string ends: index %d for Incoming URL Path", indexOfIncomingUrlPath));
+              LM_T(LmtServiceLookup, ("Comparing string ends: string that the Service the Incoming URL Path is compared to: %s", serviceP->matchForSecondWildcard));
+              LM_T(LmtServiceLookup, ("Comparing string ends: Number of chars in the string: %d", serviceP->matchForSecondWildcardLen));
+              LM_T(LmtServiceLookup, ("Comparing string ends: End of Incoming URL Path: %s", &ciP->urlPath[indexOfIncomingUrlPath]));
 
               if (strncmp(&ciP->urlPath[indexOfIncomingUrlPath], serviceP->matchForSecondWildcard, serviceP->matchForSecondWildcardLen) == 0)
               {
-                LM_TMP(("******************* %s matches", serviceP->url));
+                LM_T(LmtServiceLookup, ("******************* %s matches", serviceP->url));
 
                 ciP->wildcard[0] = &ciP->urlPath[serviceP->charsBeforeFirstWildcard + 12];
                 
                 // Destroying the incoming URL path, to extract the wildcard string
                 ciP->urlPath[sLen - serviceP->matchForSecondWildcardLen + 12] = 0;
-                LM_TMP(("WILDCARD:  '%s'", ciP->wildcard[0]));
+                LM_T(LmtServiceLookup, ("WILDCARD:  '%s'", ciP->wildcard[0]));
                 return serviceP;
               }
             }
             else
             {
-              LM_TMP(("******************* %s matches", serviceP->url));
+              LM_T(LmtServiceLookup, ("******************* %s matches", serviceP->url));
               ciP->wildcard[0] = &ciP->urlPath[serviceP->charsBeforeFirstWildcard + 12];
-              LM_TMP(("WILDCARD:  '%s'", ciP->wildcard[0]));
+              LM_T(LmtServiceLookup, ("WILDCARD:  '%s'", ciP->wildcard[0]));
               return serviceP;
             }
           }
@@ -174,35 +175,35 @@ OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestService
     }
     else
     {
-      LM_TMP(("Two wildcards. Comparing strlens: %d vs %d", serviceP->charsBeforeFirstWildcard, sLen));
+      LM_T(LmtServiceLookup, ("Two wildcards. Comparing strlens: %d vs %d", serviceP->charsBeforeFirstWildcard, sLen));
       
       if (serviceP->charsBeforeFirstWildcard < sLen)
       {
-        LM_TMP(("Two wildcards. strlens OK. Comparing charsBeforeFirstWildcardSum: %d vs %d", serviceP->charsBeforeFirstWildcardSum, cSumV[serviceP->charsBeforeFirstWildcard - 1]));
+        LM_T(LmtServiceLookup, ("Two wildcards. strlens OK. Comparing charsBeforeFirstWildcardSum: %d vs %d", serviceP->charsBeforeFirstWildcardSum, cSumV[serviceP->charsBeforeFirstWildcard - 1]));
         if (serviceP->charsBeforeFirstWildcardSum == cSumV[serviceP->charsBeforeFirstWildcard - 1])
         {
-          LM_TMP(("Two wildcards. Possible match. Finding '%s' inside '%s'", serviceP->matchForSecondWildcard, &ciP->urlPath[12]));
+          LM_T(LmtServiceLookup, ("Two wildcards. Possible match. Finding '%s' inside '%s'", serviceP->matchForSecondWildcard, &ciP->urlPath[12]));
           char* matchP;
           if ((matchP = strstr(&ciP->urlPath[12], serviceP->matchForSecondWildcard)) != NULL)
           {
-            LM_TMP(("Two wildcards. Found '%s' inside incoming URL - possible match", serviceP->matchForSecondWildcard));
-            LM_TMP(("Second wildcard: %s", &matchP[serviceP->matchForSecondWildcardLen]));
+            LM_T(LmtServiceLookup, ("Two wildcards. Found '%s' inside incoming URL - possible match", serviceP->matchForSecondWildcard));
+            LM_T(LmtServiceLookup, ("Second wildcard: %s", &matchP[serviceP->matchForSecondWildcardLen]));
             {
-              LM_TMP(("******************* %s matches", serviceP->url));
+              LM_T(LmtServiceLookup, ("******************* %s matches", serviceP->url));
               ciP->wildcard[0] = &ciP->urlPath[serviceP->charsBeforeFirstWildcard + 12];
               ciP->wildcard[1] = &matchP[serviceP->matchForSecondWildcardLen];
 
               // Destroying the incoming URL path, to extract first wildcard string
               *matchP = 0;
-              LM_TMP(("First WILDCARD:  '%s'", ciP->wildcard[0]));
-              LM_TMP(("Second WILDCARD: '%s'", ciP->wildcard[1]));
+              LM_T(LmtServiceLookup, ("First WILDCARD:  '%s'", ciP->wildcard[0]));
+              LM_T(LmtServiceLookup, ("Second WILDCARD: '%s'", ciP->wildcard[1]));
 
               return serviceP;
             }
           }
         }
       }
-      LM_TMP(("No match"));
+      LM_T(LmtServiceLookup, ("No match"));
     }
 
     ++serviceIx;
