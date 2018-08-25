@@ -30,7 +30,7 @@
 
 // ----------------------------------------------------------------------------
 //
-// urlParse - move to common/urlParse.cpp
+// urlParse -
 //
 // 1. Find ':', copy left-hand-side to 'protocol'
 // 2. Make sure "//" comes after ':'
@@ -41,6 +41,6 @@
 // NOTE
 //   The called MUST make sure 'protocol' and 'ip' have enough room
 //
-extern bool urlParse(char* url, char* protocol, int protocolSize, char* ip, int ipSize, short* portP, char** urlPathPP, char** detailsPP);
+extern bool urlParse(const char* url, char* protocol, int protocolSize, char* ip, int ipSize, short* portP, char** urlPathPP, char** detailsPP);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_URLPARSE_H_

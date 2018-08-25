@@ -1,0 +1,105 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Parse Contexts - URI Expansion
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# The following Context will be used:
+# https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld:
+# {
+#   "@context": {
+#     "T": "http://example.org/T",
+#     "T2": "http://example.org/T2",
+#     "T3": "http://example.org/T3",
+#     "P1": "http://example.org/P1",
+#     "P2": "http://example.org/P2",
+#     "P3": "http://example.org/P3",
+#     "R1": "http://example.org/R1",
+#     "R2": "http://example.org/R2",
+#     "R3": "http://example.org/R3",
+#     "P1_R1": "http://example.org/P1_R1",
+#     "P1_P1": "http://example.org/P1_P1",
+#     "R1_P1": "http://example.org/R1_P1",
+#     "R1_R1": "http://example.org/R1_R1"
+#   }
+# }
+#
+# And, the entity type will be set to "T".
+# Looking in mongo, we should see an entity type of "http://example.org/T"
+# Also, the entity should have an attribute called "@typeAlias" with value "T"
+#
+
+#
+# 01. POST /ngsi-ld/v1/entities, with an entity type of "T" and a context defining "T" to http://example.org/T
+# 02. Checking mongo to find entity type http://example.org/T and the attribute @aliasEntityType
+#
+
+echo "01. POST /ngsi-ld/v1/entities, with an entity type of 'T' and a context defining 'T' to http://example.org/T"
+echo "============================================================================================================"
+payload='{
+  "id": "http://a.b.c/entity/E1",
+  "type": "T",
+  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. Checking mongo to find entity type http://example.org/T and the attribute @aliasEntityType"
+echo "=============================================================================================="
+mongoCmd2 ftest "db.entities.findOne()" | grep 'type'
+mongoCmd2 ftest "db.entities.findOne()" | grep '@aliasEntityType'
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /ngsi-ld/v1/entities, with an entity type of 'T' and a context defining 'T' to http://example.org/T
+============================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+Date: REGEX(.*)
+
+
+
+02. Checking mongo to find entity type http://example.org/T and the attribute @aliasEntityType
+==============================================================================================
+		"type" : "http://example.org/T",
+			"type" : "ContextString",
+			"type" : "Alias",
+		"@aliasEntityType"
+		"@aliasEntityType" : {
+
+
+--TEARDOWN--
+brokerStop CB
+#dbDrop CB

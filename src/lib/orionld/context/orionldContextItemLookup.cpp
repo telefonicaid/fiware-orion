@@ -30,6 +30,7 @@ extern "C"
 }
 
 #include "orionld/context/OrionldContext.h"               // OrionldContext
+#include "orionld/context/orionldDefaultContext.h"        // orionldDefaultContext
 #include "orionld/context/orionldContextList.h"           // orionldContextHead
 #include "orionld/context/orionldContextLookup.h"         // orionldContextLookup
 #include "orionld/context/orionldContextItemLookup.h"     // Own interface
@@ -40,7 +41,7 @@ extern "C"
 //
 // orionldContextItemLookup -
 //
-KjNode* orionldContextItemLookup(OrionldContext* contextP, char* itemName)
+KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
 {
   //
   // A context must be a tree object and inside the tree there must be only
@@ -51,52 +52,64 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, char* itemName)
   // 2. Dereferenced contexts: a KjString naming the context
   // 3. Complex contexts: a KjObject containing a KjVector (called '@context') with dereferenced contexts
   //
+  // Also, if the context is NULL, then the default context is used in its place.
+  //
+  if (contextP == NULL)
+    contextP = &orionldDefaultContext;
+
+  LM_TMP(("uriExpansion: Looking up '%s' in the context %s", itemName, contextP->url));
+
   if (contextP->tree->type == KjArray)
   {
-    KjNode* nodeP = contextP->tree->children;
+    LM_TMP(("uriExpansion: The context is of type Array"));
 
-    while (nodeP != NULL)
+    for (KjNode* contextNodeP = contextP->tree->children; contextNodeP != NULL; contextNodeP = contextNodeP->next)
     {
-      if (strcmp(nodeP->name, itemName) == 0)
-        return nodeP;
+      OrionldContext* vecContextP = orionldContextLookup(contextNodeP->value.s);
 
-      nodeP = nodeP->next;
+      if (vecContextP == NULL)
+      {
+        LM_W(("Can't find context '%s'", contextNodeP->value.s));
+        continue;   // Or: download it?
+      }
+
+      // Lookup the item
+      LM_TMP(("uriExpansion: Now we can search for '%s' in context '%s'", itemName, vecContextP->url));
+      KjNode* kNodeP = orionldContextItemLookup(vecContextP, itemName);
+
+      if (kNodeP != NULL)
+        return kNodeP;
     }
 
     return NULL;
   }
   else if (contextP->tree->type == KjString)
   {
+    LM_TMP(("uriExpansion: The context is of type String - must lookup a new context"));
     // Lookup the context
     contextP = orionldContextLookup(contextP->tree->value.s);
     if (contextP == NULL)
-      return NULL;
+      return NULL;  // Or: download it?
 
     // Lookup the item
+    LM_TMP(("uriExpansion: Now we can search for '%s'", itemName));
     return orionldContextItemLookup(contextP, itemName);
   }
   else if (contextP->tree->type == KjObject)
   {
-    KjNode* contextNameP = contextP->tree->children;  // Only one child, '@context' that is a vector of strings
-
-    while (contextNameP != NULL)
+    LM_TMP(("uriExpansion: The context is of type Object"));
+    for (KjNode* contextItemP = contextP->tree->children; contextItemP != NULL; contextItemP = contextItemP->next)
     {
-      OrionldContext* contextP = orionldContextLookup(contextNameP->value.s);
-
-      if (contextP == NULL)
-        LM_W(("context '%s' not found ... Should I download it?", contextNameP->value.s));
-      else
+      LM_TMP(("uriExpansion: Comparing '%s' to '%s'", contextItemP->name, itemName));
+      if (strcmp(contextItemP->name, itemName) == 0)
       {
-        KjNode* nodeP;
-
-        if ((nodeP = orionldContextItemLookup(contextP, itemName)) != NULL)
-          return nodeP;
+        LM_TMP(("uriExpansion: found it!"));
+        return contextItemP;
       }
-
-      contextNameP = contextNameP->next;
     }
   }
 
+  LM_TMP(("uriExpansion: returning NULL :("));
   return NULL;
 }
 

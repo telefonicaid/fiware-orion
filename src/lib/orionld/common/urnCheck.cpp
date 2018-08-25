@@ -22,26 +22,25 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
-
-#include "rest/ConnectionInfo.h"
-#include "orionld/serviceRoutines/orionldPatchRegistration.h"
+#include "orionld/common/SCOMPARE.h"              // SCOMPAREx
+#include "orionld/common/urnCheck.h"              // Own interface
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldPatchRegistration -
+// urnCheck -
 //
-bool orionldPatchRegistration(ConnectionInfo* ciP)
+bool urnCheck(char* urn, char** detailsPP)
 {
-  char response[1024];
+  // FIXME: Implement!!!
 
-  LM_TMP(("In orionldPatchRegistration"));
-
-  snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"PATCH /ngsi-ld/v1/cSourceRegistrations/*\", \"registrationId\": \"%s\" }\n", ciP->wildcard[0]);
-  ciP->responsePayload = strdup(response);  // This is temporary, will leak, but not important
-  ciP->httpStatusCode  = SccNotImplemented;
+  if (!SCOMPARE4(urn, 'u', 'r', 'n', ':'))
+  {
+    *detailsPP = (char*) "protocol doesn't start with 'urn:'";
+    return false;
+  }
 
   return true;
 }
+

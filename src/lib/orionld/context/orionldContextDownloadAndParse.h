@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTDOWNLOADANDPARSE_H_
+#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTDOWNLOADANDPARSE_H_
+
 /*
 *
 * Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
@@ -22,26 +25,18 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
-
-#include "rest/ConnectionInfo.h"
-#include "orionld/serviceRoutines/orionldPatchRegistration.h"
-
-
-
-// ----------------------------------------------------------------------------
-//
-// orionldPatchRegistration -
-//
-bool orionldPatchRegistration(ConnectionInfo* ciP)
+extern "C"
 {
-  char response[1024];
-
-  LM_TMP(("In orionldPatchRegistration"));
-
-  snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"PATCH /ngsi-ld/v1/cSourceRegistrations/*\", \"registrationId\": \"%s\" }\n", ciP->wildcard[0]);
-  ciP->responsePayload = strdup(response);  // This is temporary, will leak, but not important
-  ciP->httpStatusCode  = SccNotImplemented;
-
-  return true;
+#include "kjson/kjson.h"                                // Kjson
+#include "kjson/KjNode.h"                               // KjNode
 }
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldContextDownloadAndParse -
+//
+extern KjNode* orionldContextDownloadAndParse(Kjson* kjP, const char* url, char** detailsPP);
+
+#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTDOWNLOADANDPARSE_H_

@@ -37,7 +37,7 @@ bool orionldPostRegistrations(ConnectionInfo* ciP)
 {
   LM_TMP(("In orionldPostRegistrations"));
 
-  ciP->responsePayload = (char*) "{ \"error\": \"not implemented\", \"details\": \"POST /ngsi-ld/v1/registrations\" }\n";
+  ciP->responsePayload = (char*) "{ \"error\": \"not implemented\", \"details\": \"POST /ngsi-ld/v1/cSourceRegistrations\" }\n";
   ciP->httpStatusCode  = SccNotImplemented;
 
   return true;

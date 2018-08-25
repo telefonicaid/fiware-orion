@@ -39,7 +39,7 @@ bool orionldDeleteRegistration(ConnectionInfo* ciP)
 
   LM_TMP(("In orionldDeleteRegistration"));
 
-  snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"DELETE /ngsi-ld/v1/registrations/*\", \"registrationId\": \"%s\" }\n", ciP->wildcard[0]);
+  snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"DELETE /ngsi-ld/v1/cSourceRegistrations/*\", \"registrationId\": \"%s\" }\n", ciP->wildcard[0]);
   ciP->responsePayload = strdup(response);  // This is temporary, will leak, but not important
   ciP->httpStatusCode  = SccNotImplemented;
 

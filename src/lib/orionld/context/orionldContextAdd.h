@@ -38,7 +38,7 @@ extern "C"
 //
 // orionldContextAdd -
 //
-extern bool orionldContextAdd(ConnectionInfo* ciP, char* url, char** detailsP);
+extern bool orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsP);
 
 
 

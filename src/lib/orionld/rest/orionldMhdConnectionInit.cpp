@@ -131,6 +131,39 @@ static Verb verbGet(const char* method)
 
 // -----------------------------------------------------------------------------
 //
+// ipAddressAndPort - 
+//
+static void ipAddressAndPort(ConnectionInfo* ciP)
+{
+  char            ip[32];
+  unsigned short  port = 0;
+
+  const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(ciP->connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
+
+  if (mciP != NULL)
+  {
+    struct sockaddr* addr = (struct sockaddr*) mciP->client_addr;
+
+    port = (addr->sa_data[0] << 8) + addr->sa_data[1];
+    snprintf(ip, sizeof(ip), "%d.%d.%d.%d",
+             addr->sa_data[2] & 0xFF,
+             addr->sa_data[3] & 0xFF,
+             addr->sa_data[4] & 0xFF,
+             addr->sa_data[5] & 0xFF);
+    snprintf(clientIp, sizeof(clientIp), "%s", ip);
+  }
+  else
+  {
+    port = 0;
+    snprintf(ip, sizeof(ip), "IP unknown");
+  }
+  ciP->port = port;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldMhdConnectionInit - 
 //
 int orionldMhdConnectionInit
@@ -170,34 +203,11 @@ int orionldMhdConnectionInit
 
 
   //
-  // 01. IP Address and port of caller
+  // IP Address and port of caller
   //
-  char            ip[32];
-  unsigned short  port = 0;
+  ipAddressAndPort(ciP);
 
-  const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
-
-  if (mciP != NULL)
-  {
-    struct sockaddr* addr = (struct sockaddr*) mciP->client_addr;
-
-    port = (addr->sa_data[0] << 8) + addr->sa_data[1];
-    snprintf(ip, sizeof(ip), "%d.%d.%d.%d",
-             addr->sa_data[2] & 0xFF,
-             addr->sa_data[3] & 0xFF,
-             addr->sa_data[4] & 0xFF,
-             addr->sa_data[5] & 0xFF);
-    snprintf(clientIp, sizeof(clientIp), "%s", ip);
-  }
-  else
-  {
-    port = 0;
-    snprintf(ip, sizeof(ip), "IP unknown");
-  }
-  ciP->port = port;
-
-
-  // 2. Save URL path in ConnectionInfo
+  // Save URL path in ConnectionInfo
   ciP->urlPath = (char*) url;
 
   //

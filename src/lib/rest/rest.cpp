@@ -536,6 +536,9 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
     headerP->servicePath         = value;
     headerP->servicePathReceived = true;
   }
+#ifdef ORIONLD
+  else if (strcasecmp(key.c_str(), HTTP_LINK) == 0)               headerP->link = value;
+#endif
   else
   {
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));

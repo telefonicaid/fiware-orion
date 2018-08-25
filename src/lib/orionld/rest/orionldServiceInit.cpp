@@ -26,12 +26,16 @@
 
 extern "C"
 {
-#include "kjson/kjInit.h"                             // kjInit
+#include "kjson/kjInit.h"                                   // kjInit
+#include "kjson/kjBufferCreate.h"                           // kjBufferCreate
 }
 
-#include "orionld/rest/OrionLdRestService.h"          // OrionLdRestService
-#include "orionld/rest/temporaryErrorPayloads.h"      // Temporary Error Payloads
-#include "orionld/rest/orionldMhdConnection.h"        // Own Interface
+#include "orionld/context/orionldContextDownloadAndParse.h" // orionldContextDownloadAndParse
+#include "orionld/context/orionldDefaultContext.h"          // orionldDefaultContext
+#include "orionld/context/orionldContextList.h"             // orionldContextHead, orionldContextTail
+#include "orionld/rest/OrionLdRestService.h"                // OrionLdRestService
+#include "orionld/rest/temporaryErrorPayloads.h"            // Temporary Error Payloads
+#include "orionld/rest/orionldMhdConnection.h"              // Own Interface
 
 
 
@@ -192,4 +196,33 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   }
 
   kjInit(libLogFunction);
+
+  //
+  // Now download the default context
+  // FIXME: Save the default context in mongo?
+  //
+  char*  details  = (char*) "OK";
+  Kjson* kjsonP   = kjBufferCreate();
+
+  if (kjsonP == NULL)
+  {
+    // Out-of-memory ... Already???
+    LM_X(1, ("Out-of-memory at startup :("));
+  }
+
+  orionldDefaultContext.url  = ORIONLD_DEFAULT_CONTEXT_URL;
+  orionldDefaultContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_DEFAULT_CONTEXT_URL, &details);
+  orionldDefaultContext.next = NULL;
+
+  if (orionldDefaultContext.tree == NULL)
+  {
+    // Without default context, orionld cannot function
+    LM_X(1, ("downloading default context '%s': %s", details));
+  }
+
+  // Adding the default context to the list of contexts
+  orionldContextHead = &orionldDefaultContext;
+  orionldContextTail = &orionldDefaultContext;
+
+  free(kjsonP);
 }

@@ -75,9 +75,8 @@ echo
 echo "03. POST /ngsi-ld/v1/entities, with a 'type' that is not a string - see error"
 echo "============================================================================="
 payload='{
-  "id": "E2",
+  "id": "http://a.b.c/entity/E3",
   "type": 12,
-
   "@context": [
     "http://a.b.c/7.xxx",
     "http://a.b.c/8.xxx",
@@ -92,7 +91,7 @@ echo
 echo "04. POST /ngsi-ld/v1/entities, with a '@context' that is not a vector - see error"
 echo "================================================================================="
 payload='{
-  "id": "E2",
+  "id": "http://a.b.c/entity/E2",
   "type": "A",
   "name": {
     "type": "Property",
@@ -112,7 +111,7 @@ echo
 echo "05. POST /ngsi-ld/v1/entities, with a '@context item' that is not a string - see error"
 echo "======================================================================================"
 payload='{
-  "id": "E2",
+  "id": "http://a.b.c/entity/E5",
   "type": "A",
   "name": {
     "type": "Property",
@@ -132,7 +131,7 @@ echo
 echo "06. POST /ngsi-ld/v1/entities, with all OK - see a 201"
 echo "======================================================"
 payload='{
-  "id": "E6",
+  "id": "http://a.b.c/entity/E6",
   "type": "A",
   "name": {
     "type": "Property",
@@ -151,7 +150,7 @@ echo
 echo "07. POST /ngsi-ld/v1/entities, with invalid URL for a context - see error"
 echo "========================================================================="
 payload='{
-  "id": "E6",
+  "id": "http://a.b.c/entity/E7",
   "type": "A",
   "name": {
     "type": "Property",
@@ -227,13 +226,13 @@ Date: REGEX(.*)
 05. POST /ngsi-ld/v1/entities, with a '@context item' that is not a string - see error
 ======================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 115
+Content-Length: 134
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "@context-item",
-    "title": "Not a JSON string",
+    "details": "no details",
+    "title": "Context Array Item is not a JSON String",
     "type": "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -242,7 +241,7 @@ Date: REGEX(.*)
 ======================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/E6
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E6
 Date: REGEX(.*)
 
 
@@ -250,13 +249,13 @@ Date: REGEX(.*)
 07. POST /ngsi-ld/v1/entities, with invalid URL for a context - see error
 =========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 115
+Content-Length: 134
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "@context-item",
-    "title": "Not a JSON string",
+    "details": "no details",
+    "title": "Context Array Item is not a JSON String",
     "type": "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData"
 }
 

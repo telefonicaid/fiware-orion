@@ -26,7 +26,7 @@ Parse Contexts - three cases
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB
+brokerStart CB 0-255
 
 --SHELL--
 
@@ -84,7 +84,7 @@ brokerStart CB
 echo "01. POST /ngsi-ld/v1/entities, with a context that is a 'string reference' to another context that is a set of contexts"
 echo "======================================================================================================================="
 payload='{
-  "id": "E1",
+  "id": "http://a.b.c/entity/E1",
   "type": "A",
   "name": {
     "type": "Property",
@@ -100,7 +100,7 @@ echo
 echo "02. POST /ngsi-ld/v1/entities, with a context that is a 'string reference' to another context that is a 'simple' context"
 echo "========================================================================================================================"
 payload='{
-  "id": "E1",
+  "id": "http://a.b.c/entity/E2",
   "type": "A",
   "name": {
     "type": "Property",
@@ -116,7 +116,7 @@ echo
 echo "03. POST /ngsi-ld/v1/entities, with a context that is a vector of other contexts"
 echo "================================================================================"
 payload='{
-  "id": "E1",
+  "id": "http://a.b.c/entity/E3",
   "type": "A",
   "name": {
     "type": "Property",
@@ -137,7 +137,7 @@ echo
 =======================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/E1
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 
 
@@ -146,7 +146,7 @@ Date: REGEX(.*)
 ========================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/E1
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
 Date: REGEX(.*)
 
 
@@ -155,11 +155,11 @@ Date: REGEX(.*)
 ================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/E1
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
 Date: REGEX(.*)
 
 
 
 --TEARDOWN--
 brokerStop CB
-dbDrop CB
+#dbDrop CB

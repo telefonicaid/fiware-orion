@@ -31,87 +31,16 @@ extern "C"
 #include "kjson/kjFree.h"                               // kjFree
 }
 
-#include "rest/ConnectionInfo.h"                       // ConnectionInfo
-#include "orionld/common/SCOMPARE.h"                   // SCOMPAREx
-#include "orionld/common/orionldErrorResponse.h"       // orionldErrorResponse
-#include "orionld/common/urlParse.h"                   // urlParse
-#include "orionld/common/OrionldResponseBuffer.h"      // OrionldResponseBuffer
-#include "orionld/common/orionldRequestSend.h"         // orionldRequestSend
-#include "orionld/context/OrionldContext.h"            // OrionldContext
-#include "orionld/context/orionldContextList.h"        // orionldContextHead, orionldContextTail
-#include "orionld/context/orionldContextLookup.h"      // orionldContextLookup
-#include "orionld/context/orionldContextAdd.h"         // Own interface
+#include "rest/ConnectionInfo.h"                             // ConnectionInfo
+#include "orionld/common/SCOMPARE.h"                         // SCOMPAREx
+#include "orionld/common/orionldErrorResponse.h"             // orionldErrorResponse
+#include "orionld/common/urlParse.h"                         // urlParse
+#include "orionld/context/OrionldContext.h"                  // OrionldContext
+#include "orionld/context/orionldContextList.h"              // orionldContextHead, orionldContextTail
+#include "orionld/context/orionldContextLookup.h"            // orionldContextLookup
+#include "orionld/context/orionldContextDownloadAndParse.h"  // orionldContextDownloadAndParse
 
-
-
-// ----------------------------------------------------------------------------
-//
-// orionldContextDownloadAndParse -
-//
-// The returned buffer must be freed by the caller
-//
-static KjNode* orionldContextDownloadAndParse(ConnectionInfo* ciP, char* url, char** detailsPP)
-{
-  //
-  // Prepare the httpResponse
-  // Note that the buffer will be reallocated on demand by 'writeCallback'
-  //
-  // A smarter way here would be to use a thread local buffer and allocate only if that buffer
-  // is not big enough
-  //
-  OrionldResponseBuffer  httpResponse;
-  
-  httpResponse.buf       = (char*) malloc(1024);
-  httpResponse.size      = 1024;
-  httpResponse.used      = 0;
-  httpResponse.allocated = true;
-
-  if (httpResponse.buf == NULL)
-  {
-    *detailsPP = (char*) "out of memory";
-    return NULL;
-  }
-
-  if (orionldRequestSend(&httpResponse, url, 5000, detailsPP) == false)
-  {
-    // detailsPP filled in by orionldRequestSend()
-    // httpResponse.buf freed by orionldRequestSend()
-    LM_E(("orionldRequestSend failed: %s", *detailsPP));
-    return NULL;
-  }
-
-  // <TMP>
-  for (unsigned int ix = 0; ix < strlen(httpResponse.buf); ix++)
-  {
-    if ((httpResponse.buf[ix] == '\n') || (httpResponse.buf[ix] == '\r'))
-      httpResponse.buf[ix] = ' ';
-  }
-  LM_TMP(("Downloaded payload: %s", httpResponse.buf));
-  // </TMP>
-
-  // Now parse the payload
-  KjNode* tree = kjParse(ciP->kjsonP, httpResponse.buf);
-
-  // And then we can free the httpResponse buffer
-  free(httpResponse.buf);
-
-  if (tree == NULL)
-  {
-    *detailsPP = (char*) "Error parsing context";
-    LM_E(("kjParse returned NULL"));
-    return NULL;
-  }
-
-  if ((tree->type != KjArray) && (tree->type != KjString) && (tree->type != KjObject))
-  {
-    kjFree(tree);
-    *detailsPP = (char*) "Invalid JSON type of response";
-    LM_E((*detailsPP));
-    return NULL;
-  }
-
-  return tree;
-}
+#include "orionld/context/orionldContextAdd.h"               // Own interface
 
 
 
@@ -119,7 +48,7 @@ static KjNode* orionldContextDownloadAndParse(ConnectionInfo* ciP, char* url, ch
 //
 // orionldContextAppend -
 //
-static bool orionldContextAppend(char* url, KjNode* tree, char** detailsPP)
+static bool orionldContextAppend(const char* url, KjNode* tree, char** detailsPP)
 {
   OrionldContext* contextP = (OrionldContext*) malloc(sizeof(OrionldContext));
 
@@ -169,7 +98,7 @@ static bool orionldContextAppend(char* url, KjNode* tree, char** detailsPP)
 //        "http://..."
 //      }
 //    }
-bool orionldContextAdd(ConnectionInfo* ciP, char* url, char** detailsPP)
+bool orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsPP)
 {
   LM_TMP(("********************* Getting URL '%s' and adding it as a context", url));
   LM_TMP(("But first, looking up '%s'", url));
@@ -181,7 +110,7 @@ bool orionldContextAdd(ConnectionInfo* ciP, char* url, char** detailsPP)
   }
 
   LM_TMP(("Downloading and parsing URL %s", url));
-  KjNode* tree = orionldContextDownloadAndParse(ciP, url, detailsPP);
+  KjNode* tree = orionldContextDownloadAndParse(ciP->kjsonP, url, detailsPP);
 
   if (tree == NULL)
   {
@@ -270,7 +199,7 @@ bool orionldContextAdd(ConnectionInfo* ciP, char* url, char** detailsPP)
   // 4. Either an Object or an Array
   if (contextP->type == KjObject)
   {
-    LM_TMP(("*********************************** Was an object - we are dome here"));
+    LM_TMP(("*********************************** Was an object - we are done here"));
     return true;
   }
   else if (contextP->type != KjArray)
@@ -314,7 +243,7 @@ bool orionldContextAdd(ConnectionInfo* ciP, char* url, char** detailsPP)
         
     LM_TMP(("Context is a string - meaning a new URL - download and create context: %s", url));
 
-    tree = orionldContextDownloadAndParse(ciP, url, detailsPP);
+    tree = orionldContextDownloadAndParse(ciP->kjsonP, url, detailsPP);
     if (tree == NULL)
     {
       LM_TMP(("orionldContextDownloadAndParse failed: %s", *detailsPP));

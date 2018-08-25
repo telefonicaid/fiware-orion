@@ -21,14 +21,11 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    orionldContextList.cpp
-    orionldContextAdd.cpp
-    orionldContextLookup.cpp
-    orionldContextItemLookup.cpp
-    orionldContextFree.cpp
-    orionldContextDownloadAndParse.cpp
-    orionldDefaultContext.cpp
-    orionldContextPresent.cpp
+    orionldErrorResponse.cpp
+    orionldRequestSend.cpp
+    urlParse.cpp
+    urlCheck.cpp
+    urnCheck.cpp
 )
 
 # Include directories
@@ -38,4 +35,4 @@ include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 
 # Library declaration
 # -----------------------------------------------------------------
-ADD_LIBRARY(orionld_context STATIC ${SOURCES})
+ADD_LIBRARY(orionld_common STATIC ${SOURCES})

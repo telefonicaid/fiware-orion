@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_COMMON_URNCHECK_H_
+#define SRC_LIB_ORIONLD_COMMON_URNCHECK_H_
+
 /*
 *
 * Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
@@ -22,26 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
-
-#include "rest/ConnectionInfo.h"
-#include "orionld/serviceRoutines/orionldPatchRegistration.h"
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldPatchRegistration -
+// urnCheck -
 //
-bool orionldPatchRegistration(ConnectionInfo* ciP)
-{
-  char response[1024];
+extern bool urnCheck(char* urn, char** detailsPP);
 
-  LM_TMP(("In orionldPatchRegistration"));
-
-  snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"PATCH /ngsi-ld/v1/cSourceRegistrations/*\", \"registrationId\": \"%s\" }\n", ciP->wildcard[0]);
-  ciP->responsePayload = strdup(response);  // This is temporary, will leak, but not important
-  ciP->httpStatusCode  = SccNotImplemented;
-
-  return true;
-}
+#endif  // SRC_LIB_ORIONLD_COMMON_URNCHECK_H_

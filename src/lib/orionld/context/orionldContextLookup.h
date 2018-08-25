@@ -33,6 +33,6 @@
 //
 // orionldContextLookup -
 //
-extern OrionldContext* orionldContextLookup(char* url);
+extern OrionldContext* orionldContextLookup(const char* url);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTLOOKUP_H_

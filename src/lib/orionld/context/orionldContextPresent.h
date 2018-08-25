@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTPRESENT_H_
+#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTPRESENT_H_
+
 /*
 *
 * Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
@@ -22,26 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
-
-#include "rest/ConnectionInfo.h"
-#include "orionld/serviceRoutines/orionldPatchRegistration.h"
+#include "orionld/context/OrionldContext.h"
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldPatchRegistration -
+// orionLdContextPresent -
 //
-bool orionldPatchRegistration(ConnectionInfo* ciP)
-{
-  char response[1024];
+extern void orionLdContextPresent(OrionldContext* contextP);
 
-  LM_TMP(("In orionldPatchRegistration"));
-
-  snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"PATCH /ngsi-ld/v1/cSourceRegistrations/*\", \"registrationId\": \"%s\" }\n", ciP->wildcard[0]);
-  ciP->responsePayload = strdup(response);  // This is temporary, will leak, but not important
-  ciP->httpStatusCode  = SccNotImplemented;
-
-  return true;
-}
+#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTPRESENT_H_

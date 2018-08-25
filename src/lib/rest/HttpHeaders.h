@@ -59,6 +59,9 @@
 #define HTTP_X_AUTH_TOKEN                  "X-Auth-Token"
 #define HTTP_X_REAL_IP                     "X-Real-IP"
 #define HTTP_X_FORWARDED_FOR               "X-Forwarded-For"
+#ifdef ORIONLD
+#define HTTP_LINK                          "Link"
+#endif
 
 
 
@@ -134,7 +137,9 @@ typedef struct HttpHeaders
   std::string   xforwardedFor;
   std::string   correlator;
   std::string   ngsiv2AttrsFormat;
-
+#ifdef ORIONLD
+  std::string   link;
+#endif
   bool          servicePathReceived;
 
   unsigned int  contentLength;

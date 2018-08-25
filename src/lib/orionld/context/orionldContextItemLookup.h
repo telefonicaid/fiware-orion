@@ -25,9 +25,19 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kjson/KjNode.h"                               // KjNode
+}
+
 #include "orionld/context/OrionldContext.h"
 
 
 
+// -----------------------------------------------------------------------------
+//
+// orionldContextItemLookup -
+//
+extern KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTITEMLOOKUP_H_

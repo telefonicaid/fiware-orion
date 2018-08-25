@@ -38,7 +38,7 @@ extern "C"
 //
 // orionldContextLookup -
 //
-OrionldContext* orionldContextLookup(char* url)
+OrionldContext* orionldContextLookup(const char* url)
 {
   OrionldContext* contextP = orionldContextHead;
 

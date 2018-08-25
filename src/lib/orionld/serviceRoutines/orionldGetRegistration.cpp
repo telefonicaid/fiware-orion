@@ -39,7 +39,7 @@ bool orionldGetRegistration(ConnectionInfo* ciP)
 
   LM_TMP(("In orionldGetRegistration"));
 
-  snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"GET /ngsi-ld/v1/registrations/*\", \"registrationId\": \"%s\" }\n", ciP->wildcard[0]);
+  snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"GET /ngsi-ld/v1/cSourceRegistrations/*\", \"registrationId\": \"%s\" }\n", ciP->wildcard[0]);
   ciP->responsePayload = strdup(response);  // This is temporary, will leak, but not important
   ciP->httpStatusCode  = SccNotImplemented;
 

@@ -24,6 +24,7 @@
 */
 #include "logMsg/logMsg.h"
 
+#include "rest/ConnectionInfo.h"
 #include "orionld/rest/OrionLdRestService.h"
 #include "orionld/rest/orionldServiceLookup.h"
 
@@ -34,9 +35,10 @@
 // requestPrepare -
 //
 // The cSumV values are interesting only for URL paths without wildcard of just uptil the first wildcard
-// The longest URL path without/before first wildcard is "/ngsi-ld/v1/subscriptions/".
-// The initial part ("/ngsi-ld/v1/") doesn't count, so ... 14 chars is all we need for the cSumV.
+// The longest URL path without/before first wildcard is "/ngsi-ld/v1/cSourceRegistrations/".
+// The initial part ("/ngsi-ld/v1/") doesn't count, so ... 21 chars is all we need for the cSumV.
 //
+#define MAX_CHARS_BEFORE_WILDCARD 21
 static void requestPrepare(char* url, int* cSumV, int* cSumsP, int* sLenP)
 {
   // First of all, skip the first 12 characters in the URL path ("/ngsi-ld/v1/")
@@ -49,7 +51,7 @@ static void requestPrepare(char* url, int* cSumV, int* cSumsP, int* sLenP)
   int sLen = 1;
   int ix   = 1;
 
-  while ((url[ix] != 0) && (ix < 14))
+  while ((url[ix] != 0) && (ix < MAX_CHARS_BEFORE_WILDCARD))
   {
     cSumV[ix]  = cSumV[ix - 1] + url[ix];
     sLen      += 1;
@@ -78,7 +80,7 @@ static void requestPrepare(char* url, int* cSumV, int* cSumsP, int* sLenP)
 OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestServiceVector* serviceV)
 {
   int serviceIx = 0;
-  int cSumV[14];
+  int cSumV[MAX_CHARS_BEFORE_WILDCARD];
   int cSums;
   int sLen;
 
@@ -86,6 +88,7 @@ OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestService
   requestPrepare(ciP->urlPath, cSumV, &cSums, &sLen);
   LM_TMP(("Request prepared: strlen(%s): %d", ciP->urlPath, sLen));
   LM_TMP(("Request prepared: cSums: %d", cSums));
+
 #if 0
   for (int ix = 0; ix < cSums; ix++)
     LM_TMP(("Request prepared: cSumV[%d]: %d", ix, cSumV[ix]));

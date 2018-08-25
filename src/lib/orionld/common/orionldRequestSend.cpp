@@ -67,7 +67,7 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
 //
 // orionldRequestSend - send a request and await its response
 //
-bool orionldRequestSend(OrionldResponseBuffer* rBufP, char* url, int tmoInMilliSeconds, char** detailsPP)
+bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoInMilliSeconds, char** detailsPP)
 {
   CURLcode             cCode;
   struct curl_context  cc;

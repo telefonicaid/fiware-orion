@@ -33,6 +33,6 @@
 //
 // orionldRequestSend - send a request and await its response
 //
-extern bool orionldRequestSend(OrionldResponseBuffer* rBufP, char* url, int tmoInMilliSeconds, char** detailsPP);
+extern bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoInMilliSeconds, char** detailsPP);
 
 #endif  // SRC_LIB_ORIONLD_COMOM_ORIONLDREQUESTSEND_H_

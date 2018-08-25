@@ -65,8 +65,13 @@ void orionldErrorResponseCreate(ConnectionInfo* ciP, OrionldResponseErrorType er
 
   KjNode* typeP     = kjString(ciP->kjsonP, "type",    errorTypeStringV[errorType]);
   KjNode* titleP    = kjString(ciP->kjsonP, "title",   title);
-  KjNode* detailsP  = kjString(ciP->kjsonP, "details", details);
-    
+  KjNode* detailsP;
+
+  if (details != NULL)
+    detailsP = kjString(ciP->kjsonP, "details", details);
+  else
+    detailsP = kjString(ciP->kjsonP, "details", "no details");
+
   ciP->responseTopP = kjObject(ciP->kjsonP, NULL);
 
   kjChildAdd(ciP->responseTopP, typeP);

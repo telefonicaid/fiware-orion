@@ -31,7 +31,7 @@
 
 // ----------------------------------------------------------------------------
 //
-// urlParse - move to common/urlParse.cpp
+// urlParse -
 //
 // 1. Find ':', copy left-hand-side to 'protocol'
 // 2. Make sure "//" comes after ':'
@@ -42,7 +42,7 @@
 // NOTE
 //   The called MUST make sure 'protocol' and 'ip' have enough room
 //
-bool urlParse(char* url, char* protocol, int protocolSize, char* ip, int ipSize, short* portP, char** urlPathPP, char** detailsPP)
+bool urlParse(const char* url, char* protocol, int protocolSize, char* ip, int ipSize, short* portP, char** urlPathPP, char** detailsPP)
 {
   int urlIx  = 0;
   int toIx   = 0;
@@ -141,7 +141,7 @@ bool urlParse(char* url, char* protocol, int protocolSize, char* ip, int ipSize,
   //
   if (url[urlIx] == '/')
   {
-    *urlPathPP = &url[urlIx];
+    *urlPathPP = (char*) &url[urlIx];
   }
   else
   {

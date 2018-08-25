@@ -22,26 +22,18 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
-
-#include "rest/ConnectionInfo.h"
-#include "orionld/serviceRoutines/orionldPatchRegistration.h"
-
-
-
-// ----------------------------------------------------------------------------
-//
-// orionldPatchRegistration -
-//
-bool orionldPatchRegistration(ConnectionInfo* ciP)
+extern "C"
 {
-  char response[1024];
-
-  LM_TMP(("In orionldPatchRegistration"));
-
-  snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"PATCH /ngsi-ld/v1/cSourceRegistrations/*\", \"registrationId\": \"%s\" }\n", ciP->wildcard[0]);
-  ciP->responsePayload = strdup(response);  // This is temporary, will leak, but not important
-  ciP->httpStatusCode  = SccNotImplemented;
-
-  return true;
+#include "kjson/KjNode.h"                               // KjNode
 }
+
+#include "orionld/context/OrionldContext.h"             // OrionldContext
+#include "orionld/context/orionldDefaultContext.h"      // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldDefaultContext
+//
+OrionldContext orionldDefaultContext;

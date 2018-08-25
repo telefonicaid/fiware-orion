@@ -48,6 +48,9 @@ extern "C"
 {
 #include "kjson/kjson.h"
 }
+
+struct OrionLdRestService;
+struct OrionldContext;
 #endif  
 
 
@@ -58,10 +61,6 @@ extern "C"
 */
 struct ParseData;
 struct RestService;
-
-#ifdef ORIONLD
-struct OrionLdRestService;
-#endif  
 
 
 
@@ -99,7 +98,8 @@ public:
     wildcard                  { NULL, NULL},
     kjsonP                    (NULL),
     requestTopP               (NULL),
-    responseTopP              (NULL)
+    responseTopP              (NULL),
+    contextP                  (NULL)
 #endif
     {
   }
@@ -131,7 +131,8 @@ public:
     wildcard                  { NULL, NULL},
     kjsonP                    (NULL),
     requestTopP               (NULL),
-    responseTopP              (NULL)
+    responseTopP              (NULL),
+    contextP                  (NULL)
 #endif
   {
   }
@@ -166,7 +167,8 @@ public:
     wildcard                  { NULL, NULL},
     kjsonP                    (NULL),
     requestTopP               (NULL),
-    responseTopP              (NULL)
+    responseTopP              (NULL),
+    contextP                  (NULL)
 #endif
   {
 
@@ -248,6 +250,7 @@ public:
   Kjson*                    kjsonP;
   KjNode*                   requestTopP;
   KjNode*                   responseTopP;
+  OrionldContext*           contextP;
 #endif  
 };
 

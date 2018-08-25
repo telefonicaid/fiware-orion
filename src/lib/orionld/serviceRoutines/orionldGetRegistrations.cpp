@@ -37,7 +37,7 @@ bool orionldGetRegistrations(ConnectionInfo* ciP)
 {
   LM_TMP(("In orionldGetRegistration"));
 
-  ciP->responsePayload = (char*) "{ \"error\": \"not implemented\", \"details\": \"GET /ngsi-ld/v1/registrations\" }\n";
+  ciP->responsePayload = (char*) "{ \"error\": \"not implemented\", \"details\": \"GET /ngsi-ld/v1/cSourceRegistrations\" }\n";
   ciP->httpStatusCode  = SccNotImplemented;
 
   return true;
