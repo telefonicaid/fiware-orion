@@ -269,7 +269,7 @@ echo
 
 echo "15. Check the warning about loop detection in the log"
 echo "====================================================="
-egrep 'WARN' /tmp/contextBroker.log
+egrep 'WARN' /tmp/${BROKER}.log
 echo
 echo
 

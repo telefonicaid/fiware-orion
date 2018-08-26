@@ -73,7 +73,7 @@ echo
 # the final grep -v '/#', to make this functional test work both as normal functest and under the valgrind suite.
 #
 echo "+++++ 6: service paths from log file"
-grep servicePathSplit /tmp/contextBroker.log | awk -F\| '{ print $10 }' | awk -F= '{ print $2 }' | grep -v '/#'
+grep servicePathSplit /tmp/${BROKER}.log | awk -F\| '{ print $10 }' | awk -F= '{ print $2 }' | grep -v '/#'
 echo
 
 

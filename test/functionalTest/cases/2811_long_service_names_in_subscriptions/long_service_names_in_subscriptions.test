@@ -89,7 +89,7 @@ echo
 
 echo "04. grep in log file to make sure there are NO ERRORS"
 echo "====================================================="
-grep ERR /tmp/contextBroker.log
+grep ERR /tmp/${BROKER}.log
 echo
 echo
 

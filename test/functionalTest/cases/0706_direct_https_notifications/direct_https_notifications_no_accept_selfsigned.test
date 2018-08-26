@@ -86,7 +86,7 @@ echo
 
 echo "04. Look in the CB log for the warning about cert not accepted"
 echo "=============================================================="
-grep "(curl_easy_perform failed: Peer certificate cannot be authenticated" /tmp/contextBroker.log | awk -F "curl_easy_perform" '{ print $2 }' | awk -F ")" '{ print $1 }'
+grep "(curl_easy_perform failed: Peer certificate cannot be authenticated" /tmp/${BROKER}.log | awk -F "curl_easy_perform" '{ print $2 }' | awk -F ")" '{ print $1 }'
 echo
 echo
 

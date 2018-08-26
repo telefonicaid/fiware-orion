@@ -162,22 +162,21 @@ accumulatorCount
 
 # The log has to show exactly 1 case of static buffer usage
 #echo "** Static buffer usages:"
-#grep "to HTTP server: sending static message of" /tmp/contextBroker.log | wc -l
+#grep "to HTTP server: sending static message of" /tmp/${BROKER}.log | wc -l
 
 # The log has to show exactly 2 cases of dynamic buffer usage
 #echo "** Dynamic buffer usages:"
-#grep "to HTTP server: sending dynamic message of" /tmp/contextBroker.log | wc -l
+#grep "to HTTP server: sending dynamic message of" /tmp/${BROKER}.log | wc -l
 # ----------------------------------------------------------------------
 
 # The log has to show exactly 1 error about notification too large
 echo "** Too large errors:"
-grep "HTTP request to send is too large" /tmp/contextBroker.log | wc -l
+grep "HTTP request to send is too large" /tmp/${BROKER}.log | wc -l
 
 # Notification sizes. Note that if don't use the cut, some character in the log line prologue
 # breaks the test harness: @, :, [, ], ~, /, (, ), etc.
 echo "** Notification sizes:"
-grep "to HTTP server" /tmp/contextBroker.log | grep "Sending message" | awk -F\| '{ print $10 }' | awk -F= '{ print $2 }'
-
+grep "to HTTP server" /tmp/${BROKER}.log | grep "Sending message" | awk -F\| '{ print $10 }' | awk -F= '{ print $2 }'
 --REGEXPECT--
 HTTP/1.1 200 OK
 Content-Length: 85

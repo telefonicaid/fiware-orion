@@ -86,7 +86,7 @@ echo
 
 echo "04. Check there is no Database Error at CB log"
 echo "=============================================="
-grep 'Database Error' /tmp/contextBroker.log
+grep 'Database Error' /tmp/${BROKER}.log
 echo
 echo
 

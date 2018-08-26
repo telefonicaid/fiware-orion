@@ -100,7 +100,7 @@ echo
 
 echo "04. Grep in brokers logfile to see that the forward failed and that the broker thread continued"
 echo "==============================================================================================="
-grep "(curl_easy_perform failed: Timeout was reached)" /tmp/contextBroker.log | awk -F "curl_easy_perform" '{ print "(curl_easy_perform" $2 }'
+grep "(curl_easy_perform failed: Timeout was reached)" /tmp/${BROKER}.log | awk -F "curl_easy_perform" '{ print "(curl_easy_perform" $2 }'
 echo
 echo
 
@@ -133,7 +133,7 @@ echo
 
 echo "07. Grep in brokers logfile to see that the forward failed and that the broker thread continued"
 echo "==============================================================================================="
-grep "(curl_easy_perform failed: Timeout was reached)" /tmp/contextBroker.log | awk -F "curl_easy_perform" '{ print "(curl_easy_perform" $2 }'
+grep "(curl_easy_perform failed: Timeout was reached)" /tmp/${BROKER}.log | awk -F "curl_easy_perform" '{ print "(curl_easy_perform" $2 }'
 echo
 echo
 

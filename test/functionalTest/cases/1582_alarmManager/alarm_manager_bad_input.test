@@ -84,7 +84,7 @@ echo
 
 echo "07. grep in log-file"
 echo "===================="
-egrep 'Raising alarm|Releasing alarm' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
+egrep 'Raising alarm|Releasing alarm' /tmp/${BROKER}.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
 echo
 echo
 

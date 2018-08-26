@@ -62,14 +62,14 @@ echo
 
 echo "03. grep SUMMARY in log-file (4 transactions, 1 bad input)"
 echo "=========================================================="
-egrep 'SUMMARY' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }' | sed 's/(/_/g' | sed 's/)/_/g'
+egrep 'SUMMARY' /tmp/${BROKER}.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }' | sed 's/(/_/g' | sed 's/)/_/g'
 echo
 echo
 
 
 echo "04. grep BadInput in log-file (4 lines found)"
 echo "============================================="
-grep BadInput /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
+grep BadInput /tmp/${BROKER}.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
 echo
 echo
 

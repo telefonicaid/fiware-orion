@@ -405,6 +405,8 @@ function localBrokerStart()
     CB_START_CMD="$CB_START_CMD_PREFIX -port $CP5_PORT -pidpath $CP5_PID_FILE -dbhost $dbHost:$dbPort -db $CP5_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP5_LOG_DIR $extraParams"
   fi
 
+  # In case the PID file still exists ... (happens after crashes)
+  \rm -f /tmp/orion_${port}.pid
 
   #  
   # Start broker under valgrind if VALGRIND set to 1 and if it's the 'main' broker

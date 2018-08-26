@@ -123,7 +123,7 @@ echo
 
 echo "04. Check log-file to make sure the Bad Input alarm is active"
 echo "============================================================="
-grep "BadInput" /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
+grep "BadInput" /tmp/${BROKER}.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
 echo
 echo
 
@@ -157,7 +157,7 @@ echo
 
 echo "06. Check log-file to make sure the Bad Input alarm is reset"
 echo "============================================================"
-grep "BadInput" /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
+grep "BadInput" /tmp/${BROKER}.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
 echo
 echo
 
@@ -190,7 +190,7 @@ echo
 
 echo "10. Check log-file to make sure a Runtime Error was provoked due to the invalid subscription"
 echo "============================================================================================"
-grep "malformed URL" /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
+grep "malformed URL" /tmp/${BROKER}.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
 echo
 echo
 

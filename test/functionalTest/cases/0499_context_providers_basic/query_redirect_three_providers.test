@@ -62,37 +62,37 @@ brokerStart CP2
 brokerStart CP3
 
 --SHELL--
-cb=$(ps aux  | grep contextBroker | grep $CB_PORT)
-cp1=$(ps aux | grep contextBroker | grep $CP1_PORT)
-cp2=$(ps aux | grep contextBroker | grep $CP2_PORT)
-cp3=$(ps aux | grep contextBroker | grep $CP3_PORT)
+cb=$(ps aux  | grep $BROKER | grep $CB_PORT)
+cp1=$(ps aux | grep $BROKER | grep $CP1_PORT)
+cp2=$(ps aux | grep $BROKER | grep $CP2_PORT)
+cp3=$(ps aux | grep $BROKER | grep $CP3_PORT)
 
 if [ -z "$cb" ]
 then
-  echo "Error, contextBroker not running"
+  echo "Error, broker not running"
 else
-  echo "01. contextBroker running"
+  echo "01. broker running"
 fi
 
 if [ -z "$cp1" ]
 then
   echo "Error, contextProvider1 not running"
 else
-  echo "02. contextProvider CP1 running (contextBroker serving as contextProvider)"
+  echo "02. contextProvider CP1 running (broker serving as contextProvider)"
 fi
 
 if [ -z "$cp2" ]
 then
   echo "Error, contextProvider2 not running"
 else
-  echo "03. contextProvider CP2 running (contextBroker serving as contextProvider)"
+  echo "03. contextProvider CP2 running (broker serving as contextProvider)"
 fi
 
 if [ -z "$cp3" ]
 then
   echo "Error, contextProvider3 not running"
 else
-  echo "04. contextProvider CP3 running (contextBroker serving as contextProvider)"
+  echo "04. contextProvider CP3 running (broker serving as contextProvider)"
 fi
 echo
 echo
@@ -558,10 +558,10 @@ echo
 echo
 
 --REGEXPECT--
-01. contextBroker running
-02. contextProvider CP1 running (contextBroker serving as contextProvider)
-03. contextProvider CP2 running (contextBroker serving as contextProvider)
-04. contextProvider CP3 running (contextBroker serving as contextProvider)
+01. broker running
+02. contextProvider CP1 running (broker serving as contextProvider)
+03. contextProvider CP2 running (broker serving as contextProvider)
+04. contextProvider CP3 running (broker serving as contextProvider)
 
 
 05. Query broker for E1/A1 (nothing found)
