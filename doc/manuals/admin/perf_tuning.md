@@ -17,7 +17,7 @@
 
 ##  MongoDB configuration
 
-From a performance point of view, it is recommended to use MongoDB 3.4 with WireTiger, especially
+From a performance point of view, it is recommended to use MongoDB 3.6 with WireTiger, especially
 in update-intensive scenarios.
 
 In addition, take into account the following information from the official MongoDB documentation, as it may have
