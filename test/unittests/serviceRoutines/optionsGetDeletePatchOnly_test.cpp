@@ -38,8 +38,8 @@
 */
 static RestService optionsV[] =
 {
-  { IndividualSubscriptionRequest,  3, { "v2", "subscriptions", "*" }, "", optionsGetDeletePatchOnly },
-  { InvalidRequest,                 0, {                            }, "", NULL                      }
+  { IndividualSubscriptionRequest,  3, { "v2", "subscriptions", "*" }, optionsGetDeletePatchOnly },
+  { InvalidRequest,                 0, {                            }, NULL                      }
 };
 
 
