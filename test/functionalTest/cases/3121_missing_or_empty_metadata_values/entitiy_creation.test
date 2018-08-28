@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Missing or empty metadata values are not allowed with POST /v2/op/update
+Missing or empty metadata values are not allowed with POST /v2/entities/id/attrs
 
 --SHELL-INIT--
 dbInit CB
@@ -30,12 +30,15 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. POST /v2/entities
+# 01. POST /v2/entities, to create Room1 with temperature (no metadata)
 # 02. GET /v2/entities/Room1
-# 03. POST /v2/entities/Room1/attrs
+# 03. POST /v2/entities/Room1/attrs, to add metadata with "" value to temperature and add pressure attribute with metadata with no value
 # 04. GET /v2/entities/Room1
-# 05. POST /v2/entities/Room1/attrs
+# 05. POST /v2/entities/Room1/attrs, to update temperature with metadata with no value, pressure with metadata with regular value and add humidity attribute with metadata with "" value
 # 06. GET /v2/entities/Room1
+# 07. POST /v2/entities, to create Room2 with temperature having two metadata one with "" value and another without value
+# 08. GET /v2/entities/Room2
+# 09. PUT /v2/entities/Room2/attrs/temperature/value , updating the value of Room2 temperature attribute.
 #
 
 echo "01. POST /v2/entities."
@@ -136,6 +139,45 @@ echo
 echo "06. GET /v2/entities/Room1."
 echo "==========================="
 orionCurl --url /v2/entities/Room1
+echo
+echo
+
+
+echo "07. POST /v2/entities."
+echo "======================"
+payload='{
+  "id": "Room2",
+  "type": "Room",
+  "temperature": {
+    "value": 26.5,
+    "type": "Float",
+    "metadata": {
+      "accuracy": {
+        "value": "",
+        "type": "Float"
+      },
+     "tolerance": {
+        "type": "Float"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "08. GET /v2/entities/Room2."
+echo "==========================="
+orionCurl --url /v2/entities/Room2
+echo
+echo
+
+
+echo "09. PUT /v2/entities/Room2/attrs/temperature/value."
+echo "==================================================="
+payload=' 25.6 '
+orionCurl --url /v2/entities/Room2/attrs/temperature/value --payload "$payload" --in text/plain --out json -X PUT
 echo
 echo
 
@@ -264,6 +306,53 @@ Date: REGEX(.*)
     },
     "type": "Room"
 }
+
+
+07. POST /v2/entities.
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Room2?type=Room
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. GET /v2/entities/Room2.
+===========================
+HTTP/1.1 200 OK
+Content-Length: 166
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "Room2",
+    "temperature": {
+        "metadata": {
+            "accuracy": {
+                "type": "Float",
+                "value": ""
+            },
+            "tolerance": {
+                "type": "Float",
+                "value": null
+            }
+        },
+        "type": "Float",
+        "value": 26.5
+    },
+    "type": "Room"
+}
+
+
+09. PUT /v2/entities/Room2/attrs/temperature/value.
+===================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
 
 
 --TEARDOWN--
