@@ -39,16 +39,19 @@
 *
 * rs -
 */
+#define ICEA   IndividualContextEntityAttribute
+#define IR     InvalidRequest
+
 static RestService putV[] =
 {
-  { IndividualContextEntityAttribute, 5, { "ngsi10", "contextEntities", "*", "attributes", "*" }, "", putIndividualContextEntityAttribute },
-  { InvalidRequest,                   0, {                                                     }, "", NULL                                }
+  { ICEA, 5, { "ngsi10", "contextEntities", "*", "attributes", "*" }, putIndividualContextEntityAttribute },
+  { IR,   0, {                                                     }, NULL                                }
 };
 
 static RestService badVerbV[] =
 {
-  { InvalidRequest,   0, { "*", "*", "*", "*", "*", "*"                        }, "", badRequest                          },
-  { InvalidRequest,   0, {                                                     }, "", NULL                                }
+  { IR,   0, { "*", "*", "*", "*", "*", "*"                        }, badRequest                          },
+  { IR,   0, {                                                     }, NULL                                }
 };
 
 
@@ -66,6 +69,12 @@ TEST(putIndividualContextEntityAttribute, json)
   const char*    infile      = "ngsi10.updateContextAttributeRequest.putAttribute.valid.json";
   const char*    outfile     = "ngsi10.updateContextAttributeResponse.notFound.valid.json";
   std::string    out;
+  RestService    restService =
+    {
+      VersionRequest,
+      5, { "ngsi10", "contextEntities", "entity11", "attributes", "temperature" },
+      NULL
+    };
 
   EXPECT_EQ("OK", testDataFromFile(testBuf,
                                    sizeof(testBuf),
@@ -79,6 +88,7 @@ TEST(putIndividualContextEntityAttribute, json)
   ci.inMimeType     = JSON;
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
+  ci.restServiceP   = &restService;
 
   serviceVectorsSet(NULL, putV, NULL, NULL, NULL, NULL, badVerbV);
   out = orion::requestServe(&ci);

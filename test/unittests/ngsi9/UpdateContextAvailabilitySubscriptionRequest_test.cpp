@@ -56,7 +56,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
   EXPECT_EQ("OK", testDataFromFile(testBuf,     sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   lmTraceLevelSet(LmtDump, true);
-  out = jsonTreat(testBuf, &ci, &parseData, UpdateContextAvailabilitySubscription, "updateContextAvailabilitySubscriptionRequest", NULL);
+  out = jsonTreat(testBuf, &ci, &parseData, UpdateContextAvailabilitySubscription, NULL);
   lmTraceLevelSet(LmtDump, false);
   EXPECT_EQ("OK", out) << "this test should be OK";
 
@@ -99,7 +99,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_invalidIsPattern)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  std::string out = jsonTreat(testBuf, &ci, &reqData, UpdateContextAvailabilitySubscription, "updateContextAvailabilitySubscriptionRequest", NULL);
+  std::string out = jsonTreat(testBuf, &ci, &reqData, UpdateContextAvailabilitySubscription, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

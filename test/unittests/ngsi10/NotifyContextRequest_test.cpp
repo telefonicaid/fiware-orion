@@ -59,7 +59,7 @@ TEST(NotifyContextRequest, json_ok)
   ci.outMimeType = JSON;
 
   lmTraceLevelSet(LmtDump, true);
-  std::string result = jsonTreat(testBuf, &ci, &reqData, NotifyContext, "notifyContextRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, NotifyContext, NULL);
   EXPECT_EQ("OK", result);
   lmTraceLevelSet(LmtDump, false);
 
@@ -96,7 +96,7 @@ TEST(NotifyContextRequest, json_badIsPattern)
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
-  std::string out = jsonTreat(testBuf, &ci, &reqData, NotifyContext, "notifyContextRequest", NULL);
+  std::string out = jsonTreat(testBuf, &ci, &reqData, NotifyContext, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

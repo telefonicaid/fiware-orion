@@ -1,9 +1,9 @@
-#ifndef SRC_APP_CONTEXTBROKER_VERSION_H_
-#define SRC_APP_CONTEXTBROKER_VERSION_H_
+#ifndef SRC_LIB_REST_restServiceLookup_h
+#define SRC_LIB_REST_restServiceLookup_h
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,9 +25,15 @@
 *
 * Author: Ken Zangelin
 */
+#include "rest/RestService.h"
+#include "rest/ConnectionInfo.h"
 
 
 
-#define ORION_VERSION "1.15.0-next"
+/* ****************************************************************************
+*
+* restServiceLookup -
+*/
+extern RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP);
 
-#endif  // SRC_APP_CONTEXTBROKER_VERSION_H_
+#endif

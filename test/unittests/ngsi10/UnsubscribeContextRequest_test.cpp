@@ -51,7 +51,7 @@ TEST(UnsubscribeContextRequest, badSubscriptionId_json)
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
   lmTraceLevelSet(LmtDump, true);
-  out = jsonTreat(testBuf, &ci, &reqData, UnsubscribeContext, "unsubscribeContextRequest", NULL);
+  out = jsonTreat(testBuf, &ci, &reqData, UnsubscribeContext, NULL);
   lmTraceLevelSet(LmtDump, false);
   EXPECT_STREQ("OK", out.c_str());
 

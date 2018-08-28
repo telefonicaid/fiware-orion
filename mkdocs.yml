@@ -18,6 +18,7 @@ pages:
       - 'API Walkthrough': 'user/walkthrough_apiv1.md'
       - 'Pagination': 'user/pagination.md'
       - 'Geolocation': 'user/geolocation.md'
+      - 'Transient Entities': 'user/transient_entities.md'
       - 'Structured values for attributes': 'user/structured_attribute_valued.md'
       - 'Context Providers and request forwarding': 'user/context_providers.md'
       - 'Attribute Metadata': 'user/metadata.md'

@@ -173,6 +173,14 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Mon Jul 16 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.15.0-1
+- Add: upsert option for the POST /v2/entities operation (#3215)
+- Add: transient entities functionality (new NGSIv2 builtin attribute: dateExpires) (#3000)
+- Add: "attrs" field in POST /v2/op/query (making "attributes" obsolete) (#2604)
+- Add: "expression" field in POST /v2/op/query (#2706)
+- Fix: large integer wrong rendering in responses (#2603)
+- Remove: "scopes" field in POST /v2/op/query (#2706)
+
 * Fri Jun 15 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.14.0-1
 - Add: support for APIv2 notifications (POST /v2/op/notify), which opens up for true APIv2 federation (#2986)
 - Add: camelCase actionTypes in POST /v2/op/update (append, appendStrict, update, delete and replace) (#2721)

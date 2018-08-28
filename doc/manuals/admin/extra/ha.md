@@ -81,7 +81,8 @@ For each server:
     10.0.64.40   proxy3
     ```
 
-1. Install MongoDB 3.2 using the following commands
+1. Install MongoDB 3.2 using the following commands. **WARNING:** this test was done when Mongo DB 3.2 was supported in Orion, test
+   should be redone with the current version.
 
     ```bash
     $ sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927

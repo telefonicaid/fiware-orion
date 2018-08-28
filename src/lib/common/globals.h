@@ -88,19 +88,12 @@
 
 /* ****************************************************************************
 *
-* virtual attributes
+* NGSIv2 builtin attributes
 */
 #define DATE_CREATED    "dateCreated"
 #define DATE_MODIFIED   "dateModified"
+#define DATE_EXPIRES    "dateExpires"
 #define ALL_ATTRS       "*"
-
-
-
-/* ****************************************************************************
-*
-* Transient entity attribute -
-*/
-#define DATE_EXPIRES "dateExpires"
 
 
 

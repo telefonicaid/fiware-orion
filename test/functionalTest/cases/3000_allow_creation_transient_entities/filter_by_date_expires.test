@@ -78,18 +78,13 @@ Date: REGEX(.*)
 02. GET /v2/entities q=dateExpires>2010-01-01T00:00:00Z and get the entity
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 107
+Content-Length: 25
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
     {
-        "dateExpires": {
-            "metadata": {},
-            "type": "DateTime",
-            "value": "2028-01-01T00:00:00.00Z"
-        },
         "id": "E1",
         "type": "T1"
     }

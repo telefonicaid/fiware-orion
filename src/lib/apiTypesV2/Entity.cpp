@@ -105,6 +105,7 @@ std::string Entity::render
   }
 
   // Add special attributes representing entity dates
+  // Note 'uriParamOptions[DATE_CREATED/DATE_MODIFIED] ||' is needed due to backward compability
   if ((creDate != 0) && (uriParamOptions[DATE_CREATED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end())))
   {
     ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, creDate);

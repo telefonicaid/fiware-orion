@@ -57,17 +57,17 @@ Fields:
     -   **mdNames**: an array of strings. Its elements are the names of the
         metadata of the attribute. Here the "." to "="
         replacement is not done.
-    -   **creDate**: the timestamp corresponding to attribute creation
+    -   **creDate**: the timestamp (as integer number) corresponding to attribute creation
         (as a consequence of append).
-    -   **modDate**: the timestamp corresponding to last
+    -   **modDate**: the timestamp (as integer number) corresponding to last
         attribute update. It matches creDate if the attribute has not been
         modified after creation.
 -   **attrNames**: an array of strings. Its elements are the names of the
     attributes of the entity (without IDs). In this case, the "." to "="
     replacement is not done.
--   **creDate**: the timestamp corresponding
+-   **creDate**: the timestamp (as integer number) corresponding
     to entity creation date (as a consequence of append).
--   **modDate**: the timestamp corresponding to last entity update. Note
+-   **modDate**: the timestamp (as integer number) corresponding to last entity update. Note
     that it uses to be the same that a modDate corresponding to at least
     one of the attributes (not always: it will not be the same if the
     last update was a DELETE operation). It matches creDate if the
@@ -81,6 +81,9 @@ Fields:
 -   **lastCorrelator**: value of the `Fiware-Correlator` header in the last
     update request on the entity. Used by the self-notification loop protection
     logic.
+-   **expDate** (optional): expiration timestamp (as a Date object) for the
+    entity. Have a look to the [transient entities functionality](../user/transient_entities.md)
+    for more detail.  
 
 Regarding `location.coords` in can use several formats:
 
