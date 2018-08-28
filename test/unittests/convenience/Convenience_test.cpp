@@ -47,14 +47,14 @@
 */
 RestService getV[] =
 {
-  { ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                   }, "", getContextEntitiesByEntityId     },
-  { InvalidRequest,                        0, {                                                   }, "", NULL                             }
+  { ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                   }, getContextEntitiesByEntityId     },
+  { InvalidRequest,                        0, {                                                   }, NULL                             }
 };
 
 RestService badVerbV[] =
 {
-  { ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                   }, "", badVerbGetOnly                   },
-  { InvalidRequest,                        0, {                                                   }, "", NULL                             }
+  { ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                   }, badVerbGetOnly                   },
+  { InvalidRequest,                        0, {                                                   }, NULL                             }
 };
 
 
@@ -84,7 +84,6 @@ TEST(Convenience, emptyPath)
 /* ****************************************************************************
 *
 * shortPath -
-*
 */
 TEST(Convenience, shortPath)
 {
@@ -93,7 +92,11 @@ TEST(Convenience, shortPath)
   ConnectionInfo  ci3("ngsi8", "GET", "1.1");
   ConnectionInfo  ci4("ngsi10/nada", "GET", "1.1");
   std::string     out;
-  const char*     outfile = "ngsi.unrecognizedRequest.json";
+  const char*     outfile      = "ngsi.unrecognizedRequest.json";
+  RestService     restService1 = { InvalidRequest, 1, { "ngsi10"         }, NULL };
+  RestService     restService2 = { InvalidRequest, 1, { "ngsi9"          }, NULL };
+  RestService     restService3 = { InvalidRequest, 1, { "ngsi8"          }, NULL };
+  RestService     restService4 = { InvalidRequest, 2, { "ngsi10", "json" }, NULL };
 
   utInit();
 
@@ -101,19 +104,23 @@ TEST(Convenience, shortPath)
 
   serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
 
-  ci1.apiVersion = V1;
+  ci1.apiVersion   = V1;
+  ci1.restServiceP = &restService1;
   out = orion::requestServe(&ci1);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  ci2.apiVersion = V1;
+  ci2.apiVersion   = V1;
+  ci2.restServiceP = &restService2;
   out = orion::requestServe(&ci2);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  ci3.apiVersion = V1;
+  ci3.apiVersion   = V1;
+  ci3.restServiceP = &restService3;
   out = orion::requestServe(&ci3);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  ci4.apiVersion = V1;
+  ci4.apiVersion   = V1;
+  ci4.restServiceP = &restService4;
   out = orion::requestServe(&ci4);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -125,13 +132,13 @@ TEST(Convenience, shortPath)
 /* ****************************************************************************
 *
 * badPathNgsi9 -
-*
 */
 TEST(Convenience, badPathNgsi9)
 {
   ConnectionInfo            ci("ngsi9/badpathcomponent", "GET", "1.1");
   std::string               out;
   const char*               outfile = "ngsi.unrecognizedRequest.json";
+  RestService               restService = { InvalidRequest, 2, { "ngsi9", "badpathcomponent" }, NULL };
 
   utInit();
 
@@ -139,7 +146,8 @@ TEST(Convenience, badPathNgsi9)
 
   serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
 
-  ci.apiVersion = V1;
+  ci.apiVersion   = V1;
+  ci.restServiceP = &restService;
   out = orion::requestServe(&ci);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -151,20 +159,21 @@ TEST(Convenience, badPathNgsi9)
 /* ****************************************************************************
 *
 * badPathNgsi10 -
-*
 */
 TEST(Convenience, badPathNgsi10)
 {
   ConnectionInfo            ci("ngsi10/badpathcomponent", "GET", "1.1");
   std::string               out;
-  const char*               outfile = "ngsi.unrecognizedRequest.json";
+  const char*               outfile     = "ngsi.unrecognizedRequest.json";
+  RestService               restService = { InvalidRequest, 2, { "ngsi10", "badpathcomponent" }, NULL };
 
   utInit();
 
   serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  ci.apiVersion = V1;
+  ci.apiVersion   = V1;
+  ci.restServiceP = &restService;
   out = orion::requestServe(&ci);
   EXPECT_STREQ(expectedBuf, out.c_str());
 

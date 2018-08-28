@@ -33,17 +33,9 @@ brokerStart CB
 --SHELL--
 
 #
-# 00. GET /version, just for valgrind ...
 # 01. Send five GET /v2/entities
 # 02. Ask for Metrics, see 5 Incoming Transactions
 #
-
-echo "00. GET /version, just for valgrind ..."
-echo "======================================="
-orionCurl --url /version
-echo
-echo
-
 
 echo "01. Send five GET /v2/entities"
 echo "=============================="
@@ -68,28 +60,6 @@ echo
 
 
 --REGEXPECT--
-00. GET /version, just for valgrind ...
-=======================================
-HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "orion": {
-        "compile_time": "REGEX(.*)",
-        "compiled_by": "REGEX(.*)",
-        "compiled_in": "REGEX(.*)",
-        "doc": "REGEX(.*)",
-        "git_hash": "REGEX(([0-9a-f]{40}|nogitversion))",
-        "release_date": "REGEX(.*)",
-        "uptime": "REGEX(.*)",
-        "version": "REGEX(.*)"
-    }
-}
-
-
 01. Send five GET /v2/entities
 ==============================
 HTTP/1.1 200 OK
@@ -143,20 +113,6 @@ Date: REGEX(.*)
 
 {
     "services": {
-        "default-service": {
-            "subservs": {
-                "root-subserv": {
-                    "incomingTransactionResponseSize": REGEX(\d+),
-                    "incomingTransactions": REGEX((1|2)),
-                    "serviceTime": REGEX(.*)
-                }
-            },
-            "sum": {
-                "incomingTransactionResponseSize": REGEX(\d+),
-                "incomingTransactions": REGEX((1|2)),
-                "serviceTime": REGEX(.*)
-            }
-        },
         "s1": {
             "subservs": {
                 "SP/entities1": {
@@ -226,16 +182,11 @@ Date: REGEX(.*)
                 "incomingTransactionResponseSize": 2,
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
-            },
-            "root-subserv": {
-                "incomingTransactionResponseSize": REGEX(\d+),
-                "incomingTransactions": REGEX((1|2)),
-                "serviceTime": REGEX(.*)
             }
         },
         "sum": {
             "incomingTransactionResponseSize": REGEX(\d+),
-            "incomingTransactions": REGEX((6|7)),
+            "incomingTransactions": 5,
             "serviceTime": REGEX(.*)
         }
     }

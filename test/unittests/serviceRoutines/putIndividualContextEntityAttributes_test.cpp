@@ -41,14 +41,14 @@
 */
 static RestService putV[] =
 {
-  { IndividualContextEntityAttributes, 4, { "ngsi10", "contextEntities", "*", "attributes" }, "", putIndividualContextEntityAttributes },
-  { InvalidRequest,                    0, {                                                }, "", NULL                                 }
+  { IndividualContextEntityAttributes, 4, { "ngsi10", "contextEntities", "*", "attributes" }, putIndividualContextEntityAttributes },
+  { InvalidRequest,                    0, {                                                }, NULL                                 }
 };
 
 static RestService badVerbV[] =
 {
-  { InvalidRequest,   0, { "*", "*", "*", "*", "*", "*"                   }, "", badRequest                           },
-  { InvalidRequest,   0, {                                                }, "", NULL                                 }
+  { InvalidRequest,   0, { "*", "*", "*", "*", "*", "*"                   }, badRequest                           },
+  { InvalidRequest,   0, {                                                }, NULL                                 }
 };
 
 

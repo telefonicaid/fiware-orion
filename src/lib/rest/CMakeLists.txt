@@ -32,6 +32,7 @@ SET (SOURCES
     ConnectionInfo.cpp
     StringFilter.cpp
     HttpHeaders.cpp
+    restServiceLookup.cpp
 )
 
 SET (HEADERS
@@ -46,7 +47,8 @@ SET (HEADERS
     orionLogReply.h
     OrionError.h
     HttpStatusCode.h
-    StringFilter.h    
+    StringFilter.h
+    restServiceLookup.h
 )
 
 

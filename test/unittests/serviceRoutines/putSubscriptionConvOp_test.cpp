@@ -44,8 +44,8 @@
 */
 static RestService badVerbV[] =
 {
-  { Ngsi10SubscriptionsConvOp,  3, { "ngsi10", "contextSubscriptions", "*" }, "", badVerbPutDeleteOnly },
-  { InvalidRequest,             0, { "*", "*", "*", "*", "*", "*"          }, "", badRequest           },
+  { Ngsi10SubscriptionsConvOp,  3, { "ngsi10", "contextSubscriptions", "*" }, badVerbPutDeleteOnly },
+  { InvalidRequest,             0, { "*", "*", "*", "*", "*", "*"          }, badRequest           },
 };
 
 
@@ -56,8 +56,14 @@ static RestService badVerbV[] =
 */
 TEST(putSubscriptionConvOp, put)
 {
-  ConnectionInfo ci1("/ngsi10/contextSubscriptions/012345678901234567890123",  "XVERB",  "1.1");
-  std::string    out;
+  ConnectionInfo  ci1("/ngsi10/contextSubscriptions/012345678901234567890123",  "XVERB",  "1.1");
+  std::string     out;
+  RestService     restService =
+    {
+      VersionRequest,
+      3, { "ngsi10", "contextSubscriptions", "012345678901234567890123" },
+      NULL
+    };
 
   utInit();
 
@@ -65,6 +71,7 @@ TEST(putSubscriptionConvOp, put)
   ci1.inMimeType     = JSON;
   ci1.payload        = NULL;
   ci1.payloadSize    = 0;
+  ci1.restServiceP   = &restService;
 
   serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, badVerbV);
   out = orion::requestServe(&ci1);

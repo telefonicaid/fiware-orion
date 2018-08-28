@@ -44,18 +44,20 @@
 #include "common/clockFunctions.h"
 #include "common/statistics.h"
 #include "common/tag.h"
+#include "common/limits.h"                // SERVICE_NAME_MAX_LEN
 
 #include "alarmMgr/alarmMgr.h"
 #include "metricsMgr/metricsMgr.h"
-
 #include "parse/forbiddenChars.h"
+
+#include "rest/Verb.h"
 #include "rest/HttpHeaders.h"
 #include "rest/RestService.h"
-#include "rest/rest.h"
 #include "rest/restReply.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
-#include "common/limits.h"  // SERVICE_NAME_MAX_LEN
+#include "rest/restServiceLookup.h"
+#include "rest/rest.h"
 
 
 
@@ -944,7 +946,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   {
     std::string details = "Content-Type header not used, default application/octet-stream is not supported";
     ciP->httpStatusCode = SccUnsupportedMediaType;
-    ciP->answer = restErrorReplyGet(ciP, "", "OrionError", SccUnsupportedMediaType, details);
+    restErrorReplyGet(ciP, SccUnsupportedMediaType, details, &ciP->answer);
     ciP->httpStatusCode = SccUnsupportedMediaType;
 
     return 1;
@@ -955,7 +957,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   {
     std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
     ciP->httpStatusCode = SccUnsupportedMediaType;
-    ciP->answer = restErrorReplyGet(ciP, "", "OrionError", SccUnsupportedMediaType, details);
+    restErrorReplyGet(ciP, SccUnsupportedMediaType, details, &ciP->answer);
     ciP->httpStatusCode = SccUnsupportedMediaType;
     return 1;
   }
@@ -966,7 +968,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   {
     std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
     ciP->httpStatusCode = SccUnsupportedMediaType;
-    ciP->answer = restErrorReplyGet(ciP, "", "OrionError", SccUnsupportedMediaType, details);
+    restErrorReplyGet(ciP, SccUnsupportedMediaType, details, &ciP->answer);
     ciP->httpStatusCode = SccUnsupportedMediaType;
     return 1;
   }
@@ -1128,6 +1130,10 @@ static bool acceptHeadersAcceptable(ConnectionInfo* ciP, bool* textAcceptedP)
 
 
 
+RestService restServiceForBadVerb;
+
+
+
 /* ****************************************************************************
 *
 * connectionTreat -
@@ -1239,6 +1245,25 @@ static int connectionTreat
       return MHD_NO;
     }
 
+
+    // Get API version
+    // FIXME #3109-PR: this assignment will be removed in a subsequent PR, where the function apiVersionGet() is used instead
+    //
+    ciP->apiVersion = (url[2] == '2')? V2 : V1;  // If an APIv2 request, the URL starts with "/v2/". Only V2 requests.
+
+    // LM_TMP(("--------------------- Serving APIv%d request %s %s -----------------", ciP->apiVersion, method, url));
+
+    // Lookup Rest Service
+    bool badVerb = false;
+    ciP->restServiceP = restServiceLookup(ciP, &badVerb);
+
+    if (badVerb)
+    {
+      // Bad Verb is taken care of later
+      ciP->httpStatusCode = SccBadVerb;
+      ciP->restServiceP   = &restServiceForBadVerb;  // FIXME #3109-PR: Try to remove this, or make restServiceLookup return a dummy
+    }
+
     ciP->transactionStart.tv_sec  = transactionStart.tv_sec;
     ciP->transactionStart.tv_usec = transactionStart.tv_usec;
 
@@ -1247,8 +1272,6 @@ static int connectionTreat
       clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);
     }
 
-    // LM_TMP(("--------------------- Serving request %s %s -----------------", method, url));
-    LM_T(LmtRequest, (""));
     // WARNING: This log message below is crucial for the correct function of the Behave tests - CANNOT BE REMOVED
     LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", method, url));
     *con_cls     = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
@@ -1269,7 +1292,7 @@ static int connectionTreat
     ciP->uriParam[URI_PARAM_PAGINATION_LIMIT]   = DEFAULT_PAGINATION_LIMIT;
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
 
-    // Note we need to get API version before MHD_get_connection_values() as the later
+    // Note that we need to get API version before MHD_get_connection_values() as the later
     // function may result in an error after processing Accept headers (and the
     // render for the error depends on API version)
     ciP->apiVersion = apiVersionGet(ciP->url.c_str());
@@ -1408,23 +1431,21 @@ static int connectionTreat
   // URL and headers checks are delayed to the "third" MHD call, as no
   // errors can be sent before all the request has been read
   //
+  lmTransactionSetSubservice(ciP->httpHeaders.servicePath.c_str());
+
   if (urlCheck(ciP, ciP->url) == false)
   {
     alarmMgr.badInput(clientIp, "error in URI path");
     restReply(ciP, ciP->answer);
     return MHD_YES;
   }
-
-  lmTransactionSetSubservice(ciP->httpHeaders.servicePath.c_str());
-
-  if (servicePathSplit(ciP) != 0)
+  else if (servicePathSplit(ciP) != 0)
   {
     alarmMgr.badInput(clientIp, "error in ServicePath http-header");
     restReply(ciP, ciP->answer);
     return MHD_YES;
   }
-
-  if (contentTypeCheck(ciP) != 0)
+  else if (contentTypeCheck(ciP) != 0)
   {
     alarmMgr.badInput(clientIp, "invalid mime-type in Content-Type http-header");
     restReply(ciP, ciP->answer);
@@ -1448,11 +1469,11 @@ static int connectionTreat
   if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
   {
     char details[256];
+
     snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
-
     alarmMgr.badInput(clientIp, details);
+    restErrorReplyGet(ciP, SccRequestEntityTooLarge, details, &ciP->answer);
 
-    ciP->answer         = restErrorReplyGet(ciP, "", ciP->url, SccRequestEntityTooLarge, details);
     ciP->httpStatusCode = SccRequestEntityTooLarge;
   }
 
@@ -1546,8 +1567,9 @@ static int connectionTreat
       (ciP->httpHeaders.contentLength == 0) &&
       ((strncasecmp(ciP->url.c_str(), "/log/", 5) != 0) && (strncasecmp(ciP->url.c_str(), "/admin/log", 10) != 0)))
   {
-    std::string errorMsg = restErrorReplyGet(ciP, "", url, SccContentLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request");
+    std::string errorMsg;
 
+    restErrorReplyGet(ciP, SccContentLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request", &errorMsg);
     ciP->httpStatusCode  = SccContentLengthRequired;
     restReply(ciP, errorMsg);
     alarmMgr.badInput(clientIp, errorMsg);
@@ -1564,6 +1586,7 @@ static int connectionTreat
 
   return MHD_YES;
 }
+
 
 
 /* ****************************************************************************

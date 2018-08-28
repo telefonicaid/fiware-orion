@@ -242,7 +242,7 @@ Date: REGEX(.*)
         "entityByIdAttributeByNameIdAndType": 5,
         "jsonRequests": 2,
         "statisticsRequests": 1,
-        "versionRequests": REGEX((0|1))
+        "versionRequests": 0
     },
     "measuring_interval_in_secs": REGEX(\d+),
     "uptime_in_secs": REGEX(\d+)
