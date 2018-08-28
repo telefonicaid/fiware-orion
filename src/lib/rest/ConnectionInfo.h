@@ -34,6 +34,7 @@
 #include <map>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "common/MimeType.h"
 #include "ngsi/Request.h"
@@ -47,10 +48,12 @@
 extern "C"
 {
 #include "kjson/kjson.h"
+#include "kjson/kjFree.h"
 }
 
+#include "orionld/context/OrionldContext.h"
+
 struct OrionLdRestService;
-struct OrionldContext;
 #endif  
 
 
@@ -71,130 +74,10 @@ struct RestService;
 class ConnectionInfo
 {
 public:
-  ConnectionInfo():
-    connection             (NULL),
-    verb                   (NOVERB),
-    badVerb                (false),
-    inMimeType             (JSON),
-    outMimeType            (JSON),
-    tenant                 (""),
-    restServiceP           (NULL),
-    payload                (NULL),
-    payloadSize            (0),
-    callNo                 (1),
-    parseDataP             (NULL),
-    port                   (0),
-    ip                     (""),
-    apiVersion             (V1),
-    inCompoundValue        (false),
-    compoundValueP         (NULL),
-    compoundValueRoot      (NULL),
-    httpStatusCode         (SccOk),
-#ifdef ORIONLD
-    serviceP                  (NULL),
-    responsePayload           (NULL),
-    responsePayloadAllocated  (false),
-    urlPath                   (NULL),
-    wildcard                  { NULL, NULL},
-    kjsonP                    (NULL),
-    requestTopP               (NULL),
-    responseTopP              (NULL),
-    contextP                  (NULL)
-#endif
-    {
-  }
-
-  ConnectionInfo(MimeType _outMimeType):
-    connection             (NULL),
-    verb                   (NOVERB),
-    badVerb                (false),
-    inMimeType             (JSON),
-    outMimeType            (_outMimeType),
-    tenant                 (""),
-    restServiceP           (NULL),
-    payload                (NULL),
-    payloadSize            (0),
-    callNo                 (1),
-    parseDataP             (NULL),
-    port                   (0),
-    ip                     (""),
-    apiVersion             (V1),
-    inCompoundValue        (false),
-    compoundValueP         (NULL),
-    compoundValueRoot      (NULL),
-    httpStatusCode         (SccOk),
-#ifdef ORIONLD
-    serviceP                  (NULL),
-    responsePayload           (NULL),
-    responsePayloadAllocated  (false),
-    urlPath                   (NULL),
-    wildcard                  { NULL, NULL},
-    kjsonP                    (NULL),
-    requestTopP               (NULL),
-    responseTopP              (NULL),
-    contextP                  (NULL)
-#endif
-  {
-  }
-
-  ConnectionInfo(std::string _url, std::string _method, std::string _version, MHD_Connection* _connection = NULL):
-    connection             (_connection),
-    verb                   (NOVERB),
-    badVerb                (false),
-    inMimeType             (JSON),
-    outMimeType            (JSON),
-    url                    (_url),
-    method                 (_method),
-    version                (_version),
-    tenant                 (""),
-    restServiceP           (NULL),
-    payload                (NULL),
-    payloadSize            (0),
-    callNo                 (1),
-    parseDataP             (NULL),
-    port                   (0),
-    ip                     (""),
-    apiVersion             (V1),
-    inCompoundValue        (false),
-    compoundValueP         (NULL),
-    compoundValueRoot      (NULL),
-    httpStatusCode         (SccOk),
-#ifdef ORIONLD
-    serviceP                  (NULL),
-    responsePayload           (NULL),
-    responsePayloadAllocated  (false),
-    urlPath                   (NULL),
-    wildcard                  { NULL, NULL},
-    kjsonP                    (NULL),
-    requestTopP               (NULL),
-    responseTopP              (NULL),
-    contextP                  (NULL)
-#endif
-  {
-
-    if      (_method == "POST")    verb = POST;
-    else if (_method == "PUT")     verb = PUT;
-    else if (_method == "GET")     verb = GET;
-    else if (_method == "DELETE")  verb = DELETE;
-    else if (_method == "PATCH")   verb = PATCH;
-    else if (_method == "OPTIONS") verb = OPTIONS;
-    else
-    {
-      badVerb = true;
-      verb    = NOVERB;
-    }
-  }
-
-  ~ConnectionInfo()
-  {
-    if (compoundValueRoot != NULL)
-    {
-      delete compoundValueRoot;
-    }
-
-    servicePathV.clear();
-    httpHeaders.release();
-  }
+  ConnectionInfo();
+  ConnectionInfo(MimeType _outMimeType);
+  ConnectionInfo(std::string _url, std::string _method, std::string _version, MHD_Connection* _connection = NULL);
+  ~ConnectionInfo();
 
   MHD_Connection*            connection;
   Verb                       verb;
@@ -228,10 +111,10 @@ public:
   std::map<std::string, bool>          uriParamOptions;
   std::vector<std::string>             uriParamTypes;
 
-  bool                       inCompoundValue;
-  orion::CompoundValueNode*  compoundValueP;    // Points to current node in the tree
-  orion::CompoundValueNode*  compoundValueRoot; // Points to the root of the tree
-  ::std::vector<orion::CompoundValueNode*> compoundValueVector;
+  bool                                      inCompoundValue;
+  orion::CompoundValueNode*                 compoundValueP;       // Points to current node in the tree
+  orion::CompoundValueNode*                 compoundValueRoot;    // Points to the root of the tree
+  ::std::vector<orion::CompoundValueNode*>  compoundValueVector;
 
   // Outgoing
   HttpStatusCode            httpStatusCode;
@@ -248,8 +131,8 @@ public:
   char*                     urlPath;
   char*                     wildcard[2];
   Kjson*                    kjsonP;
-  KjNode*                   requestTopP;
-  KjNode*                   responseTopP;
+  KjNode*                   requestTree;
+  KjNode*                   responseTree;
   OrionldContext*           contextP;
 #endif  
 };

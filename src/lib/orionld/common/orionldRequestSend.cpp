@@ -80,6 +80,11 @@ bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoIn
   if (urlParse(url, protocol, sizeof(protocol), ip, sizeof(ip), &port, &urlPath, detailsPP) == false)
   {
     // urlParse sets *detailsPP
+
+    // This function must release the allocated respose buffer in case of errpr
+    free(rBufP->buf);
+    rBufP->buf = NULL;
+
     LM_E(("urlParse failed for url '%s': %s", url, *detailsPP));
     return false;
   }
@@ -92,6 +97,11 @@ bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoIn
   if (cc.curl == NULL)
   {
     *detailsPP = (char*) "Unable to obtain CURL context";
+
+    // This function must release the allocated respose buffer in case of errpr
+    free(rBufP->buf);
+    rBufP->buf = NULL;
+
     LM_E((*detailsPP));
     return false;
   }
@@ -117,10 +127,14 @@ bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoIn
   LM_T(LmtRequestSend, ("curl_easy_perform returned %d", cCode));
   if (cCode != CURLE_OK)
   {
+    *detailsPP = (char*) "internal error at sending of curl request";
+
+    // This function must release the allocated respose buffer in case of errpr
+    free(rBufP->buf);
+    rBufP->buf = NULL;
+
     release_curl_context(&cc);
     LM_E(("curl_easy_perform error %d", cCode));
-    free(rBufP->buf);
-    *detailsPP = (char*) "internal error at sending of curl request";
     return false;
   }
 

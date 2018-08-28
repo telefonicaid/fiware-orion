@@ -53,10 +53,10 @@ static OrionLdRestServiceSimplified getServices[] =
 {
   { "/ngsi-ld/v1/entities/*",              orionldGetEntity          },
   { "/ngsi-ld/v1/entities",                orionldGetEntities        },
-  { "/ngsi-ld/v1/subscriptions",           orionldGetSubscriptions   },
   { "/ngsi-ld/v1/subscriptions/*",         orionldGetSubscription    },
-  { "/ngsi-ld/v1/cSourceRegistrations",    orionldGetRegistrations   },
-  { "/ngsi-ld/v1/cSourceRegistrations/*",  orionldGetRegistration    }
+  { "/ngsi-ld/v1/subscriptions",           orionldGetSubscriptions   },
+  { "/ngsi-ld/v1/cSourceRegistrations/*",  orionldGetRegistration    },
+  { "/ngsi-ld/v1/cSourceRegistrations",    orionldGetRegistrations   }
 };
 
 
@@ -67,8 +67,8 @@ static OrionLdRestServiceSimplified getServices[] =
 //
 static OrionLdRestServiceSimplified postServices[] =
 {
-  { "/ngsi-ld/v1/entities",                orionldPostEntities       },
   { "/ngsi-ld/v1/entities/*/attrs",        orionldPostEntity         },
+  { "/ngsi-ld/v1/entities",                orionldPostEntities       },
   { "/ngsi-ld/v1/subscriptions",           orionldPostSubscriptions  },
   { "/ngsi-ld/v1/cSourceRegistrations",    orionldPostRegistrations  }
 };

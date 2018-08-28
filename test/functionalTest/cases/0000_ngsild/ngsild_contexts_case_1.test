@@ -21,12 +21,12 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Parse Contexts - three cases
+Parse Contexts - case one - string reference to a vector reference
 
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+brokerStart CB 247
 
 --SHELL--
 
@@ -77,9 +77,9 @@ brokerStart CB 0-255
 
 #
 # 01. POST /ngsi-ld/v1/entities, with a context that is a 'string reference' to another context that is a set of contexts
-# 02. POST /ngsi-ld/v1/entities, with a context that is a 'string reference' to another context that is a 'simple' context
-# 03. POST /ngsi-ld/v1/entities, with a context that is a vector of other contexts
+# 02. Checking mongo to see a correct context
 #
+
 
 echo "01. POST /ngsi-ld/v1/entities, with a context that is a 'string reference' to another context that is a set of contexts"
 echo "======================================================================================================================="
@@ -97,37 +97,10 @@ echo
 echo
 
 
-echo "02. POST /ngsi-ld/v1/entities, with a context that is a 'string reference' to another context that is a 'simple' context"
-echo "========================================================================================================================"
-payload='{
-  "id": "http://a.b.c/entity/E2",
-  "type": "A",
-  "name": {
-    "type": "Property",
-    "value": "John 2"
-  },
-  "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json"
-}'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
-echo
-echo
 
-
-echo "03. POST /ngsi-ld/v1/entities, with a context that is a vector of other contexts"
-echo "================================================================================"
-payload='{
-  "id": "http://a.b.c/entity/E3",
-  "type": "A",
-  "name": {
-    "type": "Property",
-    "value": "John 2"
-  },
-  "@context": [
-    "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json",
-    "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
-  ]
-}'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo "02. Checking mongo to see a correct context"
+echo "==========================================="
+mongoCmd2 ftest "db.entities.findOne()"
 echo
 echo
 
@@ -142,24 +115,59 @@ Date: REGEX(.*)
 
 
 
-02. POST /ngsi-ld/v1/entities, with a context that is a 'string reference' to another context that is a 'simple' context
-========================================================================================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
-Date: REGEX(.*)
-
-
-
-03. POST /ngsi-ld/v1/entities, with a context that is a vector of other contexts
-================================================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
-Date: REGEX(.*)
-
+02. Checking mongo to see a correct context
+===========================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "http://a.b.c/entity/E1",
+		"type" : "http://www.example.org/entities/A",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"@context",
+		"http://uri.etsi.org/ngsi-ld/name"
+	],
+	"attrs" : {
+		"@context" : {
+			"type" : "ContextString",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld",
+			"mdNames" : [ ]
+		},
+		"http://uri=etsi=org/ngsi-ld/name" : {
+			"type" : "http://etsi.org/nsgi-ld/Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"value" : "John 2"
+			},
+			"md" : {
+				"@aliasAttributeName" : {
+					"type" : "Alias",
+					"value" : "name"
+				},
+				"@aliasAttributeType" : {
+					"type" : "Alias",
+					"value" : "Property"
+				}
+			},
+			"mdNames" : [
+				"@aliasAttributeName",
+				"@aliasAttributeType"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
 
 
 --TEARDOWN--
 brokerStop CB
-#dbDrop CB
+dbDrop CB

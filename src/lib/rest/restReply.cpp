@@ -89,7 +89,10 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
 
 #ifdef ORIONLD
     if (ciP->responsePayloadAllocated == true)
+    {
       free(ciP->responsePayload);
+      ciP->responsePayload = NULL;
+    }
 #endif    
 
     return;
@@ -164,8 +167,11 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   MHD_destroy_response(response);
 
 #ifdef ORIONLD
-    if (ciP->responsePayloadAllocated == true)
-      free(ciP->responsePayload);
+  if ((ciP->responsePayloadAllocated == true) && (ciP->responsePayload != NULL))
+  {
+    free(ciP->responsePayload);
+    ciP->responsePayload = NULL;
+  }
 #endif    
 }
 

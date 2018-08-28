@@ -539,6 +539,7 @@ void exitFunc(void)
   curl_context_cleanup();
   curl_global_cleanup();
 
+  LM_T(LmtFree, ("Calling orionldContextFreeAll"));
   orionldContextFreeAll();
 
   if (unlink(pidPath) != 0)

@@ -73,9 +73,9 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       ciP->kjsonP->stringBeforeColon = (char*) "";
       ciP->kjsonP->stringAfterColon  = (char*) "";
       
-      ciP->requestTopP = kjParse(ciP->kjsonP, ciP->payload);
+      ciP->requestTree = kjParse(ciP->kjsonP, ciP->payload);
       LM_T(LmtPayloadParse, ("After kjParse"));
-      if (ciP->requestTopP == NULL)
+      if (ciP->requestTree == NULL)
         LM_X(1, ("JSON parse error"));
       LM_T(LmtPayloadParse, ("All good - payload parsed"));
     }
@@ -106,45 +106,33 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
 
   // Is there a KJSON response tree to render?
-  if (ciP->responseTopP != NULL)
+  if (ciP->responseTree != NULL)
   {
     LM_T(LmtJsonResponse, ("Rendering KJSON response tree"));
     ciP->responsePayload          = (char*) malloc(1024);
-    ciP->responsePayloadAllocated = true;
-    kjRender(ciP->kjsonP, ciP->responseTopP, ciP->responsePayload, 1024);
+    if (ciP->responsePayload != NULL)
+    {
+      ciP->responsePayloadAllocated = true;
+      kjRender(ciP->kjsonP, ciP->responseTree, ciP->responsePayload, 1024);
+    }
+    else
+    {
+      LM_E(("Error allocating biffer for response payload"));
+    }
   }
-
+  
   if (ciP->responsePayload != NULL)
   {
     LM_T(LmtJsonResponse, ("Responding with '%s'", ciP->responsePayload));
     ciP->outMimeType = JSON;
     restReply(ciP, ciP->responsePayload);
+    // ciP->responsePayload freed and NULLed by restReply()
   }
   else
   {
     LM_T(LmtJsonResponse, ("Responding without payload"));
     restReply(ciP, "");
   }
-
-#if 0  // FIXME P9: Fix the leaks!!!
-  if (ciP->requestTopP != NULL)
-  {
-    LM_T(LmtFree, ("Calling kjFree on request"));
-    kjFree(ciP->requestTopP);
-    LM_T(LmtFree, ("kjFree'd request"));
-  }
-  
-  if (ciP->responseTopP != NULL)
-  {
-    LM_T(LmtFree, ("Calling kjFree on response"));
-    kjFree(ciP->responseTopP);
-    LM_T(LmtFree, ("kjFree'd response"));
-  }
-#endif
-
-  LM_T(LmtFree, ("Freeing ciP->kjsonP"));
-  free(ciP->kjsonP);
-  ciP->kjsonP = NULL;
 
   return MHD_YES;
 }

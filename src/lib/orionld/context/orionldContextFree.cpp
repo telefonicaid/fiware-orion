@@ -32,6 +32,7 @@ extern "C"
 
 #include "orionld/context/OrionldContext.h"                 // OrionldContext
 #include "orionld/context/orionldContextList.h"             // orionldContextHead
+#include "orionld/context/orionldDefaultContext.h"          // orionldDefaultContext
 #include "orionld/context/orionldContextFree.h"             // Own interface
 
 
@@ -44,14 +45,22 @@ void orionldContextFreeAll(void)
 {
   OrionldContext* contextP = orionldContextHead;
 
-  LM_T(LmtFree, ("Freeing all context"));
+  LM_T(LmtFree, ("Freeing contexts, starting with %p", contextP));
+  LM_TMP(("Freeing contexts, starting with %p", contextP));
   while (contextP != NULL)
   {
     OrionldContext* next = contextP->next;
 
+    LM_T(LmtContextList, ("Freeing context '%s' at %p", contextP->url, contextP));
+    LM_TMP(("Freeing context '%s' at %p", contextP->url, contextP));
     kjFree(contextP->tree);
-    free(contextP->url);
-    free(contextP);
+
+    if (contextP != &orionldDefaultContext)
+    {
+      free(contextP->url);
+      free(contextP);
+    }
+
     contextP = next;
   }
 

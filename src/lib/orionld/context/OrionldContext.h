@@ -25,7 +25,10 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
+extern "C"
+{
+#include "kjson/kjson.h"
+}
 
 
 

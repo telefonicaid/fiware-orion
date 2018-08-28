@@ -58,7 +58,10 @@ static bool orionldContextAppend(const char* url, KjNode* tree, char** detailsPP
     *detailsPP = (char*) "out of memory";
     return false;
   }
-  
+
+  LM_T(LmtContextList, ("Adding context '%s' to the list", url));
+  LM_TMP(("Adding context %p (%s) to the list", contextP, url));
+
   contextP->url  = strdup(url);
   contextP->tree = tree;
   contextP->next = NULL;
@@ -69,12 +72,25 @@ static bool orionldContextAppend(const char* url, KjNode* tree, char** detailsPP
   //
   if (orionldContextHead == NULL)
   {
+    LM_TMP(("orionldContextHead is NULL, so, this new context is the ONLY context in the list"));
     orionldContextHead = contextP;
     orionldContextTail = contextP;
   }
   else
+  {
+    LM_TMP(("orionldContextHead is non NULL, so, this new context is appended after orionldContextTail: %s", orionldContextTail->url));
     orionldContextTail->next = contextP;
+    orionldContextTail = contextP;
+  }
 
+  //
+  // Presenting the list  (TMP)
+  //
+  LM_TMP(("Current context list:"));
+  for (OrionldContext* ctxP = orionldContextHead; ctxP != NULL; ctxP = ctxP->next)
+    LM_TMP(("o %p: %s", ctxP, ctxP->url));
+  LM_TMP(("-------------------------------------------------------------------------------------------------------"));
+  LM_TMP((""));
   return true;
 }
 
@@ -82,7 +98,10 @@ static bool orionldContextAppend(const char* url, KjNode* tree, char** detailsPP
 
 // ----------------------------------------------------------------------------
 //
-// orionldContextAdd - download, parse and add a context (or various contexts) 
+// orionldContextAdd - download, parse and add a context (or various contexts)
+//
+// This function is called by orionldPostEntities to add referenced contexts, never "direct contexts"
+// Contexts are referenced either as a string, or as a vector of strings
 //
 // After downloading the initial URL, the content of these "Context URLs" may be:
 //
@@ -102,16 +121,18 @@ static bool orionldContextAppend(const char* url, KjNode* tree, char** detailsPP
 //    }
 bool orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsPP)
 {
-  LM_T(LmtContext, ("********************* Getting URL '%s' and adding it as a context", url));
+  LM_T(LmtContext, ("********************* Getting context in URL '%s' and adding it as a context", url));
   LM_T(LmtContext, ("But first, looking up '%s'", url));
 
   if (orionldContextLookup(url) != NULL)
   {
-    LM_T(LmtContext, ("Context '%s' already cached", url));
+    LM_T(LmtContext, ("Looking up context '%s': already cached", url));
+    LM_TMP(("Looking up context '%s': already cached", url));
+
     return true;
   }
 
-  LM_T(LmtContext, ("Downloading and parsing URL %s", url));
+  LM_T(LmtContext, ("Downloading and parsing context of URL '%s'", url));
   KjNode* tree = orionldContextDownloadAndParse(ciP->kjsonP, url, detailsPP);
 
   if (tree == NULL)
@@ -189,7 +210,8 @@ bool orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsPP)
   // - an object with key-values (a "leaf")
   // - a vector of contexts (URL strings)
   //
-  
+
+  LM_TMP(("Calling orionldContextAppend"));
   if (orionldContextAppend(url, tree, detailsPP) == false)
     return false;
 
@@ -245,12 +267,19 @@ bool orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsPP)
         
     LM_T(LmtContext, ("Context is a string - meaning a new URL - download and create context: %s", url));
 
+    // If already in "cache", no need to download and parse
+    if (orionldContextLookup(url) != NULL)
+    {
+      continue;
+    }
+
     tree = orionldContextDownloadAndParse(ciP->kjsonP, url, detailsPP);
     if (tree == NULL)
     {
       LM_T(LmtContext, ("orionldContextDownloadAndParse failed: %s", *detailsPP));
       return false;
     }
+    LM_TMP(("Calling orionldContextAppend (as a result of a download af a context that was in a context vector of a request)"));
     if (orionldContextAppend(url, tree, detailsPP) == false)
     {
       LM_T(LmtContext, (*detailsPP));

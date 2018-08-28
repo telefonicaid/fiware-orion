@@ -231,9 +231,9 @@ static bool payloadCheck
   KjNode**         operationSpaceNodePP
   )
 {
-  OBJECT_CHECK(ciP->requestTopP, "toplevel");
+  OBJECT_CHECK(ciP->requestTree, "toplevel");
 
-  KjNode*  kNodeP                 = ciP->requestTopP->children;
+  KjNode*  kNodeP                 = ciP->requestTree->children;
   KjNode*  idNodeP                = NULL;
   KjNode*  typeNodeP              = NULL;
   KjNode*  locationNodeP          = NULL;
@@ -852,12 +852,13 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   if (contextTreat(ciP, contextNodeP, ceP) == false)
   {
     // Error payload set by contextTreat
+    mongoRequest.release();
     return false;
   }
   
 
   // Treat the entire payload
-  for (kNodeP = ciP->requestTopP->children; kNodeP != NULL; kNodeP = kNodeP->next)
+  for (kNodeP = ciP->requestTree->children; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     LM_T(LmtUriExpansion, ("treating entity node '%s'", kNodeP->name));
 
@@ -866,6 +867,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       if (!urlCheck(idNodeP->value.s, &details) && !urnCheck(idNodeP->value.s, &details))
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN");
+        mongoRequest.release();
         return false;
       }
 
@@ -890,6 +892,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       if (expansions == -1)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item for 'entity type'", details);
+        mongoRequest.release();
         return false;
       }
       else if (expansions == 0)
@@ -909,6 +912,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       else  // expansions == 2 ... may be an incorrect context
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value of context item 'entity id'", ciP->contextP->url);
+        mongoRequest.release();
         return false;
       }
       continue;
@@ -928,6 +932,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       if (attributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
       {
         delete caP;
+        mongoRequest.release();
         return false;
       }
 
@@ -944,6 +949,8 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
       if (expansions == -1)
       {
+        delete caP;
+        mongoRequest.release();
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item for 'attribute name'", details);
         return false;
       }
@@ -980,6 +987,8 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       if (expansions == -1)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item for 'attribute type'", details);
+        delete caP;
+        mongoRequest.release();
         return false;
       }
       else if (expansions >= 0)
@@ -1019,6 +1028,9 @@ bool orionldPostEntities(ConnectionInfo* ciP)
                                            ciP->httpHeaders.ngsiv2AttrsFormat,
                                            ciP->apiVersion,
                                            NGSIV2_NO_FLAVOUR);
+  mongoRequest.release();
+  mongoResponse.release();
+
   if (ciP->httpStatusCode != SccOk)
   {
     LM_E(("mongoUpdateContext: HTTP Status Code: %d", ciP->httpStatusCode));
@@ -1028,12 +1040,6 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
   ciP->httpStatusCode = SccCreated;
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/entities/", idNodeP->value.s);
-
-  if (ciP->contextP != NULL)
-  {
-    LM_T(LmtContext, ("Context of the entity:"));
-    orionLdContextPresent(ciP->contextP);
-  }
 
   return true;
 }

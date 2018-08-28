@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <stddef.h>                                  // NULL
+
 #include "orionld/context/OrionldContext.h"          // OrionldContext
 #include "orionld/context/orionldContextList.h"      // Own interface
 

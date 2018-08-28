@@ -22,18 +22,19 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
+#include "logMsg/logMsg.h"                                  // LM_*
+#include "logMsg/traceLevels.h"                             // Lmt*
 
 extern "C"
 {
-#include "kjson/kjson.h"                                // Kjson
-#include "kjson/KjNode.h"                               // KjNode
-#include "kjson/kjParse.h"                              // kjParse
-#include "kjson/kjFree.h"                               // kjFree
+#include "kjson/kjson.h"                                    // Kjson
+#include "kjson/KjNode.h"                                   // KjNode
+#include "kjson/kjParse.h"                                  // kjParse
+#include "kjson/kjFree.h"                                   // kjFree
 }
 
-#include "orionld/common/OrionldResponseBuffer.h"            // OrionldResponseBuffer
-#include "orionld/common/orionldRequestSend.h"               // orionldRequestSend
+#include "orionld/common/OrionldResponseBuffer.h"           // OrionldResponseBuffer
+#include "orionld/common/orionldRequestSend.h"              // orionldRequestSend
 
 
 // -----------------------------------------------------------------------------
@@ -63,10 +64,13 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
     return NULL;
   }
 
+  LM_T(LmtContext, ("Downoading context '%s'", url));
   if (orionldRequestSend(&httpResponse, url, 5000, detailsPP) == false)
   {
-    // detailsPP filled in by orionldRequestSend()
-    // httpResponse.buf freed by orionldRequestSend()
+    //
+    // detailsPP is filled in by orionldRequestSend()
+    // httpResponse.buf freed by orionldRequestSend() in case of error
+    //
     LM_E(("orionldRequestSend failed: %s", *detailsPP));
     return NULL;
   }

@@ -68,6 +68,11 @@ all: prepare_release release
 
 di: install_debug
 
+redi: rm_orionld_exec di
+
+rm_orionld_exec:
+	\rm -f BUILD_DEBUG/src/app/orionld/orionld
+
 compile_info:
 	./scripts/build/compileInfo.sh
 

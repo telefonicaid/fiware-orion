@@ -55,6 +55,181 @@ static const char* validOptions[] =
 
 /* ****************************************************************************
 *
+* ConnectionInfo::ConnectionInfo - 
+*/
+ConnectionInfo::ConnectionInfo():
+  connection             (NULL),
+  verb                   (NOVERB),
+  badVerb                (false),
+  inMimeType             (JSON),
+  outMimeType            (JSON),
+  tenant                 (""),
+  restServiceP           (NULL),
+  payload                (NULL),
+  payloadSize            (0),
+  callNo                 (1),
+  parseDataP             (NULL),
+  port                   (0),
+  ip                     (""),
+  apiVersion             (V1),
+  transactionStart       { 0, 0 },
+  inCompoundValue        (false),
+  compoundValueP         (NULL),
+  compoundValueRoot      (NULL),
+  httpStatusCode         (SccOk),
+#ifdef ORIONLD
+  serviceP                  (NULL),
+  responsePayload           (NULL),
+  responsePayloadAllocated  (false),
+  urlPath                   (NULL),
+  wildcard                  { NULL, NULL},
+  kjsonP                    (NULL),
+  requestTree               (NULL),
+  responseTree              (NULL),
+  contextP                  (NULL)
+#endif
+{
+}
+
+
+
+/* ****************************************************************************
+*
+* ConnectionInfo::ConnectionInfo - 
+*/
+ConnectionInfo::ConnectionInfo(MimeType _outMimeType):
+  connection             (NULL),
+  verb                   (NOVERB),
+  badVerb                (false),
+  inMimeType             (JSON),
+  outMimeType            (_outMimeType),
+  tenant                 (""),
+  restServiceP           (NULL),
+  payload                (NULL),
+  payloadSize            (0),
+  callNo                 (1),
+  parseDataP             (NULL),
+  port                   (0),
+  ip                     (""),
+  apiVersion             (V1),
+  transactionStart       { 0, 0 },
+  inCompoundValue        (false),
+  compoundValueP         (NULL),
+  compoundValueRoot      (NULL),
+  httpStatusCode         (SccOk),
+#ifdef ORIONLD
+  serviceP                  (NULL),
+  responsePayload           (NULL),
+  responsePayloadAllocated  (false),
+  urlPath                   (NULL),
+  wildcard                  { NULL, NULL},
+  kjsonP                    (NULL),
+  requestTree               (NULL),
+  responseTree              (NULL),
+  contextP                  (NULL)
+#endif
+{
+}
+
+
+
+/* ****************************************************************************
+*
+* ConnectionInfo::ConnectionInfo - 
+*/
+ConnectionInfo::ConnectionInfo(std::string _url, std::string _method, std::string _version, MHD_Connection* _connection):
+  connection             (_connection),
+  verb                   (NOVERB),
+  badVerb                (false),
+  inMimeType             (JSON),
+  outMimeType            (JSON),
+  url                    (_url),
+  method                 (_method),
+  version                (_version),
+  tenant                 (""),
+  restServiceP           (NULL),
+  payload                (NULL),
+  payloadSize            (0),
+  callNo                 (1),
+  parseDataP             (NULL),
+  port                   (0),
+  ip                     (""),
+  apiVersion             (V1),
+  transactionStart       { 0, 0 },
+  inCompoundValue        (false),
+  compoundValueP         (NULL),
+  compoundValueRoot      (NULL),
+  httpStatusCode         (SccOk),
+#ifdef ORIONLD
+  serviceP                  (NULL),
+  responsePayload           (NULL),
+  responsePayloadAllocated  (false),
+  urlPath                   (NULL),
+  wildcard                  { NULL, NULL},
+  kjsonP                    (NULL),
+  requestTree               (NULL),
+  responseTree              (NULL),
+  contextP                  (NULL)
+#endif
+{
+  if      (_method == "POST")    verb = POST;
+  else if (_method == "PUT")     verb = PUT;
+  else if (_method == "GET")     verb = GET;
+  else if (_method == "DELETE")  verb = DELETE;
+  else if (_method == "PATCH")   verb = PATCH;
+  else if (_method == "OPTIONS") verb = OPTIONS;
+  else
+  {
+    badVerb = true;
+    verb    = NOVERB;
+  }
+}
+
+
+
+ConnectionInfo::~ConnectionInfo()
+{
+  if (compoundValueRoot != NULL)
+  {
+    delete compoundValueRoot;
+  }
+
+  servicePathV.clear();
+  httpHeaders.release();
+
+#ifdef ORIONLD
+  if (requestTree != NULL)
+  {
+    LM_T(LmtFree, ("Calling kjFree for ciP->requestTree at %p", requestTree));
+    kjFree(requestTree);
+    LM_T(LmtFree, ("kjFree'd ciP->requestTree"));
+  }
+
+  if (responseTree != NULL)
+  {
+    LM_T(LmtFree, ("Calling kjFree for ciP->responseTree at %p", responseTree));
+    kjFree(responseTree);
+    LM_T(LmtFree, ("kjFree'd ciP->responseTree"));
+  }
+
+  if (contextP != NULL)
+  {
+    // contextP->tree point part of to the request payload - already freed by the call to "kjFree(requestTree)"
+    LM_T(LmtFree, ("Freeing contextP at: %p", contextP));
+    free(contextP);
+    LM_T(LmtFree, ("NOT Freed contextP at: %p", contextP));
+  }
+
+  LM_T(LmtFree, ("Freeing ciP->kjsonP at %p", kjsonP));
+  free(kjsonP);
+  LM_T(LmtFree, ("Freed ciP->kjsonP at %p", kjsonP));
+#endif
+}
+
+
+
+/* ****************************************************************************
+*
 * isValidOption -
 */
 static bool isValidOption(std::string item)
