@@ -24,7 +24,7 @@ query/update request to the Context Provider. In this case, Orion acts
 as a pure "NGSI proxy" (i.e. doesn't cache the result of the query
 internally) and, from the point of view of the client issuing the
 original request, the process is mostly transparent. The Context
-Provider is meant to implement the NGSI10 API (at least partially) to
+Provider is meant to implement the NGSI API (at least partially) to
 support the query/update operation.
 
 Let's illustrate this with an example.

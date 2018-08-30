@@ -676,8 +676,7 @@ Let's examine in detail the different elements included in the payload:
     (however, it is still stored in the broker database and needs to be
     purged using the procedure described in the [administration
     manual](../admin/database_admin.md#deleting-expired-documents)).
-    You can extend the duration of a subscription by updating it, as
-    described [in this document](duration.md#extending-duration).
+    You can extend the duration of a subscription by updating it.
     We are using a date far enough away in time (year 2040) hoping the subscription
     will not expire while you run this tutorial :).
 -   You can also have permanent subscriptions. Just omit the `expires` field.

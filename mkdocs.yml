@@ -30,8 +30,6 @@ pages:
       - 'Forbidden characters': 'user/forbidden_characters.md'
       - 'Using regular expressions in payloads': 'user/regex_in_payload.md'
       - 'Initial notification': 'user/initial_notification.md'
-      - 'Duration (for registrations and subscriptions)': 'user/duration.md'
-      - 'Empty Types': 'user/empty_types.md'
       - 'Security considerations': 'user/security.md'
       - 'Known limitations': 'user/known_limitations.md'      
       - 'Docker': 'user/docker.md'

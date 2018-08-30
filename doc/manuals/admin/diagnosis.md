@@ -210,7 +210,7 @@ yum install contextBroker
 
 The Orion Context Broker uses the following flows:
 
--   From NGSI9/10 applications to the broker, using TCP port 1026 by
+-   From client applications to the broker, using TCP port 1026 by
     default (this is overridden with "-port" option).
 -   From the broker to subscribed applications, using the port specified
     by the application in the callback at subscription creation time.

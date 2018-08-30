@@ -140,7 +140,7 @@ root or using the sudo command):
 ### Deleting expired documents
 
 NGSI specifies an expiration time for registrations and subcriptions
-(both NGSI9 and NGSI10 subscriptions). Orion Context Broker doesn't
+(both context and context availability subscriptions). Orion Context Broker doesn't
 delete the expired documents (they are just ignored) as
 expired registrations/subscription can be "re-activated" using a subscription update request,
 modifying their duration.

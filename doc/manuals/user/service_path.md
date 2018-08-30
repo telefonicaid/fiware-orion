@@ -70,8 +70,7 @@ Some additional remarks:
 
 -   Entities belongs to one (and only one) scope.
 
--   Fiware-ServicePath
-    header is included in NGSI10 notifyContext requests sent by Orion.
+-   Fiware-ServicePath header is included in notification requests sent by Orion.
 
 -   The scopes entities can be combined orthogonally with the
     [multi-service/multi-tenant
