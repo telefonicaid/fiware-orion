@@ -51,6 +51,3 @@ curl localhost:1026/v2/entities -s -S --header 'Content-Type: application/json' 
 }
 EOF
 ```
-
-The value of the attribute is stored internally by Orion Context Broker
-in a format-independent representation. 
