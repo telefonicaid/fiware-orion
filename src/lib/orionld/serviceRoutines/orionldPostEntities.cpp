@@ -22,34 +22,34 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                  // LM_*
-#include "logMsg/traceLevels.h"                             // Lmt*
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
 extern "C"
 {
-#include "kjson/kjBuilder.h"                                // kjString, kjObject, ...
-#include "kjson/kjRender.h"                                 // kjRender
+#include "kjson/kjBuilder.h"                                   // kjString, kjObject, ...
+#include "kjson/kjRender.h"                                    // kjRender
 }
 
-#include "rest/ConnectionInfo.h"                            // ConnectionInfo
-#include "orionTypes/OrionValueType.h"                      // orion::ValueType
-#include "orionTypes/UpdateActionType.h"                    // ActionType
-#include "parse/CompoundValueNode.h"                        // CompoundValueNode
-#include "ngsi/ContextAttribute.h"                          // ContextAttribute
-#include "ngsi10/UpdateContextRequest.h"                    // UpdateContextRequest
-#include "ngsi10/UpdateContextResponse.h"                   // UpdateContextResponse
-#include "mongoBackend/mongoUpdateContext.h"                // mongoUpdateContext
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionTypes/OrionValueType.h"                         // orion::ValueType
+#include "orionTypes/UpdateActionType.h"                       // ActionType
+#include "parse/CompoundValueNode.h"                           // CompoundValueNode
+#include "ngsi/ContextAttribute.h"                             // ContextAttribute
+#include "ngsi10/UpdateContextRequest.h"                       // UpdateContextRequest
+#include "ngsi10/UpdateContextResponse.h"                      // UpdateContextResponse
+#include "mongoBackend/mongoUpdateContext.h"                   // mongoUpdateContext
 
-#include "orionld/common/orionldErrorResponse.h"            // orionldErrorResponseCreate
-#include "orionld/common/SCOMPARE.h"                        // SCOMPAREx
-#include "orionld/common/urlCheck.h"                        // urlCheck
-#include "orionld/common/urnCheck.h"                        // urnCheck
-#include "orionld/context/orionldDefaultContext.h"          // orionldDefaultContext
-#include "orionld/context/orionldContextAdd.h"              // Add a context to the context list
-#include "orionld/context/orionldContextLookup.h"           // orionldContextLookup
-#include "orionld/context/orionldContextItemLookup.h"       // orionldContextItemLookup
-#include "orionld/context/orionldContextPresent.h"          // orionldContextPresent
-#include "orionld/serviceRoutines/orionldPostEntities.h"    // Own interface
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/common/urlCheck.h"                           // urlCheck
+#include "orionld/common/urnCheck.h"                           // urnCheck
+#include "orionld/context/orionldDefaultContext.h"             // orionldDefaultContext
+#include "orionld/context/orionldContextAdd.h"                 // Add a context to the context list
+#include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
+#include "orionld/context/orionldContextItemLookup.h"          // orionldContextItemLookup
+#include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
+#include "orionld/serviceRoutines/orionldPostEntities.h"       // Own interface
 
 
 
@@ -600,27 +600,35 @@ static bool contextTreat
   //
   // In the first implementation of ngsi-ld, the allowed payloads for the @context member are:
   //
-  // 1. An array of URL strings:
+  // 1. ARRAY - An array of URL strings:
   //    "@context": [
   //      "http://...",
   //      "http://...",
   //      "http://..."
   //    }
   //
-  // 2. A single URL string:
+  // 2. STRING - A single URL string:
   //    "@context": "http://..."
+  //
+  // 3. OBJECT - Direct context:
+  //    "@context": {
+  //      "Property": "http://...",
+  //      "XXX";      "YYY"
+  //    }
+  //
+  // case 3 is not implemented in the first round. coming later
   //
   // As the payload is already parsed, what needs to be done here is to call orionldContextAdd() for each of these URLs
   //
   // The content of these "Context URLs" can be:
   //
-  // 1. An object with a single member '@context' that is an object containing key-values:
+  // 4. An object with a single member '@context' that is an object containing key-values:
   //    "@context" {
   //      "Property": "http://...",
   //      "XXX";      ""
   //    }
   //
-  // 2. An object with a single member '@context', that is a vector of URL strings (https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld):
+  // 5. An object with a single member '@context', that is a vector of URL strings (https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld):
   //    {
   //      "@context": [
   //        "http://...",

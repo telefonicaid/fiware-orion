@@ -26,6 +26,7 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/serviceRoutines/orionldGetRegistrations.h"   // Own Interface
 
 
@@ -38,8 +39,9 @@ bool orionldGetRegistrations(ConnectionInfo* ciP)
 {
   LM_T(LmtServiceRoutine, ("In orionldGetRegistration"));
 
-  ciP->responsePayload = (char*) "{ \"error\": \"not implemented\", \"details\": \"GET /ngsi-ld/v1/cSourceRegistrations\" }\n";
-  ciP->httpStatusCode  = SccNotImplemented;
+  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - GET /ngsi-ld/v1/cSourceRegistrations", NULL);
+
+  ciP->httpStatusCode = SccNotImplemented;
 
   return true;
 }

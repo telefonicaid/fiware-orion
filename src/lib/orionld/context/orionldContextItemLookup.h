@@ -40,4 +40,21 @@ extern "C"
 //
 extern KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName);
 
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldContextItemLookup -
+//
+extern KjNode* orionldContextItemLookup(char* contextUrl, const char* itemName);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldContextItemLookup -
+//
+extern KjNode* orionldContextItemLookup(KjNode* contextVector, const char* itemName);
+
+
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTITEMLOOKUP_H_

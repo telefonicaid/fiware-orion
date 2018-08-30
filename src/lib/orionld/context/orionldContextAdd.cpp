@@ -80,7 +80,7 @@ static bool orionldContextAppend(const char* url, KjNode* tree, char** detailsPP
   {
     LM_TMP(("orionldContextHead is non NULL, so, this new context is appended after orionldContextTail: %s", orionldContextTail->url));
     orionldContextTail->next = contextP;
-    orionldContextTail = contextP;
+    orionldContextTail       = contextP;
   }
 
   //
@@ -100,25 +100,61 @@ static bool orionldContextAppend(const char* url, KjNode* tree, char** detailsPP
 //
 // orionldContextAdd - download, parse and add a context (or various contexts)
 //
-// This function is called by orionldPostEntities to add referenced contexts, never "direct contexts"
-// Contexts are referenced either as a string, or as a vector of strings
+// This function is called by orionldPostEntities to add referenced contexts.
 //
-// After downloading the initial URL, the content of these "Context URLs" may be:
+// In the payload, there are three possibilities for contexts.
+// Not that the payload is already parsed and what enters this function is the value of the "@context" member:
 //
-// 1. An object with a single member '@context' that is an object containing key-values:
-//    "@context" {
+// 1. A Vector of contexts as strings:
+//    [
+//      "http://...",
+//      "http://...",
+//      "http://..."
+//    ]
+//
+// 2. A String that references a context:
+//    "http://..."
+//
+// 3. Direct context:
+//    {
 //      "Property": "http://...",
-//      "XXX";      ""
+//      "XXX";      "YYY"
 //    }
 //
-// 2. An object with a single member '@context', that is a vector of URL strings (https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld):
+//
+// If it is not a "Direct Context" (case 1), then one or more contexts may have to be downloaded.
+// The syntax of these context payload may be of two different types:
+//
+// 4. An object with a single member '@context' that is an object containing key-values:
+//    "@context" {
+//      "Property": "http://...",
+//      "XXX";      "YYY"
+//    }
+//
+// 5. An object with a single member '@context', that is a vector of URL strings (https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld):
 //    {
 //      "@context": [
 //        "http://...",
 //        "http://...",
 //        "http://..."
-//      }
+//      ]
 //    }
+//
+// The first three cases are taken care of by orionldPostEntities (case 3 is not implemented in the first round)
+// 
+// So, in this routine, the payload of the downloaded url (by calling orionldContextDownloadAndParse) must be a jSON Object with a single member "@context",
+// This member is either a JSON Array or an Object.
+//
+//
+// The resulting payload of downloading and parsing a context URL must be
+// a JSON Object with one single field, called '@context'.
+// This @context field can either be a JSON object, or a JSON Array
+// If JSON Object, the contents of the object must be a list of key-values
+// If JSON Array,  the contents of the array must be URL strings naming new contexts
+//
+// If it is an object, the list of key-values is the context and the URL is the 'name' of the context.
+// If it is an array, the array itself (naming X contexts) is the context and the the URL is the 'name' of this "complex" context.
+//
 bool orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsPP)
 {
   LM_T(LmtContext, ("********************* Getting context in URL '%s' and adding it as a context", url));
@@ -142,17 +178,6 @@ bool orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsPP)
     return false;
   }
   LM_T(LmtContext, ("tree is OK"));
-
-  //
-  // The resulting payload of downloading and parsing a context URL must be
-  // a JSON Object with one single field, called '@context'.
-  // This @context field can either be a JSON object, or a JSON Array
-  // If JSON Object, the contents of the object must be a list of key-values
-  // If JSON Array,  the contents of the array must be URL strings naming new contexts
-  //
-  // If it is an object, the list of key-values is the context and the URL is the 'name' of the context.
-  // If it is an array, the array itself (naming X contexts) is the context and the the URL is the 'name' of this "complex" context.
-  //
 
   //
   // Check that:
@@ -181,24 +206,23 @@ bool orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsPP)
   
   if (contextP->next != NULL)
   {
-    *detailsPP = (char*) "Invalid payload for a context - only one toplevel member allowed for contexts";
+    *detailsPP = (char*) "Invalid payload for a context - only one member allowed for context payloads";
     return false;
   }
   LM_T(LmtContext, ("The tree has exactly one child - OK"));
   LM_T(LmtContext, ("Only member is named '%s' and is of type %s", contextP->name, kjValueType(contextP->type)));
 
   // 3. Is the single member called '@context' ?
-  if (SCOMPARE9(contextP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
-  {
-    if ((contextP->type != KjObject) && (contextP->type != KjArray))
-    {
-      *detailsPP = (char*) "Invalid JSON type for the @context member - must be a JSON Object or a JSON Array";
-      return false;
-    }
-  }
-  else
+  if (!SCOMPARE9(contextP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
   {
     *detailsPP = (char*) "Invalid payload for a context - the member '@context' not present";
+    return false;
+  }
+
+  // 4. Is it a JSON Object or Array?
+  if ((contextP->type != KjObject) && (contextP->type != KjArray))
+  {
+    *detailsPP = (char*) "Invalid JSON type for the @context member - must be a JSON Object or a JSON Array";
     return false;
   }
 
@@ -226,16 +250,14 @@ bool orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsPP)
     LM_T(LmtContext, ("*********************************** Was an object - we are done here"));
     return true;
   }
-  else if (contextP->type != KjArray)
-  {
-    *detailsPP = (char*) "the '@context' field must be either a JDON Objevt or a JSON Array";
-    return false;
-  }
+
 
   
   LM_T(LmtContext, ("Context is an array of strings (URLs) - download and create new contexts"));
 
-  // All items in the vector must be strings
+  //
+  // All items in the vector must be strings, containing syntactically correct URLs
+  //
   for (KjNode* contextItemP = contextP->children; contextItemP != NULL; contextItemP = contextItemP->next)
   {
     LM_T(LmtContext, ("URL in context array: %s", contextItemP->value.s));

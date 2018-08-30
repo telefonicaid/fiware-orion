@@ -26,6 +26,7 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/serviceRoutines/orionldPostEntity.h"         // Own Interface
 
 
@@ -36,13 +37,11 @@
 //
 bool orionldPostEntity(ConnectionInfo* ciP)
 {
-  char response[1024];
-
   LM_T(LmtServiceRoutine, ("In orionldPostEntities: request tree at %p", ciP->requestTree));
 
-  snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"POST /ngsi-ld/v1/entities/*/attrs\", \"entityId\": \"%s\" }\n", ciP->wildcard[0]);
-  ciP->responsePayload = strdup(response);  // This is temporary, will leak, but not important
-  ciP->httpStatusCode  = SccNotImplemented;
+  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - POST /ngsi-ld/v1/entities/*/attrs", ciP->wildcard[0]);
+
+  ciP->httpStatusCode = SccNotImplemented;
 
   return true;
 }

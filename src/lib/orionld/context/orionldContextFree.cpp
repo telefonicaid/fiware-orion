@@ -46,19 +46,22 @@ void orionldContextFreeAll(void)
   OrionldContext* contextP = orionldContextHead;
 
   LM_T(LmtFree, ("Freeing contexts, starting with %p", contextP));
-  LM_TMP(("Freeing contexts, starting with %p", contextP));
   while (contextP != NULL)
   {
     OrionldContext* next = contextP->next;
 
-    LM_T(LmtContextList, ("Freeing context '%s' at %p", contextP->url, contextP));
-    LM_TMP(("Freeing context '%s' at %p", contextP->url, contextP));
+    LM_T(LmtFree, ("Freeing context '%s' at %p - calling kjFree", contextP->url, contextP));
     kjFree(contextP->tree);
+    LM_T(LmtFree, ("Freeing context '%s' at %p - after kjFree", contextP->url, contextP));
 
     if (contextP != &orionldDefaultContext)
     {
+      LM_T(LmtFree, ("Freeing contextP->url at %p", contextP->url));
       free(contextP->url);
+      LM_T(LmtFree, ("Freed contextP->url at %p", contextP->url));
+      LM_T(LmtFree, ("Freeing contextP at %p", contextP));
       free(contextP);
+      LM_T(LmtFree, ("Freed contextP at %p", contextP));
     }
 
     contextP = next;

@@ -22,11 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                      // LM_*
-#include "logMsg/traceLevels.h"                                 // Lmt*
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                                // ConnectionInfo
-#include "orionld/serviceRoutines/orionldDeleteAttribute.h"     // Own Interface
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/serviceRoutines/orionldDeleteAttribute.h"    // Own Interface
 
 
 
@@ -36,14 +37,11 @@
 //
 bool orionldDeleteAttribute(ConnectionInfo* ciP)
 {
-  char response[1024];
-
   LM_T(LmtServiceRoutine, ("In orionldDeleteAttribute"));
 
-  snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"DELETE /ngsi-ld/v1/entities/*/attrs/*\", \"entityId\": \"%s\", \"attribute\": \"%s\" }\n",
-           ciP->wildcard[0], ciP->wildcard[1]);
-  ciP->responsePayload = strdup(response);  // This is temporary, will leak, but not important
-  ciP->httpStatusCode  = SccNotImplemented;
+  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - DELETE /ngsi-ld/v1/entities/*/attrs/*", ciP->wildcard[0]);
+
+  ciP->httpStatusCode = SccNotImplemented;
 
   return true;
 }

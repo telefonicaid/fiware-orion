@@ -25,6 +25,11 @@
 #include <string.h>                                         // strlen
 #include <microhttpd.h>                                     // MHD
 
+extern "C"
+{
+#include "kjson/kjBufferCreate.h"                           // kjBufferCreate
+}
+
 #include "logMsg/logMsg.h"                                  // LM_*
 #include "logMsg/traceLevels.h"                             // Lmt*
 
@@ -194,6 +199,19 @@ int orionldMhdConnectionInit
   // Remember ciP for consequent connection callbacks from MHD
   //
   *con_cls = ciP;
+
+  //
+  // Creating kjson environment for KJson parse and render
+  //
+  ciP->kjsonP = kjBufferCreate();      
+  if (ciP->kjsonP == NULL)
+    LM_X(1, ("Out of memory"));
+  LM_TMP(("Allocated ciP->kjsonP at %p", ciP->kjsonP));
+
+  ciP->kjsonP->spacesPerIndent   = 0;
+  ciP->kjsonP->nlString          = (char*) "";
+  ciP->kjsonP->stringBeforeColon = (char*) "";
+  ciP->kjsonP->stringAfterColon  = (char*) "";
 
   //
   // The 'connection', as given by MHD is very important. No responses can be sent without it

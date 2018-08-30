@@ -64,7 +64,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
     return NULL;
   }
 
-  LM_T(LmtContext, ("Downoading context '%s'", url));
+  LM_T(LmtContext, ("Downloading context '%s'", url));
   if (orionldRequestSend(&httpResponse, url, 5000, detailsPP) == false)
   {
     //

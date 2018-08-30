@@ -26,6 +26,7 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/serviceRoutines/orionldDeleteEntity.h"       // Own Interface
 
 
@@ -36,13 +37,11 @@
 //
 bool orionldDeleteEntity(ConnectionInfo* ciP)
 {
-  char response[1024];
-
   LM_T(LmtServiceRoutine, ("In orionldDeleteEntity"));
 
-  snprintf(response, sizeof(response), "{ \"error\": \"not implemented\", \"details\": \"DELETE /ngsi-ld/v1/entities/*\", \"entityId\": \"%s\" }\n", ciP->wildcard[0]);
-  ciP->responsePayload = strdup(response);  // This is temporary, will leak, but not important
-  ciP->httpStatusCode  = SccNotImplemented;
+  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented DELETE /ngsi-ld/v1/entities/*", ciP->wildcard[0]);
+
+  ciP->httpStatusCode = SccNotImplemented;
 
   return true;
 }

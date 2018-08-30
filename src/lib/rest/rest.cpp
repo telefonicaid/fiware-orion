@@ -667,9 +667,7 @@ static void requestCompleted
   extern void delayedReleaseExecute(void);
   delayedReleaseExecute();
 
-  LM_W(("Deleting ciP"));
   delete(ciP);
-  LM_W(("Deleted ciP"));
 }
 
 

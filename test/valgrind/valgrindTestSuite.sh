@@ -56,6 +56,7 @@ export PATH=$PATH:$PWD/scripts
 #
 # global variables
 #
+export BROKER=${BROKER:-contextBroker}
 CASES_DIR=cases
 typeset -i lost
 typeset -i valgrindErrors
@@ -634,7 +635,7 @@ then
       if [ "$status" != "0" ]
       then
         mv /tmp/testHarness         test/functionalTest/$CASES_DIR/$directory/$htest.harness.out
-        cp /tmp/contextBroker.log   test/functionalTest/$CASES_DIR/$directory/$htest.contextBroker.log
+        cp /tmp/${BROKER}.log   test/functionalTest/$CASES_DIR/$directory/$htest.contextBroker.log
         detailForOkString=" (no leak but ftest error $status)"
         harnessErrorV[$harnessErrors]="$xTestNo: $file (exit code $status)"
         harnessErrors=$harnessErrors+1

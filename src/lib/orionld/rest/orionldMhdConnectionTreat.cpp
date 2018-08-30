@@ -62,16 +62,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     if (ciP->payload != NULL)
     {
       LM_T(LmtPayloadParse, ("parsing the payload '%s'", ciP->payload));
-
-      // FIXME P6: Do we really need to allocate a kjsonP for every request?
-      ciP->kjsonP = kjBufferCreate();      
-      if (ciP->kjsonP == NULL)
-        LM_X(1, ("Out of memory"));
-
-      ciP->kjsonP->spacesPerIndent   = 0;
-      ciP->kjsonP->nlString          = (char*) "";
-      ciP->kjsonP->stringBeforeColon = (char*) "";
-      ciP->kjsonP->stringAfterColon  = (char*) "";
       
       ciP->requestTree = kjParse(ciP->kjsonP, ciP->payload);
       LM_T(LmtPayloadParse, ("After kjParse"));
@@ -109,9 +99,10 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   if (ciP->responseTree != NULL)
   {
     LM_T(LmtJsonResponse, ("Rendering KJSON response tree"));
-    ciP->responsePayload          = (char*) malloc(1024);
+    ciP->responsePayload = (char*) malloc(1024);
     if (ciP->responsePayload != NULL)
     {
+      LM_TMP(("ciP->kjsonP at %p", ciP->kjsonP));
       ciP->responsePayloadAllocated = true;
       kjRender(ciP->kjsonP, ciP->responseTree, ciP->responsePayload, 1024);
     }

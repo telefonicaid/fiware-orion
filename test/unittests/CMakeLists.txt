@@ -217,6 +217,7 @@ SET (STATIC_LIBS
     ${GMOCKMAIN_LIBRARY}
     ${ORION_LIBS}
     ${COMMON_STATIC_LIBS}
+    kjson.a
 )
 
 # Include directories
@@ -226,12 +227,14 @@ include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 include_directories("${PROJECT_SOURCE_DIR}/src/app")
 include_directories("${PROJECT_SOURCE_DIR}/test/unittests")
 include_directories("${PROJECT_SOURCE_DIR}/test")
+include_directories("${PROJECT_SOURCE_DIR}/..")
 
 # Lib directories
 # ------------------------------------------------------------
 link_directories("/usr/local/lib/")
 link_directories("/usr/lib64/")
 link_directories("/usr/lib/x86_64-linux-gnu")
+link_directories("${PROJECT_SOURCE_DIR}/../kjson")
 
 
 

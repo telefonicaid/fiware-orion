@@ -29,6 +29,10 @@
 #include "common/globals.h"
 #include "rest/ConnectionInfo.h"
 
+#ifdef ORIONLD
+#include "orionld/context/orionldDefaultContext.h"
+#endif
+
 
 
 /* ****************************************************************************
@@ -212,10 +216,10 @@ ConnectionInfo::~ConnectionInfo()
     LM_T(LmtFree, ("kjFree'd ciP->responseTree"));
   }
 
-  if (contextP != NULL)
+  if ((contextP != NULL) && (contextP != &orionldDefaultContext))
   {
     // contextP->tree point part of to the request payload - already freed by the call to "kjFree(requestTree)"
-    LM_T(LmtFree, ("Freeing contextP at: %p", contextP));
+    LM_T(LmtFree, ("Freeing context '%s' at: %p", contextP->url, contextP));
     free(contextP);
     LM_T(LmtFree, ("NOT Freed contextP at: %p", contextP));
   }

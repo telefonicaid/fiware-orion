@@ -26,6 +26,7 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // Own Interface
 
 
@@ -38,8 +39,9 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
 {
   LM_T(LmtServiceRoutine, ("In orionldPostSubscriptions"));
 
-  ciP->responsePayload = (char*) "{ \"error\": \"not implemented\", \"details\": \"POST /ngsi-ld/v1/subscriptions\" }\n";
-  ciP->httpStatusCode  = SccNotImplemented;
+  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - GET /ngsi-ld/v1/subscriptions", NULL);
+
+  ciP->httpStatusCode = SccNotImplemented;
 
   return true;
 }
