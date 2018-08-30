@@ -1,4 +1,4 @@
-# Geolocation capabilities (using NGSIv2)
+# Geolocation capabilities
 
 NGSIv2 allows to filter by geographical location, e.g. all the entities located
 closer than 15 km from the center of Madrid. Of course, properly located entities are mandatory.
