@@ -25,8 +25,7 @@ maximum preflight cache time
 
         contextBroker -corsOrigin specificdomain.com
 
-CORS is available for all `/v2` resources but for `/v1` resources, it is only
-available for [simple GET requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#Simple_requests).
+CORS is available for all `/v2` resources.
 
 ## Access-Control-Allow-Origin
 

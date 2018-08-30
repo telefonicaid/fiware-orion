@@ -14,7 +14,7 @@ _Current Orion internal architecture_
 
 * The `connectionTreat()` function is the entry point for new requests (see [RQ-01 diagram](sourceCode.md#flow-rq-01) for details). Depending on the version of the NGSI API to which the request belongs (basically, depending whether the request URL prefix is `/v1` or `/v2`) the execution flow goes in one "branch" or another, of the execution logic.
 
-* In the case of NGSIv1 requests, the logic is as follows:
+* In the case of NGSIv1 requests (deprecated), the logic is as follows:
 	* First, the [**jsonParse** library](sourceCode.md#srclibjsonparse) takes the request payload as input and generates a set of objects. The NGSIv1 parsing logic is based on the [Boost library property_tree](https://theboostcpplibraries.com/boost.propertytree).
 	* Next, a request servicing function is invoked to process the request. Each request type (in terms of HTTP and URL pattern) has a separate function. We call these functions "service routines" and they reside in the library [**serviceRoutines**](sourceCode.md#srclibserviceroutines). Note that some "high level" service routines may call other "low level" service routines.
 	* At the end (either in one or two hops, see [the mapping document](ServiceRoutines.txt) for details), the service routine calls the **mongoBackend** library.

@@ -18,10 +18,6 @@
 
 ## Introduction
 
-Note that there is also an [NGSIv1 version of this walkthrough](walkthrough_apiv1.md). In general,
-you should use NGSIv2 (i.e. this document), except if you need context management availability
-functionality (aka NGSI9), not yet developed in NGSIv2. In the case of doubt, you should use NGSIv2.
-
 This walkthrough adopts a practical approach that we hope will help our
 readers to get familiar with the Orion Context Broker and have some fun
 in the process :).
@@ -32,13 +28,9 @@ You should also have a look at the [NGSIv2 implementation notes](ngsiv2_implemen
 
 The main section is [context management](#context-management). It describes the
 basic context broker functionality for context management (information about entities,
-such as the temperature of a car). Some remarks to take into account in order to use this stuff.
-
-Context availability management (information not about the entities themselves, but about the providers of
-that information) has not been yet developed in the current candidate version for NGSIv2 (although a
-section about that exists at the end of this document, as a placeholder to include this information in the
-future). You need to use NGSIv1 if you want to use this functionality. See
-[NGSIv1 walkthrough](walkthrough_apiv1.md) for more details.
+such as the temperature of a car). [Context availability management](#context-availability-management)
+(information not about the entities themselves, but about the providers of
+that information) is also described as part of this document.
 
 Before starting (or if you get lost in the middle and
 need to start from scratch :) ), restart Orion Context Broker as

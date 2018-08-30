@@ -207,30 +207,7 @@ Ej:
 
 ## Orion Errors due to Database
 
-If you are retreiving entities using a large offset value and get this error (NGSIv1):
-
-```
-GET  /v1/contextEntities?offset=54882
-
-{
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "",
-        "isPattern" : "true",
-        "id" : ".*"
-      },
-      "statusCode" : {
-        "code" : "500",
-        "reasonPhrase" : "Internal Server Error",
-        "details" : "Sort operation used more than the maximum RAM. You should create an index. Check the Database Administration section in Orion documentation."
-      }
-    }
-  ]
-}
-```
-
-or this other (NGSIv2):
+If you are retreiving entities using a large offset value and get this error:
 
 ```
 GET /v2/entities?offset=54882

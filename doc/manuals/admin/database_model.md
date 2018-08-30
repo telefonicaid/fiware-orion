@@ -87,7 +87,7 @@ Fields:
 
 Regarding `location.coords` in can use several formats:
 
-* Representing a point (the one used by NGSIv1 and NGSIv2 geo:point):
+* Representing a point (the one used by geo:point):
 
 ```
 {
@@ -96,7 +96,7 @@ Regarding `location.coords` in can use several formats:
 }
 ```
 
-* Representing a line (the one used by NGSIv2 geo:line):
+* Representing a line (the one used by geo:line):
 
 ```
 {
@@ -105,7 +105,7 @@ Regarding `location.coords` in can use several formats:
 }
 ```
 
-* Representing a polygon (the one used by NGSIv2 geo:box and NGSIv2 geo:polygon):
+* Representing a polygon (the one used by geo:box and geo:polygon):
 
 ```
 {
@@ -306,7 +306,7 @@ Fields:
 -   **count**: the number of notifications sent associated to
     the subscription.   
 -   **format**: the format to use to send notification, possible values are **JSON**
-    (meaning JSON notifications in NGSIv1 format), **normalized**, **keyValues** and **values** (the last three used in NGSIv2 format).
+    (meaning JSON notifications in NGSIv1 legacy format), **normalized**, **keyValues** and **values** (the last three used in NGSIv2 format).
 -   **status**: either `active` (for active subscriptions) or `inactive` (for inactive subscriptions).
 -   **description** (optional field): a free text string describing the subscription. Maximum length is 1024.
 -   **custom**: a boolean field to specify if this subscription uses customized notifications (a functionality in the NGSIv2 API).
