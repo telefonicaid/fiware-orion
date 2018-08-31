@@ -27,7 +27,7 @@ If your aplication needs to use these characteres, you should encode it
 using a scheme not including forbidden characters before sending the
 request to Orion. 
 
-[URL encoding](http://www.degraeve.com/reference/urlencoding.php)) is
+[URL encoding](http://www.degraeve.com/reference/urlencoding.php) is
 a valid way of encoding. However, we don't recommend its usage for
 fields that may appear in API URL (such as entity id or attribute names)
 due to it would need to encode the "%" character itself. For instance,
