@@ -1,9 +1,9 @@
-#ifndef REST_REPLY
-#define REST_REPLY
+#ifndef SRC_LIB_REST_restServiceLookup_h
+#define SRC_LIB_REST_restServiceLookup_h
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,25 +25,15 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-
+#include "rest/RestService.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/HttpStatusCode.h"
 
 
 
 /* ****************************************************************************
 *
-* restReply - 
+* restServiceLookup -
 */
-extern void restReply(ConnectionInfo* ciP, const std::string& answer);
-
-
-
-/* ****************************************************************************
-*
-* restErrorReplyGet - 
-*/
-extern void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::string& detail, std::string* outStringP);
+extern RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP);
 
 #endif

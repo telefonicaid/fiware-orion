@@ -41,22 +41,22 @@
 */
 static RestService getV[] =
 {
-  { StatisticsRequest, 1, { "statistics"          }, "", statisticsTreat      },
-  { StatisticsRequest, 2, { "cache", "statistics" }, "", statisticsCacheTreat },
-  { InvalidRequest,    0, {                       }, "", NULL                 }
+  { StatisticsRequest, 1, { "statistics"          }, statisticsTreat      },
+  { StatisticsRequest, 2, { "cache", "statistics" }, statisticsCacheTreat },
+  { InvalidRequest,    0, {                       }, NULL                 }
 };
 
 static RestService deleteV[] =
 {
-  { StatisticsRequest, 1, { "statistics"          }, "", statisticsTreat      },
-  { StatisticsRequest, 2, { "cache", "statistics" }, "", statisticsCacheTreat },
-  { InvalidRequest,    0, {                       }, "", NULL                 }
+  { StatisticsRequest, 1, { "statistics"          }, statisticsTreat      },
+  { StatisticsRequest, 2, { "cache", "statistics" }, statisticsCacheTreat },
+  { InvalidRequest,    0, {                       }, NULL                 }
 };
 
 static RestService badVerbV[] =
 {
-  { StatisticsRequest, 1, { "statistics"          }, "", badVerbGetDeleteOnly },
-  { InvalidRequest,    0, {                       }, "", NULL                 }
+  { StatisticsRequest, 1, { "statistics"          }, badVerbGetDeleteOnly },
+  { InvalidRequest,    0, {                       }, NULL                 }
 };
 
 
@@ -69,13 +69,14 @@ TEST(statisticsTreat, delete)
 {
   ConnectionInfo ci("/statistics",  "DELETE", "1.1");
   std::string    out;
-
+  RestService    restService = { StatisticsRequest, 1, { "statistics" }, NULL };
   utInit();
 
   serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);
 
-  ci.outMimeType = JSON;
-  out            = orion::requestServe(&ci);
+  ci.outMimeType  = JSON;
+  ci.restServiceP = &restService;
+  out             = orion::requestServe(&ci);
 
   EXPECT_STREQ("{\"message\":\"All statistics counter reset\"}", out.c_str());
 
@@ -92,13 +93,15 @@ TEST(statisticsTreat, get)
 {
   ConnectionInfo ci("/statistics",  "GET", "1.1");
   std::string    out;
+  RestService    restService = { StatisticsRequest, 1, { "statistics" }, NULL };
 
   utInit();
 
   serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);
 
-  ci.outMimeType = JSON;
-  out            = orion::requestServe(&ci);
+  ci.outMimeType  = JSON;
+  ci.restServiceP = &restService;
+  out             = orion::requestServe(&ci);
 
   EXPECT_STREQ("{\"uptime_in_secs\":0,\"measuring_interval_in_secs\":0}", out.c_str());
 
@@ -115,13 +118,15 @@ TEST(statisticsTreat, deleteCache)
 {
   ConnectionInfo ci("/cache/statistics",  "DELETE", "1.1");
   std::string    out;
+  RestService    restService = { StatisticsRequest, 2, { "cache", "statistics" }, NULL };
 
   utInit();
 
   serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);
 
-  ci.outMimeType = JSON;
-  out            = orion::requestServe(&ci);
+  ci.outMimeType  = JSON;
+  ci.restServiceP = &restService;
+  out             = orion::requestServe(&ci);
 
   EXPECT_STREQ("{\"message\":\"All statistics counter reset\"}", out.c_str());
 
@@ -138,13 +143,15 @@ TEST(statisticsTreat, getCache)
 {
   ConnectionInfo ci("/cache/statistics",  "GET", "1.1");
   std::string    out;
+  RestService    restService = { StatisticsRequest, 2, { "cache", "statistics" }, NULL };
 
   utInit();
 
   serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);
 
-  ci.outMimeType = JSON;
-  out            = orion::requestServe(&ci);
+  ci.outMimeType  = JSON;
+  ci.restServiceP = &restService;
+  out             = orion::requestServe(&ci);
 
   EXPECT_STREQ("{\"ids\":\"\",\"refresh\":0,\"inserts\":0,\"removes\":0,\"updates\":0,\"items\":0}", out.c_str());
 
@@ -161,11 +168,14 @@ TEST(statisticsTreat, badVerb)
 {
   ConnectionInfo ci("/statistics",  "POLLUTE", "1.1");
   std::string    out;
+  RestService    restService = { StatisticsRequest, 1, { "statistics" }, NULL };
 
   utInit();
 
   serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);
 
+  ci.outMimeType  = JSON;
+  ci.restServiceP = &restService;
   out = orion::requestServe(&ci);
 
   EXPECT_EQ("", out);

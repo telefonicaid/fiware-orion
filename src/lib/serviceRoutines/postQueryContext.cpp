@@ -188,7 +188,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   // to make JSON parsing logic (internal to jsonTreat()) independent of ciP (in fact, parsing process
   // hasn't anything to do with connection).
   HttpStatusCode sc = ciP->httpStatusCode;
-  s = jsonTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, "queryContextResponse", NULL);
+  s = jsonTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, NULL);
   ciP->httpStatusCode = sc;
 
   if (s != "OK")

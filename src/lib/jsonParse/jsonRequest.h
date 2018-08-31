@@ -61,7 +61,6 @@ extern std::string jsonTreat
   ConnectionInfo*     ciP,
   ParseData*          parseDataP,
   RequestType         request,
-  const std::string&  payloadWord,
   JsonRequest**       reqPP
 );
 

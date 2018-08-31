@@ -26,6 +26,7 @@
 #include "ngsi/ParseData.h"
 #include "parse/CompoundValueNode.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/RestService.h"
 #include "jsonParse/jsonRequest.h"
 
 #include "unittest.h"
@@ -48,7 +49,7 @@ TEST(compoundValue, updateNoCompoundValue)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFileJson)) << "Error getting test data from '" << inFileJson << "'";
   ci.inMimeType = JSON;
-  result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
+  result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
   caP = reqData.upcr.res.contextElementVector[0]->contextAttributeVector[0];
   EXPECT_EQ("1", caP->stringValue);
@@ -69,13 +70,18 @@ TEST(compoundValue, updateUnknownPath)
   const char*     outFileJson = "ngsi10.updateContextResponse.updateUnknownPath.valid.json";
   ConnectionInfo  ciJson("/ngsi10/updateContext", "POST", "1.1");
   std::string     result;
+  RestService     restService = { UpdateContext, 2, { "ngsi10", "updateContext" }, NULL };
+
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFileJson)) << "Error getting test data from '" << inFileJson << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFileJson)) << "Error getting test data from '" << outFileJson << "'";
-  ciJson.inMimeType  = JSON;
-  ciJson.outMimeType = JSON;
-  result = jsonTreat(testBuf, &ciJson, &reqData, UpdateContext, "updateContextRequest", NULL);
+
+  ciJson.inMimeType   = JSON;
+  ciJson.outMimeType  = JSON;
+  ciJson.restServiceP = &restService;
+
+  result = jsonTreat(testBuf, &ciJson, &reqData, UpdateContext, NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 
   utExit();
@@ -95,15 +101,17 @@ TEST(compoundValue, updateOneStringJson)
   ContextAttribute*          caP;
   orion::CompoundValueNode*  cvnRootP;
   orion::CompoundValueNode*  childP;
+  RestService                restService = { UpdateContext, 2, { "ngsi10", "updateContext" }, NULL };
 
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  ci.inMimeType   = JSON;
+  ci.outMimeType  = JSON;
+  ci.restServiceP = &restService;
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
 
   EXPECT_STREQ("OK", result.c_str());
 
@@ -160,14 +168,17 @@ TEST(compoundValue, updateTwoStringsJson)
   ContextAttribute*          caP;
   orion::CompoundValueNode*  cvnRootP;
   orion::CompoundValueNode*  childP;
+  RestService                restService = { UpdateContext, 2, { "ngsi10", "updateContext" }, NULL };
 
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
-  std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
+  ci.inMimeType   = JSON;
+  ci.outMimeType  = JSON;
+  ci.restServiceP = &restService;
+
+  std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
 
   EXPECT_STREQ("OK", result.c_str());
 
@@ -236,15 +247,18 @@ TEST(compoundValue, updateTwoItemsSameNameInStructJson)
   const char*     inFile  = "ngsi10.updateContextRequest.updateTwoItemsSameNameInStruct.valid.json";
   const char*     outFile = "ngsi10.updateContextResponse.updateTwoItemsSameNameInStruct.valid.json";
   ConnectionInfo  ci("/ngsi10/updateContext", "POST", "1.1");
+  RestService     restService = { UpdateContext, 2, { "ngsi10", "updateContext" }, NULL };
 
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
-  std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
+  ci.inMimeType   = JSON;
+  ci.outMimeType  = JSON;
+  ci.restServiceP = &restService;
+
+  std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
 
   EXPECT_STREQ(expectedBuf, result.c_str());
 
@@ -265,13 +279,17 @@ TEST(compoundValue, updateContextValueVectorOneItemJson)
   ContextAttribute*          caP;
   orion::CompoundValueNode*  cvnRootP;
   orion::CompoundValueNode*  childP;
+  RestService                restService = { UpdateContext, 2, { "ngsi10", "updateContext" }, NULL };
 
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
-  std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
+
+  ci.inMimeType   = JSON;
+  ci.outMimeType  = JSON;
+  ci.restServiceP = &restService;
+
+  std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
 
   caP = reqData.upcr.res.contextElementVector[0]->contextAttributeVector[0];
@@ -327,13 +345,17 @@ TEST(compoundValue, updateContextValueVectorFiveItemsJson)
   ContextAttribute*          caP;
   orion::CompoundValueNode*  cvnRootP;
   orion::CompoundValueNode*  childP;
+  RestService                restService = { UpdateContext, 2, { "ngsi10", "updateContext" }, NULL };
 
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
-  std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
+
+  ci.inMimeType   = JSON;
+  ci.outMimeType  = JSON;
+  ci.restServiceP = &restService;
+
+  std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
 
   caP = reqData.upcr.res.contextElementVector[0]->contextAttributeVector[0];
@@ -393,13 +415,17 @@ TEST(compoundValue, updateTwoStructsJson)
   ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
   ContextAttribute*          caP;
   std::string                rendered;
+  RestService                restService = { UpdateContext, 2, { "ngsi10", "updateContext" }, NULL };
 
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
-  std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
+
+  ci.inMimeType   = JSON;
+  ci.outMimeType  = JSON;
+  ci.restServiceP = &restService;
+
+  std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
 
   caP = reqData.upcr.res.contextElementVector[0]->contextAttributeVector[0];
@@ -542,13 +568,17 @@ TEST(compoundValue, sixLevelsJson)
   ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
   ContextAttribute*          caP;
   std::string                rendered;
+  RestService                restService = { UpdateContext, 2, { "ngsi10", "updateContext" }, NULL };
 
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
-  std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
+
+  ci.inMimeType   = JSON;
+  ci.outMimeType  = JSON;
+  ci.restServiceP = &restService;
+
+  std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
 
   caP = reqData.upcr.res.contextElementVector[0]->contextAttributeVector[0];
@@ -856,13 +886,17 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
   ContextAttribute*          caP;
   orion::CompoundValueNode*  cvnRootP;
   orion::CompoundValueNode*  childP;
+  RestService                restService = { UpdateContext, 2, { "ngsi10", "updateContext" }, NULL };
 
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
-  std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
+
+  ci.inMimeType   = JSON;
+  ci.outMimeType  = JSON;
+  ci.restServiceP = &restService;
+
+  std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
 
   caP = reqData.upcr.res.contextElementVector[0]->contextAttributeVector[0];

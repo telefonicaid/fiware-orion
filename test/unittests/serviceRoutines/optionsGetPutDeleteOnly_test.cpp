@@ -38,8 +38,8 @@
 */
 static RestService optionsV[] =
 {
-  { EntityAttributeRequest,  5, { "v2", "entities", "*", "attrs", "*" }, "", optionsGetPutDeleteOnly },
-  { InvalidRequest,          0, {                                     }, "", NULL                    }
+  { EntityAttributeRequest,  5, { "v2", "entities", "*", "attrs", "*" }, optionsGetPutDeleteOnly },
+  { InvalidRequest,          0, {                                     }, NULL                    }
 };
 
 

@@ -42,30 +42,34 @@
 *
 * service vectors -
 */
+#define SCA    SubscribeContextAvailability
+#define IR     InvalidRequest
+#define N9SCO  Ngsi9SubscriptionsConvOp
+
 static RestService postV[] =
 {
-  { SubscribeContextAvailability,  2, { "ngsi9", "contextAvailabilitySubscriptions"      }, "",  postSubscribeContextAvailability  },
-  { InvalidRequest,                0, {                                                  }, "",    NULL                            }
+  { SCA, 2, { "ngsi9", "contextAvailabilitySubscriptions" }, postSubscribeContextAvailability            },
+  { IR,  0, {                                             }, NULL                                        }
 };
 
 static RestService putV[] =
 {
-  { Ngsi9SubscriptionsConvOp, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "", putAvailabilitySubscriptionConvOp },
-  { InvalidRequest,           0, {                                                  }, "",    NULL                              }
+  { N9SCO, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, putAvailabilitySubscriptionConvOp    },
+  { IR,    0, {                                                  }, NULL                                 }
 };
 
 static RestService deleteV[] =
 {
-  { Ngsi9SubscriptionsConvOp, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "", deleteAvailabilitySubscriptionConvOp },
-  { InvalidRequest,           0, {                                                  }, "",    NULL                              }
+  { N9SCO, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, deleteAvailabilitySubscriptionConvOp },
+  { IR,    0, {                                                  }, NULL                                 }
 };
 
 static RestService badVerbV[] =
 {
-  { SubscribeContextAvailability, 2, { "ngsi9", "contextAvailabilitySubscriptions"      }, "",    badVerbPostOnly                   },
-  { Ngsi9SubscriptionsConvOp,     3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "",    badVerbPutDeleteOnly              },
-  { InvalidRequest,               0, { "*", "*", "*", "*", "*", "*"                     }, "",    badRequest                        },
-  { InvalidRequest,               0, {                                                  }, "",    NULL                              }
+  { SCA,   2, { "ngsi9", "contextAvailabilitySubscriptions"      }, badVerbPostOnly                      },
+  { N9SCO, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, badVerbPutDeleteOnly                 },
+  { IR,    0, { "*", "*", "*", "*", "*", "*"                     }, badRequest                           },
+  { IR,    0, {                                                  }, NULL                                 }
 };
 
 
@@ -79,16 +83,32 @@ TEST(putAvailabilitySubscriptionConvOp, put)
   ConnectionInfo ci1("/ngsi9/contextAvailabilitySubscriptions",  "GET",  "1.1");
   ConnectionInfo ci2("/ngsi9/contextAvailabilitySubscriptions/012345678901234567890123",  "XVERB",   "1.1");
   std::string    out;
+  RestService    restService1 =
+    {
+      ExitRequest,
+      2, { "/ngsi9", "contextAvailabilitySubscriptions" },
+      NULL
+    };
+  RestService    restService2 =
+    {
+      ExitRequest,
+      3, { "/ngsi9", "contextAvailabilitySubscriptions", "012345678901234567890123" },
+      NULL
+    };
 
   utInit();
 
   serviceVectorsSet(NULL, putV, postV, NULL, deleteV, NULL, badVerbV);
+  ci1.apiVersion   = V1;
+  ci1.restServiceP = &restService1;
   out = orion::requestServe(&ci1);
 
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci1.httpHeader[0]);
   EXPECT_EQ("POST",  ci1.httpHeaderValue[0]);
 
+  ci2.apiVersion   = V1;
+  ci2.restServiceP = &restService2;
   out = orion::requestServe(&ci2);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci2.httpHeader[0]);
