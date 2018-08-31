@@ -36,8 +36,8 @@ brokerStart CB
 # 04. GET /v2/entities/Room3
 #
 
-echo "01. POST /v2/op/update to create Room1, Room2, and Room3 entity in Batch operation."
-echo "==================================================================================="
+echo '01. POST /v2/op/update to create Room1, Room2, and Room3 entity in Batch operation.'
+echo '==================================================================================='
 payload='{
   "actionType": "append",
   "entities": [
@@ -88,22 +88,22 @@ echo
 echo
 
 
-echo "02. GET /v2/entities/Room1."
-echo "==========================="
+echo '02. GET /v2/entities/Room1.'
+echo '==========================='
 orionCurl --url /v2/entities/Room1
 echo
 echo
 
 
-echo "03. GET /v2/entities/Room2."
-echo "==========================="
+echo '03. GET /v2/entities/Room2.'
+echo '==========================='
 orionCurl --url /v2/entities/Room2
 echo
 echo
 
 
-echo "04. GET /v2/entities/Room3."
-echo "==========================="
+echo '04. GET /v2/entities/Room3.'
+echo '==========================='
 orionCurl --url /v2/entities/Room3
 echo
 echo

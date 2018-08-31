@@ -42,8 +42,8 @@ brokerStart CB
 # 10. GET /v2/entities/Room2.
 #
 
-echo "01. POST /v2/entities, to create Room1 with temperature (no metadata)."
-echo "======================================================================"
+echo '01. POST /v2/entities, to create Room1 with temperature (no metadata).'
+echo '======================================================================'
 payload='{
   "id": "Room1",
   "type": "Room",
@@ -57,15 +57,15 @@ echo
 echo
 
 
-echo "02. GET /v2/entities/Room1."
-echo "==========================="
+echo '02. GET /v2/entities/Room1.'
+echo '==========================='
 orionCurl --url /v2/entities/Room1
 echo
 echo
 
 
-echo "03. POST /v2/entities/Room1/attrs, to add metadata with "" value to temperature and add pressure attribute with metadata with no value."
-echo "======================================================================================================================================="
+echo '03. POST /v2/entities/Room1/attrs, to add metadata with "" value to temperature and add pressure attribute with metadata with no value.'
+echo '======================================================================================================================================='
 payload='{
   "temperature": {
     "value": 25,
@@ -92,15 +92,15 @@ echo
 echo
 
 
-echo "04. GET /v2/entities/Room1."
-echo "==========================="
+echo '04. GET /v2/entities/Room1.'
+echo '==========================='
 orionCurl --url /v2/entities/Room1
 echo
 echo
 
 
-echo "05. POST /v2/entities/Room1/attrs, to update temperature with metadata with no value, pressure with metadata with regular value and add humidity attribute with metadata with "" value."
-echo "=========================================================================================================================================================="
+echo '05. POST /v2/entities/Room1/attrs, to update temperature with metadata with no value, pressure with metadata with regular value and add humidity attribute with metadata with "" value.'
+echo '========================================================================================================================================================='
 payload='{
   "temperature": {
     "value": 25,
@@ -137,15 +137,15 @@ echo
 echo
 
 
-echo "06. GET /v2/entities/Room1."
-echo "==========================="
+echo '06. GET /v2/entities/Room1.'
+echo '==========================='
 orionCurl --url /v2/entities/Room1
 echo
 echo
 
 
-echo "07. POST /v2/entities, to create Room2 with temperature having two metadata one with "" value and another without value."
-echo "========================================================================================================================"
+echo '07. POST /v2/entities, to create Room2 with temperature having two metadata one with "" value and another without value.'
+echo '========================================================================================================================'
 payload='{
   "id": "Room2",
   "type": "Room",
@@ -168,24 +168,24 @@ echo
 echo
 
 
-echo "08. GET /v2/entities/Room2."
-echo "==========================="
+echo '08. GET /v2/entities/Room2.'
+echo '==========================='
 orionCurl --url /v2/entities/Room2
 echo
 echo
 
 
-echo "09. PUT /v2/entities/Room2/attrs/temperature/value, updating the value of Room2 temperature attribute."
-echo "======================================================================================================"
+echo '09. PUT /v2/entities/Room2/attrs/temperature/value, updating the value of Room2 temperature attribute.'
+echo '======================================================================================================'
 payload='{
   "value": 20.6,
   "type": "Number",
   "metadata": {
     "accuracy": {
-      "value": "",
       "type": "Float"
     },
     "tolerance": {
+      "value": "",
       "type": "Float"
     }
   }
@@ -195,8 +195,8 @@ echo
 echo
 
 
-echo "10. GET /v2/entities/Room2."
-echo "==========================="
+echo '10. GET /v2/entities/Room2.'
+echo '==========================='
 orionCurl --url /v2/entities/Room2
 echo
 echo
@@ -232,7 +232,7 @@ Date: REGEX(.*)
 }
 
 
-03. POST /v2/entities/Room1/attrs, to add metadata with  value to temperature and add pressure attribute with metadata with no value.
+03. POST /v2/entities/Room1/attrs, to add metadata with "" value to temperature and add pressure attribute with metadata with no value.
 =======================================================================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -275,8 +275,8 @@ Date: REGEX(.*)
 }
 
 
-05. POST /v2/entities/Room1/attrs, to update temperature with metadata with no value, pressure with metadata with regular value and add humidity attribute with metadata with  value.
-==========================================================================================================================================================
+05. POST /v2/entities/Room1/attrs, to update temperature with metadata with no value, pressure with metadata with regular value and add humidity attribute with metadata with "" value.
+=========================================================================================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -328,7 +328,7 @@ Date: REGEX(.*)
 }
 
 
-07. POST /v2/entities, to create Room2 with temperature having two metadata one with  value and another without value.
+07. POST /v2/entities, to create Room2 with temperature having two metadata one with "" value and another without value.
 ========================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -389,11 +389,11 @@ Date: REGEX(.*)
         "metadata": {
             "accuracy": {
                 "type": "Float",
-                "value": ""
+                "value": null
             },
             "tolerance": {
                 "type": "Float",
-                "value": null
+                "value": ""
             }
         },
         "type": "Number",
