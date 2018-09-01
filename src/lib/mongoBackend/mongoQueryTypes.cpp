@@ -205,7 +205,7 @@ HttpStatusCode mongoEntityTypesValues
   /* Compose query based on this aggregation command:
    *
    * db.runCommand({aggregate: "entities",
-   *                cursor: {},
+   *                cursor: { batchSize: 1000 },
    *                pipeline: [ {$match: { "_id.servicePath": /.../ } },
    *                            {$group: {_id: "$_id.type"} },
    *                            {$sort: {_id: 1} }
@@ -217,7 +217,7 @@ HttpStatusCode mongoEntityTypesValues
   BSONObj result;
   BSONObj spQuery = fillQueryServicePath(servicePathV);
   BSONObj cmd     = BSON("aggregate" << COL_ENTITIES <<
-                         "cursor" << BSONObj() <<
+                         "cursor" << BSON("batchSize" << 1000) <<
                          "pipeline"  << BSON_ARRAY(
                            BSON("$match" << BSON(C_ID_SERVICEPATH << spQuery)) <<
                            BSON("$group" << BSON("_id" << CS_ID_ENTITY)) <<
@@ -326,7 +326,7 @@ HttpStatusCode mongoEntityTypes
   /* Compose query based on this aggregation command:
    *
    * db.runCommand({aggregate: "entities",
-   *                cursor: {},
+   *                cursor: { batchSize: 1000 },
    *                pipeline: [ {$match: { "_id.servicePath": /.../ } },
    *                            {$project: {_id: 1, "attrNames": 1} },
    *                            {$project: { "attrNames"
@@ -373,7 +373,7 @@ HttpStatusCode mongoEntityTypes
           S_ATTRNAMES))));
 
   BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
-                     "cursor" << BSONObj() <<
+                     "cursor" << BSON("batchSize" << 1000) <<
                      "pipeline" << BSON_ARRAY(
                                               BSON("$match" << BSON(C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
                                               BSON("$project" << BSON("_id" << 1 << ENT_ATTRNAMES << 1)) <<
@@ -588,7 +588,7 @@ HttpStatusCode mongoAttributesForEntityType
   /* Compose query based on this aggregation command:
    *
    * db.runCommand({aggregate: "entities",
-   *                cursor: {},
+   *                cursor: { batchSize: 1000 },
    *                pipeline: [ {$match: { "_id.type": "TYPE" , "_id.servicePath": /.../ } },
    *                            {$project: {_id: 1, "attrNames": 1} },
    *                            {$unwind: "$attrNames"},
@@ -604,7 +604,7 @@ HttpStatusCode mongoAttributesForEntityType
   BSONObj result;
   BSONObj cmd =
     BSON("aggregate" << COL_ENTITIES <<
-         "cursor" << BSONObj() <<
+         "cursor" << BSON("batchSize" << 1000) <<
          "pipeline" << BSON_ARRAY(
            BSON("$match" << BSON(C_ID_ENTITY << entityType <<
                                  C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
