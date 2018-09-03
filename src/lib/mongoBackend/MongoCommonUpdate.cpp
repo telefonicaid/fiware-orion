@@ -3403,28 +3403,8 @@ static void updateEntity
     BSONObjBuilder replaceSet;
     int            now = getCurrentTime();
 
-    // This avoids strange behavior like as for the location, as reported in the #1142 issue
     // In order to enable easy append management of fields (e.g. location, dateExpiration),
-    // it could be better to use a BSONObjBuilder instead the BSON stream macro below.
-//    if (dateExpirationInPayload)
-//    {
-//      updatedEntity.append("$set", BSON(ENT_ATTRS                   << toSetObj <<
-//                                        ENT_ATTRNAMES               << toPushArr <<
-//                                        ENT_MODIFICATION_DATE       << now <<
-//                                        ENT_EXPIRATION              << currentDateExpiration <<
-//                                        ENT_LAST_CORRELATOR         << fiwareCorrelator));
-//    }
-//    else
-//    {
-//      updatedEntity.append("$set", BSON(ENT_ATTRS                   << toSetObj <<
-//                                        ENT_ATTRNAMES               << toPushArr <<
-//                                        ENT_MODIFICATION_DATE       << now <<
-//                                        ENT_LAST_CORRELATOR         << fiwareCorrelator));
-//      updatedEntity.append("$unset", toUnsetObj);
-//    }
-//
-//    notifyCerP->contextElement.entityId.modDate = now;
-
+    // we use a BSONObjBuilder instead the BSON stream macro.
     replaceSet.append(ENT_ATTRS, toSetObj);
     replaceSet.append(ENT_ATTRNAMES, toPushArr);
     replaceSet.append(ENT_MODIFICATION_DATE, now);
@@ -3447,6 +3427,8 @@ static void updateEntity
     {
       updatedEntity.append("$unset", toUnsetObj);
     }
+
+    notifyCerP->contextElement.entityId.modDate = now;
   }
   else
   {
