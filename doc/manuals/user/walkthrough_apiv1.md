@@ -1032,8 +1032,8 @@ Let's examine in detail the different elements included in the payload:
     notification receptor a means to protect itself against context producers
     that update attribute values too frequently. In multi-CB configurations, take
     into account that the last-notification measure is local to each CB node. Although
-    each node periodically synchronizes with DB in order to get potencially newer
-    values (more on this [here](perf_tuning.md#subscription-cache)) it may happen that
+    each node periodically synchronizes with DB in order to get potentially newer
+    values (more on this [here](../admin/perf_tuning.md#subscription-cache)) it may happen that
     a particular node has an old value, so throttling is not 100% accurate.
 
 The response corresponding to that request contains a subscription ID (a
@@ -1829,13 +1829,13 @@ important remarks:
 -   Given that NGSI doesn't force all the entities of a given type to
     have the same set of attributes (i.e. entities of the same type
     could have a different attributes set) the attributes set per type
-    returned by this operation is the union set of the attribut sets of
+    returned by this operation is the union set of the attribute sets of
     each entity belonging to that type.
 -   If you are not interested in attributes information, you can use the
     *?collapse=true* parameter in order to get only a list of types.
 
 In addition, you can use the following operation to get detailed
-information of a given type (by the time being, that information consits
+information of a given type (by the time being, that information consists 
 of a list of all its attributes):
 
 ``` 
