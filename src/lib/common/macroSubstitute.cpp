@@ -51,7 +51,7 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
     }
     else if (vec[ix]->valueType == orion::ValueTypeNumber)
     {
-      *valueP = toString(vec[ix]->numberValue);
+      *valueP = double2string(vec[ix]->numberValue);
     }
     else if (vec[ix]->valueType == orion::ValueTypeBoolean)
     {
@@ -70,19 +70,7 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
     {
       if (vec[ix]->compoundValueP)
       {
-        if (vec[ix]->compoundValueP->valueType == orion::ValueTypeVector)
-        {
-          *valueP = "[" + vec[ix]->compoundValueP->toJson(true, true) + "]";
-        }
-        else if (vec[ix]->compoundValueP->valueType == orion::ValueTypeObject)
-        {
-          *valueP = "{" + vec[ix]->compoundValueP->toJson(true, true) + "}";
-        }
-        else
-        {
-          LM_E(("Runtime Error (attribute is of object type but its compound is of invalid type)"));
-          *valueP = "";
-        }
+        *valueP = vec[ix]->compoundValueP->toJson(true);
       }
       else
       {

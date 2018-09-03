@@ -32,6 +32,7 @@
 #include "common/limits.h"
 #include "common/tag.h"
 #include "common/string.h"
+#include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -427,7 +428,7 @@ std::string Metadata::toStringValue(void) const
     }
     else // regular number
     {
-      return toString(numberValue);
+      return double2string(numberValue);
     }    
     break;
 
@@ -458,11 +459,9 @@ std::string Metadata::toStringValue(void) const
 *
 * toJson - 
 */
-std::string Metadata::toJson(bool isLastElement)
+std::string Metadata::toJson(void)
 {
-  std::string  out;
-
-  out = JSON_STR(name) + ":{";
+  JsonHelper jh;
 
   /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
   std::string defType = defaultType(valueType);
@@ -472,62 +471,45 @@ std::string Metadata::toJson(bool isLastElement)
     defType = defaultType(orion::ValueTypeVector);
   }
 
-  out += (type != "")? JSON_VALUE("type", type) : JSON_VALUE("type", defType);
-  out += ",";
+  jh.addString("type", (type != "")? type : defType);
 
-  if (valueType == orion::ValueTypeString)
+  if (compoundValueP != NULL)
   {
-    out += JSON_VALUE("value", stringValue);
+    jh.addRaw("value", compoundValueP->toJson(true));
+  }
+  else if (valueType == orion::ValueTypeString)
+  {
+    jh.addString("value", stringValue);
   }
   else if (valueType == orion::ValueTypeNumber)
   {
-    std::string effectiveValue;
-
     if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
     {
-      effectiveValue = JSON_STR(isodate2str(numberValue));
+      jh.addDate("value", numberValue);
     }
     else // regular number
     {
-      effectiveValue = toString(numberValue);
+      jh.addNumber("value", numberValue);
     }
-    out += JSON_VALUE_NUMBER("value", effectiveValue);
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
-    out += JSON_VALUE_BOOL("value", boolValue);
+    jh.addBool("value", boolValue);
   }
   else if (valueType == orion::ValueTypeNull)
   {
-    out += JSON_STR("value") + ":null";
-  }
-  else if (valueType == orion::ValueTypeObject)
-  {
-    if ((compoundValueP->isObject()) || (compoundValueP->isVector()))
-    {
-      compoundValueP->renderName = true;
-      out += compoundValueP->toJson(isLastElement, false);
-    }
+    jh.addRaw("value", "null");
   }
   else if (valueType == orion::ValueTypeNotGiven)
   {
     LM_E(("Runtime Error (value not given for metadata %s)", name.c_str()));
-    out += JSON_VALUE("value", stringValue);
   }
   else
   {
     LM_E(("Runtime Error (invalid value type for metadata %s)", name.c_str()));
-    out += JSON_VALUE("value", stringValue);
   }
 
-  out += "}";
-
-  if (!isLastElement)
-  {
-    out += ",";
-  }
-
-  return out;
+  return jh.str();
 }
 
 

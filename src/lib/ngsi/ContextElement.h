@@ -57,7 +57,7 @@ typedef struct ContextElement
   std::string  toJson(RenderFormat                     renderFormat,
                       const std::vector<std::string>&  attrsFilter,
                       const std::vector<std::string>&  metadataFilter,
-                      bool                             blacklist = false) const;
+                      bool                             blacklist = false);
   void         release(void);
   void         fill(const struct ContextElement& ce);
   void         fill(ContextElement* ceP, bool useDefaultType = false);
@@ -65,6 +65,14 @@ typedef struct ContextElement
   ContextAttribute* getAttribute(const std::string& attrName);
 
   std::string  check(ApiVersion apiVersion, RequestType requestType);
+
+ private:
+  void filterAttributes(const std::vector<std::string>&  attrsFilter, bool blacklist);
+
+  std::string toJsonValues(void);
+  std::string toJsonUniqueValues(void);
+  std::string toJsonKeyvalues(void);
+  std::string toJsonNormalized(const std::vector<std::string>&  metadataFilter);
 } ContextElement;
 
 #endif  // SRC_LIB_NGSI_CONTEXTELEMENT_H_

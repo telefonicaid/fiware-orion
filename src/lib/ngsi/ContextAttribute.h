@@ -99,16 +99,18 @@ public:
                       bool         omitValue = false);
   std::string  renderAsJsonObject(ApiVersion apiVersion, RequestType request, bool comma, bool omitValue = false);
   std::string  renderAsNameString(bool comma);
-  std::string  toJson(bool                             isLastElement,
-                      RenderFormat                     renderFormat,
-                      const std::vector<std::string>&  metadataFilter,
-                      RequestType                      requestType = NoRequest);
+
+  std::string  toJson(const std::vector<std::string>&  metadataFilter);
+
+  std::string  toJsonValue(void);
+
   std::string  toJsonAsValue(ApiVersion       apiVersion,
                              bool             acceptedTextPlain,
                              bool             acceptedJson,
                              MimeType         outFormatSelection,
                              MimeType*        outMimeTypeP,
                              HttpStatusCode*  scP);
+
   void         release(void);
   std::string  getName(void);
 

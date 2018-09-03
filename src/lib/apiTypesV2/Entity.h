@@ -67,8 +67,7 @@ class Entity
   ~Entity();
 
   std::string  render(std::map<std::string, bool>&         uriParamOptions,
-                      std::map<std::string, std::string>&  uriParam,
-                      bool                                 comma = false);
+                      std::map<std::string, std::string>&  uriParam);
 
   std::string  check(RequestType requestType);
   void         release(void);
@@ -82,6 +81,16 @@ class Entity
 
   void         fill(QueryContextResponse* qcrsP);
   void         hideIdAndType(bool hide = true);
+
+ private:
+  void filterAttributes (const std::vector<std::string>&  attrsFilter,
+                         bool                             dateCreatedOption,
+                         bool                             dateModifiedOption);
+
+  std::string toJsonValues(void);
+  std::string toJsonUniqueValues(void);
+  std::string toJsonKeyvalues(void);
+  std::string toJsonNormalized(const std::vector<std::string>&  metadataFilter);
 };
 
 #endif  // SRC_LIB_APITYPESV2_ENTITY_H_

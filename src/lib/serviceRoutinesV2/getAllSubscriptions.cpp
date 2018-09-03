@@ -83,7 +83,7 @@ std::string getAllSubscriptions
   if ((ciP->uriParamOptions["count"]))
   {
     ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
-    ciP->httpHeaderValue.push_back(toString(count));
+    ciP->httpHeaderValue.push_back(double2string(count));
   }
 
   std::string out;

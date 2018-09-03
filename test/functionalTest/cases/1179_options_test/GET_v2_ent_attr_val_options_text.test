@@ -58,7 +58,7 @@ echo
 echo
 
 
-echo "02. GET /v2/entities/E!/attrs/a_string/value"
+echo "02. GET /v2/entities/E1/attrs/a_string/value"
 echo "============================================"
 orionCurl --url /v2/entities/E1/attrs/a_string/value --out text
 echo
@@ -104,7 +104,7 @@ Date: REGEX(.*)
 
 
 
-02. GET /v2/entities/E!/attrs/a_string/value
+02. GET /v2/entities/E1/attrs/a_string/value
 ============================================
 HTTP/1.1 200 OK
 Content-Length: 12

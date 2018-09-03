@@ -112,23 +112,13 @@ std::string getEntityAttributeValue
                                              &(ciP->httpStatusCode),
                                              ciP->uriParamOptions[OPT_KEY_VALUES],
                                              ciP->uriParam[URI_PARAM_METADATA],
-                                             EntityAttributeValueRequest,
-                                             false));
+                                             EntityAttributeValueRequest));
     }
     else
     {
       if (attribute.pcontextAttribute->compoundValueP != NULL)
       {
         TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->render(ciP->apiVersion));
-
-        if (attribute.pcontextAttribute->compoundValueP->isObject())
-        {
-          answer = "{" + answer + "}";
-        }
-        else if (attribute.pcontextAttribute->compoundValueP->isVector())
-        {
-          answer = "[" + answer + "]";
-        }
       }
       else
       {

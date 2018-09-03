@@ -30,6 +30,7 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
 #include "parse/forbiddenChars.h"
 
@@ -679,7 +680,7 @@ std::string CompoundValueNode::render(ApiVersion apiVersion, bool noComma, bool 
 
   if (apiVersion == V2)
   {
-    return toJson(true, false); // FIXME P8: The info on comma-after-or-not is not available here ...
+    return toJson(true);
   }
 
   if (valueType == orion::ValueTypeString)
@@ -690,7 +691,7 @@ std::string CompoundValueNode::render(ApiVersion apiVersion, bool noComma, bool 
   else if (valueType == orion::ValueTypeNumber)
   {
     LM_T(LmtCompoundValueRender, ("I am a number (%s)", name.c_str()));
-    out = valueTag(key, toString(numberValue), jsonComma, container->valueType == orion::ValueTypeVector, true);
+    out = valueTag(key, double2string(numberValue), jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
@@ -818,199 +819,90 @@ std::string CompoundValueNode::render(ApiVersion apiVersion, bool noComma, bool 
 
 /* ****************************************************************************
 *
-* toJson -
+* CompoundValueNode:toJson
 *
-* FIXME P3: isLastElement is not used and should be removed
 */
-std::string CompoundValueNode::toJson(bool isLastElement, bool comma)
+std::string CompoundValueNode::toJson(bool toplevel)
 {
-  std::string  out       = "";
-  bool         jsonComma = false;
-  std::string  key       = name;
+  std::string out;
 
-  if (container != NULL)
+  switch(valueType)
   {
-    if (!container->childV.empty())
+  case orion::ValueTypeString:
+    out = toJsonString(stringValue);
+    break;
+
+  case orion::ValueTypeNumber:
+    out = double2string(numberValue);
+    break;
+
+  case orion::ValueTypeBoolean:
+    out = boolValue? "true" : "false";
+    break;
+
+  case orion::ValueTypeNull:
+    out = "null";
+    break;
+
+  case orion::ValueTypeVector:
+
+    if (childV.size() == 0)
     {
-      if (siblingNo < ((int) container->childV.size() - 1))
+      out = "[]";
+    }
+    else {
+      out = "[" + childV[0]->toJson(false);
+      for (unsigned int ix = 1; ix < childV.size(); ix++)
       {
-        jsonComma = true;
+        out += "," + childV[ix]->toJson(false);
       }
+      out += "]";
     }
+    break;
 
-    if (container->valueType == orion::ValueTypeVector)
+  case orion::ValueTypeObject:
+    if (childV.size() == 0)
     {
-      key = "item";
-    }
-  }
-
-  // No "comma after" if toplevel
-  if ((container == this) || (comma == false))
-  {
-    jsonComma = false;
-  }
-
-  if (valueType == orion::ValueTypeString)
-  {
-    LM_T(LmtCompoundValueRender, ("I am a String (%s)", name.c_str()));
-    if (container->valueType == orion::ValueTypeVector)
-    {
-      out = JSON_STR(stringValue);
+      out = "{}";
     }
     else
     {
-      out = JSON_STR(key) + ":" + JSON_STR(stringValue);
-    }
-  }
-  else if (valueType == orion::ValueTypeNumber)
-  {
-    LM_T(LmtCompoundValueRender, ("I am a Number (%s)", name.c_str()));
-    if (container->valueType == orion::ValueTypeVector)
-    {
-      out = JSON_NUMBER(toString(numberValue));
-    }
-    else
-    {
-      out = JSON_STR(key) + ":" + JSON_NUMBER(toString(numberValue));
-    }
-  }
-  else if (valueType == orion::ValueTypeBoolean)
-  {
-    LM_T(LmtCompoundValueRender, ("I am a Bool (%s)", name.c_str()));
-
-    if (container->valueType == orion::ValueTypeVector)
-    {
-      out = JSON_BOOL(boolValue);
-    }
-    else
-    {
-      out = JSON_STR(key) + ":" + JSON_BOOL(boolValue);
-    }
-  }
-  else if (valueType == orion::ValueTypeNull)
-  {
-    LM_T(LmtCompoundValueRender, ("I am NULL (%s)", name.c_str()));
-
-    if (container->valueType == orion::ValueTypeVector)
-    {
-      out = "null";
-    }
-    else
-    {
-      out = JSON_STR(key) + ":" + "null";
-    }
-  }
-  else if (valueType == orion::ValueTypeNotGiven)
-  {
-    LM_E(("Runtime Error (value not given (%s))", name.c_str()));
-    if (container->valueType == orion::ValueTypeVector)
-    {
-      out = "null";
-    }
-    else
-    {
-      out = JSON_STR(key) + ":" + "not given";
-    }
-  }
-  else if ((valueType == orion::ValueTypeVector) && (renderName == true))
-  {
-    out += JSON_STR(name) + ":[";
-    for (uint64_t ix = 0; ix < childV.size(); ++ix)
-    {
-      out += childV[ix]->toJson(false, true);
-    }
-
-    out += "]";
-  }
-  else if ((valueType == orion::ValueTypeVector) && (container == this))
-  {
-    //
-    // NOTE: Here, the '[]' are already added in the calling function
-    //
-    LM_T(LmtCompoundValueRender, ("I am a Vector (%s) and my container is TOPLEVEL", name.c_str()));
-    for (uint64_t ix = 0; ix < childV.size(); ++ix)
-    {
-      out += childV[ix]->toJson(ix == childV.size() - 1, true);
-    }
-  }
-  else if ((valueType == orion::ValueTypeVector) && (container->valueType == orion::ValueTypeVector))
-  {
-    out += "[";
-
-    for (uint64_t ix = 0; ix < childV.size(); ++ix)
-    {
-      out += childV[ix]->toJson(false, true);
-    }
-
-    out += "]";
-  }
-  else if (valueType == orion::ValueTypeVector)
-  {
-    LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));
-    out += JSON_STR(name) + ":[";
-    for (uint64_t ix = 0; ix < childV.size(); ++ix)
-    {
-      out += childV[ix]->toJson(false, true);
-    }
-
-    out += "]";
-  }
-  else if ((valueType == orion::ValueTypeObject) && (renderName == true))
-  {
-    if (name == "toplevel")
-    {
-      name = "value";
-    }
-
-    out += JSON_STR(name) + ":{";
-
-    for (uint64_t ix = 0; ix < childV.size(); ++ix)
-    {
-      out += childV[ix]->toJson(ix == childV.size() - 1, true);
-    }
-
-    out += "}";
-  }
-  else if ((valueType == orion::ValueTypeObject) && (container->valueType == orion::ValueTypeVector))
-  {
-    LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is a Vector", name.c_str()));
-    out += "{";
-    for (uint64_t ix = 0; ix < childV.size(); ++ix)
-    {
-      out += childV[ix]->toJson(ix == childV.size() - 1, true);
-    }
-
-    out += "}";
-  }
-  else if (valueType == orion::ValueTypeObject)
-  {
-    if (rootP != this)
-    {
-      LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is NOT a Vector", name.c_str()));
-      out += JSON_STR(name) + ":{";
-
-      for (uint64_t ix = 0; ix < childV.size(); ++ix)
+      out = "{" + childV[0]->toJson(false);
+      for (unsigned int ix = 1; ix < childV.size(); ix++)
       {
-        out += childV[ix]->toJson(ix == childV.size() - 1, true);
+        out += "," + childV[ix]->toJson(false);
       }
-
       out += "}";
     }
-    else
+    // Early return in this case, to avoid getting parentIsObject as in the
+    // case of root element we don't use key. Only the first call to
+    // toJson() uses toplevel == true
+    if (toplevel)
     {
-      LM_T(LmtCompoundValueRender, ("I am the TREE ROOT (%s: %d children)", name.c_str(), childV.size()));
-      for (uint64_t ix = 0; ix < childV.size(); ++ix)
-      {
-        out += childV[ix]->toJson(true, true);
-      }
+      return out;
     }
+    break;
+
+  case orion::ValueTypeNotGiven:
+    LM_E(("Runtime Error (value type not given (%s))", name.c_str()));
+    return "";
+
+  default:
+    LM_E(("Runtime Error (value type unknown (%s))", name.c_str()));
+    return "";
   }
 
-  out += jsonComma? "," : "";
+  bool parentIsObject = (container->valueType == orion::ValueTypeObject);
 
-  return out;
+  if (parentIsObject)
+  {
+    return toJsonString(name) + ":" + out;
+  }
+  else
+  {
+    return out;
+  }
 }
-
 
 
 /* ****************************************************************************

@@ -32,6 +32,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/string.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/EntityId.h"
 #include "ngsi/Request.h"
@@ -112,7 +113,127 @@ std::string ContextElement::render
 
 /* ****************************************************************************
 *
+* ContextElement::filterAttributes -
+*
+* Filter attributes vector in order to get the effective attribute vector to
+* render.
+*
+* dateCreatedOption and dateModifiedOption are due to deprecated ways of requesting
+* date in response. If used, the date is added at the end.
+*
+* FIXME PR: lot of duplicated code from Entity NGSIv2 class but we don't care
+* as NGSIv1 code is deprecated. The duplication will be solved when NGSIv1 gets removed
+*/
+void ContextElement::filterAttributes(const std::vector<std::string>&  attrsFilter, bool blacklist)
+{
+
+  if (attrsFilter.size () != 0)
+  {
+    if (std::find(attrsFilter.begin(), attrsFilter.end(), ALL_ATTRS) != attrsFilter.end())
+    {
+      // No filtering, just adding dateCreated and dateModified if needed (only in no blacklist case)
+      //
+      // The (contextAttributeVector.lookup(DATE_XXXX) == -1) check is to give preference to user
+      // defined attributes (see
+      // https://fiware-orion.readthedocs.io/en/master/user/ngsiv2_implementation_notes/index.html#datemodified-and-datecreated-attributes)
+
+      if (!blacklist)
+      {
+        if ((entityId.creDate != 0) && (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end()) && (contextAttributeVector.lookup(DATE_CREATED) == -1))
+        {
+          ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, entityId.creDate);
+          contextAttributeVector.push_back(caP);
+        }
+        if ((entityId.modDate != 0) &&  (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_MODIFIED) != attrsFilter.end()) && (contextAttributeVector.lookup(DATE_MODIFIED) == -1))
+        {
+          ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, entityId.modDate);
+          contextAttributeVector.push_back(caP);
+        }
+      }
+    }
+    else
+    {
+      // Processing depend on blacklist
+      //
+      // 1. If blacklist == true, go through the contextAttributeVector, taking only its elements
+      //    not in attrsFilter
+      // 2. If blacklist == false, reorder attributes in the same order they are in attrsFilter, excluding
+      //    the ones not there (i.e. filtering them out) and giving special treatment to creation
+      //    and modification dates
+
+      if (blacklist)
+      {
+        std::vector<ContextAttribute*> caNewV;
+        for (unsigned int ix = 0; ix < contextAttributeVector.size(); ix++)
+        {
+          ContextAttribute* caP = contextAttributeVector[ix];
+          if (std::find(attrsFilter.begin(), attrsFilter.end(), caP->name) == attrsFilter.end())
+          {
+            caNewV.push_back(caP);
+          }
+          else
+          {
+            caP->release();
+          }
+        }
+        contextAttributeVector.vec = caNewV;
+      }
+      else
+      {
+        std::vector<ContextAttribute*> caNewV;
+
+        for (unsigned int ix = 0; ix < attrsFilter.size(); ix++)
+        {
+          std::string attrsFilterItem = attrsFilter[ix];
+          if ((entityId.creDate != 0) && (attrsFilterItem == DATE_CREATED) && (contextAttributeVector.lookup(DATE_CREATED) == -1))
+          {
+            ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, entityId.creDate);
+            caNewV.push_back(caP);
+          }
+          else if ((entityId.modDate != 0) && (attrsFilterItem == DATE_MODIFIED) && (contextAttributeVector.lookup(DATE_MODIFIED) == -1))
+          {
+            ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, entityId.modDate);
+            caNewV.push_back(caP);
+          }
+          // Actual attribute filtering only takes place if '*' was not used
+          else
+          {
+            int found = contextAttributeVector.lookup(attrsFilterItem);
+            if (found != -1)
+            {
+              caNewV.push_back(contextAttributeVector.vec[found]);
+              contextAttributeVector.vec.erase(contextAttributeVector.vec.begin() + found);
+            }
+          }
+        }
+
+        // All the remainder elements in attributeVector need to be released,
+        // before overriding the vector with caNewV
+        contextAttributeVector.release();
+
+        contextAttributeVector.vec = caNewV;
+
+      }
+    }
+  }
+
+  // Removing dateExpires if not explictely included in the filter
+  bool includeDateExpires = (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_EXPIRES) != attrsFilter.end());
+  int found;
+  if (!blacklist && !includeDateExpires && ((found = contextAttributeVector.lookup(DATE_EXPIRES)) != -1))
+  {
+    contextAttributeVector.vec[found]->release();
+    contextAttributeVector.vec.erase(contextAttributeVector.vec.begin() + found);
+  }
+}
+
+
+/* ****************************************************************************
+*
 * ContextElement::toJson - 
+*
+* FIXME PR: lot of duplicated code from Entity NGSIv2 class but we don't care
+* as NGSIv1 code is deprecated. The duplication will be solved when NGSIv1 gets removed
 */
 std::string ContextElement::toJson
 (
@@ -120,27 +241,155 @@ std::string ContextElement::toJson
   const std::vector<std::string>&  attrsFilter,
   const std::vector<std::string>&  metadataFilter,
   bool                             blacklist
-) const
+)
 {
+  // Get the effective vector of attributes to render
+  filterAttributes(attrsFilter, blacklist);
+
   std::string out;
-
-  if (renderFormat != NGSI_V2_VALUES)
+  switch (renderFormat)
   {
-    out += entityId.toJson();
-    if (contextAttributeVector.size() != 0)
-    {
-      out += ",";
-    }
-  }
-
-  if (contextAttributeVector.size() != 0)
-  {
-    out += contextAttributeVector.toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
+  case NGSI_V2_VALUES:
+    out = toJsonValues();
+    break;
+  case NGSI_V2_UNIQUE_VALUES:
+    out = toJsonUniqueValues();
+    break;
+  case NGSI_V2_KEYVALUES:
+    out = toJsonKeyvalues();
+    break;
+  default:  // NGSI_V2_NORMALIZED
+    out = toJsonNormalized(metadataFilter);
+    break;
   }
 
   return out;
 }
 
+
+/* ****************************************************************************
+*
+* ContextElement::toJsonValues -
+*
+* FIXME PR: lot of duplicated code from Entity NGSIv2 class but we don't care
+* as NGSIv1 code is deprecated. The duplication will be solved when NGSIv1 gets removed
+*/
+std::string ContextElement::toJsonValues(void)
+{
+  std::string out = "[";
+
+  for (unsigned int ix = 0; ix < contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = contextAttributeVector[ix];
+    out += caP->toJsonValue();
+
+    if (ix != contextAttributeVector.size() - 1)
+    {
+      out += ",";
+    }
+  }
+
+  out += "]";
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElement::toJsonUniqueValues -
+*
+* FIXME PR: lot of duplicated code from Entity NGSIv2 class but we don't care
+* as NGSIv1 code is deprecated. The duplication will be solved when NGSIv1 gets removed
+*/
+std::string ContextElement::toJsonUniqueValues(void)
+{
+  std::string out = "[";
+
+  std::map<std::string, bool>  uniqueMap;
+
+  for (unsigned int ix = 0; ix < contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = contextAttributeVector[ix];
+
+    std::string value = caP->toJsonValue();
+
+    if (uniqueMap[value] == true)
+    {
+      // Already rendered. Skip.
+      continue;
+    }
+    else
+    {
+      out += value;
+      uniqueMap[value] = true;
+    }
+
+    if (ix != contextAttributeVector.size() - 1)
+    {
+      out += ",";
+    }
+  }
+
+  out += "]";
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElement::toJsonKeyvalues -
+*
+* FIXME PR: lot of duplicated code from Entity NGSIv2 class but we don't care
+* as NGSIv1 code is deprecated. The duplication will be solved when NGSIv1 gets removed
+*/
+std::string ContextElement::toJsonKeyvalues(void)
+{
+  JsonHelper jh;
+
+  jh.addString("id", entityId.id);
+
+  /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
+  jh.addString("type", (entityId.type != "")? entityId.type : DEFAULT_ENTITY_TYPE);
+
+  for (unsigned int ix = 0; ix < contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = contextAttributeVector[ix];
+    jh.addRaw(caP->name, caP->toJsonValue());
+  }
+
+  return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElement::toJsonNormalized -
+*
+* FIXME PR: lot of duplicated code from Entity NGSIv2 class but we don't care
+* as NGSIv1 code is deprecated. The duplication will be solved when NGSIv1 gets removed
+*/
+std::string ContextElement::toJsonNormalized(const std::vector<std::string>&  metadataFilter)
+{
+  JsonHelper jh;
+
+  jh.addString("id", entityId.id);
+
+  /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
+  jh.addString("type", (entityId.type != "")? entityId.type : DEFAULT_ENTITY_TYPE);
+
+  for (unsigned int ix = 0; ix < contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = contextAttributeVector[ix];
+    jh.addRaw(caP->name, caP->toJson(metadataFilter));
+  }
+
+  return jh.str();
+}
 
 
 /* ****************************************************************************

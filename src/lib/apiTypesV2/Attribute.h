@@ -61,8 +61,7 @@ class Attribute
                       HttpStatusCode*     scP,
                       bool                keyValues,
                       const std::string&  metadataList,
-                      RequestType         requestType,
-                      bool                comma = false);
+                      RequestType         requestType);
   void         fill(QueryContextResponse* qcrsP, std::string attrName);
 };
 

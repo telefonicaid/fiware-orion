@@ -29,6 +29,7 @@
 #include "common/errorMessages.h"
 #include "common/RenderFormat.h"
 #include "common/string.h"
+#include "common/JsonHelper.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "apiTypesV2/Attribute.h"
 
@@ -48,8 +49,7 @@ std::string Attribute::render
   HttpStatusCode*     scP,                 // out parameter (pass-through)
   bool                keyValues,           // in parameter
   const std::string&  metadataList,        // in parameter
-  RequestType         requestType,         // in parameter
-  bool                comma                // in parameter
+  RequestType         requestType          // in parameter
 )
 {
   RenderFormat  renderFormat = (keyValues == true)? NGSI_V2_KEYVALUES : NGSI_V2_NORMALIZED;
@@ -76,18 +76,16 @@ std::string Attribute::render
         stringSplit(metadataList, ',', metadataFilter);
       }
 
-      out = "{";
-
-      // First parameter (isLastElement) is 'true' as it is the last and only element
-      out += pcontextAttribute->toJson(true, renderFormat, metadataFilter, requestType);
-
-      out += "}";
-    }
-
-
-    if (comma)
-    {
-      out += ",";
+      if (renderFormat == NGSI_V2_KEYVALUES)
+      {
+        JsonHelper jh;
+        jh.addRaw(pcontextAttribute->name, pcontextAttribute->toJsonValue());
+        out = jh.str();
+      }
+      else // NGSI_V2_NORMALIZED
+      {
+        out = pcontextAttribute->toJson(metadataFilter);
+      }
     }
 
     return out;

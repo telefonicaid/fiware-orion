@@ -31,6 +31,7 @@
 #include "common/tag.h"
 #include "common/string.h"
 #include "common/globals.h"
+#include "common/JsonHelper.h"
 #include "common/errorMessages.h"
 #include "rest/uriParamNames.h"
 #include "alarmMgr/alarmMgr.h"
@@ -61,6 +62,119 @@ Entity::~Entity()
 }
 
 
+/* ****************************************************************************
+*
+* Entity::filterAttributes -
+*
+* Filter attributes vector in order to get the effective attribute vector to
+* render.
+*
+* dateCreatedOption and dateModifiedOption are due to deprecated ways of requesting
+* date in response. If used, the date is added at the end.
+*
+* FIXME P3: this methods is complex. It should be refactored
+* FIXME P3: maybe dateCreated and dateModified should be pre-included in the attributes
+* vector, so all three (dateCreated, dateModified and dateExpires) could be processed in
+* a similar way.
+*/
+void Entity::filterAttributes
+(
+  const std::vector<std::string>&  attrsFilter,
+  bool                             dateCreatedOption,
+  bool                             dateModifiedOption
+)
+{
+  bool dateCreatedAdded  = false;
+  bool dateModifiedAdded = false;
+
+  if (attrsFilter.size () != 0)
+  {
+    if (std::find(attrsFilter.begin(), attrsFilter.end(), ALL_ATTRS) != attrsFilter.end())
+    {
+      // Not filtering, just adding dateCreated and dateModified if needed
+      if ((creDate != 0) && (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end()))
+      {
+        ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, creDate);
+        attributeVector.push_back(caP);
+        dateCreatedAdded = true;
+      }
+      if ((modDate != 0) &&  (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_MODIFIED) != attrsFilter.end()))
+      {
+        ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, modDate);
+        attributeVector.push_back(caP);
+        dateModifiedAdded = true;
+      }
+    }
+    else
+    {
+      // Reorder attributes in the same order they are in attrsFilter, excluding the ones
+      // note there (i.e. filtering them out) and giving special treatment to creation
+      // and modification dates
+      //
+      // The (attributeVector.lookup(DATE_XXXX) == -1) check is to give preference to user
+      // defined attributes (see
+      // https://fiware-orion.readthedocs.io/en/master/user/ngsiv2_implementation_notes/index.html#datemodified-and-datecreated-attributes)
+
+      std::vector<ContextAttribute*> caNewV;
+
+      for (unsigned int ix = 0; ix < attrsFilter.size(); ix++)
+      {
+        std::string attrsFilterItem = attrsFilter[ix];
+        if ((creDate != 0) && (attrsFilterItem == DATE_CREATED) && (attributeVector.lookup(DATE_CREATED) == -1))
+        {
+          ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, creDate);
+          caNewV.push_back(caP);
+          dateCreatedAdded = true;
+        }
+        else if ((modDate != 0) && (attrsFilterItem == DATE_MODIFIED) && (attributeVector.lookup(DATE_MODIFIED) == -1))
+        {
+          ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, modDate);
+          caNewV.push_back(caP);
+          dateModifiedAdded = true;
+        }
+        // Actual attribute filtering only takes place if '*' was not used
+        else
+        {
+          int found = attributeVector.lookup(attrsFilterItem);
+          if (found != -1)
+          {
+            caNewV.push_back(attributeVector.vec[found]);
+            attributeVector.vec.erase(attributeVector.vec.begin() + found);
+          }
+        }
+      }
+
+      // All the remainder elements in attributeVector need to be released,
+      // before overriding the vector with caNewV
+      attributeVector.release();
+
+      attributeVector.vec = caNewV;
+    }
+  }
+
+  // Legacy support for options=dateCreated and opations=dateModified
+  if (dateCreatedOption && !dateCreatedAdded && (creDate != 0))
+  {
+    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, creDate);
+    attributeVector.push_back(caP);
+  }
+  if (dateModifiedOption && !dateModifiedAdded && (modDate != 0))
+  {
+    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, modDate);
+    attributeVector.push_back(caP);
+  }
+
+  // Removing dateExpires if not explictely included in the filter
+  bool includeDateExpires = (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_EXPIRES) != attrsFilter.end());
+  int found;
+  if (!includeDateExpires && ((found = attributeVector.lookup(DATE_EXPIRES)) != -1))
+  {
+    attributeVector.vec[found]->release();
+    attributeVector.vec.erase(attributeVector.vec.begin() + found);
+  }
+}
+
+
 
 /* ****************************************************************************
 *
@@ -75,8 +189,7 @@ Entity::~Entity()
 std::string Entity::render
 (
   std::map<std::string, bool>&         uriParamOptions,
-  std::map<std::string, std::string>&  uriParam,
-  bool                                 comma
+  std::map<std::string, std::string>&  uriParam
 )
 {
   if ((oe.details != "") || ((oe.reasonPhrase != "OK") && (oe.reasonPhrase != "")))
@@ -90,7 +203,6 @@ std::string Entity::render
   else if (uriParamOptions[OPT_VALUES]        == true)  { renderFormat = NGSI_V2_VALUES;        }
   else if (uriParamOptions[OPT_UNIQUE_VALUES] == true)  { renderFormat = NGSI_V2_UNIQUE_VALUES; }
 
-  std::string               out;
   std::vector<std::string>  metadataFilter;
   std::vector<std::string>  attrsFilter;
 
@@ -104,72 +216,147 @@ std::string Entity::render
     stringSplit(uriParam[URI_PARAM_ATTRS], ',', attrsFilter);
   }
 
-  // Add special attributes representing entity dates
-  // Note 'uriParamOptions[DATE_CREATED/DATE_MODIFIED] ||' is needed due to backward compability
-  if ((creDate != 0) && (uriParamOptions[DATE_CREATED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end())))
+  // Get the effective vector of attributes to render
+  // FIXME PR: given this is "destructive", maybe this should be done before calling render logic, no in the render itself
+  // FIXME PR: this should be moved to mongoBackend, so it returns the entity as it has to be rendered... however, note that
+  // we are adding some attributes (DATE_MODIFIED and DATE_CREATED) here. Not sure how to solve it...
+  filterAttributes(attrsFilter, uriParamOptions[DATE_CREATED], uriParamOptions[DATE_MODIFIED]);
+
+  std::string out;
+  switch (renderFormat)
   {
-    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, creDate);
-    attributeVector.push_back(caP);
-  }
-  if ((modDate != 0) && (uriParamOptions[DATE_MODIFIED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_MODIFIED) != attrsFilter.end())))
-  {
-    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, modDate);
-    attributeVector.push_back(caP);
-  }
-
-  if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
-  {
-    out = "[";
-    if (attributeVector.size() != 0)
-    {
-      out += attributeVector.toJson(renderFormat, attrsFilter, metadataFilter, false);
-    }
-    out += "]";
-  }
-  else
-  {
-    out = "{";
-
-    if (renderId)
-    {
-      out += JSON_VALUE("id", id);
-      out += ",";
-
-      /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
-      out += JSON_STR("type") + ":" + ((type != "")? JSON_STR(type) : JSON_STR(DEFAULT_ENTITY_TYPE));
-    }
-
-    std::string attrsOut;
-    if (attributeVector.size() != 0)
-    {
-      attrsOut += attributeVector.toJson(renderFormat, attrsFilter, metadataFilter, false);
-    }
-
-    //
-    // Note that just attributeVector.size() != 0 (used in previous versions) cannot be used
-    // as ciP->uriParam["attrs"] filter could remove all the attributes
-    //
-    if (attrsOut != "")
-    {
-      if (renderId)
-      {
-        out +=  "," + attrsOut;
-      }
-      else
-      {
-        out += attrsOut;
-      }
-    }
-
-    out += "}";
-  }
-
-  if (comma)
-  {
-    out += ",";
+  case NGSI_V2_VALUES:
+    out = toJsonValues();
+    break;
+  case NGSI_V2_UNIQUE_VALUES:
+    out = toJsonUniqueValues();
+    break;
+  case NGSI_V2_KEYVALUES:
+    out = toJsonKeyvalues();
+    break;
+  default:  // NGSI_V2_NORMALIZED
+    out = toJsonNormalized(metadataFilter);
+    break;
   }
 
   return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* Entity::toJsonValues -
+*/
+std::string Entity::toJsonValues(void)
+{
+  std::string out = "[";
+
+  for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = attributeVector[ix];
+    out += caP->toJsonValue();
+
+    if (ix != attributeVector.size() - 1)
+    {
+      out += ",";
+    }
+  }
+
+  out += "]";
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* Entity::toJsonUniqueValues -
+*/
+std::string Entity::toJsonUniqueValues(void)
+{
+  std::string out = "[";
+
+  std::map<std::string, bool>  uniqueMap;
+
+  for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = attributeVector[ix];
+
+    std::string value = caP->toJsonValue();
+
+    if (uniqueMap[value] == true)
+    {
+      // Already rendered. Skip.
+      continue;
+    }
+    else
+    {
+      out += value;
+      uniqueMap[value] = true;
+    }
+
+    out += ",";
+  }
+
+  // The substrig trick removes the final ",". It is not very smart, but it saves
+  // a second pass on the vector, once the "unicity" has been calculated in the hashmap
+  return out.substr(0, out.length() - 1 ) + "]";
+}
+
+
+
+/* ****************************************************************************
+*
+* Entity::toJsonKeyvalues -
+*/
+std::string Entity::toJsonKeyvalues(void)
+{
+  JsonHelper jh;
+
+  if (renderId)
+  {
+    jh.addString("id", id);
+
+    /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
+    jh.addString("type", (type != "")? type : DEFAULT_ENTITY_TYPE);
+  }
+
+  for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = attributeVector[ix];
+    jh.addRaw(caP->name, caP->toJsonValue());
+  }
+
+  return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* Entity::toJsonNormalized -
+*/
+std::string Entity::toJsonNormalized(const std::vector<std::string>&  metadataFilter)
+{
+  JsonHelper jh;
+
+  if (renderId)
+  {
+    jh.addString("id", id);
+
+    /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
+    jh.addString("type", (type != "")? type : DEFAULT_ENTITY_TYPE);
+  }
+
+  for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = attributeVector[ix];
+    jh.addRaw(caP->name, caP->toJson(metadataFilter));
+  }
+
+  return jh.str();
 }
 
 

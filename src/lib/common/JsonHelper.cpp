@@ -40,9 +40,9 @@
 */
 std::string toJsonString(const std::string& input)
 {
-  std::ostringstream ss;
+  std::string ss;
 
-  ss << '"';
+  ss = '"';
   for (std::string::const_iterator iter = input.begin(); iter != input.end(); ++iter)
   {
     /* FIXME P3: This function ensures that if the DB holds special characters (which are
@@ -63,13 +63,13 @@ std::string toJsonString(const std::string& input)
      */
     switch (char ch = *iter)
     {
-    case '\\': ss << "\\\\"; break;
-    case '"':  ss << "\\\""; break;
-    case '\b': ss << "\\b";  break;
-    case '\f': ss << "\\f";  break;
-    case '\n': ss << "\\n";  break;
-    case '\r': ss << "\\r";  break;
-    case '\t': ss << "\\t";  break;
+    case '\\': ss += "\\\\"; break;
+    case '"':  ss += "\\\""; break;
+    case '\b': ss += "\\b";  break;
+    case '\f': ss += "\\f";  break;
+    case '\n': ss += "\\n";  break;
+    case '\r': ss += "\\r";  break;
+    case '\t': ss += "\\t";  break;
     default:
       /* Converting the rest of special chars 0-31 to \u00xx. Note that 0x80 - 0xFF are untouched as they
        * correspond to UTF-8 multi-byte characters */
@@ -77,20 +77,20 @@ std::string toJsonString(const std::string& input)
       {
         static const char intToHex[16] =  { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' } ;
 
-        ss << "\\u00" << intToHex[(ch & 0xF0) >> 4] << intToHex[ch & 0x0F];
+        ss += "\\u00" + intToHex[(ch & 0xF0) >> 4] + intToHex[ch & 0x0F];
       }
       else
       {
-        ss << ch;
+        ss += ch;
       }
       break;
     }  // end-switch
 
   }  // end-for
 
-  ss << '"';
+  ss += '"';
 
-  return ss.str();
+  return ss;
 }
 
 
@@ -111,15 +111,15 @@ std::string vectorToJson(std::vector<std::string> &list)
     return "[" + toJsonString(list[0]) + "]";
 
   default:
-    std::ostringstream os;
-    os << '[';
-    os << toJsonString(list[0]);
+    std::string os;
+    os = '[';
+    os += toJsonString(list[0]);
     for (std::vector<std::string>::size_type i = 1; i != list.size(); ++i)
     {
-      os << ',' << toJsonString(list[i]);
+      os += ',' + toJsonString(list[i]);
     }
-    os << ']';
-    return os.str();
+    os += ']';
+    return os;
   }
 }
 
@@ -131,10 +131,10 @@ std::string vectorToJson(std::vector<std::string> &list)
 */
 std::string objectToJson(std::map<std::string, std::string>& list)
 {
-  std::ostringstream  os;
-  bool                firstTime = true;
+  std::string  os;
+  bool         firstTime = true;
 
-  os << '{';
+  os = '{';
 
   for (std::map<std::string, std::string>::const_iterator it = list.begin(); it != list.end(); ++it)
   {
@@ -147,15 +147,15 @@ std::string objectToJson(std::map<std::string, std::string>& list)
     }
     else
     {
-      os << ',';
+      os += ',';
     }
 
-    os << toJsonString(key) << ':' << toJsonString(value);
+    os += toJsonString(key) + ':' + toJsonString(value);
   }
 
-  os << '}';
+  os += '}';
 
-  return os.str();
+  return os;
 }
 
 
@@ -166,7 +166,7 @@ std::string objectToJson(std::map<std::string, std::string>& list)
 */
 JsonHelper::JsonHelper(): empty(true)
 {
-  ss << '{';
+  ss += '{';
 }
 
 
@@ -179,9 +179,9 @@ void JsonHelper::addString(const std::string& key, const std::string& value)
 {
   if (!empty)
   {
-    ss << ',';
+    ss += ',';
   }
-  ss << toJsonString(key) << ':' << toJsonString(value);
+  ss += toJsonString(key) + ':' + toJsonString(value);
 
   empty = false;
 }
@@ -196,9 +196,9 @@ void JsonHelper::addRaw(const std::string& key, const std::string& value)
 {
   if (!empty)
   {
-    ss << ',';
+    ss += ',';
   }
-  ss << toJsonString(key) << ':' << value;
+  ss += toJsonString(key) + ':' + value;
 
   empty = false;
 }
@@ -213,9 +213,11 @@ void JsonHelper::addNumber(const std::string& key, long long value)
 {
   if (!empty)
   {
-    ss << ',';
+    ss += ',';
   }
-  ss << toJsonString(key) << ':' << value;
+  // FIXME P7: double2str() used double as argument, but value is long long.
+  // However .test regression shows that it works... weird?
+  ss += toJsonString(key) + ':' + double2string(value);
 
   empty = false;
 }
@@ -230,22 +232,16 @@ void JsonHelper::addNumber(const std::string& key, long long value)
 *           should be used instead.
 *           See issue #3058
 */
-void JsonHelper::addNumber(const std::string& key, float  value)
+void JsonHelper::addNumber(const std::string& key, double value)
 {
-  unsigned int oldPrecision = ss.precision();
-  ss << std::fixed << std::setprecision(decimalDigits(value));
-
   if (!empty)
   {
-    ss << ',';
+    ss += ',';
   }
-  ss << toJsonString(key) << ':' << value;
-
-  // Reset stream to old parameters (whichever they are...)
-  ss.unsetf(std::ios_base::fixed);
-  ss << std::setprecision(oldPrecision);
+  ss += toJsonString(key) + ':' + double2string(value);
 
   empty = false;
+
 }
 
 
@@ -258,9 +254,9 @@ void JsonHelper::addDate(const std::string& key, long long timestamp)
 {
   if (!empty)
   {
-    ss << ',';
+    ss += ',';
   }
-  ss << toJsonString(key) << ':' << toJsonString(isodate2str(timestamp));
+  ss += toJsonString(key) + ':' + toJsonString(isodate2str(timestamp));
 
   empty = false;
 }
@@ -284,6 +280,6 @@ void JsonHelper::addBool(const std::string& key, bool b)
 */
 std::string JsonHelper::str()
 {
-  ss << '}';
-  return ss.str();
+  ss += '}';
+  return ss;
 }
