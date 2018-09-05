@@ -82,7 +82,7 @@ std::string Attribute::render
         jh.addRaw(pcontextAttribute->name, pcontextAttribute->toJsonValue());
         out = jh.str();
       }
-      else // NGSI_V2_NORMALIZED
+      else  // NGSI_V2_NORMALIZED
       {
         out = pcontextAttribute->toJson(metadataFilter);
       }

@@ -83,9 +83,9 @@ class Entity
   void         hideIdAndType(bool hide = true);
 
  private:
-  void filterAttributes (const std::vector<std::string>&  attrsFilter,
-                         bool                             dateCreatedOption,
-                         bool                             dateModifiedOption);
+  void filterAttributes(const std::vector<std::string>&  attrsFilter,
+                        bool                             dateCreatedOption,
+                        bool                             dateModifiedOption);
 
   std::string toJsonValues(void);
   std::string toJsonUniqueValues(void);
