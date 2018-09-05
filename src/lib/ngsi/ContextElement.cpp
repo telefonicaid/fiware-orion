@@ -140,12 +140,12 @@ void ContextElement::filterAttributes(const std::vector<std::string>&  attrsFilt
 
       if (!blacklist)
       {
-        if ((entityId.creDate != 0) && (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end()) && (contextAttributeVector.lookup(DATE_CREATED) == -1))
+        if ((entityId.creDate != 0) && (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end()) && (contextAttributeVector.get(DATE_CREATED) == -1))
         {
           ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, entityId.creDate);
           contextAttributeVector.push_back(caP);
         }
-        if ((entityId.modDate != 0) &&  (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_MODIFIED) != attrsFilter.end()) && (contextAttributeVector.lookup(DATE_MODIFIED) == -1))
+        if ((entityId.modDate != 0) &&  (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_MODIFIED) != attrsFilter.end()) && (contextAttributeVector.get(DATE_MODIFIED) == -1))
         {
           ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, entityId.modDate);
           contextAttributeVector.push_back(caP);
@@ -158,9 +158,9 @@ void ContextElement::filterAttributes(const std::vector<std::string>&  attrsFilt
       //
       // 1. If blacklist == true, go through the contextAttributeVector, taking only its elements
       //    not in attrsFilter
-      // 2. If blacklist == false, reorder attributes in the same order they are in attrsFilter, excluding
-      //    the ones not there (i.e. filtering them out) and giving special treatment to creation
-      //    and modification dates
+      // 2. If blacklist == false, reorder attributes in the same order they are in
+      //    attrsFilter (attributes not in attrsFilter are filtered out). Creation and modification
+      //    dates have a special treatment
 
       if (blacklist)
       {
@@ -186,12 +186,12 @@ void ContextElement::filterAttributes(const std::vector<std::string>&  attrsFilt
         for (unsigned int ix = 0; ix < attrsFilter.size(); ix++)
         {
           std::string attrsFilterItem = attrsFilter[ix];
-          if ((entityId.creDate != 0) && (attrsFilterItem == DATE_CREATED) && (contextAttributeVector.lookup(DATE_CREATED) == -1))
+          if ((entityId.creDate != 0) && (attrsFilterItem == DATE_CREATED) && (contextAttributeVector.get(DATE_CREATED) == -1))
           {
             ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, entityId.creDate);
             caNewV.push_back(caP);
           }
-          else if ((entityId.modDate != 0) && (attrsFilterItem == DATE_MODIFIED) && (contextAttributeVector.lookup(DATE_MODIFIED) == -1))
+          else if ((entityId.modDate != 0) && (attrsFilterItem == DATE_MODIFIED) && (contextAttributeVector.get(DATE_MODIFIED) == -1))
           {
             ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, entityId.modDate);
             caNewV.push_back(caP);
@@ -199,7 +199,7 @@ void ContextElement::filterAttributes(const std::vector<std::string>&  attrsFilt
           // Actual attribute filtering only takes place if '*' was not used
           else
           {
-            int found = contextAttributeVector.lookup(attrsFilterItem);
+            int found = contextAttributeVector.get(attrsFilterItem);
             if (found != -1)
             {
               caNewV.push_back(contextAttributeVector.vec[found]);
@@ -208,7 +208,7 @@ void ContextElement::filterAttributes(const std::vector<std::string>&  attrsFilt
           }
         }
 
-        // All the remainder elements in attributeVector need to be released,
+        // All the remaining elements in attributeVector need to be released,
         // before overriding the vector with caNewV
         contextAttributeVector.release();
 
@@ -218,10 +218,10 @@ void ContextElement::filterAttributes(const std::vector<std::string>&  attrsFilt
     }
   }
 
-  // Removing dateExpires if not explictely included in the filter
+  // Removing dateExpires if not explicitly included in the filter
   bool includeDateExpires = (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_EXPIRES) != attrsFilter.end());
   int found;
-  if (!blacklist && !includeDateExpires && ((found = contextAttributeVector.lookup(DATE_EXPIRES)) != -1))
+  if (!blacklist && !includeDateExpires && ((found = contextAttributeVector.get(DATE_EXPIRES)) != -1))
   {
     contextAttributeVector.vec[found]->release();
     contextAttributeVector.vec.erase(contextAttributeVector.vec.begin() + found);

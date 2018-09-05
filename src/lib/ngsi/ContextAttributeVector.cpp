@@ -337,9 +337,9 @@ void ContextAttributeVector::fill(ContextAttributeVector* cavP, bool useDefaultT
 
 /* ****************************************************************************
 *
-* lookup -
+* get -
 */
-int ContextAttributeVector::lookup(const std::string& attributeName) const
+int ContextAttributeVector::get(const std::string& attributeName) const
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

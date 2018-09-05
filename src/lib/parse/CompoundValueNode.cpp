@@ -826,7 +826,7 @@ std::string CompoundValueNode::toJson(bool toplevel)
 {
   std::string out;
 
-  switch(valueType)
+  switch (valueType)
   {
   case orion::ValueTypeString:
     out = toJsonString(stringValue);

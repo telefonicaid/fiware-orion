@@ -49,7 +49,7 @@ typedef struct ContextAttributeVector
   unsigned int             size(void) const;
   void                     release(void);
   void                     fill(struct ContextAttributeVector* cavP, bool useDefaultType = false);
-  int                      lookup(const std::string& attributeName) const;
+  int                      get(const std::string& attributeName) const;
   
   ContextAttribute*  operator[](unsigned int ix) const;
 

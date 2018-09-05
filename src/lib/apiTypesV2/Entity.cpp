@@ -116,9 +116,9 @@ void Entity::filterAttributes
     }
     else
     {
-      // Reorder attributes in the same order they are in attrsFilter, excluding the ones
-      // note there (i.e. filtering them out) and giving special treatment to creation
-      // and modification dates
+      // Reorder attributes in the same order they are in attrsFilter (attributes not
+      // in attrsFilter are filtered out). Creation and modification dates have a special
+      // treatment
       //
       // The (attributeVector.lookup(DATE_XXXX) == -1) check is to give preference to user
       // defined attributes (see
@@ -129,13 +129,13 @@ void Entity::filterAttributes
       for (unsigned int ix = 0; ix < attrsFilter.size(); ix++)
       {
         std::string attrsFilterItem = attrsFilter[ix];
-        if ((creDate != 0) && (attrsFilterItem == DATE_CREATED) && (attributeVector.lookup(DATE_CREATED) == -1))
+        if ((creDate != 0) && (attrsFilterItem == DATE_CREATED) && (attributeVector.get(DATE_CREATED) == -1))
         {
           ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, creDate);
           caNewV.push_back(caP);
           dateCreatedAdded = true;
         }
-        else if ((modDate != 0) && (attrsFilterItem == DATE_MODIFIED) && (attributeVector.lookup(DATE_MODIFIED) == -1))
+        else if ((modDate != 0) && (attrsFilterItem == DATE_MODIFIED) && (attributeVector.get(DATE_MODIFIED) == -1))
         {
           ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, modDate);
           caNewV.push_back(caP);
@@ -144,7 +144,7 @@ void Entity::filterAttributes
         // Actual attribute filtering only takes place if '*' was not used
         else
         {
-          int found = attributeVector.lookup(attrsFilterItem);
+          int found = attributeVector.get(attrsFilterItem);
           if (found != -1)
           {
             caNewV.push_back(attributeVector.vec[found]);
@@ -153,7 +153,7 @@ void Entity::filterAttributes
         }
       }
 
-      // All the remainder elements in attributeVector need to be released,
+      // All the remaining elements in attributeVector need to be released,
       // before overriding the vector with caNewV
       attributeVector.release();
 
@@ -161,7 +161,7 @@ void Entity::filterAttributes
     }
   }
 
-  // Legacy support for options=dateCreated and opations=dateModified
+  // Legacy support for options=dateCreated and options=dateModified
   if (dateCreatedOption && !dateCreatedAdded && (creDate != 0))
   {
     ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, creDate);
@@ -173,10 +173,10 @@ void Entity::filterAttributes
     attributeVector.push_back(caP);
   }
 
-  // Removing dateExpires if not explictely included in the filter
+  // Removing dateExpires if not explicitly included in the filter
   bool includeDateExpires = (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_EXPIRES) != attrsFilter.end());
   int found;
-  if (!includeDateExpires && ((found = attributeVector.lookup(DATE_EXPIRES)) != -1))
+  if (!includeDateExpires && ((found = attributeVector.get(DATE_EXPIRES)) != -1))
   {
     attributeVector.vec[found]->release();
     attributeVector.vec.erase(attributeVector.vec.begin() + found);
@@ -308,7 +308,7 @@ std::string Entity::toJsonUniqueValues(void)
     out += ",";
   }
 
-  // The substrig trick removes the final ",". It is not very smart, but it saves
+  // The substring trick replaces final "," by "]". It is not very smart, but it saves
   // a second pass on the vector, once the "unicity" has been calculated in the hashmap
   return out.substr(0, out.length() - 1 ) + "]";
 }
