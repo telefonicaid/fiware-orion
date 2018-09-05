@@ -903,7 +903,8 @@ std::string ContextAttribute::toJsonValue(void)
 *
 * toJsonAsValue -
 *
-* FIXME PR: given the new method toJsonValue() the name of this one should be changed
+* FIXME P7: toJsonValue() and toJsonAsValue() are very similar and may be confusing.
+* Try to find a couple of names different and meaningful enough
 */
 std::string ContextAttribute::toJsonAsValue
 (

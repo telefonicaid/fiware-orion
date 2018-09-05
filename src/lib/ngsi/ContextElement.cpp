@@ -121,8 +121,9 @@ std::string ContextElement::render
 * dateCreatedOption and dateModifiedOption are due to deprecated ways of requesting
 * date in response. If used, the date is added at the end.
 *
-* FIXME PR: lot of duplicated code from Entity NGSIv2 class but we don't care
-* as NGSIv1 code is deprecated. The duplication will be solved when NGSIv1 gets removed
+* FIXME P7: duplicated code in Entity::filterAttributes(). However, this
+* will be solved if ContextElement is refactored to use Entity as internal representation
+* for entities.
 */
 void ContextElement::filterAttributes(const std::vector<std::string>&  attrsFilter, bool blacklist)
 {
@@ -232,8 +233,9 @@ void ContextElement::filterAttributes(const std::vector<std::string>&  attrsFilt
 *
 * ContextElement::toJson - 
 *
-* FIXME PR: lot of duplicated code from Entity NGSIv2 class but we don't care
-* as NGSIv1 code is deprecated. The duplication will be solved when NGSIv1 gets removed
+* FIXME P7: duplicated code in Entity::toJson(). However, this
+* will be solved if ContextElement is refactored to use Entity as internal representation
+* for entities.
 */
 std::string ContextElement::toJson
 (
@@ -244,6 +246,8 @@ std::string ContextElement::toJson
 )
 {
   // Get the effective vector of attributes to render
+  // FIXME P7: filterAttributes will be moved and invoking it would not be needed from toJson()
+  // (see comment in filterAttributes)
   filterAttributes(attrsFilter, blacklist);
 
   std::string out;
@@ -271,8 +275,9 @@ std::string ContextElement::toJson
 *
 * ContextElement::toJsonValues -
 *
-* FIXME PR: lot of duplicated code from Entity NGSIv2 class but we don't care
-* as NGSIv1 code is deprecated. The duplication will be solved when NGSIv1 gets removed
+* FIXME P7: duplicated code in Entity::toJsonValues(). However, this
+* will be solved if ContextElement is refactored to use Entity as internal representation
+* for entities.
 */
 std::string ContextElement::toJsonValues(void)
 {
@@ -300,8 +305,9 @@ std::string ContextElement::toJsonValues(void)
 *
 * ContextElement::toJsonUniqueValues -
 *
-* FIXME PR: lot of duplicated code from Entity NGSIv2 class but we don't care
-* as NGSIv1 code is deprecated. The duplication will be solved when NGSIv1 gets removed
+* FIXME P7: duplicated code in toJsonUniqueValues::filterAttributes(). However, this
+* will be solved if ContextElement is refactored to use Entity as internal representation
+* for entities.
 */
 std::string ContextElement::toJsonUniqueValues(void)
 {
@@ -343,8 +349,9 @@ std::string ContextElement::toJsonUniqueValues(void)
 *
 * ContextElement::toJsonKeyvalues -
 *
-* FIXME PR: lot of duplicated code from Entity NGSIv2 class but we don't care
-* as NGSIv1 code is deprecated. The duplication will be solved when NGSIv1 gets removed
+* FIXME P7: duplicated code in Entity::toJsonKeyValues(). However, this
+* will be solved if ContextElement is refactored to use Entity as internal representation
+* for entities.
 */
 std::string ContextElement::toJsonKeyvalues(void)
 {
@@ -370,8 +377,9 @@ std::string ContextElement::toJsonKeyvalues(void)
 *
 * ContextElement::toJsonNormalized -
 *
-* FIXME PR: lot of duplicated code from Entity NGSIv2 class but we don't care
-* as NGSIv1 code is deprecated. The duplication will be solved when NGSIv1 gets removed
+* FIXME P7: duplicated code in Entity::toJsonNormalized(). However, this
+* will be solved if ContextElement is refactored to use Entity as internal representation
+* for entities.
 */
 std::string ContextElement::toJsonNormalized(const std::vector<std::string>&  metadataFilter)
 {

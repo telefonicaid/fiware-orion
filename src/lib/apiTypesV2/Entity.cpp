@@ -72,10 +72,19 @@ Entity::~Entity()
 * dateCreatedOption and dateModifiedOption are due to deprecated ways of requesting
 * date in response. If used, the date is added at the end.
 *
-* FIXME P3: this methods is complex. It should be refactored
-* FIXME P3: maybe dateCreated and dateModified should be pre-included in the attributes
-* vector, so all three (dateCreated, dateModified and dateExpires) could be processed in
-* a similar way.
+* FIXME P7: some comments regarding this function
+*
+* - Code should be integrated with the one on ContextElement::filterAttributes(). However,
+*   this is probable a sub-task of the more general task of changing ContextElement to use
+*   Entity class internally
+* - The function is pretty long and complex. It should be refactored to simplify it
+* - Related with this simplification maybe dateCreated and dateModified should be pre-included
+*   in the attributes vector, so all three (dateCreated, dateModified and dateExpires) could be
+*   processed in a similar way.
+* - This function shouldn't be called from toJson() code. The mongoBackend should deal with
+*   attributeVector preparation. Thus, either we leave the function heare and mongoBackend calls
+*   Entity::filterAttributes() or the logic is moved to mongoBackend (to be decided when we face
+*   this FIXME).
 */
 void Entity::filterAttributes
 (
@@ -217,9 +226,8 @@ std::string Entity::render
   }
 
   // Get the effective vector of attributes to render
-  // FIXME PR: given this is "destructive", maybe this should be done before calling render logic, no in the render itself
-  // FIXME PR: this should be moved to mongoBackend, so it returns the entity as it has to be rendered... however, note that
-  // we are adding some attributes (DATE_MODIFIED and DATE_CREATED) here. Not sure how to solve it...
+  // FIXME P7: filterAttributes will be moved and invoking it would not be needed from toJson()
+  // (see comment in filterAttributes)
   filterAttributes(attrsFilter, uriParamOptions[DATE_CREATED], uriParamOptions[DATE_MODIFIED]);
 
   std::string out;
