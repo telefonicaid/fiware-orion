@@ -39,6 +39,31 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// orionldContextFree -
+//
+void orionldContextFree(OrionldContext* contextP)
+{
+  if (contextP == NULL)
+    return;
+
+  if (contextP->tree != NULL)
+  {
+    kjFree(contextP->tree);
+    contextP->tree = NULL;
+  }
+
+  if (contextP != &orionldDefaultContext)
+  {
+    if (contextP->url != NULL)
+      free(contextP->url);
+    free(contextP);
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldContextFreeAll -
 //
 void orionldContextFreeAll(void)
@@ -50,20 +75,7 @@ void orionldContextFreeAll(void)
   {
     OrionldContext* next = contextP->next;
 
-    LM_T(LmtFree, ("Freeing context '%s' at %p - calling kjFree", contextP->url, contextP));
-    kjFree(contextP->tree);
-    LM_T(LmtFree, ("Freeing context '%s' at %p - after kjFree", contextP->url, contextP));
-
-    if (contextP != &orionldDefaultContext)
-    {
-      LM_T(LmtFree, ("Freeing contextP->url at %p", contextP->url));
-      free(contextP->url);
-      LM_T(LmtFree, ("Freed contextP->url at %p", contextP->url));
-      LM_T(LmtFree, ("Freeing contextP at %p", contextP));
-      free(contextP);
-      LM_T(LmtFree, ("Freed contextP at %p", contextP));
-    }
-
+    orionldContextFree(contextP);
     contextP = next;
   }
 

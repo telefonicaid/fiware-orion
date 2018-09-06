@@ -111,6 +111,7 @@ echo
 ================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: http;//FIXME.array.context.needs/url
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
 Date: REGEX(.*)
 
@@ -147,7 +148,7 @@ MongoDB server version: REGEX(.*)
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : {
-				"value" : "John 2"
+				"http://uri=etsi=org/ngsi-ld/hasValue" : "John 2"
 			},
 			"md" : {
 				"@aliasAttributeName" : {

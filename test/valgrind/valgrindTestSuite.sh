@@ -644,21 +644,20 @@ then
 
       if [ ! -f /tmp/valgrind.out ]
       then
-        echo " FAILURE! (no valgrind output for functional test $file)"
-        exit 3
-      fi
-
-      mv /tmp/valgrind.out test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
+        echo " FAILURE! (no valgrind output for $file)"
+      else
+        mv /tmp/valgrind.out test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
       
-      typeset -i headEndLine1
-      typeset -i headEndLine2
-      vMsg processing $directory/$htest.valgrind.out in $(pwd)
+        typeset -i headEndLine1
+        typeset -i headEndLine2
+        vMsg processing $directory/$htest.valgrind.out in $(pwd)
 
-      lost=0
-      leakInfo test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
+        lost=0
+        leakInfo test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
 
-      valgrindErrors=0
-      valgrindErrorInfo test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
+        valgrindErrors=0
+        valgrindErrorInfo test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
+      fi
     else
       if [ "$dryLeaks" == "on" ]
       then

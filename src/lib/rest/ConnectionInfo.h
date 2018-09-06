@@ -134,6 +134,7 @@ public:
   KjNode*                   requestTree;
   KjNode*                   responseTree;
   OrionldContext*           contextP;
+  bool                      contextToBeFreed;
 #endif  
 };
 

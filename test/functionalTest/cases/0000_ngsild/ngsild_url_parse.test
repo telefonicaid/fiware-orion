@@ -289,6 +289,7 @@ Date: REGEX(.*)
 =============================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json
 Location: /ngsi-ld/v1/entities/http://a.b.c/E7
 Date: REGEX(.*)
 

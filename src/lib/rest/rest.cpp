@@ -578,24 +578,33 @@ static void requestCompleted
   MHD_RequestTerminationCode  toe
 )
 {
+  LM_TMP(("In requestCompleted"));
+
   ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
   std::string      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
   struct timespec  reqEndTime;
 
+  LM_TMP(("In requestCompleted"));
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
   {
     free(ciP->payload);
+    ciP->payload = NULL;
   }
 
-  *con_cls = NULL;
 
   lmTransactionEnd();  // Incoming REST request ends
 
+  LM_TMP(("In requestCompleted"));
   if (timingStatistics)
   {
+    LM_TMP(("In requestCompleted"));
     clock_gettime(CLOCK_REALTIME, &reqEndTime);
+    LM_TMP(("In requestCompleted"));
     clock_difftime(&reqEndTime, &ciP->reqStartTime, &threadLastTimeStat.reqTime);
+    LM_TMP(("In requestCompleted"));
   }
+  LM_TMP(("In requestCompleted"));
+
 
   //
   // Statistics
@@ -605,6 +614,7 @@ static void requestCompleted
   //
   if (timingStatistics)
   {
+    LM_TMP(("In requestCompleted"));
     timeStatSemTake(__FUNCTION__, "updating statistics");
 
     memcpy(&lastTimeStat, &threadLastTimeStat, sizeof(lastTimeStat));
@@ -633,8 +643,9 @@ static void requestCompleted
   //
   // Metrics
   //
+  LM_TMP(("In requestCompleted. before metricsMgr.add"));
   metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN, 1);
-
+  LM_TMP(("In requestCompleted. After metricsMgr.add"));
 
   //
   // If the httpStatusCode is above the set of 200s, an error has occurred
@@ -644,6 +655,7 @@ static void requestCompleted
     metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
   }
 
+  LM_TMP(("In requestCompleted"));
 
   if (metricsMgr.isOn() && (ciP->transactionStart.tv_sec != 0))
   {
@@ -659,6 +671,7 @@ static void requestCompleted
     }
   }
 
+  LM_TMP(("In requestCompleted"));
 
   //
   // delayed release of ContextElementResponseVector must be effectuated now.
@@ -667,7 +680,13 @@ static void requestCompleted
   extern void delayedReleaseExecute(void);
   delayedReleaseExecute();
 
+  LM_TMP(("Just before deleting ciP. ciP->contextP at %p", ciP->contextP));
+
   delete(ciP);
+
+  LM_TMP(("In requestCompleted"));
+  *con_cls = NULL;
+  LM_TMP(("In requestCompleted"));
 }
 
 
@@ -1526,7 +1545,9 @@ static int connectionTreat
       *upload_data_size = 0;
 
       // Then treat the request
-      return orionldMhdConnectionTreat((ConnectionInfo*) *con_cls);
+      int ret = orionldMhdConnectionTreat((ConnectionInfo*) *con_cls);
+      LM_TMP(("After orionldMhdConnectionTreat. ciP->contextP at %p", ((ConnectionInfo*) *con_cls)->contextP));
+      return ret;
     }
   }
 #endif  

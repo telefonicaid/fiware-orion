@@ -30,6 +30,14 @@
 
 // -----------------------------------------------------------------------------
 //
+// orionldContextFree -
+//
+extern void orionldContextFree(OrionldContext* contextP);
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldContextFreeAll -
 //
 extern void orionldContextFreeAll(void);

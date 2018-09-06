@@ -54,6 +54,7 @@
 #define HTTP_HOST                          "Host"
 #define HTTP_NGSIV2_ATTRSFORMAT            "Ngsiv2-AttrsFormat"
 #define HTTP_RESOURCE_LOCATION             "Location"
+#define HTTP_LINK                          "Link"
 #define HTTP_ORIGIN                        "Origin"
 #define HTTP_USER_AGENT                    "User-Agent"
 #define HTTP_X_AUTH_TOKEN                  "X-Auth-Token"

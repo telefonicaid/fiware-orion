@@ -26,7 +26,7 @@ Parse Contexts - all errors
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB
+brokerStart CB 0-255
 
 --SHELL--
 
@@ -50,8 +50,8 @@ brokerStart CB
 # 13. Array with member that is not a valid URL
 # 
 
-echo "1. @context is a Boolean"
-echo "========================"
+echo "01. @context is a Boolean"
+echo "========================="
 payload='{
   "id": "E1",
   "type": "A",
@@ -66,8 +66,8 @@ echo
 echo
 
 
-echo "2. @context is a Number"
-echo "======================"
+echo "02. @context is a Number"
+echo "======================="
 payload='{
   "id": "E1",
   "type": "A",
@@ -82,8 +82,8 @@ echo
 echo
 
 
-echo "3. @context is an object"
-echo "========================"
+echo "03. @context is an object"
+echo "========================="
 payload='{
   "id": "E1",
   "type": "A",
@@ -98,8 +98,8 @@ echo
 echo
 
 
-echo "4. @context is an empty string"
-echo "=============================="
+echo "04. @context is an empty string"
+echo "==============================="
 payload='{
   "id": "E1",
   "type": "A",
@@ -114,8 +114,8 @@ echo
 echo
 
 
-echo "5. URL in context is an invalid URL"
-echo "==================================="
+echo "05. URL in context is an invalid URL"
+echo "===================================="
 payload='{
   "id": "E1",
   "type": "A",
@@ -130,8 +130,8 @@ echo
 echo
 
 
-echo "6. URL in context is a valid URL but it doesn't exist"
-echo "====================================================="
+echo "06. URL in context is a valid URL but it doesn't exist"
+echo "======================================================"
 payload='{
   "id": "E1",
   "type": "A",
@@ -148,8 +148,8 @@ echo
 
 
 --REGEXPECT--
-1. @context is a Boolean
-========================
+01. @context is a Boolean
+=========================
 HTTP/1.1 400 Bad Request
 Content-Length: 120
 Content-Type: application/json
@@ -162,8 +162,8 @@ Date: REGEX(.*)
 }
 
 
-2. @context is a Number
-======================
+02. @context is a Number
+=======================
 HTTP/1.1 400 Bad Request
 Content-Length: 120
 Content-Type: application/json
@@ -176,8 +176,8 @@ Date: REGEX(.*)
 }
 
 
-3. @context is an object
-========================
+03. @context is an object
+=========================
 HTTP/1.1 400 Bad Request
 Content-Length: 120
 Content-Type: application/json
@@ -190,44 +190,44 @@ Date: REGEX(.*)
 }
 
 
-4. @context is an empty string
-==============================
+04. @context is an empty string
+===============================
 HTTP/1.1 400 Bad Request
-Content-Length: 164
+Content-Length: 183
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "URL parse error - no colon found - cannot determine the protocol",
-    "title": "Invalid context",
+    "title": "failure to create context from URL",
     "type": "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData"
 }
 
 
-5. URL in context is an invalid URL
-===================================
+05. URL in context is an invalid URL
+====================================
 HTTP/1.1 400 Bad Request
-Content-Length: 164
+Content-Length: 183
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "URL parse error - no colon found - cannot determine the protocol",
-    "title": "Invalid context",
+    "title": "failure to create context from URL",
     "type": "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData"
 }
 
 
-6. URL in context is a valid URL but it doesn't exist
-=====================================================
+06. URL in context is a valid URL but it doesn't exist
+======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 141
+Content-Length: 160
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "internal error at sending of curl request",
-    "title": "Invalid context",
+    "title": "failure to create context from URL",
     "type": "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData"
 }
 

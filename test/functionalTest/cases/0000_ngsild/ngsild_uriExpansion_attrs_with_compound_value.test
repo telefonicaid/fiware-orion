@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Parse Contexts - Simple URI Expansion for attributes
+Parse Contexts - URI Expansion for attributes with compound values
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -31,40 +31,23 @@ brokerStart CB
 --SHELL--
 
 #
-# As no @context is given, the default context will be used:
-# https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json
-# {
-#   "@context": {
-#     ...
-#     "title": "http://uri.etsi.org/ngsi-ld/title",
-#     "createdAt": {
-#       "@id": "http://uri.etsi.org/ngsi-ld/createdAt",
-#       "@type": "DateTime"
-#     },
-#     ...
-#   }
-# }
-#
-
-#
-# 01. POST /ngsi-ld/v1/entities, with an attribute called 'title'
-# 02. Checking mongo to find attribute http://uri.etsi.org/ngsi-ld/title
+# 01. POST /ngsi-ld/v1/entities, with an attribute called 'X', having a compound value including 'title'
+# 02. Checking mongo to find attribute http://uri.etsi.org/ngsi-ld/title inside compound
 #
 # FIXME: Once GET /ngsi-ld/v1/entities gets implemented, use that instead of mngoCmd2
 #
 
-echo "01. POST /ngsi-ld/v1/entities, with an attribute called 'title'"
-echo "==============================================================="
+echo "01. POST /ngsi-ld/v1/entities, with an attribute called 'X', having a compound value including 'title'"
+echo "======================================================================================================"
 payload='{
   "id": "http://a.b.c/entity/E1",
   "type": "T",
-  "title": {
-    "value": "Titulo",
+  "X": {
     "type": "Property",
-    "unitCode": "123",
-    "R_R": {
-      "type": "Relationship",
-      "object": "http://a.b.c/R_R"
+    "value": {
+      "title": {
+        "value": "Titulo"
+      }
     }
   }
 }'
@@ -73,16 +56,16 @@ echo
 echo
 
 
-echo "02. Checking mongo to find entity type http://example.org/T and the metadata @aliasAttrName"
-echo "=============================================================================================="
+echo "02. Checking mongo to find attribute http://uri.etsi.org/ngsi-ld/title inside compound"
+echo "======================================================================================"
 mongoCmd2 ftest "db.entities.findOne()"
 echo
 echo
 
 
 --REGEXPECT--
-01. POST /ngsi-ld/v1/entities, with an attribute called 'title'
-===============================================================
+01. POST /ngsi-ld/v1/entities, with an attribute called 'X', having a compound value including 'title'
+======================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Link: https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json
@@ -91,8 +74,8 @@ Date: REGEX(.*)
 
 
 
-02. Checking mongo to find entity type http://example.org/T and the metadata @aliasAttrName
-==============================================================================================
+02. Checking mongo to find attribute http://uri.etsi.org/ngsi-ld/title inside compound
+======================================================================================
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
@@ -103,25 +86,24 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"http://uri.etsi.org/ngsi-ld/title"
+		"http://www.example.org/attributes/X"
 	],
 	"attrs" : {
-		"http://uri=etsi=org/ngsi-ld/title" : {
+		"http://www=example=org/attributes/X" : {
 			"type" : "http://etsi.org/nsgi-ld/Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : {
-				"http://uri=etsi=org/ngsi-ld/hasValue" : "Titulo",
-				"http://uri=etsi=org/ngsi-ld/unitCode" : "123",
-				"http://www=example=org/attributes/R_R" : {
-					"http://www=example=org/attributes/type" : "Relationship",
-					"http://uri=etsi=org/ngsi-ld/hasObject" : "http://a.b.c/R_R"
+				"http://uri=etsi=org/ngsi-ld/hasValue" : {
+					"http://uri=etsi=org/ngsi-ld/title" : {
+						"http://uri=etsi=org/ngsi-ld/hasValue" : "Titulo"
+					}
 				}
 			},
 			"md" : {
 				"@aliasAttributeName" : {
 					"type" : "Alias",
-					"value" : "title"
+					"value" : "X"
 				},
 				"@aliasAttributeType" : {
 					"type" : "Alias",

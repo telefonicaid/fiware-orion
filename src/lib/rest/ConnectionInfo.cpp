@@ -31,6 +31,7 @@
 
 #ifdef ORIONLD
 #include "orionld/context/orionldDefaultContext.h"
+#include "orionld/context/orionldContextFree.h"
 #endif
 
 
@@ -90,7 +91,8 @@ ConnectionInfo::ConnectionInfo():
   kjsonP                    (NULL),
   requestTree               (NULL),
   responseTree              (NULL),
-  contextP                  (NULL)
+  contextP                  (NULL),
+  contextToBeFreed          (false)
 #endif
 {
 }
@@ -130,7 +132,8 @@ ConnectionInfo::ConnectionInfo(MimeType _outMimeType):
   kjsonP                    (NULL),
   requestTree               (NULL),
   responseTree              (NULL),
-  contextP                  (NULL)
+  contextP                  (NULL),
+  contextToBeFreed          (false)
 #endif
 {
 }
@@ -173,7 +176,8 @@ ConnectionInfo::ConnectionInfo(std::string _url, std::string _method, std::strin
   kjsonP                    (NULL),
   requestTree               (NULL),
   responseTree              (NULL),
-  contextP                  (NULL)
+  contextP                  (NULL),
+  contextToBeFreed          (false)
 #endif
 {
   if      (_method == "POST")    verb = POST;
@@ -191,11 +195,18 @@ ConnectionInfo::ConnectionInfo(std::string _url, std::string _method, std::strin
 
 
 
+/* ****************************************************************************
+*
+* ConnectionInfo::~ConnectionInfo - 
+*/
 ConnectionInfo::~ConnectionInfo()
 {
+  LM_TMP(("*********************************************** In ConnectionInfo destructor. ciP->contextP at %p", contextP));
+
   if (compoundValueRoot != NULL)
   {
     delete compoundValueRoot;
+    compoundValueRoot = NULL;
   }
 
   servicePathV.clear();
@@ -207,6 +218,7 @@ ConnectionInfo::~ConnectionInfo()
     LM_T(LmtFree, ("Calling kjFree for ciP->requestTree at %p", requestTree));
     kjFree(requestTree);
     LM_T(LmtFree, ("kjFree'd ciP->requestTree"));
+    requestTree = NULL;
   }
 
   if (responseTree != NULL)
@@ -214,16 +226,21 @@ ConnectionInfo::~ConnectionInfo()
     LM_T(LmtFree, ("Calling kjFree for ciP->responseTree at %p", responseTree));
     kjFree(responseTree);
     LM_T(LmtFree, ("kjFree'd ciP->responseTree"));
+    responseTree = NULL;
   }
 
-  if ((contextP != NULL) && (contextP != &orionldDefaultContext))
+  if ((contextP != NULL) && (contextToBeFreed == true))
   {
-    // contextP->tree point part of to the request payload - already freed by the call to "kjFree(requestTree)"
+    LM_TMP(("Freeing contextP '%s' at: %p", contextP->url, contextP));
+    // contextP->tree points to part of the request payload - already freed by the call to "kjFree(requestTree)"
     LM_T(LmtFree, ("Freeing context '%s' at: %p", contextP->url, contextP));
-    free(contextP);
+    orionldContextFree(contextP);
     LM_T(LmtFree, ("NOT Freed contextP at: %p", contextP));
+    contextP = NULL;
   }
-
+  else
+    LM_TMP(("Not Freeing ciP->contextP: %p. %s", contextP, FT(contextToBeFreed)));
+  
   LM_T(LmtFree, ("Freeing ciP->kjsonP at %p", kjsonP));
   free(kjsonP);
   LM_T(LmtFree, ("Freed ciP->kjsonP at %p", kjsonP));

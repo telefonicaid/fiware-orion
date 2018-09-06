@@ -208,7 +208,7 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   if (kjsonP == NULL)
   {
     // Out-of-memory ... Already???
-    LM_X(1, ("Out-of-memory at startup :("));
+    LM_X(1, ("EXITING - Out-of-memory at startup :("));
   }
 
   orionldDefaultContext.url  = ORIONLD_DEFAULT_CONTEXT_URL;
@@ -218,7 +218,7 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   if (orionldDefaultContext.tree == NULL)
   {
     // Without default context, orionld cannot function
-    LM_X(1, ("downloading default context '%s': %s", details));
+    LM_X(1, ("EXITING - Without default context, orionld cannot function - error downloading default context '%s': %s", ORIONLD_DEFAULT_CONTEXT_URL, details));
   }
 
   // Adding the default context to the list of contexts

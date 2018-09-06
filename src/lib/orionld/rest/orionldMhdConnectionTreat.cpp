@@ -108,7 +108,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     }
     else
     {
-      LM_E(("Error allocating biffer for response payload"));
+      LM_E(("Error allocating buffer for response payload"));
     }
   }
   
@@ -125,5 +125,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     restReply(ciP, "");
   }
 
+  LM_TMP(("End of service routine: ciP->contextP at %p", ciP->contextP));
   return MHD_YES;
 }

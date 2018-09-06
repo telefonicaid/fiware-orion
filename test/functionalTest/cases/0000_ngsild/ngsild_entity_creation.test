@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-URL Parse
+Entity Creation
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -39,7 +39,14 @@ brokerStart CB 0-255
 # 06. POST /ngsi-ld/v1/entities, with all OK - see a 201
 # 07. POST /ngsi-ld/v1/entities, with invalid URL for a context - see error
 #
-
+# 08. POST /ngsi-ld/v1/entities, with an attribute without a type - see error
+# 09. POST /ngsi-ld/v1/entities, with an attribute with type that is not a string - see error
+# 10. POST /ngsi-ld/v1/entities, with an attribute with invalid type 'Propperty' - see error
+#
+# 11. POST /ngsi-ld/v1/entities, with a Property without a 'value'
+# 12. POST /ngsi-ld/v1/entities, with a Relationship without an 'object'
+# 13. POST /ngsi-ld/v1/entities, with a GeoProperty without a 'value'
+#
 echo "01. POST /ngsi-ld/v1/entities, with a non-object payload - see error"
 echo "===================================================================="
 payload='[
@@ -166,6 +173,92 @@ echo
 echo
 
 
+echo "08. POST /ngsi-ld/v1/entities, with an attribute without a type - see error"
+echo "==========================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E7",
+  "type": "A",
+  "name": {
+    "value": "John 7"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "09. POST /ngsi-ld/v1/entities, with an attribute with type that is not a string - see error"
+echo "==========================================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E7",
+  "type": "A",
+  "name": {
+    "type": [ 1, 2, 3 ],
+    "value": "John 7"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "10. POST /ngsi-ld/v1/entities, with an attribute with invalid type 'Propperty' - see error"
+echo "=========================================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E7",
+  "type": "A",
+  "name": {
+    "type": "Propperty",
+    "value": "John 7"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "11. POST /ngsi-ld/v1/entities, with a Property without a 'value'"
+echo "==============================================================="
+payload='{
+  "id": "http://a.b.c/entity/E7",
+  "type": "A",
+  "name": {
+    "type": "Property"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "12. POST /ngsi-ld/v1/entities, with a Relationship without an 'object'"
+echo "======================================================================"
+payload='{
+  "id": "http://a.b.c/entity/E7",
+  "type": "A",
+  "name": {
+    "type": "Relationship"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "13. POST /ngsi-ld/v1/entities, with a GeoProperty without a 'value'"
+echo "==================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E7",
+  "type": "A",
+  "name": {
+    "type": "GeoProperty"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
 --REGEXPECT--
 01. POST /ngsi-ld/v1/entities, with a non-object payload - see error
 ====================================================================
@@ -241,6 +334,7 @@ Date: REGEX(.*)
 ======================================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: http;//FIXME.array.context.needs/url
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E6
 Date: REGEX(.*)
 
@@ -256,6 +350,90 @@ Date: REGEX(.*)
 {
     "details": "no details",
     "title": "Context Array Item is not a JSON String",
+    "type": "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+08. POST /ngsi-ld/v1/entities, with an attribute without a type - see error
+===========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 119
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "name",
+    "title": "attribute without 'type' field",
+    "type": "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+09. POST /ngsi-ld/v1/entities, with an attribute with type that is not a string - see error
+===========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 116
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "attribute type",
+    "title": "Not a JSON string",
+    "type": "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+10. POST /ngsi-ld/v1/entities, with an attribute with invalid type 'Propperty' - see error
+==========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 120
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "Propperty",
+    "title": "Invalid type for attribute",
+    "type": "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+11. POST /ngsi-ld/v1/entities, with a Property without a 'value'
+===============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 129
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "name",
+    "title": "property attribute without 'value' field",
+    "type": "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+12. POST /ngsi-ld/v1/entities, with a Relationship without an 'object'
+======================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 140
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "no details",
+    "title": "relationship attribute without 'object' field",
+    "type": "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+13. POST /ngsi-ld/v1/entities, with a GeoProperty without a 'value'
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 133
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "name",
+    "title": "geo-property attribute without 'value' field",
     "type": "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData"
 }
 

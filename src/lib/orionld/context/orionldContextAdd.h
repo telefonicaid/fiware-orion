@@ -27,10 +27,27 @@
 */
 extern "C"
 {
-#include "kjson/kjParse.h"                              // kjParse
+#include "kjson/kjParse.h"                                   // kjParse
 }
 
-#include "rest/ConnectionInfo.h"
+#include "rest/ConnectionInfo.h"                             // ConnectionInfo
+#include "orionld/context/OrionldContext.h"                  // OrionldContext
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldContextCreate -
+//
+extern OrionldContext* orionldContextCreateFromTree(KjNode* tree, const char* url, char** detailsPP);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldContextCreate -
+//
+extern OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url, char** detailsPP);
 
 
 
@@ -38,7 +55,7 @@ extern "C"
 //
 // orionldContextAdd -
 //
-extern bool orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsP);
+extern OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsP);
 
 
 

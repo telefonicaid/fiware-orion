@@ -69,8 +69,13 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
   }
 
   LM_TMP(("========== Looking up '%s' in context '%s'", itemName, contextP->url));
-  if ((contextP != NULL) && (contextP->tree != NULL))
-    LM_TMP(("========== The context tree is of type %s", kjValueType(contextP->tree->type)));
+  if (contextP->tree == NULL)
+  {
+    LM_E(("The context '%s' has a NULL tree!", contextP->url));
+    return NULL;
+  }
+
+  LM_TMP(("========== The context tree is of type %s", kjValueType(contextP->tree->type)));
 
   if (contextP->tree->type == KjObject)
     LM_TMP(("========== First member is called '%s'", contextP->tree->children->name));

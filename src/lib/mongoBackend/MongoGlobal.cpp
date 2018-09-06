@@ -168,20 +168,26 @@ static void delayedReleaseAdd(const ContextElementResponseVector& cerV)
 */
 void delayedReleaseExecute(void)
 {
+  LM_TMP(("delayedReleaseExecute"));
   if (delayedReleaseP == NULL)
   {
     return;
   }
 
+  LM_TMP(("delayedReleaseExecute"));
   for (unsigned int ix = 0; ix < delayedReleaseP->cerVector.size(); ++ix)
   {
     delayedReleaseP->cerVector[ix]->release();
     delete delayedReleaseP->cerVector[ix];
   }
 
+  LM_TMP(("delayedReleaseExecute"));
   delayedReleaseP->cerVector.clear();
+  LM_TMP(("delayedReleaseExecute"));
   delete delayedReleaseP;
+  LM_TMP(("delayedReleaseExecute"));
   delayedReleaseP = NULL;
+  LM_TMP(("delayedReleaseExecute"));
 }
 
 

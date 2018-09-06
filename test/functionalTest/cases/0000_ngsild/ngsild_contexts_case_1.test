@@ -26,7 +26,7 @@ Parse Contexts - case one - string reference to a vector reference
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 247
+brokerStart CB 0-255
 
 --SHELL--
 
@@ -110,6 +110,7 @@ echo
 =======================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 
@@ -143,7 +144,7 @@ MongoDB server version: REGEX(.*)
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : {
-				"value" : "John 2"
+				"http://uri=etsi=org/ngsi-ld/hasValue" : "John 2"
 			},
 			"md" : {
 				"@aliasAttributeName" : {
