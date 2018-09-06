@@ -1,4 +1,6 @@
-# <a name="top"></a>Orion Context Broker
+# <a name="top"></a>Orion Context Broker (Linked Data Extensions)
+
+(The content of this repo will eventually be merged in the main Orion development line)
 
 <!-- Documentation badge line is processed by release.sh. Thus, if the structure of the URL changes,
      release.sh needs to be changed also -->
