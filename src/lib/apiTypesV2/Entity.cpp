@@ -179,6 +179,7 @@ void Entity::filterAttributes
   if (!includeDateExpires && ((found = attributeVector.get(DATE_EXPIRES)) != -1))
   {
     attributeVector.vec[found]->release();
+    delete attributeVector.vec[found];
     attributeVector.vec.erase(attributeVector.vec.begin() + found);
   }
 }

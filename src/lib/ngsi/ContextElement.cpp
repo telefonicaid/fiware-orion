@@ -175,6 +175,7 @@ void ContextElement::filterAttributes(const std::vector<std::string>&  attrsFilt
           else
           {
             caP->release();
+            delete caP;
           }
         }
         contextAttributeVector.vec = caNewV;
@@ -224,6 +225,7 @@ void ContextElement::filterAttributes(const std::vector<std::string>&  attrsFilt
   if (!blacklist && !includeDateExpires && ((found = contextAttributeVector.get(DATE_EXPIRES)) != -1))
   {
     contextAttributeVector.vec[found]->release();
+    delete contextAttributeVector.vec[found];
     contextAttributeVector.vec.erase(contextAttributeVector.vec.begin() + found);
   }
 }
