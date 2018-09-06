@@ -369,7 +369,7 @@ std::string Metadata::check(ApiVersion apiVersion)
       return "Invalid characters in metadata value";
     }
 
-    if (stringValue == "")
+    if (apiVersion == V1 && stringValue == "")
     {
       alarmMgr.badInput(clientIp, "missing metadata value");
       return "missing metadata value";
