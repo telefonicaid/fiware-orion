@@ -68,9 +68,7 @@ void QueueNotifier::sendNotifyContextRequest
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsOrder,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             blacklist
+  const std::vector<std::string>&  metadataFilter
 )
 {
   std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncr,
@@ -79,9 +77,7 @@ void QueueNotifier::sendNotifyContextRequest
                                                                           xauthToken,
                                                                           fiwareCorrelator,
                                                                           renderFormat,
-                                                                          attrsOrder,
-                                                                          metadataFilter,
-                                                                          blacklist);
+                                                                          metadataFilter);
 
   size_t notificationsNum = paramsV->size();
   for (unsigned ix = 0; ix < notificationsNum; ix++)

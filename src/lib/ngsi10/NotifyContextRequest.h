@@ -47,9 +47,7 @@ typedef struct NotifyContextRequest
 
   std::string   render(ApiVersion apiVersion, bool asJsonObject);
   std::string   toJson(RenderFormat                     renderFormat,
-                       const std::vector<std::string>&  attrsFilter,
-                       const std::vector<std::string>&  metadataFilter,
-                       bool                             blacklist = false);
+                       const std::vector<std::string>&  metadataFilter);
   std::string   check(ApiVersion apiVersion, const std::string& predetectedError);
   void          release(void);
   NotifyContextRequest* clone(void);
