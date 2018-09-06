@@ -96,7 +96,7 @@ std::string ContextAttributeVector::toJsonTypes(void)
     std::string                 attrName  = it->first;
     std::map<std::string, int>  attrTypes = it->second;
 
-    std::string out = "[";
+    JsonVectorHelper jvh;
 
     std::map<std::string, int>::iterator jt;
     unsigned int                         jx;
@@ -117,18 +117,12 @@ std::string ContextAttributeVector::toJsonTypes(void)
       //
       if ((type != "") || (attrTypes.size() != 1))
       {
-        out += JSON_STR(type);
+        jvh.addString(type);
       }
 
-      if (jx != attrTypes.size() - 1)
-      {
-        out += ",";
-      }
     }
 
-    out += "]";
-
-    jhTypes.addRaw("types", out);
+    jhTypes.addRaw("types", jvh.str());
 
     jh.addRaw(attrName, jhTypes.str());
   }

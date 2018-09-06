@@ -303,22 +303,15 @@ std::string Entity::toJson
 */
 std::string Entity::toJsonValues(const std::vector<ContextAttribute*>& orderedAttrs)
 {
-  std::string out = "[";
+  JsonVectorHelper jh;
 
   for (unsigned int ix = 0; ix < orderedAttrs.size(); ix++)
   {
     ContextAttribute* caP = orderedAttrs[ix];
-    out += caP->toJsonValue();
-
-    if (ix != orderedAttrs.size() - 1)
-    {
-      out += ",";
-    }
+    jh.addRaw(caP->toJsonValue());
   }
 
-  out += "]";
-
-  return out;
+  return jh.str();
 }
 
 
@@ -329,7 +322,7 @@ std::string Entity::toJsonValues(const std::vector<ContextAttribute*>& orderedAt
 */
 std::string Entity::toJsonUniqueValues(const std::vector<ContextAttribute*>& orderedAttrs)
 {
-  std::string out = "[";
+  JsonVectorHelper jh;
 
   std::map<std::string, bool>  uniqueMap;
 
@@ -346,16 +339,12 @@ std::string Entity::toJsonUniqueValues(const std::vector<ContextAttribute*>& ord
     }
     else
     {
-      out += value;
+      jh.addRaw(value);
       uniqueMap[value] = true;
     }
-
-    out += ",";
   }
 
-  // The substring trick replaces final "," by "]". It is not very smart, but it saves
-  // a second pass on the vector, once the "unicity" has been calculated in the hashmap
-  return out.substr(0, out.length() - 1 ) + "]";
+  return jh.str();
 }
 
 

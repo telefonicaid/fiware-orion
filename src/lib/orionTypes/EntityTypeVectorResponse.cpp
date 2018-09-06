@@ -31,6 +31,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/Request.h"
@@ -117,27 +118,19 @@ void EntityTypeVectorResponse::release(void)
 */
 std::string EntityTypeVectorResponse::toJson(bool values)
 {
-  std::string  out = "[";
+  JsonVectorHelper jh;
 
   for (unsigned int ix = 0; ix < entityTypeVector.vec.size(); ++ix)
   {
     if (values)
     {
-      out += JSON_STR(entityTypeVector.vec[ix]->type);
+      jh.addString(entityTypeVector.vec[ix]->type);
     }
     else  // default
     {
-      out += entityTypeVector.vec[ix]->toJson(true);
+      jh.addRaw(entityTypeVector.vec[ix]->toJson(true));
     }
-
-    if (ix != entityTypeVector.vec.size() - 1)
-    {
-      out += ",";
-    }
-
   }
 
-  out += "]";
-
-  return out;
+  return jh.str();
 }

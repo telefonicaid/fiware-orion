@@ -33,6 +33,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/Request.h"
@@ -52,23 +53,14 @@ std::string EntityVector::toJson
   const std::vector<std::string>&  metadataFilter
 )
 {
-  if (vec.size() == 0)
+  JsonVectorHelper jh;
+
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    return "[]";
+    jh.addRaw(vec[ix]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter));
   }
 
-  std::string out;
-
-  out += "[" + vec[0]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
-
-  for (unsigned int ix = 1; ix < vec.size(); ++ix)
-  {
-    out += "," + vec[ix]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
-  }
-
-  out += "]";
-
-  return out;
+  return jh.str();
 }
 
 

@@ -31,6 +31,8 @@
 #include <vector>
 #include <map>
 
+
+// FIXME P10: should be renamed to JsonObjectHelper
 class JsonHelper
 {
 public:
@@ -42,6 +44,26 @@ public:
   void        addNumber(const std::string& key, double value);
   void        addDate(const std::string& key, long long timestamp);
   void        addBool(const std::string& key, bool b);
+
+  std::string str();
+
+private:
+ std::string  ss;
+ bool         empty;
+};
+
+
+class JsonVectorHelper
+{
+public:
+  JsonVectorHelper();
+
+  void        addString(const std::string& value);
+  void        addRaw(const std::string& value);
+  void        addNumber(long long value);
+  void        addNumber(double value);
+  void        addDate(long long timestamp);
+  void        addBool(bool b);
 
   std::string str();
 
