@@ -425,11 +425,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     ngsiv2::HttpInfo          httpInfo("http://notify1.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -438,9 +434,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch)
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -497,11 +491,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     ngsiv2::HttpInfo          httpInfo("http://notify1.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -510,9 +500,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch)
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -566,9 +554,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_type
     ngsiv2::HttpInfo          httpInfo("http://notify10.me");
     std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -577,9 +562,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_type
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -631,11 +614,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_idAn
     expectedNcr.subscriptionId.set("51307b66f481db11bf860011");
 
     ngsiv2::HttpInfo          httpInfo("http://notify11.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -644,9 +623,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_idAn
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -698,11 +675,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     ngsiv2::HttpInfo          httpInfo("http://notify1.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -711,9 +684,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch)
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -770,14 +741,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_noTy
     expectedNcr1.subscriptionId.set("51307b66f481db11bf860001");
     expectedNcr2.subscriptionId.set("51307b66f481db11bf860004");
 
-    std::vector<std::string>     attrsFilter;
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo1("http://notify1.me");
     ngsiv2::HttpInfo             httpInfo4("http://notify4.me");
-
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1),
@@ -786,9 +752,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_noTy
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2),
                                                         MatchHttpInfo(&httpInfo4),
@@ -796,9 +760,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_noTy
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -859,11 +821,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_noTy
 
     ngsiv2::HttpInfo          httpInfo1("http://notify1.me");
     ngsiv2::HttpInfo          httpInfo4("http://notify4.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1),
@@ -872,9 +830,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_noTy
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2),
                                                         MatchHttpInfo(&httpInfo4),
@@ -882,9 +838,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_noTy
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -940,11 +894,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_noTy
 
     ngsiv2::HttpInfo          httpInfo1("http://notify1.me");
     ngsiv2::HttpInfo          httpInfo4("http://notify4.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1),
@@ -953,9 +903,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_noTy
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2),
                                                         MatchHttpInfo(&httpInfo4),
@@ -963,9 +911,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_noTy
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1019,11 +965,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_patt
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
 
     ngsiv2::HttpInfo          httpInfo("http://notify3.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -1032,9 +974,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_patt
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1089,11 +1029,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_patt
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
 
     ngsiv2::HttpInfo          httpInfo("http://notify3.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -1102,9 +1038,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_patt
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1155,11 +1089,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_patt
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
 
     ngsiv2::HttpInfo          httpInfo("http://notify3.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -1168,9 +1098,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_patt
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1223,11 +1151,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_patt
     expectedNcr.subscriptionId.set("51307b66f481db11bf860005");
 
     ngsiv2::HttpInfo          httpInfo("http://notify5.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -1236,9 +1160,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_patt
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1293,11 +1215,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_patt
     expectedNcr.subscriptionId.set("51307b66f481db11bf860005");
 
     ngsiv2::HttpInfo          httpInfo("http://notify5.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -1306,9 +1224,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_patt
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1359,11 +1275,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_patt
     expectedNcr.subscriptionId.set("51307b66f481db11bf860005");
 
     ngsiv2::HttpInfo          httpInfo("http://notify5.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -1372,9 +1284,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_patt
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1427,11 +1337,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatchDisjo
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     ngsiv2::HttpInfo          httpInfo("http://notify1.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -1440,9 +1346,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatchDisjo
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1495,11 +1399,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatchDisjo
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     ngsiv2::HttpInfo          httpInfo("http://notify1.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -1508,9 +1408,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatchDisjo
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1563,11 +1461,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatchDisjo
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     ngsiv2::HttpInfo          httpInfo("http://notify1.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -1576,9 +1470,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatchDisjo
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1620,7 +1512,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateNoMatch)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1662,7 +1554,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendNoMatch)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1704,7 +1596,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteNoMatch)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1746,7 +1638,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatchWitho
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1798,12 +1690,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMixMatchNo
     expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
-    ngsiv2::HttpInfo          httpInfo("http://notify1.me");
-    std::vector<std::string>  attrsFilter;
+    ngsiv2::HttpInfo          httpInfo("http://notify1.me");  
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -1812,9 +1700,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMixMatchNo
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1884,9 +1770,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMixMatchNo
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1939,11 +1823,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMixMatchNo
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     ngsiv2::HttpInfo          httpInfo("http://notify1.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -1952,9 +1832,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMixMatchNo
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2022,9 +1900,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_update2Matches1N
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2081,11 +1957,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_append2Matches1N
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     ngsiv2::HttpInfo          httpInfo("http://notify1.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -2094,9 +1966,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_append2Matches1N
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2149,11 +2019,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_delete2Matches1N
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     ngsiv2::HttpInfo          httpInfo("http://notify1.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -2162,9 +2028,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_delete2Matches1N
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2217,11 +2081,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMatch)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     ngsiv2::HttpInfo          httpInfo("http://notify2.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -2230,9 +2090,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMatch)
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2288,11 +2146,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMatch)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     ngsiv2::HttpInfo          httpInfo("http://notify2.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -2301,9 +2155,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMatch)
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2354,11 +2206,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMatch)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     ngsiv2::HttpInfo          httpInfo("http://notify2.me");
-    std::vector<std::string>  attrsFilter;
-    std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
+    std::vector<std::string>  metadataFilter;   
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -2367,9 +2215,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMatch)
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2422,11 +2268,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMatchDisjo
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     ngsiv2::HttpInfo          httpInfo("http://notify2.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -2435,9 +2277,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMatchDisjo
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2489,12 +2329,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMatchDisjo
     expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
-    ngsiv2::HttpInfo          httpInfo("http://notify2.me");
-    std::vector<std::string>  attrsFilter;
+    ngsiv2::HttpInfo          httpInfo("http://notify2.me");    
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -2503,9 +2339,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMatchDisjo
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2558,11 +2392,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMatchDisjo
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     ngsiv2::HttpInfo          httpInfo("http://notify2.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -2571,9 +2401,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMatchDisjo
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2615,7 +2443,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateNoMatch)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2657,7 +2485,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendNoMatch)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2699,7 +2527,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteNoMatch)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2741,7 +2569,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMatchWitho
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2794,11 +2622,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMixMatchNo
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     ngsiv2::HttpInfo          httpInfo("http://notify2.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -2807,9 +2631,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMixMatchNo
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2866,11 +2688,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMixMatchNo
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     ngsiv2::HttpInfo          httpInfo("http://notify2.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -2879,9 +2697,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMixMatchNo
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2934,11 +2750,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMixMatchNo
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     ngsiv2::HttpInfo          httpInfo("http://notify2.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -2947,9 +2759,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMixMatchNo
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3004,11 +2814,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_update2Matches1N
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     ngsiv2::HttpInfo          httpInfo("http://notify2.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -3017,9 +2823,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_update2Matches1N
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3076,11 +2880,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_append2Matches1N
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     ngsiv2::HttpInfo          httpInfo("http://notify2.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -3089,9 +2889,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_append2Matches1N
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3144,11 +2942,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_delete2Matches1N
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     ngsiv2::HttpInfo          httpInfo("http://notify2.me");
-    std::vector<std::string>  attrsFilter;
     std::vector<std::string>  metadataFilter;
-    attrsFilter.push_back("A1");
-    attrsFilter.push_back("A3");
-    attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -3157,9 +2951,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_delete2Matches1N
                                                         "",
                                                         "",
                                                         NGSI_V1_LEGACY,
-                                                        attrsFilter,
-                                                        metadataFilter,
-                                                        false)).Times(1);
+                                                        metadataFilter)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3215,7 +3007,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, DISABLED_MongoDbQueryF
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     /* Set MongoDB connection */
