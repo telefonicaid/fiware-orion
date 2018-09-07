@@ -393,9 +393,9 @@ static void prepareDatabaseWithNoTypeSubscriptions(void)
 */
 #define CHECK_LAST_NOTIFICATION(subId, timestamp)                                      \
 {                                                                                      \
-  DBClientBase* connection = getMongoConnection();
-  BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID(subId)));
-  EXPECT_EQ(timestamp, sub.getIntField("lastNotification"));
+  DBClientBase* connection = getMongoConnection();                                     \
+  BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID(subId))); \
+  EXPECT_EQ(timestamp, sub.getIntField("lastNotification"));                           \
 }
 
 
