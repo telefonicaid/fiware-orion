@@ -393,9 +393,9 @@ static void prepareDatabaseWithNoTypeSubscriptions(void)
 */
 #define CHECK_LAST_NOTIFICATION(subId, timestamp)                                      \
 {                                                                                      \
-  DBClientBase* connection = getMongoConnection();                                     \
-  BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID(subId))); \
-  EXPECT_EQ(timestamp, sub.getIntField("lastNotification"));                           \
+  DBClientBase* connection = getMongoConnection();
+  BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID(subId)));
+  EXPECT_EQ(timestamp, sub.getIntField("lastNotification"));
 }
 
 
@@ -1690,7 +1690,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMixMatchNo
     expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
-    ngsiv2::HttpInfo          httpInfo("http://notify1.me");  
+    ngsiv2::HttpInfo          httpInfo("http://notify1.me");
     std::vector<std::string>  metadataFilter;
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -2206,7 +2206,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMatch)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     ngsiv2::HttpInfo          httpInfo("http://notify2.me");
-    std::vector<std::string>  metadataFilter;   
+    std::vector<std::string>  metadataFilter;
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
@@ -2329,7 +2329,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMatchDisjo
     expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
-    ngsiv2::HttpInfo          httpInfo("http://notify2.me");    
+    ngsiv2::HttpInfo          httpInfo("http://notify2.me");
     std::vector<std::string>  metadataFilter;
 
     NotifierMock* notifierMock = new NotifierMock();

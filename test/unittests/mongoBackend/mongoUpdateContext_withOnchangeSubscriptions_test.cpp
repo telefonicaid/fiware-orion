@@ -1645,7 +1645,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     metadataFilter;
-    ngsiv2::HttpInfo             httpInfo("http://notify1.me");    
+    ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
                                                         MatchHttpInfo(&httpInfo),

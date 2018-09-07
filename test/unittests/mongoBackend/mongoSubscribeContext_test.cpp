@@ -2774,7 +2774,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_disjoint)
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     metadataFilter;
-    ngsiv2::HttpInfo             httpInfo("http://notify.me");    
+    ngsiv2::HttpInfo             httpInfo("http://notify.me");
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
                                                         MatchHttpInfo(&httpInfo),
@@ -3198,7 +3198,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN)
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     metadataFilter;
-    ngsiv2::HttpInfo             httpInfo("http://notify.me");    
+    ngsiv2::HttpInfo             httpInfo("http://notify.me");
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
                                                         MatchHttpInfo(&httpInfo),
