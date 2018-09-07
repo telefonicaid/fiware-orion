@@ -70,7 +70,6 @@ EntityType::EntityType(std::string _type): type(_type), count(0)
 */
 std::string EntityType::render
 (
-  ApiVersion  apiVersion,
   bool        asJsonObject,
   bool        asJsonOut,
   bool        collapsed,
@@ -83,7 +82,7 @@ std::string EntityType::render
   if (typeNameBefore && asJsonOut)
   {
     out += valueTag("name", type, true);
-    out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, true, true, true);
+    out += contextAttributeVector.render(asJsonObject, EntityTypes, true, true, true);
   }
   else
   {
@@ -96,7 +95,7 @@ std::string EntityType::render
     else
     {
       out += valueTag("name", type, true);
-      out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, false, true, true);
+      out += contextAttributeVector.render(asJsonObject, EntityTypes, false, true, true);
     }
 
     out += endTag(comma, false);

@@ -54,7 +54,6 @@ static std::string contextElement(const std::string& path, const std::string& va
   reqDataP->upcr.ceP->entityId.id          = "";
   reqDataP->upcr.ceP->entityId.type        = "";
   reqDataP->upcr.ceP->entityId.isPattern   = "false";
-  reqDataP->upcr.ceP->attributeDomainName.set("");
 
   return "OK";
 }
@@ -98,20 +97,6 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
 
   reqDataP->upcr.ceP->entityId.isPattern = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* attributeDomainName - 
-*/
-static std::string attributeDomainName(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  reqDataP->upcr.ceP->attributeDomainName.set(value);
-  LM_T(LmtParse, ("Got an attributeDomainName: '%s'", reqDataP->upcr.ceP->attributeDomainName.get().c_str()));
 
   return "OK";
 }
@@ -241,64 +226,6 @@ static std::string metadataValue(const std::string& path, const std::string& val
 
 /* ****************************************************************************
 *
-* domainMetadata - 
-*/
-static std::string domainMetadata(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Creating a reg metadata"));
-
-  reqDataP->upcr.domainMetadataP = new Metadata();
-  reqDataP->upcr.ceP->domainMetadataVector.push_back(reqDataP->upcr.domainMetadataP);
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataName - 
-*/
-static std::string domainMetadataName(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a reg metadata name: '%s'", value.c_str()));
-  reqDataP->upcr.domainMetadataP->name = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataType - 
-*/
-static std::string domainMetadataType(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a reg metadata type: '%s'", value.c_str()));
-  reqDataP->upcr.domainMetadataP->type = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataValue - 
-*/
-static std::string domainMetadataValue(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a reg metadata value: '%s'", value.c_str()));
-  reqDataP->upcr.domainMetadataP->stringValue = value;
-  reqDataP->upcr.domainMetadataP->valueType = orion::ValueTypeString;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * updateAction - 
 */
 static std::string updateAction(const std::string& path, const std::string& value, ParseData* reqDataP)
@@ -321,8 +248,7 @@ JsonNode jsonUpcrParseVector[] =
   { "/contextElements/contextElement",                                                contextElement      },
   { "/contextElements/contextElement/type",                                           entityIdType        },
   { "/contextElements/contextElement/isPattern",                                      entityIdIsPattern   },
-  { "/contextElements/contextElement/id",                                             entityIdId          },
-  { "/contextElements/contextElement/attributeDomainName",                            attributeDomainName },
+  { "/contextElements/contextElement/id",                                             entityIdId          },  
   { "/contextElements/contextElement/attributes",                                     jsonNullTreat       },
   { "/contextElements/contextElement/attributes/attribute",                           attribute           },
   { "/contextElements/contextElement/attributes/attribute/name",                      attributeName       },
@@ -333,11 +259,6 @@ JsonNode jsonUpcrParseVector[] =
   { "/contextElements/contextElement/attributes/attribute/metadatas/metadata/name",   metadataName        },
   { "/contextElements/contextElement/attributes/attribute/metadatas/metadata/type",   metadataType        },
   { "/contextElements/contextElement/attributes/attribute/metadatas/metadata/value",  metadataValue       },
-  { "/contextElements/contextElement/domainMetadatas",                                jsonNullTreat       },
-  { "/contextElements/contextElement/domainMetadatas/domainMetadata",                 domainMetadata      },
-  { "/contextElements/contextElement/domainMetadatas/domainMetadata/name",            domainMetadataName  },
-  { "/contextElements/contextElement/domainMetadatas/domainMetadata/type",            domainMetadataType  },
-  { "/contextElements/contextElement/domainMetadatas/domainMetadata/value",           domainMetadataValue },
   { "/updateAction",                                                                  updateAction        },
 
   { "LAST", NULL }
@@ -354,7 +275,6 @@ void jsonUpcrInit(ParseData* reqDataP)
   reqDataP->upcr.ceP                    = NULL;
   reqDataP->upcr.attributeP             = NULL;
   reqDataP->upcr.contextMetadataP       = NULL;
-  reqDataP->upcr.domainMetadataP        = NULL;
   reqDataP->errorString                 = "";
 }
 

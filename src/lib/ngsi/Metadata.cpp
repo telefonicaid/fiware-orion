@@ -236,7 +236,16 @@ std::string Metadata::render(bool comma)
   out += valueTag("name", name, true);
   out += valueTag("type", type, true);
 
-  if (valueType == orion::ValueTypeString)
+  if (compoundValueP != NULL)
+  {
+    // FIXME P8: We need to to this to avoid repeat the "value" keyword. I don't
+    // understand why (if you look to the similar code in Metadata::toJson(), it
+    // is not used there). It comes from the old implementation
+    compoundValueP->container = compoundValueP;
+
+    out += JSON_STR("value") + ":" + compoundValueP->toJson(true);
+  }
+  else if (valueType == orion::ValueTypeString)
   {
     out += valueTag("value", xValue, false);
   }
@@ -252,29 +261,6 @@ std::string Metadata::render(bool comma)
   {
     out += JSON_STR("value") + ":" + xValue;
   }
-  else if (valueType == orion::ValueTypeObject)
-  {
-    bool        isCompoundVector = false;
-    ApiVersion  apiVersion       = V1;
-
-    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::ValueTypeVector))
-    {
-      isCompoundVector = true;
-    }
-    else if (compoundValueP->isVector())
-    {
-      compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
-    }    
-
-    //
-    // Make compoundValueP->render not render the name 'value'
-    //
-    compoundValueP->container = compoundValueP;
-
-    out += startTag("value", isCompoundVector);
-    out += compoundValueP->render(apiVersion, true, true);
-    out += endTag(false, isCompoundVector);
-  }
   else if (valueType == orion::ValueTypeNotGiven)
   {    
     out += JSON_STR("value") + ":" + JSON_STR("not given");
@@ -282,20 +268,6 @@ std::string Metadata::render(bool comma)
   else
   {
     out += JSON_STR("value") + ":" + JSON_STR("unknown json type");
-  }
-
-  if ((valueType == orion::ValueTypeNumber) || (valueType == orion::ValueTypeBoolean) || (valueType == orion::ValueTypeNull))
-  {
-    //
-    // Adding newline for the types that do not use the valueTag() function
-    //
-    // FIXME: This might destroy V2 rendering
-    //   This newline is only desired for V1 requests and as this function hasn't that knowledge, we 'hardcode'
-    //   V1 behavior here, as V2 requests should use toJson and not render().
-    //   So, if V2 rendering is destroyed by this modification, it is only because the V2 rendering is using
-    //   a method that it SHOULD NOT USE !
-    //
-    out += "\n";
   }
 
   out += endTag(comma);

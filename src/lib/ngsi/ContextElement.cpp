@@ -80,29 +80,29 @@ ContextElement::ContextElement(const std::string& id, const std::string& type, c
 */
 std::string ContextElement::render
 (
-  ApiVersion   apiVersion,
   bool         asJsonObject,
   RequestType  requestType,
   bool         comma,
   bool         omitAttributeValues
 )
 {
+#if 0
   std::string  out                              = "";
-  bool         attributeDomainNameRendered      = attributeDomainName.get() != "";
+  bool         attributeDomainNameRendered      = false; // FIXME PR
   bool         contextAttributeVectorRendered   = contextAttributeVector.size() != 0;
-  bool         domainMetadataVectorRendered     = domainMetadataVector.size() != 0;
+  bool         domainMetadataVectorRendered     = false; // FIXME PR
 
-  bool         commaAfterDomainMetadataVector   = false;  // Last element
   bool         commaAfterContextAttributeVector = domainMetadataVectorRendered;
   bool         commaAfterAttributeDomainName    = domainMetadataVectorRendered  || contextAttributeVectorRendered;
   bool         commaAfterEntityId               = commaAfterAttributeDomainName || attributeDomainNameRendered;
+#endif
+  std::string  out                              = "";
+  bool         contextAttributeVectorRendered   = contextAttributeVector.size() != 0;
 
   out += startTag(requestType != UpdateContext? "contextElement" : "");
 
-  out += entityId.render(commaAfterEntityId, false);
-  out += attributeDomainName.render(commaAfterAttributeDomainName);
-  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType, commaAfterContextAttributeVector, omitAttributeValues);
-  out += domainMetadataVector.render(commaAfterDomainMetadataVector);
+  out += entityId.render(contextAttributeVectorRendered, false);
+  out += contextAttributeVector.render(asJsonObject, requestType, false, omitAttributeValues);
 
   out += endTag(comma, false);
 
@@ -440,17 +440,7 @@ std::string ContextElement::check(ApiVersion apiVersion, RequestType requestType
     return res;
   }
 
-  if ((res = attributeDomainName.check()) != "OK")
-  {
-    return res;
-  }
-
   if ((res = contextAttributeVector.check(apiVersion, requestType)) != "OK")
-  {
-    return res;
-  }
-
-  if ((res = domainMetadataVector.check(apiVersion)) != "OK")
   {
     return res;
   }
@@ -467,9 +457,7 @@ std::string ContextElement::check(ApiVersion apiVersion, RequestType requestType
 void ContextElement::release(void)
 {
   entityId.release();
-  attributeDomainName.release();
   contextAttributeVector.release();
-  domainMetadataVector.release();
 }
 
 
@@ -481,9 +469,7 @@ void ContextElement::release(void)
 void ContextElement::fill(const struct ContextElement& ce)
 {
   entityId.fill(&ce.entityId);
-  attributeDomainName.fill(ce.attributeDomainName);
   contextAttributeVector.fill((ContextAttributeVector*) &ce.contextAttributeVector);
-  domainMetadataVector.fill((MetadataVector*) &ce.domainMetadataVector);
   /* Note that according to http://www.cplusplus.com/reference/vector/vector/operator=/, it is
    * safe to copy vectors of std::string using '=' */
   providingApplicationList = ce.providingApplicationList;
@@ -498,9 +484,7 @@ void ContextElement::fill(const struct ContextElement& ce)
 void ContextElement::fill(ContextElement* ceP, bool useDefaultType)
 {
   entityId.fill(&ceP->entityId, useDefaultType);
-  attributeDomainName.fill(ceP->attributeDomainName);
   contextAttributeVector.fill((ContextAttributeVector*) &ceP->contextAttributeVector, useDefaultType);
-  domainMetadataVector.fill((MetadataVector*) &ceP->domainMetadataVector);
   /* Note that according to http://www.cplusplus.com/reference/vector/vector/operator=/, it is
    * safe to copy vectors of std::string using '=' */
   providingApplicationList = ceP->providingApplicationList;

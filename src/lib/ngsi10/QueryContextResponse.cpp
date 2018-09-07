@@ -94,7 +94,7 @@ QueryContextResponse::~QueryContextResponse()
 *
 * QueryContextResponse::render -
 */
-std::string QueryContextResponse::render(ApiVersion apiVersion, bool asJsonObject)
+std::string QueryContextResponse::render(bool asJsonObject)
 {
   std::string  out               = "";
   bool         errorCodeRendered = false;
@@ -128,7 +128,7 @@ std::string QueryContextResponse::render(ApiVersion apiVersion, bool asJsonObjec
 
   if (contextElementResponseVector.size() > 0)
   {
-    out += contextElementResponseVector.render(apiVersion, asJsonObject, QueryContext, errorCodeRendered);
+    out += contextElementResponseVector.render(asJsonObject, QueryContext, errorCodeRendered);
   }
 
   if (errorCodeRendered == true)
@@ -179,7 +179,7 @@ std::string QueryContextResponse::check(ApiVersion apiVersion, bool asJsonObject
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject);
+  return render(asJsonObject);
 }
 
 

@@ -42,7 +42,6 @@
 */
 std::string ContextElementResponseVector::render
 (
-  ApiVersion   apiVersion,
   bool         asJsonObject,
   RequestType  requestType,
   bool         comma,
@@ -60,7 +59,7 @@ std::string ContextElementResponseVector::render
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(apiVersion, asJsonObject, requestType, ix < (vec.size() - 1), omitAttributeValues);
+    out += vec[ix]->render(asJsonObject, requestType, ix < (vec.size() - 1), omitAttributeValues);
   }
 
   out += endTag(comma, true);

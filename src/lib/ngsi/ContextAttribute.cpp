@@ -547,7 +547,6 @@ std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
 */
 std::string ContextAttribute::renderAsJsonObject
 (
-  ApiVersion   apiVersion,
   RequestType  request,
   bool         comma,
   bool         omitValue
@@ -615,16 +614,7 @@ std::string ContextAttribute::renderAsJsonObject
   }
   else
   {
-    bool isCompoundVector = false;
-
-    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::ValueTypeVector))
-    {
-      isCompoundVector = true;
-    }
-
-    out += startTag("value", isCompoundVector);
-    out += compoundValueP->render(apiVersion);
-    out += endTag(commaAfterContextValue, isCompoundVector);
+    out += JSON_STR("value") + ":" + compoundValueP->toJson(true);
   }
 
   if (omitValue == false)
@@ -668,7 +658,6 @@ std::string ContextAttribute::renderAsNameString(bool comma)
 */
 std::string ContextAttribute::render
 (
-  ApiVersion   apiVersion,
   bool         asJsonObject,
   RequestType  request,
   bool         comma,
@@ -682,7 +671,7 @@ std::string ContextAttribute::render
 
   if (asJsonObject)
   {
-    return renderAsJsonObject(apiVersion, request, comma, omitValue);
+    return renderAsJsonObject(request, comma, omitValue);
   }
 
   out += startTag();
@@ -746,16 +735,12 @@ std::string ContextAttribute::render
   }
   else
   {
-    bool isCompoundVector = false;
+    out += JSON_STR("value") + ":" + compoundValueP->toJson(true);
 
-    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::ValueTypeVector))
+    if (commaAfterContextValue)
     {
-      isCompoundVector = true;
+      out += ',';
     }
-
-    out += startTag("value", isCompoundVector);
-    out += compoundValueP->render(apiVersion);
-    out += endTag(commaAfterContextValue, isCompoundVector);
   }
 
   out += metadataVector.render(false);

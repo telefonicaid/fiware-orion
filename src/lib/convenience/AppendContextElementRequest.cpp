@@ -28,7 +28,6 @@
 #include "common/tag.h"
 #include "convenience/AppendContextElementRequest.h"
 #include "convenience/AppendContextElementResponse.h"
-#include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/MetadataVector.h"
 #include "rest/ConnectionInfo.h"
@@ -65,9 +64,7 @@ std::string AppendContextElementRequest::render
     out += entity.render(false);
   }
 
-  out += attributeDomainName.render(true);
-  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType);
-  out += domainMetadataVector.render(false);
+  out += contextAttributeVector.render(asJsonObject, requestType);
   out += endTag();
 
   return out;
@@ -78,14 +75,6 @@ std::string AppendContextElementRequest::render
 /* ****************************************************************************
 *
 * check - 
-*
-* FIXME P3: once (if ever) AttributeDomainName::check stops to always return "OK", put back this piece of code 
-*           in its place:
--
-*   else if ((res = attributeDomainName.check(AppendContextElement, predetectedError, counter)) != "OK")
-*   {
-*     response.errorCode.fill(SccBadRequest, res):
-*   }
 *
 */
 std::string AppendContextElementRequest::check
@@ -107,10 +96,6 @@ std::string AppendContextElementRequest::check
   {
     response.errorCode.fill(SccBadRequest, res);
   }
-  else if ((res = domainMetadataVector.check(apiVersion)) != "OK")
-  {
-    response.errorCode.fill(SccBadRequest, res);
-  }
   else
   {
     return "OK";
@@ -128,5 +113,4 @@ std::string AppendContextElementRequest::check
 void AppendContextElementRequest::release(void)
 {
   contextAttributeVector.release();
-  domainMetadataVector.release();
 }

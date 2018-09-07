@@ -56,8 +56,7 @@ typedef struct ContextAttributeVector
 
   std::string        check(ApiVersion apiVersion, RequestType requestType);
 
-  std::string        render(ApiVersion   apiVersion,
-                            bool         asJsonObject,
+  std::string        render(bool         asJsonObject,
                             RequestType  requestType,
                             bool         comma       = false,
                             bool         omitValue   = false,

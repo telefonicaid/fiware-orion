@@ -217,8 +217,7 @@ payload='{
             "x3" : "3"
           }
         }
-      ],
-      "attributeDomainName" : "ATTR_DOMAIN_NAME"
+      ]
     }
   ],
   "updateAction": "APPEND"

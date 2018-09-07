@@ -65,8 +65,7 @@ typedef struct ContextElementResponse
                          ApiVersion             apiVersion   = V1);
   ContextElementResponse(ContextElement* ceP, bool useDefaultType = false);
 
-  std::string  render(ApiVersion   apiVersion,
-                      bool         asJsonObject,
+  std::string  render(bool         asJsonObject,
                       RequestType  requestType,
                       bool         comma               = false,
                       bool         omitAttributeValues = false);

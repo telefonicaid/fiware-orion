@@ -118,7 +118,7 @@ std::string getEntityAttributeValue
     {
       if (attribute.pcontextAttribute->compoundValueP != NULL)
       {
-        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->render(ciP->apiVersion));
+        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->toJson(true));
       }
       else
       {
