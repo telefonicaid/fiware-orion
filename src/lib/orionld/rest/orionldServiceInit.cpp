@@ -72,7 +72,7 @@ static void libLogFunction
   
   /* Print message to variable */
   vsnprintf(libLogBuffer, sizeof(libLogBuffer), format, args);
-  // LM_TMP(("In: libLogBuffer == '%s' (%s[%d]). Severity=%d", libLogBuffer, fileName, lineNo, severity));
+  // LM_TMP(("S:%d %s[%d]: %s", severity, fileName, lineNo, libLogBuffer));
   va_end(args);
 
   if (severity == 1)

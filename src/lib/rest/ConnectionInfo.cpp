@@ -233,9 +233,9 @@ ConnectionInfo::~ConnectionInfo()
   {
     LM_TMP(("Freeing contextP '%s' at: %p", contextP->url, contextP));
     // contextP->tree points to part of the request payload - already freed by the call to "kjFree(requestTree)"
-    LM_T(LmtFree, ("Freeing context '%s' at: %p", contextP->url, contextP));
-    orionldContextFree(contextP);
-    LM_T(LmtFree, ("NOT Freed contextP at: %p", contextP));
+    LM_T(LmtFree, ("Freeing contextP '%s' at: %p", contextP->url, contextP));
+    // orionldContextFree(contextP);  // FIXME: crash (double free) or leak ... FIX IT !!!
+    LM_T(LmtFree, ("Freed contextP at: %p", contextP));
     contextP = NULL;
   }
   else
