@@ -15,7 +15,7 @@
 * [Running](#running)
 * [API Overview](#api-overview)
 * [API Walkthrough](#api-walkthrough)
-* [API Reference Documentation](#api-reference-documentation)
+* [Reference Documentation](#reference-documentation)
 * [Testing](#testing)
     * [End-to-end tests](#end-to-end-tests)
     * [Unit Tests](#unit-tests)
@@ -127,11 +127,17 @@ Please have a look at the [Quick Start guide](doc/manuals/quick_start_guide.md) 
 
 [Top](#top)
 
-## API Reference Documentation
+## Reference Documentation
+
+API Reference Documentation:
 
 * [FIWARE NGSI v1](http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_NGSI:_publicly_available_documents) (XSD and PDF)
 * [FIWARE NGSI v2](http://telefonicaid.github.io/fiware-orion/api/v2/stable) (Apiary) - *release candidate*
   * See also [NGSIv2 implementation notes](doc/manuals/user/ngsiv2_implementation_notes.md)
+
+Orion Reference Documentation:
+
+* Orion Manuals in RTD [(en)](https://fiware-orion.readthedocs.org) [(jp)](https://fiware-orion.letsfiware.jp/)
 
 [Top](#top)
 
