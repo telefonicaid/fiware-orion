@@ -68,8 +68,8 @@ QueryContextResponse::QueryContextResponse(EntityId* eP, ContextAttribute* aP)
   ContextElementResponse* cerP = new ContextElementResponse();
   ContextAttribute*       caP  = new ContextAttribute(aP);
 
-  cerP->contextElement.entityId.fill(eP);
-  cerP->contextElement.contextAttributeVector.push_back(caP);
+  cerP->entity.fill(eP->id, eP->type, eP->isPattern);
+  cerP->entity.attributeVector.push_back(caP);
   cerP->statusCode.fill(SccOk);
 
   contextElementResponseVector.push_back(cerP);
@@ -126,9 +126,12 @@ std::string QueryContextResponse::render(bool asJsonObject)
   //
   out += startTag();
 
+  // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
+  std::vector<std::string> emptyV;
+
   if (contextElementResponseVector.size() > 0)
   {
-    out += contextElementResponseVector.render(asJsonObject, QueryContext, errorCodeRendered);
+    out += contextElementResponseVector.render(asJsonObject, QueryContext, emptyV, false, emptyV, errorCodeRendered);
   }
 
   if (errorCodeRendered == true)

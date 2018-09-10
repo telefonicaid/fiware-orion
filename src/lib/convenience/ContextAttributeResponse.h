@@ -58,7 +58,7 @@ typedef struct ContextAttributeResponse
                     bool                asJsonObject,
                     RequestType         requestType,
                     const std::string&  predetectedError);
-  void        fill(ContextAttributeVector* _cavP, const StatusCode& _statusCode);
+  void        fill(const ContextAttributeVector& caV, const StatusCode& _statusCode);
   void        fill(QueryContextResponse*  qcrP,
                    const std::string&     entityId,
                    const std::string&     entityType,

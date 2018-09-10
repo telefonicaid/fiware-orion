@@ -222,6 +222,8 @@ ContextAttribute::ContextAttribute()
   typeGiven             = false;
   onlyValue             = false;
   previousValue         = NULL;
+  actionType            = "";
+  shadowed              = false;
 
   creDate = 0;
   modDate = 0;
@@ -246,8 +248,17 @@ ContextAttribute::ContextAttribute()
 * in "cloned" from source CA to the CA being constructed.
 *
 */
-ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
+ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType, bool cloneCompound)
 {
+  CompoundValueNode* cvnP = NULL;
+  if (cloneCompound)
+  {
+    if (caP->compoundValueP != NULL)
+    {
+      cvnP = caP->compoundValueP->clone();
+    }
+  }
+
   name                  = caP->name;
   type                  = caP->type;
   valueType             = caP->valueType;
@@ -261,6 +272,35 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
   typeGiven             = caP->typeGiven;
   onlyValue             = caP->onlyValue;
   previousValue         = NULL;
+  actionType            = caP->actionType;
+  shadowed              = caP->shadowed;
+
+#if 0
+  // This block seems to be a better alternative to implement cloneCompound. If enabled
+  // the "if (cloneCompound)" fragments at the start/end of the method should be removed
+  // and also the following:
+  //
+  //   compoundValueP        = caP->compoundValueP;
+  //   caP->compoundValueP   = NULL;
+  //
+  // However, if enabled I get segfault (it seems that due to double-free). However, I don't
+  // understand the reason... the code seems to be equivalent to the current alternative.
+  //
+  // To be dicussed at PR time
+
+  if (cloneCompound)
+  {
+    if (caP->compoundValueP != NULL)
+    {
+      compoundValueP    = caP->compoundValueP->clone();
+    }
+  }
+  else
+  {
+    compoundValueP      = caP->compoundValueP;
+    caP->compoundValueP = NULL;
+  }
+#endif
 
   creDate = caP->creDate;
   modDate = caP->modDate;
@@ -298,6 +338,14 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
       type = defaultType(orion::ValueTypeVector);
     }
   }
+
+  if (cloneCompound)
+  {
+    if (cvnP != NULL)
+    {
+      caP->compoundValueP = cvnP;
+    }
+  }
 }
 
 
@@ -330,6 +378,8 @@ ContextAttribute::ContextAttribute
   typeGiven             = false;
   onlyValue             = false;
   previousValue         = NULL;
+  actionType            = "";
+  shadowed              = false;
 
   creDate = 0;
   modDate = 0;
@@ -368,6 +418,8 @@ ContextAttribute::ContextAttribute
   typeGiven             = false;
   onlyValue             = false;
   previousValue         = NULL;
+  actionType            = "";
+  shadowed              = false;
 
   creDate = 0;
   modDate = 0;
@@ -405,6 +457,8 @@ ContextAttribute::ContextAttribute
   typeGiven             = false;
   onlyValue             = false;
   previousValue         = NULL;
+  actionType            = "";
+  shadowed              = false;
 
   creDate = 0;
   modDate = 0;
@@ -442,6 +496,8 @@ ContextAttribute::ContextAttribute
   skip                  = false;
   typeGiven             = false;
   previousValue         = NULL;
+  actionType            = "";
+  shadowed              = false;
 
   creDate = 0;
   modDate = 0;
@@ -475,6 +531,8 @@ ContextAttribute::ContextAttribute
   skip                  = false;
   typeGiven             = false;
   previousValue         = NULL;
+  actionType            = "";
+  shadowed              = false;
 
   creDate = 0;
   modDate = 0;
@@ -548,6 +606,7 @@ std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
 std::string ContextAttribute::renderAsJsonObject
 (
   RequestType  request,
+  const std::vector<Metadata*>& orderedMetadata,
   bool         comma,
   bool         omitValue
 )
@@ -619,7 +678,7 @@ std::string ContextAttribute::renderAsJsonObject
 
   if (omitValue == false)
   {
-    out += metadataVector.render(false);
+    out += metadataVector.render(orderedMetadata, false);
   }
 
   out += endTag(comma);
@@ -658,20 +717,25 @@ std::string ContextAttribute::renderAsNameString(bool comma)
 */
 std::string ContextAttribute::render
 (
-  bool         asJsonObject,
-  RequestType  request,
-  bool         comma,
-  bool         omitValue
+  bool                             asJsonObject,
+  RequestType                      request,
+  const std::vector<std::string>&  metadataFilter,
+  bool                             comma,
+  bool                             omitValue
 )
 {
+  // Filter and order metadata
+  std::vector<Metadata*> orderedMetadata;
+  filterAndOrderMetadata(metadataFilter, &orderedMetadata);
+
   std::string  out                    = "";
   bool         valueRendered          = (compoundValueP != NULL) || (omitValue == false) || (request == RtUpdateContextResponse);
-  bool         commaAfterContextValue = metadataVector.size() != 0;
+  bool         commaAfterContextValue = orderedMetadata.size() != 0;
   bool         commaAfterType         = valueRendered;
 
   if (asJsonObject)
   {
-    return renderAsJsonObject(request, comma, omitValue);
+    return renderAsJsonObject(request, orderedMetadata, comma, omitValue);
   }
 
   out += startTag();
@@ -743,10 +807,73 @@ std::string ContextAttribute::render
     }
   }
 
-  out += metadataVector.render(false);
+  out += metadataVector.render(orderedMetadata, false);
   out += endTag(comma);
 
   return out;
+}
+
+
+/* ****************************************************************************
+*
+* ContextAttribute::filterAndOrderMetadata -
+*
+*/
+void ContextAttribute::filterAndOrderMetadata
+(
+  const std::vector<std::string>&  metadataFilter,
+  std::vector<Metadata*>* orderedMetadata
+)
+{
+  if (metadataFilter.size() == 0)
+  {
+    // No filter. Metadata are "as is" in the attribute except shadowed ones,
+    // which require explicit inclusiong (dateCreated, etc.)
+    for (unsigned int ix = 0; ix < metadataVector.size(); ix++)
+    {
+      if (!metadataVector[ix]->shadowed)
+      {
+        orderedMetadata->push_back(metadataVector[ix]);
+      }
+    }
+  }
+  else
+  {
+    // Filter. Processing will depend either '*' is in the metadataFilter or not
+    if (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_ALL) != metadataFilter.end())
+    {
+      // If '*' is in: all metadata are included in the same order used by the entity
+
+      for (unsigned int ix = 0; ix < metadataVector.size(); ix++)
+      {
+        if (metadataVector[ix]->shadowed)
+        {
+          // Shadowed metadata need explicit inclusion
+          if ((std::find(metadataFilter.begin(), metadataFilter.end(), metadataVector[ix]->name) != metadataFilter.end()))
+          {
+            orderedMetadata->push_back(metadataVector[ix]);
+          }
+        }
+        else
+        {
+          orderedMetadata->push_back(metadataVector[ix]);
+        }
+      }
+    }
+    else
+    {
+      // - If '*' is not in: metadata are include in the metadataFilter order
+
+      for (unsigned int ix = 0; ix < metadataFilter.size(); ix++)
+      {
+        Metadata* mdP;
+        if ((mdP = metadataVector.lookupByName(metadataFilter[ix])) != NULL)
+        {
+          orderedMetadata->push_back(mdP);
+        }
+      }
+    }
+  }
 }
 
 
@@ -758,19 +885,6 @@ std::string ContextAttribute::render
 */
 std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFilter)
 {
-
-  // Add special metadata representing attribute dates
-  if ((creDate != 0) && (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_DATECREATED) != metadataFilter.end()))
-  {
-    Metadata* mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, creDate);
-    metadataVector.push_back(mdP);
-  }
-  if ((modDate != 0) && (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_DATEMODIFIED) != metadataFilter.end()))
-  {
-    Metadata* mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, modDate);
-    metadataVector.push_back(mdP);
-  }
-
   JsonHelper jh;
 
   //
@@ -826,10 +940,13 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
     LM_E(("Runtime Error (invalid value type for attribute %s)", name.c_str()));
   }
 
+  std::vector<Metadata*> orderedMetadata;
+  filterAndOrderMetadata(metadataFilter, &orderedMetadata);
+
   //
   // metadata
   //
-  jh.addRaw("metadata", metadataVector.toJson(metadataFilter));
+  jh.addRaw("metadata", metadataVector.toJson(orderedMetadata));
 
   return jh.str();
 }

@@ -28,8 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "ngsi/ContextElement.h"
-
+#include "apiTypesV2/Entity.h"
 
 
 /* ****************************************************************************
@@ -38,14 +37,14 @@
 */
 typedef struct ContextElementVector
 {
-  std::vector<ContextElement*>  vec;
+  std::vector<Entity*>  vec;
 
-  void             push_back(ContextElement* item);
+  void             push_back(Entity* item);
   unsigned int     size(void);
   std::string      render(bool asJsonObject, RequestType requestType,bool comma);
   void             release(void);
-  ContextElement*  lookup(EntityId* eP);
-  ContextElement*  operator[](unsigned int ix) const;
+  Entity*          lookup(Entity* eP);
+  Entity*          operator[](unsigned int ix) const;
 
   std::string      check(ApiVersion apiVersion, RequestType requestType);
 } ContextElementVector;

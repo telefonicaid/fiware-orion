@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_APITYPESV2_ENTITYVECTOR_H_
-#define SRC_LIB_APITYPESV2_ENTITYVECTOR_H_
+#ifndef SRC_LIB_SERVICEROUTINESV2_SERVICEROUTINESCOMMON_H_
+#define SRC_LIB_SERVICEROUTINESV2_SERVICEROUTINESCOMMON_H_
 
 /*
 *
-* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,37 +23,42 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Fermin Galan Marquez
 */
+
+/* Common function used by serveral modules within the serviceRoutinesV2 library */
+
 #include <string>
-#include <vector>
 #include <map>
 
-#include "apiTypesV2/Entity.h"
+#include "common/string.h"
+#include "common/RenderFormat.h"
+#include "ngsi/StringList.h"
+#include "rest/uriParamNames.h"
 
 
 
 /* ****************************************************************************
 *
-* EntityVector -
+* semRender -
+*
 */
-typedef struct EntityVector
-{
-  std::vector<Entity*>  vec;
+extern void setFilters
+(
+  std::map<std::string, std::string>&  uriParam,
+  std::map<std::string, bool>&         uriParamOptions,
+  StringList*                          attrsFilter,
+  StringList*                          metadataFilter
+);
 
-  std::string render(RenderFormat                     renderFormat,
-                     const std::vector<std::string>&  attrsFilter,
-                     bool                             blacklist,
-                     const std::vector<std::string>&  metadataFilter);
 
 
-  std::string   check(RequestType requestType);
-  void          push_back(Entity* item);
-  unsigned int  size(void);
-  Entity*       lookup(const std::string& name, const std::string& type, const std::string& isPattern);
-  void          release();
+/* ****************************************************************************
+*
+* renderFormat -
+*
+*/
+extern RenderFormat getRenderFormat(std::map<std::string, bool>&  uriParamOptions);
 
-  Entity*  operator[](unsigned int ix) const;
-} EntityVector;
+#endif  // SRC_LIB_SERVICEROUTINESV2_SERVICEROUTINESCOMMON_H_
 
-#endif  // SRC_LIB_APITYPESV2_ENTITYVECTOR_H_

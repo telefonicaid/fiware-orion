@@ -97,7 +97,7 @@ payload='{
     },
     "attrs": [ "A", "B", "C" ],
     "attrsFormat": "legacy",
-    "metadata": [ "previousValue", "actionType" ]
+    "metadata": [ "actionType", "previousValue" ]
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"

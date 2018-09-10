@@ -80,6 +80,9 @@ typedef struct Metadata
   bool                       boolValue;    // "value" as a Boolean
   orion::CompoundValueNode*  compoundValueP;
 
+  bool                       shadowed;     // shadowed true means that the metadata is rendered only if explicitly required
+                                           // in metadata filter (typically for builtin metadata)
+
   Metadata();
   Metadata(Metadata* mP, bool useDefaultType = false);
   Metadata(const std::string& _name, const std::string& _type, const char* _value);

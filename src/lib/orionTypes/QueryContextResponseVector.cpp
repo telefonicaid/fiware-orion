@@ -180,11 +180,11 @@ std::string QueryContextResponseVector::render(bool asJsonObject, bool details, 
       // Does the EntityId of cerP already exist in any of the contextElementResponses in the contextElementResponseVector?
       // If so, we just add the attributes of cerP to that contextElementResponse
       //
-      ContextElementResponse* targetCerP = responseP->contextElementResponseVector.lookup(&cerP->contextElement.entityId);
+      ContextElementResponse* targetCerP = responseP->contextElementResponseVector.lookup(&cerP->entity);
 
       if (targetCerP != NULL)
       {
-        targetCerP->contextElement.contextAttributeVector.push_back(&cerP->contextElement.contextAttributeVector);
+        targetCerP->entity.attributeVector.push_back(cerP->entity.attributeVector);
       }
       else  // Not found so we will have to create a new ContextElementResponse
       {
@@ -272,11 +272,11 @@ void QueryContextResponseVector::populate(QueryContextResponse* responseP)
       // Does the EntityId of cerP already exist in any of the contextElementResponses in the contextElementResponseVector?
       // If so, we just add the attributes of cerP to that contextElementResponse
       //
-      ContextElementResponse* targetCerP = responseP->contextElementResponseVector.lookup(&cerP->contextElement.entityId);
+      ContextElementResponse* targetCerP = responseP->contextElementResponseVector.lookup(&cerP->entity);
 
       if (targetCerP != NULL)
       {
-        targetCerP->contextElement.contextAttributeVector.push_back(&cerP->contextElement.contextAttributeVector);
+        targetCerP->entity.attributeVector.push_back(cerP->entity.attributeVector);
       }
       else  // Not found so we will have to create a new ContextElementResponse
       {

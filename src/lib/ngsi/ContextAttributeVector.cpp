@@ -141,81 +141,78 @@ std::string ContextAttributeVector::toJsonTypes(void)
 /* ****************************************************************************
 *
 * ContextAttributeVector::render - 
+*
+* FIXME P5: this method doesn't depend on the class object. Should be moved out of the class?
+* Maybe included in the Entiy class render logic.
 */
 std::string ContextAttributeVector::render
 (  
-  bool         asJsonObject,
-  RequestType  request,
-  bool         comma,
-  bool         omitValue,
-  bool         attrsAsName
+  bool                                   asJsonObject,
+  RequestType                            request,
+  const std::vector<ContextAttribute*>&  orderedAttrs,
+  const std::vector<std::string>&        metadataFilter,
+  bool                                   comma,
+  bool                                   omitValue,
+  bool                                   attrsAsName
 )
 {
   std::string out = "";
 
-  if (vec.size() == 0)
+  if (orderedAttrs.size() == 0)
   {
     return "";
   }
 
-  //
-  // NOTE:
-  // If the URI parameter 'attributeFormat' is set to 'object', then the attribute vector
-  // is to be rendered as objects for JSON, and not as a vector.
-  // Also, if we have more than one attribute with the same name (possible if different metaID),
-  // only one of them should be included in the vector. Any one of them.
-  // So, step 1 is to purge the context attribute vector from 'copies'.
-  //
   if (asJsonObject)
   {
+    // If the URI parameter 'attributeFormat' is set to 'object', then the attribute vector
+    // is to be rendered as objects for JSON, and not as a vector.
+    // Also, if we have more than one attribute with the same name (possible if different metaID),
+    // only one of them should be included in the vector. Any one of them.
+    // The added vector helps to keep track and avoid duplicates
     std::vector<std::string> added;
 
-    // 1. Remove attributes with attribute names already used.
-    for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    {
-      if (addedLookup(added, vec[ix]->name) == "")
-      {
-        added.push_back(vec[ix]->name);
-        LM_T(LmtJsonAttributes, ("Keeping attribute '%s'", vec[ix]->name.c_str()));
-      }
-      else
-      {
-        LM_T(LmtJsonAttributes, ("Removing attribute '%s'", vec[ix]->name.c_str()));
-        vec[ix]->release();
-        delete vec[ix];
-        vec.erase(vec.begin() + ix);
-      }
-    }
-
-    // 2. Now it's time to render
     // Note that in the case of attribute as name, we have to use a vector, thus using
     // attrsAsName variable as value for isVector parameter
     out += startTag("attributes", attrsAsName);
-    for (unsigned int ix = 0; ix < vec.size(); ++ix)
+    for (unsigned int ix = 0; ix < orderedAttrs.size(); ++ix)
     {
-      if (attrsAsName)
+      if (addedLookup(added, orderedAttrs[ix]->name) == "")
       {
-        out += vec[ix]->renderAsNameString(ix != vec.size() - 1);
+        added.push_back(orderedAttrs[ix]->name);
+        if (attrsAsName)
+        {
+          out += orderedAttrs[ix]->renderAsNameString(true);
+        }
+        else
+        {
+          out += orderedAttrs[ix]->render(asJsonObject, request, metadataFilter, true, omitValue);
+        }
       }
       else
       {
-        out += vec[ix]->render(asJsonObject, request, ix != vec.size() - 1, omitValue);
+        LM_T(LmtJsonAttributes, ("Attribute already added attribute '%s'", orderedAttrs[ix]->name.c_str()));
       }
     }
+
+    // Remove final comma, as the addedLookup() check doesn't allow us to predict which the
+    // last invocation to orderedAttrs[ix]->render(...) and setting the comma paramter properly
+    out = out.substr(0, out.length() - 1 );
+
     out += endTag(comma, attrsAsName);
   }
   else
   {
     out += startTag("attributes", true);
-    for (unsigned int ix = 0; ix < vec.size(); ++ix)
+    for (unsigned int ix = 0; ix < orderedAttrs.size(); ++ix)
     {
       if (attrsAsName)
       {
-        out += vec[ix]->renderAsNameString(ix != vec.size() - 1);
+        out += orderedAttrs[ix]->renderAsNameString(ix != orderedAttrs.size() - 1);
       }
       else
       {
-        out += vec[ix]->render(asJsonObject, request, ix != vec.size() - 1, omitValue);
+        out += orderedAttrs[ix]->render(asJsonObject, request, metadataFilter, ix != orderedAttrs.size() - 1, omitValue);
       }
     }
     out += endTag(comma, true);
@@ -247,7 +244,8 @@ std::string ContextAttributeVector::check(ApiVersion apiVersion, RequestType req
 
 /* ****************************************************************************
 *
-* ContextAttributeVector::push_back - 
+* ContextAttributeVector::push_back -
+*
 */
 void ContextAttributeVector::push_back(ContextAttribute* item)
 {
@@ -259,12 +257,13 @@ void ContextAttributeVector::push_back(ContextAttribute* item)
 /* ****************************************************************************
 *
 * ContextAttributeVector::push_back - 
+*
 */
-void ContextAttributeVector::push_back(ContextAttributeVector* aVec)
+void ContextAttributeVector::push_back(const ContextAttributeVector& caV)
 {
-  for (unsigned int ix = 0; ix < aVec->size(); ++ix)
+  for (unsigned int ix = 0; ix < caV.size(); ++ix)
   {
-    vec.push_back(new ContextAttribute((*aVec)[ix]));
+    vec.push_back(new ContextAttribute(caV[ix]));
   }
 }
 
@@ -315,17 +314,18 @@ void ContextAttributeVector::release(void)
 /* ****************************************************************************
 *
 * ContextAttributeVector::fill - 
+*
 */
-void ContextAttributeVector::fill(ContextAttributeVector* cavP, bool useDefaultType)
+void ContextAttributeVector::fill(const ContextAttributeVector& caV, bool useDefaultType)
 {
-  if (cavP == NULL)
+  if (caV.size() == 0)
   {
     return;
   }
 
-  for (unsigned int ix = 0; ix < cavP->size(); ++ix)
+  for (unsigned int ix = 0; ix < caV.size(); ++ix)
   {
-    ContextAttribute* from = (*cavP)[ix];
+    ContextAttribute* from = caV[ix];
     ContextAttribute* caP = new ContextAttribute(from, useDefaultType);
 
     push_back(caP);
@@ -349,4 +349,26 @@ int ContextAttributeVector::get(const std::string& attributeName) const
   }
 
   return -1;
+}
+
+
+/* ****************************************************************************
+*
+* getAll -
+*
+* Like get, but takes into account there could be several attributes with same name
+* and differente ID and returns all them (in a vector of integers)
+*
+* FIXME #3168: to be removed along with all the metadata ID related code
+*
+*/
+void ContextAttributeVector::getAll(const std::string& attributeName, std::vector<int>* foundP) const
+{
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if (vec[ix]->name == attributeName)
+    {
+      foundP->push_back(ix);
+    }
+  }
 }

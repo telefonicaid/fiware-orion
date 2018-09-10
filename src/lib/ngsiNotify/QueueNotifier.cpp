@@ -62,12 +62,14 @@ int QueueNotifier::start()
 */
 void QueueNotifier::sendNotifyContextRequest
 (
-  NotifyContextRequest*            ncr,
+  NotifyContextRequest&            ncr,
   const ngsiv2::HttpInfo&          httpInfo,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
   const std::vector<std::string>&  metadataFilter
 )
 {
@@ -77,6 +79,8 @@ void QueueNotifier::sendNotifyContextRequest
                                                                           xauthToken,
                                                                           fiwareCorrelator,
                                                                           renderFormat,
+                                                                          attrsFilter,
+                                                                          blacklist,
                                                                           metadataFilter);
 
   size_t notificationsNum = paramsV->size();

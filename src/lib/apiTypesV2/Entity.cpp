@@ -37,6 +37,7 @@
 #include "alarmMgr/alarmMgr.h"
 #include "parse/forbiddenChars.h"
 #include "ngsi10/QueryContextResponse.h"
+#include "mongoBackend/dbFieldEncoding.h"
 
 #include "apiTypesV2/Entity.h"
 
@@ -54,6 +55,53 @@ Entity::Entity(): isTypePattern(false), typeGiven(false), renderId(true), creDat
 
 /* ****************************************************************************
 *
+* Entity::Entity -
+*
+* This constructor was ported from old ContextElement class
+*/
+Entity::Entity(const std::string& _id, const std::string& _type, const std::string& _isPattern)
+{
+  id            = _id;
+  type          = _type;
+  isPattern     = _isPattern;
+}
+
+
+
+/* ****************************************************************************
+*
+* Entity::Entity -
+*
+* This constructor was ported from old ContextElement class
+*/
+Entity::Entity(EntityId* eP)
+{
+  id            = eP->id;
+  type          = eP->type;
+  isPattern     = eP->isPattern;
+  isTypePattern = eP->isTypePattern;
+  servicePath   = eP->servicePath;
+  creDate       = eP->creDate;
+  modDate       = eP->modDate;
+}
+
+
+
+/* ****************************************************************************
+*
+* Entity::Entity -
+*
+* This constructor was ported from old ContextElement class
+*/
+Entity::Entity(Entity* eP)
+{
+  fill(*eP);
+}
+
+
+
+/* ****************************************************************************
+*
 * Entity::~Entity - 
 */
 Entity::~Entity()
@@ -64,131 +112,146 @@ Entity::~Entity()
 
 /* ****************************************************************************
 *
-* Entity::filterAttributes -
+* Entity::filterAndOrderAttrs -
 *
-* Filter attributes vector in order to get the effective attribute vector to
-* render.
-*
-* dateCreatedOption and dateModifiedOption are due to deprecated ways of requesting
-* date in response. If used, the date is added at the end.
-*
-* FIXME P7: some comments regarding this function
-*
-* - Code should be integrated with the one on ContextElement::filterAttributes(). However,
-*   this is probable a sub-task of the more general task of changing ContextElement to use
-*   Entity class internally
-* - The function is pretty long and complex. It should be refactored to simplify it
-* - Related with this simplification maybe dateCreated and dateModified should be pre-included
-*   in the attributes vector, so all three (dateCreated, dateModified and dateExpires) could be
-*   processed in a similar way.
-* - This function shouldn't be called from toJson() code. The mongoBackend should deal with
-*   attributeVector preparation. Thus, either we leave the function heare and mongoBackend calls
-*   Entity::filterAttributes() or the logic is moved to mongoBackend (to be decided when we face
-*   this FIXME).
 */
-void Entity::filterAttributes
+void Entity::addAllExceptShadowed(std::vector<ContextAttribute*>*  orderedAttrs)
+{
+  for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
+  {
+    if (!attributeVector[ix]->shadowed)
+    {
+      orderedAttrs->push_back(attributeVector[ix]);
+    }
+  }
+}
+
+
+/* ****************************************************************************
+*
+* Entity::filterAndOrderAttrs -
+*
+*/
+void Entity::filterAndOrderAttrs
 (
   const std::vector<std::string>&  attrsFilter,
-  bool                             dateCreatedOption,
-  bool                             dateModifiedOption
-)
+  bool                             blacklist,
+  std::vector<ContextAttribute*>*  orderedAttrs)
 {
-  bool dateCreatedAdded  = false;
-  bool dateModifiedAdded = false;
-
-  if (attrsFilter.size () != 0)
+  if (blacklist)
   {
-    if (std::find(attrsFilter.begin(), attrsFilter.end(), ALL_ATTRS) != attrsFilter.end())
+    if (attrsFilter.size() == 0)
     {
-      // Not filtering, just adding dateCreated and dateModified if needed
-      if ((creDate != 0) && (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end()))
-      {
-        ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, creDate);
-        attributeVector.push_back(caP);
-        dateCreatedAdded = true;
-      }
-      if ((modDate != 0) &&  (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_MODIFIED) != attrsFilter.end()))
-      {
-        ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, modDate);
-        attributeVector.push_back(caP);
-        dateModifiedAdded = true;
-      }
+      // No filter, no blacklist. Attributes are "as is" in the entity except shadowed ones,
+      // which require explicit inclusion (dateCreated, etc.)
+      addAllExceptShadowed(orderedAttrs);
     }
     else
     {
-      // Reorder attributes in the same order they are in attrsFilter (attributes not
-      // in attrsFilter are filtered out). Creation and modification dates have a special
-      // treatment
-      //
-      // The (attributeVector.lookup(DATE_XXXX) == -1) check is to give preference to user
-      // defined attributes (see
-      // https://fiware-orion.readthedocs.io/en/master/user/ngsiv2_implementation_notes/index.html#datemodified-and-datecreated-attributes)
-
-      std::vector<ContextAttribute*> caNewV;
-
-      for (unsigned int ix = 0; ix < attrsFilter.size(); ix++)
+      // Filter, blacklist. The order is the one in the entity, after removing attributes.
+      // In blacklis case shadowed attributes (dateCreated, etc) are never included
+      for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
       {
-        std::string attrsFilterItem = attrsFilter[ix];
-        if ((creDate != 0) && (attrsFilterItem == DATE_CREATED) && (attributeVector.get(DATE_CREATED) == -1))
+        std::string name = attributeVector[ix]->name;
+        if ((!attributeVector[ix]->shadowed) && (std::find(attrsFilter.begin(), attrsFilter.end(), name) == attrsFilter.end()))
         {
-          ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, creDate);
-          caNewV.push_back(caP);
-          dateCreatedAdded = true;
+          orderedAttrs->push_back(attributeVector[ix]);
         }
-        else if ((modDate != 0) && (attrsFilterItem == DATE_MODIFIED) && (attributeVector.get(DATE_MODIFIED) == -1))
+      }
+    }
+  }
+  else
+  {
+    if (attrsFilter.size() == 0)
+    {
+      // No filter, no blacklist. Attributes are "as is" in the entity
+      // except shadowed ones (dateCreated, etc.)
+      addAllExceptShadowed(orderedAttrs);
+    }
+    else
+    {
+      // Filter, no blacklist. Processing will depend either '*' is in the attrsFilter or not
+      if (std::find(attrsFilter.begin(), attrsFilter.end(), ALL_ATTRS) != attrsFilter.end())
+      {
+        // - If '*' is in: all attributes are included in the same order used by the entity
+        for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
         {
-          ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, modDate);
-          caNewV.push_back(caP);
-          dateModifiedAdded = true;
-        }
-        // Actual attribute filtering only takes place if '*' was not used
-        else
-        {
-          int found = attributeVector.get(attrsFilterItem);
-          if (found != -1)
+          if (attributeVector[ix]->shadowed)
           {
-            caNewV.push_back(attributeVector.vec[found]);
-            attributeVector.vec.erase(attributeVector.vec.begin() + found);
+            // Shadowed attributes needs explicit inclusion
+            if ((std::find(attrsFilter.begin(), attrsFilter.end(), attributeVector[ix]->name) != attrsFilter.end()))
+            {
+              orderedAttrs->push_back(attributeVector[ix]);
+            }
+          }
+          else
+          {
+            orderedAttrs->push_back(attributeVector[ix]);
           }
         }
       }
-
-      // All the remaining elements in attributeVector need to be released,
-      // before overriding the vector with caNewV
-      attributeVector.release();
-
-      attributeVector.vec = caNewV;
+      else
+      {
+        // - If '*' is not in: attributes are include in the attrsFilter order
+        // FIXME #3168: replace getAll() by get() once metadata ID gets removed
+        for (unsigned int ix = 0; ix < attrsFilter.size(); ix++)
+        {
+          std::vector<int> found;
+          attributeVector.getAll(attrsFilter[ix], &found);
+          for (unsigned int jx = 0; jx < found.size(); jx++)
+          {
+            orderedAttrs->push_back(attributeVector[found[jx]]);
+          }
+        }
+      }
     }
   }
+}
 
-  // Legacy support for options=dateCreated and options=dateModified
-  if (dateCreatedOption && !dateCreatedAdded && (creDate != 0))
-  {
-    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, creDate);
-    attributeVector.push_back(caP);
-  }
-  if (dateModifiedOption && !dateModifiedAdded && (modDate != 0))
-  {
-    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, modDate);
-    attributeVector.push_back(caP);
-  }
 
-  // Removing dateExpires if not explicitly included in the filter
-  bool includeDateExpires = (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_EXPIRES) != attrsFilter.end());
-  int found;
-  if (!includeDateExpires && ((found = attributeVector.get(DATE_EXPIRES)) != -1))
-  {
-    attributeVector.vec[found]->release();
-    delete attributeVector.vec[found];
-    attributeVector.vec.erase(attributeVector.vec.begin() + found);
-  }
+
+
+/* ****************************************************************************
+*
+* Entity::render -
+*
+* This method was ported from old ContextElement class. It was name render() there
+*
+*/
+std::string Entity::toJsonV1
+(
+  bool                             asJsonObject,
+  RequestType                      requestType,
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter,
+  bool                             comma,
+  bool                             omitAttributeValues
+)
+{
+  std::string  out                              = "";
+  bool         contextAttributeVectorRendered   = attributeVector.size() != 0;
+
+  out += startTag(requestType != UpdateContext? "contextElement" : "");
+
+  // Filter and order attributes
+  std::vector<ContextAttribute*> orderedAttrs;
+  filterAndOrderAttrs(attrsFilter, blacklist, &orderedAttrs);
+
+  EntityId en(id, type, isPattern);
+  out += en.render(contextAttributeVectorRendered, false);
+  out += attributeVector.render(asJsonObject, requestType, orderedAttrs, metadataFilter, false, omitAttributeValues);
+
+  out += endTag(comma, false);
+
+  return out;
 }
 
 
 
 /* ****************************************************************************
 *
-* Entity::render - 
+* Entity::toJson -
 *
 * The rendering of JSON in APIv2 depends on the URI param 'options'
 * Rendering methods:
@@ -196,10 +259,12 @@ void Entity::filterAttributes
 *   o 'keyValues'  (less verbose, only name and values shown for attributes - no type, no metadatas)
 *   o 'values'     (only the values of the attributes are printed, in a vector)
 */
-std::string Entity::render
+std::string Entity::toJson
 (
-  std::map<std::string, bool>&         uriParamOptions,
-  std::map<std::string, std::string>&  uriParam
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter
 )
 {
   if ((oe.details != "") || ((oe.reasonPhrase != "OK") && (oe.reasonPhrase != "")))
@@ -207,44 +272,23 @@ std::string Entity::render
     return oe.toJson();
   }
 
-  RenderFormat  renderFormat = NGSI_V2_NORMALIZED;
-
-  if      (uriParamOptions[OPT_KEY_VALUES]    == true)  { renderFormat = NGSI_V2_KEYVALUES;     }
-  else if (uriParamOptions[OPT_VALUES]        == true)  { renderFormat = NGSI_V2_VALUES;        }
-  else if (uriParamOptions[OPT_UNIQUE_VALUES] == true)  { renderFormat = NGSI_V2_UNIQUE_VALUES; }
-
-  std::vector<std::string>  metadataFilter;
-  std::vector<std::string>  attrsFilter;
-
-  if (uriParam[URI_PARAM_METADATA] != "")
-  {
-    stringSplit(uriParam[URI_PARAM_METADATA], ',', metadataFilter);
-  }
-
-  if (uriParam[URI_PARAM_ATTRS] != "")
-  {
-    stringSplit(uriParam[URI_PARAM_ATTRS], ',', attrsFilter);
-  }
-
-  // Get the effective vector of attributes to render
-  // FIXME P7: filterAttributes will be moved and invoking it would not be needed from toJson()
-  // (see comment in filterAttributes)
-  filterAttributes(attrsFilter, uriParamOptions[DATE_CREATED], uriParamOptions[DATE_MODIFIED]);
+  std::vector<ContextAttribute* > orderedAttrs;
+  filterAndOrderAttrs(attrsFilter, blacklist, &orderedAttrs);
 
   std::string out;
   switch (renderFormat)
   {
   case NGSI_V2_VALUES:
-    out = toJsonValues();
+    out = toJsonValues(orderedAttrs);
     break;
   case NGSI_V2_UNIQUE_VALUES:
-    out = toJsonUniqueValues();
+    out = toJsonUniqueValues(orderedAttrs);
     break;
   case NGSI_V2_KEYVALUES:
-    out = toJsonKeyvalues();
+    out = toJsonKeyvalues(orderedAttrs);
     break;
   default:  // NGSI_V2_NORMALIZED
-    out = toJsonNormalized(metadataFilter);
+    out = toJsonNormalized(orderedAttrs, metadataFilter);
     break;
   }
 
@@ -257,16 +301,16 @@ std::string Entity::render
 *
 * Entity::toJsonValues -
 */
-std::string Entity::toJsonValues(void)
+std::string Entity::toJsonValues(const std::vector<ContextAttribute*>& orderedAttrs)
 {
   std::string out = "[";
 
-  for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
+  for (unsigned int ix = 0; ix < orderedAttrs.size(); ix++)
   {
-    ContextAttribute* caP = attributeVector[ix];
+    ContextAttribute* caP = orderedAttrs[ix];
     out += caP->toJsonValue();
 
-    if (ix != attributeVector.size() - 1)
+    if (ix != orderedAttrs.size() - 1)
     {
       out += ",";
     }
@@ -283,15 +327,15 @@ std::string Entity::toJsonValues(void)
 *
 * Entity::toJsonUniqueValues -
 */
-std::string Entity::toJsonUniqueValues(void)
+std::string Entity::toJsonUniqueValues(const std::vector<ContextAttribute*>& orderedAttrs)
 {
   std::string out = "[";
 
   std::map<std::string, bool>  uniqueMap;
 
-  for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
+  for (unsigned int ix = 0; ix < orderedAttrs.size(); ix++)
   {
-    ContextAttribute* caP = attributeVector[ix];
+    ContextAttribute* caP = orderedAttrs[ix];
 
     std::string value = caP->toJsonValue();
 
@@ -320,7 +364,7 @@ std::string Entity::toJsonUniqueValues(void)
 *
 * Entity::toJsonKeyvalues -
 */
-std::string Entity::toJsonKeyvalues(void)
+std::string Entity::toJsonKeyvalues(const std::vector<ContextAttribute*>& orderedAttrs)
 {
   JsonHelper jh;
 
@@ -332,9 +376,9 @@ std::string Entity::toJsonKeyvalues(void)
     jh.addString("type", (type != "")? type : DEFAULT_ENTITY_TYPE);
   }
 
-  for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
+  for (unsigned int ix = 0; ix < orderedAttrs.size(); ix++)
   {
-    ContextAttribute* caP = attributeVector[ix];
+    ContextAttribute* caP = orderedAttrs[ix];
     jh.addRaw(caP->name, caP->toJsonValue());
   }
 
@@ -347,7 +391,7 @@ std::string Entity::toJsonKeyvalues(void)
 *
 * Entity::toJsonNormalized -
 */
-std::string Entity::toJsonNormalized(const std::vector<std::string>&  metadataFilter)
+std::string Entity::toJsonNormalized(const std::vector<ContextAttribute*>& orderedAttrs, const std::vector<std::string>&  metadataFilter)
 {
   JsonHelper jh;
 
@@ -359,9 +403,9 @@ std::string Entity::toJsonNormalized(const std::vector<std::string>&  metadataFi
     jh.addString("type", (type != "")? type : DEFAULT_ENTITY_TYPE);
   }
 
-  for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
+  for (unsigned int ix = 0; ix < orderedAttrs.size(); ix++)
   {
-    ContextAttribute* caP = attributeVector[ix];
+    ContextAttribute* caP = orderedAttrs[ix];
     jh.addRaw(caP->name, caP->toJson(metadataFilter));
   }
 
@@ -372,85 +416,141 @@ std::string Entity::toJsonNormalized(const std::vector<std::string>&  metadataFi
 
 /* ****************************************************************************
 *
-* Entity::check - 
+* toString -
+*
+* FIXME P3: Copied from EntityId class
 */
-std::string Entity::check(RequestType requestType)
+std::string Entity::toString(bool useIsPattern, const std::string& delimiter)
 {
-  ssize_t  len;
-  char     errorMsg[128];
+  std::string s;
 
-  if (((len = strlen(id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
+  s = id + delimiter + type;
+
+  if (useIsPattern)
   {
-    snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, min length supported: %d", len, MIN_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
-    return std::string(errorMsg);
+    s += delimiter + isPattern;
   }
 
-  if ((requestType == EntitiesRequest) && (id.empty()))
-  {
-    return "No Entity ID";
-  }
+  return s;
+}
 
-  if ( (len = strlen(id.c_str())) > MAX_ID_LEN)
-  {
-    snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, max length supported: %d", len, MAX_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
-    return std::string(errorMsg);
-  }
 
-  if (isPattern.empty())
-  {
-    isPattern = "false";
-  }
 
-  // isPattern MUST be either "true" or "false" (or empty => "false")
-  if ((isPattern != "true") && (isPattern != "false"))
+/* ****************************************************************************
+*
+* ContextElement::check
+*
+* This V1 "branch" of this method has been ported from old ContextElement class
+*
+*/
+std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
+{
+  if (apiVersion == V1)
   {
-    alarmMgr.badInput(clientIp, "invalid value for isPattern");
-    return "Invalid value for isPattern";
-  }
+    std::string res;
 
-  // Check for forbidden chars for "id", but not if "id" is a pattern
-  if (isPattern == "false")
-  {
-    if (forbiddenIdChars(V2, id.c_str()))
+    if (id == "")
     {
-      alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID);
-      return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
+      return "empty entityId:id";
+    }
+
+    if (!isTrue(isPattern) && !isFalse(isPattern) && isPattern != "")
+    {
+      return std::string("invalid isPattern value for entity: /") + isPattern + "/";
+    }
+
+    if ((requestType == RegisterContext) && (isTrue(isPattern)))
+    {
+      return "isPattern set to true for registrations is currently not supported";
+    }
+
+    if (isTrue(isPattern))
+    {
+      regex_t re;
+      if ((id.find('\0') != std::string::npos) || (regcomp(&re, id.c_str(), REG_EXTENDED) != 0))
+      {
+        return "invalid regex for entity id pattern";
+      }
+      regfree(&re);  // If regcomp fails it frees up itself (see glibc sources for details)
     }
   }
-
-  if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
+  else  // V2
   {
-    snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, max length supported: %d", len, MAX_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
-    return std::string(errorMsg);
-  }
+    ssize_t  len;
+    char     errorMsg[128];
 
-
-  if (!((requestType == BatchQueryRequest) || (requestType == BatchUpdateRequest && !typeGiven)))
-  {
-    if ( (len = strlen(type.c_str())) < MIN_ID_LEN)
+    if (((len = strlen(id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
     {
-      snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
+      snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, min length supported: %d", len, MIN_ID_LEN);
       alarmMgr.badInput(clientIp, errorMsg);
       return std::string(errorMsg);
     }
-  }
 
-  // Check for forbidden chars for "type", but not if "type" is a pattern
-  if (isTypePattern == false)
-  {
-    if (forbiddenIdChars(V2, type.c_str()))
+    if ((requestType == EntitiesRequest) && (id.empty()))
     {
-      alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE);
-      return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
+      return "No Entity ID";
+    }
+
+    if ( (len = strlen(id.c_str())) > MAX_ID_LEN)
+    {
+      snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, max length supported: %d", len, MAX_ID_LEN);
+      alarmMgr.badInput(clientIp, errorMsg);
+      return std::string(errorMsg);
+    }
+
+    if (isPattern.empty())
+    {
+      isPattern = "false";
+    }
+
+    // isPattern MUST be either "true" or "false" (or empty => "false")
+    if ((isPattern != "true") && (isPattern != "false"))
+    {
+      alarmMgr.badInput(clientIp, "invalid value for isPattern");
+      return "Invalid value for isPattern";
+    }
+
+    // Check for forbidden chars for "id", but not if "id" is a pattern
+    if (isPattern == "false")
+    {
+      if (forbiddenIdChars(V2, id.c_str()))
+      {
+        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID);
+        return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
+      }
+    }
+
+    if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
+    {
+      snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, max length supported: %d", len, MAX_ID_LEN);
+      alarmMgr.badInput(clientIp, errorMsg);
+      return std::string(errorMsg);
+    }
+
+    if (!((requestType == BatchQueryRequest) || (requestType == BatchUpdateRequest && !typeGiven)))
+    {
+      if ( (len = strlen(type.c_str())) < MIN_ID_LEN)
+      {
+        snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
+        alarmMgr.badInput(clientIp, errorMsg);
+        return std::string(errorMsg);
+      }
+    }
+
+    // Check for forbidden chars for "type", but not if "type" is a pattern
+    if (isTypePattern == false)
+    {
+      if (forbiddenIdChars(V2, type.c_str()))
+      {
+        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE);
+        return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
+      }
     }
   }
 
-  return attributeVector.check(V2, requestType);
+  // Common part (V1 and V2)
+  return attributeVector.check(apiVersion, requestType);
 }
-
 
 
 /* ****************************************************************************
@@ -459,12 +559,12 @@ std::string Entity::check(RequestType requestType)
 */
 void Entity::fill
 (
-  const std::string&       _id,
-  const std::string&       _type,
-  const std::string&       _isPattern,
-  ContextAttributeVector*  aVec,
-  double                   _creDate,
-  double                   _modDate
+  const std::string&             _id,
+  const std::string&             _type,
+  const std::string&             _isPattern,
+  const ContextAttributeVector&  caV,
+  double                         _creDate,
+  double                         _modDate
 )
 {
   id         = _id;
@@ -474,7 +574,80 @@ void Entity::fill
   creDate    = _creDate;
   modDate    = _modDate;
 
-  attributeVector.fill(aVec);
+  attributeVector.fill(caV);
+}
+
+
+
+
+/* ****************************************************************************
+*
+* Entity::fill -
+*/
+void Entity::fill
+(
+  const std::string&  _id,
+  const std::string&  _type,
+  const std::string&  _isPattern,
+  const std::string&  _servicePath,
+  double              _creDate,
+  double              _modDate
+)
+{
+  id          = _id;
+  type        = _type;
+  isPattern   = _isPattern;
+
+  servicePath = _servicePath;
+
+  creDate     = _creDate;
+  modDate     = _modDate;
+}
+
+
+
+/* ****************************************************************************
+*
+* Entity::fill -
+*/
+void Entity::fill
+(
+  const std::string&  _id,
+  const std::string&  _type,
+  const std::string&  _isPattern
+)
+{
+  id         = _id;
+  type       = _type;
+  isPattern  = _isPattern;
+}
+
+
+
+/* ****************************************************************************
+*
+* Entity::fill -
+*
+* This constructor was ported from old ContextElement class
+*/
+void Entity::fill(const Entity& en, bool useDefaultType)
+{
+  id            = en.id;
+  type          = en.type;
+  isPattern     = en.isPattern;
+  isTypePattern = en.isTypePattern;
+  servicePath   = en.servicePath;
+  creDate       = en.creDate;
+  modDate       = en.modDate;
+
+  if (useDefaultType && (type == ""))
+  {
+    type = DEFAULT_ENTITY_TYPE;
+  }
+
+  attributeVector.fill(en.attributeVector, useDefaultType);
+
+  providingApplicationList = en.providingApplicationList;
 }
 
 
@@ -505,14 +678,14 @@ void Entity::fill(QueryContextResponse* qcrsP)
   }
   else
   {
-    ContextElement* ceP = &qcrsP->contextElementResponseVector[0]->contextElement;
+    Entity* eP = &qcrsP->contextElementResponseVector[0]->entity;
 
-    fill(ceP->entityId.id,
-         ceP->entityId.type,
-         ceP->entityId.isPattern,
-         &ceP->contextAttributeVector,
-         ceP->entityId.creDate,
-         ceP->entityId.modDate);
+    fill(eP->id,
+         eP->type,
+         eP->isPattern,
+         eP->attributeVector,
+         eP->creDate,
+         eP->modDate);
   }
 }
 
@@ -538,4 +711,43 @@ void Entity::release(void)
 void Entity::hideIdAndType(bool hide)
 {
   renderId = !hide;
+}
+
+
+
+/* ****************************************************************************
+*
+* Entity::getAttribute
+*
+* This constructor was ported from old ContextElement class
+*/
+ContextAttribute* Entity::getAttribute(const std::string& attrName)
+{
+  for (unsigned int ix = 0; ix < attributeVector.size(); ++ix)
+  {
+    ContextAttribute* caP = attributeVector[ix];
+
+    if (dbDotEncode(caP->name) == attrName)
+    {
+      return caP;
+    }
+  }
+
+  return NULL;
+}
+
+
+
+/* ****************************************************************************
+*
+* Entity::equal
+*
+* Same method that in EntityId class
+*/
+bool Entity::equal(Entity* eP)
+{
+  return ((eP->id                == id)                &&
+          (eP->type              == type)              &&
+          (isTrue(eP->isPattern) == isTrue(isPattern)) &&
+          (eP->isTypePattern     == isTypePattern));
 }

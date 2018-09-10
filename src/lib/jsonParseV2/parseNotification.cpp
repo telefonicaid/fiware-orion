@@ -78,8 +78,8 @@ static bool parseContextElementResponse
     return false;
   }
 
-  cerP->contextElement.entityId.fill(entity.id, entity.type, entity.isPattern);
-  cerP->contextElement.contextAttributeVector.push_back(&entity.attributeVector);
+  cerP->entity.fill(entity.id, entity.type, entity.isPattern);
+  cerP->entity.attributeVector.push_back(entity.attributeVector);
   entity.release();
 
   return true;

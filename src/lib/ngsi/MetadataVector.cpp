@@ -51,20 +51,22 @@ MetadataVector::MetadataVector(void)
 /* ****************************************************************************
 *
 * MetadataVector::render -
+*
+* FIXME P5: this method doesn't depend on the class object. Should be moved out of the class?
 */
-std::string MetadataVector::render(bool comma)
+std::string MetadataVector::render(const std::vector<Metadata*>& orderedMetadata, bool comma)
 {
   std::string out = "";
 
-  if (vec.size() == 0)
+  if (orderedMetadata.size() == 0)
   {
     return "";
   }
 
   out += startTag("metadatas", true);
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  for (unsigned int ix = 0; ix < orderedMetadata.size(); ++ix)
   {
-    out += vec[ix]->render(ix != vec.size() - 1);
+    out += orderedMetadata[ix]->render(ix != orderedMetadata.size() - 1);
   }
   out += endTag(comma, true);
 
@@ -104,23 +106,13 @@ bool MetadataVector::matchFilter(const std::string& mdName, const std::vector<st
 * will have to be used to retreive that information.
 *
 */
-std::string MetadataVector::toJson(const std::vector<std::string>& metadataFilter)
+std::string MetadataVector::toJson(const std::vector<Metadata*>& orderedMetadata)
 {
-  if (vec.size() == 0)
-  {
-    return "{}";
-  }
-
   JsonHelper jh;
 
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  for (unsigned int ix = 0; ix < orderedMetadata.size(); ++ix)
   {
-    if ((vec[ix]->name == "value") || (vec[ix]->name == "type") || !(matchFilter(vec[ix]->name, metadataFilter)))
-    {
-      continue;
-    }
-
-    jh.addRaw(vec[ix]->name, vec[ix]->toJson());
+    jh.addRaw(orderedMetadata[ix]->name, orderedMetadata[ix]->toJson());
   }
 
   return jh.str();

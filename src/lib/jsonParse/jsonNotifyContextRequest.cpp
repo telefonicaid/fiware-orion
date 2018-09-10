@@ -86,8 +86,8 @@ static std::string contextResponse(const std::string& path, const std::string& v
 */
 static std::string entityIdId(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  parseDataP->ncr.cerP->contextElement.entityId.id = value;
-  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", parseDataP->ncr.cerP->contextElement.entityId.id.c_str()));
+  parseDataP->ncr.cerP->entity.id = value;
+  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", parseDataP->ncr.cerP->entity.id.c_str()));
 
   return "OK";
 }
@@ -100,8 +100,8 @@ static std::string entityIdId(const std::string& path, const std::string& value,
 */
 static std::string entityIdType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  parseDataP->ncr.cerP->contextElement.entityId.type = value;
-  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", parseDataP->ncr.cerP->contextElement.entityId.type.c_str()));
+  parseDataP->ncr.cerP->entity.type = value;
+  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", parseDataP->ncr.cerP->entity.type.c_str()));
 
   return "OK";
 }
@@ -115,7 +115,7 @@ static std::string entityIdType(const std::string& path, const std::string& valu
 static std::string entityIdIsPattern(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
-  parseDataP->ncr.cerP->contextElement.entityId.isPattern = value;
+  parseDataP->ncr.cerP->entity.isPattern = value;
 
   if (!isTrue(value) && !isFalse(value))
   {
@@ -135,7 +135,7 @@ static std::string attribute(const std::string& path, const std::string& value, 
 {
   LM_T(LmtParse, ("Creating an attribute"));
   parseDataP->ncr.attributeP = new ContextAttribute();
-  parseDataP->ncr.cerP->contextElement.contextAttributeVector.push_back(parseDataP->ncr.attributeP);
+  parseDataP->ncr.cerP->entity.attributeVector.push_back(parseDataP->ncr.attributeP);
   return "OK";
 }
 
