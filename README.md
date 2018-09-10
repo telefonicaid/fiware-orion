@@ -157,8 +157,8 @@ Please have a look to the section [on building the source code](doc/manuals/admi
 
 ## Advanced topics
 
-* [Advanced Programming](doc/manuals/user/README.md)
-* [Installation and administration](doc/manuals/admin/README.md)
+* Advanced Programming [(en)](doc/manuals/user/README.md) [(jp)](doc/manuals.jp/user/README.md)
+* Installation and administration [(en)](doc/manuals/admin/README.md) [(jp)](doc/manuals.jp/admin/README.md)
 * Container-based deployment
   * [Docker](docker/README.md)
   * [Docker Swarm and HA](docker/docker_swarm.md)
