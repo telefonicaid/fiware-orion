@@ -378,20 +378,35 @@ bool processLocationAtUpdateAttribute
 
     //
     // Case 1b:
-    //   currently we have a loation but the attribute holding it is different from the target attribute -> error
+    //   currently we have a loation but the attribute holding it is different from the target attribute.
+    //   The behaviour is different depending on NGSI version
     //
     if (*currentLocAttrName != targetAttr->name)
     {
-      *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
-                   " when another one has been previously defined [" + *currentLocAttrName + "]";
+      if (apiVersion == V1)
+      {
 
-      oe->fill(SccRequestEntityTooLarge,
-               "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
-               "NoResourcesAvailable");
+        *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
+                     " when another one has been previously defined [" + *currentLocAttrName + "]";
 
-      return false;
+        oe->fill(SccRequestEntityTooLarge,
+                 "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
+                 "NoResourcesAvailable");
+
+        return false;
+      }
+      else
+      {
+        if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
+        {
+          *errDetail = "error parsing location attribute: " + subErr;
+          oe->fill(SccBadRequest, *errDetail, "BadRequest");
+          return false;
+        }
+        *currentLocAttrName = targetAttr->name;
+        return true;
+      }
     }
-
     //
     // Case 1c:
     //   currently we have a location and the attribute holding it is the target attribute -> update the current location
@@ -412,7 +427,7 @@ bool processLocationAtUpdateAttribute
   //
   // Case 2:
   //   update *to* no-location and the attribute previously holding it is the same than the target attribute
-  //   The behaviour is differenet depending on NGSI version
+  //   The behaviour is different depending on NGSI version
   //
   else if (*currentLocAttrName == targetAttr->name)
   {
