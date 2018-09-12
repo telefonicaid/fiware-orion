@@ -71,9 +71,7 @@ typedef struct ContextElementResponse
                       bool         comma               = false,
                       bool         omitAttributeValues = false);
   std::string  toJson(RenderFormat                     renderFormat,
-                      const std::vector<std::string>&  attrsFilter,
-                      const std::vector<std::string>&  metadataFilter,
-                      bool blacklist = false);
+                      const std::vector<std::string>&  metadataFilter);
   void         release(void);
 
   std::string  check(ApiVersion          apiVersion,

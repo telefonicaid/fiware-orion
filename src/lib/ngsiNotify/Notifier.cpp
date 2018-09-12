@@ -70,9 +70,7 @@ void Notifier::sendNotifyContextRequest
     const std::string&               xauthToken,
     const std::string&               fiwareCorrelator,
     RenderFormat                     renderFormat,
-    const std::vector<std::string>&  attrsOrder,
-    const std::vector<std::string>&  metadataFilter,
-    bool                             blackList
+    const std::vector<std::string>&  metadataFilter
 )
 {
   pthread_t                         tid;
@@ -82,9 +80,7 @@ void Notifier::sendNotifyContextRequest
                                                                           xauthToken,
                                                                           fiwareCorrelator,
                                                                           renderFormat,
-                                                                          attrsOrder,
-                                                                          metadataFilter,
-                                                                          blackList);
+                                                                          metadataFilter);
 
   if (!paramsV->empty()) // al least one param, an empty vector means an error occurred
   {
@@ -190,7 +186,6 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     const std::string&                   xauthToken,
     const std::string&                   fiwareCorrelator,
     RenderFormat                         renderFormat,
-    const std::vector<std::string>&      attrsOrder,
     const std::vector<std::string>&      metadataFilter
 )
 {
@@ -250,7 +245,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       }
       else
       {
-        payload  = ncr.toJson(renderFormat, attrsOrder, metadataFilter);
+        payload  = ncr.toJson(renderFormat, metadataFilter);
       }
 
       mimeType = "application/json";
@@ -395,9 +390,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsOrder,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             blackList
+  const std::vector<std::string>&  metadataFilter
 )
 {
     ConnectionInfo                    ci;
@@ -434,7 +427,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
                                      xauthToken,
                                      fiwareCorrelator,
                                      renderFormat,
-                                     attrsOrder,
                                      metadataFilter);
     }
 
@@ -483,7 +475,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     }
     else
     {
-      payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
+      payloadString = ncrP->toJson(renderFormat, metadataFilter);
     }
 
     /* Parse URL */

@@ -1688,7 +1688,6 @@ static bool processOnChangeConditionForUpdateContext
   std::string                      tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
-  const std::vector<std::string>&  attrsOrder,
   const ngsiv2::HttpInfo&          httpInfo,
   bool                             blacklist = false
 )
@@ -1699,6 +1698,8 @@ static bool processOnChangeConditionForUpdateContext
   cer.contextElement.entityId.fill(&notifyCerP->contextElement.entityId);
 
   /* Fill NotifyContextRequest with cerP, filtering by attrL */
+  // FIXME P8: review this. Given that filterAttributes() is called on the notifyCerP in the calling
+  // method, maybe this can be simplified (or removed)
   for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
   {
     ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
@@ -1746,9 +1747,7 @@ static bool processOnChangeConditionForUpdateContext
                                           xauthToken,
                                           fiwareCorrelator,
                                           renderFormat,
-                                          attrsOrder,
-                                          metadataV,
-                                          blacklist);
+                                          metadataV);
   return true;
 }
 
@@ -2052,6 +2051,8 @@ static bool processSubscriptions
       setDateModifiedMetadata(notifyCerP);
     }
 
+    // Get the effective vector of attributes to render
+    notifyCerP->contextElement.filterAttributes(tSubP->attrL.stringV, tSubP->blacklist);
 
     /* Send notification */
     LM_T(LmtSubCache, ("NOT ignored: %s", tSubP->cacheSubId.c_str()));
@@ -2066,7 +2067,6 @@ static bool processSubscriptions
                                                                 tenant,
                                                                 xauthToken,
                                                                 fiwareCorrelator,
-                                                                tSubP->attrL.stringV,
                                                                 tSubP->httpInfo,
                                                                 tSubP->blacklist);
 

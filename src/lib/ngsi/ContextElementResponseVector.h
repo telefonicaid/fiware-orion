@@ -48,9 +48,7 @@ typedef struct ContextElementResponseVector
                                   bool         omitAttributeValues = false);
 
   std::string              toJson(RenderFormat                     renderFormat,
-                                  const std::vector<std::string>&  attrsFilter,
-                                  const std::vector<std::string>&  metadataFilter,
-                                  bool                             blacklist = false);
+                                  const std::vector<std::string>&  metadataFilter);
   void                     push_back(ContextElementResponse* item);
   unsigned int             size(void) const;
   ContextElementResponse*  lookup(EntityId* eP, HttpStatusCode code = SccNone);

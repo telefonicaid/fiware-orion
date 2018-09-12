@@ -77,16 +77,14 @@ std::string ContextElementResponseVector::render
 std::string ContextElementResponseVector::toJson
 (
   RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsFilter,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             blacklist
+  const std::vector<std::string>&  metadataFilter
 )
 {
   std::string out;
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
+    out += vec[ix]->toJson(renderFormat, metadataFilter);
 
     if (ix != vec.size() - 1)
     {

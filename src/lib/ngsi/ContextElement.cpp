@@ -200,12 +200,23 @@ void ContextElement::filterAttributes(const std::vector<std::string>&  attrsFilt
           // Actual attribute filtering only takes place if '*' was not used
           else
           {
+#if 0
+            // FIXME #3168: to be enabled once metadata ID get removed
             int found = contextAttributeVector.get(attrsFilterItem);
             if (found != -1)
             {
               caNewV.push_back(contextAttributeVector.vec[found]);
               contextAttributeVector.vec.erase(contextAttributeVector.vec.begin() + found);
             }
+#else
+            int found = contextAttributeVector.get(attrsFilterItem);
+            while (found != -1)
+            {
+              caNewV.push_back(contextAttributeVector.vec[found]);
+              contextAttributeVector.vec.erase(contextAttributeVector.vec.begin() + found);
+              found = contextAttributeVector.get(attrsFilterItem);
+            }
+#endif
           }
         }
 
@@ -242,16 +253,9 @@ void ContextElement::filterAttributes(const std::vector<std::string>&  attrsFilt
 std::string ContextElement::toJson
 (
   RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsFilter,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             blacklist
+  const std::vector<std::string>&  metadataFilter
 )
 {
-  // Get the effective vector of attributes to render
-  // FIXME P7: filterAttributes will be moved and invoking it would not be needed from toJson()
-  // (see comment in filterAttributes)
-  filterAttributes(attrsFilter, blacklist);
-
   std::string out;
   switch (renderFormat)
   {
