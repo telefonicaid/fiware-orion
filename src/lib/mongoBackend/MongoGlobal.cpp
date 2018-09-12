@@ -2165,6 +2165,12 @@ static bool processOnChangeConditionForSubscription
     return false;
   }
 
+  // Get the effective vectors of attributes to render (per context element)
+  for (unsigned int ix = 0; ix < rawCerV.size() ; ix++)
+  {
+      rawCerV[ix]->contextElement.filterAttributes(attrsOrder, blacklist);
+  }
+
   /* Prune "not found" CERs */
   pruneContextElements(rawCerV, &ncr.contextElementResponseVector);
 
@@ -2230,9 +2236,7 @@ static bool processOnChangeConditionForSubscription
                                                 xauthToken,
                                                 fiwareCorrelator,
                                                 renderFormat,
-                                                attrsOrder,
-                                                metadataV,
-                                                blacklist);
+                                                metadataV);
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
@@ -2249,9 +2253,8 @@ static bool processOnChangeConditionForSubscription
                                               xauthToken,
                                               fiwareCorrelator,
                                               renderFormat,
-                                              attrsOrder,
-                                              metadataV,
-                                              blacklist);
+                                              metadataV);
+
       ncr.contextElementResponseVector.release();
 
       return true;

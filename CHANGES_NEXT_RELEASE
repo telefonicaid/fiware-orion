@@ -1,5 +1,7 @@
 - Fix: GET /v2/subscriptions and GET /v2/subscriptions/{id} crashes for permanent subscriptions created before version 1.13.0 (#3256)
 - Hardening: Mongo driver now compiled using --use-sasl-client --ssl to enable proper DB authentication mechanisms
 - Fix: correct error payload using errorCode (previously orionError was used) in POST /v1/queryContext and POST /v1/updateContext in some cases
+- Fix: bug in metadata compound value rendering in NGSIv2 (sometimes "toplevel" key was wrongly inserted in the resulting JSON object)
 - Hardening: modification of the URL parsing mechanism, making it more efficient, and the source code easier to follow (#3109, step 1)
+- Hardening: refactor NGSIv2 rendering code (throughput increase up to 33%/365% in entities/subscriptions rendering intensive scenarios) (#1298)
 - Fix: Missing or empty metadata values were not allowed in NGSIv2 create/update operations (#3121)

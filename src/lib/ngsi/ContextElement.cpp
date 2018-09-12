@@ -32,6 +32,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/string.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/EntityId.h"
 #include "ngsi/Request.h"
@@ -112,35 +113,297 @@ std::string ContextElement::render
 
 /* ****************************************************************************
 *
+* ContextElement::filterAttributes -
+*
+* Filter attributes vector in order to get the effective attribute vector to
+* render.
+*
+* dateCreatedOption and dateModifiedOption are due to deprecated ways of requesting
+* date in response. If used, the date is added at the end.
+*
+* FIXME P7: duplicated code in Entity::filterAttributes(). However, this
+* will be solved if ContextElement is refactored to use Entity as internal representation
+* for entities.
+*/
+void ContextElement::filterAttributes(const std::vector<std::string>&  attrsFilter, bool blacklist)
+{
+
+  if (attrsFilter.size () != 0)
+  {
+    if (std::find(attrsFilter.begin(), attrsFilter.end(), ALL_ATTRS) != attrsFilter.end())
+    {
+      // No filtering, just adding dateCreated and dateModified if needed (only in no blacklist case)
+      //
+      // The (contextAttributeVector.lookup(DATE_XXXX) == -1) check is to give preference to user
+      // defined attributes (see
+      // https://fiware-orion.readthedocs.io/en/master/user/ngsiv2_implementation_notes/index.html#datemodified-and-datecreated-attributes)
+
+      if (!blacklist)
+      {
+        if ((entityId.creDate != 0) && (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end()) && (contextAttributeVector.get(DATE_CREATED) == -1))
+        {
+          ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, entityId.creDate);
+          contextAttributeVector.push_back(caP);
+        }
+        if ((entityId.modDate != 0) &&  (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_MODIFIED) != attrsFilter.end()) && (contextAttributeVector.get(DATE_MODIFIED) == -1))
+        {
+          ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, entityId.modDate);
+          contextAttributeVector.push_back(caP);
+        }
+      }
+    }
+    else
+    {
+      // Processing depend on blacklist
+      //
+      // 1. If blacklist == true, go through the contextAttributeVector, taking only its elements
+      //    not in attrsFilter
+      // 2. If blacklist == false, reorder attributes in the same order they are in
+      //    attrsFilter (attributes not in attrsFilter are filtered out). Creation and modification
+      //    dates have a special treatment
+
+      if (blacklist)
+      {
+        std::vector<ContextAttribute*> caNewV;
+        for (unsigned int ix = 0; ix < contextAttributeVector.size(); ix++)
+        {
+          ContextAttribute* caP = contextAttributeVector[ix];
+          if (std::find(attrsFilter.begin(), attrsFilter.end(), caP->name) == attrsFilter.end())
+          {
+            caNewV.push_back(caP);
+          }
+          else
+          {
+            caP->release();
+            delete caP;
+          }
+        }
+        contextAttributeVector.vec = caNewV;
+      }
+      else
+      {
+        std::vector<ContextAttribute*> caNewV;
+
+        for (unsigned int ix = 0; ix < attrsFilter.size(); ix++)
+        {
+          std::string attrsFilterItem = attrsFilter[ix];
+          if ((entityId.creDate != 0) && (attrsFilterItem == DATE_CREATED) && (contextAttributeVector.get(DATE_CREATED) == -1))
+          {
+            ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, entityId.creDate);
+            caNewV.push_back(caP);
+          }
+          else if ((entityId.modDate != 0) && (attrsFilterItem == DATE_MODIFIED) && (contextAttributeVector.get(DATE_MODIFIED) == -1))
+          {
+            ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, entityId.modDate);
+            caNewV.push_back(caP);
+          }
+          // Actual attribute filtering only takes place if '*' was not used
+          else
+          {
+#if 0
+            // FIXME #3168: to be enabled once metadata ID get removed
+            int found = contextAttributeVector.get(attrsFilterItem);
+            if (found != -1)
+            {
+              caNewV.push_back(contextAttributeVector.vec[found]);
+              contextAttributeVector.vec.erase(contextAttributeVector.vec.begin() + found);
+            }
+#else
+            int found = contextAttributeVector.get(attrsFilterItem);
+            while (found != -1)
+            {
+              caNewV.push_back(contextAttributeVector.vec[found]);
+              contextAttributeVector.vec.erase(contextAttributeVector.vec.begin() + found);
+              found = contextAttributeVector.get(attrsFilterItem);
+            }
+#endif
+          }
+        }
+
+        // All the remaining elements in attributeVector need to be released,
+        // before overriding the vector with caNewV
+        contextAttributeVector.release();
+
+        contextAttributeVector.vec = caNewV;
+
+      }
+    }
+  }
+
+  // Removing dateExpires if not explicitly included in the filter
+  bool includeDateExpires = (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_EXPIRES) != attrsFilter.end());
+  int found;
+  if (!blacklist && !includeDateExpires && ((found = contextAttributeVector.get(DATE_EXPIRES)) != -1))
+  {
+    contextAttributeVector.vec[found]->release();
+    delete contextAttributeVector.vec[found];
+    contextAttributeVector.vec.erase(contextAttributeVector.vec.begin() + found);
+  }
+}
+
+
+/* ****************************************************************************
+*
 * ContextElement::toJson - 
+*
+* FIXME P7: duplicated code in Entity::toJson(). However, this
+* will be solved if ContextElement is refactored to use Entity as internal representation
+* for entities.
 */
 std::string ContextElement::toJson
 (
   RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsFilter,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             blacklist
-) const
+  const std::vector<std::string>&  metadataFilter
+)
 {
   std::string out;
-
-  if (renderFormat != NGSI_V2_VALUES)
+  switch (renderFormat)
   {
-    out += entityId.toJson();
-    if (contextAttributeVector.size() != 0)
-    {
-      out += ",";
-    }
-  }
-
-  if (contextAttributeVector.size() != 0)
-  {
-    out += contextAttributeVector.toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
+  case NGSI_V2_VALUES:
+    out = toJsonValues();
+    break;
+  case NGSI_V2_UNIQUE_VALUES:
+    out = toJsonUniqueValues();
+    break;
+  case NGSI_V2_KEYVALUES:
+    out = toJsonKeyvalues();
+    break;
+  default:  // NGSI_V2_NORMALIZED
+    out = toJsonNormalized(metadataFilter);
+    break;
   }
 
   return out;
 }
 
+
+/* ****************************************************************************
+*
+* ContextElement::toJsonValues -
+*
+* FIXME P7: duplicated code in Entity::toJsonValues(). However, this
+* will be solved if ContextElement is refactored to use Entity as internal representation
+* for entities.
+*/
+std::string ContextElement::toJsonValues(void)
+{
+  std::string out = "[";
+
+  for (unsigned int ix = 0; ix < contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = contextAttributeVector[ix];
+    out += caP->toJsonValue();
+
+    if (ix != contextAttributeVector.size() - 1)
+    {
+      out += ",";
+    }
+  }
+
+  out += "]";
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElement::toJsonUniqueValues -
+*
+* FIXME P7: duplicated code in toJsonUniqueValues::filterAttributes(). However, this
+* will be solved if ContextElement is refactored to use Entity as internal representation
+* for entities.
+*/
+std::string ContextElement::toJsonUniqueValues(void)
+{
+  std::string out = "[";
+
+  std::map<std::string, bool>  uniqueMap;
+
+  for (unsigned int ix = 0; ix < contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = contextAttributeVector[ix];
+
+    std::string value = caP->toJsonValue();
+
+    if (uniqueMap[value] == true)
+    {
+      // Already rendered. Skip.
+      continue;
+    }
+    else
+    {
+      out += value;
+      uniqueMap[value] = true;
+    }
+
+    if (ix != contextAttributeVector.size() - 1)
+    {
+      out += ",";
+    }
+  }
+
+  out += "]";
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElement::toJsonKeyvalues -
+*
+* FIXME P7: duplicated code in Entity::toJsonKeyValues(). However, this
+* will be solved if ContextElement is refactored to use Entity as internal representation
+* for entities.
+*/
+std::string ContextElement::toJsonKeyvalues(void)
+{
+  JsonHelper jh;
+
+  jh.addString("id", entityId.id);
+
+  /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
+  jh.addString("type", (entityId.type != "")? entityId.type : DEFAULT_ENTITY_TYPE);
+
+  for (unsigned int ix = 0; ix < contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = contextAttributeVector[ix];
+    jh.addRaw(caP->name, caP->toJsonValue());
+  }
+
+  return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElement::toJsonNormalized -
+*
+* FIXME P7: duplicated code in Entity::toJsonNormalized(). However, this
+* will be solved if ContextElement is refactored to use Entity as internal representation
+* for entities.
+*/
+std::string ContextElement::toJsonNormalized(const std::vector<std::string>&  metadataFilter)
+{
+  JsonHelper jh;
+
+  jh.addString("id", entityId.id);
+
+  /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
+  jh.addString("type", (entityId.type != "")? entityId.type : DEFAULT_ENTITY_TYPE);
+
+  for (unsigned int ix = 0; ix < contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = contextAttributeVector[ix];
+    jh.addRaw(caP->name, caP->toJson(metadataFilter));
+  }
+
+  return jh.str();
+}
 
 
 /* ****************************************************************************

@@ -155,4 +155,4 @@ Date: REGEX(.*)
 brokerStop CB
 accumulatorStop ${LISTENER_PORT}
 accumulatorStop ${LISTENER2_PORT}
-#dbDrop CB
+dbDrop CB

@@ -32,6 +32,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/limits.h"
+#include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/Request.h"
@@ -115,19 +116,10 @@ void EntityTypeResponse::release(void)
 */
 std::string EntityTypeResponse::toJson(void)
 {
-  std::string  out = "{";
-  char         countV[STRING_SIZE_FOR_INT];
+  JsonHelper jh;
 
-  snprintf(countV, sizeof(countV), "%lld", entityType.count);
+  jh.addRaw("attrs", entityType.contextAttributeVector.toJsonTypes());
+  jh.addNumber("count", entityType.count);
 
-  out += JSON_STR("attrs") + ":";
-
-  out += "{";
-  out += entityType.contextAttributeVector.toJsonTypes();
-  out += "}";
-
-  out += "," + JSON_STR("count") + ":" + countV;
-  out += "}";
-
-  return out;
+  return jh.str();
 }

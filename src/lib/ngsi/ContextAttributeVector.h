@@ -49,7 +49,7 @@ typedef struct ContextAttributeVector
   unsigned int             size(void) const;
   void                     release(void);
   void                     fill(struct ContextAttributeVector* cavP, bool useDefaultType = false);
-  ContextAttribute*        lookup(const std::string& attributeName) const;
+  int                      get(const std::string& attributeName) const;
   
   ContextAttribute*  operator[](unsigned int ix) const;
 
@@ -63,10 +63,6 @@ typedef struct ContextAttributeVector
                             bool         omitValue   = false,
                             bool         attrsAsName = false);
 
-  std::string        toJson(RenderFormat                     renderFormat,
-                            const std::vector<std::string>&  attrsFilter,
-                            const std::vector<std::string>&  metadataV,
-                            bool                             blacklist) const;
   std::string        toJsonTypes(void);
 
 } ContextAttributeVector;

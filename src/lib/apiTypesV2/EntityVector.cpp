@@ -57,11 +57,11 @@ std::string EntityVector::render
 
   std::string out;
 
-  out += "[";
+  out += "[" + vec[0]->render(uriParamOptions, uriParam);
 
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  for (unsigned int ix = 1; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(uriParamOptions, uriParam, ix != vec.size() - 1);
+    out += "," + vec[ix]->render(uriParamOptions, uriParam);
   }
 
   out += "]";

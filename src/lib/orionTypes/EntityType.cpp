@@ -31,6 +31,7 @@
 
 #include "common/tag.h"
 #include "common/limits.h"
+#include "common/JsonHelper.h"
 #include "ngsi/Request.h"
 #include "orionTypes/EntityType.h"
 
@@ -143,24 +144,15 @@ void EntityType::release(void)
 */
 std::string EntityType::toJson(bool includeType)
 {
-  std::string  out = "{";
-  char         countV[STRING_SIZE_FOR_INT];
-
-  snprintf(countV, sizeof(countV), "%lld", count);
+  JsonHelper jh;
 
   if (includeType)
   {
-    out += JSON_VALUE("type", type) + ",";
+    jh.addString("type", type);
   }
 
-  out += JSON_STR("attrs") + ":";
+  jh.addRaw("attrs", contextAttributeVector.toJsonTypes());
+  jh.addNumber("count", count);
 
-  out += "{";
-  out += contextAttributeVector.toJsonTypes();
-  out += "}";
-
-  out += "," + JSON_STR("count") + ":" + countV;
-  out += "}";
-
-  return out;
+  return jh.str();
 }
