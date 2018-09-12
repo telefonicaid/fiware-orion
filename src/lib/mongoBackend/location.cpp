@@ -385,7 +385,6 @@ bool processLocationAtUpdateAttribute
     {
       if (apiVersion == V1)
       {
-
         *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
                      " when another one has been previously defined [" + *currentLocAttrName + "]";
 
