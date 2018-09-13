@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Right processing of JSON special characteres
+Correct processing of JSON special characters
 
 --SHELL-INIT--
 dbInit CB
