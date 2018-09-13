@@ -333,15 +333,6 @@ bool processLocationAtUpdateAttribute
 )
 {
   std::string subErr;
-
-  //
-  // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
-  // note that with the current logic, the name of the attribute meaning location
-  // is preserved on a replace operation. By the moment, we can leave this as it is now
-  // given that the logic in NGSIv2 for specifying location attributes is gogint to change
-  // (the best moment to address this FIXME is probably once NGSIv1 has been deprecated and
-  // removed from the code)
-  //
   std::string locationString = targetAttr->getLocation(apiVersion);
 
   /* Check that location (if any) is using the correct coordinates string (it only
