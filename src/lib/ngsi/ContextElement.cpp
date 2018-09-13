@@ -86,16 +86,6 @@ std::string ContextElement::render
   bool         omitAttributeValues
 )
 {
-#if 0
-  std::string  out                              = "";
-  bool         attributeDomainNameRendered      = false; // FIXME PR
-  bool         contextAttributeVectorRendered   = contextAttributeVector.size() != 0;
-  bool         domainMetadataVectorRendered     = false; // FIXME PR
-
-  bool         commaAfterContextAttributeVector = domainMetadataVectorRendered;
-  bool         commaAfterAttributeDomainName    = domainMetadataVectorRendered  || contextAttributeVectorRendered;
-  bool         commaAfterEntityId               = commaAfterAttributeDomainName || attributeDomainNameRendered;
-#endif
   std::string  out                              = "";
   bool         contextAttributeVectorRendered   = contextAttributeVector.size() != 0;
 
