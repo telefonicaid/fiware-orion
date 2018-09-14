@@ -143,8 +143,7 @@ std::string ContextAttributeVector::toJsonTypes(void)
 * ContextAttributeVector::render - 
 */
 std::string ContextAttributeVector::render
-(
-  ApiVersion   apiVersion,
+(  
   bool         asJsonObject,
   RequestType  request,
   bool         comma,
@@ -200,7 +199,7 @@ std::string ContextAttributeVector::render
       }
       else
       {
-        out += vec[ix]->render(apiVersion, asJsonObject, request, ix != vec.size() - 1, omitValue);
+        out += vec[ix]->render(asJsonObject, request, ix != vec.size() - 1, omitValue);
       }
     }
     out += endTag(comma, attrsAsName);
@@ -216,7 +215,7 @@ std::string ContextAttributeVector::render
       }
       else
       {
-        out += vec[ix]->render(apiVersion, asJsonObject, request, ix != vec.size() - 1, omitValue);
+        out += vec[ix]->render(asJsonObject, request, ix != vec.size() - 1, omitValue);
       }
     }
     out += endTag(comma, true);

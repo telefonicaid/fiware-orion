@@ -50,7 +50,6 @@ brokerStart CB 0-255
 echo "01. PUT /v1/contextEntities/type/T1/id/E1 and see it fail"
 echo "========================================================="
 payload='{
-  "attributeDomainName" : "",
   "attributes" : [
     {
       "name": "A1",
@@ -74,7 +73,6 @@ echo
 echo "03. POST /v1/contextEntities/type/T1/id/E1 OK"
 echo "============================================="
 payload='{
-  "attributeDomainName" : "",
   "attributes" : [
     {
       "name": "A1",
@@ -91,7 +89,6 @@ echo
 echo "04. PUT /v1/contextEntities/type/T1/id/E1 OK"
 echo "============================================"
 payload='{
-  "attributeDomainName" : "",
   "attributes" : [
     {
       "name": "A1",
@@ -115,7 +112,6 @@ echo
 echo "06. POST /v1/contextEntities/type/T2/id/E1 OK"
 echo "============================================="
 payload='{
-  "attributeDomainName" : "",
   "attributes": [
     {
       "name": "A2",

@@ -1648,9 +1648,7 @@ void pruneContextElements(const ContextElementResponseVector& oldCerV, ContextEl
     ContextElementResponse* cerP    = oldCerV[ix];
     ContextElementResponse* newCerP = new ContextElementResponse();
 
-    /* Note we cannot use the ContextElement::fill() method, given that it also copies the ContextAttributeVector. The side-effect
-     * of this is that attributeDomainName and domainMetadataVector are not being copied, but it should not be a problem, given that
-     * domain attributes are not implemented */
+    /* Note we cannot use the ContextElement::fill() method, given that it also copies the ContextAttributeVector */
     newCerP->contextElement.entityId.fill(&cerP->contextElement.entityId);
 
     // FIXME P10: not sure if this is the right way to do it, maybe we need a fill() method for this

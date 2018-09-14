@@ -30,7 +30,6 @@
 #include "ngsi/Request.h"
 #include "common/RenderFormat.h"
 #include "ngsi/EntityId.h"
-#include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/MetadataVector.h"
 
@@ -43,9 +42,7 @@
 typedef struct ContextElement
 {
   EntityId                 entityId;                // Mandatory
-  AttributeDomainName      attributeDomainName;     // Optional
   ContextAttributeVector   contextAttributeVector;  // Optional
-  MetadataVector           domainMetadataVector;    // Optional
 
   std::vector<ProvidingApplication> providingApplicationList;    // Not part of NGSI, used internally for CPr forwarding functionality
 
@@ -53,7 +50,7 @@ typedef struct ContextElement
   ContextElement(const std::string& id, const std::string& type, const std::string& isPattern);
   ContextElement(EntityId* eP);
 
-  std::string  render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, bool comma, bool omitAttributeValues = false);
+  std::string  render(bool asJsonObject, RequestType requestType, bool comma, bool omitAttributeValues = false);
   std::string  toJson(RenderFormat                     renderFormat,
                       const std::vector<std::string>&  metadataFilter);
   void         release(void);

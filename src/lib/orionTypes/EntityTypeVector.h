@@ -47,8 +47,7 @@ class EntityTypeVector
   unsigned int  size(void);
   void          release(void);
   std::string   check(ApiVersion apiVersion, const std::string& predetectedError);
-  std::string   render(ApiVersion  apiVersion,
-                       bool        asJsonObject,
+  std::string   render(bool        asJsonObject,
                        bool        asJsonOut,
                        bool        collapsed,
                        bool        comma = false);

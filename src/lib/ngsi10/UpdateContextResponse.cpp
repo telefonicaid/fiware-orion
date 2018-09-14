@@ -80,7 +80,7 @@ UpdateContextResponse::~UpdateContextResponse()
 *
 * UpdateContextResponse::render -
 */
-std::string UpdateContextResponse::render(ApiVersion apiVersion, bool asJsonObject)
+std::string UpdateContextResponse::render(bool asJsonObject)
 {
   std::string out = "";
 
@@ -99,7 +99,7 @@ std::string UpdateContextResponse::render(ApiVersion apiVersion, bool asJsonObje
     }
     else
     {
-      out += contextElementResponseVector.render(apiVersion, asJsonObject, RtUpdateContextResponse, false);
+      out += contextElementResponseVector.render(asJsonObject, RtUpdateContextResponse, false);
     }
   }
   
@@ -137,7 +137,7 @@ std::string UpdateContextResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject);
+  return render(asJsonObject);
 }
 
 

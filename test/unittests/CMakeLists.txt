@@ -125,7 +125,6 @@ SET (SOURCES
     ngsi/ContextAttribute_test.cpp
     ngsi/ContextElement_test.cpp
     ngsi/NotifyCondition_test.cpp
-    ngsi/AttributeDomainName_test.cpp
     ngsi/AttributeList_test.cpp
     ngsi/ConditionValueList_test.cpp
     ngsi/ContextAttributeVector_test.cpp

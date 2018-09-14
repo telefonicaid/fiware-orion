@@ -41,8 +41,7 @@ typedef struct ContextElementResponseVector
 {
   std::vector<ContextElementResponse*>  vec;
 
-  std::string              render(ApiVersion   apiVersion,
-                                  bool         asJsonObject,
+  std::string              render(bool         asJsonObject,
                                   RequestType  requestType,
                                   bool         comma               = false,
                                   bool         omitAttributeValues = false);

@@ -65,7 +65,7 @@ UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, 
 *
 * UpdateContextRequest::render -
 */
-std::string UpdateContextRequest::render(ApiVersion apiVersion, bool asJsonObject)
+std::string UpdateContextRequest::render(bool asJsonObject)
 {
   std::string  out = "";
 
@@ -73,8 +73,8 @@ std::string UpdateContextRequest::render(ApiVersion apiVersion, bool asJsonObjec
   // Both fields are MANDATORY, so, comma after "contextElementVector"
   //  
   out += startTag();
-  out += contextElementVector.render(apiVersion, asJsonObject, UpdateContext, true);
-  out += valueTag("updateAction", actionTypeString(apiVersion, updateActionType), false);
+  out += contextElementVector.render(asJsonObject, UpdateContext, true);
+  out += valueTag("updateAction", actionTypeString(V1, updateActionType), false);
   out += endTag(false);
 
   return out;
@@ -93,13 +93,13 @@ std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject
   if (predetectedError != "")
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
-    return response.render(apiVersion, asJsonObject);
+    return response.render(asJsonObject);
   }
 
   if ((res = contextElementVector.check(apiVersion, UpdateContext)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
-    return response.render(apiVersion, asJsonObject);
+    return response.render(asJsonObject);
   }
 
   return "OK";
@@ -133,9 +133,7 @@ void UpdateContextRequest::fill
 
   ceP->entityId.fill(entityId, entityType, "false");
 
-  ceP->attributeDomainName.fill(ucerP->attributeDomainName);
   ceP->contextAttributeVector.fill((ContextAttributeVector*) &ucerP->contextAttributeVector);
-  ceP->domainMetadataVector.fill((MetadataVector*) &ucerP->domainMetadataVector);
 
   contextElementVector.push_back(ceP);
 
@@ -159,9 +157,7 @@ void UpdateContextRequest::fill
 
   ceP->entityId.fill(entityId, entityType, "false");
 
-  ceP->attributeDomainName.fill(acerP->attributeDomainName);
   ceP->contextAttributeVector.fill((ContextAttributeVector*) &acerP->contextAttributeVector);
-  ceP->domainMetadataVector.fill((MetadataVector*) &acerP->domainMetadataVector);
 
   contextElementVector.push_back(ceP);
   updateActionType = ActionTypeAppend;  // Coming from an AppendContextElementRequest (POST), must be APPEND

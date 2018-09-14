@@ -241,7 +241,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 
       if (renderFormat == NGSI_V1_LEGACY)
       {
-        payload = ncr.render(V1, false);
+        payload = ncr.render(false);
       }
       else
       {
@@ -471,7 +471,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     if (renderFormat == NGSI_V1_LEGACY)
     {
       bool asJsonObject = (ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON);
-      payloadString = ncrP->render(ci.apiVersion, asJsonObject);
+      payloadString = ncrP->render(asJsonObject);
     }
     else
     {

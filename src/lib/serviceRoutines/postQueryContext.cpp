@@ -354,7 +354,7 @@ std::string postQueryContext
   //
   if (forwardsPending(qcrsP) == false)
   {
-    TIMED_RENDER(answer = qcrsP->render(ciP->apiVersion, asJsonObject));
+    TIMED_RENDER(answer = qcrsP->render(asJsonObject));
 
     qcrP->release();
     return answer;
@@ -530,7 +530,7 @@ std::string postQueryContext
   std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
   bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
 
-  TIMED_RENDER(answer = responseV.render(ciP->apiVersion, asJsonObject, details, qcrsP->errorCode.details));
+  TIMED_RENDER(answer = responseV.render(asJsonObject, details, qcrsP->errorCode.details));
 
 
   //

@@ -88,10 +88,6 @@ std::string postAllEntitiesWithTypeAndId
 
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
 
-  // FIXME P1: AttributeDomainName skipped
-  // FIXME P1: domainMetadataVector skipped
-
-
   // 01. Get values from URL (entityId::type, esist, !exist)
   if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
   {

@@ -324,7 +324,6 @@ ContextElementResponse::ContextElementResponse(ContextElement* ceP, bool useDefa
 */
 std::string ContextElementResponse::render
 (
-  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
   bool                comma,
@@ -334,7 +333,7 @@ std::string ContextElementResponse::render
   std::string out = "";
 
   out += startTag();
-  out += contextElement.render(apiVersion, asJsonObject, requestType, true, omitAttributeValues);
+  out += contextElement.render(asJsonObject, requestType, true, omitAttributeValues);
   out += statusCode.render(false);
   out += endTag(comma, false);
 
