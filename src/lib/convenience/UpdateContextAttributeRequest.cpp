@@ -53,10 +53,9 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 *
 * render - 
 */
-std::string UpdateContextAttributeRequest::render(ApiVersion apiVersion)
+std::string UpdateContextAttributeRequest::render(void)
 {
   std::string out = "";
-  bool        commaAfterContextValue = metadataVector.size() != 0;
 
   out += startTag();
   out += valueTag("type", type, true);
@@ -67,16 +66,7 @@ std::string UpdateContextAttributeRequest::render(ApiVersion apiVersion)
   }
   else
   {
-    bool isCompoundVector = false;
-
-    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::ValueTypeVector))
-    {
-      isCompoundVector = true;
-    }
-
-    out += startTag("value", isCompoundVector);
-    out += compoundValueP->render(apiVersion);
-    out += endTag(commaAfterContextValue, isCompoundVector);
+    out += JSON_STR("value") + ":" + compoundValueP->toJson(true);
   }
 
   out += metadataVector.render(false);

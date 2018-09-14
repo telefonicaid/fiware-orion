@@ -51,8 +51,7 @@ typedef struct ContextAttributeResponse
   ContextAttributeVector     contextAttributeVector;     // Mandatory
   StatusCode                 statusCode;                 // Mandatory
 
-  std::string render(ApiVersion   apiVersion,
-                     bool         asJsonObject,
+  std::string render(bool         asJsonObject,
                      RequestType  request);
   void        release(void);
   std::string check(ApiVersion          apiVersion,

@@ -90,7 +90,7 @@ typedef struct Metadata
   ~Metadata();
 
   std::string  render(bool comma);
-  std::string  toJson(bool isLastElement);
+  std::string  toJson(void);
   void         release(void);
   void         fill(const struct Metadata& md);
   std::string  toStringValue(void) const;

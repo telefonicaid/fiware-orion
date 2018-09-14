@@ -102,7 +102,7 @@ TEST(ContextAttribute, render)
 
   utInit();
 
-  out = caP->render(V1, false, UpdateContext, false);
+  out = caP->render(false, UpdateContext, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

@@ -67,7 +67,7 @@ TEST(NotifyContextRequest, json_ok)
   // With the data obtained, render, present and release methods are exercised
   //
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  rendered = ncrP->render(V1, false);
+  rendered = ncrP->render(false);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   ncrP->release();
@@ -149,7 +149,7 @@ TEST(NotifyContextRequest, json_render)
 
   // 1. Without ContextResponseList
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  rendered = ncrP->render(V1, false);
+  rendered = ncrP->render(false);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
@@ -160,7 +160,7 @@ TEST(NotifyContextRequest, json_render)
   cerP->statusCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  rendered = ncrP->render(V1, false);
+  rendered = ncrP->render(false);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
@@ -171,7 +171,7 @@ TEST(NotifyContextRequest, json_render)
   cerP->statusCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
-  rendered = ncrP->render(V1, false);
+  rendered = ncrP->render(false);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   utExit();

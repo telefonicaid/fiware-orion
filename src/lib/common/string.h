@@ -166,39 +166,12 @@ extern std::string servicePathCheck(const char* servicePath);
 extern bool str2double(const char* s, double* dP = NULL);
 
 
-
-/* ****************************************************************************
+/*****************************************************************************
 *
-* decimalDigits
-*
-*/
-extern unsigned int decimalDigits(double d);
-
-
-
-/* ****************************************************************************
-*
-* toString -
-*
-* If the generic ostringstream-based implementation would have performance
-* problems in the future, a set of per-type specialized functions could be
-* used without changing the toString() usage interface from existing callers
-*
-* In fact, we currently have an specialized function for float, although not
-* due to performance (but due to special treatment of decimal numbers in the
-* float case)
+* double2string -
 *
 */
-template <typename T> std::string toString(T t)
-{      
-  std::ostringstream ss;
-
-  ss << t;
-
-  return ss.str();
-}
-
-template <> std::string toString(float f);
+extern std::string double2string(double f);
 
 
 

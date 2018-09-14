@@ -43,7 +43,7 @@ TEST(ContextAttributeVector, render)
 
   utInit();
 
-  out = cav.render(V1, false, UpdateContextAttribute, "");
+  out = cav.render(false, UpdateContextAttribute, "");
   EXPECT_STREQ("", out.c_str());
 
   utExit();

@@ -53,9 +53,7 @@ public:
                                         const std::string&                         xauthToken,
                                         const std::string&                         fiwareCorrelator,
                                         RenderFormat                               renderFormat,
-                                        const std::vector<std::string>&            attrsOrder,
-                                        const std::vector<std::string>&            metadataFilter,
-                                        bool                                       blackList);
+                                        const std::vector<std::string>&            metadataFilter);
 
   virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr,
                                                     const std::string&                url,
@@ -69,10 +67,7 @@ protected:
                                                              const std::string&               xauthToken,
                                                              const std::string&               fiwareCorrelator,
                                                              RenderFormat                     renderFormat,
-                                                             const std::vector<std::string>&  attrsOrder,
-                                                             const std::vector<std::string>&  metadataFilter,
-                                                             bool                             blackList
-  );
+                                                             const std::vector<std::string>&  metadataFilter);
 };
 
 #endif  // SRC_LIB_NGSINOTIFY_NOTIFIER_H_

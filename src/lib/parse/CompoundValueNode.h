@@ -160,8 +160,8 @@ class CompoundValueNode
   CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, bool _value);
   std::string         check(void);
   std::string         finish(void);
-  std::string         render(ApiVersion apiVersion, bool noComma = false, bool noTag = false);
-  std::string         toJson(bool isLastElement, bool comma);
+
+  std::string         toJson(bool toplevel);
 
   void                shortShow(const std::string& indent);
   void                show(const std::string& indent);

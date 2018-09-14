@@ -54,14 +54,6 @@ TEST(ContextElement, check)
   EXPECT_EQ(ceP->check(V1, UpdateContext), "missing attribute name");
   aP->name = "name";
 
-  Metadata* mP = new Metadata();
-  mP->name  = "";
-  mP->stringValue = "V";
-  ceP->domainMetadataVector.push_back(mP);
-  EXPECT_EQ(ceP->check(V1, UpdateContext), "missing metadata name");
-  mP->name = "NAME";
-  EXPECT_EQ(ceP->check(V1, UpdateContext), "OK");
-
   ContextElement* ce2P = new ContextElement();
   ce2P->entityId.id = "id";
 
@@ -77,12 +69,11 @@ TEST(ContextElement, check)
   const char*     outfile1 = "ngsi.contextelement.check.middle.json";
   std::string     out;
 
-  out = ce2P->render(V1, false, UpdateContextElement, false, false);
+  out = ce2P->render(false, UpdateContextElement, false, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  mP->name  = "";
-  EXPECT_EQ("missing metadata name", ceVectorP->check(V1, UpdateContext));
+  EXPECT_EQ("OK", ceVectorP->check(V1, UpdateContext));
 
   utExit();
 }

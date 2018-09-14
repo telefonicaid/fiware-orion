@@ -304,7 +304,7 @@ Date: REGEX(.*)
 09. Ask for metrics, see 1 error in outgoing transactions
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 1908
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
