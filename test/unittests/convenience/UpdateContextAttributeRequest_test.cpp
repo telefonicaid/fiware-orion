@@ -51,7 +51,7 @@ TEST(UpdateContextAttributeRequest, render_json)
   ucar.contextValue = "Context Value";
 
   ucar.metadataVector.push_back(&mdata);
-  out = ucar.render(V1);
+  out = ucar.render();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

@@ -21,7 +21,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    AttributeDomainName.cpp
     AttributeExpression.cpp
     ConditionValueList.cpp
     ContextAttribute.cpp
@@ -61,7 +60,6 @@ SET (SOURCES
 )
 
 SET (HEADERS
-    AttributeDomainName.h
     AttributeExpression.h
     ConditionValueList.h
     ContextAttribute.h

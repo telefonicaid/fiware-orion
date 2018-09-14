@@ -46,7 +46,6 @@
 */
 std::string EntityTypeResponse::render
 (
-  ApiVersion          apiVersion,
   bool                asJsonObject,
   bool                asJsonOut,
   bool                collapsed
@@ -56,7 +55,7 @@ std::string EntityTypeResponse::render
 
   out += startTag();
 
-  out += entityType.render(apiVersion, asJsonObject, asJsonOut, collapsed, true, true);
+  out += entityType.render(asJsonObject, asJsonOut, collapsed, true, true);
   out += statusCode.render(false);
 
   out += endTag();
@@ -93,7 +92,7 @@ std::string EntityTypeResponse::check
   else
     return "OK";
 
-  return render(apiVersion, asJsonObject, asJsonOut, collapsed);
+  return render(asJsonObject, asJsonOut, collapsed);
 }
 
 

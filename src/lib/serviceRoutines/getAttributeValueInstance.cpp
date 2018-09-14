@@ -157,7 +157,7 @@ std::string getAttributeValueInstance
 
 
   // 5. Render the ContextAttributeResponse
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntityAttribute));
+  TIMED_RENDER(answer = response.render(asJsonObject, IndividualContextEntityAttribute));
 
 
   // 6. Cleanup and return result

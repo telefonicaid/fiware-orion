@@ -43,13 +43,13 @@ TEST(ContextElementVector, render)
   std::string           rendered;
   ContextElementVector  ceV;
 
-  rendered = ceV.render(V1, false, UpdateContextElement, false);
+  rendered = ceV.render(false, UpdateContextElement, false);
   EXPECT_STREQ("", rendered.c_str());
 
   ceP->entityId = eId;
   ceV.push_back(ceP);
 
-  rendered = ceV.render(V1, false, UpdateContextElement, false);
+  rendered = ceV.render(false, UpdateContextElement, false);
 
   ceV.release();
 }
