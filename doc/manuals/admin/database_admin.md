@@ -140,7 +140,7 @@ root or using the sudo command):
 ### Deleting expired documents
 
 NGSI specifies an expiration time for registrations and subcriptions
-(both NGSI9 and NGSI10 subscriptions). Orion Context Broker doesn't
+(both context and context availability subscriptions). Orion Context Broker doesn't
 delete the expired documents (they are just ignored) as
 expired registrations/subscription can be "re-activated" using a subscription update request,
 modifying their duration.
@@ -207,30 +207,7 @@ Ej:
 
 ## Orion Errors due to Database
 
-If you are retreiving entities using a large offset value and get this error (NGSIv1):
-
-```
-GET  /v1/contextEntities?offset=54882
-
-{
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "",
-        "isPattern" : "true",
-        "id" : ".*"
-      },
-      "statusCode" : {
-        "code" : "500",
-        "reasonPhrase" : "Internal Server Error",
-        "details" : "Sort operation used more than the maximum RAM. You should create an index. Check the Database Administration section in Orion documentation."
-      }
-    }
-  ]
-}
-```
-
-or this other (NGSIv2):
+If you are retreiving entities using a large offset value and get this error:
 
 ```
 GET /v2/entities?offset=54882

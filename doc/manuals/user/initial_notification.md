@@ -5,8 +5,7 @@
 Considering a given subscription, Orion Context Broker notifies whenever an update occurs and the 
 subscription conditions are met on the updated entity. That is, the entity an attribute being update
 are covered by the subscription and other optional filters (attribute values, geolocation, etc.) 
-also match. Thus, notifications are synchronous to entity updates. This is the basic mechanism that 
-works for NGSIv1 and for NGSIv2 (although the notification format vary depending of the API version, of course).
+also match. Thus, notifications are synchronous to entity updates.
 
 However, there is a special case of notification, named *initial notification*, which is sent synchronous 
 to the subscription creation (or update) transaction. This notification includes all the entities 
