@@ -21,45 +21,44 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Correct processing of JSON special characters
+Test to check the fix for precission lost in large integers
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0
+brokerStart CB
 
 --SHELL--
 
 #
-# 01. Creating entity with special JSON char (\n)
-# 02. Get entity, see \n
+# 01. Create entity with large integer 2523232323232323
+# 02. Get entity a see integer 2523232323232323
 #
 
-
-echo '01. Creating entity with special JSON char (\n)'
-echo "==============================================="
+echo "01. Create entity with large integer 2523232323232323"
+echo "====================================================="
 payload='{
   "id": "E",
   "type": "T",
   "A": {
-    "value": "000FF\nABCDGC",
-    "type": "Text"
+    "value": 2523232323232323,
+    "type": "Number"
   }
 }'
-orionCurl --url '/v2/entities' --payload "$payload"
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
-echo "02. Get entity, see A=1"
-echo "======================="
-orionCurl --url /v2/entities/E
+echo "02. Get entity a see integer 2523232323232323"
+echo "============================================="
+orionCurl --url /v2/entities/E --noPayloadCheck
 echo
 echo
 
 
 --REGEXPECT--
-01. Creating entity with special JSON char (\n)
-===============================================
+01. Create entity with large integer 2523232323232323
+=====================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E?type=T
@@ -68,23 +67,15 @@ Date: REGEX(.*)
 
 
 
-02. Get entity, see A=1
-=======================
+02. Get entity a see integer 2523232323232323
+=============================================
 HTTP/1.1 200 OK
-Content-Length: 79
+Content-Length: 82
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "A": {
-        "metadata": {},
-        "type": "Text",
-        "value": "000FF\nABCDGC"
-    },
-    "id": "E",
-    "type": "T"
-}
+{"id":"E","type":"T","A":{"type":"Number","value":2523232323232323,"metadata":{}}}
 
 
 --TEARDOWN--
