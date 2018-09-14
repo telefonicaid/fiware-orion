@@ -1,9 +1,9 @@
 FORMAT: 1A
 HOST: http://orion.lab.fiware.org
-TITLE: FIWARE-NGSI v2 Specification (WIP)
-DATE: to be fixed upon next RC production
-VERSION: latest
-PREVIOUS_VERSION: stable
+TITLE: FIWARE-NGSI v2 Specification 
+DATE: 15 Sep 2018
+VERSION: 2.0
+PREVIOUS_VERSION: RC-2018_07
 APIARY_PROJECT: orioncontextbroker
 SPEC_URL: https://telefonicaid.github.io/fiware-orion/api/v2/
 GITHUB_SOURCE: http://github.com/telefonicaid/fiware-orion.git
@@ -35,10 +35,64 @@ Sergio García Gómez (Telefónica I+D), Martin Bauer (NEC).
   
 ## Status
 
-This is a work in progress and is changing on a daily basis.
-Please send your comments to fiware-ngsi@lists.fiware.org.
-You can trace the discussions checking the archives of the mailing list:
-https://lists.fiware.org/private/fiware-ngsi/ (list subscription required).
+This specification is the final and stable version of NGSIv2 API specification (v2.0).
+
+# Changelog
+
+Changes since RC-2018.07:
+
+* None
+
+Changes since RC-2008.04:
+
+* Section "System/builtin Attributes" renamed to "Builtin Attributes"
+* Section "System/builtin Metadata" renamed to "Builtin Metadata"
+* Added new builtin attribute: `dateExpires`
+* Improved description in "Error Response" section
+* Added new option for `POST /v2/entities` operation: `upsert`
+* Clarifying about forwarding compliance in "Group Registrations"
+* `actionType` values for `POST /v2/op/update` operation are now in camelCase
+* Renamed field `attributes` to `attrs` in `POST /v2/op/query` operation
+* Added new field in `POST /v2/op/query` operation: `expression` (old `scope` field has been removed)
+* Added new operation `POST /v2/op/notify`
+
+Changes since RC-2017.11:
+
+* `orderBy` may include also `id` and `type` as ordering fields
+* Included `registrations_url` in `GET /v2` response
+* Added registration management operations
+   * `GET /v2/registrations`
+   * `POST /v2/registrations`
+   * `GET /v2/registrations/{id}`
+   * `PATCH /v2/registrations/{id}`
+   * `DELETE /v2/registrations/{id}`
+
+Changes since RC-2016.10:
+
+* New "System/builtin Metadata" section (using partially former "Special metadata in notifications" section)
+* New "Filtering out attributes and metadata" section
+* Section "Virtual Attributes" renamed to "System/builtin Attributes"
+* New system/builtin metadata: `dateCreated` and `dateModified`
+* Added `*` in "Attribute names restrictions" section
+* Added `lastFailure` and `lastSuccess` to subscription information
+* Added `failed` value for subscription `status` field
+* Added `REPLACE` as `actionType` for `POST /v2/op/update` operation, along with a clearer explanation
+  of the different action types
+* Added `metadata` field to `POST /v2/op/query` operation
+* Added `metadata` URI parameter to the following operations:
+   * `GET /v2/entities`
+   * `GET /v2/entities/{entityId}`
+   * `GET /v2/entities/{entityId}/attrs`
+   * `GET /v2/entities/{entityId}/attrs/{attrName}`
+
+Changes since RC-2016.05:
+
+* Default typing for entities, attributes and metadata aligned with schema.org
+* `typePattern` (similar to `idPattern`)
+* Simple Query Language: metadata filters (`mq`)
+* Simple Query Language: Sub-key filtering (both attribute and metadata values, i.e. `q` and `mq`)
+* Notification metadata filtering
+* System/builtin metadata in notifications: `previousValue` and `actionType`
 
 ## Copyright
 
@@ -58,6 +112,11 @@ This specification describes the "full" compliance level.
 NGSI version 2 uses camel case (camelCase) syntax for naming properties and related artifacts used
 by the API. When  referring to URIs, as part of HATEOAS patterns, and to mark them appropriately,
 the suffix `_url` is added.
+
+## Reference Implementations
+
+* NGISv2 servers
+  * [Orion Context Broker](http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker) - [Implementation Notes](https://fiware-orion.readthedocs.io/en/master/user/ngsiv2_implementation_notes/index.html)
 
 # Specification
 
