@@ -44,7 +44,12 @@ extern "C"
 void orionldContextFree(OrionldContext* contextP)
 {
   if (contextP == NULL)
+  {
+    LM_TMP(("NOT Freeing LIST context (NULL)"));
     return;
+  }
+  
+  LM_TMP(("Freeing LIST context '%s' at %p, tree at %p", contextP->url, contextP, contextP->tree));
 
   if (contextP->tree != NULL)
   {
@@ -70,7 +75,6 @@ void orionldContextFreeAll(void)
 {
   OrionldContext* contextP = orionldContextHead;
 
-  LM_T(LmtFree, ("Freeing contexts, starting with %p", contextP));
   while (contextP != NULL)
   {
     OrionldContext* next = contextP->next;
@@ -78,6 +82,4 @@ void orionldContextFreeAll(void)
     orionldContextFree(contextP);
     contextP = next;
   }
-
-  LM_T(LmtFree, ("Freed all context"));
 }

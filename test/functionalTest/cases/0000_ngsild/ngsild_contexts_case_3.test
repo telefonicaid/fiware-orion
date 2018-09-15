@@ -68,7 +68,7 @@ brokerStart CB
 #       "@id": "http://uri.etsi.org/ngsi-ld/hasObject",
 #       "@type":"@id"
 #     },
-#     "Property": "http://etsi.org/nsgi-ld/Property",
+#     "Property": "http://uri.etsi.org/ngsi-ld/Property",
 #     "Relationship": "http://uri.etsi.org/ngsi-ld/Relationship",
 #     ...                                                                                                                                                                        
 #   }
@@ -144,7 +144,7 @@ MongoDB server version: REGEX(.*)
 			"mdNames" : [ ]
 		},
 		"http://uri=etsi=org/ngsi-ld/name" : {
-			"type" : "http://etsi.org/nsgi-ld/Property",
+			"type" : "http://uri.etsi.org/ngsi-ld/Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : {

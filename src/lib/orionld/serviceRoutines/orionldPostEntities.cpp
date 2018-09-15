@@ -49,6 +49,7 @@ extern "C"
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
 #include "orionld/context/orionldContextItemLookup.h"          // orionldContextItemLookup
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
+#include "orionld/context/orionldContextList.h"                // orionldContextHead, orionldContextTail
 #include "orionld/serviceRoutines/orionldPostEntities.h"       // Own interface
 
 
@@ -455,9 +456,7 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
     char* details        = NULL;
     int   expansions;
 
-    LM_TMP(("Calling uriExpansion for '%s'", kNodeP->name));
     expansions = uriExpansion(ciP->contextP, kNodeP->name, &expandedNameP, &expandedTypeP, &details);
-    LM_TMP(("After uriExpansion"));
     if (expansions == -1)
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item", details);
@@ -466,12 +465,12 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
 
     if (expandedNameP != NULL)
     {
-      LM_TMP(("Expansion found for %s name '%s': %s", kjValueType(kNodeP->type), kNodeP->name, expandedNameP));
+      LM_T(LmtUriExpansion, ("Expansion found for %s name '%s': %s", kjValueType(kNodeP->type), kNodeP->name, expandedNameP));
       cNodeP->name = expandedNameP;
     }
     else
     {
-      LM_TMP(("NO Expansion found for %s name '%s': using: %s%s", kjValueType(kNodeP->type), kNodeP->name, ORIONLD_DEFAULT_EXPANSION_URL_DIR_ATTRIBUTE, kNodeP->name));
+      LM_T(LmtUriExpansion, ("NO Expansion found for %s name '%s': using: %s%s", kjValueType(kNodeP->type), kNodeP->name, ORIONLD_DEFAULT_EXPANSION_URL_DIR_ATTRIBUTE, kNodeP->name));
       cNodeP->name = std::string(ORIONLD_DEFAULT_EXPANSION_URL_DIR_ATTRIBUTE) + kNodeP->name;
     }
   }
@@ -741,18 +740,22 @@ static bool contextTreat
     {
       char* details;
 
+      if (urlCheck((char*) ciP->httpHeaders.link.c_str(), &details) == false)
+      {
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Link HTTP Header must be a valid URL", details);
+        return false;
+      }
+
       if ((ciP->contextP = orionldContextCreateFromUrl(ciP, ciP->httpHeaders.link.c_str(), &details)) == NULL)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from URL", details);
         return false;
       }
-      LM_TMP(("Request context '%s' at %p", ciP->contextP->url, ciP->contextP));
     }
     else
     {
       LM_T(LmtUriExpansion, ("Setting the context to the default context"));
       ciP->contextP = &orionldDefaultContext;
-      LM_TMP(("Request context '%s' at %p", ciP->contextP->url, ciP->contextP));
     }
 
     return true;
@@ -809,7 +812,9 @@ static bool contextTreat
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from URL", details);
       return false;
     }
-    LM_TMP(("Request context '%s' at %p", ciP->contextP->url, ciP->contextP));
+
+    orionldContextListInsert(ciP->contextP);
+    ciP->contextToBeFreed = false;  // context has been added to public list - must not be freed
   }
   else if (contextNodeP->type == KjArray)
   {
@@ -822,9 +827,12 @@ static bool contextTreat
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from tree", details);
       return false;
     }
-    ciP->contextToBeFreed = true;
 
-    LM_TMP(("Request context '%s' at %p", ciP->contextP->url, ciP->contextP));
+    //
+    // The context containing a vector of X context strings (URLs) must be freed
+    // The downloaded contexts though are added to the public list and will not be freed)
+    //
+    ciP->contextToBeFreed = true;
 
     LM_T(LmtContextTreat, ("The context is a VECTOR OF STRINGS"));
     for (KjNode* contextStringNodeP = contextNodeP->children; contextStringNodeP != NULL; contextStringNodeP = contextStringNodeP->next)
@@ -1117,8 +1125,6 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     return false;
   }
 
-  LM_TMP(("ciP->contextP at %p", ciP->contextP));
-  
   ciP->httpStatusCode = SccCreated;
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/entities/", idNodeP->value.s);
   httpHeaderLinkAdd(ciP, (ciP->contextP == NULL)? ORIONLD_DEFAULT_CONTEXT_URL : ciP->contextP->url);

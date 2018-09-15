@@ -44,7 +44,6 @@ OrionldContext* orionldContextLookup(const char* url)
   OrionldContext* contextP = orionldContextHead;
 
   LM_T(LmtContext, ("Looking up context '%s'", url));
-  LM_TMP(("Looking up context '%s'", url));
 
   while (contextP != NULL)
   {
@@ -52,7 +51,6 @@ OrionldContext* orionldContextLookup(const char* url)
     if (strcmp(contextP->url, url) == 0)
     {
       LM_T(LmtContextLookup, ("Found it!"));
-      LM_TMP(("Found context '%s'", url));
       return contextP;
     }
 
@@ -61,6 +59,6 @@ OrionldContext* orionldContextLookup(const char* url)
   }
 
   LM_T(LmtContextLookup, ("NOT Found"));
-  LM_TMP(("Can't find context '%s'", url));
+
   return NULL;
 }  

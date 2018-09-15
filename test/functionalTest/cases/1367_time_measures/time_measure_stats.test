@@ -326,7 +326,7 @@ Date: REGEX(.*)
 03. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: 451
+Content-Length: REGEX(.*)
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -370,7 +370,7 @@ Date: REGEX(.*)
 05. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: 477
+Content-Length: REGEX(.*)
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -435,7 +435,7 @@ Date: REGEX(.*)
 07. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: 422
+Content-Length: REGEX(.*)
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

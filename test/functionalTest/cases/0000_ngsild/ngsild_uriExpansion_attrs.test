@@ -107,7 +107,7 @@ MongoDB server version: REGEX(.*)
 	],
 	"attrs" : {
 		"http://uri=etsi=org/ngsi-ld/title" : {
-			"type" : "http://etsi.org/nsgi-ld/Property",
+			"type" : "http://uri.etsi.org/ngsi-ld/Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : {

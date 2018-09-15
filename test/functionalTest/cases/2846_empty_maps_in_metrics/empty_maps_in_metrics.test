@@ -94,7 +94,7 @@ Date: REGEX(.*)
 03. GET metrics and reset metrics at the same time
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 678
+Content-Length: REGEX(.*)
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -150,7 +150,7 @@ Date: REGEX(.*)
 04. GET metrics, see no 'emptied reported items'
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 461
+Content-Length: REGEX(.*)
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

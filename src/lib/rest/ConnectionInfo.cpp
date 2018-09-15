@@ -201,8 +201,6 @@ ConnectionInfo::ConnectionInfo(std::string _url, std::string _method, std::strin
 */
 ConnectionInfo::~ConnectionInfo()
 {
-  LM_TMP(("*********************************************** In ConnectionInfo destructor. ciP->contextP at %p", contextP));
-
   if (compoundValueRoot != NULL)
   {
     delete compoundValueRoot;
@@ -215,35 +213,27 @@ ConnectionInfo::~ConnectionInfo()
 #ifdef ORIONLD
   if (requestTree != NULL)
   {
-    LM_T(LmtFree, ("Calling kjFree for ciP->requestTree at %p", requestTree));
     kjFree(requestTree);
-    LM_T(LmtFree, ("kjFree'd ciP->requestTree"));
     requestTree = NULL;
   }
 
   if (responseTree != NULL)
   {
-    LM_T(LmtFree, ("Calling kjFree for ciP->responseTree at %p", responseTree));
     kjFree(responseTree);
-    LM_T(LmtFree, ("kjFree'd ciP->responseTree"));
     responseTree = NULL;
   }
 
-  if ((contextP != NULL) && (contextToBeFreed == true))
+  if ((contextP != NULL) && (contextP != &orionldDefaultContext) && (contextToBeFreed == true))
   {
-    LM_TMP(("Freeing contextP '%s' at: %p", contextP->url, contextP));
-    // contextP->tree points to part of the request payload - already freed by the call to "kjFree(requestTree)"
-    LM_T(LmtFree, ("Freeing contextP '%s' at: %p", contextP->url, contextP));
-    // orionldContextFree(contextP);  // FIXME: crash (double free) or leak ... FIX IT !!!
-    LM_T(LmtFree, ("Freed contextP at: %p", contextP));
+    LM_TMP(("Freeing REQUEST context '%s' at %p, tree at %p", contextP->url, contextP, contextP->tree));
+    // The tree is part of the requestTree, so it's already freed
+    free(contextP->url);
+    free(contextP);
     contextP = NULL;
   }
-  else
-    LM_TMP(("Not Freeing ciP->contextP: %p. %s", contextP, FT(contextToBeFreed)));
-  
-  LM_T(LmtFree, ("Freeing ciP->kjsonP at %p", kjsonP));
+
   free(kjsonP);
-  LM_T(LmtFree, ("Freed ciP->kjsonP at %p", kjsonP));
+  kjsonP = NULL;
 #endif
 }
 

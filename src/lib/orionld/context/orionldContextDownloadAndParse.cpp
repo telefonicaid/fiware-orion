@@ -37,11 +37,12 @@ extern "C"
 #include "orionld/common/orionldRequestSend.h"              // orionldRequestSend
 
 
+
 // -----------------------------------------------------------------------------
 //
 // orionldContextDownloadAndParse -
 //
-// The returned buffer must be freed by the caller
+// The returned tree must be freed by the caller
 //
 KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** detailsPP)
 {

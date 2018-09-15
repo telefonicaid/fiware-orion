@@ -53,6 +53,14 @@ extern OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const ch
 
 // ----------------------------------------------------------------------------
 //
+// orionldContextListInsert -
+//
+extern void orionldContextListInsert(OrionldContext* contextP);
+
+
+
+// ----------------------------------------------------------------------------
+//
 // orionldContextAdd -
 //
 extern OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsP);

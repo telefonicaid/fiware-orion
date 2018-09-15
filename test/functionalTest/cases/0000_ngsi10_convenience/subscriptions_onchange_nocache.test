@@ -581,6 +581,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "contextElement": {
                 "attributes": [
+#SORT_START
                     {
                         "name": "ligthstatus",
                         "type": "light",
@@ -591,6 +592,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                         "type": "degree",
                         "value": "t100"
                     }
+#SORT_END
                 ],
                 "id": "OfficeRoom",
                 "isPattern": "false",
@@ -620,6 +622,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "contextElement": {
                 "attributes": [
+#SORT_START
                     {
                         "name": "ligthstatus",
                         "type": "light",
@@ -630,6 +633,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                         "type": "degree",
                         "value": "t100"
                     }
+#SORT_END
                 ],
                 "id": "OfficeRoom",
                 "isPattern": "false",
@@ -659,6 +663,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "contextElement": {
                 "attributes": [
+#SORT_START
                     {
                         "name": "ligthstatus",
                         "type": "light",
@@ -669,6 +674,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                         "type": "degree",
                         "value": "t39"
                     }
+#SORT_END
                 ],
                 "id": "OfficeRoom",
                 "isPattern": "false",

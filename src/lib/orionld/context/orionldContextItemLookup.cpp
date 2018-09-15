@@ -68,17 +68,11 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
     contextP = &orionldDefaultContext;
   }
 
-  LM_TMP(("========== Looking up '%s' in context '%s'", itemName, contextP->url));
   if (contextP->tree == NULL)
   {
     LM_E(("The context '%s' has a NULL tree!", contextP->url));
     return NULL;
   }
-
-  LM_TMP(("========== The context tree is of type %s", kjValueType(contextP->tree->type)));
-
-  if (contextP->tree->type == KjObject)
-    LM_TMP(("========== First member is called '%s'", contextP->tree->children->name));
 
   if (contextP->tree->type == KjString)
   {
@@ -168,7 +162,6 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
   //
   // If we reach this point, the context is a JSON Object
   //
-  int      contextItemNo = 0;  // TMP
   KjNode*  atContextP    = contextP->tree->children;
 
   LM_T(LmtContextItemLookup, ("@atcontext is of type '%s'", kjValueType(atContextP->type)));
@@ -199,11 +192,6 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
         LM_E(("Invalid @context - items of contexts must be JSON Strings or jSOn objects - not %s", kjValueType(contextItemP->type)));
         return NULL;
       }
-
-      // <TMP>
-      LM_T(LmtContextItemLookup, ("contextItemNo: %d at %p (name: '%s')", contextItemNo, contextItemP, contextItemP->name));
-      ++contextItemNo;
-      // </TMP>
 
       //
       // Skip members whose value is a string that starts with "@" - they are information, not translations

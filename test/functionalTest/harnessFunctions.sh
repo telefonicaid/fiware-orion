@@ -350,7 +350,12 @@ function localBrokerStart()
   fi
 
   IPvOption=""
-  
+
+  #
+  # In case a previous broker died in a bad manner and the PID file has not been removed
+  #
+  \rm -f /tmp/orion_*.pid
+
   dbHost="${CB_DATABASE_HOST}"
   if [ "$dbHost" == "" ]
   then
@@ -512,6 +517,8 @@ function localBrokerStop
       fi
     fi
   fi
+
+  \rm -f /tmp/orion_*.pid
 }
 
 
@@ -584,7 +591,6 @@ function brokerStart()
 
   localBrokerStop $role
   localBrokerStart $role $traceLevels $ipVersion $xParams
-
 }
 
 
