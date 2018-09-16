@@ -8,7 +8,7 @@ in the API (e.g. `GET /v2/entities`, `GET /v2/subscriptions`,
 The mechanism is based on three URI parameters:
 
 -   **limit**, in order to specify the maximum number of elements (default
-    is 20, maximun allowed is 1000).
+    is 20, maximum allowed is 1000).
 
 -   **offset**, in order to skip a given number of elements at the
     beginning (default is 0)
@@ -51,3 +51,20 @@ GET <orion_host>:1026/v2/entities?offset=1000&limit=100
 ...
 []
 ```
+
+## Ordering results
+
+In the case of entities query, the `orderBy` URL parameter can be used to
+specify an order different from creation time. In particular, the value of
+`orderBy` is a comma-separated list of attributes and the results are ordered
+by the first attribute. On ties, the results are ordered by the second attribute and so on.
+A "!" before the attribute name means that the order is reversed. For example:
+
+    GET <orion_host>:1026/v2/entities?orderBy=temperature,!humidity
+
+orders first by temperature in ascending order, then by humidity in decreasing order
+in the case of temperature ties.
+
+Note that the special keywords `dateCreated` and `dateModified` can be used as
+elements in the `orderBy` comma-separated list (including the `!` syntax) to mean
+entity creation time and entity modification time respectively.
