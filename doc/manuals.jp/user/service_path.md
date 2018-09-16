@@ -2,7 +2,7 @@
 
 ## エンティティ・サービスパス
 
-Orion Context Broker は階層スコープをサポートしているため、[updateContext](walkthrough_apiv1.md#update-context-elements) (または [関連するコンビニエンス・オペレーション](walkthrough_apiv1.md#convenience-update-context)) を使用して、作成時にエンティティをスコープに割り当てることができます。次に、[queryContext](walkthrough_apiv1.md#query-context-operation)および [subscribeContext](walkthrough_apiv1.md#context-subscriptions) (および関連するコンビニエンス・オペレーション) も、対応するスコープのエンティティを見つけるためにスコープ指定することができます。
+Orion Context Broker は階層スコープをサポートしているため、[作成時](walkthrough_apiv2.md#entity-creation)にエンティティをスコープに割り当てることができます。[クエリ](walkthrough_apiv2.md#query-entity)と[サブスクリプション](walkthrough_apiv2.md#subscriptions)のスコープを設定して、対応するスコープのエンティティを特定することもできます。
 
 たとえば、次のスコープ (図に示す) を使用する Orion ベースのアプリケーションを考えてみましょう :
 
@@ -40,7 +40,7 @@ Orion Context Broker は階層スコープをサポートしているため、[u
 
 -   エンティティは1つのスコープ (そして、1つだけ) に属します
 
--   Orion によって送信された NGSI10 notifyContext リクエストには、Fiware-ServicePath ヘッダが含まれています
+-   Orion から送信された通知リクエストには、Fiware-ServicePath ヘッダが含まれています
 
 -   スコープエンティティは、[マルチサービス/マルチテナント機能](multitenancy.md#multi-service-tenancy)と直交して組み合わせることができます。その場合、各 "scope tree (スコープ・ツリー)" は異なるサービス/テナントに存在し、完全なデータベースベースの分離で同じ名前を使用することもできます。下の図を参照してください
 

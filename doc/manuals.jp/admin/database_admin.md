@@ -110,7 +110,7 @@ Orion Context Broker には、`/usr/share/contextBroker` ディレクトリ内�
 <a name="deleting-expired-documents"></a>
 ### 期限切れのドキュメントの削除
 
-NGSI は、レジストレーションとサブスクリプション (NGSI9 と NGSI10 サブスクリプションの両方) の有効期限を指定します。期限切れのレジストレーション/サブスクリプションはサブスクリプション更新リクエストを使用して "再アクティブ化" することができて、期間を変更するため、Orion Context Broker は期限切れのドキュメントを削除しません (無視されます)。
+NGSI は、レジストレーションとサブスクリプション (コンテキストとコンテキスト・アベイラビリティの両方のサブスクリプション) の有効期限を指定します。期限切れのレジストレーション/サブスクリプションはサブスクリプション更新リクエストを使用して "再アクティブ化" することができて、期間を変更するため、Orion Context Broker は期限切れのドキュメントを削除しません (無視されます)。
 
 ただし、有効期限が切れたレジストレーション/サブスクリプションはデータベース内の領域を消費するため、時々 "パージ" することができます。その作業を手助けするために、garbage- collector.py スクリプトが Orion Context Broker (RPM のインストール後に /usr/share/contextBroker/garbage-collector.py にあります) と一緒に提供されています。
 
@@ -164,30 +164,7 @@ Ej:
 <a name="orion-errors-due-to-databa"></a>
 ## データベースによる Orion エラー
 
-大きなオフセット値を使用してエンティティを取得し、このエラーを取得する場合は、次のようにします (NGSIv1) :
-
-```
-GET  /v1/contextEntities?offset=54882
-
-{
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "",
-        "isPattern" : "true",
-        "id" : ".*"
-      },
-      "statusCode" : {
-        "code" : "500",
-        "reasonPhrase" : "Internal Server Error",
-        "details" : "Sort operation used more than the maximum RAM. You should create an index. Check the Database Administration section in Orion documentation."
-      }
-    }
-  ]
-}
-```
-
-またはこの他の (NGSIv2) :
+大きなオフセット値を使用してエンティティを取得し、このエラーが発生した場合 :
 
 ```
 GET /v2/entities?offset=54882

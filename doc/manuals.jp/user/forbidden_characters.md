@@ -45,7 +45,7 @@
 
 ## ID フィールドの特定の制限事項
 
-NGSIv2 では、ID フィールド (エンティティ ID/ 型, 属性名/型, メタデータ名/型など) の構文制限が導入されています。これについては、[NGSI v2 仕様](http://telefonicaid.github.io/fiware-orion/api/v2/stable/)の "Field syntax restrictions" のセクションで説明しています。[ドキュメントのこのセクションで説明](v1_v2_coexistence.md#checking-id-fields)しているように、NGSIv1 用に有効にすることもできます。
+NGSIv2 では、ID フィールド (エンティティ ID/型, 属性名/型, メタデータ名/型など) の構文制限が導入されています。これについては、[NGSI v2 仕様](http://telefonicaid.github.io/fiware-orion/api/v2/stable/)の "Field syntax restrictions" のセクションで説明しています。
 
 ### カスタムペイロード特別扱い
 

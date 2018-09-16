@@ -16,7 +16,7 @@ Orion CLI スイッチの詳細については 、[管理マニュアル](../adm
 
         contextBroker -corsOrigin specificdomain.com 
 
-CORS はすべての `/v2` リソースで使用できますが、`/v1` リソースに対しては [シンプルな GET リクエスト](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#Simple_requests)でのみ使用できます。
+CORS はすべての `/v2` リソースで使用できます。
 
 ## アクセス制御の許可オリジン
 
