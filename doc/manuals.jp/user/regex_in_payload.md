@@ -1,24 +1,8 @@
 # ペイロードでの正規表現の使用 (Using regular expressions in payloads)
 
-いくつかのオペレーション (NGSIv1 と NGSIv2 の両方) では、次のように正規表現を使用できます。サポートされている正規表現のセットは、POSIX 拡張です (詳細は [こちら](https://stackoverflow.com/questions/46888312/regular-expressions-in-orion-context-broker)を参照してください)。
+いくつかのオペレーションでは、次のように正規表現を使用できます。サポートされている正規表現のセットは、POSIX 拡張です (詳細は [こちら](https://stackoverflow.com/questions/46888312/regular-expressions-in-orion-context-broker)を参照してください)。
 
-NGSIv1 の例 :
-
-```
-POST /v1/queryContext
-
-{
-  "entities": [
-    {
-      "type": "Sensor",
-      "isPattern": "true",
-      "id": ".*"
-    }
-  ]
-}
-```
-
-NGSIv2 の例 :
+例 :
 
 ```
 POST /v2/op/query
@@ -35,21 +19,7 @@ POST /v2/op/query
 
 正規表現言語では、バックスラッシュ (`\`) を使用できます。たとえば、`SENSOR\d{2}` は、SENSOR と2桁の数字が続く文字列と一致します。ただし、`\` は JSON の特殊文字です。[JSON 仕様](http://www.json.org)によれば、それは `\\` でエンコードする必要があります。
 
-```
-POST /v1/queryContext
-
-{
-  "entities": [
-    {
-      "type": "Sensor",
-      "isPattern": "true",
-      "id": "SENSOR\\d{2}"
-    }
-  ]
-}
-```
-
-NGSIv2 の例 :
+例 :
 
 ```
 POST /v2/op/query

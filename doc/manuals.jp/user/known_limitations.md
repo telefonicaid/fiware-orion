@@ -46,13 +46,6 @@ MongoDB レイヤの制限により、エンティティ ID、型およびサー
 
 それ以外の場合は、エンティティ作成時にエラーが発生します。
 
-## 期間 (duration) のフォーマット
-
-[ISO 8601 期間](https://en.wikipedia.org/wiki/ISO_8601#Durations) はいくつかのフォーマットを採用することができます。次の制約は、NGSIv1 API で Orion がサポートしている制約に適用されます (NGSIv2 では ISO 6801 の期間は使用されません) :
-
-* DT[n]H[n]M[n]S がサポートされています (P[n]W 形式はサポートされていません)
-* 小数部分は秒 (S) でサポートされますが、他の要素ではサポートされません
-
 ## エンティティ・フィールドのサイズ制限
 
 基礎となる DB の制限 (詳細は [こちら](https://github.com/telefonicaid/fiware-orion/issues/1289)) により、エンティティ ID、エンティティ型、エンティティサービスパスの合計サイズ (合計) は1014文字を超えることはできません (これは typo ではなく、1024 - 10 に相当します。;)。上限を超えようとすると、"Too long entity id/type/servicePath combination" という 400 Bad Request エラーが発生します。

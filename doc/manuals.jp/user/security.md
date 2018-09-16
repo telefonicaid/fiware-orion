@@ -20,20 +20,9 @@ Orion ContextBroker は `-https` をオプションを使用して、HTTPS を�
 
 Orion によってエクスポートされた API サーバで HTTPS を使用する以外に、通知で HTTPS を使用することもできます。これを行うには、サブスクリプションで URL の中に "https" プロトコル・スキーマを使用する必要があります。
 
-
-NGSIv2 :
-
 ```
   ...
   "url": "https://mymachime.example.com:1028/notify"
-  ...
-```
-
-NGSIv1 :
-
-```
-  ...
-  "reference": "https://mymachime.example.com:1028/notify"
   ...
 ```
 

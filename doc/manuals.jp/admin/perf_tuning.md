@@ -8,9 +8,9 @@
 * [Orion スレッド・モデルとその意味](#orion-thread-model-and-its-implications)
 * [ファイル・ディスクリプタのサイジング](#file-descriptors-sizing)
 * [semWait 統計を見るボトルネックの特定](#identifying-bottlenecks-looking-at-semwait-statistics)
-* [パフォーマンスへの影響をログ](#log-impact-on-performance)
-* [パフォーマンスへの影響のメトリクス](#metrics-impact-on-performance)
-* [パフォーマンスへの影響のミューテックス・ポリシー](#mutex-policy-impact-on-performance)
+* [ログによるパフォーマンスへの影響](#log-impact-on-performance)
+* [メトリクスによるパフォーマンスへの影響](#metrics-impact-on-performance)
+* [ミューテックス・ポリシーによるパフォーマンスへの影響](#mutex-policy-impact-on-performance)
 * [発信 HTTP 接続のタイムアウト](#outgoing-http-connections-timeout)
 * [サブスクリプション・キャッシュ](#subscription-cache)
 * [ジオ・サブスクリプションのパフォーマンスに関する考慮事項](#geo-subscription-performance-considerations)
@@ -168,26 +168,26 @@ Orion で多数のクライアント接続を CLOSE_WAIT 状態にすること�
 
 * **request** : このメトリックの値が異常に高い場合は、要求を処理する内部ロジック・モジュールに入る前にスレッドが多すぎる時間待機することを意味します。その場合、"none" ポリシーを使用することを検討してください ("none" ポリシーが使用されている場合、このメトリックの値は常に0です)。[mutex ポリシーに関するセクション](#mutex-policy-impact-on-performance) を見てください
 
-その他のメトリック (timeStat, transaction, subcache) は、内部の低レベルセマフォー用です。これらのメトリックは、主に Orion 開発者向けで、コード内のバグを識別するのに役立ちます。これらの価値はあまり高くありません。
+その他のメトリック (timeStat, transaction, subcache) は、内部の低レベルセマフォ用です。これらのメトリックは、主に Orion 開発者向けで、コード内のバグを識別するのに役立ちます。これらの価値はあまり高くありません。
 
 [トップ](#top)
 
 <a name="log-impact-on-performance"></a>
-## パフォーマンスへの影響をログ
+## ログによるパフォーマンスへの影響
 
-[ログ](logs.md)はパフォーマンスに重大な影響を与えます。したがって、高レベルのシナリオでは、`-logLevel` ERROR または WARN を使用することをお勧めします。いくつかの状況で、`-logLevel WARN` と `-logLevel INFO` 間の節約は、パフォーマンスが約50％になる可能性があることを発見しました。
+[ログ](logs.md)はパフォーマンスに重大な影響を与えます。したがって、高レベルのシナリオでは、`-logLevel` ERROR または WARN を使用することをお勧めします。いくつかの状況で、`-logLevel WARN` と `-logLevel INFO` 間の節約は、パフォーマンスが約50%になる可能性があることを発見しました。
 
 [トップ](#top)
 
 <a name="metrics-impact-on-performance"></a>
-## パフォーマンスへの影響のメトリクス
+## メトリクスによるパフォーマンスへの影響
 
-システムコールとセマフォーが関係しているため、メトリックの測定値はパフォーマンスに影響を与える可能性があります。`-disableMetrics` [CLI パラメータ](cli.md)を使用して、この機能を無効にすることができます (パフォーマンスが向上します)。
+システムコールとセマフォが関係しているため、メトリックの測定値はパフォーマンスに影響を与える可能性があります。`-disableMetrics` [CLI パラメータ](cli.md)を使用して、この機能を無効にすることができます (パフォーマンスが向上します)。
 
 [トップ](#top)
 
 <a name="mutex-policy-impact-on-performance"></a>
-## パフォーマンスへの影響のミューテックス・ポリシー
+## ミューテックス・ポリシーによるパフォーマンスへの影響
 
 Orion は4種類のポリシーをサポートしています (`-reqMutexPolicy` で設定可能) :
 
@@ -219,7 +219,7 @@ Orion は4種類のポリシーをサポートしています (`-reqMutexPolicy`
 <a name="subscription-cache"></a>
 ## サブスクリプション・キャッシュ
 
-Orion は、通知トリガーを高速化するために、コンテキスト・サブスクリプション (NGSI10) キャッシュを実装しています。現在のバージョンでは (これは将来変更される可能性があります)、コンテキスト・アベイラビリティ・サブスクリプション (NGSI9) はキャッシュを使用しません。
+Orion は、通知トリガーを高速化するために、コンテキスト・サブスクリプション・キャッシュを実装しています。現在のバージョンでは (これは将来変更される可能性があります)、コンテキスト・アベイラビリティ・サブスクリプションはキャッシュを使用しません。
 
 キャッシュ同期期間は、`-subCacheIval` により制御されます (デフォルトでは60秒です)。同期には2つの異なるタスクがあります :
 
