@@ -168,7 +168,7 @@ Please have a look to the section [on building the source code](doc/manuals/admi
 * Container-based deployment
   * [Docker](docker/README.md)
   * [Docker Swarm and HA](docker/docker_swarm.md)
-* [Development Manual](doc/manuals/devel/README.md)
+* Development Manual [(en)](doc/manuals/devel/README.md) [(jp)](doc/manuals.jp/devel/README.md)
 * [Sample code contributions](doc/manuals/code_contributions.md)
 * [Contribution guidelines](doc/manuals/contribution_guidelines.md), especially important if you plan to contribute with code
   to Orion Context Broker
