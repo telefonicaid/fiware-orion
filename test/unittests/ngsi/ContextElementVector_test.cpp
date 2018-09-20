@@ -38,16 +38,16 @@
 */
 TEST(ContextElementVector, render)
 {
-  ContextElement*       ceP = new ContextElement();
-  EntityId              eId("E_ID", "E_TYPE");
+  Entity*               eP = new Entity();
   std::string           rendered;
   ContextElementVector  ceV;
 
   rendered = ceV.render(false, UpdateContextElement, false);
   EXPECT_STREQ("", rendered.c_str());
 
-  ceP->entityId = eId;
-  ceV.push_back(ceP);
+  eP->id   = "E_ID";
+  eP->type = "E_TYPE";
+  ceV.push_back(eP);
 
   rendered = ceV.render(false, UpdateContextElement, false);
 

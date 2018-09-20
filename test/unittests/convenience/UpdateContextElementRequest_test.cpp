@@ -53,7 +53,7 @@ TEST(UpdateContextElementRequest, render_json)
   // Just the normal case
   ucer.contextAttributeVector.push_back(&ca);
 
-  out = ucer.render(V1, false, UpdateContext);
+  out = ucer.render(false, UpdateContext);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

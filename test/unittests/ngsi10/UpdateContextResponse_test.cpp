@@ -81,7 +81,7 @@ TEST(UpdateContextResponse, jsonRender)
   // Test 03. ContextElement: +entityId -contextAttributeVector
   cerP = new ContextElementResponse();
 
-  cerP->contextElement.entityId.fill("E01", "EType", "false");
+  cerP->entity.fill("E01", "EType", "false");
   cerP->statusCode.fill(SccOk);
   ucrP->contextElementResponseVector.push_back(cerP);
 
@@ -93,7 +93,7 @@ TEST(UpdateContextResponse, jsonRender)
 
   // Test 04. ContextElement: +entityId +contextAttributeVector
   caP = new ContextAttribute("ca5", "string", "context attribute 5");
-  cerP->contextElement.contextAttributeVector.push_back(caP);
+  cerP->entity.attributeVector.push_back(caP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename5)) << "Error getting test data from '" << filename5 << "'";
   out = ucrP->render(false);
@@ -103,7 +103,7 @@ TEST(UpdateContextResponse, jsonRender)
 
   // Test 05. ContextElement: contextAttributeVector of two attributes
   caP = new ContextAttribute("ca11", "string", "context attribute 11");
-  cerP->contextElement.contextAttributeVector.push_back(caP);
+  cerP->entity.attributeVector.push_back(caP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename11)) << "Error getting test data from '" << filename11 << "'";
   out = ucrP->render(false);
@@ -114,7 +114,7 @@ TEST(UpdateContextResponse, jsonRender)
   // Test 06. UpdateContextResponse::contextElementResponseVector of TWO responses
   cerP = new ContextElementResponse();
 
-  cerP->contextElement.entityId.fill("E02", "EType", "false");
+  cerP->entity.fill("E02", "EType", "false");
   cerP->statusCode.fill(SccOk);
   ucrP->contextElementResponseVector.push_back(cerP);
 

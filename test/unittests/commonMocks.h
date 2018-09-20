@@ -223,12 +223,14 @@ class NotifierMock : public Notifier
      */
   }
 
-  MOCK_METHOD7(sendNotifyContextRequest, void(NotifyContextRequest*            ncr,
+  MOCK_METHOD9(sendNotifyContextRequest, void(NotifyContextRequest&            ncr,
                                               const ngsiv2::HttpInfo&          httpInfo,
                                               const std::string&               tenant,
                                               const std::string&               xauthToken,
                                               const std::string&               fiwareCorrelator,
                                               RenderFormat                     renderFormat,
+                                              const std::vector<std::string>&  attrsFilter,
+                                              bool                             blacklist,
                                               const std::vector<std::string>&  metadataFilter));
 
     MOCK_METHOD5(sendNotifyContextAvailabilityRequest, void(NotifyContextAvailabilityRequest*  ncar,
@@ -238,15 +240,25 @@ class NotifierMock : public Notifier
                                                             RenderFormat                       renderFormat));
 
     /* Wrappers for parent methods (used in ON_CALL() defaults set in the constructor) */
-    void parent_sendNotifyContextRequest(NotifyContextRequest*            ncr,
+    void parent_sendNotifyContextRequest(NotifyContextRequest&            ncr,
                                          const ngsiv2::HttpInfo&          httpInfo,
                                          const std::string&               tenant,
                                          const std::string&               xauthToken,
                                          const std::string&               fiwareCorrelator,
                                          RenderFormat                     renderFormat,
+                                         const std::vector<std::string>&  attrsFilter,
+                                         bool                             blacklist,
                                          const std::vector<std::string>&  metadataFilter)
     {
-      Notifier::sendNotifyContextRequest(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, metadataFilter);
+      Notifier::sendNotifyContextRequest(ncr,
+                                         httpInfo,
+                                         tenant,
+                                         xauthToken,
+                                         fiwareCorrelator,
+                                         renderFormat,
+                                         attrsFilter,
+                                         blacklist,
+                                         metadataFilter);
     }
 
     void parent_sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest*  ncar,
@@ -296,7 +308,7 @@ class TimerMock : public Timer
  * Eq() matcher. FIXME */
 MATCHER_P(MatchNcr, expected, "")
 {
-  return matchNotifyContextRequest(expected, arg);
+  return matchNotifyContextRequest(expected, &arg);
 }
 
 

@@ -154,14 +154,14 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement*   ceP = new ContextElement();
+    Entity*           eP  = new Entity();
     ContextAttribute* caP = new ContextAttribute("A3", "TA3", "4, -5");
     Metadata*         mdP = new Metadata("location", "string", "WGS84");
 
-    ceP->entityId.fill("E3", "T3", "false");
+    eP->fill("E3", "T3", "false");
     caP->metadataVector.push_back(mdP);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
+    eP->attributeVector.push_back(caP);
+    req.contextElementVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
@@ -177,10 +177,10 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E3", RES_CER(0).entityId.id);
-    EXPECT_EQ("T3", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E3", RES_CER(0).id);
+    EXPECT_EQ("T3", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A3", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA3", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -285,13 +285,13 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E2", "T2", "false");
+    Entity* eP = new Entity();
+    eP->fill("E2", "T2", "false");
     ContextAttribute* caP = new ContextAttribute("A5", "TA5", "8, -9");
     Metadata* mdP = new Metadata("location", "string", "WGS84");
     caP->metadataVector.push_back(mdP);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
+    eP->attributeVector.push_back(caP);
+    req.contextElementVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
@@ -307,10 +307,10 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E2", RES_CER(0).entityId.id);
-    EXPECT_EQ("T2", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E2", RES_CER(0).id);
+    EXPECT_EQ("T2", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A5", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA5", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -404,11 +404,11 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "2, -4");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
+    eP->attributeVector.push_back(caP);
+    req.contextElementVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
@@ -424,10 +424,10 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -509,12 +509,12 @@ TEST(mongoUpdateContextGeoRequest, replaceLocAttributeWithSameLocAttribute)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "geo:point", "2, -4");
     caP->typeGiven = true;
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
+    eP->attributeVector.push_back(caP);
+    req.contextElementVector.push_back(eP);
     req.updateActionType = ActionTypeReplace;
 
     /* Invoke the function in mongoBackend library */
@@ -530,10 +530,10 @@ TEST(mongoUpdateContextGeoRequest, replaceLocAttributeWithSameLocAttribute)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("geo:point", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -609,12 +609,12 @@ TEST(mongoUpdateContextGeoRequest, replaceLocAttributeWithDifferentLocAttribute)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A2", "geo:point", "2, -4");
     caP->typeGiven = true;
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
+    eP->attributeVector.push_back(caP);
+    req.contextElementVector.push_back(eP);
     req.updateActionType = ActionTypeReplace;
 
     /* Invoke the function in mongoBackend library */
@@ -630,10 +630,10 @@ TEST(mongoUpdateContextGeoRequest, replaceLocAttributeWithDifferentLocAttribute)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("geo:point", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -709,12 +709,12 @@ TEST(mongoUpdateContextGeoRequest, replaceLocAttributeWithNoLocAttribute)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "noLoc");
     caP->typeGiven = true;
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
+    eP->attributeVector.push_back(caP);
+    req.contextElementVector.push_back(eP);
     req.updateActionType = ActionTypeReplace;
 
     /* Invoke the function in mongoBackend library */
@@ -730,10 +730,10 @@ TEST(mongoUpdateContextGeoRequest, replaceLocAttributeWithNoLocAttribute)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -806,12 +806,12 @@ TEST(mongoUpdateContextGeoRequest, replaceNoLocAttributeWithLocAttribute)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E2", "T2", "false");
+    Entity* eP = new Entity();
+    eP->fill("E2", "T2", "false");
     ContextAttribute* caP = new ContextAttribute("A2", "geo:point", "2, -4");
     caP->typeGiven = true;
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
+    eP->attributeVector.push_back(caP);
+    req.contextElementVector.push_back(eP);
     req.updateActionType = ActionTypeReplace;
 
     /* Invoke the function in mongoBackend library */
@@ -827,10 +827,10 @@ TEST(mongoUpdateContextGeoRequest, replaceNoLocAttributeWithLocAttribute)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E2", RES_CER(0).entityId.id);
-    EXPECT_EQ("T2", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E2", RES_CER(0).id);
+    EXPECT_EQ("T2", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("geo:point", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -916,11 +916,11 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
+    eP->attributeVector.push_back(caP);
+    req.contextElementVector.push_back(eP);
     req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
@@ -936,10 +936,10 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -1012,20 +1012,20 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
+    Entity* eP = new Entity();
     ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "2, -4");
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "5, -6");
     Metadata*         md1P = new Metadata("location", "string", "WGS84");
     Metadata*         md2P = new Metadata("location", "string", "WGS84");
 
-    ceP->entityId.fill("E3", "T3", "false");
+    eP->fill("E3", "T3", "false");
 
     ca1P->metadataVector.push_back(md1P);
-    ceP->contextAttributeVector.push_back(ca1P);
+    eP->attributeVector.push_back(ca1P);
 
     ca2P->metadataVector.push_back(md2P);
-    ceP->contextAttributeVector.push_back(ca2P);
-    req.contextElementVector.push_back(ceP);
+    eP->attributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
@@ -1041,10 +1041,10 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E3", RES_CER(0).entityId.id);
-    EXPECT_EQ("T3", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E3", RES_CER(0).id);
+    EXPECT_EQ("T3", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(2, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -1138,13 +1138,13 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E3", "T3", "false");
+    Entity* eP = new Entity();
+    eP->fill("E3", "T3", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "invalid");
     Metadata* mdP = new Metadata("location", "string", "WGS84");
     caP->metadataVector.push_back(mdP);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
+    eP->attributeVector.push_back(caP);
+    req.contextElementVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
@@ -1160,10 +1160,10 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E3", RES_CER(0).entityId.id);
-    EXPECT_EQ("T3", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E3", RES_CER(0).id);
+    EXPECT_EQ("T3", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -1248,13 +1248,13 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E3", "T3", "false");
+    Entity* eP = new Entity();
+    eP->fill("E3", "T3", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "2, 4");
     Metadata* mdP = new Metadata("location", "string", "gurugu");
     caP->metadataVector.push_back(mdP);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
+    eP->attributeVector.push_back(caP);
+    req.contextElementVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
@@ -1270,10 +1270,10 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E3", RES_CER(0).entityId.id);
-    EXPECT_EQ("T3", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E3", RES_CER(0).id);
+    EXPECT_EQ("T3", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -1359,13 +1359,13 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A5", "TA5", "2, 4");
     Metadata* mdP = new Metadata("location", "string", "WGS84");
     caP->metadataVector.push_back(mdP);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
+    eP->attributeVector.push_back(caP);
+    req.contextElementVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
@@ -1381,10 +1381,10 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A5", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA5", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -1472,13 +1472,13 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E2", "T2", "false");
+    Entity* eP = new Entity();
+    eP->fill("E2", "T2", "false");
     ContextAttribute* caP = new ContextAttribute("A5", "TA5", "erroneous");
     Metadata* mdP = new Metadata("location", "string", "WGS84");
     caP->metadataVector.push_back(mdP);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
+    eP->attributeVector.push_back(caP);
+    req.contextElementVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
@@ -1494,10 +1494,10 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E2", RES_CER(0).entityId.id);
-    EXPECT_EQ("T2", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E2", RES_CER(0).id);
+    EXPECT_EQ("T2", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A5", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA5", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -1585,13 +1585,13 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E2", "T2", "false");
+    Entity* eP = new Entity();
+    eP->fill("E2", "T2", "false");
     ContextAttribute* caP = new ContextAttribute("A5", "TA5", "8, -9");
     Metadata* mdP = new Metadata("location", "string", "gurugu");
     caP->metadataVector.push_back(mdP);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
+    eP->attributeVector.push_back(caP);
+    req.contextElementVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
@@ -1607,10 +1607,10 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E2", RES_CER(0).entityId.id);
-    EXPECT_EQ("T2", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E2", RES_CER(0).id);
+    EXPECT_EQ("T2", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A5", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA5", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -1697,11 +1697,11 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "invalid");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
+    eP->attributeVector.push_back(caP);
+    req.contextElementVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
@@ -1717,10 +1717,10 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -1805,13 +1805,13 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A2", "TA2", "2, -4");
     Metadata* mdP = new Metadata("location", "string", "WGS84");
     caP->metadataVector.push_back(mdP);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
+    eP->attributeVector.push_back(caP);
+    req.contextElementVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
@@ -1827,10 +1827,10 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -1917,13 +1917,13 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
     Metadata* mdP = new Metadata("location", "string", "WGS84");
     caP->metadataVector.push_back(mdP);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
+    eP->attributeVector.push_back(caP);
+    req.contextElementVector.push_back(eP);
     req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
@@ -1939,10 +1939,10 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
