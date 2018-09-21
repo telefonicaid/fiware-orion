@@ -45,6 +45,7 @@ function _usage()
     -J                   execute fix for jenkins
     -q   --speed         execute fix for functional tests during testing (improve speed)
     -Q                   execute fix for functional tests
+    -a   --attempts      attempts to execute functional test
     -e   --execute       run (rerun) test stand with 2 orions
     -H   --show          show the list of necessary commands that should be executed before starting functional tests manually
 
@@ -172,11 +173,12 @@ do
        --speed) set -- "$@" -q ;;
        --execute) set -- "$@" -e ;;
        --show) set -- "$@" -H ;;
+       --attempts) set -- "$@" -a ;;
        *) set -- "$@" "$arg" ;;
     esac
 done
 
-while getopts ":hb:S:p:s:midtr:ujJqQeH" opt; do
+while getopts ":hb:S:p:s:midtr:ujJqQeHa:" opt; do
     case ${opt} in
         h)  _usage; exit 0 ;;
         b)  branch=$OPTARG ;;
@@ -195,6 +197,7 @@ while getopts ":hb:S:p:s:midtr:ujJqQeH" opt; do
         Q)  fix_Q=true ;;
         e)  execute=true ;;
         H)  show=true ;;
+        a)  attempts=$OPTARG ;;
         *) _usage ;;
         :)
         echo "option -$OPTARG requires an argument"
@@ -318,6 +321,8 @@ if [ -n "${test}" ] && [ "${stage}" = "functional" ]; then
     if [ -n "${fix_q}" ]; then _fix_tests; fi
 
     _fix
+
+    if [ -n "${attempts}" ]; then export CB_MAX_TRIES=${attempts}; fi
 
     make functional INSTALL_DIR=~
     if [ $? -ne 0 ]; then status=false; else status=true; fi

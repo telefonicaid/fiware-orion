@@ -87,7 +87,7 @@ install_functional: install
 functional:
 	@echo '------------------------------------- make functional ----------------------------------'
 
-	./test/functionalTest/testHarness.sh
+	./test/functionalTest/testHarness.sh --stopOnError
 
 style:
 	@echo '------------------------------------- make style ---------------------------------------'
