@@ -105,6 +105,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       LM_TMP(("ciP->kjsonP at %p", ciP->kjsonP));
       ciP->responsePayloadAllocated = true;
       kjRender(ciP->kjsonP, ciP->responseTree, ciP->responsePayload, 1024);
+      LM_TMP(("ciP->kjsonP->iVec at     %p", ciP->kjsonP->iVec));
+      LM_TMP(("ciP->kjsonP->iStrings at %p", ciP->kjsonP->iStrings));
     }
     else
     {

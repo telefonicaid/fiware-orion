@@ -39,7 +39,7 @@ bool orionldDeleteEntity(ConnectionInfo* ciP)
 {
   LM_T(LmtServiceRoutine, ("In orionldDeleteEntity"));
 
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented DELETE /ngsi-ld/v1/entities/*", ciP->wildcard[0]);
+  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented DELETE /ngsi-ld/v1/entities/*", ciP->wildcard[0], OrionldDetailsString);
 
   ciP->httpStatusCode = SccNotImplemented;
 

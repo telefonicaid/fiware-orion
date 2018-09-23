@@ -54,6 +54,10 @@
 // URI parameters for 'admin' requests
 #define URI_PARAM_LEVEL                   "level"
 
+// URI parameters for JSON output format
+#define URI_PARAM_PRETTY_PRINT            "prettyPrint"
+#define URI_PARAM_SPACES                  "spaces"
+
 
 
 /* ****************************************************************************

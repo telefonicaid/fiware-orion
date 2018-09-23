@@ -111,7 +111,7 @@ echo
 ================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: http;//FIXME.array.context.needs/url
+Link: http://FIXME.array.context.needs/url
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
 Date: REGEX(.*)
 
@@ -175,4 +175,4 @@ bye
 
 --TEARDOWN--
 brokerStop CB
-#dbDrop CB
+dbDrop CB

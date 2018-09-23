@@ -39,7 +39,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 {
   LM_T(LmtServiceRoutine, ("In orionldPatchEntity"));
 
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - PATCH /ngsi-ld/v1/entities/*/attrs", ciP->wildcard[0]);
+  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - PATCH /ngsi-ld/v1/entities/*/attrs", ciP->wildcard[0], OrionldDetailsString);
 
   ciP->httpStatusCode = SccNotImplemented;
 

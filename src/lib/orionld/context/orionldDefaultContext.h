@@ -49,11 +49,12 @@ extern "C"
 // If an expansion is not found for an Entity Type or Attribute Name/Type,
 // use this prefix as default expansion and append the "not found" Name/Type.
 //
-// E.g., if the lookup the expansion for the Attribute Name "A1" returns NULLm
+// E.g., if the lookup the expansion for the Attribute Name "A1" returns NULL,
 //       then use ORIONLD_DEFAULT_EXPANSION_URL_DIR_XXX + "A1" as expansion
 //
 #define ORIONLD_DEFAULT_EXPANSION_URL_DIR_ENTITY    "http://www.example.org/entities/"
 #define ORIONLD_DEFAULT_EXPANSION_URL_DIR_ATTRIBUTE "http://www.example.org/attributes/"
+#define ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT   "http://www.example.org/default/"
 
 
 

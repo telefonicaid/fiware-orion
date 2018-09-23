@@ -151,84 +151,84 @@ echo
 01. @context is a Boolean
 =========================
 HTTP/1.1 400 Bad Request
-Content-Length: 120
+Content-Length: 118
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "@context",
     "title": "Not a JSON array nor string",
-    "type": "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 02. @context is a Number
 =======================
 HTTP/1.1 400 Bad Request
-Content-Length: 120
+Content-Length: 118
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "@context",
     "title": "Not a JSON array nor string",
-    "type": "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 03. @context is an object
 =========================
 HTTP/1.1 400 Bad Request
-Content-Length: 120
+Content-Length: 118
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "@context",
     "title": "Not a JSON array nor string",
-    "type": "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 04. @context is an empty string
 ===============================
 HTTP/1.1 400 Bad Request
-Content-Length: 183
+Content-Length: 181
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "URL parse error - no colon found - cannot determine the protocol",
     "title": "failure to create context from URL",
-    "type": "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 05. URL in context is an invalid URL
 ====================================
 HTTP/1.1 400 Bad Request
-Content-Length: 183
+Content-Length: 181
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "URL parse error - no colon found - cannot determine the protocol",
     "title": "failure to create context from URL",
-    "type": "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 06. URL in context is a valid URL but it doesn't exist
 ======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 160
+Content-Length: 158
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "internal error at sending of curl request",
     "title": "failure to create context from URL",
-    "type": "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
 }
 
 

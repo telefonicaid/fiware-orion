@@ -244,7 +244,7 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
 {
   std::string subService = "not-set";
 
-  if (on == false)
+  if ((on == false) || (srv == ""))
   {
     return;
   }

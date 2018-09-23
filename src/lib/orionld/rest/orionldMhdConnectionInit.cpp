@@ -196,6 +196,11 @@ int orionldMhdConnectionInit
   ConnectionInfo* ciP = new ConnectionInfo();
 
   //
+  // Mark connection as NGSI-LD V1  
+  //
+  ciP->apiVersion = NGSI_LD_V1;
+
+  //
   // Remember ciP for consequent connection callbacks from MHD
   //
   *con_cls = ciP;
@@ -208,10 +213,6 @@ int orionldMhdConnectionInit
     LM_X(1, ("Out of memory"));
   LM_TMP(("Allocated ciP->kjsonP at %p", ciP->kjsonP));
 
-  ciP->kjsonP->spacesPerIndent   = 0;
-  ciP->kjsonP->nlString          = (char*) "";
-  ciP->kjsonP->stringBeforeColon = (char*) "";
-  ciP->kjsonP->stringAfterColon  = (char*) "";
 
   //
   // The 'connection', as given by MHD is very important. No responses can be sent without it
@@ -273,28 +274,52 @@ int orionldMhdConnectionInit
     return MHD_YES;
   }
 
-  // 4.  Get HTTP Headers
+  // 5.  Get HTTP Headers
   MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
 
-  // 5.  Check that GET/DELETE has no payload
-  // 6.  Check that POST/PUT/PATCH has payload
-  // 7.  Check validity of tenant
-  // 8.  Check Accept header
-  // 9.  Check URL path is OK
-  // 10. Check Content-Type is accepted
+  // 6. Set servicePath: "/#" for GET requests, "/" for all others (ehmmm ... creation of subscriptions ...)
+  ciP->servicePathV.push_back((ciP->verb == GET)? "/#" : "/");
+
+  
+  // 7.  Check that GET/DELETE has no payload
+  // 8.  Check that POST/PUT/PATCH has payload
+  // 9.  Check validity of tenant
+  // 10. Check Accept header
+  // 11. Check URL path is OK
+  // 12. Check Content-Type is accepted
   LM_T(LmtHttpHeaders, ("Content-Type: %s", ciP->httpHeaders.contentType.c_str()));
   LM_T(LmtHttpHeaders, ("Accepted: %s", ciP->httpHeaders.accept.c_str()));
 
-  // 11. Get URI parameters
+  // 13. Get URI parameters
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
 
-  // 12. Check ...
+  // 14. Check ...
 
   // 20. Lookup the Service Routine
   // 21. Not found?  Look it up in the badVerb vector
   // 22. Not found still? Return error
-  // 23. Done - next step is to read the payload
-  
+
+
+  //
+  // 23. Format of response payload
+  //
+  if (ciP->prettyPrint == true)
+  {
+    // Human readable output
+    ciP->kjsonP->spacesPerIndent   = ciP->prettyPrintSpaces;
+    ciP->kjsonP->nlString          = (char*) "\n";
+    ciP->kjsonP->stringBeforeColon = (char*) "";
+    ciP->kjsonP->stringAfterColon  = (char*) " ";
+  }
+  else
+  {
+    // By default, no whitespace in output
+    ciP->kjsonP->spacesPerIndent   = 0;
+    ciP->kjsonP->nlString          = (char*) "";
+    ciP->kjsonP->stringBeforeColon = (char*) "";
+    ciP->kjsonP->stringAfterColon  = (char*) "";
+  }
+
   LM_T(LmtMhd, ("Connection Init DONE"));
   return MHD_YES;
 }

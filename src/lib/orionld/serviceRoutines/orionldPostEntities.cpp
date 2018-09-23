@@ -58,17 +58,17 @@ extern "C"
 //
 // DUPLICATE_CHECK -
 //
-#define DUPLICATE_CHECK(nodeP, pointer, what)                                                     \
-do                                                                                                \
-{                                                                                                 \
-  if (pointer != NULL)                                                                            \
-  {                                                                                               \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", "entity id");      \
-    return false;                                                                                 \
-  }                                                                                               \
-                                                                                                  \
-  pointer = nodeP;                                                                                \
-                                                                                                  \
+#define DUPLICATE_CHECK(nodeP, pointer, what)                                                                      \
+do                                                                                                                 \
+{                                                                                                                  \
+  if (pointer != NULL)                                                                                             \
+  {                                                                                                                \
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", "entity id", OrionldDetailsString); \
+    return false;                                                                                                  \
+  }                                                                                                                \
+                                                                                                                   \
+  pointer = nodeP;                                                                                                 \
+                                                                                                                   \
 } while (0)
 
 
@@ -77,14 +77,14 @@ do                                                                              
 //
 // OBJECT_CHECK -
 //
-#define OBJECT_CHECK(nodeP, what)                                                                 \
-do                                                                                                \
-{                                                                                                 \
-  if (nodeP->type != KjObject)                                                                    \
-  {                                                                                               \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON object", what);            \
-    return false;                                                                                 \
-  }                                                                                               \
+#define OBJECT_CHECK(nodeP, what)                                                                            \
+do                                                                                                           \
+{                                                                                                            \
+  if (nodeP->type != KjObject)                                                                               \
+  {                                                                                                          \
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON object", what, OrionldDetailsString); \
+    return false;                                                                                            \
+  }                                                                                                          \
 } while (0)
 
 
@@ -93,14 +93,14 @@ do                                                                              
 //
 // STRING_CHECK -
 //
-#define STRING_CHECK(nodeP, what)                                                                 \
-do                                                                                                \
-{                                                                                                 \
-  if (nodeP->type != KjString)                                                                    \
-  {                                                                                               \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON string", what);            \
-    return false;                                                                                 \
-  }                                                                                               \
+#define STRING_CHECK(nodeP, what)                                                                            \
+do                                                                                                           \
+{                                                                                                            \
+  if (nodeP->type != KjString)                                                                               \
+  {                                                                                                          \
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON string", what, OrionldDetailsString); \
+    return false;                                                                                            \
+  }                                                                                                          \
 } while (0)
 
 
@@ -109,14 +109,14 @@ do                                                                              
 //
 // ARRAY_CHECK -
 //
-#define ARRAY_CHECK(nodeP, what)                                                                  \
-do                                                                                                \
-{                                                                                                 \
-  if (nodeP->type != KjArray)                                                                     \
-  {                                                                                               \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON array", what);             \
-    return false;                                                                                 \
-  }                                                                                               \
+#define ARRAY_CHECK(nodeP, what)                                                                            \
+do                                                                                                          \
+{                                                                                                           \
+  if (nodeP->type != KjArray)                                                                               \
+  {                                                                                                         \
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON array", what, OrionldDetailsString); \
+    return false;                                                                                           \
+  }                                                                                                         \
 } while (0)
 
 
@@ -125,15 +125,15 @@ do                                                                              
 //
 // ARRAY_OR_STRING_CHECK -
 //
-#define ARRAY_OR_STRING_CHECK(nodeP, what)                                                        \
-do                                                                                                \
-{                                                                                                 \
-  if ((nodeP->type != KjArray) && (nodeP->type != KjString))                                      \
-  {                                                                                               \
-    LM_T(LmtPayloadCheck, ("the node is a '%s'", kjValueType(nodeP->type)));                      \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON array nor string", what);  \
-    return false;                                                                                 \
-  }                                                                                               \
+#define ARRAY_OR_STRING_CHECK(nodeP, what)                                                                             \
+do                                                                                                                     \
+{                                                                                                                      \
+  if ((nodeP->type != KjArray) && (nodeP->type != KjString))                                                           \
+  {                                                                                                                    \
+    LM_T(LmtPayloadCheck, ("the node is a '%s'", kjValueType(nodeP->type)));                                           \
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON array nor string", what, OrionldDetailsString); \
+    return false;                                                                                                      \
+  }                                                                                                                    \
 } while (0)
 
 
@@ -180,7 +180,7 @@ static OrionldContext* contextItemNodeTreat(ConnectionInfo* ciP, char* url)
   if (contextP == NULL)
   {
     LM_E(("Invalid context '%s': %s", url, details));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", details);
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", details, OrionldDetailsString);
     return NULL;
   }
 
@@ -272,7 +272,7 @@ static bool payloadCheck
       STRING_CHECK(kNodeP, "entity type");
       if (stringContentCheck(kNodeP->value.s, &detailsP) == false)
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid entity type name", detailsP);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid entity type name", detailsP, OrionldDetailsString);
         return false;
       }
     }
@@ -301,7 +301,7 @@ static bool payloadCheck
       // FIXME: Make sure the type is either Property or Relationship
       if (stringContentCheck(kNodeP->name, &detailsP) == false)
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Property/Relationship name", detailsP);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Property/Relationship name", detailsP, OrionldDetailsString);
         return false;
       }
     }
@@ -314,13 +314,13 @@ static bool payloadCheck
   //
   if (idNodeP == NULL)
   {
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "No 'id' of the entity", "The 'id' field is mandatory");
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "No 'id' of the entity", "The 'id' field is mandatory", OrionldDetailsString);
     return false;
   }
 
   if (typeNodeP == NULL)
   {
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "No 'type' of the entity", "The 'type' field is mandatory");
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "No 'type' of the entity", "The 'type' field is mandatory", OrionldDetailsString);
     return false;
   }
 
@@ -459,7 +459,7 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
     expansions = uriExpansion(ciP->contextP, kNodeP->name, &expandedNameP, &expandedTypeP, &details);
     if (expansions == -1)
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item", details);
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item", details, OrionldDetailsString);
       return NULL;
     }
 
@@ -605,7 +605,7 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       else
       {
         LM_E(("Invalid type for attribute '%s': '%s'", nodeP->name, nodeP->value.s));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid type for attribute", nodeP->value.s);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid type for attribute", nodeP->value.s, OrionldDetailsString);
         return false;
       }
 
@@ -655,7 +655,7 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
   if (typeP == NULL)  // Attr Type is mandatory!
   {
     LM_E(("'type' missing for attribute '%s'", kNodeP->name));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "attribute without 'type' field", kNodeP->name);
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "attribute without 'type' field", kNodeP->name, OrionldDetailsAttribute);
     return false;
   }
 
@@ -669,12 +669,12 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       if (isGeoProperty == true)
       {
         LM_E(("'value' missing for GeoProperty '%s'", kNodeP->name));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "geo-property attribute without 'value' field", kNodeP->name);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "geo-property attribute without 'value' field", kNodeP->name, OrionldDetailsAttribute);
       }
       else
       {
         LM_E(("'value' missing for Property '%s'", kNodeP->name));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "property attribute without 'value' field", kNodeP->name);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "property attribute without 'value' field", kNodeP->name, OrionldDetailsAttribute);
       }
 
       return false;
@@ -690,7 +690,7 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     case KjArray:      caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(ciP, kNodeP, NULL);  break;
     case KjNull:       caP->valueType = orion::ValueTypeNull;    break;
     case KjNone:
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal error", "Invalid type from kjson");
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal error", "Invalid type from kjson", OrionldDetailsString);
       return false;
     }
   }
@@ -699,21 +699,21 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     if (objectP == NULL)
     {
       LM_E(("'object' missing for Relationship '%s'", kNodeP->name));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "relationship attribute without 'object' field", NULL);
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "relationship attribute without 'object' field", NULL, OrionldDetailsString);
       return false;
     }
 
     if (objectP->type != KjString)
     {
       LM_E(("Relationship '%s': 'object' is not a JSON String", objectP->name));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "relationship attribute with 'object' field of non-string type", NULL);
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "relationship attribute with 'object' field of non-string type", NULL, OrionldDetailsString);
       return false;
     }
 
     char* details;
     if (urlCheck(objectP->value.s, &details) == false)
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "relationship attribute with 'object' field having invalid URL", objectP->value.s);
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "relationship attribute with 'object' field having invalid URL", objectP->value.s, OrionldDetailsAttribute);
       return false;
     }
   }
@@ -742,13 +742,13 @@ static bool contextTreat
 
       if (urlCheck((char*) ciP->httpHeaders.link.c_str(), &details) == false)
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Link HTTP Header must be a valid URL", details);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Link HTTP Header must be a valid URL", details, OrionldDetailsString);
         return false;
       }
 
       if ((ciP->contextP = orionldContextCreateFromUrl(ciP, ciP->httpHeaders.link.c_str(), &details)) == NULL)
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from URL", details);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from URL", details, OrionldDetailsString);
         return false;
       }
     }
@@ -809,7 +809,7 @@ static bool contextTreat
 
     if ((ciP->contextP = orionldContextCreateFromUrl(ciP, contextNodeP->value.s, &details)) == NULL)
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from URL", details);
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from URL", details, OrionldDetailsString);
       return false;
     }
 
@@ -821,10 +821,10 @@ static bool contextTreat
     char* details;
 
     // FIXME: When orionld is able to serve contexts, a real URL must be used here
-    ciP->contextP = orionldContextCreateFromTree(contextNodeP, "http;//FIXME.array.context.needs/url", &details);
+    ciP->contextP = orionldContextCreateFromTree(contextNodeP, "http://FIXME.array.context.needs/url", &details);
     if (ciP->contextP == NULL)
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from tree", details);
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from tree", details, OrionldDetailsString);
       return false;
     }
 
@@ -840,7 +840,7 @@ static bool contextTreat
       if (contextStringNodeP->type != KjString)
       {
         LM_E(("Context Array Item is not a JSON String, but of type '%s'", kjValueType(contextStringNodeP->type)));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Context Array Item is not a JSON String", NULL);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Context Array Item is not a JSON String", NULL, OrionldDetailsString);
         LM_T(LmtContextTreat, ("returning FALSE"));
         return false;
       }
@@ -856,14 +856,14 @@ static bool contextTreat
   else if (contextNodeP->type == KjObject)
   {
     // FIXME: seems like an inline context - not supported for now
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", "inline contexts not supported in current version of orionld");
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", "inline contexts not supported in current version of orionld", OrionldDetailsString);
     LM_E(("inline contexts not supported in current version of orionld"));
     return false;
   }
   else
   {
     LM_E(("invalid JSON type of @context member"));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", "invalid JSON type of @context member");
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", "invalid JSON type of @context member", OrionldDetailsString);
     return false;
   }
 
@@ -954,7 +954,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     {
       if (!urlCheck(idNodeP->value.s, &details) && !urnCheck(idNodeP->value.s, &details))
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN");
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN", OrionldDetailsString);
         mongoRequest.release();
         return false;
       }
@@ -979,7 +979,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
       if (expansions == -1)
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item for 'entity type'", details);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item for 'entity type'", details, OrionldDetailsString);
         mongoRequest.release();
         return false;
       }
@@ -999,7 +999,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       }      
       else  // expansions == 2 ... may be an incorrect context
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value of context item 'entity id'", ciP->contextP->url);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value of context item 'entity id'", ciP->contextP->url, OrionldDetailsString);
         mongoRequest.release();
         return false;
       }
@@ -1039,7 +1039,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       {
         delete caP;
         mongoRequest.release();
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item for 'attribute name'", details);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item for 'attribute name'", kNodeP->name, OrionldDetailsAttribute);
         return false;
       }
       else if (expansions >= 0)
@@ -1074,7 +1074,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
       if (expansions == -1)
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item for 'attribute type'", details);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item for 'attribute type'", attrTypeNodeP->value.s, OrionldDetailsOther);
         delete caP;
         mongoRequest.release();
         return false;
@@ -1102,9 +1102,6 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     }
   }
 
-  // ngsi-ld doesn't use service path - so always '/'
-  ciP->servicePathV.push_back("/");
-
   ciP->httpStatusCode = mongoUpdateContext(&mongoRequest,
                                            &mongoResponse,
                                            ciP->httpHeaders.tenant,
@@ -1121,7 +1118,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   if (ciP->httpStatusCode != SccOk)
   {
     LM_E(("mongoUpdateContext: HTTP Status Code: %d", ciP->httpStatusCode));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal Error", "Error from mongo backend");
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal Error", "Error from mongo backend", OrionldDetailsString);
     return false;
   }
 

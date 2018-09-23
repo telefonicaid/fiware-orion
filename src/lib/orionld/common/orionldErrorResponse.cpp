@@ -32,6 +32,8 @@ extern "C"
 #include "logMsg/traceLevels.h"                             // Lmt*
 
 #include "rest/ConnectionInfo.h"                            // ConnectionInfo
+#include "orionld/context/orionldDefaultContext.h"          // ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT
+#include "orionld/context/orionldContextItemLookup.h"       // orionldContextItemLookup
 #include "orionld/common/orionldErrorResponse.h"            // Own interface
 
 
@@ -42,12 +44,12 @@ extern "C"
 //
 static const char* errorTypeStringV[] =
 {
-  "http://uri.etsiu.org/ngsi-ld/errors/InvalidRequest",
-  "http://uri.etsiu.org/ngsi-ld/errors/BadRequestData",
-  "http://uri.etsiu.org/ngsi-ld/errors/AlreadyExists",
-  "http://uri.etsiu.org/ngsi-ld/errors/OperationNotSupported",
-  "http://uri.etsiu.org/ngsi-ld/errors/ResourceNotFound",
-  "http://uri.etsiu.org/ngsi-ld/errors/InternalError"
+  "http://example.org/ngsi-ld/errors/InvalidRequest",
+  "http://example.org/ngsi-ld/errors/BadRequestData",
+  "http://example.org/ngsi-ld/errors/AlreadyExists",
+  "http://example.org/ngsi-ld/errors/OperationNotSupported",
+  "http://example.org/ngsi-ld/errors/ResourceNotFound",
+  "http://example.org/ngsi-ld/errors/InternalError"
 };
 
 
@@ -60,7 +62,7 @@ static const char* errorTypeStringV[] =
 //   Only service routines should use this function.
 //   Lower level functions should just return the 'details' string.
 //
-void orionldErrorResponseCreate(ConnectionInfo* ciP, OrionldResponseErrorType errorType, const char* title, const char* details)
+void orionldErrorResponseCreate(ConnectionInfo* ciP, OrionldResponseErrorType errorType, const char* title, const char* details, OrionldDetailsType detailsType)
 {
   LM_T(LmtErrorResponse, ("Creating error response: %s (%s)", title, details));
 
@@ -68,10 +70,42 @@ void orionldErrorResponseCreate(ConnectionInfo* ciP, OrionldResponseErrorType er
   KjNode* titleP    = kjString(ciP->kjsonP, "title",   title);
   KjNode* detailsP;
 
-  if (details != NULL)
-    detailsP = kjString(ciP->kjsonP, "details", details);
+  if ((details != NULL) && (details[0] != 0))
+  {
+    char*   contextDetails = NULL;
+
+    if (detailsType == OrionldDetailsString)  // no replacement as it's just a descriptive string
+    {
+      contextDetails = (char*) details;
+    }
+    else  // lookup 'details' in context
+    {
+      KjNode* nodeP = orionldContextItemLookup(ciP->contextP, details);
+      char     contextDetailsV[512];  // FIXME: Define a max length for a context item?
+
+      if (nodeP == NULL)
+      {
+        if (detailsType == OrionldDetailsAttribute)
+          snprintf(contextDetailsV, sizeof(contextDetailsV), "%s%s", ORIONLD_DEFAULT_EXPANSION_URL_DIR_ATTRIBUTE, details);
+        else if (detailsType == OrionldDetailsEntity)
+          snprintf(contextDetailsV, sizeof(contextDetailsV), "%s%s", ORIONLD_DEFAULT_EXPANSION_URL_DIR_ENTITY, details);
+        else
+          snprintf(contextDetailsV, sizeof(contextDetailsV), "%s%s", ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT, details);
+
+        contextDetails = contextDetailsV;
+      }
+      else
+      {
+        contextDetails = nodeP->value.s;
+      }
+    }
+
+    detailsP = kjString(ciP->kjsonP, "details", contextDetails);
+  }
   else
+  {
     detailsP = kjString(ciP->kjsonP, "details", "no details");
+  }
 
   ciP->responseTree = kjObject(ciP->kjsonP, NULL);
 

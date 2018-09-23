@@ -135,6 +135,8 @@ public:
   KjNode*                   responseTree;
   OrionldContext*           contextP;
   bool                      contextToBeFreed;
+  bool                      prettyPrint;
+  char                      prettyPrintSpaces;
 #endif  
 };
 

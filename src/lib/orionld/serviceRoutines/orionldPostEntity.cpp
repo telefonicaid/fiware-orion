@@ -39,7 +39,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 {
   LM_T(LmtServiceRoutine, ("In orionldPostEntities: request tree at %p", ciP->requestTree));
 
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - POST /ngsi-ld/v1/entities/*/attrs", ciP->wildcard[0]);
+  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - POST /ngsi-ld/v1/entities/*/attrs", ciP->wildcard[0], OrionldDetailsString);
 
   ciP->httpStatusCode = SccNotImplemented;
 

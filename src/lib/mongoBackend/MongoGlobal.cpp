@@ -1291,10 +1291,13 @@ bool entitiesQuery
   /* The result of orEnt is appended to the final query */
   finalQuery.append("$or", orEnt.arr());
 
-  /* Part 2: service path */
-  const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
+  if (apiVersion != NGSI_LD_V1)
+  {
+    /* Part 2: service path */
+    const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
 
-  finalQuery.append(servicePathString, fillQueryServicePath(servicePath));
+    finalQuery.append(servicePathString, fillQueryServicePath(servicePath));
+  }
 
   /* Part 3: attributes */
   BSONArrayBuilder attrs;
@@ -1456,6 +1459,7 @@ bool entitiesQuery
   while (moreSafe(cursor))
   {
     BSONObj  r;
+
     try
     {
       // nextSafeOrError cannot be used here, as AssertionException has a special treatment in this case

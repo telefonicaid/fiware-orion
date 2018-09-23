@@ -79,6 +79,7 @@ void orionldContextFreeAll(void)
   {
     OrionldContext* next = contextP->next;
 
+    LM_TMP(("Calling orionldContextFree for context '%s', next at %p", contextP->url, contextP->next));
     orionldContextFree(contextP);
     contextP = next;
   }

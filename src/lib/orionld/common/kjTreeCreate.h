@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_COMOM_KJTREECREATE_H_
+#define SRC_LIB_ORIONLD_COMOM_KJTREECREATE_H_
+
 /*
 *
 * Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
@@ -22,26 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
-
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/serviceRoutines/orionldGetEntities.h"        // Own Interface
+#include "ngsi10/QueryContextResponse.h"                       // QueryContextResponse
 
 
-
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldGetEntities -
+// kjTreeCreateFromQueryContextResponse -
 //
-bool orionldGetEntities(ConnectionInfo* ciP)
-{
-  LM_T(LmtServiceRoutine, ("In orionldGetEntities"));
+extern KjNode* kjTreeCreateFromQueryContextResponse(ConnectionInfo* ciP, QueryContextResponse* responseP);
 
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - GET /ngsi-ld/v1/entities", NULL, OrionldDetailsString);
-
-  ciP->httpStatusCode = SccNotImplemented;
-
-  return true;
-}
+#endif  // SRC_LIB_ORIONLD_COMOM_KJTREECREATE_H_

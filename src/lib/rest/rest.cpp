@@ -232,6 +232,19 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
       ciP->uriParamTypes.push_back(val);
     }
   }
+#ifdef ORIONLD
+  else if (key == URI_PARAM_PRETTY_PRINT)
+  {
+    if (strcmp(val, "yes") == 0)
+    {
+      ciP->prettyPrint = true;
+    }
+  }
+  else if (key == URI_PARAM_SPACES)
+  {
+    ciP->prettyPrintSpaces = atoi(val);
+  }
+#endif
   else if ((key != URI_PARAM_Q)       &&
            (key != URI_PARAM_MQ)      &&
            (key != URI_PARAM_LEVEL))  // FIXME P1: possible more known options here ...
@@ -578,6 +591,8 @@ static void requestCompleted
   MHD_RequestTerminationCode  toe
 )
 {
+  LM_TMP(("In requestCompleted"));
+
   ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
   std::string      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
   struct timespec  reqEndTime;
@@ -666,9 +681,9 @@ static void requestCompleted
   extern void delayedReleaseExecute(void);
   delayedReleaseExecute();
 
-  LM_TMP(("Just before deleting ciP. REQUEST context at %p", ciP->contextP));
-
+  LM_TMP(("Destroying ConnectionInfo"));
   delete(ciP);
+  LM_TMP(("Destroyed ConnectionInfo"));
 
   *con_cls = NULL;
 }
@@ -1533,7 +1548,7 @@ static int connectionTreat
       return ret;
     }
   }
-#endif  
+#endif
 
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (*con_cls == NULL)

@@ -39,7 +39,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
 {
   LM_T(LmtServiceRoutine, ("In orionldPostSubscriptions"));
 
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - GET /ngsi-ld/v1/subscriptions", NULL);
+  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - GET /ngsi-ld/v1/subscriptions", NULL, OrionldDetailsString);
 
   ciP->httpStatusCode = SccNotImplemented;
 

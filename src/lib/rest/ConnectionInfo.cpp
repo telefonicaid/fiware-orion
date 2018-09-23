@@ -92,7 +92,9 @@ ConnectionInfo::ConnectionInfo():
   requestTree               (NULL),
   responseTree              (NULL),
   contextP                  (NULL),
-  contextToBeFreed          (false)
+  contextToBeFreed          (false),
+  prettyPrint               (false),
+  prettyPrintSpaces         (2)
 #endif
 {
 }
@@ -133,7 +135,9 @@ ConnectionInfo::ConnectionInfo(MimeType _outMimeType):
   requestTree               (NULL),
   responseTree              (NULL),
   contextP                  (NULL),
-  contextToBeFreed          (false)
+  contextToBeFreed          (false),
+  prettyPrint               (false),
+  prettyPrintSpaces         (2)
 #endif
 {
 }
@@ -177,7 +181,9 @@ ConnectionInfo::ConnectionInfo(std::string _url, std::string _method, std::strin
   requestTree               (NULL),
   responseTree              (NULL),
   contextP                  (NULL),
-  contextToBeFreed          (false)
+  contextToBeFreed          (false),
+  prettyPrint               (false),
+  prettyPrintSpaces         (2)
 #endif
 {
   if      (_method == "POST")    verb = POST;
@@ -232,8 +238,21 @@ ConnectionInfo::~ConnectionInfo()
     contextP = NULL;
   }
 
-  free(kjsonP);
-  kjsonP = NULL;
+  if (kjsonP != NULL)
+  {
+    LM_TMP(("Freeing kjsonP. iVec at %p", kjsonP->iVec));
+    if (kjsonP->iVec != NULL)
+      free(kjsonP->iVec);
+
+    LM_TMP(("Freeing kjsonP"));
+    if (kjsonP->iStrings != NULL)
+      free(kjsonP->iStrings);
+  
+    LM_TMP(("Freeing kjsonP"));
+    free(kjsonP);
+    LM_TMP(("Freed kjsonP"));
+    kjsonP = NULL;
+  }
 #endif
 }
 
