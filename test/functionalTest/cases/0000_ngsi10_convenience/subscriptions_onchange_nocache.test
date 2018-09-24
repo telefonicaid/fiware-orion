@@ -39,8 +39,8 @@ payload='{
         }
     ],
     "attributes": [
-        "temperature",
-        "ligthstatus"
+        "ligthstatus",
+        "temperature"
     ],
     "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
     "duration": "PT1H",

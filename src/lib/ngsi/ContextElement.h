@@ -30,7 +30,6 @@
 #include "ngsi/Request.h"
 #include "common/RenderFormat.h"
 #include "ngsi/EntityId.h"
-#include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/MetadataVector.h"
 
@@ -43,9 +42,7 @@
 typedef struct ContextElement
 {
   EntityId                 entityId;                // Mandatory
-  AttributeDomainName      attributeDomainName;     // Optional
   ContextAttributeVector   contextAttributeVector;  // Optional
-  MetadataVector           domainMetadataVector;    // Optional
 
   std::vector<ProvidingApplication> providingApplicationList;    // Not part of NGSI, used internally for CPr forwarding functionality
 
@@ -53,11 +50,9 @@ typedef struct ContextElement
   ContextElement(const std::string& id, const std::string& type, const std::string& isPattern);
   ContextElement(EntityId* eP);
 
-  std::string  render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, bool comma, bool omitAttributeValues = false);
+  std::string  render(bool asJsonObject, RequestType requestType, bool comma, bool omitAttributeValues = false);
   std::string  toJson(RenderFormat                     renderFormat,
-                      const std::vector<std::string>&  attrsFilter,
-                      const std::vector<std::string>&  metadataFilter,
-                      bool                             blacklist = false) const;
+                      const std::vector<std::string>&  metadataFilter);
   void         release(void);
   void         fill(const struct ContextElement& ce);
   void         fill(ContextElement* ceP, bool useDefaultType = false);
@@ -65,6 +60,14 @@ typedef struct ContextElement
   ContextAttribute* getAttribute(const std::string& attrName);
 
   std::string  check(ApiVersion apiVersion, RequestType requestType);
+
+  void filterAttributes(const std::vector<std::string>&  attrsFilter, bool blacklist);
+
+private:
+  std::string toJsonValues(void);
+  std::string toJsonUniqueValues(void);
+  std::string toJsonKeyvalues(void);
+  std::string toJsonNormalized(const std::vector<std::string>&  metadataFilter);
 } ContextElement;
 
 #endif  // SRC_LIB_NGSI_CONTEXTELEMENT_H_

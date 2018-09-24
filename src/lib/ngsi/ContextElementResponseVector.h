@@ -41,16 +41,13 @@ typedef struct ContextElementResponseVector
 {
   std::vector<ContextElementResponse*>  vec;
 
-  std::string              render(ApiVersion   apiVersion,
-                                  bool         asJsonObject,
+  std::string              render(bool         asJsonObject,
                                   RequestType  requestType,
                                   bool         comma               = false,
                                   bool         omitAttributeValues = false);
 
   std::string              toJson(RenderFormat                     renderFormat,
-                                  const std::vector<std::string>&  attrsFilter,
-                                  const std::vector<std::string>&  metadataFilter,
-                                  bool                             blacklist = false);
+                                  const std::vector<std::string>&  metadataFilter);
   void                     push_back(ContextElementResponse* item);
   unsigned int             size(void) const;
   ContextElementResponse*  lookup(EntityId* eP, HttpStatusCode code = SccNone);

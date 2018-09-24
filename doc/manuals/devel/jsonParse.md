@@ -10,7 +10,7 @@
 
 Orion Context Broker contains not one but **two** libraries for JSON parsing. The reason for this is that the external library that was originally selected for parsing of NGSIv1 JSON cannot distinguish between JSON value types such as String, Number, Boolean, Null but **treats all values as strings**. This was unacceptable for NGSIv2 and so, another external JSON library ([rapidjson](http://rapidjson.org/)) was chosen. The two JSON libraries of Orion implement the necessary adaption of the external libraries to be usable by Orion.
 
-This document describes NGSIv1 parsing details. NGSIv2 parsing details are described in a [separate document](jsonParseV2.md).
+This document describes NGSIv1 parsing details (note that NGSIv1 has been deprecated). NGSIv2 parsing details are described in a [separate document](jsonParseV2.md).
 
 In general, the NGSIv1 parsing logic is more complex than NGSIv2 logic. The good news is that you will probably not need to change anything in NGSIv1 parsing as this is the old version of the Orion API and the work should now concentrate in evolving NGSIv2, not NGSIv1.
 

@@ -90,6 +90,8 @@ Apart from the values described for `attrsFormat` in the NGSIv2 specification, O
 `legacy` value, in order to send notifications in NGSIv1 format. This way, users can benefit from the
 enhancements of NGSIv2 subscriptions (e.g. filtering) with NGSIv1 legacy notification receivers.
 
+Note that NGSIv1 is deprecated. Thus, we don't recommend to use `legacy` notification format any longer.
+
 [Top](#top)
 
 ## Datetime support
@@ -377,8 +379,7 @@ for the following aspects:
 * `PATCH /v2/registration/<id>` is not implemented. Thus, registrations cannot be updated
   directly. I.e., updates must be done deleting and re-creating the registration. Please
   see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3007) about this.
-* `idPattern` and `typePattern` are not implemented. This is similar to NGSIv1 registrations,
-  where isPattern is not implemented.
+* `idPattern` and `typePattern` are not implemented.
 * The only valid `supportedForwardingMode` is `all`. Trying to use any other value will end
   in a 501 Not Implemented error response. Please
   see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3106) about this.
@@ -396,8 +397,8 @@ The way in which Orion implements such forwarding is as follows:
 
 Orion implements an additional field `legacyForwarding` (within `provider`) not included in NGSIv2
 specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
-for forwarding requests associated to that registration. However, for the time being, NGSIv2-based
-forwarding has not been defined (see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3068)
+for forwarding requests associated to that registration. Although NGSIv1 is deprecated, for the time being,
+NGSIv2-based forwarding has not been defined (see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3068)
 about it) so the only valid option is to always use `"legacyForwarding": true` (otherwise a 501 Not Implemented
 error response will be the result).
 
@@ -420,7 +421,7 @@ NGSIv2 stable specification document but that Orion still supports
 In particular:
 
 * The usage of `dateCreated` and `dateModified` in the `options` parameter (introduced
-in stable RC-2016.05 and removed in RC-2016.10.) is still supported, e.g. `options=dateModified`. However,
+in stable RC-2016.05 and removed in RC-2016.10) is still supported, e.g. `options=dateModified`. However,
 you are highly encouraged to use `attrs` instead (i.e. `attrs=dateModified,*`).
 
 * `POST /v2/op/update` accepts the same action types as NGSIv1, that is `APPEND`, `APPEND_STRICT`,

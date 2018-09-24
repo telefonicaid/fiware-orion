@@ -324,7 +324,6 @@ ContextElementResponse::ContextElementResponse(ContextElement* ceP, bool useDefa
 */
 std::string ContextElementResponse::render
 (
-  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
   bool                comma,
@@ -334,7 +333,7 @@ std::string ContextElementResponse::render
   std::string out = "";
 
   out += startTag();
-  out += contextElement.render(apiVersion, asJsonObject, requestType, true, omitAttributeValues);
+  out += contextElement.render(asJsonObject, requestType, true, omitAttributeValues);
   out += statusCode.render(false);
   out += endTag(comma, false);
 
@@ -350,14 +349,12 @@ std::string ContextElementResponse::render
 std::string ContextElementResponse::toJson
 (
   RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsFilter,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             blacklist
+  const std::vector<std::string>&  metadataFilter
 )
 {
   std::string out;
 
-  out = contextElement.toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
+  out = contextElement.toJson(renderFormat, metadataFilter);
 
   return out;
 }

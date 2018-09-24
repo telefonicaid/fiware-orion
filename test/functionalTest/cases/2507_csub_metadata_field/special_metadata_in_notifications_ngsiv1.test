@@ -356,7 +356,7 @@ Date: REGEX(.*)
 =====================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 453
+Content-Length: 452
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -425,7 +425,7 @@ Date: REGEX(.*)
 ======================================================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 574
+Content-Length: 572
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -506,7 +506,7 @@ Date: REGEX(.*)
 =====================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 454
+Content-Length: 453
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -575,7 +575,7 @@ Date: REGEX(.*)
 ======================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 455
+Content-Length: 454
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json

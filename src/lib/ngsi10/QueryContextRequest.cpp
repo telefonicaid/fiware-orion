@@ -138,7 +138,7 @@ std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject,
     return "OK";
   }
 
-  return response.render(apiVersion, asJsonObject);
+  return response.render(asJsonObject);
 }
 
 

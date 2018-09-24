@@ -79,7 +79,7 @@ TEST(ContextElementResponse, render)
 
    cer.statusCode.fill(SccOk, "details");
 
-   out = cer.render(V1, false, UpdateContextElement, false);
+   out = cer.render(false, UpdateContextElement, false);
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
 

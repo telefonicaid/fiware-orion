@@ -1,4 +1,4 @@
-﻿
+
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -1688,7 +1688,6 @@ static bool processOnChangeConditionForUpdateContext
   std::string                      tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
-  const std::vector<std::string>&  attrsOrder,
   const ngsiv2::HttpInfo&          httpInfo,
   bool                             blacklist = false
 )
@@ -1699,6 +1698,8 @@ static bool processOnChangeConditionForUpdateContext
   cer.contextElement.entityId.fill(&notifyCerP->contextElement.entityId);
 
   /* Fill NotifyContextRequest with cerP, filtering by attrL */
+  // FIXME P8: review this. Given that filterAttributes() is called on the notifyCerP in the calling
+  // method, maybe this can be simplified (or removed)
   for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
   {
     ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
@@ -1746,9 +1747,7 @@ static bool processOnChangeConditionForUpdateContext
                                           xauthToken,
                                           fiwareCorrelator,
                                           renderFormat,
-                                          attrsOrder,
-                                          metadataV,
-                                          blacklist);
+                                          metadataV);
   return true;
 }
 
@@ -2052,6 +2051,8 @@ static bool processSubscriptions
       setDateModifiedMetadata(notifyCerP);
     }
 
+    // Get the effective vector of attributes to render
+    notifyCerP->contextElement.filterAttributes(tSubP->attrL.stringV, tSubP->blacklist);
 
     /* Send notification */
     LM_T(LmtSubCache, ("NOT ignored: %s", tSubP->cacheSubId.c_str()));
@@ -2066,7 +2067,6 @@ static bool processSubscriptions
                                                                 tenant,
                                                                 xauthToken,
                                                                 fiwareCorrelator,
-                                                                tSubP->attrL.stringV,
                                                                 tSubP->httpInfo,
                                                                 tSubP->blacklist);
 
@@ -3216,6 +3216,8 @@ static void updateEntity
    * processes the attributes in the updateContext */
   std::string     locAttr = "";
   BSONObj         currentGeoJson;
+  BSONObj         newGeoJson;
+  BSONObj         finalGeoJson;
   BSONObjBuilder  geoJson;
 
   if (r.hasField(ENT_LOCATION))
@@ -3344,20 +3346,27 @@ static void updateEntity
     notifyCerP->contextElement.entityId.modDate = now;
   }
 
-  // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
-  // not sure how the following behaves in the case of "replace"...
+  // We don't touch toSet in the replace case, due to
+  // the way in which BSON is composed in that case (see below)
   if (locAttr.length() > 0)
   {
-    BSONObj newGeoJson = geoJson.obj();
+    newGeoJson = geoJson.obj();
 
     // If processContextAttributeVector() didn't touched the geoJson, then we
     // use the existing object
-    BSONObj finalGeoJson = newGeoJson.nFields() > 0 ? newGeoJson : currentGeoJson;
+    finalGeoJson = newGeoJson.nFields() > 0 ? newGeoJson : currentGeoJson;
 
-    toSet.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
+    if (action != ActionTypeReplace)
+    {
+      toSet.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
                                     ENT_LOCATION_COORDS   << finalGeoJson));
+    }
+    else if (newGeoJson.nFields() == 0)
+    {
+      toUnset.append(ENT_LOCATION, 1);
+    }
   }
-  else
+  else if (newGeoJson.nFields() == 0)
   {
     toUnset.append(ENT_LOCATION, 1);
   }
@@ -3394,23 +3403,28 @@ static void updateEntity
     BSONObjBuilder replaceSet;
     int            now = getCurrentTime();
 
-    // This avoids strange behavior like as for the location, as reported in the #1142 issue
     // In order to enable easy append management of fields (e.g. location, dateExpiration),
-    // it could be better to use a BSONObjBuilder instead the BSON stream macro below.
+    // we use a BSONObjBuilder instead the BSON stream macro.
+    replaceSet.append(ENT_ATTRS, toSetObj);
+    replaceSet.append(ENT_ATTRNAMES, toPushArr);
+    replaceSet.append(ENT_MODIFICATION_DATE, now);
+    replaceSet.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
+
     if (dateExpirationInPayload)
     {
-      updatedEntity.append("$set", BSON(ENT_ATTRS                   << toSetObj <<
-                                        ENT_ATTRNAMES               << toPushArr <<
-                                        ENT_MODIFICATION_DATE       << now <<
-                                        ENT_EXPIRATION              << currentDateExpiration <<
-                                        ENT_LAST_CORRELATOR         << fiwareCorrelator));
+      replaceSet.append(ENT_EXPIRATION, currentDateExpiration);
     }
-    else
+
+    if (newGeoJson.nFields() > 0)
     {
-      updatedEntity.append("$set", BSON(ENT_ATTRS                   << toSetObj <<
-                                        ENT_ATTRNAMES               << toPushArr <<
-                                        ENT_MODIFICATION_DATE       << now <<
-                                        ENT_LAST_CORRELATOR         << fiwareCorrelator));
+      replaceSet.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
+                                    ENT_LOCATION_COORDS   << finalGeoJson));
+    }
+
+    updatedEntity.append("$set", replaceSet.obj());
+
+    if (!dateExpirationInPayload || newGeoJson.nFields() == 0)
+    {
       updatedEntity.append("$unset", toUnsetObj);
     }
 

@@ -1,11 +1,11 @@
 # Context Providers registration and request forwarding
 
-The register context operation (both in NGSIv1 and NGSIv2) uses the
+The register context operation uses the
 concept of "context provider" which is a URL that identifies the
 source of the context information for the entities/attributes included
 in that registration.
 
-In the case of NGSIv2, this is provided by the field `provider`:
+This is provided by the field `provider`:
 
 ```
 ...
@@ -16,24 +16,15 @@ In the case of NGSIv2, this is provided by the field `provider`:
 }
 ...
 ```
-
-In the case of NGSIv1, this is provided by the field `providingApplication`
-
-```
-...
-"providingApplication" : "http://mysensors.com/Rooms"
-...
-```
   
-If Orion receives a query or update operation (either in the standard or
-in the convenience family) and it cannot find the targeted context
+If Orion receives a query or update operation and it cannot find the targeted context
 element locally (i.e. in its internal database) *but* a Context Provider
 is registered for that context element, then Orion will forward the
 query/update request to the Context Provider. In this case, Orion acts
 as a pure "NGSI proxy" (i.e. doesn't cache the result of the query
 internally) and, from the point of view of the client issuing the
 original request, the process is mostly transparent. The Context
-Provider is meant to implement the NGSI10 API (at least partially) to
+Provider is meant to implement the NGSI API (at least partially) to
 support the query/update operation.
 
 Let's illustrate this with an example.
@@ -88,7 +79,7 @@ curl localhost:1026/v2/entities/Street4/attrs/temperature?type=Street -s -S \
   the Providing Application field at registration time, plus the
   "/queryContext" operation). Note that the query is forwarded using
   NGSIv1 format although the original request from the client used NGSIv2
-  (this is due to lack of support for NGSIv2 based forwarding, see
+  (NGSIv1 is deprecated, but we need to do so as there is yet lack of support for NGSIv2 based forwarding, see
   [this issue about it](https://github.com/telefonicaid/fiware-orion/issues/3068)).
 
 ``` 
@@ -149,9 +140,8 @@ Some additional comments:
     is used to set the CPr timeout. If a request forwarded to a CPr is
     taking more that that timeout, then Orion closes the connection and
     assumes that the CPr is not responding.
--   In the case a given
-    request involves more than one Context Provider (e.g. an
-    updateContext including 3 context elements, each one being an entity
+-   In the case a given request involves more than one Context Provider (e.g. an
+    update including 3 context elements, each one being an entity
     managed by a different Context Provider), Orion will forward the
     corresponding "piece" of the request to each Context Provider,
     gathering all the results before responding to the client. Current
@@ -161,13 +151,19 @@ Some additional comments:
 -   You can use the `-cprForwardLimit` [CLI parameter](admin/cli.md) to limit
     the maximum number of forwarded requests to Context Providers for a single client request.
     You can use 0 to disable Context Providers forwarding at all.
--   In NGSIv1 registrations, `isPattern` cannot be set to `"true"`.
-    If so, the registration fails and an error is returned.
-    The OMA specification allows for regular expressions in entity id in registrations but as of now,
-    the Context Broker doesn't support this feature.
--   You should include entity type in the query/update in order for the ContextBroker to be able to
-    forward to Context Providers. Otherwise you may encounter problems, like the one described in this
+-   On forwarding, any type of entity in the NGSIv2 update/query matches registrations without entity type. However, the
+    opposite doesn't work, so if you have registrations with types, then you must use `?type` in NGSIv2  update/query in
+    order to obtain a match. Otherwise you may encounter problems, like the one described in this
     [post at StackOverflow](https://stackoverflow.com/questions/48163972/orion-cb-doesnt-update-lazy-attributes-on-iot-agent).
 -   At the present moment, Context Broker is not able to include compound attributes in forwarded updates. A
     blank (`""`) if forwarded for them instead. Please have a look to 
     [the following issue](https://github.com/telefonicaid/fiware-orion/issues/3162) for more information.    
+-   Query filtering (e.g. `GET /v2/entities?q=temperature>40`) is not supported on query forwarding. First, Orion
+    doesn't include the filter in the `POST /v1/queryContext` operation forwarded to CPr. Second, Orion doesn't filter
+    the CPr results before responding them back to client. An issue corresponding to this limitation has been created:
+    https://github.com/telefonicaid/fiware-orion/issues/2282
+-   In the case of partial updates (e.g. `POST /v2/op/entities` resulting in some entities/attributes being updated and
+    other entities/attributes not being updated due to failing or missing CPrs), 404 Not Found is returned to the client.
+    The `error` field in this case is `PartialUpdate` and the `description` field contains information about which entity
+    attributes failed to update.
+

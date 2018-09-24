@@ -44,7 +44,6 @@
 */
 std::string ContextAttributeResponse::render
 (
-  ApiVersion   apiVersion,
   bool         asJsonObject,
   RequestType  request
 )
@@ -52,7 +51,7 @@ std::string ContextAttributeResponse::render
   std::string out = "";
 
   out += startTag();
-  out += contextAttributeVector.render(apiVersion, asJsonObject, request, true);
+  out += contextAttributeVector.render(asJsonObject, request, true);
   out += statusCode.render(false);
   out += endTag();
 
@@ -99,7 +98,7 @@ std::string ContextAttributeResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, requestType);
+  return render(asJsonObject, requestType);
 }
 
 
