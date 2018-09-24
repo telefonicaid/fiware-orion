@@ -38,7 +38,7 @@
 *
 * NotifyContextRequest::render -
 */
-std::string NotifyContextRequest::render(ApiVersion apiVersion, bool asJsonObject)
+std::string NotifyContextRequest::render(bool asJsonObject)
 {
   std::string  out                                  = "";
   bool         contextElementResponseVectorRendered = contextElementResponseVector.size() != 0;
@@ -52,7 +52,7 @@ std::string NotifyContextRequest::render(ApiVersion apiVersion, bool asJsonObjec
   out += startTag();
   out += subscriptionId.render(NotifyContext, true);
   out += originator.render(contextElementResponseVectorRendered);
-  out += contextElementResponseVector.render(apiVersion, asJsonObject, NotifyContext, false);
+  out += contextElementResponseVector.render(asJsonObject, NotifyContext, false);
   out += endTag();
 
   return out;
@@ -67,9 +67,7 @@ std::string NotifyContextRequest::render(ApiVersion apiVersion, bool asJsonObjec
 std::string NotifyContextRequest::toJson
 (
   RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsFilter,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             blacklist
+  const std::vector<std::string>&  metadataFilter
 )
 {
   if ((renderFormat != NGSI_V2_NORMALIZED) && (renderFormat != NGSI_V2_KEYVALUES) && (renderFormat != NGSI_V2_VALUES))
@@ -88,7 +86,7 @@ std::string NotifyContextRequest::toJson
   out += ",";
   out += JSON_STR("data") + ":[";
 
-  out += contextElementResponseVector.toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
+  out += contextElementResponseVector.toJson(renderFormat, metadataFilter);
   out += "]";
   out += "}";
 

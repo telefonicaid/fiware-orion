@@ -73,7 +73,7 @@ TEST(ContextElementResponseVector, render)
 
   utInit();
 
-  out = cerv.render(V1, false, UpdateContextElement, "");
+  out = cerv.render(false, UpdateContextElement, "");
   EXPECT_STREQ("", out.c_str());
 
   cer.contextElement.entityId.id         = "ID";

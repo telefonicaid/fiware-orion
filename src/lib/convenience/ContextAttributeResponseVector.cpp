@@ -56,7 +56,7 @@ std::string ContextAttributeResponseVector::render
   out += startTag(key, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(apiVersion, asJsonObject, request);
+    out += vec[ix]->render(asJsonObject, request);
   }
   out += endTag(false, true);
 

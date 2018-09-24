@@ -178,7 +178,7 @@ fi
 - Add: transient entities functionality (new NGSIv2 builtin attribute: dateExpires) (#3000)
 - Add: "attrs" field in POST /v2/op/query (making "attributes" obsolete) (#2604)
 - Add: "expression" field in POST /v2/op/query (#2706)
-- Fix: large integer wrong rendering in responses (#2603)
+- Fix: large integer wrong rendering in responses (#2603, #2425, #2506)
 - Remove: "scopes" field in POST /v2/op/query (#2706)
 
 * Fri Jun 15 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.14.0-1

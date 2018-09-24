@@ -87,7 +87,7 @@ Fields:
 
 Regarding `location.coords` in can use several formats:
 
-* Representing a point (the one used by NGSIv1 and NGSIv2 geo:point):
+* Representing a point (the one used by geo:point):
 
 ```
 {
@@ -96,7 +96,7 @@ Regarding `location.coords` in can use several formats:
 }
 ```
 
-* Representing a line (the one used by NGSIv2 geo:line):
+* Representing a line (the one used by geo:line):
 
 ```
 {
@@ -105,7 +105,7 @@ Regarding `location.coords` in can use several formats:
 }
 ```
 
-* Representing a polygon (the one used by NGSIv2 geo:box and NGSIv2 geo:polygon):
+* Representing a polygon (the one used by geo:box and geo:polygon):
 
 ```
 {
@@ -183,7 +183,7 @@ Example document:
 
 ## registrations collection
 
-The *registrations* collection stores information about NGSI9
+The *registrations* collection stores information about
 registrations. Each document in the collection corresponds to a
 registration.
 
@@ -203,12 +203,7 @@ Fields:
     The default status (i.e. if the document omits this field) is "active".
 -   **description** (optional): a free text string describing the registration. Maximum length is 1024.
 -   **expiration**: this is the timestamp for which the
-    registration expires. The expiration is calculated using the
-    duration parameter included in the registerContext operation
-    (basically, sum "now" and duration) and will be recalculated when a
-    registerContext for updating (i.e. using a not null registration ID
-    in the request) is received (see [programmers
-    guide](../user/duration.md)).
+    registration expires.
 -   **contextRegistration**: is an array whose elements contain the
     following information:
     -   **entities**: an array containing a list of
@@ -265,7 +260,7 @@ Example document:
 
 ## csubs collection
 
-The *csubs* collection stores information about NGSI10 subscriptions.
+The *csubs* collection stores information about context subscriptions.
 Each document in the collection corresponds to a subscription.
 
 Fields:
@@ -280,11 +275,7 @@ Fields:
     associated to the query "encapsulated" by the subscription. Default
     is `/#`.
 -   **expiration**: this is the timestamp on which the
-    subscription expires. This is calculated using the duration
-    parameter included in the subscribeContext operation (basically, sum
-    "now" and duration) and will be recalculated when an
-    updateContextSubscription is received (see [programmers
-    guide](../user/duration.md)). For permanent subscriptions (allowed in NGSIv2)
+    subscription expires. For permanent subscriptions
     an absurdly high value is used (see PERMANENT_SUBS_DATETIME in the source code).
 -   **lastNotification**: the time when last notification was sent. This
     is updated each time a notification is sent, to avoid violating throttling.
@@ -306,7 +297,7 @@ Fields:
 -   **count**: the number of notifications sent associated to
     the subscription.   
 -   **format**: the format to use to send notification, possible values are **JSON**
-    (meaning JSON notifications in NGSIv1 format), **normalized**, **keyValues** and **values** (the last three used in NGSIv2 format).
+    (meaning JSON notifications in NGSIv1 legacy format), **normalized**, **keyValues** and **values** (the last three used in NGSIv2 format).
 -   **status**: either `active` (for active subscriptions) or `inactive` (for inactive subscriptions).
 -   **description** (optional field): a free text string describing the subscription. Maximum length is 1024.
 -   **custom**: a boolean field to specify if this subscription uses customized notifications (a functionality in the NGSIv2 API).
@@ -357,7 +348,7 @@ Example document:
 
 ## casubs collection
 
-The *casubs* collection stores information about NGSI9 subscriptions.
+The *casubs* collection stores information about context availability subscriptions.
 Each document in the collection corresponds to a subscription.
 
 Fields:
@@ -368,11 +359,7 @@ Fields:
     queries by subscription IDs are very fast (as there is an automatic
     default index in \_id).
 -   **expiration**: this is the timestamp on which the subscription
-    will expire. It is calculated using the duration parameter included
-    in the subscribeContextAvailability operation (basically, sum "now"
-    and duration) and will be recalculated when an
-    updateContextAvailabilitySubscription is received (see [programmers
-    guide](../user/duration.md)).
+    will expire.
 -   **reference**: the URL to send notifications
 -   **entities**: an array of entities (mandatory). The JSON for each
     entity contains **id**, **type** and **isPattern**.

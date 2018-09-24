@@ -205,7 +205,7 @@ void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::stri
   {
     QueryContextResponse  qcr(errorCode);
     bool                  asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-    *outStringP = qcr.render(ciP->apiVersion, asJsonObject);
+    *outStringP = qcr.render(asJsonObject);
   }
   else if (ciP->restServiceP->request == SubscribeContext)
   {
@@ -226,7 +226,7 @@ void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::stri
   {
     UpdateContextResponse ucr(errorCode);
     bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-    *outStringP = ucr.render(ciP->apiVersion, asJsonObject);
+    *outStringP = ucr.render(asJsonObject);
   }
   else if (ciP->restServiceP->request == NotifyContext)
   {

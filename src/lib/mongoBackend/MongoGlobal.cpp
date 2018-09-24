@@ -1648,9 +1648,7 @@ void pruneContextElements(const ContextElementResponseVector& oldCerV, ContextEl
     ContextElementResponse* cerP    = oldCerV[ix];
     ContextElementResponse* newCerP = new ContextElementResponse();
 
-    /* Note we cannot use the ContextElement::fill() method, given that it also copies the ContextAttributeVector. The side-effect
-     * of this is that attributeDomainName and domainMetadataVector are not being copied, but it should not be a problem, given that
-     * domain attributes are not implemented */
+    /* Note we cannot use the ContextElement::fill() method, given that it also copies the ContextAttributeVector */
     newCerP->contextElement.entityId.fill(&cerP->contextElement.entityId);
 
     // FIXME P10: not sure if this is the right way to do it, maybe we need a fill() method for this
@@ -2165,6 +2163,12 @@ static bool processOnChangeConditionForSubscription
     return false;
   }
 
+  // Get the effective vectors of attributes to render (per context element)
+  for (unsigned int ix = 0; ix < rawCerV.size() ; ix++)
+  {
+      rawCerV[ix]->contextElement.filterAttributes(attrsOrder, blacklist);
+  }
+
   /* Prune "not found" CERs */
   pruneContextElements(rawCerV, &ncr.contextElementResponseVector);
 
@@ -2230,9 +2234,7 @@ static bool processOnChangeConditionForSubscription
                                                 xauthToken,
                                                 fiwareCorrelator,
                                                 renderFormat,
-                                                attrsOrder,
-                                                metadataV,
-                                                blacklist);
+                                                metadataV);
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
@@ -2249,9 +2251,8 @@ static bool processOnChangeConditionForSubscription
                                               xauthToken,
                                               fiwareCorrelator,
                                               renderFormat,
-                                              attrsOrder,
-                                              metadataV,
-                                              blacklist);
+                                              metadataV);
+
       ncr.contextElementResponseVector.release();
 
       return true;

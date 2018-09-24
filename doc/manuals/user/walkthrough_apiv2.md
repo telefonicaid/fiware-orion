@@ -18,10 +18,6 @@
 
 ## Introduction
 
-Note that there is also an [NGSIv1 version of this walkthrough](walkthrough_apiv1.md). In general,
-you should use NGSIv2 (i.e. this document), except if you need context management availability
-functionality (aka NGSI9), not yet developed in NGSIv2. In the case of doubt, you should use NGSIv2.
-
 This walkthrough adopts a practical approach that we hope will help our
 readers to get familiar with the Orion Context Broker and have some fun
 in the process :).
@@ -32,13 +28,9 @@ You should also have a look at the [NGSIv2 implementation notes](ngsiv2_implemen
 
 The main section is [context management](#context-management). It describes the
 basic context broker functionality for context management (information about entities,
-such as the temperature of a car). Some remarks to take into account in order to use this stuff.
-
-Context availability management (information not about the entities themselves, but about the providers of
-that information) has not been yet developed in the current candidate version for NGSIv2 (although a
-section about that exists at the end of this document, as a placeholder to include this information in the
-future). You need to use NGSIv1 if you want to use this functionality. See
-[NGSIv1 walkthrough](walkthrough_apiv1.md) for more details.
+such as the temperature of a car). [Context availability management](#context-availability-management)
+(information not about the entities themselves, but about the providers of
+that information) is also described as part of this document.
 
 Before starting (or if you get lost in the middle and
 need to start from scratch :) ), restart Orion Context Broker as
@@ -268,7 +260,7 @@ EOF
 ```
 
 Apart from `id` and `type` fields (that define the ID and type of the entity),
-the payload contains a set of attributes. Each attribrute contains a value
+the payload contains a set of attributes. Each attribute contains a value
 and a type.
 
 Orion Context Broker doesn't perform any check on types (e.g. it doesn't
@@ -601,7 +593,7 @@ which corresponds to the value `28.4` - no JSON involved here ...):
 curl localhost:1026/v2/entities/Room1/attrs/temperature/value -s -S -H 'Content-Type: text/plain' -X PUT -d 28.5
 ```
 
-Finally, the `PUT /v2/entities/{id}/attrs` operation can be use to replace all the attributes
+Finally, the `PUT /v2/entities/{id}/attrs` operation can be used to replace all the attributes
 of a given entity, i.e. removing previously existing ones.
 
 As in the case of entity creation, apart from simple values corresponding to
@@ -617,7 +609,7 @@ of the manual.
 
 ### Subscriptions
 
-The operations you have been familiarized with uptil now, to create, query and 
+The operations you have been familiarized with until now, to create, query and 
 update entities are the basic building blocks for synchronous context producer and
 context consumer applications.
 However, Orion Context Broker has another powerful feature that you can take advantage of: the
@@ -684,8 +676,7 @@ Let's examine in detail the different elements included in the payload:
     (however, it is still stored in the broker database and needs to be
     purged using the procedure described in the [administration
     manual](../admin/database_admin.md#deleting-expired-documents)).
-    You can extend the duration of a subscription by updating it, as
-    described [in this document](duration.md#extending-duration).
+    You can extend the duration of a subscription by updating it.
     We are using a date far enough away in time (year 2040) hoping the subscription
     will not expire while you run this tutorial :).
 -   You can also have permanent subscriptions. Just omit the `expires` field.
@@ -725,7 +716,7 @@ Let's examine in detail the different elements included in the payload:
     notification receptor a means to protect itself against context producers
     that update attribute values too frequently. In multi-CB configurations, take
     into account that the last-notification measure is local to each CB node. Although
-    each node periodically synchronizes with the DB in order to get potencially newer
+    each node periodically synchronizes with the DB in order to get potentially newer
     values (more on this [here](perf_tuning.md#subscription-cache)) it may happen that
     a particular node has an old value, so throttling is not 100% accurate.
 
@@ -785,7 +776,7 @@ don't actually do any update. This is due to the *initial notification*,
 which details are described [here](initial_notification.md).
 
 Now, do the following exercise, based on what you know from [update
-entity](#update-entity): oerform the following four updates in sequence, letting
+entity](#update-entity): perform the following four updates in sequence, letting
 pass more than 5 seconds between updates (to avoid losing
 notifications due to throttling):
 
@@ -887,7 +878,7 @@ important remarks:
 -   Given that NGSI doesn't force all the entities of a given type to
     have the same set of attributes (i.e. entities of the same type
     may have a different attributes set) the attributes set per type
-    returned by this operation is the union set of the attribut sets of
+    returned by this operation is the union set of the attribute sets of
     each entity belonging to that type.
 -   Moreover, attributes with the same in different entities may have
     different types. Thus, the `types` field associated to each attribute
@@ -944,7 +935,7 @@ The response will be:
 ### Batch operations
 
 Apart from the RESTful operations to manage entities described so far NGSIv2 also
-includs "batch" operations that may be useful in some cases. In particular,
+includes "batch" operations that may be useful in some cases. In particular,
 there is a batch update operation (`POST /v2/op/update`) and a batch query
 operation (`POST /v2/op/query`).
 
@@ -1027,7 +1018,7 @@ However `POST /v2/op/query` can express queries that `GET /v2/entities` cannot (
 a list of entities of different type).
 
 For example, to get the attributes temperature and pressure of all the entities of type Room or Car
-whose temperature is greater than 40 and that are located withon 20 km from the coordinates 40.31, -3.75, the
+whose temperature is greater than 40 and that are located within 20 km from the coordinates 40.31, -3.75, the
 following operation could be used:
 
 ```

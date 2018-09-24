@@ -32,6 +32,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/limits.h"
+#include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/Request.h"
@@ -45,7 +46,6 @@
 */
 std::string EntityTypeResponse::render
 (
-  ApiVersion          apiVersion,
   bool                asJsonObject,
   bool                asJsonOut,
   bool                collapsed
@@ -55,7 +55,7 @@ std::string EntityTypeResponse::render
 
   out += startTag();
 
-  out += entityType.render(apiVersion, asJsonObject, asJsonOut, collapsed, true, true);
+  out += entityType.render(asJsonObject, asJsonOut, collapsed, true, true);
   out += statusCode.render(false);
 
   out += endTag();
@@ -92,7 +92,7 @@ std::string EntityTypeResponse::check
   else
     return "OK";
 
-  return render(apiVersion, asJsonObject, asJsonOut, collapsed);
+  return render(asJsonObject, asJsonOut, collapsed);
 }
 
 
@@ -115,19 +115,10 @@ void EntityTypeResponse::release(void)
 */
 std::string EntityTypeResponse::toJson(void)
 {
-  std::string  out = "{";
-  char         countV[STRING_SIZE_FOR_INT];
+  JsonHelper jh;
 
-  snprintf(countV, sizeof(countV), "%lld", entityType.count);
+  jh.addRaw("attrs", entityType.contextAttributeVector.toJsonTypes());
+  jh.addNumber("count", entityType.count);
 
-  out += JSON_STR("attrs") + ":";
-
-  out += "{";
-  out += entityType.contextAttributeVector.toJsonTypes();
-  out += "}";
-
-  out += "," + JSON_STR("count") + ":" + countV;
-  out += "}";
-
-  return out;
+  return jh.str();
 }

@@ -32,6 +32,7 @@
 #include "common/limits.h"
 #include "common/tag.h"
 #include "common/string.h"
+#include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -235,7 +236,16 @@ std::string Metadata::render(bool comma)
   out += valueTag("name", name, true);
   out += valueTag("type", type, true);
 
-  if (valueType == orion::ValueTypeString)
+  if (compoundValueP != NULL)
+  {
+    // FIXME P8: We need to to this to avoid repeat the "value" keyword. I don't
+    // understand why (if you look to the similar code in Metadata::toJson(), it
+    // is not used there). It comes from the old implementation
+    compoundValueP->container = compoundValueP;
+
+    out += JSON_STR("value") + ":" + compoundValueP->toJson(true);
+  }
+  else if (valueType == orion::ValueTypeString)
   {
     out += valueTag("value", xValue, false);
   }
@@ -251,29 +261,6 @@ std::string Metadata::render(bool comma)
   {
     out += JSON_STR("value") + ":" + xValue;
   }
-  else if (valueType == orion::ValueTypeObject)
-  {
-    bool        isCompoundVector = false;
-    ApiVersion  apiVersion       = V1;
-
-    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::ValueTypeVector))
-    {
-      isCompoundVector = true;
-    }
-    else if (compoundValueP->isVector())
-    {
-      compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
-    }    
-
-    //
-    // Make compoundValueP->render not render the name 'value'
-    //
-    compoundValueP->container = compoundValueP;
-
-    out += startTag("value", isCompoundVector);
-    out += compoundValueP->render(apiVersion, true, true);
-    out += endTag(false, isCompoundVector);
-  }
   else if (valueType == orion::ValueTypeNotGiven)
   {    
     out += JSON_STR("value") + ":" + JSON_STR("not given");
@@ -281,20 +268,6 @@ std::string Metadata::render(bool comma)
   else
   {
     out += JSON_STR("value") + ":" + JSON_STR("unknown json type");
-  }
-
-  if ((valueType == orion::ValueTypeNumber) || (valueType == orion::ValueTypeBoolean) || (valueType == orion::ValueTypeNull))
-  {
-    //
-    // Adding newline for the types that do not use the valueTag() function
-    //
-    // FIXME: This might destroy V2 rendering
-    //   This newline is only desired for V1 requests and as this function hasn't that knowledge, we 'hardcode'
-    //   V1 behavior here, as V2 requests should use toJson and not render().
-    //   So, if V2 rendering is destroyed by this modification, it is only because the V2 rendering is using
-    //   a method that it SHOULD NOT USE !
-    //
-    out += "\n";
   }
 
   out += endTag(comma);
@@ -368,7 +341,7 @@ std::string Metadata::check(ApiVersion apiVersion)
       return "Invalid characters in metadata value";
     }
 
-    if (stringValue == "")
+    if (apiVersion == V1 && stringValue == "")
     {
       alarmMgr.badInput(clientIp, "missing metadata value");
       return "missing metadata value";
@@ -427,7 +400,7 @@ std::string Metadata::toStringValue(void) const
     }
     else // regular number
     {
-      return toString(numberValue);
+      return double2string(numberValue);
     }    
     break;
 
@@ -458,11 +431,9 @@ std::string Metadata::toStringValue(void) const
 *
 * toJson - 
 */
-std::string Metadata::toJson(bool isLastElement)
+std::string Metadata::toJson(void)
 {
-  std::string  out;
-
-  out = JSON_STR(name) + ":{";
+  JsonHelper jh;
 
   /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
   std::string defType = defaultType(valueType);
@@ -472,62 +443,45 @@ std::string Metadata::toJson(bool isLastElement)
     defType = defaultType(orion::ValueTypeVector);
   }
 
-  out += (type != "")? JSON_VALUE("type", type) : JSON_VALUE("type", defType);
-  out += ",";
+  jh.addString("type", (type != "")? type : defType);
 
-  if (valueType == orion::ValueTypeString)
+  if (compoundValueP != NULL)
   {
-    out += JSON_VALUE("value", stringValue);
+    jh.addRaw("value", compoundValueP->toJson(true));
+  }
+  else if (valueType == orion::ValueTypeString)
+  {
+    jh.addString("value", stringValue);
   }
   else if (valueType == orion::ValueTypeNumber)
   {
-    std::string effectiveValue;
-
     if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
     {
-      effectiveValue = JSON_STR(isodate2str(numberValue));
+      jh.addDate("value", numberValue);
     }
     else // regular number
     {
-      effectiveValue = toString(numberValue);
+      jh.addNumber("value", numberValue);
     }
-    out += JSON_VALUE_NUMBER("value", effectiveValue);
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
-    out += JSON_VALUE_BOOL("value", boolValue);
+    jh.addBool("value", boolValue);
   }
   else if (valueType == orion::ValueTypeNull)
   {
-    out += JSON_STR("value") + ":null";
-  }
-  else if (valueType == orion::ValueTypeObject)
-  {
-    if ((compoundValueP->isObject()) || (compoundValueP->isVector()))
-    {
-      compoundValueP->renderName = true;
-      out += compoundValueP->toJson(isLastElement, false);
-    }
+    jh.addRaw("value", "null");
   }
   else if (valueType == orion::ValueTypeNotGiven)
   {
     LM_E(("Runtime Error (value not given for metadata %s)", name.c_str()));
-    out += JSON_VALUE("value", stringValue);
   }
   else
   {
     LM_E(("Runtime Error (invalid value type for metadata %s)", name.c_str()));
-    out += JSON_VALUE("value", stringValue);
   }
 
-  out += "}";
-
-  if (!isLastElement)
-  {
-    out += ",";
-  }
-
-  return out;
+  return jh.str();
 }
 
 

@@ -44,7 +44,6 @@
 */
 std::string EntityTypeVectorResponse::render
 (
-  ApiVersion  apiVersion,
   bool        asJsonObject,
   bool        asJsonOut,
   bool        collapsed
@@ -56,7 +55,7 @@ std::string EntityTypeVectorResponse::render
 
   if (entityTypeVector.size() > 0)
   {
-    out += entityTypeVector.render(apiVersion, asJsonObject, asJsonOut, collapsed, true);
+    out += entityTypeVector.render(asJsonObject, asJsonOut, collapsed, true);
   }
 
   out += statusCode.render(false);
@@ -96,7 +95,7 @@ std::string EntityTypeVectorResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, asJsonOut, collapsed);
+  return render(asJsonObject, asJsonOut, collapsed);
 }
 
 

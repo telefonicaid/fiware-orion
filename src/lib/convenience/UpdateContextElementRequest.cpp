@@ -27,7 +27,6 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
-#include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "convenience/UpdateContextElementRequest.h"
 #include "convenience/UpdateContextElementResponse.h"
@@ -44,8 +43,7 @@ std::string UpdateContextElementRequest::render(ApiVersion apiVersion, bool asJs
   std::string out = "";
 
   out += startTag();
-  out += attributeDomainName.render(true);
-  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType);
+  out += contextAttributeVector.render(asJsonObject, requestType);
   out += endTag();
 
   return out;
@@ -56,15 +54,6 @@ std::string UpdateContextElementRequest::render(ApiVersion apiVersion, bool asJs
 /* ****************************************************************************
 *
 * check - 
-*
-*
-* FIXME P3: once (if ever) AttributeDomainName::check stops to always return "OK", put back this piece of code 
-*           in its place:
--
-*   else if ((res = attributeDomainName.check(AppendContextElement, indent, predetectedError, counter)) != "OK")
-*   {
-*     response.errorCode.fill(SccBadRequest, res);
-*   }
 *
 */
 std::string UpdateContextElementRequest::check

@@ -42,7 +42,6 @@
 */
 std::string ContextElementResponseVector::render
 (
-  ApiVersion   apiVersion,
   bool         asJsonObject,
   RequestType  requestType,
   bool         comma,
@@ -60,7 +59,7 @@ std::string ContextElementResponseVector::render
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(apiVersion, asJsonObject, requestType, ix < (vec.size() - 1), omitAttributeValues);
+    out += vec[ix]->render(asJsonObject, requestType, ix < (vec.size() - 1), omitAttributeValues);
   }
 
   out += endTag(comma, true);
@@ -77,18 +76,14 @@ std::string ContextElementResponseVector::render
 std::string ContextElementResponseVector::toJson
 (
   RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsFilter,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             blacklist
+  const std::vector<std::string>&  metadataFilter
 )
 {
   std::string out;
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += (renderFormat == NGSI_V2_VALUES)? "[": "{";
-    out += vec[ix]->toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
-    out += (renderFormat == NGSI_V2_VALUES)? "]": "}";
+    out += vec[ix]->toJson(renderFormat, metadataFilter);
 
     if (ix != vec.size() - 1)
     {

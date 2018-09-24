@@ -39,18 +39,6 @@
 #include "rest/uriParamNames.h"
 
 
-/* ****************************************************************************
-*
-* attributeDomainName - 
-*/
-static std::string attributeDomainName(const std::string& path, const std::string& value, ParseData* reqData)
-{
-  LM_T(LmtParse, ("Got an attributeDomainName"));
-  reqData->acer.res.attributeDomainName.set(value);
-  return "OK";
-}
-
-
 
 /* ****************************************************************************
 *
@@ -163,60 +151,6 @@ static std::string contextMetadataValue(const std::string& path, const std::stri
 
 /* ****************************************************************************
 *
-* domainMetadata - 
-*/
-static std::string domainMetadata(const std::string& path, const std::string& value, ParseData* reqData)
-{
-  LM_T(LmtParse, ("Got a metadata"));
-  reqData->acer.domainMetadataP = new Metadata();
-  reqData->acer.res.domainMetadataVector.push_back(reqData->acer.domainMetadataP);
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataName - 
-*/
-static std::string domainMetadataName(const std::string& path, const std::string& value, ParseData* reqData)
-{
-  LM_T(LmtParse, ("Got a metadata name '%s'", value.c_str()));
-  reqData->acer.domainMetadataP->name = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataType - 
-*/
-static std::string domainMetadataType(const std::string& path, const std::string& value, ParseData* reqData)
-{
-  LM_T(LmtParse, ("Got a metadata type '%s'", value.c_str()));
-  reqData->acer.domainMetadataP->type = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataValue - 
-*/
-static std::string domainMetadataValue(const std::string& path, const std::string& value, ParseData* reqData)
-{
-  LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
-  reqData->acer.domainMetadataP->stringValue = value;
-  reqData->acer.domainMetadataP->valueType = orion::ValueTypeString;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * entityIdId - 
 */
 static std::string entityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
@@ -269,8 +203,6 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
 */
 JsonNode jsonAcerParseVector[] =
 {
-  { "/attributeDomainName",                          attributeDomainName   },
-
   { "/id",                                           entityIdId            },
   { "/type",                                         entityIdType          },
   { "/isPattern",                                    entityIdIsPattern     },
@@ -287,12 +219,6 @@ JsonNode jsonAcerParseVector[] =
   { "/attributes/attribute/metadatas/metadata/type",  contextMetadataType   },
   { "/attributes/attribute/metadatas/metadata/value", contextMetadataValue  },
 
-  { "/metadatas",                                    jsonNullTreat         },
-  { "/metadatas/metadata",                           domainMetadata        },
-  { "/metadatas/metadata/name",                      domainMetadataName    },
-  { "/metadatas/metadata/type",                      domainMetadataType    },
-  { "/metadatas/metadata/value",                     domainMetadataValue   },
-
   { "LAST", NULL }
 };
 
@@ -304,11 +230,8 @@ JsonNode jsonAcerParseVector[] =
 */
 void jsonAcerInit(ParseData* reqData)
 {
-  reqData->acer.res.attributeDomainName.set("");
-
   reqData->acer.attributeP       = NULL;
   reqData->acer.metadataP        = NULL;
-  reqData->acer.domainMetadataP  = NULL;
 }
 
 

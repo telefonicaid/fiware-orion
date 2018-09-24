@@ -27,20 +27,7 @@
 						}
 					]
 				}
-			],
-      "attributeDomainName" : "ATTR_DOMAIN_NAME",
-      "domainMetadatas" : [
-        {
-          "name"  : "dmName",
-          "type"  : "dmType",
-          "value" : "dmValue"
-        },
-        {
-          "name"  : "dmName2",
-          "type"  : "dmType2",
-          "value" : "dmValue2"
-        }
-      ]
+			]
 		}
 	],
 	"updateAction": "UPDATE"

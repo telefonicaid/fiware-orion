@@ -129,19 +129,6 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
 
 /* ****************************************************************************
 *
-* attributeDomainName - 
-*/
-static std::string attributeDomainName(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got an attributeDomainName: '%s'", value.c_str()));
-  parseDataP->ncr.cerP->contextElement.attributeDomainName.set(value);
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * attribute - 
 */
 static std::string attribute(const std::string& path, const std::string& value, ParseData* parseDataP)
@@ -289,59 +276,6 @@ static std::string attributeMetadataValue(const std::string& path, const std::st
 
 
 
-/* ****************************************************************************
-*
-* domainMetadata - 
-*/
-static std::string domainMetadata(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Creating a domainMetadata"));
-  parseDataP->ncr.domainMetadataP = new Metadata();
-  parseDataP->ncr.cerP->contextElement.domainMetadataVector.push_back(parseDataP->ncr.domainMetadataP);
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataName - 
-*/
-static std::string domainMetadataName(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a domainMetadata name: '%s'", value.c_str()));
-  parseDataP->ncr.domainMetadataP->name = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataType - 
-*/
-static std::string domainMetadataType(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a domainMetadata type: '%s'", value.c_str()));
-  parseDataP->ncr.domainMetadataP->type = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataValue - 
-*/
-static std::string domainMetadataValue(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a domainMetadata value: '%s'", value.c_str()));
-  parseDataP->ncr.domainMetadataP->stringValue = value;
-  parseDataP->ncr.domainMetadataP->valueType = orion::ValueTypeString;
-  return "OK";
-}
-
-
 #define CELEM "/contextResponses/contextResponse/contextElement"
 /* ****************************************************************************
 *
@@ -359,8 +293,6 @@ JsonNode jsonNcrParseVector[] =
   { CELEM "/type",                                                entityIdType             },
   { CELEM "/isPattern",                                           entityIdIsPattern        },
 
-  { CELEM "/attributeDomainName",                                 attributeDomainName      },
-
   { CELEM "/attributes",                                          jsonNullTreat            },
   { CELEM "/attributes/attribute",                                attribute                },
   { CELEM "/attributes/attribute/name",                           attributeName            },
@@ -372,12 +304,6 @@ JsonNode jsonNcrParseVector[] =
   { CELEM "/attributes/attribute/metadatas/metadata/name",        attributeMetadataName    },
   { CELEM "/attributes/attribute/metadatas/metadata/type",        attributeMetadataType    },
   { CELEM "/attributes/attribute/metadatas/metadata/value",       attributeMetadataValue   },
-
-  { CELEM "/metadatas",                                           jsonNullTreat            },
-  { CELEM "/metadatas/metadata",                                  domainMetadata           },
-  { CELEM "/metadatas/metadata/name",                             domainMetadataName       },
-  { CELEM "/metadatas/metadata/type",                             domainMetadataType       },
-  { CELEM "/metadatas/metadata/value",                            domainMetadataValue      },
 
   { "/contextResponses/contextResponse/statusCode",               jsonNullTreat            },
   { "/contextResponses/contextResponse/statusCode/code",          statusCodeCode           },
@@ -400,7 +326,6 @@ void jsonNcrInit(ParseData* parseDataP)
   parseDataP->ncr.cerP                 = NULL;
   parseDataP->ncr.attributeP           = NULL;
   parseDataP->ncr.attributeMetadataP   = NULL;
-  parseDataP->ncr.domainMetadataP      = NULL;
 }
 
 

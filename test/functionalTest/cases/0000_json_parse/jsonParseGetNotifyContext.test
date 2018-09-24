@@ -39,7 +39,6 @@ payload='{
         "type": "Room",
         "isPattern": "false",
         "id": "ConferenceRoom",
-        "attributeDomainName" : "ADN",
         "attributes": [
           {
             "name": "temperature",
