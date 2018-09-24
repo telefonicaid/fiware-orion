@@ -122,9 +122,9 @@ Please have a look at the [Quick Start guide](doc/manuals/quick_start_guide.md) 
 
 ## API Walkthrough
 
-* [FIWARE NGSI v2](doc/manuals/user/walkthrough_apiv2.md) (Markdown)
-* [FIWARE NGSI v2](http://telefonicaid.github.io/fiware-orion/api/v2/stable/cookbook) (Apiary)
-  * See also [NGSIv2 implementation notes](doc/manuals/user/ngsiv2_implementation_notes.md)
+* FIWARE NGSI v2 [(en)](doc/manuals/user/walkthrough_apiv2.md) [(jp)](doc/manuals.jp/user/walkthrough_apiv2.md) (Markdown)
+* FIWARE NGSI v2 [(en)](http://telefonicaid.github.io/fiware-orion/api/v2/stable/cookbook) [(jp)](https://open-apis.letsfiware.jp/fiware-orion/api/v2/stable/cookbook) (Apiary)
+  * See also NGSIv2 implementation notes [(en)](doc/manuals/user/ngsiv2_implementation_notes.md) [(jp)](doc/manuals.jp/user/ngsiv2_implementation_notes.md)
 
 [Top](#top)
 
@@ -132,8 +132,8 @@ Please have a look at the [Quick Start guide](doc/manuals/quick_start_guide.md) 
 
 API Reference Documentation:
 
-* [FIWARE NGSI v2](http://telefonicaid.github.io/fiware-orion/api/v2/stable) (Apiary)
-  * See also [NGSIv2 implementation notes](doc/manuals/user/ngsiv2_implementation_notes.md)
+* FIWARE NGSI v2 [(en)](http://telefonicaid.github.io/fiware-orion/api/v2/stable) [(jp)](https://open-apis.letsfiware.jp/fiware-orion/api/v2/stable/) (Apiary)
+  * See also NGSIv2 implementation notes [(en)](doc/manuals/user/ngsiv2_implementation_notes.md) [(jp)](doc/manuals.jp/user/ngsiv2_implementation_notes.md)
 
 Orion Reference Documentation:
 
@@ -166,13 +166,13 @@ Please have a look to the section [on building the source code](doc/manuals/admi
 * Advanced Programming [(en)](doc/manuals/user/README.md) [(jp)](doc/manuals.jp/user/README.md)
 * Installation and administration [(en)](doc/manuals/admin/README.md) [(jp)](doc/manuals.jp/admin/README.md)
 * Container-based deployment
-  * [Docker](docker/README.md)
-  * [Docker Swarm and HA](docker/docker_swarm.md)
+  * Docker [(en)](docker/README.md) [(jp)](docker/README.jp.md)
+  * Docker Swarm and HA [(en)](docker/docker_swarm.md) [(jp)](docker/docker_swarm.jp.md)
 * Development Manual [(en)](doc/manuals/devel/README.md) [(jp)](doc/manuals.jp/devel/README.md)
-* [Sample code contributions](doc/manuals/code_contributions.md)
-* [Contribution guidelines](doc/manuals/contribution_guidelines.md), especially important if you plan to contribute with code
+* Sample code contributions [(en)](doc/manuals/code_contributions.md) [(jp)](doc/manuals.jp/code_contributions.md)
+* Contribution guidelines [(en)](doc/manuals/contribution_guidelines.md) [(jp)](doc/manuals.jp/contribution_guidelines.md), especially important if you plan to contribute with code
   to Orion Context Broker
-* [Deprecated features](doc/manuals/deprecated.md)
+* Deprecated features [(en)](doc/manuals/deprecated.md) [(jp)](doc/manuals.jp/deprecated.md)
 
 [Top](#top)
 
