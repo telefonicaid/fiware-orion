@@ -77,7 +77,7 @@ static bool dataProvidedParse
 
   if (dataProvided.HasMember("attrs"))
   {
-    if (!parseStringVector(&dataProvidedP->attributes, dataProvided["attrs"], "attrs", true, errorStringP))
+    if (!parseStringVector(&dataProvidedP->attributes, dataProvided["attrs"], "attrs", true, true, errorStringP))
     {
       return false;
     }

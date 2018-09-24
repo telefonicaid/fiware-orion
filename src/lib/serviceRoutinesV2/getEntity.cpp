@@ -90,7 +90,8 @@ std::string getEntity
   // Note we cannot set the attrs filter on &parseDataP->qcr.res.attrsFilterList given that parameter is used for querying on DB
   // and some .test would break. We use a fresh variable (attributeFilter) for that
   StringList attributeFilter;
-  setFilters(ciP->uriParam, ciP->uriParamOptions, &attributeFilter, &parseDataP->qcr.res.metadataList);
+  setAttrsFilter(ciP->uriParam, ciP->uriParamOptions, &attributeFilter);
+  setMetadataFilter(ciP->uriParam, &parseDataP->qcr.res.metadataList);
 
   // Call standard op postQueryContext
   postQueryContext(ciP, components, compV, parseDataP);

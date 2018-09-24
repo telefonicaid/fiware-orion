@@ -37,6 +37,7 @@
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutinesV2/getEntityAttribute.h"
+#include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "parse/forbiddenChars.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
@@ -105,13 +106,16 @@ std::string getEntityAttributeValue
       // Do not use attribute name, change to 'value'
       attribute.pcontextAttribute->name = "value";
 
+      StringList metadataFilter;
+      setMetadataFilter(ciP->uriParam, &metadataFilter);
+
       TIMED_RENDER(answer = attribute.render(ciP->httpHeaders.accepted("text/plain"),
                                              ciP->httpHeaders.accepted("application/json"),
                                              ciP->httpHeaders.outformatSelect(),
                                              &(ciP->outMimeType),
                                              &(ciP->httpStatusCode),
                                              ciP->uriParamOptions[OPT_KEY_VALUES],
-                                             ciP->uriParam[URI_PARAM_METADATA],
+                                             metadataFilter.stringV,
                                              EntityAttributeValueRequest));
     }
     else

@@ -47,7 +47,7 @@ extern bool isIPv6(const std::string& in);
 *
 * stringSplit - 
 */
-extern int stringSplit(const std::string& in, char delimiter, std::vector<std::string>& outV);
+extern int stringSplit(const std::string& in, char delimiter, std::vector<std::string>& outV, bool unique = false);
 
 
 

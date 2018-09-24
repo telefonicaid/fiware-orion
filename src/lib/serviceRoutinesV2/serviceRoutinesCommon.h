@@ -40,14 +40,26 @@
 
 /* ****************************************************************************
 *
-* semRender -
+* setAttrsFilter -
 *
 */
-extern void setFilters
+extern void setAttrsFilter
 (
   std::map<std::string, std::string>&  uriParam,
   std::map<std::string, bool>&         uriParamOptions,
-  StringList*                          attrsFilter,
+  StringList*                          attrsFilter
+);
+
+
+
+/* ****************************************************************************
+*
+* setMetadataFilter -
+*
+*/
+extern void setMetadataFilter
+(
+  std::map<std::string, std::string>&  uriParam,
   StringList*                          metadataFilter
 );
 

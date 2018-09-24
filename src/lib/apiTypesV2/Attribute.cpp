@@ -42,14 +42,14 @@
 */
 std::string Attribute::render
 (
-  bool                acceptedTextPlain,   // in parameter (pass-through)
-  bool                acceptedJson,        // in parameter (pass-through)
-  MimeType            outFormatSelection,  // in parameter (pass-through)
-  MimeType*           outMimeTypeP,        // out parameter (pass-through)
-  HttpStatusCode*     scP,                 // out parameter (pass-through)
-  bool                keyValues,           // in parameter
-  const std::string&  metadataList,        // in parameter
-  RequestType         requestType          // in parameter
+  bool                             acceptedTextPlain,   // in parameter (pass-through)
+  bool                             acceptedJson,        // in parameter (pass-through)
+  MimeType                         outFormatSelection,  // in parameter (pass-through)
+  MimeType*                        outMimeTypeP,        // out parameter (pass-through)
+  HttpStatusCode*                  scP,                 // out parameter (pass-through)
+  bool                             keyValues,           // in parameter
+  const std::vector<std::string>&  metadataFilter,      // in parameter
+  RequestType                      requestType          // in parameter
 )
 {
   RenderFormat  renderFormat = (keyValues == true)? NGSI_V2_KEYVALUES : NGSI_V2_NORMALIZED;
@@ -69,13 +69,6 @@ std::string Attribute::render
     }
     else
     {
-      std::vector<std::string> metadataFilter;
-
-      if (metadataList != "")
-      {
-        stringSplit(metadataList, ',', metadataFilter);
-      }
-
       if (renderFormat == NGSI_V2_KEYVALUES)
       {
         JsonHelper jh;
