@@ -9,3 +9,4 @@
 - Fix: Missing or empty metadata values were not allowed in NGSIv2 create/update operations (#3121)
 - Fix: default types for entities and attributes in NGSIv2 was wrongly using "none" in some cases
 - Fix: With NGSIv2 replace operations the geolocalization field is inconsistent in DB (#1142) (#3167)
+- Hardening: Orion now works with Mongo 3.6.
