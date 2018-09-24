@@ -235,8 +235,13 @@ HttpStatusCode mongoEntityTypesValues
 
   // Processing result to build response
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
-
-  std::vector<BSONElement> resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
+  
+  std::vector<BSONElement> resultsArray = std::vector<BSONElement>();
+  
+  if (result.hasField("cursor"))
+  {
+    resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
+  }
 
   if (resultsArray.size() == 0)
   {
@@ -395,7 +400,12 @@ HttpStatusCode mongoEntityTypes
   // Processing result to build response
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
+  std::vector<BSONElement> resultsArray = std::vector<BSONElement>();
+  
+  if (result.hasField("cursor"))
+  {
+    resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
+  }
 
   if (resultsArray.size() == 0)
   {
@@ -627,7 +637,12 @@ HttpStatusCode mongoAttributesForEntityType
   /* Processing result to build response */
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
+  std::vector<BSONElement> resultsArray = std::vector<BSONElement>();
+  
+  if (result.hasField("cursor"))
+  {
+    resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
+  }
 
   responseP->entityType.count = countEntities(tenant, servicePathV, entityType);
 
