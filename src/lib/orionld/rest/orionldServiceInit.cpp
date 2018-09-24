@@ -204,6 +204,7 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   //
   char*  details  = (char*) "OK";
   Kjson* kjsonP   = kjBufferCreate();
+  int    retries  = 0;
 
   if (kjsonP == NULL)
   {
@@ -212,8 +213,19 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   }
 
   orionldDefaultContext.url  = ORIONLD_DEFAULT_CONTEXT_URL;
-  orionldDefaultContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_DEFAULT_CONTEXT_URL, &details);
   orionldDefaultContext.next = NULL;
+  orionldDefaultContext.tree = NULL;
+
+  
+  while ((orionldDefaultContext.tree == NULL) && (retries < 5))
+  {
+    orionldDefaultContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_DEFAULT_CONTEXT_URL, &details);
+    if (orionldDefaultContext.tree != NULL)
+      break;
+
+    ++retries;
+    LM_E(("Error %d downloading default context %s: %s", retries, ORIONLD_DEFAULT_CONTEXT_URL, details));
+  }
 
   if (orionldDefaultContext.tree == NULL)
   {

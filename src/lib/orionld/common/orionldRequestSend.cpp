@@ -127,7 +127,7 @@ bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoIn
   LM_T(LmtRequestSend, ("curl_easy_perform returned %d", cCode));
   if (cCode != CURLE_OK)
   {
-    *detailsPP = (char*) "internal error at sending of curl request";
+    *detailsPP = (char*) url;
 
     // This function must release the allocated respose buffer in case of errpr
     free(rBufP->buf);

@@ -221,12 +221,12 @@ Date: REGEX(.*)
 06. URL in context is a valid URL but it doesn't exist
 ======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 158
+Content-Length: 140
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "internal error at sending of curl request",
+    "details": "http://valid.url/oh/yes",
     "title": "failure to create context from URL",
     "type": "http://example.org/ngsi-ld/errors/BadRequestData"
 }

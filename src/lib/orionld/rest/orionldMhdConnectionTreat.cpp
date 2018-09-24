@@ -36,6 +36,7 @@ extern "C"
 #include "rest/ConnectionInfo.h"                            // ConnectionInfo
 #include "rest/restReply.h"                                 // restReply
 
+#include "orionld/common/orionldErrorResponse.h"            // orionldErrorResponseCreate
 #include "orionld/serviceRoutines/orionldBadVerb.h"         // orionldBadVerb
 #include "orionld/rest/orionldServiceInit.h"                // orionldRestServiceV 
 #include "orionld/rest/orionldServiceLookup.h"              // orionldServiceLookup
@@ -50,6 +51,8 @@ extern "C"
 //
 int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 {
+  bool error = false;
+
   LM_T(LmtMhd, ("Read all the payload - treating the request!"));
 
   // If no error predetected, lookup the service and call its service routine
@@ -64,33 +67,41 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       LM_T(LmtPayloadParse, ("parsing the payload '%s'", ciP->payload));
       
       ciP->requestTree = kjParse(ciP->kjsonP, ciP->payload);
-      LM_T(LmtPayloadParse, ("After kjParse"));
+      LM_T(LmtPayloadParse, ("After kjParse: %p", ciP->requestTree));
       if (ciP->requestTree == NULL)
-        LM_X(1, ("JSON parse error"));
+      {
+        LM_TMP(("Creating Error Response for JSON Parse Error (%s)", ciP->kjsonP->errorString));
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "JSON Parse Error", ciP->kjsonP->errorString, OrionldDetailsString);
+        ciP->httpStatusCode = SccBadRequest;
+        error = true;
+      }
       LM_T(LmtPayloadParse, ("All good - payload parsed"));
     }
 
-    if (ciP->serviceP != NULL)
+    if (error == false)
     {
-      LM_T(LmtServiceRoutine, ("Calling Service Routine %s", ciP->serviceP->url));
-      bool b = ciP->serviceP->serviceRoutine(ciP);
-      LM_T(LmtServiceRoutine,("service routine '%s' done", ciP->serviceP->url));
-
-      if (b == false)
+      if (ciP->serviceP != NULL)
       {
-        //
-        // If the service routine failed (returned FALSE), but no HTTP status code is set,
-        // The HTTP status code defaults to 400
-        //
-        if (ciP->httpStatusCode == SccOk)
+        LM_T(LmtServiceRoutine, ("Calling Service Routine %s", ciP->serviceP->url));
+        bool b = ciP->serviceP->serviceRoutine(ciP);
+        LM_T(LmtServiceRoutine,("service routine '%s' done", ciP->serviceP->url));
+
+        if (b == false)
         {
-          ciP->httpStatusCode = SccBadRequest;
+          //
+          // If the service routine failed (returned FALSE), but no HTTP status code is set,
+          // The HTTP status code defaults to 400
+          //
+          if (ciP->httpStatusCode == SccOk)
+          {
+            ciP->httpStatusCode = SccBadRequest;
+          }
         }
       }
-    }
-    else
-    {
-      orionldBadVerb(ciP);
+      else
+      {
+        orionldBadVerb(ciP);
+      }
     }
   }
 

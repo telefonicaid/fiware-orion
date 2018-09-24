@@ -80,7 +80,7 @@ void orionldErrorResponseCreate(ConnectionInfo* ciP, OrionldResponseErrorType er
     }
     else  // lookup 'details' in context
     {
-      KjNode* nodeP = orionldContextItemLookup(ciP->contextP, details);
+      KjNode*  nodeP = orionldContextItemLookup(ciP->contextP, details);
       char     contextDetailsV[512];  // FIXME: Define a max length for a context item?
 
       if (nodeP == NULL)
