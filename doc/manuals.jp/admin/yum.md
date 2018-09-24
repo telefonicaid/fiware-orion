@@ -18,8 +18,11 @@
 name=FIWARE release repository
 baseurl=https://nexus.lab.fiware.org/repository/el/7/x86_64/release
 enabled=1
+protect=0
 gpgcheck=0
-priority=1
+metadata_expire=30s
+autorefresh=1
+type=rpm-md
 
 ```
 または、[FIWARE public repository](https://nexus.lab.fiware.org/repository/raw/public/repositories/el/7/x86_64/fiware-release.repo) からダウンロードします。
@@ -35,8 +38,11 @@ sudo wget -P /etc/yum.repos.d/ https://nexus.lab.fiware.org/repository/raw/publi
 name=FIWARE nightly repository
 baseurl=https://nexus.lab.fiware.org/repository/el/7/x86_64/nightly
 enabled=1
+protect=0
 gpgcheck=0
-priority=1
+metadata_expire=30s
+autorefresh=1
+type=rpm-md
 
 ```
 または、[FIWARE public repository](https://nexus.lab.fiware.org/repository/raw/public/repositories/el/7/x86_64/fiware-nightly.repo) からダウンロードします。
