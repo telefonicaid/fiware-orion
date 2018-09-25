@@ -7,8 +7,9 @@
 [![License badge](https://img.shields.io/badge/license-AGPL-blue.svg)](https://opensource.org/licenses/AGPL-3.0)
 [![Documentation badge](https://readthedocs.org/projects/fiware-orion/badge/?version=latest)](http://fiware-orion.readthedocs.io/en/latest/?badge=latest)
 [![Docker badge](https://img.shields.io/docker/pulls/fiware/orion.svg)](https://hub.docker.com/r/fiware/orion/)
-[![SOF support badge](https://img.shields.io/badge/tag-fiware--orion-orange.svg?logo=stackoverflow)](http://stackoverflow.com/questions/tagged/fiware-orion)
-[![NGSI v2](https://img.shields.io/badge/NGSI-v2-blue.svg)](http://fiware.github.io/context.Orion/api/v2/stable/)
+[![SOF support badge](https://nexus.lab.fiware.org/repository/raw/public/badges/stackoverflow/orion.svg)](http://stackoverflow.com/questions/tagged/fiware-orion)
+[![Build badge](https://img.shields.io/travis/telefonicaid/fiware-orion.svg)](https://travis-ci.org/telefonicaid/fiware-orion/)
+[![NGSI v2](https://nexus.lab.fiware.org/repository/raw/public/badges/specifications/ngsiv2.svg)](http://fiware.github.io/context.Orion/api/v2/stable/)
 
 * [Introduction](#introduction)
 * [GEi overall description](#gei-overall-description)
@@ -24,7 +25,7 @@
 * [Advanced topics](#advanced-topics)
 * [License](#license)
 * [Support](#support)
-		  
+
 ## Introduction
 
 This is the code repository for the Orion Context Broker, the reference implementation of the Publish/Subscribe Context Broker GE.
@@ -76,7 +77,7 @@ How to run Orion Context Broker can be found at [the corresponding section of th
 
 In order to create an entity (Room1) with two attributes (temperature and pressure):
 
-``` 
+```
 curl <orion_host>:1026/v2/entities -s -S --header 'Content-Type: application/json' \
     -X POST -d @- <<EOF
 {
@@ -92,13 +93,13 @@ curl <orion_host>:1026/v2/entities -s -S --header 'Content-Type: application/jso
   }
 }
 EOF
-``` 
+```
 In order to query the entity:
 
     curl <orion_host>:1026/v2/entities/Room2 -s -S --header 'Accept: application/json' | python -mjson.tool
 
 In order to update one of the entity atributes (temperature):
-``` 
+```
 curl <orion_host>:1026/v2/entities/Room2/attrs/temperature -s -S \
     --header 'Content-Type: application/json' \
     -X PUT -d @- <<EOF
@@ -107,7 +108,7 @@ curl <orion_host>:1026/v2/entities/Room2/attrs/temperature -s -S \
   "type": "Number"
 }
 EOF
-``` 
+```
 
 or (more compact):
 ```
