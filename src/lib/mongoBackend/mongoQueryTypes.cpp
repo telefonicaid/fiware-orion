@@ -235,9 +235,9 @@ HttpStatusCode mongoEntityTypesValues
 
   // Processing result to build response
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
-  
+
   std::vector<BSONElement> resultsArray = std::vector<BSONElement>();
-  
+
   if (result.hasField("cursor"))
   {
     resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
@@ -401,7 +401,7 @@ HttpStatusCode mongoEntityTypes
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
   std::vector<BSONElement> resultsArray = std::vector<BSONElement>();
-  
+
   if (result.hasField("cursor"))
   {
     resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
@@ -638,7 +638,7 @@ HttpStatusCode mongoAttributesForEntityType
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
   std::vector<BSONElement> resultsArray = std::vector<BSONElement>();
-  
+
   if (result.hasField("cursor"))
   {
     resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
