@@ -217,6 +217,11 @@ static RestService getServiceV[] =
   { SemStateRequest,                               2, { "admin", "sem"                                                                 },  semStateTreat                                    },
   { MetricsRequest,                                2, { "admin", "metrics"                                                             },  getMetrics                                       },
 
+  // Test for NGSI-LD like URLs. Example with GET /ngsi-ld/v1/entities/E1/attrs/A1
+  // E1 and A1 could be URIs (with slashes inside)
+
+  { getNgsiTestRequest, 6, { "ngsi-ld", "v1", "entities", "*", "attrs", "*"  },  getNgsiTest },
+
 #ifdef DEBUG
   { ExitRequest,                                   2, { "exit", "*"                                                                    },  exitTreat                                        },
   { ExitRequest,                                   1, { "exit"                                                                         },  exitTreat                                        },

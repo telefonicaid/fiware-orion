@@ -132,7 +132,11 @@ typedef enum RequestType
   RegistrationRequest,
   RegistrationsRequest,
 
-  InvalidRequest = 100
+  InvalidRequest = 100,
+
+  // PoC
+  getNgsiTestRequest = 200
+
 } RequestType;
 
 

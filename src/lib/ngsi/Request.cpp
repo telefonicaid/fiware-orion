@@ -126,6 +126,7 @@ const char* requestType(RequestType rt)
 
   case RegistrationRequest:                              return "RegistrationRequest";
   case RegistrationsRequest:                             return "RegistrationsRequest";
+  case getNgsiTestRequest:                               return "getNgsiTestRequest";
   }
 
   return "";

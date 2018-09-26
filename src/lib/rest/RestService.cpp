@@ -521,6 +521,80 @@ static bool compErrorDetect
 
 
 
+// FIXME PoC: maybe we have already a function like this in some library?
+static std::string join(const std::vector<std::string>& vec, unsigned int from, unsigned int to, char delimiter)
+{
+  // Safety check
+  if (from > to)
+  {
+    return "";
+  }
+
+  std::string s;
+  for (unsigned int ix = from; ix < to; ix++)
+  {
+    s += vec[ix];
+    if (ix != to - 1)
+    {
+      s += delimiter;
+    }
+  }
+  return s;
+}
+
+
+
+// PoC
+static void ngsiLdRedux(const std::vector<std::string>& oldCompV, std::vector<std::string>* newCompVP)
+{
+  // URL can be
+  //
+  // case1: /ngsi-ld/v1/entities
+  // case2: /ngsi-ld/v1/entities/E1
+  // case3: /ngsi-ld/v1/entities/E1/attrs/A1
+
+  // We searh for "attrs" backwards. If not found, then we are in case 1 or 2. Probably we can also implement
+  // it forwards...
+  unsigned int attrsPos = oldCompV.size();
+  for (unsigned int ix = oldCompV.size() -1 ; ix > 0; ix--)
+  {
+    if (oldCompV[ix] == "attrs")
+    {
+      attrsPos = ix;
+      break;
+    }
+  }
+
+  if (attrsPos == oldCompV.size())
+  {
+    if (oldCompV.size() == 3)
+    {
+      // case 1: no changes in the components vector
+      *newCompVP = oldCompV;
+    }
+    else
+    {
+      // case 2: concatenate components from pos 3 to the end
+      newCompVP->push_back(oldCompV[0]);                              // alternative: use literal "ngsi-ld"
+      newCompVP->push_back(oldCompV[1]);                              // alternative: use literal "v1"
+      newCompVP->push_back(oldCompV[2]);                              // alternative: use literal "entities"
+      newCompVP->push_back(join(oldCompV, 3, oldCompV.size(), '/'));  // composing entity
+    }
+  }
+  else
+  {
+    // case 3: concatenate entity components and attribute entities
+    newCompVP->push_back(oldCompV[0]);                                         // alternative: use literal "ngsi-ld"
+    newCompVP->push_back(oldCompV[1]);                                         // alternative: use literal "v1"
+    newCompVP->push_back(oldCompV[2]);                                         // alternative: use literal "entities"
+    newCompVP->push_back(join(oldCompV, 3, attrsPos, '/'));                    // composing entity
+    newCompVP->push_back(oldCompV[attrsPos]);                                  // alternative: use literal "attrs"
+    newCompVP->push_back(join(oldCompV, attrsPos + 1, oldCompV.size(), '/'));  // composing attr
+  }
+}
+
+
+
 /* ****************************************************************************
 *
 * restService -
@@ -557,7 +631,19 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   //
   // Split URI PATH into components
   //
-  components = stringSplit(ciP->url, '/', compV);
+  std::vector<std::string> _compV;
+  stringSplit(ciP->url, '/', _compV);
+
+  if ((_compV[0] == "ngsi-ld") && (_compV[1] == "v1"))
+  {
+    ngsiLdRedux(_compV, &compV);
+  }
+  else
+  {
+    compV = _compV;
+  }
+  components = compV.size();
+
   if (!compCheck(components, compV))
   {
     OrionError oe;

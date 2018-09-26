@@ -389,5 +389,6 @@ void statisticsUpdate(RequestType request, MimeType inMimeType)
 
   case RegistrationRequest:                              ++noOfRegistrationRequest; break;
   case RegistrationsRequest:                             ++noOfRegistrationsRequest; break;
+  case getNgsiTestRequest:                               break;
   }
 }

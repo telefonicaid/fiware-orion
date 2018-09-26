@@ -31,7 +31,15 @@
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 
-
+// FIXME PoC: I know, this is not the place for this :) A new file should be created for the servicer routine
+// However, this is a PoC and for the sake of simplificy I have chosen a random existing serviceRouting file
+std::string getNgsiTest
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
 /* ****************************************************************************
 *

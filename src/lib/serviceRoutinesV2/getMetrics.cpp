@@ -37,6 +37,22 @@
 #include "serviceRoutinesV2/getMetrics.h"
 
 
+// FIXME PoC: I know, this is not the place for this :) A new file should be created for the servicer routine
+// However, this is a PoC and for the sake of simplificy I have chosen a random existing serviceRouting file
+std::string getNgsiTest
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
+{
+  LM_W(("PoC: GET /ngsi-ld/v1/entities/{}/attrs/{} received"));
+  LM_W(("PoC:   the entity is:    %s", compV[3].c_str()));
+  LM_W(("PoC:   the attribute is: %s", compV[5].c_str()));
+  return "OK";
+}
+
 
 /* ****************************************************************************
 *
