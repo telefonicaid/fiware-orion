@@ -142,8 +142,8 @@ The string "ISO8601" as type for attributes and metadata is also supported. The 
 (The content of this section applies to all builtins except `dateExpires` attribute. Check the document
 [on transient entities](transient_entities.md) for specific information about `dateExpires`).
 
-First of all: **you are strongly encouraged to not use attributes or metadata with same name of a NGSIv2
-builtin one**. In fact, the NGSIv2 specification forbids that (check "Attribute names restrictions" and
+First of all: **you are strongly encouraged to not use attributes or metadata with the same name as an
+NGSIv2 builtin**. In fact, the NGSIv2 specification forbids that (check "Attribute names restrictions" and
 "Metadata names restrictions" sections in the specification).
 
 However, if you are forced to have such attributes or metadata (maybe due to legacy reasons) take into

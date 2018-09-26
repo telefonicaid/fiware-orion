@@ -128,9 +128,7 @@ void UpdateContextRequest::fill
   const std::string&                 entityType
 )
 {
-  Entity* eP = new Entity();
-
-  eP->fill(entityId, entityType, "false");
+  Entity* eP = new Entity(entityId, entityType, "false");
 
   eP->attributeVector.fill(ucerP->contextAttributeVector);
 
@@ -152,9 +150,7 @@ void UpdateContextRequest::fill
   const std::string&                  entityType
 )
 {
-  Entity* eP = new Entity();
-
-  eP->fill(entityId, entityType, "false");
+  Entity* eP = new Entity(entityId, entityType, "false");
 
   eP->attributeVector.fill(acerP->contextAttributeVector);
 
@@ -215,7 +211,7 @@ void UpdateContextRequest::fill
   ActionType                           _updateActionType
 )
 {
-  Entity*           eP = new Entity();
+  Entity*           eP = new Entity(entityId, entityType, "false");
   ContextAttribute* caP;
 
   if (ucarP->compoundValueP != NULL)
@@ -230,7 +226,6 @@ void UpdateContextRequest::fill
 
   caP->metadataVector.fill((MetadataVector*) &ucarP->metadataVector);
   eP->attributeVector.push_back(caP);
-  eP->fill(entityId, entityType, "false");
 
   contextElementVector.push_back(eP);
 

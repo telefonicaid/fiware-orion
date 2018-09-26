@@ -112,10 +112,10 @@ Entity::~Entity()
 
 /* ****************************************************************************
 *
-* Entity::filterAndOrderAttrs -
+* Entity::addAllAttrsExceptShadowed -
 *
 */
-void Entity::addAllExceptShadowed(std::vector<ContextAttribute*>*  orderedAttrs)
+void Entity::addAllAttrsExceptShadowed(std::vector<ContextAttribute*>*  orderedAttrs)
 {
   for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
   {
@@ -144,12 +144,12 @@ void Entity::filterAndOrderAttrs
     {
       // No filter, no blacklist. Attributes are "as is" in the entity except shadowed ones,
       // which require explicit inclusion (dateCreated, etc.)
-      addAllExceptShadowed(orderedAttrs);
+      addAllAttrsExceptShadowed(orderedAttrs);
     }
     else
     {
       // Filter, blacklist. The order is the one in the entity, after removing attributes.
-      // In blacklis case shadowed attributes (dateCreated, etc) are never included
+      // In blacklist case shadowed attributes (dateCreated, etc) are never included
       for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
       {
         std::string name = attributeVector[ix]->name;
@@ -166,11 +166,11 @@ void Entity::filterAndOrderAttrs
     {
       // No filter, no blacklist. Attributes are "as is" in the entity
       // except shadowed ones (dateCreated, etc.)
-      addAllExceptShadowed(orderedAttrs);
+      addAllAttrsExceptShadowed(orderedAttrs);
     }
     else
     {
-      // Filter, no blacklist. Processing will depend either '*' is in the attrsFilter or not
+      // Filter, no blacklist. Processing will depend on whether '*' is in the attrsFilter or not
       if (std::find(attrsFilter.begin(), attrsFilter.end(), ALL_ATTRS) != attrsFilter.end())
       {
         // - If '*' is in: all attributes are included in the same order used by the entity
