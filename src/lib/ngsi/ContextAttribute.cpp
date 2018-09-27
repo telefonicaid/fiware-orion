@@ -286,7 +286,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType, b
   // However, if enabled I get segfault (it seems that due to double-free). However, I don't
   // understand the reason... the code seems to be equivalent to the current alternative.
   //
-  // To be dicussed at PR time
+  // FIXME P8: this may be related with #3162
 
   if (cloneCompound)
   {
@@ -839,7 +839,7 @@ void ContextAttribute::filterAndOrderMetadata
   }
   else
   {
-    // Filter. Processing will depend either '*' is in the metadataFilter or not
+    // Filter. Processing will depend on whether '*' is in the metadataFilter or not
     if (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_ALL) != metadataFilter.end())
     {
       // If '*' is in: all metadata are included in the same order used by the entity

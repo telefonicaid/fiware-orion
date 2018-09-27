@@ -1,4 +1,4 @@
-if: branch = master and type IN (pull_request)
+if: branch = master
 dist: trusty
 sudo: false
 language: minimal

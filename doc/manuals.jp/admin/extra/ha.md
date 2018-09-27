@@ -14,7 +14,7 @@ HA プロキシ・クラスタに、つまり Context Broker に Active-Active �
 
 ![ha.png](../../../manuals/admin/extra/ha.png)
 
-以下では、そのようなクラスタを一連の仮想マシンに構成するためのさまざまな手順について説明します。Docker 関連のドキュメントでは、[Docker Swarm クラスタ](../../../../docker/docker_swarm.md)を活用して、同じアーキテクチャを作成する方法について簡単に説明します。
+以下では、そのようなクラスタを一連の仮想マシンに構成するためのさまざまな手順について説明します。Docker 関連のドキュメントでは、[Docker Swarm クラスタ](../../../../docker/docker_swarm.jp.md)を活用して、同じアーキテクチャを作成する方法について簡単に説明します。
 
 ## サービス構成
 
