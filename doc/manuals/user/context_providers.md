@@ -155,10 +155,10 @@ Some additional comments:
     opposite doesn't work, so if you have registrations with types, then you must use `?type` in NGSIv2  update/query in
     order to obtain a match. Otherwise you may encounter problems, like the one described in this
     [post at StackOverflow](https://stackoverflow.com/questions/48163972/orion-cb-doesnt-update-lazy-attributes-on-iot-agent).   
--   At the present moment, Context Broker is not able to include compound attribute values in results of forwared queries. A
+-   At the present moment, Context Broker is not able to include compound attribute values in results of forwarded queries. A
     blank (`""`) value appears in this case. Please have a look to 
     [the following issue](https://github.com/telefonicaid/fiware-orion/issues/3162) for more information. However, 
-    note that updates includinig compound values doesn't have this problem and are forwarded correctly.
+    note that updates including compound values don't have this problem and are forwarded correctly.
     - On the meanwhile, there is a docker image available at [Dockerhub](https://hub.docker.com/r/fiware/orion/)
       labeled "fiware/orion:fix3162" which includes a fix for this. However, this image is not recommended for
       production use, given it could be some memory leak problems (not confirmed).
