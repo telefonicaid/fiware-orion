@@ -125,7 +125,7 @@ class Entity
                            bool                             blacklist,
                            std::vector<ContextAttribute*>*  orderedAttrs);
 
-  void addAllExceptShadowed(std::vector<ContextAttribute*>*  orderedAttrs);
+  void addAllAttrsExceptShadowed(std::vector<ContextAttribute*>*  orderedAttrs);
 
   std::string toJsonValues(const std::vector<ContextAttribute*>& orderedAttrs);
   std::string toJsonUniqueValues(const std::vector<ContextAttribute*>& orderedAttrs);

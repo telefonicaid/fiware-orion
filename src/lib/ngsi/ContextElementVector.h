@@ -37,6 +37,9 @@
 */
 typedef struct ContextElementVector
 {
+  // FIXME #1298: the name of this class is no longer meaninfull, as the class now contains
+  // a vector of Entity*, not ContextElement*. Rename (maybe a good name would be EntityVector)
+  // In general we have some other "ContextElementSomething". Do a global search in the code
   std::vector<Entity*>  vec;
 
   void             push_back(Entity* item);
