@@ -158,7 +158,10 @@ Some additional comments:
 -   At the present moment, Context Broker is not able to include compound attribute values in results of forwared queries. A
     blank (`""`) value appears in this case. Please have a look to 
     [the following issue](https://github.com/telefonicaid/fiware-orion/issues/3162) for more information. However, 
-    note that updates includinig compound values doesn't have this problem and are forwarded correctly.    
+    note that updates includinig compound values doesn't have this problem and are forwarded correctly.
+    - On the meanwhile, there is a docker image available at [Dockerhub](https://hub.docker.com/r/fiware/orion/)
+      labeled "fiware/orion:fix3162" which includes a fix for this. However, this image is not recommended for
+      production use, given it could be some memory leak problems (not confirmed).
 -   Query filtering (e.g. `GET /v2/entities?q=temperature>40`) is not supported on query forwarding. First, Orion
     doesn't include the filter in the `POST /v1/queryContext` operation forwarded to CPr. Second, Orion doesn't filter
     the CPr results before responding them back to client. An issue corresponding to this limitation has been created:
