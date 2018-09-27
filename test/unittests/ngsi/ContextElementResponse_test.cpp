@@ -81,7 +81,7 @@ TEST(ContextElementResponse, render)
 
    std::vector<std::string> emptyV;
 
-   out = cer.render(false, UpdateContextElement, emptyV, false, emptyV, false);
+   out = cer.toJsonV1(false, UpdateContextElement, emptyV, false, emptyV, false);
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
 

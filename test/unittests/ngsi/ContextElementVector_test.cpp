@@ -42,14 +42,14 @@ TEST(ContextElementVector, render)
   std::string           rendered;
   ContextElementVector  ceV;
 
-  rendered = ceV.render(false, UpdateContextElement, false);
+  rendered = ceV.toJsonV1(false, UpdateContextElement, false);
   EXPECT_STREQ("", rendered.c_str());
 
   eP->id   = "E_ID";
   eP->type = "E_TYPE";
   ceV.push_back(eP);
 
-  rendered = ceV.render(false, UpdateContextElement, false);
+  rendered = ceV.toJsonV1(false, UpdateContextElement, false);
 
   ceV.release();
 }

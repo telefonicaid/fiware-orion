@@ -437,7 +437,7 @@ TEST(compoundValue, updateTwoStructsJson)
   std::vector<std::string> emptyMdV;
 
   ci.outMimeType = JSON;
-  rendered = caP->render(false, UpdateContext, emptyMdV, false);
+  rendered = caP->toJsonV1(false, UpdateContext, emptyMdV, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
@@ -591,7 +591,7 @@ TEST(compoundValue, sixLevelsJson)
   std::vector<std::string> emptyMdV;
 
   ci.outMimeType = JSON; 
-  rendered = caP->render(false, UpdateContext, emptyMdV, false);
+  rendered = caP->toJsonV1(false, UpdateContext, emptyMdV, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
@@ -1002,7 +1002,7 @@ TEST(compoundValue, tenCompounds)
   utInit();
 
   upcrP = &reqData.upcr.res;
-  rendered = upcrP->render(false);
+  rendered = upcrP->toJsonV1(false);
 
   utExit();
 }

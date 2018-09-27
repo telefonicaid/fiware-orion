@@ -47,7 +47,7 @@ TEST(ContextAttributeVector, render)
   const std::vector<std::string>        emptyMdV;
 
   // FIXME P3: "" is a string, signature tells bool...
-  out = cav.render(false, UpdateContextAttribute, emptyAttrsV, emptyMdV, "");
+  out = cav.toJsonV1(false, UpdateContextAttribute, emptyAttrsV, emptyMdV, "");
   EXPECT_STREQ("", out.c_str());
 
   utExit();

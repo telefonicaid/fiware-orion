@@ -42,12 +42,12 @@ TEST(ScopeVector, renderAndRelease)
 
   utInit();
 
-  out = sV.render(false);
+  out = sV.toJsonV1(false);
   EXPECT_STREQ("", out.c_str());
 
   sV.push_back(s);
 
-  out = sV.render(false);
+  out = sV.toJsonV1(false);
 
   EXPECT_EQ(sV.size(), 1);
   sV.release();

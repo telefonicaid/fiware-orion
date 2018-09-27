@@ -65,11 +65,11 @@ TEST(Metadata, render)
 
   utInit();
 
-  out = m1.render(false);
+  out = m1.toJsonV1(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = m2.render(false);
+  out = m2.toJsonV1(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

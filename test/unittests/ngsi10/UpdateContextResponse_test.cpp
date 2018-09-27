@@ -64,7 +64,7 @@ TEST(UpdateContextResponse, jsonRender)
   ucrP->errorCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  out = ucrP->render(false);
+  out = ucrP->toJsonV1(false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -72,7 +72,7 @@ TEST(UpdateContextResponse, jsonRender)
   // Test 02. UpdateContextResponse::errorCode NOT OK and contextElementResponseVector filled id (with details)
   ucrP->errorCode.fill(SccBadRequest, "no details");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  out = ucrP->render(false);
+  out = ucrP->toJsonV1(false);
   EXPECT_STREQ(expectedBuf, out.c_str());
   ucrP->errorCode.fill(SccOk); // Cleanup
 
@@ -86,7 +86,7 @@ TEST(UpdateContextResponse, jsonRender)
   ucrP->contextElementResponseVector.push_back(cerP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
-  out = ucrP->render(false);
+  out = ucrP->toJsonV1(false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -96,7 +96,7 @@ TEST(UpdateContextResponse, jsonRender)
   cerP->entity.attributeVector.push_back(caP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename5)) << "Error getting test data from '" << filename5 << "'";
-  out = ucrP->render(false);
+  out = ucrP->toJsonV1(false);
   EXPECT_STREQ(expectedBuf, out.c_str()); 
 
 
@@ -106,7 +106,7 @@ TEST(UpdateContextResponse, jsonRender)
   cerP->entity.attributeVector.push_back(caP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename11)) << "Error getting test data from '" << filename11 << "'";
-  out = ucrP->render(false);
+  out = ucrP->toJsonV1(false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -119,7 +119,7 @@ TEST(UpdateContextResponse, jsonRender)
   ucrP->contextElementResponseVector.push_back(cerP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename13)) << "Error getting test data from '" << filename13 << "'";
-  out = ucrP->render(false);
+  out = ucrP->toJsonV1(false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

@@ -63,7 +63,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
   UpdateContextAvailabilitySubscriptionRequest* ucasP = &parseData.ucas.res;
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out = ucasP->render();
+  out = ucasP->toJsonV1();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";

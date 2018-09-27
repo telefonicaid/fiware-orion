@@ -164,35 +164,35 @@ static void prepareDatabase(void)
                        BSON("id" << "E2" << "type" << "T2") <<
                        BSON("id" << "E3" << "type" << "T3")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
+                       BSON("name" << "A1" << "type" << "TA1") <<
+                       BSON("name" << "A2" << "type" << "TA2") <<
+                       BSON("name" << "A3" << "type" << "TA3")));
 
   BSONObj cr2 = BSON("providingApplication" << "http://cr2.com" <<
                      "entities" << BSON_ARRAY(
                        BSON("id" << "E1" << "type" << "T1")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                       BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")));
+                       BSON("name" << "A1" << "type" << "TA1") <<
+                       BSON("name" << "A4" << "type" << "TA4")));
 
   BSONObj cr3 = BSON("providingApplication" << "http://cr3.com" <<
                      "entities" << BSON_ARRAY(
                        BSON("id" << "E2" << "type" << "T2")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
+                       BSON("name" << "A2" << "type" << "TA2") <<
+                       BSON("name" << "A3" << "type" << "TA3")));
 
   BSONObj cr4 = BSON("providingApplication" << "http://cr4.com" <<
                      "entities" << BSON_ARRAY(
                        BSON("id" << "E1" << "type" << "T1bis")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A1" << "type" << "TA1bis" << "isDomain" << "false")));
+                       BSON("name" << "A1" << "type" << "TA1bis")));
 
   BSONObj cr5 = BSON("providingApplication" << "http://cr5.com" <<
                      "entities" << BSON_ARRAY(
                        BSON("id" << "E1")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
+                       BSON("name" << "A1" << "type" << "TA1")));
 
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
 
@@ -253,35 +253,35 @@ static void prepareDatabasePatternTrue(void)
                        BSON("id" << "E2" << "type" << "T") <<
                        BSON("id" << "E3" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
+                       BSON("name" << "A1" << "type" << "TA1") <<
+                       BSON("name" << "A2" << "type" << "TA2") <<
+                       BSON("name" << "A3" << "type" << "TA3")));
 
   BSONObj cr2 = BSON("providingApplication" << "http://cr2.com" <<
                      "entities" << BSON_ARRAY(
                        BSON("id" << "E1" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                       BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")));
+                       BSON("name" << "A1" << "type" << "TA1") <<
+                       BSON("name" << "A4" << "type" << "TA4")));
 
   BSONObj cr3 = BSON("providingApplication" << "http://cr3.com" <<
                      "entities" << BSON_ARRAY(
                        BSON("id" << "E2" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
+                       BSON("name" << "A2" << "type" << "TA2") <<
+                       BSON("name" << "A3" << "type" << "TA3")));
 
   BSONObj cr4 = BSON("providingApplication" << "http://cr4.com" <<
                      "entities" << BSON_ARRAY(
                        BSON("id" << "E2" << "type" << "Tbis")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A2" << "type" << "TA2bis" << "isDomain" << "false")));
+                       BSON("name" << "A2" << "type" << "TA2bis")));
 
   BSONObj cr5 = BSON("providingApplication" << "http://cr5.com" <<
                      "entities" << BSON_ARRAY(
                        BSON("id" << "E3")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false")));
+                       BSON("name" << "A2" << "type" << "TA2")));
 
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
 
@@ -353,19 +353,19 @@ static void prepareDatabaseSeveralCprs(void)
                      "entities" << BSON_ARRAY(
                        BSON("id" << "E1" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A2" << "type" << "T" << "isDomain" << "false")));
+                       BSON("name" << "A2" << "type" << "T")));
 
   BSONObj cr2 = BSON("providingApplication" << "http://cpr3.com" <<
                      "entities" << BSON_ARRAY(
                        BSON("id" << "E2" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A4" << "type" << "T" << "isDomain" << "false")));
+                       BSON("name" << "A4" << "type" << "T")));
 
   BSONObj cr3 = BSON("providingApplication" << "http://cpr2.com" <<
                      "entities" << BSON_ARRAY(
                        BSON("id" << "E3" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A5" << "type" << "T" << "isDomain" << "false")));
+                       BSON("name" << "A5" << "type" << "T")));
 
   BSONObj cr4 = BSON("providingApplication" << "http://cpr1.com" <<
                      "entities" << BSON_ARRAY(
