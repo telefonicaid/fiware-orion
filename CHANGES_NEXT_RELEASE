@@ -1,0 +1,1 @@
+- Remove: isDomain field in NGSIv1 registrations (it was never used)

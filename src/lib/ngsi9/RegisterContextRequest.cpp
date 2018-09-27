@@ -125,7 +125,6 @@ void RegisterContextRequest::fill(RegisterProviderRequest& rpr, const std::strin
   duration       = rpr.duration;
   registrationId = rpr.registrationId;
 
-  crP->registrationMetadataVector.fill((MetadataVector*) &rpr.metadataVector);
   crP->providingApplication = rpr.providingApplication;
 
   crP->entityIdVector.push_back(entityIdP);
@@ -133,7 +132,7 @@ void RegisterContextRequest::fill(RegisterProviderRequest& rpr, const std::strin
 
   if (attributeName != "")
   {
-    ContextRegistrationAttribute* attributeP = new ContextRegistrationAttribute(attributeName, "", "false");
+    ContextRegistrationAttribute* attributeP = new ContextRegistrationAttribute(attributeName, "");
 
     crP->contextRegistrationAttributeVector.push_back(attributeP);
   }

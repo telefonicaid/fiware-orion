@@ -42,62 +42,6 @@
 
 /* ****************************************************************************
 *
-* contextMetadata - 
-*/
-static std::string contextMetadata(const std::string& path, const std::string& value, ParseData* reqData)
-{
-  LM_T(LmtParse, ("Got a metadata"));
-  reqData->rpr.metadataP = new Metadata();
-  reqData->rpr.res.metadataVector.push_back(reqData->rpr.metadataP);
-  return "OK";
-}
-
-
-
-
-/* ****************************************************************************
-*
-* contextMetadataName - 
-*/
-static std::string contextMetadataName(const std::string& path, const std::string& value, ParseData* reqData)
-{
-  LM_T(LmtParse, ("Got a metadata name '%s'", value.c_str()));
-  reqData->rpr.metadataP->name = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* contextMetadataType - 
-*/
-static std::string contextMetadataType(const std::string& path, const std::string& value, ParseData* reqData)
-{
-  LM_T(LmtParse, ("Got a metadata type '%s'", value.c_str()));
-  reqData->rpr.metadataP->type = value;
-  return "OK";
-}
-
-
-
-
-/* ****************************************************************************
-*
-* contextMetadataValue - 
-*/
-static std::string contextMetadataValue(const std::string& path, const std::string& value, ParseData* reqData)
-{
-  LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
-  reqData->rpr.metadataP->stringValue = value;
-  reqData->rpr.metadataP->valueType = orion::ValueTypeString;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * duration - 
 */
 static std::string duration(const std::string& path, const std::string& value, ParseData* reqData)
@@ -140,12 +84,6 @@ static std::string registrationId(const std::string& path, const std::string& va
 */
 JsonNode jsonRprParseVector[] =
 {
-  { "/metadatas",                       jsonNullTreat         },
-  { "/metadatas/metadata",              contextMetadata       },
-  { "/metadatas/metadata/name",         contextMetadataName   },
-  { "/metadatas/metadata/type",         contextMetadataType   },
-  { "/metadatas/metadata/value",        contextMetadataValue  },
-
   { "/duration",                        duration              },
   { "/providingApplication",            providingApplication  },
   { "/registrationId",                  registrationId        },
@@ -176,7 +114,6 @@ void jsonRprInit(ParseData* reqData)
 */
 void jsonRprRelease(ParseData* reqData)
 {
-  reqData->rpr.res.release();
 }
 
 

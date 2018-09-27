@@ -43,7 +43,6 @@ typedef struct ContextRegistration
 {
   EntityIdVector                      entityIdVector;                        // Optional
   ContextRegistrationAttributeVector  contextRegistrationAttributeVector;    // Optional
-  MetadataVector                      registrationMetadataVector;            // Optional
   ProvidingApplication                providingApplication;                  // Mandatory
 
   bool                                entityIdVectorPresent;                 // entityIdList present during parsing

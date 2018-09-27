@@ -126,7 +126,6 @@ void ContextRegistrationAttributeVector::release(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->release();
     delete(vec[ix]);
   }
 

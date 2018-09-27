@@ -309,7 +309,7 @@ extern bool includedEntity(EntityId en, const EntityIdVector& entityIdV);
 *
 * includedAttribute -
 */
-extern bool includedAttribute(const ContextRegistrationAttribute& attr, const StringList& attrsV);
+extern bool includedAttribute(const std::string& attrName, const StringList& attrsV);
 
 
 

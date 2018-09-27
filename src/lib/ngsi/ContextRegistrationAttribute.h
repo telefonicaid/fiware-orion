@@ -43,13 +43,10 @@ typedef struct ContextRegistrationAttribute
 {
   std::string     name;            // Mandatory
   std::string     type;            // Optional
-  std::string     isDomain;        // Mandatory
-  MetadataVector  metadataVector;  // Optional
 
   ContextRegistrationAttribute();
-  ContextRegistrationAttribute(const std::string& _name, const std::string& _type, const std::string& _isDomain = "");
+  ContextRegistrationAttribute(const std::string& _name, const std::string& _type);
   std::string     render(bool comma);
-  void            release(void);
 
   std::string     check(ApiVersion apiVersion);
 } ContextRegistrationAttribute;

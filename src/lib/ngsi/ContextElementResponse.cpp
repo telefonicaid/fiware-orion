@@ -38,6 +38,7 @@
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/compoundResponses.h"
+#include "mongoBackend/MongoGlobal.h"       // includedAttribute
 
 using namespace mongo;
 
@@ -81,43 +82,6 @@ ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP)
 
   entity.fill(cerP->entity);
   statusCode.fill(cerP->statusCode);
-}
-
-
-
-/* ****************************************************************************
-*
-* includedAttribute -
-*
-* FIXME: note that in the current implementation, in which we only use 'name' to
-* compare, this function is equal to the one for ContextRegistrationAttrribute.
-* However, we keep them separated, as isDomain (present in ContextRegistrationAttribute
-* but not in ContextRegistration could mean a difference). To review once domain attributes
-* get implemented.
-*
-* FIXME #1298: domain is not going to be implemented. Unify functions
-*
-*/
-static bool includedAttribute(const ContextAttribute& attr, const StringList& attrsV)
-{
-  //
-  // This is the case in which the queryContextRequest doesn't include attributes,
-  // so all the attributes are included in the response
-  //
-  if (attrsV.size() == 0 || attrsV.lookup(ALL_ATTRS))
-  {
-    return true;
-  }
-
-  for (unsigned int ix = 0; ix < attrsV.size(); ++ix)
-  {
-    if (attrsV[ix] == attr.name)
-    {
-      return true;
-    }
-  }
-
-  return false;
 }
 
 
@@ -179,7 +143,7 @@ ContextElementResponse::ContextElementResponse
     ca.type           = getStringFieldF(attr, ENT_ATTRS_TYPE);
 
     // Skip attribute if the attribute is in the list (or attrL is empty or includes "*")
-    if (!includedAttribute(ca, attrL))
+    if (!includedAttribute(ca.name, attrL))
     {
       continue;
     }

@@ -55,7 +55,6 @@
 #define REG_ENTITY_ISTYPEPATTERN     "isTypePattern"
 #define REG_ATTRS_NAME               "name"
 #define REG_ATTRS_TYPE               "type"
-#define REG_ATTRS_ISDOMAIN           "isDomain"
 #define REG_SERVICE_PATH             "servicePath"
 #define REG_FORMAT                   "format"
 #define REG_DESCRIPTION              "description"
