@@ -427,9 +427,9 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsAll)
   /* Forge the request (from "inside" to "outside") */
   /* Note that although it is a bit weird having an updateContext without attributes to update,
    * it is legal from the point of view of OMA spec */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E3", "T3", "false");
-  req.contextElementVector.push_back(ceP);
+  Entity* eP = new Entity();
+  eP->fill("E3", "T3", "false");
+  req.contextElementVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -443,14 +443,14 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsAll)
   EXPECT_EQ("", res.errorCode.details);
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
-  EXPECT_EQ("E3", RES_CER(0).entityId.id);
-  EXPECT_EQ("T3", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E3", RES_CER(0).id);
+  EXPECT_EQ("T3", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
   EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
   EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
-  EXPECT_EQ(0, RES_CER(0).contextAttributeVector.size());
+  EXPECT_EQ(0, RES_CER(0).attributeVector.size());
 
   utExit();
 }
@@ -473,11 +473,11 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneSingle)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E1", "T1", "false");
+  Entity* eP = new Entity();
+  eP->fill("E1", "T1", "false");
   ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
-  ceP->contextAttributeVector.push_back(caP);
-  req.contextElementVector.push_back(ceP);
+  eP->attributeVector.push_back(caP);
+  req.contextElementVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -492,11 +492,11 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneSingle)
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(1, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA4", RES_CER_ATTR(0, 0)->type);
@@ -536,11 +536,11 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneMulti)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E1", "T1", "false");
+  Entity* eP = new Entity();
+  eP->fill("E1", "T1", "false");
   ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
-  ceP->contextAttributeVector.push_back(caP);
-  req.contextElementVector.push_back(ceP);
+  eP->attributeVector.push_back(caP);
+  req.contextElementVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -555,11 +555,11 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneMulti)
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(1, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
@@ -595,13 +595,13 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsSubset)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E3", "T3", "false");
+  Entity* eP = new Entity();
+  eP->fill("E3", "T3", "false");
   ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
   ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val");
-  ceP->contextAttributeVector.push_back(ca1P);
-  ceP->contextAttributeVector.push_back(ca2P);
-  req.contextElementVector.push_back(ceP);
+  eP->attributeVector.push_back(ca1P);
+  eP->attributeVector.push_back(ca2P);
+  req.contextElementVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -616,11 +616,11 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsSubset)
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E3", RES_CER(0).entityId.id);
-  EXPECT_EQ("T3", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E3", RES_CER(0).id);
+  EXPECT_EQ("T3", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(2, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
@@ -664,11 +664,11 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E1", "T1", "false");
+  Entity* eP = new Entity();
+  eP->fill("E1", "T1", "false");
   ContextAttribute* caP = new ContextAttribute("A5", "TA5", "new_val");
-  ceP->contextAttributeVector.push_back(caP);
-  req.contextElementVector.push_back(ceP);
+  eP->attributeVector.push_back(caP);
+  req.contextElementVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -683,11 +683,11 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(1, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A5", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA5", RES_CER_ATTR(0, 0)->type);
@@ -729,12 +729,12 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntity)
   /* Forge the request (from "inside" to "outside") */
   /* Note that although it is a bit weird having an updateContext without attributes to update,
      * it is legal from the point of view of OMA spec */
-  ContextElement* ce1P = new ContextElement();
-  ContextElement* ce2P = new ContextElement();
-  ce1P->entityId.fill("E1", "T1", "false");
-  ce2P->entityId.fill("E2", "T2", "false");
-  req.contextElementVector.push_back(ce1P);
-  req.contextElementVector.push_back(ce2P);
+  Entity* e1P = new Entity();
+  Entity* e2P = new Entity();
+  e1P->fill("E1", "T1", "false");
+  e2P->fill("E2", "T2", "false");
+  req.contextElementVector.push_back(e1P);
+  req.contextElementVector.push_back(e2P);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -748,23 +748,23 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntity)
   EXPECT_EQ("", res.errorCode.details);
 
   ASSERT_EQ(2, res.contextElementResponseVector.size());
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
   EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
   EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
-  EXPECT_EQ(0, RES_CER(0).contextAttributeVector.size());
+  EXPECT_EQ(0, RES_CER(0).attributeVector.size());
 
-  EXPECT_EQ("E2", RES_CER(1).entityId.id);
-  EXPECT_EQ("T2", RES_CER(1).entityId.type);
-  EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
+  EXPECT_EQ("E2", RES_CER(1).id);
+  EXPECT_EQ("T2", RES_CER(1).type);
+  EXPECT_EQ("false", RES_CER(1).isPattern);
   EXPECT_EQ(0, RES_CER(1).providingApplicationList.size());
   EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(1).code);
   EXPECT_EQ("No context element found", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(1).details);
-  EXPECT_EQ(0, RES_CER(1).contextAttributeVector.size());
+  EXPECT_EQ(0, RES_CER(1).attributeVector.size());
 
   utExit();
 }
@@ -789,15 +789,15 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E1", "T1", "false");
+  Entity* eP = new Entity();
+  eP->fill("E1", "T1", "false");
   ContextAttribute* ca1P = new ContextAttribute("A3", "TA3", "new_val");
   ContextAttribute* ca2P = new ContextAttribute("A4", "TA4", "new_val");
   ContextAttribute* ca3P = new ContextAttribute("A5", "TA5", "new_val");
-  ceP->contextAttributeVector.push_back(ca1P);
-  ceP->contextAttributeVector.push_back(ca2P);
-  ceP->contextAttributeVector.push_back(ca3P);
-  req.contextElementVector.push_back(ceP);
+  eP->attributeVector.push_back(ca1P);
+  eP->attributeVector.push_back(ca2P);
+  eP->attributeVector.push_back(ca3P);
+  req.contextElementVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -812,11 +812,11 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(3, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA3", RES_CER_ATTR(0, 0)->type);
@@ -876,24 +876,24 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ce1P = new ContextElement();
-  ContextElement* ce2P = new ContextElement();
-  ce1P->entityId.fill("E1", "T1", "false");
-  ce2P->entityId.fill("E2", "T2", "false");
+  Entity* e1P = new Entity();
+  Entity* e2P = new Entity();
+  e1P->fill("E1", "T1", "false");
+  e2P->fill("E2", "T2", "false");
   ContextAttribute* ca1P = new ContextAttribute("A3", "TA3", "new_val");
   ContextAttribute* ca2P = new ContextAttribute("A4", "TA4", "new_val");
   ContextAttribute* ca3P = new ContextAttribute("A5", "TA5", "new_val");
   ContextAttribute* ca4P = new ContextAttribute("A3", "TA3", "new_val");
   ContextAttribute* ca5P = new ContextAttribute("A4", "TA4", "new_val");
   ContextAttribute* ca6P = new ContextAttribute("A5", "TA5", "new_val");
-  ce1P->contextAttributeVector.push_back(ca1P);
-  ce1P->contextAttributeVector.push_back(ca2P);
-  ce1P->contextAttributeVector.push_back(ca3P);
-  ce2P->contextAttributeVector.push_back(ca4P);
-  ce2P->contextAttributeVector.push_back(ca5P);
-  ce2P->contextAttributeVector.push_back(ca6P);
-  req.contextElementVector.push_back(ce1P);
-  req.contextElementVector.push_back(ce2P);
+  e1P->attributeVector.push_back(ca1P);
+  e1P->attributeVector.push_back(ca2P);
+  e1P->attributeVector.push_back(ca3P);
+  e2P->attributeVector.push_back(ca4P);
+  e2P->attributeVector.push_back(ca5P);
+  e2P->attributeVector.push_back(ca6P);
+  req.contextElementVector.push_back(e1P);
+  req.contextElementVector.push_back(e2P);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -908,11 +908,11 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
 
   ASSERT_EQ(2, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(3, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA3", RES_CER_ATTR(0, 0)->type);
@@ -943,11 +943,11 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
-  EXPECT_EQ("E2", RES_CER(1).entityId.id);
-  EXPECT_EQ("T2", RES_CER(1).entityId.type);
-  EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
+  EXPECT_EQ("E2", RES_CER(1).id);
+  EXPECT_EQ("T2", RES_CER(1).type);
+  EXPECT_EQ("false", RES_CER(1).isPattern);
   EXPECT_EQ(0, RES_CER(1).providingApplicationList.size());
-  ASSERT_EQ(3, RES_CER(1).contextAttributeVector.size());
+  ASSERT_EQ(3, RES_CER(1).attributeVector.size());
 
   EXPECT_EQ("A3", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("TA3", RES_CER_ATTR(1, 0)->type);
@@ -1012,11 +1012,11 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoType)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E1", "", "false");
+  Entity* eP = new Entity();
+  eP->fill("E1", "", "false");
   ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
-  ceP->contextAttributeVector.push_back(caP);
-  req.contextElementVector.push_back(ceP);
+  eP->attributeVector.push_back(caP);
+  req.contextElementVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1031,11 +1031,11 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoType)
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(1, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
@@ -1079,9 +1079,9 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern0Attr)
   /* Forge the request (from "inside" to "outside") */
   /* Note that although it is a bit weird having an updateContext without attributes to update,
      * it is legal from the point of view of OMA spec */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E[2-3]", "T", "true");
-  req.contextElementVector.push_back(ceP);
+  Entity* eP = new Entity();
+  eP->fill("E[2-3]", "T", "true");
+  req.contextElementVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1115,11 +1115,11 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern1AttrSingle)
   prepareDatabasePatternTrue();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E[1-3]", "T", "true");
+  Entity* eP = new Entity();
+  eP->fill("E[1-3]", "T", "true");
   ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
-  ceP->contextAttributeVector.push_back(caP);
-  req.contextElementVector.push_back(ceP);
+  eP->attributeVector.push_back(caP);
+  req.contextElementVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1155,11 +1155,11 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern1AttrMulti)
   prepareDatabasePatternTrue();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E[1-2]", "T", "true");
+  Entity* eP = new Entity();
+  eP->fill("E[1-2]", "T", "true");
   ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
-  ceP->contextAttributeVector.push_back(caP);
-  req.contextElementVector.push_back(ceP);
+  eP->attributeVector.push_back(caP);
+  req.contextElementVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1195,13 +1195,13 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternNAttr)
   prepareDatabasePatternTrue();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E[1-2]", "T", "true");
+  Entity* eP = new Entity();
+  eP->fill("E[1-2]", "T", "true");
   ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
   ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val");
-  ceP->contextAttributeVector.push_back(ca1P);
-  ceP->contextAttributeVector.push_back(ca2P);
-  req.contextElementVector.push_back(ceP);
+  eP->attributeVector.push_back(ca1P);
+  eP->attributeVector.push_back(ca2P);
+  req.contextElementVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1237,9 +1237,9 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternFail)
   /* Forge the request (from "inside" to "outside") */
   /* Note that although it is a bit weird having an updateContext without attributes to update,
      * it is legal from the point of view of OMA spec */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("R.*", "T", "true");
-  req.contextElementVector.push_back(ceP);
+  Entity* eP = new Entity();
+  eP->fill("R.*", "T", "true");
+  req.contextElementVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1279,11 +1279,11 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternNoType)
   prepareDatabasePatternTrue();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E[2-3]", "", "true");
+  Entity* eP = new Entity();
+  eP->fill("E[2-3]", "", "true");
   ContextAttribute* caP = new ContextAttribute("A2", "TA2", "new_val");
-  ceP->contextAttributeVector.push_back(caP);
-  req.contextElementVector.push_back(ceP);
+  eP->attributeVector.push_back(caP);
+  req.contextElementVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1322,12 +1322,12 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, mixPatternAndNotPattern)
   /* Forge the request (from "inside" to "outside") */
   /* Note that although it is a bit weird having an updateContext without attributes to update,
      * it is legal from the point of view of OMA spec */
-  ContextElement* ce1P = new ContextElement();
-  ContextElement* ce2P = new ContextElement();
-  ce1P->entityId.fill("E[2-3]", "T", "true");
-  ce2P->entityId.fill("E1", "T", "false");
-  req.contextElementVector.push_back(ce1P);
-  req.contextElementVector.push_back(ce2P);
+  Entity* e1P = new Entity();
+  Entity* e2P = new Entity();
+  e1P->fill("E[2-3]", "T", "true");
+  e2P->fill("E1", "T", "false");
+  req.contextElementVector.push_back(e1P);
+  req.contextElementVector.push_back(e2P);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1368,33 +1368,33 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   prepareDatabaseSeveralCprs();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ce1P = new ContextElement();
-  ContextElement* ce2P = new ContextElement();
-  ContextElement* ce3P = new ContextElement();
-  ContextElement* ce4P = new ContextElement();
+  Entity* e1P = new Entity();
+  Entity* e2P = new Entity();
+  Entity* e3P = new Entity();
+  Entity* e4P = new Entity();
 
-  ce1P->entityId.fill("E1", "T", "false");
+  e1P->fill("E1", "T", "false");
   ContextAttribute* ca1P = new ContextAttribute("A1", "T", "10");
   ContextAttribute* ca2P = new ContextAttribute("A2", "T", "20");
-  ce1P->contextAttributeVector.push_back(ca1P);
-  ce1P->contextAttributeVector.push_back(ca2P);
-  ce2P->entityId.fill("E2", "T", "false");
+  e1P->attributeVector.push_back(ca1P);
+  e1P->attributeVector.push_back(ca2P);
+  e2P->fill("E2", "T", "false");
   ContextAttribute* ca3P = new ContextAttribute("A4", "T", "40");
   ContextAttribute* ca4P = new ContextAttribute("A3", "T", "30");
-  ce2P->contextAttributeVector.push_back(ca3P);
-  ce2P->contextAttributeVector.push_back(ca4P);
-  ce3P->entityId.fill("E3", "T", "false");
+  e2P->attributeVector.push_back(ca3P);
+  e2P->attributeVector.push_back(ca4P);
+  e3P->fill("E3", "T", "false");
   ContextAttribute* ca5P = new ContextAttribute("A5", "T", "50");
   ContextAttribute* ca6P = new ContextAttribute("A6", "T", "60");
-  ce3P->contextAttributeVector.push_back(ca5P);
-  ce3P->contextAttributeVector.push_back(ca6P);
-  ce4P->entityId.fill("E4", "T", "false");
+  e3P->attributeVector.push_back(ca5P);
+  e3P->attributeVector.push_back(ca6P);
+  e4P->fill("E4", "T", "false");
   ContextAttribute* ca7P = new ContextAttribute("A7", "T", "70");
-  ce4P->contextAttributeVector.push_back(ca7P);
-  req.contextElementVector.push_back(ce1P);
-  req.contextElementVector.push_back(ce2P);
-  req.contextElementVector.push_back(ce3P);
-  req.contextElementVector.push_back(ce4P);
+  e4P->attributeVector.push_back(ca7P);
+  req.contextElementVector.push_back(e1P);
+  req.contextElementVector.push_back(e2P);
+  req.contextElementVector.push_back(e3P);
+  req.contextElementVector.push_back(e4P);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1409,11 +1409,11 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
 
   ASSERT_EQ(4, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(2, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
@@ -1436,11 +1436,11 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_EQ("action: UPDATE - entity: [E1, T] - offending attribute: A2", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
-  EXPECT_EQ("E2", RES_CER(1).entityId.id);
-  EXPECT_EQ("T", RES_CER(1).entityId.type);
-  EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
+  EXPECT_EQ("E2", RES_CER(1).id);
+  EXPECT_EQ("T", RES_CER(1).type);
+  EXPECT_EQ("false", RES_CER(1).isPattern);
   EXPECT_EQ(0, RES_CER(1).providingApplicationList.size());
-  ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
+  ASSERT_EQ(2, RES_CER(1).attributeVector.size());
 
   EXPECT_EQ("A4", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(1, 0)->type);
@@ -1463,11 +1463,11 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_EQ("action: UPDATE - entity: [E2, T] - offending attribute: A4", RES_CER_STATUS(1).details);
 
   /* Context Element response # 3 */
-  EXPECT_EQ("E3", RES_CER(2).entityId.id);
-  EXPECT_EQ("T", RES_CER(2).entityId.type);
-  EXPECT_EQ("false", RES_CER(2).entityId.isPattern);
+  EXPECT_EQ("E3", RES_CER(2).id);
+  EXPECT_EQ("T", RES_CER(2).type);
+  EXPECT_EQ("false", RES_CER(2).isPattern);
   EXPECT_EQ(0, RES_CER(2).providingApplicationList.size());
-  ASSERT_EQ(2, RES_CER(2).contextAttributeVector.size());
+  ASSERT_EQ(2, RES_CER(2).attributeVector.size());
 
   EXPECT_EQ("A5", RES_CER_ATTR(2, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(2, 0)->type);
@@ -1490,11 +1490,11 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_EQ("", RES_CER_STATUS(2).details);
 
   /* Context Element response # 4 */
-  EXPECT_EQ("E4", RES_CER(3).entityId.id);
-  EXPECT_EQ("T", RES_CER(3).entityId.type);
-  EXPECT_EQ("false", RES_CER(3).entityId.isPattern);
+  EXPECT_EQ("E4", RES_CER(3).id);
+  EXPECT_EQ("T", RES_CER(3).type);
+  EXPECT_EQ("false", RES_CER(3).isPattern);
   EXPECT_EQ(0, RES_CER(3).providingApplicationList.size());
-  ASSERT_EQ(1, RES_CER(3).contextAttributeVector.size());
+  ASSERT_EQ(1, RES_CER(3).attributeVector.size());
 
   EXPECT_EQ("A7", RES_CER_ATTR(3, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(3, 0)->type);
@@ -1567,11 +1567,11 @@ TEST(mongoContextProvidersUpdateRequest, notFoundUpdate)
   /* empty database, no preparation step */
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E1", "T1", "false");
+  Entity* eP = new Entity();
+  eP->fill("E1", "T1", "false");
   ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
-  ceP->contextAttributeVector.push_back(caP);
-  req.contextElementVector.push_back(ceP);
+  eP->attributeVector.push_back(caP);
+  req.contextElementVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1587,11 +1587,11 @@ TEST(mongoContextProvidersUpdateRequest, notFoundUpdate)
   ASSERT_EQ(1, res.contextElementResponseVector.size());
 
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(1, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
@@ -1622,11 +1622,11 @@ TEST(mongoContextProvidersUpdateRequest, notFoundDelete)
   /* empty database, no preparation step */
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E1", "T1", "false");
+  Entity* eP = new Entity();
+  eP->fill("E1", "T1", "false");
   ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
-  ceP->contextAttributeVector.push_back(caP);
-  req.contextElementVector.push_back(ceP);
+  eP->attributeVector.push_back(caP);
+  req.contextElementVector.push_back(eP);
   req.updateActionType = ActionTypeDelete;
 
   /* Invoke the function in mongoBackend library */
@@ -1642,11 +1642,11 @@ TEST(mongoContextProvidersUpdateRequest, notFoundDelete)
   ASSERT_EQ(1, res.contextElementResponseVector.size());
 
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(1, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);

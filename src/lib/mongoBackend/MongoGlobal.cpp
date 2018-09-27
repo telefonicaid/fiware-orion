@@ -1190,24 +1190,199 @@ bool processAreaScopeV2(const Scope* scoP, BSONObj* areaQueryP)
 
 /* ****************************************************************************
 *
-* addDatesForAttrs -
+* addIfNotPresentAttr -
+*
+* If the attribute doesn't exist in the entity, then add it (shadowed, render will depend on filter)
 */
-static void addDatesForAttrs(ContextElementResponse* cerP, bool includeCreDate, bool includeModDate)
+static void addIfNotPresentAttr
+(
+  Entity*             eP,
+  const std::string&  name,
+  const std::string&  type,
+  double              value
+)
 {
-  for (unsigned int ix = 0; ix < cerP->contextElement.contextAttributeVector.size(); ix++)
+  if (eP->attributeVector.get(name) == -1)
   {
-    ContextAttribute* caP = cerP->contextElement.contextAttributeVector[ix];
+    ContextAttribute* caP = new ContextAttribute(name, type, value);
+    caP->shadowed = true;
+    eP->attributeVector.push_back(caP);
+  }
+}
 
-    if (includeCreDate && caP->creDate != 0)
+
+
+/* ****************************************************************************
+*
+* addIfNotPresentAttrMetadata (double version) -
+*
+* If the metadata doesn't exist in the attribute, then add it (shadowed, render will depend on filter)
+*/
+static void addIfNotPresentMetadata
+(
+  ContextAttribute*   caP,
+  const std::string&  name,
+  const std::string&  type,
+  double              value
+)
+{
+  if (caP->metadataVector.lookupByName(name) == NULL)
+  {
+    Metadata* mdP = new Metadata(name, type, value);
+    mdP->shadowed = true;
+    caP->metadataVector.push_back(mdP);
+  }
+}
+
+
+/* ****************************************************************************
+*
+* addIfNotPresentAttrMetadata (string version) -
+*
+* If the metadata doesn't exist in the attribute, then add it (shadowed, render will depend on filter)
+*/
+static void addIfNotPresentMetadata
+(
+  ContextAttribute*   caP,
+  const std::string&  name,
+  const std::string&  type,
+  const std::string&  value
+)
+{
+  if (caP->metadataVector.lookupByName(name) == NULL)
+  {
+    Metadata* mdP = new Metadata(name, type, value);
+    mdP->shadowed = true;
+    caP->metadataVector.push_back(mdP);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* addIfNotPresentPreviousValueMetadata
+*
+* If the metadata doesn't exist in the attribute, then add it (shadowed, render will depend on filter)
+*/
+static void addIfNotPresentPreviousValueMetadata(ContextAttribute* caP)
+{
+  if (caP->metadataVector.lookupByName(NGSI_MD_PREVIOUSVALUE) != NULL)
+  {
+    return;
+  }
+
+  // Created the metadata
+  Metadata* mdP = NULL;
+  ContextAttribute* previousValueP = caP->previousValue;
+
+  if (previousValueP->compoundValueP == NULL)
+  {
+    switch (previousValueP->valueType)
     {
-      Metadata*   mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, caP->creDate);
-      caP->metadataVector.push_back(mdP);
+    case orion::ValueTypeString:
+      mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->stringValue);
+      break;
+
+    case orion::ValueTypeBoolean:
+      mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->boolValue);
+      break;
+
+    case orion::ValueTypeNumber:
+      mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->numberValue);
+      break;
+
+    case orion::ValueTypeNull:
+      mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, "");
+      mdP->valueType = orion::ValueTypeNull;
+      break;
+
+    case orion::ValueTypeNotGiven:
+      LM_E(("Runtime Error (value not given for metadata)"));
+      return;
+
+    default:
+      LM_E(("Runtime Error (unknown value type: %d)", previousValueP->valueType));
+      return;
+    }
+  }
+  else
+  {
+    mdP            = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, "");
+    mdP->valueType = previousValueP->valueType;
+
+    // Steal the compound
+    mdP->compoundValueP = previousValueP->compoundValueP;
+    previousValueP->compoundValueP = NULL;
+  }
+
+  // Add it to the vector (shadowed)
+  mdP->shadowed = true;
+  caP->metadataVector.push_back(mdP);
+}
+
+
+
+/* ****************************************************************************
+*
+* addBuiltins -
+*
+* Add builtin attributes and metadata. Note that not all are necessarily rendered
+* at the end, given the filtering process done at rendering stage.
+*
+* Attributes:
+* - dateCreated
+* - dateModified
+*
+* Metadata:
+* - dateModified
+* - dateCreated
+* - actionType
+* - previousValue
+*
+* Note that dateExpires it not added by this function, as it is implemented
+* as regular attribute, recoved from the DB in the "attrs" key-map.
+*/
+void addBuiltins(ContextElementResponse* cerP)
+{
+  // dateCreated attribute
+  if (cerP->entity.creDate != 0)
+  {
+    addIfNotPresentAttr(&cerP->entity, DATE_CREATED, DATE_TYPE, cerP->entity.creDate);
+  }
+
+  // dateModified attribute
+  if (cerP->entity.modDate != 0)
+  {
+    addIfNotPresentAttr(&cerP->entity, DATE_MODIFIED, DATE_TYPE, cerP->entity.modDate);
+  }
+
+  for (unsigned int ix = 0; ix < cerP->entity.attributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = cerP->entity.attributeVector[ix];
+
+    // dateCreated medatada
+    if (caP->creDate != 0)
+    {
+      addIfNotPresentMetadata(caP, NGSI_MD_DATECREATED, DATE_TYPE, caP->creDate);
     }
 
-    if (includeModDate && caP->modDate != 0)
+    // dateModified metadata
+    if (caP->modDate != 0)
     {
-      Metadata*   mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, caP->modDate);
-      caP->metadataVector.push_back(mdP);
+      addIfNotPresentMetadata(caP, NGSI_MD_DATEMODIFIED, DATE_TYPE, caP->modDate);
+    }
+
+    // actionType
+    if (caP->actionType != "")
+    {
+      addIfNotPresentMetadata(caP, NGSI_MD_ACTIONTYPE, DEFAULT_ATTR_STRING_TYPE, caP->actionType);
+    }
+
+    // previosValue
+    if (caP->previousValue != NULL)
+    {
+      addIfNotPresentPreviousValueMetadata(caP);
     }
   }
 }
@@ -1252,7 +1427,6 @@ bool entitiesQuery
 (
   const EntityIdVector&            enV,
   const StringList&                attrL,
-  const StringList&                metadataList,
   const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
@@ -1303,6 +1477,13 @@ bool entitiesQuery
   {
     std::string attrName = attrL[ix];
 
+    /* Early exit in the case of ATTR_ALL */
+    if (attrName == ALL_ATTRS)
+    {
+      LM_T(LmtMongo, ("Attributes wildcard found"));
+      break;
+    }
+
     /* Custom metadata (e.g. dateCreated) are not "real" attributes in the DB, so they cannot
      * be included in the search query */
     if (!isCustomAttr(attrName))
@@ -1312,7 +1493,8 @@ bool entitiesQuery
     }
   }
 
-  if (attrs.arrSize() > 0)
+  // If the attributes wildcard is in the list, then we ommit the attributes filter
+  if ((attrs.arrSize() > 0) && (!attrL.lookup(ALL_ATTRS)))
   {
     /* If we don't do this checking, the {$in: [] } in the attribute name part will
      * make the query fail*/
@@ -1500,11 +1682,11 @@ bool entitiesQuery
       //
       if (enV.size() == 1)
       {
-        cer->contextElement.entityId.fill(enV[0]);
+        cer->entity.fill(enV[0]->id, enV[0]->type, enV[0]->isPattern);
       }
       else
       {
-        cer->contextElement.entityId.fill("", "", "");
+        cer->entity.fill("", "", "");
       }
 
       cer->statusCode.fill(SccReceiverInternalError, exErr);
@@ -1534,7 +1716,11 @@ bool entitiesQuery
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
     ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, apiVersion);
 
-    addDatesForAttrs(cer, metadataList.lookup(NGSI_MD_DATECREATED), metadataList.lookup(NGSI_MD_DATEMODIFIED));
+    // Add builtin attributes and metadata (only in NGSIv2)
+    if (apiVersion == V2)
+    {
+      addBuiltins(cer);
+    }
 
     /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
     for (unsigned int ix = 0; ix < attrL.size(); ++ix)
@@ -1548,9 +1734,9 @@ bool entitiesQuery
         continue;
       }
 
-      for (unsigned int jx = 0; jx < cer->contextElement.contextAttributeVector.size(); ++jx)
+      for (unsigned int jx = 0; jx < cer->entity.attributeVector.size(); ++jx)
       {
-        if (attrName == cer->contextElement.contextAttributeVector[jx]->name)
+        if (attrName == cer->entity.attributeVector[jx]->name)
         {
           found = true;
           break;
@@ -1560,7 +1746,7 @@ bool entitiesQuery
       if (!found)
       {
         ContextAttribute* caP = new ContextAttribute(attrName, "", "", false);
-        cer->contextElement.contextAttributeVector.push_back(caP);
+        cer->entity.attributeVector.push_back(caP);
       }
     }
 
@@ -1592,9 +1778,7 @@ bool entitiesQuery
 
       for (unsigned int jx = 0; jx < cerV->size(); ++jx)
       {
-        EntityId eP = (*cerV)[jx]->contextElement.entityId;
-
-        if ((eP.id == enV[ix]->id) && (eP.type == enV[ix]->type))
+        if (((*cerV)[jx]->entity.id == enV[ix]->id) && ((*cerV)[jx]->entity.type == enV[ix]->type))
         {
           needToAdd = false;
           break;  /* jx */
@@ -1605,9 +1789,9 @@ bool entitiesQuery
       {
         ContextElementResponse* cerP = new ContextElementResponse();
 
-        cerP->contextElement.entityId.id = enV[ix]->id;
-        cerP->contextElement.entityId.type = enV[ix]->type;
-        cerP->contextElement.entityId.isPattern = "false";
+        cerP->entity.id = enV[ix]->id;
+        cerP->entity.type = enV[ix]->type;
+        cerP->entity.isPattern = "false";
 
         //
         // This entity has to be pruned if after CPr searching no attribute is "added" to it.
@@ -1620,7 +1804,7 @@ bool entitiesQuery
         {
           ContextAttribute* caP = new ContextAttribute(attrL[jx], "", "", false);
 
-          cerP->contextElement.contextAttributeVector.push_back(caP);
+          cerP->entity.attributeVector.push_back(caP);
         }
 
         cerP->statusCode.fill(SccOk);
@@ -1648,31 +1832,35 @@ void pruneContextElements(const ContextElementResponseVector& oldCerV, ContextEl
     ContextElementResponse* cerP    = oldCerV[ix];
     ContextElementResponse* newCerP = new ContextElementResponse();
 
-    /* Note we cannot use the ContextElement::fill() method, given that it also copies the ContextAttributeVector */
-    newCerP->contextElement.entityId.fill(&cerP->contextElement.entityId);
+    newCerP->entity.fill(cerP->entity.id,
+                         cerP->entity.type,
+                         cerP->entity.isPattern,
+                         cerP->entity.servicePath,
+                         cerP->entity.creDate,
+                         cerP->entity.modDate);
 
     // FIXME P10: not sure if this is the right way to do it, maybe we need a fill() method for this
-    newCerP->contextElement.providingApplicationList = cerP->contextElement.providingApplicationList;
+    newCerP->entity.providingApplicationList = cerP->entity.providingApplicationList;
     newCerP->statusCode.fill(&cerP->statusCode);
 
     bool pruneEntity = cerP->prune;
 
-    for (unsigned int jx = 0; jx < cerP->contextElement.contextAttributeVector.size(); ++jx)
+    for (unsigned int jx = 0; jx < cerP->entity.attributeVector.size(); ++jx)
     {
-      ContextAttribute* caP = cerP->contextElement.contextAttributeVector[jx];
+      ContextAttribute* caP = cerP->entity.attributeVector[jx];
 
       if (caP->found)
       {
         ContextAttribute* newCaP = new ContextAttribute(caP);
-        newCerP->contextElement.contextAttributeVector.push_back(newCaP);
+        newCerP->entity.attributeVector.push_back(newCaP);
       }
     }
 
     /* If after pruning the entity has no attribute and no CPr information, then it is not included
      * in the output vector, except if "prune" is set to false */
     if (pruneEntity &&
-        (newCerP->contextElement.contextAttributeVector.size()   == 0) &&
-        (newCerP->contextElement.providingApplicationList.size() == 0))
+        (newCerP->entity.attributeVector.size()          == 0) &&
+        (newCerP->entity.providingApplicationList.size() == 0))
     {
       newCerP->release();
       delete newCerP;
@@ -1980,7 +2168,7 @@ bool isCondValueInContextElementResponse(ConditionValueList* condValues, Context
   {
     for (unsigned int aclx = 0; aclx < cerV->size(); ++aclx)
     {
-      ContextAttributeVector caV = (*cerV)[aclx]->contextElement.contextAttributeVector;
+      ContextAttributeVector caV = (*cerV)[aclx]->entity.attributeVector;
 
       for (unsigned int kx = 0; kx < caV.size(); ++kx)
       {
@@ -2091,9 +2279,9 @@ static void setOnSubscriptionMetadata(ContextElementResponseVector* cerVP)
   {
     ContextElementResponse* cerP = (*cerVP)[ix];
 
-    for (unsigned int jx = 0; jx < cerP->contextElement.contextAttributeVector.size(); jx++)
+    for (unsigned int jx = 0; jx < cerP->entity.attributeVector.size(); jx++)
     {
-      ContextAttribute*  caP     = cerP->contextElement.contextAttributeVector[jx];
+      ContextAttribute*  caP     = cerP->entity.attributeVector[jx];
       Metadata*          newMdP  = new Metadata(NGSI_MD_NOTIF_ONSUBCHANGE, DEFAULT_ATTR_BOOL_TYPE, true);
 
       caP->metadataVector.push_back(newMdP);
@@ -2148,29 +2336,30 @@ static bool processOnChangeConditionForSubscription
   StringList                    metadataList;
 
   metadataList.fill(metadataV);
-  if (!blacklist && !entitiesQuery(enV, attrL, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
+  if (!blacklist && !entitiesQuery(enV, attrL, *resP, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
 
     return false;
   }
-  else if (blacklist && !entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
+  else if (blacklist && !entitiesQuery(enV, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
 
     return false;
-  }
-
-  // Get the effective vectors of attributes to render (per context element)
-  for (unsigned int ix = 0; ix < rawCerV.size() ; ix++)
-  {
-      rawCerV[ix]->contextElement.filterAttributes(attrsOrder, blacklist);
   }
 
   /* Prune "not found" CERs */
   pruneContextElements(rawCerV, &ncr.contextElementResponseVector);
+
+  // Add builtin attributes and metadata (both NGSIv1 and NGSIv2 as this is
+  // for notifications and NGSIv2 builtins can be used in NGSIv1 notifications) */
+  for (unsigned int ix = 0; ix < ncr.contextElementResponseVector.size() ; ix++)
+  {
+    addBuiltins(ncr.contextElementResponseVector[ix]);
+  }
 
 #ifdef WORKAROUND_2994
   delayedReleaseAdd(rawCerV);
@@ -2202,7 +2391,7 @@ static bool processOnChangeConditionForSubscription
       ContextElementResponseVector  allCerV;
 
 
-      if (!entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, false, tenant, servicePathV))
+      if (!entitiesQuery(enV, emptyList, *resP, &rawCerV, &err, false, tenant, servicePathV))
       {
 #ifdef WORKAROUND_2994
         delayedReleaseAdd(rawCerV);
@@ -2228,12 +2417,14 @@ static bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
-        getNotifier()->sendNotifyContextRequest(&ncr,
+        getNotifier()->sendNotifyContextRequest(ncr,
                                                 notifyHttpInfo,
                                                 tenant,
                                                 xauthToken,
                                                 fiwareCorrelator,
                                                 renderFormat,
+                                                attrsOrder,
+                                                blacklist,
                                                 metadataV);
         allCerV.release();
         ncr.contextElementResponseVector.release();
@@ -2245,12 +2436,14 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
-      getNotifier()->sendNotifyContextRequest(&ncr,
+      getNotifier()->sendNotifyContextRequest(ncr,
                                               notifyHttpInfo,
                                               tenant,
                                               xauthToken,
                                               fiwareCorrelator,
                                               renderFormat,
+                                              attrsOrder,
+                                              blacklist,
                                               metadataV);
 
       ncr.contextElementResponseVector.release();
@@ -2558,9 +2751,9 @@ void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>
 */
 void fillContextProviders(ContextElementResponse* cer, const ContextRegistrationResponseVector& crrV)
 {
-  for (unsigned int ix = 0; ix < cer->contextElement.contextAttributeVector.size(); ++ix)
+  for (unsigned int ix = 0; ix < cer->entity.attributeVector.size(); ++ix)
   {
-    ContextAttribute* ca = cer->contextElement.contextAttributeVector[ix];
+    ContextAttribute* ca = cer->entity.attributeVector[ix];
 
     if (ca->found)
     {
@@ -2573,7 +2766,7 @@ void fillContextProviders(ContextElementResponse* cer, const ContextRegistration
     MimeType     perEntPaMimeType  = NOMIMETYPE;
     MimeType     perAttrPaMimeType = NOMIMETYPE;
 
-    cprLookupByAttribute(cer->contextElement.entityId,
+    cprLookupByAttribute(cer->entity,
                          ca->name,
                          crrV,
                          &perEntPa,
@@ -2602,9 +2795,9 @@ void fillContextProviders(ContextElementResponse* cer, const ContextRegistration
 */
 bool someContextElementNotFound(const ContextElementResponse& cer)
 {
-  for (unsigned int ix = 0; ix < cer.contextElement.contextAttributeVector.size(); ++ix)
+  for (unsigned int ix = 0; ix < cer.entity.attributeVector.size(); ++ix)
   {
-    if (!cer.contextElement.contextAttributeVector[ix]->found)
+    if (!cer.entity.attributeVector[ix]->found)
     {
       return true;
     }
@@ -2624,7 +2817,7 @@ bool someContextElementNotFound(const ContextElementResponse& cer)
 */
 void cprLookupByAttribute
 (
-  EntityId&                                 en,
+  const Entity&                             en,
   const std::string&                        attrName,
   const ContextRegistrationResponseVector&  crrV,
   std::string*                              perEntPa,

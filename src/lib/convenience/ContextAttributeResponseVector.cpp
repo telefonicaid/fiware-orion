@@ -40,9 +40,8 @@
 */
 std::string ContextAttributeResponseVector::render
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         request
+  bool         asJsonObject,
+  RequestType  request
 )
 {
   std::string out = "";
@@ -149,8 +148,8 @@ void ContextAttributeResponseVector::release(void)
 *
 * ContextAttributeResponseVector::fill -
 */
-void ContextAttributeResponseVector::fill(ContextAttributeVector* cavP, const StatusCode& statusCode)
+void ContextAttributeResponseVector::fill(const ContextAttributeVector& caV, const StatusCode& statusCode)
 {
   vec.push_back(new ContextAttributeResponse());
-  vec[0]->fill(cavP, statusCode);
+  vec[0]->fill(caV, statusCode);
 }

@@ -54,7 +54,6 @@ AppendContextElementResponse::AppendContextElementResponse() : errorCode("errorC
 */
 std::string AppendContextElementResponse::render
 (
-  ApiVersion   apiVersion,
   bool         asJsonObject,
   RequestType  requestType
 )
@@ -74,7 +73,7 @@ std::string AppendContextElementResponse::render
       out += entity.render(true);
     }
 
-    out += contextAttributeResponseVector.render(apiVersion, asJsonObject, requestType);
+    out += contextAttributeResponseVector.render(asJsonObject, requestType);
   }
 
   out += endTag();
@@ -111,7 +110,7 @@ std::string AppendContextElementResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, requestType);
+  return render(asJsonObject, requestType);
 }
 
 
@@ -144,9 +143,9 @@ void AppendContextElementResponse::fill(UpdateContextResponse* ucrsP, const std:
   {
     ContextElementResponse* cerP = ucrsP->contextElementResponseVector[0];
 
-    contextAttributeResponseVector.fill(&cerP->contextElement.contextAttributeVector, cerP->statusCode);
+    contextAttributeResponseVector.fill(cerP->entity.attributeVector, cerP->statusCode);
     
-    entity.fill(&cerP->contextElement.entityId);
+    entity.fill(cerP->entity.id, cerP->entity.type, cerP->entity.isPattern);
   }
   else
   {
@@ -192,7 +191,7 @@ void AppendContextElementResponse::fill(UpdateContextResponse* ucrsP, const std:
   {
     if (ucrsP->contextElementResponseVector.size() == 1)
     {
-      errorCode.details = ucrsP->contextElementResponseVector[0]->contextElement.entityId.id;
+      errorCode.details = ucrsP->contextElementResponseVector[0]->entity.id;
     }
   }
 }

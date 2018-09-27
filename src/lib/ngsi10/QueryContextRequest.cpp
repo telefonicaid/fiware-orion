@@ -229,7 +229,8 @@ void QueryContextRequest::fill(BatchQuery* bqP)
     entityIdVector.push_back(eP);
   }
 
-  attributeList.fill(bqP->attributeV.stringV);
+  attributeList.fill(bqP->attributeV.stringV);  // attributeV is deprecated
+  metadataList.fill(bqP->metadataV.stringV);
   restriction.scopeVector.fill(bqP->scopeV, false);  // false: DO NOT ALLOCATE NEW scopes - reference the 'old' ones
   bqP->scopeV.vec.clear();  // QueryContextRequest::restriction.scopeVector has taken over the Scopes from bqP
 }

@@ -78,10 +78,12 @@ public:
 
 
   bool                      onlyValue;                // Used when ony the value is meaningful in v2 updates of value, without regarding metadata
+  bool                      shadowed;                 // shadowed true means that the attribute is rendered only if explicitly required
+                                                      // in attrs filter (typically for builtin attributes)
 
   ~ContextAttribute();
   ContextAttribute();
-  ContextAttribute(ContextAttribute* caP, bool useDefaultType = false);
+  ContextAttribute(ContextAttribute* caP, bool useDefaultType = false, bool cloneCompound = false);
   ContextAttribute(const std::string& _name, const std::string& _type, const char* _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, const std::string& _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, double _value, bool _found = true);
@@ -94,9 +96,10 @@ public:
 
   std::string  render(bool         asJsonObject,
                       RequestType  request,
+                      const std::vector<std::string>& metadataFilter,
                       bool         comma = false,
                       bool         omitValue = false);
-  std::string  renderAsJsonObject(RequestType request, bool comma, bool omitValue = false);
+  std::string  renderAsJsonObject(RequestType request, const std::vector<Metadata*>& orderedMetadata, bool comma, bool omitValue = false);
   std::string  renderAsNameString(bool comma);
 
   std::string  toJson(const std::vector<std::string>&  metadataFilter);
@@ -124,6 +127,9 @@ public:
   bool              compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
 private:
+  void filterAndOrderMetadata(const std::vector<std::string>&  metadataFilter,
+                              std::vector<Metadata*>*          orderedMetadata);
+
   void bsonAppendAttrValue(mongo::BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast) const;
 
 } ContextAttribute;

@@ -101,7 +101,7 @@ bool processDateExpirationAtEntityCreation
 {
   for (unsigned ix = 0; ix < caV.size(); ++ix)
   {
-    const ContextAttribute* caP = caV[ix];
+    ContextAttribute* caP = caV[ix];
 
     if (caP->name == DATE_EXPIRES)
     {
@@ -111,6 +111,9 @@ bool processDateExpirationAtEntityCreation
         return false;
       }
 
+      // dateExpires is not rendered except if explicitly requested (i.e. shadow = true)
+      // (note we are in update entity code but the attribute could be rendered in a triggered notification)
+      caP->shadowed = true;
       return true;
     }
   }

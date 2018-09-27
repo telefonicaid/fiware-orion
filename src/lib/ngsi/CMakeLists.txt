@@ -25,7 +25,6 @@ SET (SOURCES
     ConditionValueList.cpp
     ContextAttribute.cpp
     ContextAttributeVector.cpp
-    ContextElement.cpp
     ContextElementVector.cpp
     ContextElementResponse.cpp
     ContextElementResponseVector.cpp
@@ -64,7 +63,6 @@ SET (HEADERS
     ConditionValueList.h
     ContextAttribute.h
     ContextAttributeVector.h
-    ContextElement.h
     ContextElementResponse.h
     ContextElementResponseVector.h
     ContextRegistrationAttribute.h

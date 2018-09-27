@@ -30,6 +30,7 @@
 #include <map>
 
 #include "ngsi/ContextAttributeVector.h"
+#include "ngsi/EntityId.h"
 #include "rest/OrionError.h"
 
 
@@ -63,34 +64,73 @@ class Entity
   double                  creDate;          // used by dateCreated functionality in NGSIv2
   double                  modDate;          // used by dateModified functionality in NGSIv2
 
+  std::vector<ProvidingApplication> providingApplicationList;    // Not part of NGSI, used internally for CPr forwarding functionality
+
   Entity();
+  Entity(const std::string& id, const std::string& type, const std::string& isPattern);
+  explicit Entity(EntityId* eP);
+  explicit Entity(Entity* eP);
+
   ~Entity();
 
-  std::string  render(std::map<std::string, bool>&         uriParamOptions,
-                      std::map<std::string, std::string>&  uriParam);
+  std::string  toJsonV1(bool                             asJsonObject,
+                        RequestType                      requestType,
+                        const std::vector<std::string>&  attrsFilter,
+                        bool                             blacklist,
+                        const std::vector<std::string>&  metadataFilter,
+                        bool                             comma,
+                        bool                             omitAttributeValues = false);
 
-  std::string  check(RequestType requestType);
+  std::string  toJson(RenderFormat                     renderFormat,
+                      const std::vector<std::string>&  attrsFilter,
+                      bool                             blacklist,
+                      const std::vector<std::string>&  metadataFilter);
+
+  std::string  toString(bool useIsPattern = false, const std::string& delimiter = ", ");
+
+  std::string  check(ApiVersion apiVersion, RequestType requestType);
+
   void         release(void);
 
-  void         fill(const std::string&       id,
-                    const std::string&       type,
-                    const std::string&       isPattern,
-                    ContextAttributeVector*  aVec,
-                    double                   creDate,
-                    double                   modDate);
+  void         fill(const std::string&             id,
+                    const std::string&             type,
+                    const std::string&             isPattern,
+                    const ContextAttributeVector&  caV,
+                    double                         creDate,
+                    double                         modDate);
+
+  void         fill(const std::string&  id,
+                    const std::string&  type,
+                    const std::string&  isPattern,
+                    const std::string&  servicePath,
+                    double              creDate = 0,
+                    double              modDate = 0);
+
+  void         fill(const std::string&  id,
+                    const std::string&  type,
+                    const std::string&  isPattern);
+
+  void         fill(const Entity& en, bool useDefaultType = false);
 
   void         fill(QueryContextResponse* qcrsP);
+
   void         hideIdAndType(bool hide = true);
 
- private:
-  void filterAttributes(const std::vector<std::string>&  attrsFilter,
-                        bool                             dateCreatedOption,
-                        bool                             dateModifiedOption);
+  ContextAttribute* getAttribute(const std::string& attrName);
 
-  std::string toJsonValues(void);
-  std::string toJsonUniqueValues(void);
-  std::string toJsonKeyvalues(void);
-  std::string toJsonNormalized(const std::vector<std::string>&  metadataFilter);
+  bool         equal(Entity* eP);
+
+ private:
+  void filterAndOrderAttrs(const std::vector<std::string>&  attrsFilter,
+                           bool                             blacklist,
+                           std::vector<ContextAttribute*>*  orderedAttrs);
+
+  void addAllAttrsExceptShadowed(std::vector<ContextAttribute*>*  orderedAttrs);
+
+  std::string toJsonValues(const std::vector<ContextAttribute*>& orderedAttrs);
+  std::string toJsonUniqueValues(const std::vector<ContextAttribute*>& orderedAttrs);
+  std::string toJsonKeyvalues(const std::vector<ContextAttribute*>& orderedAttrs);
+  std::string toJsonNormalized(const std::vector<ContextAttribute*>& orderedAttrs, const std::vector<std::string>&  metadataFilter);
 };
 
 #endif  // SRC_LIB_APITYPESV2_ENTITY_H_

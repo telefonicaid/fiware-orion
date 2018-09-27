@@ -69,7 +69,7 @@ std::string UpdateContextAttributeRequest::render(void)
     out += JSON_STR("value") + ":" + compoundValueP->toJson(true);
   }
 
-  out += metadataVector.render(false);
+  out += metadataVector.render(metadataVector.vec, false);
   out += endTag();
 
   return out;

@@ -55,8 +55,10 @@ class Entities
   Entities();
   ~Entities();
 
-  std::string  render(std::map<std::string, bool>&         uriParamOptions,
-                      std::map<std::string, std::string>&  uriParam);
+  std::string  render(RenderFormat                     renderFormat,
+                      const std::vector<std::string>&  attrsFilter,
+                      bool                             blacklist,
+                      const std::vector<std::string>&  metadataFilter);
 
   std::string  check(RequestType requestType);
   void         release(void);

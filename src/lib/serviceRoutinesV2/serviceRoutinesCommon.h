@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_SERVICEROUTINESV2_SERVICEROUTINESCOMMON_H_
+#define SRC_LIB_SERVICEROUTINESV2_SERVICEROUTINESCOMMON_H_
+
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -20,55 +23,42 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Fermin Galan Marquez
 */
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
 
-#include "ngsi/ContextAttributeVector.h"
+/* Common function used by serveral modules within the serviceRoutinesV2 library */
 
-#include "unittest.h"
+#include <string>
+#include <map>
+
+#include "common/string.h"
+#include "common/RenderFormat.h"
+#include "ngsi/StringList.h"
+#include "rest/uriParamNames.h"
 
 
 
 /* ****************************************************************************
 *
-* render - 
+* setFilters -
 *
 */
-TEST(ContextAttributeVector, render)
-{
-  ContextAttributeVector  cav;
-  std::string             out;
-
-  utInit();
-
-  const std::vector<ContextAttribute*>  emptyAttrsV;
-  const std::vector<std::string>        emptyMdV;
-
-  // FIXME P3: "" is a string, signature tells bool...
-  out = cav.render(false, UpdateContextAttribute, emptyAttrsV, emptyMdV, "");
-  EXPECT_STREQ("", out.c_str());
-
-  utExit();
-}
+extern void setFilters
+(
+  std::map<std::string, std::string>&  uriParam,
+  std::map<std::string, bool>&         uriParamOptions,
+  StringList*                          attrsFilter,
+  StringList*                          metadataFilter
+);
 
 
 
 /* ****************************************************************************
 *
-* get - 
-*/
-TEST(ContextAttributeVector, get)
-{
-}
-
-
-
-/* ****************************************************************************
+* renderFormat -
 *
-* size - 
 */
-TEST(ContextAttributeVector, size)
-{
-}
+extern RenderFormat getRenderFormat(std::map<std::string, bool>&  uriParamOptions);
+
+#endif  // SRC_LIB_SERVICEROUTINESV2_SERVICEROUTINESCOMMON_H_
+

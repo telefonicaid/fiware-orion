@@ -130,7 +130,7 @@ interpreted as an expiration date (i.e. the entity will not be deleted after the
 
 However, even in the case the attribute would keep its previous value without any special semantic, note
 that `dataExpires` becomes a builtin attribute, so it is not shown except if explicitly requested with
-`attrs` URI parameter (in GET based queries) or `"attrs"` field (in `POST /v2/op/query`).
+`attrs` URI parameter (in GET based queries) or `"attrs"` field (in `POST /v2/op/query` and subscriptions).
 
 Once `dateExpires` attribute get updated for first time, it will start to mean an expiration date on the given
 entity, with the behaviour described in previous section. Please, **take this into account in the case

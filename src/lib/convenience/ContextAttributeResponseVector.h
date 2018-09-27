@@ -41,8 +41,7 @@ typedef struct ContextAttributeResponseVector
 {
   std::vector<ContextAttributeResponse*>  vec;
 
-  std::string                render(ApiVersion   apiVersion,
-                                    bool         asJsonObject,
+  std::string                render(bool         asJsonObject,
                                     RequestType  request);
   void                       push_back(ContextAttributeResponse* item);
   unsigned int               size(void);
@@ -51,7 +50,7 @@ typedef struct ContextAttributeResponseVector
                                    bool                asJsonObject,
                                    RequestType         requestType,
                                    const std::string&  predetectedError);
-  void                       fill(ContextAttributeVector* cavP, const StatusCode& statusCode);
+  void                       fill(const ContextAttributeVector& caV, const StatusCode& statusCode);
 
   ContextAttributeResponse*  operator[](unsigned int ix) const;
 

@@ -29,9 +29,10 @@
 
 #include "common/RenderFormat.h"
 #include "common/globals.h"
-#include "ngsi/ContextElement.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/StringList.h"
+#include "ngsi/ContextAttribute.h"
+#include "apiTypesV2/Entity.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -50,7 +51,7 @@ struct QueryContextResponse;
 */
 typedef struct ContextElementResponse
 {
-  ContextElement   contextElement;             // Mandatory
+  Entity           entity;                     // Mandatory (represents a Context Element)
   StatusCode       statusCode;                 // Mandatory
 
   bool             prune;                      // operational attribute used internally by the queryContext logic for not deleting entities that were
@@ -63,13 +64,18 @@ typedef struct ContextElementResponse
                          const StringList&      attrL,
                          bool                   includeEmpty = true,
                          ApiVersion             apiVersion   = V1);
-  ContextElementResponse(ContextElement* ceP, bool useDefaultType = false);
+  ContextElementResponse(Entity* eP, bool useDefaultType = false);
 
   std::string  render(bool         asJsonObject,
                       RequestType  requestType,
-                      bool         comma               = false,
-                      bool         omitAttributeValues = false);
+                      const std::vector<std::string>&  attrsFilter,
+                      bool                             blacklist,
+                      const std::vector<std::string>&  metadataFilter,
+                      bool                             comma               = false,
+                      bool                             omitAttributeValues = false);
   std::string  toJson(RenderFormat                     renderFormat,
+                      const std::vector<std::string>&  attrsFilter,
+                      bool                             blacklist,
                       const std::vector<std::string>&  metadataFilter);
   void         release(void);
 

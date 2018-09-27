@@ -60,16 +60,16 @@ RegisterProviderRequest::RegisterProviderRequest()
 std::string RegisterProviderRequest::render(void)
 {
   std::string  out                            = "";
-  bool         durationRendered               = duration.get() != "";
+  //bool         durationRendered               = duration.get() != "";
   bool         providingApplicationRendered   = providingApplication.get() != "";
   bool         registrationIdRendered         = registrationId.get() != "";
   bool         commaAfterRegistrationId       = false;    // Last element
   bool         commaAfterProvidingApplication = registrationIdRendered;
   bool         commaAfterDuration             = commaAfterProvidingApplication || providingApplicationRendered;
-  bool         commaAfterMetadataVector       = commaAfterDuration || durationRendered;
+  //bool         commaAfterMetadataVector       = commaAfterDuration || durationRendered;
 
   out += startTag();
-  out += metadataVector.render(commaAfterMetadataVector);
+  // out += metadataVector.render(commaAfterMetadataVector); //FIXME #1298 remove context registration metadata
   out += duration.render(commaAfterDuration);
   out += providingApplication.render(commaAfterProvidingApplication);
   out += registrationId.render(RegisterContext, commaAfterRegistrationId);

@@ -36,6 +36,7 @@
 #include "apiTypesV2/Entities.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/getEntities.h"
+#include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "rest/OrionError.h"
 #include "parse/forbiddenChars.h"
@@ -85,9 +86,14 @@ std::string getEntity
   // Fill in QueryContextRequest
   parseDataP->qcr.res.fill(entityId, type, "false", EntityTypeEmptyOrNotEmpty, "");
 
+  // Get attrs and metadata filters from URL params
+  // Note we cannot set the attrs filter on &parseDataP->qcr.res.attrsFilterList given that parameter is used for querying on DB
+  // and some .test would break. We use a fresh variable (attributeFilter) for that
+  StringList attributeFilter;
+  setFilters(ciP->uriParam, ciP->uriParamOptions, &attributeFilter, &parseDataP->qcr.res.metadataList);
+
   // Call standard op postQueryContext
   postQueryContext(ciP, components, compV, parseDataP);
-
 
   // Render entity response
   Entity       entity;
@@ -101,7 +107,10 @@ std::string getEntity
   entity.fill(&parseDataP->qcrs.res);
 
   std::string answer;
-  TIMED_RENDER(answer = entity.render(ciP->uriParamOptions, ciP->uriParam));
+  TIMED_RENDER(answer = entity.toJson(getRenderFormat(ciP->uriParamOptions),
+                                      attributeFilter.stringV,
+                                      false,
+                                      parseDataP->qcr.res.metadataList.stringV));
 
   if (parseDataP->qcrs.res.errorCode.code == SccOk && parseDataP->qcrs.res.contextElementResponseVector.size() > 1)
   {

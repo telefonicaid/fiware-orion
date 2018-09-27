@@ -132,11 +132,11 @@ void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
 
     ContextElementResponse* cerP = qcrsP->contextElementResponseVector[0];
 
-    for (std::size_t i = 0; i < cerP->contextElement.contextAttributeVector.size(); ++i)
+    for (std::size_t i = 0; i < cerP->entity.attributeVector.size(); ++i)
     {
-      if (cerP->contextElement.contextAttributeVector[i]->name == attrName)
+      if (cerP->entity.attributeVector[i]->name == attrName)
       {
-        pcontextAttribute = cerP->contextElement.contextAttributeVector[i];
+        pcontextAttribute = cerP->entity.attributeVector[i];
         break;
       }
     }
