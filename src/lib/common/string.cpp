@@ -24,10 +24,10 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <string>
 #include <vector>
-#include <math.h>    // modf
+#include <algorithm>  // find
+#include <math.h>     // modf
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -162,7 +162,7 @@ bool getIPv6Port(const std::string& in, std::string& outIp, std::string& outPort
 *
 * stringSplit - 
 */
-int stringSplit(const std::string& in, char delimiter, std::vector<std::string>& outV)
+int stringSplit(const std::string& in, char delimiter, std::vector<std::string>& outV, bool unique)
 {
   char* s          = strdup(in.c_str());
   char* toFree     = s;
@@ -201,7 +201,11 @@ int stringSplit(const std::string& in, char delimiter, std::vector<std::string>&
   // 4. pick up all components
   for (int ix = 0; ix < components; ix++)
   {
-    outV.push_back(start);
+    // If unique is true, we need to ensure the element hasn't been added previousy in order to add it
+    if ((!unique) || (std::find(outV.begin(), outV.end(), std::string(start)) == outV.end()))
+    {
+      outV.push_back(start);
+    }
     start = &start[strlen(start) + 1];
   }
 

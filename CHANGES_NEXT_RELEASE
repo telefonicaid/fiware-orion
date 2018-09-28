@@ -11,4 +11,6 @@
 - Fix: With NGSIv2 replace operations the geolocalization field is inconsistent in DB (#1142) (#3167)
 - Fix: duplicated attribute/metadata keys in JSON response in some cases for dateCreated/dateModified/actionType
 - Fix: proper management of user attributes/metadata which name matches the one of a builtin (the user defined shadows the builtin for rendering but not for filtering)
+- Fix: pre-update metadata content included in notifications (and it shouldn't) (#3310)
+- Fix: duplicated items in ?attrs and ?metadata URI params (and "attrs" and "metadata" in POST /v2/op/query and subscriptions) cause duplicated keys in responses/notifications (#3311)
 - Fix: dateCreated and dateModified included in initial notification (#3182)

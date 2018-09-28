@@ -39,27 +39,20 @@
 
 /* ****************************************************************************
 *
-* setFilters -
+* setAttrsFilter -
 *
 */
-void setFilters
+void setAttrsFilter
 (
   std::map<std::string, std::string>&  uriParam,
   std::map<std::string, bool>&         uriParamOptions,
-  StringList*                          attrsFilter,
-  StringList*                          metadataFilter
+  StringList*                          attrsFilter
 )
 {
-  // Add metadata filter
-  if (uriParam[URI_PARAM_METADATA] != "")
-  {
-    stringSplit(uriParam[URI_PARAM_METADATA], ',', metadataFilter->stringV);
-  }
-
   // Add attributes filter
   if (uriParam[URI_PARAM_ATTRS] != "")
   {
-    stringSplit(uriParam[URI_PARAM_ATTRS], ',', attrsFilter->stringV);
+    stringSplit(uriParam[URI_PARAM_ATTRS], ',', attrsFilter->stringV, true);
   }
 
   // dateCreated and dateModified options are still supported although deprecated.
@@ -91,6 +84,26 @@ void setFilters
     {
       attrsFilter->push_back(DATE_MODIFIED);
     }
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* setMetadataFilter -
+*
+*/
+void setMetadataFilter
+(
+  std::map<std::string, std::string>&  uriParam,
+  StringList*                          metadataFilter
+)
+{
+  // Add metadata filter
+  if (uriParam[URI_PARAM_METADATA] != "")
+  {
+    stringSplit(uriParam[URI_PARAM_METADATA], ',', metadataFilter->stringV, true);
   }
 }
 

@@ -2112,12 +2112,20 @@ static void updateAttrInNotifyCer
       int now = getCurrentTime();
       caP->modDate = now;
 
-      /* Metadata */
+      /* Metadata. Note we clean any previous content as updating an attribute means that all
+       * its previous values are removed (this may change if someday PATCH /v2/entities/E/attrs/A/metadata
+       * is implemented) */
+      // FIXME P3: ensure that location and ID metadata are not problematic (current .test suite doesn't raise
+      // any problem, but maybe the specific case is not covered)
+      caP->metadataVector.release();
       for (unsigned int jx = 0; jx < targetAttr->metadataVector.size(); jx++)
       {
         Metadata* targetMdP = targetAttr->metadataVector[jx];
 
         /* Search for matching metadata in the CER attribute */
+        // FIXME P5: maybe this can be optimized, as we started with an empty caP->metadataVector so probably
+        // we can assume that every metadata is new and the "for" block is not needed (although I'm
+        // not fully sure... we should test)
         bool matchMd = false;
         for (unsigned int kx = 0; kx < caP->metadataVector.size(); kx++)
         {

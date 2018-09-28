@@ -312,7 +312,6 @@ ContextElementResponse::ContextElementResponse
 }
 
 
-
 /* ****************************************************************************
 *
 * ContextElementResponse::ContextElementResponse -
