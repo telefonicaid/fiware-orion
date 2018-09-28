@@ -50,8 +50,7 @@ payload='{
       ],
       "attributes": [
         {
-          "name": "temperature",
-          "isDomain": "false"
+          "name": "temperature"
         }
       ],
       "providingApplication": "http://kz.org"
@@ -100,7 +99,7 @@ Date: REGEX(.*)
 
 +++ 2: Discover the Sensor of temperature
 HTTP/1.1 200 OK
-Content-Length: 232
+Content-Length: 213
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -111,7 +110,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "temperature",
                         "type": ""
                     }

@@ -24,6 +24,7 @@
 from getopt import getopt, GetoptError
 
 import os
+import shutil
 import sys
 import re
 import tempfile
@@ -119,9 +120,11 @@ def patch_content_lengths(file_name, cl):
 
         file_temp.close()
 
-        # Remove old file, replacing by the edited one
+        # Remove old file, replacing by the edited one. Note we use shutil.move() instead of os.rename()
+        # as the later has problems when src and dest are not in the same filesystem (it is problematic
+        # if symlinks are used)
         os.remove(file_name)
-        os.rename(file_temp.name, file_name)
+        shutil.move(file_temp.name, file_name)
     except Exception as err:
         print ('* error processing file %s: %s' % (file_name, str(err)))
 

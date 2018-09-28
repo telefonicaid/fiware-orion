@@ -70,8 +70,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/spath-none"
@@ -141,8 +140,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/spath-s1"
@@ -224,7 +222,7 @@ Date: REGEX(.*)
 03. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1 and see it work
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 234
+Content-Length: 215
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -235,7 +233,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -257,7 +254,7 @@ Date: REGEX(.*)
 04. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1?exist=entity::type and see it work
 ===================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 234
+Content-Length: 215
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -268,7 +265,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -290,7 +286,7 @@ Date: REGEX(.*)
 05. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1?entity::type=T1 and see it work
 ================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 234
+Content-Length: 215
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -301,7 +297,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -357,7 +352,7 @@ Date: REGEX(.*)
 08. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1?attributesFormat=object and see it work
 ========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 234
+Content-Length: 215
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -368,7 +363,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -404,7 +398,7 @@ Date: REGEX(.*)
 10. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1, without service-path, see two hits
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 432
+Content-Length: 394
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -415,7 +409,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -434,7 +427,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -456,7 +448,7 @@ Date: REGEX(.*)
 11. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1, with service-path /#, see two hits
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 432
+Content-Length: 394
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -467,7 +459,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -486,7 +477,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -508,7 +498,7 @@ Date: REGEX(.*)
 12. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1, with service-path /, see one hit
 ==================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 234
+Content-Length: 215
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -519,7 +509,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -541,7 +530,7 @@ Date: REGEX(.*)
 13. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1, with service-path /s1, see one hit
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 232
+Content-Length: 213
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -552,7 +541,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }

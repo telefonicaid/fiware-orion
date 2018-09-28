@@ -47,8 +47,7 @@ payload='{
       "attributes": [
         {
           "name": "temperature",
-          "type": "degree",
-          "isDomain": "false"
+          "type": "degree"
         }
       ],
       "providingApplication": "http://localhost:1028/application"
@@ -95,7 +94,7 @@ Date: REGEX(.*)
 }
 ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 317
+Content-Length: 298
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -106,7 +105,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "temperature",
                         "type": "degree"
                     }

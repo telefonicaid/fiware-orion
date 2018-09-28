@@ -52,8 +52,7 @@ payload='{
       "attributes": [
         {
           "name": "ping",
-          "type": "command",
-          "isDomain": "false"
+          "type": "command"
         }
       ],
       "providingApplication": "http://localhost:'${LISTENER_PORT}'/v1"
