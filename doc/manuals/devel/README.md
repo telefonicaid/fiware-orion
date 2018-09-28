@@ -1,6 +1,6 @@
 # <a name="top"></a>Development Manual
 
-*Note: This document describes Orion Context Broker as of release 1.15.x.*
+*Note: This document describes Orion Context Broker as of release 2.0.x.*
 
 ## Intended audience
 The intended audience of this manual is developers that need to understand the internals of the Orion Context Broker
