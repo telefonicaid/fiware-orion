@@ -168,7 +168,7 @@ touch CHANGES_NEXT_RELEASE
 # dev release sets 'latest' and not 'X.Y.Z-next"
 if [ "$BROKER_RELEASE" != "dev" ]
 then
-  sed "s/(https:\/\/img.shields.io\/readthedocs\/fiware-orion.svg)](https:\/\/fiware-orion.rtfd.io)/(https:\/\/img.shields.io\/readthedocs\/fiware-orion.$NEW_VERSION.svg)](https:\/\/fiware-orion.rtfd.io\/en\/$NEW_VERSION\/)/" README.md > /tmp/README.md
+  sed "s/(https:\/\/img.shields.io\/readthedocs\/fiware-orion.svg)](https:\/\/fiware-orion.rtfd.io)/(https:\/\/img.shields.io\/readthedocs\/fiware-orion\/$NEW_VERSION.svg)](https:\/\/fiware-orion.rtfd.io\/en\/$NEW_VERSION\/)/" README.md > /tmp/README.md
 else
   sed "s/(https:\/\/img.shields.io\/readthedocs\/fiware-orion\/$currentVersion.svg)](https:\/\/fiware-orion.rtfd.io\/en\/$currentVersion\/)/(https:\/\/img.shields.io\/readthedocs\/fiware-orion.svg)](https:\/\/fiware-orion.rtfd.io)/" README.md > /tmp/README.md
 fi
