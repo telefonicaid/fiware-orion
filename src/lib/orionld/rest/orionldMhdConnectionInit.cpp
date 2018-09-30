@@ -36,6 +36,7 @@ extern "C"
 #include "rest/Verb.h"                                      // Verb
 #include "rest/ConnectionInfo.h"                            // ConnectionInfo
 #include "orionld/rest/temporaryErrorPayloads.h"            // Temporary Error Payloads
+#include "orionld/common/orionldErrorResponse.h"            // OrionldBadRequestData, OrionldDetailsString, ...
 #include "orionld/rest/orionldMhdConnectionInit.h"          // Own interface
 
 
@@ -318,6 +319,17 @@ int orionldMhdConnectionInit
     ciP->kjsonP->nlString          = (char*) "";
     ciP->kjsonP->stringBeforeColon = (char*) "";
     ciP->kjsonP->stringAfterColon  = (char*) "";
+  }
+
+  //
+  // NGSI-LD only accepts the verbs POST, GET, DELETE and PATCH
+  // If any other verb is used, even if a valid REST Verb, a generic error will be returned
+  //
+  if ((ciP->verb != POST) && (ciP->verb != GET) && (ciP->verb != DELETE) && (ciP->verb != PATCH))
+  {
+    LM_T(LmtVerb, ("The verb '%s' is not supported by NGSI-LD", method));
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Verb not supported by NGSI-LD", method, OrionldDetailsString);
+    ciP->httpStatusCode = SccBadRequest;
   }
 
   LM_T(LmtMhd, ("Connection Init DONE"));

@@ -8,6 +8,7 @@
 * Temporary predefined payloads
 */
 extern const char* invalidVerbPayload;
+extern const char* unsupportedVerbPayload;
 extern const char* payloadTooLargePayload;
 extern const char* genericErrorPayload;
 extern const char* doubleSlashPayload;

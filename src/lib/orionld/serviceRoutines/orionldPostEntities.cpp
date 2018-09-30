@@ -734,35 +734,9 @@ static bool contextTreat
   ContextElement*  ceP
 )
 {
-  if (contextNodeP == NULL)
-  {
-    if (ciP->httpHeaders.link != "")
-    {
-      char* details;
-
-      if (urlCheck((char*) ciP->httpHeaders.link.c_str(), &details) == false)
-      {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Link HTTP Header must be a valid URL", details, OrionldDetailsString);
-        return false;
-      }
-
-      if ((ciP->contextP = orionldContextCreateFromUrl(ciP, ciP->httpHeaders.link.c_str(), &details)) == NULL)
-      {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from URL", details, OrionldDetailsString);
-        return false;
-      }
-    }
-    else
-    {
-      LM_T(LmtUriExpansion, ("Setting the context to the default context"));
-      ciP->contextP = &orionldDefaultContext;
-    }
-
-    return true;
-  }
-  
+  LM_TMP(("contextNodeP at %p", contextNodeP));
   //
-  // In the first implementation of ngsi-ld, the allowed payloads for the @context member are:
+  // The allowed payloads for the @context member are:
   //
   // 1. ARRAY - An array of URL strings:
   //    "@context": [
@@ -780,7 +754,9 @@ static bool contextTreat
   //      "XXX";      "YYY"
   //    }
   //
-  // case 3 is not implemented in the first round. coming later
+  // -----------------------------------------------------------
+  // Case 3 is not implemented in the first round. coming later.
+  // -----------------------------------------------------------
   //
   // As the payload is already parsed, what needs to be done here is to call orionldContextAdd() for each of these URLs
   //
@@ -925,6 +901,23 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   if (payloadCheck(ciP, &idNodeP, &typeNodeP, &locationP, &contextNodeP, &observationSpaceP, &operationSpaceP) == false)
     return false;
 
+  //
+  // If a context came in via HTTP Header, then ciP->contextP is non NULL
+  // If also no context via payload, then we'll just use the default context
+  // If we have a context in both HTTP Header and payload, then we return an error
+  //
+  if ((ciP->contextP != NULL) && (contextNodeP != NULL))
+  {
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "@context both in HTTP Header and in payload", "only one permitted", OrionldDetailsString);
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
+  }
+  else if ((ciP->contextP == NULL) && (contextNodeP == NULL))
+  {
+    ciP->contextP = &orionldDefaultContext;
+  }
+
+
   LM_T(LmtUriExpansion, ("type node at %p", typeNodeP));
   UpdateContextRequest   mongoRequest;
   UpdateContextResponse  mongoResponse;
@@ -937,7 +930,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   mongoRequest.updateActionType = ActionTypeAppendStrict;  // Error if entity already exists, I hope
 
   // First treat the @context, if none, use the default context
-  if (contextTreat(ciP, contextNodeP, ceP) == false)
+  if ((contextNodeP != NULL) && contextTreat(ciP, contextNodeP, ceP) == false)
   {
     // Error payload set by contextTreat
     mongoRequest.release();

@@ -37,9 +37,11 @@ extern "C"
 #include "rest/restReply.h"                                 // restReply
 
 #include "orionld/common/orionldErrorResponse.h"            // orionldErrorResponseCreate
+#include "orionld/common/urlCheck.h"                        // urlCheck
 #include "orionld/serviceRoutines/orionldBadVerb.h"         // orionldBadVerb
 #include "orionld/rest/orionldServiceInit.h"                // orionldRestServiceV 
 #include "orionld/rest/orionldServiceLookup.h"              // orionldServiceLookup
+#include "orionld/context/orionldContextAdd.h"              // orionldContextCreateFromUrl
 #include "orionld/rest/temporaryErrorPayloads.h"            // Temporary Error Payloads
 #include "orionld/rest/orionldMhdConnectionTreat.h"         // Own Interface
 
@@ -58,54 +60,77 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   // If no error predetected, lookup the service and call its service routine
   if (ciP->httpStatusCode == SccOk)
   {
-    if ((ciP->verb == POST) || (ciP->verb == GET) || (ciP->verb == DELETE) || (ciP->verb == PATCH))
-      ciP->serviceP = orionldServiceLookup(ciP, &orionldRestServiceV[ciP->verb]);
+    //
+    // Lookup the Service
+    //
+    // orionldMhdConnectionInit guarantees that a valid verb is used. I.e. POST, GET, DELETE or PATCH
+    // orionldServiceLookup makes sure the URL supprts the verb
+    //
+    ciP->serviceP = orionldServiceLookup(ciP, &orionldRestServiceV[ciP->verb]);
 
-    
+    if (ciP->serviceP == NULL)
+    {
+      // FIXME: Can this happen?  BadVerb service routine?
+      orionldBadVerb(ciP);
+    }
+
     if (ciP->payload != NULL)
     {
       LM_T(LmtPayloadParse, ("parsing the payload '%s'", ciP->payload));
       
       ciP->requestTree = kjParse(ciP->kjsonP, ciP->payload);
-      LM_TMP(("kjParse returned a requestTree at %p", ciP->requestTree));
       LM_T(LmtPayloadParse, ("After kjParse: %p", ciP->requestTree));
       if (ciP->requestTree == NULL)
       {
         LM_TMP(("Creating Error Response for JSON Parse Error (%s)", ciP->kjsonP->errorString));
-        LM_TMP(("SccBadRequest: ciP->kjsonP at %p", ciP->kjsonP));
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "JSON Parse Error", ciP->kjsonP->errorString, OrionldDetailsString);
-        LM_TMP(("SccBadRequest"));
         ciP->httpStatusCode = SccBadRequest;
-        LM_TMP(("SccBadRequest"));
         error = true;
-        LM_TMP(("SccBadRequest"));
       }
       LM_T(LmtPayloadParse, ("All good - payload parsed"));
     }
 
+    //
+    // Checking for @context in HTTP Header
+    //
+    if (ciP->httpHeaders.link != "")
+    {
+      char* details;
+
+      if (urlCheck((char*) ciP->httpHeaders.link.c_str(), &details) == false)
+      {
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Link HTTP Header must be a valid URL", details, OrionldDetailsString);
+        return false;
+      }
+
+      if ((ciP->contextP = orionldContextCreateFromUrl(ciP, ciP->httpHeaders.link.c_str(), &details)) == NULL)
+      {
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from URL", details, OrionldDetailsString);
+        return false;
+      }
+    }
+    else
+    {
+      ciP->contextP = NULL;
+    }
+    
+
     if (error == false)
     {
-      if (ciP->serviceP != NULL)
+      LM_T(LmtServiceRoutine, ("Calling Service Routine %s", ciP->serviceP->url));
+      bool b = ciP->serviceP->serviceRoutine(ciP);
+      LM_T(LmtServiceRoutine,("service routine '%s' done", ciP->serviceP->url));
+      
+      if (b == false)
       {
-        LM_T(LmtServiceRoutine, ("Calling Service Routine %s", ciP->serviceP->url));
-        bool b = ciP->serviceP->serviceRoutine(ciP);
-        LM_T(LmtServiceRoutine,("service routine '%s' done", ciP->serviceP->url));
-
-        if (b == false)
+        //
+        // If the service routine failed (returned FALSE), but no HTTP status code is set,
+        // The HTTP status code defaults to 400
+        //
+        if (ciP->httpStatusCode == SccOk)
         {
-          //
-          // If the service routine failed (returned FALSE), but no HTTP status code is set,
-          // The HTTP status code defaults to 400
-          //
-          if (ciP->httpStatusCode == SccOk)
-          {
-            ciP->httpStatusCode = SccBadRequest;
-          }
+          ciP->httpStatusCode = SccBadRequest;
         }
-      }
-      else
-      {
-        orionldBadVerb(ciP);
       }
     }
   }
@@ -118,11 +143,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     ciP->responsePayload = (char*) malloc(1024);
     if (ciP->responsePayload != NULL)
     {
-      LM_TMP(("ciP->kjsonP at %p", ciP->kjsonP));
       ciP->responsePayloadAllocated = true;
       kjRender(ciP->kjsonP, ciP->responseTree, ciP->responsePayload, 1024);
-      LM_TMP(("ciP->kjsonP->iVec at     %p", ciP->kjsonP->iVec));
-      LM_TMP(("ciP->kjsonP->iStrings at %p", ciP->kjsonP->iStrings));
     }
     else
     {

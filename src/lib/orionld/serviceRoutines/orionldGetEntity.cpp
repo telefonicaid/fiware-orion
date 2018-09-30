@@ -50,34 +50,6 @@ bool orionldGetEntity(ConnectionInfo* ciP)
 
   LM_T(LmtServiceRoutine, ("In orionldGetEntity: %s", ciP->wildcard[0]));
 
-  //
-  // <Context>
-  //   - all this to be moved to orionldMhdConnectionTreat
-  //   - POST entities has the same lines implemented
-  //
-  if (ciP->httpHeaders.link != "")
-  {
-    char* details;
-
-    if (urlCheck((char*) ciP->httpHeaders.link.c_str(), &details) == false)
-    {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Link HTTP Header must be a valid URL", details, OrionldDetailsString);
-      return false;
-    }
-
-    if ((ciP->contextP = orionldContextCreateFromUrl(ciP, ciP->httpHeaders.link.c_str(), &details)) == NULL)
-    {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from URL", details, OrionldDetailsString);
-      return false;
-    }
-  }
-  else
-  {
-    LM_T(LmtUriExpansion, ("Setting the context to the default context"));
-    ciP->contextP = &orionldDefaultContext;
-  }
-  // </Context>
-
   request.entityIdVector.push_back(&entityId);
   LM_TMP(("Calling mongoQueryContext"));
   //
