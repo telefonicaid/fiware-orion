@@ -26,6 +26,8 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "ngsi/ParseData.h"                                    // ParseData needed for postUpdateContext()
+#include "serviceRoutines/postUpdateContext.h"                 // postUpdateContext
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/serviceRoutines/orionldDeleteEntity.h"       // Own Interface
 
@@ -37,11 +39,31 @@
 //
 bool orionldDeleteEntity(ConnectionInfo* ciP)
 {
+  ParseData  parseData;
+  Entity     entity;
+
   LM_T(LmtServiceRoutine, ("In orionldDeleteEntity"));
 
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented DELETE /ngsi-ld/v1/entities/*", ciP->wildcard[0], OrionldDetailsString);
+  // Fill in entity with the entity-id from the URL
+  entity.id = ciP->wildcard[0];
 
-  ciP->httpStatusCode = SccNotImplemented;
+  // Fill in the upcr field for postUpdateContext, with the entity and DELETE as action
+  parseData.upcr.res.fill(&entity, ActionTypeDelete);
+
+  // Call standard op postUpdateContext
+  std::vector<std::string> compV;  // dum my - postUpdateContext requires this arg as its 3rd parameter
+  postUpdateContext(ciP, 3, compV, &parseData);
+
+  // Check result
+  if (parseData.upcrs.res.oe.code != SccNone)
+  {
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, parseData.upcrs.res.oe.details.c_str(), ciP->wildcard[0], OrionldDetailsString);
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
+  }
+
+  // Release allocated data
+  parseData.upcr.res.contextElementVector.release();
 
   return true;
 }

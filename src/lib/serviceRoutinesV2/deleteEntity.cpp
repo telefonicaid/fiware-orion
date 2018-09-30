@@ -79,9 +79,9 @@ std::string deleteEntity
 
   if (compV.size() == 5)  // Deleting an attribute
   {
-    ContextAttribute *ca = new ContextAttribute;
-    ca->name = compV[4];
-    eP->attributeVector.push_back(ca);
+    ContextAttribute* caP = new ContextAttribute;
+    caP->name = compV[4];
+    eP->attributeVector.push_back(caP);
   }
 
   // Fill in UpdateContextRequest
@@ -94,7 +94,7 @@ std::string deleteEntity
 
   // Check for potential error
   string  answer = "";
-  if (parseDataP->upcrs.res.oe.code != SccNone )
+  if (parseDataP->upcrs.res.oe.code != SccNone)
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
     ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
