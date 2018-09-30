@@ -32,6 +32,7 @@ SET (HEADERS
 SET (STATIC_LIBS
     ${ORION_LIBS}
     ${COMMON_STATIC_LIBS}
+    kjson.a
 )
 
 # Include directories

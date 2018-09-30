@@ -217,7 +217,6 @@ SET (STATIC_LIBS
     ${GMOCKMAIN_LIBRARY}
     ${ORION_LIBS}
     ${COMMON_STATIC_LIBS}
-    kjson.a
 )
 
 # Include directories

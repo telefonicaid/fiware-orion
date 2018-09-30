@@ -67,13 +67,18 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       LM_T(LmtPayloadParse, ("parsing the payload '%s'", ciP->payload));
       
       ciP->requestTree = kjParse(ciP->kjsonP, ciP->payload);
+      LM_TMP(("kjParse returned a requestTree at %p", ciP->requestTree));
       LM_T(LmtPayloadParse, ("After kjParse: %p", ciP->requestTree));
       if (ciP->requestTree == NULL)
       {
         LM_TMP(("Creating Error Response for JSON Parse Error (%s)", ciP->kjsonP->errorString));
+        LM_TMP(("SccBadRequest: ciP->kjsonP at %p", ciP->kjsonP));
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "JSON Parse Error", ciP->kjsonP->errorString, OrionldDetailsString);
+        LM_TMP(("SccBadRequest"));
         ciP->httpStatusCode = SccBadRequest;
+        LM_TMP(("SccBadRequest"));
         error = true;
+        LM_TMP(("SccBadRequest"));
       }
       LM_T(LmtPayloadParse, ("All good - payload parsed"));
     }

@@ -31,14 +31,6 @@
 
 /* ****************************************************************************
 *
-* ServiceRoutine -
-*/
-typedef bool (*ServiceRoutine)(ConnectionInfo* ciP);
-
-
-
-/* ****************************************************************************
-*
 * OrionldServiceRoutine -
 */
 typedef bool (*OrionldServiceRoutine)(ConnectionInfo* ciP);
@@ -93,16 +85,16 @@ typedef struct OrionLdRestServiceSimplifiedVector
 //
 typedef struct OrionLdRestService
 {
-  char*           url;                           // URL Path 
-  ServiceRoutine  serviceRoutine;                // Function pointer to service routine
-  int             wildcards;                     // Number of wildcards in URL: 0, 1, or 2
-  int             charsBeforeFirstWildcard;      // E.g. 8 for [/ngsi-ld/v1]/entities/*
-  int             charsBeforeFirstWildcardSum;   // -"-  'e' + 'n' + 't' + 'i' + 't' + 'i' + 'e' + 's'
-  int             charsBeforeSecondWildcard;     // E.g. 5 for [/ngsi-ld/v1]/entities/*/attrs/*
-  int             charsBeforeSecondWildcardSum;  // -"- 'a' + 't' + 't' + 'r' + 's' - used to find start of wildcard no 2 
-  char            matchForSecondWildcard[16];    // E.g. "/attrs/" for [/ngsi-ld/v1]/entities/*/attrs/*
-  int             matchForSecondWildcardLen;     // strlen of last path to match
-  int             supportedVerbMask;             // Bitmask of supported verbs
+  char*                  url;                           // URL Path 
+  OrionldServiceRoutine  serviceRoutine;                // Function pointer to service routine
+  int                    wildcards;                     // Number of wildcards in URL: 0, 1, or 2
+  int                    charsBeforeFirstWildcard;      // E.g. 8 for [/ngsi-ld/v1]/entities/*
+  int                    charsBeforeFirstWildcardSum;   // -"-  'e' + 'n' + 't' + 'i' + 't' + 'i' + 'e' + 's'
+  int                    charsBeforeSecondWildcard;     // E.g. 5 for [/ngsi-ld/v1]/entities/*/attrs/*
+  int                    charsBeforeSecondWildcardSum;  // -"- 'a' + 't' + 't' + 'r' + 's' - used to find start of wildcard no 2 
+  char                   matchForSecondWildcard[16];    // E.g. "/attrs/" for [/ngsi-ld/v1]/entities/*/attrs/*
+  int                    matchForSecondWildcardLen;     // strlen of last path to match
+  int                    supportedVerbMask;             // Bitmask of supported verbs
 } OrionLdRestService;
 
 

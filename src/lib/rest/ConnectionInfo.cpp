@@ -217,8 +217,10 @@ ConnectionInfo::~ConnectionInfo()
   httpHeaders.release();
 
 #ifdef ORIONLD
+  LM_TMP(("In ~ConnectionInfo"));
   if (requestTree != NULL)
   {
+    LM_TMP(("Releasing requestTree at %p", requestTree));
     kjFree(requestTree);
     requestTree = NULL;
   }

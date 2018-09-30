@@ -174,6 +174,7 @@ SET (ORION_LIBS
     rest          # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o; jsonRequestTreat from payloadParse@RestService.cpp.o;
     orionld_rest
     orionld_serviceRoutines
+    orionld_common
     orionld_context
     orionld_common
     jsonParse
