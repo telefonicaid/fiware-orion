@@ -601,9 +601,9 @@ std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
 
 /* ****************************************************************************
 *
-* toJsonV1AsJsonObject -
+* toJsonV1AsObject -
 */
-std::string ContextAttribute::toJsonV1AsJsonObject
+std::string ContextAttribute::toJsonV1AsObject
 (
   RequestType                    request,
   const std::vector<Metadata*>&  orderedMetadata,
@@ -735,7 +735,7 @@ std::string ContextAttribute::toJsonV1
 
   if (asJsonObject)
   {
-    return toJsonV1AsJsonObject(request, orderedMetadata, comma, omitValue);
+    return toJsonV1AsObject(request, orderedMetadata, comma, omitValue);
   }
 
   out += startTag();
