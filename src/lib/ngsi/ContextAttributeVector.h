@@ -45,28 +45,26 @@ typedef struct ContextAttributeVector
   ContextAttributeVector();
 
   void                     push_back(ContextAttribute* item);
-  void                     push_back(ContextAttributeVector* aVec);
+  void                     push_back(const ContextAttributeVector& caV);
   unsigned int             size(void) const;
   void                     release(void);
-  void                     fill(struct ContextAttributeVector* cavP, bool useDefaultType = false);
-  ContextAttribute*        lookup(const std::string& attributeName) const;
+  void                     fill(const ContextAttributeVector& caV, bool useDefaultType = false);
+  int                      get(const std::string& attributeName) const;
+  void                     getAll(const std::string& attributeName, std::vector<int>* foundP) const;
   
   ContextAttribute*  operator[](unsigned int ix) const;
 
 
   std::string        check(ApiVersion apiVersion, RequestType requestType);
 
-  std::string        render(ApiVersion   apiVersion,
-                            bool         asJsonObject,
-                            RequestType  requestType,
-                            bool         comma       = false,
-                            bool         omitValue   = false,
-                            bool         attrsAsName = false);
+  std::string        toJsonV1(bool                                   asJsonObject,
+                              RequestType                            requestType,
+                              const std::vector<ContextAttribute*>&  orderedAttrs,
+                              const std::vector<std::string>&        metadataFilter,
+                              bool                                   comma       = false,
+                              bool                                   omitValue   = false,
+                              bool                                   attrsAsName = false);
 
-  std::string        toJson(RenderFormat                     renderFormat,
-                            const std::vector<std::string>&  attrsFilter,
-                            const std::vector<std::string>&  metadataV,
-                            bool                             blacklist) const;
   std::string        toJsonTypes(void);
 
 } ContextAttributeVector;

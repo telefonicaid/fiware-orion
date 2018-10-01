@@ -87,7 +87,7 @@ StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const 
 *
 * StatusCode::render -
 */
-std::string StatusCode::render(bool comma, bool showKey)
+std::string StatusCode::toJsonV1(bool comma, bool showKey)
 {
   std::string  out  = "";
 

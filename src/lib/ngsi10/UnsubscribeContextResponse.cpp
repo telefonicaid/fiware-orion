@@ -64,15 +64,15 @@ UnsubscribeContextResponse::~UnsubscribeContextResponse()
 
 /* ****************************************************************************
 *
-* UnsubscribeContextResponse::render - 
+* UnsubscribeContextResponse::toJsonV1 -
 */
-std::string UnsubscribeContextResponse::render(void)
+std::string UnsubscribeContextResponse::toJsonV1(void)
 {
   std::string out = "";
 
   out += startTag();
-  out += subscriptionId.render(RtUnsubscribeContextResponse, true);
-  out += statusCode.render(false);
+  out += subscriptionId.toJsonV1(RtUnsubscribeContextResponse, true);
+  out += statusCode.toJsonV1(false);
   out += endTag();
 
   return out;

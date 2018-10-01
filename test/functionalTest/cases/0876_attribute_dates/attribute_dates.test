@@ -183,7 +183,7 @@ Date: REGEX(.*)
 02. GET E1/A1, see dateCreated == dateModified
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 176
+Content-Length: 108
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -200,7 +200,7 @@ Date: REGEX(.*)
 }
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 178
+Content-Length: 109
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -229,7 +229,7 @@ Date: REGEX(.*)
 04. GET E1/A1, check dateModified and dateCreated
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 176
+Content-Length: 108
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -246,7 +246,7 @@ Date: REGEX(.*)
 }
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 178
+Content-Length: 109
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -277,7 +277,7 @@ Date: REGEX(.*)
 ==================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 401
+Content-Length: 264
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -324,7 +324,7 @@ Date: REGEX(.*)
 ==================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 402
+Content-Length: 265
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)

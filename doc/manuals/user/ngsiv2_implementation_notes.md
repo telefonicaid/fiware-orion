@@ -7,8 +7,7 @@
 * [Limit to attributes for entity location](#limit-to-attributes-for-entity-location)
 * [Legacy attribute format in notifications](#legacy-attribute-format-in-notifications)
 * [Datetime support](#datetime-support)
-* [`dateModified` and `dateCreated` attributes](#datemodified-and-datecreated-attributes)
-* [`dateModified` and `dateCreated` metadata](#datemodified-and-datecreated-metadata)
+* [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
 * [Subscription payload validations](#subscription-payload-validations)
 * [`actionType` metadata](#actiontype-metadata)
 * [`noAttrDetail` option](#noattrdetail-option)
@@ -90,6 +89,8 @@ Apart from the values described for `attrsFormat` in the NGSIv2 specification, O
 `legacy` value, in order to send notifications in NGSIv1 format. This way, users can benefit from the
 enhancements of NGSIv2 subscriptions (e.g. filtering) with NGSIv1 legacy notification receivers.
 
+Note that NGSIv1 is deprecated. Thus, we don't recommend to use `legacy` notification format any longer.
+
 [Top](#top)
 
 ## Datetime support
@@ -136,126 +137,34 @@ The string "ISO8601" as type for attributes and metadata is also supported. The 
 
 [Top](#top)
 
-## `dateModified` and `dateCreated` attributes
+## User attributes or metadata matching builtin name
 
-The section "Attribute names restrictions" establishes that builtin attribute names cannot be used as user
-attribute names. Thus, `dateCreated` and `dateModified` (which are builtin attributes) cannot be used as user
-attribute names.
+(The content of this section applies to all builtins except `dateExpires` attribute. Check the document
+[on transient entities](transient_entities.md) for specific information about `dateExpires`).
 
-However, due to legacy reasons, Orion doesn't reject attempts of using these attribute with 400 Bad Request errors. **You are
-strongly encouraged to not use dateCreate/dateModified as attribute names** but, if you at the end need to do so, take into
-account the following:
+First of all: **you are strongly encouraged to not use attributes or metadata with the same name as an
+NGSIv2 builtin**. In fact, the NGSIv2 specification forbids that (check "Attribute names restrictions" and
+"Metadata names restrictions" sections in the specification).
 
-You can use dateModified/dateCreated attributes at creation/update time, e.g.:
+However, if you are forced to have such attributes or metadata (maybe due to legacy reasons) take into
+account the following considerations:
 
-```
-POST /v2/entities
-
-{
-  "id": "FutureEntity",
-  "type": "T",
-  ...
-  "dateModified": {
-      "type": "DateTime".
-      "value": "2050-01-01T00:00:00Z"
-  }
-}
-```
-
-Retrieval of such attributes using GET API operations will return the value you created/updated. You don't need to use
-`?attrs=dateModified,...` in this case, e.g.:
-
-```
-GET /v2/entities/FutureEntity/attrs
-```
-
-```
-{
-  ...
-  "dateModified": {
-      "type": "DateTime".
-      "value": "2050-01-01T00:00:00Z"
-  }
-}
-```
-
-However, when included in notifications, the value is not the one provided by the user (*), but the real
-one corresponding to entity modification/creation stored internally by Orion, e.g. (assuming the last update
-for that entity was sent at 11:16:05 at May 28th, 2018):
-
-```
-POST /notify
-
-{
-    "data": [
-        {
-            "dateModified": {
-                "metadata": {},
-                "type": "DateTime",
-                "value": "2018-05-28T11:16:05Z"
-            },
-            "id": "FutureEntity",
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "5b082dc2c17960f8773dd74d"
-}
-```
-
-(*) Exception: initial notifications use the value provided by the user. However, this is probably a side
-effect of [this issue](https://github.com/telefonicaid/fiware-orion/issues/3182).
-
-In addition, filters will use the real modification/creation date as stored internally by Orion. For instance,
-the following filter will not retrieve any result (even when user provided 2050-01-01T00:00:00Z as dateModified, which
-would match the filter condition):
-
-```
-GET /v2/entities?q=dateModified>2030-01-01T00:00:00Z
-```
-
-This behaviour is assessed by the functional test `entity_dates_overriden_by_user.test`
-and `entity_dates_overriden_by_user_subs.test` cases included in
-[`cases/0876_entity_dates directory`](https://github.com/telefonicaid/fiware-orion/tree/master/test/functionalTest/cases/0876_entity_dates).
-Please have a look, if you need a more detailed description.
-
-[Top](#top)
-
-## `dateModified` and `dateCreated` metadata
-
-The section "Metadata name restrictions" establishes that builtin metadata names cannot be used as user metadta
-names. Thus, `dateCreated` and `dateModified` (which are builtin metadata) cannot be used as user metadata names.
-
-However, due to legacy reasons, Orion doesn't reject attempts of using these metadata with 400 Bad Request errors. **You are
-strongly encouraged to not use dateCreate/dateModified as metadata names** but, if you at the end need to do so, take into 
-account the following:
-
-You can use dateModified/dateCreated metadata at creation/update time, e.g.:
-
-```
-POST /v2/entities
-
-{
-  "id": "FutureEntity",
-  "type": "T",
-  ...
-  "futureAttr": {
-      "value": 42,
-      "type": "Number",
-      "dateModified": {
-          "type": "DateTime".
-           "value": "2050-01-01T00:00:00Z"
-      }
-  }
-}
-```
-
-However, they are ignored. Orion will keep attribute creation/modification internally and always using them in GET responses,
-notifications and filters.
-
-This behaviour is assessed by the functional test `attrs_dates_overriden_by_user.test`
-and `attrs_dates_overriden_by_user_subs.test` cases included in
-[`cases/0876_attribute_dates directory`](https://github.com/telefonicaid/fiware-orion/tree/master/test/functionalTest/cases/0876_attribute_dates).
-Please have a look, if you need a more detailed description.
+* You can create/update attributes and/or metadata which name is the same of a NGSIv2 builtin.
+  Orion will let you do so.
+* User defined attributes and/or metadata are shown without need to explicit declare it in the GET request
+  or subscription. For instance, if you created a `dateModified` attribute with value
+  "2050-01-01" in entity E1, then `GET /v2/entities/E1` will retrieve it. You don't need to use
+  `?attrs=dateModified`.
+* When rendered (in response to GET operations or in notifications) the user defined attribute/metadata
+  will take preference over the builtin even when declared explicitly. For instance, if you created
+  a `dateModified` attribute with value "2050-01-01" in entity E1 and you request
+  `GET /v2/entities?attrs=dateModified` you will get "2050-01-01".
+* However, filtering (i.e. `q` or `mq`) is based on the value of the builtin. For instance, if you created
+  a `dateModified` attribute with value "2050-01-01" in entity E1 and you request
+  `GET /v2/entities?q=dateModified>2049-12-31` you will get no entity. It happens that "2050-01-01" is
+  greater than "2049-12-31" but the date you modified the entity (some date in 2018 or 2019 maybe) will
+  not be greater than "2049-12-31". Note this is somehow inconsistent (i.e. user defined takes preference
+  in rendering but not in filtering) and may change in the future.
 
 [Top](#top)
 
@@ -377,8 +286,7 @@ for the following aspects:
 * `PATCH /v2/registration/<id>` is not implemented. Thus, registrations cannot be updated
   directly. I.e., updates must be done deleting and re-creating the registration. Please
   see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3007) about this.
-* `idPattern` and `typePattern` are not implemented. This is similar to NGSIv1 registrations,
-  where isPattern is not implemented.
+* `idPattern` and `typePattern` are not implemented.
 * The only valid `supportedForwardingMode` is `all`. Trying to use any other value will end
   in a 501 Not Implemented error response. Please
   see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3106) about this.
@@ -396,8 +304,8 @@ The way in which Orion implements such forwarding is as follows:
 
 Orion implements an additional field `legacyForwarding` (within `provider`) not included in NGSIv2
 specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
-for forwarding requests associated to that registration. However, for the time being, NGSIv2-based
-forwarding has not been defined (see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3068)
+for forwarding requests associated to that registration. Although NGSIv1 is deprecated, for the time being,
+NGSIv2-based forwarding has not been defined (see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3068)
 about it) so the only valid option is to always use `"legacyForwarding": true` (otherwise a 501 Not Implemented
 error response will be the result).
 
@@ -420,7 +328,7 @@ NGSIv2 stable specification document but that Orion still supports
 In particular:
 
 * The usage of `dateCreated` and `dateModified` in the `options` parameter (introduced
-in stable RC-2016.05 and removed in RC-2016.10.) is still supported, e.g. `options=dateModified`. However,
+in stable RC-2016.05 and removed in RC-2016.10) is still supported, e.g. `options=dateModified`. However,
 you are highly encouraged to use `attrs` instead (i.e. `attrs=dateModified,*`).
 
 * `POST /v2/op/update` accepts the same action types as NGSIv1, that is `APPEND`, `APPEND_STRICT`,

@@ -39,15 +39,15 @@ public:
   void        addString(const std::string& key, const std::string& value);
   void        addRaw(const std::string& key, const std::string& value);
   void        addNumber(const std::string& key, long long value);
-  void        addNumber(const std::string& key, float value);
+  void        addNumber(const std::string& key, double value);
   void        addDate(const std::string& key, long long timestamp);
   void        addBool(const std::string& key, bool b);
 
   std::string str();
 
 private:
- std::ostringstream ss;
- bool               empty;
+ std::string  ss;
+ bool         empty;
 };
 
 
@@ -74,15 +74,15 @@ std::string vectorToJson(std::vector<T> &list)
     return "[]";
   }
 
-  std::ostringstream ss;
+  std::string ss;
 
-  ss << '[' << list[0].toJson();
+  ss += '[' + list[0].toJson();
   for (size_type i = 1; i != list.size(); ++i)
   {
-    ss << ',' << list[i].toJson();
+    ss += ',' + list[i].toJson();
   }
-  ss << ']';
-  return ss.str();
+  ss += ']';
+  return ss;
 }
 
 template <>

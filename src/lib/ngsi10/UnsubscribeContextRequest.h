@@ -39,7 +39,7 @@ typedef struct UnsubscribeContextRequest
 {
   SubscriptionId  subscriptionId;    // Mandatory
 
-  std::string     render(void);
+  std::string     toJsonV1(void);
   std::string     check(void);
   void            release(void);
 } UnsubscribeContextRequest;

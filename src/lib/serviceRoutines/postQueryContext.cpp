@@ -104,7 +104,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   // 2. Render the string of the request we want to forward
   //
   std::string  payload;
-  TIMED_RENDER(payload = qcrP->render());
+  TIMED_RENDER(payload = qcrP->toJsonV1());
 
   char* cleanPayload = (char*) payload.c_str();;
 
@@ -236,14 +236,14 @@ static bool forwardsPending(QueryContextResponse* qcrsP)
   {
     ContextElementResponse* cerP  = qcrsP->contextElementResponseVector[ix];
 
-    if (cerP->contextElement.providingApplicationList.size() != 0)
+    if (cerP->entity.providingApplicationList.size() != 0)
     {
       return true;
     }
 
-    for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
+    for (unsigned int aIx = 0 ; aIx < cerP->entity.attributeVector.size(); ++aIx)
     {
-      ContextAttribute* aP  = cerP->contextElement.contextAttributeVector[aIx];
+      ContextAttribute* aP  = cerP->entity.attributeVector[aIx];
 
       if (aP->providingApplication.get() != "")
       {
@@ -322,7 +322,7 @@ std::string postQueryContext
     // Bad Input detected by Mongo Backend - request ends here !
     OrionError oe(qcrsP->errorCode);
 
-    TIMED_RENDER(answer = oe.render());
+    TIMED_RENDER(answer = oe.toJsonV1());
     qcrP->release();
     return answer;
   }
@@ -354,7 +354,7 @@ std::string postQueryContext
   //
   if (forwardsPending(qcrsP) == false)
   {
-    TIMED_RENDER(answer = qcrsP->render(ciP->apiVersion, asJsonObject));
+    TIMED_RENDER(answer = qcrsP->toJsonV1(asJsonObject));
 
     qcrP->release();
     return answer;
@@ -382,7 +382,7 @@ std::string postQueryContext
   for (unsigned int ix = 0 ; ix < qcrsP->contextElementResponseVector.size(); ++ix)
   {
     ContextElementResponse* cerP  = qcrsP->contextElementResponseVector[ix];
-    EntityId*               eP    = &cerP->contextElement.entityId;
+    EntityId en(cerP->entity.id, cerP->entity.type, cerP->entity.isPattern);
 
     //
     // If a Context Provider has been registered with an empty attribute list for
@@ -392,11 +392,11 @@ std::string postQueryContext
     // When there is a Context Provider in ContextElement::providingApplicationList, then the
     // request must be sent to that Context Provider also
     //
-    for (unsigned int ix = 0; ix < cerP->contextElement.providingApplicationList.size(); ++ix)
+    for (unsigned int ix = 0; ix < cerP->entity.providingApplicationList.size(); ++ix)
     {
       QueryContextRequest* requestP;
 
-      requestP = new QueryContextRequest(cerP->contextElement.providingApplicationList[ix].get(), eP, qcrP->attributeList);
+      requestP = new QueryContextRequest(cerP->entity.providingApplicationList[ix].get(), &en, qcrP->attributeList);
       requestV.push_back(requestP);
     }
 
@@ -404,15 +404,15 @@ std::string postQueryContext
     // What if the Attribute Vector of the ContextElementResponse is empty?
     // For now, just push it into localQcrsP, but only if its local, i.e. its contextElement.providingApplicationList is empty
     //
-    if ((cerP->contextElement.contextAttributeVector.size() == 0) && (cerP->contextElement.providingApplicationList.size() == 0))
+    if ((cerP->entity.attributeVector.size() == 0) && (cerP->entity.providingApplicationList.size() == 0))
     {
-      localQcrsP->contextElementResponseVector.push_back(new ContextElementResponse(eP, NULL));
+      localQcrsP->contextElementResponseVector.push_back(new ContextElementResponse(&en, NULL));
     }
     else
     {
-      for (unsigned int aIx = 0; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
+      for (unsigned int aIx = 0; aIx < cerP->entity.attributeVector.size(); ++aIx)
       {
-        ContextAttribute*    aP  = cerP->contextElement.contextAttributeVector[aIx];
+        ContextAttribute*    aP  = cerP->entity.attributeVector[aIx];
 
         //
         // An empty providingApplication means the attribute is local
@@ -431,16 +431,16 @@ std::string postQueryContext
           // If we find a suitable existing contextElementResponse, we put it there,
           // otherwise, we have to create a new contextElementResponse.
           //
-          ContextElementResponse* contextElementResponseP = localQcrsP->contextElementResponseVector.lookup(eP);
+          ContextElementResponse* contextElementResponseP = localQcrsP->contextElementResponseVector.lookup(&cerP->entity);
 
           if (contextElementResponseP == NULL)
           {
-            contextElementResponseP = new ContextElementResponse(eP, aP);
+            contextElementResponseP = new ContextElementResponse(&en, aP);
             localQcrsP->contextElementResponseVector.push_back(contextElementResponseP);
           }
           else
           {
-            contextElementResponseP->contextElement.contextAttributeVector.push_back(new ContextAttribute(aP));
+            contextElementResponseP->entity.attributeVector.push_back(new ContextAttribute(aP));
           }
 
           continue;
@@ -450,16 +450,16 @@ std::string postQueryContext
         //
         // Not a local attribute - aP->providingApplication is not empty
         //
-        QueryContextRequest* requestP = requestV.lookup(aP->providingApplication.get(), eP);
+        QueryContextRequest* requestP = requestV.lookup(aP->providingApplication.get(), &en);
 
         if (requestP == NULL)
         {
-          requestP = new QueryContextRequest(aP->providingApplication.get(), eP, aP->name);
+          requestP = new QueryContextRequest(aP->providingApplication.get(), &en, aP->name);
           requestV.push_back(requestP);
         }
         else
         {
-          EntityId* entityP = new EntityId(eP);
+          EntityId* entityP = new EntityId(&en);
           bool      pushed;
 
           requestP->attributeList.push_back_if_absent(aP->name);
@@ -530,7 +530,7 @@ std::string postQueryContext
   std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
   bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
 
-  TIMED_RENDER(answer = responseV.render(ciP->apiVersion, asJsonObject, details, qcrsP->errorCode.details));
+  TIMED_RENDER(answer = responseV.toJsonV1(asJsonObject, details, qcrsP->errorCode.details));
 
 
   //

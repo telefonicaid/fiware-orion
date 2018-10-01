@@ -155,9 +155,9 @@ std::string SubscriptionId::toJson(RequestType container, bool comma)
 
 /* ****************************************************************************
 *
-* SubscriptionId::render -
+* SubscriptionId::toJsonV1 -
 */
-std::string SubscriptionId::render(RequestType container, bool comma)
+std::string SubscriptionId::toJsonV1(RequestType container, bool comma)
 {
   std::string xString = string;
 

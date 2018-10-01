@@ -47,7 +47,7 @@ typedef struct RegisterContextRequest
 
   std::string                servicePath;                // Not part of payload, just an internal field
 
-  std::string   render(void);
+  std::string   toJsonV1(void);
   std::string   check(ApiVersion apiVersion, const std::string& predetectedError, int counter);
   void          release(void);
   void          fill(RegisterProviderRequest& rpr, const std::string& entityId, const std::string& entityType, const std::string& attributeName);

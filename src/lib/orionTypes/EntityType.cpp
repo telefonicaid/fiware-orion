@@ -31,6 +31,7 @@
 
 #include "common/tag.h"
 #include "common/limits.h"
+#include "common/JsonHelper.h"
 #include "ngsi/Request.h"
 #include "orionTypes/EntityType.h"
 
@@ -59,7 +60,7 @@ EntityType::EntityType(std::string _type): type(_type), count(0)
 
 /* ****************************************************************************
 *
-* EntityType::render -
+* EntityType::toJsonV1 -
 *
 * This method is used by:
 *   o EntityTypeVector
@@ -67,9 +68,8 @@ EntityType::EntityType(std::string _type): type(_type), count(0)
 *
 * 'typeNameBefore' is set to TRUE when called from EntityTypeResponse
 */
-std::string EntityType::render
+std::string EntityType::toJsonV1
 (
-  ApiVersion  apiVersion,
   bool        asJsonObject,
   bool        asJsonOut,
   bool        collapsed,
@@ -79,10 +79,14 @@ std::string EntityType::render
 {
   std::string  out = "";
 
+  // No metadata filter in this case, an empty vector is used to fulfil method signature.
+  // For attribute filter, we use the ContextAttributeVector itself
+  std::vector<std::string> emptyMdV;
+
   if (typeNameBefore && asJsonOut)
   {
     out += valueTag("name", type, true);
-    out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, true, true, true);
+    out += contextAttributeVector.toJsonV1(asJsonObject, EntityTypes, contextAttributeVector.vec, emptyMdV, true, true, true);
   }
   else
   {
@@ -95,7 +99,7 @@ std::string EntityType::render
     else
     {
       out += valueTag("name", type, true);
-      out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, false, true, true);
+      out += contextAttributeVector.toJsonV1(asJsonObject, EntityTypes, contextAttributeVector.vec, emptyMdV, false, true, true);
     }
 
     out += endTag(comma, false);
@@ -143,24 +147,15 @@ void EntityType::release(void)
 */
 std::string EntityType::toJson(bool includeType)
 {
-  std::string  out = "{";
-  char         countV[STRING_SIZE_FOR_INT];
-
-  snprintf(countV, sizeof(countV), "%lld", count);
+  JsonHelper jh;
 
   if (includeType)
   {
-    out += JSON_VALUE("type", type) + ",";
+    jh.addString("type", type);
   }
 
-  out += JSON_STR("attrs") + ":";
+  jh.addRaw("attrs", contextAttributeVector.toJsonTypes());
+  jh.addNumber("count", count);
 
-  out += "{";
-  out += contextAttributeVector.toJsonTypes();
-  out += "}";
-
-  out += "," + JSON_STR("count") + ":" + countV;
-  out += "}";
-
-  return out;
+  return jh.str();
 }

@@ -40,11 +40,10 @@
 
 /* ****************************************************************************
 *
-* EntityTypeVectorResponse::render -
+* EntityTypeVectorResponse::toJsonV1 -
 */
-std::string EntityTypeVectorResponse::render
+std::string EntityTypeVectorResponse::toJsonV1
 (
-  ApiVersion  apiVersion,
   bool        asJsonObject,
   bool        asJsonOut,
   bool        collapsed
@@ -56,10 +55,10 @@ std::string EntityTypeVectorResponse::render
 
   if (entityTypeVector.size() > 0)
   {
-    out += entityTypeVector.render(apiVersion, asJsonObject, asJsonOut, collapsed, true);
+    out += entityTypeVector.toJsonV1(asJsonObject, asJsonOut, collapsed, true);
   }
 
-  out += statusCode.render(false);
+  out += statusCode.toJsonV1(false);
 
   out += endTag();
 
@@ -96,7 +95,7 @@ std::string EntityTypeVectorResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, asJsonOut, collapsed);
+  return toJsonV1(asJsonObject, asJsonOut, collapsed);
 }
 
 

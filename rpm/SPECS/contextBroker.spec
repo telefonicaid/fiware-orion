@@ -173,12 +173,30 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Fri Sep 28 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.0.0-1
+- Fix: GET /v2/subscriptions and GET /v2/subscriptions/{id} crashes for permanent subscriptions created before version 1.13.0 (#3256)
+- Fix: correct processing of JSON special characters  (such as \n) in NGSIv2 rendering (#3280, #2938)
+- Fix: correct error payload using errorCode (previously orionError was used) in POST /v1/queryContext and POST /v1/updateContext in some cases
+- Fix: bug in metadata compound value rendering in NGSIv2 (sometimes "toplevel" key was wrongly inserted in the resulting JSON object)
+- Fix: missing or empty metadata values were not allowed in NGSIv2 create/update operations (#3121)
+- Fix: default types for entities and attributes in NGSIv2 was wrongly using "none" in some cases
+- Fix: with NGSIv2 replace operations the geolocalization field is inconsistent in DB (#1142, #3167)
+- Fix: duplicated attribute/metadata keys in JSON response in some cases for dateCreated/dateModified/actionType
+- Fix: proper management of user attributes/metadata which name matches the one of a builtin (the user defined shadows the builtin for rendering but not for filtering)
+- Fix: pre-update metadata content included in notifications (and it shouldn't) (#3310)
+- Fix: duplicated items in ?attrs and ?metadata URI params (and "attrs" and "metadata" in POST /v2/op/query and subscriptions) cause duplicated keys in responses/notifications (#3311)
+- Fix: dateCreated and dateModified included in initial notification (#3182)
+- Hardening: modification of the URL parsing mechanism, making it more efficient, and the source code easier to follow (#3109, step 1)
+- Hardening: refactor NGSIv2 rendering code (throughput increase up to 33%/365% in entities/subscriptions rendering intensive scenarios) (#1298)
+- Hardening: Mongo driver now compiled using --use-sasl-client --ssl to enable proper DB authentication mechanisms
+- Deprecated: NGSIv1 API (along with related CLI parameters: -strictNgsiv1Ids and -ngsiv1Autocast)
+
 * Mon Jul 16 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.15.0-1
 - Add: upsert option for the POST /v2/entities operation (#3215)
 - Add: transient entities functionality (new NGSIv2 builtin attribute: dateExpires) (#3000)
 - Add: "attrs" field in POST /v2/op/query (making "attributes" obsolete) (#2604)
 - Add: "expression" field in POST /v2/op/query (#2706)
-- Fix: large integer wrong rendering in responses (#2603)
+- Fix: large integer wrong rendering in responses (#2603, #2425, #2506)
 - Remove: "scopes" field in POST /v2/op/query (#2706)
 
 * Fri Jun 15 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.14.0-1

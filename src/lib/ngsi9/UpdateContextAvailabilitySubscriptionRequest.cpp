@@ -47,9 +47,9 @@ UpdateContextAvailabilitySubscriptionRequest::UpdateContextAvailabilitySubscript
 
 /* ****************************************************************************
 *
-* UpdateContextAvailabilitySubscriptionRequest::render -
+* UpdateContextAvailabilitySubscriptionRequest::toJsonV1 -
 */
-std::string UpdateContextAvailabilitySubscriptionRequest::render(void)
+std::string UpdateContextAvailabilitySubscriptionRequest::toJsonV1(void)
 {  
   std::string   out                      = "";
   bool          subscriptionRendered     = subscriptionId.rendered(UpdateContextAvailabilitySubscription);
@@ -63,11 +63,11 @@ std::string UpdateContextAvailabilitySubscriptionRequest::render(void)
   bool          commaAfterEntityIdVector = attributeListRendered || durationRendered || restrictionRendered || subscriptionRendered;
 
   out += startTag();
-  out += entityIdVector.render(commaAfterEntityIdVector);
-  out += attributeList.render(commaAfterAttributeList, "attributes");
-  out += duration.render(commaAfterDuration);
-  out += restriction.render(restrictions, commaAfterRestriction);
-  out += subscriptionId.render(UpdateContextAvailabilitySubscription, commaAfterSubscriptionId);
+  out += entityIdVector.toJsonV1(commaAfterEntityIdVector);
+  out += attributeList.toJsonV1(commaAfterAttributeList, "attributes");
+  out += duration.toJsonV1(commaAfterDuration);
+  out += restriction.toJsonV1(restrictions, commaAfterRestriction);
+  out += subscriptionId.toJsonV1(UpdateContextAvailabilitySubscription, commaAfterSubscriptionId);
   out += endTag();
 
   return out;
@@ -101,7 +101,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::check(const std::strin
   else
     return "OK";
 
-  return response.render();
+  return response.toJsonV1();
 }
 
 

@@ -1,0 +1,118 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PUT /v2/entities/E1 a A1 location attribute on entity that has already A1 as location attribute
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create E1/A1
+# 02. Modify E1 to E1/A1 with A1 location attribute
+# 03. Make sure E1 is as modified
+#
+
+echo "01. Create E1/A1"
+echo "==================="
+payload='
+{
+   "A1": {
+      "type": "geo:point",
+       "value": "-5, 2"
+   },
+   "id": "E1",
+   "type": "T1"
+}
+'
+orionCurl --url '/v2/entities' --payload "$payload"
+echo
+echo
+
+
+echo "02. Modify E1 to E1/A1 with A1 location attribute"
+echo "================================================="
+payload='
+{
+	"A1": {
+      "type": "geo:point",
+       "value": "2, -4"
+   }	
+}
+'
+orionCurl --url '/v2/entities/E1/attrs' --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "03. Make sure E1 is as modified"
+echo "==============================="
+orionCurl --url /v2/entities/E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1/A1
+===================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Modify E1 to E1/A1 with A1 location attribute
+=================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Make sure E1 is as modified
+===============================
+HTTP/1.1 200 OK
+Content-Length: 79
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "geo:point",
+        "value": "2, -4"
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

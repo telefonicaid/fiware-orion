@@ -58,17 +58,23 @@ Due to limitations at MongoDB layer, the length of entity ID, type and servicePa
 
 Otherwise, we will get an error at entity creation time.
 
-## Duration format
-
-[ISO 8601 duration](https://en.wikipedia.org/wiki/ISO_8601#Durations) may adopt several formats. The following
-constrains applies to the one that Orion supports in the NGSIv1 API (NGSIv2 doesn't uses ISO801 durations):
-
-* P[n]Y[n]M[n]DT[n]H[n]M[n]S is supported (P[n]W format is not supported)
-* Decimal fractions are supported for seconds (S), but not in other elements.
-
 ## Entity fields size limitation
 
 Due to underlying DB limitations (see details [here](https://github.com/telefonicaid/fiware-orion/issues/1289)),
 the combined size (sum) of entity id, entity type and entity service path cannot exceed 1014 characters (this is not a typo, 
 it corresponds to 1024 minus 10, details in the aforementioned link ;). If you attempt to overpass the limit you will get
 a 400 BadRequest "Too long entity id/type/servicePath combination" error.
+
+## Subscription cache limitation
+
+Orion Context Broker uses a subscription cache (actually, a bad name, given it is more a mem map than a cache ;) to speed up
+subscription triggering. That cache consumes RAM space and if you are using an abnormally high number of subscriptions, Orion
+may crash due to memory outage. It would be extremely rare to have that situation in a real usage case (we have been able to
+reproduce the situation only in a laboratory setup) but, if happens, then disable cache usage with the `-noCache` CLI switch.
+
+As a reference, in our lab tests in a machine with Orion 1.13.0 running with 4 GB RAM, Orion crashed when the number 
+of subscriptions got higher than 211.000 subscriptions.
+
+There is [an issue in the repository](https://github.com/telefonicaid/fiware-orion/issues/2780) about improvements related with this.
+
+

@@ -394,17 +394,10 @@ HttpStatusCode processRegisterContext
     {
       ContextRegistrationAttribute* cra = cr->contextRegistrationAttributeVector[jx];
 
-      attrs.append(BSON(REG_ATTRS_NAME << cra->name << REG_ATTRS_TYPE << cra->type << "isDomain" << cra->isDomain));
-      LM_T(LmtMongo, ("Attribute registration: {name: %s, type: %s, isDomain: %s}",
+      attrs.append(BSON(REG_ATTRS_NAME << cra->name << REG_ATTRS_TYPE << cra->type));
+      LM_T(LmtMongo, ("Attribute registration: {name: %s, type: %s}",
                       cra->name.c_str(),
-                      cra->type.c_str(),
-                      cra->isDomain.c_str()));
-
-      unsigned int size = requestP->contextRegistrationVector[ix]->contextRegistrationAttributeVector[jx]->metadataVector.size();
-      for (unsigned int kx = 0; kx < size; ++kx)
-      {
-        // FIXME: metadata not supported at the moment
-      }
+                      cra->type.c_str()));
     }
 
     contextRegistration.append(

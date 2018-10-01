@@ -86,9 +86,9 @@ void QueryContextResponseVector::release(void)
 
 /* ****************************************************************************
 *
-* QueryContextResponseVector::render -
+* QueryContextResponseVector::toJsonV1 -
 */
-std::string QueryContextResponseVector::render(ApiVersion apiVersion, bool asJsonObject, bool details, const std::string& detailsString)
+std::string QueryContextResponseVector::toJsonV1(bool asJsonObject, bool details, const std::string& detailsString)
 {
   QueryContextResponse* responseP = new QueryContextResponse();
   std::string           answer;
@@ -180,11 +180,11 @@ std::string QueryContextResponseVector::render(ApiVersion apiVersion, bool asJso
       // Does the EntityId of cerP already exist in any of the contextElementResponses in the contextElementResponseVector?
       // If so, we just add the attributes of cerP to that contextElementResponse
       //
-      ContextElementResponse* targetCerP = responseP->contextElementResponseVector.lookup(&cerP->contextElement.entityId);
+      ContextElementResponse* targetCerP = responseP->contextElementResponseVector.lookup(&cerP->entity);
 
       if (targetCerP != NULL)
       {
-        targetCerP->contextElement.contextAttributeVector.push_back(&cerP->contextElement.contextAttributeVector);
+        targetCerP->entity.attributeVector.push_back(cerP->entity.attributeVector);
       }
       else  // Not found so we will have to create a new ContextElementResponse
       {
@@ -196,7 +196,7 @@ std::string QueryContextResponseVector::render(ApiVersion apiVersion, bool asJso
     }
   }
 
-  answer = responseP->render(apiVersion, asJsonObject);
+  answer = responseP->toJsonV1(asJsonObject);
   responseP->release();
   delete responseP;
 
@@ -272,11 +272,11 @@ void QueryContextResponseVector::populate(QueryContextResponse* responseP)
       // Does the EntityId of cerP already exist in any of the contextElementResponses in the contextElementResponseVector?
       // If so, we just add the attributes of cerP to that contextElementResponse
       //
-      ContextElementResponse* targetCerP = responseP->contextElementResponseVector.lookup(&cerP->contextElement.entityId);
+      ContextElementResponse* targetCerP = responseP->contextElementResponseVector.lookup(&cerP->entity);
 
       if (targetCerP != NULL)
       {
-        targetCerP->contextElement.contextAttributeVector.push_back(&cerP->contextElement.contextAttributeVector);
+        targetCerP->entity.attributeVector.push_back(cerP->entity.attributeVector);
       }
       else  // Not found so we will have to create a new ContextElementResponse
       {

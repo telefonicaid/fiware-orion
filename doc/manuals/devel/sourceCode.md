@@ -7,8 +7,8 @@
 * [src/lib/orionTypes/](#srcliboriontypes) (Common types)
 * [src/lib/rest/](#srclibrest) (REST interface, using external library microhttpd)
 * [src/lib/ngsi/](#srclibngsi) (Common NGSI types)
-* [src/lib/ngsi10/](#srclibngsi10) (Common NGSI10 types)
-* [src/lib/ngsi9/](#srclibngsi9) (Common NGSI9 types)
+* [src/lib/ngsi10/](#srclibngsi10) (Common NGSI10 types, NGSI10 = context management)
+* [src/lib/ngsi9/](#srclibngsi9) (Common NGSI9 types, NGSI9 = context management availability)
 * [src/lib/apiTypesV2/](#srclibapitypesv2) (NGSIv2 types)
 * [src/lib/parse/](#srclibparse) (Common functions and types for payload parsing)
 * [src/lib/jsonParse/](#srclibjsonparse) (Parsing of JSON payload for NGSIv1 requests, using external library Boost property_tree)
@@ -208,8 +208,8 @@ The **ngsi** library contains a collection of classes for the different payloads
 
 These classes (as well as the classes in the libraries `ngsi9`, `ngsi10`, `convenience`) all have a standard set of methods:
 
-* `render()`, to render the object to a JSON string (mainly for NGSIv1)
 * `toJson()`, to render the object to a JSON string (for NGSIv2)
+* `toJsonV1()`, to render the object to a JSON string (for NGSIv1)
 * `present()`, for debugging (the object is dumped as text to the log file)
 * `release()`, to release all allocated resources of the object
 * `check()`, to make sure the object follows the rules, i.e. about no forbidden characters, or mandatory fields missing, etc.
@@ -222,7 +222,7 @@ The classes follow a hierarchy, e.g. `UpdateContextRequest` (top hierarchy class
 * `ContextAttributeVector`
 * `MetadataVector` (this field `MetadataVector domainMetadataVector` is part of NGSIv1 but Orion doesn't make use of it)
 
-The methods `render()`, `check()`, `release()`, etc. are called in a tree-like fashion, starting from the top hierarchy class, e.g. `UpdateContextRequest`:
+The methods `toJson()`, `check()`, `release()`, etc. are called in a tree-like fashion, starting from the top hierarchy class, e.g. `UpdateContextRequest`:
 
 * `UpdateContextRequest::check()` calls:
   * `ContextElementVector::check()` calls (for each item in the vector):

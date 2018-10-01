@@ -39,9 +39,9 @@
 
 /* ****************************************************************************
 *
-* ScopeVector::render -
+* ScopeVector::toJsonV1 -
 */
-std::string ScopeVector::render(bool comma)
+std::string ScopeVector::toJsonV1(bool comma)
 {
   std::string out = "";
 
@@ -53,7 +53,7 @@ std::string ScopeVector::render(bool comma)
   out += startTag("scope", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-     out += vec[ix]->render(ix != vec.size() - 1);
+     out += vec[ix]->toJsonV1(ix != vec.size() - 1);
   }
   out += endTag(comma, true);
 

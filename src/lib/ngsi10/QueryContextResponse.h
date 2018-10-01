@@ -52,7 +52,7 @@ typedef struct QueryContextResponse
   QueryContextResponse(StatusCode& _errorCode);
   ~QueryContextResponse();
 
-  std::string            render(ApiVersion apiVersion, bool asJsonObject);
+  std::string            toJsonV1(bool asJsonObject);
   std::string            check(ApiVersion apiVersion, bool asJsonObject, const std::string&  predetectedError);
   void                   release(void);
   void                   fill(QueryContextResponse* qcrsP);

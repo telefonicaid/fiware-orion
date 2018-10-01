@@ -50,12 +50,12 @@ typedef struct UpdateContextResponse
   UpdateContextResponse(StatusCode& _errorCode);
   ~UpdateContextResponse();
 
-  std::string   render(ApiVersion apiVersion, bool asJsonObject);
+  std::string   toJsonV1(bool asJsonObject);
   std::string   check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError);
   void          release(void);
   void          fill(UpdateContextResponse* upcrsP);
-  void          notFoundPush(EntityId* eP, ContextAttribute* aP, StatusCode* scP);
-  void          foundPush(EntityId* eP, ContextAttribute* aP);
+  void          notFoundPush(Entity* eP, ContextAttribute* aP, StatusCode* scP);
+  void          foundPush(Entity* eP, ContextAttribute* aP);
   void          merge(UpdateContextResponse* upcrsP);
 } UpdateContextResponse;
 

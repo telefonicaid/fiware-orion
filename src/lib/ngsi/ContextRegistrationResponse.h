@@ -44,7 +44,7 @@ typedef struct ContextRegistrationResponse
 
   ContextRegistrationResponse();
 
-  std::string  render(bool comma);
+  std::string  toJsonV1(bool comma);
   void         release(void);
 
   std::string  check(ApiVersion          apiVersion,

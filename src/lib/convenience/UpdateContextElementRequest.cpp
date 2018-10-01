@@ -27,7 +27,6 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
-#include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "convenience/UpdateContextElementRequest.h"
 #include "convenience/UpdateContextElementResponse.h"
@@ -37,15 +36,19 @@
 
 /* ****************************************************************************
 *
-* render - 
+* toJsonV1 -
+*
 */
-std::string UpdateContextElementRequest::render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType)
+std::string UpdateContextElementRequest::toJsonV1(bool asJsonObject, RequestType requestType)
 {
   std::string out = "";
 
+  // No metadata filter in this case, an empty vector is used to fulfil method signature.
+  // For attribute filter, we use the ContextAttributeVector itself
+  std::vector<std::string> emptyMdV;
+
   out += startTag();
-  out += attributeDomainName.render(true);
-  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType);
+  out += contextAttributeVector.toJsonV1(asJsonObject, requestType, contextAttributeVector.vec, emptyMdV);
   out += endTag();
 
   return out;
@@ -56,15 +59,6 @@ std::string UpdateContextElementRequest::render(ApiVersion apiVersion, bool asJs
 /* ****************************************************************************
 *
 * check - 
-*
-*
-* FIXME P3: once (if ever) AttributeDomainName::check stops to always return "OK", put back this piece of code 
-*           in its place:
--
-*   else if ((res = attributeDomainName.check(AppendContextElement, indent, predetectedError, counter)) != "OK")
-*   {
-*     response.errorCode.fill(SccBadRequest, res);
-*   }
 *
 */
 std::string UpdateContextElementRequest::check
@@ -91,7 +85,7 @@ std::string UpdateContextElementRequest::check
     return "OK";
   }
 
-  return response.render(apiVersion, asJsonObject, requestType);
+  return response.toJsonV1(asJsonObject, requestType);
 }
 
 

@@ -38,15 +38,17 @@
 
 /* ****************************************************************************
 *
-* ContextElementResponseVector::render -
+* ContextElementResponseVector::toJsonV1 -
 */
-std::string ContextElementResponseVector::render
+std::string ContextElementResponseVector::toJsonV1
 (
-  ApiVersion   apiVersion,
-  bool         asJsonObject,
-  RequestType  requestType,
-  bool         comma,
-  bool         omitAttributeValues
+  bool                             asJsonObject,
+  RequestType                      requestType,
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter,
+  bool                             comma,
+  bool                             omitAttributeValues
 )
 {
   std::string out = "";
@@ -60,7 +62,7 @@ std::string ContextElementResponseVector::render
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(apiVersion, asJsonObject, requestType, ix < (vec.size() - 1), omitAttributeValues);
+    out += vec[ix]->toJsonV1(asJsonObject, requestType, attrsFilter, blacklist, metadataFilter, ix < (vec.size() - 1), omitAttributeValues);
   }
 
   out += endTag(comma, true);
@@ -78,17 +80,15 @@ std::string ContextElementResponseVector::toJson
 (
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             blacklist
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter
 )
 {
   std::string out;
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += (renderFormat == NGSI_V2_VALUES)? "[": "{";
-    out += vec[ix]->toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
-    out += (renderFormat == NGSI_V2_VALUES)? "]": "}";
+    out += vec[ix]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
 
     if (ix != vec.size() - 1)
     {
@@ -184,11 +184,11 @@ void ContextElementResponseVector::release(void)
 *
 * ContextElementResponseVector::lookup -
 */
-ContextElementResponse* ContextElementResponseVector::lookup(EntityId* eP, HttpStatusCode code)
+ContextElementResponse* ContextElementResponseVector::lookup(Entity* eP, HttpStatusCode code)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    if (vec[ix]->contextElement.entityId.equal(eP) == true)
+    if (vec[ix]->entity.equal(eP) == true)
     {
       if ((code == SccNone) || (vec[ix]->statusCode.code == code))
       {

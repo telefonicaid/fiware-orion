@@ -504,7 +504,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
   if (notification.HasMember("attrs"))
   {
-    if (parseStringVector(&subsP->notification.attributes, notification["attrs"], "attrs", true, &errorString) == false)
+    if (parseStringVector(&subsP->notification.attributes, notification["attrs"], "attrs", true, true, &errorString) == false)
     {
       return badInput(ciP, errorString);
     }
@@ -517,6 +517,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     if (parseStringVector(&subsP->notification.attributes,
                           notification["exceptAttrs"],
                           "exceptAttrs",
+                          true,
                           true,
                           &errorString) == false)
     {
@@ -535,7 +536,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   // metadata
   if (notification.HasMember("metadata"))
   {
-    if (parseStringVector(&subsP->notification.metadata, notification["metadata"], "metadata", true, &errorString) == false)
+    if (parseStringVector(&subsP->notification.metadata, notification["metadata"], "metadata", true, true, &errorString) == false)
     {
       return badInput(ciP, errorString);
     }
@@ -592,7 +593,7 @@ static std::string parseNotifyConditionVector
   {
     std::string errorString;
 
-    if (parseStringVector(&subsP->subject.condition.attributes, condition["attrs"], "attrs", true, &errorString) == false)
+    if (parseStringVector(&subsP->subject.condition.attributes, condition["attrs"], "attrs", true, true, &errorString) == false)
     {
       return badInput(ciP, errorString);
     }

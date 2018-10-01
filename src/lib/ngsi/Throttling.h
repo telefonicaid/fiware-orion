@@ -46,7 +46,7 @@ typedef struct Throttling
   void               set(const std::string& value);
   const std::string  get(void);
   bool               isEmpty(void);
-  std::string        render(bool comma);
+  std::string        toJsonV1(bool comma);
 
   std::string        check(void);
 

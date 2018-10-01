@@ -61,6 +61,7 @@ optionsGetPutOnly
 optionsGetPutDeleteOnly
 optionsGetDeletePatchOnly
 optionsPostOnly
+serviceRoutinesCommon.cpp
 )
 
 SET (HEADERS
@@ -98,6 +99,7 @@ getRegistration.h
 deleteRegistration.h
 getRegistrations.h
 postRegistration.h
+serviceRoutinesCommon.h
 )
 
 

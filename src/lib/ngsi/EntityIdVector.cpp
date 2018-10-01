@@ -41,9 +41,9 @@
 
 /* ****************************************************************************
 *
-* EntityIdVector::render -
+* EntityIdVector::toJsonV1 -
 */
-std::string EntityIdVector::render(bool comma)
+std::string EntityIdVector::toJsonV1(bool comma)
 {
   std::string out = "";
 
@@ -55,7 +55,7 @@ std::string EntityIdVector::render(bool comma)
   out += startTag("entities", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(ix != vec.size() - 1, true);
+    out += vec[ix]->toJsonV1(ix != vec.size() - 1, true);
   }
 
   out += endTag(comma, true);

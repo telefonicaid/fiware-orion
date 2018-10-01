@@ -57,16 +57,18 @@ Entities::~Entities()
 
 /* ****************************************************************************
 *
-* Entities::render -
+* Entities::toJson -
 *
 */
-std::string Entities::render
+std::string Entities::toJson
 (
-  std::map<std::string, bool>&         uriParamOptions,
-  std::map<std::string, std::string>&  uriParam
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter
 )
 {
-  return vec.render(uriParamOptions, uriParam);
+  return vec.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
 }
 
 
@@ -131,7 +133,7 @@ void Entities::fill(QueryContextResponse* qcrsP)
 
   for (unsigned int ix = 0; ix < qcrsP->contextElementResponseVector.size(); ++ix)
   {
-    ContextElement* ceP = &qcrsP->contextElementResponseVector[ix]->contextElement;
+    Entity* eP = &qcrsP->contextElementResponseVector[ix]->entity;
     StatusCode* scP = &qcrsP->contextElementResponseVector[ix]->statusCode;
 
     if (scP->code == SccReceiverInternalError)
@@ -146,16 +148,16 @@ void Entities::fill(QueryContextResponse* qcrsP)
     }
     else
     {
-      Entity*         eP  = new Entity();
+      Entity*         newP  = new Entity();
 
-      eP->id        = ceP->entityId.id;
-      eP->type      = ceP->entityId.type;
-      eP->isPattern = ceP->entityId.isPattern;
-      eP->creDate   = ceP->entityId.creDate;
-      eP->modDate   = ceP->entityId.modDate;
+      newP->id        = eP->id;
+      newP->type      = eP->type;
+      newP->isPattern = eP->isPattern;
+      newP->creDate   = eP->creDate;
+      newP->modDate   = eP->modDate;
 
-      eP->attributeVector.fill(&ceP->contextAttributeVector);
-      vec.push_back(eP);
+      newP->attributeVector.fill(eP->attributeVector);
+      vec.push_back(newP);
     }
   }
 }

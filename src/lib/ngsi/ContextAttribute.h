@@ -78,10 +78,12 @@ public:
 
 
   bool                      onlyValue;                // Used when ony the value is meaningful in v2 updates of value, without regarding metadata
+  bool                      shadowed;                 // shadowed true means that the attribute is rendered only if explicitly required
+                                                      // in attrs filter (typically for builtin attributes)
 
   ~ContextAttribute();
   ContextAttribute();
-  ContextAttribute(ContextAttribute* caP, bool useDefaultType = false);
+  ContextAttribute(ContextAttribute* caP, bool useDefaultType = false, bool cloneCompound = false);
   ContextAttribute(const std::string& _name, const std::string& _type, const char* _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, const std::string& _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, double _value, bool _found = true);
@@ -91,23 +93,30 @@ public:
   /* Grabbers for metadata to which CB gives a special semantic */
   std::string  getLocation(ApiVersion apiVersion = V1) const;
 
-  std::string  render(ApiVersion   apiVersion,
-                      bool         asJsonObject,
-                      RequestType  request,
-                      bool         comma = false,
-                      bool         omitValue = false);
-  std::string  renderAsJsonObject(ApiVersion apiVersion, RequestType request, bool comma, bool omitValue = false);
-  std::string  renderAsNameString(bool comma);
-  std::string  toJson(bool                             isLastElement,
-                      RenderFormat                     renderFormat,
-                      const std::vector<std::string>&  metadataFilter,
-                      RequestType                      requestType = NoRequest);
+  std::string  toJsonV1(bool                             asJsonObject,
+                        RequestType                      request,
+                        const std::vector<std::string>&  metadataFilter,
+                        bool                             comma = false,
+                        bool                             omitValue = false);
+
+  std::string  toJsonV1AsObject(RequestType                    request,
+                                const std::vector<Metadata*>&  orderedMetadata,
+                                bool                           comma,
+                                bool                           omitValue = false);
+
+  std::string  toJsonV1AsNameString(bool comma);
+
+  std::string  toJson(const std::vector<std::string>&  metadataFilter);
+
+  std::string  toJsonValue(void);
+
   std::string  toJsonAsValue(ApiVersion       apiVersion,
                              bool             acceptedTextPlain,
                              bool             acceptedJson,
                              MimeType         outFormatSelection,
                              MimeType*        outMimeTypeP,
                              HttpStatusCode*  scP);
+
   void         release(void);
   std::string  getName(void);
 
@@ -122,6 +131,9 @@ public:
   bool              compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
 private:
+  void filterAndOrderMetadata(const std::vector<std::string>&  metadataFilter,
+                              std::vector<Metadata*>*          orderedMetadata);
+
   void bsonAppendAttrValue(mongo::BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast) const;
 
 } ContextAttribute;

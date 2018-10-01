@@ -41,19 +41,21 @@ typedef struct ContextElementResponseVector
 {
   std::vector<ContextElementResponse*>  vec;
 
-  std::string              render(ApiVersion   apiVersion,
-                                  bool         asJsonObject,
-                                  RequestType  requestType,
-                                  bool         comma               = false,
-                                  bool         omitAttributeValues = false);
+  std::string              toJsonV1(bool                             asJsonObject,
+                                    RequestType                      requestType,
+                                    const std::vector<std::string>&  attrsFilter,
+                                    bool                             blacklist,
+                                    const std::vector<std::string>&  metadataFilter,
+                                    bool                             comma               = false,
+                                    bool                             omitAttributeValues = false);
 
   std::string              toJson(RenderFormat                     renderFormat,
                                   const std::vector<std::string>&  attrsFilter,
-                                  const std::vector<std::string>&  metadataFilter,
-                                  bool                             blacklist = false);
+                                  bool                             blacklist,
+                                  const std::vector<std::string>&  metadataFilter);
   void                     push_back(ContextElementResponse* item);
   unsigned int             size(void) const;
-  ContextElementResponse*  lookup(EntityId* eP, HttpStatusCode code = SccNone);
+  ContextElementResponse*  lookup(Entity* eP, HttpStatusCode code = SccNone);
   void                     release();
   void                     fill(ContextElementResponseVector& cerV);
   ContextElementResponse*  operator[] (unsigned int ix) const;

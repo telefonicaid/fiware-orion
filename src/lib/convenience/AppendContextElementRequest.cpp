@@ -28,7 +28,6 @@
 #include "common/tag.h"
 #include "convenience/AppendContextElementRequest.h"
 #include "convenience/AppendContextElementResponse.h"
-#include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/MetadataVector.h"
 #include "rest/ConnectionInfo.h"
@@ -47,11 +46,10 @@ AppendContextElementRequest::AppendContextElementRequest()
 
 /* ****************************************************************************
 *
-* render - 
+* toJsonV1 -
 */
-std::string AppendContextElementRequest::render
+std::string AppendContextElementRequest::toJsonV1
 (
-  ApiVersion   apiVersion,
   bool         asJsonObject,
   RequestType  requestType
 )
@@ -62,12 +60,14 @@ std::string AppendContextElementRequest::render
 
   if (entity.id != "")
   {
-    out += entity.render(false);
+    out += entity.toJsonV1(false);
   }
 
-  out += attributeDomainName.render(true);
-  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType);
-  out += domainMetadataVector.render(false);
+  // No metadata filter in this case, an empty vector is used to fulfil method signature.
+  // For attribute filter, we use the ContextAttributeVector itself
+  std::vector<std::string> emptyMdV;
+
+  out += contextAttributeVector.toJsonV1(asJsonObject, requestType, contextAttributeVector.vec, emptyMdV);
   out += endTag();
 
   return out;
@@ -78,14 +78,6 @@ std::string AppendContextElementRequest::render
 /* ****************************************************************************
 *
 * check - 
-*
-* FIXME P3: once (if ever) AttributeDomainName::check stops to always return "OK", put back this piece of code 
-*           in its place:
--
-*   else if ((res = attributeDomainName.check(AppendContextElement, predetectedError, counter)) != "OK")
-*   {
-*     response.errorCode.fill(SccBadRequest, res):
-*   }
 *
 */
 std::string AppendContextElementRequest::check
@@ -107,16 +99,12 @@ std::string AppendContextElementRequest::check
   {
     response.errorCode.fill(SccBadRequest, res);
   }
-  else if ((res = domainMetadataVector.check(apiVersion)) != "OK")
-  {
-    response.errorCode.fill(SccBadRequest, res);
-  }
   else
   {
     return "OK";
   }
 
-  return response.render(apiVersion, asJsonObject, requestType);
+  return response.toJsonV1(asJsonObject, requestType);
 }
 
 
@@ -128,5 +116,4 @@ std::string AppendContextElementRequest::check
 void AppendContextElementRequest::release(void)
 {
   contextAttributeVector.release();
-  domainMetadataVector.release();
 }

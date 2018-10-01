@@ -86,8 +86,7 @@ payload4='{
     "attributes": [
       {
         "name": "A1",
-        "type": "T1",
-        "isDomain": "false"
+        "type": "T1"
       }
     ],
     "providingApplication": "http://localhost:'$CP1_PORT'/v1"

@@ -122,7 +122,7 @@ std::string postIndividualContextEntityAttributeWithTypeAndId
 
 
   // 06. Cleanup and return result
-  TIMED_RENDER(answer = response.render(false, false));
+  TIMED_RENDER(answer = response.toJsonV1(false, false));
 
   parseDataP->upcar.res.release();
   parseDataP->upcrs.res.release();

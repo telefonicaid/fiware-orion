@@ -63,8 +63,8 @@ static std::string contextResponse(const std::string& path, const std::string& v
 */
 static std::string entityIdId(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  parseDataP->upcrs.cerP->contextElement.entityId.id = value;
-  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", parseDataP->upcrs.cerP->contextElement.entityId.id.c_str()));
+  parseDataP->upcrs.cerP->entity.id = value;
+  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", parseDataP->upcrs.cerP->entity.id.c_str()));
 
   return "OK";
 }
@@ -77,8 +77,8 @@ static std::string entityIdId(const std::string& path, const std::string& value,
 */
 static std::string entityIdType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  parseDataP->upcrs.cerP->contextElement.entityId.type = value;
-  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", parseDataP->upcrs.cerP->contextElement.entityId.type.c_str()));
+  parseDataP->upcrs.cerP->entity.type = value;
+  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", parseDataP->upcrs.cerP->entity.type.c_str()));
 
   return "OK";
 }
@@ -92,7 +92,7 @@ static std::string entityIdType(const std::string& path, const std::string& valu
 static std::string entityIdIsPattern(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
-  parseDataP->upcrs.cerP->contextElement.entityId.isPattern = value;
+  parseDataP->upcrs.cerP->entity.isPattern = value;
 
   if (!isTrue(value) && !isFalse(value))
   {
@@ -106,26 +106,13 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
 
 /* ****************************************************************************
 *
-* attributeDomainName - 
-*/
-static std::string attributeDomainName(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got an attributeDomainName: '%s'", value.c_str()));
-  parseDataP->upcrs.cerP->contextElement.attributeDomainName.set(value);
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * attribute - 
 */
 static std::string attribute(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Creating an attribute"));
   parseDataP->upcrs.attributeP = new ContextAttribute();
-  parseDataP->upcrs.cerP->contextElement.contextAttributeVector.push_back(parseDataP->upcrs.attributeP);
+  parseDataP->upcrs.cerP->entity.attributeVector.push_back(parseDataP->upcrs.attributeP);
   return "OK";
 }
 
@@ -228,60 +215,6 @@ static std::string attributeMetadataValue(const std::string& path, const std::st
 
 /* ****************************************************************************
 *
-* domainMetadata - 
-*/
-static std::string domainMetadata(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Creating a domainMetadata"));
-  parseDataP->upcrs.domainMetadataP = new Metadata();
-  parseDataP->upcrs.cerP->contextElement.domainMetadataVector.push_back(parseDataP->upcrs.domainMetadataP);
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataName - 
-*/
-static std::string domainMetadataName(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a domainMetadata name: '%s'", value.c_str()));
-  parseDataP->upcrs.domainMetadataP->name = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataType - 
-*/
-static std::string domainMetadataType(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a domainMetadata type: '%s'", value.c_str()));
-  parseDataP->upcrs.domainMetadataP->type = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataValue - 
-*/
-static std::string domainMetadataValue(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a domainMetadata value: '%s'", value.c_str()));
-  parseDataP->upcrs.domainMetadataP->stringValue = value;
-  parseDataP->upcrs.domainMetadataP->valueType = orion::ValueTypeString;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * statusCodeCode - 
 */
 static std::string statusCodeCode(const std::string& path, const std::string& value, ParseData* parseDataP)
@@ -375,8 +308,6 @@ JsonNode jsonUpcrsParseVector[] =
   { CELEM "/type",                                                entityIdType             },
   { CELEM "/isPattern",                                           entityIdIsPattern        },
 
-  { CELEM "/attributeDomainName",                                 attributeDomainName      },
-
   { CELEM "/attributes",                                          jsonNullTreat            },
   { CELEM "/attributes/attribute",                                attribute                },
   { CELEM "/attributes/attribute/name",                           attributeName            },
@@ -388,12 +319,6 @@ JsonNode jsonUpcrsParseVector[] =
   { CELEM "/attributes/attribute/metadatas/metadata/name",        attributeMetadataName    },
   { CELEM "/attributes/attribute/metadatas/metadata/type",        attributeMetadataType    },
   { CELEM "/attributes/attribute/metadatas/metadata/value",       attributeMetadataValue   },
-
-  { CELEM "/metadatas",                                           jsonNullTreat            },
-  { CELEM "/metadatas/metadata",                                  domainMetadata           },
-  { CELEM "/metadatas/metadata/name",                             domainMetadataName       },
-  { CELEM "/metadatas/metadata/type",                             domainMetadataType       },
-  { CELEM "/metadatas/metadata/value",                            domainMetadataValue      },
 
   { "/contextResponses/contextResponse/statusCode",               jsonNullTreat            },
   { "/contextResponses/contextResponse/statusCode/code",          statusCodeCode           },
@@ -421,7 +346,6 @@ void jsonUpcrsInit(ParseData* reqDataP)
   reqDataP->upcrs.cerP                  = NULL;
   reqDataP->upcrs.attributeP            = NULL;
   reqDataP->upcrs.metadataP             = NULL;
-  reqDataP->upcrs.domainMetadataP       = NULL;
 
   reqDataP->errorString                = "";
 }

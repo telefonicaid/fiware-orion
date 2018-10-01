@@ -64,27 +64,27 @@ Notifier::~Notifier (void)
 */
 void Notifier::sendNotifyContextRequest
 (
-    NotifyContextRequest*            ncrP,
+    NotifyContextRequest&            ncr,
     const ngsiv2::HttpInfo&          httpInfo,
     const std::string&               tenant,
     const std::string&               xauthToken,
     const std::string&               fiwareCorrelator,
     RenderFormat                     renderFormat,
-    const std::vector<std::string>&  attrsOrder,
-    const std::vector<std::string>&  metadataFilter,
-    bool                             blackList
+    const std::vector<std::string>&  attrsFilter,
+    bool                             blacklist,
+    const std::vector<std::string>&  metadataFilter
 )
 {
   pthread_t                         tid;
-  std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncrP,
+  std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncr,
                                                                           httpInfo,
                                                                           tenant,
                                                                           xauthToken,
                                                                           fiwareCorrelator,
                                                                           renderFormat,
-                                                                          attrsOrder,
-                                                                          metadataFilter,
-                                                                          blackList);
+                                                                          attrsFilter,
+                                                                          blacklist,
+                                                                          metadataFilter);
 
   if (!paramsV->empty()) // al least one param, an empty vector means an error occurred
   {
@@ -124,7 +124,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
 )
 {
     /* Render NotifyContextAvailabilityRequest */
-    std::string payload = ncar->render();
+    std::string payload = ncar->toJsonV1();
 
     /* Parse URL */
     std::string  host;
@@ -190,7 +190,8 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     const std::string&                   xauthToken,
     const std::string&                   fiwareCorrelator,
     RenderFormat                         renderFormat,
-    const std::vector<std::string>&      attrsOrder,
+    const std::vector<std::string>&      attrsFilter,
+    bool                                 blacklist,
     const std::vector<std::string>&      metadataFilter
 )
 {
@@ -207,7 +208,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     std::string                         mimeType;
     std::map<std::string, std::string>  qs;
     std::map<std::string, std::string>  headers;
-    const ContextElement&               ce      = cv[ix]->contextElement;
+    Entity&                             en      = cv[ix]->entity;
 
     //
     // 1. Verb/Method
@@ -223,7 +224,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     //
     // 2. URL
     //
-    if (macroSubstitute(&url, httpInfo.url, ce) == false)
+    if (macroSubstitute(&url, httpInfo.url, en) == false)
     {
       // Warning already logged in macroSubstitute()
       return paramsV;  // empty vector
@@ -238,7 +239,9 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       NotifyContextRequest   ncr;
       ContextElementResponse cer;
 
-      cer.contextElement  = ce;
+      cer.entity.fill(en.id, en.type, en.isPattern, en.servicePath);
+      cer.entity.attributeVector.push_back(en.attributeVector);
+
       cer.statusCode.code = SccOk;
 
       ncr.subscriptionId  = subscriptionId;
@@ -246,18 +249,18 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 
       if (renderFormat == NGSI_V1_LEGACY)
       {
-        payload = ncr.render(V1, false);
+        payload = ncr.toJsonV1(false, attrsFilter, blacklist, metadataFilter);
       }
       else
       {
-        payload  = ncr.toJson(renderFormat, attrsOrder, metadataFilter);
+        payload  = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
       }
 
       mimeType = "application/json";
     }
     else
     {
-      if (macroSubstitute(&payload, httpInfo.payload, ce) == false)
+      if (macroSubstitute(&payload, httpInfo.payload, en) == false)
       {
         // Warning already logged in macroSubstitute()
         return paramsV;  // empty vector
@@ -279,7 +282,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       std::string key   = it->first;
       std::string value = it->second;
 
-      if ((macroSubstitute(&key, it->first, ce) == false) || (macroSubstitute(&value, it->second, ce) == false))
+      if ((macroSubstitute(&key, it->first, en) == false) || (macroSubstitute(&value, it->second, en) == false))
       {
         // Warning already logged in macroSubstitute()
         return paramsV;  // empty vector
@@ -302,7 +305,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       std::string key   = it->first;
       std::string value = it->second;
 
-      if ((macroSubstitute(&key, it->first, ce) == false) || (macroSubstitute(&value, it->second, ce) == false))
+      if ((macroSubstitute(&key, it->first, en) == false) || (macroSubstitute(&value, it->second, en) == false))
       {
         // Warning already logged in macroSubstitute()
         return paramsV;  // empty vector
@@ -363,7 +366,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     params->protocol         = protocol;
     params->verb             = method;
     params->tenant           = tenant;
-    params->servicePath      = ce.entityId.servicePath;
+    params->servicePath      = en.servicePath;
     params->xauthToken       = xauthToken;
     params->resource         = uri;
     params->content_type     = mimeType;
@@ -389,15 +392,15 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 */
 std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 (
-  NotifyContextRequest*            ncrP,
+  NotifyContextRequest&            ncr,
   const ngsiv2::HttpInfo&          httpInfo,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsOrder,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             blackList
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter
 )
 {
     ConnectionInfo                    ci;
@@ -427,14 +430,15 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     //
     if (httpInfo.custom && !disableCusNotif)
     {
-      return buildSenderParamsCustom(ncrP->subscriptionId,
-                                     ncrP->contextElementResponseVector,
+      return buildSenderParamsCustom(ncr.subscriptionId,
+                                     ncr.contextElementResponseVector,
                                      httpInfo,
                                      tenant,
                                      xauthToken,
                                      fiwareCorrelator,
                                      renderFormat,
-                                     attrsOrder,
+                                     attrsFilter,
+                                     blacklist,
                                      metadataFilter);
     }
 
@@ -447,9 +451,9 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     std::string spathList;
     bool        atLeastOneNotDefault = false;
 
-    for (unsigned int ix = 0; ix < ncrP->contextElementResponseVector.size(); ++ix)
+    for (unsigned int ix = 0; ix < ncr.contextElementResponseVector.size(); ++ix)
     {
-      EntityId* eP = &ncrP->contextElementResponseVector[ix]->contextElement.entityId;
+      Entity* eP = &ncr.contextElementResponseVector[ix]->entity;
 
       if (spathList != "")
       {
@@ -479,11 +483,11 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     if (renderFormat == NGSI_V1_LEGACY)
     {
       bool asJsonObject = (ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON);
-      payloadString = ncrP->render(ci.apiVersion, asJsonObject);
+      payloadString = ncr.toJsonV1(asJsonObject, attrsFilter, blacklist, metadataFilter);
     }
     else
     {
-      payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
+      payloadString = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
     }
 
     /* Parse URL */
@@ -517,7 +521,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->mimeType         = JSON;
     params->renderFormat     = renderFormatToString(renderFormat);
     params->fiwareCorrelator = fiwareCorrelator;
-    params->subscriptionId   = ncrP->subscriptionId.get();
+    params->subscriptionId   = ncr.subscriptionId.get();
     params->registration     = false;
 
     paramsV->push_back(params);

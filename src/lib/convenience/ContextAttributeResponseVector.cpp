@@ -36,13 +36,12 @@
 
 /* ****************************************************************************
 *
-* ContextAttributeResponseVector::render - 
+* ContextAttributeResponseVector::toJsonV1 -
 */
-std::string ContextAttributeResponseVector::render
+std::string ContextAttributeResponseVector::toJsonV1
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         request
+  bool         asJsonObject,
+  RequestType  request
 )
 {
   std::string out = "";
@@ -56,7 +55,7 @@ std::string ContextAttributeResponseVector::render
   out += startTag(key, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(apiVersion, asJsonObject, request);
+    out += vec[ix]->toJsonV1(asJsonObject, request);
   }
   out += endTag(false, true);
 
@@ -149,8 +148,8 @@ void ContextAttributeResponseVector::release(void)
 *
 * ContextAttributeResponseVector::fill -
 */
-void ContextAttributeResponseVector::fill(ContextAttributeVector* cavP, const StatusCode& statusCode)
+void ContextAttributeResponseVector::fill(const ContextAttributeVector& caV, const StatusCode& statusCode)
 {
   vec.push_back(new ContextAttributeResponse());
-  vec[0]->fill(cavP, statusCode);
+  vec[0]->fill(caV, statusCode);
 }

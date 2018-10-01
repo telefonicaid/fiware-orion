@@ -46,7 +46,7 @@ typedef struct UpdateContextSubscriptionResponse
   UpdateContextSubscriptionResponse(StatusCode& errorCode);
   ~UpdateContextSubscriptionResponse();
 
-  std::string render(void);
+  std::string toJsonV1(void);
 } UpdateContextSubscriptionResponse;
 
 #endif  // SRC_LIB_NGSI10_UPDATECONTEXTSUBSCRIPTIONRESPONSE_H_

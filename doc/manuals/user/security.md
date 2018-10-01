@@ -32,20 +32,9 @@ Apart from using HTTPS in the API server exported by Orion, you can also use HTT
 notifications. In order to do so you have to use the "https" protocol schema in URL in your
 subscriptions, e.g.
 
-
-NGSIv2:
-
 ```
   ...
   "url": "https://mymachime.example.com:1028/notify"
-  ...
-```
-
-NGSIv1:
-
-```
-  ...
-  "reference": "https://mymachime.example.com:1028/notify"
   ...
 ```
 

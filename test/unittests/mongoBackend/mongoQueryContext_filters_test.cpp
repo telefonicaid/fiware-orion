@@ -287,8 +287,8 @@ TEST(mongoQueryContextRequest_filters, equalToOne_s)
 
     /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
     ASSERT_EQ(2, res.contextElementResponseVector.size());
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("E2", RES_CER(1).entityId.id);
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("E2", RES_CER(1).id);
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
@@ -335,7 +335,7 @@ TEST(mongoQueryContextRequest_filters, equalToOne_n)
 
   /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(1, res.contextElementResponseVector.size());
-  EXPECT_EQ("E2", RES_CER(0).entityId.id);
+  EXPECT_EQ("E2", RES_CER(0).id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
@@ -393,9 +393,9 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_s)
 
   /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(3, res.contextElementResponseVector.size());
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("E2", RES_CER(1).entityId.id);
-  EXPECT_EQ("E4", RES_CER(2).entityId.id);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("E2", RES_CER(1).id);
+  EXPECT_EQ("E4", RES_CER(2).id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
@@ -442,8 +442,8 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_n)
 
   /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(2, res.contextElementResponseVector.size());
-  EXPECT_EQ("E3", RES_CER(0).entityId.id);
-  EXPECT_EQ("E4", RES_CER(1).entityId.id);
+  EXPECT_EQ("E3", RES_CER(0).id);
+  EXPECT_EQ("E4", RES_CER(1).id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
@@ -501,9 +501,9 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_s)
 
   /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(3, res.contextElementResponseVector.size());
-  EXPECT_EQ("E3", RES_CER(0).entityId.id);
-  EXPECT_EQ("E4", RES_CER(1).entityId.id);
-  EXPECT_EQ("E5", RES_CER(2).entityId.id);
+  EXPECT_EQ("E3", RES_CER(0).id);
+  EXPECT_EQ("E4", RES_CER(1).id);
+  EXPECT_EQ("E5", RES_CER(2).id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
@@ -550,10 +550,10 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_n)
 
   /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(4, res.contextElementResponseVector.size());
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("E2", RES_CER(1).entityId.id);
-  EXPECT_EQ("E4", RES_CER(2).entityId.id);
-  EXPECT_EQ("E5", RES_CER(3).entityId.id);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("E2", RES_CER(1).id);
+  EXPECT_EQ("E4", RES_CER(2).id);
+  EXPECT_EQ("E5", RES_CER(3).id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
@@ -611,8 +611,8 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_s)
 
   /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(2, res.contextElementResponseVector.size());
-  EXPECT_EQ("E3", RES_CER(0).entityId.id);
-  EXPECT_EQ("E5", RES_CER(1).entityId.id);
+  EXPECT_EQ("E3", RES_CER(0).id);
+  EXPECT_EQ("E5", RES_CER(1).id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
@@ -659,9 +659,9 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_n)
 
   /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(3, res.contextElementResponseVector.size());
-  EXPECT_EQ("E2", RES_CER(0).entityId.id);
-  EXPECT_EQ("E3", RES_CER(1).entityId.id);
-  EXPECT_EQ("E4", RES_CER(2).entityId.id);
+  EXPECT_EQ("E2", RES_CER(0).id);
+  EXPECT_EQ("E3", RES_CER(1).id);
+  EXPECT_EQ("E4", RES_CER(2).id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
@@ -719,9 +719,9 @@ TEST(mongoQueryContextRequest_filters, greaterThan_n)
 
   /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(3, res.contextElementResponseVector.size());
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("E2", RES_CER(1).entityId.id);
-  EXPECT_EQ("E3", RES_CER(2).entityId.id);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("E2", RES_CER(1).id);
+  EXPECT_EQ("E3", RES_CER(2).id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
@@ -779,8 +779,8 @@ TEST(mongoQueryContextRequest_filters, greaterThanOrEqual_n)
 
   /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(2, res.contextElementResponseVector.size());
-  EXPECT_EQ("E2", RES_CER(0).entityId.id);
-  EXPECT_EQ("E3", RES_CER(1).entityId.id);
+  EXPECT_EQ("E2", RES_CER(0).id);
+  EXPECT_EQ("E3", RES_CER(1).id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
@@ -838,9 +838,9 @@ TEST(mongoQueryContextRequest_filters, lessThan_n)
 
   /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(3, res.contextElementResponseVector.size());
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("E4", RES_CER(1).entityId.id);
-  EXPECT_EQ("E5", RES_CER(2).entityId.id);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("E4", RES_CER(1).id);
+  EXPECT_EQ("E5", RES_CER(2).id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
@@ -898,8 +898,8 @@ TEST(mongoQueryContextRequest_filters, lessThanOrEqual_n)
 
   /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(2, res.contextElementResponseVector.size());
-  EXPECT_EQ("E4", RES_CER(0).entityId.id);
-  EXPECT_EQ("E5", RES_CER(1).entityId.id);
+  EXPECT_EQ("E4", RES_CER(0).id);
+  EXPECT_EQ("E5", RES_CER(1).id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
@@ -957,8 +957,8 @@ TEST(mongoQueryContextRequest_filters, insideRange_n)
 
   /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(2, res.contextElementResponseVector.size());
-  EXPECT_EQ("E4", RES_CER(0).entityId.id);
-  EXPECT_EQ("E5", RES_CER(1).entityId.id);
+  EXPECT_EQ("E4", RES_CER(0).id);
+  EXPECT_EQ("E5", RES_CER(1).id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
@@ -1016,9 +1016,9 @@ TEST(mongoQueryContextRequest_filters, outsideRange_n)
 
   /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(3, res.contextElementResponseVector.size());
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("E2", RES_CER(1).entityId.id);
-  EXPECT_EQ("E3", RES_CER(2).entityId.id);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("E2", RES_CER(1).id);
+  EXPECT_EQ("E3", RES_CER(2).id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
@@ -1077,11 +1077,11 @@ TEST(mongoQueryContextRequest_filters, withAttribute)
 
   /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(5, res.contextElementResponseVector.size());
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("E2", RES_CER(1).entityId.id);
-  EXPECT_EQ("E3", RES_CER(2).entityId.id);
-  EXPECT_EQ("E4", RES_CER(3).entityId.id);
-  EXPECT_EQ("E5", RES_CER(4).entityId.id);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("E2", RES_CER(1).id);
+  EXPECT_EQ("E3", RES_CER(2).id);
+  EXPECT_EQ("E4", RES_CER(3).id);
+  EXPECT_EQ("E5", RES_CER(4).id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
@@ -1131,12 +1131,12 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
 
   /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(6, res.contextElementResponseVector.size());
-  EXPECT_EQ("C1", RES_CER(0).entityId.id);
-  EXPECT_EQ("C2", RES_CER(1).entityId.id);
-  EXPECT_EQ("C3", RES_CER(2).entityId.id);
-  EXPECT_EQ("E6", RES_CER(3).entityId.id);
-  EXPECT_EQ("E7", RES_CER(4).entityId.id);
-  EXPECT_EQ("E8", RES_CER(5).entityId.id);
+  EXPECT_EQ("C1", RES_CER(0).id);
+  EXPECT_EQ("C2", RES_CER(1).id);
+  EXPECT_EQ("C3", RES_CER(2).id);
+  EXPECT_EQ("E6", RES_CER(3).id);
+  EXPECT_EQ("E7", RES_CER(4).id);
+  EXPECT_EQ("E8", RES_CER(5).id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
@@ -1187,8 +1187,8 @@ TEST(mongoQueryContextRequest_filters, stringsWithCommas)
 
   /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(2, res.contextElementResponseVector.size());
-  EXPECT_EQ("C1", RES_CER(0).entityId.id);
-  EXPECT_EQ("C2", RES_CER(1).entityId.id);
+  EXPECT_EQ("C1", RES_CER(0).id);
+  EXPECT_EQ("C2", RES_CER(1).id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
@@ -1240,7 +1240,7 @@ TEST(mongoQueryContextRequest_filters, combiningSeveralFilters)
 
   /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(1, res.contextElementResponseVector.size());
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
+  EXPECT_EQ("E1", RES_CER(0).id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
@@ -1290,8 +1290,8 @@ TEST(mongoQueryContextRequest_filters, repeatSameFilter)
 
   /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(2, res.contextElementResponseVector.size());
-  EXPECT_EQ("E4", RES_CER(0).entityId.id);
-  EXPECT_EQ("E5", RES_CER(1).entityId.id);
+  EXPECT_EQ("E4", RES_CER(0).id);
+  EXPECT_EQ("E5", RES_CER(1).id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
@@ -1341,8 +1341,8 @@ TEST(mongoQueryContextRequest_filters, rangeWithDecimals)
 
   /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(2, res.contextElementResponseVector.size());
-  EXPECT_EQ("E4", RES_CER(0).entityId.id);
-  EXPECT_EQ("E5", RES_CER(1).entityId.id);
+  EXPECT_EQ("E4", RES_CER(0).id);
+  EXPECT_EQ("E5", RES_CER(1).id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();

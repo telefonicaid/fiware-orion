@@ -42,7 +42,7 @@
 */
 extern void processContextElement
 (
-  ContextElement*                      ceP,
+  Entity*                              ceP,
   UpdateContextResponse*               responseP,
   ActionType                           action,
   const std::string&                   tenant,

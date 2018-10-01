@@ -34,12 +34,12 @@ brokerStart CB
 # NGSIv2 implementation notes). Maybe in the future could change.
 #
 # 01. Create entity with user provided dateCreated and dateModified metadata in a far away future
-# 02. GET /v2/entities/E1 and don't get dateModified or dateCreated metadata [should get user defined dates]
-# 03. GET /v2/entities/E1?metadata=dateModified,dateCreated and get automatic dates [should be user defined ones]
+# 02. GET /v2/entities/E1 and get user defined dates
+# 03. GET /v2/entities/E1?metadata=dateModified,dateCreated and get user defined dates
 # 04. GET /v2/entities?mq=A.dateCreated>2049-01-01 and get nothing [should be E1]
 # 05. GET /v2/entities?mq=A.dateModified>2049-01-01 and get nothing [should be E1]
-# 06. GET /v2/entities?mq=A.dateCreated<2049-01-01 and get E1 [should get nothing]
-# 07. GET /v2/entities?mq=A.dateModified<2049-01-01 and get E1 [should get nothing]
+# 06. GET /v2/entities?mq=A.dateCreated<2049-01-01 and get E1-user [should get no entity]
+# 07. GET /v2/entities?mq=A.dateModified<2049-01-01 and get E1-user [should get no entity]
 # 08. Modify attribute A so metadatas dateModified and dateCreated are removed (so automatic metadata will be used)
 # 09. GET /v2/entities/E1 and don't get dateModified or dateCreated metadata
 # 10. GET /v2/entities/E1?metadata=dateModified,dateCreated and get automatic dates
@@ -74,15 +74,15 @@ echo
 echo
 
 
-echo "02. GET /v2/entities/E1 and don't get dateModified or dateCreated metadata [should get user defined dates]"
-echo "=========================================================================================================="
+echo "02. GET /v2/entities/E1 and and get user defined dates"
+echo "======================================================"
 orionCurl --url '/v2/entities/E1'
 echo
 echo
 
 
-echo "03. GET /v2/entities/E1?metadata=dateModified,dateCreated and get automatic dates [should be user defined ones]"
-echo "==============================================================================================================="
+echo "03. GET /v2/entities/E1?metadata=dateModified,dateCreated and get user defined dates"
+echo "===================================================================================="
 orionCurl --url '/v2/entities/E1?metadata=dateModified,dateCreated'
 echo
 echo
@@ -102,15 +102,15 @@ echo
 echo
 
 
-echo "06. GET /v2/entities?mq=A.dateCreated<2049-01-01 and get E1 [should get nothing]"
-echo "================================================================================"
+echo "06. GET /v2/entities?mq=A.dateCreated<2049-01-01 and get E1-user [should get no entity]"
+echo "======================================================================================="
 orionCurl --url '/v2/entities?mq=A.dateCreated<2049-01-01'
 echo
 echo
 
 
-echo "07. GET /v2/entities?mq=A.dateModified<2049-01-01 and get E1 [should get nothing]"
-echo "================================================================================="
+echo "07. GET /v2/entities?mq=A.dateModified<2049-01-01 and get E1-user [should get no entity]"
+echo "========================================================================================"
 orionCurl --url '/v2/entities?mq=A.dateModified<2049-01-01'
 echo
 echo
@@ -182,27 +182,8 @@ Date: REGEX(.*)
 
 
 
-02. GET /v2/entities/E1 and don't get dateModified or dateCreated metadata [should get user defined dates]
-==========================================================================================================
-HTTP/1.1 200 OK
-Content-Length: 69
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "A": {
-        "metadata": {},
-        "type": "Number",
-        "value": 42
-    },
-    "id": "E1",
-    "type": "T"
-}
-
-
-03. GET /v2/entities/E1?metadata=dateModified,dateCreated and get automatic dates [should be user defined ones]
-===============================================================================================================
+02. GET /v2/entities/E1 and and get user defined dates
+======================================================
 HTTP/1.1 200 OK
 Content-Length: 205
 Content-Type: application/json
@@ -214,11 +195,39 @@ Date: REGEX(.*)
         "metadata": {
             "dateCreated": {
                 "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                "value": "2050-01-01T00:00:00.00Z"
             },
             "dateModified": {
                 "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                "value": "2051-01-01T00:00:00.00Z"
+            }
+        },
+        "type": "Number",
+        "value": 42
+    },
+    "id": "E1",
+    "type": "T"
+}
+
+
+03. GET /v2/entities/E1?metadata=dateModified,dateCreated and get user defined dates
+====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 205
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {
+            "dateCreated": {
+                "type": "DateTime",
+                "value": "2050-01-01T00:00:00.00Z"
+            },
+            "dateModified": {
+                "type": "DateTime",
+                "value": "2051-01-01T00:00:00.00Z"
             }
         },
         "type": "Number",
@@ -251,10 +260,10 @@ Date: REGEX(.*)
 []
 
 
-06. GET /v2/entities?mq=A.dateCreated<2049-01-01 and get E1 [should get nothing]
-================================================================================
+06. GET /v2/entities?mq=A.dateCreated<2049-01-01 and get E1-user [should get no entity]
+=======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 71
+Content-Length: 207
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -262,7 +271,16 @@ Date: REGEX(.*)
 [
     {
         "A": {
-            "metadata": {},
+            "metadata": {
+                "dateCreated": {
+                    "type": "DateTime",
+                    "value": "2050-01-01T00:00:00.00Z"
+                },
+                "dateModified": {
+                    "type": "DateTime",
+                    "value": "2051-01-01T00:00:00.00Z"
+                }
+            },
             "type": "Number",
             "value": 42
         },
@@ -272,10 +290,10 @@ Date: REGEX(.*)
 ]
 
 
-07. GET /v2/entities?mq=A.dateModified<2049-01-01 and get E1 [should get nothing]
-=================================================================================
+07. GET /v2/entities?mq=A.dateModified<2049-01-01 and get E1-user [should get no entity]
+========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 71
+Content-Length: 207
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -283,7 +301,16 @@ Date: REGEX(.*)
 [
     {
         "A": {
-            "metadata": {},
+            "metadata": {
+                "dateCreated": {
+                    "type": "DateTime",
+                    "value": "2050-01-01T00:00:00.00Z"
+                },
+                "dateModified": {
+                    "type": "DateTime",
+                    "value": "2051-01-01T00:00:00.00Z"
+                }
+            },
             "type": "Number",
             "value": 42
         },

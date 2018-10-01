@@ -50,13 +50,6 @@ brokerStart CB 0
 echo "01. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A1?entity::type=T2 and see it fail"
 echo "================================================================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X1"
-    }
-  ],
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/part01"
 }'
@@ -68,13 +61,6 @@ echo
 echo "02. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A1?!exist=entity::type and see it fail"
 echo "====================================================================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X2"
-    }
-  ],
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/part02"
 }'
@@ -86,13 +72,6 @@ echo
 echo "03. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A1 and see it work"
 echo "================================================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X3"
-    }
-  ],
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/part03"
 }'
@@ -104,13 +83,6 @@ echo
 echo "04. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A2?exist=entity::type and see it work"
 echo "===================================================================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X4"
-    }
-  ],
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/part04"
 }'
@@ -122,13 +94,6 @@ echo
 echo "05. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A4?entity::type=T1 and see it work"
 echo "================================================================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X5"
-    }
-  ],
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/part05"
 }'
@@ -156,13 +121,6 @@ echo
 echo "07. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, without service-path"
 echo "======================================================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X7"
-    }
-  ],
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/part07"
 }'
@@ -174,13 +132,6 @@ echo
 echo "08. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, service-path /s1"
 echo "==================================================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X8"
-    }
-  ],
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/part08"
 }'
@@ -192,13 +143,6 @@ echo
 echo "09. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, service-path /s2"
 echo "==================================================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X9"
-    }
-  ],
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/part09"
 }'
@@ -402,7 +346,7 @@ Date: REGEX(.*)
 06. Discover E1-T1, get three hits
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 604
+Content-Length: 547
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -413,7 +357,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": ""
                     }
@@ -432,7 +375,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A2", 
                         "type": ""
                     }
@@ -451,7 +393,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A4", 
                         "type": ""
                     }
@@ -515,7 +456,7 @@ Date: REGEX(.*)
 10. Discover E1-T1-A3, without service-path, get three hits
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 604
+Content-Length: 547
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -526,7 +467,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A3", 
                         "type": ""
                     }
@@ -545,7 +485,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A3", 
                         "type": ""
                     }
@@ -564,7 +503,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A3", 
                         "type": ""
                     }
@@ -586,7 +524,7 @@ Date: REGEX(.*)
 11. Discover E1-T1-A3, with service-path /#, get three hits
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 604
+Content-Length: 547
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -597,7 +535,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A3", 
                         "type": ""
                     }
@@ -616,7 +553,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A3", 
                         "type": ""
                     }
@@ -635,7 +571,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A3", 
                         "type": ""
                     }
@@ -657,7 +592,7 @@ Date: REGEX(.*)
 12. Discover E1-T1-A3, with service-path /, get one hit
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 205
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -668,7 +603,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A3", 
                         "type": ""
                     }
@@ -690,7 +624,7 @@ Date: REGEX(.*)
 13. Discover E1-T1-A3, with service-path /s1, get one hit
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 205
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -701,7 +635,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A3", 
                         "type": ""
                     }
@@ -723,7 +656,7 @@ Date: REGEX(.*)
 14. Discover E1-T1-A3, with service-path /s2, get one hit
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 205
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -734,7 +667,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A3", 
                         "type": ""
                     }

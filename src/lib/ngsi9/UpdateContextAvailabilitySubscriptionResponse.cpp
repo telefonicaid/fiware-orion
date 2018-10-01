@@ -70,9 +70,9 @@ UpdateContextAvailabilitySubscriptionResponse::~UpdateContextAvailabilitySubscri
 
 /* ****************************************************************************
 *
-* UpdateContextAvailabilitySubscriptionResponse::render - 
+* UpdateContextAvailabilitySubscriptionResponse::toJsonV1 -
 */
-std::string UpdateContextAvailabilitySubscriptionResponse::render(void)
+std::string UpdateContextAvailabilitySubscriptionResponse::toJsonV1(void)
 {
   std::string  out                = "";
   bool         durationRendered   = !duration.isEmpty();
@@ -80,12 +80,12 @@ std::string UpdateContextAvailabilitySubscriptionResponse::render(void)
 
   out += startTag();
 
-  out += subscriptionId.render(RtUpdateContextAvailabilitySubscriptionResponse, errorCodeRendered || durationRendered);
-  out += duration.render(errorCodeRendered);
+  out += subscriptionId.toJsonV1(RtUpdateContextAvailabilitySubscriptionResponse, errorCodeRendered || durationRendered);
+  out += duration.toJsonV1(errorCodeRendered);
 
   if (errorCodeRendered)
   {
-    out += errorCode.render(false);
+    out += errorCode.toJsonV1(false);
   }
 
   out += endTag();
@@ -111,7 +111,9 @@ std::string UpdateContextAvailabilitySubscriptionResponse::check(const std::stri
     errorCode.fill(SccBadRequest, res);
   }
   else
+  {
     return "OK";
+  }
 
-  return render();
+  return toJsonV1();
 }

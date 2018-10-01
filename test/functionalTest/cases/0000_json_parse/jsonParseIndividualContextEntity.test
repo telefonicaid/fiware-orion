@@ -37,7 +37,6 @@ orionCurl --url "/v1/contextEntities/ENTITY_ID" -X "DELETE"
 echo "3: ++++++++ POST that is OK ++++++++++++++++++++"
 url="/v1/contextEntities/ENTITY_ID"
 payload='{
-  "attributeDomainName" : "",
   "attributes" : [
     {
       "name" : "pressure",
@@ -51,7 +50,6 @@ orionCurl --url ${url} --payload "${payload}"
 echo "4: +++++++++ PUT that fails +++++++++++++++++++"
 url="/v1/contextEntities/ENTITY_ID"
 payload='{
-  "attributeDomainName" : "",
   "attributes" : [
     {
       "name" : "temperature",
@@ -77,8 +75,7 @@ payload='{
             "attributes": [
                 {
                     "name": "temperature",
-                    "type": "degree",
-                    "isDomain": "false"
+                    "type": "degree"
                 }
             ],
             "providingApplication": "http://localhost:1028/application"
@@ -94,7 +91,6 @@ orionCurl --url "/v1/contextEntities/ENTITY_ID"
 echo "7: +++++++++++++ PUT that is OK ++++++++++++++++"
 url="/v1/contextEntities/ENTITY_ID"
 payload='{
-  "attributeDomainName" : "",
   "attributes" : [
     {
       "name" : "pressure",

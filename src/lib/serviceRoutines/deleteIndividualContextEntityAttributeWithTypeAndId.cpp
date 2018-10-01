@@ -95,14 +95,14 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
   {
     alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
     response.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    TIMED_RENDER(answer = response.render(false, false));
+    TIMED_RENDER(answer = response.toJsonV1(false, false));
     return answer;
   }
   else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
   {
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
     response.fill(SccBadRequest, "non-matching entity::types in URL");
-    TIMED_RENDER(answer = response.render(false, false));
+    TIMED_RENDER(answer = response.toJsonV1(false, false));
     return answer;
   }
 
@@ -120,7 +120,7 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
 
 
   // 06. Cleanup and return result
-  TIMED_RENDER(answer = response.render(false, false));
+  TIMED_RENDER(answer = response.toJsonV1(false, false));
 
   parseDataP->upcr.res.release();
 

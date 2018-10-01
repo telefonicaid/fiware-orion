@@ -152,7 +152,7 @@ char* htmlEscape(const char* s)
 */
 std::string jsonInvalidCharsTransformation(const std::string& input)
 {
-  std::ostringstream ss;
+  std::string ss;
 
   for (std::string::const_iterator iter = input.begin(); iter != input.end(); ++iter)
   {
@@ -175,13 +175,13 @@ std::string jsonInvalidCharsTransformation(const std::string& input)
      */
     switch (char ch = *iter)
     {
-    case '\\': ss << "\\\\"; break;
-    case '"':  ss << "\\\""; break;    
-    case '\b': ss << "\\b";  break;
-    case '\f': ss << "\\f";  break;
-    case '\n': ss << "\\n";  break;
-    case '\r': ss << "\\r";  break;
-    case '\t': ss << "\\t";  break;
+    case '\\': ss += "\\\\"; break;
+    case '"':  ss += "\\\""; break;
+    case '\b': ss += "\\b";  break;
+    case '\f': ss += "\\f";  break;
+    case '\n': ss += "\\n";  break;
+    case '\r': ss += "\\r";  break;
+    case '\t': ss += "\\t";  break;
 
     default:
       /* Converting the rest of special chars 0-31 to \u00xx. Note that 0x80 - 0xFF are untouched as they
@@ -190,18 +190,18 @@ std::string jsonInvalidCharsTransformation(const std::string& input)
       {
         static const char intToHex[16] =  { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' } ;
 
-        ss << "\\u00" << intToHex[(ch & 0xF0) >> 4] << intToHex[ch & 0x0F];
+        ss += "\\u00" + intToHex[(ch & 0xF0) >> 4] + intToHex[ch & 0x0F];
       }
       else
       {
-        ss << ch;
+        ss += ch;
       }
       break;
     }  // end-switch
 
   }  // end-for
 
-  return ss.str();
+  return ss;
 }
 
 

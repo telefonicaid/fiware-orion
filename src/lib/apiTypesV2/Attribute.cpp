@@ -29,6 +29,7 @@
 #include "common/errorMessages.h"
 #include "common/RenderFormat.h"
 #include "common/string.h"
+#include "common/JsonHelper.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "apiTypesV2/Attribute.h"
 
@@ -37,19 +38,18 @@
 
 /* ****************************************************************************
 *
-* Attribute::render -
+* Attribute::toJson -
 */
-std::string Attribute::render
+std::string Attribute::toJson
 (
-  bool                acceptedTextPlain,   // in parameter (pass-through)
-  bool                acceptedJson,        // in parameter (pass-through)
-  MimeType            outFormatSelection,  // in parameter (pass-through)
-  MimeType*           outMimeTypeP,        // out parameter (pass-through)
-  HttpStatusCode*     scP,                 // out parameter (pass-through)
-  bool                keyValues,           // in parameter
-  const std::string&  metadataList,        // in parameter
-  RequestType         requestType,         // in parameter
-  bool                comma                // in parameter
+  bool                             acceptedTextPlain,   // in parameter (pass-through)
+  bool                             acceptedJson,        // in parameter (pass-through)
+  MimeType                         outFormatSelection,  // in parameter (pass-through)
+  MimeType*                        outMimeTypeP,        // out parameter (pass-through)
+  HttpStatusCode*                  scP,                 // out parameter (pass-through)
+  bool                             keyValues,           // in parameter
+  const std::vector<std::string>&  metadataFilter,      // in parameter
+  RequestType                      requestType          // in parameter
 )
 {
   RenderFormat  renderFormat = (keyValues == true)? NGSI_V2_KEYVALUES : NGSI_V2_NORMALIZED;
@@ -69,25 +69,16 @@ std::string Attribute::render
     }
     else
     {
-      std::vector<std::string> metadataFilter;
-
-      if (metadataList != "")
+      if (renderFormat == NGSI_V2_KEYVALUES)
       {
-        stringSplit(metadataList, ',', metadataFilter);
+        JsonHelper jh;
+        jh.addRaw(pcontextAttribute->name, pcontextAttribute->toJsonValue());
+        out = jh.str();
       }
-
-      out = "{";
-
-      // First parameter (isLastElement) is 'true' as it is the last and only element
-      out += pcontextAttribute->toJson(true, renderFormat, metadataFilter, requestType);
-
-      out += "}";
-    }
-
-
-    if (comma)
-    {
-      out += ",";
+      else  // NGSI_V2_NORMALIZED
+      {
+        out = pcontextAttribute->toJson(metadataFilter);
+      }
     }
 
     return out;
@@ -134,11 +125,11 @@ void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
 
     ContextElementResponse* cerP = qcrsP->contextElementResponseVector[0];
 
-    for (std::size_t i = 0; i < cerP->contextElement.contextAttributeVector.size(); ++i)
+    for (std::size_t i = 0; i < cerP->entity.attributeVector.size(); ++i)
     {
-      if (cerP->contextElement.contextAttributeVector[i]->name == attrName)
+      if (cerP->entity.attributeVector[i]->name == attrName)
       {
-        pcontextAttribute = cerP->contextElement.contextAttributeVector[i];
+        pcontextAttribute = cerP->entity.attributeVector[i];
         break;
       }
     }

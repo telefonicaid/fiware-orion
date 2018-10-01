@@ -84,9 +84,9 @@ std::string AttributeExpression::get(void)
 
 /* ****************************************************************************
 *
-* AttributeExpression::render - 
+* AttributeExpression::toJsonV1 -
 */
-std::string AttributeExpression::render(bool comma)
+std::string AttributeExpression::toJsonV1(bool comma)
 {
   if (string == "")
   {

@@ -48,11 +48,10 @@ UpdateContextElementResponse::UpdateContextElementResponse()
 
 /* ****************************************************************************
 *
-* render -
+* toJsonV1 -
 */
-std::string UpdateContextElementResponse::render
+std::string UpdateContextElementResponse::toJsonV1
 (
-  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType
 )
@@ -63,11 +62,11 @@ std::string UpdateContextElementResponse::render
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(false);
+    out += errorCode.toJsonV1(false);
   }
   else
   {
-    out += contextAttributeResponseVector.render(apiVersion, asJsonObject, requestType);
+    out += contextAttributeResponseVector.toJsonV1(asJsonObject, requestType);
   }
 
   out += endTag();
@@ -104,7 +103,7 @@ std::string UpdateContextElementResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, requestType);
+  return toJsonV1(asJsonObject, requestType);
 }
 
 
@@ -144,7 +143,7 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
     //
     // Remove values from the context attributes
     //
-    for (unsigned int aIx = 0; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
+    for (unsigned int aIx = 0; aIx < cerP->entity.attributeVector.size(); ++aIx)
     {
       //
       // NOTE
@@ -153,13 +152,13 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
       //   For /v2, we would need to reset the valueType to STRING as well, but since this function is used only
       //   in v1, this is not strictly necessary.
       //   However, it doesn't hurt, so that modification is included as well: 
-      //     cerP->contextElement.contextAttributeVector[aIx]->valueType = orion::ValueTypeString
+      //     cerP->entity.attributeVector[aIx]->valueType = orion::ValueTypeString
       //
-      cerP->contextElement.contextAttributeVector[aIx]->stringValue = "";
-      cerP->contextElement.contextAttributeVector[aIx]->valueType   = orion::ValueTypeString;
+      cerP->entity.attributeVector[aIx]->stringValue = "";
+      cerP->entity.attributeVector[aIx]->valueType   = orion::ValueTypeString;
     }
 
-    contextAttributeResponseVector.fill(&cerP->contextElement.contextAttributeVector, cerP->statusCode);
+    contextAttributeResponseVector.fill(cerP->entity.attributeVector, cerP->statusCode);
   }
 
 
@@ -197,7 +196,7 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
   {
     if (ucrsP->contextElementResponseVector.size() == 1)
     {
-      errorCode.details = ucrsP->contextElementResponseVector[0]->contextElement.entityId.id;
+      errorCode.details = ucrsP->contextElementResponseVector[0]->entity.id;
     }
   }
 }

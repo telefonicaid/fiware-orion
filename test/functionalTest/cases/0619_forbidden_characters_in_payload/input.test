@@ -58,8 +58,7 @@ payload='{
     "attributes": [
       {
         "name": "temperature",
-        "type": "centigrade",
-        "isDomain": "false"
+        "type": "centigrade"
       }
     ],
     "providingApplication": "http://mysensors.com/Rooms"
@@ -103,8 +102,7 @@ payload='{
     "attributes": [
       {
         "name": "temperature",
-        "type": "centigrade",
-        "isDomain": "false"
+        "type": "centigrade"
       }
     ],
     "providingApplication": "pa=http://mysensors.com/Rooms"
@@ -217,8 +215,7 @@ payload='{
             "x3" : "3"
           }
         }
-      ],
-      "attributeDomainName" : "ATTR_DOMAIN_NAME"
+      ]
     }
   ],
   "updateAction": "APPEND"

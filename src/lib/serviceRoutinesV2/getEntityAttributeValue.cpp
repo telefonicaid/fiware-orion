@@ -37,6 +37,7 @@
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutinesV2/getEntityAttribute.h"
+#include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "parse/forbiddenChars.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
@@ -105,30 +106,23 @@ std::string getEntityAttributeValue
       // Do not use attribute name, change to 'value'
       attribute.pcontextAttribute->name = "value";
 
-      TIMED_RENDER(answer = attribute.render(ciP->httpHeaders.accepted("text/plain"),
+      StringList metadataFilter;
+      setMetadataFilter(ciP->uriParam, &metadataFilter);
+
+      TIMED_RENDER(answer = attribute.toJson(ciP->httpHeaders.accepted("text/plain"),
                                              ciP->httpHeaders.accepted("application/json"),
                                              ciP->httpHeaders.outformatSelect(),
                                              &(ciP->outMimeType),
                                              &(ciP->httpStatusCode),
                                              ciP->uriParamOptions[OPT_KEY_VALUES],
-                                             ciP->uriParam[URI_PARAM_METADATA],
-                                             EntityAttributeValueRequest,
-                                             false));
+                                             metadataFilter.stringV,
+                                             EntityAttributeValueRequest));
     }
     else
     {
       if (attribute.pcontextAttribute->compoundValueP != NULL)
       {
-        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->render(ciP->apiVersion));
-
-        if (attribute.pcontextAttribute->compoundValueP->isObject())
-        {
-          answer = "{" + answer + "}";
-        }
-        else if (attribute.pcontextAttribute->compoundValueP->isVector())
-        {
-          answer = "[" + answer + "]";
-        }
+        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->toJson(true));
       }
       else
       {

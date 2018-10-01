@@ -36,6 +36,7 @@
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutinesV2/getEntityAttribute.h"
+#include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "parse/forbiddenChars.h"
 #include "rest/OrionError.h"
 
@@ -76,7 +77,6 @@ std::string getEntityAttribute
 
   // 01. Fill in QueryContextRequest
   parseDataP->qcr.res.fill(compV[2], type, "false", EntityTypeEmptyOrNotEmpty, "");
-  parseDataP->qcr.res.metadataList.fill(ciP->uriParam[URI_PARAM_METADATA]);
 
 
   // 02. Call standard op postQueryContext
@@ -86,13 +86,16 @@ std::string getEntityAttribute
   // 03. Render entity attribute response
   attribute.fill(&parseDataP->qcrs.res, compV[4]);
 
-  TIMED_RENDER(answer = attribute.render(ciP->httpHeaders.accepted("text/plain"),
+  StringList metadataFilter;
+  setMetadataFilter(ciP->uriParam, &metadataFilter);
+
+  TIMED_RENDER(answer = attribute.toJson(ciP->httpHeaders.accepted("text/plain"),
                                          ciP->httpHeaders.accepted("application/json"),
                                          ciP->httpHeaders.outformatSelect(),
                                          &(ciP->outMimeType),
                                          &(ciP->httpStatusCode),
                                          ciP->uriParamOptions[OPT_KEY_VALUES],
-                                         ciP->uriParam[URI_PARAM_METADATA],
+                                         metadataFilter.stringV,
                                          EntityAttributeResponse));
 
   if (attribute.oe.reasonPhrase == ERROR_TOO_MANY)

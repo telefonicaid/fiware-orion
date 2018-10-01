@@ -34,6 +34,7 @@
 #include "common/tag.h"
 #include "common/string.h"
 #include "common/RenderFormat.h"
+#include "common/JsonHelper.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/Request.h"
 
@@ -53,6 +54,7 @@ ContextAttributeVector::ContextAttributeVector()
 /* ****************************************************************************
 *
 * ContextAttributeVector::toJsonTypes -
+*
 */
 std::string ContextAttributeVector::toJsonTypes(void)
 {
@@ -66,7 +68,7 @@ std::string ContextAttributeVector::toJsonTypes(void)
   }
 
   // Pass 2 - generate JSON
-  std::string out;
+  JsonHelper jh;
 
   std::map<std::string, std::map<std::string, int> >::iterator it;
   unsigned int                                                 ix;
@@ -75,10 +77,12 @@ std::string ContextAttributeVector::toJsonTypes(void)
     std::string                 attrName  = it->first;
     std::map<std::string, int>  attrTypes = it->second;
 
-    out += JSON_STR(attrName) + ":{" + JSON_STR("types") + ":[";
+    std::string out = "[";
 
     std::map<std::string, int>::iterator jt;
     unsigned int                         jx;
+
+    JsonHelper jhTypes;
 
     for (jt = attrTypes.begin(), jx = 0; jt != attrTypes.end(); ++jt, ++jx)
     {
@@ -103,207 +107,39 @@ std::string ContextAttributeVector::toJsonTypes(void)
       }
     }
 
-    out += "]}";
+    out += "]";
 
-    if (ix != perAttrTypes.size() - 1)
-    {
-      out += ",";
-    }
+    jhTypes.addRaw("types", out);
+
+    jh.addRaw(attrName, jhTypes.str());
   }
 
-  return out;
+  return jh.str();
 }
 
 
 
 /* ****************************************************************************
 *
-* ContextAttributeVector::toJson - 
+* ContextAttributeVector::toJsonV1 -
 *
-* Attributes named 'id' or 'type' are not rendered in API version 2, due to the 
-* compact way in which API v2 is rendered. Attributes named 'id' or 'type' would simply
-* collide with the 'id' and 'type' of the entity itself (holder of the attribute).
-*
-* If anybody needs an attribute named 'id' or 'type', then API v1
-* will have to be used to retrieve that information.
+* FIXME P5: this method doesn't depend on the class object. Should be moved out of the class?
+* Maybe included in the Entiy class render logic.
 */
-std::string ContextAttributeVector::toJson
-(
-  RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsFilter,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             blacklist
-) const
-{
-  if (vec.size() == 0)
-  {
-    return "";
-  }
-
-  // Check if dateExipres has to be rendered or not
-  bool includeDateExpires = (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_EXPIRES) != attrsFilter.end());
-
-  //
-  // Pass 1 - count the total number of attributes valid for rendering.
-  //
-  // Attributes named 'id' or 'type' are not rendered.
-  // This gives us a small problem in the logic here, about knowing whether the
-  // comma should be rendered or not.
-  //
-  // To fix this problem we need to do two passes over the vector, the first pass to
-  // count the number of valid attributes and the second to do the work.
-  // In the second pass, if the number of rendered attributes "so far" is less than the total
-  // number of valid attributes, then the comma must be rendered.
-  //
-  int validAttributes = 0;
-  std::map<std::string, bool>  uniqueMap;
-  if ((attrsFilter.size() == 0) || (std::find(attrsFilter.begin(), attrsFilter.end(), ALL_ATTRS) != attrsFilter.end()))
-  {
-    for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    {
-      if ((vec[ix]->name == "id") || (vec[ix]->name == "type"))
-      {
-        continue;
-      }
-
-      if ((vec[ix]->name == DATE_EXPIRES) && !includeDateExpires)
-      {
-        continue;
-      }
-
-      if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
-      {
-        if (uniqueMap[vec[ix]->stringValue] == true)
-        {
-          continue;
-        }
-      }
-
-      ++validAttributes;
-
-      if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
-      {
-        uniqueMap[vec[ix]->stringValue] = true;
-      }
-    }
-  }
-  else if (!blacklist)
-  {
-    for (std::vector<std::string>::const_iterator it = attrsFilter.begin(); it != attrsFilter.end(); ++it)
-    {
-      if ((*it == DATE_EXPIRES) && !includeDateExpires)
-      {
-        continue;
-      }
-
-      if (lookup(*it) != NULL)
-      {
-        ++validAttributes;
-      }
-    }
-  }
-  else // attrsFilter is black list
-  {
-    for (unsigned ix = 0; ix < vec.size(); ++ix)
-    {
-      if (std::find(attrsFilter.begin(), attrsFilter.end(), vec[ix]->name) == attrsFilter.end())
-      {
-         ++validAttributes;
-      }
-    }
-  }
-
-  //
-  // Pass 2 - do the work, helped by the value of 'validAttributes'.
-  //
-  std::string  out;
-  int          renderedAttributes = 0;
-
-  uniqueMap.clear();
-
-  if (attrsFilter.size() == 0 || (std::find(attrsFilter.begin(), attrsFilter.end(), ALL_ATTRS) != attrsFilter.end()))
-  {
-    for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    {
-      if ((vec[ix]->name == "id") || (vec[ix]->name == "type"))
-      {
-        continue;
-      }
-
-      if ((vec[ix]->name == DATE_EXPIRES) && !includeDateExpires)
-      {
-        continue;
-      }
-
-      ++renderedAttributes;
-
-      if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
-      {
-        if (uniqueMap[vec[ix]->stringValue] == true)
-        {
-          continue;
-        }
-      }
-
-      out += vec[ix]->toJson(renderedAttributes == validAttributes, renderFormat, metadataFilter);
-
-      if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
-      {
-        uniqueMap[vec[ix]->stringValue] = true;
-      }
-    }
-  }
-  else if (!blacklist)
-  {
-    for (std::vector<std::string>::const_iterator it = attrsFilter.begin(); it != attrsFilter.end(); ++it)
-    {
-      ContextAttribute* caP = lookup(*it);
-      if (caP != NULL)
-      {
-        if ((caP->name == DATE_EXPIRES) && !includeDateExpires)
-        {
-          continue;
-        }
-
-        ++renderedAttributes;
-        out += caP->toJson(renderedAttributes == validAttributes, renderFormat, metadataFilter);
-      }
-    }
-  }
-  else // attrsFilter is black list
-  {
-    for (unsigned ix = 0; ix < vec.size(); ++ix)
-    {
-      if (std::find(attrsFilter.begin(), attrsFilter.end(), vec[ix]->name) == attrsFilter.end())
-      {
-        ++renderedAttributes;
-        out += vec[ix]->toJson(renderedAttributes == validAttributes, renderFormat, metadataFilter);
-      }
-    }
-  }
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextAttributeVector::render - 
-*/
-std::string ContextAttributeVector::render
-(
-  ApiVersion   apiVersion,
-  bool         asJsonObject,
-  RequestType  request,
-  bool         comma,
-  bool         omitValue,
-  bool         attrsAsName
+std::string ContextAttributeVector::toJsonV1
+(  
+  bool                                   asJsonObject,
+  RequestType                            request,
+  const std::vector<ContextAttribute*>&  orderedAttrs,
+  const std::vector<std::string>&        metadataFilter,
+  bool                                   comma,
+  bool                                   omitValue,
+  bool                                   attrsAsName
 )
 {
   std::string out = "";
 
-  if (vec.size() == 0)
+  if (orderedAttrs.size() == 0)
   {
     return "";
   }
@@ -318,31 +154,32 @@ std::string ContextAttributeVector::render
     // Note that in the case of attribute as name, we have to use a vector, thus using
     // attrsAsName variable as value for isVector parameter
     out += startTag("attributes", attrsAsName);
-    for (unsigned int ix = 0; ix < vec.size(); ++ix)
+    for (unsigned int ix = 0; ix < orderedAttrs.size(); ++ix)
     {
+      bool comma = (ix != orderedAttrs.size() -1);
       if (attrsAsName)
       {
-        out += vec[ix]->renderAsNameString(ix != vec.size() - 1);
+        out += orderedAttrs[ix]->toJsonV1AsNameString(comma);
       }
       else
       {
-        out += vec[ix]->render(apiVersion, asJsonObject, request, ix != vec.size() - 1, omitValue);
+        out += orderedAttrs[ix]->toJsonV1(asJsonObject, request, metadataFilter, comma, omitValue);
       }
-    }
+    }   
     out += endTag(comma, attrsAsName);
   }
   else
   {
     out += startTag("attributes", true);
-    for (unsigned int ix = 0; ix < vec.size(); ++ix)
+    for (unsigned int ix = 0; ix < orderedAttrs.size(); ++ix)
     {
       if (attrsAsName)
       {
-        out += vec[ix]->renderAsNameString(ix != vec.size() - 1);
+        out += orderedAttrs[ix]->toJsonV1AsNameString(ix != orderedAttrs.size() - 1);
       }
       else
       {
-        out += vec[ix]->render(apiVersion, asJsonObject, request, ix != vec.size() - 1, omitValue);
+        out += orderedAttrs[ix]->toJsonV1(asJsonObject, request, metadataFilter, ix != orderedAttrs.size() - 1, omitValue);
       }
     }
     out += endTag(comma, true);
@@ -374,7 +211,8 @@ std::string ContextAttributeVector::check(ApiVersion apiVersion, RequestType req
 
 /* ****************************************************************************
 *
-* ContextAttributeVector::push_back - 
+* ContextAttributeVector::push_back -
+*
 */
 void ContextAttributeVector::push_back(ContextAttribute* item)
 {
@@ -386,12 +224,13 @@ void ContextAttributeVector::push_back(ContextAttribute* item)
 /* ****************************************************************************
 *
 * ContextAttributeVector::push_back - 
+*
 */
-void ContextAttributeVector::push_back(ContextAttributeVector* aVec)
+void ContextAttributeVector::push_back(const ContextAttributeVector& caV)
 {
-  for (unsigned int ix = 0; ix < aVec->size(); ++ix)
+  for (unsigned int ix = 0; ix < caV.size(); ++ix)
   {
-    vec.push_back(new ContextAttribute((*aVec)[ix]));
+    vec.push_back(new ContextAttribute(caV[ix]));
   }
 }
 
@@ -442,17 +281,18 @@ void ContextAttributeVector::release(void)
 /* ****************************************************************************
 *
 * ContextAttributeVector::fill - 
+*
 */
-void ContextAttributeVector::fill(ContextAttributeVector* cavP, bool useDefaultType)
+void ContextAttributeVector::fill(const ContextAttributeVector& caV, bool useDefaultType)
 {
-  if (cavP == NULL)
+  if (caV.size() == 0)
   {
     return;
   }
 
-  for (unsigned int ix = 0; ix < cavP->size(); ++ix)
+  for (unsigned int ix = 0; ix < caV.size(); ++ix)
   {
-    ContextAttribute* from = (*cavP)[ix];
+    ContextAttribute* from = caV[ix];
     ContextAttribute* caP = new ContextAttribute(from, useDefaultType);
 
     push_back(caP);
@@ -463,17 +303,39 @@ void ContextAttributeVector::fill(ContextAttributeVector* cavP, bool useDefaultT
 
 /* ****************************************************************************
 *
-* lookup -
+* get -
 */
-ContextAttribute* ContextAttributeVector::lookup(const std::string& attributeName) const
+int ContextAttributeVector::get(const std::string& attributeName) const
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     if (vec[ix]->name == attributeName)
     {
-      return vec[ix];
+      return ix;
     }
   }
 
-  return NULL;
+  return -1;
+}
+
+
+/* ****************************************************************************
+*
+* getAll -
+*
+* Like get, but takes into account there could be several attributes with same name
+* and differente ID and returns all them (in a vector of integers)
+*
+* FIXME #3168: to be removed along with all the metadata ID related code
+*
+*/
+void ContextAttributeVector::getAll(const std::string& attributeName, std::vector<int>* foundP) const
+{
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if (vec[ix]->name == attributeName)
+    {
+      foundP->push_back(ix);
+    }
+  }
 }

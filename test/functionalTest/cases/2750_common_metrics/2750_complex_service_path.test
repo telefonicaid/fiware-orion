@@ -125,7 +125,7 @@ Date: REGEX(.*)
 05. Ask for Metrics, see A1 and A2 as service paths, as well as two 'root service path'
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((842|850))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

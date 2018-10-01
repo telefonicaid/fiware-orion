@@ -42,9 +42,9 @@ SubscribeResponse::SubscribeResponse()
 
 /* ****************************************************************************
 *
-* SubscribeResponse::render - 
+* SubscribeResponse::toJsonV1 -
 */
-std::string SubscribeResponse::render(bool comma)
+std::string SubscribeResponse::toJsonV1(bool comma)
 {
   std::string  out                 = "";
   std::string  tag                 = "subscribeResponse";
@@ -52,9 +52,9 @@ std::string SubscribeResponse::render(bool comma)
   bool         throttlingRendered  = !throttling.isEmpty();
 
   out += startTag(tag);
-  out += subscriptionId.render(RtSubscribeResponse, durationRendered || throttlingRendered);
-  out += duration.render(throttlingRendered);
-  out += throttling.render(false);
+  out += subscriptionId.toJsonV1(RtSubscribeResponse, durationRendered || throttlingRendered);
+  out += duration.toJsonV1(throttlingRendered);
+  out += throttling.toJsonV1(false);
   out += endTag(comma);
 
   return out;

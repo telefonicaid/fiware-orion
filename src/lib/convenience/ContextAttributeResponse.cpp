@@ -40,20 +40,23 @@
 
 /* ****************************************************************************
 *
-* render - 
+* toJsonV1 -
 */
-std::string ContextAttributeResponse::render
+std::string ContextAttributeResponse::toJsonV1
 (
-  ApiVersion   apiVersion,
   bool         asJsonObject,
   RequestType  request
 )
 {
   std::string out = "";
 
+  // No metadata filter in this case, an empty vector is used to fulfil method signature.
+  // For attribute filter, we use the ContextAttributeVector itself
+  std::vector<std::string> emptyMdV;
+
   out += startTag();
-  out += contextAttributeVector.render(apiVersion, asJsonObject, request, true);
-  out += statusCode.render(false);
+  out += contextAttributeVector.toJsonV1(asJsonObject, request, contextAttributeVector.vec, emptyMdV, true);
+  out += statusCode.toJsonV1(false);
   out += endTag();
 
   return out;
@@ -99,7 +102,7 @@ std::string ContextAttributeResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, requestType);
+  return toJsonV1(asJsonObject, requestType);
 }
 
 
@@ -119,9 +122,9 @@ void ContextAttributeResponse::release(void)
 *
 * fill - 
 */
-void ContextAttributeResponse::fill(ContextAttributeVector* _cavP, const StatusCode& _statusCode)
+void ContextAttributeResponse::fill(const ContextAttributeVector& caV, const StatusCode& _statusCode)
 {
-  contextAttributeVector.fill(_cavP);
+  contextAttributeVector.fill(caV);
   statusCode.fill(_statusCode);
 }
 
@@ -176,7 +179,7 @@ void ContextAttributeResponse::fill
     alarmMgr.badInput(clientIp, "more than one context element found in this query - selecting the first one");
   }
 
-  contextAttributeVector.fill(&qcrP->contextElementResponseVector[0]->contextElement.contextAttributeVector);
+  contextAttributeVector.fill(qcrP->contextElementResponseVector[0]->entity.attributeVector);
 
   if ((statusCode.code == SccNone) || (statusCode.code == SccOk))
   {

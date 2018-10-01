@@ -38,7 +38,7 @@
 *
 * ContextElementVector::push_back -
 */
-void ContextElementVector::push_back(ContextElement* item)
+void ContextElementVector::push_back(Entity* item)
 {
   vec.push_back(item);
 }
@@ -47,14 +47,13 @@ void ContextElementVector::push_back(ContextElement* item)
 
 /* ****************************************************************************
 *
-* ContextElementVector::render -
+* ContextElementVector::toJsonV1 -
 */
-std::string ContextElementVector::render
+std::string ContextElementVector::toJsonV1
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         requestType,
-  bool                comma
+  bool         asJsonObject,
+  RequestType  requestType,
+  bool         comma
 )
 {
   std::string  out = "";
@@ -66,9 +65,12 @@ std::string ContextElementVector::render
 
   out += startTag("contextElements", true);
 
+  // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
+  std::vector<std::string> emptyV;
+
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(apiVersion, asJsonObject, requestType, ix != vec.size() - 1);
+    out += vec[ix]->toJsonV1(asJsonObject, requestType, emptyV, false, emptyV, ix != vec.size() - 1);
   }
 
   out += endTag(comma, true);
@@ -99,7 +101,7 @@ void ContextElementVector::release(void)
 *
 * ContextElementVector::operator[] -
 */
-ContextElement* ContextElementVector::operator[](unsigned int ix) const
+Entity* ContextElementVector::operator[](unsigned int ix) const
 {
     if (ix < vec.size())
     {
@@ -152,11 +154,11 @@ std::string ContextElementVector::check(ApiVersion apiVersion, RequestType reque
 *
 * ContextElementVector::lookup - 
 */
-ContextElement* ContextElementVector::lookup(EntityId* eP)
+Entity* ContextElementVector::lookup(Entity* eP)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    if ((vec[ix]->entityId.id == eP->id) && (vec[ix]->entityId.type == eP->type))
+    if ((vec[ix]->id == eP->id) && (vec[ix]->type == eP->type))
     {
       return vec[ix];
     }

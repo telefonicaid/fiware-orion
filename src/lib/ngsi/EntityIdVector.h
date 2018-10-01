@@ -49,7 +49,7 @@ typedef struct EntityIdVector
 {
   std::vector<EntityId*>  vec;
 
-  std::string  render(bool comma);
+  std::string  toJsonV1(bool comma);
   void         push_back(EntityId* item);
   bool         push_back_if_absent(EntityId* item);
   unsigned int size(void) const;

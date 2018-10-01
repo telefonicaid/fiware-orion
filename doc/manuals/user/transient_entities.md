@@ -1,11 +1,11 @@
 # Transient Entities
 
-A transient entity is a regular entity (i.e. it has id/type, a set of attributes, etc.) but with a expiration timestamp.
+A transient entity is a regular entity (i.e. it has id/type, a set of attributes, etc.) but with an expiration timestamp.
 When such point in time is reached the entity is automatically deleted from the context managed by Orion.
 
 Thus, a first and very important piece of advice: **be careful if you use transient entities as once
 the expiration time has come, the entity will be automatically deleted from database and there is
-no way of recovering it**. Ensure the information you set in a transient entity  is not relevant once 
+no way of recovering it**. Ensure the information you set in a transient entity is not relevant once 
 the entity has expired (i.e. deleted).
 
 In addition, **have a look to the [backward compatibility considerations section](#backward-compatibility-considerations)
@@ -107,7 +107,7 @@ This become the entity into a regular (i.e. not transient) entity and will not b
 
 ## Deletion of expired entities
 
-Expiration relies on the MongoDB feture to [expire documents at a specific clock time](https://docs.mongodb.com/manual/tutorial/expire-data/#expire-documents-at-a-specific-clock-time). This is based in a background thread thats wakes up every 60 seconds,
+Expiration relies on the MongoDB feature to [expire documents at a specific clock time](https://docs.mongodb.com/manual/tutorial/expire-data/#expire-documents-at-a-specific-clock-time). This is based in a background thread that wakes up every 60 seconds,
 so your transient entities may remain in the database up to 60 seconds (or a bit more, if the MongoDB load is high) after
 expiration date (see [MongoDB documentation](https://docs.mongodb.com/manual/core/index-ttl/#timing-of-the-delete-operation)
 for more details).
@@ -129,8 +129,8 @@ the same value (e.g. in GET operations, etc.). If `dateExpires` is a `DateTime` 
 interpreted as an expiration date (i.e. the entity will not be deleted after the datetime passes).
 
 However, even in the case the attribute would keep its previous value without any special semantic, note
-that `dataExpires` becomes a builtin attribute, so it is not shown except if explicetly requested with
-`attrs` URI parameter (in GET based queries) or `"attrs"` field (in `POST /v2/op/query`).
+that `dataExpires` becomes a builtin attribute, so it is not shown except if explicitly requested with
+`attrs` URI parameter (in GET based queries) or `"attrs"` field (in `POST /v2/op/query` and subscriptions).
 
 Once `dateExpires` attribute get updated for first time, it will start to mean an expiration date on the given
 entity, with the behaviour described in previous section. Please, **take this into account in the case

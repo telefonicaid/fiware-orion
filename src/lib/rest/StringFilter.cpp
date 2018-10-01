@@ -2069,7 +2069,7 @@ bool StringFilter::mqMatch(ContextElementResponse* cerP)
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
   {
     StringFilterItem*  itemP = filters[ix];
-    ContextAttribute*  caP   = cerP->contextElement.getAttribute(itemP->attributeName);
+    ContextAttribute*  caP   = cerP->entity.getAttribute(itemP->attributeName);
 
     if ((itemP->op == SfopExists) || (itemP->op == SfopNotExists))
     {
@@ -2181,7 +2181,7 @@ bool StringFilter::qMatch(ContextElementResponse* cerP)
     // Unary operator?
     if ((itemP->op == SfopExists) || (itemP->op == SfopNotExists))
     {
-      ContextAttribute* caP = cerP->contextElement.getAttribute(itemP->attributeName);
+      ContextAttribute* caP = cerP->entity.getAttribute(itemP->attributeName);
 
       if (itemP->compoundPath.size() == 0)
       {
@@ -2223,11 +2223,11 @@ bool StringFilter::qMatch(ContextElementResponse* cerP)
     {
       caP            = &ca;
       ca.valueType   = orion::ValueTypeNumber;
-      ca.numberValue = (itemP->left == DATE_CREATED)? cerP->contextElement.entityId.creDate : cerP->contextElement.entityId.modDate;
+      ca.numberValue = (itemP->left == DATE_CREATED)? cerP->entity.creDate : cerP->entity.modDate;
     }
     else if (itemP->op != SfopNotExists)
     {
-      caP = cerP->contextElement.getAttribute(itemP->attributeName);
+      caP = cerP->entity.getAttribute(itemP->attributeName);
 
       // If the attribute doesn't exist, no need to go further: filter fails
       if (caP == NULL)

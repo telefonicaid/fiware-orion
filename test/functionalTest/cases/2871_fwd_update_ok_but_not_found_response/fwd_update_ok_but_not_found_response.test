@@ -63,8 +63,7 @@ doc='{
          "attrs":[
             {
                "name":"turn",
-               "type":"string",
-               "isDomain":"false"
+               "type":"string"
             }
          ],
          "providingApplication":"http://localhost:9997/bug2871"

@@ -48,8 +48,7 @@ payload='{
       "attributes": [
         {
           "name": "temperature",
-          "type": "degree",
-          "isDomain": "false"
+          "type": "degree"
         }
       ],
       "providingApplication": "http://sensor1:1028"
@@ -79,8 +78,7 @@ payload='{
       "attributes": [
         {
           "name": "temperature",
-          "type": "degree",
-          "isDomain": "false"
+          "type": "degree"
         }
       ],
       "providingApplication": "http://sensor2:1028"
@@ -126,8 +124,7 @@ payload='{
       "attributes": [
         {
           "name": "temperature",
-          "type": "degree",
-          "isDomain": "false"
+          "type": "degree"
         }
       ],
       "providingApplication": "http://sensor3:1028"
@@ -172,8 +169,7 @@ payload='{
       "attributes": [
         {
           "name": "temperature",
-          "type": "degree",
-          "isDomain": "false"
+          "type": "degree"
         }
       ],
       "providingApplication": "http://sensor4:1028"
@@ -278,7 +274,7 @@ Date: REGEX(.*)
 7: ++++++++++++++++++++
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 509
+Content-Length: 471
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
@@ -291,7 +287,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "temperature",
                         "type": "degree"
                     }
@@ -310,7 +305,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "temperature",
                         "type": "degree"
                     }
@@ -331,7 +325,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 294
+Content-Length: 275
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
@@ -344,7 +338,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "temperature",
                         "type": "degree"
                     }
@@ -365,7 +358,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 501
+Content-Length: 463
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
@@ -378,7 +371,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "temperature",
                         "type": "degree"
                     }
@@ -397,7 +389,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "temperature",
                         "type": "degree"
                     }
@@ -418,7 +409,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 290
+Content-Length: 271
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
@@ -431,7 +422,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "temperature",
                         "type": "degree"
                     }

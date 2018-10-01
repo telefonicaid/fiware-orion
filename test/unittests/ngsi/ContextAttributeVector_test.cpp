@@ -43,7 +43,11 @@ TEST(ContextAttributeVector, render)
 
   utInit();
 
-  out = cav.render(V1, false, UpdateContextAttribute, "");
+  const std::vector<ContextAttribute*>  emptyAttrsV;
+  const std::vector<std::string>        emptyMdV;
+
+  // FIXME P3: "" is a string, signature tells bool...
+  out = cav.toJsonV1(false, UpdateContextAttribute, emptyAttrsV, emptyMdV, "");
   EXPECT_STREQ("", out.c_str());
 
   utExit();

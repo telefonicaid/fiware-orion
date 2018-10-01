@@ -24,6 +24,7 @@
 */
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "rapidjson/document.h"
 
@@ -41,6 +42,7 @@ bool parseStringVector
   const rapidjson::Value&    jsonVector,
   const std::string&         fieldName,
   bool                       emptyStringNotAllowed,
+  bool                       unique,
   std::string*               errorStringP
 )
 {
@@ -72,7 +74,11 @@ bool parseStringVector
       return false;
     }
 
-    sVecP->push_back(value);
+    // If unique is true, we need to ensure the element hasn't been added previousy in order to add it
+    if ((!unique) || (std::find(sVecP->begin(), sVecP->end(), value) == sVecP->end()))
+    {
+      sVecP->push_back(value);
+    }
   }
 
   return true;

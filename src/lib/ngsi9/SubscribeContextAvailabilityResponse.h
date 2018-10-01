@@ -48,7 +48,7 @@ typedef struct SubscribeContextAvailabilityResponse
   SubscribeContextAvailabilityResponse(const std::string& _subscriptionId, const std::string& _duration);
   SubscribeContextAvailabilityResponse(const std::string& _subscriptionId, StatusCode& _errorCode);
 
-   std::string render(void);
+   std::string toJsonV1(void);
 } SubscribeContextAvailabilityResponse;
 
 #endif  // SRC_LIB_NGSI9_SUBSCRIBECONTEXTAVAILABILITYRESPONSE_H_

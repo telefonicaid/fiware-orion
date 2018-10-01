@@ -32,18 +32,6 @@ brokerStart CB
 echo "1: ++++++++++++++++++++"
 url="/v1/registry/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01"
 payload='{
-  "metadatas" : [
-    {
-      "name" : "ID",
-      "type" : "string",
-      "value" : "1110"
-    },
-    {
-      "name" : "cm2",
-      "type" : "string",
-      "value" : "XXX"
-    }
-  ],
   "duration" : "PT1H",
   "providingApplication" : "http://kz.tid.es/abc"
 }'
@@ -69,18 +57,6 @@ orionCurl --url ${url} --payload "${payload}"
 echo "3: ++++++++++++++++++++"
 url="/v1/registry/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01"
 payload='{
-  "metadatas" : [
-    {
-      "name" : "ID",
-      "type" : "string",
-      "value" : "1111"
-    },
-    {
-      "name" : "cm2",
-      "type" : "string",
-      "value" : "YYY"
-    }
-  ],
   "duration" : "PT2H",
   "providingApplication" : "http://kz.tid.es/abc2",
   "registrationId" : "'$REG_ID'"
@@ -149,7 +125,7 @@ Date: REGEX(.*)
 }
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 236
+Content-Length: 217
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -159,8 +135,7 @@ Date: REGEX(.*)
         {
             "contextRegistration": {
                 "attributes": [
-                    {
-                        "isDomain": "false",
+                    {                        
                         "name": "ATTRIBUTE_01",
                         "type": ""
                     }
@@ -190,7 +165,7 @@ Date: REGEX(.*)
 }
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 237
+Content-Length: 218
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -200,8 +175,7 @@ Date: REGEX(.*)
         {
             "contextRegistration": {
                 "attributes": [
-                    {
-                        "isDomain": "false",
+                    {                        
                         "name": "ATTRIBUTE_01",
                         "type": ""
                     }
@@ -220,7 +194,7 @@ Date: REGEX(.*)
 }
 5: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 237
+Content-Length: 218
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -231,7 +205,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "ATTRIBUTE_01",
                         "type": ""
                     }

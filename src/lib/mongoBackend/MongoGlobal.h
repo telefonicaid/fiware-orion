@@ -309,7 +309,7 @@ extern bool includedEntity(EntityId en, const EntityIdVector& entityIdV);
 *
 * includedAttribute -
 */
-extern bool includedAttribute(const ContextRegistrationAttribute& attr, const StringList& attrsV);
+extern bool includedAttribute(const std::string& attrName, const StringList& attrsV);
 
 
 
@@ -330,7 +330,6 @@ extern bool entitiesQuery
 (
   const EntityIdVector&            enV,
   const StringList&                attrL,
-  const StringList&                metadataList,
   const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
@@ -498,7 +497,7 @@ extern bool someContextElementNotFound(const ContextElementResponse& cer);
 */
 extern void cprLookupByAttribute
 (
-  EntityId&                                en,
+  const Entity&                            en,
   const std::string&                       attrName,
   const ContextRegistrationResponseVector& crrV,
   std::string*                             perEntPa,
@@ -506,5 +505,13 @@ extern void cprLookupByAttribute
   std::string*                             perAttrPa,
   MimeType*                                perAttrPaMimeType
 );
+
+
+/* ****************************************************************************
+*
+* addBuiltins -
+*
+*/
+extern void addBuiltins(ContextElementResponse* cerP);
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOGLOBAL_H_

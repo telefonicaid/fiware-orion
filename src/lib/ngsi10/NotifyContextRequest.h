@@ -45,11 +45,14 @@ typedef struct NotifyContextRequest
   Originator                    originator;                    // Mandatory
   ContextElementResponseVector  contextElementResponseVector;  // Optional
 
-  std::string   render(ApiVersion apiVersion, bool asJsonObject);
+  std::string   toJsonV1(bool                             asJsonObject,
+                         const std::vector<std::string>&  attrsFilter,
+                         bool                             blacklist,
+                         const std::vector<std::string>&  metadataFilter);
   std::string   toJson(RenderFormat                     renderFormat,
                        const std::vector<std::string>&  attrsFilter,
-                       const std::vector<std::string>&  metadataFilter,
-                       bool                             blacklist = false);
+                       bool                             blacklist,
+                       const std::vector<std::string>&  metadataFilter);
   std::string   check(ApiVersion apiVersion, const std::string& predetectedError);
   void          release(void);
   NotifyContextRequest* clone(void);

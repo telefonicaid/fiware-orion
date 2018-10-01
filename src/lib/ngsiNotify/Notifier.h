@@ -47,15 +47,15 @@ class Notifier
 public:
   virtual ~Notifier(void);
 
-  virtual void sendNotifyContextRequest(NotifyContextRequest*                      ncr,
-                                        const ngsiv2::HttpInfo&                    httpInfo,
-                                        const std::string&                         tenant,
-                                        const std::string&                         xauthToken,
-                                        const std::string&                         fiwareCorrelator,
-                                        RenderFormat                               renderFormat,
-                                        const std::vector<std::string>&            attrsOrder,
-                                        const std::vector<std::string>&            metadataFilter,
-                                        bool                                       blackList);
+  virtual void sendNotifyContextRequest(NotifyContextRequest&            ncr,
+                                        const ngsiv2::HttpInfo&          httpInfo,
+                                        const std::string&               tenant,
+                                        const std::string&               xauthToken,
+                                        const std::string&               fiwareCorrelator,
+                                        RenderFormat                     renderFormat,
+                                        const std::vector<std::string>&  attrsFilter,
+                                        bool                             blacklist,
+                                        const std::vector<std::string>&  metadataFilter);
 
   virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr,
                                                     const std::string&                url,
@@ -63,16 +63,15 @@ public:
                                                     const std::string&                fiwareCorrelator,
                                                     RenderFormat                      renderFormat);
 protected:
-  static std::vector<SenderThreadParams*>* buildSenderParams(NotifyContextRequest*            ncrP,
+  static std::vector<SenderThreadParams*>* buildSenderParams(NotifyContextRequest&            ncr,
                                                              const ngsiv2::HttpInfo&          httpInfo,
                                                              const std::string&               tenant,
                                                              const std::string&               xauthToken,
                                                              const std::string&               fiwareCorrelator,
                                                              RenderFormat                     renderFormat,
-                                                             const std::vector<std::string>&  attrsOrder,
-                                                             const std::vector<std::string>&  metadataFilter,
-                                                             bool                             blackList
-  );
+                                                             const std::vector<std::string>&  attrsFilter,
+                                                             bool                             blacklist,
+                                                             const std::vector<std::string>&  metadataFilter);
 };
 
 #endif  // SRC_LIB_NGSINOTIFY_NOTIFIER_H_

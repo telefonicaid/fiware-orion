@@ -80,9 +80,9 @@ std::string Originator::get(void)
 
 /* ****************************************************************************
 *
-* Originator::render -
+* Originator::toJsonV1 -
 */
-std::string Originator::render(bool comma)
+std::string Originator::toJsonV1(bool comma)
 {
   if (string == "")
   {

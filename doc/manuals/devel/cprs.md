@@ -8,7 +8,7 @@ The Orion Context Broker, as explained in [the User & Programmers Manual](../use
 
 ## Forwarding of update requests
 
-In NGSIv1, the request `POST /v1/updateContext` has a field called `updateActionType`. This field can take on five different values:
+In NGSIv1 (deprecated), the request `POST /v1/updateContext` has a field called `updateActionType`. This field can take on five different values:
 
 * UPDATE
 * APPEND

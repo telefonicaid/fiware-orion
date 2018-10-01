@@ -118,7 +118,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
     }
     else if (name == "attrs")
     {
-      std::string r = parseStringList(ciP, iter, &bqrP->attrsV, name);
+      std::string r = parseStringList(ciP, iter, &bqrP->attrsV, name, true);
 
       if (r != "OK")
       {
@@ -144,7 +144,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
     }
     else if (name == "metadata")
     {
-      std::string r = parseStringList(ciP, iter, &bqrP->metadataV, name);
+      std::string r = parseStringList(ciP, iter, &bqrP->metadataV, name, true);
 
       if (r != "OK")
       {

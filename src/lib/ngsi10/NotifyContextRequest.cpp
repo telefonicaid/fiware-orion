@@ -36,9 +36,15 @@
 
 /* ****************************************************************************
 *
-* NotifyContextRequest::render -
+* NotifyContextRequest::toJsonV1 -
 */
-std::string NotifyContextRequest::render(ApiVersion apiVersion, bool asJsonObject)
+std::string NotifyContextRequest::toJsonV1
+(
+  bool                             asJsonObject,
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter
+)
 {
   std::string  out                                  = "";
   bool         contextElementResponseVectorRendered = contextElementResponseVector.size() != 0;
@@ -50,9 +56,9 @@ std::string NotifyContextRequest::render(ApiVersion apiVersion, bool asJsonObjec
   //   This doubt is taken care of by the variable 'contextElementResponseVectorRendered'
   //
   out += startTag();
-  out += subscriptionId.render(NotifyContext, true);
-  out += originator.render(contextElementResponseVectorRendered);
-  out += contextElementResponseVector.render(apiVersion, asJsonObject, NotifyContext, false);
+  out += subscriptionId.toJsonV1(NotifyContext, true);
+  out += originator.toJsonV1(contextElementResponseVectorRendered);
+  out += contextElementResponseVector.toJsonV1(asJsonObject, NotifyContext, attrsFilter, blacklist, metadataFilter, false);
   out += endTag();
 
   return out;
@@ -68,8 +74,8 @@ std::string NotifyContextRequest::toJson
 (
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             blacklist
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter    
 )
 {
   if ((renderFormat != NGSI_V2_NORMALIZED) && (renderFormat != NGSI_V2_KEYVALUES) && (renderFormat != NGSI_V2_VALUES))
@@ -88,7 +94,7 @@ std::string NotifyContextRequest::toJson
   out += ",";
   out += JSON_STR("data") + ":[";
 
-  out += contextElementResponseVector.toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
+  out += contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
   out += "]";
   out += "}";
 
@@ -121,7 +127,7 @@ std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string
     return "OK";
   }
 
-  return response.render();
+  return response.toJsonV1();
 }
 
 

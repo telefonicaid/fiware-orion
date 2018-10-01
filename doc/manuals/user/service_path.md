@@ -3,11 +3,9 @@
 ## Entity service paths
 
 Orion Context Broker supports hierarchical scopes, so entities can be
-assigned to a scope at creation time with
-[updateContext](walkthrough_apiv1.md#update-context-elements) (or [related
-convenience operation](walkthrough_apiv1.md#convenience-update-context)). Then,
-[queryContext](walkthrough_apiv1.md#query-context-operation) and [subscribeContext](walkthrough_apiv1.md#context-subscriptions) (and related
-convenience operations) can be also scoped to locate entities in the corresponding scopes.
+assigned to a scope [at creation time](walkthrough_apiv2.md#entity-creation).
+Then, [query](walkthrough_apiv2.md#query-entity) and [subscription](walkthrough_apiv2.md#subscriptions)
+can be also scoped to locate entities in the corresponding scopes.
 
 For example, consider an Orion-based application using the following
 scopes (shown in the figure):
@@ -72,8 +70,7 @@ Some additional remarks:
 
 -   Entities belongs to one (and only one) scope.
 
--   Fiware-ServicePath
-    header is included in NGSI10 notifyContext requests sent by Orion.
+-   Fiware-ServicePath header is included in notification requests sent by Orion.
 
 -   The scopes entities can be combined orthogonally with the
     [multi-service/multi-tenant

@@ -108,9 +108,9 @@ std::string RegistrationId::get(void) const
 
 /* ****************************************************************************
 *
-* RegistrationId::render -
+* RegistrationId::toJsonV1 -
 */
-std::string RegistrationId::render(RequestType requestType, bool comma)
+std::string RegistrationId::toJsonV1(RequestType requestType, bool comma)
 {
   if (string == "")
   {

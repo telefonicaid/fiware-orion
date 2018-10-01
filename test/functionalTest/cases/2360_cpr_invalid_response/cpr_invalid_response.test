@@ -65,8 +65,7 @@ payload='{
       "attributes": [
         {
           "name": "c_name",
-          "type": "command",
-          "isDomain": "false"
+          "type": "command"
         }
       ],
       "providingApplication": "http://localhost:'${LISTENER_PORT}'/badresponse"
