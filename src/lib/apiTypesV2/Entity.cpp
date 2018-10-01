@@ -193,14 +193,12 @@ void Entity::filterAndOrderAttrs
       else
       {
         // - If '*' is not in: attributes are include in the attrsFilter order
-        // FIXME #3168: replace getAll() by get() once metadata ID gets removed
         for (unsigned int ix = 0; ix < attrsFilter.size(); ix++)
         {
-          std::vector<int> found;
-          attributeVector.getAll(attrsFilter[ix], &found);
-          for (unsigned int jx = 0; jx < found.size(); jx++)
+          int found;
+          if ((found = attributeVector.get(attrsFilter[ix])) != -1)
           {
-            orderedAttrs->push_back(attributeVector[found[jx]]);
+            orderedAttrs->push_back(attributeVector[found]);
           }
         }
       }

@@ -317,25 +317,3 @@ int ContextAttributeVector::get(const std::string& attributeName) const
 
   return -1;
 }
-
-
-/* ****************************************************************************
-*
-* getAll -
-*
-* Like get, but takes into account there could be several attributes with same name
-* and differente ID and returns all them (in a vector of integers)
-*
-* FIXME #3168: to be removed along with all the metadata ID related code
-*
-*/
-void ContextAttributeVector::getAll(const std::string& attributeName, std::vector<int>* foundP) const
-{
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    if (vec[ix]->name == attributeName)
-    {
-      foundP->push_back(ix);
-    }
-  }
-}
