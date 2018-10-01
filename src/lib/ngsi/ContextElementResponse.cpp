@@ -291,9 +291,9 @@ ContextElementResponse::ContextElementResponse(Entity* eP, bool useDefaultType)
 
 /* ****************************************************************************
 *
-* ContextElementResponse::render - 
+* ContextElementResponse::toJsonV1 -
 */
-std::string ContextElementResponse::render
+std::string ContextElementResponse::toJsonV1
 (
   bool                             asJsonObject,
   RequestType                      requestType,
@@ -308,7 +308,7 @@ std::string ContextElementResponse::render
 
   out += startTag();
   out += entity.toJsonV1(asJsonObject, requestType, attrsFilter, blacklist, metadataFilter, true, omitAttributeValues);
-  out += statusCode.render(false);
+  out += statusCode.toJsonV1(false);
   out += endTag(comma, false);
 
   return out;

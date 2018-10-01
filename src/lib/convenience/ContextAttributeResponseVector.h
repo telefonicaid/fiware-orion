@@ -41,8 +41,7 @@ typedef struct ContextAttributeResponseVector
 {
   std::vector<ContextAttributeResponse*>  vec;
 
-  std::string                render(bool         asJsonObject,
-                                    RequestType  request);
+  std::string                toJsonV1(bool asJsonObject, RequestType request);
   void                       push_back(ContextAttributeResponse* item);
   unsigned int               size(void);
   void                       release(void);

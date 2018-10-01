@@ -86,9 +86,9 @@ void QueryContextResponseVector::release(void)
 
 /* ****************************************************************************
 *
-* QueryContextResponseVector::render -
+* QueryContextResponseVector::toJsonV1 -
 */
-std::string QueryContextResponseVector::render(bool asJsonObject, bool details, const std::string& detailsString)
+std::string QueryContextResponseVector::toJsonV1(bool asJsonObject, bool details, const std::string& detailsString)
 {
   QueryContextResponse* responseP = new QueryContextResponse();
   std::string           answer;
@@ -196,7 +196,7 @@ std::string QueryContextResponseVector::render(bool asJsonObject, bool details, 
     }
   }
 
-  answer = responseP->render(asJsonObject);
+  answer = responseP->toJsonV1(asJsonObject);
   responseP->release();
   delete responseP;
 

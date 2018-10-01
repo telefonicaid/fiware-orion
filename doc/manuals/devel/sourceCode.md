@@ -208,8 +208,8 @@ The **ngsi** library contains a collection of classes for the different payloads
 
 These classes (as well as the classes in the libraries `ngsi9`, `ngsi10`, `convenience`) all have a standard set of methods:
 
-* `render()`, to render the object to a JSON string (mainly for NGSIv1)
 * `toJson()`, to render the object to a JSON string (for NGSIv2)
+* `toJsonV1()`, to render the object to a JSON string (for NGSIv1)
 * `present()`, for debugging (the object is dumped as text to the log file)
 * `release()`, to release all allocated resources of the object
 * `check()`, to make sure the object follows the rules, i.e. about no forbidden characters, or mandatory fields missing, etc.
@@ -222,7 +222,7 @@ The classes follow a hierarchy, e.g. `UpdateContextRequest` (top hierarchy class
 * `ContextAttributeVector`
 * `MetadataVector` (this field `MetadataVector domainMetadataVector` is part of NGSIv1 but Orion doesn't make use of it)
 
-The methods `render()`, `check()`, `release()`, etc. are called in a tree-like fashion, starting from the top hierarchy class, e.g. `UpdateContextRequest`:
+The methods `toJson()`, `check()`, `release()`, etc. are called in a tree-like fashion, starting from the top hierarchy class, e.g. `UpdateContextRequest`:
 
 * `UpdateContextRequest::check()` calls:
   * `ContextElementVector::check()` calls (for each item in the vector):

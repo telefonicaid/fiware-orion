@@ -37,9 +37,9 @@
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttributeVector::render -
+* ContextRegistrationAttributeVector::toJsonV1 -
 */
-std::string ContextRegistrationAttributeVector::render(bool comma)
+std::string ContextRegistrationAttributeVector::toJsonV1(bool comma)
 {
   std::string out = "";
 
@@ -51,7 +51,7 @@ std::string ContextRegistrationAttributeVector::render(bool comma)
   out += startTag("attributes", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(ix != vec.size() - 1);
+    out += vec[ix]->toJsonV1(ix != vec.size() - 1);
   }
   out += endTag(comma, true);
 

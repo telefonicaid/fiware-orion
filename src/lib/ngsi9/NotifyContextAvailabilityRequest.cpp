@@ -44,9 +44,9 @@ NotifyContextAvailabilityRequest::NotifyContextAvailabilityRequest()
 
 /* ****************************************************************************
 *
-* NotifyContextAvailabilityRequest::render -
+* NotifyContextAvailabilityRequest::toJsonV1 -
 */
-std::string NotifyContextAvailabilityRequest::render(void)
+std::string NotifyContextAvailabilityRequest::toJsonV1(void)
 {
   std::string out = "";
 
@@ -57,8 +57,8 @@ std::string NotifyContextAvailabilityRequest::render(void)
   //  With an empty contextRegistrationResponseVector there would be no notification
   //
   out += startTag();
-  out += subscriptionId.render(NotifyContextAvailability, true);
-  out += contextRegistrationResponseVector.render(false);
+  out += subscriptionId.toJsonV1(NotifyContextAvailability, true);
+  out += contextRegistrationResponseVector.toJsonV1(false);
   out += endTag();
 
   return out;
@@ -89,7 +89,7 @@ std::string NotifyContextAvailabilityRequest::check(ApiVersion apiVersion, const
     return "OK";
   }
 
-  return response.render();
+  return response.toJsonV1();
 }
 
 

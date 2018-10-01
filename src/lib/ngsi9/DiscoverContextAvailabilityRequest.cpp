@@ -85,7 +85,7 @@ std::string DiscoverContextAvailabilityRequest::check(const std::string& predete
   else
     return "OK";
 
-  return response.render();
+  return response.toJsonV1();
 }
 
 

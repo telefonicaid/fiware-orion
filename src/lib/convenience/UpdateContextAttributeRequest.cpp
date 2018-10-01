@@ -51,9 +51,9 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 
 /* ****************************************************************************
 *
-* render - 
+* toJsonV1 -
 */
-std::string UpdateContextAttributeRequest::render(void)
+std::string UpdateContextAttributeRequest::toJsonV1(void)
 {
   std::string out = "";
 
@@ -69,7 +69,7 @@ std::string UpdateContextAttributeRequest::render(void)
     out += JSON_STR("value") + ":" + compoundValueP->toJson(true);
   }
 
-  out += metadataVector.render(metadataVector.vec, false);
+  out += metadataVector.toJsonV1(metadataVector.vec, false);
   out += endTag();
 
   return out;
@@ -103,7 +103,7 @@ std::string UpdateContextAttributeRequest::check
     return "OK";
   }
 
-  std::string out = response.render(false);
+  std::string out = response.toJsonV1(false);
 
   out = "{" + out + "}";
 

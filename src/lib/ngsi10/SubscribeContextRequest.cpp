@@ -61,7 +61,7 @@ std::string SubscribeContextRequest::check(const std::string& predetectedError, 
   {
     alarmMgr.badInput(clientIp, res);
     response.subscribeError.errorCode.fill(SccBadRequest, std::string("invalid payload: ") + res);
-    return response.render();
+    return response.toJsonV1();
   }
 
   return "OK";

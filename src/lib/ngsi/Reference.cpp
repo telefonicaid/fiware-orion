@@ -100,9 +100,9 @@ std::string Reference::get(void)
 
 /* ****************************************************************************
 *
-* Reference::render -
+* Reference::toJsonV1 -
 */
-std::string Reference::render(bool comma)
+std::string Reference::toJsonV1(bool comma)
 {
   if (string == "")
   {

@@ -41,10 +41,10 @@ typedef struct EntityVector
 {
   std::vector<Entity*>  vec;
 
-  std::string render(RenderFormat                     renderFormat,
-                     const std::vector<std::string>&  attrsFilter,
-                     bool                             blacklist,
-                     const std::vector<std::string>&  metadataFilter);
+  std::string  toJson(RenderFormat                     renderFormat,
+                      const std::vector<std::string>&  attrsFilter,
+                      bool                             blacklist,
+                      const std::vector<std::string>&  metadataFilter);
 
 
   std::string   check(RequestType requestType);

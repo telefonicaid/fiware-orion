@@ -124,7 +124,7 @@ std::string getAttributeValueInstanceWithTypeAndId
     response.fill(&parseDataP->qcrs.res, entityId, entityTypeFromPath, attributeName, metaID);
   }
 
-  TIMED_RENDER(answer = response.render(asJsonObject, AttributeValueInstance));
+  TIMED_RENDER(answer = response.toJsonV1(asJsonObject, AttributeValueInstance));
 
   parseDataP->qcr.res.release();
   parseDataP->qcrs.res.release();

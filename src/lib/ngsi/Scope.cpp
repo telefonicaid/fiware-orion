@@ -384,9 +384,9 @@ int Scope::fill
 
 /* ****************************************************************************
 *
-* Scope::render -
+* Scope::toJsonV1 -
 */
-std::string Scope::render(bool notLastInVector)
+std::string Scope::toJsonV1(bool notLastInVector)
 {
   std::string out      = "";
   const char* tTag     = "type";

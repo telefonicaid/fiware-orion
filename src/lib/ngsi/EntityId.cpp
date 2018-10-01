@@ -78,10 +78,10 @@ EntityId::EntityId
 
 /* ****************************************************************************
 *
-* EntityId::render -
+* EntityId::toJsonV1 -
 *
 */
-std::string EntityId::render(bool comma, bool isInVector)
+std::string EntityId::toJsonV1(bool comma, bool isInVector)
 {
   std::string  out              = "";
   char*        isPatternEscaped = htmlEscape(isPattern.c_str());

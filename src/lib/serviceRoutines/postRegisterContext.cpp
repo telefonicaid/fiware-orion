@@ -76,7 +76,7 @@ std::string postRegisterContext
 
         alarmMgr.badInput(clientIp, details);
         ciP->httpStatusCode = SccBadRequest;
-        return oe.render();
+        return oe.toJsonV1();
       }
     }
   }
@@ -91,7 +91,7 @@ std::string postRegisterContext
     alarmMgr.badInput(clientIp, "more than one service path for a registration");
     rcr.errorCode.fill(SccBadRequest, "more than one service path for notification");
 
-    TIMED_RENDER(answer = rcr.render());
+    TIMED_RENDER(answer = rcr.toJsonV1());
 
     return answer;
   }
@@ -105,12 +105,12 @@ std::string postRegisterContext
   {
     rcr.errorCode.fill(SccBadRequest, res);
 
-    TIMED_RENDER(answer = rcr.render());
+    TIMED_RENDER(answer = rcr.toJsonV1());
     return answer;
   }
 
   TIMED_MONGO(ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->uriParam, ciP->httpHeaders.correlator, ciP->tenant, ciP->servicePathV[0]));
-  TIMED_RENDER(answer = rcr.render());
+  TIMED_RENDER(answer = rcr.toJsonV1());
 
   return answer;
 }

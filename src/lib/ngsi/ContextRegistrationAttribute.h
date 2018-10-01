@@ -46,7 +46,7 @@ typedef struct ContextRegistrationAttribute
 
   ContextRegistrationAttribute();
   ContextRegistrationAttribute(const std::string& _name, const std::string& _type);
-  std::string     render(bool comma);
+  std::string     toJsonV1(bool comma);
 
   std::string     check(ApiVersion apiVersion);
 } ContextRegistrationAttribute;

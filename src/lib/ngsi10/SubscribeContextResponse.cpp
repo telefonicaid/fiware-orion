@@ -70,7 +70,9 @@ std::string SubscribeContextResponse::toJson(void)
 
   if (subscribeError.errorCode.code == SccNone)
   {
-    out += subscribeResponse.render(false);
+    // FIXME P5: it is a bit weird to call a toJsonV1() method from a toJson() method. However,
+    // SubscribeResponse doesn't have another option. This should be looked into detail.
+    out += subscribeResponse.toJsonV1(false);
   }
   else
   {
@@ -84,9 +86,9 @@ std::string SubscribeContextResponse::toJson(void)
 
 /* ****************************************************************************
 *
-* SubscribeContextResponse::render - 
+* SubscribeContextResponse::toJsonV1 -
 */
-std::string SubscribeContextResponse::render(void)
+std::string SubscribeContextResponse::toJsonV1(void)
 {
   std::string out     = "";
 
@@ -94,11 +96,11 @@ std::string SubscribeContextResponse::render(void)
 
   if (subscribeError.errorCode.code == SccNone)
   {
-    out += subscribeResponse.render(false);
+    out += subscribeResponse.toJsonV1(false);
   }
   else
   {
-    out += subscribeError.render(SubscribeContext, false);
+    out += subscribeError.toJsonV1(SubscribeContext, false);
   }
 
   out += endTag(false);

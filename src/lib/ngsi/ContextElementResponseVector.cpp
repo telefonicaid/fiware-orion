@@ -38,9 +38,9 @@
 
 /* ****************************************************************************
 *
-* ContextElementResponseVector::render -
+* ContextElementResponseVector::toJsonV1 -
 */
-std::string ContextElementResponseVector::render
+std::string ContextElementResponseVector::toJsonV1
 (
   bool                             asJsonObject,
   RequestType                      requestType,
@@ -62,7 +62,7 @@ std::string ContextElementResponseVector::render
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(asJsonObject, requestType, attrsFilter, blacklist, metadataFilter, ix < (vec.size() - 1), omitAttributeValues);
+    out += vec[ix]->toJsonV1(asJsonObject, requestType, attrsFilter, blacklist, metadataFilter, ix < (vec.size() - 1), omitAttributeValues);
   }
 
   out += endTag(comma, true);

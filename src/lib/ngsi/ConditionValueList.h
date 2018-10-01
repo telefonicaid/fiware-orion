@@ -41,7 +41,7 @@ typedef struct ConditionValueList
 {
   std::vector<std::string>  vec;
 
-  std::string  render(bool comma);
+  std::string  toJsonV1(bool comma);
   void         release(void);
   void         push_back(const std::string& attributeName);
   unsigned int size(void);

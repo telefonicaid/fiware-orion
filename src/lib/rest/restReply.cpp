@@ -174,64 +174,64 @@ void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::stri
   if (ciP->restServiceP->request == RegisterContext)
   {
     RegisterContextResponse rcr("000000000000000000000000", errorCode);
-    *outStringP = rcr.render();
+    *outStringP = rcr.toJsonV1();
   }
   else if (ciP->restServiceP->request == DiscoverContextAvailability)
   {
     DiscoverContextAvailabilityResponse dcar(errorCode);
-    *outStringP = dcar.render();
+    *outStringP = dcar.toJsonV1();
   }
   else if (ciP->restServiceP->request == SubscribeContextAvailability)
   {
     SubscribeContextAvailabilityResponse scar("000000000000000000000000", errorCode);
-    *outStringP = scar.render();
+    *outStringP = scar.toJsonV1();
   }
   else if ((ciP->restServiceP->request == UpdateContextAvailabilitySubscription) || (ciP->restServiceP->request == Ngsi9SubscriptionsConvOp))
   {
     UpdateContextAvailabilitySubscriptionResponse ucas(errorCode);
-    *outStringP = ucas.render();
+    *outStringP = ucas.toJsonV1();
   }
   else if (ciP->restServiceP->request == UnsubscribeContextAvailability)
   {
     UnsubscribeContextAvailabilityResponse ucar(errorCode);
-    *outStringP = ucar.render();
+    *outStringP = ucar.toJsonV1();
   }
   else if (ciP->restServiceP->request == NotifyContextAvailability)
   {
     NotifyContextAvailabilityResponse ncar(errorCode);
-    *outStringP = ncar.render();
+    *outStringP = ncar.toJsonV1();
   }
   else if (ciP->restServiceP->request == QueryContext)
   {
     QueryContextResponse  qcr(errorCode);
     bool                  asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-    *outStringP = qcr.render(asJsonObject);
+    *outStringP = qcr.toJsonV1(asJsonObject);
   }
   else if (ciP->restServiceP->request == SubscribeContext)
   {
     SubscribeContextResponse scr(errorCode);
-    *outStringP = scr.render();
+    *outStringP = scr.toJsonV1();
   }
   else if ((ciP->restServiceP->request == UpdateContextSubscription) || (ciP->restServiceP->request == Ngsi10SubscriptionsConvOp))
   {
     UpdateContextSubscriptionResponse ucsr(errorCode);
-    *outStringP = ucsr.render();
+    *outStringP = ucsr.toJsonV1();
   }
   else if (ciP->restServiceP->request == UnsubscribeContext)
   {
     UnsubscribeContextResponse uncr(errorCode);
-    *outStringP = uncr.render();
+    *outStringP = uncr.toJsonV1();
   }
   else if (ciP->restServiceP->request == UpdateContext)
   {
     UpdateContextResponse ucr(errorCode);
     bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-    *outStringP = ucr.render(asJsonObject);
+    *outStringP = ucr.toJsonV1(asJsonObject);
   }
   else if (ciP->restServiceP->request == NotifyContext)
   {
     NotifyContextResponse ncr(errorCode);
-    *outStringP = ncr.render();
+    *outStringP = ncr.toJsonV1();
   }
   else
   {

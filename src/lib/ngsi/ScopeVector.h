@@ -40,7 +40,7 @@ typedef struct ScopeVector
 {
   std::vector<Scope*>  vec;
 
-  std::string  render(bool comma);
+  std::string  toJsonV1(bool comma);
   void         push_back(Scope* item);
   unsigned int size(void) const;
   void         release();

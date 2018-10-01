@@ -42,7 +42,7 @@ typedef struct ContextRegistrationResponseVector
 
   void                          push_back(ContextRegistrationResponse* item);
   unsigned int                  size(void) const;
-  std::string                   render(bool comma);
+  std::string                   toJsonV1(bool comma);
   void                          release(void);
 
   ContextRegistrationResponse*  operator[](unsigned int ix) const;

@@ -61,9 +61,9 @@ UpdateContextSubscriptionResponse::~UpdateContextSubscriptionResponse() {
 
 /* ****************************************************************************
 *
-* UpdateContextSubscriptionResponse::render - 
+* UpdateContextSubscriptionResponse::toJsonV1 -
 */
-std::string UpdateContextSubscriptionResponse::render(void)
+std::string UpdateContextSubscriptionResponse::toJsonV1(void)
 {
   std::string out  = "";
 
@@ -71,11 +71,11 @@ std::string UpdateContextSubscriptionResponse::render(void)
 
   if (subscribeError.errorCode.code == SccNone)
   {
-    out += subscribeResponse.render(false);
+    out += subscribeResponse.toJsonV1(false);
   }
   else
   {
-    out += subscribeError.render(UpdateContextSubscription, false);
+    out += subscribeError.toJsonV1(UpdateContextSubscription, false);
   }
 
   out += endTag();

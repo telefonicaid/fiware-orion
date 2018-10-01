@@ -45,7 +45,7 @@ public:
 
   MetadataVector(void);
 
-  std::string     render(const std::vector<Metadata*>& orderedMetadata, bool comma);
+  std::string     toJsonV1(const std::vector<Metadata*>& orderedMetadata, bool comma);
   std::string     toJson(const std::vector<Metadata*>& orderedMetadata);
   std::string     check(ApiVersion apiVersion);
 

@@ -45,7 +45,7 @@ typedef struct SubscribeResponse
 
   SubscribeResponse();
 
-  std::string render(bool comma);
+  std::string toJsonV1(bool comma);
 } SubscribeResponse;
 
 #endif  // SRC_LIB_NGSI_SUBSCRIBERESPONSE_H_

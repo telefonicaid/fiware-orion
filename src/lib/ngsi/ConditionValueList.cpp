@@ -37,9 +37,9 @@
 
 /* ****************************************************************************
 *
-* render - 
+* toJsonV1 -
 */
-std::string ConditionValueList::render(bool comma)
+std::string ConditionValueList::toJsonV1(bool comma)
 {
   std::string  out = "";
 

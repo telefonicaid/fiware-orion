@@ -80,9 +80,9 @@ std::string RestrictionString::get(void)
 
 /* ****************************************************************************
 *
-* RestrictionString::render -
+* RestrictionString::toJsonV1 -
 */
-std::string RestrictionString::render(bool comma)
+std::string RestrictionString::toJsonV1(bool comma)
 {
   if (string == "")
   {

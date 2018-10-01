@@ -60,16 +60,16 @@ NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse(StatusCode&
 
 /* ****************************************************************************
 *
-* NotifyContextAvailabilityResponse::render -
+* NotifyContextAvailabilityResponse::toJsonV1 -
 */
-std::string NotifyContextAvailabilityResponse::render(void)
+std::string NotifyContextAvailabilityResponse::toJsonV1(void)
 {
   std::string out = "";
 
   responseCode.keyNameSet("responseCode");
 
   out += startTag();
-  out += responseCode.render(false);
+  out += responseCode.toJsonV1(false);
   out += endTag();
 
   return out;

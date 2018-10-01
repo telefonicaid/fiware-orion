@@ -48,7 +48,7 @@ typedef struct ContextRegistration
   bool                                entityIdVectorPresent;                 // entityIdList present during parsing
 
   ContextRegistration();
-  std::string  render(bool comma, bool isInVector);
+  std::string  toJsonV1(bool comma, bool isInVector);
   void         release();
 
   std::string  check(ApiVersion          apiVersion,

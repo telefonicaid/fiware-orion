@@ -36,10 +36,10 @@
 
 /* ****************************************************************************
 *
-* render - 
+* toJsonV1 -
 *
 */
-std::string UpdateContextElementRequest::render(bool asJsonObject, RequestType requestType)
+std::string UpdateContextElementRequest::toJsonV1(bool asJsonObject, RequestType requestType)
 {
   std::string out = "";
 
@@ -48,7 +48,7 @@ std::string UpdateContextElementRequest::render(bool asJsonObject, RequestType r
   std::vector<std::string> emptyMdV;
 
   out += startTag();
-  out += contextAttributeVector.render(asJsonObject, requestType, contextAttributeVector.vec, emptyMdV);
+  out += contextAttributeVector.toJsonV1(asJsonObject, requestType, contextAttributeVector.vec, emptyMdV);
   out += endTag();
 
   return out;
@@ -85,7 +85,7 @@ std::string UpdateContextElementRequest::check
     return "OK";
   }
 
-  return response.render(asJsonObject, requestType);
+  return response.toJsonV1(asJsonObject, requestType);
 }
 
 

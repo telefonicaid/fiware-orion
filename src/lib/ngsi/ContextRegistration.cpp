@@ -49,9 +49,9 @@ ContextRegistration::ContextRegistration()
 
 /* ****************************************************************************
 *
-* ContextRegistration::render -
+* ContextRegistration::toJsonV1 -
 */
-std::string ContextRegistration::render(bool comma, bool isInVector)
+std::string ContextRegistration::toJsonV1(bool comma, bool isInVector)
 {
   std::string out = "";
 
@@ -63,9 +63,9 @@ std::string ContextRegistration::render(bool comma, bool isInVector)
   //
 
   out += startTag(!isInVector? "contextRegistration" : "");
-  out += entityIdVector.render(true);
-  out += contextRegistrationAttributeVector.render(true);
-  out += providingApplication.render(false);
+  out += entityIdVector.toJsonV1(true);
+  out += contextRegistrationAttributeVector.toJsonV1(true);
+  out += providingApplication.toJsonV1(false);
   out += endTag(comma);
 
   return out;

@@ -41,13 +41,13 @@ typedef struct ContextElementResponseVector
 {
   std::vector<ContextElementResponse*>  vec;
 
-  std::string              render(bool                             asJsonObject,
-                                  RequestType                      requestType,
-                                  const std::vector<std::string>&  attrsFilter,
-                                  bool                             blacklist,
-                                  const std::vector<std::string>&  metadataFilter,
-                                  bool                             comma               = false,
-                                  bool                             omitAttributeValues = false);
+  std::string              toJsonV1(bool                             asJsonObject,
+                                    RequestType                      requestType,
+                                    const std::vector<std::string>&  attrsFilter,
+                                    bool                             blacklist,
+                                    const std::vector<std::string>&  metadataFilter,
+                                    bool                             comma               = false,
+                                    bool                             omitAttributeValues = false);
 
   std::string              toJson(RenderFormat                     renderFormat,
                                   const std::vector<std::string>&  attrsFilter,

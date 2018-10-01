@@ -94,13 +94,18 @@ public:
   std::string  getId() const;
   std::string  getLocation(ApiVersion apiVersion = V1) const;
 
-  std::string  render(bool         asJsonObject,
-                      RequestType  request,
-                      const std::vector<std::string>& metadataFilter,
-                      bool         comma = false,
-                      bool         omitValue = false);
-  std::string  renderAsJsonObject(RequestType request, const std::vector<Metadata*>& orderedMetadata, bool comma, bool omitValue = false);
-  std::string  renderAsNameString(bool comma);
+  std::string  toJsonV1(bool                             asJsonObject,
+                        RequestType                      request,
+                        const std::vector<std::string>&  metadataFilter,
+                        bool                             comma = false,
+                        bool                             omitValue = false);
+
+  std::string  toJsonV1AsJsonObject(RequestType                    request,
+                                    const std::vector<Metadata*>&  orderedMetadata,
+                                    bool                           comma,
+                                    bool                           omitValue = false);
+
+  std::string  toJsonV1AsNameString(bool comma);
 
   std::string  toJson(const std::vector<std::string>&  metadataFilter);
 

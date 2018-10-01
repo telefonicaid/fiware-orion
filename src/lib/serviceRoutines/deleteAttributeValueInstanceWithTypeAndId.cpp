@@ -89,7 +89,7 @@ std::string deleteAttributeValueInstanceWithTypeAndId
 
     response.fill(SccBadRequest, "non-matching entity::types in URL");
 
-    TIMED_RENDER(answer = response.render(false, false));
+    TIMED_RENDER(answer = response.toJsonV1(false, false));
 
     return answer;
   }
@@ -108,7 +108,7 @@ std::string deleteAttributeValueInstanceWithTypeAndId
 
 
   // 06. Cleanup and return result
-  TIMED_RENDER(answer = response.render(false, false));
+  TIMED_RENDER(answer = response.toJsonV1(false, false));
   response.release();
   parseDataP->upcr.res.release();
 

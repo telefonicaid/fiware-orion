@@ -62,9 +62,9 @@ ContextRegistrationAttribute::ContextRegistrationAttribute
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttribute::render -
+* ContextRegistrationAttribute::toJsonV1 -
 */
-std::string ContextRegistrationAttribute::render(bool comma)
+std::string ContextRegistrationAttribute::toJsonV1(bool comma)
 {
   std::string out = "";
 

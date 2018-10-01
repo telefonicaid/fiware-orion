@@ -48,9 +48,9 @@ UpdateContextElementResponse::UpdateContextElementResponse()
 
 /* ****************************************************************************
 *
-* render -
+* toJsonV1 -
 */
-std::string UpdateContextElementResponse::render
+std::string UpdateContextElementResponse::toJsonV1
 (
   bool                asJsonObject,
   RequestType         requestType
@@ -62,11 +62,11 @@ std::string UpdateContextElementResponse::render
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(false);
+    out += errorCode.toJsonV1(false);
   }
   else
   {
-    out += contextAttributeResponseVector.render(asJsonObject, requestType);
+    out += contextAttributeResponseVector.toJsonV1(asJsonObject, requestType);
   }
 
   out += endTag();
@@ -103,7 +103,7 @@ std::string UpdateContextElementResponse::check
     return "OK";
   }
 
-  return render(asJsonObject, requestType);
+  return toJsonV1(asJsonObject, requestType);
 }
 
 

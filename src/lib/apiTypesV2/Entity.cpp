@@ -239,8 +239,8 @@ std::string Entity::toJsonV1
   filterAndOrderAttrs(attrsFilter, blacklist, &orderedAttrs);
 
   EntityId en(id, type, isPattern);
-  out += en.render(contextAttributeVectorRendered, false);
-  out += attributeVector.render(asJsonObject, requestType, orderedAttrs, metadataFilter, false, omitAttributeValues);
+  out += en.toJsonV1(contextAttributeVectorRendered, false);
+  out += attributeVector.toJsonV1(asJsonObject, requestType, orderedAttrs, metadataFilter, false, omitAttributeValues);
 
   out += endTag(comma, false);
 

@@ -33,14 +33,14 @@
 
 /* ****************************************************************************
 *
-* UnsubscribeContextRequest::render - 
+* UnsubscribeContextRequest::toJsonV1 -
 */
-std::string UnsubscribeContextRequest::render(void)
+std::string UnsubscribeContextRequest::toJsonV1(void)
 {
   std::string out = "";
 
   out += startTag();
-  out += subscriptionId.render(UnsubscribeContext, false);
+  out += subscriptionId.toJsonV1(UnsubscribeContext, false);
   out += endTag();
 
   return out;
@@ -60,7 +60,7 @@ std::string UnsubscribeContextRequest::check()
   if ((res = subscriptionId.check()) != "OK")
   {
      response.statusCode.fill(SccBadRequest, std::string("Invalid Subscription Id: /") + subscriptionId.get() + "/: " + res);
-     return response.render();
+     return response.toJsonV1();
   }
 
   return "OK";

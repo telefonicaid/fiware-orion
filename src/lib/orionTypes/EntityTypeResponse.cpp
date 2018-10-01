@@ -42,21 +42,21 @@
 
 /* ****************************************************************************
 *
-* EntityTypeResponse::render -
+* EntityTypeResponse::toJsonV1 -
 */
-std::string EntityTypeResponse::render
+std::string EntityTypeResponse::toJsonV1
 (
-  bool                asJsonObject,
-  bool                asJsonOut,
-  bool                collapsed
+  bool  asJsonObject,
+  bool  asJsonOut,
+  bool  collapsed
 )
 {
   std::string out = "";
 
   out += startTag();
 
-  out += entityType.render(asJsonObject, asJsonOut, collapsed, true, true);
-  out += statusCode.render(false);
+  out += entityType.toJsonV1(asJsonObject, asJsonOut, collapsed, true, true);
+  out += statusCode.toJsonV1(false);
 
   out += endTag();
 
@@ -92,7 +92,7 @@ std::string EntityTypeResponse::check
   else
     return "OK";
 
-  return render(asJsonObject, asJsonOut, collapsed);
+  return toJsonV1(asJsonObject, asJsonOut, collapsed);
 }
 
 

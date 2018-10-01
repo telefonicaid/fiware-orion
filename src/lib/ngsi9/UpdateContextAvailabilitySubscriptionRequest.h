@@ -54,7 +54,7 @@ typedef struct UpdateContextAvailabilitySubscriptionRequest
 
   UpdateContextAvailabilitySubscriptionRequest();
 
-  std::string     render(void);
+  std::string     toJsonV1(void);
   std::string     check(const std::string& predetectedError, int counter);
   void            release(void);
 } UpdateContextAvailabilitySubscriptionRequest;

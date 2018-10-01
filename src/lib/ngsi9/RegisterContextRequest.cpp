@@ -40,9 +40,9 @@
 
 /* ****************************************************************************
 *
-* RegisterContextRequest::render -
+* RegisterContextRequest::toJsonV1 -
 */
-std::string RegisterContextRequest::render(void)
+std::string RegisterContextRequest::toJsonV1(void)
 {
   std::string  out                                 = "";
   bool         durationRendered                    = duration.get() != "";
@@ -53,9 +53,9 @@ std::string RegisterContextRequest::render(void)
 
   out += startTag();
 
-  out += contextRegistrationVector.render(      commaAfterContextRegistrationVector);
-  out += duration.render(                       commaAfterDuration);
-  out += registrationId.render(RegisterContext, commaAfterRegistrationId);
+  out += contextRegistrationVector.toJsonV1(      commaAfterContextRegistrationVector);
+  out += duration.toJsonV1(                       commaAfterDuration);
+  out += registrationId.toJsonV1(RegisterContext, commaAfterRegistrationId);
 
   out += endTag(false);
 
@@ -95,7 +95,7 @@ std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::stri
     return "OK";
   }
 
-  return response.render();
+  return response.toJsonV1();
 }
 
 
