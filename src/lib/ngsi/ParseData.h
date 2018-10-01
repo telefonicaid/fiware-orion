@@ -252,9 +252,9 @@ struct UpdateContextAvailabilitySubscriptionData
 */
 struct UpdateContextData
 {
-  UpdateContextData(): ceP(NULL), entityIdP(NULL), attributeP(NULL), contextMetadataP(NULL) {}
+  UpdateContextData(): eP(NULL), entityIdP(NULL), attributeP(NULL), contextMetadataP(NULL) {}
   UpdateContextRequest   res;
-  ContextElement*        ceP;
+  Entity*                eP;
   EntityId*              entityIdP;
   ContextAttribute*      attributeP;
   Metadata*              contextMetadataP;

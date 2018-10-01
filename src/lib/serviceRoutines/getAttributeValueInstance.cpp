@@ -125,15 +125,15 @@ std::string getAttributeValueInstance
     // mongoQueryContext() (although breaking the design principle about mongo*() functions follow the NGSI
     // standard). To think about ...
     //
-    for (unsigned int i = 0; i < cerP->contextElement.contextAttributeVector.size(); i++)
+    for (unsigned int i = 0; i < cerP->entity.attributeVector.size(); i++)
     {
-      if (cerP->contextElement.contextAttributeVector[i]->getId() == metaIdValue)
+      if (cerP->entity.attributeVector[i]->getId() == metaIdValue)
       {
-        response.contextAttributeVector.push_back(cerP->contextElement.contextAttributeVector[i]);
+        response.contextAttributeVector.push_back(cerP->entity.attributeVector[i]);
       }
     }
 
-    if (cerP->contextElement.contextAttributeVector.size() > 0 && response.contextAttributeVector.size() == 0)
+    if (cerP->entity.attributeVector.size() > 0 && response.contextAttributeVector.size() == 0)
     {
       response.statusCode.fill(SccContextElementNotFound,
                                std::string("Attribute-ValueID pair: /") + attributeName + "-" + metaIdValue + "/");

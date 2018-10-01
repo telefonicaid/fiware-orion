@@ -63,7 +63,7 @@ TEST(QueryContextResponse, json_render)
   // 1. ContextElement: +entityId -contextAttributeVector
   cerP = new ContextElementResponse();
 
-  cerP->contextElement.entityId.fill("E01", "EType", "false");
+  cerP->entity.fill("E01", "EType", "false");
   cerP->statusCode.fill(SccOk);
   qcrP->contextElementResponseVector.push_back(cerP);
 
@@ -81,7 +81,7 @@ TEST(QueryContextResponse, json_render)
 
   // 3. ContextElement: +entityId +contextAttributeVector
   caP = new ContextAttribute("ca", "string", "a context attribute");
-  cerP->contextElement.contextAttributeVector.push_back(caP);
+  cerP->entity.attributeVector.push_back(caP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
   out = qcrP->render(false);
@@ -97,7 +97,7 @@ TEST(QueryContextResponse, json_render)
 
 
   // 5. ContextElement: +entityId -contextAttributeVector
-  cerP->contextElement.contextAttributeVector.release();
+  cerP->entity.attributeVector.release();
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename5)) << "Error getting test data from '" << filename5 << "'";
   out = qcrP->render(false);
@@ -114,7 +114,7 @@ TEST(QueryContextResponse, json_render)
 
   // 7. ContextElement: +entityId +contextAttributeVector
   caP = new ContextAttribute("ca7", "string", "context attribute 7");
-  cerP->contextElement.contextAttributeVector.push_back(caP);
+  cerP->entity.attributeVector.push_back(caP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename7)) << "Error getting test data from '" << filename7 << "'";
   out = qcrP->render(false);
@@ -131,7 +131,7 @@ TEST(QueryContextResponse, json_render)
 
   // 9. ContextElement: contextAttributeVector of two attributes
   caP = new ContextAttribute("ca9", "string", "context attribute 9");
-  cerP->contextElement.contextAttributeVector.push_back(caP);
+  cerP->entity.attributeVector.push_back(caP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename9)) << "Error getting test data from '" << filename9 << "'";
   out = qcrP->render(false);
@@ -142,7 +142,7 @@ TEST(QueryContextResponse, json_render)
   // 10. QueryContextResponse::contextElementResponseVector of TWO responses
   cerP = new ContextElementResponse();
 
-  cerP->contextElement.entityId.fill("E02", "EType", "false");
+  cerP->entity.fill("E02", "EType", "false");
   cerP->statusCode.fill(SccOk);
   qcrP->contextElementResponseVector.push_back(cerP);
 

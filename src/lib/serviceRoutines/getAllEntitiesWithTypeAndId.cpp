@@ -133,10 +133,13 @@ std::string getAllEntitiesWithTypeAndId
     response.statusCode.details = "entityId::type/attribute::name pair not found";
   }
 
-
   // 06. Translate QueryContextResponse to ContextElementResponse
+
+  // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
+  std::vector<std::string> emptyV;
+
   response.fill(&parseDataP->qcrs.res, entityId, entityType);
-  TIMED_RENDER(answer = response.render(asJsonObject, RtContextElementResponse));
+  TIMED_RENDER(answer = response.render(asJsonObject, RtContextElementResponse, emptyV, false, emptyV));
 
   // 07. Cleanup and return result
   parseDataP->qcr.res.release();

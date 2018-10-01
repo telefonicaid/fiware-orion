@@ -43,9 +43,9 @@
 /* Some useful macros to avoid to long and verbose lines in asserts */
 #define RES_CNTX_REG(i)         res.responseVector[i]->contextRegistration
 #define RES_CNTX_REG_ATTR(i, j) res.responseVector[i]->contextRegistration.contextRegistrationAttributeVector[j]
-#define RES_CER(i)              res.contextElementResponseVector[i]->contextElement
+#define RES_CER(i)              res.contextElementResponseVector[i]->entity
 #define RES_CER_STATUS(i)       res.contextElementResponseVector[i]->statusCode
-#define RES_CER_ATTR(i, j)      res.contextElementResponseVector[i]->contextElement.contextAttributeVector[j]
+#define RES_CER_ATTR(i, j)      res.contextElementResponseVector[i]->entity.attributeVector[j]
 
 #define C_STR_FIELD(b, f)       getStringField(b, f).c_str()
 

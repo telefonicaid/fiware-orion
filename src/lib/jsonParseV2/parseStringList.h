@@ -43,7 +43,8 @@ extern std::string parseStringList
   ConnectionInfo*                               ciP,
   const rapidjson::Value::ConstMemberIterator&  iter,
   StringList*                                   sP,
-  const std::string&                            fieldName
+  const std::string&                            fieldName,
+  bool                                          unique = false
 );
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSESTRINGLIST_H_

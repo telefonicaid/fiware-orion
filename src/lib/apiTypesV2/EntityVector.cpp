@@ -46,8 +46,10 @@
 */
 std::string EntityVector::render
 (
-  std::map<std::string, bool>&         uriParamOptions,
-  std::map<std::string, std::string>&  uriParam
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter
 )
 {
   if (vec.size() == 0)
@@ -57,11 +59,11 @@ std::string EntityVector::render
 
   std::string out;
 
-  out += "[" + vec[0]->render(uriParamOptions, uriParam);
+  out += "[" + vec[0]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
 
   for (unsigned int ix = 1; ix < vec.size(); ++ix)
   {
-    out += "," + vec[ix]->render(uriParamOptions, uriParam);
+    out += "," + vec[ix]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
   }
 
   out += "]";
@@ -81,7 +83,7 @@ std::string EntityVector::check(RequestType requestType)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType)) != "OK")
+    if ((res = vec[ix]->check(V2, requestType)) != "OK")
     {
       alarmMgr.badInput(clientIp, "invalid vector of Entity");
       return res;

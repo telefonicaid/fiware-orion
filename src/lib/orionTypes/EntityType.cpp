@@ -79,10 +79,14 @@ std::string EntityType::render
 {
   std::string  out = "";
 
+  // No metadata filter in this case, an empty vector is used to fulfil method signature.
+  // For attribute filter, we use the ContextAttributeVector itself
+  std::vector<std::string> emptyMdV;
+
   if (typeNameBefore && asJsonOut)
   {
     out += valueTag("name", type, true);
-    out += contextAttributeVector.render(asJsonObject, EntityTypes, true, true, true);
+    out += contextAttributeVector.render(asJsonObject, EntityTypes, contextAttributeVector.vec, emptyMdV, true, true, true);
   }
   else
   {
@@ -95,7 +99,7 @@ std::string EntityType::render
     else
     {
       out += valueTag("name", type, true);
-      out += contextAttributeVector.render(asJsonObject, EntityTypes, false, true, true);
+      out += contextAttributeVector.render(asJsonObject, EntityTypes, contextAttributeVector.vec, emptyMdV, false, true, true);
     }
 
     out += endTag(comma, false);

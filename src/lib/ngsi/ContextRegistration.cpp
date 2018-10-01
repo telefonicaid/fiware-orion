@@ -65,7 +65,7 @@ std::string ContextRegistration::render(bool comma, bool isInVector)
   out += startTag(!isInVector? "contextRegistration" : "");
   out += entityIdVector.render(true);
   out += contextRegistrationAttributeVector.render(true);
-  out += registrationMetadataVector.render(true);
+  //out += registrationMetadataVector.render(true);  // FIXME #1298: remove registration metadata stuff
   out += providingApplication.render(false);
   out += endTag(comma);
 

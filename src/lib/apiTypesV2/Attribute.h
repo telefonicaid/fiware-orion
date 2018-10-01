@@ -54,14 +54,16 @@ class Attribute
   OrionError         oe;                    // Optional - mandatory if not 200-OK
 
   Attribute(): pcontextAttribute(0) {}
-  std::string  render(bool                acceptedTextPlain,
-                      bool                acceptedJson,
-                      MimeType            outFormatSelection,
-                      MimeType*           outMimeTypeP,
-                      HttpStatusCode*     scP,
-                      bool                keyValues,
-                      const std::string&  metadataList,
-                      RequestType         requestType);
+
+  std::string  render(bool                             acceptedTextPlain,
+                      bool                             acceptedJson,
+                      MimeType                         outFormatSelection,
+                      MimeType*                        outMimeTypeP,
+                      HttpStatusCode*                  scP,
+                      bool                             keyValues,
+                      const std::vector<std::string>&  metadataFilter,
+                      RequestType                      requestType);
+
   void         fill(QueryContextResponse* qcrsP, std::string attrName);
 };
 

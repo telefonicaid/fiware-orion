@@ -207,6 +207,16 @@ def bad_response():
     r.data = '{"name":"ENTITY_NOT_FOUND","message":"The entity with the requested id [qa_name_01] was not found."}'
     return r
 
+# From https://stackoverflow.com/questions/14902299/json-loads-allows-duplicate-keys-in-a-dictionary-overwriting-the-first-value
+def dict_raise_on_duplicates(ordered_pairs):
+    """Reject duplicate keys."""
+    d = {}
+    for k, v in ordered_pairs:
+        if k in d:
+           raise ValueError("duplicate key: %r" % (k,))
+        else:
+           d[k] = v
+    return d
 
 def record_request(request):
     """
@@ -262,9 +272,12 @@ def record_request(request):
     if ((request.data is not None) and (len(request.data) != 0)):
         s += '\n'
         if pretty == True:
-            raw = json.loads(request.data)
-            s += json.dumps(raw, indent=4, sort_keys=True)
-            s += '\n'
+            try:
+                raw = json.loads(request.data, object_pairs_hook=dict_raise_on_duplicates)
+                s += json.dumps(raw, indent=4, sort_keys=True)
+                s += '\n'
+            except ValueError as e:
+                s += str(e)
         else:
             s += request.data
 

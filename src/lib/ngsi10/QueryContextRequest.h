@@ -49,9 +49,9 @@ class BatchQuery;
 */
 typedef struct QueryContextRequest
 {
-  EntityIdVector    entityIdVector; // Mandatory
-  StringList        attributeList;  // Optional
-  Restriction       restriction;    // Optional
+  EntityIdVector    entityIdVector;  // Mandatory
+  StringList        attributeList;   // Optional
+  Restriction       restriction;     // Optional
 
   int               restrictions;
   StringList        metadataList;     // From URI param 'metadata'

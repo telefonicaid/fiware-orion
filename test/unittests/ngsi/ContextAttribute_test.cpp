@@ -102,7 +102,9 @@ TEST(ContextAttribute, render)
 
   utInit();
 
-  out = caP->render(false, UpdateContext, false);
+  std::vector<std::string> emptyMdV;
+
+  out = caP->render(false, UpdateContext, emptyMdV, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

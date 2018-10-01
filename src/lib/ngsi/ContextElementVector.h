@@ -28,8 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "ngsi/ContextElement.h"
-
+#include "apiTypesV2/Entity.h"
 
 
 /* ****************************************************************************
@@ -38,14 +37,17 @@
 */
 typedef struct ContextElementVector
 {
-  std::vector<ContextElement*>  vec;
+  // FIXME #1298: the name of this class is no longer meaninfull, as the class now contains
+  // a vector of Entity*, not ContextElement*. Rename (maybe a good name would be EntityVector)
+  // In general we have some other "ContextElementSomething". Do a global search in the code
+  std::vector<Entity*>  vec;
 
-  void             push_back(ContextElement* item);
+  void             push_back(Entity* item);
   unsigned int     size(void);
   std::string      render(bool asJsonObject, RequestType requestType,bool comma);
   void             release(void);
-  ContextElement*  lookup(EntityId* eP);
-  ContextElement*  operator[](unsigned int ix) const;
+  Entity*          lookup(Entity* eP);
+  Entity*          operator[](unsigned int ix) const;
 
   std::string      check(ApiVersion apiVersion, RequestType requestType);
 } ContextElementVector;

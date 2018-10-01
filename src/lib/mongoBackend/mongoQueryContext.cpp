@@ -93,19 +93,18 @@ static void addContextProviderEntity
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
-    if ((cerV[ix]->contextElement.entityId.id == enP->id) && (cerV[ix]->contextElement.entityId.type == enP->type))
+    if ((cerV[ix]->entity.id == enP->id) && (cerV[ix]->entity.type == enP->type))
     {
-      cerV[ix]->contextElement.providingApplicationList.push_back(pa);
+      cerV[ix]->entity.providingApplicationList.push_back(pa);
       return;    /* by construction, no more than one CER with the same entity information should exist in the CERV) */
     }
   }
 
   /* Reached this point, it means that the cerV doesn't contain a proper CER, so we create it */
-  ContextElementResponse* cerP            = new ContextElementResponse();
-  cerP->contextElement.entityId.id        = enP->id;
-  cerP->contextElement.entityId.type      = enP->type;
-  cerP->contextElement.entityId.isPattern = "false";
-  cerP->contextElement.providingApplicationList.push_back(pa);
+  ContextElementResponse* cerP = new ContextElementResponse();
+
+  cerP->entity.fill(enP->id, enP->type, "false");
+  cerP->entity.providingApplicationList.push_back(pa);
 
   cerP->statusCode.fill(SccOk);
   cerV.push_back(cerP);
@@ -131,14 +130,14 @@ static void addContextProviderAttribute
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
-    if ((cerV[ix]->contextElement.entityId.id != enP->id) || (cerV[ix]->contextElement.entityId.type != enP->type))
+    if ((cerV[ix]->entity.id != enP->id) || (cerV[ix]->entity.type != enP->type))
     {
      continue;
     }
 
-    for (unsigned int jx = 0; jx < cerV[ix]->contextElement.contextAttributeVector.size(); ++jx)
+    for (unsigned int jx = 0; jx < cerV[ix]->entity.attributeVector.size(); ++jx)
     {
-      std::string attrName = cerV[ix]->contextElement.contextAttributeVector[jx]->name;
+      std::string attrName = cerV[ix]->entity.attributeVector[jx]->name;
 
       if (attrName == craP->name)
       {
@@ -151,7 +150,7 @@ static void addContextProviderAttribute
     ContextAttribute* caP = new ContextAttribute(craP->name, "", "");
 
     caP->providingApplication = pa;
-    cerV[ix]->contextElement.contextAttributeVector.push_back(caP);
+    cerV[ix]->entity.attributeVector.push_back(caP);
 
     return;
   }
@@ -161,16 +160,13 @@ static void addContextProviderAttribute
     /* Reached this point, it means that the cerV doesn't contain a proper CER, so we create it */
     ContextElementResponse* cerP            = new ContextElementResponse();
 
-    cerP->contextElement.entityId.id        = enP->id;
-    cerP->contextElement.entityId.type      = enP->type;
-    cerP->contextElement.entityId.isPattern = "false";
-
+    cerP->entity.fill(enP->id, enP->type, "false");
     cerP->statusCode.fill(SccOk);
 
     ContextAttribute* caP = new ContextAttribute(craP->name, "", "");
 
     caP->providingApplication = pa;
-    cerP->contextElement.contextAttributeVector.push_back(caP);
+    cerP->entity.attributeVector.push_back(caP);
 
     cerV.push_back(cerP);
   }
@@ -336,35 +332,9 @@ HttpStatusCode mongoQueryContext
   bool                         reqSemTaken;
   ContextElementResponseVector rawCerV;
 
-  //
-  // dateCreated and dateModified options are still supported although deprecated.
-  // Note that we check for attr list emptyness, as in that case the "*" needs
-  // to be added to print also user attributes
-  //
-  if (options[DATE_CREATED])
-  {
-    if (requestP->attributeList.size() == 0)
-    {
-      requestP->attributeList.push_back(ALL_ATTRS);
-    }
-
-    requestP->attributeList.push_back(DATE_CREATED);
-  }
-
-  if (options[DATE_MODIFIED])
-  {
-    if (requestP->attributeList.size() == 0)
-    {
-      requestP->attributeList.push_back(ALL_ATTRS);
-    }
-
-    requestP->attributeList.push_back(DATE_MODIFIED);
-  }
-
   reqSemTake(__FUNCTION__, "ngsi10 query request", SemReadOp, &reqSemTaken);
   ok = entitiesQuery(requestP->entityIdVector,
                      requestP->attributeList,
-                     requestP->metadataList,
                      requestP->restriction,
                      &rawCerV,
                      &err,

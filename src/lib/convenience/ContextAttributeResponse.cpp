@@ -50,8 +50,12 @@ std::string ContextAttributeResponse::render
 {
   std::string out = "";
 
+  // No metadata filter in this case, an empty vector is used to fulfil method signature.
+  // For attribute filter, we use the ContextAttributeVector itself
+  std::vector<std::string> emptyMdV;
+
   out += startTag();
-  out += contextAttributeVector.render(asJsonObject, request, true);
+  out += contextAttributeVector.render(asJsonObject, request, contextAttributeVector.vec, emptyMdV, true);
   out += statusCode.render(false);
   out += endTag();
 
@@ -118,9 +122,9 @@ void ContextAttributeResponse::release(void)
 *
 * fill - 
 */
-void ContextAttributeResponse::fill(ContextAttributeVector* _cavP, const StatusCode& _statusCode)
+void ContextAttributeResponse::fill(const ContextAttributeVector& caV, const StatusCode& _statusCode)
 {
-  contextAttributeVector.fill(_cavP);
+  contextAttributeVector.fill(caV);
   statusCode.fill(_statusCode);
 }
 
@@ -187,9 +191,9 @@ void ContextAttributeResponse::fill
   //
   if (metaID != "")
   {
-    for (unsigned int aIx = 0; aIx < qcrP->contextElementResponseVector[0]->contextElement.contextAttributeVector.size(); ++aIx)
+    for (unsigned int aIx = 0; aIx < qcrP->contextElementResponseVector[0]->entity.attributeVector.size(); ++aIx)
     {
-      ContextAttribute* caP  = qcrP->contextElementResponseVector[0]->contextElement.contextAttributeVector[aIx];
+      ContextAttribute* caP  = qcrP->contextElementResponseVector[0]->entity.attributeVector[aIx];
       Metadata*         mP   = caP->metadataVector.lookupByName("ID");
 
       if ((mP == NULL) || (mP->stringValue != metaID))
@@ -207,7 +211,7 @@ void ContextAttributeResponse::fill
   }
   else
   {
-    contextAttributeVector.fill(&qcrP->contextElementResponseVector[0]->contextElement.contextAttributeVector);
+    contextAttributeVector.fill(qcrP->contextElementResponseVector[0]->entity.attributeVector);
   }
 
   if ((statusCode.code == SccNone) || (statusCode.code == SccOk))

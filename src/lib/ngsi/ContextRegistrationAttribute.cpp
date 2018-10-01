@@ -81,8 +81,8 @@ std::string ContextRegistrationAttribute::render(bool comma)
   out += startTag();
   out += valueTag("name",     name, true);
   out += valueTag("type",     type, true);
-  out += valueTag("isDomain", isDomain, metadataVector.size() != 0);
-  out += metadataVector.render(false);
+  out += valueTag("isDomain", isDomain, false /*metadataVector.size() != 0*/);  // FIXME #1298 remove isDomain stuff
+  //out += metadataVector.render(false); // FIXME #1298 remove registration metadata stuff
   out += endTag(comma);
 
   return out;

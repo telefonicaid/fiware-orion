@@ -71,6 +71,7 @@ Metadata::Metadata()
   valueType       = orion::ValueTypeNotGiven;
   typeGiven       = false;
   compoundValueP  = NULL;
+  shadowed        = false;
 }
 
 
@@ -91,6 +92,7 @@ Metadata::Metadata(Metadata* mP, bool useDefaultType)
   boolValue       = mP->boolValue;
   typeGiven       = mP->typeGiven;
   compoundValueP  = (mP->compoundValueP != NULL)? mP->compoundValueP->clone() : NULL;
+  shadowed        = mP->shadowed;
 
   if (useDefaultType && !typeGiven)
   {
@@ -119,6 +121,7 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const cha
   stringValue     = std::string(_value);
   typeGiven       = false;
   compoundValueP  = NULL;
+  shadowed        = false;
 }
 
 
@@ -135,6 +138,7 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const std
   stringValue     = _value;
   typeGiven       = false;
   compoundValueP  = NULL;
+  shadowed        = false;
 }
 
 
@@ -151,6 +155,7 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, double _v
   numberValue     = _value;
   typeGiven       = false;
   compoundValueP  = NULL;
+  shadowed        = false;
 }
 
 
@@ -167,6 +172,7 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, bool _val
   boolValue       = _value;
   typeGiven       = false;
   compoundValueP  = NULL;
+  shadowed        = false;
 }
 
 
@@ -181,6 +187,7 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
   type            = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringFieldF(mdB, ENT_ATTRS_MD_TYPE) : "";
   typeGiven       = (type == "")? false : true;
   compoundValueP  = NULL;
+  shadowed        = false;
 
   BSONType bsonType = getFieldF(mdB, ENT_ATTRS_MD_VALUE).type();
   switch (bsonType)

@@ -109,13 +109,17 @@ std::string getIndividualContextEntity
   // 4. If 404 Not Found - enter request entity data into response context element
   if (response.statusCode.code == SccContextElementNotFound)
   {
-    response.contextElement.entityId.fill(entityId, entityType, "false");
+    response.entity.fill(entityId, entityType, "false");
     response.statusCode.details = "Entity id: /" + entityId + "/";
   }
 
 
   // 5. Render the ContextElementResponse
-  TIMED_RENDER(answer = response.render(asJsonObject, IndividualContextEntity));
+
+  // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
+  std::vector<std::string> emptyV;
+
+  TIMED_RENDER(answer = response.render(asJsonObject, IndividualContextEntity, emptyV, false, emptyV));
 
 
   // 6. Cleanup and return result

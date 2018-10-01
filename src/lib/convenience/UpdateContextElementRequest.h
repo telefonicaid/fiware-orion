@@ -41,7 +41,7 @@ typedef struct UpdateContextElementRequest
 {
   ContextAttributeVector     contextAttributeVector;     // Optional
 
-  std::string  render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType);
+  std::string  render(bool asJsonObject, RequestType requestType);
   void         release(void);
   std::string  check(ApiVersion          apiVersion,
                      bool                asJsonObject,

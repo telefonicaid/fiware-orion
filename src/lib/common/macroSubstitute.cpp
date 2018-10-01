@@ -25,7 +25,6 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
-#include "ngsi/ContextElement.h"
 
 #include "common/string.h"
 #include "common/limits.h"
@@ -117,7 +116,7 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
 *   Date:   Mon Jun 19 16:33:29 2017 +0200
 *
 */
-bool macroSubstitute(std::string* to, const std::string& from, const ContextElement& ce)
+bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
 {
   // Initial size check: is the string to convert too big?
   //
@@ -183,17 +182,17 @@ bool macroSubstitute(std::string* to, const std::string& from, const ContextElem
 
     if (macroName == "id")
     {
-      toAdd += ce.entityId.id.length() * times;
+      toAdd += en.id.length() * times;
     }
     else if (macroName == "type")
     {
-      toAdd += ce.entityId.type.length() * times;
+      toAdd += en.type.length() * times;
     }
     else
     {
       std::string value;
 
-      attributeValue(&value, ce.contextAttributeVector.vec, macroName.c_str());
+      attributeValue(&value, en.attributeVector.vec, macroName.c_str());
       toAdd += value.length() * times;
     }
   }
@@ -217,15 +216,15 @@ bool macroSubstitute(std::string* to, const std::string& from, const ContextElem
 
     if (macroName == "id")
     {
-      value = ce.entityId.id;
+      value = en.id;
     }
     else if (macroName == "type")
     {
-      value = ce.entityId.type;
+      value = en.type;
     }
     else
     {
-      attributeValue(&value, ce.contextAttributeVector.vec, macroName.c_str());
+      attributeValue(&value, en.attributeVector.vec, macroName.c_str());
     }
 
     // We have to do the replace operation as many times as macro occurrences

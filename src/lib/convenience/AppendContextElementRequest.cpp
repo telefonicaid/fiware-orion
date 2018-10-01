@@ -50,7 +50,6 @@ AppendContextElementRequest::AppendContextElementRequest()
 */
 std::string AppendContextElementRequest::render
 (
-  ApiVersion   apiVersion,
   bool         asJsonObject,
   RequestType  requestType
 )
@@ -64,7 +63,11 @@ std::string AppendContextElementRequest::render
     out += entity.render(false);
   }
 
-  out += contextAttributeVector.render(asJsonObject, requestType);
+  // No metadata filter in this case, an empty vector is used to fulfil method signature.
+  // For attribute filter, we use the ContextAttributeVector itself
+  std::vector<std::string> emptyMdV;
+
+  out += contextAttributeVector.render(asJsonObject, requestType, contextAttributeVector.vec, emptyMdV);
   out += endTag();
 
   return out;
@@ -101,7 +104,7 @@ std::string AppendContextElementRequest::check
     return "OK";
   }
 
-  return response.render(apiVersion, asJsonObject, requestType);
+  return response.render(asJsonObject, requestType);
 }
 
 

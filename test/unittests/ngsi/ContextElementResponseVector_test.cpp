@@ -46,9 +46,9 @@ TEST(ContextElementResponseVector, check)
   out = cerv.check(V1, UpdateContext, "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
-  cer.contextElement.entityId.id         = "ID";
-  cer.contextElement.entityId.type       = "Type";
-  cer.contextElement.entityId.isPattern  = "false";
+  cer.entity.id         = "ID";
+  cer.entity.type       = "Type";
+  cer.entity.isPattern  = "false";
   cer.statusCode.fill(SccOk, "details");
 
   cerv.push_back(&cer);
@@ -73,12 +73,15 @@ TEST(ContextElementResponseVector, render)
 
   utInit();
 
-  out = cerv.render(false, UpdateContextElement, "");
+  std::vector<std::string> emptyV;
+
+  // FIXME P2: "" is string, function signature says bool..
+  out = cerv.render(false, UpdateContextElement, emptyV, false, emptyV, "");
   EXPECT_STREQ("", out.c_str());
 
-  cer.contextElement.entityId.id         = "ID";
-  cer.contextElement.entityId.type       = "Type";
-  cer.contextElement.entityId.isPattern  = "false";
+  cer.entity.id         = "ID";
+  cer.entity.type       = "Type";
+  cer.entity.isPattern  = "false";
   cer.statusCode.fill(SccOk, "details");
 
   utExit();

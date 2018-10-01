@@ -47,13 +47,13 @@
 static std::string contextElement(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("new contextElement"));
-  reqDataP->upcr.ceP = new ContextElement();
+  reqDataP->upcr.eP = new Entity();
 
-  reqDataP->upcr.res.contextElementVector.push_back(reqDataP->upcr.ceP);
+  reqDataP->upcr.res.contextElementVector.push_back(reqDataP->upcr.eP);
 
-  reqDataP->upcr.ceP->entityId.id          = "";
-  reqDataP->upcr.ceP->entityId.type        = "";
-  reqDataP->upcr.ceP->entityId.isPattern   = "false";
+  reqDataP->upcr.eP->id          = "";
+  reqDataP->upcr.eP->type        = "";
+  reqDataP->upcr.eP->isPattern   = "false";
 
   return "OK";
 }
@@ -66,8 +66,8 @@ static std::string contextElement(const std::string& path, const std::string& va
 */
 static std::string entityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  reqDataP->upcr.ceP->entityId.id = value;
-  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->upcr.ceP->entityId.id.c_str()));
+  reqDataP->upcr.eP->id = value;
+  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->upcr.eP->id.c_str()));
 
   return "OK";
 }
@@ -80,8 +80,8 @@ static std::string entityIdId(const std::string& path, const std::string& value,
 */
 static std::string entityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  reqDataP->upcr.ceP->entityId.type = value;
-  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->upcr.ceP->entityId.type.c_str()));
+  reqDataP->upcr.eP->type = value;
+  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->upcr.eP->type.c_str()));
 
   return "OK";
 }
@@ -96,7 +96,7 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
 {
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
 
-  reqDataP->upcr.ceP->entityId.isPattern = value;
+  reqDataP->upcr.eP->isPattern = value;
 
   return "OK";
 }
@@ -113,7 +113,7 @@ static std::string attribute(const std::string& path, const std::string& value, 
 
   reqDataP->upcr.attributeP = new ContextAttribute("", "", "");
   reqDataP->upcr.attributeP->valueType = orion::ValueTypeNotGiven;
-  reqDataP->upcr.ceP->contextAttributeVector.push_back(reqDataP->upcr.attributeP);
+  reqDataP->upcr.eP->attributeVector.push_back(reqDataP->upcr.attributeP);
 
   return "OK";
 }
@@ -272,7 +272,7 @@ JsonNode jsonUpcrParseVector[] =
 */
 void jsonUpcrInit(ParseData* reqDataP)
 {
-  reqDataP->upcr.ceP                    = NULL;
+  reqDataP->upcr.eP                     = NULL;
   reqDataP->upcr.attributeP             = NULL;
   reqDataP->upcr.contextMetadataP       = NULL;
   reqDataP->errorString                 = "";

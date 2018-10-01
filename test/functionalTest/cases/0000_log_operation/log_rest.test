@@ -47,7 +47,7 @@ echo
 
 
 echo "=== 4. POST trace level"
-orionCurl --url "/log/traceLevel/101-102,105" -X "POST" --include 2> /dev/null
+orionCurl --url "/log/traceLevel/101-102,105" -X "POST" 2> /dev/null
 echo
 echo
 
@@ -133,7 +133,6 @@ Content-Length: 0
 Allow: PUT, DELETE
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
-
 
 
 

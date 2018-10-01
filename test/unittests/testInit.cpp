@@ -232,22 +232,24 @@ static bool equalContextElementResponseVector
       ContextElementResponse* cerArg      = cerArgV[ix];
       ContextElementResponse* cerExpected = cerExpectedV[jx];
 
-      if (!equalEntity(cerExpected->contextElement.entityId, cerArg->contextElement.entityId))
+      EntityId enExpected(cerExpected->entity.id, cerExpected->entity.type);
+      EntityId enArg(cerArg->entity.id, cerArg->entity.type);
+
+      if (!equalEntity(enExpected, enArg))
       {
         LM_M(("entity doesn't match in ContextElementResponseVector comparison, continue ..."));
         continue; /* loop in jx */
       }
 
       /* If there aren't attributes to check, then early exits the loop */
-      if (cerExpected->contextElement.contextAttributeVector.size() == 0)
+      if (cerExpected->entity.attributeVector.size() == 0)
       {
         LM_M(("entity (without attributes) matches in ContextElementResponseVector comparison, check next one..."));
         entityMatch = true;
         break; /* loop in jx */
       }
 
-      if (equalContextAttributeVector(cerExpected->contextElement.contextAttributeVector,
-                                      cerArg->contextElement.contextAttributeVector))
+      if (equalContextAttributeVector(cerExpected->entity.attributeVector, cerArg->entity.attributeVector))
       {
         LM_M(("entity (with attributes) matches in ContextElementResponseVector comparison, check next one..."));
         entityMatch = true;
