@@ -212,8 +212,7 @@ Fields:
         reasons, **isPattern** may be `"true"` or `"false"` (text) while
         **isTypePattern** may be `true` or `false` (boolean).
     -   **attrs**: an array containing a list of attributes (optional).
-        The JSON for each attribute contains **name**, **type** and
-        **isDomain**.
+        The JSON for each attribute contains **name** and **type**.
     -   **providingApplication**: the URL of the providing application
         for this registration (mandatory)
 
@@ -241,13 +240,11 @@ Example document:
            "attrs": [
                {
                    "name": "A1",
-                   "type": "TA1",
-                   "isDomain": "false"
+                   "type": "TA1"
                },
                {
                    "name": "A2",
-                  "type": "TA2",
-                   "isDomain": "true"
+                   "type": "TA2"
                }
            ],
            "providingApplication": "http://foo.bar/notif"

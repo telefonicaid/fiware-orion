@@ -49,14 +49,14 @@ TEST(MetadataVector, render)
 
   metadataFilter.push_back(&m);
 
-  out = mV.render(metadataFilter, false);
+  out = mV.toJsonV1(metadataFilter, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   metadataFilter.push_back(&m2);
 
   mV.push_back(&m2); 
-  out = mV.render(metadataFilter, false);
+  out = mV.toJsonV1(metadataFilter, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

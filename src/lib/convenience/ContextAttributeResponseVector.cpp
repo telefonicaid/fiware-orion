@@ -36,9 +36,9 @@
 
 /* ****************************************************************************
 *
-* ContextAttributeResponseVector::render - 
+* ContextAttributeResponseVector::toJsonV1 -
 */
-std::string ContextAttributeResponseVector::render
+std::string ContextAttributeResponseVector::toJsonV1
 (
   bool         asJsonObject,
   RequestType  request
@@ -55,7 +55,7 @@ std::string ContextAttributeResponseVector::render
   out += startTag(key, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(asJsonObject, request);
+    out += vec[ix]->toJsonV1(asJsonObject, request);
   }
   out += endTag(false, true);
 

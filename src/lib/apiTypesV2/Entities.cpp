@@ -57,10 +57,10 @@ Entities::~Entities()
 
 /* ****************************************************************************
 *
-* Entities::render -
+* Entities::toJson -
 *
 */
-std::string Entities::render
+std::string Entities::toJson
 (
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
@@ -68,7 +68,7 @@ std::string Entities::render
   const std::vector<std::string>&  metadataFilter
 )
 {
-  return vec.render(renderFormat, attrsFilter, blacklist, metadataFilter);
+  return vec.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
 }
 
 

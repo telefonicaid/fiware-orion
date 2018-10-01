@@ -43,7 +43,7 @@ typedef struct NotifyContextAvailabilityResponse
   NotifyContextAvailabilityResponse();
   NotifyContextAvailabilityResponse(StatusCode& sc);
 
-  std::string   render(void);
+  std::string   toJsonV1(void);
   void          release(void);
 } NotifyContextAvailabilityResponse;
 

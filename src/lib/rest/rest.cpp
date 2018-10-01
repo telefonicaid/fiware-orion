@@ -862,7 +862,7 @@ int servicePathSplit(ConnectionInfo* ciP)
   if (servicePaths > SERVICE_PATH_MAX_COMPONENTS)
   {
     OrionError e(SccBadRequest, "too many service paths - a maximum of ten service paths is allowed");
-    ciP->answer = e.render();
+    ciP->answer = e.toJsonV1();
 
     if (servicePathCopy != NULL)
     {

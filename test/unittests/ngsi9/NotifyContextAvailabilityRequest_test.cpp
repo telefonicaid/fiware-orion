@@ -60,7 +60,7 @@ TEST(NotifyContextAvailabilityRequest, ok_json)
 
   const char*     outfile = "ngsi9.notifyContextAvailabilityRequest.ok.valid.json";
 
-  out = ncarP->render();
+  out = ncarP->toJsonV1();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -126,14 +126,13 @@ TEST(NotifyContextAvailabilityRequest, json_render)
 
   // Test 1. contextRegistrationResponseVector with ONE contextRegistrationResponse instance
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  rendered = ncarP->render();
+  rendered = ncarP->toJsonV1();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
 
   // Test 2. contextRegistrationResponseVector with TWO contextRegistrationResponse instances
-  Metadata*                     mdP   = new Metadata("M01", "MType", "123");
-  ContextRegistrationAttribute* craP  = new ContextRegistrationAttribute("CRA1", "CType", "false");
+  ContextRegistrationAttribute* craP  = new ContextRegistrationAttribute("CRA1", "CType");
 
   eidP->fill("E02", "EType", "false");
   crrP = new ContextRegistrationResponse();
@@ -142,12 +141,11 @@ TEST(NotifyContextAvailabilityRequest, json_render)
   crrP->contextRegistration.entityIdVector.push_back(eidP);
   crrP->contextRegistration.entityIdVectorPresent = true;
   crrP->contextRegistration.contextRegistrationAttributeVector.push_back(craP);
-  crrP->contextRegistration.registrationMetadataVector.push_back(mdP);
 
   crrP->contextRegistration.providingApplication.set("http://www.tid.es/NotifyContextAvailabilityRequestTest2");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  rendered = ncarP->render();
+  rendered = ncarP->toJsonV1();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   utExit();

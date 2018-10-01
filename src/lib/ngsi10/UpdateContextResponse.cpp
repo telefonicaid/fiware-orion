@@ -78,9 +78,9 @@ UpdateContextResponse::~UpdateContextResponse()
 
 /* ****************************************************************************
 *
-* UpdateContextResponse::render -
+* UpdateContextResponse::toJsonV1 -
 */
-std::string UpdateContextResponse::render(bool asJsonObject)
+std::string UpdateContextResponse::toJsonV1(bool asJsonObject)
 {
   std::string out = "";
 
@@ -88,21 +88,21 @@ std::string UpdateContextResponse::render(bool asJsonObject)
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(false);
+    out += errorCode.toJsonV1(false);
   }
   else
   {
     if (contextElementResponseVector.size() == 0)
     {
       errorCode.fill(SccContextElementNotFound, errorCode.details);
-      out += errorCode.render(false);
+      out += errorCode.toJsonV1(false);
     }
     else
     {      
       // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
       std::vector<std::string> emptyV;
 
-      out += contextElementResponseVector.render(asJsonObject, RtUpdateContextResponse, emptyV, false, emptyV, false);
+      out += contextElementResponseVector.toJsonV1(asJsonObject, RtUpdateContextResponse, emptyV, false, emptyV, false);
     }
   }
   
@@ -140,7 +140,7 @@ std::string UpdateContextResponse::check
     return "OK";
   }
 
-  return render(asJsonObject);
+  return toJsonV1(asJsonObject);
 }
 
 

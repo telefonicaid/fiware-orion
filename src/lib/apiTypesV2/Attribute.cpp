@@ -38,9 +38,9 @@
 
 /* ****************************************************************************
 *
-* Attribute::render -
+* Attribute::toJson -
 */
-std::string Attribute::render
+std::string Attribute::toJson
 (
   bool                             acceptedTextPlain,   // in parameter (pass-through)
   bool                             acceptedJson,        // in parameter (pass-through)

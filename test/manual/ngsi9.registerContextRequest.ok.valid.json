@@ -16,13 +16,11 @@
     "attributes": [
       {
         "name": "temperature",
-        "type": "centigrade",
-        "isDomain": "false"
+        "type": "centigrade"
       },
       {
         "name": "pressure",
-        "type": "mmHg",
-        "isDomain": "false"
+        "type": "mmHg"
       }
     ],
     "providingApplication": "http://mysensors.com/Rooms"

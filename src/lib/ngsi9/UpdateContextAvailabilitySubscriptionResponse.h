@@ -49,7 +49,7 @@ typedef struct UpdateContextAvailabilitySubscriptionResponse
   UpdateContextAvailabilitySubscriptionResponse(StatusCode& _errorCode);
   ~UpdateContextAvailabilitySubscriptionResponse();
 
-  std::string render(void);
+  std::string toJsonV1(void);
   std::string check(const std::string& predetectedError);
 } UpdateContextAvailabilitySubscriptionResponse;
 

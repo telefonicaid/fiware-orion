@@ -55,7 +55,7 @@ class Entities
   Entities();
   ~Entities();
 
-  std::string  render(RenderFormat                     renderFormat,
+  std::string  toJson(RenderFormat                     renderFormat,
                       const std::vector<std::string>&  attrsFilter,
                       bool                             blacklist,
                       const std::vector<std::string>&  metadataFilter);

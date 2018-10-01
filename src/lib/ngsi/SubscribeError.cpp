@@ -83,9 +83,9 @@ std::string SubscribeError::toJson(RequestType requestType, bool comma)
 
 /* ****************************************************************************
 *
-* SubscribeError::render -
+* SubscribeError::toJsonV1 -
 */
-std::string SubscribeError::render(RequestType requestType, bool comma)
+std::string SubscribeError::toJsonV1(RequestType requestType, bool comma)
 {
   std::string out = "";
 
@@ -103,16 +103,16 @@ std::string SubscribeError::render(RequestType requestType, bool comma)
     {
       subscriptionId.set("000000000000000000000000");
     }
-    out += subscriptionId.render(requestType, true);
+    out += subscriptionId.toJsonV1(requestType, true);
   }
   else if ((requestType          == SubscribeContext)           &&
            (subscriptionId.get() != "000000000000000000000000") &&
            (subscriptionId.get() != ""))
   {
-    out += subscriptionId.render(requestType, true);
+    out += subscriptionId.toJsonV1(requestType, true);
   }
 
-  out += errorCode.render(false);
+  out += errorCode.toJsonV1(false);
 
   out += endTag(comma);
 

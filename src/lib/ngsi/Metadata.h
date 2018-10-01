@@ -92,7 +92,7 @@ typedef struct Metadata
   Metadata(const std::string& _name, const mongo::BSONObj& mdB);
   ~Metadata();
 
-  std::string  render(bool comma);
+  std::string  toJsonV1(bool comma);
   std::string  toJson(void);
   void         release(void);
   void         fill(const struct Metadata& md);

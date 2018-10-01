@@ -93,7 +93,7 @@ TEST(QueryContextRequest, ok_json)
   QueryContextRequest*  qcrP = &parseData.qcr.res;
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  rendered = qcrP->render();
+  rendered = qcrP->toJsonV1();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   qcrP->release();

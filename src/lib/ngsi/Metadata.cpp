@@ -232,9 +232,9 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 
 /* ****************************************************************************
 *
-* Metadata::render -
+* Metadata::toJsonV1 -
 */
-std::string Metadata::render(bool comma)
+std::string Metadata::toJsonV1(bool comma)
 {
   std::string out     = "";
   std::string xValue  = toStringValue();

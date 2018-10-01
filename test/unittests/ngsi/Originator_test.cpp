@@ -93,12 +93,12 @@ TEST(Originator, render)
 
   utInit();
 
-  out = originator.render(false);
+  out = originator.toJsonV1(false);
   EXPECT_STREQ("", out.c_str());
 
   originator.string = "String";
 
-  out = originator.render(false);
+  out = originator.toJsonV1(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

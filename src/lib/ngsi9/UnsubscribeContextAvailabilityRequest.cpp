@@ -72,7 +72,7 @@ std::string UnsubscribeContextAvailabilityRequest::check(const std::string& pred
   else
     return "OK";
 
-  return response.render();
+  return response.toJsonV1();
 }
 
 

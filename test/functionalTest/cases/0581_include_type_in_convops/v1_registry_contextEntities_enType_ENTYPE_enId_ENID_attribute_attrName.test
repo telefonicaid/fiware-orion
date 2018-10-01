@@ -49,18 +49,6 @@ echo "02. POST /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr
 echo "==============================================================================="
 url="/v1/registry/contextEntities/entity01/attributes/attr01"
 payload='{
-  "metadatas": [
-    {
-      "name": "ID",
-      "type": "string",
-      "value": "1110"
-    },
-    {
-      "name": "cm2",
-      "type": "string",
-      "value": "XXX"
-    }
-  ],
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/abc"
 }'
@@ -79,18 +67,6 @@ echo
 echo "04. POST /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr02"
 echo "============================================================================"
 payload='{
-  "metadatas" : [
-    {
-      "name" : "ID",
-      "type" : "string",
-      "value" : "1110"
-    },
-    {
-      "name" : "cm2",
-      "type" : "string",
-      "value" : "XXX"
-    }
-  ],
   "duration" : "PT1H",
   "providingApplication" : "http://kz.tid.es/abc"
 }'
@@ -152,7 +128,7 @@ Date: REGEX(.*)
 03. GET /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr01 OK
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 232
+Content-Length: 213
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -163,7 +139,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "attr01", 
                         "type": ""
                     }
@@ -199,7 +174,7 @@ Date: REGEX(.*)
 05. GET /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr02
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 232
+Content-Length: 213
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -210,7 +185,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "attr02",
                         "type": ""
                     }

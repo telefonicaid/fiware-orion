@@ -40,9 +40,9 @@
 
 /* ****************************************************************************
 *
-* render - 
+* toJsonV1 -
 */
-std::string ContextAttributeResponse::render
+std::string ContextAttributeResponse::toJsonV1
 (
   bool         asJsonObject,
   RequestType  request
@@ -55,8 +55,8 @@ std::string ContextAttributeResponse::render
   std::vector<std::string> emptyMdV;
 
   out += startTag();
-  out += contextAttributeVector.render(asJsonObject, request, contextAttributeVector.vec, emptyMdV, true);
-  out += statusCode.render(false);
+  out += contextAttributeVector.toJsonV1(asJsonObject, request, contextAttributeVector.vec, emptyMdV, true);
+  out += statusCode.toJsonV1(false);
   out += endTag();
 
   return out;
@@ -102,7 +102,7 @@ std::string ContextAttributeResponse::check
     return "OK";
   }
 
-  return render(asJsonObject, requestType);
+  return toJsonV1(asJsonObject, requestType);
 }
 
 

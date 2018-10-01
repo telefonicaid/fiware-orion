@@ -99,7 +99,7 @@ std::string putIndividualContextEntity
 
 
   // 05. Cleanup and return result
-  TIMED_RENDER(answer = response.render(asJsonObject, IndividualContextEntity));
+  TIMED_RENDER(answer = response.toJsonV1(asJsonObject, IndividualContextEntity));
 
 
   response.release();

@@ -50,7 +50,7 @@ TEST(ContextAttributeResponse, render_json)
   car.contextAttributeVector.push_back(&ca);
   car.statusCode.fill(SccOk, "OK");
 
-  out = car.render(false, ContextEntityAttributes);
+  out = car.toJsonV1(false, ContextEntityAttributes);
 
   utExit();
 }

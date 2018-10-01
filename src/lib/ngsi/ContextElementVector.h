@@ -44,7 +44,7 @@ typedef struct ContextElementVector
 
   void             push_back(Entity* item);
   unsigned int     size(void);
-  std::string      render(bool asJsonObject, RequestType requestType,bool comma);
+  std::string      toJsonV1(bool asJsonObject, RequestType requestType,bool comma);
   void             release(void);
   Entity*          lookup(Entity* eP);
   Entity*          operator[](unsigned int ix) const;

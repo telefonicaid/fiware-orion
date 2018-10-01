@@ -139,7 +139,7 @@ std::string getAllEntitiesWithTypeAndId
   std::vector<std::string> emptyV;
 
   response.fill(&parseDataP->qcrs.res, entityId, entityType);
-  TIMED_RENDER(answer = response.render(asJsonObject, RtContextElementResponse, emptyV, false, emptyV));
+  TIMED_RENDER(answer = response.toJsonV1(asJsonObject, RtContextElementResponse, emptyV, false, emptyV));
 
   // 07. Cleanup and return result
   parseDataP->qcr.res.release();

@@ -62,9 +62,9 @@ UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, 
 
 /* ****************************************************************************
 *
-* UpdateContextRequest::render -
+* UpdateContextRequest::toJsonV1 -
 */
-std::string UpdateContextRequest::render(bool asJsonObject)
+std::string UpdateContextRequest::toJsonV1(bool asJsonObject)
 {
   std::string  out = "";
 
@@ -72,7 +72,7 @@ std::string UpdateContextRequest::render(bool asJsonObject)
   // Both fields are MANDATORY, so, comma after "contextElementVector"
   //  
   out += startTag();
-  out += contextElementVector.render(asJsonObject, UpdateContext, true);
+  out += contextElementVector.toJsonV1(asJsonObject, UpdateContext, true);
   out += valueTag("updateAction", actionTypeString(V1, updateActionType), false);
   out += endTag(false);
 
@@ -92,13 +92,13 @@ std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject
   if (predetectedError != "")
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
-    return response.render(asJsonObject);
+    return response.toJsonV1(asJsonObject);
   }
 
   if ((res = contextElementVector.check(apiVersion, UpdateContext)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
-    return response.render(asJsonObject);
+    return response.toJsonV1(asJsonObject);
   }
 
   return "OK";

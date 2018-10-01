@@ -57,7 +57,7 @@ std::string postSubscribeContextAvailability
                                                                       ciP->uriParam,
                                                                       ciP->httpHeaders.correlator,
                                                                       ciP->tenant));
-  TIMED_RENDER(answer = scar.render());
+  TIMED_RENDER(answer = scar.toJsonV1());
 
   return answer;
 }

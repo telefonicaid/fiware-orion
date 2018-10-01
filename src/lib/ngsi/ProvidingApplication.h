@@ -47,7 +47,7 @@ typedef struct ProvidingApplication
   std::string   get(void);
   MimeType      getMimeType(void);
   bool          isEmpty(void);
-  std::string   render(bool comma);
+  std::string   toJsonV1(bool comma);
   const char*   c_str(void);
   void          release(void);
 

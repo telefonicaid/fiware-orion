@@ -47,18 +47,6 @@ echo
 echo "02. POST /v1/registry/contextEntities/type/ET1/id/entity01 OK"
 echo "============================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "ID",
-      "type": "string",
-      "value": "1110"
-    },
-    {
-      "name": "cm2",
-      "type": "string",
-      "value": "XXX"
-    }
-  ],
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/abc"
 }'
@@ -76,13 +64,6 @@ echo
 echo "04. POST /v1/registry/contextEntities/type/ET1/id/entity02"
 echo "=========================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "cm2",
-      "type": "string",
-      "value": "XXX"
-    }
-  ],
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/abc"
 }'

@@ -140,10 +140,10 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   //
   // FIXME: Forwards are done using NGSIv1 only, for now
   //        This will hopefully change soon ...
-  //        Once we implement forwards in NGSIv2, this render() should be like this:
-  //        TIMED_RENDER(payload = upcrP->render(ciP->apiVersion, asJsonObject, ""));
+  //        Once we implement forwards in NGSIv2, this toJsonV1() should be like this:
+  //        TIMED_RENDER(payload = upcrP->toJson());
   //
-  TIMED_RENDER(payload = upcrP->render(asJsonObject));
+  TIMED_RENDER(payload = upcrP->toJsonV1(asJsonObject));
 
   ciP->outMimeType  = outMimeType;
   cleanPayload      = (char*) payload.c_str();
@@ -466,7 +466,7 @@ std::string postUpdateContext
     upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
     alarmMgr.badInput(clientIp, "more than one service path for an update request");
 
-    TIMED_RENDER(answer = upcrsP->render(asJsonObject));
+    TIMED_RENDER(answer = upcrsP->toJsonV1(asJsonObject));
     upcrP->release();
 
     return answer;
@@ -481,7 +481,7 @@ std::string postUpdateContext
   {
     upcrsP->errorCode.fill(SccBadRequest, res);
 
-    TIMED_RENDER(answer = upcrsP->render(asJsonObject));
+    TIMED_RENDER(answer = upcrsP->toJsonV1(asJsonObject));
 
     upcrP->release();
     return answer;
@@ -523,7 +523,7 @@ std::string postUpdateContext
   bool forwarding = forwardsPending(upcrsP);
   if (forwarding == false)
   {
-    TIMED_RENDER(answer = upcrsP->render(asJsonObject));
+    TIMED_RENDER(answer = upcrsP->toJsonV1(asJsonObject));
 
     upcrP->release();
     return answer;
@@ -734,7 +734,7 @@ std::string postUpdateContext
   {
     // Note that v2 case doesn't use an actual response (so no need to waste time rendering it).
     // We render in the v1 case only
-    TIMED_RENDER(answer = response.render(asJsonObject));
+    TIMED_RENDER(answer = response.toJsonV1(asJsonObject));
   }
 
   //

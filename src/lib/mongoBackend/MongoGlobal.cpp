@@ -786,20 +786,20 @@ bool includedEntity(EntityId en, const EntityIdVector& entityIdV)
 *
 * includedAttribute -
 */
-bool includedAttribute(const ContextRegistrationAttribute& attr, const StringList& attrsV)
+bool includedAttribute(const std::string& attrName, const StringList& attrsV)
 {
   //
-  // This is the case in which the discoverAvailabilityRequest doesn't include attributes,
+  // attrsV.size() == 0 is the case in which the query request doesn't include attributes,
   // so all the attributes are included in the response
   //
-  if (attrsV.size() == 0)
+  if ((attrsV.size() == 0) || attrsV.lookup(ALL_ATTRS))
   {
     return true;
   }
 
   for (unsigned int ix = 0; ix < attrsV.size(); ++ix)
   {
-    if (attrsV[ix] == attr.name)
+    if (attrsV[ix] == attrName)
     {
       return true;
     }
@@ -1909,15 +1909,11 @@ static void processAttribute(ContextRegistrationResponse* crr, const StringList&
 {
   ContextRegistrationAttribute attr(
     getStringFieldF(attribute, REG_ATTRS_NAME),
-    getStringFieldF(attribute, REG_ATTRS_TYPE),
-    getStringFieldF(attribute, REG_ATTRS_ISDOMAIN));
+    getStringFieldF(attribute, REG_ATTRS_TYPE));
 
-  // FIXME: we don't take metadata into account at the moment
-  // attr.metadataV = ..
-
-  if (includedAttribute(attr, attrL))
+  if (includedAttribute(attr.name, attrL))
   {
-    ContextRegistrationAttribute* attrP = new ContextRegistrationAttribute(attr.name, attr.type, attr.isDomain);
+    ContextRegistrationAttribute* attrP = new ContextRegistrationAttribute(attr.name, attr.type);
     crr->contextRegistration.contextRegistrationAttributeVector.push_back(attrP);
   }
 }

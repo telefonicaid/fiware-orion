@@ -136,9 +136,9 @@ int64_t Duration::parse(void)
 
 /* ****************************************************************************
 *
-* Duration::render -
+* Duration::toJsonV1 -
 */
-std::string Duration::render(bool comma)
+std::string Duration::toJsonV1(bool comma)
 {
   if (string == "")
   {

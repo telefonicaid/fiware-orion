@@ -97,9 +97,9 @@ RegisterContextResponse::RegisterContextResponse(const std::string& _registratio
 
 /* ****************************************************************************
 *
-* RegisterContextResponse::render - 
+* RegisterContextResponse::toJsonV1 -
 */
-std::string RegisterContextResponse::render(void)
+std::string RegisterContextResponse::toJsonV1(void)
 {
   std::string  out = "";
   bool         errorCodeRendered = (errorCode.code != SccNone) && (errorCode.code != SccOk);
@@ -108,14 +108,14 @@ std::string RegisterContextResponse::render(void)
 
   if (!errorCodeRendered)
   {
-    out += duration.render(true);
+    out += duration.toJsonV1(true);
   }
 
-  out += registrationId.render(RegisterResponse, errorCodeRendered);
+  out += registrationId.toJsonV1(RegisterResponse, errorCodeRendered);
 
   if (errorCodeRendered)
   {
-    out += errorCode.render(false);
+    out += errorCode.toJsonV1(false);
   }
 
   out += endTag();
@@ -129,7 +129,7 @@ std::string RegisterContextResponse::render(void)
 *
 * RegisterContextResponse::check - 
 */
-std::string RegisterContextResponse::check(const std::string& predetectedError, int counter)
+std::string RegisterContextResponse::check(const std::string& predetectedError)
 {
   RegisterContextResponse  response;
   std::string              res;
@@ -146,7 +146,7 @@ std::string RegisterContextResponse::check(const std::string& predetectedError, 
   else
     return "OK";
 
-  return response.render();
+  return response.toJsonV1();
 }
 
 

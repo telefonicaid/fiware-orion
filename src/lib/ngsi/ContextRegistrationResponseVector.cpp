@@ -47,9 +47,9 @@ void ContextRegistrationResponseVector::push_back(ContextRegistrationResponse* i
 
 /* ****************************************************************************
 *
-* ContextRegistrationResponseVector::render -
+* ContextRegistrationResponseVector::toJsonV1 -
 */
-std::string ContextRegistrationResponseVector::render(bool comma)
+std::string ContextRegistrationResponseVector::toJsonV1(bool comma)
 {
   std::string  out = "";
 
@@ -62,7 +62,7 @@ std::string ContextRegistrationResponseVector::render(bool comma)
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-     out += vec[ix]->render((ix != vec.size() - 1));
+     out += vec[ix]->toJsonV1((ix != vec.size() - 1));
   }
 
   out += endTag(comma, true);

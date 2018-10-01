@@ -60,7 +60,7 @@ EntityType::EntityType(std::string _type): type(_type), count(0)
 
 /* ****************************************************************************
 *
-* EntityType::render -
+* EntityType::toJsonV1 -
 *
 * This method is used by:
 *   o EntityTypeVector
@@ -68,7 +68,7 @@ EntityType::EntityType(std::string _type): type(_type), count(0)
 *
 * 'typeNameBefore' is set to TRUE when called from EntityTypeResponse
 */
-std::string EntityType::render
+std::string EntityType::toJsonV1
 (
   bool        asJsonObject,
   bool        asJsonOut,
@@ -86,7 +86,7 @@ std::string EntityType::render
   if (typeNameBefore && asJsonOut)
   {
     out += valueTag("name", type, true);
-    out += contextAttributeVector.render(asJsonObject, EntityTypes, contextAttributeVector.vec, emptyMdV, true, true, true);
+    out += contextAttributeVector.toJsonV1(asJsonObject, EntityTypes, contextAttributeVector.vec, emptyMdV, true, true, true);
   }
   else
   {
@@ -99,7 +99,7 @@ std::string EntityType::render
     else
     {
       out += valueTag("name", type, true);
-      out += contextAttributeVector.render(asJsonObject, EntityTypes, contextAttributeVector.vec, emptyMdV, false, true, true);
+      out += contextAttributeVector.toJsonV1(asJsonObject, EntityTypes, contextAttributeVector.vec, emptyMdV, false, true, true);
     }
 
     out += endTag(comma, false);

@@ -84,8 +84,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -119,8 +118,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -191,7 +189,7 @@ Date: REGEX(.*)
 =================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 271
+Content-Length: 252
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -204,7 +202,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "A1",
                         "type": "string"
                     }

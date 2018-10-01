@@ -104,9 +104,9 @@ const std::string Throttling::get(void)
 
 /* ****************************************************************************
 *
-* Throttling::render -
+* Throttling::toJsonV1 -
 */
-std::string Throttling::render(bool comma)
+std::string Throttling::toJsonV1(bool comma)
 {
   if (string == "")
   {

@@ -1,1 +1,2 @@
 - Hardening: Orion now works with Mongo 3.6 (#3079)
+- Remove: isDomain field in NGSIv1 registrations (it was never used)

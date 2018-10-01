@@ -63,9 +63,9 @@ void StringList::fill(const std::string& commaSeparatedList)
 
 /* ****************************************************************************
 *
-* render - 
+* StringList::toJsonV1 -
 */
-std::string StringList::render(bool comma, const std::string& fieldName)
+std::string StringList::toJsonV1(bool comma, const std::string& fieldName)
 {
   std::string  out = "";
 
