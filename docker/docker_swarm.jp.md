@@ -46,10 +46,10 @@ Docker クライアントは、今、作成したクラスタのマネージャ�
 ```bash
 $ docker machine ls
 
-NAME          ACTIVE   DRIVER       STATE     URL                          SWARM   DOCKER        ERRORS  
-ms-manager0   *        virtualbox   Running   tcp://192.168.99.101:2376            v18.02.0-ce   
-ms-worker0    -        virtualbox   Running   tcp://192.168.99.102:2376            v18.02.0-ce   
-ms-worker1    -        virtualbox   Running   tcp://192.168.99.100:2376            v18.02.0-ce   
+NAME          ACTIVE   DRIVER       STATE     URL                          SWARM   DOCKER        ERRORS
+ms-manager0   *        virtualbox   Running   tcp://192.168.99.101:2376            v18.02.0-ce
+ms-worker0    -        virtualbox   Running   tcp://192.168.99.102:2376            v18.02.0-ce
+ms-worker1    -        virtualbox   Running   tcp://192.168.99.100:2376            v18.02.0-ce
 ```
 
 `*` のノードは、Docker クライアントが接続するノードです。
@@ -207,7 +207,7 @@ MongoDB ReplicaSet を Docker Swarm にデプロイする方法の詳細につ�
       "compiled_by" : "root",
       "compiled_in" : "4d72f1940cd1",
       "release_date" : "Wed Feb 21 15:56:28 UTC 2018",
-      "doc" : "https://fiware-orion.readthedocs.org/en/master/"
+      "doc" : "https://fiware-orion.rtfd.io/"
     }
     }
     ```
@@ -217,8 +217,8 @@ MongoDB ReplicaSet を Docker Swarm にデプロイする方法の詳細につ�
     $ docker service scale orion_orion=3
 
     orion_orion scaled to 3
-    overall progress: 2 out of 3 tasks 
-    1/3: running   [==================================================>] 
-    2/3: preparing [=================================>                 ] 
-    3/3: running   [==================================================>] 
+    overall progress: 2 out of 3 tasks
+    1/3: running   [==================================================>]
+    2/3: preparing [=================================>                 ]
+    3/3: running   [==================================================>]
     ```
