@@ -100,10 +100,10 @@ public:
                         bool                             comma = false,
                         bool                             omitValue = false);
 
-  std::string  toJsonV1AsJsonObject(RequestType                    request,
-                                    const std::vector<Metadata*>&  orderedMetadata,
-                                    bool                           comma,
-                                    bool                           omitValue = false);
+  std::string  toJsonV1AsObject(RequestType                    request,
+                                const std::vector<Metadata*>&  orderedMetadata,
+                                bool                           comma,
+                                bool                           omitValue = false);
 
   std::string  toJsonV1AsNameString(bool comma);
 
