@@ -150,15 +150,7 @@ payload='{
     "attributes": [
       {
         "name": "A2",
-        "type": "string",
-        "isDomain": "false",
-        "metadatas": [
-          {
-            "name":   "ID",
-            "type":   "string",
-            "value":  "primary"
-          }
-        ]
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'$CP1_PORT'/v1"

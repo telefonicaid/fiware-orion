@@ -105,7 +105,7 @@ std::string OrionError::smartRender(ApiVersion apiVersion)
 {
   if (apiVersion == V1 || apiVersion == NO_VERSION)
   {
-    return render();
+    return toJsonV1();
   }
   else // admin or v2
   {
@@ -156,10 +156,10 @@ std::string OrionError::toJson(void)
 
 /* ****************************************************************************
 *
-* OrionError::render -
+* OrionError::toJsonV1 -
 *
 */
-std::string OrionError::render(void)
+std::string OrionError::toJsonV1(void)
 {
   std::string  out           = "{";
 

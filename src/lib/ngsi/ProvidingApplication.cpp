@@ -120,9 +120,9 @@ MimeType ProvidingApplication::getMimeType(void)
 
 /* ****************************************************************************
 *
-* ProvidingApplication::render -
+* ProvidingApplication::toJsonV1 -
 */
-std::string ProvidingApplication::render(bool comma)
+std::string ProvidingApplication::toJsonV1(bool comma)
 {
   if (string == "")
   {

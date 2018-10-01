@@ -92,7 +92,7 @@ std::string postBatchQuery
   {
     entities.fill(&parseDataP->qcrs.res);
 
-    TIMED_RENDER(answer = entities.render(getRenderFormat(ciP->uriParamOptions),
+    TIMED_RENDER(answer = entities.toJson(getRenderFormat(ciP->uriParamOptions),
                                           filterAttrs.stringV, false, qcrP->metadataList.stringV));
   }
 

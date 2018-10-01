@@ -52,8 +52,7 @@ payload='{
       "attributes": [
         {
           "name": "temperature",
-          "type": "degree",
-          "isDomain": "false"
+          "type": "degree"
         }
       ],
       "providingApplication": "http://localhost:'${CP1_PORT}'/v1"

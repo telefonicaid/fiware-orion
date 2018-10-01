@@ -330,7 +330,7 @@ std::string getEntities
     }
     else
     {
-      TIMED_RENDER(answer = entities.render(getRenderFormat(ciP->uriParamOptions),
+      TIMED_RENDER(answer = entities.toJson(getRenderFormat(ciP->uriParamOptions),
                                             attributeFilter.stringV,
                                             false,
                                             parseDataP->qcr.res.metadataList.stringV));

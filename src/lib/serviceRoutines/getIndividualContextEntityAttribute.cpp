@@ -122,7 +122,7 @@ std::string getIndividualContextEntityAttribute
 
 
   // 5. Render the ContextAttributeResponse
-  TIMED_RENDER(answer = response.render(asJsonObject, IndividualContextEntityAttribute));
+  TIMED_RENDER(answer = response.toJsonV1(asJsonObject, IndividualContextEntityAttribute));
 
 
   // 6. Cleanup and return result

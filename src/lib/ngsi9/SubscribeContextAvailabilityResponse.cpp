@@ -82,7 +82,7 @@ SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(const
 *
 * SubscribeContextAvailabilityResponse::render -
 */
-std::string SubscribeContextAvailabilityResponse::render(void)
+std::string SubscribeContextAvailabilityResponse::toJsonV1(void)
 {
   std::string  out                = "";
   bool         durationRendered   = !duration.isEmpty();
@@ -90,11 +90,13 @@ std::string SubscribeContextAvailabilityResponse::render(void)
 
   out += startTag();
 
-  out += subscriptionId.render(RtSubscribeContextAvailabilityResponse, durationRendered || errorCodeRendered);
-  out += duration.render(errorCodeRendered);
+  out += subscriptionId.toJsonV1(RtSubscribeContextAvailabilityResponse, durationRendered || errorCodeRendered);
+  out += duration.toJsonV1(errorCodeRendered);
 
   if (errorCodeRendered)
-     out += errorCode.render(false);
+  {
+    out += errorCode.toJsonV1(false);
+  }
 
   out += endTag();
   

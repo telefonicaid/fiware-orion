@@ -171,8 +171,7 @@ payload='{
     "attributes": [
       {
         "name": "ping",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"

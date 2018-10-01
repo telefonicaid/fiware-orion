@@ -36,9 +36,9 @@
 
 /* ****************************************************************************
 *
-* NotifyContextRequest::render -
+* NotifyContextRequest::toJsonV1 -
 */
-std::string NotifyContextRequest::render
+std::string NotifyContextRequest::toJsonV1
 (
   bool                             asJsonObject,
   const std::vector<std::string>&  attrsFilter,
@@ -56,9 +56,9 @@ std::string NotifyContextRequest::render
   //   This doubt is taken care of by the variable 'contextElementResponseVectorRendered'
   //
   out += startTag();
-  out += subscriptionId.render(NotifyContext, true);
-  out += originator.render(contextElementResponseVectorRendered);
-  out += contextElementResponseVector.render(asJsonObject, NotifyContext, attrsFilter, blacklist, metadataFilter, false);
+  out += subscriptionId.toJsonV1(NotifyContext, true);
+  out += originator.toJsonV1(contextElementResponseVectorRendered);
+  out += contextElementResponseVector.toJsonV1(asJsonObject, NotifyContext, attrsFilter, blacklist, metadataFilter, false);
   out += endTag();
 
   return out;
@@ -127,7 +127,7 @@ std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string
     return "OK";
   }
 
-  return response.render();
+  return response.toJsonV1();
 }
 
 

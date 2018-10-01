@@ -112,7 +112,7 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(asJsonObject, IndividualContextEntity));
+    TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
     return out;
   }
   entityId = (entityIdFromPayload != "")? entityIdFromPayload : entityIdFromURL;
@@ -125,7 +125,7 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(asJsonObject, IndividualContextEntity));
+    TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
     return out;
   }
   entityType = (entityTypeFromPayload != "")? entityTypeFromPayload :entityTypeFromURL;
@@ -139,7 +139,7 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(asJsonObject, IndividualContextEntity));
+    TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
     return out;
   }
 
@@ -151,7 +151,7 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(asJsonObject, IndividualContextEntity));
+    TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
     return out;
   }
 
@@ -173,7 +173,7 @@ std::string postIndividualContextEntity
   response.fill(&parseDataP->upcrs.res);
 
   // 05. Cleanup and return result
-  TIMED_RENDER(answer = response.render(asJsonObject, IndividualContextEntity));
+  TIMED_RENDER(answer = response.toJsonV1(asJsonObject, IndividualContextEntity));
 
   response.release();
   parseDataP->upcr.res.release();

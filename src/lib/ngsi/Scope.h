@@ -82,7 +82,7 @@ typedef struct Scope
                     const std::string&  georelString,
                     std::string*        errorString);
 
-  std::string  render(bool notLastInVector);
+  std::string  toJsonV1(bool notLastInVector);
   void         release(void);
 
   std::string  check(void);

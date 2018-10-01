@@ -50,9 +50,9 @@ AppendContextElementResponse::AppendContextElementResponse() : errorCode("errorC
 
 /* ****************************************************************************
 *
-* AppendContextElementResponse::render - 
+* AppendContextElementResponse::toJsonV1 -
 */
-std::string AppendContextElementResponse::render
+std::string AppendContextElementResponse::toJsonV1
 (
   bool         asJsonObject,
   RequestType  requestType
@@ -64,16 +64,16 @@ std::string AppendContextElementResponse::render
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(false);
+    out += errorCode.toJsonV1(false);
   }
   else
   {
     if (entity.id != "")
     {
-      out += entity.render(true);
+      out += entity.toJsonV1(true);
     }
 
-    out += contextAttributeResponseVector.render(asJsonObject, requestType);
+    out += contextAttributeResponseVector.toJsonV1(asJsonObject, requestType);
   }
 
   out += endTag();
@@ -110,7 +110,7 @@ std::string AppendContextElementResponse::check
     return "OK";
   }
 
-  return render(asJsonObject, requestType);
+  return toJsonV1(asJsonObject, requestType);
 }
 
 

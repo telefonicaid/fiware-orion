@@ -128,7 +128,7 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
 
   for (unsigned int aIx = 0; aIx < regP->dataProvided.attributes.size(); ++aIx)
   {
-    attrs.append(BSON(REG_ATTRS_NAME << regP->dataProvided.attributes[aIx] << REG_ATTRS_TYPE << "" << REG_ATTRS_ISDOMAIN << "false"));
+    attrs.append(BSON(REG_ATTRS_NAME << regP->dataProvided.attributes[aIx] << REG_ATTRS_TYPE << ""));
   }
 
   contextRegistration.append(

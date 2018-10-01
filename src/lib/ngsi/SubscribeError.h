@@ -43,7 +43,7 @@ typedef struct SubscribeError
   StatusCode      errorCode;          // Mandatory
 
   SubscribeError();
-  std::string render(RequestType requestType, bool comma);
+  std::string toJsonV1(RequestType requestType, bool comma);
   std::string toJson(RequestType requestType, bool comma);
   std::string check(void);
 } SubscribeError;

@@ -46,7 +46,7 @@ typedef struct SubscribeContextResponse
   SubscribeContextResponse(StatusCode& errorCode);
   ~SubscribeContextResponse();
 
-  std::string render(void);
+  std::string toJsonV1(void);
   std::string toJson(void);
 } SubscribeContextResponse;
 

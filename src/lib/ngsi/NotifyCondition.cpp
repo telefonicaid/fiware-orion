@@ -61,9 +61,9 @@ NotifyCondition::NotifyCondition(NotifyCondition* ncP)
 
 /* ****************************************************************************
 *
-* NotifyCondition::render -
+* NotifyCondition::toJsonV1 -
 */
-std::string NotifyCondition::render(bool notLastInVector)
+std::string NotifyCondition::toJsonV1(bool notLastInVector)
 {
   std::string out = "";
 
@@ -75,8 +75,8 @@ std::string NotifyCondition::render(bool notLastInVector)
 
   out += startTag();
   out += valueTag("type", type, commaAfterType);
-  out += condValueList.render(commaAfterCondValueList);
-  out += restriction.render(commaAfterRestriction);
+  out += condValueList.toJsonV1(commaAfterCondValueList);
+  out += restriction.toJsonV1(commaAfterRestriction);
   out += endTag();
 
   return out;

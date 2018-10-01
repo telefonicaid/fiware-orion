@@ -47,13 +47,13 @@ void ContextElementVector::push_back(Entity* item)
 
 /* ****************************************************************************
 *
-* ContextElementVector::render -
+* ContextElementVector::toJsonV1 -
 */
-std::string ContextElementVector::render
+std::string ContextElementVector::toJsonV1
 (
-  bool                asJsonObject,
-  RequestType         requestType,
-  bool                comma
+  bool         asJsonObject,
+  RequestType  requestType,
+  bool         comma
 )
 {
   std::string  out = "";

@@ -76,7 +76,7 @@ TEST(ContextElementResponseVector, render)
   std::vector<std::string> emptyV;
 
   // FIXME P2: "" is string, function signature says bool..
-  out = cerv.render(false, UpdateContextElement, emptyV, false, emptyV, "");
+  out = cerv.toJsonV1(false, UpdateContextElement, emptyV, false, emptyV, "");
   EXPECT_STREQ("", out.c_str());
 
   cer.entity.id         = "ID";

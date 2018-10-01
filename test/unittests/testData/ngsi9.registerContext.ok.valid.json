@@ -16,22 +16,7 @@
       "attributes": [
         {
           "name": "temperature",
-          "type": "degree",
-          "isDomain": "false",
-          "metadatas": [
-            {
-              "name": "ID",
-              "type": "string",
-              "value": "1110"
-            }
-          ]
-        }
-      ],
-      "metadatas": [
-        {
-          "name": "ID",
-          "type": "string",
-          "value": "2212"
+          "type": "degree"
         }
       ],
       "providingApplication": "http://192.168.100.1:70/application"

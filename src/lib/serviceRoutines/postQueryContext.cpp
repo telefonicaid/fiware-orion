@@ -104,7 +104,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   // 2. Render the string of the request we want to forward
   //
   std::string  payload;
-  TIMED_RENDER(payload = qcrP->render());
+  TIMED_RENDER(payload = qcrP->toJsonV1());
 
   char* cleanPayload = (char*) payload.c_str();;
 
@@ -322,7 +322,7 @@ std::string postQueryContext
     // Bad Input detected by Mongo Backend - request ends here !
     OrionError oe(qcrsP->errorCode);
 
-    TIMED_RENDER(answer = oe.render());
+    TIMED_RENDER(answer = oe.toJsonV1());
     qcrP->release();
     return answer;
   }
@@ -354,7 +354,7 @@ std::string postQueryContext
   //
   if (forwardsPending(qcrsP) == false)
   {
-    TIMED_RENDER(answer = qcrsP->render(asJsonObject));
+    TIMED_RENDER(answer = qcrsP->toJsonV1(asJsonObject));
 
     qcrP->release();
     return answer;
@@ -530,7 +530,7 @@ std::string postQueryContext
   std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
   bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
 
-  TIMED_RENDER(answer = responseV.render(asJsonObject, details, qcrsP->errorCode.details));
+  TIMED_RENDER(answer = responseV.toJsonV1(asJsonObject, details, qcrsP->errorCode.details));
 
 
   //

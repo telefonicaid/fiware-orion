@@ -119,7 +119,7 @@ std::string getIndividualContextEntity
   // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
   std::vector<std::string> emptyV;
 
-  TIMED_RENDER(answer = response.render(asJsonObject, IndividualContextEntity, emptyV, false, emptyV));
+  TIMED_RENDER(answer = response.toJsonV1(asJsonObject, IndividualContextEntity, emptyV, false, emptyV));
 
 
   // 6. Cleanup and return result

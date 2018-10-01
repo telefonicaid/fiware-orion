@@ -277,8 +277,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtN_Ok)
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "T1");
-  ContextRegistrationAttribute cra1("A1", "TA1", "false");
-  ContextRegistrationAttribute cra2("A2", "TA2", "true");
+  ContextRegistrationAttribute cra1("A1", "TA1");
+  ContextRegistrationAttribute cra2("A2", "TA2");
   ContextRegistrationResponse crr;
   crr.contextRegistration.entityIdVector.push_back(&en);
   crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra1);
@@ -319,10 +319,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtN_Ok)
   BSONObj rattr1 = regAttrs[1].embeddedObject();
   EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
   EXPECT_STREQ("TA1", C_STR_FIELD(rattr0, "type"));
-  EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
   EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
   EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
-  EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -347,8 +345,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtNnt_Ok)
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "T1");
-  ContextRegistrationAttribute cra1("A1", "", "false");
-  ContextRegistrationAttribute cra2("A2", "", "true");
+  ContextRegistrationAttribute cra1("A1", "");
+  ContextRegistrationAttribute cra2("A2", "");
   ContextRegistrationResponse crr;
   crr.contextRegistration.entityIdVector.push_back(&en);
   crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra1);
@@ -389,10 +387,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtNnt_Ok)
   BSONObj rattr1 = regAttrs[1].embeddedObject();
   EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
   EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-  EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
   EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
   EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-  EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -417,8 +413,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtN_Ok)
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "");
-  ContextRegistrationAttribute cra1("A1", "TA1", "false");
-  ContextRegistrationAttribute cra2("A2", "TA2", "true");
+  ContextRegistrationAttribute cra1("A1", "TA1");
+  ContextRegistrationAttribute cra2("A2", "TA2");
   ContextRegistrationResponse crr;
   crr.contextRegistration.entityIdVector.push_back(&en);
   crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra1);
@@ -459,10 +455,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtN_Ok)
   BSONObj rattr1 = regAttrs[1].embeddedObject();
   EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
   EXPECT_STREQ("TA1", C_STR_FIELD(rattr0, "type"));
-  EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
   EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
   EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
-  EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -487,8 +481,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtNnt_Ok)
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "");
-  ContextRegistrationAttribute cra1("A1", "", "false");
-  ContextRegistrationAttribute cra2("A2", "", "true");
+  ContextRegistrationAttribute cra1("A1", "");
+  ContextRegistrationAttribute cra2("A2", "");
   ContextRegistrationResponse crr;
   crr.contextRegistration.entityIdVector.push_back(&en);
   crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra1);
@@ -529,10 +523,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtNnt_Ok)
   BSONObj rattr1 = regAttrs[1].embeddedObject();
   EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
   EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-  EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
   EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
   EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-  EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -686,8 +678,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtN_Ok)
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
     EntityId en2("E2", "T2");
-    ContextRegistrationAttribute cra1("A1", "TA1", "false");
-    ContextRegistrationAttribute cra2("A2", "TA2", "true");
+    ContextRegistrationAttribute cra1("A1", "TA1");
+    ContextRegistrationAttribute cra2("A2", "TA2");
     ContextRegistrationResponse crr;
     crr.contextRegistration.entityIdVector.push_back(&en1);
     crr.contextRegistration.entityIdVector.push_back(&en2);
@@ -732,10 +724,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtN_Ok)
     BSONObj rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -761,8 +751,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtNnt_Ok)
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
     EntityId en2("E2", "T2");
-    ContextRegistrationAttribute cra1("A1", "", "false");
-    ContextRegistrationAttribute cra2("A2", "", "true");
+    ContextRegistrationAttribute cra1("A1", "");
+    ContextRegistrationAttribute cra2("A2", "");
     ContextRegistrationResponse crr;
     crr.contextRegistration.entityIdVector.push_back(&en1);
     crr.contextRegistration.entityIdVector.push_back(&en2);
@@ -807,10 +797,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtNnt_Ok)
     BSONObj rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -836,8 +824,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtN_Ok)
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
     EntityId en2("E2", "");
-    ContextRegistrationAttribute cra1("A1", "TA1", "false");
-    ContextRegistrationAttribute cra2("A2", "TA2", "true");
+    ContextRegistrationAttribute cra1("A1", "TA1");
+    ContextRegistrationAttribute cra2("A2", "TA2");
     ContextRegistrationResponse crr;
     crr.contextRegistration.entityIdVector.push_back(&en1);
     crr.contextRegistration.entityIdVector.push_back(&en2);
@@ -882,10 +870,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtN_Ok)
     BSONObj rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -911,8 +897,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtNnt_Ok)
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
     EntityId en2("E2", "");
-    ContextRegistrationAttribute cra1("A1", "", "false");
-    ContextRegistrationAttribute cra2("A2", "", "true");
+    ContextRegistrationAttribute cra1("A1", "");
+    ContextRegistrationAttribute cra2("A2", "");
     ContextRegistrationResponse crr;
     crr.contextRegistration.entityIdVector.push_back(&en1);
     crr.contextRegistration.entityIdVector.push_back(&en2);
@@ -957,10 +943,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtNnt_Ok)
     BSONObj rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1132,10 +1116,10 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtN_Ok)
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
     EntityId en2("E2", "T2");
-    ContextRegistrationAttribute cra1("A1", "TA1", "false");
-    ContextRegistrationAttribute cra2("A2", "TA2", "true");
-    ContextRegistrationAttribute cra3("A3", "TA3", "false");
-    ContextRegistrationAttribute cra4("A4", "TA4", "true");
+    ContextRegistrationAttribute cra1("A1", "TA1");
+    ContextRegistrationAttribute cra2("A2", "TA2");
+    ContextRegistrationAttribute cra3("A3", "TA3");
+    ContextRegistrationAttribute cra4("A4", "TA4");
     ContextRegistrationResponse crr1, crr2;
     crr1.contextRegistration.entityIdVector.push_back(&en1);
     crr1.contextRegistration.contextRegistrationAttributeVector.push_back(&cra1);
@@ -1183,10 +1167,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtN_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
@@ -1201,10 +1183,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtN_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A3", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA3", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA4", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1230,10 +1210,10 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtNnt_Ok)
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
     EntityId en2("E2", "T2");
-    ContextRegistrationAttribute cra1("A1", "", "false");
-    ContextRegistrationAttribute cra2("A2", "", "true");
-    ContextRegistrationAttribute cra3("A3", "", "false");
-    ContextRegistrationAttribute cra4("A4", "", "true");
+    ContextRegistrationAttribute cra1("A1", "");
+    ContextRegistrationAttribute cra2("A2", "");
+    ContextRegistrationAttribute cra3("A3", "");
+    ContextRegistrationAttribute cra4("A4", "");
     ContextRegistrationResponse crr1, crr2;
     crr1.contextRegistration.entityIdVector.push_back(&en1);
     crr1.contextRegistration.contextRegistrationAttributeVector.push_back(&cra1);
@@ -1281,10 +1261,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtNnt_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
@@ -1299,10 +1277,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtNnt_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A3", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1328,10 +1304,10 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtN_Ok)
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
     EntityId en2("E2", "");
-    ContextRegistrationAttribute cra1("A1", "TA1", "false");
-    ContextRegistrationAttribute cra2("A2", "TA2", "true");
-    ContextRegistrationAttribute cra3("A3", "TA3", "false");
-    ContextRegistrationAttribute cra4("A4", "TA4", "true");
+    ContextRegistrationAttribute cra1("A1", "TA1");
+    ContextRegistrationAttribute cra2("A2", "TA2");
+    ContextRegistrationAttribute cra3("A3", "TA3");
+    ContextRegistrationAttribute cra4("A4", "TA4");
     ContextRegistrationResponse crr1, crr2;
     crr1.contextRegistration.entityIdVector.push_back(&en1);
     crr1.contextRegistration.contextRegistrationAttributeVector.push_back(&cra1);
@@ -1379,10 +1355,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtN_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
@@ -1397,10 +1371,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtN_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A3", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA3", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA4", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1426,10 +1398,10 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtNnt_Ok)
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
     EntityId en2("E2", "");
-    ContextRegistrationAttribute cra1("A1", "", "false");
-    ContextRegistrationAttribute cra2("A2", "", "true");
-    ContextRegistrationAttribute cra3("A3", "", "false");
-    ContextRegistrationAttribute cra4("A4", "", "true");
+    ContextRegistrationAttribute cra1("A1", "");
+    ContextRegistrationAttribute cra2("A2", "");
+    ContextRegistrationAttribute cra3("A3", "");
+    ContextRegistrationAttribute cra4("A4", "");
     ContextRegistrationResponse crr1, crr2;
     crr1.contextRegistration.entityIdVector.push_back(&en1);
     crr1.contextRegistration.contextRegistrationAttributeVector.push_back(&cra1);
@@ -1477,10 +1449,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtNnt_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
@@ -1495,10 +1465,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtNnt_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A3", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1694,10 +1662,10 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtN_Ok)
     EntityId en2("E2", "T2");
     EntityId en3("E3", "T3");
     EntityId en4("E4", "T4");
-    ContextRegistrationAttribute cra1("A1", "TA1", "false");
-    ContextRegistrationAttribute cra2("A2", "TA2", "true");
-    ContextRegistrationAttribute cra3("A3", "TA3", "false");
-    ContextRegistrationAttribute cra4("A4", "TA4", "true");
+    ContextRegistrationAttribute cra1("A1", "TA1");
+    ContextRegistrationAttribute cra2("A2", "TA2");
+    ContextRegistrationAttribute cra3("A3", "TA3");
+    ContextRegistrationAttribute cra4("A4", "TA4");
     ContextRegistrationResponse crr1, crr2;
     crr1.contextRegistration.entityIdVector.push_back(&en1);
     crr1.contextRegistration.entityIdVector.push_back(&en2);
@@ -1750,10 +1718,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtN_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
@@ -1771,10 +1737,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtN_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A3", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA3", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA4", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1802,10 +1766,10 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtNnt_Ok)
     EntityId en2("E2", "T2");
     EntityId en3("E3", "T3");
     EntityId en4("E4", "T4");
-    ContextRegistrationAttribute cra1("A1", "", "false");
-    ContextRegistrationAttribute cra2("A2", "", "true");
-    ContextRegistrationAttribute cra3("A3", "", "false");
-    ContextRegistrationAttribute cra4("A4", "", "true");
+    ContextRegistrationAttribute cra1("A1", "");
+    ContextRegistrationAttribute cra2("A2", "");
+    ContextRegistrationAttribute cra3("A3", "");
+    ContextRegistrationAttribute cra4("A4", "");
     ContextRegistrationResponse crr1, crr2;
     crr1.contextRegistration.entityIdVector.push_back(&en1);
     crr1.contextRegistration.entityIdVector.push_back(&en2);
@@ -1858,10 +1822,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtNnt_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
@@ -1879,10 +1841,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtNnt_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A3", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1910,10 +1870,10 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtN_Ok)
     EntityId en2("E2", "");
     EntityId en3("E3", "");
     EntityId en4("E4", "");
-    ContextRegistrationAttribute cra1("A1", "TA1", "false");
-    ContextRegistrationAttribute cra2("A2", "TA2", "true");
-    ContextRegistrationAttribute cra3("A3", "TA3", "false");
-    ContextRegistrationAttribute cra4("A4", "TA4", "true");
+    ContextRegistrationAttribute cra1("A1", "TA1");
+    ContextRegistrationAttribute cra2("A2", "TA2");
+    ContextRegistrationAttribute cra3("A3", "TA3");
+    ContextRegistrationAttribute cra4("A4", "TA4");
     ContextRegistrationResponse crr1, crr2;
     crr1.contextRegistration.entityIdVector.push_back(&en1);
     crr1.contextRegistration.entityIdVector.push_back(&en2);
@@ -1966,10 +1926,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtN_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
@@ -1987,10 +1945,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtN_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A3", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA3", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA4", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2018,10 +1974,10 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtNnt_Ok)
     EntityId en2("E2", "");
     EntityId en3("E3", "");
     EntityId en4("E4", "");
-    ContextRegistrationAttribute cra1("A1", "", "false");
-    ContextRegistrationAttribute cra2("A2", "", "true");
-    ContextRegistrationAttribute cra3("A3", "", "false");
-    ContextRegistrationAttribute cra4("A4", "", "true");
+    ContextRegistrationAttribute cra1("A1", "");
+    ContextRegistrationAttribute cra2("A2", "");
+    ContextRegistrationAttribute cra3("A3", "");
+    ContextRegistrationAttribute cra4("A4", "");
     ContextRegistrationResponse crr1, crr2;
     crr1.contextRegistration.entityIdVector.push_back(&en1);
     crr1.contextRegistration.entityIdVector.push_back(&en2);
@@ -2074,10 +2030,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtNnt_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
@@ -2095,10 +2049,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtNnt_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A3", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);

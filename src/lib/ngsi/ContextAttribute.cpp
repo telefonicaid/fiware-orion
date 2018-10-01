@@ -601,14 +601,14 @@ std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
 
 /* ****************************************************************************
 *
-* renderAsJsonObject - 
+* toJsonV1AsObject -
 */
-std::string ContextAttribute::renderAsJsonObject
+std::string ContextAttribute::toJsonV1AsObject
 (
-  RequestType  request,
-  const std::vector<Metadata*>& orderedMetadata,
-  bool         comma,
-  bool         omitValue
+  RequestType                    request,
+  const std::vector<Metadata*>&  orderedMetadata,
+  bool                           comma,
+  bool                           omitValue
 )
 {
   std::string  out                    = "";
@@ -678,7 +678,7 @@ std::string ContextAttribute::renderAsJsonObject
 
   if (omitValue == false)
   {
-    out += metadataVector.render(orderedMetadata, false);
+    out += metadataVector.toJsonV1(orderedMetadata, false);
   }
 
   out += endTag(comma);
@@ -690,9 +690,9 @@ std::string ContextAttribute::renderAsJsonObject
 
 /* ****************************************************************************
 *
-* renderAsNameString -
+* toJsonV1AsNameString -
 */
-std::string ContextAttribute::renderAsNameString(bool comma)
+std::string ContextAttribute::toJsonV1AsNameString(bool comma)
 {
   std::string  out = "";
 
@@ -713,9 +713,9 @@ std::string ContextAttribute::renderAsNameString(bool comma)
 
 /* ****************************************************************************
 *
-* render - 
+* toJsonV1 -
 */
-std::string ContextAttribute::render
+std::string ContextAttribute::toJsonV1
 (
   bool                             asJsonObject,
   RequestType                      request,
@@ -735,7 +735,7 @@ std::string ContextAttribute::render
 
   if (asJsonObject)
   {
-    return renderAsJsonObject(request, orderedMetadata, comma, omitValue);
+    return toJsonV1AsObject(request, orderedMetadata, comma, omitValue);
   }
 
   out += startTag();
@@ -807,7 +807,7 @@ std::string ContextAttribute::render
     }
   }
 
-  out += metadataVector.render(orderedMetadata, false);
+  out += metadataVector.toJsonV1(orderedMetadata, false);
   out += endTag(comma);
 
   return out;

@@ -46,7 +46,7 @@ typedef struct UnsubscribeContextAvailabilityResponse
   UnsubscribeContextAvailabilityResponse(SubscriptionId _subscriptionId);
   ~UnsubscribeContextAvailabilityResponse();
 
-  std::string render(void);
+  std::string toJsonV1(void);
 } UnsubscribeContextAvailabilityResponse;
 
 #endif  // SRC_LIB_NGSI9_UNSUBSCRIBECONTEXTAVAILABILITYRESPONSE_H_

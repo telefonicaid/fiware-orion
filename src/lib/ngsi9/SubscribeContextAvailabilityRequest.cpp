@@ -50,9 +50,9 @@ SubscribeContextAvailabilityRequest::SubscribeContextAvailabilityRequest()
 
 /* ****************************************************************************
 *
-* SubscribeContextAvailabilityRequest::render -
+* SubscribeContextAvailabilityRequest::toJsonV1 -
 */
-std::string SubscribeContextAvailabilityRequest::render(void)
+std::string SubscribeContextAvailabilityRequest::toJsonV1(void)
 {
   std::string out                      = "";
   bool        commaAfterEntityIdVector = (restrictions > 0) || !duration.isEmpty() || !reference.isEmpty() || (attributeList.size() != 0);
@@ -61,11 +61,11 @@ std::string SubscribeContextAvailabilityRequest::render(void)
   bool        commaAfterDuration       = restrictions > 0;
 
   out += startTag();
-  out += entityIdVector.render(commaAfterEntityIdVector);
-  out += attributeList.render(commaAfterAttributeList, "attributes");
-  out += reference.render(commaAfterReference);
-  out += duration.render(commaAfterDuration);
-  out += restriction.render(restrictions, true);
+  out += entityIdVector.toJsonV1(commaAfterEntityIdVector);
+  out += attributeList.toJsonV1(commaAfterAttributeList, "attributes");
+  out += reference.toJsonV1(commaAfterReference);
+  out += duration.toJsonV1(commaAfterDuration);
+  out += restriction.toJsonV1(restrictions, true);
   out += endTag();
 
   return out;
@@ -97,7 +97,7 @@ std::string SubscribeContextAvailabilityRequest::check(const std::string& predet
   else
     return "OK";
 
-  return response.render();
+  return response.toJsonV1();
 }
 
 

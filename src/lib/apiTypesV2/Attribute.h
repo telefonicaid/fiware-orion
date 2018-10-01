@@ -55,7 +55,7 @@ class Attribute
 
   Attribute(): pcontextAttribute(0) {}
 
-  std::string  render(bool                             acceptedTextPlain,
+  std::string  toJson(bool                             acceptedTextPlain,
                       bool                             acceptedJson,
                       MimeType                         outFormatSelection,
                       MimeType*                        outMimeTypeP,

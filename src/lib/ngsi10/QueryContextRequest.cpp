@@ -92,9 +92,9 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 
 /* ****************************************************************************
 *
-* QueryContextRequest::render -
+* QueryContextRequest::toJsonV1 -
 */
-std::string QueryContextRequest::render(void)
+std::string QueryContextRequest::toJsonV1(void)
 {
   std::string   out                      = "";
   bool          attributeListRendered    = attributeList.size() != 0;
@@ -103,9 +103,9 @@ std::string QueryContextRequest::render(void)
   bool          commaAfterEntityIdVector = attributeListRendered || restrictionRendered;
 
   out += startTag();
-  out += entityIdVector.render(commaAfterEntityIdVector);
-  out += attributeList.render(commaAfterAttributeList, "attributes");
-  out += restriction.render(restrictions, false);
+  out += entityIdVector.toJsonV1(commaAfterEntityIdVector);
+  out += attributeList.toJsonV1(commaAfterAttributeList, "attributes");
+  out += restriction.toJsonV1(restrictions, false);
   out += endTag();
 
   return out;
@@ -138,7 +138,7 @@ std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject,
     return "OK";
   }
 
-  return response.render(asJsonObject);
+  return response.toJsonV1(asJsonObject);
 }
 
 

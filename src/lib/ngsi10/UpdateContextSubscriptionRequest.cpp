@@ -76,7 +76,7 @@ std::string UpdateContextSubscriptionRequest::check(const std::string& predetect
   else
     return "OK";
 
-  return response.render();
+  return response.toJsonV1();
 }
 
 

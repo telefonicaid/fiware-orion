@@ -50,7 +50,7 @@ TEST(AppendContextElementRequest, render_json)
 
    acer.contextAttributeVector.push_back(&ca);
    
-   out = acer.render(false, UpdateContext);
+   out = acer.toJsonV1(false, UpdateContext);
 
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());

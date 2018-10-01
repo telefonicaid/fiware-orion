@@ -92,9 +92,9 @@ QueryContextResponse::~QueryContextResponse()
 
 /* ****************************************************************************
 *
-* QueryContextResponse::render -
+* QueryContextResponse::toJsonV1 -
 */
-std::string QueryContextResponse::render(bool asJsonObject)
+std::string QueryContextResponse::toJsonV1(bool asJsonObject)
 {
   std::string  out               = "";
   bool         errorCodeRendered = false;
@@ -131,12 +131,12 @@ std::string QueryContextResponse::render(bool asJsonObject)
 
   if (contextElementResponseVector.size() > 0)
   {
-    out += contextElementResponseVector.render(asJsonObject, QueryContext, emptyV, false, emptyV, errorCodeRendered);
+    out += contextElementResponseVector.toJsonV1(asJsonObject, QueryContext, emptyV, false, emptyV, errorCodeRendered);
   }
 
   if (errorCodeRendered == true)
   {
-    out += errorCode.render(false);
+    out += errorCode.toJsonV1(false);
   }
 
 
@@ -150,7 +150,7 @@ std::string QueryContextResponse::render(bool asJsonObject)
   {
     LM_W(("Internal Error (Both error-code and response vector empty)"));
     errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
-    out += errorCode.render(false);
+    out += errorCode.toJsonV1(false);
   }
 
   out += endTag();
@@ -182,7 +182,7 @@ std::string QueryContextResponse::check(ApiVersion apiVersion, bool asJsonObject
     return "OK";
   }
 
-  return render(asJsonObject);
+  return toJsonV1(asJsonObject);
 }
 
 

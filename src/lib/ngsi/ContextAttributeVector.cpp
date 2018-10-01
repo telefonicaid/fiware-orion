@@ -140,12 +140,12 @@ std::string ContextAttributeVector::toJsonTypes(void)
 
 /* ****************************************************************************
 *
-* ContextAttributeVector::render - 
+* ContextAttributeVector::toJsonV1 -
 *
 * FIXME P5: this method doesn't depend on the class object. Should be moved out of the class?
 * Maybe included in the Entiy class render logic.
 */
-std::string ContextAttributeVector::render
+std::string ContextAttributeVector::toJsonV1
 (  
   bool                                   asJsonObject,
   RequestType                            request,
@@ -182,11 +182,11 @@ std::string ContextAttributeVector::render
         added.push_back(orderedAttrs[ix]->name);
         if (attrsAsName)
         {
-          out += orderedAttrs[ix]->renderAsNameString(true);
+          out += orderedAttrs[ix]->toJsonV1AsNameString(true);
         }
         else
         {
-          out += orderedAttrs[ix]->render(asJsonObject, request, metadataFilter, true, omitValue);
+          out += orderedAttrs[ix]->toJsonV1(asJsonObject, request, metadataFilter, true, omitValue);
         }
       }
       else
@@ -196,7 +196,7 @@ std::string ContextAttributeVector::render
     }
 
     // Remove final comma, as the addedLookup() check doesn't allow us to predict which the
-    // last invocation to orderedAttrs[ix]->render(...) and setting the comma paramter properly
+    // last invocation to orderedAttrs[ix]->toJsonV1(...) and setting the comma paramter properly
     out = out.substr(0, out.length() - 1 );
 
     out += endTag(comma, attrsAsName);
@@ -208,11 +208,11 @@ std::string ContextAttributeVector::render
     {
       if (attrsAsName)
       {
-        out += orderedAttrs[ix]->renderAsNameString(ix != orderedAttrs.size() - 1);
+        out += orderedAttrs[ix]->toJsonV1AsNameString(ix != orderedAttrs.size() - 1);
       }
       else
       {
-        out += orderedAttrs[ix]->render(asJsonObject, request, metadataFilter, ix != orderedAttrs.size() - 1, omitValue);
+        out += orderedAttrs[ix]->toJsonV1(asJsonObject, request, metadataFilter, ix != orderedAttrs.size() - 1, omitValue);
       }
     }
     out += endTag(comma, true);

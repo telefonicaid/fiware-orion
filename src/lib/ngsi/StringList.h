@@ -43,7 +43,7 @@ typedef struct StringList
 
   void         fill(const std::vector<std::string>& aVec);
   void         fill(const std::string& commaSeparatedList);
-  std::string  render(bool comma, const std::string& fieldName);
+  std::string  toJsonV1(bool comma, const std::string& fieldName);
   std::string  toString(void);
   void         release(void);
   bool         lookup(const std::string& string) const;

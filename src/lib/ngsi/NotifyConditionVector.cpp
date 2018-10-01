@@ -47,9 +47,9 @@ NotifyConditionVector::NotifyConditionVector()
 
 /* ****************************************************************************
 *
-* NotifyConditionVector::render -
+* NotifyConditionVector::toJsonV1 -
 */
-std::string NotifyConditionVector::render(bool comma)
+std::string NotifyConditionVector::toJsonV1(bool comma)
 {
   std::string out = "";
 
@@ -61,7 +61,7 @@ std::string NotifyConditionVector::render(bool comma)
   out += startTag("notifyConditions", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(ix != vec.size() - 1);
+    out += vec[ix]->toJsonV1(ix != vec.size() - 1);
   }
   out += endTag(comma, true);
 

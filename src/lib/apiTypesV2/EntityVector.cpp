@@ -42,9 +42,9 @@
 
 /* ****************************************************************************
 *
-* EntityVector::render -
+* EntityVector::toJson -
 */
-std::string EntityVector::render
+std::string EntityVector::toJson
 (
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,

@@ -44,7 +44,7 @@ typedef struct NotifyContextResponse
   NotifyContextResponse();
   NotifyContextResponse(StatusCode& sc);
 
-  std::string   render(void);
+  std::string   toJsonV1(void);
   void          release(void);
 } NotifyContextResponse;
 

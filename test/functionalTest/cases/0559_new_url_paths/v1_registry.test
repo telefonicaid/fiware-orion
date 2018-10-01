@@ -613,7 +613,7 @@ Date: REGEX(.*)
 8. GET /v1/registry/contextEntities/G/attributes/A
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 217
+Content-Length: 198
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -624,7 +624,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "A",
                         "type": ""
                     }
@@ -770,7 +769,7 @@ Date: REGEX(.*)
 11. GET /v1/registry/contextEntityTypes/V/attributes/A
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 217
+Content-Length: 198
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -781,7 +780,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "A",
                         "type": ""
                     }

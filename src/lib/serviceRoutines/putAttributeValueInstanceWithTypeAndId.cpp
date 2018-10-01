@@ -84,7 +84,7 @@ std::string putAttributeValueInstanceWithTypeAndId
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
     response.fill(SccBadRequest, "non-matching entity::types in URL");
 
-    TIMED_RENDER(answer = response.render(false, false));
+    TIMED_RENDER(answer = response.toJsonV1(false, false));
 
     parseDataP->upcar.res.release();
     return answer;
@@ -99,7 +99,7 @@ std::string putAttributeValueInstanceWithTypeAndId
     std::string details = "unmatching metadata ID value URI/payload: /" + metaID + "/ vs /" + mP->stringValue + "/";
 
     response.fill(SccBadRequest, details);
-    TIMED_RENDER(answer = response.render(false, false));
+    TIMED_RENDER(answer = response.toJsonV1(false, false));
     parseDataP->upcar.res.release();
 
     return answer;
@@ -119,7 +119,7 @@ std::string putAttributeValueInstanceWithTypeAndId
 
 
   // 07. Render result
-  TIMED_RENDER(answer = response.render(false, false));
+  TIMED_RENDER(answer = response.toJsonV1(false, false));
 
 
   // 08. Cleanup and return result

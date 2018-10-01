@@ -89,7 +89,7 @@ std::string putAttributeValueInstance
 
     response.fill(SccBadRequest, details);
 
-    TIMED_RENDER(answer = response.render(false, false));
+    TIMED_RENDER(answer = response.toJsonV1(false, false));
 
     parseDataP->upcar.res.release();
 
@@ -109,7 +109,7 @@ std::string putAttributeValueInstance
 
 
   // 05. Render result
-  TIMED_RENDER(answer = response.render(false, false));
+  TIMED_RENDER(answer = response.toJsonV1(false, false));
 
 
   // 06. Cleanup and return result
