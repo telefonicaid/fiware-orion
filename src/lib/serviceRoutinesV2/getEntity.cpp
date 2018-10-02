@@ -54,9 +54,9 @@
 *
 * URI parameters:
 *   - type=<TYPE>
-*   - options=keyValues|values|unique   (used in Entity::render)
-*   - attrs=A1,A2,...An                 (used in Entity::render)
-*   - metadata=M1,M2,...Mn              (used in Entity::render)
+*   - options=keyValues|values|unique   (used in Entity::toJson)
+*   - attrs=A1,A2,...An                 (used in Entity::toJson)
+*   - metadata=M1,M2,...Mn              (used in Entity::toJson)
 */
 std::string getEntity
 (

@@ -117,10 +117,11 @@ std::string DataProvided::toJson(void)
 */
 std::string Provider::toJson(void)
 {
-  JsonHelper   jh;
-  std::string  urlAsJson = "{\"url\": \"" + http.url + "\"}";
+  JsonHelper jhUrl;
+  jhUrl.addString("url", http.url);
 
-  jh.addRaw("http", urlAsJson);
+  JsonHelper   jh;
+  jh.addRaw("http", jhUrl.str());
   jh.addString("supportedForwardingMode", forwardingModeToString(supportedForwardingMode));
   jh.addBool("legacyForwarding", legacyForwardingMode? "true" : "false");
 

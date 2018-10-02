@@ -25,6 +25,7 @@
 #include <string>
 
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/Request.h"
 #include "ngsi/SubscribeError.h"
@@ -46,37 +47,14 @@ SubscribeError::SubscribeError()
 *
 * SubscribeError::toJson -
 */
-std::string SubscribeError::toJson(RequestType requestType, bool comma)
+std::string SubscribeError::toJson(void)
 {
-  std::string  out;
+  JsonHelper jh;
 
-  out += JSON_VALUE("error", errorCode.reasonPhrase.c_str());
-  out += ",";
-  out += JSON_VALUE("description", errorCode.details.c_str());
+  jh.addString("error", errorCode.reasonPhrase);
+  jh.addString("description", errorCode.details);
 
-
-  if (requestType == UpdateContextSubscription)
-  {
-    //
-    // NOTE: the subscriptionId must have come from the request.
-    //       If the field is empty, we are in unit tests and I here set it to all zeroes
-    //
-    if (subscriptionId.get() == "")
-    {
-      subscriptionId.set("000000000000000000000000");
-    }
-    out += ",";
-    out += JSON_PROP("affectedItems") + "[" + JSON_STR(subscriptionId.toJson(requestType, true)) + "]";
-  }
-  else if ((requestType          == SubscribeContext)           &&
-           (subscriptionId.get() != "000000000000000000000000") &&
-           (subscriptionId.get() != ""))
-  {
-    out += ",";
-    out += JSON_PROP("affectedItems") + "[" + JSON_STR(subscriptionId.toJson(requestType, true)) + "]";
-  }
-
-  return out;
+  return jh.str();
 }
 
 

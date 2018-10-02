@@ -213,7 +213,7 @@ void Entity::filterAndOrderAttrs
 
 /* ****************************************************************************
 *
-* Entity::render -
+* Entity::toJsonV1 -
 *
 * This method was ported from old ContextElement class. It was name render() there
 *
