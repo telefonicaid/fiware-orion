@@ -229,9 +229,16 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   setStringVectorF(sub, CSUB_ATTRS, &(cSubP->attributes));
 
+  //
+  // 07. Push metadata names to Metadata Vector (cSubP->metadatas)
+  //
+  if (sub.hasField(CSUB_METADATA))
+  {
+    setStringVectorF(sub, CSUB_METADATA, &(cSubP->metadata));
+  }
 
   //
-  // 07. Fill in cSubP->notifyConditionV from condVec
+  // 08. Fill in cSubP->notifyConditionV from condVec
   //
   setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
 
@@ -266,8 +273,6 @@ int mongoSubCacheItemInsert
   const char*         subscriptionId,
   const char*         servicePath,
   int                 lastNotificationTime,
-  int                 lastFailure,
-  int                 lastSuccess,
   long long           expirationTime,
   const std::string&  status,
   const std::string&  q,
@@ -360,7 +365,7 @@ int mongoSubCacheItemInsert
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->servicePath           = strdup(servicePath);
   cSubP->renderFormat          = renderFormat;
-  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->count                 = 0;
