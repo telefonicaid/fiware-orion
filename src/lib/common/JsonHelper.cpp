@@ -77,7 +77,9 @@ std::string toJsonString(const std::string& input)
       {
         static const char intToHex[16] =  { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' } ;
 
-        ss += "\\u00" + intToHex[(ch & 0xF0) >> 4] + intToHex[ch & 0x0F];
+        ss += "\\u00";
+        ss += intToHex[(ch & 0xF0) >> 4];
+        ss += intToHex[ch & 0x0F];
       }
       else
       {
@@ -156,7 +158,9 @@ void JsonHelper::addString(const std::string& key, const std::string& value)
   {
     ss += ',';
   }
-  ss += toJsonString(key) + ':' + toJsonString(value);
+  ss += toJsonString(key);
+  ss += ':';
+  ss += toJsonString(value);
 
   empty = false;
 }
@@ -173,7 +177,9 @@ void JsonHelper::addRaw(const std::string& key, const std::string& value)
   {
     ss += ',';
   }
-  ss += toJsonString(key) + ':' + value;
+  ss += toJsonString(key);
+  ss += ':';
+  ss += value;
 
   empty = false;
 }
@@ -192,7 +198,9 @@ void JsonHelper::addNumber(const std::string& key, long long value)
   }
   // FIXME P7: double2str() used double as argument, but value is long long.
   // However .test regression shows that it works... weird?
-  ss += toJsonString(key) + ':' + double2string(value);
+  ss += toJsonString(key);
+  ss += ':';
+  ss += double2string(value);
 
   empty = false;
 }
@@ -213,7 +221,9 @@ void JsonHelper::addNumber(const std::string& key, double value)
   {
     ss += ',';
   }
-  ss += toJsonString(key) + ':' + double2string(value);
+  ss += toJsonString(key);
+  ss += ':';
+  ss +=  double2string(value);
 
   empty = false;
 
@@ -231,7 +241,9 @@ void JsonHelper::addDate(const std::string& key, long long timestamp)
   {
     ss += ',';
   }
-  ss += toJsonString(key) + ':' + toJsonString(isodate2str(timestamp));
+  ss += toJsonString(key);
+  ss += ':';
+  ss += toJsonString(isodate2str(timestamp));
 
   empty = false;
 }
