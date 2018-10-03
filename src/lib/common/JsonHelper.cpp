@@ -42,7 +42,6 @@ std::string toJsonString(const std::string& input)
 {
   std::string ss;
 
-  ss = '"';
   for (std::string::const_iterator iter = input.begin(); iter != input.end(); ++iter)
   {
     /* FIXME P3: This function ensures that if the DB holds special characters (which are
@@ -89,8 +88,6 @@ std::string toJsonString(const std::string& input)
     }  // end-switch
 
   }  // end-for
-
-  ss += '"';
 
   return ss;
 }
@@ -158,9 +155,11 @@ void JsonHelper::addString(const std::string& key, const std::string& value)
   {
     ss += ',';
   }
+  ss += '"';
   ss += toJsonString(key);
-  ss += ':';
+  ss += "\":\"";
   ss += toJsonString(value);
+  ss += '"';
 
   empty = false;
 }
@@ -177,8 +176,9 @@ void JsonHelper::addRaw(const std::string& key, const std::string& value)
   {
     ss += ',';
   }
+  ss += '"';
   ss += toJsonString(key);
-  ss += ':';
+  ss += "\":";
   ss += value;
 
   empty = false;
@@ -198,8 +198,9 @@ void JsonHelper::addNumber(const std::string& key, long long value)
   }
   // FIXME P7: double2str() used double as argument, but value is long long.
   // However .test regression shows that it works... weird?
+  ss += '"';
   ss += toJsonString(key);
-  ss += ':';
+  ss += "\":";
   ss += double2string(value);
 
   empty = false;
@@ -221,8 +222,9 @@ void JsonHelper::addNumber(const std::string& key, double value)
   {
     ss += ',';
   }
+  ss += '"';
   ss += toJsonString(key);
-  ss += ':';
+  ss += "\":";
   ss +=  double2string(value);
 
   empty = false;
@@ -241,9 +243,11 @@ void JsonHelper::addDate(const std::string& key, long long timestamp)
   {
     ss += ',';
   }
+  ss += '"';
   ss += toJsonString(key);
-  ss += ':';
+  ss += "\":\"";
   ss += toJsonString(isodate2str(timestamp));
+  ss += '"';
 
   empty = false;
 }
@@ -294,7 +298,9 @@ void JsonVectorHelper::addString(const std::string& value)
   {
     ss += ',';
   }
+  ss += '"';
   ss += toJsonString(value);
+  ss += '"';
 
   empty = false;
 }
@@ -369,7 +375,9 @@ void JsonVectorHelper::addDate(long long timestamp)
   {
     ss += ',';
   }
+  ss += '"';
   ss += toJsonString(isodate2str(timestamp));
+  ss += '"';
 
   empty = false;
 }

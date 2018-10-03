@@ -676,7 +676,9 @@ std::string CompoundValueNode::toJson(bool toplevel)
   switch (valueType)
   {
   case orion::ValueTypeString:
-    out = toJsonString(stringValue);
+    out = '"';
+    out += toJsonString(stringValue);
+    out += '"';
     break;
 
   case orion::ValueTypeNumber:
@@ -708,10 +710,12 @@ std::string CompoundValueNode::toJson(bool toplevel)
     }
     else
     {
-      out = "{" + childV[0]->toJson(false);
+      out = "{";
+      out += childV[0]->toJson(false);
       for (unsigned int ix = 1; ix < childV.size(); ix++)
       {
-        out += "," + childV[ix]->toJson(false);
+        out += ",";
+        out += childV[ix]->toJson(false);
       }
       out += "}";
     }
@@ -737,7 +741,10 @@ std::string CompoundValueNode::toJson(bool toplevel)
 
   if (parentIsObject)
   {
-    return toJsonString(name) + ":" + out;
+    std::string preOut = "\"";
+    preOut += toJsonString(name);
+    preOut += "\":";
+    return preOut + out;
   }
   else
   {
