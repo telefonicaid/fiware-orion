@@ -702,23 +702,19 @@ std::string CompoundValueNode::toJson(bool toplevel)
     break;
 
   case orion::ValueTypeObject:
-    // In thic case we cannot use JsonObjectHelper to build the object, as we don't have a
+    // In this case we cannot use JsonObjectHelper to build the object, as we don't have a
     // key-value sequence to invoke addXX() method
-    if (childV.size() == 0)
+    out = "{";
+    for (unsigned int ix = 0; ix < childV.size(); ix++)
     {
-      out = "{}";
-    }
-    else
-    {
-      out = "{";
-      out += childV[0]->toJson(false);
-      for (unsigned int ix = 1; ix < childV.size(); ix++)
+      out += childV[ix]->toJson(false);
+      if (ix != childV.size() - 1)
       {
         out += ",";
-        out += childV[ix]->toJson(false);
       }
-      out += "}";
     }
+    out += "}";
+
     // Early return in this case, to avoid getting parentIsObject as in the
     // case of root element we don't use key. Only the first call to
     // toJson() uses toplevel == true
