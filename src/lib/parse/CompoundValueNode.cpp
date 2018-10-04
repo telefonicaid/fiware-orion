@@ -744,7 +744,8 @@ std::string CompoundValueNode::toJson(bool toplevel)
     std::string preOut = "\"";
     preOut += toJsonString(name);
     preOut += "\":";
-    return preOut + out;
+    preOut += out;
+    return preOut;
   }
   else
   {

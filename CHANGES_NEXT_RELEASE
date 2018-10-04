@@ -1,2 +1,3 @@
 - Fix: metadata filter was lost during csub cache refresh (#3290)
+- Fix: NGSIv1-like error responses were used in some NGSIv2 operations
 - Remove: isDomain field in NGSIv1 registrations (it was never used)
