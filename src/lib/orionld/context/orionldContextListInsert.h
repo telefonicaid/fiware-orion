@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTFREE_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTFREE_H_
+#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTLISTINSERT_H_
+#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTLISTINSERT_H_
 
 /*
 *
@@ -25,14 +25,19 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
+extern "C"
+{
+#include "kjson/KjNode.h"                                    // KjNode
+}
+
+#include "orionld/context/OrionldContext.h"                  // OrionldContext
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextFree -
+// orionldContextListInsert -
 //
-extern void orionldContextFree(OrionldContext* contextP);
+extern void orionldContextListInsert(OrionldContext* contextP);
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTFREE_H_
+#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTLISTINSERT_H_

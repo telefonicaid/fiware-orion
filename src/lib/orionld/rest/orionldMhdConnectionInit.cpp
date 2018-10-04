@@ -262,7 +262,7 @@ int orionldMhdConnectionInit
   if (ciP->verb == NOVERB)
   {
     LM_T(LmtVerb, ("NOVERB for (%s)", method));
-    ciP->responsePayload  = (char*) invalidVerbPayload;
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not a valid verb", method, OrionldDetailsString);
     ciP->httpStatusCode   = SccBadRequest;
     return MHD_YES;
   }

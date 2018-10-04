@@ -23,9 +23,13 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET (SOURCES
     orionldContextList.cpp
     orionldContextAdd.cpp
+    orionldContextCreateFromTree.cpp
+    orionldContextCreateFromUrl.cpp
+    orionldContextListInsert.cpp
     orionldContextLookup.cpp
     orionldContextItemLookup.cpp
     orionldContextFree.cpp
+    orionldContextFreeAll.cpp
     orionldContextDownloadAndParse.cpp
     orionldDefaultContext.cpp
     orionldContextPresent.cpp

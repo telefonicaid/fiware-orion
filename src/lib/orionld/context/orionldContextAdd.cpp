@@ -40,97 +40,10 @@ extern "C"
 #include "orionld/context/orionldContextList.h"                // orionldContextHead, orionldContextTail
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
 #include "orionld/context/orionldContextDownloadAndParse.h"    // orionldContextDownloadAndParse
+#include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
+#include "orionld/context/orionldContextCreateFromUrl.h"       // orionldContextCreateFromUrl
+#include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
 #include "orionld/context/orionldContextAdd.h"                 // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldContextCreate -
-//
-OrionldContext* orionldContextCreateFromTree(KjNode* tree, const char* url, char** detailsPP)
-{
-  OrionldContext* contextP = (OrionldContext*) malloc(sizeof(OrionldContext));
-
-  if (contextP == NULL)
-  {
-    *detailsPP = (char*) "out of memory";
-    return NULL;
-  }
-
-  LM_TMP(("Allocated context '%s' at %p, tree at %p", url, contextP, tree));
-
-  contextP->url  = strdup(url);
-  contextP->tree = tree;
-  contextP->next = NULL;
-
-  return contextP;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldContextCreateFromUrl -
-//
-OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url, char** detailsPP)
-{
-  OrionldContext* contextP = orionldContextLookup(url);
-
-  //
-  // If found, use it
-  //
-  if (contextP != NULL)
-  {
-    return contextP;
-  }
-
-  //
-  // Else, create a new tree
-  //
-  contextP = orionldContextCreateFromTree(NULL, url, detailsPP);
-
-  if (contextP == NULL)
-  {
-    ciP->contextToBeFreed = false;
-    return NULL;
-  }
-
-  contextP->tree = orionldContextDownloadAndParse(ciP->kjsonP, url, detailsPP);
-  if (contextP->tree == NULL)
-  {
-    free(contextP->url);
-    free(contextP);
-    ciP->contextToBeFreed = false;
-    return NULL;
-  }
-
-  ciP->contextToBeFreed = true;
-  
-  return contextP;
-}
-
-
-
-// ----------------------------------------------------------------------------
-//
-// orionldContextListInsert -
-//
-void orionldContextListInsert(OrionldContext* contextP)
-{    
-  LM_T(LmtContextList, ("Adding context '%s' to the list (context at %p, tree at %p)", contextP->url, contextP, contextP->tree));
-
-  if (orionldContextHead == NULL)
-  {
-    orionldContextHead = contextP;
-    orionldContextTail = contextP;
-  }
-  else
-  {
-    orionldContextTail->next = contextP;
-    orionldContextTail       = contextP;
-  }
-}
 
 
 

@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTFREE_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTFREE_H_
-
 /*
 *
 * Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,14 +22,35 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
+#include "logMsg/logMsg.h"                                  // LM_*
+#include "logMsg/traceLevels.h"                             // Lmt*
+
+extern "C"
+{
+#include "kjson/kjFree.h"                                   // kjFree
+}
+
+#include "orionld/context/OrionldContext.h"                 // OrionldContext
+#include "orionld/context/orionldContextList.h"             // orionldContextHead
+#include "orionld/context/orionldContextFree.h"             // orionldContextFree
+#include "orionld/context/orionldContextFreeAll.h"          // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextFree -
+// orionldContextFreeAll -
 //
-extern void orionldContextFree(OrionldContext* contextP);
+void orionldContextFreeAll(void)
+{
+  OrionldContext* contextP = orionldContextHead;
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTFREE_H_
+  while (contextP != NULL)
+  {
+    OrionldContext* next = contextP->next;
+
+    LM_TMP(("Calling orionldContextFree for context '%s', next at %p", contextP->url, contextP->next));
+    orionldContextFree(contextP);
+    contextP = next;
+  }
+}

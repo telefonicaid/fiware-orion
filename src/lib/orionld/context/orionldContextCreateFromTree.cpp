@@ -22,44 +22,41 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                  // LM_*
-#include "logMsg/traceLevels.h"                             // Lmt*
+#include <string.h>                                            // strdup
+#include <stdlib.h>                                            // malloc
+
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
 extern "C"
 {
-#include "kjson/kjFree.h"                                   // kjFree
+#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjParse.h"                                     // kjParse
+#include "kjson/kjFree.h"                                      // kjFree
 }
 
-#include "orionld/context/OrionldContext.h"                 // OrionldContext
-#include "orionld/context/orionldDefaultContext.h"          // orionldDefaultContext
-#include "orionld/context/orionldContextFree.h"             // Own interface
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/context/orionldContextCreateFromTree.h"      // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextFree -
+// orionldContextCreateFromTree -
 //
-void orionldContextFree(OrionldContext* contextP)
+OrionldContext* orionldContextCreateFromTree(KjNode* tree, const char* url, char** detailsPP)
 {
+  OrionldContext* contextP = (OrionldContext*) malloc(sizeof(OrionldContext));
+
   if (contextP == NULL)
   {
-    LM_TMP(("NOT Freeing LIST context (NULL)"));
-    return;
-  }
-  
-  LM_TMP(("Freeing LIST context '%s' at %p, tree at %p", contextP->url, contextP, contextP->tree));
-
-  if (contextP->tree != NULL)
-  {
-    kjFree(contextP->tree);
-    contextP->tree = NULL;
+    *detailsPP = (char*) "out of memory";
+    return NULL;
   }
 
-  if (contextP != &orionldDefaultContext)
-  {
-    if (contextP->url != NULL)
-      free(contextP->url);
-    free(contextP);
-  }
+  contextP->url  = strdup(url);
+  contextP->tree = tree;
+  contextP->next = NULL;
+
+  return contextP;
 }

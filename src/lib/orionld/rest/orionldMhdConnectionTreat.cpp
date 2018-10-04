@@ -41,7 +41,7 @@ extern "C"
 #include "orionld/serviceRoutines/orionldBadVerb.h"         // orionldBadVerb
 #include "orionld/rest/orionldServiceInit.h"                // orionldRestServiceV 
 #include "orionld/rest/orionldServiceLookup.h"              // orionldServiceLookup
-#include "orionld/context/orionldContextAdd.h"              // orionldContextCreateFromUrl
+#include "orionld/context/orionldContextCreateFromUrl.h"    // orionldContextCreateFromUrl
 #include "orionld/rest/temporaryErrorPayloads.h"            // Temporary Error Payloads
 #include "orionld/rest/orionldMhdConnectionTreat.h"         // Own Interface
 

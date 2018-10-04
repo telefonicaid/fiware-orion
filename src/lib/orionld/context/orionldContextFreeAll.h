@@ -25,14 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextFree -
+// orionldContextFreeAll -
 //
-extern void orionldContextFree(OrionldContext* contextP);
+extern void orionldContextFreeAll(void);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTFREE_H_

@@ -35,42 +35,10 @@ extern "C"
 
 
 
-// -----------------------------------------------------------------------------
-//
-// orionldContextCreate -
-//
-extern OrionldContext* orionldContextCreateFromTree(KjNode* tree, const char* url, char** detailsPP);
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldContextCreate -
-//
-extern OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url, char** detailsPP);
-
-
-
-// ----------------------------------------------------------------------------
-//
-// orionldContextListInsert -
-//
-extern void orionldContextListInsert(OrionldContext* contextP);
-
-
-
 // ----------------------------------------------------------------------------
 //
 // orionldContextAdd -
 //
 extern OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsP);
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldContextFreeAll -
-//
-extern void orionldContextFreeAll(void);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_

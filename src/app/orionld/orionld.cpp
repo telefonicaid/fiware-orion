@@ -102,13 +102,12 @@
 #include "metricsMgr/metricsMgr.h"
 #include "logSummary/logSummary.h"
 
-#include "orionld/rest/orionldMhdConnection.h"  // orionLdServiceInit
-#include "orionld/context/orionldContextAdd.h"  // orionldContextFreeAll
+#include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
+#include "orionld/context/orionldContextFreeAll.h"          // orionldContextFreeAll
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
 #include "orionld/orionldRestServices.h"
-#include "orionld/rest/orionldServiceInit.h"
 
 using namespace orion;
 
