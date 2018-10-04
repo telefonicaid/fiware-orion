@@ -49,7 +49,7 @@ SubscribeError::SubscribeError()
 */
 std::string SubscribeError::toJson(void)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   jh.addString("error", errorCode.reasonPhrase);
   jh.addString("description", errorCode.details);

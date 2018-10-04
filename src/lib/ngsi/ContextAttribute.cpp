@@ -885,7 +885,7 @@ void ContextAttribute::filterAndOrderMetadata
 */
 std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFilter)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   //
   // type

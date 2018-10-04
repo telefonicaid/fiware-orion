@@ -142,7 +142,7 @@ std::string OrionError::toJson(void)
   char*  reasonPhraseEscaped = htmlEscape(reasonPhrase.c_str());
   char*  detailsEscaped      = htmlEscape(details.c_str());
 
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   jh.addString("error", reasonPhraseEscaped);
   jh.addString("description", detailsEscaped);

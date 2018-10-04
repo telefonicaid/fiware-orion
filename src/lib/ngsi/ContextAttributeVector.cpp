@@ -87,7 +87,7 @@ std::string ContextAttributeVector::toJsonTypes(void)
   }
 
   // Pass 2 - generate JSON
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   std::map<std::string, std::map<std::string, int> >::iterator it;
   unsigned int                                                 ix;
@@ -101,7 +101,7 @@ std::string ContextAttributeVector::toJsonTypes(void)
     std::map<std::string, int>::iterator jt;
     unsigned int                         jx;
 
-    JsonHelper jhTypes;
+    JsonObjectHelper jhTypes;
 
     for (jt = attrTypes.begin(), jx = 0; jt != attrTypes.end(); ++jt, ++jx)
     {

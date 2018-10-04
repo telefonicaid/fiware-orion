@@ -115,7 +115,7 @@ void EntityTypeResponse::release(void)
 */
 std::string EntityTypeResponse::toJson(void)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   jh.addRaw("attrs", entityType.contextAttributeVector.toJsonTypes());
   jh.addNumber("count", entityType.count);

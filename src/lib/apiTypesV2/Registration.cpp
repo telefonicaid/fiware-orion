@@ -67,7 +67,7 @@ Registration::~Registration()
 */
 std::string Registration::toJson(void)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   jh.addString("id", id);
 
@@ -101,7 +101,7 @@ std::string Registration::toJson(void)
 */
 std::string DataProvided::toJson(void)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   jh.addRaw("entities", vectorToJson(entities));
   jh.addRaw("attrs", vectorToJson(attributes));
@@ -117,10 +117,10 @@ std::string DataProvided::toJson(void)
 */
 std::string Provider::toJson(void)
 {
-  JsonHelper jhUrl;
+  JsonObjectHelper jhUrl;
   jhUrl.addString("url", http.url);
 
-  JsonHelper   jh;
+  JsonObjectHelper   jh;
   jh.addRaw("http", jhUrl.str());
   jh.addString("supportedForwardingMode", forwardingModeToString(supportedForwardingMode));
   jh.addBool("legacyForwarding", legacyForwardingMode? "true" : "false");
@@ -136,7 +136,7 @@ std::string Provider::toJson(void)
 */
 std::string ForwardingInformation::toJson()
 {
-  JsonHelper  jh;
+  JsonObjectHelper  jh;
 
   jh.addNumber("timesSent", timesSent);
 

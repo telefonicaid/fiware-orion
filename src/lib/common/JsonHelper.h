@@ -32,11 +32,10 @@
 #include <map>
 
 
-// FIXME P10: should be renamed to JsonObjectHelper
-class JsonHelper
+class JsonObjectHelper
 {
 public:
-  JsonHelper();
+  JsonObjectHelper();
 
   void        addString(const std::string& key, const std::string& value);
   void        addRaw(const std::string& key, const std::string& value);

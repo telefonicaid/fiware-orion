@@ -108,7 +108,7 @@ bool MetadataVector::matchFilter(const std::string& mdName, const std::vector<st
 */
 std::string MetadataVector::toJson(const std::vector<Metadata*>& orderedMetadata)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   for (unsigned int ix = 0; ix < orderedMetadata.size(); ++ix)
   {

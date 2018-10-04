@@ -702,7 +702,7 @@ std::string CompoundValueNode::toJson(bool toplevel)
     break;
 
   case orion::ValueTypeObject:
-    // In thic case we cannot use JsonHelper to build the object, as we don't have a
+    // In thic case we cannot use JsonObjectHelper to build the object, as we don't have a
     // key-value sequence to invoke addXX() method
     if (childV.size() == 0)
     {

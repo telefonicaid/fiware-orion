@@ -119,7 +119,7 @@ std::string EntityId::toJsonV1(bool comma, bool isInVector)
 */
 std::string EntityId::toJson(void) const
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   char*  typeEscaped  = htmlEscape(type.c_str());
   char*  idEscaped    = htmlEscape(id.c_str());

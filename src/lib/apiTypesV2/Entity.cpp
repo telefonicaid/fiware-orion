@@ -355,7 +355,7 @@ std::string Entity::toJsonUniqueValues(const std::vector<ContextAttribute*>& ord
 */
 std::string Entity::toJsonKeyvalues(const std::vector<ContextAttribute*>& orderedAttrs)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   if (renderId)
   {
@@ -382,7 +382,7 @@ std::string Entity::toJsonKeyvalues(const std::vector<ContextAttribute*>& ordere
 */
 std::string Entity::toJsonNormalized(const std::vector<ContextAttribute*>& orderedAttrs, const std::vector<std::string>&  metadataFilter)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   if (renderId)
   {
