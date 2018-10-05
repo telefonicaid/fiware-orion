@@ -71,7 +71,7 @@ std::string Attribute::toJson
     {
       if (renderFormat == NGSI_V2_KEYVALUES)
       {
-        JsonHelper jh;
+        JsonObjectHelper jh;
         jh.addRaw(pcontextAttribute->name, pcontextAttribute->toJsonValue());
         out = jh.str();
       }

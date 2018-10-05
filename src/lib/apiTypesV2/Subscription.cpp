@@ -63,7 +63,7 @@ Subscription::~Subscription()
 */
 std::string Subscription::toJson(void)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   jh.addString("id", this->id);
 
@@ -111,7 +111,7 @@ std::string Subscription::toJson(void)
 */
 std::string Notification::toJson(const std::string& attrsFormat)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   if (this->timesSent > 0)
   {
@@ -169,7 +169,7 @@ std::string Notification::toJson(const std::string& attrsFormat)
 */
 std::string Subject::toJson()
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   jh.addRaw("entities", vectorToJson(this->entities));
   jh.addRaw("condition", this->condition.toJson());
@@ -185,11 +185,11 @@ std::string Subject::toJson()
 */
 std::string Condition::toJson()
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   jh.addRaw("attrs", vectorToJson(this->attributes));
 
-  JsonHelper jhe;
+  JsonObjectHelper jhe;
 
   if (this->expression.q        != "")  jhe.addString("q",        this->expression.q);
   if (this->expression.mq       != "")  jhe.addString("mq",       this->expression.mq);

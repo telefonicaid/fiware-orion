@@ -27,6 +27,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/RenderFormat.h"
+#include "common/JsonHelper.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
 #include "rest/OrionError.h"
@@ -84,21 +85,14 @@ std::string NotifyContextRequest::toJson
     alarmMgr.badInput(clientIp, "Invalid notification format");
 
     return oe.toJson();
-  }
+  }  
 
-  std::string out;
+  JsonObjectHelper jh;
 
-  out += "{";
-  out += JSON_STR("subscriptionId") + ":";
-  out += JSON_STR(subscriptionId.get());
-  out += ",";
-  out += JSON_STR("data") + ":[";
+  jh.addString("subscriptionId", subscriptionId.get());
+  jh.addRaw("data", contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter));
 
-  out += contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
-  out += "]";
-  out += "}";
-
-  return out;
+  return jh.str();
 }
 
 

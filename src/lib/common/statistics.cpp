@@ -224,11 +224,11 @@ std::string renderTimingStatistics(void)
     return "{}";
   }
 
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   if (acc)
   {
-    JsonHelper accJh;
+    JsonObjectHelper accJh;
 
     if (accJsonV1ParseTime)      accJh.addNumber("jsonV1Parse",      timeSpecToFloat(accTimeStat.jsonV1ParseTime));
     if (accJsonV2ParseTime)      accJh.addNumber("jsonV2Parse",      timeSpecToFloat(accTimeStat.jsonV2ParseTime));
@@ -243,7 +243,7 @@ std::string renderTimingStatistics(void)
   }
   if (last)
   {
-    JsonHelper lastJh;
+    JsonObjectHelper lastJh;
 
     if (lastJsonV1ParseTime)      lastJh.addNumber("jsonV1Parse",      timeSpecToFloat(lastTimeStat.jsonV1ParseTime));
     if (lastJsonV2ParseTime)      lastJh.addNumber("jsonV2Parse",      timeSpecToFloat(lastTimeStat.jsonV2ParseTime));

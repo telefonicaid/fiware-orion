@@ -37,7 +37,7 @@ namespace ngsiv2
 */
 std::string EntID::toJson()
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   if (!this->id.empty())
   {

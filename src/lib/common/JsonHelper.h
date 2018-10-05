@@ -31,10 +31,11 @@
 #include <vector>
 #include <map>
 
-class JsonHelper
+
+class JsonObjectHelper
 {
 public:
-  JsonHelper();
+  JsonObjectHelper();
 
   void        addString(const std::string& key, const std::string& value);
   void        addRaw(const std::string& key, const std::string& value);
@@ -42,6 +43,26 @@ public:
   void        addNumber(const std::string& key, double value);
   void        addDate(const std::string& key, long long timestamp);
   void        addBool(const std::string& key, bool b);
+
+  std::string str();
+
+private:
+ std::string  ss;
+ bool         empty;
+};
+
+
+class JsonVectorHelper
+{
+public:
+  JsonVectorHelper();
+
+  void        addString(const std::string& value);
+  void        addRaw(const std::string& value);
+  void        addNumber(long long value);
+  void        addNumber(double value);
+  void        addDate(long long timestamp);
+  void        addBool(bool b);
 
   std::string str();
 
@@ -76,10 +97,12 @@ std::string vectorToJson(std::vector<T> &list)
 
   std::string ss;
 
-  ss += '[' + list[0].toJson();
+  ss += '[';
+  ss += list[0].toJson();
   for (size_type i = 1; i != list.size(); ++i)
   {
-    ss += ',' + list[i].toJson();
+    ss += ',';
+    ss += list[i].toJson();
   }
   ss += ']';
   return ss;
