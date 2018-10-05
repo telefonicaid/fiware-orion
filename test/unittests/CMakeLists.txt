@@ -135,7 +135,6 @@ SET (SOURCES
     ngsi/ProvidingApplication_test.cpp
     ngsi/Duration_test.cpp
     ngsi/AttributeExpression_test.cpp
-    ngsi/ContextElementVector_test.cpp
     ngsi/ContextRegistrationResponse_test.cpp
     ngsi/ContextRegistrationResponseVector_test.cpp
     ngsi/EntityId_test.cpp
