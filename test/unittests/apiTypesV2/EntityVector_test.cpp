@@ -22,6 +22,8 @@
 *
 * Author: Fermin Galan
 */
+#include <string>
+
 #include "apiTypesV2/EntityVector.h"
 #include "unittests/unittest.h"
 
