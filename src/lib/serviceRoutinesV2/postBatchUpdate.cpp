@@ -73,7 +73,7 @@ std::string postBatchUpdate
   buP->release();  // upcrP just 'took over' the data from buP, buP is no longer needed
 
   std::string  answer = "";
-  if (parseDataP->upcr.res.contextElementVector.size() == 0)
+  if (parseDataP->upcr.res.entityVector.size() == 0)
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITIES_VECTOR);
     alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITIES_VECTOR);
