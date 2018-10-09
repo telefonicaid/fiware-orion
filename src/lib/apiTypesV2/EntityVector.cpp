@@ -67,17 +67,65 @@ std::string EntityVector::toJson
 
 /* ****************************************************************************
 *
+* EntityVector::toJsonV1 -
+*
+* Ported from old class ContextElementVector
+*/
+std::string EntityVector::toJsonV1
+(
+  bool         asJsonObject,
+  RequestType  requestType,
+  bool         comma
+)
+{
+  std::string  out = "";
+
+  if (vec.size() == 0)
+  {
+    return "";
+  }
+
+  out += startTag("contextElements", true);
+
+  // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
+  std::vector<std::string> emptyV;
+
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    out += vec[ix]->toJsonV1(asJsonObject, requestType, emptyV, false, emptyV, ix != vec.size() - 1);
+  }
+
+  out += endTag(comma, true);
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
 * EntityVector::check -
 */
-std::string EntityVector::check(RequestType requestType)
+std::string EntityVector::check(ApiVersion apiVersion, RequestType requestType)
 {
+  if ((apiVersion == V1) && (requestType == UpdateContext))
+  {
+    if (vec.size() == 0)
+    {
+      return "No context elements";
+    }
+  }
+
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(V2, requestType)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType)) != "OK")
     {
-      alarmMgr.badInput(clientIp, "invalid vector of Entity");
+      if (apiVersion == V2)
+      {
+        alarmMgr.badInput(clientIp, "invalid vector of Entity");
+      }
       return res;
     }
   }
@@ -121,6 +169,25 @@ Entity*  EntityVector::operator[] (unsigned int ix) const
 unsigned int EntityVector::size(void)
 {
   return vec.size();
+}
+
+
+
+/* ****************************************************************************
+*
+* EntityVector::lookup -
+*/
+Entity* EntityVector::lookup(const std::string& name, const std::string& type)
+{
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if ((vec[ix]->id == name) && (vec[ix]->type == type))
+    {
+      return vec[ix];
+    }
+  }
+
+  return NULL;
 }
 
 

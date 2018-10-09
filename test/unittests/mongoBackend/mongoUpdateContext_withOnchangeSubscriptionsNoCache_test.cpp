@@ -449,7 +449,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch)
     eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Prepare database */
@@ -522,7 +522,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch)
     eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Prepare database */
@@ -591,7 +591,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_type
     eP->fill("E7", "T1", "false");
     ContextAttribute* ca2P = new ContextAttribute("A4", "TA4", "new_val");
     eP->attributeVector.push_back(ca2P);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Prepare database */
@@ -659,7 +659,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_idAn
     eP->fill("E9", "T1", "false");
     ContextAttribute* ca2P = new ContextAttribute("A4", "TA4", "new_val");
     eP->attributeVector.push_back(ca2P);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Prepare database */
@@ -727,7 +727,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch)
     eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeDelete;
 
     /* Prepare database */
@@ -812,7 +812,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_noTy
     eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Prepare database */
@@ -899,7 +899,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_noTy
     eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Prepare database */
@@ -981,7 +981,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_noTy
     eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeDelete;
 
     /* Prepare database */
@@ -1051,7 +1051,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_patt
     eP->fill("E1", "T", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Prepare database */
@@ -1122,7 +1122,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_patt
     eP->fill("E1", "T", "false");
     ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Prepare database */
@@ -1189,7 +1189,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_patt
     eP->fill("E1", "T", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeDelete;
 
     /* Prepare database */
@@ -1258,7 +1258,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_patt
     eP->fill("E3", "T3", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Prepare database */
@@ -1329,7 +1329,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_patt
     eP->fill("E3", "T3", "false");
     ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Prepare database */
@@ -1396,7 +1396,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_patt
     eP->fill("E3", "T3", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeDelete;
 
     /* Prepare database */
@@ -1465,7 +1465,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatchDisjo
     eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A2", "TA2", "new_val");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Prepare database */
@@ -1534,7 +1534,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatchDisjo
     eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A5", "TA5", "new_val");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Prepare database */
@@ -1603,7 +1603,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatchDisjo
     eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A2", "TA2", "");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeDelete;
 
     /* Prepare database */
@@ -1645,7 +1645,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateNoMatch)
     eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A3", "TA3", "new_val");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Prepare database */
@@ -1687,7 +1687,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendNoMatch)
     eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A6", "TA6", "new_val");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Prepare database */
@@ -1729,7 +1729,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteNoMatch)
     eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A3", "TA3", "");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeDelete;
 
     /* Prepare database */
@@ -1771,7 +1771,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatchWitho
     eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "X");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Prepare database */
@@ -1842,7 +1842,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMixMatchNo
     ContextAttribute* caa2P = new ContextAttribute("A7", "TA7", "new_val7");   // no match
     eP->attributeVector.push_back(caa1P);
     eP->attributeVector.push_back(caa2P);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Prepare database */
@@ -1915,7 +1915,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMixMatchNo
     ContextAttribute* caa2P = new ContextAttribute("A6", "TA6", "new_val6");   // no match
     eP->attributeVector.push_back(caa1P);
     eP->attributeVector.push_back(caa2P);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Prepare database */
@@ -1984,7 +1984,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMixMatchNo
     ContextAttribute* caa2P = new ContextAttribute("A2", "TA2", "");    // match
     eP->attributeVector.push_back(caa1P);
     eP->attributeVector.push_back(caa2P);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeDelete;
 
     /* Prepare database */
@@ -2055,7 +2055,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_update2Matches1N
     ContextAttribute* caa2P = new ContextAttribute("A2", "TA2", "new_val2");
     eP->attributeVector.push_back(caa1P);
     eP->attributeVector.push_back(caa2P);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Prepare database */
@@ -2128,7 +2128,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_append2Matches1N
     ContextAttribute* caa2P = new ContextAttribute("A5", "TA5", "new_val5");
     eP->attributeVector.push_back(caa1P);
     eP->attributeVector.push_back(caa2P);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Prepare database */
@@ -2195,7 +2195,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_delete2Matches1N
     eP->fill("E1", "T1", "false");
     ContextAttribute* caa1P = new ContextAttribute("A1", "TA1", "");
     eP->attributeVector.push_back(caa1P);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeDelete;
 
     /* Prepare database */
@@ -2265,7 +2265,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMatch)
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
 
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Prepare database */
@@ -2336,7 +2336,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMatch)
     eP->fill("E2", "T2", "false");
     ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Prepare database */
@@ -2403,7 +2403,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMatch)
     eP->fill("E2", "T2", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeDelete;
 
     /* Prepare database */
@@ -2472,7 +2472,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMatchDisjo
     eP->fill("E2", "T2", "false");
     ContextAttribute* caP = new ContextAttribute("A2", "TA2", "new_val");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Prepare database */
@@ -2541,7 +2541,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMatchDisjo
     eP->fill("E2", "T2", "false");
     ContextAttribute* caP = new ContextAttribute("A5", "TA5", "new_val");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Prepare database */
@@ -2610,7 +2610,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMatchDisjo
     eP->fill("E2", "T2", "false");
     ContextAttribute* caP = new ContextAttribute("A2", "TA2", "");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeDelete;
 
     /* Prepare database */
@@ -2652,7 +2652,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateNoMatch)
     eP->fill("E2", "T2", "false");
     ContextAttribute* caP = new ContextAttribute("A3", "TA3", "new_val");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Prepare database */
@@ -2694,7 +2694,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendNoMatch)
     eP->fill("E2", "T2", "false");
     ContextAttribute* caP = new ContextAttribute("A6", "TA6", "new_val");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Prepare database */
@@ -2736,7 +2736,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteNoMatch)
     eP->fill("E2", "T2", "false");
     ContextAttribute* caP = new ContextAttribute("A3", "TA3", "");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeDelete;
 
     /* Prepare database */
@@ -2778,7 +2778,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMatchWitho
     eP->fill("E2", "T2", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "X");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Prepare database */
@@ -2849,7 +2849,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMixMatchNo
     ContextAttribute* caa2P = new ContextAttribute("A7", "TA7", "new_val7");   // no match
     eP->attributeVector.push_back(caa1P);
     eP->attributeVector.push_back(caa2P);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Prepare database */
@@ -2922,7 +2922,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMixMatchNo
     ContextAttribute* caa2P = new ContextAttribute("A6", "TA6", "new_val6");    // no match
     eP->attributeVector.push_back(caa1P);
     eP->attributeVector.push_back(caa2P);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Prepare database */
@@ -2991,7 +2991,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMixMatchNo
     ContextAttribute* caa2P = new ContextAttribute("A2", "TA2", "");   // match
     eP->attributeVector.push_back(caa1P);
     eP->attributeVector.push_back(caa2P);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeDelete;
 
     /* Prepare database */
@@ -3062,7 +3062,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_update2Matches1N
     ContextAttribute* caa2P = new ContextAttribute("A2", "TA2", "new_val2");
     eP->attributeVector.push_back(caa1P);
     eP->attributeVector.push_back(caa2P);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Prepare database */
@@ -3135,7 +3135,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_append2Matches1N
     ContextAttribute* caa2P = new ContextAttribute("A5", "TA5", "new_val5");
     eP->attributeVector.push_back(caa1P);
     eP->attributeVector.push_back(caa2P);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Prepare database */
@@ -3202,7 +3202,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_delete2Matches1N
     eP->fill("E2", "T2", "false");
     ContextAttribute* caa1P = new ContextAttribute("A1", "TA1", "");
     eP->attributeVector.push_back(caa1P);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeDelete;
 
     /* Prepare database */
@@ -3262,7 +3262,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, DISABLED_MongoDbQueryF
     eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */

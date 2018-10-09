@@ -25,7 +25,6 @@ SET (SOURCES
     ConditionValueList.cpp
     ContextAttribute.cpp
     ContextAttributeVector.cpp
-    ContextElementVector.cpp
     ContextElementResponse.cpp
     ContextElementResponseVector.cpp
     ContextRegistration.cpp

@@ -161,7 +161,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     eP->fill("E3", "T3", "false");
     caP->metadataVector.push_back(mdP);
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
@@ -291,7 +291,7 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     Metadata* mdP = new Metadata("location", "string", "WGS84");
     caP->metadataVector.push_back(mdP);
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
@@ -408,7 +408,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
     eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "2, -4");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
@@ -514,7 +514,7 @@ TEST(mongoUpdateContextGeoRequest, replaceLocAttributeWithSameLocAttribute)
     ContextAttribute* caP = new ContextAttribute("A1", "geo:point", "2, -4");
     caP->typeGiven = true;
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeReplace;
 
     /* Invoke the function in mongoBackend library */
@@ -614,7 +614,7 @@ TEST(mongoUpdateContextGeoRequest, replaceLocAttributeWithDifferentLocAttribute)
     ContextAttribute* caP = new ContextAttribute("A2", "geo:point", "2, -4");
     caP->typeGiven = true;
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeReplace;
 
     /* Invoke the function in mongoBackend library */
@@ -714,7 +714,7 @@ TEST(mongoUpdateContextGeoRequest, replaceLocAttributeWithNoLocAttribute)
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "noLoc");
     caP->typeGiven = true;
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeReplace;
 
     /* Invoke the function in mongoBackend library */
@@ -811,7 +811,7 @@ TEST(mongoUpdateContextGeoRequest, replaceNoLocAttributeWithLocAttribute)
     ContextAttribute* caP = new ContextAttribute("A2", "geo:point", "2, -4");
     caP->typeGiven = true;
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeReplace;
 
     /* Invoke the function in mongoBackend library */
@@ -920,7 +920,7 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
     eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
@@ -1025,7 +1025,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
 
     ca2P->metadataVector.push_back(md2P);
     eP->attributeVector.push_back(ca2P);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
@@ -1144,7 +1144,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     Metadata* mdP = new Metadata("location", "string", "WGS84");
     caP->metadataVector.push_back(mdP);
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
@@ -1254,7 +1254,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
     Metadata* mdP = new Metadata("location", "string", "gurugu");
     caP->metadataVector.push_back(mdP);
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
@@ -1365,7 +1365,7 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     Metadata* mdP = new Metadata("location", "string", "WGS84");
     caP->metadataVector.push_back(mdP);
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
@@ -1478,7 +1478,7 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     Metadata* mdP = new Metadata("location", "string", "WGS84");
     caP->metadataVector.push_back(mdP);
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
@@ -1591,7 +1591,7 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     Metadata* mdP = new Metadata("location", "string", "gurugu");
     caP->metadataVector.push_back(mdP);
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
@@ -1701,7 +1701,7 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "invalid");
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
@@ -1811,7 +1811,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     Metadata* mdP = new Metadata("location", "string", "WGS84");
     caP->metadataVector.push_back(mdP);
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
@@ -1923,7 +1923,7 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     Metadata* mdP = new Metadata("location", "string", "WGS84");
     caP->metadataVector.push_back(mdP);
     eP->attributeVector.push_back(caP);
-    req.contextElementVector.push_back(eP);
+    req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */

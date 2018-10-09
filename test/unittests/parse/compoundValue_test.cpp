@@ -51,7 +51,7 @@ TEST(compoundValue, updateNoCompoundValue)
   ci.inMimeType = JSON;
   result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
-  caP = reqData.upcr.res.contextElementVector[0]->attributeVector[0];
+  caP = reqData.upcr.res.entityVector[0]->attributeVector[0];
   EXPECT_EQ("1", caP->stringValue);
 
   utExit();
@@ -115,7 +115,7 @@ TEST(compoundValue, updateOneStringJson)
 
   EXPECT_STREQ("OK", result.c_str());
 
-  caP = reqData.upcr.res.contextElementVector[0]->attributeVector[0];
+  caP = reqData.upcr.res.entityVector[0]->attributeVector[0];
 
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
@@ -182,7 +182,7 @@ TEST(compoundValue, updateTwoStringsJson)
 
   EXPECT_STREQ("OK", result.c_str());
 
-  caP = reqData.upcr.res.contextElementVector[0]->attributeVector[0];
+  caP = reqData.upcr.res.entityVector[0]->attributeVector[0];
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
@@ -292,7 +292,7 @@ TEST(compoundValue, updateContextValueVectorOneItemJson)
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
 
-  caP = reqData.upcr.res.contextElementVector[0]->attributeVector[0];
+  caP = reqData.upcr.res.entityVector[0]->attributeVector[0];
 
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
@@ -358,7 +358,7 @@ TEST(compoundValue, updateContextValueVectorFiveItemsJson)
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
 
-  caP = reqData.upcr.res.contextElementVector[0]->attributeVector[0];
+  caP = reqData.upcr.res.entityVector[0]->attributeVector[0];
 
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
@@ -428,7 +428,7 @@ TEST(compoundValue, updateTwoStructsJson)
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
 
-  caP = reqData.upcr.res.contextElementVector[0]->attributeVector[0];
+  caP = reqData.upcr.res.entityVector[0]->attributeVector[0];
 
 
   EXPECT_TRUE(caP != NULL);
@@ -583,7 +583,7 @@ TEST(compoundValue, sixLevelsJson)
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
 
-  caP = reqData.upcr.res.contextElementVector[0]->attributeVector[0];
+  caP = reqData.upcr.res.entityVector[0]->attributeVector[0];
 
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
@@ -903,7 +903,7 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
 
-  caP = reqData.upcr.res.contextElementVector[0]->attributeVector[0];
+  caP = reqData.upcr.res.entityVector[0]->attributeVector[0];
 
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
@@ -943,7 +943,7 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
   //
   // Now the second ContextAttribute, that also has a Compound value
   //
-  caP = reqData.upcr.res.contextElementVector[0]->attributeVector[1];
+  caP = reqData.upcr.res.entityVector[0]->attributeVector[1];
 
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);

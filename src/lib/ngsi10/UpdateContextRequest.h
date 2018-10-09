@@ -28,7 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "ngsi/ContextElementVector.h"
+#include "apiTypesV2/EntityVector.h"
 #include "orionTypes/UpdateActionType.h"
 #include "apiTypesV2/Entity.h"
 #include "apiTypesV2/Entities.h"
@@ -51,7 +51,7 @@ struct UpdateContextAttributeRequest;
 */
 typedef struct UpdateContextRequest
 {
-  ContextElementVector    contextElementVector;  // Mandatory
+  EntityVector            entityVector;          // Mandatory
   ActionType              updateActionType;      // Mandatory
 
   std::string             contextProvider;       // Not part of the payload - used internally only
