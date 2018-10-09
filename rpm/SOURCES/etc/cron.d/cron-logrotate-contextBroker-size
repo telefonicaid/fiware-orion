@@ -16,7 +16,7 @@
 # along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# fermin at tid dot es
+# iot_support at tid dot es
 
 # cron job to test and execute log rotate by size.
 */30 * * * * orion logrotate  /etc/sysconfig/logrotate-contextBroker-size
