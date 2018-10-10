@@ -202,33 +202,31 @@ The **ngsi** library contains a collection of classes for the different payloads
 * `ContextAttributeVector`
 * `Metadata`
 * `MetadataVector`
-* `ContextElementVector`
 
 ### Methods and hierarchy
 
 These classes (as well as the classes in the libraries `ngsi9`, `ngsi10`, `convenience`) all have a standard set of methods:
 
-* `toJson()`, to render the object to a JSON string (for NGSIv2)
+* `toJson()`, to render the object to a JSON string (for NGSIv2). This method levarages `JsonObjectHelper` and `JsonVectorHelper`
+  in order to simplify the rendering process. This way you just add the elements you needs to print using `add*()` methods and don't
+  need to bother with starting/ending brackets, quotes and comma control.
 * `toJsonV1()`, to render the object to a JSON string (for NGSIv1)
 * `present()`, for debugging (the object is dumped as text to the log file)
 * `release()`, to release all allocated resources of the object
 * `check()`, to make sure the object follows the rules, i.e. about no forbidden characters, or mandatory fields missing, etc.
 
-The classes follow a hierarchy, e.g. `UpdateContextRequest` (top hierarchy class found in the ngsi10 library) contains a `ContextElementVector`. `ContextElementVector` is of course a vector of `ContextElement`.
-`ContextElement` in its turn contains:
+The classes follow a hierarchy, e.g. `UpdateContextRequest` (top hierarchy class found in the ngsi10 library) contains a
+`EntityVector`. `EntityVector` is of course a vector of `Entity`.
 
-* `EntityId`
-* `AttributeDomainName`
-* `ContextAttributeVector`
-* `MetadataVector` (this field `MetadataVector domainMetadataVector` is part of NGSIv1 but Orion doesn't make use of it)
+Note that both `EntityVector` and `Entity` classes doesn't belong to this library, but to [`src/lib/apiTypesV2`](#srclibapitypesv2).
+In general, given that NGSIv1 is now deprecated, we try to use NGSIv2 classes as much as possible, reducing the number
+of equivalente classes within `src/lib/ngsi`.
 
 The methods `toJson()`, `check()`, `release()`, etc. are called in a tree-like fashion, starting from the top hierarchy class, e.g. `UpdateContextRequest`:
 
 * `UpdateContextRequest::check()` calls:
-  * `ContextElementVector::check()` calls (for each item in the vector):
-      * `ContextElement::check()` calls:
-          * `EntityId::check()`
-          * `AttributeDomainName::check()`
+  * `EntityVector::check()` calls (for each item in the vector):
+      * `Entity::check()` calls:
           * `ContextAttributeVector::check()` calls (for each item in the vector):
               * `ContextAttribute::check()` calls:
                   * `MetadataVector::check()` calls  (for each item in the vector):

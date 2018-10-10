@@ -473,6 +473,10 @@ So, as you can see:
 [Top](#top)
 
 ## Fixing a memory leak
+
+NOTE: some of the classes/functions used in this example no longer exists in the code (e.g. ContextElementVector class).
+However, the example is still valid to illustrate how a memory leak is debugged.
+
 Memory leaks are detected using [valgrind memcheck](http://valgrind.org/docs/manual/mc-manual.html). A special shell script `test/valgrind/valgrindTestSuite.sh` has been developed for this purpose and a make step is linked to it: `make valgrind`.
 
 If `valgrindTestSuite.sh` is run by hand, remember that Orion must be compiled in DEBUG mode for it to work (`make debug install`).  
