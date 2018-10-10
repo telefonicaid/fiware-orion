@@ -26,6 +26,7 @@
 #include <string>
 
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/StatusCode.h"
 #include "rest/OrionError.h"
@@ -138,18 +139,18 @@ std::string OrionError::setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpS
 */
 std::string OrionError::toJson(void)
 {
-  std::string  out;
-  char*        reasonPhraseEscaped = htmlEscape(reasonPhrase.c_str());
-  char*        detailsEscaped = htmlEscape(details.c_str());
+  char*  reasonPhraseEscaped = htmlEscape(reasonPhrase.c_str());
+  char*  detailsEscaped      = htmlEscape(details.c_str());
 
-  out += "{" + JSON_VALUE("error", reasonPhraseEscaped);
-  out += ",";
-  out += JSON_VALUE("description", detailsEscaped) + "}";
+  JsonObjectHelper jh;
+
+  jh.addString("error", reasonPhraseEscaped);
+  jh.addString("description", detailsEscaped);
 
   free(reasonPhraseEscaped);
   free(detailsEscaped);
 
-  return out;
+  return jh.str();
 }
 
 
@@ -186,7 +187,7 @@ std::string OrionError::toJsonV1(void)
 
 /* ****************************************************************************
 *
-* OrionError::render -
+* OrionError::shrinkReasonPhrase -
 *
 * This method removes any whitespace in the reasonPhrase field, i.e.
 * transforms "Not Found" to "NotFound".

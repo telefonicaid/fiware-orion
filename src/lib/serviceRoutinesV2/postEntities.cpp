@@ -132,7 +132,7 @@ std::string postEntities
   else if (parseDataP->upcrs.res.errorCode.code != SccOk)
   {
     ciP->httpStatusCode = parseDataP->upcrs.res.errorCode.code;
-    TIMED_RENDER(answer = parseDataP->upcrs.res.errorCode.toJson(true));
+    TIMED_RENDER(answer = parseDataP->upcrs.res.errorCode.toJson());
     ciP->answer         = answer;
   }
   else

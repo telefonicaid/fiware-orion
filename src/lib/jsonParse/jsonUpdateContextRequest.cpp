@@ -49,7 +49,7 @@ static std::string contextElement(const std::string& path, const std::string& va
   LM_T(LmtParse, ("new contextElement"));
   reqDataP->upcr.eP = new Entity();
 
-  reqDataP->upcr.res.contextElementVector.push_back(reqDataP->upcr.eP);
+  reqDataP->upcr.res.entityVector.push_back(reqDataP->upcr.eP);
 
   reqDataP->upcr.eP->id          = "";
   reqDataP->upcr.eP->type        = "";

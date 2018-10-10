@@ -44,7 +44,7 @@ typedef struct SubscribeError
 
   SubscribeError();
   std::string toJsonV1(RequestType requestType, bool comma);
-  std::string toJson(RequestType requestType, bool comma);
+  std::string toJson(void);
   std::string check(void);
 } SubscribeError;
 

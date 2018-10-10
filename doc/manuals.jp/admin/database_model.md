@@ -147,7 +147,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **expiration** : これはレジストレーションが失効するタイムスタンプです
 -   **contextRegistration** : 要素に以下の情報が含まれる配列です :
     -   **entities** : エンティティのリストを含む配列です (必須)。各エンティティの JSON には、**id**, **type** および **isPattern** が含まれています
-    -   **attrs** : 属性のリストを含む配列です (オプション)。各属性の JSON には、**name**, **type** および **isDomain** が含まれています
+    -   **attrs** : 属性のリストを含む配列です (オプション)。各属性の JSON には、**name** および **type** が含まれています
     -   **providingApplication** : このレジストレーションのための提供アプリケーションの URL です (必須)
 
 サンプルドキュメント :
@@ -174,13 +174,11 @@ Orion Context Broker は、データベース内で次のサブセクション�
            "attrs": [
                {
                    "name": "A1",
-                   "type": "TA1",
-                   "isDomain": "false"
+                   "type": "TA1"
                },
                {
                    "name": "A2",
-                  "type": "TA2",
-                   "isDomain": "true"
+                   "type": "TA2"
                }
            ],
            "providingApplication": "http://foo.bar/notif"

@@ -32,6 +32,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/RenderFormat.h"
+#include "common/JsonHelper.h"
 #include "ngsi/ContextElementResponseVector.h"
 
 
@@ -84,19 +85,14 @@ std::string ContextElementResponseVector::toJson
   const std::vector<std::string>&  metadataFilter
 )
 {
-  std::string out;
+  JsonVectorHelper jvh;
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
-
-    if (ix != vec.size() - 1)
-    {
-      out += ",";
-    }
+    jvh.addRaw(vec[ix]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter));
   }
 
-  return out;
+  return jvh.str();
 }
 
 

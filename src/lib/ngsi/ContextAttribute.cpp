@@ -885,7 +885,7 @@ void ContextAttribute::filterAndOrderMetadata
 */
 std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFilter)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   //
   // type
@@ -969,7 +969,10 @@ std::string ContextAttribute::toJsonValue(void)
   {
     if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
     {
-      return toJsonString(isodate2str(numberValue));
+      std::string out = "\"";
+      out += toJsonString(isodate2str(numberValue));
+      out += '"';
+      return out;
     }
     else // regular number
     {
@@ -978,7 +981,10 @@ std::string ContextAttribute::toJsonValue(void)
   }
   else if (valueType == orion::ValueTypeString)
   {
-    return toJsonString(stringValue);
+    std::string out = "\"";
+    out += toJsonString(stringValue);
+    out += '"';
+    return out;
   }
   else if (valueType == orion::ValueTypeBoolean)
   {

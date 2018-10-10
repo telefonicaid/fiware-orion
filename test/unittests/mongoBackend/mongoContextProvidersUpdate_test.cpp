@@ -429,7 +429,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsAll)
    * it is legal from the point of view of OMA spec */
   Entity* eP = new Entity();
   eP->fill("E3", "T3", "false");
-  req.contextElementVector.push_back(eP);
+  req.entityVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -477,7 +477,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneSingle)
   eP->fill("E1", "T1", "false");
   ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
   eP->attributeVector.push_back(caP);
-  req.contextElementVector.push_back(eP);
+  req.entityVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -540,7 +540,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneMulti)
   eP->fill("E1", "T1", "false");
   ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
   eP->attributeVector.push_back(caP);
-  req.contextElementVector.push_back(eP);
+  req.entityVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -601,7 +601,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsSubset)
   ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val");
   eP->attributeVector.push_back(ca1P);
   eP->attributeVector.push_back(ca2P);
-  req.contextElementVector.push_back(eP);
+  req.entityVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -668,7 +668,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
   eP->fill("E1", "T1", "false");
   ContextAttribute* caP = new ContextAttribute("A5", "TA5", "new_val");
   eP->attributeVector.push_back(caP);
-  req.contextElementVector.push_back(eP);
+  req.entityVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -733,8 +733,8 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntity)
   Entity* e2P = new Entity();
   e1P->fill("E1", "T1", "false");
   e2P->fill("E2", "T2", "false");
-  req.contextElementVector.push_back(e1P);
-  req.contextElementVector.push_back(e2P);
+  req.entityVector.push_back(e1P);
+  req.entityVector.push_back(e2P);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -797,7 +797,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
   eP->attributeVector.push_back(ca1P);
   eP->attributeVector.push_back(ca2P);
   eP->attributeVector.push_back(ca3P);
-  req.contextElementVector.push_back(eP);
+  req.entityVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -892,8 +892,8 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
   e2P->attributeVector.push_back(ca4P);
   e2P->attributeVector.push_back(ca5P);
   e2P->attributeVector.push_back(ca6P);
-  req.contextElementVector.push_back(e1P);
-  req.contextElementVector.push_back(e2P);
+  req.entityVector.push_back(e1P);
+  req.entityVector.push_back(e2P);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1016,7 +1016,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoType)
   eP->fill("E1", "", "false");
   ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
   eP->attributeVector.push_back(caP);
-  req.contextElementVector.push_back(eP);
+  req.entityVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1081,7 +1081,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern0Attr)
      * it is legal from the point of view of OMA spec */
   Entity* eP = new Entity();
   eP->fill("E[2-3]", "T", "true");
-  req.contextElementVector.push_back(eP);
+  req.entityVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1119,7 +1119,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern1AttrSingle)
   eP->fill("E[1-3]", "T", "true");
   ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
   eP->attributeVector.push_back(caP);
-  req.contextElementVector.push_back(eP);
+  req.entityVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1159,7 +1159,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern1AttrMulti)
   eP->fill("E[1-2]", "T", "true");
   ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
   eP->attributeVector.push_back(caP);
-  req.contextElementVector.push_back(eP);
+  req.entityVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1201,7 +1201,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternNAttr)
   ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val");
   eP->attributeVector.push_back(ca1P);
   eP->attributeVector.push_back(ca2P);
-  req.contextElementVector.push_back(eP);
+  req.entityVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1239,7 +1239,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternFail)
      * it is legal from the point of view of OMA spec */
   Entity* eP = new Entity();
   eP->fill("R.*", "T", "true");
-  req.contextElementVector.push_back(eP);
+  req.entityVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1283,7 +1283,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternNoType)
   eP->fill("E[2-3]", "", "true");
   ContextAttribute* caP = new ContextAttribute("A2", "TA2", "new_val");
   eP->attributeVector.push_back(caP);
-  req.contextElementVector.push_back(eP);
+  req.entityVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1326,8 +1326,8 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, mixPatternAndNotPattern)
   Entity* e2P = new Entity();
   e1P->fill("E[2-3]", "T", "true");
   e2P->fill("E1", "T", "false");
-  req.contextElementVector.push_back(e1P);
-  req.contextElementVector.push_back(e2P);
+  req.entityVector.push_back(e1P);
+  req.entityVector.push_back(e2P);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1391,10 +1391,10 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   e4P->fill("E4", "T", "false");
   ContextAttribute* ca7P = new ContextAttribute("A7", "T", "70");
   e4P->attributeVector.push_back(ca7P);
-  req.contextElementVector.push_back(e1P);
-  req.contextElementVector.push_back(e2P);
-  req.contextElementVector.push_back(e3P);
-  req.contextElementVector.push_back(e4P);
+  req.entityVector.push_back(e1P);
+  req.entityVector.push_back(e2P);
+  req.entityVector.push_back(e3P);
+  req.entityVector.push_back(e4P);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1571,7 +1571,7 @@ TEST(mongoContextProvidersUpdateRequest, notFoundUpdate)
   eP->fill("E1", "T1", "false");
   ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
   eP->attributeVector.push_back(caP);
-  req.contextElementVector.push_back(eP);
+  req.entityVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
@@ -1626,7 +1626,7 @@ TEST(mongoContextProvidersUpdateRequest, notFoundDelete)
   eP->fill("E1", "T1", "false");
   ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
   eP->attributeVector.push_back(caP);
-  req.contextElementVector.push_back(eP);
+  req.entityVector.push_back(eP);
   req.updateActionType = ActionTypeDelete;
 
   /* Invoke the function in mongoBackend library */

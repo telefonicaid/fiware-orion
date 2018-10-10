@@ -30,7 +30,7 @@
 #include "common/errorMessages.h"
 #include "unittests/unittest.h"
 
-#include "ngsi/ContextElementVector.h"
+#include "apiTypesV2/EntityVector.h"
 
 
 
@@ -103,7 +103,7 @@ TEST(Entity, checkV1)
 
   Entity* en2P = new Entity("id", "", "false");
 
-  ContextElementVector* ceVectorP = new ContextElementVector();
+  EntityVector* ceVectorP = new EntityVector();
 
   EXPECT_EQ(ceVectorP->check(V1, UpdateContext), "No context elements");
 

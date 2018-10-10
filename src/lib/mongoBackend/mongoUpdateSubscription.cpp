@@ -533,7 +533,7 @@ static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subC
 *
 * setLastFailure -
 */
-static long long setLastFailure(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
+static void setLastFailure(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
   long long lastFailure = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTFAILURE);
 
@@ -547,8 +547,6 @@ static long long setLastFailure(const BSONObj& subOrig, CachedSubscription* subC
   }
 
   setLastFailure(lastFailure, b);
-
-  return lastFailure;
 }
 
 
@@ -557,7 +555,7 @@ static long long setLastFailure(const BSONObj& subOrig, CachedSubscription* subC
 *
 * setLastSuccess -
 */
-static long long setLastSuccess(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
+static void setLastSuccess(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
   long long lastSuccess = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESS);
 
@@ -571,8 +569,6 @@ static long long setLastSuccess(const BSONObj& subOrig, CachedSubscription* subC
   }
 
   setLastSuccess(lastSuccess, b);
-
-  return lastSuccess;
 }
 
 
@@ -689,14 +685,12 @@ static void setMetadata(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
 *
 * updateInCache -
 */
-void updateInCache
+static void updateInCache
 (
   const BSONObj&             doc,
   const SubscriptionUpdate&  subUp,
   const std::string&         tenant,
-  long long                  lastNotification,
-  long long                  lastFailure,
-  long long                  lastSuccess
+  long long                  lastNotification
 )
 {
   //
@@ -788,8 +782,6 @@ void updateInCache
                                           subUp.id.c_str(),
                                           servicePathCache,
                                           lastNotification,
-                                          lastFailure,
-                                          lastSuccess,
                                           doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
                                           doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_STATUS) : STATUS_ACTIVE,
                                           q,
@@ -889,8 +881,6 @@ std::string mongoUpdateSubscription
   std::string         servicePath      = servicePathV[0] == "" ? SERVICE_PATH_ALL : servicePathV[0];
   bool                notificationDone = false;
   long long           lastNotification = 0;
-  long long           lastFailure      = 0;
-  long long           lastSuccess      = 0;
   CachedSubscription* subCacheP        = NULL;
 
   if (!noCache)
@@ -946,8 +936,8 @@ std::string mongoUpdateSubscription
     setCount(0, subOrig, &b);
   }
 
-  lastFailure = setLastFailure(subOrig, subCacheP, &b);
-  lastSuccess = setLastSuccess(subOrig, subCacheP, &b);
+  setLastFailure(subOrig, subCacheP, &b);
+  setLastSuccess(subOrig, subCacheP, &b);
 
   setExpression(subUp, subOrig, &b);
   setFormat(subUp, subOrig, &b);
@@ -969,7 +959,7 @@ std::string mongoUpdateSubscription
   // Update in cache
   if (!noCache)
   {
-    updateInCache(doc, subUp, tenant, lastNotification, lastFailure, lastSuccess);
+    updateInCache(doc, subUp, tenant, lastNotification);
   }
 
   reqSemGive(__FUNCTION__, "ngsiv2 update subscription request", reqSemTaken);

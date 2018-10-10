@@ -382,7 +382,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     {
       if (upcrsP->errorCode.code == SccOk)
       {
-        upcrsP->errorCode.fill(SccContextElementNotFound, upcrP->contextElementVector[0]->id);
+        upcrsP->errorCode.fill(SccContextElementNotFound, upcrP->entityVector[0]->id);
       }
     }
   }
@@ -400,7 +400,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     }
     else if (upcrsP->contextElementResponseVector.size() == 0)
     {
-      upcrsP->errorCode.details = upcrP->contextElementVector[0]->id;
+      upcrsP->errorCode.details = upcrP->entityVector[0]->id;
     }
   }
 }
@@ -413,9 +413,9 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
 */
 static void attributesToNotFound(UpdateContextRequest* upcrP)
 {
-  for (unsigned int ceIx = 0; ceIx < upcrP->contextElementVector.size(); ++ceIx)
+  for (unsigned int ceIx = 0; ceIx < upcrP->entityVector.size(); ++ceIx)
   {
-    Entity* eP = upcrP->contextElementVector[ceIx];
+    Entity* eP = upcrP->entityVector[ceIx];
 
     for (unsigned int aIx = 0; aIx < eP->attributeVector.size(); ++aIx)
     {
@@ -626,14 +626,14 @@ std::string postUpdateContext
 
         //
         // 3. Lookup ContextElement in UpdateContextRequest according to EntityId.
-        //    If not found, add one (to the ContextElementVector of the UpdateContextRequest).
+        //    If not found, add one (to the EntityVector of the UpdateContextRequest).
         //
-        Entity* eP = reqP->contextElementVector.lookup(&cerP->entity);
+        Entity* eP = reqP->entityVector.lookup(cerP->entity.id, cerP->entity.type);
         if (eP == NULL)
         {
           eP = new Entity();
           eP->fill(cerP->entity.id, cerP->entity.type, cerP->entity.isPattern);
-          reqP->contextElementVector.push_back(eP);
+          reqP->entityVector.push_back(eP);
         }
 
 

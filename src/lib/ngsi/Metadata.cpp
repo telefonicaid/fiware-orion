@@ -440,7 +440,7 @@ std::string Metadata::toStringValue(void) const
 */
 std::string Metadata::toJson(void)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
   std::string defType = defaultType(valueType);

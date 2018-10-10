@@ -339,7 +339,7 @@ static std::string metricsRender(std::map<std::string, uint64_t>* metricsMap)
   std::map<std::string, uint64_t>::iterator  it;
   uint64_t                                   incomingTransactions = 0;
   uint64_t                                   totalServiceTime     = 0;
-  JsonHelper                                 jh;
+  JsonObjectHelper                                 jh;
 
   for (it = metricsMap->begin();  it != metricsMap->end(); ++it)
   {
@@ -393,22 +393,22 @@ std::string MetricsManager::_toJson(void)
   std::map<std::string, std::map<std::string, std::map<std::string, uint64_t>*>*>::iterator  serviceIter;
   std::map<std::string, std::map<std::string, uint64_t>*>::iterator                          subServiceIter;
   std::map<std::string, uint64_t>::iterator                                                  metricIter;
-  JsonHelper                                                                                 top;
-  JsonHelper                                                                                 services;
+  JsonObjectHelper                                                                                 top;
+  JsonObjectHelper                                                                                 services;
   std::map<std::string, uint64_t>                                                            sum;
   std::map<std::string, std::map<std::string, uint64_t> >                                    subServCrossTenant;
 
   for (serviceIter = metrics.begin(); serviceIter != metrics.end(); ++serviceIter)
   {
-    JsonHelper                                                subServiceTop;
-    JsonHelper                                                jhSubService;
+    JsonObjectHelper                                                subServiceTop;
+    JsonObjectHelper                                                jhSubService;
     std::string                                               service        = serviceIter->first;
     std::map<std::string, std::map<std::string, uint64_t>*>*  servMap        = serviceIter->second;
     std::map<std::string, uint64_t>                           serviceSum;
 
     for (subServiceIter = servMap->begin(); subServiceIter != servMap->end(); ++subServiceIter)
     {
-      JsonHelper                        jhMetrics;
+      JsonObjectHelper                        jhMetrics;
       std::string                       subService           = subServiceIter->first;
       std::map<std::string, uint64_t>*  metricMap            = subServiceIter->second;
 
@@ -475,13 +475,13 @@ std::string MetricsManager::_toJson(void)
   //
   // Sum for grand total
   //
-  JsonHelper   lastSum;
-  JsonHelper   jhSubServ;
+  JsonObjectHelper   lastSum;
+  JsonObjectHelper   jhSubServ;
 
   std::map<std::string, std::map<std::string, uint64_t> >::iterator  it;
   for (it = subServCrossTenant.begin();  it != subServCrossTenant.end(); ++it)
   {
-    JsonHelper   jhSubServCross;
+    JsonObjectHelper   jhSubServCross;
     std::string  subService = it->first;
     std::string  subServiceString;
 
