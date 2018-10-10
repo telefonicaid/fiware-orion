@@ -31,6 +31,7 @@
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -47,21 +48,12 @@
 *
 * semRender - 
 *
-* NOTE: in the current implementation, 'toplevel' is always false.
-*       When the operation "GET /admin/sem/<sem-name>" is implemented, 'toplevel' will
-*       be set to true for the rendering of the response to that request.
 */
-static const std::string semRender(const char* name, bool toplevel, const char* state)
+static const std::string semRender(const char* state)
 {
-  std::string out;
+  JsonObjectHelper jh;
 
-  if (!toplevel)
-  {
-    out = JSON_STR(name) + ":";
-  }
-
-  out += "{";
-  out += JSON_STR("status") + ":" + JSON_STR(state);
+  jh.addString("status", state);
 
   //
   // FIXME P4 Fill in more fields here in the future (as part of issue #2145):
@@ -74,10 +66,7 @@ static const std::string semRender(const char* name, bool toplevel, const char* 
   // "taken":     number of taken semaphores (for connectionEndpoints only)
   //
 
-
-  out += "}";
-
-  return out;
+  return jh.str();
 }
 
 
@@ -94,33 +83,19 @@ std::string semStateTreat
   ParseData*                 parseDataP
 )
 {
-  const char* dbConnectionPoolState      = mongoConnectionPoolSemGet();
-  const char* dbConnectionState          = mongoConnectionSemGet();
-  const char* requestState               = reqSemGet();
-  const char* subCacheState              = cacheSemGet();
-  const char* transactionState           = transSemGet();
-  const char* timeStatState              = timeStatSemGet();
-  const char* logMsgState                = lmSemGet();
-  const char* alarmMgrState              = alarmMgr.semGet();
-  const char* connectionContextState     = connectionContextSemGet();
-  const char* connectionSubContextState  = connectionSubContextSemGet();
-  const char* metricsMgrState            = metricsMgr.semStateGet();
+  JsonObjectHelper jh;
 
-  std::string out = "{";
+  jh.addRaw("dbConnectionPool",    semRender(mongoConnectionPoolSemGet()));
+  jh.addRaw("dbConnection",        semRender(mongoConnectionSemGet()));
+  jh.addRaw("request",             semRender(reqSemGet()));
+  jh.addRaw("subCache",            semRender(cacheSemGet()));
+  jh.addRaw("transaction",         semRender(transSemGet()));
+  jh.addRaw("timeStat",            semRender(timeStatSemGet()));
+  jh.addRaw("logMsg",              semRender(lmSemGet()));
+  jh.addRaw("alarmMgr",            semRender(alarmMgr.semGet()));
+  jh.addRaw("metricsMgr",          semRender(metricsMgr.semStateGet()));
+  jh.addRaw("connectionContext",   semRender(connectionSubContextSemGet()));
+  jh.addRaw("connectionEndpoints", semRender(connectionSubContextSemGet()));
 
-  out += semRender("dbConnectionPool",     false, dbConnectionPoolState)     + ",";
-  out += semRender("dbConnection",         false, dbConnectionState)         + ",";
-  out += semRender("request",              false, requestState)              + ",";
-  out += semRender("subCache",             false, subCacheState)             + ",";
-  out += semRender("transaction",          false, transactionState)          + ",";
-  out += semRender("timeStat",             false, timeStatState)             + ",";
-  out += semRender("logMsg",               false, logMsgState)               + ",";
-  out += semRender("alarmMgr",             false, alarmMgrState)             + ",";
-  out += semRender("metricsMgr",           false, metricsMgrState)           + ",";
-  out += semRender("connectionContext",    false, connectionContextState)    + ",";
-  out += semRender("connectionEndpoints",  false, connectionSubContextState);
-
-  out += "}";
-
-  return out;
+  return jh.str();
 }
