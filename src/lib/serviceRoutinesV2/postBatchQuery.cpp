@@ -90,7 +90,8 @@ std::string postBatchQuery
   }
   else
   {
-    entities.fill(&parseDataP->qcrs.res);
+    OrionError oe;
+    entities.fill(parseDataP->qcrs.res, &oe);
 
     TIMED_RENDER(answer = entities.toJson(getRenderFormat(ciP->uriParamOptions),
                                           filterAttrs.stringV, false, qcrP->metadataList.stringV));

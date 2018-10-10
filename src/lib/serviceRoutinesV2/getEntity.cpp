@@ -105,13 +105,22 @@ std::string getEntity
     entity.hideIdAndType();
   }
 
-  entity.fill(&parseDataP->qcrs.res);
+  OrionError   oe;
+  std::string  answer;
 
-  std::string answer;
-  TIMED_RENDER(answer = entity.toJson(getRenderFormat(ciP->uriParamOptions),
-                                      attributeFilter.stringV,
-                                      false,
-                                      parseDataP->qcr.res.metadataList.stringV));
+  entity.fill(parseDataP->qcrs.res, &oe);
+
+  if (oe.code == SccNone)
+  {
+    TIMED_RENDER(answer = entity.toJson(getRenderFormat(ciP->uriParamOptions),
+                                        attributeFilter.stringV,
+                                        false,
+                                        parseDataP->qcr.res.metadataList.stringV));
+  }
+  else
+  {
+    TIMED_RENDER(answer = oe.toJson());
+  }
 
   if (parseDataP->qcrs.res.errorCode.code == SccOk && parseDataP->qcrs.res.contextElementResponseVector.size() > 1)
   {

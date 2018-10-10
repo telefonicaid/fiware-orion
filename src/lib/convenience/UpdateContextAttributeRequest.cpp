@@ -66,7 +66,7 @@ std::string UpdateContextAttributeRequest::toJsonV1(void)
   }
   else
   {
-    out += JSON_STR("value") + ":" + compoundValueP->toJson(true);
+    out += JSON_STR("value") + ":" + compoundValueP->toJson();
   }
 
   out += metadataVector.toJsonV1(metadataVector.vec, false);

@@ -673,7 +673,7 @@ std::string ContextAttribute::toJsonV1AsObject
   }
   else
   {
-    out += JSON_STR("value") + ":" + compoundValueP->toJson(true);
+    out += JSON_STR("value") + ":" + compoundValueP->toJson();
   }
 
   if (omitValue == false)
@@ -799,7 +799,7 @@ std::string ContextAttribute::toJsonV1
   }
   else
   {
-    out += JSON_STR("value") + ":" + compoundValueP->toJson(true);
+    out += JSON_STR("value") + ":" + compoundValueP->toJson();
 
     if (commaAfterContextValue)
     {
@@ -906,7 +906,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   //
   if (compoundValueP != NULL)
   {
-    jh.addRaw("value", compoundValueP->toJson(true));
+    jh.addRaw("value", compoundValueP->toJson());
   }
   else if (valueType == orion::ValueTypeNumber)
   {
@@ -963,7 +963,7 @@ std::string ContextAttribute::toJsonValue(void)
 {
   if (compoundValueP != NULL)
   {
-    return compoundValueP->toJson(true);
+    return compoundValueP->toJson();
   }
   else if (valueType == orion::ValueTypeNumber)
   {
@@ -1098,7 +1098,7 @@ std::string ContextAttribute::toJsonAsValue
     {
       *outMimeTypeP = outFormatSelection;
 
-      out = compoundValueP->toJson(true);
+      out = compoundValueP->toJson();
     }
   }
 

@@ -81,13 +81,14 @@ std::string getEntityAttributeValue
   parseDataP->qcr.res.fill(compV[2], type, "false", EntityTypeEmptyOrNotEmpty, "");
 
   // Call standard op postQueryContext
+  OrionError oe;
   postQueryContext(ciP, components, compV, parseDataP);
-  attribute.fill(&parseDataP->qcrs.res, compV[4]);
+  attribute.fill(parseDataP->qcrs.res, compV[4], &oe);
 
-  if (attribute.oe.code != SccNone)
+  if (oe.code != SccNone)
   {
-    TIMED_RENDER(answer = attribute.oe.toJson());
-    ciP->httpStatusCode = attribute.oe.code;
+    TIMED_RENDER(answer = oe.toJson());
+    ciP->httpStatusCode = oe.code;
   }
   else
   {
@@ -122,7 +123,7 @@ std::string getEntityAttributeValue
     {
       if (attribute.pcontextAttribute->compoundValueP != NULL)
       {
-        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->toJson(true));
+        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->toJson());
       }
       else
       {

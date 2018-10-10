@@ -161,7 +161,7 @@ class CompoundValueNode
   std::string         check(void);
   std::string         finish(void);
 
-  std::string         toJson(bool toplevel);
+  std::string         toJson(void);
 
   void                shortShow(const std::string& indent);
   void                show(const std::string& indent);

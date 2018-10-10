@@ -211,6 +211,9 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
     valueType = orion::ValueTypeNull;
     break;
 
+  // FIXME P7: why don't have a case for Object (valueType = orion::ValueTypeObject)
+  // and other for Array (valueType = orion::ValueTypeVector)? This is confusing, probably
+  // from the days when valueType wasn't already invented...
   case Object:
   case Array:
     valueType      = orion::ValueTypeObject;
@@ -245,7 +248,7 @@ std::string Metadata::toJsonV1(bool comma)
 
   if (compoundValueP != NULL)
   {
-    out += JSON_STR("value") + ":" + compoundValueP->toJson(true);
+    out += JSON_STR("value") + ":" + compoundValueP->toJson();
   }
   else if (valueType == orion::ValueTypeString)
   {
@@ -449,7 +452,7 @@ std::string Metadata::toJson(void)
 
   if (compoundValueP != NULL)
   {
-    jh.addRaw("value", compoundValueP->toJson(true));
+    jh.addRaw("value", compoundValueP->toJson());
   }
   else if (valueType == orion::ValueTypeString)
   {

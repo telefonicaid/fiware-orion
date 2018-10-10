@@ -32,6 +32,7 @@
 #include "common/JsonHelper.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "apiTypesV2/Attribute.h"
+#include "rest/OrionError.h"
 
 
 
@@ -54,37 +55,32 @@ std::string Attribute::toJson
 {
   RenderFormat  renderFormat = (keyValues == true)? NGSI_V2_KEYVALUES : NGSI_V2_NORMALIZED;
 
-  if (pcontextAttribute)
+  std::string out;
+
+  if (requestType == EntityAttributeValueRequest)
   {
-    std::string out;
-
-    if (requestType == EntityAttributeValueRequest)
+    out = pcontextAttribute->toJsonAsValue(V2,
+                                           acceptedTextPlain,
+                                           acceptedJson,
+                                           outFormatSelection,
+                                           outMimeTypeP,
+                                           scP);
+  }
+  else
+  {
+    if (renderFormat == NGSI_V2_KEYVALUES)
     {
-      out = pcontextAttribute->toJsonAsValue(V2,
-                                             acceptedTextPlain,
-                                             acceptedJson,
-                                             outFormatSelection,
-                                             outMimeTypeP,
-                                             scP);
+      JsonObjectHelper jh;
+      jh.addRaw(pcontextAttribute->name, pcontextAttribute->toJsonValue());
+      out = jh.str();
     }
-    else
+    else  // NGSI_V2_NORMALIZED
     {
-      if (renderFormat == NGSI_V2_KEYVALUES)
-      {
-        JsonObjectHelper jh;
-        jh.addRaw(pcontextAttribute->name, pcontextAttribute->toJsonValue());
-        out = jh.str();
-      }
-      else  // NGSI_V2_NORMALIZED
-      {
-        out = pcontextAttribute->toJson(metadataFilter);
-      }
+      out = pcontextAttribute->toJson(metadataFilter);
     }
-
-    return out;
   }
 
-  return oe.toJson();
+  return out;
 }
 
 
@@ -98,32 +94,32 @@ std::string Attribute::toJson
 *   The Query should be for an indvidual entity
 *
 */
-void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
+void Attribute::fill(const QueryContextResponse& qcrs, const std::string& attrName, OrionError* oeP)
 {
-  if (qcrsP->errorCode.code == SccContextElementNotFound)
+  if (qcrs.errorCode.code == SccContextElementNotFound)
   {
-    oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
+    oeP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
   }
-  else if (qcrsP->errorCode.code != SccOk)
+  else if (qcrs.errorCode.code != SccOk)
   {
     //
     // any other error distinct from Not Found
     //
-    oe.fill(qcrsP->errorCode.code, qcrsP->errorCode.details, qcrsP->errorCode.reasonPhrase);
+    oeP->fill(qcrs.errorCode.code, qcrs.errorCode.details, qcrs.errorCode.reasonPhrase);
   }
-  else if (qcrsP->contextElementResponseVector.size() > 1)  // qcrsP->errorCode.code == SccOk
+  else if (qcrs.contextElementResponseVector.size() > 1)  // qcrs.errorCode.code == SccOk
   {
     //
     // If there are more than one entity, we return an error
     //
-    oe.fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
+    oeP->fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
   }
   else
   {
     pcontextAttribute = NULL;
     // Look for the attribute by name
 
-    ContextElementResponse* cerP = qcrsP->contextElementResponseVector[0];
+    ContextElementResponse* cerP = qcrs.contextElementResponseVector[0];
 
     for (std::size_t i = 0; i < cerP->entity.attributeVector.size(); ++i)
     {
@@ -136,7 +132,7 @@ void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
 
     if (pcontextAttribute == NULL)
     {
-      oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
+      oeP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
     }
   }
 }
