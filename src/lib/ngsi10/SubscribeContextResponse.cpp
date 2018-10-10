@@ -27,6 +27,7 @@
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 #include "ngsi10/SubscribeContextResponse.h"
 
 /* ****************************************************************************
@@ -64,24 +65,21 @@ SubscribeContextResponse::SubscribeContextResponse(StatusCode& errorCode)
 */
 std::string SubscribeContextResponse::toJson(void)
 {
-  std::string out = "";
-
-  out += "{";
-
   if (subscribeError.errorCode.code == SccNone)
   {
+    std::string out;
     // FIXME P5: it is a bit weird to call a toJsonV1() method from a toJson() method. However,
     // SubscribeResponse doesn't have another option. This should be looked into detail.
+    out += "{";
     out += subscribeResponse.toJsonV1(false);
+    out += "}";
+    return out;
   }
   else
   {
-    out += subscribeError.toJson(SubscribeContext, false);
+    return subscribeError.toJson();
   }
 
-  out +=  "}";
-
-  return out;
 }
 
 /* ****************************************************************************

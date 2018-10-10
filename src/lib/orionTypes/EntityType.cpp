@@ -147,7 +147,7 @@ void EntityType::release(void)
 */
 std::string EntityType::toJson(bool includeType)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   if (includeType)
   {

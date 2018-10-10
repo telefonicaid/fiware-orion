@@ -193,8 +193,8 @@ JSON パース実装は専用ライブラリにありますが、テキスト・
 
 これらのクラスだけでなく、ライブラリ内の`ngsi9`, `ngsi10`, `convenience` クラスのすべてのメソッドの標準セットを持っています : 
 
-* `render()`, JSON 文字列 (主に NGSIv1 用) にレンダリングします
 * `toJson()`, JSON 文字列 (NGSIv2 用)にレンダリングします
+* `toJsonV1()`, JSON 文字列 (NGSIv1 用) にレンダリングします
 * `present()`, デバッグ用。オブジェクトはログ・ファイルにテキストとしてダンプされます
 * `release()`, オブジェクトのすべての割り当てられたリソースを解放します
 * `check()`, オブジェクトがルールに従うこと、すなわち禁止されていない文字や必須フィールドがないことなどを確認します
@@ -207,7 +207,7 @@ JSON パース実装は専用ライブラリにありますが、テキスト・
 * `ContextAttributeVector`
 * `MetadataVector` (このフィールド `MetadataVector domainMetadataVector` は NGSIv1 の一部ですが、Orion はそれを使用しません)
 
-`render()`, `check()`, `release()` などのメソッドはツリー構造で呼び出されます。たとえば、`UpdateContextRequest` :
+`toJson()`, `check()`, `release()` などのメソッドはツリー構造で呼び出されます。たとえば、`UpdateContextRequest` :
 
 * `UpdateContextRequest::check()` コール :
   * `ContextElementVector::check()` コール (ベクトルの各アイテム) :

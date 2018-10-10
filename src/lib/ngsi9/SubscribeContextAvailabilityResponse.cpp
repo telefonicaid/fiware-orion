@@ -80,7 +80,7 @@ SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(const
 
 /* ****************************************************************************
 *
-* SubscribeContextAvailabilityResponse::render -
+* SubscribeContextAvailabilityResponse::toJsonV1 -
 */
 std::string SubscribeContextAvailabilityResponse::toJsonV1(void)
 {

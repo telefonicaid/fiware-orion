@@ -670,12 +670,15 @@ std::string CompoundValueNode::check(void)
 */
 std::string CompoundValueNode::toJson(bool toplevel)
 {
-  std::string out;
+  std::string      out;
+  JsonVectorHelper jh;
 
   switch (valueType)
   {
   case orion::ValueTypeString:
-    out = toJsonString(stringValue);
+    out = '"';
+    out += toJsonString(stringValue);
+    out += '"';
     break;
 
   case orion::ValueTypeNumber:
@@ -691,35 +694,27 @@ std::string CompoundValueNode::toJson(bool toplevel)
     break;
 
   case orion::ValueTypeVector:
-
-    if (childV.size() == 0)
+    for (unsigned int ix = 0; ix < childV.size(); ix++)
     {
-      out = "[]";
+      jh.addRaw(childV[ix]->toJson(false));
     }
-    else {
-      out = "[" + childV[0]->toJson(false);
-      for (unsigned int ix = 1; ix < childV.size(); ix++)
-      {
-        out += "," + childV[ix]->toJson(false);
-      }
-      out += "]";
-    }
+    out = jh.str();
     break;
 
   case orion::ValueTypeObject:
-    if (childV.size() == 0)
+    // In this case we cannot use JsonObjectHelper to build the object, as we don't have a
+    // key-value sequence to invoke addXX() method
+    out = "{";
+    for (unsigned int ix = 0; ix < childV.size(); ix++)
     {
-      out = "{}";
-    }
-    else
-    {
-      out = "{" + childV[0]->toJson(false);
-      for (unsigned int ix = 1; ix < childV.size(); ix++)
+      out += childV[ix]->toJson(false);
+      if (ix != childV.size() - 1)
       {
-        out += "," + childV[ix]->toJson(false);
+        out += ",";
       }
-      out += "}";
     }
+    out += "}";
+
     // Early return in this case, to avoid getting parentIsObject as in the
     // case of root element we don't use key. Only the first call to
     // toJson() uses toplevel == true
@@ -742,7 +737,11 @@ std::string CompoundValueNode::toJson(bool toplevel)
 
   if (parentIsObject)
   {
-    return toJsonString(name) + ":" + out;
+    std::string preOut = "\"";
+    preOut += toJsonString(name);
+    preOut += "\":";
+    preOut += out;
+    return preOut;
   }
   else
   {

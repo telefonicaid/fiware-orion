@@ -55,8 +55,6 @@ extern int mongoSubCacheItemInsert
   const char*            subscriptionId,
   const char*            servicePath,
   int                    lastNotificationTime,
-  int                    lastFailure,
-  int                    lastSuccess,
   long long              expirationTime,
   const std::string&     status,
   const std::string&     q,

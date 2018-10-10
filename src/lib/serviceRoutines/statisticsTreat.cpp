@@ -151,7 +151,7 @@ static void resetStatistics(void)
 *
 * renderUsedCounter -
 */
-inline void renderUsedCounter(JsonHelper* js, const std::string& field, int counter)
+inline void renderUsedCounter(JsonObjectHelper* js, const std::string& field, int counter)
 {
   if (counter != -1)
   {
@@ -167,7 +167,7 @@ inline void renderUsedCounter(JsonHelper* js, const std::string& field, int coun
 */
 std::string renderCounterStats(void)
 {
-  JsonHelper js;
+  JsonObjectHelper js;
 
   // FIXME: try to chose names closer to the ones used in API URLs
   renderUsedCounter(&js, "jsonRequests",                              noOfJsonRequests);
@@ -246,7 +246,7 @@ std::string renderCounterStats(void)
 */
 std::string renderSemWaitStats(void)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   jh.addNumber("request",           semTimeReqGet());
   jh.addNumber("dbConnectionPool",  mongoPoolConnectionSemWaitingTimeGet());
@@ -267,7 +267,7 @@ std::string renderSemWaitStats(void)
 */
 std::string renderNotifQueueStats(void)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
   float      timeInQ = QueueStatistics::getTimeInQ();
   int        out     = QueueStatistics::getOut();
 
@@ -298,7 +298,7 @@ std::string statisticsTreat
 )
 {
 
-  JsonHelper js;
+  JsonObjectHelper js;
 
   if (ciP->method == "DELETE")
   {
@@ -355,7 +355,7 @@ std::string statisticsCacheTreat
 )
 {
 
-  JsonHelper js;
+  JsonObjectHelper js;
 
   if (ciP->method == "DELETE")
   {

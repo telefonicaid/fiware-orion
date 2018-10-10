@@ -56,7 +56,7 @@ UpdateContextRequest::UpdateContextRequest()
 UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, Entity* eP)
 {
   contextProvider = _contextProvider;
-  contextElementVector.push_back(new Entity(eP->id, eP->type, eP->isPattern));
+  entityVector.push_back(new Entity(eP->id, eP->type, eP->isPattern));
 }
 
 
@@ -72,7 +72,7 @@ std::string UpdateContextRequest::toJsonV1(bool asJsonObject)
   // Both fields are MANDATORY, so, comma after "contextElementVector"
   //  
   out += startTag();
-  out += contextElementVector.toJsonV1(asJsonObject, UpdateContext, true);
+  out += entityVector.toJsonV1(asJsonObject, UpdateContext, true);
   out += valueTag("updateAction", actionTypeString(V1, updateActionType), false);
   out += endTag(false);
 
@@ -95,7 +95,7 @@ std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject
     return response.toJsonV1(asJsonObject);
   }
 
-  if ((res = contextElementVector.check(apiVersion, UpdateContext)) != "OK")
+  if ((res = entityVector.check(apiVersion, UpdateContext)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
     return response.toJsonV1(asJsonObject);
@@ -112,7 +112,7 @@ std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject
 */
 void UpdateContextRequest::release(void)
 {
-  contextElementVector.release();
+  entityVector.release();
 }
 
 
@@ -132,7 +132,7 @@ void UpdateContextRequest::fill
 
   eP->attributeVector.fill(ucerP->contextAttributeVector);
 
-  contextElementVector.push_back(eP);
+  entityVector.push_back(eP);
 
   updateActionType = ActionTypeUpdate;  // Coming from an UpdateContextElementRequest (PUT), must be UPDATE
 }
@@ -154,7 +154,7 @@ void UpdateContextRequest::fill
 
   eP->attributeVector.fill(acerP->contextAttributeVector);
 
-  contextElementVector.push_back(eP);
+  entityVector.push_back(eP);
   updateActionType = ActionTypeAppend;  // Coming from an AppendContextElementRequest (POST), must be APPEND
 }
 
@@ -176,7 +176,7 @@ void UpdateContextRequest::fill
   Entity* eP = new Entity();
 
   eP->fill(entityId, entityType, isPattern);
-  contextElementVector.push_back(eP);
+  entityVector.push_back(eP);
 
   updateActionType = _updateActionType;
 
@@ -218,7 +218,7 @@ void UpdateContextRequest::fill
   caP->metadataVector.fill((MetadataVector*) &ucarP->metadataVector);
   eP->attributeVector.push_back(caP);
 
-  contextElementVector.push_back(eP);
+  entityVector.push_back(eP);
 
   updateActionType = _updateActionType;
 }
@@ -235,7 +235,7 @@ void UpdateContextRequest::fill(const Entity* entP, ActionType _updateActionType
 
   eP->attributeVector.fill(entP->attributeVector);
 
-  contextElementVector.push_back(eP);
+  entityVector.push_back(eP);
   updateActionType = _updateActionType;
 }
 
@@ -257,7 +257,7 @@ void UpdateContextRequest::fill
   ContextAttribute* aP = new ContextAttribute(attributeP);
 
   eP->attributeVector.push_back(aP);
-  contextElementVector.push_back(eP);
+  entityVector.push_back(eP);
   updateActionType = _updateActionType;
 }
 
@@ -291,7 +291,7 @@ void UpdateContextRequest::fill
     }
 
     eP->attributeVector.vec.clear();  // original vector is cleared
-    contextElementVector.push_back(neweP);
+    entityVector.push_back(neweP);
   }
 }
 
@@ -303,16 +303,16 @@ void UpdateContextRequest::fill
 */
 ContextAttribute* UpdateContextRequest::attributeLookup(Entity* eP, const std::string& attributeName)
 {
-  for (unsigned int ceIx = 0; ceIx < contextElementVector.size(); ++ceIx)
+  for (unsigned int ceIx = 0; ceIx < entityVector.size(); ++ceIx)
   {
-    Entity* enP = contextElementVector[ceIx];
+    Entity* enP = entityVector[ceIx];
 
     if ((enP->id != eP->id) || (enP->type != eP->type))
     {
       continue;
     }
 
-    Entity* eP = contextElementVector[ceIx];
+    Entity* eP = entityVector[ceIx];
 
     for (unsigned int aIx = 0; aIx < eP->attributeVector.size(); ++aIx)
     {

@@ -1,7 +1,7 @@
 # Orion Context Broker クイックスタートガイド
 
 Orion Context Broker クイックスタートガイド
-Orion Context Broker へようこそ！この簡単なガイドでは、簡単な方法で [FIWARE Lab](https://lab.fiware.org) の Orion Context Broker グローバルインスタンスで作業するためのいくつかの初期ステップについて説明します。
+Orion Context Broker へようこそ！この簡単なガイドでは、簡単な方法で [FIWARE Lab](https://lab.fiware.org) (FIWARE Foundation が所有し、管理) の Orion Context Broker グローバルインスタンスで作業するためのいくつかの初期ステップについて説明します。
 
 Orion Context Broker は、[FIWARE NGSI バージョン2 API](http://fiware.github.io/context.Orion/api/v2/stable/) を実装しています。そのような API の良い学習リソースは、[NGSI version 2 Cookbook](http://fiware.github.io/context.Orion/api/v2/stable/cookbook/) です。
 
