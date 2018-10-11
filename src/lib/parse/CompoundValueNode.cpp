@@ -49,13 +49,7 @@ CompoundValueNode::CompoundValueNode():
   name        ("Unset"),
   valueType   (orion::ValueTypeNotGiven),
   numberValue (0.0),
-  boolValue   (false),
-  container   (NULL),
-  rootP       (NULL),
-  siblingNo   (0),
-  renderName  (false),
-  path        ("Unset"),
-  level       (0)
+  boolValue   (false)
 {
   LM_T(LmtCompoundValue, ("Created EMPTY compound node at %p", this));
 }
@@ -67,16 +61,10 @@ CompoundValueNode::CompoundValueNode():
 * CompoundValueNode - constructor for toplevel 'node'
 */
 CompoundValueNode::CompoundValueNode(orion::ValueType _type):
-  name        ("toplevel"),
+  name        (""),
   valueType   (_type),
   numberValue (0.0),
-  boolValue   (false),
-  container   (this),
-  rootP       (this),
-  siblingNo   (0),
-  renderName  (false),
-  path        ("/"),
-  level       (0)
+  boolValue   (false)
 {
   LM_T(LmtCompoundValue, ("Created TOPLEVEL compound node (a %s) at %p", (valueType == orion::ValueTypeVector)? "Vector" : "Object", this));
 }
@@ -89,30 +77,18 @@ CompoundValueNode::CompoundValueNode(orion::ValueType _type):
 */
 CompoundValueNode::CompoundValueNode
 (
-  CompoundValueNode*  _container,
-  const std::string&  _path,
   const std::string&  _name,
   const std::string&  _value,
-  int                 _siblingNo,
-  orion::ValueType    _type,
-  int                 _level
+  orion::ValueType    _type
 ):
   name        (_name),
   valueType   (_type),
   stringValue (_value),
   numberValue (0.0),
-  boolValue   (false),
-  container   (_container),
-  rootP       (container->rootP),
-  siblingNo   (_siblingNo),
-  renderName  (false),
-  path        (_path),
-  level       (container->level + 1)
+  boolValue   (false)
 {
-  LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s at %p",
+  LM_T(LmtCompoundValue, ("Created compound node '%s', type %s at %p",
                           name.c_str(),
-                          level,
-                          siblingNo,
                           orion::valueTypeName(valueType),
                           this));
 }
@@ -125,30 +101,18 @@ CompoundValueNode::CompoundValueNode
 */
 CompoundValueNode::CompoundValueNode
 (
-  CompoundValueNode*  _container,
-  const std::string&  _path,
   const std::string&  _name,
   const char*         _value,
-  int                 _siblingNo,
-  orion::ValueType    _type,
-  int                 _level
+  orion::ValueType    _type
 ):
   name        (_name),
   valueType   (_type),
   stringValue (std::string(_value)),
   numberValue (0.0),
-  boolValue   (false),
-  container   (_container),
-  rootP       (container->rootP),
-  siblingNo   (_siblingNo),
-  renderName  (false),
-  path        (_path),
-  level       (container->level + 1)
+  boolValue   (false)
 {
-  LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s at %p",
+  LM_T(LmtCompoundValue, ("Created compound node '%s', type %s at %p",
                           name.c_str(),
-                          level,
-                          siblingNo,
                           orion::valueTypeName(valueType),
                           this));
 }
@@ -161,30 +125,18 @@ CompoundValueNode::CompoundValueNode
 */
 CompoundValueNode::CompoundValueNode
 (
-  CompoundValueNode*  _container,
-  const std::string&  _path,
   const std::string&  _name,
   double              _value,
-  int                 _siblingNo,
-  orion::ValueType    _type,
-  int                 _level
+  orion::ValueType    _type
 ):
   name        (_name),
   valueType   (_type),
   stringValue (),
   numberValue (_value),
-  boolValue   (false),
-  container   (_container),
-  rootP       (container->rootP),
-  siblingNo   (_siblingNo),
-  renderName  (false),
-  path        (_path),
-  level       (container->level + 1)
+  boolValue   (false)
 {
-  LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s at %p",
+  LM_T(LmtCompoundValue, ("Created compound node '%s', type %s at %p",
                           name.c_str(),
-                          level,
-                          siblingNo,
                           orion::valueTypeName(valueType),
                           this));
 }
@@ -197,30 +149,18 @@ CompoundValueNode::CompoundValueNode
 */
 CompoundValueNode::CompoundValueNode
 (
-  CompoundValueNode*  _container,
-  const std::string&  _path,
   const std::string&  _name,
   bool                _value,
-  int                 _siblingNo,
-  orion::ValueType    _type,
-  int                 _level
+  orion::ValueType    _type
 ):
   name        (_name),
   valueType   (_type),
   stringValue (""),
   numberValue (0.0),
-  boolValue   (_value),
-  container   (_container),
-  rootP       (container->rootP),
-  siblingNo   (_siblingNo),
-  renderName  (false),
-  path        (_path),
-  level       (container->level + 1)
+  boolValue   (_value)
 {
-  LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s at %p",
+  LM_T(LmtCompoundValue, ("Created compound node '%s', type %s at %p",
                           name.c_str(),
-                          level,
-                          siblingNo,
                           orion::valueTypeName(valueType),
                           this));
 }
@@ -233,7 +173,7 @@ CompoundValueNode::CompoundValueNode
 */
 CompoundValueNode::~CompoundValueNode()
 {
-  LM_T(LmtCompoundValue, ("Destroying node %p: name: '%s', path '%s' at %p (with %d children)", this, name.c_str(), path.c_str(), this, childV.size()));
+  LM_T(LmtCompoundValue, ("Destroying node %p: name: '%s' at %p (with %d children)", this, name.c_str(), this, childV.size()));
 
   for (uint64_t ix = 0; ix < childV.size(); ++ix)
   {
@@ -258,10 +198,11 @@ CompoundValueNode::~CompoundValueNode()
 /* ****************************************************************************
 *
 * finish -
+*
 */
 std::string CompoundValueNode::finish(void)
 {
-  error = "OK";
+  std::string error = "OK";
 
   LM_T(LmtCompoundValue, ("Finishing a compound"));
 
@@ -270,7 +211,7 @@ std::string CompoundValueNode::finish(void)
     show("");
   }
 
-  check();  // sets 'error' for toplevel node
+  error = check("");  // sets 'error' for toplevel node
 
   return error;
 }
@@ -283,21 +224,16 @@ std::string CompoundValueNode::finish(void)
 */
 CompoundValueNode* CompoundValueNode::add(CompoundValueNode* node)
 {
-  node->container = this;
-  node->level     = level + 1;
-  node->siblingNo = childV.size();
-  node->rootP     = rootP;
-
   if (node->valueType == orion::ValueTypeString)
-    LM_T(LmtCompoundValueAdd, ("Adding String '%s', with value '%s' under '%s' (%s)",
+  {
+    LM_T(LmtCompoundValueAdd, ("Adding String '%s', with value '%s'",
                                node->name.c_str(),
-                               node->stringValue.c_str(),
-                               node->container->path.c_str(),
-                               node->container->name.c_str()));
+                               node->stringValue.c_str()));
+  }
   else
-    LM_T(LmtCompoundValueAdd, ("Adding %s '%s' under '%s' (%s)", orion::valueTypeName(node->valueType), node->name.c_str(),
-                               node->container->path.c_str(),
-                               node->container->name.c_str()));
+  {
+    LM_T(LmtCompoundValueAdd, ("Adding %s '%s')", orion::valueTypeName(node->valueType), node->name.c_str()));
+  }
 
   childV.push_back(node);
   return node;
@@ -316,18 +252,7 @@ CompoundValueNode* CompoundValueNode::add
   const std::string&      _value
 )
 {
-  std::string newPath = path;
-
-  if (newPath == "/")
-  {
-    newPath += _name;
-  }
-  else
-  {
-    newPath += "/" + _name;
-  }
-
-  CompoundValueNode* node = new CompoundValueNode(this, newPath, _name, _value, childV.size(), _type, level + 1);
+  CompoundValueNode* node = new CompoundValueNode(_name, _value, _type);
 
   return add(node);
 }
@@ -345,18 +270,7 @@ CompoundValueNode* CompoundValueNode::add
   const char*             _value
 )
 {
-  std::string newPath = path;
-
-  if (newPath == "/")
-  {
-    newPath += _name;
-  }
-  else
-  {
-    newPath += "/" + _name;
-  }
-
-  CompoundValueNode* node = new CompoundValueNode(this, newPath, _name, _value, childV.size(), _type, level + 1);
+  CompoundValueNode* node = new CompoundValueNode(_name, _value, _type);
 
   return add(node);
 }
@@ -374,18 +288,7 @@ CompoundValueNode* CompoundValueNode::add
   double                  _value
 )
 {
-  std::string newPath = path;
-
-  if (newPath == "/")
-  {
-    newPath += _name;
-  }
-  else
-  {
-    newPath += "/" + _name;
-  }
-
-  CompoundValueNode* node = new CompoundValueNode(this, newPath, _name, _value, childV.size(), _type, level + 1);
+  CompoundValueNode* node = new CompoundValueNode(_name, _value, _type);
 
   return add(node);
 }
@@ -403,18 +306,7 @@ CompoundValueNode* CompoundValueNode::add
   bool                    _value
 )
 {
-  std::string newPath = path;
-
-  if (newPath == "/")
-  {
-    newPath += _name;
-  }
-  else
-  {
-    newPath += "/" + _name;
-  }
-
-  CompoundValueNode* node = new CompoundValueNode(this, newPath, _name, _value, childV.size(), _type, level + 1);
+  CompoundValueNode* node = new CompoundValueNode(_name, _value, _type);
 
   return add(node);
 }
@@ -427,19 +319,7 @@ CompoundValueNode* CompoundValueNode::add
 */
 void CompoundValueNode::shortShow(const std::string& indent)
 {
-  if ((rootP == this) && (valueType == orion::ValueTypeVector))
-  {
-    LM_T(LmtCompoundValue,      ("%s%s (toplevel vector)",
-                                 indent.c_str(),
-                                 name.c_str()));
-  }
-  else if (rootP == this)
-  {
-    LM_T(LmtCompoundValue,      ("%s%s (toplevel object)",
-                                 indent.c_str(),
-                                 name.c_str()));
-  }
-  else if (valueType == orion::ValueTypeVector)
+  if (valueType == orion::ValueTypeVector)
   {
     LM_T(LmtCompoundValue,      ("%s%s (vector)",
                                  indent.c_str(),
@@ -511,24 +391,9 @@ void CompoundValueNode::show(const std::string& indent)
                                 name.c_str()));
   }
 
-  LM_T(LmtCompoundValueShow, ("%scontainer: %s",
-                              indent.c_str(),
-                              container->name.c_str()));
-  LM_T(LmtCompoundValueShow, ("%slevel:     %d",
-                              indent.c_str(),
-                              level));
-  LM_T(LmtCompoundValueShow, ("%ssibling:   %d",
-                              indent.c_str(),
-                              siblingNo));
   LM_T(LmtCompoundValueShow, ("%stype:      %s",
                               indent.c_str(),
                               orion::valueTypeName(valueType)));
-  LM_T(LmtCompoundValueShow, ("%spath:      %s",
-                              indent.c_str(),
-                              path.c_str()));
-  LM_T(LmtCompoundValueShow, ("%srootP:     %s",
-                              indent.c_str(),
-                              rootP->name.c_str()));
 
   if (valueType == orion::ValueTypeString)
   {
@@ -594,9 +459,8 @@ void CompoundValueNode::show(const std::string& indent)
 * A vector must have all its children with the same name.
 * An object cannot have two children with the same name.
 *
-* Encountered errors are saved in the 'error' field of the root of the tree (rootP->error).
 */
-std::string CompoundValueNode::check(void)
+std::string CompoundValueNode::check(const std::string& path)
 {
   if (valueType == orion::ValueTypeVector)
   {
@@ -609,11 +473,9 @@ std::string CompoundValueNode::check(void)
     {
       if (childV[ix]->name != childV[0]->name)
       {
-        rootP->error =
-          std::string("bad tag-name of vector item: /") + childV[ix]->name + "/, should be /" + childV[0]->name + "/";
-
-        alarmMgr.badInput(clientIp, rootP->error);
-        return rootP->error;
+        std::string error = "bad tag-name of vector item: /" + childV[ix]->name + "/, should be /" + childV[0]->name + "/";
+        alarmMgr.badInput(clientIp, error);
+        return error;
       }
     }
   }
@@ -630,10 +492,11 @@ std::string CompoundValueNode::check(void)
       {
         if (childV[ix]->name == childV[ix2]->name)
         {
-          rootP->error = std::string("duplicated tag-name: /") + childV[ix]->name + "/ in path: " + path;
-          alarmMgr.badInput(clientIp, rootP->error);
+          std::string fullPath = (path == "" ? "/" : path + name);
+          std::string error = "duplicated tag-name: /" + childV[ix]->name + "/ in path: " + fullPath;
+          alarmMgr.badInput(clientIp, error);
 
-          return rootP->error;
+          return error;
         }
       }
     }
@@ -652,7 +515,7 @@ std::string CompoundValueNode::check(void)
 
   for (uint64_t ix = 0; ix < childV.size(); ++ix)
   {
-    res = childV[ix]->check();
+    res = childV[ix]->check(path + name + "/");
     if (res !="OK")
     {
       return res;
@@ -727,42 +590,35 @@ CompoundValueNode* CompoundValueNode::clone(void)
 
   LM_T(LmtCompoundValue, ("cloning '%s'", name.c_str()));
 
-  if (rootP == this)
+  switch (valueType)
   {
-    me = new CompoundValueNode(valueType);
-  }
-  else
-  {
-    switch (valueType)
-    {
-    case orion::ValueTypeString:
-    case orion::ValueTypeObject:
-    case orion::ValueTypeVector:
-      me = new CompoundValueNode(container, path, name, stringValue, siblingNo, valueType, level);
-      break;
+  case orion::ValueTypeString:
+  case orion::ValueTypeObject:
+  case orion::ValueTypeVector:
+    me = new CompoundValueNode(name, stringValue, valueType);
+    break;
 
-    case orion::ValueTypeNumber:
-      me = new CompoundValueNode(container, path, name, numberValue, siblingNo, valueType, level);
-      break;
+  case orion::ValueTypeNumber:
+    me = new CompoundValueNode(name, numberValue, valueType);
+    break;
 
-    case orion::ValueTypeBoolean:
-      me = new CompoundValueNode(container, path, name, boolValue, siblingNo, valueType, level);
-      break;
+  case orion::ValueTypeBoolean:
+    me = new CompoundValueNode(name, boolValue, valueType);
+    break;
 
-    case orion::ValueTypeNull:
-      me = new CompoundValueNode(container, path, name, stringValue, siblingNo, valueType, level);
-      me->valueType = orion::ValueTypeNull;
-      break;
+  case orion::ValueTypeNull:
+    me = new CompoundValueNode(name, stringValue, valueType);
+    me->valueType = orion::ValueTypeNull;
+    break;
 
-    case orion::ValueTypeNotGiven:
-      me = NULL;
-      LM_E(("Runtime Error (value not given in compound node value)"));
-      break;
+  case orion::ValueTypeNotGiven:
+    me = NULL;
+    LM_E(("Runtime Error (value not given in compound node value)"));
+    break;
 
-    default:
-      me = NULL;
-      LM_E(("Runtime Error (unknown compound node value type: %d)", valueType));
-    }
+  default:
+    me = NULL;
+    LM_E(("Runtime Error (unknown compound node value type: %d)", valueType));
   }
 
   for (unsigned int ix = 0; ix < childV.size(); ++ix)
@@ -816,16 +672,5 @@ bool CompoundValueNode::isString(void)
 const char* CompoundValueNode::cname(void)
 {
   return name.c_str();
-}
-
-
-
-/* ****************************************************************************
-*
-* cpath -
-*/
-const char* CompoundValueNode::cpath(void)
-{
-  return path.c_str();
 }
 }

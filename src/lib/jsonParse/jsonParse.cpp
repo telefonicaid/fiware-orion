@@ -286,10 +286,9 @@ void eatCompound
       }
 
       containerP->add(orion::ValueTypeString, nodeName, nodeValue);
-      LM_T(LmtCompoundValue, ("Added string '%s' (value: '%s') under '%s'",
+      LM_T(LmtCompoundValue, ("Added string '%s' (value: '%s')",
                               nodeName.c_str(),
-                              nodeValue.c_str(),
-                              containerP->cpath()));
+                              nodeValue.c_str()));
     }
     else if ((nodeName == "") && (nodeValue == "") && (noOfChildren == 0))  // Unnamed String with EMPTY VALUE
     {
@@ -298,30 +297,31 @@ void eatCompound
     }
     else if ((nodeName != "") && (nodeValue == "") && (noOfChildren == 0))  // Named Empty string
     {
-      LM_T(LmtCompoundValue, ("Adding container '%s' under '%s'", nodeName.c_str(), containerP->cpath()));
+      LM_T(LmtCompoundValue, ("Adding container '%s'", nodeName.c_str()));
       containerP = containerP->add(ValueTypeString, nodeName, "");
     }
     else if ((nodeName != "") && (nodeValue == ""))  // Named Container
     {
-      LM_T(LmtCompoundValue, ("Adding container '%s' under '%s'", nodeName.c_str(), containerP->cpath()));
+      LM_T(LmtCompoundValue, ("Adding container '%s'", nodeName.c_str()));
       containerP = containerP->add(ValueTypeObject, nodeName, "");
     }
     else if ((nodeName == "") && (nodeValue == ""))  // Name-Less container
     {
-      LM_T(LmtCompoundValue, ("Adding name-less container under '%s' (parent may be a Vector!)", containerP->cpath()));
+      LM_T(LmtCompoundValue, ("Adding name-less container (parent may be a Vector!)"));
       containerP->valueType = ValueTypeVector;
       containerP = containerP->add(ValueTypeObject, "item", "");
     }
     else if ((nodeName == "") && (nodeValue != ""))  // Name-Less String + its container is a vector
     {
       containerP->valueType = ValueTypeVector;
-      LM_T(LmtCompoundValue, ("Set '%s' to be a vector", containerP->cpath()));
+      LM_T(LmtCompoundValue, ("Set to be a vector"));
       containerP->add(orion::ValueTypeString, "item", nodeValue);
-      LM_T(LmtCompoundValue, ("Added a name-less string (value: '%s') under '%s'",
-                              nodeValue.c_str(), containerP->cpath()));
+      LM_T(LmtCompoundValue, ("Added a name-less string (value: '%s')", nodeValue.c_str()));
     }
     else
-      LM_T(LmtCompoundValue, ("IMPOSSIBLE !!!"));
+    {
+      LM_E(("Runtime Error (impossible siutation)"));
+    }
   }
 
   boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;

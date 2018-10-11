@@ -211,17 +211,18 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
     valueType = orion::ValueTypeNull;
     break;
 
-  // FIXME P7: why don't have a case for Object (valueType = orion::ValueTypeObject)
-  // and other for Array (valueType = orion::ValueTypeVector)? This is confusing, probably
-  // from the days when valueType wasn't already invented...
   case Object:
-  case Array:
     valueType      = orion::ValueTypeObject;
     compoundValueP = new orion::CompoundValueNode();
     compoundObjectResponse(compoundValueP, getFieldF(mdB, ENT_ATTRS_VALUE));
-    compoundValueP->container = compoundValueP;
-    compoundValueP->name      = "value";
-    compoundValueP->valueType = (bsonType == Object)? orion::ValueTypeObject : orion::ValueTypeVector;
+    compoundValueP->valueType = orion::ValueTypeObject;
+    break;
+
+  case Array:
+    valueType      = orion::ValueTypeVector;
+    compoundValueP = new orion::CompoundValueNode();
+    compoundVectorResponse(compoundValueP, getFieldF(mdB, ENT_ATTRS_VALUE));
+    compoundValueP->valueType = orion::ValueTypeVector;
     break;
 
   default:

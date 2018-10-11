@@ -66,7 +66,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
   }
 
   caP->valueType  = (document.IsObject())? orion::ValueTypeObject : orion::ValueTypeVector;
-  parseContextAttributeCompoundValueStandAlone(document, caP, caP->valueType);
+  parseContextAttributeCompoundValueStandAlone(document, caP);
 
   return "OK";
 }
