@@ -1,4 +1,4 @@
- Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -29,8 +29,6 @@ brokerStart CB 0-255
 
 --SHELL--
 
-#
-# FIXME P2, once 'null' values are supported (issue #2359), this test should be enabled
 #
 # 01. Create E1 with A1 with compound value containing all JSON types
 # 02. GET /v2/entities?q=A1.N:null, see E1
