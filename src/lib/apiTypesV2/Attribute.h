@@ -50,9 +50,9 @@ struct QueryContextResponse;
 class Attribute
 {
  public:
-  ContextAttribute*  pcontextAttribute;  // Mandatory
+  ContextAttribute*  contextAttributeP;  // Mandatory
 
-  Attribute(): pcontextAttribute(0) {}
+  Attribute(): contextAttributeP(0) {}
 
   std::string  toJson(bool                             acceptedTextPlain,
                       bool                             acceptedJson,

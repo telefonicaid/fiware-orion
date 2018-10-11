@@ -30,6 +30,7 @@
 #include "common/RenderFormat.h"
 #include "common/string.h"
 #include "common/JsonHelper.h"
+#include "logMsg/logMsg.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "apiTypesV2/Attribute.h"
 #include "rest/OrionError.h"
@@ -53,13 +54,18 @@ std::string Attribute::toJson
   RequestType                      requestType          // in parameter
 )
 {
+  if (contextAttributeP == NULL) {
+    LM_E(("Runtime Error (NULL contextAttributeP)"));
+    return "";
+  }
+
   RenderFormat  renderFormat = (keyValues == true)? NGSI_V2_KEYVALUES : NGSI_V2_NORMALIZED;
 
   std::string out;
 
   if (requestType == EntityAttributeValueRequest)
   {
-    out = pcontextAttribute->toJsonAsValue(V2,
+    out = contextAttributeP->toJsonAsValue(V2,
                                            acceptedTextPlain,
                                            acceptedJson,
                                            outFormatSelection,
@@ -71,12 +77,12 @@ std::string Attribute::toJson
     if (renderFormat == NGSI_V2_KEYVALUES)
     {
       JsonObjectHelper jh;
-      jh.addRaw(pcontextAttribute->name, pcontextAttribute->toJsonValue());
+      jh.addRaw(contextAttributeP->name, contextAttributeP->toJsonValue());
       out = jh.str();
     }
     else  // NGSI_V2_NORMALIZED
     {
-      out = pcontextAttribute->toJson(metadataFilter);
+      out = contextAttributeP->toJson(metadataFilter);
     }
   }
 
@@ -116,7 +122,7 @@ void Attribute::fill(const QueryContextResponse& qcrs, const std::string& attrNa
   }
   else
   {
-    pcontextAttribute = NULL;
+    contextAttributeP = NULL;
     // Look for the attribute by name
 
     ContextElementResponse* cerP = qcrs.contextElementResponseVector[0];
@@ -125,12 +131,12 @@ void Attribute::fill(const QueryContextResponse& qcrs, const std::string& attrNa
     {
       if (cerP->entity.attributeVector[i]->name == attrName)
       {
-        pcontextAttribute = cerP->entity.attributeVector[i];
+        contextAttributeP = cerP->entity.attributeVector[i];
         break;
       }
     }
 
-    if (pcontextAttribute == NULL)
+    if (contextAttributeP == NULL)
     {
       oeP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
     }

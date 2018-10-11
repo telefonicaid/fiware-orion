@@ -93,19 +93,19 @@ std::string getEntityAttributeValue
   else
   {
     // save the original attribute type
-    std::string attributeType = attribute.pcontextAttribute->type;
+    std::string attributeType = attribute.contextAttributeP->type;
 
     // the same of the wrapped operation
     ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
 
     // Remove unwanted fields from attribute before rendering
-    attribute.pcontextAttribute->type = "";
-    attribute.pcontextAttribute->metadataVector.release();
+    attribute.contextAttributeP->type = "";
+    attribute.contextAttributeP->metadataVector.release();
 
     if (ciP->outMimeType == JSON)
     {
       // Do not use attribute name, change to 'value'
-      attribute.pcontextAttribute->name = "value";
+      attribute.contextAttributeP->name = "value";
 
       StringList metadataFilter;
       setMetadataFilter(ciP->uriParam, &metadataFilter);
@@ -121,20 +121,20 @@ std::string getEntityAttributeValue
     }
     else
     {
-      if (attribute.pcontextAttribute->compoundValueP != NULL)
+      if (attribute.contextAttributeP->compoundValueP != NULL)
       {
-        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->toJson());
+        TIMED_RENDER(answer = attribute.contextAttributeP->compoundValueP->toJson());
       }
       else
       {
         if ((attributeType == DATE_TYPE) || (attributeType == DATE_TYPE_ALT))
         {
-          TIMED_RENDER(answer = isodate2str(attribute.pcontextAttribute->numberValue));
+          TIMED_RENDER(answer = isodate2str(attribute.contextAttributeP->numberValue));
         }
         else
         {
-          TIMED_RENDER(answer = attribute.pcontextAttribute->getValue());
-          if (attribute.pcontextAttribute->valueType == orion::ValueTypeString)
+          TIMED_RENDER(answer = attribute.contextAttributeP->getValue());
+          if (attribute.contextAttributeP->valueType == orion::ValueTypeString)
           {
             answer = '"' + answer + '"';
           }
