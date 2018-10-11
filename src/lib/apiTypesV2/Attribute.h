@@ -50,10 +50,9 @@ struct QueryContextResponse;
 class Attribute
 {
  public:
-  ContextAttribute*  pcontextAttribute;
-  OrionError         oe;                    // Optional - mandatory if not 200-OK
+  ContextAttribute*  contextAttributeP;  // Mandatory
 
-  Attribute(): pcontextAttribute(0) {}
+  Attribute(): contextAttributeP(0) {}
 
   std::string  toJson(bool                             acceptedTextPlain,
                       bool                             acceptedJson,
@@ -64,7 +63,7 @@ class Attribute
                       const std::vector<std::string>&  metadataFilter,
                       RequestType                      requestType);
 
-  void         fill(QueryContextResponse* qcrsP, std::string attrName);
+  void         fill(const QueryContextResponse& qcrs, const std::string& attrName, OrionError* oeP);
 };
 
 #endif  // SRC_LIB_APITYPESV2_ATTRIBUTE_H_

@@ -321,12 +321,13 @@ std::string getEntities
   }
   else
   {
-    entities.fill(&parseDataP->qcrs.res);
+    OrionError oe;
+    entities.fill(parseDataP->qcrs.res, &oe);
 
-    if (entities.oe.code != SccNone)
+    if (oe.code != SccNone)
     {
-      TIMED_RENDER(answer = entities.oe.toJson());
-      ciP->httpStatusCode = entities.oe.code;
+      TIMED_RENDER(answer = oe.toJson());
+      ciP->httpStatusCode = oe.code;
     }
     else
     {

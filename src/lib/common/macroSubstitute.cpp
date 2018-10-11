@@ -69,7 +69,7 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
     {
       if (vec[ix]->compoundValueP)
       {
-        *valueP = vec[ix]->compoundValueP->toJson(true);
+        *valueP = vec[ix]->compoundValueP->toJson();
       }
       else
       {

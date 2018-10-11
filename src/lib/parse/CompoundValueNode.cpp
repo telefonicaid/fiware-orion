@@ -668,10 +668,11 @@ std::string CompoundValueNode::check(void)
 * CompoundValueNode:toJson
 *
 */
-std::string CompoundValueNode::toJson(bool toplevel)
+std::string CompoundValueNode::toJson(void)
 {
   std::string      out;
-  JsonVectorHelper jh;
+  JsonVectorHelper jvh;
+  JsonObjectHelper joh;
 
   switch (valueType)
   {
@@ -679,50 +680,30 @@ std::string CompoundValueNode::toJson(bool toplevel)
     out = '"';
     out += toJsonString(stringValue);
     out += '"';
-    break;
+    return out;
 
   case orion::ValueTypeNumber:
-    out = double2string(numberValue);
-    break;
+    return double2string(numberValue);
 
   case orion::ValueTypeBoolean:
-    out = boolValue? "true" : "false";
-    break;
+    return (boolValue? "true" : "false");
 
   case orion::ValueTypeNull:
-    out = "null";
-    break;
+    return "null";
 
   case orion::ValueTypeVector:
     for (unsigned int ix = 0; ix < childV.size(); ix++)
     {
-      jh.addRaw(childV[ix]->toJson(false));
+      jvh.addRaw(childV[ix]->toJson());
     }
-    out = jh.str();
-    break;
+    return jvh.str();
 
   case orion::ValueTypeObject:
-    // In this case we cannot use JsonObjectHelper to build the object, as we don't have a
-    // key-value sequence to invoke addXX() method
-    out = "{";
     for (unsigned int ix = 0; ix < childV.size(); ix++)
     {
-      out += childV[ix]->toJson(false);
-      if (ix != childV.size() - 1)
-      {
-        out += ",";
-      }
+      joh.addRaw(childV[ix]->name, childV[ix]->toJson());
     }
-    out += "}";
-
-    // Early return in this case, to avoid getting parentIsObject as in the
-    // case of root element we don't use key. Only the first call to
-    // toJson() uses toplevel == true
-    if (toplevel)
-    {
-      return out;
-    }
-    break;
+    return joh.str();
 
   case orion::ValueTypeNotGiven:
     LM_E(("Runtime Error (value type not given (%s))", name.c_str()));
@@ -732,22 +713,8 @@ std::string CompoundValueNode::toJson(bool toplevel)
     LM_E(("Runtime Error (value type unknown (%s))", name.c_str()));
     return "";
   }
-
-  bool parentIsObject = (container->valueType == orion::ValueTypeObject);
-
-  if (parentIsObject)
-  {
-    std::string preOut = "\"";
-    preOut += toJsonString(name);
-    preOut += "\":";
-    preOut += out;
-    return preOut;
-  }
-  else
-  {
-    return out;
-  }
 }
+
 
 
 /* ****************************************************************************

@@ -28,8 +28,6 @@
 #include <string>
 
 #include "rest/ConnectionInfo.h"
-#include "rest/OrionError.h"
-#include "alarmMgr/alarmMgr.h"
 
 
 
