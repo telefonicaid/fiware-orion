@@ -99,39 +99,26 @@ MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "http://a.b.c/entity/E1",
-		"type" : "http://www.example.org/entities/T",
+		"type" : "http://www.example.org/ngsi-ld/default/T",
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"http://uri.etsi.org/ngsi-ld/title"
+		"title"
 	],
 	"attrs" : {
-		"http://uri=etsi=org/ngsi-ld/title" : {
-			"type" : "http://uri.etsi.org/ngsi-ld/Property",
+		"title" : {
+			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : {
-				"http://uri=etsi=org/ngsi-ld/hasValue" : "Titulo",
-				"http://uri=etsi=org/ngsi-ld/unitCode" : "123",
-				"http://www=example=org/attributes/R_R" : {
-					"http://www=example=org/attributes/type" : "Relationship",
-					"http://uri=etsi=org/ngsi-ld/hasObject" : "http://a.b.c/R_R"
+				"http://www=example=org/ngsi-ld/default/value" : "Titulo",
+				"http://www=example=org/ngsi-ld/default/unitCode" : "123",
+				"http://www=example=org/ngsi-ld/default/R_R" : {
+					"http://www=example=org/ngsi-ld/default/type" : "Relationship",
+					"http://www=example=org/ngsi-ld/default/object" : "http://a.b.c/R_R"
 				}
 			},
-			"md" : {
-				"@aliasAttributeName" : {
-					"type" : "Alias",
-					"value" : "title"
-				},
-				"@aliasAttributeType" : {
-					"type" : "Alias",
-					"value" : "Property"
-				}
-			},
-			"mdNames" : [
-				"@aliasAttributeName",
-				"@aliasAttributeType"
-			]
+			"mdNames" : [ ]
 		}
 	},
 	"creDate" : REGEX(.*),

@@ -132,12 +132,12 @@ MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "http://a.b.c/entity/E1",
-		"type" : "http://www.example.org/entities/A",
+		"type" : "http://www.example.org/ngsi-ld/default/A",
 		"servicePath" : "/"
 	},
 	"attrNames" : [
 		"@context",
-		"http://uri.etsi.org/ngsi-ld/name"
+		"name"
 	],
 	"attrs" : {
 		"@context" : {
@@ -147,27 +147,14 @@ MongoDB server version: REGEX(.*)
 			"value" : "https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld",
 			"mdNames" : [ ]
 		},
-		"http://uri=etsi=org/ngsi-ld/name" : {
-			"type" : "http://uri.etsi.org/ngsi-ld/Property",
+		"name" : {
+			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : {
-				"http://uri=etsi=org/ngsi-ld/hasValue" : "John 2"
+				"http://www=example=org/ngsi-ld/default/value" : "John 2"
 			},
-			"md" : {
-				"@aliasAttributeName" : {
-					"type" : "Alias",
-					"value" : "name"
-				},
-				"@aliasAttributeType" : {
-					"type" : "Alias",
-					"value" : "Property"
-				}
-			},
-			"mdNames" : [
-				"@aliasAttributeName",
-				"@aliasAttributeType"
-			]
+			"mdNames" : [ ]
 		}
 	},
 	"creDate" : REGEX(.*),

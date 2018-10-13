@@ -123,15 +123,15 @@ Date: REGEX(.*)
 03. GET E1, see default context, pretty-print with 4 spaces
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 350
+Content-Length: 301
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "id": "http://a.b.c/entity/E1",
-    "type": "http://www.example.org/entities/A",
-    "http://uri.etsi.org/ngsi-ld/name": {
-        "type": "http://uri.etsi.org/ngsi-ld/Property",
+    "type": "http://www.example.org/ngsi-ld/default/A",
+    "name": {
+        "type": "Property",
         "value": "compounds for later ..."
     },
     "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json"
@@ -142,15 +142,15 @@ Date: REGEX(.*)
 04. GET E2, see test context, pretty-print with default number of spaces (2)
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 301
+Content-Length: 256
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "id": "http://a.b.c/entity/E2",
-  "type": "http://www.example.org/entities/A",
-  "http://schema.org/name": {
-    "type": "http://www.example.org/attributes/Property",
+  "type": "http://www.example.org/ngsi-ld/default/A",
+  "name": {
+    "type": "Property",
     "value": "compounds for later ..."
   },
   "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
@@ -161,11 +161,11 @@ Date: REGEX(.*)
 05. GET E2, but without prettyPrint
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 268
+Content-Length: 223
 Content-Type: application/json
 Date: REGEX(.*)
 
-{"id":"http://a.b.c/entity/E2","type":"http://www.example.org/entities/A","http://schema.org/name":{"type":"http://www.example.org/attributes/Property","value":"compounds for later ..."},"@context":"https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"}
+{"id":"http://a.b.c/entity/E2","type":"http://www.example.org/ngsi-ld/default/A","name":{"type":"Property","value":"compounds for later ..."},"@context":"https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"}
 
 
 06. Attempt to GET non-existing E3, see empty response

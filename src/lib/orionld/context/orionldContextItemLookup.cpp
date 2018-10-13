@@ -61,7 +61,9 @@ extern "C"
 //
 KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
 {
-  LM_TMP(("Here"));
+  if (contextP == NULL)
+    return NULL;
+
   if (contextP->tree->type == KjString)
   {
     LM_T(LmtContextItemLookup, ("The context is of type String - must lookup a new context"));
