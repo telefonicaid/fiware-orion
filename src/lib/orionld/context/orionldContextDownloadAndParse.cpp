@@ -33,8 +33,10 @@ extern "C"
 #include "kjson/kjFree.h"                                   // kjFree
 }
 
-#include "orionld/common/OrionldResponseBuffer.h"           // OrionldResponseBuffer
-#include "orionld/common/orionldRequestSend.h"              // orionldRequestSend
+#include "orionld/common/OrionldResponseBuffer.h"              // OrionldResponseBuffer
+#include "orionld/common/orionldRequestSend.h"                 // orionldRequestSend
+#include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
+#include "orionld/context/orionldContextDownloadAndParse.h"    // Own interface
 
 
 
@@ -75,9 +77,11 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
     LM_E(("orionldRequestSend failed: %s", *detailsPP));
     return NULL;
   }
+  LM_TMP(("Got @context - parsing it"));
 
   // Now parse the payload
   KjNode* tree = kjParse(kjsonP, httpResponse.buf);
+  LM_TMP(("Got @context - parsed it"));
 
   // And then we can free the httpResponse buffer
   free(httpResponse.buf);
@@ -95,6 +99,99 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
     *detailsPP = (char*) "Invalid JSON type of response";
     LM_E((*detailsPP));
     return NULL;
+  }
+
+  
+  //
+  // Lastly, make sure the context is not shadowing any alias form the Core Context
+  // If the Core Context is NULL, then this check is NOT done, as we are processing the
+  // Core Context ...
+  //
+  // A @context can be:
+  //   1. A string, referencing another context
+  //   2. A vector of strings, referencing a number of contexts
+  //   3. An object, with one member named '@context', that is an object and contains a number of key-values (alias-value)
+  //
+  // If the current context if an object, then we need to make sure that no alias is shadowing any of the Core Context aliases
+  //
+  // FIXME: This loop is very very SLOW.
+  //        Many many strcmp are performed each time a new context is introduced.
+  //        By keeping the checksum of the names in de default context and calculating the checksums of the names
+  //        in the new checksum, 99.9% of the strcmp's can be replaced by simple integer comparisons.
+  //
+  if (orionldCoreContext.tree == NULL)
+  {
+    LM_TMP(("This is the Core Context - we are done here"));
+    return tree;
+  }
+  
+  if (tree->type != KjObject)
+  {
+    kjFree(tree);
+    *detailsPP = (char*) "Not a JSON Object - invalid @context";
+    LM_E((*detailsPP));
+    return NULL;
+  }
+
+  KjNode* contextNodeP = tree->children;
+  LM_TMP(("contextNodeP is named '%s'", contextNodeP->name));
+
+  if (contextNodeP == NULL)
+  {
+    kjFree(tree);
+    *detailsPP = (char*) "Invalid context - object must have a single member, called '@context'";
+    LM_E((*detailsPP));
+    return NULL;
+  }
+
+  if (strcmp(contextNodeP->name, "@context") != 0)
+  {
+    kjFree(tree);
+    *detailsPP = (char*) "Invalid context - object must have a single member, called '@context'";
+    LM_E((*detailsPP));
+    return NULL;
+  }
+
+  if (contextNodeP->children == NULL)
+  {
+    kjFree(tree);
+    *detailsPP = (char*) "Invalid context - '@context' is empty";
+    LM_E((*detailsPP));
+    return NULL;
+  }
+
+  if (contextNodeP->next != NULL)
+  {
+    kjFree(tree);
+    *detailsPP = (char*) "Invalid context - '@context' must be the only member of the JSON object";
+    LM_E((*detailsPP));
+    return NULL;
+  }
+
+  // Now, we have '@context' - is it an object?
+  if (contextNodeP->type != KjObject)
+  {
+    LM_TMP(("Not an object ('@context' in '%s' is a '%s') - we are done here", url, kjValueType(tree->type)));
+    return tree;
+  }
+
+  LM_TMP(("Starting collision loop"));
+  for (KjNode* kNodeP = contextNodeP->children; kNodeP != NULL; kNodeP = kNodeP->next)
+  {
+    LM_TMP(("Checking collision for '%s'", kNodeP->name));
+
+    for (KjNode* coreNodeP = orionldCoreContext.tree->children; coreNodeP != NULL; coreNodeP = coreNodeP->next)
+    {
+      LM_TMP(("Comparing '%s' to '%s'", kNodeP->name, coreNodeP->name));
+      if (strcmp(kNodeP->name, coreNodeP->name) == 0)
+      {
+        LM_E(("New context collides with core context. Offending alias: '%s'", kNodeP->name));
+        kjFree(tree);
+        *detailsPP = (char*) "Invalid context - colliding with Core Context";
+        LM_E((*detailsPP));
+        return NULL;
+      }
+    }
   }
 
   return tree;

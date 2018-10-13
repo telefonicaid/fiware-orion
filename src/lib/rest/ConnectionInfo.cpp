@@ -30,7 +30,7 @@
 #include "rest/ConnectionInfo.h"
 
 #ifdef ORIONLD
-#include "orionld/context/orionldDefaultContext.h"
+#include "orionld/context/orionldCoreContext.h"
 #include "orionld/context/orionldContextFree.h"
 #endif
 
@@ -231,7 +231,7 @@ ConnectionInfo::~ConnectionInfo()
     responseTree = NULL;
   }
 
-  if ((contextP != NULL) && (contextP != &orionldDefaultContext) && (contextToBeFreed == true))
+  if ((contextP != NULL) && (contextP != &orionldCoreContext) && (contextToBeFreed == true))
   {
     LM_TMP(("Freeing REQUEST context '%s' at %p, tree at %p", contextP->url, contextP, contextP->tree));
     // The tree is part of the requestTree, so it's already freed

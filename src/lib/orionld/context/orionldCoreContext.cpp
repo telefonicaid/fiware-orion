@@ -24,16 +24,16 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                               // KjNode
+#include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "orionld/context/OrionldContext.h"             // OrionldContext
-#include "orionld/context/orionldDefaultContext.h"      // Own interface
+#include "orionld/context/OrionldContext.h"                    // OrionldContext
+#include "orionld/context/orionldCoreContext.h"                // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldDefaultContext
+// orionldCoreContext
 //
-OrionldContext orionldDefaultContext;
+OrionldContext orionldCoreContext;

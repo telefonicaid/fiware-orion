@@ -28,6 +28,8 @@ test/functionalTest/cases/*/*.teardown
 test/functionalTest/cases/*/*.sorted
 test/functionalTest/cases/*.contextBroker.log
 test/functionalTest/cases/*/*.contextBroker.log
+test/functionalTest/cases/*/*.log
+test/functionalTest/cases/*.log
 
 core*
 test/valgrind/*.out

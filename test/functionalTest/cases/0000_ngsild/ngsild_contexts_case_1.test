@@ -26,7 +26,7 @@ Parse Contexts - case one - string reference to a vector reference
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0
+brokerStart CB 0-255
 
 --SHELL--
 
@@ -42,6 +42,7 @@ brokerStart CB 0
 # https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld:
 # {
 #   "@context": {
+#     "name": "http://schema.org/name",
 #     "T": "http://example.org/T",
 #     "T2": "http://example.org/T2",
 #     "T3": "http://example.org/T3",
@@ -55,6 +56,13 @@ brokerStart CB 0
 #     "P1_P1": "http://example.org/P1_P1",
 #     "R1_P1": "http://example.org/R1_P1",
 #     "R1_R1": "http://example.org/R1_R1"
+#     "T_Query": "http://example.org/T_Query",
+#     "P100": "http://example.org/P100",
+#     "R100": "http://example.org/R100",
+#     "DateProp": {
+#       "@id":   "http://example.org/DateProp",
+#       "@type": "http://uri.etsi.org/ngsi-ld/DateTime"
+#     }
 #   }
 # }
 #

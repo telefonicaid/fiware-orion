@@ -24,21 +24,21 @@
 */
 #include <microhttpd.h>
 
-#include "logMsg/logMsg.h"                                  // LM_*
-#include "logMsg/traceLevels.h"                             // Lmt*
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
 extern "C"
 {
-#include "kjson/kjInit.h"                                   // kjInit
-#include "kjson/kjBufferCreate.h"                           // kjBufferCreate
+#include "kjson/kjInit.h"                                      // kjInit
+#include "kjson/kjBufferCreate.h"                              // kjBufferCreate
 }
 
-#include "orionld/context/orionldContextDownloadAndParse.h" // orionldContextDownloadAndParse
-#include "orionld/context/orionldDefaultContext.h"          // orionldDefaultContext
-#include "orionld/context/orionldContextList.h"             // orionldContextHead, orionldContextTail
-#include "orionld/rest/OrionLdRestService.h"                // OrionLdRestService
-#include "orionld/rest/temporaryErrorPayloads.h"            // Temporary Error Payloads
-#include "orionld/rest/orionldMhdConnection.h"              // Own Interface
+#include "orionld/context/orionldContextDownloadAndParse.h"    // orionldContextDownloadAndParse
+#include "orionld/context/orionldCoreContext.h"                // orionldCoreContext, ORIONLD_CORE_CONTEXT_URL
+#include "orionld/context/orionldContextList.h"                // orionldContextHead, orionldContextTail
+#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
+#include "orionld/rest/temporaryErrorPayloads.h"               // Temporary Error Payloads
+#include "orionld/rest/orionldMhdConnection.h"                 // Own Interface
 
 
 
@@ -212,30 +212,32 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
     LM_X(1, ("EXITING - Out-of-memory at startup :("));
   }
 
-  orionldDefaultContext.url  = ORIONLD_DEFAULT_CONTEXT_URL;
-  orionldDefaultContext.next = NULL;
-  orionldDefaultContext.tree = NULL;
+  orionldCoreContext.url  = ORIONLD_CORE_CONTEXT_URL;
+  orionldCoreContext.next = NULL;
+  orionldCoreContext.tree = NULL;
 
-  
-  while ((orionldDefaultContext.tree == NULL) && (retries < 5))
+  LM_TMP(("Downloading Core Context"));
+  while ((orionldCoreContext.tree == NULL) && (retries < 5))
   {
-    orionldDefaultContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_DEFAULT_CONTEXT_URL, &details);
-    if (orionldDefaultContext.tree != NULL)
+    orionldCoreContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_CORE_CONTEXT_URL, &details);
+    if (orionldCoreContext.tree != NULL)
       break;
 
     ++retries;
-    LM_E(("Error %d downloading default context %s: %s", retries, ORIONLD_DEFAULT_CONTEXT_URL, details));
+    LM_E(("Error %d downloading default context %s: %s", retries, ORIONLD_CORE_CONTEXT_URL, details));
   }
 
-  if (orionldDefaultContext.tree == NULL)
+  if (orionldCoreContext.tree == NULL)
   {
     // Without default context, orionld cannot function
-    LM_X(1, ("EXITING - Without default context, orionld cannot function - error downloading default context '%s': %s", ORIONLD_DEFAULT_CONTEXT_URL, details));
+    LM_X(1, ("EXITING - Without default context, orionld cannot function - error downloading default context '%s': %s", ORIONLD_CORE_CONTEXT_URL, details));
   }
 
+  LM_TMP(("Downloaded Core Context"));
+
   // Adding the default context to the list of contexts
-  orionldContextHead = &orionldDefaultContext;
-  orionldContextTail = &orionldDefaultContext;
+  orionldContextHead = &orionldCoreContext;
+  orionldContextTail = &orionldCoreContext;
 
   free(kjsonP);
 }

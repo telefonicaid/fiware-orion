@@ -34,7 +34,7 @@ extern "C"
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "ngsi10/QueryContextResponse.h"                       // QueryContextResponse
 #include "orionld/common/orionldErrorResponse.h"               // OrionldResponseErrorType, orionldErrorResponse
-#include "orionld/context/orionldDefaultContext.h"             // orionldDefaultContext
+#include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
 #include "orionld/common/kjTreeCreate.h"                       // Own interface
 
 
@@ -204,7 +204,7 @@ KjNode* kjTreeCreateFromQueryContextResponse(ConnectionInfo* ciP, QueryContextRe
   //
   if (contextP == NULL)
   {
-    nodeP = kjString(ciP->kjsonP, "@context", orionldDefaultContext.url);
+    nodeP = kjString(ciP->kjsonP, "@context", orionldCoreContext.url);
     kjChildAdd(top, nodeP);
   }
   else

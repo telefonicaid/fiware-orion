@@ -24,17 +24,17 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                   // KjNode
-#include "kjson/kjBuilder.h"                                // kjString
+#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjBuilder.h"                                   // kjString
 }
 
-#include "logMsg/logMsg.h"                                  // LM_*
-#include "logMsg/traceLevels.h"                             // Lmt*
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                            // ConnectionInfo
-#include "orionld/context/orionldDefaultContext.h"          // ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT
-#include "orionld/context/orionldContextItemLookup.h"       // orionldContextItemLookup
-#include "orionld/common/orionldErrorResponse.h"            // Own interface
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/context/orionldCoreContext.h"                // ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT
+#include "orionld/context/orionldContextItemLookup.h"          // orionldContextItemLookup
+#include "orionld/common/orionldErrorResponse.h"               // Own interface
 
 
 
@@ -78,33 +78,27 @@ void orionldErrorResponseCreate(ConnectionInfo* ciP, OrionldResponseErrorType er
   LM_TMP(("Here"));
     if (detailsType == OrionldDetailsString)  // no replacement as it's just a descriptive string
     {
-  LM_TMP(("Here"));
+      LM_TMP(("Here"));
       contextDetails = (char*) details;
     }
     else  // lookup 'details' in context
     {
-  LM_TMP(("Here"));
+      LM_TMP(("Here"));
       KjNode*  nodeP = orionldContextItemLookup(ciP->contextP, details);
       char     contextDetailsV[512];  // FIXME: Define a max length for a context item?
 
       if (nodeP == NULL)
       {
-  LM_TMP(("Here"));
-        if (detailsType == OrionldDetailsAttribute)
-          snprintf(contextDetailsV, sizeof(contextDetailsV), "%s%s", ORIONLD_DEFAULT_EXPANSION_URL_DIR_ATTRIBUTE, details);
-        else if (detailsType == OrionldDetailsEntity)
-          snprintf(contextDetailsV, sizeof(contextDetailsV), "%s%s", ORIONLD_DEFAULT_EXPANSION_URL_DIR_ENTITY, details);
-        else
-          snprintf(contextDetailsV, sizeof(contextDetailsV), "%s%s", ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT, details);
-
+        LM_TMP(("Here"));
+        snprintf(contextDetailsV, sizeof(contextDetailsV), "%s%s", ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT, details);
         contextDetails = contextDetailsV;
-  LM_TMP(("Here"));
+        LM_TMP(("Here"));
       }
       else
       {
-  LM_TMP(("Here"));
+        LM_TMP(("Here"));
         contextDetails = nodeP->value.s;
-  LM_TMP(("Here"));
+        LM_TMP(("Here"));
       }
     }
 

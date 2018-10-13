@@ -22,19 +22,18 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                  // LM_*
-#include "logMsg/traceLevels.h"                             // Lmt*
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                   // KjNode
+#include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "orionld/context/OrionldContext.h"                 // OrionldContext
-#include "orionld/context/orionldDefaultContext.h"          // orionldDefaultContext
-#include "orionld/context/orionldContextList.h"             // orionldContextHead
-#include "orionld/context/orionldContextLookup.h"           // orionldContextLookup
-#include "orionld/context/orionldContextItemLookup.h"       // Own interface
+#include "orionld/context/OrionldContext.h"                    // OrionldContext
+#include "orionld/context/orionldContextList.h"                // orionldContextHead
+#include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
+#include "orionld/context/orionldContextItemLookup.h"          // Own interface
 
 
 
@@ -62,18 +61,7 @@ extern "C"
 //
 KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
 {
-  if (contextP == NULL)
-  {
-    LM_T(LmtContextItemLookup, ("context is NULL, using the default context '%s'", orionldDefaultContext.url));
-    contextP = &orionldDefaultContext;
-  }
-
-  if (contextP->tree == NULL)
-  {
-    LM_E(("The context '%s' has a NULL tree!", contextP->url));
-    return NULL;
-  }
-
+  LM_TMP(("Here"));
   if (contextP->tree->type == KjString)
   {
     LM_T(LmtContextItemLookup, ("The context is of type String - must lookup a new context"));
@@ -202,7 +190,7 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
         continue;
       }
 
-      LM_T(LmtContextItemLookup, ("looking for '%s', comparing with '%s'", itemName, contextItemP->name));
+      // LM_T(LmtContextItemLookup, ("looking for '%s', comparing with '%s'", itemName, contextItemP->name));
       if (strcmp(contextItemP->name, itemName) == 0)
       {
         LM_T(LmtContextItemLookup, ("found it!"));

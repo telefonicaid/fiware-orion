@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDDEFAULTCONTEXT_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDDEFAULTCONTEXT_H_
+#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCORECONTEXT_H_
+#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCORECONTEXT_H_
 
 /*
 *
@@ -36,32 +36,30 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// ORIONLD_DEFAULT_CONTEXT_URL - 
+// ORIONLD_CORE_CONTEXT_URL - 
 //
-#define ORIONLD_DEFAULT_CONTEXT_URL (char*) "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json"
+#define ORIONLD_CORE_CONTEXT_URL (char*) "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json"
 
 
 
 // -----------------------------------------------------------------------------
 //
-// ORIONLD_DEFAULT_EXPANSION_URL_DIR - 
+// ORIONLD_DEFAULT_EXPANSION_URL_DIR - FIXME: Remove - use the value of "@vocab"
 //
 // If an expansion is not found for an Entity Type or Attribute Name/Type,
 // use this prefix as default expansion and append the "not found" Name/Type.
 //
 // E.g., if the lookup the expansion for the Attribute Name "A1" returns NULL,
-//       then use ORIONLD_DEFAULT_EXPANSION_URL_DIR_XXX + "A1" as expansion
+//       then use ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT + "A1" as expansion
 //
-#define ORIONLD_DEFAULT_EXPANSION_URL_DIR_ENTITY    "http://www.example.org/entities/"
-#define ORIONLD_DEFAULT_EXPANSION_URL_DIR_ATTRIBUTE "http://www.example.org/attributes/"
-#define ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT   "http://www.example.org/default/"
+#define ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT    "http://www.example.org/ngsi-ld/default/"
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldDefaultContext
+// orionldCoreContext
 //
-extern OrionldContext orionldDefaultContext;
+extern OrionldContext orionldCoreContext;
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDDEFAULTCONTEXT_H_
+#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCORECONTEXT_H_

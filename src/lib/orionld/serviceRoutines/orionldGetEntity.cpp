@@ -30,7 +30,6 @@
 
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
-#include "orionld/context/orionldDefaultContext.h"             // orionldDefaultContext
 #include "orionld/context/orionldContextAdd.h"                 // Add a context to the context list
 #include "orionld/common/kjTreeCreate.h"                       // kjTreeCreateFromQueryContextResponse
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate

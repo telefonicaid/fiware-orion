@@ -31,7 +31,7 @@ SET (SOURCES
     orionldContextFree.cpp
     orionldContextFreeAll.cpp
     orionldContextDownloadAndParse.cpp
-    orionldDefaultContext.cpp
+    orionldCoreContext.cpp
     orionldContextPresent.cpp
 )
 

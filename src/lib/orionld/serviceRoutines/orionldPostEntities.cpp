@@ -44,7 +44,7 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
-#include "orionld/context/orionldDefaultContext.h"             // orionldDefaultContext
+#include "orionld/context/orionldCoreContext.h"                // ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT
 #include "orionld/context/orionldContextAdd.h"                 // Add a context to the context list
 #include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
 #include "orionld/context/orionldContextCreateFromUrl.h"       // orionldContextCreateFromUrl
@@ -345,29 +345,55 @@ static bool payloadCheck
 
 // ----------------------------------------------------------------------------
 //
-// uriExpansion - 
+// uriExpansion -
+//
+// 1. Lookup in Core Context - if found there, no expansion is made, just return from function
+// 2. Lookup in user context, expand if found
+// 3. If not, expand using the default context
 //
 // Returns the number of expansions done.
 //  -1: an error has occurred
-//   0: no expansions found
+//   0: expansion found in core context, so, nothing have to be done
 //   1: expansion found only for the attr-name/entity-type
 //   2: expansions found both for attr-name and attr-type
+//   3: expansion NOT found in core context, and NO other contexts present - use default URL
 //
 static int uriExpansion(OrionldContext* contextP, const char* name, char** expandedNameP, char** expandedTypeP, char** detailsPP)
 {
   *expandedNameP = NULL;
   *expandedTypeP = NULL;
 
-  LM_T(LmtUriExpansion, ("looking up context item for '%s', in context '%s'", name, contextP->url));
-  KjNode* contextValueP = orionldContextItemLookup(contextP, name);
-  LM_T(LmtUriExpansion, ("contextValueP at %p", contextValueP));
-    
-  if (contextValueP == NULL)
-  {
-    LM_T(LmtUriExpansion, ("no context found"));
-    return 0;
-  }
+  LM_T(LmtUriExpansion, ("looking up alias for '%s'", name));
 
+  //
+  // 1. Lookup the alias ('name') in the Core Context.
+  //    If found there, no expansion is done and no alias is added
+  //
+  KjNode* contextValueP = orionldContextItemLookup(&orionldCoreContext, name);
+  LM_TMP(("Here"));
+  if (contextValueP != NULL)
+    return 0;
+
+
+  //
+  // 2. use the default context?
+  //
+  LM_TMP(("Here"));
+  if (contextP == NULL)
+    return -2;
+
+  LM_TMP(("Here"));
+  LM_T(LmtUriExpansion, ("looking up context item for '%s', in context '%s'", name, contextP->url));
+
+  contextValueP = orionldContextItemLookup(contextP, name);
+  if (contextValueP == NULL)
+    return -2;
+
+
+  //
+  // 3. Lookup in user context 
+  //
+  LM_T(LmtUriExpansion, ("contextValueP at %p", contextValueP));
   if (contextValueP->type == KjString)
   {
     LM_T(LmtUriExpansion, ("got a string - expanded name is '%s'", contextValueP->value.s));
@@ -376,7 +402,12 @@ static int uriExpansion(OrionldContext* contextP, const char* name, char** expan
     return 1;
   }
 
-
+  if (contextValueP->type != KjObject)
+  {
+    // FIXME: I need ciP here to fill in the error-response
+    return -1;
+  }
+    
   //
   // The context item has a complex value: "@id" and "@type".
   // The value of:
@@ -473,8 +504,8 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
     }
     else
     {
-      LM_T(LmtUriExpansion, ("NO Expansion found for %s name '%s': using: %s%s", kjValueType(kNodeP->type), kNodeP->name, ORIONLD_DEFAULT_EXPANSION_URL_DIR_ATTRIBUTE, kNodeP->name));
-      cNodeP->name = std::string(ORIONLD_DEFAULT_EXPANSION_URL_DIR_ATTRIBUTE) + kNodeP->name;
+      LM_T(LmtUriExpansion, ("NO Expansion found for %s name '%s': using: %s%s", kjValueType(kNodeP->type), kNodeP->name, ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT, kNodeP->name));
+      cNodeP->name = std::string(ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT) + kNodeP->name;
     }
   }
 #endif
@@ -905,8 +936,11 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     return false;
 
   //
-  // If a context came in via HTTP Header, then ciP->contextP is non NULL
-  // If also no context via payload, then we'll just use the default context
+  // If a context came in via HTTP Header, then ciP->contextP is pointing to it.
+  // If a context is present in the payload, then contextNodeP is pointing to it (thanks to payloadCheck).
+  //
+  // If 'ciP->contextP' is NULL and 'contextP' is also NULL, then we'll just use the default context
+  //
   // If we have a context in both HTTP Header and payload, then we return an error
   //
   if ((ciP->contextP != NULL) && (contextNodeP != NULL))
@@ -915,16 +949,12 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }
-  else if ((ciP->contextP == NULL) && (contextNodeP == NULL))
-  {
-    ciP->contextP = &orionldDefaultContext;
-  }
 
 
   LM_T(LmtUriExpansion, ("type node at %p", typeNodeP));
   UpdateContextRequest   mongoRequest;
   UpdateContextResponse  mongoResponse;
-  ContextElement*        ceP       = new ContextElement();  // FIXME: Do I really need to allocate ?
+  ContextElement*        ceP       = new ContextElement();  // FIXME: Any way I can avoid to allocate ?
   EntityId*              entityIdP;
 
   mongoRequest.contextElementVector.push_back(ceP);
@@ -932,8 +962,11 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
   mongoRequest.updateActionType = ActionTypeAppendStrict;  // Error if entity already exists, I hope
 
+  //
   // First treat the @context, if none, use the default context
-  if ((contextNodeP != NULL) && contextTreat(ciP, contextNodeP, ceP) == false)
+  // contextTreat needs cpP to push the '@context' attribute to the ContextElement.
+  //
+  if ((contextNodeP != NULL) && (contextTreat(ciP, contextNodeP, ceP) == false))
   {
     // Error payload set by contextTreat
     mongoRequest.release();
@@ -956,11 +989,11 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       }
 
       entityIdP->id        = idNodeP->value.s;
+      entityIdP->type      = (typeNodeP != NULL)? typeNodeP->value.s : NULL;
       entityIdP->isPattern = false;
       entityIdP->creDate   = getCurrentTime();
       entityIdP->modDate   = getCurrentTime();
 
-      // Lookup entityIdP->id in @context?
       continue;
     }
     else if (kNodeP == typeNodeP)
@@ -972,6 +1005,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       char*  expandedName;
       char*  expandedType;
       int    expansions = uriExpansion(ciP->contextP, typeNodeP->value.s, &expandedName, &expandedType, &details);
+      LM_T(LmtUriExpansion, ("Got %d expansions", expansions));
 
       if (expansions == -1)
       {
@@ -981,12 +1015,18 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       }
       else if (expansions == 0)
       {
-        // No expansion found - perform default expansion
-        entityIdP->type = std::string(ORIONLD_DEFAULT_EXPANSION_URL_DIR_ENTITY) + typeNodeP->value.s;
+        // Expansion found in Core Context - perform no expansion
+      }
+      else if (expansions == -2)
+      {
+        // No expansion found in Core Context, and in no other contexts either - use default URL
+        LM_TMP(("EXPANSION: use default URL for entity type '%s'", typeNodeP->value.s));
+        entityIdP->type = ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT;
+        entityIdP->type += typeNodeP->value.s;
       }
       else if (expansions == 1)
       {
-        // Take the long name, just ... NOT expandedType but expandedName. All Good
+        // Take the long name, just ... NOT expandedType but expandedName. All good
         entityIdP->type = expandedName;
 
         // Add '@aliasEntityType' as an attribute, with original entity type as value, and change the entity type to 'expansion'
@@ -1026,11 +1066,13 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       //
       LM_T(LmtUriExpansion, ("Calling uriExpansion for the attribute name '%s'", kNodeP->name));
       LM_T(LmtUriExpansion, ("------------- uriExpansion for attr name starts here ------------------------------"));
-      char*  expandedName = NULL;
-      char*  expandedType = NULL;
       char*  details;
-      int    expansions   = uriExpansion(ciP->contextP, kNodeP->name, &expandedName, &expandedType, &details);
+      char*  expandedName  = NULL;
+      char*  expandedType  = NULL;
+      int    expansions    = uriExpansion(ciP->contextP, kNodeP->name, &expandedName, &expandedType, &details);
+      bool   expansionDone = false;
 
+      LM_TMP(("EXPANSION: uriExpansion returned %d for '%s'", expansions, kNodeP->name));
       if (expansions == -1)
       {
         delete caP;
@@ -1038,60 +1080,94 @@ bool orionldPostEntities(ConnectionInfo* ciP)
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item for 'attribute name'", kNodeP->name, OrionldDetailsAttribute);
         return false;
       }
-      else if (expansions >= 0)
+      else if (expansions == -2)
       {
-        // Add '@aliasAttributeName' as a metadata, with original attr name as value, and change the 'real' attr name to 'expansion'
-        Metadata* mdP = new Metadata("@aliasAttributeName", "Alias", kNodeP->name);
-        caP->metadataVector.push_back(mdP);
-
-        // Now change the attribute name to its expanded value
+        // No expansion found in Core Context, and in no other contexts either - use default URL
+        LM_TMP(("EXPANSION: use default URL for attribute '%s'", kNodeP->name));
+        caP->name     = ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT;
+        caP->name    += kNodeP->name;
+        expansionDone = true;
+      }
+      else if (expansions == 0)
+      {
+        // Found in Core Context - no expansion
+        caP->name = kNodeP->name;
+      }
+      else
+      {
+        // Change the attribute name to its expanded value
         if (expandedName == NULL)
         {
           LM_T(LmtUriExpansion, ("No expansion found - perform default expansion - prepending http://www.example.org/attribute/ to the attr name (%s)", kNodeP->name));
-          caP->name = std::string(ORIONLD_DEFAULT_EXPANSION_URL_DIR_ATTRIBUTE) + kNodeP->name;
+          caP->name  = ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT;
+          caP->name += kNodeP->name;
         }
         else
         {
           caP->name = expandedName;
         }
+        expansionDone = true;
       }
 
+      if (expansionDone == true)
+      {
+        // Add '@aliasAttributeName' as a metadata, with original attribute name as value
+        Metadata* mdP = new Metadata("@aliasAttributeName", "Alias", kNodeP->name);
+        caP->metadataVector.push_back(mdP);
+      }
 
-      
       //
       // URI Expansion for Attribute TYPE
       //
       LM_T(LmtUriExpansion, ("Calling uriExpansion for the attribute type '%s'", attrTypeNodeP->value.s));
       LM_T(LmtUriExpansion, ("------------- uriExpansion for attr type starts here ------------------------------"));
 
-      expandedName = NULL;
-      expandedType = NULL;
-      expansions   = uriExpansion(ciP->contextP, attrTypeNodeP->value.s, &expandedName, &expandedType, &details);
+      expandedName  = NULL;
+      expandedType  = NULL;
+      expansions    = uriExpansion(ciP->contextP, attrTypeNodeP->value.s, &expandedName, &expandedType, &details);
+      expansionDone = false;
 
       if (expansions == -1)
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item for 'attribute type'", attrTypeNodeP->value.s, OrionldDetailsOther);
         delete caP;
         mongoRequest.release();
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item for 'attribute type'", attrTypeNodeP->value.s, OrionldDetailsOther);
         return false;
       }
-      else if (expansions >= 0)
+      else if (expansions == -2)
       {
-        // Add '@aliasAttributeType' as a metadata, with original attr type as value, and change the 'real' attr type to 'expansion'
-        Metadata* mdP = new Metadata("@aliasAttributeType", "Alias", attrTypeNodeP->value.s);
-        caP->metadataVector.push_back(mdP);
-
-        // Now change the attribute type to its expanded value
+        // No expansion found in Core Context, and in no other contexts either - use default URL
+        LM_TMP(("EXPANSION: use default URL for attribute '%s'", attrTypeNodeP->value.s));
+        caP->type     = ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT;
+        caP->type    += attrTypeNodeP->value.s;
+        expansionDone = true;
+      }
+      else if (expansions == 0)
+      {
+        // Found in Core Context - no expansion
+        caP->type = attrTypeNodeP->value.s;
+      }
+      else
+      {
+        // Change the attribute type to its expanded value
         if (expandedName == NULL)
         {
           // No expansion found - perform default expansion
           LM_T(LmtUriExpansion, ("No expansion found - perform default expansion - prepending http://www.example.org/attribute/ to the attr type (%s)", attrTypeNodeP->value.s));
-          caP->type = std::string(ORIONLD_DEFAULT_EXPANSION_URL_DIR_ATTRIBUTE) + attrTypeNodeP->value.s;
+          caP->type = std::string(ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT) + attrTypeNodeP->value.s;
         }
         else
         {
           caP->type = expandedName;
         }
+        expansionDone = true;
+      }
+
+      if (expansionDone == true)
+      {
+        // Add '@aliasAttributeType' as a metadata, with original attribute type as value
+        Metadata* mdP = new Metadata("@aliasAttributeType", "Alias", attrTypeNodeP->name);
+        caP->metadataVector.push_back(mdP);
       }
 
       ceP->contextAttributeVector.push_back(caP);
@@ -1120,7 +1196,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
   ciP->httpStatusCode = SccCreated;
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/entities/", idNodeP->value.s);
-  httpHeaderLinkAdd(ciP, (ciP->contextP == NULL)? ORIONLD_DEFAULT_CONTEXT_URL : ciP->contextP->url);
+  httpHeaderLinkAdd(ciP, (ciP->contextP == NULL)? ORIONLD_CORE_CONTEXT_URL : ciP->contextP->url);
 
   return true;
 }
