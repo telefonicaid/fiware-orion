@@ -30,23 +30,6 @@ brokerStart CB 0-255
 
 --SHELL--
 
-# https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json:
-# {
-#   "@context": {
-#     "id": "@id",
-#     "type": "@type",
-#     "value": "http://uri.etsi.org/ngsi-ld/hasValue",
-#     "object": {
-#       "@id": "http://uri.etsi.org/ngsi-ld/hasObject",
-#       "@type":"@id"
-#     },
-#     "Property": "http://uri.etsi.org/ngsi-ld/Property",
-#     "Relationship": "http://uri.etsi.org/ngsi-ld/Relationship",
-#     ...                                                                                                                                                                        
-#   }
-# }
-
-
 #
 # 01. POST /ngsi-ld/v1/entities, with a context that has an attribute called 'detail' and another one called 'detail2'
 # 02. Checking mongo to see that 'detail' has not been expanded but 'detail2' has the default URI Expansion
@@ -132,13 +115,6 @@ MongoDB server version: REGEX(.*)
 			"mdNames" : [
 				"@aliasAttributeName"
 			]
-		},
-		"@context" : {
-			"type" : "ContextString",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
-			"value" : "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json",
-			"mdNames" : [ ]
 		}
 	},
 	"creDate" : REGEX(.*),
