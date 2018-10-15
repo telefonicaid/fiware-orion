@@ -817,13 +817,14 @@ static bool contextTreat
   {
     char* details;
 
+    LM_TMP(("Calling orionldContextCreateFromUrl"));
     if ((ciP->contextP = orionldContextCreateFromUrl(ciP, contextNodeP->value.s, &details)) == NULL)
     {
+      LM_E(("Failed to create context from URL: %s", details));
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from URL", details, OrionldDetailsString);
       return false;
     }
-
-    orionldContextListInsert(ciP->contextP);
+    LM_TMP(("orionldContextCreateFromUrl OK"));
     ciP->contextToBeFreed = false;  // context has been added to public list - must not be freed
   }
   else if (contextNodeP->type == KjArray)
@@ -831,12 +832,20 @@ static bool contextTreat
     char* details;
 
     // FIXME: When orionld is able to serve contexts, a real URL must be used here
+    //
+    // REMEMBER
+    //   This context is just the array of context-strings: [ "url1", "url2" ]
+    //   Thr individual contezts ("url1", "url2") are treated a few lines down
+    //
+    LM_TMP(("Calling orionldContextCreateFromTree"));
     ciP->contextP = orionldContextCreateFromTree(contextNodeP, "http://FIXME.array.context.needs/url", &details);
     if (ciP->contextP == NULL)
     {
+      LM_E(("Failed to create context from Tree : %s", details));
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from tree", details, OrionldDetailsString);
       return false;
     }
+    LM_TMP(("orionldContextCreateFromTree OK"));
 
     //
     // The context containing a vector of X context strings (URLs) must be freed

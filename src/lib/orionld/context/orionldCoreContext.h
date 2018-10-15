@@ -62,4 +62,12 @@ extern "C"
 //
 extern OrionldContext orionldCoreContext;
 
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldCoreContextString - to avoid download during functest
+//
+extern const char* orionldCoreContextString;
+
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCORECONTEXT_H_

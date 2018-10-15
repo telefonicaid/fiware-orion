@@ -31,6 +31,7 @@ extern "C"
 {
 #include "kjson/kjInit.h"                                      // kjInit
 #include "kjson/kjBufferCreate.h"                              // kjBufferCreate
+#include "kjson/kjParse.h"                                     // kjParse
 }
 
 #include "orionld/context/orionldContextDownloadAndParse.h"    // orionldContextDownloadAndParse
@@ -168,7 +169,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 //
 // This function converts the OrionLdRestServiceSimplified vectors to OrionLdRestService vectors
 //
-void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int vecItems)
+void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int vecItems, bool defContextFromFile)
 {
   int svIx;  // Service Vector Index
 
@@ -216,24 +217,39 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   orionldCoreContext.next = NULL;
   orionldCoreContext.tree = NULL;
 
-  LM_TMP(("Downloading Core Context"));
-  while ((orionldCoreContext.tree == NULL) && (retries < 5))
+  if (defContextFromFile == true)
   {
-    orionldCoreContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_CORE_CONTEXT_URL, &details);
-    if (orionldCoreContext.tree != NULL)
-      break;
+    char* buf = strdup(orionldCoreContextString);
 
-    ++retries;
-    LM_E(("Error %d downloading default context %s: %s", retries, ORIONLD_CORE_CONTEXT_URL, details));
+    LM_TMP(("Using local Core Context"));
+    orionldCoreContext.tree = kjParse(kjsonP, buf);
+    LM_TMP(("Parsed local Core Context"));
+    free(buf);
+  }
+  else
+  {
+    LM_TMP(("Downloading Core Context"));
+    while ((orionldCoreContext.tree == NULL) && (retries < 5))
+    {
+      LM_TMP(("Calling orionldContextDownloadAndParse"));
+      orionldCoreContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_CORE_CONTEXT_URL, &details);
+      LM_TMP(("Back from orionldContextDownloadAndParse. orionldCoreContext.tree at %p", orionldCoreContext.tree));
+      if (orionldCoreContext.tree != NULL)
+        break;
+
+      ++retries;
+      LM_E(("Error %d downloading default context %s: %s", retries, ORIONLD_CORE_CONTEXT_URL, details));
+    }
   }
 
+  LM_TMP(("orionldCoreContext.tree at %p", orionldCoreContext.tree));
   if (orionldCoreContext.tree == NULL)
   {
     // Without default context, orionld cannot function
     LM_X(1, ("EXITING - Without default context, orionld cannot function - error downloading default context '%s': %s", ORIONLD_CORE_CONTEXT_URL, details));
   }
 
-  LM_TMP(("Downloaded Core Context"));
+  LM_TMP(("Downloaded Core Context '%s'. json tree at %p", orionldCoreContext.url, orionldCoreContext.tree));
 
   // Adding the default context to the list of contexts
   orionldContextHead = &orionldCoreContext;

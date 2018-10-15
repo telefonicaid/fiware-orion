@@ -41,8 +41,13 @@ extern OrionLdRestServiceVector orionldRestServiceV[9];
 //
 // orionldServiceInit -
 //
-// This function converts the RestServiceLd vectors to OrionLdRestService vectors
+// This function converts the RestServiceLd vectors to OrionLdRestService vectors.
 //
-extern void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int vecItems);
+// PARAMETERS
+//   restServiceVV       - vector of REST services
+//   vecItems            - number of items in  the vector
+//   defContextFromFile  - do not download Core Context nor Default Context if set to true
+//
+extern void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int vecItems, bool defContextFromFile);
 
 #endif  // SRC_LIB_ORIONLD_REST_ORIONLDSERVICEINIT_H_

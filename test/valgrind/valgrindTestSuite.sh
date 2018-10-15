@@ -377,13 +377,22 @@ function valgrindErrorInfo()
   #
   typeset -i vErrors
   vErrors=0
+  date > /tmp/kz
   for num in $(grep "errors in context" $filename | awk '{ print $2 }')
   do
     typeset -i xNum
-    xNum=$num
-    if [ $xNum != 0 ]
+    if [ "$num" == "file" ]  # Garbage in valgrind file ... (Binary file XXX matches)
     then
-      vErrors=$vErrors+$xNum
+      echo filename: $filename >> /tmp/kz
+      echo num: $num >> /tmp/kz
+      grep "errors in context" $filename >> /tmp/kz
+      xNum=101
+    else  
+      xNum=$num
+      if [ $xNum != 0 ]
+      then
+        vErrors=$vErrors+$xNum
+      fi
     fi
   done
   valgrindErrors=$vErrors

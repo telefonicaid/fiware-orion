@@ -540,7 +540,7 @@ void exitFunc(void)
 
   LM_T(LmtFree, ("Calling orionldContextFreeAll"));
   orionldContextFreeAll();
-
+  
   if (unlink(pidPath) != 0)
   {
     LM_T(LmtSoftError, ("error removing PID file '%s': %s", pidPath, strerror(errno)));
@@ -987,10 +987,13 @@ int main(int argC, char* argV[])
     LM_T(LmtSubCache, ("noCache == false"));
   }
 
+  //
   // Given that contextBrokerInit() may create thread (in the threadpool notification mode,
   // it has to be done before curl_global_init(), see https://curl.haxx.se/libcurl/c/threaded-ssl.html
   // Otherwise, we have empirically checked that CB may randomly crash
+  //
   contextBrokerInit(dbName, mtenant);
+  orionldServiceInit(restServiceVV, 9, true);  // FIXME: 'true' means no downloading of default context
 
   if (https)
   {
@@ -1045,7 +1048,6 @@ int main(int argC, char* argV[])
                           NULL);
   }
 
-  orionldServiceInit(restServiceVV, 9);
   // orionLdServiceInitPresent();
   
   LM_I(("Startup completed"));

@@ -35,7 +35,7 @@
 // orionldContextListInsert -
 //
 void orionldContextListInsert(OrionldContext* contextP)
-{    
+{
   LM_T(LmtContextList, ("Adding context '%s' to the list (context at %p, tree at %p)", contextP->url, contextP, contextP->tree));
 
   if (orionldContextHead == NULL)

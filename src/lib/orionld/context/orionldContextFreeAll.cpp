@@ -31,6 +31,7 @@ extern "C"
 }
 
 #include "orionld/context/OrionldContext.h"                 // OrionldContext
+#include "orionld/context/orionldCoreContext.h"             // orionldCoreContext
 #include "orionld/context/orionldContextList.h"             // orionldContextHead
 #include "orionld/context/orionldContextFree.h"             // orionldContextFree
 #include "orionld/context/orionldContextFreeAll.h"          // Own interface
@@ -43,7 +44,7 @@ extern "C"
 //
 void orionldContextFreeAll(void)
 {
-  OrionldContext* contextP = orionldContextHead;
+  OrionldContext* contextP = orionldContextHead->next;  // Skipping Core Context
 
   while (contextP != NULL)
   {
@@ -53,4 +54,7 @@ void orionldContextFreeAll(void)
     orionldContextFree(contextP);
     contextP = next;
   }
+
+  // Lastly, freeing the Core Context
+  orionldContextFree(&orionldCoreContext);
 }

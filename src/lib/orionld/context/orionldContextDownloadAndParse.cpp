@@ -114,7 +114,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
   //
   // If the current context if an object, then we need to make sure that no alias is shadowing any of the Core Context aliases
   //
-  // FIXME: This loop is very very SLOW.
+  // FIXME: This loop is VERY VERY SLOW.
   //        Many many strcmp are performed each time a new context is introduced.
   //        By keeping the checksum of the names in de default context and calculating the checksums of the names
   //        in the new checksum, 99.9% of the strcmp's can be replaced by simple integer comparisons.
@@ -171,7 +171,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
   // Now, we have '@context' - is it an object?
   if (contextNodeP->type != KjObject)
   {
-    LM_TMP(("Not an object ('@context' in '%s' is a '%s') - we are done here", url, kjValueType(tree->type)));
+    LM_TMP(("Not an object ('@context' in '%s' is of type '%s') - we are done here (no collision check necessary)", url, kjValueType(contextNodeP->type)));
     return tree;
   }
 

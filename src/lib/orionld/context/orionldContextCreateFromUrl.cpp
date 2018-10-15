@@ -35,6 +35,7 @@ extern "C"
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
 #include "orionld/context/orionldContextDownloadAndParse.h"    // orionldContextDownloadAndParse
+#include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
 #include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
 #include "orionld/context/orionldContextCreateFromUrl.h"       // Own interface
 
@@ -53,6 +54,7 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
   //
   if (contextP != NULL)
   {
+    LM_TMP(("Found context '%s' - no need for creation", url));
     return contextP;
   }
 
@@ -63,13 +65,17 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
 
   if (contextP == NULL)
   {
+    LM_E(("orionldContextCreateFromTree: %s", *detailsPP));
     ciP->contextToBeFreed = false;
     return NULL;
   }
 
+  LM_TMP(("Calling orionldContextDownloadAndParse"));
   contextP->tree = orionldContextDownloadAndParse(ciP->kjsonP, url, detailsPP);
+  LM_TMP(("orionldContextDownloadAndParse returned tree at %p", contextP->tree));
   if (contextP->tree == NULL)
   {
+    LM_E(("orionldContextDownloadAndParse: %s", *detailsPP));
     free(contextP->url);
     free(contextP);
     ciP->contextToBeFreed = false;
@@ -77,6 +83,9 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
   }
 
   ciP->contextToBeFreed = true;
-  
+  LM_TMP(("Inserting context '%s' in common list", url));
+  orionldContextListInsert(contextP);
+  LM_TMP(("Inserted context '%s' in common list", url));
+
   return contextP;
 }
