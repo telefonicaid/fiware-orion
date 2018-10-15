@@ -61,7 +61,6 @@ CompoundValueNode::CompoundValueNode():
 * CompoundValueNode - constructor for toplevel 'node'
 */
 CompoundValueNode::CompoundValueNode(orion::ValueType _type):
-  name        (""),
   valueType   (_type),
   numberValue (0.0),
   boolValue   (false)
@@ -202,8 +201,6 @@ CompoundValueNode::~CompoundValueNode()
 */
 std::string CompoundValueNode::finish(void)
 {
-  std::string error = "OK";
-
   LM_T(LmtCompoundValue, ("Finishing a compound"));
 
   if (lmTraceIsSet(LmtCompoundValueShow))
@@ -211,9 +208,7 @@ std::string CompoundValueNode::finish(void)
     show("");
   }
 
-  error = check("");  // sets 'error' for toplevel node
-
-  return error;
+  return check("");
 }
 
 
@@ -492,7 +487,7 @@ std::string CompoundValueNode::check(const std::string& path)
       {
         if (childV[ix]->name == childV[ix2]->name)
         {
-          std::string fullPath = (path == "" ? "/" : path + name);
+          std::string fullPath = (path == "" ? "/" : path + name + "/");
           std::string error = "duplicated tag-name: /" + childV[ix]->name + "/ in path: " + fullPath;
           alarmMgr.badInput(clientIp, error);
 

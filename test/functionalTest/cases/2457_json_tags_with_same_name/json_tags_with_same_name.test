@@ -296,13 +296,13 @@ Date: REGEX(.*)
 07. V2: Try to create an entity E7 with attr A1 with compound value { "a": 1, "b": { "a": 1, "a": 2} } - see error
 ==================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
+Content-Length: 76
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "duplicated tag-name: /a/ in path: /b",
+    "description": "duplicated tag-name: /a/ in path: /b/",
     "error": "BadRequest"
 }
 
@@ -310,7 +310,7 @@ Date: REGEX(.*)
 08. V1: Try to create an entity E7 with attr A1 with compound value { "a": 1, "b": { "a": 1, "a": 2} } - see error
 ==================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 128
+Content-Length: 129
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -318,7 +318,7 @@ Date: REGEX(.*)
 {
     "errorCode": {
         "code": "400",
-        "details": "compound value error: duplicated tag-name: /a/ in path: /b",
+        "details": "compound value error: duplicated tag-name: /a/ in path: /b/",
         "reasonPhrase": "Bad Request"
     }
 }
