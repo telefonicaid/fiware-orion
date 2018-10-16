@@ -89,14 +89,14 @@ _MB-01: エンティティが見つかった、mongoUpdate UPDATE/REPLACE のケ
 
 * `mongoUpdateContext()` はサービス・ルーチンから呼び出されます (ステップ1)
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
-* ループの中では、`processContextElement()` が、着信リクエストの各 `ContextElement` オブジェクト (要するに CE) に対して呼び出されます (ステップ3)
-* 事前の条件チェックの後、`processContextElement()` は個々の CE を処理します。まず、その CE に対応するエンティティが、`connectionOperations` モジュールで `collectionQuery()` を使ってデータベース内で検索されます (ステップ4と5)。エンティティが見つかったとしましょう (ステップ6)
-* 実行フローは、エンティティ更新の実行を担当する `updateEntity()` に渡されます (ステップ7)。 `updateEntity()` は順番に CE への属性を処理するためにフローを `processContextAttributeVector()`に渡します (ステップ8)
-* `processContextAttributeVector()` は CE 内の個々の属性を処理するための  `updateContextAttributeItem()` を呼び出すループを含んでいます (ステップ9)。後でこの処理を実装するために使用された戦略を詳しく説明します
+* ループの中では、`processContextElement()` が、着信リクエストの各 `Entity` オブジェクトに対して呼び出されます (ステップ3)
+* 事前の条件チェックの後、`processContextElement()` は個々のエンティティを処理します。まず、そのエンティティに対応するエンティティが、`connectionOperations` モジュールで `collectionQuery()` を使ってデータベース内で検索されます (ステップ4と5)。エンティティが見つかったとしましょう (ステップ6)
+* 実行フローは、エンティティ更新の実行を担当する `updateEntity()` に渡されます (ステップ7)。 `updateEntity()` は順番にエンティティへの属性を処理するためにフローを `processContextAttributeVector()`に渡します (ステップ8)
+* `processContextAttributeVector()` は、エンティティ内の個々の属性を処理するための  `updateContextAttributeItem()` を呼び出すループを含んでいます (ステップ9)。後でこの処理を実装するために使用された戦略を詳しく説明します
 * 属性の処理が完了すると、 `processContextAttributeVector()` は `addTriggeredSubscriptions()` を呼び出して更新オペレーションによってトリガーされたサブスクリプションを検出します (ステップ10)。これについては後で詳しく説明します
 * 最後に、データベース内の実体を実際に更新するために、`connectionOperations` モジュール内で ` collectionUpdate()` を呼び出してコントロールを `updateEntity()` に返します (ステップ11と12)
 * 次のステップは、更新オペレーションによってトリガされた通知を送信することです。これは `processSubscriptions()`によって行われます(ステップ13)。これに関する詳細は (図表[MD-01](＃flow-md-01)) を参照してください
-* 最後に、`searchContextProviders()`が呼び出されて、データベース内に見つからなかった CE の各属性に対して適切なコンテキスト・プロバイダを見つけます (ステップ14)。この情報は、[コンテキスト・プロバイダのドキュメント](cprs.md) で説明されているように、更新処理をコンテキスト・プロバイダに転送するために、呼び出し側のサービス・ルーチンによって使用されます。詳細は、図 [MD-02](＃flow-md-02) の  `searchContextProviders()` です。
+* 最後に、`searchContextProviders()`が呼び出されて、データベース内に見つからなかったエンティティの各属性に対して適切なコンテキスト・プロバイダを見つけます (ステップ14)。この情報は、[コンテキスト・プロバイダのドキュメント](cprs.md) で説明されているように、更新処理をコンテキスト・プロバイダに転送するために、呼び出し側のサービス・ルーチンによって使用されます。詳細は、図 [MD-02](＃flow-md-02) の  `searchContextProviders()` です。
 * ステップ2でリクエスト・セマフォが取得された場合は、リクエスト・セマフォが戻される前に解放されます (ステップ15)
 
 ケース2 : アクション・タイプが "UPDATE" または "REPLACE" であり、エンティティが見つからない場合
@@ -108,8 +108,8 @@ _MB-02: エンティティが見つからない場合の、mongoUpdate UPDATE/RE
 
 * `mongoUpdateContext()` はサービス・ルーチンから呼び出されます (ステップ1)
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
-* ループの中では、`processContextElement()`が、着信リクエストの各 `ContextElement` オブジェクト (要するにCE) に対して呼び出されます (ステップ3)
-* 前提条件のチェックの後、`processContextElement()` は個々の CE を処理します。まず、その CE に対応するエンティティが、`connectionOperations` モジュールで `collectionQuery()` を使ってデータベース内で検索されます (ステップ4と5)。エンティティが見つからないと仮定しましょう (ステップ6)
+* ループの中では、`processContextElement()`が、着信リクエストの各 `Entity` オブジェクト (要するにエンティティ) に対して呼び出されます (ステップ3)
+* 前提条件のチェックの後、`processContextElement()` は個々のエンティティを処理します。まず、そのエンティティに対応するエンティティが、`connectionOperations` モジュールで `collectionQuery()` を使ってデータベース内で検索されます (ステップ4と5)。エンティティが見つからないと仮定しましょう (ステップ6)
 * `searchContextProviders()` は、エンティティの適切なコンテキスト・プロバイダを見つけるために呼び出されます (ステップ7)。この情報は、[コンテキスト・プロバイダのドキュメント](cprs.md)で説明されているように、コール・サービス・ルーチンが更新オペレーションをコンテキスト・プロバイダに転送するために使用されます。詳細は、図 [MD-02](#flow-md-02) の `searchContextProviders()` 実装を参照してください
 * リクエスト・セマフォがステップ2で取得された場合、リクエスト・セマフォは戻される前に解放されます (ステップ8)
 
@@ -122,10 +122,10 @@ _MB-03: エンティティが見つかった場合の mongoUpdate APPEND/APPEND_
 
 * `mongoUpdateContext()` または `mongoNotifyContext()` はサービス・ルーチンから呼び出されます (ステップ1)
 * `-reqMutexPolicy` に応じて、リクエストセマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
-* ループの中では、`processContextElement()` が着信リクエストの各 `ContextElement` オブジェクト (要するに CE) に対して呼び出されます (ステップ3)
-* 前提条件のチェックの後、`processContextElement()` は個々の CE を処理します。まず、その CE に対応するエンティティが、`connectionOperations` モジュールで `collectionQuery()` を使ってデータベース内で検索されます (ステップ4と5)。エンティティが見つかったとしましょう (ステップ6)
-* 実行フローは、エンティティ更新の実行を担当する `updateEntity()` に渡されます (ステップ7) `updateEntity()`は、CE の属性を処理するために、フローを `processContextAttributeVector()` に渡します(ステップ8)
-* `processContextAttributeVector()` は、ループ内で `appendContextAttributeItem()` を呼び出して、CE の個々の属性を処理します (ステップ9)。後でこの処理を実装するために使用された戦略に関する詳細を説明します
+* ループの中では、`processContextElement()` が着信リクエストの各 `Entity` オブジェクト (要するにエンティティ) に対して呼び出されます (ステップ3)
+* 前提条件のチェックの後、`processContextElement()` は個々のエンティティを処理します。まず、そのエンティティに対応するエンティティが、`connectionOperations` モジュールで `collectionQuery()` を使ってデータベース内で検索されます (ステップ4と5)。エンティティが見つかったとしましょう (ステップ6)
+* 実行フローは、エンティティ更新の実行を担当する `updateEntity()` に渡されます (ステップ7) `updateEntity()`は、エンティティの属性を処理するために、フローを `processContextAttributeVector()` に渡します(ステップ8)
+* `processContextAttributeVector()` は、ループ内で `appendContextAttributeItem()` を呼び出して、エンティティの個々の属性を処理します (ステップ9)。後でこの処理を実装するために使用された戦略に関する詳細を説明します
 * 属性の処理が完了すると、`processContextAttributeVector()` は `addTriggeredSubscriptions()` を呼び出して更新オペレーションによってトリガーされたサブスクリプションを検出します (ステップ10)。これについては後で詳しく説明します
 * コントロールが `updateEntity()` に返されると、`connectionOperations` モジュールの `collectionUpdate()` が呼び出されて、データベースの実体を実際に更新します (ステップ11と12)
 * 次のステップは、更新オペレーションによってトリガされた通知を送信することです。これは  `processSubscriptions()` によって行われます (ステップ13)。これに関する詳細は、図 [MD-01](#flow-md-01) を参照してください
@@ -140,8 +140,8 @@ _MB-04: 新しいエンティティの場合での mongoUpdate APPEND/APPEND_STR
 
 * `mongoUpdateContext()` または `mongoNotifyContext()` はサービス・ルーチンから呼び出されます (ステップ1)
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
-* ループの中では、`processContextElement()` が着信リクエストの各 `ContextElement` オブジェクト (要するに CE )に対して呼び出されます (ステップ3)
-* 前提条件のチェックの後、`processContextElement()` は個々の CE を処理します。まず、その CE に対応するエンティティが、`connectionOperations` モジュールで `collectionQuery()` を使ってデータベース内で検索されます (ステップ4と5)。エンティティが見つからないと仮定しましょう (ステップ6)
+* ループの中では、`processContextElement()` が着信リクエストの各 `Entity` オブジェクト (要するにエンティティ)に対して呼び出されます (ステップ3)
+* 前提条件のチェックの後、`processContextElement()` は個々のエンティティを処理します。まず、そのエンティティに対応するエンティティが、`connectionOperations` モジュールで `collectionQuery()` を使ってデータベース内で検索されます (ステップ4と5)。エンティティが見つからないと仮定しましょう (ステップ6)
 * 実行フローは、エンティティの作成を担当する `createEntity()` に渡されます(ステップ7)。データベース内の実体の実際の作成は、`connectionOperations` モジュールの `collectionInsert()` によって行われます (ステップ8と9)
 * 制御は `processContextElement()` に返され、更新オペレーションによってトリガーされたサブスクリプションを検出するために `addTriggeredSubscriptions()` を呼び出します (ステップ10)。これについては後で詳しく説明します
 * 次のステップは、 `processSubscriptions()` を呼び出すことによって、更新オペレーションによってトリガーされた通知を送信することです (ステップ11)。これに関する詳細は、図 [MD-01](#flow-md-01) を参照してください
@@ -156,10 +156,10 @@ _MB-05: エンティティを削除しない mongoUpdate DELETE_
 
 * `mongoUpdateContext()` は、サービス・ルーチンから呼び出されます (ステップ1)
 * `-reqMutexPolicy` にしたがって、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
-* ループでは、`processContextElement()` が着信リクエストの各 `ContextElement` オブジェクト (CE) に対して呼び出されます (ステップ3)
-* 前提条件のチェックの後、`processContextElement()` は個々の CE を処理します。まず、その CE に対応するエンティティは、`connectionOperations` モジュールの `collectionQuery()` を呼び出すことによってデータベース内で検索されます (ステップ4と5)。エンティティが見つかったとしましょう (ステップ6)
-* 実行フローは、エンティティ更新の実行を担当する `updateEntity()` に渡されます(ステップ7)。`updateEntity()`は、CE の属性を処理するために、`processContextAttributeVector()` にフローを渡します (ステップ8)
-* `processContextAttributeVector()` は CE 内の個々の属性に対するループで `deleteContextAttributeItem()` を呼び出します(ステップ9)。後でこの処理を実装するために使用された戦略に関する詳細を説明します
+* ループでは、`processContextElement()` が着信リクエストの各 `Entity` オブジェクト (要するにエンティティ) に対して呼び出されます (ステップ3)
+* 前提条件のチェックの後、`processContextElement()` は個々のエンティティを処理します。まず、そのエンティティに対応するエンティティは、`connectionOperations` モジュールの `collectionQuery()` を呼び出すことによってデータベース内で検索されます (ステップ4と5)。エンティティが見つかったとしましょう (ステップ6)
+* 実行フローは、エンティティ更新の実行を担当する `updateEntity()` に渡されます(ステップ7)。`updateEntity()`は、エンティティの属性を処理するために、`processContextAttributeVector()` にフローを渡します (ステップ8)
+* `processContextAttributeVector()` はエンティティ内の個々の属性に対するループで `deleteContextAttributeItem()` を呼び出します(ステップ9)。後でこの処理を実装するために使用された戦略に関する詳細を説明します
 * 属性の処理が完了すると、`processContextAttributeVector()` は、更新オペレーション (ステップ10) によってトリガーされたサブスクリプションを検出するために `addTriggeredSubscriptions()` を呼び出します。これについては後で詳しく説明します
 * コントロールが `updateEntity()` に返されると、`connectionOperations` モジュールの `collectionUpdate()` が呼び出され、データベース内のエンティティを更新します (ステップ11と12)
 * 次のステップは、`processSubscriptions()` を呼び出すことによって、更新オペレーションによって引き起こされた通知を送信することです (ステップ13)。これに関する詳細は、図 [MD-01](#flow-md-01) を参照してください
@@ -174,8 +174,8 @@ _MB-06: エンティティを削除する mongoUpdate DELETE_
 
 * `mongoUpdateContext()` はサービスルーチンから呼び出されます (ステップ1)
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
-* ループの中では、`processContextElement()` が着信リクエストの各 `ContextElement` オブジェクト (要するにCE) に対して呼び出されます (ステップ3)
-* 前提条件のチェックの後、`processContextElement()` は個々の CE を処理します。まず、その CE に対応するエンティティは、`connectionOperations` モジュールで `collectionQuery()` を呼び出すことによってデータベース内で検索されます (ステップ4と5)。エンティティが見つかったとしましょう (ステップ6)
+* ループの中では、`processContextElement()` が着信リクエストの各 `Entity` オブジェクト (要するにエンティティ) に対して呼び出されます (ステップ3)
+* 前提条件のチェックの後、`processContextElement()` は個々のエンティティを処理します。まず、そのエンティティに対応するエンティティは、`connectionOperations` モジュールで `collectionQuery()` を呼び出すことによってデータベース内で検索されます (ステップ4と5)。エンティティが見つかったとしましょう (ステップ6)
 * 実行フローは、エンティティ更新の実行を担当する `updateEntity()` に渡されます (ステップ7)。`updateEntity()` は実際のエンティティの削除を行うために `removeEntity()` にフローを渡します (ステップ8)
 * `removeEntity()` は、実際にデータベース内のエンティティを削除するために、`connectionOperations` モジュール内で `collectionRemove()` を呼び出します (ステップ9と10)
 * ステップ2でリクエスト・セマフォが取得された場合、リクエスト・セマフォは戻される前に解放されます (ステップ11)
@@ -196,9 +196,9 @@ _MB-06: エンティティを削除する mongoUpdate DELETE_
 
 これらの変数は、出力パラメータとして `updateEntity()` に返され、データベースのエンティティ更新オペレーションで使用されます。上記の図を参照してください。
 
-`toSet`, `toUnset` などを満たすために `processContextAttributeVector()` は着信 CE の属性を処理します。各属性処理の実行は、属性ごとの処理関数に委譲されます。
+`toSet`, `toUnset` などを満たすために `processContextAttributeVector()` は着信エンティティの属性を処理します。各属性処理の実行は、属性ごとの処理関数に委譲されます。
 
-* `updateContextAttributeItem()`、アクション・タイプが UPDATE または REPLACE の場合。`updateAttribute()` はヘルパー関数として内部的に使用されます。データベースの属性情報と受信 CE をマージするために `mergeAttrInfo()` を使用します
+* `updateContextAttributeItem()`、アクション・タイプが UPDATE または REPLACE の場合。`updateAttribute()` はヘルパー関数として内部的に使用されます。データベースの属性情報と着信エンティティをマージするために `mergeAttrInfo()` を使用します
 * `appendContextAttributeItem()`、アクション・タイプが APPEND または APPEND_STRICT の場合 `appendAttribute()` は内部的にヘルパー関数として使用され、属性がエンティティに既に存在し、実際の追加でない場合は、ボールを `updateAttribute()` に渡します
 * `deleteContextAttributeItem()`、アクション・タイプがDELETEの場合。`deleteAttribute()` はヘルパー関数として内部的に使用されます
 
@@ -206,7 +206,7 @@ _MB-06: エンティティを削除する mongoUpdate DELETE_
 
 * `addTriggeredSubscriptions()`。実際には、この関数には2つのバージョンがあります。`addTriggeredSubscriptions()` 自体は単なるディスパッチャです。サブスクリプション・キャッシュを使用して特定のエンティティの変更がサブスクリプションをトリガするかどうかをチェックする `_withCache()` バージョンと、チェックを行うためにデータベースの `csubs` コレクションをチェックする `_noCache()` です。 明らかに、使用されるバージョンは、サブスクリプション・キャッシュが有効かどうか、すなわちグローバルな `noCache` ブール変数の値によって異なります。`_withCache()` バージョンでは、サブスクリプション・キャッシュ・セマフォを取得または提供する必要があります。[詳細はこのドキュメント](semaphores.md#subscription-cache-semaphore)を参照してください
 
-* `processSubscriptions()`。`subsToNotify` マップとは別に、この関数のもう1つの重要なパラメータは、`notifyCerP` です。これは、送信する通知を記入するために使用されるコンテキスト要素レスポンス (CER) への参照です。新しいエンティティの場合、この CER は、更新リクエストの着信 CE の内容から構築されます。既存のエンティティを更新する場合には、ロジックは、CER で始まり、`toSet`, `toUnset` などのフィールドが構築されると同時に更新されます。言い換えれば、CE 属性が処理されている間、ロジックは常に更新された CER を保持します。`updateContextAttributeItem()` と `updateContextAttributeItem()` で使用される `updateAttrInNotifyCer()` と `deleteContextAttributeItem()` で使用される `deleteAttrInNotifyCer()` は、このタスクを行うのに使われるヘルパー関数です。これに関する詳細は以下のシーケンス図に示されています。
+* `processSubscriptions()`。`subsToNotify` マップとは別に、この関数のもう1つの重要なパラメータは、`notifyCerP` です。これは、送信する通知を記入するために使用されるコンテキスト要素レスポンス (CER) への参照です。新しいエンティティの場合、この CER は、更新リクエストの着信エンティティの内容から構築されます。既存のエンティティを更新する場合には、ロジックは、CER で始まり、`toSet`, `toUnset` などのフィールドが構築されると同時に更新されます。言い換えれば、CE 属性が処理されている間、ロジックは常に更新された CER を保持します。`updateContextAttributeItem()` と `updateContextAttributeItem()` で使用される `updateAttrInNotifyCer()` と `deleteContextAttributeItem()` で使用される `deleteAttrInNotifyCer()` は、このタスクを行うのに使われるヘルパー関数です。これに関する詳細は以下のシーケンス図に示されています。
 
 <a name="flow-md-01"></a>
 ![`processSubscriptions()` function detail](../../manuals/devel/images/Flow-MD-01.png)
