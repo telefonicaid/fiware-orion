@@ -50,7 +50,7 @@ TEST(CompoundValueNode, tree)
 
   for (int ix = 0; ix < 5; ++ix)
   {
-    vecItem = new orion::CompoundValueNode(vec, std::string("/vec/") + name, name, "a", ix, orion::ValueTypeString, 2);
+    vecItem = new orion::CompoundValueNode(name, "a", orion::ValueTypeString);
     vec->add(vecItem);
   }
 
@@ -64,8 +64,6 @@ TEST(CompoundValueNode, tree)
   ASSERT_EQ(1, copy->childV.size());
   ASSERT_EQ(6, copy->childV[0]->childV.size());
   ASSERT_STREQ("vecItem", copy->childV[0]->childV[0]->name.c_str());
-  ASSERT_EQ(3, copy->childV[0]->childV[3]->siblingNo);
-  ASSERT_EQ(2, copy->childV[0]->childV[3]->level);
 
   delete tree;
   delete copy;
@@ -108,8 +106,8 @@ TEST(CompoundValueNode, vectorInvalidAndOk)
   lmTraceLevelSet(LmtCompoundValueAdd, true);
 
   orion::CompoundValueNode*  tree     = new orion::CompoundValueNode(orion::ValueTypeObject);
-  orion::CompoundValueNode*  vec      = new orion::CompoundValueNode(tree, "/vec", "vec", "", 0, orion::ValueTypeVector, 1);
-  orion::CompoundValueNode*  item1    = new orion::CompoundValueNode(vec, std::string("/vec/vecitem1"), "vecitem1",  "a", 0, orion::ValueTypeString, 2);
+  orion::CompoundValueNode*  vec      = new orion::CompoundValueNode("vec", "", orion::ValueTypeVector);
+  orion::CompoundValueNode*  item1    = new orion::CompoundValueNode("vecitem1", "a", orion::ValueTypeString);
   const char*                outFile  = "ngsi.compoundValue.vector.invalid.json";
 
   utInit();
@@ -118,12 +116,12 @@ TEST(CompoundValueNode, vectorInvalidAndOk)
   vec->add(item1);
   vec->add(orion::ValueTypeString, "vecitem", "a");
 
-  tree->finish();
-  EXPECT_STREQ("bad tag-name of vector item: /vecitem/, should be /vecitem1/", tree->error.c_str());
+  std::string error = tree->finish();
+  EXPECT_STREQ("bad tag-name of vector item: /vecitem/, should be /vecitem1/", error.c_str());
 
   item1->name = "vecitem";
-  tree->finish();
-  EXPECT_STREQ("OK", tree->error.c_str());
+  error = tree->finish();
+  EXPECT_STREQ("OK", error.c_str());
 
   std::string rendered;
 
@@ -153,9 +151,9 @@ TEST(CompoundValueNode, structInvalidAndOk)
   lmTraceLevelSet(LmtCompoundValueAdd, true);
 
   orion::CompoundValueNode*  tree     = new orion::CompoundValueNode(orion::ValueTypeObject);
-  orion::CompoundValueNode*  str      = new orion::CompoundValueNode(tree, "/struct", "struct", "", 0, orion::ValueTypeObject, 1);
-  orion::CompoundValueNode*  item1    = new orion::CompoundValueNode(str, std::string("/struct/structitem"), "structitem", "a", 0, orion::ValueTypeString, 2);
-  orion::CompoundValueNode*  item2    = new orion::CompoundValueNode(str, std::string("/struct/structitem"), "structitem", "a", 1, orion::ValueTypeString, 2);
+  orion::CompoundValueNode*  str      = new orion::CompoundValueNode("struct", "", orion::ValueTypeObject);
+  orion::CompoundValueNode*  item1    = new orion::CompoundValueNode("structitem", "a", orion::ValueTypeString);
+  orion::CompoundValueNode*  item2    = new orion::CompoundValueNode("structitem", "a", orion::ValueTypeString);
   const char*                outFile  = "ngsi.compoundValue.struct.invalid.json";
 
   utInit();
@@ -164,12 +162,12 @@ TEST(CompoundValueNode, structInvalidAndOk)
   str->add(item1);
   str->add(item2);
 
-  tree->finish();
-  EXPECT_STREQ("duplicated tag-name: /structitem/ in path: /struct", tree->error.c_str());
+  std::string error = tree->finish();
+  EXPECT_STREQ("duplicated tag-name: /structitem/ in path: /struct/", error.c_str());
 
   item2->name = "structitem2";
-  tree->finish();
-  EXPECT_STREQ("OK", tree->error.c_str());
+  error = tree->finish();
+  EXPECT_STREQ("OK", error.c_str());
 
   std::string rendered;
 

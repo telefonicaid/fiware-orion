@@ -1164,7 +1164,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
 
   if ((compoundValueP != NULL) && (compoundValueP->childV.size() != 0))
   {
-    return compoundValueP->check();
+    return compoundValueP->check("");
   }
 
   if (valueType == orion::ValueTypeString)
