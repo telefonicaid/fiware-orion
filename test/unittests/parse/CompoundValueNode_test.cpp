@@ -163,7 +163,7 @@ TEST(CompoundValueNode, structInvalidAndOk)
   str->add(item2);
 
   std::string error = tree->finish();
-  EXPECT_STREQ("duplicated tag-name: /structitem/ in path: /struct", error.c_str());
+  EXPECT_STREQ("duplicated tag-name: /structitem/ in path: /struct/", error.c_str());
 
   item2->name = "structitem2";
   error = tree->finish();
