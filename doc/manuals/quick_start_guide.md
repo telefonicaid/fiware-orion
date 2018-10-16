@@ -1,7 +1,7 @@
 # Orion Context Broker Quick Start Guide
 
 Welcome to Orion Context Broker! In this brief guide you will find information about some initial steps to work with the
-Orion Context Broker global instance in [FIWARE Lab](https://lab.fiware.org) in an easy way.
+Orion Context Broker global instance in [FIWARE Lab](https://lab.fiware.org) (owned and managed by the FIWARE Foundation) in an easy way.
 
 Orion Context Broker implements the [FIWARE NGSI version 2](http://fiware.github.io/context.Orion/api/v2/stable/) API.
 A good learning resource for such API is the

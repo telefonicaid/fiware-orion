@@ -39,7 +39,6 @@
 */
 Entities::Entities()
 {
-  oe.fill(SccNone, "", "");
 }
 
 
@@ -83,7 +82,7 @@ std::string Entities::toJson
 */
 std::string Entities::check(RequestType requestType)
 {
-  return vec.check(requestType);
+  return vec.check(V2, requestType);
 }
 
 
@@ -109,32 +108,32 @@ void Entities::release(void)
 *   present in the Entities for v2 (that number is in the HTTP header Fiware-Total-Count for v2).
 *   Other values for "details" are lost as well, if errorCode::code equals SccOk.
 */
-void Entities::fill(QueryContextResponse* qcrsP)
+void Entities::fill(const QueryContextResponse& qcrs, OrionError* oeP)
 {
-  if (qcrsP->errorCode.code == SccContextElementNotFound)
+  if (qcrs.errorCode.code == SccContextElementNotFound)
   {
     //
     // If no entities are found, we respond with a 200 OK
     // and an empty vector of entities ( [] )
     //
 
-    oe.fill(SccOk, "", "OK");
+    oeP->fill(SccOk, "", "OK");
     return;
   }
-  else if (qcrsP->errorCode.code != SccOk)
+  else if (qcrs.errorCode.code != SccOk)
   {
     //
     // If any other error - use the error for the response
     //
 
-    oe.fill(qcrsP->errorCode.code, qcrsP->errorCode.details, qcrsP->errorCode.reasonPhrase);
+    oeP->fill(qcrs.errorCode.code, qcrs.errorCode.details, qcrs.errorCode.reasonPhrase);
     return;
   }
 
-  for (unsigned int ix = 0; ix < qcrsP->contextElementResponseVector.size(); ++ix)
+  for (unsigned int ix = 0; ix < qcrs.contextElementResponseVector.size(); ++ix)
   {
-    Entity* eP = &qcrsP->contextElementResponseVector[ix]->entity;
-    StatusCode* scP = &qcrsP->contextElementResponseVector[ix]->statusCode;
+    Entity* eP = &qcrs.contextElementResponseVector[ix]->entity;
+    StatusCode* scP = &qcrs.contextElementResponseVector[ix]->statusCode;
 
     if (scP->code == SccReceiverInternalError)
     {
@@ -142,7 +141,7 @@ void Entities::fill(QueryContextResponse* qcrsP)
       // think so, as the releasing logic in the upper layer will deal with that but
       // let's do anyway just in case... (we don't have a ft covering this, so valgrind suite
       // cannot help here and it is better to ensure)
-      oe.fill(SccReceiverInternalError, scP->details, "InternalServerError");
+      oeP->fill(SccReceiverInternalError, scP->details, "InternalServerError");
       vec.release();
       return;
     }

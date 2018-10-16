@@ -33,8 +33,7 @@ echo $testStartTime > /tmp/brokerStartCounter
 #
 # DISABLED - funct tests that are disabled, for some reason
 #
-DISABLED=('test/functionalTest/cases/1156_qfilters_and_compounds/qfilters_and_compounds_equals_null.test' \
-          'test/functionalTest/cases/0000_bad_requests/exit.test' \
+DISABLED=('test/functionalTest/cases/0000_bad_requests/exit.test' \
           'test/functionalTest/cases/0917_queryContext_behaves_differently/query_with_and_without_forwarding.test' \
           'test/functionalTest/cases/0000_ipv6_support/ipv4_only.test' \
           'test/functionalTest/cases/0000_ipv6_support/ipv6_only.test' \

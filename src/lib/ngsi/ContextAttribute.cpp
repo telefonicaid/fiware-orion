@@ -654,7 +654,7 @@ std::string ContextAttribute::toJsonV1AsObject
   }
   else
   {
-    out += JSON_STR("value") + ":" + compoundValueP->toJson(true);
+    out += JSON_STR("value") + ":" + compoundValueP->toJson();
   }
 
   if (omitValue == false)
@@ -780,7 +780,7 @@ std::string ContextAttribute::toJsonV1
   }
   else
   {
-    out += JSON_STR("value") + ":" + compoundValueP->toJson(true);
+    out += JSON_STR("value") + ":" + compoundValueP->toJson();
 
     if (commaAfterContextValue)
     {
@@ -866,7 +866,7 @@ void ContextAttribute::filterAndOrderMetadata
 */
 std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFilter)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   //
   // type
@@ -887,7 +887,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   //
   if (compoundValueP != NULL)
   {
-    jh.addRaw("value", compoundValueP->toJson(true));
+    jh.addRaw("value", compoundValueP->toJson());
   }
   else if (valueType == orion::ValueTypeNumber)
   {
@@ -944,13 +944,16 @@ std::string ContextAttribute::toJsonValue(void)
 {
   if (compoundValueP != NULL)
   {
-    return compoundValueP->toJson(true);
+    return compoundValueP->toJson();
   }
   else if (valueType == orion::ValueTypeNumber)
   {
     if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
     {
-      return toJsonString(isodate2str(numberValue));
+      std::string out = "\"";
+      out += toJsonString(isodate2str(numberValue));
+      out += '"';
+      return out;
     }
     else // regular number
     {
@@ -959,7 +962,10 @@ std::string ContextAttribute::toJsonValue(void)
   }
   else if (valueType == orion::ValueTypeString)
   {
-    return toJsonString(stringValue);
+    std::string out = "\"";
+    out += toJsonString(stringValue);
+    out += '"';
+    return out;
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
@@ -1073,7 +1079,7 @@ std::string ContextAttribute::toJsonAsValue
     {
       *outMimeTypeP = outFormatSelection;
 
-      out = compoundValueP->toJson(true);
+      out = compoundValueP->toJson();
     }
   }
 
@@ -1139,7 +1145,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
 
   if ((compoundValueP != NULL) && (compoundValueP->childV.size() != 0))
   {
-    return compoundValueP->check();
+    return compoundValueP->check("");
   }
 
   if (valueType == orion::ValueTypeString)

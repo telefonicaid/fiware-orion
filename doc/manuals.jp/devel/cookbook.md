@@ -466,6 +466,10 @@ Orion はリクエストをサポートしています :
 [Top](#top)
 
 <a name="fixing-a-memory-leak"></a>
+
+注 : この例で使用されているクラス/関数の一部は、コード内に存在しなくなりました (ContextElementVector クラスなど)。
+ただし、この例は、メモリリークのデバッグ方法を示すためにも有効です
+
 ## メモリ・リークの修正
 メモリ・リークは、[valgrind memcheck](http://valgrind.org/docs/manual/mc-manual.html) を使用して検出されます。特別なシェル・スクリプト `test/valgrind/valgrindTestSuite.sh` がこの目的のために開発され、make のステップがそれにリンクされています : `make valgrind`
 

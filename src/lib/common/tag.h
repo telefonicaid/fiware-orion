@@ -39,13 +39,6 @@
 * Macros for JSON rendering
 */
 #define JSON_STR(value)                std::string("\"" + std::string(value) + "\"")
-#define JSON_NUMBER(value)             std::string(value)
-#define JSON_BOOL(bvalue)              std::string((bvalue == true)? "true" : "false") 
-
-#define JSON_PROP(name)                std::string("\"" + std::string(name) + "\":")
-#define JSON_VALUE(name, value)        std::string(JSON_PROP(name) + JSON_STR(value))
-#define JSON_VALUE_NUMBER(name, value) std::string(JSON_PROP(name) + JSON_NUMBER(value))
-#define JSON_VALUE_BOOL(name, value)   std::string(JSON_PROP(name) + ((value == true)? "true" : "false"))
 
 
 

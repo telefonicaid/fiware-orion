@@ -85,14 +85,14 @@ _MB-01: mongoUpdate UPDATE/REPLACE case with entity found_
 
 * `mongoUpdateContext()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).
-* In a loop, `processContextElement()` is called for each `ContextElement` object (CE, in short) of the incoming request (step 3).
-* After pre-conditions checks, `processContextElement()` processes an individual CE. First, the entity corresponding to that CE is searched in the database, using `collectionQuery()` in the `connectionOperations` module (steps 4 and 5). Let's assume that the entity is found (step 6).
-* The execution flow passes to `updateEntity()`, in charge of doing the entity update (step 7). `updateEntity()` in sequence passes the flow to `processContextAttributeVector()` in order to process the attributes in the CE (step 8).
-* `processContextAttributeVector()` contains a loop calling `updateContextAttributeItem()` for processing of each individual attribute in the CE (step 9). Details on the strategy used to implement this processing later.
+* In a loop, `processContextElement()` is called for each `Entity` object of the incoming request (step 3).
+* After pre-conditions checks, `processContextElement()` processes an individual entity. First, the entity corresponding to that Entity is searched in the database, using `collectionQuery()` in the `connectionOperations` module (steps 4 and 5). Let's assume that the entity is found (step 6).
+* The execution flow passes to `updateEntity()`, in charge of doing the entity update (step 7). `updateEntity()` in sequence passes the flow to `processContextAttributeVector()` in order to process the attributes in the Entity (step 8).
+* `processContextAttributeVector()` contains a loop calling `updateContextAttributeItem()` for processing of each individual attribute in the Entity (step 9). Details on the strategy used to implement this processing later.
 * Once the processing of the attributes in done, `processContextAttributeVector()` calls `addTriggeredSubscriptions()` to detect subscriptions triggered by the update operation (step 10). More details on this later.
 * Finally the control is returned to `updateEntity()` with invokes `collectionUpdate()` in the `connectionOperations` module in order to actually update the entity in the database (steps 11 and 12).
 * The next step is to send the notifications triggered by the update operation, which is done by `processSubscriptions()` (step 13). More details on this in (diagram [MD-01](#flow-md-01)).
-* Finally, `searchContextProviders()` is called to try to find a suitable context provider for each attribute in the CE that was not found in the database (step 14). This information would be used by the calling service routine in order to forward the update operation to context providers, as described in the [context providers documentation](cprs.md). More information on `searchContextProviders()` in (diagram [MD-02](#flow-md-02)).
+* Finally, `searchContextProviders()` is called to try to find a suitable context provider for each attribute in the Entity that was not found in the database (step 14). This information would be used by the calling service routine in order to forward the update operation to context providers, as described in the [context providers documentation](cprs.md). More information on `searchContextProviders()` in (diagram [MD-02](#flow-md-02)).
 * If the request semaphore was taken in step 2, then it is released before returning (step 15).
 
 Case 2: action type is "UPDATE" or "REPLACE" and the entity is not found.
@@ -104,8 +104,8 @@ _MB-02: mongoUpdate UPDATE/REPLACE case with entity not found_
 
 * `mongoUpdateContext()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).
-* In a loop, `processContextElement()` is called for each `ContextElement` object (CE, in short) of the incoming request (step 3).
-* After precondition checks, `processContextElement()` processes an individual CE. First, the entity corresponding to that CE is searched in the database, using `collectionQuery()` in the `connectionOperations` module (steps 4 and 5). Let's assume that the entity is not found (step 6).
+* In a loop, `processContextElement()` is called for each `Entity` object (Entity, in short) of the incoming request (step 3).
+* After precondition checks, `processContextElement()` processes an individual Entity. First, the entity corresponding to that Entity is searched in the database, using `collectionQuery()` in the `connectionOperations` module (steps 4 and 5). Let's assume that the entity is not found (step 6).
 * `searchContextProviders()` is called in order to try to find a suitable context provider for the entity (step 7). This information would be used by the calling service routine to forward the update operation to context providers, as described in the [context providers documentation](cprs.md). More information on `searchContextProviders()` implementation in (diagram [MD-02](#flow-md-02)).
 * If the request semaphore was taken in step 2, then it is released before returning (step 8).
 
@@ -118,10 +118,10 @@ _MB-03: mongoUpdate APPEND/APPEND_STRICT case with existing entity_
 
 * `mongoUpdateContext()` or `mongoNotifyContext()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).
-* In a loop, `processContextElement()` is called for each `ContextElement` object (CE, in short) of the incoming request (step 3).
-* After precondition checks, `processContextElement()` processes an individual CE. First, the entity corresponding to that CE is searched in the database, using `collectionQuery()` in the `connectionOperations` module (steps 4 and 5). Let's assume that the entity is found (step 6).
-* The execution flow passes to `updateEntity()` that is in charge of doing the entity update (step 7). `updateEntity()` in its turn passes the flow to `processContextAttributeVector()` in order to process the attributes in the CE (step 8).
-* `processContextAttributeVector()` calls `appendContextAttributeItem()` in a loop to process each individual attribute in the CE (step 9). More details regarding the strategy used to implement this processing later.
+* In a loop, `processContextElement()` is called for each `Entity` object (Entity, in short) of the incoming request (step 3).
+* After precondition checks, `processContextElement()` processes an individual Entity. First, the entity corresponding to that Entity is searched in the database, using `collectionQuery()` in the `connectionOperations` module (steps 4 and 5). Let's assume that the entity is found (step 6).
+* The execution flow passes to `updateEntity()` that is in charge of doing the entity update (step 7). `updateEntity()` in its turn passes the flow to `processContextAttributeVector()` in order to process the attributes in the Entity (step 8).
+* `processContextAttributeVector()` calls `appendContextAttributeItem()` in a loop to process each individual attribute in the Entity (step 9). More details regarding the strategy used to implement this processing later.
 * Once the processing of the attributes is done, `processContextAttributeVector()` calls `addTriggeredSubscriptions()` to detect subscriptions triggered by the update operation (step 10). More details on this later.
 
 * When the control is returned to `updateEntity()`, `collectionUpdate()` in the `connectionOperations` module is invoked to actually update the entity in the database (steps 11 and 12).
@@ -137,8 +137,8 @@ _MB-04: mongoUpdate APPEND/APPEND_STRICT case with new entity_
 
 * `mongoUpdateContext()` or `mongoNotifyContext()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).
-* In a loop, `processContextElement()` is called for each `ContextElement` object (CE, in short) of the incoming request (step 3).
-* After precondition checks, `processContextElement()` processes an individual CE. First, the entity corresponding to that CE is searched in the database, using `collectionQuery()` in the `connectionOperations` module (steps 4 and 5). Let's assume that the entity is not found (step 6).
+* In a loop, `processContextElement()` is called for each `Entity` object (Entity, in short) of the incoming request (step 3).
+* After precondition checks, `processContextElement()` processes an individual Entity. First, the entity corresponding to that Entity is searched in the database, using `collectionQuery()` in the `connectionOperations` module (steps 4 and 5). Let's assume that the entity is not found (step 6).
 * The execution flow passes to `createEntity()` that in charge of creating the entity (step 7). The actual creation of the entity in the database is done by `collectionInsert()` in the `connectionOperations` module (steps 8 and 9).
 * Control is returned to `processContextElement()`, which calls `addTriggeredSubscriptions()` in order to detect subscriptions triggered by the update operation (step 10). More details on this later.
 * The next step is to send notifications triggered by the update operation, by calling `processSubscriptions()` (step 11). More details on this in (diagram [MD-01](#flow-md-01)).
@@ -153,10 +153,10 @@ _MB-05: mongoUpdate DELETE not remove entity_
 
 * `mongoUpdateContext()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).
-* In a loop, `processContextElement()` is invoked for each `ContextElement` object (CE, in short) of the incoming request (step 3).
-* After precondition checks, `processContextElement()` processes an individual CE. First, the entity corresponding to that CE is searched in the database, by calling `collectionQuery()` in the `connectionOperations` module (steps 4 and 5). Let's assume that the entity is found (step 6).
-* The execution flow passes to `updateEntity()`, thqat is in charge of doing the entity update (step 7). `updateEntity()` in its turn passes the flow to `processContextAttributeVector()` in order to process the attributes of the CE (step 8).
-* `processContextAttributeVector()` calls `deleteContextAttributeItem()` in a loop over each individual attribute in the CE (step 9). More details regarding the strategy used to implement this processing later.
+* In a loop, `processContextElement()` is invoked for each `Entity` object (Entity, in short) of the incoming request (step 3).
+* After precondition checks, `processContextElement()` processes an individual Entity. First, the entity corresponding to that Entity is searched in the database, by calling `collectionQuery()` in the `connectionOperations` module (steps 4 and 5). Let's assume that the entity is found (step 6).
+* The execution flow passes to `updateEntity()`, thqat is in charge of doing the entity update (step 7). `updateEntity()` in its turn passes the flow to `processContextAttributeVector()` in order to process the attributes of the Entity (step 8).
+* `processContextAttributeVector()` calls `deleteContextAttributeItem()` in a loop over each individual attribute in the Entity (step 9). More details regarding the strategy used to implement this processing later.
 * Once the processing of the attributes is done, `processContextAttributeVector()` calls `addTriggeredSubscriptions()` in order to detect subscriptions triggered by the update operation (step 10). More details on this later.
 * When the control is returned to `updateEntity()`, `collectionUpdate()` in the `connectionOperations` module is invoked to update the entity in the database (steps 11 and 12).
 * The next step is to send notifications triggered by the update operation, by invoking `processSubscriptions()` (step 13). More details on this in (diagram [MD-01](#flow-md-01)).
@@ -171,8 +171,8 @@ _MB-06: mongoUpdate DELETE remove entity_
 
 * `mongoUpdateContext()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
-* In a loop, `processContextElement()` is called for each `ContextElement` object (CE, in short) of the incoming request (step 3).
-* After precondition checks, `processContextElement()` processes an individual CE. First, the entity corresponding to that CE is searched in the database, by invoking `collectionQuery()` in the `connectionOperations` module (steps 4 and 5). Let's assume that the entity is found (step 6).
+* In a loop, `processContextElement()` is called for each `Entity` object (Entity, in short) of the incoming request (step 3).
+* After precondition checks, `processContextElement()` processes an individual Entity. First, the entity corresponding to that Entity is searched in the database, by invoking `collectionQuery()` in the `connectionOperations` module (steps 4 and 5). Let's assume that the entity is found (step 6).
 * The execution flow passes to `updateEntity()`, in charge of doing the entity update (step 7). `updateEntity()` in its turn passes the flow to `removeEntity()` in order to do the actual entity removal (step 8).
 * `removeEntity()` invokes `collectionRemove()` in the `connectionOperations` module in order to actually remove the entity in the database (steps 9 and 10).
 * If the request semaphore was taken in step 2, then it is released before returning (step 11).
@@ -192,16 +192,16 @@ The update is based on "deltas" rather than setting the whole `attrs` and `attrs
 
 These variables are returned to `updateEntity()` as output parameters, to be used in the entity update operation on the database (as shown in the diagrams above)
 
-In order to fill `toSet`, `toUnset`, etc. `processContextAttributeVector()` processes the attributes in the incoming CE. Execution for each attribute processing is delegated to a per-attribute processing function:
+In order to fill `toSet`, `toUnset`, etc. `processContextAttributeVector()` processes the attributes in the incoming Entity. Execution for each attribute processing is delegated to a per-attribute processing function:
 
-* `updateContextAttributeItem()`, if action type is UPDATE or REPLACE. `updateAttribute()` is used internally as a helper function (which in its turn may use `mergeAttrInfo()` to merge the attribute information in the database and in the incoming CE).
+* `updateContextAttributeItem()`, if action type is UPDATE or REPLACE. `updateAttribute()` is used internally as a helper function (which in its turn may use `mergeAttrInfo()` to merge the attribute information in the database and in the incoming Entity).
 * `appendContextAttributeItem()`, if action type is APPEND or APPEND_STRICT. `appendAttribute()` is used internally as a helper function, passing the ball to `updateAttribute()` if the attribute already exists in the entity and it isn't an actual append.
 * `deleteContextAttributeItem()`, if action type is DELETE. `deleteAttribute()` is used internally as a helper function.
 
 During the update process, either in the case of creating new entities or updating existing ones, context subscriptions may be triggered, so notifications would be sent. In order for this to work, the update logic keeps a map `subsToNotify` to hold triggered subscriptions. `addTriggeredSubscriptions()`  is in charge of adding new subscriptions to the map, while `processSubscriptions()` is in charge of sending the notifications once the process has ended, based on the content of the map `subsToNotify`. Both `addTriggeredSubscriptions()` and `processSubscriptions()` invocations are shown in the context of the different execution flow cases in the diagrams above.
 
 * `addTriggeredSubscriptions()`. Actually, there are two versions of this function (`addTriggeredSubscriptions()` itself is just a dispatcher): the `_withCache()` version (which uses the subscription cache to check whether a particular entity modification triggers any subscriptions) and `_noCache()` (which checks the `csubs` collection in the database in order to do the checking). Obviously, the version to be used depends on whether the subscription cache is enabled or not, i.e. the value of the global `noCache` bool variable. The `_withCache()` version needs to take/give the subscription cache semaphore (see [this document for details](semaphores.md#subscription-cache-semaphore)).
-* `processSubscriptions()`. Apart from the `subsToNotify` map, another important parameter in this function is `notifyCerP`, which is a reference to the context element response (CER) that will be used to fill in the notifications to be sent. In the case of new entities, this CER is built from the contents of the incoming CE in the update request. In the case of updating an existing entity, the logic starts with CER and updates it at the same time the `toSet`, `toUnset`, etc. fields are built. In other words, the logic keeps always an updated CER while the CE attributes are being processed. `updateAttrInNotifyCer()` (used in `updateContextAttributeItem()` and `updateContextAttributeItem()`) and `deleteAttrInNotifyCer()` (used in `deleteContextAttributeItem()`) are helper functions used to do this task. Details on this are shown in the sequence diagram below.
+* `processSubscriptions()`. Apart from the `subsToNotify` map, another important parameter in this function is `notifyCerP`, which is a reference to the context element response (CER) that will be used to fill in the notifications to be sent. In the case of new entities, this CER is built from the contents of the incoming Entity in the update request. In the case of updating an existing entity, the logic starts with CER and updates it at the same time the `toSet`, `toUnset`, etc. fields are built. In other words, the logic keeps always an updated CER while the Entity attributes are being processed. `updateAttrInNotifyCer()` (used in `updateContextAttributeItem()` and `updateContextAttributeItem()`) and `deleteAttrInNotifyCer()` (used in `deleteContextAttributeItem()`) are helper functions used to do this task. Details on this are shown in the sequence diagram below.
 
 <a name="flow-md-01"></a>
 ![`processSubscriptions()` function detail](images/Flow-MD-01.png)

@@ -54,9 +54,9 @@
 *
 * URI parameters:
 *   - type=<TYPE>
-*   - options=keyValues|values|unique   (used in Entity::render)
-*   - attrs=A1,A2,...An                 (used in Entity::render)
-*   - metadata=M1,M2,...Mn              (used in Entity::render)
+*   - options=keyValues|values|unique   (used in Entity::toJson)
+*   - attrs=A1,A2,...An                 (used in Entity::toJson)
+*   - metadata=M1,M2,...Mn              (used in Entity::toJson)
 */
 std::string getEntity
 (
@@ -105,13 +105,22 @@ std::string getEntity
     entity.hideIdAndType();
   }
 
-  entity.fill(&parseDataP->qcrs.res);
+  OrionError   oe;
+  std::string  answer;
 
-  std::string answer;
-  TIMED_RENDER(answer = entity.toJson(getRenderFormat(ciP->uriParamOptions),
-                                      attributeFilter.stringV,
-                                      false,
-                                      parseDataP->qcr.res.metadataList.stringV));
+  entity.fill(parseDataP->qcrs.res, &oe);
+
+  if (oe.code == SccNone)
+  {
+    TIMED_RENDER(answer = entity.toJson(getRenderFormat(ciP->uriParamOptions),
+                                        attributeFilter.stringV,
+                                        false,
+                                        parseDataP->qcr.res.metadataList.stringV));
+  }
+  else
+  {
+    TIMED_RENDER(answer = oe.toJson());
+  }
 
   if (parseDataP->qcrs.res.errorCode.code == SccOk && parseDataP->qcrs.res.contextElementResponseVector.size() > 1)
   {

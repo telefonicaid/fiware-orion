@@ -60,7 +60,7 @@ NotifyContextResponse::NotifyContextResponse(StatusCode& sc)
 
 /* ****************************************************************************
 *
-* NotifyContextResponse::render -
+* NotifyContextResponse::toJsonV1 -
 */
 std::string NotifyContextResponse::toJsonV1(void)
 {

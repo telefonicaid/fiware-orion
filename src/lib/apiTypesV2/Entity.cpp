@@ -38,6 +38,7 @@
 #include "parse/forbiddenChars.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "mongoBackend/dbFieldEncoding.h"
+#include "rest/OrionError.h"
 
 #include "apiTypesV2/Entity.h"
 
@@ -211,7 +212,7 @@ void Entity::filterAndOrderAttrs
 
 /* ****************************************************************************
 *
-* Entity::render -
+* Entity::toJsonV1 -
 *
 * This method was ported from old ContextElement class. It was name render() there
 *
@@ -265,11 +266,6 @@ std::string Entity::toJson
   const std::vector<std::string>&  metadataFilter
 )
 {
-  if ((oe.details != "") || ((oe.reasonPhrase != "OK") && (oe.reasonPhrase != "")))
-  {
-    return oe.toJson();
-  }
-
   std::vector<ContextAttribute* > orderedAttrs;
   filterAndOrderAttrs(attrsFilter, blacklist, &orderedAttrs);
 
@@ -301,22 +297,15 @@ std::string Entity::toJson
 */
 std::string Entity::toJsonValues(const std::vector<ContextAttribute*>& orderedAttrs)
 {
-  std::string out = "[";
+  JsonVectorHelper jh;
 
   for (unsigned int ix = 0; ix < orderedAttrs.size(); ix++)
   {
     ContextAttribute* caP = orderedAttrs[ix];
-    out += caP->toJsonValue();
-
-    if (ix != orderedAttrs.size() - 1)
-    {
-      out += ",";
-    }
+    jh.addRaw(caP->toJsonValue());
   }
 
-  out += "]";
-
-  return out;
+  return jh.str();
 }
 
 
@@ -327,7 +316,7 @@ std::string Entity::toJsonValues(const std::vector<ContextAttribute*>& orderedAt
 */
 std::string Entity::toJsonUniqueValues(const std::vector<ContextAttribute*>& orderedAttrs)
 {
-  std::string out = "[";
+  JsonVectorHelper jh;
 
   std::map<std::string, bool>  uniqueMap;
 
@@ -344,16 +333,12 @@ std::string Entity::toJsonUniqueValues(const std::vector<ContextAttribute*>& ord
     }
     else
     {
-      out += value;
+      jh.addRaw(value);
       uniqueMap[value] = true;
     }
-
-    out += ",";
   }
 
-  // The substring trick replaces final "," by "]". It is not very smart, but it saves
-  // a second pass on the vector, once the "unicity" has been calculated in the hashmap
-  return out.substr(0, out.length() - 1 ) + "]";
+  return jh.str();
 }
 
 
@@ -364,7 +349,7 @@ std::string Entity::toJsonUniqueValues(const std::vector<ContextAttribute*>& ord
 */
 std::string Entity::toJsonKeyvalues(const std::vector<ContextAttribute*>& orderedAttrs)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   if (renderId)
   {
@@ -391,7 +376,7 @@ std::string Entity::toJsonKeyvalues(const std::vector<ContextAttribute*>& ordere
 */
 std::string Entity::toJsonNormalized(const std::vector<ContextAttribute*>& orderedAttrs, const std::vector<std::string>&  metadataFilter)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   if (renderId)
   {
@@ -654,29 +639,29 @@ void Entity::fill(const Entity& en, bool useDefaultType)
 *
 * Entity::fill -
 */
-void Entity::fill(QueryContextResponse* qcrsP)
+void Entity::fill(const QueryContextResponse& qcrs, OrionError* oeP)
 {
-  if (qcrsP->errorCode.code == SccContextElementNotFound)
+  if (qcrs.errorCode.code == SccContextElementNotFound)
   {
-    oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
+    oeP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
   }
-  else if (qcrsP->errorCode.code != SccOk)
+  else if (qcrs.errorCode.code != SccOk)
   {
     //
     // any other error distinct from Not Found
     //
-    oe.fill(qcrsP->errorCode.code, qcrsP->errorCode.details, qcrsP->errorCode.reasonPhrase);
+    oeP->fill(qcrs.errorCode.code, qcrs.errorCode.details, qcrs.errorCode.reasonPhrase);
   }
-  else if (qcrsP->contextElementResponseVector.size() > 1)  // qcrsP->errorCode.code == SccOk
+  else if (qcrs.contextElementResponseVector.size() > 1)  // qcrs.errorCode.code == SccOk
   {
     //
     // If there are more than one entity, we return an error
     //
-    oe.fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
+    oeP->fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
   }
   else
   {
-    Entity* eP = &qcrsP->contextElementResponseVector[0]->entity;
+    Entity* eP = &qcrs.contextElementResponseVector[0]->entity;
 
     fill(eP->id,
          eP->type,

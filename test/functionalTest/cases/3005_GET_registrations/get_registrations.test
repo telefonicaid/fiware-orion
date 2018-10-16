@@ -220,7 +220,7 @@ Date: REGEX(.*)
 05. GET all four registration, without service path
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 1057
+Content-Length: 1053
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -335,7 +335,7 @@ Date: REGEX(.*)
 07. GET one registration using service path /a1/e2
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 265
+Content-Length: 264
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -370,7 +370,7 @@ Date: REGEX(.*)
 08. GET all four registrations (step 04) for service path /#
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 1057
+Content-Length: 1053
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

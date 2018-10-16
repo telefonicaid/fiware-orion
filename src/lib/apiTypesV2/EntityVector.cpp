@@ -33,6 +33,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/Request.h"
@@ -52,21 +53,49 @@ std::string EntityVector::toJson
   const std::vector<std::string>&  metadataFilter
 )
 {
+  JsonVectorHelper jh;
+
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    jh.addRaw(vec[ix]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter));
+  }
+
+  return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* EntityVector::toJsonV1 -
+*
+* Ported from old class ContextElementVector
+*/
+std::string EntityVector::toJsonV1
+(
+  bool         asJsonObject,
+  RequestType  requestType,
+  bool         comma
+)
+{
+  std::string  out = "";
+
   if (vec.size() == 0)
   {
-    return "[]";
+    return "";
   }
 
-  std::string out;
+  out += startTag("contextElements", true);
 
-  out += "[" + vec[0]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
+  // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
+  std::vector<std::string> emptyV;
 
-  for (unsigned int ix = 1; ix < vec.size(); ++ix)
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += "," + vec[ix]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
+    out += vec[ix]->toJsonV1(asJsonObject, requestType, emptyV, false, emptyV, ix != vec.size() - 1);
   }
 
-  out += "]";
+  out += endTag(comma, true);
 
   return out;
 }
@@ -77,15 +106,26 @@ std::string EntityVector::toJson
 *
 * EntityVector::check -
 */
-std::string EntityVector::check(RequestType requestType)
+std::string EntityVector::check(ApiVersion apiVersion, RequestType requestType)
 {
+  if ((apiVersion == V1) && (requestType == UpdateContext))
+  {
+    if (vec.size() == 0)
+    {
+      return "No context elements";
+    }
+  }
+
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(V2, requestType)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType)) != "OK")
     {
-      alarmMgr.badInput(clientIp, "invalid vector of Entity");
+      if (apiVersion == V2)
+      {
+        alarmMgr.badInput(clientIp, "invalid vector of Entity");
+      }
       return res;
     }
   }
@@ -129,6 +169,25 @@ Entity*  EntityVector::operator[] (unsigned int ix) const
 unsigned int EntityVector::size(void)
 {
   return vec.size();
+}
+
+
+
+/* ****************************************************************************
+*
+* EntityVector::lookup -
+*/
+Entity* EntityVector::lookup(const std::string& name, const std::string& type)
+{
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if ((vec[ix]->id == name) && (vec[ix]->type == type))
+    {
+      return vec[ix];
+    }
+  }
+
+  return NULL;
 }
 
 

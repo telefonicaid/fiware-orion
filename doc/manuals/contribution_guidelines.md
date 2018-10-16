@@ -694,7 +694,7 @@ values are assigned at object construction time in memory at execution time.
 *Rule*: pointer variable names should use `P` (capital P) as suffix.
 
 ```
-ContextElement* ceP;
+Entity* eP;
 ```
 
 *Rationale*: pointer variables can be easily identified at a glanze, which makes the code clearer.

@@ -82,7 +82,7 @@ def ignore(root, file):
         return True
 
     # PNG files in manuals o functionalTest are ignored
-    if ('manuals' in root or 'functionalTest' in root or 'apiary' in root) and file.endswith('.png'):
+    if ('manuals' in root or 'functionalTest' in root or 'apiary' in root) and (file.endswith('.png') or file.endswith('.ico')):
         return True
 
     # Files in the rpm/SRPMS, rpm/SOURCES or rpm/RPMS directories are not processed

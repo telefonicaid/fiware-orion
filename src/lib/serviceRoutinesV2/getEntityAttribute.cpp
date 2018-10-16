@@ -84,25 +84,32 @@ std::string getEntityAttribute
 
 
   // 03. Render entity attribute response
-  attribute.fill(&parseDataP->qcrs.res, compV[4]);
+  OrionError oe;
+  attribute.fill(parseDataP->qcrs.res, compV[4], &oe);
 
-  StringList metadataFilter;
-  setMetadataFilter(ciP->uriParam, &metadataFilter);
+  if (oe.code == SccNone)
+  {
+    StringList metadataFilter;
+    setMetadataFilter(ciP->uriParam, &metadataFilter);
+    TIMED_RENDER(answer = attribute.toJson(ciP->httpHeaders.accepted("text/plain"),
+                                           ciP->httpHeaders.accepted("application/json"),
+                                           ciP->httpHeaders.outformatSelect(),
+                                           &(ciP->outMimeType),
+                                           &(ciP->httpStatusCode),
+                                           ciP->uriParamOptions[OPT_KEY_VALUES],
+                                           metadataFilter.stringV,
+                                           EntityAttributeResponse));
+  }
+  else
+  {
+    TIMED_RENDER(answer = oe.toJson());
+  }
 
-  TIMED_RENDER(answer = attribute.toJson(ciP->httpHeaders.accepted("text/plain"),
-                                         ciP->httpHeaders.accepted("application/json"),
-                                         ciP->httpHeaders.outformatSelect(),
-                                         &(ciP->outMimeType),
-                                         &(ciP->httpStatusCode),
-                                         ciP->uriParamOptions[OPT_KEY_VALUES],
-                                         metadataFilter.stringV,
-                                         EntityAttributeResponse));
-
-  if (attribute.oe.reasonPhrase == ERROR_TOO_MANY)
+  if (oe.reasonPhrase == ERROR_TOO_MANY)
   {
     ciP->httpStatusCode = SccConflict;
   }
-  else if (attribute.oe.reasonPhrase == ERROR_NOT_FOUND)
+  else if (oe.reasonPhrase == ERROR_NOT_FOUND)
   {
     ciP->httpStatusCode = SccContextElementNotFound;  // Attribute to be precise!
   }

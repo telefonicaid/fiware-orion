@@ -187,33 +187,26 @@ JSON パース実装は専用ライブラリにありますが、テキスト・
 * `ContextAttributeVector`
 * `Metadata`
 * `MetadataVector`
-* `ContextElementVector`
 
 ### メソッドと階層
 
 これらのクラスだけでなく、ライブラリ内の`ngsi9`, `ngsi10`, `convenience` クラスのすべてのメソッドの標準セットを持っています : 
 
-* `render()`, JSON 文字列 (主に NGSIv1 用) にレンダリングします
-* `toJson()`, JSON 文字列 (NGSIv2 用)にレンダリングします
+* `toJson()`, JSON 文字列 (NGSIv2 用) にレンダリングします。このメソッドは、レンダリング・プロセスを単純化するために、`JsonObjectHelper` と `JsonVectorHelper` を優先します。この方法では、`add*()` メソッドを使ってプリントする必要がある要素を追加するだけで、開始/終了の大括弧、引用符、コンマの制御を気にする必要はありません
+* `toJsonV1()`, JSON 文字列 (NGSIv1 用) にレンダリングします
 * `present()`, デバッグ用。オブジェクトはログ・ファイルにテキストとしてダンプされます
 * `release()`, オブジェクトのすべての割り当てられたリソースを解放します
 * `check()`, オブジェクトがルールに従うこと、すなわち禁止されていない文字や必須フィールドがないことなどを確認します
 
-クラスは階層に従います。たとえば、`UpdateContextRequest` (ngsi10 ライブラリにある最上位の階層クラス) には `ContextElementVector` が含まれます。もちろん、`ContextElementVector` は `ContextElement` のベクトルです。
-`ContextElement` には以下が含まれています :
+クラスは階層に従います。たとえば、`UpdateContextRequest` (ngsi10 ライブラリにある最上位の階層クラス) には `EntityVector` が含まれます。もちろん、`EntityVector` は `Entity` のベクトルです。
 
-* `EntityId`
-* `AttributeDomainName`
-* `ContextAttributeVector`
-* `MetadataVector` (このフィールド `MetadataVector domainMetadataVector` は NGSIv1 の一部ですが、Orion はそれを使用しません)
+`EntityVector` クラスと `Entity` クラスはこのライブラリに属していませんが、[`src/lib/apiTypesV2`](#srclibapitypesv2) に属することに注意してください。一般的に、NGSIv1 は非難されているので、可能な限り NGSIv2 クラスを使用して、`src/lib/ngsi` 内の等価クラスの数を減らそうとします。
 
-`render()`, `check()`, `release()` などのメソッドはツリー構造で呼び出されます。たとえば、`UpdateContextRequest` :
+`toJson()`, `check()`, `release()` などのメソッドはツリー構造で呼び出されます。たとえば、`UpdateContextRequest` :
 
 * `UpdateContextRequest::check()` コール :
-  * `ContextElementVector::check()` コール (ベクトルの各アイテム) :
-      * `ContextElement::check()` コール :
-          * `EntityId::check()`
-          * `AttributeDomainName::check()`
+  * `EntityVector::check()` calls (ベクトルの各アイテム) :
+      * `Entity::check()` calls:
           * `ContextAttributeVector::check()` コール (ベクトルの各アイテム) :
               * `ContextAttribute::check()` コール :
                   * `MetadataVector::check()` コール (ベクトルの各アイテム) :

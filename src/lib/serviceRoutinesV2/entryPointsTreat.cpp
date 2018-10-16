@@ -31,6 +31,7 @@
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -49,15 +50,13 @@ std::string entryPointsTreat
   ParseData*                 parseDataP
 )
 {
-  std::string out = "{";
+  JsonObjectHelper jh;
 
-  out += JSON_VALUE("entities_url",      ENTITIES_URL)      + ",";
-  out += JSON_VALUE("types_url",         TYPES_URL)         + ",";
-  out += JSON_VALUE("subscriptions_url", SUBSCRIPTIONS_URL) + ",";
-  out += JSON_VALUE("registrations_url", REGISTRATIONS_URL);
-
-  out += "}";
+  jh.addString("entities_url",      ENTITIES_URL);
+  jh.addString("types_url",         TYPES_URL);
+  jh.addString("subscriptions_url", SUBSCRIPTIONS_URL);
+  jh.addString("registrations_url", REGISTRATIONS_URL);
 
   ciP->httpStatusCode = SccOk;
-  return out;
+  return jh.str();
 }
