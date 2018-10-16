@@ -42,58 +42,6 @@ namespace orion
 {
 /* ****************************************************************************
 *
-* compoundValueStart - 
-*
-* This function is called when the first compound node is encountered, so not
-* only must the root be created, but also the first node of the compound tree
-* must be taken care of. This is done by calling compoundValueMiddle.
-*/
-void compoundValueStart
-(
-    ConnectionInfo*     ciP,
-    const std::string&  path,
-    const std::string&  name,
-    const std::string&  value,
-    const std::string&  rest,
-    orion::ValueType    type,
-    bool                fatherIsVector
-)
-{
-  ciP->inCompoundValue   = true;
-  ciP->compoundValueP    = new orion::CompoundValueNode(orion::ValueTypeObject);
-  ciP->compoundValueRoot = ciP->compoundValueP;
-
-  LM_T(LmtCompoundValueContainer, ("Set current container to '%s' (%s)",
-                                   ciP->compoundValueP->path.c_str(),
-                                   ciP->compoundValueP->name.c_str()));
-
-
-  if (fatherIsVector)
-  {
-    ciP->compoundValueP->valueType = orion::ValueTypeVector;
-  }
-
-  //
-  // In the parsing routines, in all context attributes that can accept Compound values,
-  // a pointer to the one where we are right now is saved in ParseData.
-  //
-  // If this pointer is not set, it is a fatal error and the broker dies, because of the
-  // following LM_X, that does an exit
-  // It is better to exit here and clearly see the error, than to continue and get strange
-  // outputs that will be difficult to trace back to here.
-  //
-  if (ciP->parseDataP->lastContextAttribute == NULL)
-    orionExitFunction(1, "No pointer to last ContextAttribute");
-
-  ciP->compoundValueVector.push_back(ciP->compoundValueP);
-  LM_T(LmtCompoundValueAdd, ("Created new toplevel element"));
-  compoundValueMiddle(ciP, rest, name, value, type);
-}
-
-
-
-/* ****************************************************************************
-*
 * compoundValueMiddle - 
 *
 * containerType: vector/object/string
@@ -119,9 +67,7 @@ void compoundValueMiddle
     // ciP->compoundValueP points to the current compound container
     ciP->compoundValueP = ciP->compoundValueP->add(type, name, "");
 
-    LM_T(LmtCompoundValueContainer, ("Set current container to '%s' (%s)",
-                                     ciP->compoundValueP->path.c_str(),
-                                     ciP->compoundValueP->name.c_str()));
+    LM_T(LmtCompoundValueContainer, ("Set current container to '%s'", ciP->compoundValueP->name.c_str()));
   }
   else
   {

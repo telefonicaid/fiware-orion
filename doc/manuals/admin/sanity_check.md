@@ -31,7 +31,7 @@ curl --header 'Accept: application/json' localhost:1026/version
     "compiled_by" : "fermin",
     "compiled_in" : "debvm",
     "release_date" : "Wed Sep 27 16:56:16 CEST 2017",
-    "doc" : "https://fiware-orion.readthedocs.org/en/master/"
+    "doc" : "https://fiware-orion.rtfd.io/"
   }
 }
 ```

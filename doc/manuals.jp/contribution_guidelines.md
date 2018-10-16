@@ -637,7 +637,7 @@ Y:Y(const std::string& _fooName, const std::string& _myLongFooName):
 *ルール* : ポインタ変数名はサフィックスとして `P` (大文字の P　) を使用する必要があります
 
 ```
-ContextElement* ceP;
+Entity* eP;
 ```
 
 *理由* : ポインタ変数は、glanze で簡単に識別することができるため、コードが明確になります

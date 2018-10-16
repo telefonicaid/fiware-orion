@@ -49,8 +49,7 @@ struct QueryContextResponse;
 class Entities
 {
  public:
-  EntityVector  vec;          // Optional - mandatory if 200-OK
-  OrionError    oe;           // Optional - mandatory if not 200-OK
+  EntityVector  vec;          // Mandatory
 
   Entities();
   ~Entities();
@@ -62,7 +61,7 @@ class Entities
 
   std::string  check(RequestType requestType);
   void         release(void);
-  void         fill(QueryContextResponse* qcrsP);
+  void         fill(const QueryContextResponse& qcrs, OrionError* oeP);
 };
 
 #endif  // SRC_LIB_APITYPESV2_ENTITIES_H_

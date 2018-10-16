@@ -212,13 +212,17 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
     break;
 
   case Object:
-  case Array:
     valueType      = orion::ValueTypeObject;
     compoundValueP = new orion::CompoundValueNode();
     compoundObjectResponse(compoundValueP, getFieldF(mdB, ENT_ATTRS_VALUE));
-    compoundValueP->container = compoundValueP;
-    compoundValueP->name      = "value";
-    compoundValueP->valueType = (bsonType == Object)? orion::ValueTypeObject : orion::ValueTypeVector;
+    compoundValueP->valueType = orion::ValueTypeObject;
+    break;
+
+  case Array:
+    valueType      = orion::ValueTypeVector;
+    compoundValueP = new orion::CompoundValueNode();
+    compoundVectorResponse(compoundValueP, getFieldF(mdB, ENT_ATTRS_VALUE));
+    compoundValueP->valueType = orion::ValueTypeVector;
     break;
 
   default:
@@ -245,12 +249,7 @@ std::string Metadata::toJsonV1(bool comma)
 
   if (compoundValueP != NULL)
   {
-    // FIXME P8: We need to to this to avoid repeat the "value" keyword. I don't
-    // understand why (if you look to the similar code in Metadata::toJson(), it
-    // is not used there). It comes from the old implementation
-    compoundValueP->container = compoundValueP;
-
-    out += JSON_STR("value") + ":" + compoundValueP->toJson(true);
+    out += JSON_STR("value") + ":" + compoundValueP->toJson();
   }
   else if (valueType == orion::ValueTypeString)
   {
@@ -454,7 +453,7 @@ std::string Metadata::toJson(void)
 
   if (compoundValueP != NULL)
   {
-    jh.addRaw("value", compoundValueP->toJson(true));
+    jh.addRaw("value", compoundValueP->toJson());
   }
   else if (valueType == orion::ValueTypeString)
   {

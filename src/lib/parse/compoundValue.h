@@ -36,23 +36,6 @@ namespace orion
 {
 /* ****************************************************************************
 *
-* compoundValueStart - 
-*/
-extern void compoundValueStart
-(
-  ConnectionInfo*     ciP,
-  const std::string&  path,
-  const std::string&  name,
-  const std::string&  value,
-  const std::string&  rest,
-  orion::ValueType    type,
-  bool                fatherIsVector
-);
-
-
-
-/* ****************************************************************************
-*
 * compoundValueMiddle - 
 */
 extern void compoundValueMiddle

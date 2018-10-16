@@ -55,7 +55,6 @@ class Entity
   std::string             isPattern;        // Optional
   bool                    isTypePattern;
   ContextAttributeVector  attributeVector;  // Optional
-  OrionError              oe;               // Optional - mandatory if not 200-OK
 
   std::string             servicePath;      // Not part of payload, just an internal field
   bool                    typeGiven;        // Was 'type' part of the incoming payload?
@@ -112,7 +111,7 @@ class Entity
 
   void         fill(const Entity& en, bool useDefaultType = false);
 
-  void         fill(QueryContextResponse* qcrsP);
+  void         fill(const QueryContextResponse& qcrs, OrionError* oeP);
 
   void         hideIdAndType(bool hide = true);
 

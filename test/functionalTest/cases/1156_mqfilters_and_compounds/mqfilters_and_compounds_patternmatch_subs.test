@@ -278,7 +278,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     "M1": {
                         "type": "StructuredValue",
                         "value": {
-                            "f": 3.14REGEX([01]*),
+                            "f": 3.14,
                             "i": 10,
                             "modified": false,
                             "s": "test_string"
@@ -327,7 +327,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     "M1": {
                         "type": "StructuredValue",
                         "value": {
-                            "f": 3.14REGEX([01]*),
+                            "f": 3.14,
                             "i": 10,
                             "modified": false,
                             "s": "test_string"
@@ -376,7 +376,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     "M1": {
                         "type": "StructuredValue",
                         "value": {
-                            "f": 3.14REGEX([01]*),
+                            "f": 3.14,
                             "i": 10,
                             "modified": false,
                             "s": "test_string"
@@ -438,7 +438,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     "M1": {
                         "type": "StructuredValue",
                         "value": {
-                            "f": 3.14REGEX([01]*),
+                            "f": 3.14,
                             "i": 10,
                             "modified": true,
                             "s": "test_string"
@@ -473,7 +473,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     "M1": {
                         "type": "StructuredValue",
                         "value": {
-                            "f": 3.14REGEX([01]*),
+                            "f": 3.14,
                             "i": 10,
                             "modified": true,
                             "s": "test_string"
@@ -508,7 +508,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     "M1": {
                         "type": "StructuredValue",
                         "value": {
-                            "f": 3.14REGEX([01]*),
+                            "f": 3.14,
                             "i": 10,
                             "modified": true,
                             "s": "test_string"
