@@ -45,7 +45,7 @@ extern "C"
 //
 // orionldContextCreateFromUrl -
 //
-OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url, char** detailsPP)
+OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url, OrionldContextType contextType, char** detailsPP)
 {
   OrionldContext* contextP = orionldContextLookup(url);
 
@@ -61,7 +61,7 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
   //
   // Else, create a new tree
   //
-  contextP = orionldContextCreateFromTree(NULL, url, detailsPP);
+  contextP = orionldContextCreateFromTree(NULL, url, contextType, detailsPP);
 
   if (contextP == NULL)
   {

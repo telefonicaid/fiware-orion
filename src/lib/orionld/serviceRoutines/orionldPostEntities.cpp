@@ -44,7 +44,7 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
-#include "orionld/context/orionldCoreContext.h"                // ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT
+#include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
 #include "orionld/context/orionldContextAdd.h"                 // Add a context to the context list
 #include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
 #include "orionld/context/orionldContextCreateFromUrl.h"       // orionldContextCreateFromUrl
@@ -178,7 +178,7 @@ static OrionldContext* contextItemNodeTreat(ConnectionInfo* ciP, char* url)
   LM_T(LmtContextTreat, ("In contextItemNodeTreat. url == '%s'", url));
 
   char*            details;
-  OrionldContext*  contextP = orionldContextAdd(ciP, url, &details);
+  OrionldContext*  contextP = orionldContextAdd(ciP, url, OrionldUserContext, &details);
 
   if (contextP == NULL)
   {
@@ -504,8 +504,8 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
     }
     else
     {
-      LM_T(LmtUriExpansion, ("NO Expansion found for %s name '%s': using: %s%s", kjValueType(kNodeP->type), kNodeP->name, ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT, kNodeP->name));
-      cNodeP->name = std::string(ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT) + kNodeP->name;
+      LM_T(LmtUriExpansion, ("NO Expansion found for %s name '%s': using: %s%s", kjValueType(kNodeP->type), kNodeP->name, orionldDefaultUrl, kNodeP->name));
+      cNodeP->name = std::string(orionldDefaultUrl) + kNodeP->name;
     }
   }
 #endif
@@ -818,7 +818,7 @@ static bool contextTreat
     char* details;
 
     LM_TMP(("Calling orionldContextCreateFromUrl"));
-    if ((ciP->contextP = orionldContextCreateFromUrl(ciP, contextNodeP->value.s, &details)) == NULL)
+    if ((ciP->contextP = orionldContextCreateFromUrl(ciP, contextNodeP->value.s, OrionldUserContext, &details)) == NULL)
     {
       LM_E(("Failed to create context from URL: %s", details));
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from URL", details, OrionldDetailsString);
@@ -838,7 +838,7 @@ static bool contextTreat
     //   Thr individual contezts ("url1", "url2") are treated a few lines down
     //
     LM_TMP(("Calling orionldContextCreateFromTree"));
-    ciP->contextP = orionldContextCreateFromTree(contextNodeP, "http://FIXME.array.context.needs/url", &details);
+    ciP->contextP = orionldContextCreateFromTree(contextNodeP, "http://FIXME.array.context.needs/url", OrionldUserContext, &details);
     if (ciP->contextP == NULL)
     {
       LM_E(("Failed to create context from Tree : %s", details));
@@ -1030,7 +1030,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       {
         // No expansion found in Core Context, and in no other contexts either - use default URL
         LM_TMP(("EXPANSION: use default URL for entity type '%s'", typeNodeP->value.s));
-        entityIdP->type = ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT;
+        entityIdP->type = orionldDefaultUrl;
         entityIdP->type += typeNodeP->value.s;
       }
       else if (expansions == 1)
@@ -1093,7 +1093,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       {
         // No expansion found in Core Context, and in no other contexts either - use default URL
         LM_TMP(("EXPANSION: use default URL for attribute '%s'", kNodeP->name));
-        caP->name     = ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT;
+        caP->name     = orionldDefaultUrl;
         caP->name    += kNodeP->name;
         expansionDone = true;
       }
@@ -1108,7 +1108,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
         if (expandedName == NULL)
         {
           LM_T(LmtUriExpansion, ("No expansion found - perform default expansion - prepending http://www.example.org/attribute/ to the attr name (%s)", kNodeP->name));
-          caP->name  = ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT;
+          caP->name  = orionldDefaultUrl;
           caP->name += kNodeP->name;
         }
         else
@@ -1147,7 +1147,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       {
         // No expansion found in Core Context, and in no other contexts either - use default URL
         LM_TMP(("EXPANSION: use default URL for attribute '%s'", attrTypeNodeP->value.s));
-        caP->type     = ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT;
+        caP->type     = orionldDefaultUrl;
         caP->type    += attrTypeNodeP->value.s;
         expansionDone = true;
       }
@@ -1163,7 +1163,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
         {
           // No expansion found - perform default expansion
           LM_T(LmtUriExpansion, ("No expansion found - perform default expansion - prepending http://www.example.org/attribute/ to the attr type (%s)", attrTypeNodeP->value.s));
-          caP->type = std::string(ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT) + attrTypeNodeP->value.s;
+          caP->type = std::string(orionldDefaultUrl) + attrTypeNodeP->value.s;
         }
         else
         {

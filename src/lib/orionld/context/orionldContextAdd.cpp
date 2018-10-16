@@ -51,9 +51,9 @@ extern "C"
 //
 // orionldContextAppend -
 //
-static OrionldContext* orionldContextAppend(const char* url, KjNode* tree, char** detailsPP)
+static OrionldContext* orionldContextAppend(const char* url, KjNode* tree, OrionldContextType contextType, char** detailsPP)
 {
-  OrionldContext* contextP = orionldContextCreateFromTree(tree, url, detailsPP);
+  OrionldContext* contextP = orionldContextCreateFromTree(tree, url, contextType, detailsPP);
 
   if (contextP == NULL)
     return NULL;
@@ -133,7 +133,7 @@ static OrionldContext* orionldContextAppend(const char* url, KjNode* tree, char*
 // If it is an object, the list of key-values is the context and the URL is the 'name' of the context.
 // If it is an array, the array itself (naming X contexts) is the context and the the URL is the 'name' of this "complex" context.
 //
-OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, char** detailsPP)
+OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, OrionldContextType contextType, char** detailsPP)
 {
   OrionldContext* contextP = NULL;
 
@@ -220,7 +220,7 @@ OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, char** d
   // - a vector of contexts (URL strings)
   //
 
-  if ((contextP = orionldContextAppend(url, tree, detailsPP)) == NULL)
+  if ((contextP = orionldContextAppend(url, tree, contextType, detailsPP)) == NULL)
   {
     kjFree(tree);
     return NULL;
@@ -301,7 +301,7 @@ OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, char** d
       return NULL;
     }
 
-    if (orionldContextAppend(url, tree, detailsPP) == NULL)
+    if (orionldContextAppend(url, tree, contextType, detailsPP) == NULL)
     {
       LM_T(LmtContext, (*detailsPP));
 

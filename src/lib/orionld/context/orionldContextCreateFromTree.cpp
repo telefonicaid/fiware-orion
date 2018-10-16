@@ -44,7 +44,7 @@ extern "C"
 //
 // orionldContextCreateFromTree -
 //
-OrionldContext* orionldContextCreateFromTree(KjNode* tree, const char* url, char** detailsPP)
+OrionldContext* orionldContextCreateFromTree(KjNode* tree, const char* url, OrionldContextType contextType, char** detailsPP)
 {
   OrionldContext* contextP = (OrionldContext*) malloc(sizeof(OrionldContext));
 
@@ -56,6 +56,7 @@ OrionldContext* orionldContextCreateFromTree(KjNode* tree, const char* url, char
 
   contextP->url  = strdup(url);
   contextP->tree = tree;
+  contextP->type = contextType;
   contextP->next = NULL;
 
   return contextP;

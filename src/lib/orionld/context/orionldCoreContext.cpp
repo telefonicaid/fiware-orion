@@ -42,6 +42,14 @@ OrionldContext orionldCoreContext;
 
 // -----------------------------------------------------------------------------
 //
+// orionldDefaultUrlContext -
+//
+OrionldContext orionldDefaultUrlContext;
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldCoreContextString - to avoid download during functest
 //
 const char* orionldCoreContextString = "{  \
@@ -162,3 +170,23 @@ const char* orionldCoreContextString = "{  \
    \"triggerReason\": \"http://uri.etsi.org/ngsi-ld/triggerReason\"  \
   }  \
 }";
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldDefaultUrlContextString - to avoid download during functest
+//
+const char* orionldDefaultUrlContextString = "{  \
+  \"@context\": {  \
+    \"@vocab\": \"http://example.org/ngsi-ld/default/\"  \
+  }  \
+}";
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldDefaultUrl -
+//
+char* orionldDefaultUrl = (char*) "DEFAULT URL";

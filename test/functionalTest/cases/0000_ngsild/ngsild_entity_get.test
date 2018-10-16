@@ -123,13 +123,13 @@ Date: REGEX(.*)
 03. GET E1, see default context, pretty-print with 4 spaces
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 301
+Content-Length: 297
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "id": "http://a.b.c/entity/E1",
-    "type": "http://www.example.org/ngsi-ld/default/A",
+    "type": "http://example.org/ngsi-ld/default/A",
     "name": {
         "type": "Property",
         "value": "compounds for later ..."
@@ -142,13 +142,13 @@ Date: REGEX(.*)
 04. GET E2, see test context, pretty-print with default number of spaces (2)
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 256
+Content-Length: 252
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "id": "http://a.b.c/entity/E2",
-  "type": "http://www.example.org/ngsi-ld/default/A",
+  "type": "http://example.org/ngsi-ld/default/A",
   "name": {
     "type": "Property",
     "value": "compounds for later ..."
@@ -161,11 +161,11 @@ Date: REGEX(.*)
 05. GET E2, but without prettyPrint
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 223
+Content-Length: 219
 Content-Type: application/json
 Date: REGEX(.*)
 
-{"id":"http://a.b.c/entity/E2","type":"http://www.example.org/ngsi-ld/default/A","name":{"type":"Property","value":"compounds for later ..."},"@context":"https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"}
+{"id":"http://a.b.c/entity/E2","type":"http://example.org/ngsi-ld/default/A","name":{"type":"Property","value":"compounds for later ..."},"@context":"https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"}
 
 
 06. Attempt to GET non-existing E3, see empty response

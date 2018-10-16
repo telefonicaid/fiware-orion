@@ -32,7 +32,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/context/orionldCoreContext.h"                // ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT
+#include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
 #include "orionld/context/orionldContextItemLookup.h"          // orionldContextItemLookup
 #include "orionld/common/orionldErrorResponse.h"               // Own interface
 
@@ -70,52 +70,38 @@ void orionldErrorResponseCreate(ConnectionInfo* ciP, OrionldResponseErrorType er
   KjNode* titleP    = kjString(ciP->kjsonP, "title",   title);
   KjNode* detailsP;
 
-  LM_TMP(("Here"));
   if ((details != NULL) && (details[0] != 0))
   {
     char*   contextDetails = NULL;
 
-  LM_TMP(("Here"));
     if (detailsType == OrionldDetailsString)  // no replacement as it's just a descriptive string
     {
-      LM_TMP(("Here"));
       contextDetails = (char*) details;
     }
     else  // lookup 'details' in context
     {
-      LM_TMP(("Here"));
       KjNode*  nodeP = orionldContextItemLookup(ciP->contextP, details);
       char     contextDetailsV[512];  // FIXME: Define a max length for a context item?
 
       if (nodeP == NULL)
       {
-        LM_TMP(("Here"));
-        snprintf(contextDetailsV, sizeof(contextDetailsV), "%s%s", ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT, details);
+        snprintf(contextDetailsV, sizeof(contextDetailsV), "%s%s", orionldDefaultUrl, details);
         contextDetails = contextDetailsV;
-        LM_TMP(("Here"));
       }
       else
       {
-        LM_TMP(("Here"));
         contextDetails = nodeP->value.s;
-        LM_TMP(("Here"));
       }
     }
 
-  LM_TMP(("Here"));
     detailsP = kjString(ciP->kjsonP, "details", contextDetails);
-  LM_TMP(("Here"));
   }
   else
   {
-  LM_TMP(("Here"));
     detailsP = kjString(ciP->kjsonP, "details", "no details");
-  LM_TMP(("Here"));
   }
 
-  LM_TMP(("Here. ciP->kjsonP: %p", ciP->kjsonP));
   ciP->responseTree = kjObject(ciP->kjsonP, NULL);
-  LM_TMP(("Here"));
 
   kjChildAdd(ciP->responseTree, typeP);
   kjChildAdd(ciP->responseTree, titleP);

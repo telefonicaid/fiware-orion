@@ -357,12 +357,12 @@ Date: REGEX(.*)
 08. POST /ngsi-ld/v1/entities, with an attribute without a type - see error
 ===========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 156
+Content-Length: 152
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "http://www.example.org/ngsi-ld/default/name",
+    "details": "http://example.org/ngsi-ld/default/name",
     "title": "attribute without 'type' field",
     "type": "http://example.org/ngsi-ld/errors/BadRequestData"
 }
@@ -399,12 +399,12 @@ Date: REGEX(.*)
 11. POST /ngsi-ld/v1/entities, with a Property without a 'value'
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 166
+Content-Length: 162
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "http://www.example.org/ngsi-ld/default/name",
+    "details": "http://example.org/ngsi-ld/default/name",
     "title": "property attribute without 'value' field",
     "type": "http://example.org/ngsi-ld/errors/BadRequestData"
 }
@@ -427,12 +427,12 @@ Date: REGEX(.*)
 13. POST /ngsi-ld/v1/entities, with a GeoProperty without a 'value'
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 170
+Content-Length: 166
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "http://www.example.org/ngsi-ld/default/name",
+    "details": "http://example.org/ngsi-ld/default/name",
     "title": "geo-property attribute without 'value' field",
     "type": "http://example.org/ngsi-ld/errors/BadRequestData"
 }

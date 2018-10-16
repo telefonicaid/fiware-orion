@@ -132,7 +132,7 @@ MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "http://a.b.c/entity/E1",
-		"type" : "http://www.example.org/ngsi-ld/default/A",
+		"type" : "http://example.org/ngsi-ld/default/A",
 		"servicePath" : "/"
 	},
 	"attrNames" : [
@@ -152,7 +152,7 @@ MongoDB server version: REGEX(.*)
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : {
-				"http://www=example=org/ngsi-ld/default/value" : "John 2"
+				"http://example=org/ngsi-ld/default/value" : "John 2"
 			},
 			"mdNames" : [ ]
 		}

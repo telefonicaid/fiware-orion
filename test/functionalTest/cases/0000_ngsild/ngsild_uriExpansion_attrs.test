@@ -99,7 +99,7 @@ MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "http://a.b.c/entity/E1",
-		"type" : "http://www.example.org/ngsi-ld/default/T",
+		"type" : "http://example.org/ngsi-ld/default/T",
 		"servicePath" : "/"
 	},
 	"attrNames" : [
@@ -111,11 +111,11 @@ MongoDB server version: REGEX(.*)
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : {
-				"http://www=example=org/ngsi-ld/default/value" : "Titulo",
-				"http://www=example=org/ngsi-ld/default/unitCode" : "123",
-				"http://www=example=org/ngsi-ld/default/R_R" : {
-					"http://www=example=org/ngsi-ld/default/type" : "Relationship",
-					"http://www=example=org/ngsi-ld/default/object" : "http://a.b.c/R_R"
+				"http://example=org/ngsi-ld/default/value" : "Titulo",
+				"http://example=org/ngsi-ld/default/unitCode" : "123",
+				"http://example=org/ngsi-ld/default/R_R" : {
+					"http://example=org/ngsi-ld/default/type" : "Relationship",
+					"http://example=org/ngsi-ld/default/object" : "http://a.b.c/R_R"
 				}
 			},
 			"mdNames" : [ ]

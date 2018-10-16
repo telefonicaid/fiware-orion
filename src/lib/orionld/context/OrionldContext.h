@@ -34,12 +34,27 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 //
+// OrionldContextType
+//
+typedef enum OrionldContextType
+{
+  OrionldNoContext = 0,
+  OrionldCoreContext,
+  OrionldDefaultUrlContext,
+  OrionldUserContext
+} OrionldContextType;
+
+
+
+// ----------------------------------------------------------------------------
+//
 // OrionldContext
 //
 typedef struct OrionldContext
 {
   char*                   url;
   KjNode*                 tree;
+  OrionldContextType      type;
   struct OrionldContext*  next;
 } OrionldContext;
 

@@ -38,6 +38,6 @@ extern "C"
 //
 // orionldContextCreateFromTree -
 //
-extern OrionldContext* orionldContextCreateFromTree(KjNode* tree, const char* url, char** detailsPP);
+extern OrionldContext* orionldContextCreateFromTree(KjNode* tree, const char* url, OrionldContextType contextType, char** detailsPP);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCREATEFROMTREE_H_

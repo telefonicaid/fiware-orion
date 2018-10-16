@@ -44,15 +44,9 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// ORIONLD_DEFAULT_EXPANSION_URL_DIR - FIXME: Remove - use the value of "@vocab"
+// ORIONLD_DEFAULT_URL_CONTEXT_URL -
 //
-// If an expansion is not found for an Entity Type or Attribute Name/Type,
-// use this prefix as default expansion and append the "not found" Name/Type.
-//
-// E.g., if the lookup the expansion for the Attribute Name "A1" returns NULL,
-//       then use ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT + "A1" as expansion
-//
-#define ORIONLD_DEFAULT_EXPANSION_URL_DIR_DEFAULT    "http://www.example.org/ngsi-ld/default/"
+#define ORIONLD_DEFAULT_URL_CONTEXT_URL (char*) "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContextVocab.jsonld"
 
 
 
@@ -66,8 +60,32 @@ extern OrionldContext orionldCoreContext;
 
 // -----------------------------------------------------------------------------
 //
+// orionldDefaultUrlContext
+//
+extern OrionldContext orionldDefaultUrlContext;
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldCoreContextString - to avoid download during functest
 //
 extern const char* orionldCoreContextString;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldDefaultUrlContextString - to avoid download during functest
+//
+extern const char* orionldDefaultUrlContextString;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldDefaultUrl -
+//
+extern char* orionldDefaultUrl;
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCORECONTEXT_H_
