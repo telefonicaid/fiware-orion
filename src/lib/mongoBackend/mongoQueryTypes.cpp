@@ -47,10 +47,19 @@
 */
 using mongo::BSONArrayBuilder;
 using mongo::BSONObj;
+using mongo::BSONArray;
 using mongo::BSONElement;
 using mongo::DBClientCursor;
 using mongo::DBClientBase;
 
+
+
+/* ****************************************************************************
+*
+* BATCH_SIZE constant
+*
+*/
+#define BATCH_SIZE  1000
 
 
 /* ****************************************************************************
@@ -174,6 +183,43 @@ static long long countEntities
   return c;
 }
 
+/* ****************************************************************************
+*
+* countCmd -
+*
+*/
+static unsigned int countCmd(const std::string& tenant, const BSONArray& pipelineForCount)
+{
+  BSONObj result;
+  BSONObj cmd     = BSON("aggregate" << COL_ENTITIES <<
+                         "cursor" << BSON("batchSize" << BATCH_SIZE) <<
+                         "pipeline"  << pipelineForCount);
+
+  std::string err;
+
+  if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
+  {
+    LM_E(("Runtime Error (ejecuting: %s, error %s)", cmd.toString().c_str(), err.c_str()));
+    return 0;
+  }
+
+  // Processing result to build response
+  LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
+
+  std::vector<BSONElement> resultsArray = std::vector<BSONElement>();
+
+  if (result.hasField("cursor"))
+  {
+    resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
+    return getIntFieldF(resultsArray[0].embeddedObject(), "count");
+  }
+  else
+  {
+    LM_E(("Runtime Error (ejecuting: %s, result hasn't cursor field"));
+    return 0;
+  }
+
+}
 
 
 /* ****************************************************************************
@@ -208,20 +254,49 @@ HttpStatusCode mongoEntityTypesValues
    *                cursor: { batchSize: 1000 },
    *                pipeline: [ {$match: { "_id.servicePath": /.../ } },
    *                            {$group: {_id: "$_id.type"} },
-   *                            {$sort: {_id: 1} }
+   *                            {$sort: {_id: 1} },
+   *                            {$skip: ... },
+   *                            {$limit: ... }
    *                          ]
    *                })
    *
+   * Up to Orion 2.0.0 we didn't use $skip and $limit. We got all the results in order to get the count
+   * (to be used in fiware-total-count if the user request so). However, support to MongoDB 3.6 with the
+   * old driver needs using cursor and bathSize so the old approach is no longer valid and we do now
+   * the count in a separate operation. Note that with this approach in some cases the count could not
+   * be accurate if some entity creation/deletion operation takes place in the middle. However, it is a
+   * reasonable price to pay to support MongoDB 3.6.
+   *
+   * The new approach also assumes that the batch will not surpass 16MB. It is hardly improbable to reach
+   * the 16MB limit given that each individual result is small (just a short list of attribute names).
+   *
+   * For more detail on this, check dicussion in the following links. Old implementation can be retrieved
+   * in tag 2.0.0 in the case it could be uselful (for instance, due to a change in the mongo driver).
+   *
+   * https://github.com/telefonicaid/fiware-orion/issues/3070
+   * https://github.com/telefonicaid/fiware-orion/pull/3251
+   *
    */
 
-  BSONObj result;
   BSONObj spQuery = fillQueryServicePath(servicePathV);
+
+  // FIXME P5: avoid duplicated code in pipeline and pipelineForCount;
+  BSONArray pipeline = BSON_ARRAY(
+    BSON("$match" << BSON(C_ID_SERVICEPATH << spQuery)) <<
+    BSON("$group" << BSON("_id" << CS_ID_ENTITY)) <<
+    BSON("$sort"  << BSON("_id" << 1)) <<
+    BSON("$skip" << offset) <<
+    BSON("$limit" << limit));
+
+  BSONArray pipelineForCount = BSON_ARRAY(
+    BSON("$match" << BSON(C_ID_SERVICEPATH << spQuery)) <<
+    BSON("$group" << BSON("_id" << CS_ID_ENTITY)) <<
+    BSON("$count" << "count"));
+
+  BSONObj result;
   BSONObj cmd     = BSON("aggregate" << COL_ENTITIES <<
-                         "cursor" << BSON("batchSize" << 1000) <<
-                         "pipeline"  << BSON_ARRAY(
-                           BSON("$match" << BSON(C_ID_SERVICEPATH << spQuery)) <<
-                           BSON("$group" << BSON("_id" << CS_ID_ENTITY)) <<
-                           BSON("$sort"  << BSON("_id" << 1))));
+                         "cursor" << BSON("batchSize" << BATCH_SIZE) <<
+                         "pipeline"  << pipeline);
 
   std::string err;
 
@@ -262,22 +337,13 @@ HttpStatusCode mongoEntityTypesValues
     resultsArray.erase(resultsArray.begin());
   }
 
-
-  /* Another strategy to implement pagination is to use the $skip and $limit operators in the
-   * aggregation framework. However, doing so, we don't know the total number of results, which can
-   * be needed in the case of count request (using that approach, we need to do two queries: one to get
-   * the count and other to get the actual results with $skip and $limit, in the same "transaction" to
-   * avoid incoherence between both if some entity type is created or deleted in the process).
-   *
-   * However, considering that the number of types will be small compared with the number of entities,
-   * the current approach seems to be ok
-   */
+  // Get count if user requested (i.e. if totalTypesP is not NULL)
   if (totalTypesP != NULL)
   {
-    *totalTypesP = resultsArray.size();
+    *totalTypesP = countCmd(tenant, pipelineForCount);
   }
 
-  for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
+  for (unsigned int ix = 0; ix < resultsArray.size(); ++ix)
   {
     BSONObj     resultItem = resultsArray[ix].embeddedObject();
     std::string type;
@@ -340,7 +406,9 @@ HttpStatusCode mongoEntityTypes
    *                            },
    *                            {$unwind: "$attrNames"},
    *                            {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrNames"}} },
-   *                            {$sort: {_id: 1} }
+   *                            {$sort: {_id: 1} },
+   *                            {$skip: ... },
+   *                            {$limit: ... },
    *                          ]
    *                })
    *
@@ -355,6 +423,19 @@ HttpStatusCode mongoEntityTypes
    *           following command can be used:
    *
    *           db.runCommand({aggregate: "entities", pipeline: [ {$group: {_id: "$_id.type"} }]})
+   *
+   * Up to Orion 2.0.0 we didn't use $skip and $limit. We got all the results in order to get the count
+   * (to be used in fiware-total-count if the user request so). However, support to MongoDB 3.6 with the
+   * old driver needs using cursor and bathSize so the old approach is no longer valid and we do now
+   * the count in a separate operation. Note that with this approach in some cases the count could not
+   * be accurate if some entity creation/deletion operation takes place in the middle. However, it is a
+   * reasonable price to pay to support MongoDB 3.6.
+   *
+   * The new approach also assumes that the batch will not surpass 16MB. It is hardly improbable to reach
+   * the 16MB limit given that each individual result is small (just a short list of attribute names).
+   *
+   * For more detail on this, check dicussion in the following links. Old implementation can be retrieved
+   * in tag 2.0.0 in the case it could be uselful (for instance, due to a change in the mongo driver).
    */
 
   BSONObj result;
@@ -377,15 +458,28 @@ HttpStatusCode mongoEntityTypes
           nulledArrayBuilder.arr() <<
           S_ATTRNAMES))));
 
+  // FIXME P5: avoid duplicated code in pipeline and pipelineForCount;
+  BSONArray pipeline = BSON_ARRAY(
+    BSON("$match" << BSON(C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
+    BSON("$project" << BSON("_id" << 1 << ENT_ATTRNAMES << 1)) <<
+         projection << BSON("$unwind" << S_ATTRNAMES) <<
+    BSON("$group" << BSON("_id"   << CS_ID_ENTITY <<
+                          "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
+    BSON("$sort" << BSON("_id" << 1)) <<
+    BSON("$skip" << offset) <<
+    BSON("$limit" << limit));
+
+  BSONArray pipelineForCount = BSON_ARRAY(
+    BSON("$match" << BSON(C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
+    BSON("$project" << BSON("_id" << 1 << ENT_ATTRNAMES << 1)) <<
+         projection << BSON("$unwind" << S_ATTRNAMES) <<
+    BSON("$group" << BSON("_id"   << CS_ID_ENTITY <<
+                          "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
+    BSON("$count" << "count"));
+
   BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
-                     "cursor" << BSON("batchSize" << 1000) <<
-                     "pipeline" << BSON_ARRAY(
-                                              BSON("$match" << BSON(C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
-                                              BSON("$project" << BSON("_id" << 1 << ENT_ATTRNAMES << 1)) <<
-                                              projection << BSON("$unwind" << S_ATTRNAMES) <<
-                                              BSON("$group" << BSON("_id"   << CS_ID_ENTITY <<
-                                                                    "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
-                                              BSON("$sort" << BSON("_id" << 1))));
+                     "cursor" << BSON("batchSize" << BATCH_SIZE) <<
+                     "pipeline" << pipeline);
 
   std::string err;
 
@@ -415,16 +509,7 @@ HttpStatusCode mongoEntityTypes
     return SccOk;
   }
 
-  /* Another strategy to implement pagination is to use the $skip and $limit operators in the
-   * aggregation framework. However, doing so, we don't know the total number of results, which can
-   * be needed in the case of count request (using that approach, we need to do two queries: one to get
-   * the count and other to get the actual results with $skip and $limit, in the same "transaction" to
-   * avoid incoherence between both if some entity type is created or deleted in the process).
-   *
-   * However, considering that the number of types will be small compared with the number of entities,
-   * the current approach seems to be ok
-   *
-   * emptyEntityType is special: it must aggregate results for entity type "" and for entities without type.
+  /* emptyEntityType is special: it must aggregate results for entity type "" and for entities without type.
    * Is pre-created before starting processing results and destroyed if at the end it has not been used
    * (i.e. pushed back into the vector)
    *
@@ -433,12 +518,13 @@ HttpStatusCode mongoEntityTypes
   EntityType* emptyEntityType     = new EntityType("");
   bool        emptyEntityTypeUsed = false;
 
+  // Get count if user requested (i.e. if totalTypesP is not NULL)
   if (totalTypesP != NULL)
   {
-    *totalTypesP = resultsArray.size();
+    *totalTypesP = countCmd(tenant, pipelineForCount);
   }
 
-  for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
+  for (unsigned int ix = 0; ix < resultsArray.size(); ++ix)
   {
     BSONObj                   resultItem  = resultsArray[ix].embeddedObject();
     std::vector<BSONElement>  attrsArray  = getFieldF(resultItem, "attrs").Array();
@@ -614,7 +700,7 @@ HttpStatusCode mongoAttributesForEntityType
   BSONObj result;
   BSONObj cmd =
     BSON("aggregate" << COL_ENTITIES <<
-         "cursor" << BSON("batchSize" << 1000) <<
+         "cursor" << BSON("batchSize" << BATCH_SIZE) <<
          "pipeline" << BSON_ARRAY(
            BSON("$match" << BSON(C_ID_ENTITY << entityType <<
                                  C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
