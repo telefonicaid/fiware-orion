@@ -56,7 +56,7 @@ void orionldContextFree(OrionldContext* contextP)
     contextP->tree = NULL;
   }
 
-  if (contextP != &orionldCoreContext)
+  if (contextP->type == OrionldUserContext)
   {
     if (contextP->url != NULL)
       free(contextP->url);

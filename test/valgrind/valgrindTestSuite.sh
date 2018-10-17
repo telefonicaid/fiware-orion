@@ -89,6 +89,27 @@ function usage()
 
 # -----------------------------------------------------------------------------
 #
+# VG_DEBUG_FILE - separate file used for debugging the valgrind test suite script
+#
+VG_DEBUG_FILE=/tmp/valgrindTestSuite.log
+
+
+
+# -----------------------------------------------------------------------------
+#
+# vgDebug - write to VG_DEBUG_FILE
+#
+function vgDebug()
+{
+  now=$(date)
+  echo "$now: $*" >> $VG_DEBUG_FILE
+}
+date > $VG_DEBUG_FILE
+
+
+
+# -----------------------------------------------------------------------------
+#
 # vMsg
 #
 function vMsg()
@@ -326,6 +347,7 @@ function brokerStop()
 #
 function leakInfo()
 {
+    vgDebug "Getting leak info for $1"
     filename=$1
     # Get info from valgrind
     startLine1=$(grep --text -n "LEAK SUMMARY" $filename | awk -F: '{ print $1 }' | head -1)
@@ -358,6 +380,7 @@ function leakInfo()
     \rm valgrind.leakSummary valgrind.leakSummary2
 
     lost=$(add $definitelyLost1 $indirectlyLost1 $definitelyLost2 $indirectlyLost2)
+    vgDebug "Done getting leak info for $1"
 }
 
 
@@ -370,6 +393,7 @@ function leakInfo()
 #
 function valgrindErrorInfo()
 {
+  vgDebug "Getting error info for $1"
   filename=$1
 
   #
@@ -377,15 +401,15 @@ function valgrindErrorInfo()
   #
   typeset -i vErrors
   vErrors=0
-  date > /tmp/kz
+
   for num in $(grep "errors in context" $filename | awk '{ print $2 }')
   do
     typeset -i xNum
     if [ "$num" == "file" ]  # Garbage in valgrind file ... (Binary file XXX matches)
     then
-      echo filename: $filename >> /tmp/kz
-      echo num: $num >> /tmp/kz
-      grep "errors in context" $filename >> /tmp/kz
+      vgDebug filename: $filename
+      vgDebug num: $num
+      grep "errors in context" $filename >> $VG_DEBUG_FILE
       xNum=101
     else  
       xNum=$num
@@ -397,6 +421,8 @@ function valgrindErrorInfo()
   done
   valgrindErrors=$vErrors
   vMsg valgrindErrors: $valgrindErrors
+
+  vgDebug "Done getting error info for $1"
 }
 
 
@@ -428,17 +454,15 @@ function printTestLinePrefix()
 function printNotImplementedString()
 {
   echo "Not apt for valgrind - skipped"
-  echo                                    >> /tmp/valgrindTestSuiteLog
-  echo "$1 not implemented - skipped"     >> /tmp/valgrindTestSuiteLog
-  echo                                    >> /tmp/valgrindTestSuiteLog
+  vgDebug "$1 not implemented - skipped"
 }
 
-function printImplementedString()
+function testStartDebug()
 {
-  echo '# ---------------------------------------------' >> /tmp/valgrindTestSuiteLog
-  echo '# '                                              >> /tmp/valgrindTestSuiteLog
-  echo "# $1"                                            >> /tmp/valgrindTestSuiteLog
-  echo '# '                                              >> /tmp/valgrindTestSuiteLog
+  vgDebug '# ---------------------------------------------'
+  vgDebug '# '
+  vgDebug "# FUNC TEST: $1"
+  vgDebug '# '
 }
 
 
@@ -541,8 +565,6 @@ then
   vMsg "Selecting only the leak test"
 fi
 
-date > /tmp/valgrindTestSuiteLog
-
 typeset -i noOfTests
 noOfTests=0
 setNumberOfTests
@@ -585,6 +607,7 @@ then
     then
       if [ $testNo -lt $fromIx ]
       then
+        vgDebug "Skipping $file (before fromIx)"
         continue
       fi
     fi
@@ -594,6 +617,7 @@ then
       hit=$(echo ' '$ixList' ' | grep ' '$testNo' ')
       if [ "$hit" == "" ]
       then
+        vgDebug "Skipping $file (not in ixList)"
         continue
       fi
     fi
@@ -619,11 +643,12 @@ then
     if [ "$?" -ne "0" ]
     then
       printNotImplementedString $htest
+      vgDebug "Skipping $file (not implemented)"
       continue
     fi
 
     cd $SRC_TOP
-    printImplementedString $htest
+    testStartDebug $htest
     typeset -i lost
     lost=0
     valgrindErrors=0
@@ -636,14 +661,16 @@ then
       vMsg "------------------------------------------------"
 
       startTime=$(date +%s.%2N)
+      vgDebug "Calling testHarness.sh for $file"
       VALGRIND=1 test/functionalTest/testHarness.sh --filter $file > /tmp/testHarness 2>&1
+      vgDebug "testHarness.sh for $file FINISHED"
       status=$?
       endTime=$(date +%s.%2N)
       diffTime=$(echo $endTime - $startTime | bc)
       vMsg status=$status
       if [ "$status" != "0" ]
       then
-        mv /tmp/testHarness         test/functionalTest/$CASES_DIR/$directory/$htest.harness.out
+        mv /tmp/testHarness     test/functionalTest/$CASES_DIR/$directory/$htest.harness.out
         cp /tmp/${BROKER}.log   test/functionalTest/$CASES_DIR/$directory/$htest.contextBroker.log
         detailForOkString=" (no leak but ftest error $status)"
         harnessErrorV[$harnessErrors]="$xTestNo: $file (exit code $status)"
@@ -655,6 +682,7 @@ then
       then
         echo " FAILURE! (no valgrind output for $file)"
       else
+        vgDebug "Checking valgrind output for $file"
         mv /tmp/valgrind.out test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
       
         typeset -i headEndLine1
@@ -686,6 +714,7 @@ then
     fi
     cd - > /dev/null
 
+    vgDebug "Presenting result for $file"
     if [ "$lost" != "0" ]
     then
       leakFound "$htest.valgrind.out" $htest $lost $dir $xTestNo
@@ -700,6 +729,8 @@ then
     then
       echo $okString "($diffTime seconds)" $detailForOkString
     fi
+    vgDebug "Test finished for $file"
+    echo >> $VG_DEBUG_FILE
   done
   orderedExit=1
 fi
