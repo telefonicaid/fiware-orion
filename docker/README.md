@@ -119,25 +119,59 @@ The parameter `-t orion` in the `docker build` command gives the image a name. T
 
 If you want to know more about images and the building process you can find it in [Docker's documentation](https://docs.docker.com/userguide/dockerimages/).
 
-## 4. Other info
+## 4. Troubleshooting
+
+Orion has an in-build mechanism that allows waiting for mongoDB to be ready. However in some situations it is better to wait that MongoDB is ready before starting Orion (see e.g. [this issue](https://github.com/telefonicaid/fiware-orion/issues/3326#issuecomment-430528027)). This can be done with an healthcheck in docker-compose.yml:
+```
+version: '2.1'
+
+services:
+  mongo:
+    image: mongo:3.2.8
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: echo 'db.stats().ok' | mongo localhost:27017/local --quiet
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    extra_hosts:
+      - "localhost:127.0.0.1"
+
+  orion:
+    image: fiware/orion:1.15.0
+    ports:
+      - "1026:1026"
+    command: -dbhost mongo 
+    network_mode: host
+    extra_hosts:
+      - "mongo:127.0.0.1"
+      - "localhost:127.0.0.1"
+    depends_on:
+      mongo:
+        condition: service_healthy 
+```
+The configuration above includes an healthcheck command for Mongo, that will test regularly if Mongo is alive and healthy. It also have a condition on the startup of Orion, that will wait that Mongo is healthy.
+
+## 5. Other info
 
 Things to keep in mind while working with docker containers and Orion Context Broker.
 
-### 4.1 Data persistence
+### 5.1 Data persistence
 Everything you do with Orion Context Broker when dockerized is non-persistent. *You will lose all your data* if you turn off the MongoDB container. This will happen with either method presented in this README.
 
 If you want to prevent this from happening take a look at [this link](https://registry.hub.docker.com/_/mongo/) in section *Where to Store Data* of the MongoDB docker documentation. In it you will find instructions and ideas on how to make your MongoDB data persistent.
 
-### 4.2 Using `sudo`
+### 5.2 Using `sudo`
 
 If you do not want to have to use `sudo` follow [these instructions](http://askubuntu.com/questions/477551/how-can-i-use-docker-without-sudo).
 
-### 4.3 Listen on different ports
+### 5.3 Listen on different ports
 
 In `-p 1026:1026` the first value represents the port to listen on localhost. If you want to run a second context broker
 on your machine you should change this value to something else, for example `-p 1027:1026`.
 
-### 4.4 Extra parameters for Orion
+### 5.4 Extra parameters for Orion
 
 Anything after the name of the container image (`orion` if you are building, or `fiware/orion` if you are pulling from the repository) is interpreted as a parameter for the Orion Context Broker. In this case we are telling the broker where the MongoDB host is, represented by the name of our other MongoDB container. Take a look at the [documentation](https://github.com/telefonicaid/fiware-orion) for other command-line options.
 
