@@ -151,9 +151,7 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : {
-				"http://example=org/ngsi-ld/default/value" : "John 2"
-			},
+			"value" : "John 2",
 			"mdNames" : [ ]
 		}
 	},

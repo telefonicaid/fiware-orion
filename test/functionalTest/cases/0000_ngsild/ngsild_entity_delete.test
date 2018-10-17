@@ -88,7 +88,7 @@ Date: REGEX(.*)
 02. GET E1
 ==========
 HTTP/1.1 200 OK
-Content-Length: 279
+Content-Length: 257
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -97,7 +97,7 @@ Date: REGEX(.*)
   "type": "http://example.org/ngsi-ld/default/A",
   "name": {
     "type": "Property",
-    "value": "compounds for later ..."
+    "value": "1"
   },
   "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json"
 }

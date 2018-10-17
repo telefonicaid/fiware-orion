@@ -94,18 +94,14 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : {
-				"http://example=org/ngsi-ld/default/value" : "detail - no expansion"
-			},
+			"value" : "detail - no expansion",
 			"mdNames" : [ ]
 		},
 		"http://example=org/ngsi-ld/default/detail2" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : {
-				"http://example=org/ngsi-ld/default/value" : "detail2 - expanded to default"
-			},
+			"value" : "detail2 - expanded to default",
 			"md" : {
 				"@aliasAttributeName" : {
 					"type" : "Alias",

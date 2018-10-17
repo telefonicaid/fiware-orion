@@ -230,7 +230,7 @@ KjNode* kjTreeCreateFromQueryContextResponse(ConnectionInfo* ciP, QueryContextRe
 
     default:
       orionldErrorResponseCreate(ciP, OrionldInternalError, "invalid context", "not a string nor an array", OrionldDetailsString);
-      // FIXME: leaks!!!
+      // FIXME: leaks!!! (Call kjFree(top))?
       return ciP->responseTree;
     }
   }

@@ -110,14 +110,7 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : {
-				"http://example=org/ngsi-ld/default/value" : "Titulo",
-				"http://example=org/ngsi-ld/default/unitCode" : "123",
-				"http://example=org/ngsi-ld/default/R_R" : {
-					"http://example=org/ngsi-ld/default/type" : "Relationship",
-					"http://example=org/ngsi-ld/default/object" : "http://a.b.c/R_R"
-				}
-			},
+			"value" : "Titulo",
 			"mdNames" : [ ]
 		}
 	},

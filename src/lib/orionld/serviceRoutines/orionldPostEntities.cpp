@@ -250,10 +250,12 @@ static bool payloadCheck
   OBJECT_CHECK(ciP->requestTree, "toplevel");
 
   KjNode*  kNodeP                 = ciP->requestTree->children;
+
   KjNode*  idNodeP                = NULL;
   KjNode*  typeNodeP              = NULL;
-  KjNode*  locationNodeP          = NULL;
   KjNode*  contextNodeP           = NULL;
+
+  KjNode*  locationNodeP          = NULL;
   KjNode*  observationSpaceNodeP  = NULL;
   KjNode*  operationSpaceNodeP    = NULL;
   
@@ -647,7 +649,7 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     }
     else if (SCOMPARE6(nodeP->name, 'v', 'a', 'l', 'u', 'e', 0))
     {
-      DUPLICATE_CHECK(nodeP, valueP, "attribute type");
+      DUPLICATE_CHECK(nodeP, valueP, "attribute value");
     }
     else if (SCOMPARE9(nodeP->name, 'u', 'n', 'i', 't', 'C', 'o', 'd', 'e', 0))
     {
@@ -714,19 +716,21 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       return false;
     }
 
-    switch (kNodeP->type)
+    LM_TMP(("---- Getting value: valueP at %p, type is %s", valueP, kjValueType(valueP->type)));
+    switch (valueP->type)
     {
-    case KjBoolean:    caP->valueType = orion::ValueTypeBoolean; caP->boolValue      = kNodeP->value.b; break;
-    case KjInt:        caP->valueType = orion::ValueTypeNumber;  caP->numberValue    = kNodeP->value.i; break;
-    case KjFloat:      caP->valueType = orion::ValueTypeNumber;  caP->numberValue    = kNodeP->value.f; break;
-    case KjString:     caP->valueType = orion::ValueTypeString;  caP->stringValue    = kNodeP->value.s; break;
-    case KjObject:     caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(ciP, kNodeP, NULL); break;
-    case KjArray:      caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(ciP, kNodeP, NULL);  break;
+    case KjBoolean:    caP->valueType = orion::ValueTypeBoolean; caP->boolValue      = valueP->value.b; break;
+    case KjInt:        caP->valueType = orion::ValueTypeNumber;  caP->numberValue    = valueP->value.i; break;
+    case KjFloat:      caP->valueType = orion::ValueTypeNumber;  caP->numberValue    = valueP->value.f; break;
+    case KjString:     caP->valueType = orion::ValueTypeString;  caP->stringValue    = valueP->value.s; break;
+    case KjObject:     caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(ciP, valueP, NULL); break;
+    case KjArray:      caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(ciP, valueP, NULL);  break;
     case KjNull:       caP->valueType = orion::ValueTypeNull;    break;
     case KjNone:
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal error", "Invalid type from kjson", OrionldDetailsString);
       return false;
     }
+    LM_TMP(("---- After getting value"));
   }
   else if (isRelationship == true)
   {
