@@ -91,7 +91,7 @@ payload='{
   },
   "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json"
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
 echo
 

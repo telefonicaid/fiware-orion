@@ -94,6 +94,22 @@ do                                                                              
 
 // -----------------------------------------------------------------------------
 //
+// ATTRIBUTE_IS_OBJECT_CHECK -
+//
+#define ATTRIBUTE_IS_OBJECT_CHECK(nodeP)                                                                                          \
+do                                                                                                                                \
+{                                                                                                                                 \
+  if (nodeP->type != KjObject)                                                                                                    \
+  {                                                                                                                               \
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute must be a JSON object", nodeP->name, OrionldDetailsString); \
+    return false;                                                                                                                 \
+  }                                                                                                                               \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
 // STRING_CHECK -
 //
 #define STRING_CHECK(nodeP, what)                                                                            \
@@ -585,7 +601,7 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
 {
   LM_T(LmtPayloadCheck, ("Treating attribute '%s' (KjNode at %p)", kNodeP->name, kNodeP));
 
-  OBJECT_CHECK(kNodeP, "attribute");
+  ATTRIBUTE_IS_OBJECT_CHECK(kNodeP);
 
   KjNode* typeP              = NULL;  // For ALL:            Mandatory
   KjNode* valueP             = NULL;  // For 'Property':     Mandatory

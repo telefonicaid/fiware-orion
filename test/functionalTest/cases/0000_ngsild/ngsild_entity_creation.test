@@ -47,6 +47,7 @@ brokerStart CB 0-255
 # 12. POST /ngsi-ld/v1/entities, with a Relationship without an 'object'
 # 13. POST /ngsi-ld/v1/entities, with a GeoProperty without a 'value'
 #
+
 echo "01. POST /ngsi-ld/v1/entities, with a non-object payload - see error"
 echo "===================================================================="
 payload='[
@@ -74,7 +75,7 @@ payload='{
     "http://a.b.c/6.xxx"
   ]
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
 echo
 
@@ -90,7 +91,7 @@ payload='{
     "http://a.b.c/9.xxx"
   ]
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
 echo
 
@@ -110,7 +111,7 @@ payload='{
     "u3": "http://a.b.c/12.xxx"
   }
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
 echo
 
@@ -130,7 +131,7 @@ payload='{
     "http://a.b.c/14.xxx"
   ]
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
 echo
 
@@ -149,7 +150,7 @@ payload='{
     "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
   ]
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
 echo
 
@@ -168,7 +169,7 @@ payload='{
     "https://json-ld.org/contexts/personX.jsonld"
   ]
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
 echo
 

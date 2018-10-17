@@ -100,7 +100,7 @@ payload='{
   },
   "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld"
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
 echo
 

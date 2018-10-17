@@ -49,11 +49,94 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// contentTypeCheck -
+//
+// - Content-Type: application/json + no context at all - OK
+// - Content-Type: application/json + context in payload - see error
+// - Content-Type: application/json + context in HTTP Header - OK
+// - Content-Type: application/ld+json + no context at all - see error
+// - Content-Type: application/ld+json + context in payload - OK
+// - Content-Type: application/ld+json + context in HTTP Header - see error
+// - Content-Type: application/ld+json + context in HTTP Header + context in payload - see error
+//
+static bool contentTypeCheck(ConnectionInfo* ciP, char** errorTitleP, char** detailsP)
+{
+  if ((ciP->verb != POST) && (ciP->verb != PATCH))
+    return true;
+
+  if (ciP->requestTree == NULL)
+  {
+    return true;  // No error detected about Content-Type, error postponed to later check
+  }
+
+  if (ciP->requestTree->children == NULL)
+  {
+    return true;  // No error detected about Content-Type, error postponed to later check
+  }
+
+  if (ciP->requestTree->type != KjObject)  // FIXME: Are all payloads JSON Objects ... ?
+  {
+    return true;  // No error detected about Content-Type, error postponed to later check
+  }
+
+  // Lookup "@context" attribute
+  KjNode* contextNodeP     = ciP->requestTree->children;
+  bool    contextInPayload = false;
+
+  while ((contextNodeP != NULL) && (contextInPayload == false))
+  {
+    if (strcmp(contextNodeP->name, "@context") == 0)
+      contextInPayload = true;
+    else
+      contextNodeP = contextNodeP->next;
+  }
+
+  LM_TMP(("Context In JSON Payload: %s", (contextInPayload == true)?    "YES" : "NO"));
+  LM_TMP(("Context In HTTP Header:  %s", (ciP->httpHeaders.link != "")? "YES" : "NO"));
+
+  if (strcmp(ciP->httpHeaders.contentType.c_str(), "application/json") == 0)
+  {
+    LM_TMP(("Content-Type is: application/json"));
+
+    if (contextNodeP != NULL)
+    {
+      *errorTitleP = (char*) "Invalid MIME-type for @context in payload";
+      *detailsP    = (char*) "For @context in payload, the MIME type must be application/ld+json";
+      return false;
+    }
+  }
+  else if (strcmp(ciP->httpHeaders.contentType.c_str(), "application/ld+json") == 0)
+  {
+    LM_TMP(("Content-Type is: application/ld+json"));
+
+    if (ciP->httpHeaders.link != "")
+    {
+      *errorTitleP = (char*) "@context in Link HTTP Header";
+      *detailsP    = (char*) "For application/ld+json, the @context must come inside the JSON payload, NOT in HTTP Header";
+      return false;
+    }
+
+    if (contextInPayload == false)
+    {
+      *errorTitleP = (char*) "@context missing in JSON payload";
+      *detailsP    = (char*) "For application/ld+json, the @context must be present in the JSON payload";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldMhdConnectionTreat -
 //
 int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 {
-  bool error = false;
+  char* details;
+  bool  error = false;
 
   LM_T(LmtMhd, ("Read all the payload - treating the request!"));
 
@@ -95,17 +178,17 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     if (ciP->httpHeaders.link != "")
     {
-      char* details;
-
       if (urlCheck((char*) ciP->httpHeaders.link.c_str(), &details) == false)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Link HTTP Header must be a valid URL", details, OrionldDetailsString);
+        ciP->httpStatusCode = SccBadRequest;
         return false;
       }
 
       if ((ciP->contextP = orionldContextCreateFromUrl(ciP, ciP->httpHeaders.link.c_str(), OrionldUserContext, &details)) == NULL)
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from URL", details, OrionldDetailsString);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Failure to create context from URL", details, OrionldDetailsString);
+        ciP->httpStatusCode = SccBadRequest;
         return false;
       }
     }
@@ -113,7 +196,22 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     {
       ciP->contextP = NULL;
     }
-    
+
+
+    //
+    // ContentType Check
+    //
+    if (error == false)
+    {
+      char* errorTitle;
+
+      if (contentTypeCheck(ciP, &errorTitle, &details) == false)
+      {
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, errorTitle, details, OrionldDetailsString);
+        ciP->httpStatusCode = SccBadRequest;
+        error = true;
+      }
+    }
 
     if (error == false)
     {

@@ -1,0 +1,288 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Creation
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Content-Type: application/json + no context at all - OK
+# 02. Content-Type: application/ld+json + no context at all - see error
+# 03. Content-Type: application/json + context in payload - see error
+# 04. Content-Type: application/ld+json + context in payload - OK
+# 05. Content-Type: application/json + context in HTTP Header - OK
+# 06. Content-Type: application/ld+json + context in HTTP Header - see error
+# 07. Content-Type: application/ld+json + context in HTTP Header + context in payload - see error
+#
+# 08. GET Entity from step 01 - see correct URI Expansion (matching Default URL @context)
+# 09. GET Entity from step 04 - see correct URI Expansion (matching @context in payload)
+# 10. GET Entity from step 05 - see correct URI Expansion (matching @context in HTTP Header)
+#
+
+
+echo "01. Content-Type: application/json + no context at all - OK"
+echo "==========================================================="
+payload='{
+  "id": "http://a.b.c/entity/E1",
+  "type": "A"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "02. Content-Type: application/ld+json + no context at all - see error"
+echo "====================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E2",
+  "type": "A"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "03. Content-Type: application/json + context in payload - see error"
+echo "==================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E3",
+  "type": "A",
+  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "04. Content-Type: application/ld+json + context in payload - OK"
+echo "==============================================================="
+payload='{
+  "id": "http://a.b.c/entity/E4",
+  "type": "A",
+  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "05. Content-Type: application/json + context in HTTP Header - OK"
+echo "================================================================"
+payload='{
+  "id": "http://a.b.c/entity/E5",
+  "type": "A",
+  "P100": {
+    "type": "Property",
+    "value": 100
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json" -H "Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+echo
+echo
+
+
+echo "06. Content-Type: application/ld+json + context in HTTP Header - see error"
+echo "=========================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E6",
+  "type": "A"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+echo
+echo
+
+
+echo "07. Content-Type: application/ld+json + context in HTTP Header + context in payload - see error"
+echo "==============================================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E7",
+  "type": "A",
+  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+echo
+echo
+
+
+echo "08. GET Entity from step 01 - see correct URI Expansion (matching Default URL @context)"
+echo "======================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+echo
+echo
+
+
+echo "09. GET Entity from step 04 - see correct URI Expansion (matching @context in payload)"
+echo "======================================================================================"
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E4
+echo
+echo
+
+
+echo "10. GET Entity from step 05 - see correct URI Expansion (matching @context in HTTP Header)"
+echo "=========================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E5
+echo
+echo
+
+
+--REGEXPECT--
+01. Content-Type: application/json + no context at all - OK
+===========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+Date: REGEX(.*)
+
+
+
+02. Content-Type: application/ld+json + no context at all - see error
+=====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 188
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "For application/ld+json, the @context must be present in the JSON payload",
+    "title": "@context missing in JSON payload",
+    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. Content-Type: application/json + context in payload - see error
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 190
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "For @context in payload, the MIME type must be application/ld+json",
+    "title": "Invalid MIME-type for @context in payload",
+    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+04. Content-Type: application/ld+json + context in payload - OK
+===============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E4
+Date: REGEX(.*)
+
+
+
+05. Content-Type: application/json + context in HTTP Header - OK
+================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E5
+Date: REGEX(.*)
+
+
+
+06. Content-Type: application/ld+json + context in HTTP Header - see error
+==========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 202
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "For application/ld+json, the @context must come inside the JSON payload, NOT in HTTP Header",
+    "title": "@context in Link HTTP Header",
+    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+07. Content-Type: application/ld+json + context in HTTP Header + context in payload - see error
+===============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 202
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "For application/ld+json, the @context must come inside the JSON payload, NOT in HTTP Header",
+    "title": "@context in Link HTTP Header",
+    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+08. GET Entity from step 01 - see correct URI Expansion (matching Default URL @context)
+=======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 185
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json",
+    "id": "http://a.b.c/entity/E1",
+    "type": "http://example.org/ngsi-ld/default/A"
+}
+
+
+09. GET Entity from step 04 - see correct URI Expansion (matching @context in payload)
+======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 158
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
+    "id": "http://a.b.c/entity/E4",
+    "type": "http://example.org/ngsi-ld/default/A"
+}
+
+
+10. GET Entity from step 05 - see correct URI Expansion (matching @context in HTTP Header)
+==========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 250
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json",
+    "http://example.org/P100": {
+        "type": "Property",
+        "value": 100.0
+    },
+    "id": "http://a.b.c/entity/E5",
+    "type": "http://example.org/ngsi-ld/default/A"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

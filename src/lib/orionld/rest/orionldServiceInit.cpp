@@ -253,7 +253,7 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
     while ((orionldDefaultUrlContext.tree == NULL) && (retries < 5))
     {
       orionldDefaultUrlContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_DEFAULT_URL_CONTEXT_URL,  &details);
-      if (orionldDefaultUrlContext.tree!= NULL)
+      if (orionldDefaultUrlContext.tree != NULL)
         break;
 
       ++retries;
@@ -271,14 +271,11 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   LM_TMP(("Downloaded Core Context '%s'. json tree at %p", orionldCoreContext.url, orionldCoreContext.tree));
 
   // Adding the core context to the list of contexts
-  orionldCoreContext.type = OrionldCoreContext;
-
   orionldContextHead = &orionldCoreContext;
-  orionldContextTail = &orionldCoreContext;
-
 
   // Adding the Default URL context to the list of contexts
   orionldCoreContext.next = &orionldDefaultUrlContext;
+  orionldContextTail      = &orionldDefaultUrlContext;
 
   //
   // Checking the "Default URL Context" and extracting the Default URL path.
