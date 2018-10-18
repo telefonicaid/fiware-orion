@@ -36,7 +36,7 @@
 *
 * HttpHeaders::HttpHeaders - 
 */
-HttpHeaders::HttpHeaders(): gotHeaders(false), servicePathReceived(false), contentLength(0)
+HttpHeaders::HttpHeaders(): gotHeaders(false), servicePathReceived(false), contentLength(0), acceptJson(false), acceptJsonld(false)
 {
 }
 

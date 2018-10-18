@@ -105,14 +105,20 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
 
   for (unsigned int hIx = 0; hIx < ciP->httpHeader.size(); ++hIx)
   {
+    LM_TMP(("KZ: Adding HTTP Header '%s': '%s'", ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str()));
     MHD_add_response_header(response, ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str());
   }
 
   if (answer != "")
   {
+    LM_TMP(("KZ: Adding HTTP Header '%s': %d", HTTP_CONTENT_TYPE, ciP->outMimeType));
     if (ciP->outMimeType == JSON)
     {
       MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/json");
+    }
+    else if (ciP->outMimeType == JSONLD)
+    {
+      MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/ld+json");
     }
     else if (ciP->outMimeType == TEXT)
     {
@@ -227,7 +233,7 @@ void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::stri
   else if (ciP->restServiceP->request == QueryContext)
   {
     QueryContextResponse  qcr(errorCode);
-    bool                  asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+    bool                  asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && ((ciP->outMimeType == JSON) || (ciP->outMimeType == JSONLD));
     *outStringP = qcr.render(ciP->apiVersion, asJsonObject);
   }
   else if (ciP->restServiceP->request == SubscribeContext)
@@ -248,7 +254,7 @@ void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::stri
   else if (ciP->restServiceP->request == UpdateContext)
   {
     UpdateContextResponse ucr(errorCode);
-    bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+    bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && ((ciP->outMimeType == JSON) || (ciP->outMimeType == JSONLD));
     *outStringP = ucr.render(ciP->apiVersion, asJsonObject);
   }
   else if (ciP->restServiceP->request == NotifyContext)

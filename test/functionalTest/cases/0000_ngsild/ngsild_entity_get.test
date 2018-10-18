@@ -36,7 +36,7 @@ brokerStart CB 0-255
 # 03. GET E1, see default context, pretty-print with 4 spaces
 # 04. GET E2, see test context, pretty-print with default number of spaces (2)
 # 05. GET E2, but without prettyPrint
-# 06. Attempt to GET non-existing E3, see empty response
+# 06. Attempt to GET non-existing E3, see 404 not Found
 #
 
 
@@ -73,27 +73,27 @@ echo
 
 echo "03. GET E1, see default context, pretty-print with 4 spaces"
 echo "==========================================================="
-orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E1?prettyPrint=yes&spaces=4' --noPayloadCheck 
+orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E1?prettyPrint=yes&spaces=4' --noPayloadCheck -H "Accept: application/ld+json"
 echo
 echo
 
 
 echo "04. GET E2, see test context, pretty-print with default number of spaces (2)"
 echo "============================================================================"
-orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E2?prettyPrint=yes' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E2?prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json"
 echo
 echo
 
 
 echo "05. GET E2, but without prettyPrint"
 echo "==================================="
-orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E2 --noPayloadCheck
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E2 --noPayloadCheck -H "Accept: application/ld+json"
 echo
 echo
 
 
-echo "06. Attempt to GET non-existing E3, see empty response"
-echo "======================================================"
+echo "06. Attempt to GET non-existing E3, see 404 not Found"
+echo "====================================================="
 orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E3?prettyPrint=yes' --noPayloadCheck
 echo
 echo
@@ -124,7 +124,7 @@ Date: REGEX(.*)
 ===========================================================
 HTTP/1.1 200 OK
 Content-Length: 280
-Content-Type: application/json
+Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
@@ -143,7 +143,7 @@ Date: REGEX(.*)
 ============================================================================
 HTTP/1.1 200 OK
 Content-Length: 235
-Content-Type: application/json
+Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
@@ -162,14 +162,14 @@ Date: REGEX(.*)
 ===================================
 HTTP/1.1 200 OK
 Content-Length: 202
-Content-Type: application/json
+Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {"id":"http://a.b.c/entity/E2","type":"http://example.org/ngsi-ld/default/A","name":{"type":"Property","value":"John 6"},"@context":"https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"}
 
 
-06. Attempt to GET non-existing E3, see empty response
-======================================================
+06. Attempt to GET non-existing E3, see 404 not Found
+=====================================================
 HTTP/1.1 404 Not Found
 Content-Length: 133
 Content-Type: application/json

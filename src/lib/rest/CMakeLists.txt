@@ -33,6 +33,7 @@ SET (SOURCES
     StringFilter.cpp
     HttpHeaders.cpp
     restServiceLookup.cpp
+    httpHeaderAdd.cpp
 )
 
 SET (HEADERS
@@ -49,6 +50,7 @@ SET (HEADERS
     HttpStatusCode.h
     StringFilter.h
     restServiceLookup.h
+    httpHeaderAdd.h
 )
 
 

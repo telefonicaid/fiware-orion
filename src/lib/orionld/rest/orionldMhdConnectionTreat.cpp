@@ -131,10 +131,39 @@ static bool contentTypeCheck(ConnectionInfo* ciP, char** errorTitleP, char** det
 
 // -----------------------------------------------------------------------------
 //
+// acceptHeaderCheck -
+//
+static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** detailsP)
+{
+  LM_TMP(("ciP->httpHeaders.accept == %s", ciP->httpHeaders.accept.c_str()));
+
+  for (unsigned int ix = 0; ix < ciP->httpHeaders.acceptHeaderV.size(); ix++)
+  {
+    LM_TMP(("ciP->Accept header %d: %s", ix, ciP->httpHeaders.acceptHeaderV[ix]->mediaRange.c_str()));
+    if (strcmp(ciP->httpHeaders.acceptHeaderV[ix]->mediaRange.c_str(), "application/ld+json") == 0)
+      ciP->httpHeaders.acceptJsonld = true;
+    else if (strcmp(ciP->httpHeaders.acceptHeaderV[ix]->mediaRange.c_str(), "application/json") == 0)
+      ciP->httpHeaders.acceptJson = true;
+  }
+
+  if ((ciP->httpHeaders.acceptJsonld == false) && (ciP->httpHeaders.acceptJson == false))
+  {
+    *errorTitleP = (char*) "invalid mime-type";
+    *detailsP    = (char*) "HTTP Header /Accept/ contains neither 'application/json' nor 'application/ld+json'";
+    return false;
+  }
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldMhdConnectionTreat -
 //
 int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 {
+  char* errorTitle;
   char* details;
   bool  error = false;
 
@@ -182,14 +211,14 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Link HTTP Header must be a valid URL", details, OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;
-        return false;
+        return false;  // FIXME: Can I return here? What about rendering resuly and calling restReply (end of this function) ?
       }
 
       if ((ciP->contextP = orionldContextCreateFromUrl(ciP, ciP->httpHeaders.link.c_str(), OrionldUserContext, &details)) == NULL)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Failure to create context from URL", details, OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;
-        return false;
+        return false;  // FIXME: Can I return here?
       }
     }
     else
@@ -203,9 +232,17 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     if (error == false)
     {
-      char* errorTitle;
-
       if (contentTypeCheck(ciP, &errorTitle, &details) == false)
+      {
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, errorTitle, details, OrionldDetailsString);
+        ciP->httpStatusCode = SccBadRequest;
+        error = true;
+      }
+    }
+
+    if (error == false)
+    {
+      if (acceptHeaderCheck(ciP, &errorTitle, &details) == false)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, errorTitle, details, OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;
@@ -223,7 +260,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       {
         //
         // If the service routine failed (returned FALSE), but no HTTP status code is set,
-        // The HTTP status code defaults to 400
+        // the HTTP status code defaults to 400
         //
         if (ciP->httpStatusCode == SccOk)
         {
@@ -235,6 +272,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
 
   // Is there a KJSON response tree to render?
+  // [ Note that this is always TRUE when error == true ]
+  //
   if (ciP->responseTree != NULL)
   {
     LM_T(LmtJsonResponse, ("Rendering KJSON response tree"));
@@ -253,7 +292,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   if (ciP->responsePayload != NULL)
   {
     LM_T(LmtJsonResponse, ("Responding with '%s'", ciP->responsePayload));
-    ciP->outMimeType = JSON;
     restReply(ciP, ciP->responsePayload);
     // ciP->responsePayload freed and NULLed by restReply()
   }

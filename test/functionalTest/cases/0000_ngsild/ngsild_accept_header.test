@@ -1,0 +1,129 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Accept Header MIME Types
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create Entity E1 with context as a string
+# 02. GET E1, with 'Accept: application/json' - see 'Content-Type: application/json', HTTP Header 'Link' with @context, and no context in payload
+# 03. GET E1, with 'Accept: application/ld+json' - see 'Content-Type: application/ld+json', context in payload, no 'Link' HTTP Header
+# 04. GET E1, without specific Accept MIME type (application/json is default - should it be for ngsi-ld requests?), see results like step 02
+#
+
+echo "01. Create Entity E1 with context as a string"
+echo "============================================="
+payload='{
+  "id": "http://a.b.c/entity/E1",
+  "type": "A",
+  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. GET E1, with 'Accept: application/json' - see 'Content-Type: application/json', HTTP Header 'Link' with @context, and no context in payload"
+echo "==============================================================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E1 -H "Accept: application/json"
+echo
+echo
+
+
+echo "03. GET E1, with 'Accept: application/ld+json' - see 'Content-Type: application/ld+json', context in payload, no 'Link' HTTP Header"
+echo "==================================================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E1 -H "Accept: application/ld+json"
+echo
+echo
+
+
+echo "04. GET E1, without specific Accept MIME type (application/json is default - should it be for ngsi-ld requests?), see results like step 02"
+echo "=========================================================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+echo
+echo
+
+
+
+--REGEXPECT--
+01. Create Entity E1 with context as a string
+=============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+Date: REGEX(.*)
+
+
+
+02. GET E1, with 'Accept: application/json' - see 'Content-Type: application/json', HTTP Header 'Link' with @context, and no context in payload
+===============================================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 77
+Content-Type: application/json
+Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
+Date: REGEX(.*)
+
+{
+    "id": "http://a.b.c/entity/E1",
+    "type": "http://example.org/ngsi-ld/default/A"
+}
+
+
+03. GET E1, with 'Accept: application/ld+json' - see 'Content-Type: application/ld+json', context in payload, no 'Link' HTTP Header
+===================================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 158
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
+    "id": "http://a.b.c/entity/E1",
+    "type": "http://example.org/ngsi-ld/default/A"
+}
+
+
+04. GET E1, without specific Accept MIME type (application/json is default - should it be for ngsi-ld requests?), see results like step 02
+==========================================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 77
+Content-Type: application/json
+Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
+Date: REGEX(.*)
+
+{
+    "id": "http://a.b.c/entity/E1",
+    "type": "http://example.org/ngsi-ld/default/A"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

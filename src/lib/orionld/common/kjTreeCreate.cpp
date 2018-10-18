@@ -28,10 +28,12 @@ extern "C"
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
 }
 
+#include "parseArgs/baStd.h"                                   // BA_FT - for debugging only
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "rest/httpHeaderAdd.h"                                // httpHeaderAdd
 #include "ngsi10/QueryContextResponse.h"                       // QueryContextResponse
 #include "orionld/common/orionldErrorResponse.h"               // OrionldResponseErrorType, orionldErrorResponse
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
@@ -200,40 +202,71 @@ KjNode* kjTreeCreateFromQueryContextResponse(ConnectionInfo* ciP, QueryContextRe
 
 
   //
+  // Set MIME Type to JSONLD if JSONLD is in the Accepot header of the incoming request
+  //
+  if (ciP->httpHeaders.acceptJsonld == true)
+  {
+    ciP->outMimeType = JSONLD;
+    LM_TMP(("KZ: ciP->outMimeType = JSONLD"));
+  }
+
+  
+  //
   // If no context inside attribute list, then the default context has been used
   //
   if (contextP == NULL)
   {
     nodeP = kjString(ciP->kjsonP, "@context", orionldCoreContext.url);
-    kjChildAdd(top, nodeP);
+
+    LM_TMP(("KZ: ciP->httpHeaders.acceptJsonld == %s", BA_FT(ciP->httpHeaders.acceptJsonld)));
+    LM_TMP(("KZ: ciP->httpHeaders.acceptJson   == %s", BA_FT(ciP->httpHeaders.acceptJson)));
+    if (ciP->httpHeaders.acceptJsonld == true)
+    {
+      kjChildAdd(top, nodeP);
+    }
+    else
+      httpHeaderAdd(ciP, "Link", orionldCoreContext.url);  // Should we send back the Link if Core Context?
   }
   else
   {
-    switch (contextP->valueType)
+    if (ciP->httpHeaders.acceptJsonld == false)
     {
-    case orion::ValueTypeString:
-      nodeP = kjString(ciP->kjsonP, "@context", contextP->stringValue.c_str());
-      kjChildAdd(top, nodeP);
-      break;
-
-    case orion::ValueTypeVector:
-      nodeP = kjArray(ciP->kjsonP, "@context");
-      kjChildAdd(top, nodeP);
-
-      for (unsigned int ix = 0; ix < contextP->compoundValueP->childV.size(); ix++)
+      if (contextP->valueType == orion::ValueTypeString)
       {
-        orion::CompoundValueNode*  compoundP     = contextP->compoundValueP->childV[ix];
-        KjNode*                    contextItemP  = kjString(ciP->kjsonP, NULL, compoundP->stringValue.c_str());
-        kjChildAdd(nodeP, contextItemP);
+        httpHeaderAdd(ciP, "Link", contextP->stringValue.c_str());
       }
-      break;
+      else
+      {
+        httpHeaderAdd(ciP, "Link", "Implement Context-Servicing for orionld");
+      }
+    }
+    else
+    {
+      switch (contextP->valueType)
+      {
+      case orion::ValueTypeString:
+        nodeP = kjString(ciP->kjsonP, "@context", contextP->stringValue.c_str());
+        kjChildAdd(top, nodeP);
+        break;
 
-    default:
-      orionldErrorResponseCreate(ciP, OrionldInternalError, "invalid context", "not a string nor an array", OrionldDetailsString);
-      // FIXME: leaks!!! (Call kjFree(top))?
-      return ciP->responseTree;
+      case orion::ValueTypeVector:
+        nodeP = kjArray(ciP->kjsonP, "@context");
+        kjChildAdd(top, nodeP);
+
+        for (unsigned int ix = 0; ix < contextP->compoundValueP->childV.size(); ix++)
+        {
+          orion::CompoundValueNode*  compoundP     = contextP->compoundValueP->childV[ix];
+          KjNode*                    contextItemP  = kjString(ciP->kjsonP, NULL, compoundP->stringValue.c_str());
+          kjChildAdd(nodeP, contextItemP);
+        }
+        break;
+
+      default:
+        orionldErrorResponseCreate(ciP, OrionldInternalError, "invalid context", "not a string nor an array", OrionldDetailsString);
+        // FIXME: leaks!!! (Call kjFree(top))?
+        return ciP->responseTree;
+      }
     }
   }
-
   return top;
 }

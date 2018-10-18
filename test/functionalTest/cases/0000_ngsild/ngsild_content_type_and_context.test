@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Entity Creation
+Content-Type and Context
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -131,7 +131,7 @@ echo
 
 echo "08. GET Entity from step 01 - see correct URI Expansion (matching Default URL @context)"
 echo "======================================================================================="
-orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E1 -H "Accept: application/ld+json"
 echo
 echo
 
@@ -145,7 +145,7 @@ echo
 
 echo "10. GET Entity from step 05 - see correct URI Expansion (matching @context in HTTP Header)"
 echo "=========================================================================================="
-orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E5
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E5 -H "Accept: application/ld+json"
 echo
 echo
 
@@ -241,7 +241,7 @@ Date: REGEX(.*)
 =======================================================================================
 HTTP/1.1 200 OK
 Content-Length: 185
-Content-Type: application/json
+Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
@@ -254,12 +254,12 @@ Date: REGEX(.*)
 09. GET Entity from step 04 - see correct URI Expansion (matching @context in payload)
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 158
+Content-Length: 77
 Content-Type: application/json
+Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
 Date: REGEX(.*)
 
 {
-    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E4",
     "type": "http://example.org/ngsi-ld/default/A"
 }
@@ -269,7 +269,7 @@ Date: REGEX(.*)
 ==========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 250
-Content-Type: application/json
+Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {

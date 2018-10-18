@@ -42,10 +42,11 @@ const char* mimeTypeToString(MimeType mimeType)
 {
   switch (mimeType)
   {  
-  case JSON:     return "JSON";
-  case TEXT:     return "TEXT";
-  case HTML:     return "HTML";
-  case NOMIMETYPE: return "NOMIMETYPE";
+  case JSON:        return "JSON";
+  case TEXT:        return "TEXT";
+  case HTML:        return "HTML";
+  case JSONLD:      return "JSONLD";
+  case NOMIMETYPE:  return "NOMIMETYPE";
   }
 
   return "Unknown mimeType";

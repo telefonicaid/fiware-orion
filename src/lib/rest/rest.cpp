@@ -333,6 +333,8 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
   HttpAcceptHeader*  acceptHeaderP;
   char*              delimiter;
 
+  LM_TMP(("Initial value of Accept header: %s", value));
+
   if (value[0] == 0)
   {
     // NOTE
@@ -354,10 +356,15 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
   // The broker accepts only the following two media types:
   //   - application/json
   //   - text/plain
+  //   - application/ld+json (if compiled for orionld)
+  //
   // So, if the media-range is anything else, it is rejected immediately and not put in the list
   //
   if ((strcmp(cP, "*/*")              != 0) &&
       (strcmp(cP, "application/*")    != 0) &&
+#ifdef ORIONLD
+      (strcmp(cP, "application/ld+json") != 0) &&
+#endif
       (strcmp(cP, "application/json") != 0) &&
       (strcmp(cP, "text/*")           != 0) &&
       (strcmp(cP, "text/plain")       != 0))

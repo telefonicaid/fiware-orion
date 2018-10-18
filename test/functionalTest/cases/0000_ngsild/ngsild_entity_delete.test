@@ -55,7 +55,7 @@ echo
 
 echo "02. GET E1"
 echo "=========="
-orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E1?prettyPrint=yes' --noPayloadCheck 
+orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E1?prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json"
 echo
 echo
 
@@ -69,7 +69,7 @@ echo
 
 echo "04. GET E1, see error"
 echo "====================="
-orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E1?prettyPrint=yes' --noPayloadCheck 
+orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E1?prettyPrint=yes' --noPayloadCheck
 echo
 echo
 
@@ -89,7 +89,7 @@ Date: REGEX(.*)
 ==========
 HTTP/1.1 200 OK
 Content-Length: 257
-Content-Type: application/json
+Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {

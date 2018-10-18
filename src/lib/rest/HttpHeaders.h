@@ -1,5 +1,5 @@
-#ifndef HTTP_HEADERS_H
-#define HTTP_HEADERS_H
+#ifndef SRC_LIB_REST_HTTPHEADERS_H_
+#define SRC_LIB_REST_HTTPHEADERS_H_
 
 /*
 *
@@ -138,13 +138,15 @@ typedef struct HttpHeaders
   std::string   xforwardedFor;
   std::string   correlator;
   std::string   ngsiv2AttrsFormat;
-#ifdef ORIONLD
-  std::string   link;
-#endif
   bool          servicePathReceived;
-
   unsigned int  contentLength;
   std::string   connection;
+
+#ifdef ORIONLD
+  std::string   link;
+  bool          acceptJson;
+  bool          acceptJsonld;
+#endif
 } HttpHeaders;
 
-#endif
+#endif  // SRC_LIB_REST_HTTPHEADERS_H_
