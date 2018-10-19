@@ -38,6 +38,7 @@ extern "C"
 #include "ngsi/ContextAttribute.h"                             // ContextAttribute
 #include "ngsi10/UpdateContextRequest.h"                       // UpdateContextRequest
 #include "ngsi10/UpdateContextResponse.h"                      // UpdateContextResponse
+#include "mongoBackend/mongoEntityExists.h"                    // mongoEntityExists
 #include "mongoBackend/mongoUpdateContext.h"                   // mongoUpdateContext
 
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
@@ -191,8 +192,6 @@ void httpHeaderLinkAdd(ConnectionInfo* ciP, char* url)
 //
 static OrionldContext* contextItemNodeTreat(ConnectionInfo* ciP, char* url)
 {
-  LM_T(LmtContextTreat, ("In contextItemNodeTreat. url == '%s'", url));
-
   char*            details;
   OrionldContext*  contextP = orionldContextAdd(ciP, url, OrionldUserContext, &details);
 
@@ -388,7 +387,7 @@ static int uriExpansion(OrionldContext* contextP, const char* name, char** expan
   //    If found there, no expansion is done and no alias is added
   //
   KjNode* contextValueP = orionldContextItemLookup(&orionldCoreContext, name);
-  LM_TMP(("Here"));
+
   if (contextValueP != NULL)
     return 0;
 
@@ -396,11 +395,9 @@ static int uriExpansion(OrionldContext* contextP, const char* name, char** expan
   //
   // 2. use the default context?
   //
-  LM_TMP(("Here"));
   if (contextP == NULL)
     return -2;
 
-  LM_TMP(("Here"));
   LM_T(LmtUriExpansion, ("looking up context item for '%s', in context '%s'", name, contextP->url));
 
   contextValueP = orionldContextItemLookup(contextP, name);
@@ -989,7 +986,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   mongoRequest.contextElementVector.push_back(ceP);
   entityIdP = &mongoRequest.contextElementVector[0]->entityId;
 
-  mongoRequest.updateActionType = ActionTypeAppendStrict;  // Error if entity already exists, I hope
+  mongoRequest.updateActionType = ActionTypeAppend;
 
   //
   // First treat the @context, if none, use the default context
@@ -1013,6 +1010,17 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       if (!urlCheck(idNodeP->value.s, &details) && !urnCheck(idNodeP->value.s, &details))
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN", OrionldDetailsString);
+        mongoRequest.release();
+        return false;
+      }
+
+      //
+      // If the entity already exists, an error should be returned
+      //
+      if (mongoEntityExists(idNodeP->value.s, ciP->tenant.c_str()) == true)
+      {
+        orionldErrorResponseCreate(ciP, OrionldAlreadyExists, "Entity already exists", idNodeP->value.s, OrionldDetailsString);
+        ciP->httpStatusCode = SccConflict;
         mongoRequest.release();
         return false;
       }

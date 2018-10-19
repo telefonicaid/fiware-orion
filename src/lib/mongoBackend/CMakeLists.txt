@@ -53,6 +53,7 @@ SET (SOURCES
     location.cpp
     compoundValueBson.cpp
     dateExpiration.cpp
+    mongoEntityExists.cpp
 )
 
 SET (HEADERS
@@ -90,6 +91,7 @@ SET (HEADERS
     location.h
     compoundValueBson.h
     dateExpiration.h
+    mongoEntityExists.h
 )
 
 
