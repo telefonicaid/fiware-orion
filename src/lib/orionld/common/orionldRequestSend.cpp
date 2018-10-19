@@ -38,25 +38,35 @@
 //
 static size_t writeCallback(void* contents, size_t size, size_t members, void* userP)
 {
-  size_t                  realSize = size * members;
-  OrionldResponseBuffer*  rBuf     = (OrionldResponseBuffer*) userP;
+  size_t                  realSize   = size * members;
+  OrionldResponseBuffer*  rBufP      = (OrionldResponseBuffer*) userP;
+  int                     xtraBytes  = 512;
 
+  LM_TMP(("Here"));
   LM_T(LmtWriteCallback, ("Got a chunk of %d bytes: %s", realSize, (char*) contents));
 
-  if (realSize + rBuf->used > rBuf->size)
+  if (realSize + rBufP->used > rBufP->size)
   {
-    rBuf->buf = (char*) realloc(rBuf->buf, rBuf->size + realSize + 1);
-    if (rBuf->buf == NULL)
+    if (rBufP->buf == rBufP->internalBuffer)
+    {
+      rBufP->buf = (char*) malloc(rBufP->size + realSize + xtraBytes);
+    }
+    else
+    {
+      rBufP->buf = (char*) realloc(rBufP->buf, rBufP->size + realSize + xtraBytes);
+    }
+
+    if (rBufP->buf == NULL)
     {
       LM_E(("Runtime Error (out of memory)"));
       return 0;
     }
   }
 
-  memcpy(&rBuf->buf[rBuf->used], contents, realSize);
-  rBuf->used += realSize;
-  rBuf->size += realSize;
-  rBuf->buf[rBuf->used] = 0;
+  memcpy(&rBufP->buf[rBufP->used], contents, realSize);
+  rBufP->used += realSize;
+  rBufP->size += realSize + xtraBytes;
+  rBufP->buf[rBufP->used] = 0;
 
   return realSize;
 }
@@ -84,7 +94,8 @@ bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoIn
     // urlParse sets *detailsPP
 
     // This function must release the allocated respose buffer in case of errpr
-    free(rBufP->buf);
+    if (rBufP->buf != rBufP->internalBuffer)
+      free(rBufP->buf);
     rBufP->buf = NULL;
 
     LM_E(("urlParse failed for url '%s': %s", url, *detailsPP));
@@ -101,7 +112,8 @@ bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoIn
     *detailsPP = (char*) "Unable to obtain CURL context";
 
     // This function must release the allocated respose buffer in case of error
-    free(rBufP->buf);
+    if (rBufP->buf != rBufP->internalBuffer)
+      free(rBufP->buf);
     rBufP->buf = NULL;
 
     LM_E((*detailsPP));
@@ -132,7 +144,8 @@ bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoIn
     *detailsPP = (char*) url;
 
     // This function must release the allocated respose buffer in case of error
-    free(rBufP->buf);
+    if (rBufP->buf != rBufP->internalBuffer)
+      free(rBufP->buf);
     rBufP->buf = NULL;
 
     release_curl_context(&cc);

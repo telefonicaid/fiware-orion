@@ -59,8 +59,8 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
 
   for (int tries = 0; tries < 5; tries++)
   {
-    httpResponse.buf       = (char*) malloc(1024);
-    httpResponse.size      = 1024;
+    httpResponse.buf       = httpResponse.internalBuffer;
+    httpResponse.size      = sizeof(httpResponse.internalBuffer);
     httpResponse.used      = 0;
     httpResponse.allocated = true;
 
@@ -104,7 +104,9 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
   LM_TMP(("Got @context - parsed it"));
 
   // Now we can free the httpResponse buffer
-  free(httpResponse.buf);
+  if (httpResponse.buf != httpResponse.internalBuffer)
+    free(httpResponse.buf);
+  httpResponse.buf = NULL;
 
   if (tree == NULL)
   {
