@@ -55,8 +55,8 @@ static OrionLdRestServiceSimplified getServices[] =
   { "/ngsi-ld/v1/entities",                orionldGetEntities        },
   { "/ngsi-ld/v1/subscriptions/*",         orionldGetSubscription    },
   { "/ngsi-ld/v1/subscriptions",           orionldGetSubscriptions   },
-  { "/ngsi-ld/v1/cSourceRegistrations/*",  orionldGetRegistration    },
-  { "/ngsi-ld/v1/cSourceRegistrations",    orionldGetRegistrations   }
+  { "/ngsi-ld/v1/csourceRegistrations/*",  orionldGetRegistration    },
+  { "/ngsi-ld/v1/csourceRegistrations",    orionldGetRegistrations   }
 };
 
 
@@ -70,7 +70,7 @@ static OrionLdRestServiceSimplified postServices[] =
   { "/ngsi-ld/v1/entities/*/attrs",        orionldPostEntity         },
   { "/ngsi-ld/v1/entities",                orionldPostEntities       },
   { "/ngsi-ld/v1/subscriptions",           orionldPostSubscriptions  },
-  { "/ngsi-ld/v1/cSourceRegistrations",    orionldPostRegistrations  }
+  { "/ngsi-ld/v1/csourceRegistrations",    orionldPostRegistrations  }
 };
 
 
@@ -83,7 +83,7 @@ static OrionLdRestServiceSimplified patchServices[] =
 {
   { "/ngsi-ld/v1/entities/*/attrs",        orionldPatchEntity        },
   { "/ngsi-ld/v1/subscriptions/*",         orionldPatchSubscription  },
-  { "/ngsi-ld/v1/cSourceRegistrations/*",  orionldPatchRegistration  }
+  { "/ngsi-ld/v1/csourceRegistrations/*",  orionldPatchRegistration  }
 };
 
 
@@ -97,7 +97,7 @@ static OrionLdRestServiceSimplified deleteServices[] =
   { "/ngsi-ld/v1/entities/*/attrs/*",      orionldDeleteAttribute    },  // Very important that orionldDeleteAttribute comes before orionldDeleteEntity
   { "/ngsi-ld/v1/entities/*",              orionldDeleteEntity       },
   { "/ngsi-ld/v1/subscriptions/*",         orionldDeleteSubscription },
-  { "/ngsi-ld/v1/cSourceRegistrations/*",  orionldDeleteRegistration }
+  { "/ngsi-ld/v1/csourceRegistrations/*",  orionldDeleteRegistration }
 };
 
 

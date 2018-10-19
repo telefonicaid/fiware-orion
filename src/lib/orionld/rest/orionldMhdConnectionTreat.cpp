@@ -147,9 +147,9 @@ static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** de
     {
       const char* appType = &mediaRange[12];
 
-      if (SCOMPARE8(appType, 'l', 'd', '+', 'j', 's', 'o', 'n', 0))  ciP->httpHeaders.acceptJsonld = true;
-      else if (SCOMPARE5(appType, 'j', 's', 'o', 'n', 0))            ciP->httpHeaders.acceptJson   = true;
-      else if (SCOMPARE2(appType, '*', 0) == 0)
+      if      (SCOMPARE8(appType, 'l', 'd', '+', 'j', 's', 'o', 'n', 0))  ciP->httpHeaders.acceptJsonld = true;
+      else if (SCOMPARE5(appType, 'j', 's', 'o', 'n', 0))                 ciP->httpHeaders.acceptJson   = true;
+      else if (SCOMPARE2(appType, '*', 0))
       {
         ciP->httpHeaders.acceptJsonld = true;
         ciP->httpHeaders.acceptJson   = true;
@@ -169,6 +169,8 @@ static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** de
 
     return false;
   }
+
+  LM_TMP(("Done"));
   return true;
 }
 

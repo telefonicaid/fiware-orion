@@ -35,22 +35,22 @@ brokerStart CB
 # 02. GET /ngsi-ld/v1/entities/E1
 # 03. GET /ngsi-ld/v1/subscriptions
 # 04. GET /ngsi-ld/v1/subscriptions/S1
-# 05. GET /ngsi-ld/v1/cSourceRegistrations
-# 06. GET /ngsi-ld/v1/cSourceRegistrations/R1
+# 05. GET /ngsi-ld/v1/csourceRegistrations
+# 06. GET /ngsi-ld/v1/csourceRegistrations/R1
 #
 # 07. POST /ngsi-ld/v1/entities
 # 08. POST /ngsi-ld/v1/entities/E1/attrs
 # 09. POST /ngsi-ld/v1/subscriptions
-# 10. POST /ngsi-ld/v1/cSourceRegistrations
+# 10. POST /ngsi-ld/v1/csourceRegistrations
 #
 # 11. PATCH /ngsi-ld/v1/entities/E1/attrs
 # 12. PATCH /ngsi-ld/v1/subscriptions/S1
-# 13. PATCH /ngsi-ld/v1/cSourceRegistrations/R1
+# 13. PATCH /ngsi-ld/v1/csourceRegistrations/R1
 #
 # 14. DELETE /ngsi-ld/v1/entities/E1
 # 15. DELETE /ngsi-ld/v1/entities/E1/attrs/A1
 # 16. DELETE /ngsi-ld/v1/subscriptions/S1
-# 17. DELETE /ngsi-ld/v1/cSourceRegistrations/R1
+# 17. DELETE /ngsi-ld/v1/csourceRegistrations/R1
 #
 
 echo "01. GET /ngsi-ld/v1/entities"
@@ -81,16 +81,16 @@ echo
 echo
 
 
-echo "05. GET /ngsi-ld/v1/cSourceRegistrations"
+echo "05. GET /ngsi-ld/v1/csourceRegistrations"
 echo "========================================"
-orionCurl --url /ngsi-ld/v1/cSourceRegistrations
+orionCurl --url /ngsi-ld/v1/csourceRegistrations
 echo
 echo
 
 
-echo "06. GET /ngsi-ld/v1/cSourceRegistrations/R1"
+echo "06. GET /ngsi-ld/v1/csourceRegistrations/R1"
 echo "==========================================="
-orionCurl --url /ngsi-ld/v1/cSourceRegistrations/R1
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/R1
 echo
 echo
 
@@ -127,12 +127,12 @@ echo
 echo
 
 
-echo "10. POST /ngsi-ld/v1/cSourceRegistrations"
+echo "10. POST /ngsi-ld/v1/csourceRegistrations"
 echo "========================================="
 payload='{
   "expiration": "now"
 }'
-orionCurl --url /ngsi-ld/v1/cSourceRegistrations --payload "$payload"
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
 echo
 echo
 
@@ -155,11 +155,11 @@ echo
 echo
 
 
-echo "13. PATCH /ngsi-ld/v1/cSourceRegistrations/R1"
+echo "13. PATCH /ngsi-ld/v1/csourceRegistrations/R1"
 echo "============================================="
 payload='{
 }'
-orionCurl --url /ngsi-ld/v1/cSourceRegistrations/R1 --payload "$payload" -X PATCH
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/R1 --payload "$payload" -X PATCH
 echo
 echo
 
@@ -191,11 +191,11 @@ echo
 echo
 
 
-echo "17. DELETE /ngsi-ld/v1/cSourceRegistrations/R1"
+echo "17. DELETE /ngsi-ld/v1/csourceRegistrations/R1"
 echo "=============================================="
 payload='{
 }'
-orionCurl --url /ngsi-ld/v1/cSourceRegistrations/R1 --payload "$payload" -X DELETE
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/R1 --payload "$payload" -X DELETE
 echo
 echo
 
@@ -257,7 +257,7 @@ Date: REGEX(.*)
 }
 
 
-05. GET /ngsi-ld/v1/cSourceRegistrations
+05. GET /ngsi-ld/v1/csourceRegistrations
 ========================================
 HTTP/1.1 501 Not Implemented
 Content-Length: 147
@@ -266,12 +266,12 @@ Date: REGEX(.*)
 
 {
     "details": "no details",
-    "title": "not implemented - GET /ngsi-ld/v1/cSourceRegistrations",
+    "title": "not implemented - GET /ngsi-ld/v1/csourceRegistrations",
     "type": "http://example.org/ngsi-ld/errors/BadRequestData"
 }
 
 
-06. GET /ngsi-ld/v1/cSourceRegistrations/R1
+06. GET /ngsi-ld/v1/csourceRegistrations/R1
 ===========================================
 HTTP/1.1 501 Not Implemented
 Content-Length: 141
@@ -280,7 +280,7 @@ Date: REGEX(.*)
 
 {
     "details": "R1",
-    "title": "not implemented - GET /ngsi-ld/v1/cSourceRegistrations/*",
+    "title": "not implemented - GET /ngsi-ld/v1/csourceRegistrations/*",
     "type": "http://example.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -323,7 +323,7 @@ Date: REGEX(.*)
 }
 
 
-10. POST /ngsi-ld/v1/cSourceRegistrations
+10. POST /ngsi-ld/v1/csourceRegistrations
 =========================================
 HTTP/1.1 501 Not Implemented
 Content-Length: 147
@@ -332,7 +332,7 @@ Date: REGEX(.*)
 
 {
     "details": "no details",
-    "title": "not implemented - GET /ngsi-ld/v1/cSourceRegistrations",
+    "title": "not implemented - GET /ngsi-ld/v1/csourceRegistrations",
     "type": "http://example.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -365,7 +365,7 @@ Date: REGEX(.*)
 }
 
 
-13. PATCH /ngsi-ld/v1/cSourceRegistrations/R1
+13. PATCH /ngsi-ld/v1/csourceRegistrations/R1
 =============================================
 HTTP/1.1 501 Not Implemented
 Content-Length: 143
@@ -374,7 +374,7 @@ Date: REGEX(.*)
 
 {
     "details": "R1",
-    "title": "not implemented - PATCH /ngsi-ld/v1/cSourceRegistrations/*",
+    "title": "not implemented - PATCH /ngsi-ld/v1/csourceRegistrations/*",
     "type": "http://example.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -421,7 +421,7 @@ Date: REGEX(.*)
 }
 
 
-17. DELETE /ngsi-ld/v1/cSourceRegistrations/R1
+17. DELETE /ngsi-ld/v1/csourceRegistrations/R1
 ==============================================
 HTTP/1.1 501 Not Implemented
 Content-Length: 144
@@ -430,7 +430,7 @@ Date: REGEX(.*)
 
 {
     "details": "R1",
-    "title": "not implemented - DELETE /ngsi-ld/v1/cSourceRegistrations/*",
+    "title": "not implemented - DELETE /ngsi-ld/v1/csourceRegistrations/*",
     "type": "http://example.org/ngsi-ld/errors/BadRequestData"
 }
 

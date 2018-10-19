@@ -36,7 +36,7 @@
 // requestPrepare -
 //
 // The cSumV values are interesting only for URL paths without wildcard of just uptil the first wildcard
-// The longest URL path without/before first wildcard is "/ngsi-ld/v1/cSourceRegistrations/".
+// The longest URL path without/before first wildcard is "/ngsi-ld/v1/csourceRegistrations/".
 // The initial part ("/ngsi-ld/v1/") doesn't count, so ... 21 chars is all we need for the cSumV.
 //
 #define MAX_CHARS_BEFORE_WILDCARD 21
