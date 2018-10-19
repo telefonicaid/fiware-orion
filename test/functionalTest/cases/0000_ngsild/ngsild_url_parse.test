@@ -381,15 +381,15 @@ Date: REGEX(.*)
 
 14. DELETE /ngsi-ld/v1/entities/E1
 ==================================
-HTTP/1.1 400 Bad Request
-Content-Length: 177
+HTTP/1.1 404 Not Found
+Content-Length: 179
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "http://a.b.c/list/of/entities/E1.xxx",
     "title": "The requested entity has not been found. Check type and id",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://example.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 

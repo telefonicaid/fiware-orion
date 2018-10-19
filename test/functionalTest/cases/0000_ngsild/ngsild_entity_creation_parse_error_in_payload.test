@@ -61,7 +61,7 @@ Date: REGEX(.*)
 {
     "details": "JSON Parse Error: expecting comma or end of object",
     "title": "JSON Parse Error",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://example.org/ngsi-ld/errors/InvalidRequest"
 }
 
 

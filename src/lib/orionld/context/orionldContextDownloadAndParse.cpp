@@ -51,44 +51,64 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
   //
   // Prepare the httpResponse buffer
   //
-  // A smarter way here would be to use a thread local buffer and allocate only if that buffer
-  // is not big enough
+  // A faster way would be to use a thread local buffer and allocate only if that buffer is not big enough.
+  // This to avoid calling malloc for smaller 
   //
   OrionldResponseBuffer  httpResponse;
-  
-  httpResponse.buf       = (char*) malloc(1024);
-  httpResponse.size      = 1024;
-  httpResponse.used      = 0;
-  httpResponse.allocated = true;
+  bool                   ok = false;
 
-  if (httpResponse.buf == NULL)
+  for (int tries = 0; tries < 5; tries++)
   {
-    *detailsPP = (char*) "out of memory";
-    return NULL;
-  }
+    httpResponse.buf       = (char*) malloc(1024);
+    httpResponse.size      = 1024;
+    httpResponse.used      = 0;
+    httpResponse.allocated = true;
 
-  LM_T(LmtContext, ("Downloading context '%s'", url));
-  if (orionldRequestSend(&httpResponse, url, 5000, detailsPP) == false)
-  {
+    if (httpResponse.buf == NULL)
+    {
+      *detailsPP = (char*) "out of memory";
+      return NULL;
+    }
+
+    LM_T(LmtContext, ("Downloading context '%s'", url));
+
     //
     // detailsPP is filled in by orionldRequestSend()
     // httpResponse.buf freed by orionldRequestSend() in case of error
     //
-    LM_E(("orionldRequestSend failed: %s", *detailsPP));
+    bool tryAgain = false;
+    if (orionldRequestSend(&httpResponse, url, 5000, detailsPP, &tryAgain) == true)
+    {
+      ok = true;
+      break;
+    }
+    else
+    {
+      LM_E(("orionldRequestSend failed (try number %d out of 5): %s", tries + 1, *detailsPP));
+    }
+
+    if (tryAgain == false)
+      break;
+  }
+
+  if (ok == false)
+  {
+    LM_E(("orionldRequestSend failed"));
+    // detailsPP filled in by orionldRequestSend
     return NULL;
   }
-  LM_TMP(("Got @context - parsing it"));
 
   // Now parse the payload
+  LM_TMP(("Got @context - parsing it"));
   KjNode* tree = kjParse(kjsonP, httpResponse.buf);
   LM_TMP(("Got @context - parsed it"));
 
-  // And then we can free the httpResponse buffer
+  // Now we can free the httpResponse buffer
   free(httpResponse.buf);
 
   if (tree == NULL)
   {
-    *detailsPP = (char*) "Error parsing context";
+    *detailsPP = kjsonP->errorString;
     LM_E(("kjParse returned NULL"));
     return NULL;
   }

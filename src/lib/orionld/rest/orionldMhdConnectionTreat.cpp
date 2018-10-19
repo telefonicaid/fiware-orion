@@ -38,8 +38,9 @@ extern "C"
 
 #include "orionld/common/orionldErrorResponse.h"            // orionldErrorResponseCreate
 #include "orionld/common/urlCheck.h"                        // urlCheck
+#include "orionld/common/SCOMPARE.h"                        // SCOMPARE
 #include "orionld/serviceRoutines/orionldBadVerb.h"         // orionldBadVerb
-#include "orionld/rest/orionldServiceInit.h"                // orionldRestServiceV 
+#include "orionld/rest/orionldServiceInit.h"                // orionldRestServiceV
 #include "orionld/rest/orionldServiceLookup.h"              // orionldServiceLookup
 #include "orionld/context/orionldContextCreateFromUrl.h"    // orionldContextCreateFromUrl
 #include "orionld/rest/temporaryErrorPayloads.h"            // Temporary Error Payloads
@@ -139,17 +140,33 @@ static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** de
 
   for (unsigned int ix = 0; ix < ciP->httpHeaders.acceptHeaderV.size(); ix++)
   {
-    LM_TMP(("ciP->Accept header %d: %s", ix, ciP->httpHeaders.acceptHeaderV[ix]->mediaRange.c_str()));
-    if (strcmp(ciP->httpHeaders.acceptHeaderV[ix]->mediaRange.c_str(), "application/ld+json") == 0)
+    const char* mediaRange = ciP->httpHeaders.acceptHeaderV[ix]->mediaRange.c_str();
+
+    LM_TMP(("ciP->Accept header %d: %s", ix, mediaRange));
+    if (SCOMPARE12(mediaRange, 'a', 'p', 'p', 'l', 'i', 'c', 'a', 't', 'i', 'o', 'n', '/'))
+    {
+      const char* appType = &mediaRange[12];
+
+      if (SCOMPARE8(appType, 'l', 'd', '+', 'j', 's', 'o', 'n', 0))  ciP->httpHeaders.acceptJsonld = true;
+      else if (SCOMPARE5(appType, 'j', 's', 'o', 'n', 0))            ciP->httpHeaders.acceptJson   = true;
+      else if (SCOMPARE2(appType, '*', 0) == 0)
+      {
+        ciP->httpHeaders.acceptJsonld = true;
+        ciP->httpHeaders.acceptJson   = true;
+      }
+    }
+    else if (SCOMPARE4(mediaRange, '*', '/', '*', 0) == 0)
+    {
       ciP->httpHeaders.acceptJsonld = true;
-    else if (strcmp(ciP->httpHeaders.acceptHeaderV[ix]->mediaRange.c_str(), "application/json") == 0)
-      ciP->httpHeaders.acceptJson = true;
+      ciP->httpHeaders.acceptJson   = true;
+    }
   }
 
   if ((ciP->httpHeaders.acceptJsonld == false) && (ciP->httpHeaders.acceptJson == false))
   {
     *errorTitleP = (char*) "invalid mime-type";
     *detailsP    = (char*) "HTTP Header /Accept/ contains neither 'application/json' nor 'application/ld+json'";
+
     return false;
   }
   return true;
@@ -189,13 +206,13 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     if (ciP->payload != NULL)
     {
       LM_T(LmtPayloadParse, ("parsing the payload '%s'", ciP->payload));
-      
+
       ciP->requestTree = kjParse(ciP->kjsonP, ciP->payload);
       LM_T(LmtPayloadParse, ("After kjParse: %p", ciP->requestTree));
       if (ciP->requestTree == NULL)
       {
         LM_TMP(("Creating Error Response for JSON Parse Error (%s)", ciP->kjsonP->errorString));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "JSON Parse Error", ciP->kjsonP->errorString, OrionldDetailsString);
+        orionldErrorResponseCreate(ciP, OrionldInvalidRequest, "JSON Parse Error", ciP->kjsonP->errorString, OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;
         error = true;
       }
@@ -255,7 +272,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       LM_T(LmtServiceRoutine, ("Calling Service Routine %s", ciP->serviceP->url));
       bool b = ciP->serviceP->serviceRoutine(ciP);
       LM_T(LmtServiceRoutine,("service routine '%s' done", ciP->serviceP->url));
-      
+
       if (b == false)
       {
         //
@@ -288,7 +305,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       LM_E(("Error allocating buffer for response payload"));
     }
   }
-  
+
   if (ciP->responsePayload != NULL)
   {
     LM_T(LmtJsonResponse, ("Responding with '%s'", ciP->responsePayload));

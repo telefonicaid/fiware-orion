@@ -27,8 +27,10 @@
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "ngsi/ParseData.h"                                    // ParseData needed for postUpdateContext()
-#include "serviceRoutines/postUpdateContext.h"                 // postUpdateContext
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/common/urlCheck.h"                           // urlCheck
+#include "orionld/common/urnCheck.h"                           // urnCheck
+#include "serviceRoutines/postUpdateContext.h"                 // postUpdateContext
 #include "orionld/serviceRoutines/orionldDeleteEntity.h"       // Own Interface
 
 
@@ -44,6 +46,16 @@ bool orionldDeleteEntity(ConnectionInfo* ciP)
 
   LM_T(LmtServiceRoutine, ("In orionldDeleteEntity"));
 
+  // Check that the Entity ID is a valid URI
+  char* details;
+
+  if ((urlCheck(ciP->wildcard[0], &details) == false) && (urnCheck(ciP->wildcard[0], &details)))
+  {
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Entity ID", details, OrionldDetailsString);
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
+  }
+
   // Fill in entity with the entity-id from the URL
   entity.id = ciP->wildcard[0];
 
@@ -57,8 +69,14 @@ bool orionldDeleteEntity(ConnectionInfo* ciP)
   // Check result
   if (parseData.upcrs.res.oe.code != SccNone)
   {
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, parseData.upcrs.res.oe.details.c_str(), ciP->wildcard[0], OrionldDetailsString);
-    ciP->httpStatusCode = SccBadRequest;
+    OrionldResponseErrorType eType = (parseData.upcrs.res.oe.code == SccContextElementNotFound)? OrionldResourceNotFound : OrionldBadRequestData;
+
+    orionldErrorResponseCreate(ciP, eType, parseData.upcrs.res.oe.details.c_str(), ciP->wildcard[0], OrionldDetailsString);
+    ciP->httpStatusCode = (parseData.upcrs.res.oe.code == SccContextElementNotFound)? SccContextElementNotFound : SccBadRequest;
+
+    // Release allocated data
+    parseData.upcr.res.contextElementVector.release();
+
     return false;
   }
 

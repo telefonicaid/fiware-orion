@@ -67,7 +67,7 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
 //
 // orionldRequestSend - send a request and await its response
 //
-bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoInMilliSeconds, char** detailsPP)
+bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoInMilliSeconds, char** detailsPP, bool* tryAgainP)
 {
   CURLcode             cCode;
   struct curl_context  cc;
@@ -76,7 +76,9 @@ bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoIn
   char   ip[256];
   short  port    = 0;
   char*  urlPath = NULL;
-  
+
+  *tryAgainP = false;
+
   if (urlParse(url, protocol, sizeof(protocol), ip, sizeof(ip), &port, &urlPath, detailsPP) == false)
   {
     // urlParse sets *detailsPP
@@ -98,7 +100,7 @@ bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoIn
   {
     *detailsPP = (char*) "Unable to obtain CURL context";
 
-    // This function must release the allocated respose buffer in case of errpr
+    // This function must release the allocated respose buffer in case of error
     free(rBufP->buf);
     rBufP->buf = NULL;
 
@@ -129,12 +131,15 @@ bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoIn
   {
     *detailsPP = (char*) url;
 
-    // This function must release the allocated respose buffer in case of errpr
+    // This function must release the allocated respose buffer in case of error
     free(rBufP->buf);
     rBufP->buf = NULL;
 
     release_curl_context(&cc);
     LM_E(("curl_easy_perform error %d", cCode));
+
+    *tryAgainP = true;  // FIXME: might depend on cCode ...
+
     return false;
   }
 

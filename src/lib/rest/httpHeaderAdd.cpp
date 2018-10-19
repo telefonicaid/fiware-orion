@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_COMOM_ORIONLDREQUESTSEND_H_
-#define SRC_LIB_ORIONLD_COMOM_ORIONLDREQUESTSEND_H_
-
 /*
 *
 * Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,14 +22,19 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/OrionldResponseBuffer.h"
+#include <string>
+#include <vector>
+
+#include "rest/ConnectionInfo.h"
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldRequestSend - send a request and await its response
+// httpHeaderAdd -
 //
-extern bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoInMilliSeconds, char** detailsPP, bool* tryAgainP);
-
-#endif  // SRC_LIB_ORIONLD_COMOM_ORIONLDREQUESTSEND_H_
+void httpHeaderAdd(ConnectionInfo* ciP, const char* key, const char* value)
+{
+  ciP->httpHeader.push_back(key);
+  ciP->httpHeaderValue.push_back(value);
+}

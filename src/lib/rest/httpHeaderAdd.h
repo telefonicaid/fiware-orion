@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMOM_ORIONLDREQUESTSEND_H_
-#define SRC_LIB_ORIONLD_COMOM_ORIONLDREQUESTSEND_H_
+#ifndef SRC_LIB_REST_HTTPHEADERADD_H_
+#define SRC_LIB_REST_HTTPHEADERADD_H_
 
 /*
 *
@@ -25,14 +25,21 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/OrionldResponseBuffer.h"
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldRequestSend - send a request and await its response
+// ConnectionInfo - to avoid to include "ConnectionInfo.h"
 //
-extern bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoInMilliSeconds, char** detailsPP, bool* tryAgainP);
+class ConnectionInfo;
 
-#endif  // SRC_LIB_ORIONLD_COMOM_ORIONLDREQUESTSEND_H_
+
+
+// -----------------------------------------------------------------------------
+//
+// httpHeaderAdd -
+//
+extern void httpHeaderAdd(ConnectionInfo* ciP, const char* key, const char* value);
+
+#endif  // SRC_LIB_REST_HTTPHEADERADD_H_
