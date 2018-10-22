@@ -57,7 +57,6 @@ export PATH=$PATH:$PWD/scripts
 # global variables
 #
 export BROKER=${BROKER:-contextBroker}
-CASES_DIR=cases
 typeset -i lost
 typeset -i valgrindErrors
 
@@ -149,12 +148,11 @@ function dbReset()
 {
   test=$1
 
-  echo "Resetting database for $test" >> /tmp/valgrindDbReset.log
-  dbResetAllFtest.sh >> /tmp/valgrindDbReset.log 2>&1
+  vgDebug "Resetting database for $test"
+  dbResetAllFtest.sh >> $VG_DEBUG_FILE 2>&1
 }
 
 date
-date > /tmp/valgrindDbReset.log
 dbReset ALL
 totalStartTime=$(date +%s.%2N)
 
@@ -303,7 +301,7 @@ function brokerStart()
 
     while [ $loopNo -lt $loops ]
     do
-      nc -w 2 localhost ${CB_TEST_PORT} &>/dev/null </dev/null
+      nc -zv localhost ${CB_TEST_PORT} &>/dev/null </dev/null
       if [ "$?" == "0" ]
       then
         vMsg The orion context broker has started, listening on port $CB_TEST_PORT
@@ -477,7 +475,7 @@ function setNumberOfTests()
 
   if [ "$runHarness" -eq "1" ]
   then
-    for file in $(find ../functionalTest/$CASES_DIR -name "$TEST_FILTER")
+    for file in $(find ../functionalTest/cases -name "$TEST_FILTER")
     do
       noOfTests=$noOfTests+1
     done
@@ -549,7 +547,7 @@ function valgrindErrorFound()
 #
 
 # Port tests
-nc -w 2 localhost ${CB_TEST_PORT} &>/dev/null </dev/null
+nc -zv localhost ${CB_TEST_PORT} &>/dev/null </dev/null
 if [ "$?" == "0" ]
 then
    # Successful nc means that port CB_TEST_PORT is used, thus exit
@@ -596,7 +594,7 @@ then
     exit 1
   fi
 
-  cd $SRC_TOP/test/functionalTest/$CASES_DIR
+  cd $SRC_TOP/test/functionalTest/cases
   vMsg TEST_FILTER: $TEST_FILTER
   for file in $(find . -name "$TEST_FILTER" | sort)
   do
@@ -639,7 +637,7 @@ then
 
     # In the case of harness test, we check that the test is implemented checking
     # that the word VALGRIND_READY apears in the .test file (usually, in a commented line)
-    grep VALGRIND_READY $SRC_TOP/test/functionalTest/$CASES_DIR/$directory/$file > /dev/null 2>&1
+    grep VALGRIND_READY $SRC_TOP/test/functionalTest/cases/$directory/$file > /dev/null 2>&1
     if [ "$?" -ne "0" ]
     then
       printNotImplementedString $htest
@@ -662,7 +660,7 @@ then
 
       startTime=$(date +%s.%2N)
       vgDebug "Calling testHarness.sh for $file"
-      VALGRIND=1 test/functionalTest/testHarness.sh --filter $file > /tmp/testHarness 2>&1
+      VALGRIND=1 test/functionalTest/testHarness.sh --filter $file > /tmp/funcTestUnderValgrind.tmp 2>&1
       vgDebug "testHarness.sh for $file FINISHED"
       status=$?
       endTime=$(date +%s.%2N)
@@ -670,8 +668,8 @@ then
       vMsg status=$status
       if [ "$status" != "0" ]
       then
-        mv /tmp/testHarness     test/functionalTest/$CASES_DIR/$directory/$htest.harness.out
-        cp /tmp/${BROKER}.log   test/functionalTest/$CASES_DIR/$directory/$htest.contextBroker.log
+        mv /tmp/funcTestUnderValgrind.tmp  test/functionalTest/cases/$directory/$htest.harness.out
+        cp /tmp/${BROKER}.log              test/functionalTest/cases/$directory/$htest.contextBroker.log
         detailForOkString=" (no leak but ftest error $status)"
         harnessErrorV[$harnessErrors]="$xTestNo: $file (exit code $status)"
         harnessErrors=$harnessErrors+1
@@ -683,17 +681,17 @@ then
         echo " FAILURE! (no valgrind output for $file)"
       else
         vgDebug "Checking valgrind output for $file"
-        mv /tmp/valgrind.out test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
+        mv /tmp/valgrind.out test/functionalTest/cases/$directory/$htest.valgrind.out
       
         typeset -i headEndLine1
         typeset -i headEndLine2
         vMsg processing $directory/$htest.valgrind.out in $(pwd)
 
         lost=0
-        leakInfo test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
+        leakInfo test/functionalTest/cases/$directory/$htest.valgrind.out
 
         valgrindErrors=0
-        valgrindErrorInfo test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
+        valgrindErrorInfo test/functionalTest/cases/$directory/$htest.valgrind.out
       fi
     else
       if [ "$dryLeaks" == "on" ]

@@ -22,12 +22,32 @@
 #
 # Author: Ken Zangelin
 #
-
 date
 export BROKER=${BROKER:-contextBroker}
 testStartTime=$(date +%s.%2N)
 MAX_TRIES=${CB_MAX_TRIES:-3}
-echo $testStartTime > /tmp/brokerStartCounter
+
+
+
+# -----------------------------------------------------------------------------
+#
+# Log file for debugging
+#
+export LOG_FILE=/tmp/testHarness.log
+
+echo $testStartTime > $LOG_FILE
+
+
+
+# -----------------------------------------------------------------------------
+#
+# logMsg -
+#
+function logMsg()
+{
+  now=$(date)
+  echo $now: $* >> $LOG_FILE
+}
 
 
 
@@ -70,15 +90,6 @@ if [ "$ORION_FT_DEBUG" == "1" ]
 then
   _debug='on'
 fi
-
-
-
-# -----------------------------------------------------------------------------
-#
-# Log file for debugging
-#
-rm -f /tmp/orionFuncTestDebug.log
-echo $(date) > /tmp/orionFuncTestDebug.log
 
 
 
@@ -183,7 +194,8 @@ function exitFunction()
   errorFile=$5
   forced=$6
 
-  echo -n "(FAIL $exitCode - $errorText) "
+  logMsg "FAILURE $exitCode for test $testFile: $errorText"
+  echo -n "(FAILURE $exitCode - $errorText) "
 
   if [ "$stopOnError" == "on" ] || [ "$forced" == "DIE" ]
   then
@@ -197,17 +209,14 @@ function exitFunction()
     exit $exitCode
   fi
 
-  echo                         >> /tmp/orionFuncTestLog
-  echo '----- ' $NAME ' -----' >> /tmp/orionFuncTestLog
-  echo $errorString            >> /tmp/orionFuncTestLog
+  logMsg
+  logMsg "----- $NAME -----"
+  logMsg $errorString
 
   if [ "$errorFile" != "" ] && [ -f "$errorFile" ]
   then
-    cat $errorFile               >> /tmp/orionFuncTestLog   2> /dev/null
-    echo                         >> /tmp/orionFuncTestLog
+    cat $errorFile >> $LOG_FILE
   fi
-
-  echo                         >> /tmp/orionFuncTestLog
 
   testErrorV[$testError]=$testFile
   testError=$testError+1
@@ -221,7 +230,7 @@ function exitFunction()
 # ME - name of script, to be used in error and verbose messages 
 #
 ME=$(basename $0)
-vMsg "$ME, in directory $SCRIPT_HOME"
+logMsg "$ME, in directory $SCRIPT_HOME"
 
 
 
@@ -246,7 +255,7 @@ ixList=""
 noCache=""
 threadpool=ON
 
-vMsg "parsing options"
+logMsg "parsing options"
 while [ "$#" != 0 ]
 do
   if   [ "$1" == "-u" ];             then usage 0;
@@ -277,7 +286,7 @@ do
   shift
 done
 
-vMsg "options parsed"
+logMsg "options parsed"
 
 
 
@@ -313,11 +322,11 @@ fi
 #
 if [ "$dirOrFile" != "" ]
 then
-  vMsg dirOrFile: $dirOrFile
-  vMsg dirGiven: $dirGiven
-  vMsg filterGiven: $filterGiven
-  vMsg dir: $dir
-  vMsg testFilter: $testFilter
+  logMsg dirOrFile: $dirOrFile
+  logMsg dirGiven: $dirGiven
+  logMsg filterGiven: $filterGiven
+  logMsg dir: $dir
+  logMsg testFilter: $testFilter
 
   if [ -d "$dirOrFile" ]
   then
@@ -341,8 +350,8 @@ then
     dirPart=$(dirname $dirOrFile)
     filePath=$(basename $dirOrFile)
     xdir=$(basename $dirPart);
-    vMsg "dirPart: $dirPart"
-    vMsg "filePath: $filePath"
+    logMsg "dirPart: $dirPart"
+    logMsg "filePath: $filePath"
 
     if [ "$dirPart" != "." ]
     then
@@ -354,9 +363,9 @@ then
   fi
 fi
 
-vMsg directory: $dir
-vMsg testFilter: $testFilter
-vMsg "Script in $SCRIPT_HOME"
+logMsg directory: $dir
+logMsg testFilter: $testFilter
+logMsg "Script in $SCRIPT_HOME"
 
 
 
@@ -378,13 +387,13 @@ then
   then
     # First, we try with a testEnv.sh file in the script home (usual situation in the
     # RPM deployment case)
-    vMsg Sourcing $SCRIPT_HOME/testEnv.sh
+    logMsg Sourcing $SCRIPT_HOME/testEnv.sh
     source $SCRIPT_HOME/testEnv.sh
   elif [ -f "$SCRIPT_HOME/../../scripts/testEnv.sh" ]
   then
     # Second, we try with a testEnv.sh file in the script/testEnv.sh (realtive to git repo home).
     # Note that the script home in this case is test/functionaTest
-    vMsg Sourcing $SCRIPT_HOME/../../scripts/testEnv.sh
+    logMsg Sourcing $SCRIPT_HOME/../../scripts/testEnv.sh
     source $SCRIPT_HOME/../../scripts/testEnv.sh
   else
     echo "------------------------------------------------------------------"
@@ -398,7 +407,7 @@ if [ "$CONTEXTBROKER_HARNESS_FUNCTIONS_SOURCED" != "YES" ]
 then
   if [ -f $SCRIPT_HOME/harnessFunctions.sh ]
   then
-    vMsg Sourcing $SCRIPT_HOME/harnessFunctions.sh
+    logMsg Sourcing $SCRIPT_HOME/harnessFunctions.sh
     source $SCRIPT_HOME/harnessFunctions.sh
   else
     echo "--------------------------------------------------------------------------------------------"
@@ -414,7 +423,7 @@ fi
 #
 # Preparations - cd to the test directory
 #
-dMsg Functional Tests Starting ...
+logMsg Functional Tests Starting ...
 if [ "$dirOrFile" != "" ] && [ -d "$dirOrFile" ]
 then
   cd $dirOrFile
@@ -426,8 +435,7 @@ else
 fi
 
 
-echo "Orion Functional tests starting" > /tmp/orionFuncTestLog
-date >> /tmp/orionFuncTestLog
+logMsg "Orion Functional tests starting"
 
 
 
@@ -435,14 +443,14 @@ date >> /tmp/orionFuncTestLog
 #
 # Preparations - number of test cases
 #
-vMsg find in $(pwd), filter: $testFilter
+logMsg find in $(pwd), filter: $testFilter
 if [ "$match" == "" ]
 then
   fileList=$(find . -name "$testFilter" | sort | sed 's/^.\///')
 else
   fileList=$(find . -name "$testFilter" | grep "$match" | sort | sed 's/^.\///')
 fi
-vMsg "fileList: $fileList"
+logMsg "fileList: $fileList"
 typeset -i noOfTests
 typeset -i testNo
 
@@ -470,9 +478,9 @@ function fileCleanup()
   path=$3
   dir=$(dirname $path)
 
-  vMsg "---------------------------------------------------------"
-  vMsg "In fileCleanup for $filename in $dir"
-  vMsg "---------------------------------------------------------"
+  logMsg "---------------------------------------------------------"
+  logMsg "In fileCleanup for $filename in $dir"
+  logMsg "---------------------------------------------------------"
 
   if [ "$keepOutputFiles" != "on" ]
   then
@@ -517,12 +525,12 @@ function fileCreation()
   if [ "$dirname" != "." ] && [ "$dirname" != "" ]
   then
     pathWithoutExt=$dirname/$filename
-    vMsg New path: $path
+    logMsg New path: $path
   else
     pathWithoutExt=$filename
   fi
 
-  vMsg Creating test files for $pathWithoutExt
+  logMsg Creating test files for $pathWithoutExt
 
   
   #
@@ -541,7 +549,7 @@ function fileCreation()
   if [ $(grep "\-\-SHELL\-INIT\-\-" $path | wc -l) -eq 1 ]
   then
     TEST_SHELL_INIT=${pathWithoutExt}.shellInit
-    vMsg "Creating $TEST_SHELL_INIT at $PWD"
+    logMsg "Creating $TEST_SHELL_INIT at $PWD"
     sed -n '/--SHELL-INIT--/,/^--/p' $path  | grep -v "^--" > $TEST_SHELL_INIT
   else
     exitFunction 3 "--SHELL-INIT-- part is missing" $path "($path)" "" DIE
@@ -553,7 +561,7 @@ function fileCreation()
   if [ $(grep "\-\-SHELL\-\-" $path | wc -l) -eq 1 ]
   then
     TEST_SHELL=${pathWithoutExt}.shell
-    vMsg "Creating $TEST_SHELL at $PWD"
+    logMsg "Creating $TEST_SHELL at $PWD"
     sed -n '/--SHELL--/,/^--/p' $path  | grep -v "^--" > $TEST_SHELL
   else
     exitFunction 4 "--SHELL-- part is missing" $path "($path)" "" DIE
@@ -565,7 +573,7 @@ function fileCreation()
   if [ $(grep "\-\-REGEXPECT\-\-" $path | wc -l) -eq 1 ]
   then
     TEST_REGEXPECT=${pathWithoutExt}.regexpect
-    vMsg "Creating $TEST_REGEXPECT at $PWD"
+    logMsg "Creating $TEST_REGEXPECT at $PWD"
     sed -n '/--REGEXPECT--/,/^--/p' $path  | grep -v "^--" > $TEST_REGEXPECT
   else
     exitFunction 5 "--REGEXPECT-- part is missing" $path "($path)" "" DIE
@@ -577,7 +585,7 @@ function fileCreation()
   if [ $(grep "\-\-TEARDOWN\-\-" $path | wc -l) -eq 1 ]
   then
     TEST_TEARDOWN=${pathWithoutExt}.teardown
-    vMsg "Creating $TEST_TEARDOWN at $PWD"
+    logMsg "Creating $TEST_TEARDOWN at $PWD"
     sed -n '/--TEARDOWN--/,/^--/p' $path  | grep -v "^--" > $TEST_TEARDOWN
   else
     exitFunction 6 "--TEARDOWN-- part is missing" $path "($path)" "" DIE
@@ -597,7 +605,6 @@ function partExecute()
   forcedDie=$3
   __tryNo=$4
 
-  vMsg Executing $what part for $path
   dirname=$(dirname $path)
   filename=$(basename $path .test)
   
@@ -612,8 +619,14 @@ function partExecute()
   chmod 755 $dirname/$filename.$what
   rm -f $dirname/$filename.$what.stderr
   rm -f $dirname/$filename.$what.stdout
+
+  logMsg "Executing $what part for $path"
+  logMsg "==========================  $dirname/$filename.$what ==============================="
+  cat $dirname/$filename.$what >> $LOG_FILE
+  logMsg "=========================================================================================================="
   $dirname/$filename.$what > $dirname/$filename.$what.stdout 2> $dirname/$filename.$what.stderr
   exitCode=$?
+  logMsg "$what part of $path is done - now checks"
   linesInStderr=$(wc -l $dirname/$filename.$what.stderr | awk '{ print $1}' 2> /dev/null)
 
   #
@@ -625,6 +638,10 @@ function partExecute()
     then
       exitFunction 7 "$what: output on stderr" $path "($path): $what produced output on stderr" $dirname/$filename.$what.stderr "$forcedDie"
     else
+      logMsg "$what: output on stderr"
+      logMsg "------------------------------------------------------"
+      cat $dirname/$filename.$what.stderr >> $LOG_FILE
+      logMsg "------------------------------------------------------"
       echo -n "(ERROR 7 - $what: output on stderr) "
     fi
 
@@ -638,6 +655,7 @@ function partExecute()
   #
   if [ "$exitCode" != "0" ]
   then
+    logMsg "$what: exit code is $exitCode - retry? (try: $__tryNo, MAX_TRIES: $MAX_TRIES)"
     if [ $__tryNo == $MAX_TRIES ]
     then
       exitFunction 8 $path "$what exited with code $exitCode" "($path)" $dirname/$filename.$what.stderr "$forcedDie"
@@ -657,6 +675,7 @@ function partExecute()
   then
     mv $dirname/$filename.$what.stdout $dirname/$filename.out # We are very much used to this name ...
 
+    logMsg "Performing diff for $dirname/$filename"
     #
     # Special sorted diff or normal REGEX diff ?
     #
@@ -674,6 +693,7 @@ function partExecute()
 
     if [ "$exitCode" != "0" ]
     then
+      logMsg "$what $dirname/$filename: exitCode=$exitCode"
       if [ $__tryNo == $MAX_TRIES ]
       then
         exitFunction 9 ".out and .regexpect differ" $path "($path) output not as expected" $dirname/$filename.diff
@@ -683,6 +703,7 @@ function partExecute()
 
       if [ "$CB_DIFF_TOOL" != "" ] && [ $__tryNo == $MAX_TRIES ]
       then
+        logMsg "Calling diff tool $CB_DIFF_TOOL"
         endDate=$(date)
         if [ $blockDiff == 'yes' ]
         then
@@ -690,8 +711,11 @@ function partExecute()
         else
           $CB_DIFF_TOOL $dirname/$filename.regexpect $dirname/$filename.out
         fi
+        logMsg "diff tool $CB_DIFF_TOOL finished"
       fi
       partExecuteResult=9
+      logMsg "partExecute is DONE"
+      logMsg "==================================================================="
       return
     fi
   fi
@@ -725,7 +749,7 @@ function runTest()
 
   runTestStatus="ok"
 
-  vMsg path=$path
+  logMsg "runTest: path=$path"
   dirname=$(dirname $path)
   filename=$(basename $path .test)
   dir=""
@@ -733,16 +757,14 @@ function runTest()
   if [ "$dirname" != "." ] && [ "$dirname" != "" ]
   then
     path=$dirname/$filename.test
-    vMsg New path: $path
+    logMsg "New path: $path"
   fi
-
-  vMsg running test $path
 
   # 1. Remove old output files
   fileCleanup $filename removeAll $path
   if [ "$toBeStopped" == "yes" ]
   then
-    echo toBeStopped == yes
+    logMsg toBeStopped == yes
     runTestStatus="stopped"
     return
   fi
@@ -751,17 +773,19 @@ function runTest()
   fileCreation $path $filename
   if [ "$toBeStopped" == "yes" ]
   then
+    logMsg stopped2
     runTestStatus="stopped2"
     return
   fi
 
   # 3. Run the SHELL-INIT part
-  vMsg Executing SHELL-INIT part for $path
+  logMsg Executing SHELL-INIT part for $path
   chmod 755 $dirname/$filename.shellInit
   rm -f $dirname/$filename.shellInit.stderr
   rm -f $dirname/$filename.shellInit.stdout
   $dirname/$filename.shellInit > $dirname/$filename.shellInit.stdout 2> $dirname/$filename.shellInit.stderr
   exitCode=$?
+  logMsg "SHELL-INIT part for $path DONE. exitCode=$exitCode"
   linesInStderr=$(wc -l $dirname/$filename.shellInit.stderr | awk '{ print $1}' 2> /dev/null)
 
   if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
@@ -773,7 +797,7 @@ function runTest()
 
   if [ "$exitCode" != "0" ]
   then
-
+    logMsg "Trying the SHELL-INIT part AGAIN for $path"
     #
     # 3.2 Run the SHELL-INIT part AGAIN
     #
@@ -788,8 +812,12 @@ function runTest()
     sleep 1
     rm -f $dirname/$filename.shellInit.stderr
     rm -f $dirname/$filename.shellInit.stdout
+
+    logMsg "Executing SHELL-INIT part for $path"
     $dirname/$filename.shellInit > $dirname/$filename.shellInit.stdout 2> $dirname/$filename.shellInit.stderr
     exitCode=$?
+    logMsg "SHELL-INIT (again) part for $path DONE. exitCode=$exitCode"
+
     linesInStderr=$(wc -l $dirname/$filename.shellInit.stderr | awk '{ print $1}' 2> /dev/null)
 
     if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
@@ -819,13 +847,13 @@ function runTest()
   # 5. Run the TEARDOWN part
   partExecute teardown $path "DIE" 0
   teardownResult=$partExecuteResult
-  vMsg "teardownResult: $teardownResult"
-  vMsg "shellResult: $shellResult"
+  logMsg "teardownResult: $teardownResult"
+  logMsg "shellResult: $shellResult"
 
   if [ "$shellResult" == "0" ] && [ "$teardownResult" == "0" ]
   then
     # 6. Remove output files
-    vMsg "Remove output files: fileCleanup $filename $keep"
+    logMsg "Remove output files: fileCleanup $filename $keep"
     fileCleanup $filename $keep $path
   else
     file=$(basename $path .test)
@@ -873,7 +901,7 @@ function testDisabled
 #
 # Main loop
 #
-vMsg Total number of tests: $noOfTests
+logMsg Total number of tests: $noOfTests
 testNo=0
 for testFile in $fileList
 do
@@ -959,7 +987,10 @@ do
         printf "Running test %04d/%d: %s\n" "$testNo" "$noOfTests" "$testFile"
       fi
 
+      logMsg "Calling runTest for $testFile, try $tryNo"
       runTest $testFile $tryNo
+      logMsg "runTest for $testFile, try $tryNo DONE. shellResult=$shellResult"
+
       if [ "$shellResult" == "0" ]
       then
         if [ $tryNo != 1 ]
@@ -1034,7 +1065,7 @@ then
   echo
   echo "Orion Functional Test Log File:"
   echo "================================================================================"
-  cat /tmp/orionFuncTestLog 2> /dev/null
+  cat $LOG_FILE 2> /dev/null
   echo "================================================================================"
   echo
   echo "----------- Failing tests ------------------"

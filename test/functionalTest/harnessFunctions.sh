@@ -57,42 +57,6 @@ function harnessExit()
 
 # ------------------------------------------------------------------------------
 #
-# vMsg - verbose output
-#
-# Remember that if the '--verbose' flag is used, the verboser messages pollute
-# the total answer and the harness test will fail.
-#
-# Verbose mode is only meant to troubleshoot harness tests that fail.
-#
-function vMsg()
-{
-  if [ "$_verbose" == "on" ]
-  then
-    echo $*
-  fi
-}
-
-
-
-# ------------------------------------------------------------------------------
-#
-# dMsg - debug output
-#
-function dMsg()
-{
-  if [ "$ORION_FT_DEBUG" == 1 ] || [ "$_debug" == "on"  ]
-  then
-    echo $* >> /tmp/orionFuncTestDebug.log
-  fi
-}
-
-
-# ------------------------------------------------------------------------------
-#
-# dbInit - 
-#
-# ------------------------------------------------------------------------------
-#
 # dbInit - 
 #
 function dbInit()
@@ -112,7 +76,7 @@ function dbInit()
     port="27017"
   fi
   
-  dMsg initializing database;
+  logMsg initializing database;
 
   if [ "$role" == "CB" ]
   then
@@ -144,7 +108,7 @@ function dbInit()
     db=$baseDbName
   fi
 
-  dMsg "database to drop: <$db>" 
+  logMsg "database to drop: <$db>" 
   echo 'db.dropDatabase()' | mongo mongodb://$host:$port/$db --quiet
 }
 
@@ -234,17 +198,21 @@ function brokerStopAwait
   loopNo=0
   loops=50
 
+  logMsg "Awaiting broker to stop (broker on port $port)"
   while [ $loopNo -lt $loops ]
   do
-    nc -w 2 localhost $port &>/dev/null </dev/null
-    if [ "$?" != "0" ]
+    logMsg "Calling nc: nc -w 2 localhost $port"
+    nc -zv localhost $port &>/dev/null </dev/null
+    r=$? # 0 == OK
+    logMsg "nc returned $r"
+    if [ "$r" != "0" ]
     then
-      vMsg The orion context broker on port $port has stopped
+      logMsg The orion context broker on port $port has stopped
       sleep 1
       break;
     fi
 
-    vMsg Awaiting orion context broker to fully stop '('$loopNo')' ...
+    logMsg Awaiting orion context broker to fully stop '('$loopNo')' ...
     sleep .2
     loopNo=$loopNo+1
   done
@@ -301,15 +269,15 @@ function brokerStartAwait
 
   while [ $loopNo -lt $loops ]
   do
-    nc -w 2 localhost $port &>/dev/null </dev/null
+    nc -zv localhost $port &>/dev/null </dev/null
     if [ "$?" == "0" ]
     then
-      vMsg The orion context broker has started, listening on port $port
+      logMsg The orion context broker has started, listening on port $port
       echo "Broker started after $loopNo checks" >> /tmp/brokerStartCounter
       break;
     fi
 
-    vMsg Awaiting valgrind to fully start the orion context broker '('$loopNo')' ...
+    logMsg Awaiting valgrind to fully start the orion context broker '('$loopNo')' ...
     sleep .2
     loopNo=$loopNo+1
   done
@@ -368,7 +336,7 @@ function localBrokerStart()
     dbPort="27017"
   fi
 
-  dMsg starting broker for role $role
+  logMsg starting broker for role $role
 
   if [ "$ipVersion" == "IPV4" ]
   then
@@ -451,7 +419,7 @@ function localBrokerStart()
   fi
 
   ps=$(ps aux | grep $BROKER)
-  dMsg $ps
+  logMsg $ps
 
   # Sometimes (especially when using remote DB) CB needs some time to connect DB and
   # the test execution needs to a guard time. The righ value for CB_WAIT_AFTER_START
@@ -601,6 +569,7 @@ function brokerStart()
 #
 function brokerStop
 {
+  logMsg "In brokerStop"
   if [ "$1" == "-v" ]
   then
     _verbose=1
@@ -613,7 +582,7 @@ function brokerStop
     role=CB
   fi
  
-  vMsg "Stopping broker $1"
+  logMsg "Stopping broker $1"
 
   if [ "$role" == "CB" ]
   then
@@ -643,14 +612,17 @@ function brokerStop
 
   if [ "$VALGRIND" == "" ]
   then
-    vMsg "killing with PID from pidFile"
+    logMsg "killing with PID from pidFile"
     kill $(cat $pidFile 2> /dev/null) 2> /dev/null
-    vMsg "should be dead"
+    logMsg "should be dead"
     rm -f /tmp/orion_${port}.pid 2> /dev/null
   else
+    logMsg "killing broker by sending /exit/harakiri request"
     curl localhost:${port}/exit/harakiri 2> /dev/null >> ${TEST_BASENAME}.valgrind.stop.out
     # Waiting for valgrind to terminate (sleep a max of 10)
+    logMsg "waiting broker to stop"
     brokerStopAwait $port
+    logMsg "broker seems to have stopped"
   fi
 }
 
@@ -752,7 +724,7 @@ function accumulatorStart()
    sleep 1
 
    time=$time+1
-   nc -w 2 $bindIp $port &>/dev/null </dev/null
+   nc -zv $bindIp $port &>/dev/null </dev/null
    port_not_ok=$?
   done
 }
@@ -1041,9 +1013,9 @@ function orionCurl()
 {
   payloadCheckFormat='json'
 
-  dMsg
-  dMsg $(date)
-  dMsg orionCurl $*
+  logMsg
+  logMsg $(date)
+  logMsg orionCurl $*
 
   _host='localhost'
   _port=$CB_PORT
@@ -1159,12 +1131,12 @@ function orionCurl()
     _noPayloadCheck='on'
   fi
 
-  dMsg $_in: $_in
-  dMsg _out: $_out
-  dMsg _outFormat: $_outFormat
-  dMsg _inFormat: $_inFormat
-  dMsg payloadCheckFormat: $payloadCheckFormat
-  dMsg _noPayloadCheck: $_noPayloadCheck
+  logMsg $_in: $_in
+  logMsg _out: $_out
+  logMsg _outFormat: $_outFormat
+  logMsg _inFormat: $_inFormat
+  logMsg payloadCheckFormat: $payloadCheckFormat
+  logMsg _noPayloadCheck: $_noPayloadCheck
 
 
   #
@@ -1187,13 +1159,13 @@ function orionCurl()
 
   command=${command}' --header "Expect:"'
   command=${command}' -s -S --dump-header /tmp/httpHeaders.out'
-  dMsg command: $command
+  logMsg command: $command
 
 
   #
   # Execute the command
   #
-  dMsg Executing the curl-command
+  logMsg Executing the curl-command
   eval $command > /tmp/orionCurl.response 2> /dev/null
   _response=$(cat /tmp/orionCurl.response)
 
@@ -1226,11 +1198,11 @@ function orionCurl()
   else
     if [ "$_response" != "" ]
     then
-      dMsg buffer to $payloadCheckFormat beautify: $_response
+      logMsg buffer to $payloadCheckFormat beautify: $_response
 
       if [ "$payloadCheckFormat" == json ] || [ "$payloadCheckFormat" == "" ]
       then
-        vMsg Running python tool for $_response
+        logMsg Running python tool for $_response
         #
         # We need to apply pretty-print on _response. Otherwise positional processing used in .test
         # (e.g. to get SUB_ID typically grep and awk are used) will break
@@ -1238,7 +1210,7 @@ function orionCurl()
         _response=$(echo $_response | python -mjson.tool)
         echo "$_response"
       else
-        dMsg Unknown payloadCheckFormat
+        logMsg Unknown payloadCheckFormat
       fi
     fi
   fi
@@ -1266,8 +1238,7 @@ export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd
 export -f mongoCmd2
-export -f vMsg
-export -f dMsg
+export -f logMsg
 export -f valgrindSleep
 export -f brokerStartAwait
 export -f brokerStopAwait

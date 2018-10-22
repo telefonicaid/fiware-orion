@@ -31,6 +31,7 @@ extern "C"
 #include "kjson/kjRender.h"                                    // kjRender
 }
 
+#include "common/globals.h"                                    // parse8601Time
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionTypes/OrionValueType.h"                         // orion::ValueType
 #include "orionTypes/UpdateActionType.h"                       // ActionType
@@ -587,6 +588,18 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
 
 // -----------------------------------------------------------------------------
 //
+// geojsonCheck - FIXME
+//
+static bool geojsonCheck(char* geoJsonString, char** detailsP)
+{
+  *detailsP = (char*) "not implemented";
+  return false;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // attributeTreat - NO
 //
 // We will need more than one function;
@@ -625,9 +638,10 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
   // ADVANTAGE:
   //   Just a simple integer comparison before we do the complete string-comparisom
   //
-  bool isProperty     = false;
-  bool isGeoProperty  = false;
-  bool isRelationship = false;
+  bool isProperty         = false;
+  bool isGeoProperty      = false;
+  bool isTemporalProperty = false;
+  bool isRelationship     = false;
 
   while (nodeP != NULL)
   {
@@ -650,6 +664,11 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       {
         isProperty    = true;
         isGeoProperty = true;
+      }
+      else if (SCOMPARE17(nodeP->value.s, 'T', 'e', 'm', 'p', 'o', 'r', 'a', 'l', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
+      {
+        isProperty         = true;
+        isTemporalProperty = false;
       }
       else
       {
@@ -720,6 +739,11 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
         LM_E(("'value' missing for GeoProperty '%s'", kNodeP->name));
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "geo-property attribute without 'value' field", kNodeP->name, OrionldDetailsAttribute);
       }
+      else if (isTemporalProperty == true)
+      {
+        LM_E(("'value' missing for TemporalProperty '%s'", kNodeP->name));
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "temporal-property attribute without 'value' field", kNodeP->name, OrionldDetailsAttribute);
+      }
       else
       {
         LM_E(("'value' missing for Property '%s'", kNodeP->name));
@@ -729,21 +753,58 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       return false;
     }
 
-    LM_TMP(("---- Getting value: valueP at %p, type is %s", valueP, kjValueType(valueP->type)));
-    switch (valueP->type)
+    //
+    // Get the value, and check for correct value for Geo/Temporal Attributes
+    //
+    if (isGeoProperty == true)
     {
-    case KjBoolean:    caP->valueType = orion::ValueTypeBoolean; caP->boolValue      = valueP->value.b; break;
-    case KjInt:        caP->valueType = orion::ValueTypeNumber;  caP->numberValue    = valueP->value.i; break;
-    case KjFloat:      caP->valueType = orion::ValueTypeNumber;  caP->numberValue    = valueP->value.f; break;
-    case KjString:     caP->valueType = orion::ValueTypeString;  caP->stringValue    = valueP->value.s; break;
-    case KjObject:     caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(ciP, valueP, NULL); break;
-    case KjArray:      caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(ciP, valueP, NULL);  break;
-    case KjNull:       caP->valueType = orion::ValueTypeNull;    break;
-    case KjNone:
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal error", "Invalid type from kjson", OrionldDetailsString);
-      return false;
+      char* details;
+
+      if (valueP->type != KjString)
+      {
+        LM_E(("GeoProperty Attribute with non-string value"));
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "geo-property attribute must have a value of type JSON String", kNodeP->name, OrionldDetailsAttribute);
+        return false;
+      }
+      else if (geojsonCheck(valueP->value.s, &details) == false)
+      {
+        LM_E(("GeoProperty Attribute with invalid Geo-value"));
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "geo-property attribute must have a valid GeoJson value", kNodeP->name, OrionldDetailsAttribute);
+        return false;
+      }
     }
-    LM_TMP(("---- After getting value"));
+    else if (isTemporalProperty == true)
+    {
+      if (valueP->type != KjString)
+      {
+        LM_E(("TemporalProperty Attribute with non-string value"));
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "temporal-property attribute must have a value of type JSON String", kNodeP->name, OrionldDetailsAttribute);
+        return false;
+      }
+      else if (parse8601Time(valueP->value.s) == -1)
+      {
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "temporal-property attribute must have a valid ISO8601 as value", kNodeP->name, OrionldDetailsAttribute);
+        return false;
+      }
+
+      // FIXME: Change the value type from string to Number, for easier check with filters?
+    }
+    else
+    {
+      switch (valueP->type)
+      {
+      case KjBoolean:    caP->valueType = orion::ValueTypeBoolean; caP->boolValue      = valueP->value.b; break;
+      case KjInt:        caP->valueType = orion::ValueTypeNumber;  caP->numberValue    = valueP->value.i; break;
+      case KjFloat:      caP->valueType = orion::ValueTypeNumber;  caP->numberValue    = valueP->value.f; break;
+      case KjString:     caP->valueType = orion::ValueTypeString;  caP->stringValue    = valueP->value.s; break;
+      case KjObject:     caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(ciP, valueP, NULL); break;
+      case KjArray:      caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(ciP, valueP, NULL);  break;
+      case KjNull:       caP->valueType = orion::ValueTypeNull;    break;
+      case KjNone:
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal error", "Invalid type from kjson", OrionldDetailsString);
+        return false;
+      }
+    }
   }
   else if (isRelationship == true)
   {
