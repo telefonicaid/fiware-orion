@@ -49,6 +49,7 @@ using mongo::BSONArrayBuilder;
 using mongo::BSONObj;
 using mongo::BSONArray;
 using mongo::BSONElement;
+using mongo::BSONNULL;
 using mongo::DBClientCursor;
 using mongo::DBClientBase;
 
@@ -211,14 +212,21 @@ static unsigned int countCmd(const std::string& tenant, const BSONArray& pipelin
   if (result.hasField("cursor"))
   {
     resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
-    return getIntFieldF(resultsArray[0].embeddedObject(), "count");
+    if ((resultsArray.size() > 0) && (resultsArray[0].embeddedObject().hasField("count")))
+    {
+      return getIntFieldF(resultsArray[0].embeddedObject(), "count");
+    }
+    else
+    {
+      LM_E(("Runtime Error (ejecuting: %s, firstBatch does not have a count", cmd.toString().c_str()));
+    }
   }
   else
   {
-    LM_E(("Runtime Error (ejecuting: %s, result hasn't cursor field"));
-    return 0;
+    LM_E(("Runtime Error (ejecuting: %s, result hasn't cursor field", cmd.toString().c_str()));
   }
 
+  return 0;
 }
 
 
@@ -253,12 +261,17 @@ HttpStatusCode mongoEntityTypesValues
    * db.runCommand({aggregate: "entities",
    *                cursor: { batchSize: 1000 },
    *                pipeline: [ {$match: { "_id.servicePath": /.../ } },
-   *                            {$group: {_id: "$_id.type"} },
+   *                (1)         {$project: {_id.type: {$ifNull: ["$_id.type", null]}, "attrNames": 1 } },
+   *                (2)         {$group: {_id: {$cond: [{$in: [$_id.type, [null, ""]]}, "", "$_id.type"]} },
    *                            {$sort: {_id: 1} },
    *                            {$skip: ... },
    *                            {$limit: ... }
    *                          ]
    *                })
+   *
+   * (1) The $ifNull causes that entities without _id.type have _id.type: null (used by (2))
+   *
+   * (2) The $cond used in this $group is to group together entities with empty type ("") and null type
    *
    * Up to Orion 2.0.0 we didn't use $skip and $limit. We got all the results in order to get the count
    * (to be used in fiware-total-count if the user request so). However, support to MongoDB 3.6 with the
@@ -279,18 +292,24 @@ HttpStatusCode mongoEntityTypesValues
    */
 
   BSONObj spQuery = fillQueryServicePath(servicePathV);
+  BSONObj groupCond = BSON("$cond" << BSON_ARRAY(
+                               BSON("$in" << BSON_ARRAY(CS_ID_ENTITY << BSON_ARRAY(BSONNULL << ""))) <<
+                               "" <<
+                               CS_ID_ENTITY));
 
   // FIXME P5: avoid duplicated code in pipeline and pipelineForCount;
   BSONArray pipeline = BSON_ARRAY(
     BSON("$match" << BSON(C_ID_SERVICEPATH << spQuery)) <<
-    BSON("$group" << BSON("_id" << CS_ID_ENTITY)) <<
+    BSON("$project" << BSON(C_ID_ENTITY << BSON("$ifNull" << BSON_ARRAY(CS_ID_ENTITY << BSONNULL)) << ENT_ATTRNAMES << 1)) <<
+    BSON("$group" << BSON("_id" << groupCond)) <<
     BSON("$sort"  << BSON("_id" << 1)) <<
     BSON("$skip" << offset) <<
     BSON("$limit" << limit));
 
   BSONArray pipelineForCount = BSON_ARRAY(
     BSON("$match" << BSON(C_ID_SERVICEPATH << spQuery)) <<
-    BSON("$group" << BSON("_id" << CS_ID_ENTITY)) <<
+    BSON("$project" << BSON(C_ID_ENTITY << BSON("$ifNull" << BSON_ARRAY(CS_ID_ENTITY << BSONNULL)) << ENT_ATTRNAMES << 1)) <<
+    BSON("$group" << BSON("_id" << groupCond)) <<
     BSON("$count" << "count"));
 
   BSONObj result;
@@ -306,6 +325,12 @@ HttpStatusCode mongoEntityTypesValues
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
     return SccOk;
+  }
+
+  // Get count if user requested (i.e. if totalTypesP is not NULL)
+  if (totalTypesP != NULL)
+  {
+    *totalTypesP = countCmd(tenant, pipelineForCount);
   }
 
   // Processing result to build response
@@ -324,23 +349,6 @@ HttpStatusCode mongoEntityTypesValues
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
     return SccOk;
-  }
-
-  /* Null and "" (which can appear only in the case of creating entities using NGSIv1) are
-   * collapsed to the same type "". Due to sorting, they appear at the beginning. In case
-   * both of them appear, one has to be removed or the pagination logic would break.
-   */
-  if ((resultsArray.size() > 1) &&
-      (getFieldF(resultsArray[0].embeddedObject(), "_id").isNull()) &&
-      (getStringFieldF(resultsArray[1].embeddedObject(), "_id") == ""))
-  {
-    resultsArray.erase(resultsArray.begin());
-  }
-
-  // Get count if user requested (i.e. if totalTypesP is not NULL)
-  if (totalTypesP != NULL)
-  {
-    *totalTypesP = countCmd(tenant, pipelineForCount);
   }
 
   for (unsigned int ix = 0; ix < resultsArray.size(); ++ix)
@@ -399,24 +407,28 @@ HttpStatusCode mongoEntityTypes
    * db.runCommand({aggregate: "entities",
    *                cursor: { batchSize: 1000 },
    *                pipeline: [ {$match: { "_id.servicePath": /.../ } },
-   *                            {$project: {_id: 1, "attrNames": 1} },
+   *                (1)         {$project: {_id.type: {$ifNull: ["$_id.type", null]}, "attrNames": 1 } },
    *                            {$project: { "attrNames"
-   *                                  {$cond: [ {$eq: [ "$attrNames", [ ] ] }, [null], "$attrNames"] }
+   *                (2)               {$cond: [ {$eq: [ "$attrNames", [ ] ] }, [null], "$attrNames"] }
    *                               }
    *                            },
    *                            {$unwind: "$attrNames"},
-   *                            {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrNames"}} },
+   *                (3)         {$group: {_id: {$cond: [{$in: [$_id.type, [null, ""]]}, "", "$_id.type"]},
+   *                                      attrs: {$addToSet: "$attrNames"}},
    *                            {$sort: {_id: 1} },
    *                            {$skip: ... },
    *                            {$limit: ... },
    *                          ]
    *                })
    *
-   * The $cond part is hard... more information at
-   *   http://stackoverflow.com/questions/27510143/empty-array-prevents-document-to-appear-in-query
+   * (1) The $ifNull causes that entities without _id.type have _id.type: null (used by (3))
    *
-   * As a consequence, some "null" values may appear in the resulting attrs vector,
-   * which are pruned by the result processing logic.
+   * (2) This $cond part is hard... more information at
+   *     http://stackoverflow.com/questions/27510143/empty-array-prevents-document-to-appear-in-query
+   *     As a consequence, some "null" values may appear in the resulting attrs vector,
+   *     which are pruned by the result processing logic.
+   *
+   * (3) The $cond used in this $group is to group together entities with empty type ("") and null type
    *
    * FIXME P6: in the future, we can interpret the collapse parameter at this layer.
    *           If collapse=true so we don't need attributes, the
@@ -444,26 +456,29 @@ HttpStatusCode mongoEntityTypes
   // Building the projection part of the query that includes types that have no attributes
   // See bug: https://github.com/telefonicaid/fiware-orion/issues/686
   //
-  BSONArrayBuilder  emptyArrayBuilder;
-  BSONArrayBuilder  nulledArrayBuilder;
 
-  nulledArrayBuilder.appendNull();
-
-  // We are using the $cond: [ .. ] and not the $cond: { .. } one, as the former is the only one valid in MongoDB 2.4
+  // FIXME P3. We are using the $cond: [ .. ] and not the $cond: { .. } one, due to the former was
+  // the only one valid in MongoDB 2.4. However, MongoDB 2.4 support was removed time ago, so we could
+  // change the syntax
   BSONObj projection = BSON(
     "$project" << BSON(
       ENT_ATTRNAMES << BSON(
         "$cond" << BSON_ARRAY(
-          BSON("$eq" << BSON_ARRAY(S_ATTRNAMES << emptyArrayBuilder.arr()) ) <<
-          nulledArrayBuilder.arr() <<
+          BSON("$eq" << BSON_ARRAY(S_ATTRNAMES << BSONArray() )) <<
+          BSON_ARRAY(BSONNULL) <<
           S_ATTRNAMES))));
+
+  BSONObj groupCond = BSON("$cond" << BSON_ARRAY(
+                               BSON("$in" << BSON_ARRAY(CS_ID_ENTITY << BSON_ARRAY(BSONNULL << ""))) <<
+                               "" <<
+                               CS_ID_ENTITY));
 
   // FIXME P5: avoid duplicated code in pipeline and pipelineForCount;
   BSONArray pipeline = BSON_ARRAY(
     BSON("$match" << BSON(C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
-    BSON("$project" << BSON("_id" << 1 << ENT_ATTRNAMES << 1)) <<
+    BSON("$project" << BSON(C_ID_ENTITY << BSON("$ifNull" << BSON_ARRAY(CS_ID_ENTITY << BSONNULL)) << ENT_ATTRNAMES << 1)) <<
          projection << BSON("$unwind" << S_ATTRNAMES) <<
-    BSON("$group" << BSON("_id"   << CS_ID_ENTITY <<
+    BSON("$group" << BSON("_id"   << groupCond <<
                           "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
     BSON("$sort" << BSON("_id" << 1)) <<
     BSON("$skip" << offset) <<
@@ -471,9 +486,9 @@ HttpStatusCode mongoEntityTypes
 
   BSONArray pipelineForCount = BSON_ARRAY(
     BSON("$match" << BSON(C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
-    BSON("$project" << BSON("_id" << 1 << ENT_ATTRNAMES << 1)) <<
+    BSON("$project" << BSON("_id.type" << BSON("$ifNull" << BSON_ARRAY(CS_ID_ENTITY << BSONNULL)) << ENT_ATTRNAMES << 1)) <<
          projection << BSON("$unwind" << S_ATTRNAMES) <<
-    BSON("$group" << BSON("_id"   << CS_ID_ENTITY <<
+    BSON("$group" << BSON("_id"   << groupCond <<
                           "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
     BSON("$count" << "count"));
 
@@ -489,6 +504,12 @@ HttpStatusCode mongoEntityTypes
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
     return SccOk;
+  }
+
+  // Get count if user requested (i.e. if totalTypesP is not NULL)
+  if (totalTypesP != NULL)
+  {
+    *totalTypesP = countCmd(tenant, pipelineForCount);
   }
 
   // Processing result to build response
@@ -509,48 +530,15 @@ HttpStatusCode mongoEntityTypes
     return SccOk;
   }
 
-  /* emptyEntityType is special: it must aggregate results for entity type "" and for entities without type.
-   * Is pre-created before starting processing results and destroyed if at the end it has not been used
-   * (i.e. pushed back into the vector)
-   *
-   */
-
-  EntityType* emptyEntityType     = new EntityType("");
-  bool        emptyEntityTypeUsed = false;
-
-  // Get count if user requested (i.e. if totalTypesP is not NULL)
-  if (totalTypesP != NULL)
-  {
-    *totalTypesP = countCmd(tenant, pipelineForCount);
-  }
-
   for (unsigned int ix = 0; ix < resultsArray.size(); ++ix)
   {
     BSONObj                   resultItem  = resultsArray[ix].embeddedObject();
     std::vector<BSONElement>  attrsArray  = getFieldF(resultItem, "attrs").Array();
     EntityType*               entityType;
 
-    //
-    // nullId true means that the "cumulative" entityType for both no-type and type "" has to be used. This happens
-    // when the results item has the field "" and at the same time the value of that field is JSON null or when
-    // the value of the field "_id" is ""
-    //
-    bool nullId = ((resultItem.hasField("")) && (getFieldF(resultItem, "").isNull())) ||
-                  getFieldF(resultItem, "_id").isNull()                               ||
-                  (getStringFieldF(resultItem, "_id") == "");
+    entityType = new EntityType(getStringFieldF(resultItem, "_id"));
 
-    if (nullId)
-    {
-      entityType           = emptyEntityType;
-      emptyEntityTypeUsed  = true;
-    }
-    else
-    {
-      entityType = new EntityType(getStringFieldF(resultItem, "_id"));
-    }
-
-    /* Note we use += due to emptyEntityType accumulates */
-    entityType->count += countEntities(tenant, servicePathV, entityType->type);
+    entityType->count = countEntities(tenant, servicePathV, entityType->type);
 
     if (!attrsArray[0].isNull())
     {
@@ -594,20 +582,8 @@ HttpStatusCode mongoEntityTypes
         }
       }
     }
-    // entityType corresponding to nullId case is skipped, as it is (eventually) added outside the for loop
-    if (!nullId)
-    {
-      responseP->entityTypeVector.push_back(entityType);
-    }
-  }
 
-  if (emptyEntityTypeUsed)
-  {
-    responseP->entityTypeVector.push_back(emptyEntityType);
-  }
-  else
-  {
-    delete emptyEntityType;
+    responseP->entityTypeVector.push_back(entityType);
   }
 
   char detailsMsg[256];
@@ -686,16 +662,26 @@ HttpStatusCode mongoAttributesForEntityType
    * db.runCommand({aggregate: "entities",
    *                cursor: { batchSize: 1000 },
    *                pipeline: [ {$match: { "_id.type": "TYPE" , "_id.servicePath": /.../ } },
-   *                            {$project: {_id: 1, "attrNames": 1} },
+   *                (1)         {$project: {_id.type: {$ifNull: ["$_id.type", null]}, "attrNames": 1 } },
    *                            {$unwind: "$attrNames"},
-   *                            {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrNames"}} },
+   *                (2)         {$group: {_id: {$cond: [{$in: [$_id.type, [null, ""]]}, "", "$_id.type"]},
+   *                                      attrs: {$addToSet: "$attrNames"}},
    *                            {$unwind: "$attrs"},
    *                            {$group: {_id: "$attrs" }},
    *                            {$sort: {_id: 1}}
    *                          ]
    *                })
    *
+   * (1) The $ifNull causes that entities without _id.type have _id.type: null (used by (2))
+   *
+   * (2) The $cond used in this $group is to group together entities with empty type ("") and null type
+   *
    */
+
+  BSONObj groupCond = BSON("$cond" << BSON_ARRAY(
+                               BSON("$in" << BSON_ARRAY(CS_ID_ENTITY << BSON_ARRAY(BSONNULL << ""))) <<
+                               "" <<
+                               CS_ID_ENTITY));
 
   BSONObj result;
   BSONObj cmd =
@@ -704,9 +690,9 @@ HttpStatusCode mongoAttributesForEntityType
          "pipeline" << BSON_ARRAY(
            BSON("$match" << BSON(C_ID_ENTITY << entityType <<
                                  C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
-           BSON("$project" << BSON("_id" << 1 << ENT_ATTRNAMES << 1)) <<
+           BSON("$project" << BSON(C_ID_ENTITY << BSON("$ifNull" << BSON_ARRAY(CS_ID_ENTITY << BSONNULL)) << ENT_ATTRNAMES << 1)) <<
            BSON("$unwind" << S_ATTRNAMES) <<
-           BSON("$group" << BSON("_id" << CS_ID_ENTITY << "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
+           BSON("$group" << BSON("_id" << groupCond << "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
            BSON("$unwind" << "$attrs") <<
            BSON("$group" << BSON("_id" << "$attrs")) <<
            BSON("$sort" << BSON("_id" << 1))));
