@@ -522,9 +522,20 @@ HttpStatusCode mongoEntityTypes
     resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
   }
 
+  // Early return if no element was found
   if (resultsArray.size() == 0)
   {
-    responseP->statusCode.fill(SccContextElementNotFound);
+    if (totalTypesP != NULL)
+    {
+      char detailsMsg[256];
+      snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %u. Offset is %u", *totalTypesP, offset);
+      responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
+    }
+    else
+    {
+      responseP->statusCode.fill(SccContextElementNotFound);
+    }
+
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
     return SccOk;
@@ -586,31 +597,15 @@ HttpStatusCode mongoEntityTypes
     responseP->entityTypeVector.push_back(entityType);
   }
 
-  char detailsMsg[256];
-
-  if (responseP->entityTypeVector.size() > 0)
+  if (totalTypesP != NULL)
   {
-    if (totalTypesP != NULL)
-    {
-      snprintf(detailsMsg, sizeof(detailsMsg), "Count: %d", (int) resultsArray.size());
-      responseP->statusCode.fill(SccOk, detailsMsg);
-    }
-    else
-    {
-      responseP->statusCode.fill(SccOk);
-    }
+    char detailsMsg[256];
+    snprintf(detailsMsg, sizeof(detailsMsg), "Count: %u", *totalTypesP);
+    responseP->statusCode.fill(SccOk, detailsMsg);
   }
   else
   {
-    if (totalTypesP != NULL)
-    {
-      snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %zu. Offset is %u", resultsArray.size(), offset);
-      responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
-    }
-    else
-    {
-      responseP->statusCode.fill(SccContextElementNotFound);
-    }
+    responseP->statusCode.fill(SccOk);
   }
 
   reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
