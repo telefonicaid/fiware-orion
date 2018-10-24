@@ -93,7 +93,7 @@ using orion::CompoundValueNode;
 */
 static bool isNotCustomMetadata(std::string md)
 {
-  if ((md != NGSI_MD_ID) && (md != NGSI_MD_LOCATION))
+  if (md != NGSI_MD_ID)
   {
     return false;
   }
@@ -1987,13 +1987,13 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
     caRes->metadataVector.push_back(md);
   }
 
-  if ((caReq->getLocation().length() > 0) && (caReq->type != GEO_POINT))
-  {
-    /* Note that if attribute type is geo:point then the user is using the "new way"
-     * of locating entities in NGSIv1, thus location metadata is not rendered */
-    md = new Metadata(NGSI_MD_LOCATION, "string", caReq->getLocation());
-    caRes->metadataVector.push_back(md);
-  }
+//  if ((caReq->getLocation().length() > 0) && (caReq->type != GEO_POINT))
+//  {
+//    /* Note that if attribute type is geo:point then the user is using the "new way"
+//     * of locating entities in NGSIv1, thus location metadata is not rendered */
+//    md = new Metadata(NGSI_MD_LOCATION, "string", caReq->getLocation());
+//    caRes->metadataVector.push_back(md);
+//  }
 
   /* Custom (just "mirroring" in the response) */
   for (unsigned int ix = 0; ix < caReq->metadataVector.size(); ++ix)
