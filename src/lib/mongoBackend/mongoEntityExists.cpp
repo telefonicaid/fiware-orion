@@ -56,44 +56,33 @@ bool mongoEntityExists(const char* entityId, const char* tenant)
 {
   BSONObjBuilder bob;
 
-  LM_TMP(("entityId: %s", entityId));
   bob.append("_id." ENT_ENTITY_ID, entityId);
-  LM_TMP(("Here"));
   
   /* Do the query on MongoDB */
-  LM_TMP(("Here"));
   std::auto_ptr<DBClientCursor>  cursor;
-  LM_TMP(("Here"));
   BSONObj                        query = bob.obj();
-  LM_TMP(("Here"));
+
   TIME_STAT_MONGO_READ_WAIT_START();
-  LM_TMP(("Here"));
 
   DBClientBase* connection = getMongoConnection();
   std::string   err;
 
-  LM_TMP(("Here"));
   if (collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err) == false)
   {
-  LM_TMP(("Here"));
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     return false;    
   }
 
-  LM_TMP(("Here"));
   unsigned int docs = 0;
 
   while (moreSafe(cursor))
   {
-  LM_TMP(("Here"));
     BSONObj  bo;
 
     try
     {
-  LM_TMP(("Here"));
       bo = cursor->nextSafe();
-  LM_TMP(("Here"));
       ++docs;
     }
     catch (...)
@@ -101,9 +90,7 @@ bool mongoEntityExists(const char* entityId, const char* tenant)
     }
   }
 
-  LM_TMP(("Here"));
   releaseMongoConnection(connection);
-  LM_TMP(("Here"));
 
   return (docs == 0)? false : true;
 }

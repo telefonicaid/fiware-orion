@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTLISTPRESENT_H_
+#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTLISTPRESENT_H_
 
 /*
 *
@@ -25,15 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"                             // ConnectionInfo
-#include "orionld/context/OrionldContext.h"                  // OrionldContextType
+#include "orionld/context/OrionldContext.h"
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldContextAdd -
+// orionldContextListPresent -
 //
-extern OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, OrionldContextType contextType, char** detailsP);
+extern void orionldContextListPresent(void);
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTLISTPRESENT_H_

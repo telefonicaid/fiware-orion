@@ -37,40 +37,13 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponse
 #include "orionld/common/urlParse.h"                           // urlParse
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
-#include "orionld/context/orionldContextList.h"                // orionldContextHead, orionldContextTail
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
 #include "orionld/context/orionldContextDownloadAndParse.h"    // orionldContextDownloadAndParse
 #include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
 #include "orionld/context/orionldContextCreateFromUrl.h"       // orionldContextCreateFromUrl
 #include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
+#include "orionld/context/orionldContextAppend.h"              // orionldContextAppend
 #include "orionld/context/orionldContextAdd.h"                 // Own interface
-
-
-
-// ----------------------------------------------------------------------------
-//
-// orionldContextAppend -
-//
-static OrionldContext* orionldContextAppend(const char* url, KjNode* tree, OrionldContextType contextType, char** detailsPP)
-{
-  OrionldContext* contextP = orionldContextCreateFromTree(tree, url, contextType, detailsPP);
-
-  if (contextP == NULL)
-    return NULL;
-
-  orionldContextListInsert(contextP);
-
-  //
-  // Presenting the list  (TMP)
-  //
-  LM_TMP(("Current context LIST:"));
-  for (OrionldContext* ctxP = orionldContextHead; ctxP != NULL; ctxP = ctxP->next)
-    LM_TMP(("o %p: %s, tree at %p", ctxP, ctxP->url, ctxP->tree));
-  LM_TMP(("-------------------------------------------------------------------------------------------------------"));
-  LM_TMP((""));
-
-  return contextP;
-}
 
 
 

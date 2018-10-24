@@ -33,6 +33,9 @@ SET (SOURCES
     orionldContextDownloadAndParse.cpp
     orionldCoreContext.cpp
     orionldContextPresent.cpp
+    orionldContextValueLookup.cpp
+    orionldContextAppend.cpp
+    orionldContextListPresent.cpp
 )
 
 # Include directories

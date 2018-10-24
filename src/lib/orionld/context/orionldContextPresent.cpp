@@ -46,7 +46,7 @@ static void allCachedContextsPresent(void)
 
   while (contextP != NULL)
   {
-    orionLdContextPresent(contextP);
+    orionldContextPresent(contextP);
     contextP = contextP->next;
   }
 }
@@ -111,9 +111,9 @@ static void objectContextPresent(OrionldContext* contextP)
 
 // ----------------------------------------------------------------------------
 //
-// orionLdContextPresent -
+// orionldContextPresent -
 //
-void orionLdContextPresent(OrionldContext* contextP)
+void orionldContextPresent(OrionldContext* contextP)
 {
   //
   // Three types of contexts;

@@ -1,0 +1,140 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Test for short Alias in payload
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E1, with test context and an attribute named 'name'
+# 02. Check representation in mongo
+# 03. GET E1, see short name for 'name', not its long name
+#
+
+echo "01. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E1, with test context and an attribute named 'name'"
+echo "======================================================================================================"
+payload='{
+  "id": "http://a.b.c/entity/E1",
+  "type": "T",
+  "name": {
+    "type": "Property",
+    "value": "John 1"
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. Check representation in mongo"
+echo "================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. GET E1, see short name for 'name', not its long name"
+echo "========================================================"
+entityId=http://a.b.c/entity/E1
+orionCurl --url "/ngsi-ld/v1/entities/$entityId?prettyPrint=yes&spaces=2" --noPayloadCheck -H "Accept: application/ld+json"
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E1, with test context and an attribute named 'name'
+======================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+Date: REGEX(.*)
+
+
+
+02. Check representation in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "http://a.b.c/entity/E1",
+		"type" : "http://example.org/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"@context",
+		"http://schema.org/name"
+	],
+	"attrs" : {
+		"@context" : {
+			"type" : "ContextString",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
+			"mdNames" : [ ]
+		},
+		"http://schema=org/name" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "John 1",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. GET E1, see short name for 'name', not its long name
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 200
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+{
+  "id": "http://a.b.c/entity/E1",
+  "type": "T",
+  "name": {
+    "type": "Property",
+    "value": "John 1"
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+}
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

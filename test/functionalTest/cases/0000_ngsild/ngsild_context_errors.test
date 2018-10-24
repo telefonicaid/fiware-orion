@@ -26,7 +26,7 @@ Parse Contexts - all errors
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+brokerStart CB 212-249
 
 --SHELL--
 

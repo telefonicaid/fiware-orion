@@ -1048,7 +1048,7 @@ int main(int argC, char* argV[])
                           NULL);
   }
 
-  // orionLdServiceInitPresent();
+  // orionldServiceInitPresent();
   
   LM_I(("Startup completed"));
   if (simulatedNotification)

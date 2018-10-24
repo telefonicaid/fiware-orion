@@ -26,7 +26,7 @@ Parse Contexts - with parse error in incoming payload
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0
+brokerStart CB 212-249
 
 --SHELL--
 

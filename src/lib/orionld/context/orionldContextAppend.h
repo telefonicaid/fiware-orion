@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTAPPEND_H_
+#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTAPPEND_H_
 
 /*
 *
@@ -25,15 +25,20 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kjson/KjNode.h"                                    // KjNode
+}
+
 #include "rest/ConnectionInfo.h"                             // ConnectionInfo
-#include "orionld/context/OrionldContext.h"                  // OrionldContextType
+#include "orionld/context/OrionldContext.h"                  // OrionldContext
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldContextAdd -
+// orionldContextAppend -
 //
-extern OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, OrionldContextType contextType, char** detailsP);
+extern OrionldContext* orionldContextAppend(const char* url, KjNode* tree, OrionldContextType contextType, char** detailsPP);
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTAPPEND_H_

@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+#ifndef SRC_LIB_ORIONLD_COMMON_HTTPSTATUSCODETOORIONLDERRORTYPE_H_
+#define SRC_LIB_ORIONLD_COMMON_HTTPSTATUSCODETOORIONLDERRORTYPE_H_
 
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,15 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"                             // ConnectionInfo
-#include "orionld/context/OrionldContext.h"                  // OrionldContextType
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldContextAdd -
+// httpStatusCodeToOrionldErrorType
 //
-extern OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, OrionldContextType contextType, char** detailsP);
+extern OrionldResponseErrorType httpStatusCodeToOrionldErrorType(HttpStatusCode sc);
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_HTTPSTATUSCODETOORIONLDERRORTYPE_H_

@@ -35,46 +35,86 @@ extern "C"
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "rest/httpHeaderAdd.h"                                // httpHeaderAdd
 #include "ngsi10/QueryContextResponse.h"                       // QueryContextResponse
+
 #include "orionld/common/orionldErrorResponse.h"               // OrionldResponseErrorType, orionldErrorResponse
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
+#include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
+#include "orionld/context/orionldContextValueLookup.h"         // orionldContextValueLookup
+#include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
+#include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
+#include "orionld/context/orionldContextListPresent.h"         // orionldContextListPresent
+#include "orionld/common/kjTreeCreateFromContextAttribute.h"   // kjTreeCreateFromContextAttribute
+#include "orionld/common/httpStatusCodeToOrionldErrorType.h"   // httpStatusCodeToOrionldErrorType
 #include "orionld/common/kjTreeCreate.h"                       // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// httpStatusCodeToOrionldErrorType
+// orionldContextTreeFromAttribute -
 //
-static OrionldResponseErrorType httpStatusCodeToOrionldErrorType(HttpStatusCode sc)
+// What we have in ContextAttribute::value is what we need as value of "@context" in the Context Tree.
+// We must create the toplevel object and the "@context" member, and give it the value of "ContextAttribute::value".
+// If ContextAttribute::value is a string, then the Context Tree will be simply a string called "@context" with the value of ContextAttribute::value.
+// If ContextAttribute::value is a vector ...
+// If ContextAttribute::value is an object ...
+//
+static KjNode* orionldContextTreeFromAttribute(ConnectionInfo* ciP, ContextAttribute* caP, char** detailsP)
 {
-  switch (sc)
+  KjNode* topNodeP;
+
+  if (caP->valueType == orion::ValueTypeString)
   {
-  case SccNone:                           return OrionldInternalError;
-  case SccOk:                             return OrionldInternalError;  // Should not be here if 200 ...
-  case SccCreated:                        return OrionldInternalError;
-  case SccNoContent:                      return OrionldInternalError;
-  case SccBadRequest:                     return OrionldBadRequestData;
-  case SccForbidden:                      return OrionldOperationNotSupported;
-  case SccContextElementNotFound:         return OrionldResourceNotFound;
-  case SccBadVerb:                        return OrionldInvalidRequest;
-  case SccNotAcceptable:                  return OrionldInvalidRequest;
-  case SccConflict:                       return OrionldAlreadyExists;
-  case SccContentLengthRequired:          return OrionldInvalidRequest;
-  case SccRequestEntityTooLarge:          return OrionldInvalidRequest;
-  case SccUnsupportedMediaType:           return OrionldInvalidRequest;
-  case SccInvalidModification:            return OrionldOperationNotSupported;
-  case SccSubscriptionIdNotFound:         return OrionldResourceNotFound;
-  case SccMissingParameter:               return OrionldBadRequestData;
-  case SccInvalidParameter:               return OrionldBadRequestData;
-  case SccErrorInMetadata:                return OrionldBadRequestData;
-  case SccEntityIdReNotAllowed:           return OrionldBadRequestData;
-  case SccEntityTypeRequired:             return OrionldBadRequestData;
-  case SccAttributeListRequired:          return OrionldInvalidRequest;
-  case SccReceiverInternalError:          return OrionldInternalError;
-  case SccNotImplemented:                 return OrionldOperationNotSupported;
+    LM_TMP(("It's a String!"));
+    topNodeP = kjString(ciP->kjsonP, "@context", caP->stringValue.c_str());
+  }
+  else if (caP->valueType == orion::ValueTypeVector)
+  {
+    LM_TMP(("It's an Array!"));
+    topNodeP = kjArray(ciP->kjsonP, "@context");
+
+    // the vector must be of strings
+    for (unsigned int ix = 0; ix < caP->compoundValueP->childV.size(); ix++)
+    {
+      orion::CompoundValueNode* compoundP = caP->compoundValueP->childV[ix];
+      
+      if (compoundP->valueType != orion::ValueTypeString)
+      {
+        kjFree(topNodeP);
+        *detailsP = (char*) "Array member not a string";
+        return NULL;
+      }
+
+      KjNode* itemNodeP = kjString(ciP->kjsonP, NULL, compoundP->stringValue.c_str());
+      kjChildAdd(topNodeP, itemNodeP);
+      LM_TMP(("Added array item '%s' to context", itemNodeP->value.s));
+    }
+  }
+  else if (caP->valueType == orion::ValueTypeObject)
+  {
+    LM_TMP(("It's an Object!"));
+    topNodeP = kjObject(ciP->kjsonP, "@context");
+
+    // All members must be strings
+    for (unsigned int ix = 0; ix < caP->compoundValueP->childV.size(); ix++)
+    {
+      orion::CompoundValueNode* compoundP = caP->compoundValueP->childV[ix];
+
+      if (compoundP->valueType != orion::ValueTypeString)
+      {
+        kjFree(topNodeP);
+        *detailsP = (char*) "Array member not a string";
+        return NULL;
+      }
+
+      KjNode* itemNodeP = kjString(ciP->kjsonP, compoundP->name.c_str(), compoundP->stringValue.c_str());
+      kjChildAdd(topNodeP, itemNodeP);
+
+      LM_TMP(("Added object member '%s' == '%s' to context", itemNodeP->name, itemNodeP->value.s));
+    }
   }
 
-  return OrionldInternalError;
+  return topNodeP;
 }
 
 
@@ -83,8 +123,23 @@ static OrionldResponseErrorType httpStatusCodeToOrionldErrorType(HttpStatusCode 
 //
 // kjTreeCreateFromQueryContextResponse -
 //
+// PARAMETERS
+//   ciP        - ConnectionInfo, where all info about each request is stored
+//   responseP  - The binary struct that is being converted to a KjNode tree
+//
+// The @context of an entity of "responseP", is the attribute named "@context" inside
+// responseP->contextElementResponseVector[ix]->contextElement.ContextAttributeVector.
+// The value of this context must be used to replace the long names of the items eligible for alias replacement, into their aliases.
+// The context for the entity is found in the context-cache.
+// If not present, it is retreived from the "@context" attribute of the entity and put in the cache
+//
+// Items eligible for alias replacement:
+//  - Entity-Type
+//  - Attr-Name
+//
 KjNode* kjTreeCreateFromQueryContextResponse(ConnectionInfo* ciP, QueryContextResponse* responseP)
 {
+  LM_TMP(("In kjTreeCreateFromQueryContextResponse - later will be calling orionldContextValueLookup"));
   //
   // Error?
   //
@@ -93,9 +148,9 @@ KjNode* kjTreeCreateFromQueryContextResponse(ConnectionInfo* ciP, QueryContextRe
 
   if (responseP->errorCode.code != SccOk)
   {
-    LM_TMP(("Error %d from mongoBackend", responseP->errorCode.code));
+    LM_E(("Error %d from mongoBackend", responseP->errorCode.code));
     OrionldResponseErrorType errorType = httpStatusCodeToOrionldErrorType(responseP->errorCode.code);
-    
+
     orionldErrorResponseCreate(ciP, errorType, responseP->errorCode.reasonPhrase.c_str(), responseP->errorCode.details.c_str(), OrionldDetailsString);
 
     if (responseP->errorCode.code == SccContextElementNotFound)
@@ -104,7 +159,7 @@ KjNode* kjTreeCreateFromQueryContextResponse(ConnectionInfo* ciP, QueryContextRe
     return ciP->responseTree;    
   }
 
-  int hits  = responseP->contextElementResponseVector.size();
+  int hits = responseP->contextElementResponseVector.size();
 
   if (hits == 0)  // No hit
   {
@@ -114,34 +169,120 @@ KjNode* kjTreeCreateFromQueryContextResponse(ConnectionInfo* ciP, QueryContextRe
   else if (hits > 1)  // More than one hit - not possible!
   {
     orionldErrorResponseCreate(ciP, OrionldInternalError, "More than one hit", ciP->wildcard[0], OrionldDetailsEntity);
+    return NULL;
+  }
+
+  //
+  // All good so far, one and only one context element in  the vector, and no errors anywhere
+  // Now we need the @context of the entity, to use for alias replacements
+  // The @context is found in the context-cache.
+  // If this is the first time the context is used, we may need to retrieve the context from the entity and add it to the cache.
+  // If the entity has no context, then all is ok as well.
+  //
+  ContextElement* ceP      = &responseP->contextElementResponseVector[0]->contextElement;
+  char*           eId      = (char*) ceP->entityId.id.c_str();
+  OrionldContext* contextP = orionldContextLookup(ceP->entityId.id.c_str());
+
+  LM_TMP(("Getting the @context for the entity '%s'", eId));
+  
+  if (contextP == NULL)
+  {
+    LM_TMP(("The @context for '%s' was not found in the cache - adding it", eId));
+    ContextAttribute* contextAttributeP = ceP->contextAttributeVector.lookup("@context");
+
+    if (contextAttributeP != NULL)
+    {
+      //
+      // Now we need to convert the ContextAttribute "@context" into a OrionldContext
+      //
+      // Let's compare a Context Tree with the ContextAttribute "@context"
+      //
+      // Context Tree:
+      //   ----------------------------------------------
+      //   {
+      //     "@context": {} | [] | ""
+      //   }
+      //
+      // ContextAttribute:
+      //   ----------------------------------------------
+      //   "@context": {
+      //     "type": "xxx",
+      //     "value": {} | [] | ""
+      //
+      // What we have in ContextAttribute::value is what we need as value of "@context" in the Context Tree.
+      // We must create the toplevel object and the "@context" member, and give it the value of "ContextAttribute::value".
+      // If ContextAttribute::value is a string, then the Context Tree will be simply a string called "@context" with the value of ContextAttribute::value.
+      // If ContextAttribute::value is a vector ...
+      // If ContextAttribute::value is an object ...
+      // The function orionldContextTreeFromAttribute does just this
+      //
+
+      LM_TMP(("Found an attribute called context @context for entity '%s'", eId));
+      char*    details;
+      LM_TMP(("Creating a KjNode tree for the @context attribute"));
+      KjNode*  contextTree = orionldContextTreeFromAttribute(ciP, contextAttributeP, &details);
+
+      if (contextTree == NULL)
+      {
+        LM_E(("Unable to create context tree for @context attribute of entity '%s': %s", eId, details));
+        orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create context tree for @context attribute", details, OrionldDetailsEntity);
+        return NULL;
+      }
+      LM_TMP(("Created a KjNode tree for the @context attribute. Now creating a orionldContext for the tree"));
+
+      contextP = orionldContextCreateFromTree(contextTree, eId, OrionldUserContext, &details);
+      if (contextP == NULL)
+      {
+        LM_E(("Unable to create context from tree: %s", details));
+        orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create context from tree", details, OrionldDetailsEntity);
+        return NULL;
+      }
+
+      LM_TMP(("Inserting the new context in the context-cache"));
+      orionldContextListInsert(contextP);
+      orionldContextListPresent();
+    }
   }
 
 
-  KjNode*           top = kjObject(NULL, NULL);
-  ContextElement*   ceP = &responseP->contextElementResponseVector[0]->contextElement;
-  KjNode*           nodeP;
-
   //
+  // Time to create the KjNode tree
+  //
+  KjNode*  top = kjObject(NULL, NULL);
+  KjNode*  nodeP;
+  
   // id
-  //
   nodeP = kjString(ciP->kjsonP, "id", ceP->entityId.id.c_str());
+  // FIXME: uridecode nodeP->value.s
   kjChildAdd(top, nodeP);
 
 
-  //
   // type
-  //
   if (ceP->entityId.type != "")
   {
-    nodeP = kjString(ciP->kjsonP, "type", ceP->entityId.type.c_str());
+    LM_TMP(("Calling orionldContextValueLookup for %s", ceP->entityId.type.c_str()));
+    KjNode* aliasNodeP = orionldContextValueLookup(contextP, ceP->entityId.type.c_str());
+
+    if (aliasNodeP != NULL)
+    {
+      LM_TMP(("Found the alias: '%s' => '%s'", ceP->entityId.type.c_str(), aliasNodeP->name));
+      nodeP = kjString(ciP->kjsonP, "type", aliasNodeP->name);
+    }
+    else
+    {
+      LM_TMP(("No alias found, keeping long name '%s'", ceP->entityId.type.c_str()));
+      nodeP = kjString(ciP->kjsonP, "type", ceP->entityId.type.c_str());
+    }
+
     kjChildAdd(top, nodeP);
   }
-
+  else
+    LM_TMP(("NOT Calling orionldContextValueLookup for entity Type as it is EMPTY!!!"));
 
   //
   // Attributes, including @context
   //
-  ContextAttribute* contextP = NULL;
+  ContextAttribute* contextAttrP = NULL;
 
   for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); aIx++)
   {
@@ -149,11 +290,20 @@ KjNode* kjTreeCreateFromQueryContextResponse(ConnectionInfo* ciP, QueryContextRe
     
     if (strcmp(aP->name.c_str(), "@context") == 0)
     {
-      contextP = aP;
+      contextAttrP = aP;
       continue;
     }
 
-    KjNode* aTop = kjObject(ciP->kjsonP, aP->name.c_str());
+    //
+    // Lookup alias for the Attribute Name
+    //
+    KjNode* aliasNodeP = orionldContextValueLookup(contextP, aP->name.c_str());
+    KjNode* aTop;
+    
+    if (aliasNodeP != NULL)
+      aTop = kjObject(ciP->kjsonP, aliasNodeP->name);
+    else
+      aTop = kjObject(ciP->kjsonP, aP->name.c_str());
 
     // type
     if (aP->type != "")
@@ -210,11 +360,11 @@ KjNode* kjTreeCreateFromQueryContextResponse(ConnectionInfo* ciP, QueryContextRe
     LM_TMP(("KZ: ciP->outMimeType = JSONLD"));
   }
 
-  
+
   //
   // If no context inside attribute list, then the default context has been used
   //
-  if (contextP == NULL)
+  if (contextAttrP == NULL)
   {
     nodeP = kjString(ciP->kjsonP, "@context", orionldCoreContext.url);
 
@@ -231,9 +381,9 @@ KjNode* kjTreeCreateFromQueryContextResponse(ConnectionInfo* ciP, QueryContextRe
   {
     if (ciP->httpHeaders.acceptJsonld == false)
     {
-      if (contextP->valueType == orion::ValueTypeString)
+      if (contextAttrP->valueType == orion::ValueTypeString)
       {
-        httpHeaderAdd(ciP, "Link", contextP->stringValue.c_str());
+        httpHeaderAdd(ciP, "Link", contextAttrP->stringValue.c_str());
       }
       else
       {
@@ -242,10 +392,10 @@ KjNode* kjTreeCreateFromQueryContextResponse(ConnectionInfo* ciP, QueryContextRe
     }
     else
     {
-      switch (contextP->valueType)
+      switch (contextAttrP->valueType)
       {
       case orion::ValueTypeString:
-        nodeP = kjString(ciP->kjsonP, "@context", contextP->stringValue.c_str());
+        nodeP = kjString(ciP->kjsonP, "@context", contextAttrP->stringValue.c_str());
         kjChildAdd(top, nodeP);
         break;
 
@@ -253,9 +403,9 @@ KjNode* kjTreeCreateFromQueryContextResponse(ConnectionInfo* ciP, QueryContextRe
         nodeP = kjArray(ciP->kjsonP, "@context");
         kjChildAdd(top, nodeP);
 
-        for (unsigned int ix = 0; ix < contextP->compoundValueP->childV.size(); ix++)
+        for (unsigned int ix = 0; ix < contextAttrP->compoundValueP->childV.size(); ix++)
         {
-          orion::CompoundValueNode*  compoundP     = contextP->compoundValueP->childV[ix];
+          orion::CompoundValueNode*  compoundP     = contextAttrP->compoundValueP->childV[ix];
           KjNode*                    contextItemP  = kjString(ciP->kjsonP, NULL, compoundP->stringValue.c_str());
           kjChildAdd(nodeP, contextItemP);
         }

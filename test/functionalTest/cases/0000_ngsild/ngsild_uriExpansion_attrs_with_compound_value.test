@@ -26,7 +26,7 @@ Parse Contexts - URI Expansion for attributes with compound values
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB
+brokerStart CB 212-249
 
 --SHELL--
 

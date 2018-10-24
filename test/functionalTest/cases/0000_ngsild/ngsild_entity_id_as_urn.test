@@ -26,7 +26,7 @@ Entity Type as a URN
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB
+brokerStart CB 212-249
 
 --SHELL--
 

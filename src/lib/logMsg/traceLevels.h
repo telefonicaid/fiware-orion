@@ -165,6 +165,7 @@ typedef enum TraceLevels
   LmtContextDownload,
   LmtContextLookup,
   LmtContextItemLookup,
+  LmtContextValueLookup,
   LmtContextPresent,
 #endif
 

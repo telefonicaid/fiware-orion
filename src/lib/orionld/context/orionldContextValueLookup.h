@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTVALUELOOKUP_H_
+#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTVALUELOOKUP_H_
 
 /*
 *
@@ -25,15 +25,36 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"                             // ConnectionInfo
-#include "orionld/context/OrionldContext.h"                  // OrionldContextType
+extern "C"
+{
+#include "kjson/KjNode.h"                               // KjNode
+}
+
+#include "orionld/context/OrionldContext.h"
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldContextAdd -
+// orionldContextValueLookup -
 //
-extern OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, OrionldContextType contextType, char** detailsP);
+extern KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value);
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldContextValueLookup -
+//
+extern KjNode* orionldContextValueLookup(char* contextUrl, const char* value);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldContextValueLookup -
+//
+extern KjNode* orionldContextValueLookup(KjNode* contextVector, const char* value);
+
+
+#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTVALUELOOKUP_H_

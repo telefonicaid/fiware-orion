@@ -27,6 +27,9 @@ SET (SOURCES
     urlCheck.cpp
     urnCheck.cpp
     kjTreeCreate.cpp
+    kjTreeCreateFromContextAttribute.cpp
+    kjTreeCreateFromCompoundValue.cpp
+    httpStatusCodeToOrionldErrorType.cpp
 )
 
 # Include directories

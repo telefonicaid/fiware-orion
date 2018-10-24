@@ -31,7 +31,7 @@
 
 // ----------------------------------------------------------------------------
 //
-// orionLdContextList
+// orionldContextHead/Tail
 //
 extern OrionldContext* orionldContextHead;
 extern OrionldContext* orionldContextTail;

@@ -33,43 +33,22 @@ extern "C"
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
 #include "orionld/context/orionldContextList.h"                // orionldContextHead
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
-#include "orionld/context/orionldContextItemLookup.h"          // Own interface
+#include "orionld/context/orionldContextValueLookup.h"         // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextItemLookup -
+// orionldContextValueLookup -
 //
-// If the context 'contextP' comes from the payload, then it can be:
-// - A JSON String, naming another Context
-// - A JSON Vector of JSON Strings, naming a group of contexts
-// - A JSON Object, being an inline context (not supported right now)
-//
-// If instead it is a downloaded context, then the context 'contextP'  must always be:
-//   - A JSON Object
-//   - With ONE and only ONE child
-//   - The child must be named '@context'
-//   - The '@context' child can be;
-//     - A JSON Array of JSON Strings, naming other contexts
-//     - A JSON String, naming another Context
-//     - A JSON Object, with key-value pairs (this is the 'final' context where the info resides)
-//
-// This function is called from:
-//   o serviceRoutines - with an "entity context" as first parameter
-//   o orionldContextItemLookup, recursively, with ...
-//
-KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
+KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value)
 {
-  LM_TMP(("contextP at %p", contextP));
   if (contextP == NULL)
     return NULL;
 
-  LM_TMP(("context URL: %s", contextP->url));
-  LM_TMP(("contextP->tree at %p", contextP->tree));
   if (contextP->tree->type == KjString)
   {
-    LM_T(LmtContextItemLookup, ("The context is of type String - must lookup a new context"));
+    LM_T(LmtContextValueLookup, ("The context is of type String - must lookup a new context"));
 
     // Lookup the context
     OrionldContext* dereferencedContextP = orionldContextLookup(contextP->tree->value.s);
@@ -79,13 +58,13 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
       return NULL;  // Or: download it?
     }
 
-    // Lookup the item
-    LM_T(LmtContextItemLookup, ("Now we can search for '%s' (in context '%s'", itemName, dereferencedContextP->url));
-    return orionldContextItemLookup(dereferencedContextP, itemName);
+    // Lookup the value
+    LM_T(LmtContextValueLookup, ("Now we can search for '%s' (in context '%s'", value, dereferencedContextP->url));
+    return orionldContextValueLookup(dereferencedContextP, value);
   }
   else if (contextP->tree->type == KjArray)
   {
-    LM_T(LmtContextItemLookup, ("The context is of type Array"));
+    LM_T(LmtContextValueLookup, ("The context is of type Array"));
 
     for (KjNode* contextNodeP = contextP->tree->children; contextNodeP != NULL; contextNodeP = contextNodeP->next)
     {
@@ -103,13 +82,13 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
         continue;   // Or: download it?
       }
 
-      // Lookup the item
-      LM_T(LmtContextItemLookup, ("Now we can search for '%s' in context '%s'", itemName, dereferencedContextP->url));
-      KjNode* kNodeP = orionldContextItemLookup(dereferencedContextP, itemName);
+      // Lookup the value
+      LM_T(LmtContextValueLookup, ("Now we can search for '%s' in context '%s'", value, dereferencedContextP->url));
+      KjNode* kNodeP = orionldContextValueLookup(dereferencedContextP, value);
 
       if (kNodeP != NULL)
       {
-        LM_T(LmtContextItemLookup, ("Found '%s' in context '%s'", itemName, dereferencedContextP->url));
+        LM_T(LmtContextValueLookup, ("Found '%s' in context '%s'", value, dereferencedContextP->url));
         return kNodeP;
       }
     }
@@ -125,25 +104,25 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
     // Now, either we have an inline context, with many key-values, or
     // the object has a single member "@context".
     //
-    LM_T(LmtContextItemLookup, ("Looking up '%s' in the %s context '%s'", itemName, kjValueType(contextP->tree->type), contextP->url));
+    LM_T(LmtContextValueLookup, ("Looking up '%s' in the %s context '%s'", value, kjValueType(contextP->tree->type), contextP->url));
 
     if (contextP->tree->children == NULL)
     {
-      LM_E(("Context tree is a JSON object, but, it has no children!"));
+      LM_E(("ERROR: Context tree is a JSON object, but, it has no children!"));
       return NULL;
     }
-#if 0    
+
     if (contextP->tree->children->next != NULL)
     {
-      LM_E(("Context tree is a JSON object, but, it has more than one child! (%s)", contextP->url));
+      LM_E(("ERROR: Context tree is a JSON object, but, it has more than one child! (%s)", contextP->url));
       return NULL;
     }
+
     if (strcmp(contextP->tree->children->name, "@context") != 0)
     {
       LM_E(("Context tree is a JSON object, and it has exactly one child, but its name must be '@context', not '%s'", contextP->tree->children->name));
       return NULL;
     }
-#endif
   }
   else
   {
@@ -151,35 +130,19 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
     return NULL;
   }
 
-
   //
   // If we reach this point, the context is a JSON Object
   //
   KjNode*  atContextP    = contextP->tree->children;
 
-  LM_T(LmtContextItemLookup, ("@atcontext is of type '%s'", kjValueType(atContextP->type)));
+  LM_T(LmtContextValueLookup, ("@atcontext is of type '%s'", kjValueType(atContextP->type)));
 
-  //
-  // About contextP->tree->children->children:
-  //
-  // If a KjObject, the payload looks like this:
-  // {
-  //   "@context": {
-  //     "xxx"; "http://...",
-  //     ...
-  //   }
-  // }
-  //
-  // Now, the tree (contextP->tree) points at the start of the payload (the very first '{')
-  // It's first (and only) child is "@context", whose first child is "xxx".
-  // Thus, contextP->tree->children->children references "xxx".
-  //
-  // The "xxx" child has siblings following the next pointer until reaching NULL
-  //
   if (atContextP->type == KjObject)
   {
+    LM_TMP(("Here"));
     for (KjNode* contextItemP = atContextP->children; contextItemP != NULL; contextItemP = contextItemP->next)
     {
+      LM_TMP(("Here"));
       if ((contextItemP->type != KjString) && (contextItemP->type !=  KjObject))
       {
         LM_E(("Invalid @context - items of contexts must be JSON Strings or jSOn objects - not %s", kjValueType(contextItemP->type)));
@@ -189,19 +152,42 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
       //
       // Skip members whose value is a string that starts with "@" - they are information, not translations
       //
+      LM_TMP(("Here"));
       if ((contextItemP->type == KjString) && (contextItemP->value.s[0] == '@'))
       {
-        LM_T(LmtContextItemLookup, ("Skipping '%s' with value '%s'", contextItemP->name, contextItemP->value.s));
+        LM_T(LmtContextValueLookup, ("Skipping '%s' with value '%s'", contextItemP->name, contextItemP->value.s));
         continue;
       }
 
-      // LM_T(LmtContextItemLookup, ("looking for '%s', comparing with '%s'", itemName, contextItemP->name));
-      if (strcmp(contextItemP->name, itemName) == 0)
+      LM_TMP(("Here"));
+      LM_T(LmtContextValueLookup, ("looking for '%s', comparing with '%s'", value, contextItemP->name));
+      LM_TMP(("Here"));
+      LM_TMP(("contextItemP at %p", contextItemP));
+      LM_TMP(("Here"));
+      LM_TMP(("contextItemP->value.s: '%s'", contextItemP->value.s));
+      LM_TMP(("Here"));
+      LM_TMP(("value: '%s'", value));
+      LM_TMP(("Here"));
+
+      if (contextItemP->type == KjObject)
       {
-        LM_T(LmtContextItemLookup, ("found it!"));
-        return contextItemP;
+        // Lookup item "@id" inside contextItemP that is a JSON object
       }
+      else if (contextItemP->type == KjString)
+      {
+        if (strcmp(contextItemP->value.s, value) == 0)
+        {
+          LM_T(LmtContextValueLookup, ("found it!"));
+          return contextItemP;
+        }
+      }
+      else
+      {
+        // error
+      }
+      LM_TMP(("Here"));
     }
+    LM_TMP(("Here"));
   }
   else if (atContextP->type == KjArray)
   {
@@ -213,41 +199,40 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
         return NULL;
       }
 
-      KjNode* nodeP = orionldContextItemLookup(contextP->value.s, itemName);
+      KjNode* nodeP = orionldContextValueLookup(contextP->value.s, value);
 
       if (nodeP != NULL)
         return nodeP;
     }
   }
   
-  LM_T(LmtContextItemLookup, ("found no expansion: returning NULL :("));
+  LM_T(LmtContextValueLookup, ("found no expansion: returning NULL :("));
   return NULL;
 }
 
 
 
-
 // -----------------------------------------------------------------------------
 //
-// orionldContextItemLookup -
+// orionldContextValueLookup -
 //
-KjNode* orionldContextItemLookup(char* contextUrl, const char* itemName)
+KjNode* orionldContextValueLookup(char* contextUrl, const char* value)
 {
   OrionldContext* contextP = orionldContextLookup(contextUrl);
 
   if (contextP == NULL)
     return NULL;
 
-  return orionldContextItemLookup(contextP, itemName);
+  return orionldContextValueLookup(contextP, value);
 }
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextItemLookup -
+// orionldContextValueLookup -
 //
-KjNode* orionldContextItemLookup(KjNode* contextVector, const char* itemName)
+KjNode* orionldContextValueLookup(KjNode* contextVector, const char* value)
 {
   if (contextVector->type != KjArray)
   {
@@ -265,7 +250,7 @@ KjNode* orionldContextItemLookup(KjNode* contextVector, const char* itemName)
     if (contextP == NULL)
       return NULL;
 
-    itemP = orionldContextItemLookup(contextP, itemName);
+    itemP = orionldContextValueLookup(contextP, value);
     if (itemP != NULL)
       return itemP;
 

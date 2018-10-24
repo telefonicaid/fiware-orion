@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+#ifndef SRC_LIB_ORIONLD_COMMON_KJTREECREATEFROMCOMPOUNDVALUE_H_
+#define SRC_LIB_ORIONLD_COMMON_KJTREECREATEFROMCOMPOUNDVALUE_H_
 
 /*
 *
@@ -25,15 +25,20 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"                             // ConnectionInfo
-#include "orionld/context/OrionldContext.h"                  // OrionldContextType
+extern "C"
+{
+#include "kjson/KjNode.h"                                      // KjNode
+}
+
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "parse/CompoundValueNode.h"                           // CompoundValueNode
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldContextAdd -
+// kjTreeCreateFromCompoundValue -
 //
-extern OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, OrionldContextType contextType, char** detailsP);
+extern KjNode* kjTreeCreateFromCompoundValue(ConnectionInfo* ciP, orion::CompoundValueNode* compoundP, char** detailsP);
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_KJTREECREATEFROMCOMPOUNDVALUE_H_

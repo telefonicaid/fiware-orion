@@ -31,7 +31,7 @@
 
 // ----------------------------------------------------------------------------
 //
-// orionLdContextList
+// orionldContextHead/Tail
 //
 OrionldContext* orionldContextHead = NULL;
 OrionldContext* orionldContextTail = NULL;

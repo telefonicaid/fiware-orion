@@ -1,8 +1,6 @@
 #ifndef HTTP_STATUS_CODE_H
 #define HTTP_STATUS_CODE_H
 
-#include <string>
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -27,6 +25,9 @@
 *
 * Author: developer
 */
+#include <string>
+
+
 
 /* ****************************************************************************
 *
