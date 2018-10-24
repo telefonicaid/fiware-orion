@@ -26,7 +26,7 @@ Notifications of different sizes
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0-255
-accumulatorStart --pretty-print -v
+accumulatorStart --pretty-print
 
 #
 # Taking into account that the notification size depends on (but is not exactly equal to)

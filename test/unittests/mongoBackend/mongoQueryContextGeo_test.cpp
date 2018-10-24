@@ -89,7 +89,7 @@ static void prepareDatabase(void)
                    "attrNames" << BSON_ARRAY("pos" << "foo") <<
                    "attrs" << BSON(
                      "pos" << BSON("type" << "location" << "value" << "2, 3" << "md" <<
-                              BSON("location" << BSON( "type" << "string" << "value" << "WGS84"))) <<
+                              BSON("location" << BSON("type" << "string" << "value" << "WGS84"))) <<
                      "foo" << BSON("type" << "string" << "value" << "attr_A")) <<
                    "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(3.0 << 2.0)));
 
@@ -97,7 +97,7 @@ static void prepareDatabase(void)
                    "attrNames" << BSON_ARRAY("pos" << "foo") <<
                    "attrs" << BSON(
                      "pos" << BSON("type" << "location" << "value" << "5, 5" << "md" <<
-                              BSON("location" << BSON( "type" << "string" << "value" << "WGS84"))) <<
+                              BSON("location" << BSON("type" << "string" << "value" << "WGS84"))) <<
                      "foo" << BSON("type" << "string" << "value" << "attr_B")) <<
                    "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(5.0 << 5.0)));
 
@@ -105,7 +105,7 @@ static void prepareDatabase(void)
                    "attrNames" << BSON_ARRAY("pos" << "foo") <<
                    "attrs" << BSON(
                      "pos" << BSON("type" << "location" << "value" << "4, 7" << "md" <<
-                              BSON("location" << BSON( "type" << "string" << "value" << "WGS84"))) <<
+                              BSON("location" << BSON("type" << "string" << "value" << "WGS84"))) <<
                      "foo" << BSON("type" << "string" << "value" << "attr_C")) <<
                    "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(7.0 << 4.0)));
 
@@ -121,7 +121,7 @@ static void prepareDatabase(void)
                        "attrNames" << BSON_ARRAY("pos" << "foo") <<
                        "attrs" << BSON(
                          "pos" << BSON("type" << "location" << "value" << "40.418889, -3.691944" << "md" <<
-                              BSON("location" << BSON( "type" << "string" << "value" << "WGS84"))) <<
+                              BSON("location" << BSON("type" << "string" << "value" << "WGS84"))) <<
                          "foo" << BSON("type" << "string" << "value" << "attr_Mad")) <<
                        "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.691944 << 40.418889)));
 
@@ -129,7 +129,7 @@ static void prepareDatabase(void)
                        "attrNames" << BSON_ARRAY("pos" << "foo") <<
                        "attrs" << BSON(
                          "pos" << BSON("type" << "location" << "value" << "40.533333, -3.633333" << "md" <<
-                              BSON("location" << BSON( "type" << "string" << "value" << "WGS84"))) <<
+                              BSON("location" << BSON("type" << "string" << "value" << "WGS84"))) <<
                          "foo" << BSON("type" << "string" << "value" << "attr_Alc")) <<
                        "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.633333 << 40.533333)));
 
@@ -137,7 +137,7 @@ static void prepareDatabase(void)
                        "attrNames" << BSON_ARRAY("pos" << "foo") <<
                        "attrs" << BSON(
                          "pos" << BSON("type" << "location" << "value" << "40.316667, -3.75" << "md" <<
-                              BSON("location" << BSON( "type" << "string" << "value" << "WGS84"))) <<
+                              BSON("location" << BSON("type" << "string" << "value" << "WGS84"))) <<
                          "foo" << BSON("type" << "string" << "value" << "attr_Leg")) <<
                        "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.75 << 40.316667)));
 

@@ -101,13 +101,12 @@ echo
 
 --REGEXPECT--
 01. Create E1 with NGSIV2
-===================
+=========================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
-
 
 
 
@@ -120,23 +119,20 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "type": "T",
-    "isPattern": "false",
-    "id": "E2",
     "contextResponses": [
         {
             "attributes": [
                 {
-                    "name": "A",
-                    "type": "whatever",
-                    "value": "",
                     "metadatas": [
                         {
                             "name": "location",
                             "type": "string",
                             "value": "WGS84"
                         }
-                    ]
+                    ], 
+                    "name": "A", 
+                    "type": "whatever", 
+                    "value": ""
                 }
             ],
             "statusCode": {
@@ -144,7 +140,10 @@ Date: REGEX(.*)
                 "reasonPhrase": "OK"
             }
         }
-    ]
+    ],
+    "id": "E2", 
+    "isPattern": "false", 
+    "type": "T"
 }
 
 
@@ -158,35 +157,34 @@ Date: REGEX(.*)
 
 [
     {
-        "id": "E1",
-        "type": "T",
         "A": {
-            "type": "whatever",
-            "value": "40, -3",
             "metadata": {
                 "location": {
                     "type": "string",
                     "value": "WGS84"
                 }
-            }
-        }
+            },
+            "type": "whatever",
+            "value": "40, -3"
+        },
+        "id": "E1", 
+        "type": "T"
     },
     {
-        "id": "E2",
-        "type": "T",
         "A": {
-            "type": "whatever",
-            "value": "39,-2",
             "metadata": {
                 "location": {
                     "type": "string",
                     "value": "WGS84"
                 }
-            }
-        }
+            },
+            "type": "whatever",
+            "value": "39,-2"
+        },
+        "id": "E2", 
+        "type": "T"
     }
 ]
-
 
 
 04. Get E1 and E2 with NGSIV1
@@ -201,23 +199,23 @@ Date: REGEX(.*)
     "contextResponses": [
         {
             "contextElement": {
-                "type": "T",
-                "isPattern": "false",
-                "id": "E1",
                 "attributes": [
                     {
-                        "name": "A",
-                        "type": "whatever",
-                        "value": "40, -3",
                         "metadatas": [
                             {
                                 "name": "location",
                                 "type": "string",
                                 "value": "WGS84"
                             }
-                        ]
+                        ],
+                        "name": "A",
+                        "type": "whatever",
+                        "value": "40, -3"
                     }
-                ]
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T"
             },
             "statusCode": {
                 "code": "200",
@@ -226,23 +224,23 @@ Date: REGEX(.*)
         },
         {
             "contextElement": {
-                "type": "T",
-                "isPattern": "false",
-                "id": "E2",
                 "attributes": [
                     {
-                        "name": "A",
-                        "type": "whatever",
-                        "value": "39,-2",
                         "metadatas": [
                             {
                                 "name": "location",
                                 "type": "string",
                                 "value": "WGS84"
                             }
-                        ]
+                        ],
+                        "name": "A",
+                        "type": "whatever",
+                        "value": "39,-2"
                     }
-                ]
+                ], 
+                "id": "E2", 
+                "isPattern": "false", 
+                "type": "T"
             },
             "statusCode": {
                 "code": "200",
