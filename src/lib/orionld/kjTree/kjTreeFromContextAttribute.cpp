@@ -40,8 +40,8 @@ extern "C"
 #include "orionld/context/orionldContextValueLookup.h"         // orionldContextValueLookup
 #include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
 #include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
-#include "orionld/common/kjTreeCreateFromCompoundValue.h"      // kjTreeCreateFromCompoundValue
-#include "orionld/common/kjTreeCreateFromContextAttribute.h"   // Own interface
+#include "orionld/kjTree/kjTreeFromCompoundValue.h"            // kjTreeFromCompoundValue
+#include "orionld/kjTree/kjTreeFromContextAttribute.h"         // Own interface
 
 
 
@@ -60,9 +60,9 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeCreateFromContextAttribute -
+// kjTreeFromContextAttribute -
 //
-KjNode* kjTreeCreateFromContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP, char** detailsP)
+KjNode* kjTreeFromContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP, char** detailsP)
 {
   KjNode* aTopNodeP = kjObject(ciP->kjsonP, caP->name.c_str());  // Top node for the attribute
 
@@ -119,7 +119,7 @@ KjNode* kjTreeCreateFromContextAttribute(ConnectionInfo* ciP, ContextAttribute* 
 
   case orion::ValueTypeVector:
   case orion::ValueTypeObject:
-    nodeP = kjTreeCreateFromCompoundValue(ciP, caP->compoundValueP, detailsP);
+    nodeP = kjTreeFromCompoundValue(ciP, caP->compoundValueP, detailsP);
     if (nodeP == NULL)
       return NULL;
     kjChildAdd(aTopNodeP, nodeP);

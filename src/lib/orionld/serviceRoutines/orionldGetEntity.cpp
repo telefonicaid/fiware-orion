@@ -31,7 +31,7 @@
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
 #include "orionld/context/orionldContextAdd.h"                 // Add a context to the context list
-#include "orionld/common/kjTreeCreate.h"                       // kjTreeCreateFromQueryContextResponse
+#include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/serviceRoutines/orionldGetEntity.h"          // Own Interface
 
@@ -77,7 +77,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
   //
   LM_TMP(("response.contextElementResponseVector.size: %d", response.contextElementResponseVector.size()));
   
-  ciP->responseTree = kjTreeCreateFromQueryContextResponse(ciP, &response);
+  ciP->responseTree = kjTreeFromQueryContextResponse(ciP, &response);
   if (ciP->responseTree == NULL)
   {
     ciP->httpStatusCode = SccContextElementNotFound;

@@ -21,12 +21,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    orionldRequestSend.cpp
-    orionldErrorResponse.cpp
-    urlParse.cpp
-    urlCheck.cpp
-    urnCheck.cpp
-    httpStatusCodeToOrionldErrorType.cpp
+    kjTreeFromQueryContextResponse.cpp
+    kjTreeFromContextAttribute.cpp
+    kjTreeFromCompoundValue.cpp
 )
 
 # Include directories
@@ -36,4 +33,4 @@ include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 
 # Library declaration
 # -----------------------------------------------------------------
-ADD_LIBRARY(orionld_common STATIC ${SOURCES})
+ADD_LIBRARY(orionld_kjTree STATIC ${SOURCES})

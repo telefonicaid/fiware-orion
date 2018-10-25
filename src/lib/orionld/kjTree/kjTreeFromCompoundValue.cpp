@@ -30,15 +30,15 @@ extern "C"
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "parse/CompoundValueNode.h"                           // CompoundValueNode
-#include "orionld/common/kjTreeCreateFromCompoundValue.h"      // Own interface
+#include "orionld/kjTree/kjTreeFromCompoundValue.h"            // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeCreateFromCompoundValue2
+// kjTreeFromCompoundValue2
 //
-static KjNode* kjTreeCreateFromCompoundValue2(ConnectionInfo* ciP, KjNode* parentP, orion::CompoundValueNode* compoundP, char** detailsP)
+static KjNode* kjTreeFromCompoundValue2(ConnectionInfo* ciP, KjNode* parentP, orion::CompoundValueNode* compoundP, char** detailsP)
 {
   KjNode*       nodeP = NULL;
   char*         name  = (char*) compoundP->name.c_str();
@@ -76,7 +76,7 @@ static KjNode* kjTreeCreateFromCompoundValue2(ConnectionInfo* ciP, KjNode* paren
     size = compoundP->childV.size();
     for (unsigned int ix = 0; ix < size; ++ix)
     {
-      KjNode* itemP = kjTreeCreateFromCompoundValue2(ciP, nodeP,  compoundP->childV[ix], detailsP);
+      KjNode* itemP = kjTreeFromCompoundValue2(ciP, nodeP,  compoundP->childV[ix], detailsP);
 
       if (itemP == NULL)
         return NULL;
@@ -101,9 +101,9 @@ static KjNode* kjTreeCreateFromCompoundValue2(ConnectionInfo* ciP, KjNode* paren
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeCreateFromCompoundValue -
+// kjTreeFromCompoundValue -
 //
-KjNode* kjTreeCreateFromCompoundValue(ConnectionInfo* ciP, orion::CompoundValueNode* compoundP, char** detailsP)
+KjNode* kjTreeFromCompoundValue(ConnectionInfo* ciP, orion::CompoundValueNode* compoundP, char** detailsP)
 {
   KjNode* topNodeP;
 
@@ -126,7 +126,7 @@ KjNode* kjTreeCreateFromCompoundValue(ConnectionInfo* ciP, orion::CompoundValueN
   unsigned int size = compoundP->childV.size();
   for (unsigned int ix = 0; ix < size; ++ix)
   {
-    KjNode* nodeP = kjTreeCreateFromCompoundValue2(ciP, topNodeP, compoundP->childV[ix], detailsP);
+    KjNode* nodeP = kjTreeFromCompoundValue2(ciP, topNodeP, compoundP->childV[ix], detailsP);
     if (nodeP == NULL)
     {
       kjFree(topNodeP);

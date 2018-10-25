@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_KJTREECREATEFROMCONTEXTATTRIBUTE_H_
-#define SRC_LIB_ORIONLD_COMMON_KJTREECREATEFROMCONTEXTATTRIBUTE_H_
+#ifndef SRC_LIB_ORIONLD_COMMON_KJTREEFROMCOMPOUNDVALUE_H_
+#define SRC_LIB_ORIONLD_COMMON_KJTREEFROMCOMPOUNDVALUE_H_
 
 /*
 *
@@ -31,14 +31,14 @@ extern "C"
 }
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "ngsi/ContextAttribute.h"                             // ContextAttribute
+#include "parse/CompoundValueNode.h"                           // CompoundValueNode
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeCreateFromContextAttribute -
+// kjTreeFromCompoundValue -
 //
-extern KjNode* kjTreeCreateFromContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP, char** detailsP);
+extern KjNode* kjTreeFromCompoundValue(ConnectionInfo* ciP, orion::CompoundValueNode* compoundP, char** detailsP);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_KJTREECREATEFROMCONTEXTATTRIBUTE_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_KJTREEFROMCOMPOUNDVALUE_H_

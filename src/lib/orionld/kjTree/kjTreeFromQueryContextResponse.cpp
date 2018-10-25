@@ -43,9 +43,9 @@ extern "C"
 #include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
 #include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
 #include "orionld/context/orionldContextListPresent.h"         // orionldContextListPresent
-#include "orionld/common/kjTreeCreateFromContextAttribute.h"   // kjTreeCreateFromContextAttribute
 #include "orionld/common/httpStatusCodeToOrionldErrorType.h"   // httpStatusCodeToOrionldErrorType
-#include "orionld/common/kjTreeCreate.h"                       // Own interface
+#include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
+#include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // Own interface
 
 
 
@@ -126,7 +126,7 @@ static KjNode* orionldContextTreeFromAttribute(ConnectionInfo* ciP, ContextAttri
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeCreateFromQueryContextResponse -
+// kjTreeFromQueryContextResponse -
 //
 // PARAMETERS
 //   ciP        - ConnectionInfo, where all info about each request is stored
@@ -142,9 +142,9 @@ static KjNode* orionldContextTreeFromAttribute(ConnectionInfo* ciP, ContextAttri
 //  - Entity-Type
 //  - Attr-Name
 //
-KjNode* kjTreeCreateFromQueryContextResponse(ConnectionInfo* ciP, QueryContextResponse* responseP)
+KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, QueryContextResponse* responseP)
 {
-  LM_TMP(("In kjTreeCreateFromQueryContextResponse - later will be calling orionldContextValueLookup"));
+  LM_TMP(("In kjTreeFromQueryContextResponse - later will be calling orionldContextValueLookup"));
   //
   // Error?
   //

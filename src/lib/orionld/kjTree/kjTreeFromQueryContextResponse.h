@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMOM_KJTREECREATE_H_
-#define SRC_LIB_ORIONLD_COMOM_KJTREECREATE_H_
+#ifndef SRC_LIB_ORIONLD_COMOM_KJTREEFROMQUERYCONTEXTRESPONSE_H_
+#define SRC_LIB_ORIONLD_COMOM_KJTREEFROMQUERYCONTEXTRESPONSE_H_
 
 /*
 *
@@ -31,8 +31,8 @@
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeCreateFromQueryContextResponse -
+// kjTreeFromQueryContextResponse -
 //
-extern KjNode* kjTreeCreateFromQueryContextResponse(ConnectionInfo* ciP, QueryContextResponse* responseP);
+extern KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, QueryContextResponse* responseP);
 
-#endif  // SRC_LIB_ORIONLD_COMOM_KJTREECREATE_H_
+#endif  // SRC_LIB_ORIONLD_COMOM_KJTREEFROMQUERYCONTEXTRESPONSE_H_
