@@ -39,7 +39,6 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"            // orionldErrorResponseCreate
 #include "orionld/common/urlCheck.h"                        // urlCheck
 #include "orionld/common/SCOMPARE.h"                        // SCOMPARE
-#include "orionld/serviceRoutines/orionldBadVerb.h"         // orionldBadVerb
 #include "orionld/rest/orionldServiceInit.h"                // orionldRestServiceV
 #include "orionld/rest/orionldServiceLookup.h"              // orionldServiceLookup
 #include "orionld/context/orionldContextCreateFromUrl.h"    // orionldContextCreateFromUrl
@@ -203,11 +202,15 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
     if (ciP->serviceP == NULL)
     {
-      // FIXME: Can this happen?  BadVerb service routine?
-      orionldBadVerb(ciP);
+      // FIXME: Implement orionldBadVerb, looking at all verbs etc ...
+
+      // For now, we just return a "Not Found"
+      orionldErrorResponseCreate(ciP, OrionldInvalidRequest, "Service Not Found", ciP->urlPath, OrionldDetailsString);
+      ciP->httpStatusCode = (HttpStatusCode) 404;
+      error = true;
     }
 
-    if (ciP->payload != NULL)
+    if ((error == false) && (ciP->payload != NULL))
     {
       LM_T(LmtPayloadParse, ("parsing the payload '%s'", ciP->payload));
 
@@ -226,20 +229,19 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     // Checking for @context in HTTP Header
     //
-    if (ciP->httpHeaders.link != "")
+    if ((error == false) && (ciP->httpHeaders.link != ""))
     {
       if (urlCheck((char*) ciP->httpHeaders.link.c_str(), &details) == false)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Link HTTP Header must be a valid URL", details, OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;
-        return false;  // FIXME: Can I return here? What about rendering resuly and calling restReply (end of this function) ?
+        error = true;
       }
-
-      if ((ciP->contextP = orionldContextCreateFromUrl(ciP, ciP->httpHeaders.link.c_str(), OrionldUserContext, &details)) == NULL)
+      else if ((ciP->contextP = orionldContextCreateFromUrl(ciP, ciP->httpHeaders.link.c_str(), OrionldUserContext, &details)) == NULL)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Failure to create context from URL", details, OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;
-        return false;  // FIXME: Can I return here?
+        error = true;
       }
     }
     else

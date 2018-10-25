@@ -39,6 +39,7 @@ SET (SOURCES
     orionldPatchSubscription.cpp
     orionldPatchRegistration.cpp
     orionldBadVerb.cpp
+    orionldGetContext.cpp
 )
 
 # Include directories
