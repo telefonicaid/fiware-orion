@@ -177,6 +177,7 @@ SET (ORION_LIBS
     orionld_kjTree
     orionld_context
     orionld_common
+    orionld_context
     jsonParse
     jsonParseV2
     rest          # this is repeated for linking str2Verb from parseSubscription@parseSubscription.cpp.o;

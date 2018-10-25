@@ -26,7 +26,10 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "mongoBackend/mongoQueryContext.h"                    // mongoQueryContext
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
+#include "orionld/kjTree/kjTreeFromContextContextAttribute.h"  // kjTreeFromContextContextAttribute
 #include "orionld/serviceRoutines/orionldGetContext.h"         // Own Interface
 
 
@@ -37,11 +40,70 @@
 //
 bool orionldGetContext(ConnectionInfo* ciP)
 {
-  LM_T(LmtServiceRoutine, ("In orionldGetContext"));
+  LM_T(LmtServiceRoutine, ("In orionldGetContext - looking up context '%s'", ciP->wildcard[0]));
 
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - GET /ngsi-ld/ex/v1/context/*", ciP->wildcard[0], OrionldDetailsString);
+  OrionldContext* contextP    = orionldContextLookup(ciP->wildcard[0]);
+  KjNode*         contextTree = NULL;
 
-  ciP->httpStatusCode = SccNotImplemented;
+  if (contextP != NULL)
+  {
+    contextTree = contextP->tree;
+  }
+  else
+  {
+    // OK, might be an entity context then ...
+    
+    QueryContextRequest   request;
+    EntityId              entityId(ciP->wildcard[0], "", "false", false);
+    QueryContextResponse  response;
+
+    request.entityIdVector.push_back(&entityId);
+
+    LM_TMP(("Calling mongoQueryContext"));
+    ciP->httpStatusCode = mongoQueryContext(&request,
+                                            &response,
+                                            ciP->tenant,
+                                            ciP->servicePathV,
+                                            ciP->uriParam,
+                                            ciP->uriParamOptions,
+                                            NULL,
+                                            ciP->apiVersion);
+    LM_TMP(("Back from mongoQueryContext. httpStatusCode == %d", ciP->httpStatusCode));
+    
+    if (response.errorCode.code == SccBadRequest)
+    {
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Bad Request", NULL, OrionldDetailsString);
+      return false;
+    }
+    else if (response.contextElementResponseVector.size() > 0)
+    {
+      LM_TMP(("Looking up '@context' attribute"));
+      ContextAttribute* contextAttributeP = response.contextElementResponseVector[0]->contextElement.contextAttributeVector.lookup("@context");
+
+      if (contextAttributeP != NULL)
+      {
+        char* details;
+
+        LM_TMP(("Found '@context' attribute"));
+
+        contextTree = kjTreeFromContextContextAttribute(ciP, contextAttributeP, &details);
+        if (contextTree != NULL)
+          LM_TMP(("Got a responseTree for the @context :-)"));
+        else
+          LM_TMP(("No responseTree for the @context :-("));
+      }
+    }
+    
+    if (contextTree == NULL)
+    {
+      LM_TMP(("context '%s' not found", ciP->wildcard[0]));
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Context Not Found", ciP->wildcard[0], OrionldDetailsString);
+      ciP->httpStatusCode = SccContextElementNotFound;
+      return false;
+    }
+  }
+
+  ciP->responseTree = contextTree;
 
   return true;
 }

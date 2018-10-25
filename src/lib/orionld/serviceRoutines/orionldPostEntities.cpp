@@ -33,6 +33,7 @@ extern "C"
 
 #include "common/globals.h"                                    // parse8601Time
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "rest/rest.h"                                         // restPortGet
 #include "orionTypes/OrionValueType.h"                         // orion::ValueType
 #include "orionTypes/UpdateActionType.h"                       // ActionType
 #include "parse/CompoundValueNode.h"                           // CompoundValueNode
@@ -42,6 +43,7 @@ extern "C"
 #include "mongoBackend/mongoEntityExists.h"                    // mongoEntityExists
 #include "mongoBackend/mongoUpdateContext.h"                   // mongoUpdateContext
 
+#include "orionld/rest/orionldServiceInit.h"                   // orionldHostName, orionldHostNameLen
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/urlCheck.h"                           // urlCheck
@@ -850,7 +852,8 @@ static bool contextTreat
 (
   ConnectionInfo*  ciP,
   KjNode*          contextNodeP,
-  ContextElement*  ceP
+  ContextElement*  ceP,
+  char*            entityId
 )
 {
   LM_TMP(("contextNodeP at %p", contextNodeP));
@@ -896,7 +899,7 @@ static bool contextTreat
   //      }
   //    }
   //
-  LM_T(LmtContextTreat, ("Got a @context, of type %s", kjValueType(contextNodeP->type)));
+  LM_T(LmtContextTreat, ("Got @context for '%s', type %s", entityId, kjValueType(contextNodeP->type)));
 
   if (contextNodeP->type == KjString)
   {
@@ -915,22 +918,32 @@ static bool contextTreat
   else if (contextNodeP->type == KjArray)
   {
     char* details;
-
-    // FIXME: When orionld is able to serve contexts, a real URL must be used here
+    
     //
     // REMEMBER
     //   This context is just the array of context-strings: [ "url1", "url2" ]
-    //   Thr individual contezts ("url1", "url2") are treated a few lines down
+    //   The individual contexts ("url1", "url2") are treated a few lines down
     //
-    LM_TMP(("Calling orionldContextCreateFromTree"));
-    ciP->contextP = orionldContextCreateFromTree(contextNodeP, "http://FIXME.array.context.needs/url", OrionldUserContext, &details);
+    // contextUrl = "http://" host + ":" + port + "/ngsi-ld/ex/v1/contexts/" + entity.id;
+    //
+    int   linkPathLen = 7 + orionldHostNameLen + 1 + 5 + 27 + strlen(entityId) + 1;
+    char* linkPath    = (char*) malloc(linkPathLen);
+
+    if (linkPath == NULL)
+    {
+      LM_E(("out of memory creating Link HTTP Header"));
+      orionldErrorResponseCreate(ciP, OrionldInternalError, "cannot create Link HTTP Header", "out of memory", OrionldDetailsString);
+      return false;
+    }
+    sprintf(linkPath, "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", orionldHostName, restPortGet(), entityId);
+
+    ciP->contextP = orionldContextCreateFromTree(contextNodeP, linkPath, OrionldUserContext, &details);
     if (ciP->contextP == NULL)
     {
       LM_E(("Failed to create context from Tree : %s", details));
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from tree", details, OrionldDetailsString);
       return false;
     }
-    LM_TMP(("orionldContextCreateFromTree OK"));
 
     //
     // The context containing a vector of X context strings (URLs) must be freed
@@ -938,20 +951,18 @@ static bool contextTreat
     //
     ciP->contextToBeFreed = true;
 
-    LM_T(LmtContextTreat, ("The context is a VECTOR OF STRINGS"));
     for (KjNode* contextStringNodeP = contextNodeP->children; contextStringNodeP != NULL; contextStringNodeP = contextStringNodeP->next)
     {
       if (contextStringNodeP->type != KjString)
       {
         LM_E(("Context Array Item is not a JSON String, but of type '%s'", kjValueType(contextStringNodeP->type)));
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Context Array Item is not a JSON String", NULL, OrionldDetailsString);
-        LM_T(LmtContextTreat, ("returning FALSE"));
         return false;
       }
 
       if (contextItemNodeTreat(ciP, contextStringNodeP->value.s) == NULL)
       {
-        LM_T(LmtContextTreat, ("contextItemNodeTreat failed"));
+        LM_E(("contextItemNodeTreat failed"));
         // Error payload set by contextItemNodeTreat
         return false;
       }
@@ -1053,20 +1064,18 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
   mongoRequest.contextElementVector.push_back(ceP);
   entityIdP = &mongoRequest.contextElementVector[0]->entityId;
-
   mongoRequest.updateActionType = ActionTypeAppend;
 
   //
   // First treat the @context, if none, use the default context
   // contextTreat needs cpP to push the '@context' attribute to the ContextElement.
   //
-  if ((contextNodeP != NULL) && (contextTreat(ciP, contextNodeP, ceP) == false))
+  if ((contextNodeP != NULL) && (contextTreat(ciP, contextNodeP, ceP, idNodeP->value.s) == false))
   {
     // Error payload set by contextTreat
     mongoRequest.release();
     return false;
   }
-  
 
   // Treat the entire payload
   for (kNodeP = ciP->requestTree->children; kNodeP != NULL; kNodeP = kNodeP->next)

@@ -27,7 +27,6 @@
 
 #include "orionld/context/orionldContextList.h"                // orionldContextHead, orionldContextTail
 #include "orionld/context/orionldContextListInsert.h"          // Own Interface
-#include "orionld/context/orionldContextListPresent.h"         // orionldContextListPresent
 
 
 
@@ -49,6 +48,4 @@ void orionldContextListInsert(OrionldContext* contextP)
     orionldContextTail->next = contextP;
     orionldContextTail       = contextP;
   }
-
-  orionldContextListPresent();
 }

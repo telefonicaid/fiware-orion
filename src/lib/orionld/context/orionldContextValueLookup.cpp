@@ -205,7 +205,13 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value)
         return nodeP;
     }
   }
-  
+  else if (atContextP->type == KjString)
+  {
+    KjNode* nodeP = orionldContextValueLookup(atContextP->value.s, value);
+    if (nodeP != NULL)
+      return nodeP;
+  }
+
   LM_T(LmtContextValueLookup, ("found no expansion: returning NULL :("));
   return NULL;
 }

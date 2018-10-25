@@ -41,7 +41,7 @@ extern "C"
 //
 // orionldContextListPresent -
 //
-void orionldContextListPresent(void)
+void orionldContextListPresent(ConnectionInfo* ciP)
 {
   int contexts = 0;
 
@@ -55,7 +55,7 @@ void orionldContextListPresent(void)
   for (OrionldContext* contextP = orionldContextHead; contextP != NULL; contextP = contextP->next)
   {
     LM_TMP(("=================== %s ======================", contextP->url));
-    orionldContextPresent(contextP);
+    orionldContextPresent(ciP, contextP);
     LM_TMP(("==============================================================="));
     LM_TMP((""));
   }

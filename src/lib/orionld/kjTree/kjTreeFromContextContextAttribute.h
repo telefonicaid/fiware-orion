@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTLISTPRESENT_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTLISTPRESENT_H_
+#ifndef SRC_LIB_ORIONLD_COMMON_KJTREEFROMCONTEXTCONTEXTATTRIBUTE_H_
+#define SRC_LIB_ORIONLD_COMMON_KJTREEFROMCONTEXTCONTEXTATTRIBUTE_H_
 
 /*
 *
@@ -25,15 +25,20 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
-#include "orionld/context/OrionldContext.h"
+extern "C"
+{
+#include "kjson/KjNode.h"                                      // KjNode
+}
+
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "ngsi/ContextAttribute.h"                             // ContextAttribute
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldContextListPresent -
+// kjTreeFromContextContextAttribute -
 //
-extern void orionldContextListPresent(ConnectionInfo* ciP);
+extern KjNode* kjTreeFromContextContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP, char** detailsP);
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTLISTPRESENT_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_KJTREEFROMCONTEXTCONTEXTATTRIBUTE_H_

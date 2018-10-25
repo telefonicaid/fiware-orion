@@ -45,82 +45,8 @@ extern "C"
 #include "orionld/context/orionldContextListPresent.h"         // orionldContextListPresent
 #include "orionld/common/httpStatusCodeToOrionldErrorType.h"   // httpStatusCodeToOrionldErrorType
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
+#include "orionld/kjTree/kjTreeFromContextContextAttribute.h"  // kjTreeFromContextContextAttribute
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldContextTreeFromAttribute -
-//
-// What we have in ContextAttribute::value is what we need as value of "@context" in the Context Tree.
-// We must create the toplevel object and the "@context" member, and give it the value of "ContextAttribute::value".
-// If ContextAttribute::value is a string, then the Context Tree will be simply a string called "@context" with the value of ContextAttribute::value.
-// If ContextAttribute::value is a vector ...
-// If ContextAttribute::value is an object ...
-//
-static KjNode* orionldContextTreeFromAttribute(ConnectionInfo* ciP, ContextAttribute* caP, char** detailsP)
-{
-  KjNode* topNodeP = NULL;
-
-  if (caP->valueType == orion::ValueTypeString)
-  {
-    LM_TMP(("It's a String!"));
-    topNodeP = kjString(ciP->kjsonP, "@context", caP->stringValue.c_str());
-  }
-  else if (caP->valueType == orion::ValueTypeVector)
-  {
-    LM_TMP(("It's an Array!"));
-    topNodeP = kjArray(ciP->kjsonP, "@context");
-
-    // the vector must be of strings
-    for (unsigned int ix = 0; ix < caP->compoundValueP->childV.size(); ix++)
-    {
-      orion::CompoundValueNode* compoundP = caP->compoundValueP->childV[ix];
-      
-      if (compoundP->valueType != orion::ValueTypeString)
-      {
-        kjFree(topNodeP);
-        *detailsP = (char*) "Array member not a string";
-        return NULL;
-      }
-
-      KjNode* itemNodeP = kjString(ciP->kjsonP, NULL, compoundP->stringValue.c_str());
-      kjChildAdd(topNodeP, itemNodeP);
-      LM_TMP(("Added array item '%s' to context", itemNodeP->value.s));
-    }
-  }
-  else if (caP->valueType == orion::ValueTypeObject)
-  {
-    LM_TMP(("It's an Object!"));
-    topNodeP = kjObject(ciP->kjsonP, "@context");
-
-    // All members must be strings
-    for (unsigned int ix = 0; ix < caP->compoundValueP->childV.size(); ix++)
-    {
-      orion::CompoundValueNode* compoundP = caP->compoundValueP->childV[ix];
-
-      if (compoundP->valueType != orion::ValueTypeString)
-      {
-        kjFree(topNodeP);
-        *detailsP = (char*) "Array member not a string";
-        return NULL;
-      }
-
-      KjNode* itemNodeP = kjString(ciP->kjsonP, compoundP->name.c_str(), compoundP->stringValue.c_str());
-      kjChildAdd(topNodeP, itemNodeP);
-
-      LM_TMP(("Added object member '%s' == '%s' to context", itemNodeP->name, itemNodeP->value.s));
-    }
-  }
-  else
-  {
-    LM_E(("Error - @context attribute value must be either String, Array, or Object"));
-    return NULL;
-  }
-
-  return topNodeP;
-}
 
 
 
@@ -219,13 +145,13 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, QueryContextResponse
       // If ContextAttribute::value is a string, then the Context Tree will be simply a string called "@context" with the value of ContextAttribute::value.
       // If ContextAttribute::value is a vector ...
       // If ContextAttribute::value is an object ...
-      // The function orionldContextTreeFromAttribute does just this
+      // The function kjTreeFromContextContextAttribute does just this
       //
 
       LM_TMP(("Found an attribute called context @context for entity '%s'", eId));
       char*    details;
       LM_TMP(("Creating a KjNode tree for the @context attribute"));
-      KjNode*  contextTree = orionldContextTreeFromAttribute(ciP, contextAttributeP, &details);
+      KjNode*  contextTree = kjTreeFromContextContextAttribute(ciP, contextAttributeP, &details);
 
       if (contextTree == NULL)
       {
@@ -245,7 +171,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, QueryContextResponse
 
       LM_TMP(("Inserting the new context in the context-cache"));
       orionldContextListInsert(contextP);
-      orionldContextListPresent();
+      orionldContextListPresent(ciP);
     }
   }
 

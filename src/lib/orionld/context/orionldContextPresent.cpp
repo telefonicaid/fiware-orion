@@ -28,6 +28,8 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                   // KjNode
+#include "kjson/kjRender.h"                                 // kjRender
+#include "kjson/kjBufferCreate.h"                           // kjBufferCreate
 }
 
 #include "orionld/context/OrionldContext.h"                 // OrionldContext
@@ -40,13 +42,13 @@ extern "C"
 //
 // allCachedContextsPresent -
 //
-static void allCachedContextsPresent(void)
+static void allCachedContextsPresent(ConnectionInfo* ciP)
 {
   OrionldContext* contextP = orionldContextHead;
 
   while (contextP != NULL)
   {
-    orionldContextPresent(contextP);
+    orionldContextPresent(ciP, contextP);
     contextP = contextP->next;
   }
 }
@@ -87,32 +89,83 @@ static void arrayContextPresent(OrionldContext* contextP)
 //
 // objectContextPresent -
 //
-static void objectContextPresent(OrionldContext* contextP)
+static Kjson* kjsonBuffer = NULL;
+static void objectContextPresent(ConnectionInfo* ciP, OrionldContext* contextP)
 {
-  LM_T(LmtContextPresent, ("Context OBJECT: %s (ignored: %s):", contextP->url, (contextP->ignore == true)? "YES" : "NO"));
-
-  for (KjNode* nodeP = contextP->tree->children->children; nodeP != NULL; nodeP = nodeP->next)
+  if (contextP == NULL)
   {
-    if (nodeP->type == KjString)
-      LM_T(LmtContextPresent, ("  %s: %s", nodeP->name, nodeP->value.s));
-    else if (nodeP->type == KjObject)
-    {
-      LM_T(LmtContextPresent, ("  %s: {", nodeP->name));
+    LM_T(LmtContextPresent, ("contextP == NULL"));
+    return;
+  }
 
-      for (KjNode* childP = nodeP->children; childP != NULL; childP = childP->next)
-        LM_T(LmtContextPresent, ("    %s: %s", childP->name, childP->value.s));
-      LM_T(LmtContextPresent, ("  }"));
+  if (kjsonBuffer == NULL)
+  {
+    kjsonBuffer = kjBufferCreate();
+    if (kjsonBuffer == NULL)
+      LM_X(1, ("Out of memory"));
+    
+    kjsonBuffer->spacesPerIndent   = 0;
+    kjsonBuffer->nlString          = (char*) "";
+    kjsonBuffer->stringBeforeColon = (char*) "";
+    kjsonBuffer->stringAfterColon  = (char*) "";
+  }
+
+  LM_T(LmtContextPresent, ("Context '%s' (ignored: %s):", contextP->url, (contextP->ignore == true)? "YES" : "NO"));
+
+  char buf[1024];
+  
+  kjRender(kjsonBuffer, contextP->tree, buf, sizeof(buf));
+  buf[120] = 0;
+  LM_T(LmtContextPresent, ("Context Tree: %s", buf));
+
+#if 0  
+  if (contextP->tree == NULL)
+  {
+    LM_T(LmtContextPresent, ("contextP->tree is NULL"));
+  }
+  else if (contextP->tree->children == NULL)
+  {
+    LM_T(LmtContextPresent, ("contextP->tree is of type '%s'", kjValueType(contextP->tree->type)));
+    LM_T(LmtContextPresent, ("contextP->tree->children is NULL"));
+  }    
+  else if (contextP->tree->children->children == NULL)
+  {
+    LM_T(LmtContextPresent, ("contextP->tree->children->children is NULL"));
+  }
+  else
+  {
+    if (contextP->tree->children->type == KjString)
+    {
+      LM_T(LmtContextPresent, ("    %s: %s", contextP->tree->children->name, contextP->tree->children->value.s));
+    }
+    else if (contextP->tree->children->type == KjObject)
+    {
+      for (KjNode* nodeP = contextP->tree->children->children; nodeP != NULL; nodeP = nodeP->next)
+      {
+        if (nodeP->type == KjString)
+        {
+          LM_T(LmtContextPresent, ("  %s: %s", nodeP->name, nodeP->value.s));
+        }
+        else if (nodeP->type == KjObject)
+        {
+          LM_T(LmtContextPresent, ("  %s: {", nodeP->name));
+
+          for (KjNode* childP = nodeP->children; childP != NULL; childP = childP->next)
+            LM_T(LmtContextPresent, ("    %s: %s", childP->name, childP->value.s));
+          LM_T(LmtContextPresent, ("  }"));
+        }
+      }
     }
   }
+#endif  
 }
-
 
 
 // ----------------------------------------------------------------------------
 //
 // orionldContextPresent -
 //
-void orionldContextPresent(OrionldContext* contextP)
+void orionldContextPresent(ConnectionInfo* ciP, OrionldContext* contextP)
 {
   //
   // Three types of contexts;
@@ -125,9 +178,9 @@ void orionldContextPresent(OrionldContext* contextP)
   //
 
   if (contextP == NULL)
-    allCachedContextsPresent();
+    allCachedContextsPresent(ciP);
   else if (contextP->tree->type == KjObject)
-    objectContextPresent(contextP);
+    objectContextPresent(ciP, contextP);
   else if (contextP->tree->type == KjString)
     stringContextPresent(contextP);
   else if (contextP->tree->type == KjArray)

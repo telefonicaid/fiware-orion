@@ -87,6 +87,14 @@ typedef std::string (*RestServeFunction)(ConnectionInfo* ciP);
 
 /* ****************************************************************************
 *
+* restPortGet -
+*/
+extern unsigned short restPortGet(void);
+
+
+
+/* ****************************************************************************
+*
 * restInit -
 */
 extern void restInit

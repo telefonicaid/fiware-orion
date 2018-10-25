@@ -304,14 +304,14 @@ Date: REGEX(.*)
 
 07. GET /ngsi-ld/ex/v1/contexts/C1
 ==================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 131
+HTTP/1.1 404 Not Found
+Content-Length: 102
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "C1",
-    "title": "not implemented - GET /ngsi-ld/ex/v1/context/*",
+    "title": "Context Not Found",
     "type": "http://example.org/ngsi-ld/errors/BadRequestData"
 }
 

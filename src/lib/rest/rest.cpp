@@ -97,6 +97,17 @@ static int                       reqNo                 = 1;
 
 /* ****************************************************************************
 *
+* restPortGet -
+*/
+unsigned short restPortGet(void)
+{
+  return port;
+}
+
+
+
+/* ****************************************************************************
+*
 * correlatorGenerate -
 */
 static void correlatorGenerate(char* buffer)
