@@ -130,7 +130,7 @@ MongoDB server version: REGEX(.*)
 	},
 	"attrNames" : [
 		"@context",
-		"name"
+		"http://schema.org/name"
 	],
 	"attrs" : {
 		"@context" : {
@@ -143,7 +143,7 @@ MongoDB server version: REGEX(.*)
 			],
 			"mdNames" : [ ]
 		},
-		"name" : {
+		"http://schema=org/name" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),

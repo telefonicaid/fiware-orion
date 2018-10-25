@@ -88,13 +88,13 @@ Date: REGEX(.*)
 02. GET E1
 ==========
 HTTP/1.1 200 OK
-Content-Length: 257
+Content-Length: 222
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
   "id": "http://a.b.c/entity/E1",
-  "type": "http://example.org/ngsi-ld/default/A",
+  "type": "A",
   "name": {
     "type": "Property",
     "value": "1"

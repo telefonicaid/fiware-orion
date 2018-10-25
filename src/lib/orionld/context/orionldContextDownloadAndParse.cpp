@@ -77,7 +77,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
     // httpResponse.buf freed by orionldRequestSend() in case of error
     //
     bool tryAgain = false;
-    if (orionldRequestSend(&httpResponse, url, 5000, detailsPP, &tryAgain) == true)
+    if (orionldRequestSend(&httpResponse, url, 10000, detailsPP, &tryAgain) == true)
     {
       ok = true;
       break;

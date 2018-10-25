@@ -189,4 +189,5 @@ const char* orionldDefaultUrlContextString = "{  \
 //
 // orionldDefaultUrl -
 //
-char* orionldDefaultUrl = (char*) "DEFAULT URL";
+char* orionldDefaultUrl    = (char*) "DEFAULT URL";
+int   orionldDefaultUrlLen = -1;

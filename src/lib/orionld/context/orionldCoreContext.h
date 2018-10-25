@@ -88,4 +88,12 @@ extern const char* orionldDefaultUrlContextString;
 //
 extern char* orionldDefaultUrl;
 
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldDefaultUrlLen -
+//
+extern int orionldDefaultUrlLen;
+
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCORECONTEXT_H_

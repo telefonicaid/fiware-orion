@@ -36,6 +36,7 @@ extern "C"
 }
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL, ORIONLD_DEFAULT_URL_CONTEXT_URL
 #include "orionld/context/orionldContextCreateFromTree.h"      // Own interface
 
 
@@ -48,16 +49,35 @@ OrionldContext* orionldContextCreateFromTree(KjNode* tree, const char* url, Orio
 {
   OrionldContext* contextP = (OrionldContext*) malloc(sizeof(OrionldContext));
 
+  LM_T(LmtContext, ("Creating Context '%s'", url));
+
   if (contextP == NULL)
   {
     *detailsPP = (char*) "out of memory";
     return NULL;
   }
 
-  contextP->url  = strdup(url);
-  contextP->tree = tree;
-  contextP->type = contextType;
-  contextP->next = NULL;
+  contextP->url     = strdup(url);
+  contextP->tree    = tree;
+  contextP->type    = contextType;
+  contextP->ignore  = false;
+  contextP->next    = NULL;
 
+  //
+  // Lookups in USER contexts must not include the Core Context nor the Default URL Context
+  // If a user context include any of these two, that part of the total context must be ignored.
+  // Nothing is removed from the total context, so that the context can be retreived intact, but the
+  // Core part must not be used in the lookups.
+  //
+  // FIXME TPUT: A char-sum would make these comparisons faster 
+  //
+  if ((strcmp(contextP->url, ORIONLD_CORE_CONTEXT_URL) == 0) || (strcmp(contextP->url, ORIONLD_DEFAULT_URL_CONTEXT_URL) == 0))
+  {
+    LM_T(LmtContext, ("Context '%s' is IGNORED", contextP->url));
+    contextP->ignore = true;
+  }
+  else
+    LM_T(LmtContext, ("Context '%s' is NOT ignored", contextP->url));
+    
   return contextP;
 }

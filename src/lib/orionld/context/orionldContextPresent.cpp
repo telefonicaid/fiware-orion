@@ -59,7 +59,7 @@ static void allCachedContextsPresent(void)
 //
 static void stringContextPresent(OrionldContext* contextP)
 {
-  LM_T(LmtContextPresent, ("String: %s:", contextP->url));
+  LM_T(LmtContextPresent, ("Context STRING: %s (ignored: %s):", contextP->url, (contextP->ignore == true)? "YES" : "NO"));
   LM_T(LmtContextPresent, ("  %s", contextP->tree->value.s));
 }
 
@@ -73,7 +73,7 @@ static void arrayContextPresent(OrionldContext* contextP)
 {
   KjNode* itemP;
     
-  LM_T(LmtContextPresent, ("Array: %s:", contextP->url));
+  LM_T(LmtContextPresent, ("Context ARRAY: %s (ignored: %s):", contextP->url, (contextP->ignore == true)? "YES" : "NO"));
 
   for (itemP = contextP->tree->children; itemP != NULL; itemP = itemP->next)
   {
@@ -89,9 +89,8 @@ static void arrayContextPresent(OrionldContext* contextP)
 //
 static void objectContextPresent(OrionldContext* contextP)
 {
-  LM_T(LmtContextPresent, ("Object: %s:", contextP->url));
+  LM_T(LmtContextPresent, ("Context OBJECT: %s (ignored: %s):", contextP->url, (contextP->ignore == true)? "YES" : "NO"));
 
-  
   for (KjNode* nodeP = contextP->tree->children->children; nodeP != NULL; nodeP = nodeP->next)
   {
     if (nodeP->type == KjString)

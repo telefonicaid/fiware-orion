@@ -58,7 +58,7 @@ brokerStart CB 212-249
 
 #
 # 01. POST /ngsi-ld/v1/entities, with an entity type of "T" and a context defining "T" to http://example.org/T
-# 02. Checking mongo to find entity type http://example.org/T and the attribute @aliasEntityType
+# 02. Checking mongo to find entity type http://example.org/T
 #
 
 echo "01. POST /ngsi-ld/v1/entities, with an entity type of 'T' and a context defining 'T' to http://example.org/T"
@@ -73,10 +73,9 @@ echo
 echo
 
 
-echo "02. Checking mongo to find entity type http://example.org/T and the attribute @aliasEntityType"
-echo "=============================================================================================="
-mongoCmd2 ftest "db.entities.findOne()" | grep 'type'
-mongoCmd2 ftest "db.entities.findOne()" | grep '@aliasEntityType'
+echo "02. Checking mongo to find entity type http://example.org/T"
+echo "==========================================================="
+mongoCmd2 ftest "db.entities.findOne()" | grep 'http://example.org/T'
 echo
 echo
 
@@ -92,15 +91,11 @@ Date: REGEX(.*)
 
 
 
-02. Checking mongo to find entity type http://example.org/T and the attribute @aliasEntityType
-==============================================================================================
+02. Checking mongo to find entity type http://example.org/T
+===========================================================
 		"type" : "http://example.org/T",
-			"type" : "ContextString",
-			"type" : "Alias",
-		"@aliasEntityType"
-		"@aliasEntityType" : {
 
 
 --TEARDOWN--
 brokerStop CB
-#dbDrop CB
+dbDrop CB

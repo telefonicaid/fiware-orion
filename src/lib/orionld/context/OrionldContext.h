@@ -55,6 +55,7 @@ typedef struct OrionldContext
   char*                   url;
   KjNode*                 tree;
   OrionldContextType      type;
+  bool                    ignore;
   struct OrionldContext*  next;
 } OrionldContext;
 

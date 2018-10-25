@@ -61,7 +61,7 @@ extern "C"
 //
 static KjNode* orionldContextTreeFromAttribute(ConnectionInfo* ciP, ContextAttribute* caP, char** detailsP)
 {
-  KjNode* topNodeP;
+  KjNode* topNodeP = NULL;
 
   if (caP->valueType == orion::ValueTypeString)
   {
@@ -112,6 +112,11 @@ static KjNode* orionldContextTreeFromAttribute(ConnectionInfo* ciP, ContextAttri
 
       LM_TMP(("Added object member '%s' == '%s' to context", itemNodeP->name, itemNodeP->value.s));
     }
+  }
+  else
+  {
+    LM_E(("Error - @context attribute value must be either String, Array, or Object"));
+    return NULL;
   }
 
   return topNodeP;
@@ -260,22 +265,52 @@ KjNode* kjTreeCreateFromQueryContextResponse(ConnectionInfo* ciP, QueryContextRe
   // type
   if (ceP->entityId.type != "")
   {
-    LM_TMP(("Calling orionldContextValueLookup for %s", ceP->entityId.type.c_str()));
-    KjNode* aliasNodeP = orionldContextValueLookup(contextP, ceP->entityId.type.c_str());
+    nodeP = NULL;
 
-    if (aliasNodeP != NULL)
+    LM_TMP(("=================== Reverse alias-search for Entity-Type '%s'", ceP->entityId.type.c_str()));
+
+    // Is it the default URL ?
+    if (orionldDefaultUrlLen != -1)
     {
-      LM_TMP(("Found the alias: '%s' => '%s'", ceP->entityId.type.c_str(), aliasNodeP->name));
-      nodeP = kjString(ciP->kjsonP, "type", aliasNodeP->name);
-    }
-    else
-    {
-      LM_TMP(("No alias found, keeping long name '%s'", ceP->entityId.type.c_str()));
-      nodeP = kjString(ciP->kjsonP, "type", ceP->entityId.type.c_str());
+      if (strncmp(ceP->entityId.type.c_str(), orionldDefaultUrl, orionldDefaultUrlLen) == 0)
+      {
+        nodeP = kjString(ciP->kjsonP, "type", &ceP->entityId.type.c_str()[orionldDefaultUrlLen]);
+        if (nodeP == NULL)
+        {
+          LM_E(("out of memory"));
+          orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create tree node", "out of memory", OrionldDetailsEntity);
+          return NULL;
+        }
+      }
     }
 
+    if (nodeP == NULL)
+    {
+      LM_TMP(("Calling orionldContextValueLookup for %s", ceP->entityId.type.c_str()));
+      KjNode* aliasNodeP = orionldContextValueLookup(contextP, ceP->entityId.type.c_str());
+
+      if (aliasNodeP != NULL)
+      {
+        LM_TMP(("Found the alias: '%s' => '%s'", ceP->entityId.type.c_str(), aliasNodeP->name));
+        nodeP = kjString(ciP->kjsonP, "type", aliasNodeP->name);
+      }
+      else
+      {
+        LM_TMP(("No alias found, keeping long name '%s'", ceP->entityId.type.c_str()));
+        nodeP = kjString(ciP->kjsonP, "type", ceP->entityId.type.c_str());
+      }
+
+      if (nodeP == NULL)
+      {
+        LM_E(("out of memory"));
+        orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create tree node", "out of memory", OrionldDetailsEntity);
+        return NULL;
+      }      
+    }
+    
     kjChildAdd(top, nodeP);
   }
+
   else
     LM_TMP(("NOT Calling orionldContextValueLookup for entity Type as it is EMPTY!!!"));
 
@@ -286,29 +321,51 @@ KjNode* kjTreeCreateFromQueryContextResponse(ConnectionInfo* ciP, QueryContextRe
 
   for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); aIx++)
   {
-    ContextAttribute* aP = ceP->contextAttributeVector[aIx];
-    
-    if (strcmp(aP->name.c_str(), "@context") == 0)
+    ContextAttribute* aP       = ceP->contextAttributeVector[aIx];
+    char*             attrName = (char*) aP->name.c_str();
+    KjNode*           aTop;
+
+    if (strcmp(attrName, "@context") == 0)
     {
       contextAttrP = aP;
       continue;
     }
 
-    //
-    // Lookup alias for the Attribute Name
-    //
-    KjNode* aliasNodeP = orionldContextValueLookup(contextP, aP->name.c_str());
-    KjNode* aTop;
-    
-    if (aliasNodeP != NULL)
-      aTop = kjObject(ciP->kjsonP, aliasNodeP->name);
+    // Is it the default URL ?
+    if ((orionldDefaultUrlLen != -1) && (strncmp(attrName, orionldDefaultUrl, orionldDefaultUrlLen) == 0))
+    {
+      attrName = &attrName[orionldDefaultUrlLen];
+    }
     else
-      aTop = kjObject(ciP->kjsonP, aP->name.c_str());
+    {
+      //
+      // Lookup alias for the Attribute Name
+      //
+      KjNode* aliasNodeP = orionldContextValueLookup(contextP, aP->name.c_str());
+    
+      if (aliasNodeP != NULL)
+        attrName = aliasNodeP->name;
+    }
+
+    aTop = kjObject(ciP->kjsonP, attrName);
+    if (aTop == NULL)
+    {
+      LM_E(("Error creating a KjNode Object"));
+      orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create tree node", "out of memory", OrionldDetailsEntity);
+      return NULL;
+    }
 
     // type
     if (aP->type != "")
     {
       nodeP = kjString(ciP->kjsonP, "type", aP->type.c_str());
+      if (nodeP == NULL)
+      {
+        LM_E(("Error creating a KjNode String"));
+        orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create tree node", "out of memory", OrionldDetailsEntity);
+        return NULL;
+      }
+
       kjChildAdd(aTop, nodeP);
     }
 

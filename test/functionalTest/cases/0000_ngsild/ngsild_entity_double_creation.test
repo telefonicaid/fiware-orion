@@ -97,7 +97,7 @@ Date: REGEX(.*)
 02. GET /ngsi-ld/v1/entities/E1
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 202
+Content-Length: 167
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -108,7 +108,7 @@ Date: REGEX(.*)
         "type": "Property",
         "value": "John 1"
     },
-    "type": "http://example.org/ngsi-ld/default/A"
+    "type": "A"
 }
 
 
@@ -129,7 +129,7 @@ Date: REGEX(.*)
 04. GET /ngsi-ld/v1/entities/E1, making sure step 02 didn't modify anything
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 202
+Content-Length: 167
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -140,7 +140,7 @@ Date: REGEX(.*)
         "type": "Property",
         "value": "John 1"
     },
-    "type": "http://example.org/ngsi-ld/default/A"
+    "type": "A"
 }
 
 

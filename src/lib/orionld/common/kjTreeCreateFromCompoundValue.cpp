@@ -40,8 +40,8 @@ extern "C"
 //
 static KjNode* kjTreeCreateFromCompoundValue2(ConnectionInfo* ciP, KjNode* parentP, orion::CompoundValueNode* compoundP, char** detailsP)
 {
-  KjNode*       nodeP;
-  char*         name = (char*) compoundP->name.c_str();
+  KjNode*       nodeP = NULL;
+  char*         name  = (char*) compoundP->name.c_str();
   unsigned int  size;
 
   switch (compoundP->valueType)
@@ -88,6 +88,7 @@ static KjNode* kjTreeCreateFromCompoundValue2(ConnectionInfo* ciP, KjNode* paren
     break;
 
   case orion::ValueTypeNotGiven:
+  default:
     nodeP = kjString(ciP->kjsonP, name, "UNKNOWN TYPE");
     kjChildAdd(parentP, nodeP);
     break;

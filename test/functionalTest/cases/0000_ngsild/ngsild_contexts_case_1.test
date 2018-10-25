@@ -137,7 +137,7 @@ MongoDB server version: REGEX(.*)
 	},
 	"attrNames" : [
 		"@context",
-		"name"
+		"http://example.org/ngsi-ld/default/name"
 	],
 	"attrs" : {
 		"@context" : {
@@ -147,7 +147,7 @@ MongoDB server version: REGEX(.*)
 			"value" : "https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld",
 			"mdNames" : [ ]
 		},
-		"name" : {
+		"http://example=org/ngsi-ld/default/name" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),

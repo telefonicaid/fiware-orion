@@ -103,10 +103,10 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"title"
+		"http://example.org/ngsi-ld/default/title"
 	],
 	"attrs" : {
-		"title" : {
+		"http://example=org/ngsi-ld/default/title" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),

@@ -506,7 +506,6 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
   if ((parentP != NULL) && (parentP->type == KjObject))
     cNodeP->name = kNodeP->name;
 
-#if 1
   // Any URI Expansion needed?
   if ((kNodeP->name != NULL) && (kNodeP->name[0] != 0))
   {
@@ -533,7 +532,6 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
       cNodeP->name = std::string(orionldDefaultUrl) + kNodeP->name;
     }
   }
-#endif
 
   if (kNodeP->type == KjString)
   {
@@ -1075,6 +1073,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   {
     LM_T(LmtUriExpansion, ("treating entity node '%s'", kNodeP->name));
 
+    // Entity ID
     if (kNodeP == idNodeP)
     {
       if (!urlCheck(idNodeP->value.s, &details) && !urnCheck(idNodeP->value.s, &details))
@@ -1103,6 +1102,8 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
       continue;
     }
+
+    // Entity TYPE    
     else if (kNodeP == typeNodeP)
     {
       entityIdP->isTypePattern = false;
@@ -1165,92 +1166,61 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
 
       //
-      // URI Expansion for Attribute NAME
+      // URI Expansion for Attribute NAME - except if its name is one of the following three:
+      // 1. location
+      // 2. observationSpace
+      // 3. operationSpace
       //
-      LM_T(LmtUriExpansion, ("------------- URI-Expansion for attribute named '%s' starts here ------------------------------", kNodeP->name));
-      char*  details;
-      char*  expandedName  = NULL;
-      char*  expandedType  = NULL;
-      int    expansions    = uriExpansion(ciP->contextP, kNodeP->name, &expandedName, &expandedType, &details);
-
-      LM_TMP(("EXPANSION: uriExpansion returned %d for '%s'", expansions, kNodeP->name));
-      if (expansions == -1)
+      if ((strcmp(kNodeP->name, "location") == 0) || (strcmp(kNodeP->name, "observationSpace") == 0) || (strcmp(kNodeP->name, "operationSpace") == 0))
       {
-        delete caP;
-        mongoRequest.release();
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item for 'attribute name'", kNodeP->name, OrionldDetailsAttribute);
-        return false;
-      }
-      else if (expansions == -2)
-      {
-        // No expansion found in Core Context, and in no other contexts either - use default URL
-        LM_TMP(("EXPANSION: use default URL for attribute '%s'", kNodeP->name));
-        caP->name     = orionldDefaultUrl;
-        caP->name    += kNodeP->name;
-      }
-      else if (expansions == 0)
-      {
-        // Found in Core Context - no expansion
         caP->name = kNodeP->name;
       }
       else
       {
-        // Change the attribute name to its expanded value
-        if (expandedName == NULL)
+        LM_T(LmtUriExpansion, ("------------- URI-Expansion for attribute named '%s' starts here ------------------------------", kNodeP->name));
+        char*  details;
+        char*  expandedName  = NULL;
+        char*  expandedType  = NULL;
+        int    expansions    = uriExpansion(ciP->contextP, kNodeP->name, &expandedName, &expandedType, &details);
+
+        LM_TMP(("EXPANSION: uriExpansion returned %d for '%s'", expansions, kNodeP->name));
+        if (expansions == -1)
         {
-          LM_T(LmtUriExpansion, ("No expansion found - perform default expansion - prepending http://www.example.org/attribute/ to the attr name (%s)", kNodeP->name));
-          caP->name  = orionldDefaultUrl;
-          caP->name += kNodeP->name;
+          delete caP;
+          mongoRequest.release();
+          orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item for 'attribute name'", kNodeP->name, OrionldDetailsAttribute);
+          return false;
+        }
+        else if (expansions == -2)
+        {
+          // No expansion found in Core Context, and in no other contexts either - use default URL
+          LM_TMP(("EXPANSION: use default URL for attribute '%s'", kNodeP->name));
+          caP->name     = orionldDefaultUrl;
+          caP->name    += kNodeP->name;
+        }
+        else if (expansions == 0)
+        {
+          // Found in Core Context - no expansion
+          caP->name = kNodeP->name;
         }
         else
         {
-          caP->name = expandedName;
+          // Change the attribute name to its expanded value
+          if (expandedName == NULL)
+          {
+            LM_T(LmtUriExpansion, ("No expansion found - perform default expansion - prepending http://www.example.org/attribute/ to the attr name (%s)", kNodeP->name));
+            caP->name  = orionldDefaultUrl;
+            caP->name += kNodeP->name;
+          }
+          else
+            caP->name = expandedName;
         }
       }
 
       //
-      // URI Expansion for Attribute TYPE
+      // NO URI Expansion for Attribute TYPE
       //
-      LM_T(LmtUriExpansion, ("Calling uriExpansion for the attribute type '%s'", attrTypeNodeP->value.s));
-      LM_T(LmtUriExpansion, ("------------- uriExpansion for attr type starts here ------------------------------"));
-
-      expandedName  = NULL;
-      expandedType  = NULL;
-      expansions    = uriExpansion(ciP->contextP, attrTypeNodeP->value.s, &expandedName, &expandedType, &details);
-
-      if (expansions == -1)
-      {
-        delete caP;
-        mongoRequest.release();
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item for 'attribute type'", attrTypeNodeP->value.s, OrionldDetailsOther);
-        return false;
-      }
-      else if (expansions == -2)
-      {
-        // No expansion found in Core Context, and in no other contexts either - use default URL
-        LM_TMP(("EXPANSION: use default URL for attribute '%s'", attrTypeNodeP->value.s));
-        caP->type     = orionldDefaultUrl;
-        caP->type    += attrTypeNodeP->value.s;
-      }
-      else if (expansions == 0)
-      {
-        // Found in Core Context - no expansion
-        caP->type = attrTypeNodeP->value.s;
-      }
-      else
-      {
-        // Change the attribute type to its expanded value
-        if (expandedName == NULL)
-        {
-          // No expansion found - perform default expansion
-          LM_T(LmtUriExpansion, ("No expansion found - perform default expansion - prepending http://www.example.org/attribute/ to the attr type (%s)", attrTypeNodeP->value.s));
-          caP->type = std::string(orionldDefaultUrl) + attrTypeNodeP->value.s;
-        }
-        else
-        {
-          caP->type = expandedName;
-        }
-      }
+      caP->type = attrTypeNodeP->value.s;
 
       ceP->contextAttributeVector.push_back(caP);
     }

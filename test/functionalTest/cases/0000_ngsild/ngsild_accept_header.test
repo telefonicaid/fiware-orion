@@ -85,42 +85,42 @@ Date: REGEX(.*)
 02. GET E1, with 'Accept: application/json' - see 'Content-Type: application/json', HTTP Header 'Link' with @context, and no context in payload
 ===============================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 77
+Content-Length: 42
 Content-Type: application/json
 Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
 Date: REGEX(.*)
 
 {
     "id": "http://a.b.c/entity/E1",
-    "type": "http://example.org/ngsi-ld/default/A"
+    "type": "A"
 }
 
 
 03. GET E1, with 'Accept: application/ld+json' - see 'Content-Type: application/ld+json', context in payload, no 'Link' HTTP Header
 ===================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 158
+Content-Length: 123
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
     "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E1",
-    "type": "http://example.org/ngsi-ld/default/A"
+    "type": "A"
 }
 
 
 04. GET E1, without specific Accept MIME type (application/json is default - should it be for ngsi-ld requests?), see results like step 02
 ==========================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 77
+Content-Length: 42
 Content-Type: application/json
 Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
 Date: REGEX(.*)
 
 {
     "id": "http://a.b.c/entity/E1",
-    "type": "http://example.org/ngsi-ld/default/A"
+    "type": "A"
 }
 
 

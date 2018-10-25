@@ -61,12 +61,20 @@ extern "C"
 //
 KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
 {
-  LM_TMP(("contextP at %p", contextP));
+  LM_T(LmtContextItemLookup, ("Looking up ContextItem '%s'", itemName));
   if (contextP == NULL)
+  {
+    LM_T(LmtContextItemLookup, ("The context is a NULL pointer - ContextItem '%s' not found", itemName));
     return NULL;
+  }
 
-  LM_TMP(("context URL: %s", contextP->url));
-  LM_TMP(("contextP->tree at %p", contextP->tree));
+  if (contextP->ignore == true)
+  {
+    LM_T(LmtContextItemLookup, ("The context '%s' is ignored - ContextItem '%s' not found", contextP->url, itemName));
+    return NULL;
+  }
+
+  LM_T(LmtContextItemLookup, ("Looking up ContextItem '%s' in context '%s', contextTree at %p", itemName, contextP->url, contextP->tree));
   if (contextP->tree->type == KjString)
   {
     LM_T(LmtContextItemLookup, ("The context is of type String - must lookup a new context"));
@@ -80,7 +88,7 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
     }
 
     // Lookup the item
-    LM_T(LmtContextItemLookup, ("Now we can search for '%s' (in context '%s'", itemName, dereferencedContextP->url));
+    LM_T(LmtContextItemLookup, ("Now we can search for '%s' (in context '%s')", itemName, dereferencedContextP->url));
     return orionldContextItemLookup(dereferencedContextP, itemName);
   }
   else if (contextP->tree->type == KjArray)
@@ -91,7 +99,7 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
     {
       if (contextNodeP->type != KjString)
       {
-        LM_E(("The Context Array must only contain JSON Strings"));
+        LM_E(("ERROR - the Context Array must only contain JSON Strings"));
         return NULL;
       }
 
@@ -99,7 +107,7 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
 
       if (dereferencedContextP == NULL)
       {
-        LM_W(("Can't find context '%s'", contextNodeP->value.s));
+        LM_W(("Can't find context '%s' - trying with the nexy context in the Array", contextNodeP->value.s));
         continue;   // Or: download it?
       }
 
@@ -114,6 +122,7 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
       }
     }
 
+    LM_T(LmtContextItemLookup, ("Context Item '%s' - NOT FOUND", itemName));
     return NULL;
   }
   else if (contextP->tree->type == KjObject)
@@ -129,25 +138,13 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
 
     if (contextP->tree->children == NULL)
     {
-      LM_E(("Context tree is a JSON object, but, it has no children!"));
+      LM_E(("ERROR: Context tree is a JSON object, but, it has no children!"));
       return NULL;
     }
-#if 0    
-    if (contextP->tree->children->next != NULL)
-    {
-      LM_E(("Context tree is a JSON object, but, it has more than one child! (%s)", contextP->url));
-      return NULL;
-    }
-    if (strcmp(contextP->tree->children->name, "@context") != 0)
-    {
-      LM_E(("Context tree is a JSON object, and it has exactly one child, but its name must be '@context', not '%s'", contextP->tree->children->name));
-      return NULL;
-    }
-#endif
   }
   else
   {
-    LM_E(("The '@context' is a %s - must be either Object, String or Array", kjValueType(contextP->tree->children->type)));
+    LM_E(("ERROR: The '@context' is a %s - must be either Object, String or Array", kjValueType(contextP->tree->children->type)));
     return NULL;
   }
 
@@ -155,9 +152,7 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
   //
   // If we reach this point, the context is a JSON Object
   //
-  KjNode*  atContextP    = contextP->tree->children;
-
-  LM_T(LmtContextItemLookup, ("@atcontext is of type '%s'", kjValueType(atContextP->type)));
+  KjNode* atContextP = contextP->tree->children;
 
   //
   // About contextP->tree->children->children:
@@ -180,7 +175,7 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
   {
     for (KjNode* contextItemP = atContextP->children; contextItemP != NULL; contextItemP = contextItemP->next)
     {
-      if ((contextItemP->type != KjString) && (contextItemP->type !=  KjObject))
+      if ((contextItemP->type != KjString) && (contextItemP->type != KjObject))
       {
         LM_E(("Invalid @context - items of contexts must be JSON Strings or jSOn objects - not %s", kjValueType(contextItemP->type)));
         return NULL;

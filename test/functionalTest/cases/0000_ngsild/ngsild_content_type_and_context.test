@@ -240,35 +240,35 @@ Date: REGEX(.*)
 08. GET Entity from step 01 - see correct URI Expansion (matching Default URL @context)
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 185
+Content-Length: 150
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
     "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json",
     "id": "http://a.b.c/entity/E1",
-    "type": "http://example.org/ngsi-ld/default/A"
+    "type": "A"
 }
 
 
 09. GET Entity from step 04 - see correct URI Expansion (matching @context in payload)
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 77
+Content-Length: 42
 Content-Type: application/json
 Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
 Date: REGEX(.*)
 
 {
     "id": "http://a.b.c/entity/E4",
-    "type": "http://example.org/ngsi-ld/default/A"
+    "type": "A"
 }
 
 
 10. GET Entity from step 05 - see correct URI Expansion (matching @context in HTTP Header)
 ==========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 250
+Content-Length: 215
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -279,7 +279,7 @@ Date: REGEX(.*)
         "value": 100.0
     },
     "id": "http://a.b.c/entity/E5",
-    "type": "http://example.org/ngsi-ld/default/A"
+    "type": "A"
 }
 
 

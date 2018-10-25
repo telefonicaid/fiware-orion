@@ -214,15 +214,17 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
     LM_X(1, ("EXITING - Out-of-memory at startup :("));
   }
 
-  orionldCoreContext.url         = ORIONLD_CORE_CONTEXT_URL;
-  orionldCoreContext.next        = NULL;
-  orionldCoreContext.tree        = NULL;
-  orionldCoreContext.type        = OrionldCoreContext;
-  
-  orionldDefaultUrlContext.url   = ORIONLD_DEFAULT_URL_CONTEXT_URL;
-  orionldDefaultUrlContext.next  = NULL;
-  orionldDefaultUrlContext.tree  = NULL;
-  orionldDefaultUrlContext.type  = OrionldDefaultUrlContext;
+  orionldCoreContext.url           = ORIONLD_CORE_CONTEXT_URL;
+  orionldCoreContext.next          = NULL;
+  orionldCoreContext.tree          = NULL;
+  orionldCoreContext.type          = OrionldCoreContext;
+  orionldCoreContext.ignore        = true;
+
+  orionldDefaultUrlContext.url     = ORIONLD_DEFAULT_URL_CONTEXT_URL;
+  orionldDefaultUrlContext.next    = NULL;
+  orionldDefaultUrlContext.tree    = NULL;
+  orionldDefaultUrlContext.type    = OrionldDefaultUrlContext;
+  orionldDefaultUrlContext.ignore  = true;
 
   if (defContextFromFile == true)
   {
@@ -314,7 +316,8 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
     LM_X(1, ("Invalid Default URL Context - the member '@vocab' must be of 'String' type"));
   }
 
-  orionldDefaultUrl = strdup(vocabNodeP->value.s);
+  orionldDefaultUrl    = strdup(vocabNodeP->value.s);
+  orionldDefaultUrlLen = strlen(orionldDefaultUrl);
 
   if (urlCheck(orionldDefaultUrl, &details) == false)
   {

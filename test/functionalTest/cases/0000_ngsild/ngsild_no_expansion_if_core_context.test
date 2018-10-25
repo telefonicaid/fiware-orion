@@ -86,11 +86,11 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"detail",
+		"http://example.org/ngsi-ld/default/detail",
 		"http://example.org/ngsi-ld/default/detail2"
 	],
 	"attrs" : {
-		"detail" : {
+		"http://example=org/ngsi-ld/default/detail" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -102,15 +102,7 @@ MongoDB server version: REGEX(.*)
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : "detail2 - expanded to default",
-			"md" : {
-				"@aliasAttributeName" : {
-					"type" : "Alias",
-					"value" : "detail2"
-				}
-			},
-			"mdNames" : [
-				"@aliasAttributeName"
-			]
+			"mdNames" : [ ]
 		}
 	},
 	"creDate" : REGEX(.*),

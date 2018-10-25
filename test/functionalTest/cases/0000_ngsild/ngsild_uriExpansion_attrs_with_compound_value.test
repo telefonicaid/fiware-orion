@@ -98,15 +98,7 @@ MongoDB server version: REGEX(.*)
 					"http://example=org/ngsi-ld/default/value" : "Titulo"
 				}
 			},
-			"md" : {
-				"@aliasAttributeName" : {
-					"type" : "Alias",
-					"value" : "X"
-				}
-			},
-			"mdNames" : [
-				"@aliasAttributeName"
-			]
+			"mdNames" : [ ]
 		}
 	},
 	"creDate" : REGEX(.*),
