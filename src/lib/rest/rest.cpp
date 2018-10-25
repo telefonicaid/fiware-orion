@@ -1534,7 +1534,7 @@ static int connectionTreat
     //
     // Seems like an NGSI-LD request, but, let's make sure
     //
-    if ((url[0] == '/') && (url[1] == 'n') && (url[2] == 'g') && (url[3] == 's') && (url[4] == 'i') && (url[6] == 'l') && (url[7] == 'd') && (url[8] == '/') && (url[9] == 'v') && (url[10] == '1') && (url[11] == '/'))
+    if ((url[0] == '/') && (url[1] == 'n') && (url[2] == 'g') && (url[3] == 's') && (url[4] == 'i') && (url[6] == 'l') && (url[7] == 'd') && (url[8] == '/'))
     {
       if      (*con_cls == NULL)        return orionldMhdConnectionInit(connection, url, method, version, con_cls);
       else if (*upload_data_size != 0)  return orionldMhdConnectionPayloadRead((ConnectionInfo*) *con_cls, upload_data_size, upload_data);

@@ -197,7 +197,9 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     // orionldMhdConnectionInit guarantees that a valid verb is used. I.e. POST, GET, DELETE or PATCH
     // orionldServiceLookup makes sure the URL supprts the verb
     //
+    LM_TMP(("Calling orionldServiceLookup"));
     ciP->serviceP = orionldServiceLookup(ciP, &orionldRestServiceV[ciP->verb]);
+    LM_TMP(("orionldServiceLookup returned service pointer at %p", ciP->serviceP));
 
     if (ciP->serviceP == NULL)
     {
@@ -263,10 +265,12 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     {
       if (acceptHeaderCheck(ciP, &errorTitle, &details) == false)
       {
+        LM_E(("acceptHeaderCheck failed: %s", details));
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, errorTitle, details, OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;
         error = true;
       }
+      LM_TMP(("After acceptHeaderCheck"));
     }
 
     if (error == false)

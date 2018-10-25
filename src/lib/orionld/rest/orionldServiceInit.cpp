@@ -38,7 +38,7 @@ extern "C"
 #include "orionld/context/orionldContextDownloadAndParse.h"    // orionldContextDownloadAndParse
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext, ORIONLD_CORE_CONTEXT_URL
 #include "orionld/context/orionldContextList.h"                // orionldContextHead, orionldContextTail
-#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
+#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
 #include "orionld/rest/temporaryErrorPayloads.h"               // Temporary Error Payloads
 #include "orionld/rest/orionldMhdConnection.h"                 // Own Interface
 
@@ -110,7 +110,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   serviceP->serviceRoutine  = simpleServiceP->serviceRoutine;
 
   // 2. Loop over the URL Path, count wildcards, charsBeforeFirstWildcard, etc
-  int    ix            = 11;    // strlen("/ngsi-ld/v1/") - 1
+  int    ix            = ORION_LD_SERVICE_PREFIX_LEN - 1;
   char*  wildCardStart = NULL;
   char*  wildCardEnd   = NULL;
 

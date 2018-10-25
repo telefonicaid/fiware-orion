@@ -76,10 +76,21 @@ typedef struct OrionLdRestServiceSimplifiedVector
 
 // -----------------------------------------------------------------------------
 //
+// ORION_LD_SERVICE_PREFIX_LEN -
+//
+// This is the length of the prefix of URL paths for orionld services.
+// The prefix is "/ngsi-ld/" and its string length is 9
+//
+#define ORION_LD_SERVICE_PREFIX_LEN 9
+
+
+
+// -----------------------------------------------------------------------------
+//
 // OrionLdRestService -
 //
 // NOTE
-//   The initial string '/ngsi-ld/v1/' doesn't count in the four charsBefore fields.
+//   The initial string '/ngsi-ld/' doesn't count in the four charsBefore fields.
 //   That the URL starts with that string will be made sure before we get as far as to
 //   lookup a URL.
 //
