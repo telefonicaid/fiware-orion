@@ -57,6 +57,7 @@ extern "C"
 #include "orionld/context/orionldContextList.h"                // orionldContextHead, orionldContextTail
 #include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
+#include "orionld/context/orionldUserContextKeyValuesCheck.h"  // orionldUserContextKeyValuesCheck
 #include "orionld/serviceRoutines/orionldPostEntities.h"       // Own interface
 
 
@@ -981,6 +982,30 @@ static bool contextTreat
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", "invalid JSON type of @context member", OrionldDetailsString);
     return false;
   }
+
+
+#if 0
+  //
+  // Check the validity of the context
+  //
+
+  //
+  // FIXME: task/28.orionld-user-context-cannot-use-core-context-values
+  //        The check is implemented, but ... six different types of contexts ... just too much
+  //        This test (orionldUserContextKeyValuesCheck) is postponed until hardening/xx.orionld-order-in-contexts
+  //        is implemented.
+  //
+  char* details;
+
+  LM_TMP(("orionldPostEntities calling orionldUserContextKeyValuesCheck"));
+  if (orionldUserContextKeyValuesCheck(ciP->contextP->tree, ciP->contextP->url, &details) == false)
+  {
+    LM_TMP(("orionldPostEntities called orionldUserContextKeyValuesCheck(%s): %s", ciP->contextP->url, details));
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", details, OrionldDetailsString);
+    return false;
+  }
+  LM_TMP(("orionldPostEntities called orionldUserContextKeyValuesCheck: %s", "OK"));
+#endif
 
   LM_T(LmtContextTreat, ("The @context is treated as an attribute"));
   // The @context is treated as an attribute

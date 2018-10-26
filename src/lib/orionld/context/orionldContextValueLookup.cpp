@@ -139,10 +139,8 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value)
 
   if (atContextP->type == KjObject)
   {
-    LM_TMP(("Here"));
     for (KjNode* contextItemP = atContextP->children; contextItemP != NULL; contextItemP = contextItemP->next)
     {
-      LM_TMP(("Here"));
       if ((contextItemP->type != KjString) && (contextItemP->type !=  KjObject))
       {
         LM_E(("Invalid @context - items of contexts must be JSON Strings or jSOn objects - not %s", kjValueType(contextItemP->type)));
@@ -152,22 +150,16 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value)
       //
       // Skip members whose value is a string that starts with "@" - they are information, not translations
       //
-      LM_TMP(("Here"));
       if ((contextItemP->type == KjString) && (contextItemP->value.s[0] == '@'))
       {
         LM_T(LmtContextValueLookup, ("Skipping '%s' with value '%s'", contextItemP->name, contextItemP->value.s));
         continue;
       }
 
-      LM_TMP(("Here"));
       LM_T(LmtContextValueLookup, ("looking for '%s', comparing with '%s'", value, contextItemP->name));
-      LM_TMP(("Here"));
       LM_TMP(("contextItemP at %p", contextItemP));
-      LM_TMP(("Here"));
       LM_TMP(("contextItemP->value.s: '%s'", contextItemP->value.s));
-      LM_TMP(("Here"));
       LM_TMP(("value: '%s'", value));
-      LM_TMP(("Here"));
 
       if (contextItemP->type == KjObject)
       {
@@ -185,9 +177,7 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value)
       {
         // error
       }
-      LM_TMP(("Here"));
     }
-    LM_TMP(("Here"));
   }
   else if (atContextP->type == KjArray)
   {

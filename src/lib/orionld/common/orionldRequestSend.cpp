@@ -146,6 +146,7 @@ bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoIn
     // This function must release the allocated respose buffer in case of error
     if (rBufP->buf != rBufP->internalBuffer)
       free(rBufP->buf);
+
     rBufP->buf = NULL;
 
     release_curl_context(&cc);

@@ -83,9 +83,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
       break;
     }
     else
-    {
       LM_E(("orionldRequestSend failed (try number %d out of 5): %s", tries + 1, *detailsPP));
-    }
 
     if (tryAgain == false)
       break;
