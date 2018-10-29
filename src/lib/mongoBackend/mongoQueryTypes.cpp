@@ -200,7 +200,7 @@ static unsigned int countCmd(const std::string& tenant, const BSONArray& pipelin
 
   if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
   {
-    LM_E(("Runtime Error (ejecuting: %s, error %s)", cmd.toString().c_str(), err.c_str()));
+    LM_E(("Runtime Error (executing: %s, error %s)", cmd.toString().c_str(), err.c_str()));
     return 0;
   }
 
@@ -218,12 +218,12 @@ static unsigned int countCmd(const std::string& tenant, const BSONArray& pipelin
     }
     else
     {
-      LM_E(("Runtime Error (ejecuting: %s, firstBatch does not have a count", cmd.toString().c_str()));
+      LM_E(("Runtime Error (executing: %s, firstBatch does not have a count", cmd.toString().c_str()));
     }
   }
   else
   {
-    LM_E(("Runtime Error (ejecuting: %s, result hasn't cursor field", cmd.toString().c_str()));
+    LM_E(("Runtime Error (executing: %s, result hasn't cursor field", cmd.toString().c_str()));
   }
 
   return 0;
