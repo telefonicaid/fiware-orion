@@ -5,80 +5,120 @@
 
 [![FIWARE Core Context Management](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/core.svg)](https://www.fiware.org/developers/catalogue/)
 [![License badge](https://img.shields.io/github/license/telefonicaid/fiware-orion.svg)](https://opensource.org/licenses/AGPL-3.0)
-[![Documentation badge](https://img.shields.io/readthedocs/fiware-orion.svg)](https://fiware-orion.rtfd.io)
 [![Docker badge](https://img.shields.io/docker/pulls/fiware/orion.svg)](https://hub.docker.com/r/fiware/orion/)
 [![SOF support badge](https://nexus.lab.fiware.org/repository/raw/public/badges/stackoverflow/orion.svg)](http://stackoverflow.com/questions/tagged/fiware-orion)
+[![NGSI v2](https://nexus.lab.fiware.org/repository/raw/public/badges/specifications/ngsiv2.svg)](http://fiware.github.io/context.Orion/api/v2/stable/)
+<br>
+[![Documentation badge](https://img.shields.io/readthedocs/fiware-orion.svg)](https://fiware-orion.rtfd.io)
 [![Build badge](https://img.shields.io/travis/telefonicaid/fiware-orion.svg)](https://travis-ci.org/telefonicaid/fiware-orion/)
 ![Status](https://nexus.lab.fiware.org/static/badges/statuses/orion.svg)
-[![NGSI v2](https://nexus.lab.fiware.org/repository/raw/public/badges/specifications/ngsiv2.svg)](http://fiware.github.io/context.Orion/api/v2/stable/)
 
-* [Introduction](#introduction)
-* [GEi overall description](#gei-overall-description)
-* [Introductory presentations](#introductory-presentations)
-* [Build and Install](#build-and-install)
-* [Running](#running)
-* [API Overview](#api-overview)
-* [API Walkthrough](#api-walkthrough)
-* [Reference Documentation](#reference-documentation)
-* [Testing](#testing)
-    * [End-to-end tests](#end-to-end-tests)
-    * [Unit Tests](#unit-tests)
-* [Advanced topics](#advanced-topics)
-* [License](#license)
-* [Support](#support)
+The Orion Context Broker is an implementation of the Publish/Subscribe Context
+Broker GE, providing an
+[NGSI](https://swagger.lab.fiware.org/?url=https://raw.githubusercontent.com/Fiware/specifications/master/OpenAPI/ngsiv2/ngsiv2-openapi.json)
+interface. Using this interface, clients can do several operations:
 
-## Introduction
+-   Register context producer applications, e.g. a temperature sensor within a
+    room
+-   Update context information, e.g. send updates of temperature
+-   Get notified when changes on context information take place (e.g. the
+    temperature has changed) or with a given frequency (e.g. get the temperature
+    each minute)
+-   Query context information. The Orion Context Broker stores context
+    information updated from applications, so queries are resolved based on that
+    information.
 
-This is the code repository for the Orion Context Broker, the reference implementation of the Publish/Subscribe Context Broker GE.
+This project is part of [FIWARE](https://www.fiware.org/). For more information
+check the FIWARE Catalogue entry for
+[Core Context Management](https://github.com/Fiware/catalogue/tree/master/core).
 
-This project is part of [FIWARE](http://www.fiware.org). Check also the [FIWARE Catalogue entry for Orion](http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker)
+## Content
 
-Any feedback on this documentation is highly welcome, including bugs, typos
-or things you think should be included but aren't. You can use [github issues](https://github.com/telefonicaid/fiware-orion/issues/new) to provide feedback.
+-   [Background](#background)
+    -   [Description](#gei-overall-description)
+    -   [Introductory presentations](#introductory-presentations)
+-   [Install](#install)
+-   [Running](#running)
+-   [Usage](#usage)
+-   [API](#api)
+-   [Reference Documentation](#reference-documentation)
+-   [Testing](#testing)
+    -   [End-to-end tests](#end-to-end-tests)
+    -   [Unit Tests](#unit-tests)
+-   [Advanced topics](#advanced-topics)
+-   [Support](#support)
+-   [Quality Assurance](#quality-assurance)
+-   [License](#license)
 
-You can find the User & Programmer's Manual and the Installation & Administration Manual on [readthedocs.io](https://fiware-orion.readthedocs.io)
+## Background
 
-For documentation previous to Orion 0.23.0 please check the manuals at FIWARE public wiki:
+You can find the User & Programmer's Manual and the Installation &
+Administration Manual on [readthedocs.io](https://fiware-orion.readthedocs.io)
 
-* [Orion Context Broker - Installation and Administration Guide](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide)
-* [Orion Context Broker - User and Programmers Guide](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide)
+For documentation previous to Orion 0.23.0 please check the manuals at FIWARE
+public wiki:
+
+-   [Orion Context Broker - Installation and Administration Guide](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide)
+-   [Orion Context Broker - User and Programmers Guide](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide)
+
+Any feedback on this documentation is highly welcome, including bugs, typos or
+things you think should be included but aren't. You can use
+[github issues](https://github.com/telefonicaid/fiware-orion/issues/new) to
+provide feedback.
 
 [Top](#top)
 
-## GEi overall description
+### Description
 
-Orion is a C++ implementation of the NGSIv2 REST API binding developed as a part of the FIWARE platform.
+Orion is a C++ implementation of the NGSIv2 REST API binding developed as a part
+of the FIWARE platform.
 
-Orion Context Broker allows you to manage the entire lifecycle of context information including updates, queries, registrations and subscriptions. It is an NGSIv2 server implementation to manage context information and its availability. Using the Orion Context Broker, you are able to create context elements and manage them through updates and queries. In addition, you can subscribe to context information so when some condition occurs (e.g. the context elements have changed) you receive a notification. These usage scenarios and the Orion Context Broker features are described in this documentation.
+Orion Context Broker allows you to manage the entire lifecycle of context
+information including updates, queries, registrations and subscriptions. It is
+an NGSIv2 server implementation to manage context information and its
+availability. Using the Orion Context Broker, you are able to create context
+elements and manage them through updates and queries. In addition, you can
+subscribe to context information so when some condition occurs (e.g. the context
+elements have changed) you receive a notification. These usage scenarios and the
+Orion Context Broker features are described in this documentation.
 
-If this is your first contact with the Orion Context Broker, it is highly recommended to have a look to the brief [Quick Start guide](doc/manuals/quick_start_guide.md).
+If this is your first contact with the Orion Context Broker, it is highly
+recommended to have a look to the brief
+[Quick Start guide](doc/manuals/quick_start_guide.md).
 
 [Top](#top)
 
-## Introductory presentations
+### Introductory presentations
 
-* Orion Context Broker [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-20180928) [(jp)](https://www.slideshare.net/fisuda/orion-contextbroker-20180928-117091650)
-* NGSIv2 Overview for Developers That Already Know NGSIv1 [(en)](https://www.slideshare.net/fermingalan/ngsiv2-overview-for-developers-that-already-know-ngsiv1-20180928) [(jp)](https://www.slideshare.net/fisuda/orion-contextbroker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20180928)
+-   Orion Context Broker
+    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-20180928)
+    [(jp)](https://www.slideshare.net/fisuda/orion-contextbroker-20180928-117091650)
+-   NGSIv2 Overview for Developers That Already Know NGSIv1
+    [(en)](https://www.slideshare.net/fermingalan/ngsiv2-overview-for-developers-that-already-know-ngsiv1-20180928)
+    [(jp)](https://www.slideshare.net/fisuda/orion-contextbroker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20180928)
 
 [Top](#top)
 
-## Build and Install
+## Install
 
-Build and Install documentation for Orion Context Broker can be found at [the corresponding section of the Admin Manual](doc/manuals/admin/install.md).
+Build and Install documentation for Orion Context Broker can be found at
+[the corresponding section of the Admin Manual](doc/manuals/admin/install.md).
 
 [Top](#top)
 
 ## Running
 
-How to run Orion Context Broker can be found at [the corresponding section of the Admin Manual](doc/manuals/admin/running.md).
+How to run Orion Context Broker can be found at
+[the corresponding section of the Admin Manual](doc/manuals/admin/running.md).
 
 [Top](#top)
 
-## API Overview
+## Usage
 
-In order to create an entity (Room1) with two attributes (temperature and pressure):
+In order to create an entity (Room1) with two attributes (temperature and
+pressure):
 
-```
+```console
 curl <orion_host>:1026/v2/entities -s -S --header 'Content-Type: application/json' \
     -X POST -d @- <<EOF
 {
@@ -95,12 +135,16 @@ curl <orion_host>:1026/v2/entities -s -S --header 'Content-Type: application/jso
 }
 EOF
 ```
+
 In order to query the entity:
 
+```console
     curl <orion_host>:1026/v2/entities/Room2 -s -S --header 'Accept: application/json' | python -mjson.tool
+```
 
 In order to update one of the entity atributes (temperature):
-```
+
+```console
 curl <orion_host>:1026/v2/entities/Room2/attrs/temperature -s -S \
     --header 'Content-Type: application/json' \
     -X PUT -d @- <<EOF
@@ -112,21 +156,32 @@ EOF
 ```
 
 or (more compact):
-```
+
+```console
 curl <orion_host>:1026/v2/entities/Room2/attrs/temperature/value -s -S \
     --header 'Content-Type: text/plain' \
     -X PUT -d 26.3
 ```
 
-Please have a look at the [Quick Start guide](doc/manuals/quick_start_guide.md) if you want to test these operations in an actual public instance of Orion Context Broker. In addition, have a look to the API Walkthrough and API Reference sections below in order to know more details about the API (subscriptions, registrations, etc.).
+Please have a look at the [Quick Start guide](doc/manuals/quick_start_guide.md)
+if you want to test these operations in an actual public instance of Orion
+Context Broker. In addition, have a look to the API Walkthrough and API
+Reference sections below in order to know more details about the API
+(subscriptions, registrations, etc.).
 
 [Top](#top)
 
-## API Walkthrough
+## API
 
-* FIWARE NGSI v2 [(en)](doc/manuals/user/walkthrough_apiv2.md) [(jp)](doc/manuals.jp/user/walkthrough_apiv2.md) (Markdown)
-* FIWARE NGSI v2 [(en)](http://telefonicaid.github.io/fiware-orion/api/v2/stable/cookbook) [(jp)](https://open-apis.letsfiware.jp/fiware-orion/api/v2/stable/cookbook) (Apiary)
-  * See also NGSIv2 implementation notes [(en)](doc/manuals/user/ngsiv2_implementation_notes.md) [(jp)](doc/manuals.jp/user/ngsiv2_implementation_notes.md)
+-   FIWARE NGSI v2 [(en)](doc/manuals/user/walkthrough_apiv2.md)
+    [(jp)](doc/manuals.jp/user/walkthrough_apiv2.md) (Markdown)
+-   FIWARE NGSI v2
+    [(en)](http://telefonicaid.github.io/fiware-orion/api/v2/stable/cookbook)
+    [(jp)](https://open-apis.letsfiware.jp/fiware-orion/api/v2/stable/cookbook)
+    (Apiary)
+    -   See also NGSIv2 implementation notes
+        [(en)](doc/manuals/user/ngsiv2_implementation_notes.md)
+        [(jp)](doc/manuals.jp/user/ngsiv2_implementation_notes.md)
 
 [Top](#top)
 
@@ -134,12 +189,17 @@ Please have a look at the [Quick Start guide](doc/manuals/quick_start_guide.md) 
 
 API Reference Documentation:
 
-* FIWARE NGSI v2 [(en)](http://telefonicaid.github.io/fiware-orion/api/v2/stable) [(jp)](https://open-apis.letsfiware.jp/fiware-orion/api/v2/stable/) (Apiary)
-  * See also NGSIv2 implementation notes [(en)](doc/manuals/user/ngsiv2_implementation_notes.md) [(jp)](doc/manuals.jp/user/ngsiv2_implementation_notes.md)
+-   FIWARE NGSI v2
+    [(en)](http://telefonicaid.github.io/fiware-orion/api/v2/stable)
+    [(jp)](https://open-apis.letsfiware.jp/fiware-orion/api/v2/stable/) (Apiary)
+    -   See also NGSIv2 implementation notes
+        [(en)](doc/manuals/user/ngsiv2_implementation_notes.md)
+        [(jp)](doc/manuals.jp/user/ngsiv2_implementation_notes.md)
 
 Orion Reference Documentation:
 
-* Orion Manuals in RTD [(en)](https://fiware-orion.readthedocs.org) [(jp)](https://fiware-orion.letsfiware.jp/)
+-   Orion Manuals in RTD [(en)](https://fiware-orion.readthedocs.org)
+    [(jp)](https://fiware-orion.letsfiware.jp/)
 
 [Top](#top)
 
@@ -151,7 +211,10 @@ The functional_test makefile target is used for running end-to-end tests:
 
     make functional_test INSTALL_DIR=~
 
-Please have a look to the section [on building the source code](doc/manuals/admin/build_source.md) in order to get more information about how to prepare the environment to run the functional_test target.
+Please have a look to the section
+[on building the source code](doc/manuals/admin/build_source.md) in order to get
+more information about how to prepare the environment to run the functional_test
+target.
 
 ### Unit Tests
 
@@ -159,34 +222,68 @@ The unit_test makefile target is used for running the unit tests:
 
     make unit_test
 
-Please have a look to the section [on building the source code](doc/manuals/admin/build_source.md) in order to get more information about how to prepare the environment to run the unit_test target.
+Please have a look to the section
+[on building the source code](doc/manuals/admin/build_source.md) in order to get
+more information about how to prepare the environment to run the unit_test
+target.
 
 [Top](#top)
 
 ## Advanced topics
 
-* Advanced Programming [(en)](doc/manuals/user/README.md) [(jp)](doc/manuals.jp/user/README.md)
-* Installation and administration [(en)](doc/manuals/admin/README.md) [(jp)](doc/manuals.jp/admin/README.md)
-* Container-based deployment
-  * Docker [(en)](docker/README.md) [(jp)](docker/README.jp.md)
-  * Docker Swarm and HA [(en)](docker/docker_swarm.md) [(jp)](docker/docker_swarm.jp.md)
-* Development Manual [(en)](doc/manuals/devel/README.md) [(jp)](doc/manuals.jp/devel/README.md)
-* Sample code contributions [(en)](doc/manuals/code_contributions.md) [(jp)](doc/manuals.jp/code_contributions.md)
-* Contribution guidelines [(en)](doc/manuals/contribution_guidelines.md) [(jp)](doc/manuals.jp/contribution_guidelines.md), especially important if you plan to contribute with code
-  to Orion Context Broker
-* Deprecated features [(en)](doc/manuals/deprecated.md) [(jp)](doc/manuals.jp/deprecated.md)
-
-[Top](#top)
-
-## License
-
-Orion Context Broker is licensed under Affero General Public License (GPL) version 3.
+-   Advanced Programming [(en)](doc/manuals/user/README.md)
+    [(jp)](doc/manuals.jp/user/README.md)
+-   Installation and administration [(en)](doc/manuals/admin/README.md)
+    [(jp)](doc/manuals.jp/admin/README.md)
+-   Container-based deployment
+    -   Docker [(en)](docker/README.md) [(jp)](docker/README.jp.md)
+    -   Docker Swarm and HA [(en)](docker/docker_swarm.md)
+        [(jp)](docker/docker_swarm.jp.md)
+-   Development Manual [(en)](doc/manuals/devel/README.md)
+    [(jp)](doc/manuals.jp/devel/README.md)
+-   Sample code contributions [(en)](doc/manuals/code_contributions.md)
+    [(jp)](doc/manuals.jp/code_contributions.md)
+-   Contribution guidelines [(en)](doc/manuals/contribution_guidelines.md)
+    [(jp)](doc/manuals.jp/contribution_guidelines.md), especially important if
+    you plan to contribute with code to Orion Context Broker
+-   Deprecated features [(en)](doc/manuals/deprecated.md)
+    [(jp)](doc/manuals.jp/deprecated.md)
 
 [Top](#top)
 
 ## Support
 
-Ask your thorough programming questions using [stackoverflow](http://stackoverflow.com/questions/ask)
-and your general questions on [FIWARE Q&A](https://ask.fiware.org). In both cases please use the tag `fiware-orion`
+Ask your thorough programming questions using
+[stackoverflow](http://stackoverflow.com/questions/ask) and your general
+questions on [FIWARE Q&A](https://ask.fiware.org). In both cases please use the
+tag `fiware-orion`
 
 [Top](#top)
+
+## Quality Assurance
+
+This project is part of [FIWARE](https://fiware.org/) and has been rated as
+follows:
+
+-   **Version Tested:**
+    ![ ](https://img.shields.io/badge/dynamic/json.svg?label=Version&url=https://fiware.github.io/catalogue/json/orion.json&query=$.version&colorB=blue)
+-   **Documentation:**
+    ![ ](https://img.shields.io/badge/dynamic/json.svg?label=Completeness&url=https://fiware.github.io/catalogue/json/orion.json&query=$.docCompleteness&colorB=blue)
+    ![ ](https://img.shields.io/badge/dynamic/json.svg?label=Usability&url=https://fiware.github.io/catalogue/json/orion.json&query=$.docSoundness&colorB=blue)
+-   **Responsiveness:**
+    ![ ](https://img.shields.io/badge/dynamic/json.svg?label=Time%20to%20Respond&url=https://fiware.github.io/catalogue/json/orion.json&query=$.timeToCharge&colorB=blue)
+    ![ ](https://img.shields.io/badge/dynamic/json.svg?label=Time%20to%20Fix&url=https://fiware.github.io/catalogue/json/orion.json&query=$.timeToFix&colorB=blue)
+-   **FIWARE Testing:**
+    ![ ](https://img.shields.io/badge/dynamic/json.svg?label=Tests%20Passed&url=https://fiware.github.io/catalogue/json/orion.json&query=$.failureRate&colorB=blue)
+    ![ ](https://img.shields.io/badge/dynamic/json.svg?label=Scalability&url=https://fiware.github.io/catalogue/json/orion.json&query=$.scalability&colorB=blue)
+    ![ ](https://img.shields.io/badge/dynamic/json.svg?label=Performance&url=https://fiware.github.io/catalogue/json/orion.json&query=$.performance&colorB=blue)
+    ![ ](https://img.shields.io/badge/dynamic/json.svg?label=Stability&url=https://fiware.github.io/catalogue/json/orion.json&query=$.stability&colorB=blue)
+
+---
+
+## License
+
+Orion Context Broker is licensed under Affero General Public License (GPL)
+version 3.
+
+© 2018 Telefonica Investigación y Desarrollo, S.A.U
