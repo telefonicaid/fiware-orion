@@ -73,7 +73,7 @@ commands that require root privilege):
 
 * (Optional but highly recommended) run unit test. Firstly, you have to install MongoDB as the unit and functional tests
 rely on mongod running in localhost. Check [the official MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/)
-for details. Recommended version is 3.4 (although 3.2 should also work fine).
+for details. Recommended version is 3.6 (although 3.2 and 3.4 should also work fine).
 
 * Install the binary. You can use INSTALL_DIR to set the installation prefix path (default is /usr), thus the broker is installed in `$INSTALL_DIR/bin` directory.
 
