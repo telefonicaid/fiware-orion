@@ -73,8 +73,8 @@ echo
 echo
 
 
-echo "02. Checking mongo to find entity type http://example.org/T and the metadata @aliasAttrName"
-echo "=============================================================================================="
+echo "02. Checking mongo to find attribute http://uri.etsi.org/ngsi-ld/title"
+echo "======================================================================"
 mongoCmd2 ftest "db.entities.findOne()"
 echo
 echo
@@ -91,8 +91,8 @@ Date: REGEX(.*)
 
 
 
-02. Checking mongo to find entity type http://example.org/T and the metadata @aliasAttrName
-==============================================================================================
+02. Checking mongo to find attribute http://uri.etsi.org/ngsi-ld/title
+======================================================================
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
@@ -111,7 +111,19 @@ MongoDB server version: REGEX(.*)
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : "Titulo",
-			"mdNames" : [ ]
+			"md" : {
+				"unitCode" : {
+					"value" : "123"
+				},
+				"R_R" : {
+					"type" : "Relationship",
+					"value" : "http://a.b.c/R_R"
+				}
+			},
+			"mdNames" : [
+				"unitCode",
+				"R_R"
+			]
 		}
 	},
 	"creDate" : REGEX(.*),
@@ -123,4 +135,4 @@ bye
 
 --TEARDOWN--
 brokerStop CB
-#dbDrop CB
+dbDrop CB

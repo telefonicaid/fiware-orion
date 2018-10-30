@@ -174,12 +174,18 @@ CompoundValueNode::CompoundValueNode
   numberValue (_value),
   boolValue   (false),
   container   (_container),
-  rootP       (container->rootP),
+  rootP       (NULL),
   siblingNo   (_siblingNo),
   renderName  (false),
   path        (_path),
-  level       (container->level + 1)
+  level       (0)
 {
+  if (_container != NULL)
+  {
+    rootP = container->rootP;
+    level = container->level + 1;
+  }
+
   LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s at %p",
                           name.c_str(),
                           level,

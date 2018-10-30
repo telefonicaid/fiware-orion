@@ -86,8 +86,6 @@ KjNode* kjTreeFromContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP, c
     kjChildAdd(aTopNodeP, typeNodeP);
   }
   
-  // This is for ngsi-ld only, so, no metadata
-
   // Value
   KjNode* nodeP;
 
@@ -130,6 +128,16 @@ KjNode* kjTreeFromContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP, c
     ALLOCATION_CHECK(nodeP);
     kjChildAdd(aTopNodeP, nodeP);
     break;
+  }
+
+  // Metadata
+  for (unsigned int ix = 0; ix < caP->metadataVector.size(); ix++)
+  {
+    Metadata* mdP = caP->metadataVector[ix];
+
+    // They are all strings for now ...
+    nodeP = kjString(ciP->kjsonP, mdP->name.c_str(), mdP->stringValue.c_str());
+    kjChildAdd(aTopNodeP, nodeP);
   }
 
   return aTopNodeP;

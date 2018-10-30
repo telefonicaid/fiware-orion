@@ -283,11 +283,12 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
       if (b == false)
       {
+        LM_TMP(("Service Routine for %s %s returned FALSE (%d)", verbName(ciP->verb), ciP->urlPath, ciP->httpStatusCode));
         //
-        // If the service routine failed (returned FALSE), but no HTTP status code is set,
+        // If the service routine failed (returned FALSE), but no HTTP status ERROR code is set,
         // the HTTP status code defaults to 400
         //
-        if (ciP->httpStatusCode == SccOk)
+        if (ciP->httpStatusCode < 400)
         {
           ciP->httpStatusCode = SccBadRequest;
         }
@@ -295,7 +296,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     }
   }
 
-
+  //
   // Is there a KJSON response tree to render?
   // [ Note that this is always TRUE when error == true ]
   //

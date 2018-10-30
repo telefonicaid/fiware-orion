@@ -275,7 +275,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
   // Cloning metadata
   for (unsigned int mIx = 0; mIx < caP->metadataVector.size(); ++mIx)
   {
-    LM_T(LmtClone, ("Copying metadata %d", mIx));
+    LM_T(LmtClone, ("Copying metadata %d ('%s' of type '%s')", mIx, caP->metadataVector[mIx]->name.c_str(),  valueTypeName(caP->metadataVector[mIx]->valueType)));
     Metadata* mP = new Metadata(caP->metadataVector[mIx], useDefaultType);
     metadataVector.push_back(mP);
   }

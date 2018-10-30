@@ -46,6 +46,7 @@ extern "C"
 #include "orionld/common/httpStatusCodeToOrionldErrorType.h"   // httpStatusCodeToOrionldErrorType
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
 #include "orionld/kjTree/kjTreeFromContextContextAttribute.h"  // kjTreeFromContextContextAttribute
+#include "orionld/kjTree/kjTreeFromCompoundValue.h"            // kjTreeFromCompoundValue
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // Own interface
 
 
@@ -243,6 +244,8 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, QueryContextResponse
   //
   // Attributes, including @context
   //
+  // FIXME: Use kjTreeFromContextAttribute() !!!
+  //
   ContextAttribute* contextAttrP = NULL;
 
   for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); aIx++)
@@ -331,8 +334,62 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, QueryContextResponse
     }
 
     kjChildAdd(top, aTop);  // Adding the attribute to the tree
-  }
 
+    // Metadata
+    for (unsigned int ix = 0; ix < aP->metadataVector.size(); ix++)
+    {
+      //
+      // Metadata with "type" != "" are built as Objects with type+value/object
+      //
+      Metadata* mdP     = aP->metadataVector[ix];
+      char*     details = NULL;
+      char*     mdName  = (char*) mdP->name.c_str();
+      
+      LM_TMP(("Extracting metadata '%s' (value type: %d)", mdName, mdP->valueType));
+
+      if (mdP->type != "")
+      {
+        const char*  valueFieldName = (mdP->type == "Relationship")? "object" : "value";
+        KjNode*      typeP;
+        KjNode*      valueP = NULL;
+
+        nodeP = kjObject(ciP->kjsonP, mdName);
+        typeP = kjString(ciP->kjsonP, "type", mdP->type.c_str());
+        
+        switch (mdP->valueType)
+        {
+        case orion::ValueTypeString:   valueP = kjString(ciP->kjsonP, valueFieldName, mdP->stringValue.c_str());   break;
+        case orion::ValueTypeNumber:   valueP = kjFloat(ciP->kjsonP, valueFieldName, mdP->numberValue);            break;
+        case orion::ValueTypeBoolean:  valueP = kjBoolean(ciP->kjsonP, valueFieldName, mdP->boolValue);            break;
+        case orion::ValueTypeNull:     valueP = kjNull(ciP->kjsonP, valueFieldName);                               break;
+        case orion::ValueTypeObject:   valueP = kjTreeFromCompoundValue(ciP, mdP->compoundValueP, &details);       break;
+        case orion::ValueTypeVector:   valueP = kjTreeFromCompoundValue(ciP, mdP->compoundValueP, &details);       break;
+        case orion::ValueTypeNotGiven: valueP = kjString(ciP->kjsonP, valueFieldName, "UNKNOWN TYPE IN MONGODB");  break;
+        }
+
+        kjChildAdd(nodeP, typeP);
+        kjChildAdd(nodeP, valueP);
+      }
+      else
+      {
+        switch (mdP->valueType)
+        {
+        case orion::ValueTypeString:   nodeP = kjString(ciP->kjsonP, mdName, mdP->stringValue.c_str()); break;
+        case orion::ValueTypeNumber:   nodeP = kjFloat(ciP->kjsonP, mdName, mdP->numberValue);          break;
+        case orion::ValueTypeBoolean:  nodeP = kjBoolean(ciP->kjsonP, mdName, mdP->boolValue);          break;
+        case orion::ValueTypeNull:     nodeP = kjNull(ciP->kjsonP, mdName);                             break;
+        case orion::ValueTypeObject:   nodeP = kjTreeFromCompoundValue(ciP, mdP->compoundValueP, &details);        break;
+        case orion::ValueTypeVector:   nodeP = kjTreeFromCompoundValue(ciP, mdP->compoundValueP, &details);        break;
+        case orion::ValueTypeNotGiven: nodeP = kjString(ciP->kjsonP, mdName, "UNKNOWN TYPE IN MONGODB");           break;
+        }
+      }
+
+      if (nodeP == NULL)
+        LM_E(("Error in creation of KjNode for metadata (%s)", (details != NULL)? details : "no details"));
+      else
+        kjChildAdd(aTop, nodeP);
+    }
+  }
 
   //
   // Set MIME Type to JSONLD if JSONLD is in the Accepot header of the incoming request

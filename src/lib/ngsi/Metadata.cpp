@@ -80,7 +80,7 @@ Metadata::Metadata()
 */
 Metadata::Metadata(Metadata* mP, bool useDefaultType)
 {
-  LM_T(LmtClone, ("'cloning' a Metadata"));
+  LM_T(LmtClone, ("'cloning' Metadata '%s'", mP->name.c_str()));
 
   name            = mP->name;
   type            = mP->type;
@@ -89,6 +89,8 @@ Metadata::Metadata(Metadata* mP, bool useDefaultType)
   numberValue     = mP->numberValue;
   boolValue       = mP->boolValue;
   typeGiven       = mP->typeGiven;
+
+  LM_T(LmtClone, ("mP->compoundValueP at %p", mP->compoundValueP));
   compoundValueP  = (mP->compoundValueP != NULL)? mP->compoundValueP->clone() : NULL;
 
   if (useDefaultType && !typeGiven)
@@ -437,6 +439,14 @@ std::string Metadata::toStringValue(void) const
 
   case orion::ValueTypeNull:
     return "null";
+    break;
+
+  case orion::ValueTypeObject:
+    return "an object";
+    break;
+
+  case orion::ValueTypeVector:
+    return "an array";
     break;
 
   case orion::ValueTypeNotGiven:
