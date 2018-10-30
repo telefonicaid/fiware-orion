@@ -908,11 +908,13 @@ TEST(mongoQueryTypes, queryAllDbException)
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("Database Error (collection: utest "
             "- runCommand(): { aggregate: \"entities\", "
+            "cursor: { batchSize: 1000 }, "
             "pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, "
-            "{ $project: { _id: 1, attrNames: 1 } }, "
+            "{ $project: { _id.type: { $ifNull: [ \"$_id.type\", null ] }, attrNames: 1 } }, "
             "{ $project: { attrNames: { $cond: [ { $eq: [ \"$attrNames\", [] ] }, [ null ], \"$attrNames\" ] } } }, "
             "{ $unwind: \"$attrNames\" }, "
-            "{ $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $sort: { _id: 1 } } ] } "
+            "{ $group: { _id: { $cond: [ { $in: [ \"$_id.type\", [ null, \"\" ] ] }, \"\", \"$_id.type\" ] }, attrs: { $addToSet: \"$attrNames\" } } }, "
+            "{ $sort: { _id: 1 } }, { $skip: 0 }, { $limit: 20 } ] } "
             "- exception: boom!!)", res.statusCode.details);
   EXPECT_EQ(0, res.entityTypeVector.size());
 
@@ -959,13 +961,13 @@ TEST(mongoQueryTypes, queryAllGenericException)
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("Database Error (collection: utest "
             "- runCommand(): { aggregate: \"entities\", "
+            "cursor: { batchSize: 1000 }, "
             "pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, "
-            "{ $project: { _id: 1, attrNames: 1 } }, "
-            "{ $project: { attrNames: { $cond: [ { $eq: [ \"$attrNames\", [] ] }, "
-            "[ null ], \"$attrNames\" ] } } }, "
+            "{ $project: { _id.type: { $ifNull: [ \"$_id.type\", null ] }, attrNames: 1 } }, "
+            "{ $project: { attrNames: { $cond: [ { $eq: [ \"$attrNames\", [] ] }, [ null ], \"$attrNames\" ] } } }, "
             "{ $unwind: \"$attrNames\" }, "
-            "{ $group: { _id: \"$_id.type\", "
-            "attrs: { $addToSet: \"$attrNames\" } } }, { $sort: { _id: 1 } } ] } "
+            "{ $group: { _id: { $cond: [ { $in: [ \"$_id.type\", [ null, \"\" ] ] }, \"\", \"$_id.type\" ] }, attrs: { $addToSet: \"$attrNames\" } } }, "
+            "{ $sort: { _id: 1 } }, { $skip: 0 }, { $limit: 20 } ] } "
             "- exception: std::exception)", res.statusCode.details);
   EXPECT_EQ(0, res.entityTypeVector.size());
 
@@ -1463,10 +1465,14 @@ TEST(mongoQueryTypes, queryGivenTypeDbException)
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("Database Error (collection: utest "
             "- runCommand(): { aggregate: \"entities\", "
+            "cursor: { batchSize: 1000 }, "
             "pipeline: [ { $match: { _id.type: \"Car\", _id.servicePath: { $in: [ /^/.*/, null ] } } }, "
-            "{ $project: { _id: 1, attrNames: 1 } }, { $unwind: \"$attrNames\" }, "
-            "{ $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, "
-            "{ $unwind: \"$attrs\" }, { $group: { _id: \"$attrs\" } }, { $sort: { _id: 1 } } ] } "
+            "{ $project: { _id.type: { $ifNull: [ \"$_id.type\", null ] }, attrNames: 1 } }, "
+            "{ $unwind: \"$attrNames\" }, "
+            "{ $group: { _id: { $cond: [ { $in: [ \"$_id.type\", [ null, \"\" ] ] }, \"\", \"$_id.type\" ] }, attrs: { $addToSet: \"$attrNames\" } } }, "
+            "{ $unwind: \"$attrs\" }, "
+            "{ $group: { _id: \"$attrs\" } }, "
+            "{ $sort: { _id: 1 } } ] } "
             "- exception: boom!!)", res.statusCode.details);
   EXPECT_EQ(0, res.entityType.contextAttributeVector.size());
 
@@ -1511,13 +1517,14 @@ TEST(mongoQueryTypes, queryGivenTypeGenericException)
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("Database Error (collection: utest "
             "- runCommand(): { aggregate: \"entities\", "
-            "pipeline: [ { $match: { _id.type: \"Car\", "
-            "_id.servicePath: { $in: [ /^/.*/, null ] } } }, "
-            "{ $project: { _id: 1, attrNames: 1 } }, "
+            "cursor: { batchSize: 1000 }, "
+            "pipeline: [ { $match: { _id.type: \"Car\", _id.servicePath: { $in: [ /^/.*/, null ] } } }, "
+            "{ $project: { _id.type: { $ifNull: [ \"$_id.type\", null ] }, attrNames: 1 } }, "
             "{ $unwind: \"$attrNames\" }, "
-            "{ $group: { _id: \"$_id.type\", "
-            "attrs: { $addToSet: \"$attrNames\" } } }, "
-            "{ $unwind: \"$attrs\" }, { $group: { _id: \"$attrs\" } }, { $sort: { _id: 1 } } ] } "
+            "{ $group: { _id: { $cond: [ { $in: [ \"$_id.type\", [ null, \"\" ] ] }, \"\", \"$_id.type\" ] }, attrs: { $addToSet: \"$attrNames\" } } }, "
+            "{ $unwind: \"$attrs\" }, "
+            "{ $group: { _id: \"$attrs\" } }, "
+            "{ $sort: { _id: 1 } } ] } "
             "- exception: std::exception)", res.statusCode.details);
   EXPECT_EQ(0, res.entityType.contextAttributeVector.size());
 
