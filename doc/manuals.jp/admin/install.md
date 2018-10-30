@@ -19,7 +19,7 @@
 
 * システムリソース : [これらの推奨事項](diagnosis.md#resource-availability)を参照
 * オペレーティング・システム : CentOS/RedHat。リファレンス・オペレーティング・システムは CentOS 7.4.1708 ですが、それ以降の CentOS/RedHat 7.x バージョンでも動作します
-* データベース : MongoDB は、Orion Context Broker をインストールするホストと同じホストで実行するか、ネットワーク経由でアクセス可能な別のホストで実行する必要があります。推奨される MongoDB のバージョンは 3.4 です。古いバージョンでは動作しますが、推奨しません
+* データベース : MongoDB は、Orion Context Broker をインストールするホストと同じホストで実行するか、ネットワーク経由でアクセス可能な別のホストで実行する必要があります。推奨される MongoDB のバージョンは 3.6 です。古いバージョンでは動作しますが、推奨しません
 * RPM の依存関係 (これらのパッケージのいくつかは、公式の CentOS/RedHat リポジトリにはありませんが、EPEL にあります。EPEL リポジトリを設定する必要があります。<http://fedoraproject.org/wiki/EPEL> を参照してください) :
     * contextBroker パッケージ (必須) は次のパッケージに依存しています : libstdc++, boost-thread, boost-filesystem, gnutls, libgcrypt, libcurl, openssl, logrotate, libuuid
 
