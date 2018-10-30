@@ -2,7 +2,7 @@
 
 ## General restrictions
 
-In order to avoid script injections attack in some circustances (e.g.
+In order to avoid script injections attack in some circumstances (e.g.
 cross domain to co-located web servers in the same hot that CB) the
 following characters are forbidden in any request:
 
@@ -23,7 +23,7 @@ like this:
         "description": "Invalid characters in attribute type"
     }
 
-If your aplication needs to use these characteres, you should encode it
+If your application needs to use these characters, you should encode it
 using a scheme not including forbidden characters before sending the
 request to Orion. 
 
