@@ -41,6 +41,11 @@ Orion Context Broker は、データベース管理者に柔軟性を提供す�
     * `attrNames`
     * `creDate`
 
+`orderBy` クエリ (つまり `GET /v2/entities?orderBy=A`) を使用する場合、それらのインデックスを
+作成することもお勧めします。特に、指定された属性 'A' によって昇順 (つまり `orderBy=A`) に
+並べ替える場合は、インデックス `{attrs.A.value: 1}` を作成する必要があります。指定された属性 'A' を
+降順で並べ替える場合 (つまり、`orderBy=!A`)、インデックス `{attrs.A.value: -1}` を作成する必要があります。
+
 Orion Context Broker が実際に保証する唯一のインデックスは、機能上の必要な [ジオロケーション機能](../user/geolocation.md)のために、エンティティ・コレクション内にある、`location.coords` フィールドの "2dsphere" です。Orion の起動時またはエンティティの作成時にインデックスが保証されます。
 
 [このドキュメント](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/admin/extra/indexes_analysis.md)では、古い Orion バージョンをベースにしていますが、インデックスの影響についての分析を見つけることができますが、古くなった可能性があります。
