@@ -1,0 +1,155 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Metadta with compound value
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-249
+
+--SHELL--
+
+#
+# 01. Create an entity E with an attribute A having a metadata M that has a compound value
+# 02. See the entity in the database
+# 03. GET the entity
+#
+
+echo "01. Create an entity E with an attribute A having a metadata M that has a compound value"
+echo "========================================================================================"
+payload='{
+  "id": "http://a.b.c/entity/E",
+  "type": "TTT",
+  "A": {
+    "type": "Property",
+    "value": 12,
+    "M": {
+      "type": "Property",
+      "value": {
+        "a": 1,
+        "b": 2
+      }
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "02. See the entity in the database"
+echo "=================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+
+echo "03. GET the entity"
+echo "=================="
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E with an attribute A having a metadata M that has a compound value
+========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E
+Date: REGEX(.*)
+
+
+
+02. See the entity in the database
+==================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb://localhost:REGEX(.*)/ftest
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "http://a.b.c/entity/E",
+		"type" : "http://example.org/ngsi-ld/default/TTT",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"http://example.org/ngsi-ld/default/A"
+	],
+	"attrs" : {
+		"http://example=org/ngsi-ld/default/A" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 12,
+			"md" : {
+				"M" : {
+					"type" : "Property",
+					"value" : {
+						"a" : 1,
+						"b" : 2
+					}
+				}
+			},
+			"mdNames" : [
+				"M"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. GET the entity
+==================
+HTTP/1.1 200 OK
+Content-Length: 145
+Content-Type: application/json
+Link: https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json
+Date: REGEX(.*)
+
+{
+    "A": {
+        "M": {
+            "type": "Property",
+            "value": {
+                "a": 1.0,
+                "b": 2.0
+            }
+        },
+        "type": "Property",
+        "value": 12.0
+    },
+    "id": "http://a.b.c/entity/E",
+    "type": "TTT"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
