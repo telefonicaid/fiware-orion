@@ -1,0 +1,152 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Create an inconsistent entity with a location attribute and no metadata directly in DB.
+GET the resulting entity both with NGSIV1 and NGSV2.
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create E1 directly in DB
+# 02. Get E1 with NGSIV1
+# 03. Get E1 with NGSIV2
+
+echo "01. Create E1 directly in DB"
+echo "============================"
+mongoCmd ${CB_DB_NAME} 'db.entities.insert({
+        "_id": {
+                "id": "E1",
+                "type": "T",
+                "servicePath": "/"
+        },
+        "attrNames": ["A"],
+        "attrs": {
+                "A": {
+                        "type": "whatever",
+                        "creDate": 1462826512,
+                        "modDate": 1462826512,
+                        "value": "40,-3"
+                }
+        },
+        "creDate": 1462826512,
+        "modDate": 1462826512,
+        "location" : {
+	        "attrName" : "A",
+	        "coords" : {
+	            "type" : "Point",
+	            "coordinates" : [ 
+	                -3.0, 
+	                40.0
+	            ]
+	        }
+    	}
+})'
+echo
+echo
+echo
+echo
+
+
+echo "02. Get E1 with NGSIV1"
+echo "======================"
+orionCurl --url '/v1/contextEntities/E1'
+echo
+echo
+
+
+echo "03. Get E1 with NGSIV2"
+echo "======================"
+orionCurl --url '/v2/entities/E1'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 directly in DB
+============================
+WriteResult({ "nInserted" : 1 })
+
+
+
+
+02. Get E1 with NGSIV1
+======================
+HTTP/1.1 200 OK
+Content-Length: 237
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "metadatas": [
+                    {
+                        "name": "location", 
+                        "type": "string", 
+                        "value": "WGS84"
+                    }
+                ], 
+                "name": "A", 
+                "type": "whatever", 
+                "value": "40,-3"
+            }
+        ], 
+        "id": "E1", 
+        "isPattern": "false", 
+        "type": "T"
+    }, 
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+03. Get E1 with NGSIV2
+======================
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {}, 
+        "type": "whatever", 
+        "value": "40,-3"
+    }, 
+    "id": "E1", 
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+#dbDrop CB

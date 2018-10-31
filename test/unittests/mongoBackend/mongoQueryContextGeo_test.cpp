@@ -88,24 +88,21 @@ static void prepareDatabase(void)
   BSONObj A = BSON("_id" << BSON("id" << "A" << "type" << "Point") <<
                    "attrNames" << BSON_ARRAY("pos" << "foo") <<
                    "attrs" << BSON(
-                     "pos" << BSON("type" << "location" << "value" << "2, 3" << "md" <<
-                              BSON("location" << BSON("type" << "string" << "value" << "WGS84"))) <<
+                     "pos" << BSON("type" << "location" << "value" << "2, 3") <<
                      "foo" << BSON("type" << "string" << "value" << "attr_A")) <<
                    "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(3.0 << 2.0)));
 
   BSONObj B = BSON("_id" << BSON("id" << "B" << "type" << "Point") <<
                    "attrNames" << BSON_ARRAY("pos" << "foo") <<
                    "attrs" << BSON(
-                     "pos" << BSON("type" << "location" << "value" << "5, 5" << "md" <<
-                              BSON("location" << BSON("type" << "string" << "value" << "WGS84"))) <<
+                     "pos" << BSON("type" << "location" << "value" << "5, 5") <<
                      "foo" << BSON("type" << "string" << "value" << "attr_B")) <<
                    "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(5.0 << 5.0)));
 
   BSONObj C = BSON("_id" << BSON("id" << "C" << "type" << "Point") <<
                    "attrNames" << BSON_ARRAY("pos" << "foo") <<
                    "attrs" << BSON(
-                     "pos" << BSON("type" << "location" << "value" << "4, 7" << "md" <<
-                              BSON("location" << BSON("type" << "string" << "value" << "WGS84"))) <<
+                     "pos" << BSON("type" << "location" << "value" << "4, 7") <<
                      "foo" << BSON("type" << "string" << "value" << "attr_C")) <<
                    "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(7.0 << 4.0)));
 
@@ -120,24 +117,21 @@ static void prepareDatabase(void)
   BSONObj city1 = BSON("_id" << BSON("id" << "Madrid" << "type" << "City") <<
                        "attrNames" << BSON_ARRAY("pos" << "foo") <<
                        "attrs" << BSON(
-                         "pos" << BSON("type" << "location" << "value" << "40.418889, -3.691944" << "md" <<
-                              BSON("location" << BSON("type" << "string" << "value" << "WGS84"))) <<
+                         "pos" << BSON("type" << "location" << "value" << "40.418889, -3.691944") <<
                          "foo" << BSON("type" << "string" << "value" << "attr_Mad")) <<
                        "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.691944 << 40.418889)));
 
   BSONObj city2 = BSON("_id" << BSON("id" << "Alcobendas" << "type" << "City") <<
                        "attrNames" << BSON_ARRAY("pos" << "foo") <<
                        "attrs" << BSON(
-                         "pos" << BSON("type" << "location" << "value" << "40.533333, -3.633333" << "md" <<
-                              BSON("location" << BSON("type" << "string" << "value" << "WGS84"))) <<
+                         "pos" << BSON("type" << "location" << "value" << "40.533333, -3.633333") <<
                          "foo" << BSON("type" << "string" << "value" << "attr_Alc")) <<
                        "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.633333 << 40.533333)));
 
   BSONObj city3 = BSON("_id" << BSON("id" << "Leganes" << "type" << "City") <<
                        "attrNames" << BSON_ARRAY("pos" << "foo") <<
                        "attrs" << BSON(
-                         "pos" << BSON("type" << "location" << "value" << "40.316667, -3.75" << "md" <<
-                              BSON("location" << BSON("type" << "string" << "value" << "WGS84"))) <<
+                         "pos" << BSON("type" << "location" << "value" << "40.316667, -3.75") <<
                          "foo" << BSON("type" << "string" << "value" << "attr_Leg")) <<
                        "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.75 << 40.316667)));
 

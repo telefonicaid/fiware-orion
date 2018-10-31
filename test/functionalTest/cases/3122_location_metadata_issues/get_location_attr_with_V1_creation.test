@@ -1,0 +1,176 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Create an entity with a location metadata, old way of creating a location attribute, with NGSIV1 POST.
+GET the resulting entity both with NGSIV1 and NGSV2.
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create E1 with NGSIV1
+# 02. Get E1 with NGSIV1
+# 03. Get E1 with NGSIV2
+
+echo "01. Create E1 with NGSIV1"
+echo "========================="
+payload='
+{
+    "attributes": [
+        {
+            "name": "A",
+            "type": "whatever",
+            "value": "40,-3",
+            "metadatas": [
+               {
+                  "name": "location",
+                  "type": "string",
+                  "value": "WGS84"
+               }
+            ]
+        }
+    ]
+}
+'
+orionCurl --url '/v1/contextEntities/type/T/id/E1' --payload "$payload"
+echo
+echo
+
+
+echo "02. Get E1 with NGSIV1"
+echo "======================"
+orionCurl --url '/v1/contextEntities/E1'
+echo
+echo
+
+
+echo "03. Get E1 with NGSIV2"
+echo "======================"
+orionCurl --url '/v2/entities/E1'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 with NGSIV1
+=========================
+HTTP/1.1 200 OK
+Content-Length: 236
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "metadatas": [
+                        {
+                            "name": "location",
+                            "type": "string",
+                            "value": "WGS84"
+                        }
+                    ], 
+                    "name": "A", 
+                    "type": "whatever", 
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "E1", 
+    "isPattern": "false", 
+    "type": "T"
+}
+
+
+02. Get E1 with NGSIV1
+======================
+HTTP/1.1 200 OK
+Content-Length: 237
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "metadatas": [
+                    {
+                        "name": "location", 
+                        "type": "string", 
+                        "value": "WGS84"
+                    }
+                ], 
+                "name": "A", 
+                "type": "whatever", 
+                "value": "40,-3"
+            }
+        ], 
+        "id": "E1", 
+        "isPattern": "false", 
+        "type": "T"
+    }, 
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+03. Get E1 with NGSIV2
+======================
+HTTP/1.1 200 OK
+Content-Length: 120
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {
+            "location": {
+                "type": "string", 
+                "value": "WGS84"
+            }
+        }, 
+        "type": "whatever", 
+        "value": "40,-3"
+    }, 
+    "id": "E1", 
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+#dbDrop CB

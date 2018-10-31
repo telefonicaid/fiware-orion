@@ -132,10 +132,11 @@ ContextElementResponse::ContextElementResponse
   attrs.getFieldNames(attrNames);
   for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
-    std::string        attrName = *i;
-    BSONObj            attr     = getObjectFieldF(attrs, attrName);
-    ContextAttribute*  caP      = NULL;
+    std::string        attrName                = *i;
+    BSONObj            attr                    = getObjectFieldF(attrs, attrName);
+    ContextAttribute*  caP                     = NULL;
     ContextAttribute   ca;
+    bool               noLocationMetadata      = true;
 
     // Name and type
     ca.name           = dbDotDecode(basePart(attrName));
@@ -230,6 +231,26 @@ ContextElementResponse::ContextElementResponse
       {
         std::string currentMd = *i;
         Metadata*   md = new Metadata(dbDotDecode(currentMd), getObjectFieldF(mds, currentMd));
+        caP->metadataVector.push_back(md);
+
+        /* The flag below indicates that a location metadata was found during iteration.
+        * It needs to the NGSIV1 check below, in order to add it if the flag is false */
+        if (md->name == NGSI_MD_LOCATION)
+        {
+          noLocationMetadata = false;
+        }
+      }
+    }
+
+    if (apiVersion == V1)
+    {
+      /* Setting location metadata (if location attr found
+       *  and the location metadata was not present) */
+      if ((locAttr == ca.name) && (ca.type != GEO_POINT) && noLocationMetadata)
+      {
+        /* Note that if attribute type is geo:point then the user is using the "new way"
+         * of locating entities in NGSIv1, thus location metadata is not rendered */
+        Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WGS84);
         caP->metadataVector.push_back(md);
       }
     }
