@@ -103,24 +103,27 @@ static KjNode* kjTreeFromCompoundValue2(ConnectionInfo* ciP, KjNode* parentP, or
 //
 // kjTreeFromCompoundValue -
 //
-KjNode* kjTreeFromCompoundValue(ConnectionInfo* ciP, orion::CompoundValueNode* compoundP, char** detailsP)
+KjNode* kjTreeFromCompoundValue(ConnectionInfo* ciP, orion::CompoundValueNode* compoundP, KjNode* containerP, char** detailsP)
 {
-  KjNode* topNodeP;
-
-  if (compoundP->valueType == orion::ValueTypeObject)
-    topNodeP = kjObject(ciP->kjsonP, NULL);
-  else if (compoundP->valueType == orion::ValueTypeVector)
-    topNodeP = kjArray(ciP->kjsonP, NULL);
-  else
-  {
-    *detailsP = (char*) "not a compound";
-    return NULL;
-  }
+  KjNode* topNodeP = containerP;
 
   if (topNodeP == NULL)
   {
-    *detailsP = (char*) "unable to allocate";
-    return NULL;
+    if (compoundP->valueType == orion::ValueTypeObject)
+      topNodeP = kjObject(ciP->kjsonP, NULL);
+    else if (compoundP->valueType == orion::ValueTypeVector)
+      topNodeP = kjArray(ciP->kjsonP, NULL);
+    else
+    {
+      *detailsP = (char*) "not a compound";
+      return NULL;
+    }
+
+    if (topNodeP == NULL)
+    {
+      *detailsP = (char*) "unable to allocate";
+      return NULL;
+    }
   }
 
   unsigned int size = compoundP->childV.size();

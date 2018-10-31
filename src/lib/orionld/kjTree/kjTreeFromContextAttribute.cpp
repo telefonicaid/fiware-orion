@@ -117,7 +117,7 @@ KjNode* kjTreeFromContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP, c
 
   case orion::ValueTypeVector:
   case orion::ValueTypeObject:
-    nodeP = kjTreeFromCompoundValue(ciP, caP->compoundValueP, detailsP);
+    nodeP = kjTreeFromCompoundValue(ciP, caP->compoundValueP, NULL, detailsP);
     if (nodeP == NULL)
       return NULL;
     kjChildAdd(aTopNodeP, nodeP);

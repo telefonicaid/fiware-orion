@@ -508,6 +508,7 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
   if ((parentP != NULL) && (parentP->type == KjObject))
     cNodeP->name = kNodeP->name;
 
+#if 0  
   // Any URI Expansion needed?
   if ((kNodeP->name != NULL) && (kNodeP->name[0] != 0))
   {
@@ -534,6 +535,7 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
       cNodeP->name = std::string(orionldDefaultUrl) + kNodeP->name;
     }
   }
+#endif
 
   if (kNodeP->type == KjString)
   {

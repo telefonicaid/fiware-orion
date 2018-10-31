@@ -39,6 +39,6 @@ extern "C"
 //
 // kjTreeFromCompoundValue -
 //
-extern KjNode* kjTreeFromCompoundValue(ConnectionInfo* ciP, orion::CompoundValueNode* compoundP, char** detailsP);
+extern KjNode* kjTreeFromCompoundValue(ConnectionInfo* ciP, orion::CompoundValueNode* compoundP, KjNode* containerP, char** detailsP);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_KJTREEFROMCOMPOUNDVALUE_H_
