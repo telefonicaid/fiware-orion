@@ -49,9 +49,19 @@ However, in order to help administrators in this task, the following indexes are
     * `attrNames`
     * `creDate`
 
+In the case of using `orderBy` queries (i.e. `GET /v2/entities?orderBy=A`), it is also recommended 
+to create indexes for them. In particular, if you are ordering by a given attribute 'A' in ascending order
+(i.e. `orderBy=A`) you should create an index `{attrs.A.value: 1}`. In the case or ordering by a given
+attribute 'A' in descending order (i.e. `orderBy=!A`) you should create an index `{attrs.A.value: -1}`.
+
 The only index that Orion Context Broker actually ensures is the "2dsphere" in the `location.coords`
 field in the entities collection, due to functional needs [geo-location functionality](../user/geolocation.md).
 The index is ensured on Orion startup or when entities are created.
+
+In the case you use `orderBy` queries to order result by attribute  it is also
+advisable to create a index for the attribute in the following way:
+
+
 
 You can find an analysis about the effect of indexes in [this document](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/admin/extra/indexes_analysis.md), although
 it is based on an old Orion version, so it is probably outdated.
