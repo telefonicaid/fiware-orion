@@ -414,12 +414,12 @@ Date: REGEX(.*)
 12. POST /ngsi-ld/v1/entities, with a Relationship without an 'object'
 ======================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 138
+Content-Length: 167
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "no details",
+    "details": "http://example.org/ngsi-ld/default/name",
     "title": "relationship attribute without 'object' field",
     "type": "http://example.org/ngsi-ld/errors/BadRequestData"
 }

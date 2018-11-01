@@ -1007,9 +1007,9 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     char* details;
 
     if (objectP == NULL)
-      ATTRIBUTE_ERROR("relationship attribute without 'object' field", NULL);
+      ATTRIBUTE_ERROR("relationship attribute without 'object' field", caName);
     if (objectP->type != KjString)
-      ATTRIBUTE_ERROR("relationship attribute with 'object' field of non-string type", objectP->name);
+      ATTRIBUTE_ERROR("relationship attribute with 'object' field of non-string type", caName);
     if (urlCheck(objectP->value.s, &details) == false)
       ATTRIBUTE_ERROR("relationship attribute with 'object' field having invalid URL", objectP->value.s);
   }
@@ -1238,23 +1238,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
   if (payloadCheck(ciP, &idNodeP, &typeNodeP, &locationP, &contextNodeP, &observationSpaceP, &operationSpaceP) == false)
     return false;
-
-  //
-  // If a context came in via HTTP Header, then ciP->contextP is pointing to it.
-  // If a context is present in the payload, then contextNodeP is pointing to it (thanks to payloadCheck).
-  //
-  // If 'ciP->contextP' is NULL and 'contextP' is also NULL, then we'll just use the default context
-  //
-  // If we have a context in both HTTP Header and payload, then we return an error
-  //
-  if ((ciP->contextP != NULL) && (contextNodeP != NULL))
-  {
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "@context both in HTTP Header and in payload", "only one permitted", OrionldDetailsString);
-    ciP->httpStatusCode = SccBadRequest;
-    return false;
-  }
-
-
+  
   LM_T(LmtUriExpansion, ("type node at %p", typeNodeP));
   UpdateContextRequest   mongoRequest;
   UpdateContextResponse  mongoResponse;

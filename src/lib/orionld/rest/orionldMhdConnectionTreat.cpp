@@ -59,7 +59,7 @@ extern "C"
 // - Content-Type: application/ld+json + context in HTTP Header - see error
 // - Content-Type: application/ld+json + context in HTTP Header + context in payload - see error
 //
-static bool contentTypeCheck(ConnectionInfo* ciP, char** errorTitleP, char** detailsP)
+static bool contentTypeCheck(ConnectionInfo* ciP, KjNode* contextNodeP, char** errorTitleP, char** detailsP)
 {
   if ((ciP->verb != POST) && (ciP->verb != PATCH))
     return true;
@@ -79,26 +79,18 @@ static bool contentTypeCheck(ConnectionInfo* ciP, char** errorTitleP, char** det
     return true;  // No error detected about Content-Type, error postponed to later check
   }
 
-  // Lookup "@context" attribute
-  KjNode* contextNodeP     = ciP->requestTree->children;
-  bool    contextInPayload = false;
 
-  while ((contextNodeP != NULL) && (contextInPayload == false))
-  {
-    if (strcmp(contextNodeP->name, "@context") == 0)
-      contextInPayload = true;
-    else
-      contextNodeP = contextNodeP->next;
-  }
+  bool  contextInPayload     = (contextNodeP != NULL);
+  bool  contextInHttpHeader  = (ciP->httpHeaders.link != "");
 
   LM_TMP(("Context In JSON Payload: %s", (contextInPayload == true)?    "YES" : "NO"));
-  LM_TMP(("Context In HTTP Header:  %s", (ciP->httpHeaders.link != "")? "YES" : "NO"));
+  LM_TMP(("Context In HTTP Header:  %s", (contextInHttpHeader == true)? "YES" : "NO"));
 
   if (strcmp(ciP->httpHeaders.contentType.c_str(), "application/json") == 0)
   {
     LM_TMP(("Content-Type is: application/json"));
 
-    if (contextNodeP != NULL)
+    if (contextInPayload == true)
     {
       *errorTitleP = (char*) "Invalid MIME-type for @context in payload";
       *detailsP    = (char*) "For @context in payload, the MIME type must be application/ld+json";
@@ -109,7 +101,7 @@ static bool contentTypeCheck(ConnectionInfo* ciP, char** errorTitleP, char** det
   {
     LM_TMP(("Content-Type is: application/ld+json"));
 
-    if (ciP->httpHeaders.link != "")
+    if (contextInHttpHeader == true)
     {
       *errorTitleP = (char*) "@context in Link HTTP Header";
       *detailsP    = (char*) "For application/ld+json, the @context must come inside the JSON payload, NOT in HTTP Header";
@@ -183,7 +175,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 {
   char* errorTitle;
   char* details;
-  bool  error = false;
 
   LM_T(LmtMhd, ("Read all the payload - treating the request!"));
 
@@ -207,13 +198,17 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       // For now, we just return a "Not Found"
       orionldErrorResponseCreate(ciP, OrionldInvalidRequest, "Service Not Found", ciP->urlPath, OrionldDetailsString);
       ciP->httpStatusCode = (HttpStatusCode) 404;
-      error = true;
+      goto respond;
     }
 
-    if ((error == false) && (ciP->payload != NULL))
-    {
-      LM_T(LmtPayloadParse, ("parsing the payload '%s'", ciP->payload));
+    bool     jsonldLinkInHttpHeader = (ciP->httpHeaders.link != "");
+    KjNode*  contextNodeP           = NULL;
 
+    //
+    // Parsing payload
+    //
+    if (ciP->payload != NULL)
+    {
       ciP->requestTree = kjParse(ciP->kjsonP, ciP->payload);
       LM_T(LmtPayloadParse, ("After kjParse: %p", ciP->requestTree));
       if (ciP->requestTree == NULL)
@@ -221,27 +216,70 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
         LM_TMP(("Creating Error Response for JSON Parse Error (%s)", ciP->kjsonP->errorString));
         orionldErrorResponseCreate(ciP, OrionldInvalidRequest, "JSON Parse Error", ciP->kjsonP->errorString, OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;
-        error = true;
+        goto respond;
       }
-      LM_T(LmtPayloadParse, ("All good - payload parsed"));
+      LM_T(LmtPayloadParse, ("All good - payload parsed. ciP->requestTree at %p", ciP->requestTree));
+
+      //
+      // Looking up "@context" attribute at first level in payload
+      //
+      for (KjNode* attrNodeP = ciP->requestTree->children; attrNodeP != NULL; attrNodeP = attrNodeP->next)
+      {
+        if (attrNodeP->name == NULL)
+          continue;
+        LM_TMP(("Attr '%s'", attrNodeP->name));
+        if (SCOMPARE9(attrNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
+        {
+          contextNodeP = attrNodeP;
+          LM_TMP(("Found a @context in the payload"));
+          break;
+        }
+      }
     }
 
+    LM_TMP(("Here"));
+
+    if (contextNodeP == NULL)
+      LM_TMP(("No @context in payload"));
+
     //
-    // Checking for @context in HTTP Header
+    // ContentType Check
     //
-    if ((error == false) && (ciP->httpHeaders.link != ""))
+    if (contentTypeCheck(ciP, contextNodeP, &errorTitle, &details) == false)
+    {
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, errorTitle, details, OrionldDetailsString);
+      ciP->httpStatusCode = SccBadRequest;
+      goto respond;
+    }
+
+    if (acceptHeaderCheck(ciP, &errorTitle, &details) == false)
+    {
+      LM_E(("acceptHeaderCheck failed: %s", details));
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, errorTitle, details, OrionldDetailsString);
+      ciP->httpStatusCode = SccBadRequest;
+      goto respond;
+    }
+    LM_TMP(("After acceptHeaderCheck"));
+
+    
+    //
+    // Checking the @context in HTTP Header
+    //
+    if (jsonldLinkInHttpHeader == true)
     {
       if (urlCheck((char*) ciP->httpHeaders.link.c_str(), &details) == false)
       {
+        LM_E(("urlCheck: %s", details));
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Link HTTP Header must be a valid URL", details, OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;
-        error = true;
+        goto respond;
       }
-      else if ((ciP->contextP = orionldContextCreateFromUrl(ciP, ciP->httpHeaders.link.c_str(), OrionldUserContext, &details)) == NULL)
+
+      if ((ciP->contextP = orionldContextCreateFromUrl(ciP, ciP->httpHeaders.link.c_str(), OrionldUserContext, &details)) == NULL)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Failure to create context from URL", details, OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;
-        error = true;
+        goto respond;
       }
     }
     else
@@ -249,53 +287,26 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       ciP->contextP = NULL;
     }
 
-
     //
-    // ContentType Check
+    // FIXME: Checking the @context from payload ... move from orionldPostEntities()
     //
-    if (error == false)
+    LM_T(LmtServiceRoutine, ("Calling Service Routine %s", ciP->serviceP->url));
+    bool b = ciP->serviceP->serviceRoutine(ciP);
+    LM_T(LmtServiceRoutine,("service routine '%s' done", ciP->serviceP->url));
+    
+    if (b == false)
     {
-      if (contentTypeCheck(ciP, &errorTitle, &details) == false)
-      {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, errorTitle, details, OrionldDetailsString);
+      LM_TMP(("Service Routine for %s %s returned FALSE (%d)", verbName(ciP->verb), ciP->urlPath, ciP->httpStatusCode));
+      //
+      // If the service routine failed (returned FALSE), but no HTTP status ERROR code is set,
+      // the HTTP status code defaults to 400
+      //
+      if (ciP->httpStatusCode < 400)
         ciP->httpStatusCode = SccBadRequest;
-        error = true;
-      }
-    }
-
-    if (error == false)
-    {
-      if (acceptHeaderCheck(ciP, &errorTitle, &details) == false)
-      {
-        LM_E(("acceptHeaderCheck failed: %s", details));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, errorTitle, details, OrionldDetailsString);
-        ciP->httpStatusCode = SccBadRequest;
-        error = true;
-      }
-      LM_TMP(("After acceptHeaderCheck"));
-    }
-
-    if (error == false)
-    {
-      LM_T(LmtServiceRoutine, ("Calling Service Routine %s", ciP->serviceP->url));
-      bool b = ciP->serviceP->serviceRoutine(ciP);
-      LM_T(LmtServiceRoutine,("service routine '%s' done", ciP->serviceP->url));
-
-      if (b == false)
-      {
-        LM_TMP(("Service Routine for %s %s returned FALSE (%d)", verbName(ciP->verb), ciP->urlPath, ciP->httpStatusCode));
-        //
-        // If the service routine failed (returned FALSE), but no HTTP status ERROR code is set,
-        // the HTTP status code defaults to 400
-        //
-        if (ciP->httpStatusCode < 400)
-        {
-          ciP->httpStatusCode = SccBadRequest;
-        }
-      }
     }
   }
 
+respond:
   //
   // Is there a KJSON response tree to render?
   // [ Note that this is always TRUE when error == true ]

@@ -394,7 +394,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, QueryContextResponse
   }
 
   //
-  // Set MIME Type to JSONLD if JSONLD is in the Accepot header of the incoming request
+  // Set MIME Type to JSONLD if JSONLD is in the Accept header of the incoming request
   //
   if (ciP->httpHeaders.acceptJsonld == true)
   {
