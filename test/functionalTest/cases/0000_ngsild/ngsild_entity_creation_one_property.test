@@ -21,27 +21,28 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Entity Creation Error - should reject an entity with a property value equal to null
+Entity Creation - should create an entity with One Property
 
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 212-249
+brokerStart CB 0-255 --prettyPrint
 
 --SHELL--
 
 #
-# 01. POST /ngsi-ld/v1/entities with an attribute with value NULL
+# 01. POST /ngsi-ld/v1/entities with One Property
+# 02. GET entity
 #
 
-echo "01. POST /ngsi-ld/v1/entities with an attribute with value NULL"
-echo "==============================================================="
+echo "01. POST /ngsi-ld/v1/entities with One Property"
+echo "==============================================="
 payload='{
-  "id": "urn:ngsi-ld:T4:9000",
+  "id": "urn:ngsi-ld:T:12:13:14",
   "type": "T",
   "P1": {
     "type": "Property",
-    "value": null
+    "value": "Hola"
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
@@ -49,19 +50,41 @@ echo
 echo
 
 
+echo "02. GET entity"
+echo "=============="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
 --REGEXPECT--
-01. POST /ngsi-ld/v1/entities with an attribute with value NULL
-===============================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 162
+01. POST /ngsi-ld/v1/entities with One Property
+===============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14
+Date: REGEX(.*)
+
+
+
+02. GET entity
+==============
+HTTP/1.1 200 OK
+Content-Length: 111
 Content-Type: application/json
+Link: https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json
 Date: REGEX(.*)
 
 {
-    "details": "http://example.org/ngsi-ld/default/P1",
-    "title": "property attribute with NULL 'value' field",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+  "id": "urn:ngsi-ld:T:12:13:14",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": "Hola"
+  }
 }
+
 
 
 --TEARDOWN--

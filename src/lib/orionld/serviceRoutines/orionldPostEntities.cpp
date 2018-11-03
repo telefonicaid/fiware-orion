@@ -66,17 +66,17 @@ extern "C"
 //
 // DUPLICATE_CHECK -
 //
-#define DUPLICATE_CHECK(nodeP, pointer, what)                                                                      \
-do                                                                                                                 \
-{                                                                                                                  \
-  if (pointer != NULL)                                                                                             \
-  {                                                                                                                \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", "entity id", OrionldDetailsString); \
-    return false;                                                                                                  \
-  }                                                                                                                \
-                                                                                                                   \
-  pointer = nodeP;                                                                                                 \
-                                                                                                                   \
+#define DUPLICATE_CHECK(nodeP, pointer, what)                                                               \
+do                                                                                                          \
+{                                                                                                           \
+  if (pointer != NULL)                                                                                      \
+  {                                                                                                         \
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", what, OrionldDetailsString); \
+    return false;                                                                                           \
+  }                                                                                                         \
+                                                                                                            \
+  pointer = nodeP;                                                                                          \
+                                                                                                            \
 } while (0)
 
 
@@ -276,7 +276,7 @@ static bool payloadCheck
   KjNode*  locationNodeP          = NULL;
   KjNode*  observationSpaceNodeP  = NULL;
   KjNode*  operationSpaceNodeP    = NULL;
-  
+
   //
   // First make sure all mandatory data is present and that data types are correct
   //
@@ -415,7 +415,7 @@ static int uriExpansion(OrionldContext* contextP, const char* name, char** expan
     else
       return -2;
   }
-  
+
 
   //
   // Context Item found - must be either a string or an object containing two strings
@@ -434,7 +434,7 @@ static int uriExpansion(OrionldContext* contextP, const char* name, char** expan
     // FIXME: I need ciP here to fill in the error-response
     return -1;
   }
-    
+
   //
   // The context item has a complex value: "@id" and "@type".
   // The value of:
@@ -489,7 +489,7 @@ static int uriExpansion(OrionldContext* contextP, const char* name, char** expan
   LM_T(LmtUriExpansion, ("returning %d (expansions found): name='%s', type='%s'", children, *expandedNameP, *expandedTypeP));
   return children;
 }
-  
+
 
 
 // -----------------------------------------------------------------------------
@@ -508,7 +508,7 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
   if ((parentP != NULL) && (parentP->type == KjObject))
     cNodeP->name = kNodeP->name;
 
-#if 0  
+#if 0
   // Any URI Expansion needed?
   if ((kNodeP->name != NULL) && (kNodeP->name[0] != 0))
   {
@@ -568,13 +568,6 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
 
     for (KjNode* kChildP = kNodeP->children; kChildP != NULL; kChildP = kChildP->next)
     {
-      // Skip 'type' if in level 1
-      if ((level == 1) && (kChildP->type == KjString) && (SCOMPARE5(kChildP->name, 't', 'y', 'p', 'e', 0)))
-      {
-        LM_T(LmtCompoundCreation, ("Skipping '%s' node on level %d", kChildP->name, level));
-        continue;
-      }
-
       orion::CompoundValueNode* cChildP = compoundCreate(ciP, kChildP, kNodeP, level);
       cNodeP->childV.push_back(cChildP);
     }
@@ -591,7 +584,7 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
       cNodeP->childV.push_back(cChildP);
     }
   }
-  
+
   return cNodeP;
 }
 
@@ -599,12 +592,135 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
 
 // -----------------------------------------------------------------------------
 //
-// geojsonCheck - FIXME
+// GeoJSON -
 //
-static bool geojsonCheck(char* geoJsonString, char** detailsP)
+// The value of a GeoJSON Property must be a JSON Object.
+// The Object must have exactly two members:
+// - type:        a JSON String that is a supported GeoJSON type (Point, Polygon, ...)
+// - coordinates: a JSON Array of Numbers. The number of members depends on the 'type'
+//
+//
+// ACCEPTED TYPES:
+// First of all, a Position is an Array of 2-3 Numbers  (Implementations SHOULD NOT extend positions beyond three elements)
+//
+//   Point:            a Position                        [ 1, 2 ]
+//   MultiPoint:       an Array of Positions             [ [ 1, 2 ], [ 1, 2 ], [ 1, 2 ], ... ]
+//   LineString:       an Array of 2+ Positions          [ [ 1, 2 ], [ 1, 2 ], ... ]
+//   MultiLineString:  an Array of LineString            [ [ [ 1, 2 ], [ 1, 2 ] ], [ [ 1, 2 ], [ 1, 2 ] ], ... ]
+//   Polygon:          closed LineString with 4+ pos     [ [ 1, 2 ], [ 3, 4 ], [ 5, 6 ], ..., [ 1, 2 ] ]
+//   MultiPolygon:     an Array of Polygon               [ [ [ [ 1, 2 ], [ 1, 2 ] ], [ [ 1, 2 ], [ 1, 2 ] ], ... ], [ [ [ 1, 2 ], [ 1, 2 ] ], [ [ 1, 2 ], [ 1, 2 ] ], ... ], ... ]
+//
+
+
+
+// -----------------------------------------------------------------------------
+//
+// GeoJsonType -
+//
+typedef enum GeoJsonType
 {
-  *detailsP = (char*) "not implemented";
-  return false;
+  GeoJsonPoint,
+  GeoJsonMultiPoint,
+  GeoJsonLineString,
+  GeoJsonMultiLineString,
+  GeoJsonPolygon,
+  GeoJsonMultiPolygon
+} GeoJsonType;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// geoJsonTypeCheck -
+//
+static bool geoJsonTypeCheck(char* typeName, GeoJsonType* typeP, char** detailsP)
+{
+  if      (SCOMPARE6(typeName, 'P', 'o', 'i', 'n', 't', 0))                                                       *typeP = GeoJsonPoint;
+  else if (SCOMPARE11(typeName, 'M', 'u', 'l', 't', 'i', 'P', 'o', 'i', 'n', 't', 0))                             *typeP = GeoJsonMultiPoint;
+  else if (SCOMPARE11(typeName, 'L', 'i', 'n', 'e', 'S', 't', 'r', 'i', 'n', 'g', 0))                             *typeP = GeoJsonLineString;
+  else if (SCOMPARE16(typeName, 'M', 'u', 'l', 't', 'i', 'L', 'i', 'n', 'e', 'S', 't', 'r', 'i', 'n', 'g', 0))    *typeP = GeoJsonLineString;
+  else if (SCOMPARE8(typeName, 'P', 'o', 'l', 'y', 'g', 'o', 'n', 0))                                             *typeP = GeoJsonPolygon;
+  else if (SCOMPARE13(typeName, 'M', 'u', 'l', 't', 'i', 'P', 'o', 'l', 'y', 'g', 'o', 'n', 0))                   *typeP = GeoJsonMultiPolygon;
+  else
+  {
+    LM_E(("Invalid GeoJSON type: %s", typeName));
+    *detailsP = (char*) "invalid GeoJSON type";
+
+    return false;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// geojsonCheck - check validity of any geo-property
+//
+static bool geojsonCheck(ConnectionInfo* ciP, KjNode* geoJsonNodeP, char** detailsP)
+{
+  KjNode*     typeP    = NULL;
+  KjNode*     coordsP  = NULL;
+  GeoJsonType geoJsonType  = (GeoJsonType) -1;
+
+  if (geoJsonNodeP->type != KjObject)
+  {
+    *detailsP = (char*) "A GeoProperty value must be a JSON Object";
+    return false;
+  }
+
+  for (KjNode* itemP = geoJsonNodeP->children; itemP != NULL; itemP = itemP->next)
+  {
+    LM_TMP(("Item '%s'", itemP->name));
+
+    if (SCOMPARE5(itemP->name, 't', 'y', 'p', 'e', 0))
+    {
+      DUPLICATE_CHECK(itemP, typeP, geoJsonNodeP->name);
+
+      if (itemP->type != KjString)
+      {
+        *detailsP = (char*) "the 'type' field of a GeoJSON object must be a JSON String";
+        return false;
+      }
+
+      if (geoJsonTypeCheck(itemP->value.s, &geoJsonType, detailsP) == false)
+        return false;
+    }
+    else if (SCOMPARE12(itemP->name, 'c', 'o', 'o', 'r', 'd', 'i', 'n', 'a', 't', 'e', 's', 0))
+    {
+      DUPLICATE_CHECK(itemP, coordsP, geoJsonNodeP->name);
+
+      if (itemP->type != KjArray)
+      {
+        *detailsP = (char*) "the 'coordinates' field of a GeoJSON object must be a JSON Array";
+        return false;
+      }
+    }
+    else
+    {
+      *detailsP = (char*) "invalid field in a GeoJSON object";
+      return false;
+    }
+  }
+
+  if (typeP == NULL)
+  {
+    *detailsP = (char*) "Mandatory 'type' field missing for a GeoJSON Property";
+    return false;
+  }
+
+  if (coordsP == NULL)
+  {
+    *detailsP = (char*) "Mandatory 'coordinates' field missing for a GeoJSON Property";
+    return false;
+  }
+
+  // FIXME: Check all types of GeoJSON - Point, Polygon, etc (different Arrays of Number)
+  // if (geoJsonCoordinatesCheck(coordsP->children, detailsP) == false)
+  //   return false;
+
+  return true;
 }
 
 
@@ -720,7 +836,7 @@ static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* node
     }
   }
   else  // Relationship
-  { 
+  {
     // A "Relationship" has no 'value', instead it has 'object', that must be of string type
     if (objectNodeP->type != KjString)
     {
@@ -745,12 +861,12 @@ static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* node
 //
 // ATTRIBUTE_ERROR -
 //
-#define ATTRIBUTE_ERROR(errorString, attrName)                                                            \
-do                                                                                                        \
-{                                                                                                         \
-  LM_E((errorString));                                                                                    \
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, errorString, attrName, OrionldDetailsAttribute); \
-  return false;                                                                                           \
+#define ATTRIBUTE_ERROR(errorString, details)                                                            \
+do                                                                                                       \
+{                                                                                                        \
+  LM_E((errorString));                                                                                   \
+  orionldErrorResponseCreate(ciP, OrionldBadRequestData, errorString, details, OrionldDetailsAttribute); \
+  return false;                                                                                          \
 } while (0)
 
 
@@ -772,15 +888,6 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
 
   ATTRIBUTE_IS_OBJECT_CHECK(kNodeP);
 
-  KjNode* typeP              = NULL;  // For ALL:            Mandatory
-  KjNode* valueP             = NULL;  // For 'Property':     Mandatory
-  KjNode* objectP            = NULL;  // For 'Relationship:  Mandatory
-  KjNode* unitCodeP          = NULL;  // For 'Property':     Optional
-  KjNode* observedAtP        = NULL;  // For ALL:            Optional
-  KjNode* observationSpaceP  = NULL;  // For 'GeoProperty':  Optional
-  KjNode* operationSpaceP    = NULL;  // For 'GeoProperty':  Optional
-  KjNode* nodeP              = kNodeP->children;
-
   //
   // For performance issues, all predefined names should have their char-sum precalculated
   //
@@ -797,10 +904,18 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
   // ADVANTAGE:
   //   Just a simple integer comparison before we do the complete string-comparisom
   //
-  bool isProperty         = false;
-  bool isGeoProperty      = false;
-  bool isTemporalProperty = false;
-  bool isRelationship     = false;
+  KjNode* typeP              = NULL;  // For ALL:            Mandatory
+  KjNode* valueP             = NULL;  // For 'Property':     Mandatory
+  KjNode* objectP            = NULL;  // For 'Relationship:  Mandatory
+  KjNode* unitCodeP          = NULL;  // For 'Property':     Optional
+  KjNode* observedAtP        = NULL;  // For ALL:            Optional
+  KjNode* observationSpaceP  = NULL;  // For 'GeoProperty':  Optional
+  KjNode* operationSpaceP    = NULL;  // For 'GeoProperty':  Optional
+  bool    isProperty         = false;
+  bool    isGeoProperty      = false;
+  bool    isTemporalProperty = false;
+  bool    isRelationship     = false;
+  KjNode* nodeP              = kNodeP->children;
 
   while (nodeP != NULL)
   {
@@ -910,18 +1025,20 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     }
 
     nodeP = nodeP->next;
+    LM_TMP(("Next Node: %p", nodeP));
   }
 
+  LM_TMP(("After loop"));
 
   //
   // Mandatory fields for Property:
   //   type
-  //   value
-  //   
+  //   value (cannot be NULL)
+  //
   // Mandatory fields for Relationship:
   //   type
-  //   object
-  //  
+  //   object (must be a JSON String)
+  //
   if (typeP == NULL)  // Attr Type is mandatory!
   {
     LM_E(("'type' missing for attribute '%s'", kNodeP->name));
@@ -955,20 +1072,30 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       return false;
     }
 
+    if (valueP->type == KjNull)
+    {
+      LM_E(("NULL 'value' for Property '%s'", kNodeP->name));
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "property attribute with NULL 'value' field", kNodeP->name, OrionldDetailsAttribute);
+      return NULL;
+    }
+
     //
     // Get the value, and check for correct value for Geo/Temporal Attributes
     //
     if (isGeoProperty == true)
     {
-      char* details;
+      char* details = (char*) "no details";
 
-      if (valueP->type != KjString)
-        ATTRIBUTE_ERROR("geo-property attribute must have a value of type JSON String", kjValueType(valueP->type));
-      else if (geojsonCheck(valueP->value.s, &details) == false)
+      if (valueP->type != KjObject)
+        ATTRIBUTE_ERROR("geo-property attribute value must be a JSON Object", kjValueType(valueP->type));
+      else if (geojsonCheck(ciP, valueP, &details) == false)
+      {
+        LM_TMP(("geojsonCheck error for %s: %s", caName, details));
         ATTRIBUTE_ERROR("geo-property attribute must have a valid GeoJson value", details);
+      }
 
-      caP->valueType   = orion::ValueTypeString;
-      caP->stringValue = valueP->value.s;
+      caP->valueType       = orion::ValueTypeObject;
+      caP->compoundValueP  = compoundCreate(ciP, valueP, NULL, 0);
     }
     else if (isTemporalProperty == true)
     {
@@ -1093,7 +1220,7 @@ static bool contextTreat
   else if (contextNodeP->type == KjArray)
   {
     char* details;
-    
+
     //
     // REMEMBER
     //   This context is just the array of context-strings: [ "url1", "url2" ]
@@ -1213,7 +1340,7 @@ static bool contextTreat
     caP->valueType      = orion::ValueTypeObject;  // All compounds have Object as value type (I think)
     caP->compoundValueP = compoundP;
   }
-      
+
   ceP->contextAttributeVector.push_back(caP);
 
   return true;
@@ -1238,7 +1365,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
   if (payloadCheck(ciP, &idNodeP, &typeNodeP, &locationP, &contextNodeP, &observationSpaceP, &operationSpaceP) == false)
     return false;
-  
+
   LM_T(LmtUriExpansion, ("type node at %p", typeNodeP));
   UpdateContextRequest   mongoRequest;
   UpdateContextResponse  mongoResponse;
@@ -1295,7 +1422,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       continue;
     }
 
-    // Entity TYPE    
+    // Entity TYPE
     else if (kNodeP == typeNodeP)
     {
       entityIdP->isTypePattern = false;
@@ -1328,7 +1455,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       {
         // Take the long name, just ... NOT expandedType but expandedName. All good
         entityIdP->type = expandedName;
-      }      
+      }
       else  // expansions == 2 ... may be an incorrect context
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value of context item 'entity id'", ciP->contextP->url, OrionldDetailsString);
@@ -1348,7 +1475,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
       ContextAttribute* caP            = new ContextAttribute();
       KjNode*           attrTypeNodeP  = NULL;
-      
+
       if (attributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
       {
         ciP->httpStatusCode = SccBadRequest;  // FIXME: Should be set inside 'attributeTreat' - could be 500, not 400 ...
