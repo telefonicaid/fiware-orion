@@ -301,17 +301,19 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, QueryContextResponse
     }
 
     // value
+    const char*  valueFieldName = (aP->type == "Relationship")? "object" : "value";
+
     switch (aP->valueType)
     {
-    case orion::ValueTypeString:    nodeP = kjString(ciP->kjsonP, "value", aP->stringValue.c_str());      break;
-    case orion::ValueTypeNumber:    nodeP = kjFloat(ciP->kjsonP, "value", aP->numberValue);               break;
-    case orion::ValueTypeBoolean:   nodeP = kjBoolean(ciP->kjsonP, "value", (KBool) aP->boolValue);       break;
-    case orion::ValueTypeNull:      nodeP = kjNull(ciP->kjsonP, "value");                                 break;
-    case orion::ValueTypeNotGiven:  nodeP = kjString(ciP->kjsonP, "value", "UNKNOWN TYPE");               break;
+    case orion::ValueTypeString:    nodeP = kjString(ciP->kjsonP, valueFieldName, aP->stringValue.c_str());      break;
+    case orion::ValueTypeNumber:    nodeP = kjFloat(ciP->kjsonP, valueFieldName, aP->numberValue);               break;
+    case orion::ValueTypeBoolean:   nodeP = kjBoolean(ciP->kjsonP, valueFieldName, (KBool) aP->boolValue);       break;
+    case orion::ValueTypeNull:      nodeP = kjNull(ciP->kjsonP, valueFieldName);                                 break;
+    case orion::ValueTypeNotGiven:  nodeP = kjString(ciP->kjsonP, valueFieldName, "UNKNOWN TYPE");               break;
 
     case orion::ValueTypeVector:
     case orion::ValueTypeObject:
-      nodeP = (aP->valueType == orion::ValueTypeVector)? kjArray(ciP->kjsonP, "value") : kjObject(ciP->kjsonP, "value");
+      nodeP = (aP->valueType == orion::ValueTypeVector)? kjArray(ciP->kjsonP, valueFieldName) : kjObject(ciP->kjsonP, valueFieldName);
       if (nodeP == NULL)
       {
         LM_E(("kjTreeFromCompoundValue: %s", details));

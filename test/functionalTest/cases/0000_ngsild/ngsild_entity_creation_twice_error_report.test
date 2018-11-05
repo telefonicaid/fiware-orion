@@ -1,0 +1,95 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Creation - should report an error if Entity already exists
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255 --prettyPrint
+
+--SHELL--
+
+#
+# 01. POST /ngsi-ld/v1/entities with One Property - OK
+# 02. POST /ngsi-ld/v1/entities, attempting to create the very same entity - see error
+#
+
+echo "01. POST /ngsi-ld/v1/entities with One Property - OK"
+echo "===================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:12:13:14",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": "Hola"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. POST /ngsi-ld/v1/entities, attempting to create the very same entity - see error"
+echo "===================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:12:13:14",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": "Hola"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /ngsi-ld/v1/entities with One Property - OK
+====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14
+Date: REGEX(.*)
+
+
+
+02. POST /ngsi-ld/v1/entities, attempting to create the very same entity - see error
+====================================================================================
+HTTP/1.1 409 Conflict
+Content-Length: 125
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "urn:ngsi-ld:T:12:13:14",
+    "title": "Entity already exists",
+    "type": "http://example.org/ngsi-ld/errors/AlreadyExists"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

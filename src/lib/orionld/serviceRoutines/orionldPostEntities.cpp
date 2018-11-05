@@ -955,8 +955,9 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     }
     else if (SCOMPARE6(nodeP->name, 'v', 'a', 'l', 'u', 'e', 0))
     {
-      DUPLICATE_CHECK(nodeP, valueP, "attribute value");
-    }
+      DUPLICATE_CHECK(nodeP, valueP, "attribute value"); 
+      // FIXME: "value" for Relationship Attribute should be added as metadata
+   }
     else if (SCOMPARE9(nodeP->name, 'u', 'n', 'i', 't', 'C', 'o', 'd', 'e', 0))
     {
       DUPLICATE_CHECK(nodeP, unitCodeP, "unit code");
@@ -970,12 +971,7 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     else if (SCOMPARE7(nodeP->name, 'o', 'b', 'j', 'e', 'c', 't', 0))
     {
       DUPLICATE_CHECK(nodeP, objectP, "object");
-      if (metadataAdd(ciP, caP, nodeP, caName) == false)
-      {
-        LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error adding metadata to attribute", nodeP->name, OrionldDetailsString);
-        return false;
-      }
+      // FIXME: "object" for Property Attribute should be added as metadata
     }
     else if (SCOMPARE11(nodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
     {
@@ -1137,8 +1133,11 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       ATTRIBUTE_ERROR("relationship attribute without 'object' field", caName);
     if (objectP->type != KjString)
       ATTRIBUTE_ERROR("relationship attribute with 'object' field of non-string type", caName);
-    if (urlCheck(objectP->value.s, &details) == false)
-      ATTRIBUTE_ERROR("relationship attribute with 'object' field having invalid URL", objectP->value.s);
+    if ((urlCheck(objectP->value.s, &details) == false) && (urnCheck(objectP->value.s, &details) == false))
+      ATTRIBUTE_ERROR("relationship attribute with 'object' field having invalid URI", objectP->value.s);
+
+    caP->valueType   = orion::ValueTypeString;
+    caP->stringValue = objectP->value.s;
   }
 
   return true;
