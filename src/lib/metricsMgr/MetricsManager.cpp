@@ -260,11 +260,6 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
     return;
   }
 
-  if (subService == "")
-  {
-    return;
-  }
-
   semTake();
 
 

@@ -84,7 +84,11 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   response = MHD_create_response_from_buffer(answerLen, (void*) answer.c_str(), MHD_RESPMEM_MUST_COPY);
   if (!response)
   {
-    metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
+    if (ciP->apiVersion != NGSI_LD_V1)
+    {
+      metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
+    }
+    
     LM_E(("Runtime Error (MHD_create_response_from_buffer FAILED)"));
 
 #ifdef ORIONLD
@@ -100,7 +104,10 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
 
   if (answerLen > 0)
   {
-    metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_RESP_SIZE, answerLen);
+    if (ciP->apiVersion != NGSI_LD_V1)
+    {
+      metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_RESP_SIZE, answerLen);
+    }
   }
 
   for (unsigned int hIx = 0; hIx < ciP->httpHeader.size(); ++hIx)

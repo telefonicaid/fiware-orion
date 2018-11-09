@@ -328,8 +328,9 @@ respond:
 
   if (ciP->responsePayload != NULL)
   {
-    LM_T(LmtJsonResponse, ("Responding with '%s'", ciP->responsePayload));
+    LM_T(LmtJsonResponse, ("Responding with %d: '%s'", ciP->httpStatusCode, ciP->responsePayload));
     restReply(ciP, ciP->responsePayload);
+    LM_TMP(("After restReply"));
     // ciP->responsePayload freed and NULLed by restReply()
   }
   else
