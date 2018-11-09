@@ -32,9 +32,10 @@ brokerStart CB 212-249
 
 #
 # 01. Create Entity E1 with context as a string
-# 02. GET E1, with 'Accept: application/json' - see 'Content-Type: application/json', HTTP Header 'Link' with @context, and no context in payload
-# 03. GET E1, with 'Accept: application/ld+json' - see 'Content-Type: application/ld+json', context in payload, no 'Link' HTTP Header
-# 04. GET E1, without specific Accept MIME type (application/json is default - should it be for ngsi-ld requests?), see results like step 02
+# 02. Checking mongo content to see URL
+# 03. GET E1, with 'Accept: application/json' - see 'Content-Type: application/json', HTTP Header 'Link' with @context, and no context in payload
+# 04. GET E1, with 'Accept: application/ld+json' - see 'Content-Type: application/ld+json', context in payload, no 'Link' HTTP Header
+# 05. GET E1, without specific Accept MIME type (application/json is default - should it be for ngsi-ld requests?), see results like step 03
 #
 
 echo "01. Create Entity E1 with context as a string"
@@ -49,21 +50,29 @@ echo
 echo
 
 
-echo "02. GET E1, with 'Accept: application/json' - see 'Content-Type: application/json', HTTP Header 'Link' with @context, and no context in payload"
+echo "02. Checking mongo content to see URL"
+echo "====================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. GET E1, with 'Accept: application/json' - see 'Content-Type: application/json', HTTP Header 'Link' with @context, and no context in payload"
 echo "==============================================================================================================================================="
-orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E1 -H "Accept: application/json"
+url=`urlencode http://a.b.c/entity/E1`
+orionCurl --url /ngsi-ld/v1/entities/$url -H "Accept: application/json"
 echo
 echo
 
 
-echo "03. GET E1, with 'Accept: application/ld+json' - see 'Content-Type: application/ld+json', context in payload, no 'Link' HTTP Header"
+echo "04. GET E1, with 'Accept: application/ld+json' - see 'Content-Type: application/ld+json', context in payload, no 'Link' HTTP Header"
 echo "==================================================================================================================================="
 orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E1 -H "Accept: application/ld+json"
 echo
 echo
 
 
-echo "04. GET E1, without specific Accept MIME type (application/json is default - should it be for ngsi-ld requests?), see results like step 02"
+echo "05. GET E1, without specific Accept MIME type (application/json is default - should it be for ngsi-ld requests?), see results like step 03"
 echo "=========================================================================================================================================="
 orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 echo
@@ -82,7 +91,37 @@ Date: REGEX(.*)
 
 
 
-02. GET E1, with 'Accept: application/json' - see 'Content-Type: application/json', HTTP Header 'Link' with @context, and no context in payload
+02. Checking mongo content to see URL
+=====================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb://localhost:27017/ftest
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "http://a.b.c/entity/E1",
+		"type" : "http://example.org/ngsi-ld/default/A",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"@context"
+	],
+	"attrs" : {
+		"@context" : {
+			"type" : "ContextString",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. GET E1, with 'Accept: application/json' - see 'Content-Type: application/json', HTTP Header 'Link' with @context, and no context in payload
 ===============================================================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 42
@@ -96,7 +135,7 @@ Date: REGEX(.*)
 }
 
 
-03. GET E1, with 'Accept: application/ld+json' - see 'Content-Type: application/ld+json', context in payload, no 'Link' HTTP Header
+04. GET E1, with 'Accept: application/ld+json' - see 'Content-Type: application/ld+json', context in payload, no 'Link' HTTP Header
 ===================================================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 123
@@ -110,7 +149,7 @@ Date: REGEX(.*)
 }
 
 
-04. GET E1, without specific Accept MIME type (application/json is default - should it be for ngsi-ld requests?), see results like step 02
+05. GET E1, without specific Accept MIME type (application/json is default - should it be for ngsi-ld requests?), see results like step 03
 ==========================================================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 42

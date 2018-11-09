@@ -1239,6 +1239,8 @@ static bool contextTreat
     sprintf(linkPath, "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", orionldHostName, restPortGet(), entityId);
 
     ciP->contextP = orionldContextCreateFromTree(contextNodeP, linkPath, OrionldUserContext, &details);
+    free(linkPath);  // orionldContextCreateFromTree strdups the URL
+
     if (ciP->contextP == NULL)
     {
       LM_E(("Failed to create context from Tree : %s", details));

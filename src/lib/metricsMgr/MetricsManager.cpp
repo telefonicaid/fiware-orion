@@ -192,6 +192,7 @@ bool MetricsManager::servicePathForMetrics(const std::string& spathIn, std::stri
     return false;
   }
 
+
   //
   // Exclude the first '/' from the Service Path
   // But, only if it starts with a '/'
@@ -255,6 +256,11 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
   }
 
   if (servicePathForMetrics(subServ, &subService) == false)
+  {
+    return;
+  }
+
+  if (subService == "")
   {
     return;
   }

@@ -410,12 +410,11 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, QueryContextResponse
   //
   if (contextAttrP == NULL)
   {
-    nodeP = kjString(ciP->kjsonP, "@context", orionldCoreContext.url);
-
     LM_TMP(("KZ: ciP->httpHeaders.acceptJsonld == %s", BA_FT(ciP->httpHeaders.acceptJsonld)));
     LM_TMP(("KZ: ciP->httpHeaders.acceptJson   == %s", BA_FT(ciP->httpHeaders.acceptJson)));
     if (ciP->httpHeaders.acceptJsonld == true)
     {
+      nodeP = kjString(ciP->kjsonP, "@context", orionldCoreContext.url);
       kjChildAdd(top, nodeP);
     }
     else
@@ -436,31 +435,38 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, QueryContextResponse
     }
     else
     {
-      switch (contextAttrP->valueType)
+      if (contextAttrP->valueType == orion::ValueTypeString)
       {
-      case orion::ValueTypeString:
         nodeP = kjString(ciP->kjsonP, "@context", contextAttrP->stringValue.c_str());
         kjChildAdd(top, nodeP);
-        break;
-
-      case orion::ValueTypeVector:
-        nodeP = kjArray(ciP->kjsonP, "@context");
-        kjChildAdd(top, nodeP);
-
-        for (unsigned int ix = 0; ix < contextAttrP->compoundValueP->childV.size(); ix++)
+      }
+      else if (contextAttrP->compoundValueP != NULL)
+      {
+        if (contextAttrP->compoundValueP->valueType == orion::ValueTypeVector)
         {
-          orion::CompoundValueNode*  compoundP     = contextAttrP->compoundValueP->childV[ix];
-          KjNode*                    contextItemP  = kjString(ciP->kjsonP, NULL, compoundP->stringValue.c_str());
-          kjChildAdd(nodeP, contextItemP);
-        }
-        break;
+          nodeP = kjArray(ciP->kjsonP, "@context");
+          kjChildAdd(top, nodeP);
 
-      default:
+          for (unsigned int ix = 0; ix < contextAttrP->compoundValueP->childV.size(); ix++)
+          {
+            orion::CompoundValueNode*  compoundP     = contextAttrP->compoundValueP->childV[ix];
+            KjNode*                    contextItemP  = kjString(ciP->kjsonP, NULL, compoundP->stringValue.c_str());
+            kjChildAdd(nodeP, contextItemP);
+          }
+        }
+        else
+        {
+          orionldErrorResponseCreate(ciP, OrionldInternalError, "invalid context", "inline contexts not supported - wait it's coming ...", OrionldDetailsString);
+          return ciP->responseTree;
+        }
+      }
+      else
+      {
         orionldErrorResponseCreate(ciP, OrionldInternalError, "invalid context", "not a string nor an array", OrionldDetailsString);
-        // FIXME: leaks!!! (Call kjFree(top))?
         return ciP->responseTree;
       }
     }
   }
+
   return top;
 }
