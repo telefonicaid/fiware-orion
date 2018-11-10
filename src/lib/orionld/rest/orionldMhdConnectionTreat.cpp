@@ -39,9 +39,10 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"            // orionldErrorResponseCreate
 #include "orionld/common/urlCheck.h"                        // urlCheck
 #include "orionld/common/SCOMPARE.h"                        // SCOMPARE
+#include "orionld/context/orionldContextCreateFromUrl.h"    // orionldContextCreateFromUrl
+#include "orionld/serviceRoutines/orionldBadVerb.h"         // orionldBadVerb
 #include "orionld/rest/orionldServiceInit.h"                // orionldRestServiceV
 #include "orionld/rest/orionldServiceLookup.h"              // orionldServiceLookup
-#include "orionld/context/orionldContextCreateFromUrl.h"    // orionldContextCreateFromUrl
 #include "orionld/rest/temporaryErrorPayloads.h"            // Temporary Error Payloads
 #include "orionld/rest/orionldMhdConnectionTreat.h"         // Own Interface
 
@@ -193,11 +194,15 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
     if (ciP->serviceP == NULL)
     {
-      // FIXME: Implement orionldBadVerb, looking at all verbs etc ...
-
-      // For now, we just return a "Not Found"
-      orionldErrorResponseCreate(ciP, OrionldInvalidRequest, "Service Not Found", ciP->urlPath, OrionldDetailsString);
-      ciP->httpStatusCode = (HttpStatusCode) 404;
+      if (orionldBadVerb(ciP) == true)
+      {
+        ciP->httpStatusCode = SccBadVerb;
+      }
+      else
+      {
+        orionldErrorResponseCreate(ciP, OrionldInvalidRequest, "Service Not Found", ciP->urlPath, OrionldDetailsString);
+        ciP->httpStatusCode = SccContextElementNotFound;
+      }
       goto respond;
     }
 

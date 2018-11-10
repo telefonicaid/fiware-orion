@@ -129,6 +129,7 @@ public:
   char*                     responsePayload;
   bool                      responsePayloadAllocated;
   char*                     urlPath;
+  char*                     verbString;
   char*                     wildcard[2];
   Kjson*                    kjsonP;
   KjNode*                   requestTree;

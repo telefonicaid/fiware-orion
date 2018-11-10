@@ -27,6 +27,8 @@
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/rest/temporaryErrorPayloads.h"               // notFoundPayload
+#include "orionld/rest/orionldServiceInit.h"                   // orionldRestServiceV
+#include "orionld/rest/orionldServiceLookup.h"                 // orionldServiceLookup
 #include "orionld/serviceRoutines/orionldBadVerb.h"            // Own Interface
 
 
@@ -35,10 +37,43 @@
 //
 // orionldBadVerb -
 //
-void orionldBadVerb(ConnectionInfo* ciP)
+bool orionldBadVerb(ConnectionInfo* ciP)
 {
-  LM_T(LmtServiceRoutine, ("Implement badVerb!!!!!"));
+  unsigned short  bitmask = 0;
+  bool            found   = false;
 
-  ciP->responsePayload = (char*) notFoundPayload;
-  ciP->httpStatusCode  = SccContextElementNotFound;
+  LM_TMP(("PATH: %s", ciP->urlPath));
+  LM_TMP(("VERB: %s", ciP->verbString));
+
+  //
+  // There are nine verbs/methods, but only GET, POST, PATCH and DELETE are supported by ORIONLD
+  // This loop looks up the URL PATH for each "orionld-valid" verb and keeps a bitmask of the hits
+  //
+  for (unsigned short verbNo = 0; verbNo <= PATCH; verbNo++)  // 0:GET, 1:PUT, 2:POST, 3:DELETE, 4:PATCH
+  {
+    if (verbNo == PUT) continue;
+
+    if (orionldServiceLookup(ciP, &orionldRestServiceV[verbNo]) != NULL)
+    {
+      bitmask |= (1 << verbNo);
+      found = true;
+    }
+  }
+
+  if (found == false)
+    return false;
+
+  char allowValue[128];
+
+  allowValue[0] = 0;
+
+  if (bitmask & (1 << GET))    strcat(allowValue, ",GET");
+  if (bitmask & (1 << POST))   strcat(allowValue, ",POST");
+  if (bitmask & (1 << DELETE)) strcat(allowValue, ",PATCH");
+  if (bitmask & (1 << PATCH))  strcat(allowValue, ",DELETE");
+
+  ciP->httpHeader.push_back(HTTP_ALLOW);
+  ciP->httpHeaderValue.push_back(&allowValue[1]);  // Skipping first comma
+
+  return true;
 }

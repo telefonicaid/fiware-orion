@@ -1,0 +1,65 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Bad Verb with a supported URL PATH
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. PATCH /ngsi-ld/v1/entities, see 405 and Allow: POST,GET
+#
+
+
+echo "01. PATCH /ngsi-ld/v1/entities, see 405 and Allow: POST,GET"
+echo "==========================================================="
+payload='{
+  "id": "http://a.b.c/entity/E1",
+  "type": "A",
+  "name": {
+    "type": "Property",
+    "value": "1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X PATCH --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. PATCH /ngsi-ld/v1/entities, see 405 and Allow: POST,GET
+===========================================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: GET,POST
+Date: REGEX(.*)
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -33,6 +33,6 @@
 //
 // orionldBadVerb -
 //
-extern void orionldBadVerb(ConnectionInfo* ciP);
+extern bool orionldBadVerb(ConnectionInfo* ciP);
 
 #endif  // SRC_LIB_ORIONLD_REST_ORIONLDBADVERB_H_

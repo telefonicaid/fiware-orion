@@ -125,7 +125,7 @@ static Verb verbGet(const char* method)
     char c4 = method[4];
     char c5 = method[5];
     char c6 = method[6];
-    char c7 = method[6];
+    char c7 = method[7];
 
     if ((c0 == 'O') && (c1 == 'P') && (c2 == 'T') && (c3 == 'I') && (c4 == 'O') && (c5 == 'N') && (c6 == 'S') && (c7 == 0))
       return OPTIONS;
@@ -207,6 +207,11 @@ int orionldMhdConnectionInit
   *con_cls = ciP;
 
   //
+  // Keep a pointer to the method/verb
+  //
+  ciP->verbString = (char*) method;
+
+  //
   // Creating kjson environment for KJson parse and render
   //
   ciP->kjsonP = kjBufferCreate();      
@@ -286,8 +291,8 @@ int orionldMhdConnectionInit
   // 9.  Check validity of tenant
   // 10. Check Accept header
   // 11. Check URL path is OK
-  // 12. Check Content-Type is accepted
 
+  // 12. Check Content-Type is accepted
   if ((ciP->verb == POST) || (ciP->verb == PATCH))
   {
     //
