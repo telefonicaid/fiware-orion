@@ -212,7 +212,6 @@ int orionldMhdConnectionInit
   ciP->kjsonP = kjBufferCreate();      
   if (ciP->kjsonP == NULL)
     LM_X(1, ("Out of memory"));
-  LM_TMP(("Allocated ciP->kjsonP at %p", ciP->kjsonP));
 
 
   //
@@ -288,8 +287,19 @@ int orionldMhdConnectionInit
   // 10. Check Accept header
   // 11. Check URL path is OK
   // 12. Check Content-Type is accepted
-  LM_T(LmtHttpHeaders, ("Content-Type: %s", ciP->httpHeaders.contentType.c_str()));
-  LM_T(LmtHttpHeaders, ("Accepted: %s", ciP->httpHeaders.accept.c_str()));
+
+  if ((ciP->verb == POST) || (ciP->verb == PATCH))
+  {
+    //
+    // FIXME: Instead of multiple strcmps, save an enum constant in ciP about content-type
+    //
+    if ((strcmp(ciP->httpHeaders.contentType.c_str(), "application/json") != 0) && (strcmp(ciP->httpHeaders.contentType.c_str(), "application/ld+json") != 0))
+    {
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "unsupported format of payload", "only application/json and application/ld+json are supported", OrionldDetailsString);
+      ciP->httpStatusCode = SccBadRequest;
+      return MHD_YES;
+    }
+  }
 
   // 13. Get URI parameters
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
