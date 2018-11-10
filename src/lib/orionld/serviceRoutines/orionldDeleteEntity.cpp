@@ -49,7 +49,7 @@ bool orionldDeleteEntity(ConnectionInfo* ciP)
   // Check that the Entity ID is a valid URI
   char* details;
 
-  if ((urlCheck(ciP->wildcard[0], &details) == false) && (urnCheck(ciP->wildcard[0], &details)))
+  if ((urlCheck(ciP->wildcard[0], &details) == false) && (urnCheck(ciP->wildcard[0], &details) == false))
   {
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Entity ID", details, OrionldDetailsString);
     ciP->httpStatusCode = SccBadRequest;

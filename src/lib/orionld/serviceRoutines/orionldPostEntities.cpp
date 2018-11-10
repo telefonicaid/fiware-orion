@@ -1396,7 +1396,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     // Entity ID
     if (kNodeP == idNodeP)
     {
-      if (!urlCheck(idNodeP->value.s, &details) && !urnCheck(idNodeP->value.s, &details))
+      if ((urlCheck(idNodeP->value.s, &details) == false) && (urnCheck(idNodeP->value.s, &details) == false))
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN", OrionldDetailsString);
         mongoRequest.release();

@@ -1,0 +1,201 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Deletion - should delete the entity
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255 --prettyPrint
+
+--SHELL--
+
+#
+# 01. Create an entity
+# 02. See entity in mongo content
+# 03. GET the entity
+# 04. DELETE the entity
+# 05. GET the entity - see error
+# 06. DELETE the entity - see error
+# 07. See no entities in mongo content
+#
+
+echo "01. Create an entity"
+echo "===================="
+payload='{
+  "id": "urn:ngsi-ld:T:12:13:14",
+  "type": "T",
+  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. See entity in mongo content"
+echo "==============================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. GET the entity"
+echo "=================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14?prettyPrint=yes&spaces=2' --noPayloadCheck  -H "Accept: application/ld+json"
+echo
+echo
+
+
+echo "04. DELETE the entity"
+echo "====================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14' -X DELETE
+echo
+echo
+
+
+echo "05. GET the entity - see error"
+echo "=============================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14?prettyPrint=yes&spaces=2' --noPayloadCheck  -H "Accept: application/ld+json"
+echo
+echo
+
+
+echo "06. DELETE the entity - see error"
+echo "================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14' -X DELETE
+echo
+echo
+
+
+echo "07. See no entities in mongo content"
+echo "===================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity
+====================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14
+Date: REGEX(.*)
+
+
+
+02. See entity in mongo content
+===============================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb://localhost:27017/ftest
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:12:13:14",
+		"type" : "http://example.org/ngsi-ld/default/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"@context"
+	],
+	"attrs" : {
+		"@context" : {
+			"type" : "ContextString",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. GET the entity
+==================
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:T:12:13:14",
+  "type": "T",
+  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld"
+}
+
+
+
+04. DELETE the entity
+=====================
+HTTP/1.1 200 OK
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+05. GET the entity - see error
+==============================
+HTTP/1.1 404 Not Found
+Content-Length: 133
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "type": "http://example.org/ngsi-ld/errors/ResourceNotFound",
+  "title": "No context element found",
+  "details": "no details"
+}
+
+
+
+06. DELETE the entity - see error
+=================================
+HTTP/1.1 404 Not Found
+Content-Length: 165
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "urn:ngsi-ld:T:12:13:14",
+    "title": "The requested entity has not been found. Check type and id",
+    "type": "http://example.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+07. See no entities in mongo content
+====================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb://localhost:27017/ftest
+MongoDB server version: REGEX(.*)
+null
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
