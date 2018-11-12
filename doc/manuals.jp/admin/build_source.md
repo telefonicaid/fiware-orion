@@ -70,7 +70,7 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
         cd fiware-orion
         make
 
-* (オプションですが強く推奨されます) ユニット・テストの実行です。まず、MongoDB をユニットとしてインストールする必要があり、機能テストは localhost で動作する mongod に依存しています。詳細については、[公式 MongoDB のドキュメント](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/)を確認してください。推奨バージョンは 3.4 です。ただし、3.2 も正常に動作するはずです
+* (オプションですが強く推奨されます) ユニット・テストの実行です。まず、MongoDB をユニットとしてインストールする必要があり、機能テストは localhost で動作する mongod に依存しています。詳細については、[公式 MongoDB のドキュメント](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/)を確認してください。推奨バージョンは 3.6 です。ただし、3.2 および 3.4 も正常に動作するはずです
 
 * バイナリをインストールします。INSTALL_DIR を使用して、インストール・プレフィックス・パス (デフォルトは /usr) を設定することができます。したがって、broker は `$INSTALL_DIR/bin` ディレクトリにインストールされます
 

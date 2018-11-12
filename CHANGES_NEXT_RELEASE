@@ -1,5 +1,6 @@
 - Fix: metadata filter was lost during csub cache refresh (#3290)
 - Fix: NGSIv1-like error responses were used in some NGSIv2 operations
+- Add: support to MongoDB 3.6 (#3079)
 - Remove: isDomain field in NGSIv1 registrations (it was never used)
 - Fix: NGSIv2-NGSIv1 location metadata issues (#3122)
 - Fix: Wrong inclusion of "location" metadata in geo:json notifications (#3045)

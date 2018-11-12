@@ -40,9 +40,9 @@ Regarding service/tenant name syntax, it must be a string of
 alphanumeric characters (and the "\_" symbol). Maximum length is 50
 characters,
 which should be enough for most use cases. Orion Context Broker
-interprets the tentant name in lowercase, thus, although you can use
+interprets the tenant name in lowercase, thus, although you can use
 tenants such as in updateContext "MyService" it is not advisable, as the
 notifications related with that tenant will be sent with "myservice"
-and, in that sense, it is not coherent the tentant you used in
+and, in that sense, it is not coherent the tenant you used in
 updateContext compared with the one that Orion sends in
 notifyContextRequest.
