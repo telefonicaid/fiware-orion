@@ -333,7 +333,8 @@ void setCondsAndInitialNotify
                                             status,
                                             fiwareCorrelator,
                                             notifAttributesV,
-                                            blacklist);
+                                            blacklist,
+                                            V2);
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));

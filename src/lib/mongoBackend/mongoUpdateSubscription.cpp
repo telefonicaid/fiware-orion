@@ -341,7 +341,8 @@ static void setCondsAndInitialNotifyNgsiv1
                                             status,
                                             fiwareCorrelator,
                                             sub.notification.attributes,
-                                            sub.notification.blacklist);
+                                            sub.notification.blacklist,
+                                            V2);
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));

@@ -3087,7 +3087,7 @@ static void updateEntity
 
   /* Build CER used for notifying (if needed) */
   StringList               emptyAttrL;
-  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL);
+  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL, true, apiVersion);
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates

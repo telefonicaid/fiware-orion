@@ -2322,7 +2322,8 @@ static bool processOnChangeConditionForSubscription
   const Restriction*               resP,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist
+  bool                             blacklist,
+  ApiVersion                       apiVersion
 )
 {
   std::string                   err;
@@ -2330,16 +2331,17 @@ static bool processOnChangeConditionForSubscription
   ContextElementResponseVector  rawCerV;
   StringList                    emptyList;
   StringList                    metadataList;
+std::cout << "\nprocessOnChange renderFormat:\n" << renderFormat << std::endl;
 
   metadataList.fill(metadataV);
-  if (!blacklist && !entitiesQuery(enV, attrL, *resP, &rawCerV, &err, true, tenant, servicePathV))
+  if (!blacklist && !entitiesQuery(enV, attrL, *resP, &rawCerV, &err, true, tenant, servicePathV, 0, 0, NULL, NULL, "", apiVersion))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
 
     return false;
   }
-  else if (blacklist && !entitiesQuery(enV, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
+  else if (blacklist && !entitiesQuery(enV, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV, 0, 0, NULL, NULL, "", apiVersion))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
@@ -2387,7 +2389,7 @@ static bool processOnChangeConditionForSubscription
       ContextElementResponseVector  allCerV;
 
 
-      if (!entitiesQuery(enV, emptyList, *resP, &rawCerV, &err, false, tenant, servicePathV))
+      if (!entitiesQuery(enV, emptyList, *resP, &rawCerV, &err, false, tenant, servicePathV, 0, 0, NULL, NULL, "", apiVersion))
       {
 #ifdef WORKAROUND_2994
         delayedReleaseAdd(rawCerV);
@@ -2476,7 +2478,8 @@ static BSONArray processConditionVector
   const std::string&               status,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist
+  bool                             blacklist,
+  ApiVersion                       apiVersion
 )
 {
   BSONArrayBuilder conds;
@@ -2493,7 +2496,7 @@ static BSONArray processConditionVector
       {
         conds.append(nc->condValueList[jx]);
       }
-
+std::cout << "\nprocessConditionVector apiVersion:\n " << apiVersion << std::endl;
       if ((status == STATUS_ACTIVE) &&
           (processOnChangeConditionForSubscription(enV,
                                                    attrL,
@@ -2508,7 +2511,8 @@ static BSONArray processConditionVector
                                                    resP,
                                                    fiwareCorrelator,
                                                    attrsOrder,
-                                                   blacklist)))
+                                                   blacklist,
+                                                   apiVersion)))
       {
         *notificationDone = true;
       }
@@ -2548,7 +2552,8 @@ BSONArray processConditionVector
   const std::string&               status,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist
+  bool                             blacklist,
+  ApiVersion                       apiVersion
 )
 {
   NotifyConditionVector ncV;
@@ -2574,7 +2579,8 @@ BSONArray processConditionVector
                                          status,
                                          fiwareCorrelator,
                                          attrsOrder,
-                                         blacklist);
+                                         blacklist,
+                                         apiVersion);
 
   enV.release();
   ncV.release();
