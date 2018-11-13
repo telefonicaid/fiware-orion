@@ -378,7 +378,7 @@ static bool payloadCheck
 //   1: expansion found only for the attr-name/entity-type
 //   2: expansions found both for attr-name and attr-type
 //
-static int uriExpansion(OrionldContext* contextP, const char* name, char** expandedNameP, char** expandedTypeP, char** detailsPP)
+int uriExpansion(OrionldContext* contextP, const char* name, char** expandedNameP, char** expandedTypeP, char** detailsPP)
 {
   KjNode* contextValueP = NULL;
 
@@ -507,35 +507,6 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
 
   if ((parentP != NULL) && (parentP->type == KjObject))
     cNodeP->name = kNodeP->name;
-
-#if 0
-  // Any URI Expansion needed?
-  if ((kNodeP->name != NULL) && (kNodeP->name[0] != 0))
-  {
-    char* expandedNameP  = NULL;
-    char* expandedTypeP  = NULL;
-    char* details        = NULL;
-    int   expansions;
-
-    expansions = uriExpansion(ciP->contextP, kNodeP->name, &expandedNameP, &expandedTypeP, &details);
-    if (expansions == -1)
-    {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item", details, OrionldDetailsString);
-      return NULL;
-    }
-
-    if (expandedNameP != NULL)
-    {
-      LM_T(LmtUriExpansion, ("Expansion found for %s name '%s': %s", kjValueType(kNodeP->type), kNodeP->name, expandedNameP));
-      cNodeP->name = expandedNameP;
-    }
-    else
-    {
-      LM_T(LmtUriExpansion, ("NO Expansion found for %s name '%s': using: %s%s", kjValueType(kNodeP->type), kNodeP->name, orionldDefaultUrl, kNodeP->name));
-      cNodeP->name = std::string(orionldDefaultUrl) + kNodeP->name;
-    }
-  }
-#endif
 
   if (kNodeP->type == KjString)
   {
@@ -1433,6 +1404,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       char*  expandedName;
       char*  expandedType;
       int    expansions = uriExpansion(ciP->contextP, typeNodeP->value.s, &expandedName, &expandedType, &details);
+      LM_TMP(("KZ: URI Expansion for type '%s': '%s'", typeNodeP->value.s, expandedName));
       LM_T(LmtUriExpansion, ("Got %d expansions", expansions));
 
       if (expansions == -1)

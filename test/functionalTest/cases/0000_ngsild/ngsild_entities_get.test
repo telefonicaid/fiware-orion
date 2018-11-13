@@ -1,0 +1,328 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieval of Entities with basic options
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E1, with test context, and type T
+# 02. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E2, with test context, and type T2
+# 03. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E3, with test context, and type T
+# 04. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E4, with test context, and type T2
+# 05. GET all entities of type T, see E1 and E3
+# 06. GET all entities of type T2, see E2 and E4
+# 07. GET all entities with id E1, see entity E1 only
+# 08. GET all entities with id E.*, see all four entities
+# 09. GET all entities with id E5, see empty array
+#
+
+echo "01. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E1, with test context, and type T"
+echo "===================================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E1",
+  "type": "T",
+  "A1": {
+    "type": "Property",
+    "value": "E1"
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E2, with test context, and type T2"
+echo "====================================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E2",
+  "type": "T2",
+  "A1": {
+    "type": "Property",
+    "value": "E2"
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "03. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E3, with test context, and type T"
+echo "===================================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E3",
+  "type": "T",
+  "A1": {
+    "type": "Property",
+    "value": "E3"
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "04. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E4, with test context, and type T2"
+echo "====================================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E4",
+  "type": "T2",
+  "A1": {
+    "type": "Property",
+    "value": "E4"
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "05. GET all entities of type T, see E1 and E3"
+echo "============================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json" -H "Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+echo
+echo
+
+
+echo "06. GET all entities of type T2, see E2 and E4"
+echo "=============================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T2&prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json"  -H "Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+echo
+echo
+
+
+echo "07. GET all entities with id E1, see entity E1 only"
+echo "==================================================="
+orionCurl --url '/ngsi-ld/v1/entities?id=http://a.b.c/entity/E1&prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json"  -H "Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+echo
+echo
+
+
+echo "08. GET all entities with id E.*, see all four entities"
+echo "======================================================="
+orionCurl --url '/ngsi-ld/v1/entities?idPattern=http://a.b.c/entity/E.*&prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json"  -H "Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+echo
+echo
+
+
+echo "09. GET all entities with id E5, see empty array"
+echo "================================================"
+orionCurl --url '/ngsi-ld/v1/entities?id=http://a.b.c/entity/E5&prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json"  -H "Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+echo
+echo
+
+
+
+--REGEXPECT--
+01. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E1, with test context, and type T
+====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+Date: REGEX(.*)
+
+
+
+02. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E2, with test context, and type T2
+=====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
+Date: REGEX(.*)
+
+
+
+03. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E3, with test context, and type T
+====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
+Date: REGEX(.*)
+
+
+
+04. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E4, with test context, and type T2
+=====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E4
+Date: REGEX(.*)
+
+
+
+05. GET all entities of type T, see E1 and E3
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 429
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+[
+  {
+    "id": "http://a.b.c/entity/E1",
+    "type": "T",
+    "A1": {
+      "type": "Property",
+      "value": "E1"
+    },
+    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+  },
+  {
+    "id": "http://a.b.c/entity/E3",
+    "type": "T",
+    "A1": {
+      "type": "Property",
+      "value": "E3"
+    },
+    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+  }
+]
+
+
+
+06. GET all entities of type T2, see E2 and E4
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 431
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+[
+  {
+    "id": "http://a.b.c/entity/E2",
+    "type": "T2",
+    "A1": {
+      "type": "Property",
+      "value": "E2"
+    },
+    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+  },
+  {
+    "id": "http://a.b.c/entity/E4",
+    "type": "T2",
+    "A1": {
+      "type": "Property",
+      "value": "E4"
+    },
+    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+  }
+]
+
+
+
+07. GET all entities with id E1, see entity E1 only
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 216
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+[
+  {
+    "id": "http://a.b.c/entity/E1",
+    "type": "T",
+    "A1": {
+      "type": "Property",
+      "value": "E1"
+    },
+    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+  }
+]
+
+
+
+08. GET all entities with id E.*, see all four entities
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 857
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+[
+  {
+    "id": "http://a.b.c/entity/E1",
+    "type": "T",
+    "A1": {
+      "type": "Property",
+      "value": "E1"
+    },
+    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+  },
+  {
+    "id": "http://a.b.c/entity/E2",
+    "type": "T2",
+    "A1": {
+      "type": "Property",
+      "value": "E2"
+    },
+    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+  },
+  {
+    "id": "http://a.b.c/entity/E3",
+    "type": "T",
+    "A1": {
+      "type": "Property",
+      "value": "E3"
+    },
+    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+  },
+  {
+    "id": "http://a.b.c/entity/E4",
+    "type": "T2",
+    "A1": {
+      "type": "Property",
+      "value": "E4"
+    },
+    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+  }
+]
+
+
+
+09. GET all entities with id E5, see empty array
+================================================
+HTTP/1.1 200 OK
+Content-Length: 3
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -220,16 +220,12 @@ echo
 --REGEXPECT--
 01. GET /ngsi-ld/v1/entities
 ============================
-HTTP/1.1 501 Not Implemented
-Content-Length: 135
+HTTP/1.1 200 OK
+Content-Length: 2
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "details": "no details",
-    "title": "not implemented - GET /ngsi-ld/v1/entities",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
-}
+[]
 
 
 02. GET /ngsi-ld/v1/entities/E1

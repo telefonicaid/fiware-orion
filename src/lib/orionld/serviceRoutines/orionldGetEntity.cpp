@@ -77,7 +77,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
   //
   LM_TMP(("response.contextElementResponseVector.size: %d", response.contextElementResponseVector.size()));
   
-  ciP->responseTree = kjTreeFromQueryContextResponse(ciP, &response);
+  ciP->responseTree = kjTreeFromQueryContextResponse(ciP, true, &response);
   if (ciP->responseTree == NULL)
   {
     ciP->httpStatusCode = SccContextElementNotFound;

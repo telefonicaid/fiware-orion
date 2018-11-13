@@ -112,13 +112,11 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
 
   for (unsigned int hIx = 0; hIx < ciP->httpHeader.size(); ++hIx)
   {
-    LM_TMP(("KZ: Adding HTTP Header '%s': '%s'", ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str()));
     MHD_add_response_header(response, ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str());
   }
 
   if (answer != "")
   {
-    LM_TMP(("KZ: Adding HTTP Header '%s': %d", HTTP_CONTENT_TYPE, ciP->outMimeType));
     if (ciP->outMimeType == JSON)
     {
       MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/json");
