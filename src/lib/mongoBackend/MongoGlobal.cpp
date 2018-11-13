@@ -2331,7 +2331,6 @@ static bool processOnChangeConditionForSubscription
   ContextElementResponseVector  rawCerV;
   StringList                    emptyList;
   StringList                    metadataList;
-std::cout << "\nprocessOnChange renderFormat:\n" << renderFormat << std::endl;
 
   metadataList.fill(metadataV);
   if (!blacklist && !entitiesQuery(enV, attrL, *resP, &rawCerV, &err, true, tenant, servicePathV, 0, 0, NULL, NULL, "", apiVersion))
@@ -2496,7 +2495,7 @@ static BSONArray processConditionVector
       {
         conds.append(nc->condValueList[jx]);
       }
-std::cout << "\nprocessConditionVector apiVersion:\n " << apiVersion << std::endl;
+
       if ((status == STATUS_ACTIVE) &&
           (processOnChangeConditionForSubscription(enV,
                                                    attrL,
