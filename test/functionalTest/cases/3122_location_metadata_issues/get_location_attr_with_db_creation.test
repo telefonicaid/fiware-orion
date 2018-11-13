@@ -31,12 +31,12 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create E1 directly in DB
-# 02. Get E1 with NGSIV1
-# 03. Get E1 with NGSIV2
+# 01. Create E1 directly in DB with location GeoJSON field but without location metadata nor geo:xxx type
+# 02. Get E1 with NGSIV1 with location metadata
+# 03. Get E1 with NGSIV2 without location metadata
 
-echo "01. Create E1 directly in DB"
-echo "============================"
+echo "01. Create E1 directly in DB with location GeoJSON field but without location metadata nor geo:xxx type"
+echo "======================================================================================================="
 mongoCmd ${CB_DB_NAME} 'db.entities.insert({
         "_id": {
                 "id": "E1",
@@ -71,30 +71,30 @@ echo
 echo
 
 
-echo "02. Get E1 with NGSIV1"
-echo "======================"
+echo "02. Get E1 with NGSIV1 with location metadata"
+echo "============================================="
 orionCurl --url '/v1/contextEntities/E1'
 echo
 echo
 
 
-echo "03. Get E1 with NGSIV2"
-echo "======================"
+echo "03. Get E1 with NGSIV2 without location metadata"
+echo "================================================"
 orionCurl --url '/v2/entities/E1'
 echo
 echo
 
 
 --REGEXPECT--
-01. Create E1 directly in DB
-============================
+01. Create E1 directly in DB with location GeoJSON field but without location metadata nor geo:xxx type
+=======================================================================================================
 WriteResult({ "nInserted" : 1 })
 
 
 
 
-02. Get E1 with NGSIV1
-======================
+02. Get E1 with NGSIV1 with location metadata
+=============================================
 HTTP/1.1 200 OK
 Content-Length: 237
 Content-Type: application/json
@@ -128,8 +128,8 @@ Date: REGEX(.*)
 }
 
 
-03. Get E1 with NGSIV2
-======================
+03. Get E1 with NGSIV2 without location metadata
+================================================
 HTTP/1.1 200 OK
 Content-Length: 76
 Content-Type: application/json

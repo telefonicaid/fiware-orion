@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Wrong inclusion of "location" metadata in geo:json notifications
+Check "location" metadata is not wrongly included in NGSIv2 notifications
 
 --SHELL-INIT--
 dbInit CB
@@ -31,10 +31,10 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create E with type T 
-# 02. Create subscription for E
-# 03. Trigger notification
-# 04. See notification and make sure the metadata is correct
+# 01. Create E with type T
+# 02. Create NGSIv2 subscription for E
+# 03. Trigger notification by updating value of "name" attribute
+# 04. See NGSIv2 notification and make sure "location" metadata is not included
 #
 
 echo "01. Create E with type: T"
@@ -67,8 +67,8 @@ echo
 echo
 
 
-echo "02. Create subscription for E"
-echo "============================="
+echo "02. Create NGSIv2 subscription for E"
+echo "===================================="
 payload='{
   "description": "A subscription to get info about E",
   "subject": {
@@ -96,18 +96,18 @@ echo
 echo
 
 
-echo "03. Trigger notification"
-echo "========================"
+echo "03. Trigger notification by updating value of name attribute"
+echo "============================================================"
 payload='{
-  "value": "$1"
+  "value": "SD1"
 }'
 orionCurl --url /v2/entities/E/attrs/name --payload "$payload" -X PUT
 echo
 echo
 
 
-echo "04. See notification and make sure the metadata is correct"
-echo "=========================================================="
+echo "04. See NGSIv2 notification and make sure location metadata is not included"
+echo "==========================================================================="
 accumulatorDump
 echo
 echo
@@ -124,8 +124,8 @@ Date: REGEX(.*)
 
 
 
-02. Create subscription for E
-=============================
+02. Create NGSIv2 subscription for E
+====================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -134,8 +134,8 @@ Date: REGEX(.*)
 
 
 
-03. Trigger notification
-========================
+03. Trigger notification by updating value of name attribute
+============================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -143,8 +143,8 @@ Date: REGEX(.*)
 
 
 
-04. See notification and make sure the metadata is correct
-==========================================================
+04. See NGSIv2 notification and make sure location metadata is not included
+===========================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 343
@@ -206,12 +206,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://localhost:9997/notify
+POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 342
-User-Agent: orion/2.0.0-next libcurl/7.29.0
+Content-Length: 343
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
-Host: localhost:9997
+Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -223,7 +223,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "name": {
                 "metadata": {}, 
                 "type": "Text", 
-                "value": "$1"
+                "value": "SD1"
             }, 
             "perimeter": {
                 "metadata": {}, 

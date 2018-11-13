@@ -32,13 +32,13 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create E1 with NGSIV1
-# 02. Create E2 with NGSIV1
-# 03. Check E1 entity in DB
-# 04. Check E2 entity in DB
+# 01. Create E1 with NGSIV1 with location metadata
+# 02. Create E2 with NGSIV1 without location metadata
+# 03. Check E1 entity in DB has location metadata and location GeoJSON field
+# 04. Check E2 entity in DB has no location metadata nor location GeoJSON field
 
-echo "01. Create E1 with NGSIV1"
-echo "========================="
+echo "01. Create E1 with NGSIV1 with location metadata"
+echo "================================================"
 payload='
 {
     "attributes": [
@@ -62,8 +62,8 @@ echo
 echo
 
 
-echo "02. Create E2 with NGSIV1"
-echo "========================="
+echo "02. Create E2 with NGSIV1 without location metadata"
+echo "==================================================="
 payload='
 {
     "attributes": [
@@ -80,23 +80,23 @@ echo
 echo
 
 
-echo "03. Check E1 entity in DB"
-echo "========================="
+echo "03. Check E1 entity in DB has location metadata and location GeoJSON field"
+echo "=========================================================================="
 mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "E1",  "type": "T", "servicePath" : "/" } }, {_id:0, attrs: 1, location: 1})' | python -mjson.tool
 echo
 echo
 
 
-echo "04. Check E2 entity in DB"
-echo "========================="
+echo "04. Check E2 entity in DB has no location metadata nor location GeoJSON field"
+echo "============================================================================="
 mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "E2",  "type": "T", "servicePath" : "/" } }, {_id:0, attrs: 1, location: 1})' | python -mjson.tool
 echo
 echo
 
 
 --REGEXPECT--
-01. Create E1 with NGSIV1
-=========================
+01. Create E1 with NGSIV1 with location metadata
+================================================
 HTTP/1.1 200 OK
 Content-Length: 236
 Content-Type: application/json
@@ -132,8 +132,8 @@ Date: REGEX(.*)
 }
 
 
-02. Create E2 with NGSIV1
-=========================
+02. Create E2 with NGSIV1 without location metadata
+===================================================
 HTTP/1.1 200 OK
 Content-Length: 170
 Content-Type: application/json
@@ -162,8 +162,8 @@ Date: REGEX(.*)
 }
 
 
-03. Check E1 entity in DB
-=========================
+03. Check E1 entity in DB has location metadata and location GeoJSON field
+==========================================================================
 {
     "attrs": {
         "A": {
@@ -195,8 +195,8 @@ Date: REGEX(.*)
 }
 
 
-04. Check E2 entity in DB
-=========================
+04. Check E2 entity in DB has no location metadata nor location GeoJSON field
+=============================================================================
 {
     "attrs": {
         "A": {

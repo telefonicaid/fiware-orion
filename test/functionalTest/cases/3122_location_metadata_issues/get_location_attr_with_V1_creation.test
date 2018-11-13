@@ -31,12 +31,12 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create E1 with NGSIV1
-# 02. Get E1 with NGSIV1
-# 03. Get E1 with NGSIV2
+# 01. Create E1 with NGSIV1 with location metadata
+# 02. Get E1 with NGSIV1 and check location metadata is included
+# 03. Get E1 with NGSIV2 and check location metadata is included
 
-echo "01. Create E1 with NGSIV1"
-echo "========================="
+echo "01. Create E1 with NGSIV1 with location metadata"
+echo "================================================"
 payload='
 {
     "attributes": [
@@ -60,23 +60,23 @@ echo
 echo
 
 
-echo "02. Get E1 with NGSIV1"
-echo "======================"
+echo "02. Get E1 with NGSIV1 and check location metadata is included"
+echo "=============================================================="
 orionCurl --url '/v1/contextEntities/E1'
 echo
 echo
 
 
-echo "03. Get E1 with NGSIV2"
-echo "======================"
+echo "03. Get E1 with NGSIV2 and check location metadata is included"
+echo "=============================================================="
 orionCurl --url '/v2/entities/E1'
 echo
 echo
 
 
 --REGEXPECT--
-01. Create E1 with NGSIV1
-=========================
+01. Create E1 with NGSIV1 with location metadata
+================================================
 HTTP/1.1 200 OK
 Content-Length: 236
 Content-Type: application/json
@@ -112,8 +112,8 @@ Date: REGEX(.*)
 }
 
 
-02. Get E1 with NGSIV1
-======================
+02. Get E1 with NGSIV1 and check location metadata is included
+==============================================================
 HTTP/1.1 200 OK
 Content-Length: 237
 Content-Type: application/json
@@ -147,8 +147,8 @@ Date: REGEX(.*)
 }
 
 
-03. Get E1 with NGSIV2
-======================
+03. Get E1 with NGSIV2 and check location metadata is included
+==============================================================
 HTTP/1.1 200 OK
 Content-Length: 120
 Content-Type: application/json
