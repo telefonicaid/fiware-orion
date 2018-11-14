@@ -234,6 +234,7 @@ link_directories("/usr/local/lib/")
 link_directories("/usr/lib64/")
 link_directories("/usr/lib/x86_64-linux-gnu")
 link_directories("${PROJECT_SOURCE_DIR}/../kjson")
+link_directories("${PROJECT_SOURCE_DIR}/../kbase")
 
 
 
