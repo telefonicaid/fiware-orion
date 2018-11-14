@@ -24,6 +24,7 @@
 */
 extern "C"
 {
+#include "kbase/kStringSplit.h"                                // kStringSplit
 #include "kjson/kjBuilder.h"                                   // kjArray, kjChildAdd, ...
 }
 
@@ -164,14 +165,23 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   {
     char  longName[256];
     char* details;
-    char* shortName = attrs;  // FIXME: Split attrs at ',' and loop over
+    char* shortName;
+    char* shortNameVector[32];
+    int   vecItems = (int) sizeof(shortNameVector) / sizeof(shortNameVector[0]);;
 
-    if (uriExpand(ciP->contextP, shortName, longName, sizeof(longName), &details) == true)
-      parseData.qcr.res.attributeList.push_back(longName);
-    else
+    vecItems = kStringSplit(attrs, ',', (char**) shortNameVector, vecItems);
+
+    for (int ix = 0; ix < vecItems; ix++)
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of attribute", shortName, OrionldDetailsString);
-      return false;
+      shortName = shortNameVector[ix];
+
+      if (uriExpand(ciP->contextP, shortName, longName, sizeof(longName), &details) == true)
+        parseData.qcr.res.attributeList.push_back(longName);
+      else
+      {
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of attribute", shortName, OrionldDetailsString);
+        return false;
+      }
     }
   }
 
