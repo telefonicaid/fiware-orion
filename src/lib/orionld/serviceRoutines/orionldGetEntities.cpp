@@ -32,6 +32,7 @@ extern "C"
 
 #include "serviceRoutines/postQueryContext.h"                  // V1 service routine that does the whole work ...
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "mongoBackend/mongoQueryContext.h"                    // mongoQueryContext
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
@@ -55,16 +56,10 @@ bool uriExpand(OrionldContext* contextP, char* shortName, char* longName, int lo
   char* expandedType;
   int   n;
 
-  if (contextP != NULL)
-    LM_TMP(("KZ; Calling uriExpansion for '%s' in context '%s'", shortName, contextP->url));
-  else
-    LM_TMP(("KZ; Calling uriExpansion for '%s' in NULL context", shortName));
-
   n = uriExpansion(contextP, shortName, &expandedName, &expandedType, detailsP);
-  LM_TMP(("KZ; uriExpansion for '%s': %d", shortName, n));
   if (n == -1)
   {
-    LM_E(("KZ: uriExpansion error: %s", *detailsP));
+    LM_E(("uriExpansion error: %s", *detailsP));
     return false;
   }
   else if (n == -2)  // expansion NOT found in the context - use default URL
@@ -111,6 +106,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   char*        idString       = (id != NULL)? id      : idPattern;
   const char*  isIdPattern    = (id != NULL)? "false" : "true";
   bool         isTypePattern  = (*type != 0)? false : true;
+  char*        attrs          = (ciP->uriParam["attrs"].empty())?       NULL : (char*) ciP->uriParam["attrs"].c_str();
   EntityId*    entityIdP;
   char         typeExpanded[256];
 
@@ -138,11 +134,11 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
     if (uriExpand(ciP->contextP, type, typeExpanded, sizeof(typeExpanded), &details) == false)
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion", details, OrionldDetailsString);
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
       return false;
     }
+
     type = typeExpanded;
-    LM_TMP(("KZ: type '%s' expanded to '%s'", type, typeExpanded));
   }
   else  // No type given - match all types
   {
@@ -151,28 +147,112 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   }
 
 
-  LM_TMP(("KZ: ------------- Creating EntityId --------------"));
 
   entityIdP = new EntityId(idString, type, isIdPattern, isTypePattern);
 
   parseData.qcr.res.entityIdVector.push_back(entityIdP);
 
+#if 0
+  LM_TMP(("KZ: ------------- Created EntityId --------------"));
   LM_TMP(("KZ: entityId.id:            '%s'", entityIdP->id.c_str()));
   LM_TMP(("KZ: entityId.isPattern:     '%s'", entityIdP->isPattern.c_str()));
   LM_TMP(("KZ: entityId.type:          '%s'", entityIdP->type.c_str()));
   LM_TMP(("KZ: entityId.isTypePattern: '%s'", entityIdP->isTypePattern? "true" : "false"));
+#endif
 
+  if (attrs != NULL)  // FIXME: Just one attribute for now
+  {
+    char  longName[256];
+    char* details;
+    char* shortName = attrs;  // FIXME: Split attrs at ',' and loop over
+
+    if (uriExpand(ciP->contextP, shortName, longName, sizeof(longName), &details) == true)
+      parseData.qcr.res.attributeList.push_back(longName);
+    else
+    {
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of attribute", shortName, OrionldDetailsString);
+      return false;
+    }
+  }
 
   // Call standard op postQueryContext
   std::vector<std::string>  compV;    // Not used but part of signature for postQueryContext
 
   LM_TMP(("Calling postQueryContext"));
-  std::string answer = postQueryContext(ciP, 0, compV, &parseData);
-  LM_TMP(("KZ: postQueryContext gave %d results", parseData.qcrs.res.contextElementResponseVector.size()));
+  std::string answer   = postQueryContext(ciP, 0, compV, &parseData);
+  int         entities = parseData.qcrs.res.contextElementResponseVector.size();
+  LM_TMP(("KZ: postQueryContext gave %d results - we now need to query the '@context' from all these entities", entities));
 
+  //
+  // Unfortunately, we need to do a second query now, to get the attribute "@context" of all the matching entities
+  //
+  // The special attribute "@context" cannot be included in the first query as the list of attributes in that query is the filter
+  // for the entities to match. Pretty much all entities have an attribute called "@context", so if we include "@context" in the first
+  // query, all entities would match, and that is not what we want.
+  //
+  QueryContextResponse  qResForContextAttr;  // Response buffer where all "@context" attributes will be found
+
+  if (entities > 0)
+  {
+    QueryContextRequest       qReq;
+    std::vector<std::string>  servicePathV;
+
+    // Add each entity in the result of the first query to the request of the second query
+    for (int ix = 0; ix < entities; ix++)
+    {
+      EntityId* entityP = &parseData.qcrs.res.contextElementResponseVector[ix]->contextElement.entityId;
+
+      qReq.entityIdVector.push_back(entityP);
+    }
+
+    // Only interested in the attribute "@context"
+    qReq.attributeList.push_back("@context");
+
+    // mongoQueryContext requires a ServicePath, even though ngsi-ld doesn't support service paths
+    servicePathV.push_back("/#");
+
+    HttpStatusCode sCode = mongoQueryContext(&qReq, &qResForContextAttr, ciP->tenant, servicePathV, ciP->uriParam, ciP->uriParamOptions, NULL, ciP->apiVersion);
+
+    if (sCode != SccOk)
+    {
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error querying for @context attributes", NULL, OrionldDetailsString);
+      return false;
+    }
+  }
+
+  // Now we need to add the "@context" member to each entity in parseData.qcrs.res
+  QueryContextResponse* responseP = &parseData.qcrs.res;
+
+  for (unsigned int ix = 0; ix < responseP->contextElementResponseVector.size(); ix++)
+  {
+    EntityId* eIdP = &responseP->contextElementResponseVector[ix]->contextElement.entityId;
+
+    // Find eIdP in qResForContextAttr
+    for (unsigned int cx = 0; cx < qResForContextAttr.contextElementResponseVector.size(); cx++)
+    {
+      if (qResForContextAttr.contextElementResponseVector[cx]->contextElement.entityId.id == eIdP->id)
+      {
+        ContextElement* ceForContextAttrP = &qResForContextAttr.contextElementResponseVector[cx]->contextElement;
+
+        // Found the entity, now get its "@context"
+        ContextAttribute* atContextP = ceForContextAttrP->contextAttributeVector.lookup("@context");
+
+        if (atContextP != NULL)
+        {
+          ContextAttribute* aP = atContextP->clone();
+
+          // Add the @context attribute to its corresponding entity in responseP
+          responseP->contextElementResponseVector[ix]->contextElement.contextAttributeVector.push_back(aP);
+        }
+      }
+    }
+  }
+
+  //
   // Transform QueryContextResponse to KJ-Tree
+  //
   ciP->httpStatusCode = SccOk;
-  ciP->responseTree = kjTreeFromQueryContextResponse(ciP, false, &parseData.qcrs.res);
+  ciP->responseTree   = kjTreeFromQueryContextResponse(ciP, false, &parseData.qcrs.res);
 
   return true;
 }
