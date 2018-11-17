@@ -37,7 +37,7 @@ extern "C"
 #include "rest/restReply.h"                                 // restReply
 
 #include "orionld/common/orionldErrorResponse.h"            // orionldErrorResponseCreate
-#include "orionld/common/urlCheck.h"                        // urlCheck
+#include "orionld/common/linkCheck.h"                       // linkCheck
 #include "orionld/common/SCOMPARE.h"                        // SCOMPARE
 #include "orionld/context/orionldContextCreateFromUrl.h"    // orionldContextCreateFromUrl
 #include "orionld/serviceRoutines/orionldBadVerb.h"         // orionldBadVerb
@@ -176,7 +176,7 @@ static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** de
   if (ciP->httpHeaders.acceptJson == true)
     LM_TMP(("KZ: acceptJson == true"));
 
-    return true;
+  return true;
 }
 
 
@@ -219,7 +219,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       goto respond;
     }
 
-    bool     jsonldLinkInHttpHeader = (ciP->httpHeaders.link != "");
+    bool     jsonldLinkInHttpHeader = (ciP->httpHeaders.link != "");  // The URL is extracted later
     KjNode*  contextNodeP           = NULL;
 
     //
@@ -245,6 +245,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       {
         if (attrNodeP->name == NULL)
           continue;
+
         LM_TMP(("Attr '%s'", attrNodeP->name));
         if (SCOMPARE9(attrNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
         {
@@ -285,15 +286,16 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     if (jsonldLinkInHttpHeader == true)
     {
-      if (urlCheck((char*) ciP->httpHeaders.link.c_str(), &details) == false)
+      LM_TMP(("KZ: Calling linkCheck with: '%s'", ciP->httpHeaders.link.c_str()));
+      if (linkCheck((char*) ciP->httpHeaders.link.c_str(), &ciP->httpHeaders.linkUrl, &details) == false)
       {
-        LM_E(("urlCheck: %s", details));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Link HTTP Header must be a valid URL", details, OrionldDetailsString);
+        LM_E(("linkCheck: %s", details));
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Link HTTP Header", details, OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;
         goto respond;
       }
 
-      if ((ciP->contextP = orionldContextCreateFromUrl(ciP, ciP->httpHeaders.link.c_str(), OrionldUserContext, &details)) == NULL)
+      if ((ciP->contextP = orionldContextCreateFromUrl(ciP, ciP->httpHeaders.linkUrl, OrionldUserContext, &details)) == NULL)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Failure to create context from URL", details, OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;

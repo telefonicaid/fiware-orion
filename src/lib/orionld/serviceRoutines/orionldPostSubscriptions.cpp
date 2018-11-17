@@ -636,11 +636,9 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
   }
 
 #if 0
-  char* linkHeader = NULL;
-  else // Context in Link HTTP Header
+  else if (ciP->httpHeaders.linkUrl != NULL)  // Context in Link HTTP Header
   {
-    if (!ciP->httpHeaders.link.empty())
-      linkHeader = (char*) ciP->httpHeaders.link.c_str();
+    ...
   }
 #endif
 

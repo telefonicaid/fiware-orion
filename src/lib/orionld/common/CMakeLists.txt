@@ -26,6 +26,7 @@ SET (SOURCES
     urlParse.cpp
     urlCheck.cpp
     urnCheck.cpp
+    linkCheck.cpp
     httpStatusCodeToOrionldErrorType.cpp
 )
 

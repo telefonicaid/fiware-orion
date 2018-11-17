@@ -144,6 +144,7 @@ typedef struct HttpHeaders
 
 #ifdef ORIONLD
   std::string   link;
+  char*         linkUrl;
   bool          acceptJson;
   bool          acceptJsonld;
   bool          ngsildContent;
