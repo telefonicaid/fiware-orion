@@ -83,5 +83,8 @@ bool orionldDeleteEntity(ConnectionInfo* ciP)
   // Release allocated data
   parseData.upcr.res.contextElementVector.release();
 
+  // HTTP Response Code is 204 - No Content
+  ciP->httpStatusCode = SccNoContent;
+
   return true;
 }

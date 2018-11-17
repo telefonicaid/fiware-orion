@@ -109,7 +109,6 @@ MongoDB server version: REGEX(.*)
 	"throttling" : NumberLong(5),
 	"servicePath" : "/",
 	"description" : "Description of Test subscription 01",
-	"name" : "Test subscription 01",
 	"status" : "paused",
 	"entities" : [ ],
 	"attrs" : [
@@ -119,6 +118,7 @@ MongoDB server version: REGEX(.*)
 	],
 	"metadata" : [ ],
 	"blacklist" : false,
+	"name" : "Test subscription 01",
 	"ldContext" : "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
 	"conditions" : [
 		"http://example.org/P2"

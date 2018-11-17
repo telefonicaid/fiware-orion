@@ -152,7 +152,7 @@ Date: REGEX(.*)
 
 04. DELETE the entity
 =====================
-HTTP/1.1 200 OK
+HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
 
