@@ -49,7 +49,7 @@ echo
 --REGEXPECT--
 01. Attempt to send a payload with Content-Type image/gif - see error
 =====================================================================
-HTTP/1.1 400 Bad Request
+HTTP/1.1 415 Unsupported Media Type
 Content-Length: 185
 Content-Type: application/json
 Date: REGEX(.*)

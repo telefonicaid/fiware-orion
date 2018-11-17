@@ -300,8 +300,12 @@ int orionldMhdConnectionInit
     //
     if ((strcmp(ciP->httpHeaders.contentType.c_str(), "application/json") != 0) && (strcmp(ciP->httpHeaders.contentType.c_str(), "application/ld+json") != 0))
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "unsupported format of payload", "only application/json and application/ld+json are supported", OrionldDetailsString);
-      ciP->httpStatusCode = SccBadRequest;
+      orionldErrorResponseCreate(ciP,
+                                 OrionldBadRequestData,
+                                 "unsupported format of payload",
+                                 "only application/json and application/ld+json are supported",
+                                 OrionldDetailsString);
+      ciP->httpStatusCode = SccUnsupportedMediaType;
       return MHD_YES;
     }
   }
