@@ -549,7 +549,15 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
   }
   else if (strcasecmp(key.c_str(), HTTP_EXPECT) == 0)            headerP->expect         = value;
   else if (strcasecmp(key.c_str(), HTTP_CONNECTION) == 0)        headerP->connection     = value;
-  else if (strcasecmp(key.c_str(), HTTP_CONTENT_TYPE) == 0)      headerP->contentType    = value;
+  else if (strcasecmp(key.c_str(), HTTP_CONTENT_TYPE) == 0)
+  {
+    headerP->contentType = value;
+
+#ifdef ORIONLD
+    if (strcmp(value, "application/ld+json") == 0)
+      headerP->ngsildContent = true;
+#endif
+  }
   else if (strcasecmp(key.c_str(), HTTP_CONTENT_LENGTH) == 0)    headerP->contentLength  = atoi(value);
   else if (strcasecmp(key.c_str(), HTTP_ORIGIN) == 0)            headerP->origin         = value;
   else if (strcasecmp(key.c_str(), HTTP_FIWARE_SERVICE) == 0)

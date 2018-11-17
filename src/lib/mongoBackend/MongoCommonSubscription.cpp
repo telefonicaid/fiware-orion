@@ -453,3 +453,55 @@ void setMetadata(const Subscription& sub, BSONObjBuilder* b)
   b->append(CSUB_METADATA, metadataArr);
   LM_T(LmtMongo, ("Subscription metadata: %s", metadataArr.toString().c_str()));
 }
+
+
+#ifdef ORIONLD
+/* ****************************************************************************
+*
+* setContext -
+*/
+void setContext(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP)
+{
+  LM_TMP(("KZ: sub.ldContext == '%s'", sub.ldContext.c_str()));
+
+  if (sub.ldContext != "")
+  {
+    LM_TMP(("KZ: Appending '%s': '%s' to mongo::BSONObjBuilder", CSUB_LDCONTEXT, sub.ldContext.c_str()));
+
+    bobP->append(CSUB_LDCONTEXT, sub.ldContext);
+    LM_T(LmtMongo, ("Subscription context: %s", sub.ldContext.c_str()));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* setSubscriptionId -
+*/
+std::string setSubscriptionId(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP)
+{
+  if (sub.id.empty())
+    return setNewSubscriptionId(bobP);
+
+  bobP->append("_id", sub.id);
+
+  return sub.id;
+}
+
+
+
+/* ****************************************************************************
+*
+* setName -
+*/
+void setName(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP)
+{
+  if (sub.name != "")
+  {
+    bobP->append(CSUB_NAME, sub.name);
+    LM_T(LmtMongo, ("Subscription name: %s", sub.name.c_str()));
+  }
+}
+
+#endif

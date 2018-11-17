@@ -926,7 +926,7 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     }
     else if (SCOMPARE6(nodeP->name, 'v', 'a', 'l', 'u', 'e', 0))
     {
-      DUPLICATE_CHECK(nodeP, valueP, "attribute value"); 
+      DUPLICATE_CHECK(nodeP, valueP, "attribute value");
       // FIXME: "value" for Relationship Attribute should be added as metadata
    }
     else if (SCOMPARE9(nodeP->name, 'u', 'n', 'i', 't', 'C', 'o', 'd', 'e', 0))
@@ -1120,11 +1120,10 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
 //
 // contextTreat -
 //
-static bool contextTreat
+ContextAttribute* contextTreat
 (
   ConnectionInfo*  ciP,
   KjNode*          contextNodeP,
-  ContextElement*  ceP,
   char*            entityId
 )
 {
@@ -1182,7 +1181,7 @@ static bool contextTreat
     {
       LM_E(("Failed to create context from URL: %s", details));
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from URL", details, OrionldDetailsString);
-      return false;
+      return NULL;
     }
     LM_TMP(("orionldContextCreateFromUrl OK"));
     ciP->contextToBeFreed = false;  // context has been added to public list - must not be freed
@@ -1194,7 +1193,7 @@ static bool contextTreat
     //
     // REMEMBER
     //   This context is just the array of context-strings: [ "url1", "url2" ]
-    //   The individual contexts ("url1", "url2") are treated a few lines down
+    //   The individual contexts (the items of the vector - "url1", ...) are treated a few lines down
     //
     // contextUrl = "http://" host + ":" + port + "/ngsi-ld/ex/v1/contexts/" + entity.id;
     //
@@ -1205,7 +1204,7 @@ static bool contextTreat
     {
       LM_E(("out of memory creating Link HTTP Header"));
       orionldErrorResponseCreate(ciP, OrionldInternalError, "cannot create Link HTTP Header", "out of memory", OrionldDetailsString);
-      return false;
+      return NULL;
     }
     sprintf(linkPath, "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", orionldHostName, restPortGet(), entityId);
 
@@ -1216,7 +1215,7 @@ static bool contextTreat
     {
       LM_E(("Failed to create context from Tree : %s", details));
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from tree", details, OrionldDetailsString);
-      return false;
+      return NULL;
     }
 
     //
@@ -1231,14 +1230,14 @@ static bool contextTreat
       {
         LM_E(("Context Array Item is not a JSON String, but of type '%s'", kjValueType(contextStringNodeP->type)));
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Context Array Item is not a JSON String", NULL, OrionldDetailsString);
-        return false;
+        return NULL;
       }
 
       if (contextItemNodeTreat(ciP, contextStringNodeP->value.s) == NULL)
       {
         LM_E(("contextItemNodeTreat failed"));
         // Error payload set by contextItemNodeTreat
-        return false;
+        return NULL;
       }
     }
   }
@@ -1247,13 +1246,13 @@ static bool contextTreat
     // FIXME: seems like an inline context - not supported for now
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", "inline contexts not supported in current version of orionld", OrionldDetailsString);
     LM_E(("inline contexts not supported in current version of orionld"));
-    return false;
+    return NULL;
   }
   else
   {
     LM_E(("invalid JSON type of @context member"));
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", "invalid JSON type of @context member", OrionldDetailsString);
-    return false;
+    return NULL;
   }
 
 
@@ -1313,9 +1312,7 @@ static bool contextTreat
     caP->compoundValueP = compoundP;
   }
 
-  ceP->contextAttributeVector.push_back(caP);
-
-  return true;
+  return caP;
 }
 
 
@@ -1333,7 +1330,6 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   KjNode*  contextNodeP       = NULL;
   KjNode*  observationSpaceP  = NULL;
   KjNode*  operationSpaceP    = NULL;
-  KjNode*  kNodeP;
 
   if (payloadCheck(ciP, &idNodeP, &typeNodeP, &locationP, &contextNodeP, &observationSpaceP, &operationSpaceP) == false)
     return false;
@@ -1350,17 +1346,24 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
   //
   // First treat the @context, if none, use the default context
-  // contextTreat needs cpP to push the '@context' attribute to the ContextElement.
+  // contextTreat needs ceP to push the '@context' attribute to the ContextElement.
   //
-  if ((contextNodeP != NULL) && (contextTreat(ciP, contextNodeP, ceP, idNodeP->value.s) == false))
+  if (contextNodeP != NULL)
   {
-    // Error payload set by contextTreat
-    mongoRequest.release();
-    return false;
+    ContextAttribute* caP;
+
+    if ((caP = contextTreat(ciP, contextNodeP, idNodeP->value.s)) == NULL)
+    {
+      // Error payload set by contextTreat
+      mongoRequest.release();
+      return false;
+    }
+
+    ceP->contextAttributeVector.push_back(caP);
   }
 
   // Treat the entire payload
-  for (kNodeP = ciP->requestTree->children; kNodeP != NULL; kNodeP = kNodeP->next)
+  for (KjNode* kNodeP = ciP->requestTree->children; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     LM_T(LmtUriExpansion, ("treating entity node '%s'", kNodeP->name));
 

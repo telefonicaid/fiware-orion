@@ -115,6 +115,11 @@
 #define CSUB_LASTFAILURE             "lastFailure"
 #define CSUB_LASTSUCCESS             "lastSuccess"
 
+#ifdef ORIONLD
+#define CSUB_LDCONTEXT               "ldContext"
+#define CSUB_NAME                    "name"
+#endif
+
 #define CASUB_EXPIRATION             "expiration"
 #define CASUB_REFERENCE              "reference"
 #define CASUB_ENTITIES               "entities"

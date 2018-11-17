@@ -146,6 +146,7 @@ typedef struct HttpHeaders
   std::string   link;
   bool          acceptJson;
   bool          acceptJsonld;
+  bool          ngsildContent;
 #endif
 } HttpHeaders;
 

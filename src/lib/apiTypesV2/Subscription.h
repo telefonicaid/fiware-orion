@@ -108,6 +108,12 @@ struct Subscription
   long long     throttling;
   RenderFormat  attrsFormat;
   Restriction   restriction;
+
+#ifdef ORIONLD
+  std::string   name;
+  std::string   ldContext;
+#endif
+
   std::string   toJson();
 
   ~Subscription();

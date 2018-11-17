@@ -1,0 +1,140 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Creation and DB Contebt
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. POST /ngsi-ld/v1/subscriptions, with a sub-id
+# 02. Check mongo 
+#
+
+
+echo "01. POST /ngsi-ld/v1/subscriptions, with a sub-id"
+echo "================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub01",
+  "type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "watchedAttributes": [ "P2" ],
+  "q": "no check of Subscription::q implemented so far",
+  "geoQ": {
+    "geometry": "valid geometry",
+    "coordinates": "1, 2",
+    "georel": "valid georel",
+    "geoproperty": "not supported"
+  },
+  "csf": "not implemented",
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    },
+    "status": "ignored",
+    "timesSent": "ignored",
+    "lastNotification": "ignored",
+    "lastFailure": "ignored",
+    "lastSuccess": "ignored"
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 5,
+  "status": "to be ignored - read-only",
+  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
+  "createdAt": "ignored",
+  "modifiedAt": "ignored"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. Check subscription in mongo"
+echo "==============================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /ngsi-ld/v1/subscriptions, with a sub-id
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
+Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01
+Date: REGEX(.*)
+
+
+
+02. Check subscription in mongo
+===============================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb://localhost:27017/ftest
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "http://a.b.c/subs/sub01",
+	"expiration" : NumberLong(REGEX(.*)),
+	"reference" : "http://valid.url/url",
+	"custom" : false,
+	"throttling" : NumberLong(5),
+	"servicePath" : "/",
+	"description" : "Description of Test subscription 01",
+	"name" : "Test subscription 01",
+	"status" : "paused",
+	"entities" : [ ],
+	"attrs" : [
+		"http://example.org/P1",
+		"http://example.org/P2",
+		"http://example.org/ngsi-ld/default/A3"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"ldContext" : "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
+	"conditions" : [
+		"http://example.org/P2"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "valid geometry",
+		"coords" : "1, 2",
+		"georel" : "valid georel"
+	},
+	"format" : "keyValues"
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

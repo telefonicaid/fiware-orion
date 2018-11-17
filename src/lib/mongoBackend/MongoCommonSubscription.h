@@ -191,4 +191,31 @@ extern void setBlacklist(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder*
 */
 extern void setMetadata(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
 
+
+
+#ifdef ORIONLD
+/* ****************************************************************************
+*
+* setContext -
+*/
+extern void setContext(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP);
+
+
+
+/* ****************************************************************************
+*
+* setSubscriptionId -
+*/
+extern std::string setSubscriptionId(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP);
+
+
+
+/* ****************************************************************************
+*
+* setName -
+*/
+extern void setName(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP);
+
+#endif
+
 #endif  // SRC_LIB_MONGOBACKEND_MONGOCOMMONSUBSCRIPTION_H_

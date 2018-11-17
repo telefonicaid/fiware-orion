@@ -98,7 +98,7 @@ static bool contentTypeCheck(ConnectionInfo* ciP, KjNode* contextNodeP, char** e
       return false;
     }
   }
-  else if (strcmp(ciP->httpHeaders.contentType.c_str(), "application/ld+json") == 0)
+  else if (ciP->httpHeaders.ngsildContent == true)
   {
     LM_TMP(("Content-Type is: application/ld+json"));
 

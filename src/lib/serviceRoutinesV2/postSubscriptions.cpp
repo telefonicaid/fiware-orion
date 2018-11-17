@@ -77,7 +77,8 @@ extern std::string postSubscriptions
                           ciP->tenant,
                           ciP->servicePathV,
                           ciP->httpHeaders.xauthToken,
-                          ciP->httpHeaders.correlator));
+                          ciP->httpHeaders.correlator,
+                          ""));
 
   // Check potential error
   if (beError.code != SccNone)
