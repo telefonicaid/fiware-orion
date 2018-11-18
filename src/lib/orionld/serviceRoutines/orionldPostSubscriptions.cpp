@@ -70,7 +70,7 @@ extern ContextAttribute* contextTreat
 // FIXME: move to orionld/common
 //
 extern void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, const char* subscriptionId);
-extern void httpHeaderLinkAdd(ConnectionInfo* ciP, char* url);
+extern void httpHeaderLinkAdd(ConnectionInfo* ciP, const char* url);
 
 
 

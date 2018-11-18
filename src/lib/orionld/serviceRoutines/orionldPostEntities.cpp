@@ -177,15 +177,36 @@ void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, co
 }
 
 
+#define LINK_REL_AND_TYPE        "rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\""
+#define LINK_REL_AND_TYPE_SIZE   70
 
 // ----------------------------------------------------------------------------
 //
 // httpHeaderLinkAdd -
 //
-void httpHeaderLinkAdd(ConnectionInfo* ciP, char* url)
+void httpHeaderLinkAdd(ConnectionInfo* ciP, const char* url)
 {
-  ciP->httpHeader.push_back(HTTP_LINK);
-  ciP->httpHeaderValue.push_back(url);
+  char           link[256];
+  char*          linkP   = link;
+  unsigned int   urlLen  = strlen(url);
+
+  if (urlLen > sizeof(link) + LINK_REL_AND_TYPE_SIZE + 3)
+  {
+    linkP = (char*) malloc(sizeof(link) + LINK_REL_AND_TYPE_SIZE + 3);
+    if (linkP == NULL)
+    {
+      LM_E(("Out-of-memory allocating roome for HTTP Link Header"));
+      return;
+    }
+  }
+
+  sprintf(linkP, "<%s>; %s", url, LINK_REL_AND_TYPE);
+
+  ciP->httpHeader.push_back("Link");
+  ciP->httpHeaderValue.push_back(linkP);
+
+  if (linkP != link)
+    free(linkP);
 }
 
 

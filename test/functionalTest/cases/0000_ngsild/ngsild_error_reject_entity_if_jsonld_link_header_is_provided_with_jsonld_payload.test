@@ -40,7 +40,7 @@ payload='{
   "id": "urn:ngsi-ld:T4:9000",
   "type": "T"
 }'
-orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json" -H "Link: http://a.b.c/context.jsonld"
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json" -H 'Link: <http://a.b.c/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 

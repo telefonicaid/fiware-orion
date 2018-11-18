@@ -53,6 +53,16 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// httpHeaderLinkAdd -
+//
+// FIXME: move to orionld/common
+//
+extern void httpHeaderLinkAdd(ConnectionInfo* ciP, const char* url);
+
+
+
+// -----------------------------------------------------------------------------
+//
 // kjTreeFromQueryContextResponse -
 //
 // PARAMETERS
@@ -442,7 +452,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, QueryCo
         kjChildAdd(top, nodeP);
       }
       else
-        httpHeaderAdd(ciP, "Link", orionldCoreContext.url);  // Should we send back the Link if Core Context?
+        httpHeaderLinkAdd(ciP, orionldCoreContext.url);  // FIXME: Should we send back the Link if Core Context?
     }
     else
     {
@@ -450,11 +460,11 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, QueryCo
       {
         if (contextAttrP->valueType == orion::ValueTypeString)
         {
-          httpHeaderAdd(ciP, "Link", contextAttrP->stringValue.c_str());
+          httpHeaderLinkAdd(ciP, contextAttrP->stringValue.c_str());
         }
         else
         {
-          httpHeaderAdd(ciP, "Link", "Implement Context-Servicing for orionld");
+          httpHeaderLinkAdd(ciP, "Implement Context-Servicing for orionld");
         }
       }
       else

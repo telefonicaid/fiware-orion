@@ -46,7 +46,7 @@ payload='{
     "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
   ]
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
 echo
 echo
 
@@ -63,7 +63,7 @@ echo
 =====================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: http://REGEX(.*)/ngsi-ld/ex/v1/contexts/http://a.b.c/E1
+Link: <http://IP:9999/ngsi-ld/ex/v1/contexts/http://a.b.c/E1>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/E1
 Date: REGEX(.*)
 

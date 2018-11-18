@@ -1037,6 +1037,7 @@ function orionCurl()
   _urlParams=''
   _xauthToken=''
   _payloadCheck=''
+  _linkHeaderFix=''
 
   #
   # Parsing parameters
@@ -1060,6 +1061,7 @@ function orionCurl()
     elif [ "$1" == "--in" ]; then              _in="$2"; shift;
     elif [ "$1" == "--out" ]; then             _out="$2"; shift;
     elif [ "$1" == "--xauthToken" ]; then      _xauthToken='--header "X-Auth-Token: '${2}'"'; shift;
+    elif [ "$1" == "--linkHeaderFix" ]; then   _linkHeaderFix='on'
     elif [ "$1" == "-v" ]; then                _verbose=on;
     elif [ "$1" == "--verbose" ]; then         _verbose=on;
     elif [ "$1" == "--debug" ]; then           _debug=on;
@@ -1174,12 +1176,32 @@ function orionCurl()
     echo "Broker seems to have died ..."
   else
     _responseHeaders=$(cat /tmp/httpHeaders.out)
+
+    #
+    # Substitute the IP of the host where the test is running for the string IP
+    # Why?
+    # Ran into troubles matching the Link HTTP Header using Python REGEX:
+    #
+    # Link: <http://REGEX(.*):9999/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:T:12:13:14>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+    #
+    # Some of the chars <"<; probably fucks REGEX up.
+    # I tried everything, like replacing these chars for something else, ('<' => '-LT-', etc) etc but nothing worked.
+    # Removing the hostname removed the need for a REGEX, so ...
+    #
+    if [ "$_linkHeaderFix" == "on" ]
+    then
+      hostName=$(hostname)
+      sed "s/$hostName/IP/" /tmp/httpHeaders.out > /tmp/httpHeaders2.out
+      mv /tmp/httpHeaders2.out /tmp/httpHeaders.out
+    fi
+
     #
     # Remove "Connection: Keep-Alive" and "Connection: close" headers
     #
     sed '/Connection: Keep-Alive/d' /tmp/httpHeaders.out  > /tmp/httpHeaders2.out
     sed '/Connection: close/d'      /tmp/httpHeaders2.out > /tmp/httpHeaders.out
     sed '/Connection: Close/d'      /tmp/httpHeaders.out
+
   fi
 
   #

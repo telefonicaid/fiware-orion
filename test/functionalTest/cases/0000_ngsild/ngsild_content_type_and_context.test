@@ -112,7 +112,7 @@ payload='{
   "id": "http://a.b.c/entity/E6",
   "type": "A"
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -124,7 +124,7 @@ payload='{
   "type": "A",
   "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -155,7 +155,7 @@ echo
 ===========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 
@@ -193,7 +193,7 @@ Date: REGEX(.*)
 ===============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
+Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E4
 Date: REGEX(.*)
 
@@ -203,7 +203,7 @@ Date: REGEX(.*)
 ================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
+Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E5
 Date: REGEX(.*)
 
@@ -256,7 +256,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 42
 Content-Type: application/json
-Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
+Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

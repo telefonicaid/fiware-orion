@@ -90,7 +90,7 @@ echo
 =================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
+Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01
 Date: REGEX(.*)
 

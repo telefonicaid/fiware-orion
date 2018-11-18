@@ -85,7 +85,7 @@ echo
 ===============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 

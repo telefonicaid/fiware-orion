@@ -111,7 +111,7 @@ echo
 ================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: http://REGEX(.*)/ngsi-ld/ex/v1/contexts/http://a.b.c/entity/E3
+Link: REGEX(.*)
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
 Date: REGEX(.*)
 
