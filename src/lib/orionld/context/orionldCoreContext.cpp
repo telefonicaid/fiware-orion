@@ -50,6 +50,14 @@ OrionldContext orionldDefaultUrlContext;
 
 // -----------------------------------------------------------------------------
 //
+// orionldDefaultContext
+//
+OrionldContext orionldDefaultContext;
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldCoreContextString - to avoid download during functest
 //
 const char* orionldCoreContextString = "{  \
@@ -181,6 +189,20 @@ const char* orionldDefaultUrlContextString = "{  \
   \"@context\": {  \
     \"@vocab\": \"http://example.org/ngsi-ld/default/\"  \
   }  \
+}";
+
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldDefaultContextString - to avoid download during functest
+//
+const char* orionldDefaultContextString = "{  \
+  \"@context\": [  \
+    \"https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContextVocab.jsonld\",  \
+    \"https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json\"  \
+  ]  \
 }";
 
 

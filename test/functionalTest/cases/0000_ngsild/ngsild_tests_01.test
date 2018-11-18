@@ -83,7 +83,7 @@ echo
 ====================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:REGEX(.*)
 Date: REGEX(.*)
 
@@ -141,7 +141,7 @@ bye
 HTTP/1.1 200 OK
 Content-Length: 328
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

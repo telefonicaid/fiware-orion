@@ -41,6 +41,7 @@ typedef enum OrionldContextType
   OrionldNoContext = 0,
   OrionldCoreContext,
   OrionldDefaultUrlContext,
+  OrionldDefaultContext,
   OrionldUserContext
 } OrionldContextType;
 

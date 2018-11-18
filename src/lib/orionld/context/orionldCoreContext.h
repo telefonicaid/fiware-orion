@@ -52,6 +52,14 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// ORIONLD_DEFAULT_CONTEXT_URL -
+//
+#define ORIONLD_DEFAULT_CONTEXT_URL (char*) "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldCoreContext
 //
 extern OrionldContext orionldCoreContext;
@@ -68,6 +76,14 @@ extern OrionldContext orionldDefaultUrlContext;
 
 // -----------------------------------------------------------------------------
 //
+// orionldDefaultContext
+//
+extern OrionldContext orionldDefaultContext;
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldCoreContextString - to avoid download during functest
 //
 extern const char* orionldCoreContextString;
@@ -79,6 +95,14 @@ extern const char* orionldCoreContextString;
 // orionldDefaultUrlContextString - to avoid download during functest
 //
 extern const char* orionldDefaultUrlContextString;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldDefaultContextString - to avoid download during functest
+//
+extern const char* orionldDefaultContextString;
 
 
 

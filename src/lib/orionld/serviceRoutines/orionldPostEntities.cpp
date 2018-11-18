@@ -177,18 +177,26 @@ void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, co
 }
 
 
+
 #define LINK_REL_AND_TYPE        "rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\""
 #define LINK_REL_AND_TYPE_SIZE   70
-
 // ----------------------------------------------------------------------------
 //
 // httpHeaderLinkAdd -
 //
-void httpHeaderLinkAdd(ConnectionInfo* ciP, const char* url)
+void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP)
 {
-  char           link[256];
-  char*          linkP   = link;
-  unsigned int   urlLen  = strlen(url);
+  char             link[256];
+  char*            linkP     = link;
+  OrionldContext*  contextP  = (_contextP != NULL)? _contextP : &orionldDefaultContext;
+  char*            url;
+  unsigned int     urlLen;
+
+  if (_contextP == &orionldCoreContext)
+    _contextP = &orionldDefaultContext;
+
+  url    = contextP->url;
+  urlLen = strlen(url);
 
   if (urlLen > sizeof(link) + LINK_REL_AND_TYPE_SIZE + 3)
   {
@@ -1568,7 +1576,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
   ciP->httpStatusCode = SccCreated;
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/entities/", idNodeP->value.s);
-  httpHeaderLinkAdd(ciP, (ciP->contextP == NULL)? ORIONLD_CORE_CONTEXT_URL : ciP->contextP->url);
+  httpHeaderLinkAdd(ciP, ciP->contextP);
 
   LM_TMP(("Function Done"));
   return true;

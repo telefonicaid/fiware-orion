@@ -57,7 +57,7 @@ extern "C"
 //
 // FIXME: move to orionld/common
 //
-extern void httpHeaderLinkAdd(ConnectionInfo* ciP, const char* url);
+extern void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP);
 
 
 
@@ -452,7 +452,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, QueryCo
         kjChildAdd(top, nodeP);
       }
       else
-        httpHeaderLinkAdd(ciP, orionldCoreContext.url);  // FIXME: Should we send back the Link if Core Context?
+        httpHeaderLinkAdd(ciP, &orionldDefaultContext);
     }
     else
     {
@@ -460,11 +460,18 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, QueryCo
       {
         if (contextAttrP->valueType == orion::ValueTypeString)
         {
-          httpHeaderLinkAdd(ciP, contextAttrP->stringValue.c_str());
+          OrionldContext context = { (char*) contextAttrP->stringValue.c_str(), NULL, OrionldUserContext, false, NULL };
+          httpHeaderLinkAdd(ciP, &context);
         }
         else
         {
-          httpHeaderLinkAdd(ciP, "Implement Context-Servicing for orionld");
+          // FIXME: Implement Context-Servicing for orionld
+          //
+          // If we get here, the context is compound, and can't be returned in the Link HTTP Header.
+          // We now need to create a context in the broker, able to serve it, and in the Link HTTP Header
+          // return this Link
+          //
+          httpHeaderLinkAdd(ciP, NULL);
         }
       }
       else

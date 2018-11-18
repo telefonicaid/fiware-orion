@@ -235,15 +235,26 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   orionldDefaultUrlContext.type    = OrionldDefaultUrlContext;
   orionldDefaultUrlContext.ignore  = true;
 
+  orionldDefaultContext.url        = ORIONLD_DEFAULT_CONTEXT_URL;
+  orionldDefaultContext.next       = NULL;
+  orionldDefaultContext.tree       = NULL;
+  orionldDefaultContext.type       = OrionldDefaultContext;
+  orionldDefaultContext.ignore     = true;
+  
   if (defContextFromFile == true)
   {
-    char* buf = strdup(orionldCoreContextString);
+    char* buf;
 
+    buf = strdup(orionldCoreContextString);
     orionldCoreContext.tree = kjParse(kjsonP, buf);
     free(buf);
 
     buf = strdup(orionldDefaultUrlContextString);
     orionldDefaultUrlContext.tree = kjParse(kjsonP, buf);
+    free(buf);
+
+    buf = strdup(orionldDefaultContextString);
+    orionldDefaultContext.tree = kjParse(kjsonP, buf);
     free(buf);
   }
   else
@@ -270,10 +281,22 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
       ++retries;
       LM_E(("Error %d downloading Default URI Context %s: %s", retries, ORIONLD_DEFAULT_URL_CONTEXT_URL, details));
     }
+
+    // Download the "Default" context
+    retries = 0;
+    while ((orionldDefaultContext.tree == NULL) && (retries < 5))
+    {
+      orionldDefaultContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_DEFAULT_CONTEXT_URL,  &details);
+      if (orionldDefaultContext.tree != NULL)
+        break;
+
+      ++retries;
+      LM_E(("Error %d downloading Default Context %s: %s", retries, ORIONLD_DEFAULT_CONTEXT_URL, details));
+    }
   }
 
   LM_TMP(("orionldCoreContext.tree at %p", orionldCoreContext.tree));
-  if ((orionldCoreContext.tree == NULL) || (orionldDefaultUrlContext.tree == NULL))
+  if ((orionldCoreContext.tree == NULL) || (orionldDefaultUrlContext.tree == NULL) || (orionldDefaultContext.tree == NULL))
   {
     // Without default context, orionld cannot function
     LM_X(1, ("EXITING - Without default context, orionld cannot function - error downloading default context '%s': %s", ORIONLD_CORE_CONTEXT_URL, details));

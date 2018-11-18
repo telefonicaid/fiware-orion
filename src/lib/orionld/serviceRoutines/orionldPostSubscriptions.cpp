@@ -70,7 +70,7 @@ extern ContextAttribute* contextTreat
 // FIXME: move to orionld/common
 //
 extern void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, const char* subscriptionId);
-extern void httpHeaderLinkAdd(ConnectionInfo* ciP, const char* url);
+extern void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP);
 
 
 
@@ -867,7 +867,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   LM_TMP(("After mongoCreateSubscription"));
   ciP->httpStatusCode = SccCreated;
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/subscriptions/", subId.c_str());
-  httpHeaderLinkAdd(ciP, (ciP->contextP == NULL)? ORIONLD_CORE_CONTEXT_URL : ciP->contextP->url);
+  httpHeaderLinkAdd(ciP, ciP->contextP);
 
   return true;
 }
