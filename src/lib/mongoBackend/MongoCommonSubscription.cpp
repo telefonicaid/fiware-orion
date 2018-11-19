@@ -306,7 +306,8 @@ void setCondsAndInitialNotify
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   BSONObjBuilder*                  b,
-  bool*                            notificationDone
+  bool*                            notificationDone,
+  ApiVersion                       apiVersion
 )
 {
   //
@@ -334,7 +335,7 @@ void setCondsAndInitialNotify
                                             fiwareCorrelator,
                                             notifAttributesV,
                                             blacklist,
-                                            V2);
+                                            apiVersion);
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));

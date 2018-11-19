@@ -54,7 +54,7 @@ HttpStatusCode mongoSubscribeContext
   ngsiv2::Subscription  sub;
 
   requestP->toNgsiv2Subscription(&sub);
-  std::string subId = mongoCreateSubscription(sub, &oe, tenant, servicePathV, xauthToken, fiwareCorrelator);
+  std::string subId = mongoCreateSubscription(sub, &oe, tenant, servicePathV, xauthToken, fiwareCorrelator, V1);
 
   if (subId != "")
   {
