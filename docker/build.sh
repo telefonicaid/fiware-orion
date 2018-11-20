@@ -1,11 +1,10 @@
 #!/bin/bash
 
-USER=$1
-PASSWORD=$2
-REV=$3
-
+set -e
 export DEBIAN_FRONTEND=noninteractive
 
+TOKEN=$1
+REV=$2
 HOME='/opt'
 
 DEPS=(
@@ -66,6 +65,7 @@ TO_CLEAN=(
  'openssl' \
 )
 
+echo "Building ${REV}"
 cd ${HOME}
 
 apt-get -y update
@@ -92,17 +92,17 @@ make install
 ldconfig
 
 if [ -z "${TEST}" ]; then
-  git clone https://${USER}:${PASSWORD}@gitlab.com/kzangeli/kbase.git ${HOME}/kbase
+  git clone https://gitlab-ci-token:${TOKEN}@gitlab.com/kzangeli/kbase.git ${HOME}/kbase
   cd ${HOME}/kbase
   make
   make install
 
-  git clone https://${USER}:${PASSWORD}@gitlab.com/kzangeli/klog.git ${HOME}/klog
+  git clone https://gitlab-ci-token:${TOKEN}@gitlab.com/kzangeli/klog.git ${HOME}/klog
   cd ${HOME}/klog
   make
   make install
 
-  git clone https://${USER}:${PASSWORD}@gitlab.com/kzangeli/kjson.git ${HOME}/kjson
+  git clone https://gitlab-ci-token:${TOKEN}@gitlab.com/kzangeli/kjson.git ${HOME}/kjson
   cd ${HOME}/kjson
   mkdir bin
   make

@@ -1,12 +1,11 @@
 FROM debian:stretch-slim
 
-ARG USER
-ARG PASSWORD
+ARG TOKEN
 ARG REV
 
 ADD build.sh /usr/bin/build
 
-RUN build ${USER} ${PASSWORD} ${REV}
+RUN build ${TOKEN} ${REV}
 
 ENTRYPOINT ["orionld","-fg", "-multiservice", "-ngsiv1Autocast" ]
 
