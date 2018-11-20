@@ -1,20 +1,15 @@
-if: branch = master and type IN (pull_request)
+if: type not IN (pull_request)
 dist: trusty
 sudo: false
 language: minimal
 env:
   global:
-    - IMAGE=fiware/orion-ci:rpm7
-  matrix:
-    - TEST=compliance
-    - TEST=unit
-    - TEST=functional
+  - IMAGE=fiware/orion-ld
+  - secure: TZA3hKWQMqbz1bVAMdrziW5uzxIK3nSDCGTftccNmn7kYeZjbcKdFyJRazsTH3n0pP8KaStiQOadj8SLAA7ckMIGxhNa5UkzbdWcXu1Rvwq+5sUPCM9Fd3kfxLRrpZkt3Lkjmxgzass7MtUNooBpIJjawOeG8+Jymsj8qJoiSPTdL33AK0EHn9Lc2+98Gbg5x2f8u9wV2ix7SzGQU7xJzV4WpIGwE1pzKV76JAm/Iroi4yI/2NT3g7AbcJwa7G69bxHldmKYCjcFZfjRu3ytALWQlSDhWEsMjq1Uxo2LbyUCoxUbSLzFTUl7EaCx+uUhacK2ftT2ZrFwx8xQBnuGyRXjHxLOLC/EelNJNuq941cliK6SgxNoZap/ieLchLjdGVkJ8OQYGguvWiWZYLl0rqPHuq90rTeyWIm6VpdCNARG9ASkQACKu4HAPCkB/qlJolR39BnYtvC4D/zLAl/3FFACBHnXu1AIZjWe+13M3pc1US37DsOlkJvmGck/YLJTicEh2iLitvEznrRQdaCHtuKMFThRgOS1rGdXc0NtuG7XqPwu+rnwN6ONgNynTRZjpjZZp778yC8bd9dMj/HiRkZhFYykhReATtMv2ISI4GUSISDo2u6eRZtOwsitkfBqnbFAlBm630Uf7RT4AaLc3kVcevpDUGRvdakjV+qF9MM=
+  - secure: LdxazLHoPbGMgg6UGQxAR4G4yRHyAeTWAcOgz3yuTft8nN5sTTCIFBDzJvv0CR/4lattrJCIpxGiS/8yd3CPW96H6uSIn/YavnJZc+UuAFtj2uAruwDjxROXHT3SFpylNkgQseB9rC9BGl+Rv8UfHWOXTgdMX+L+zEV2UM0ZGwH0aFL+ZjfnLmWbks/7tpM6Z/KuKVc3V7CKtYBbd9BKYLmCC1pTW2Ij/kdSEec3G6gfOCVGQFfEp1Ja924j9nKgGLH6RaSmn4nPnwy2urdK7TSVIhMDRarEkKvT33QG6MZvD/WkbTJgOA23wI2ULp1kn30q5R4uoGmXmN5vX0/VHLye2AhWuktH6IPjXvfkODpp0sFWWmkjmk6Unr2pK8pLd0jhN5VGp3TI08kHpLhJehS74Gp45eIV9s5zkWOMqY7XblTL2gp1AgebBcg0jxch6ISSpGfs2zn3u0CS5RV2w9u40KhqRaOo+THOpPT7fmu+vNqRyMkeIs16PJmKNnnoroYjbLDPVfYbKMk4aB/vjynqNTsfr9olNCdqAlFV9swDziH/kGJuCdlBzy3MHqQLUBi1pvlndX5zAwkLnlZVLydHi7YsIowmIw0P2sGIoN+gKRsDFpZ9ZKGkm37iMNkEs/b57uxAlgmmdu9zA4F+Idg65IKxMRttgfrLdwETg5c=
 before_install: true
 install: true
-before_script:
-  - if [ "$TEST" != "compliance" ]; then echo '{"ipv6":true,"fixed-cidr-v6":"2001:db8:1::/64"}' | sudo tee /etc/docker/daemon.json; fi
-  - if [ "$TEST" != "compliance" ]; then sudo service docker restart; fi
-  - if [ "$TEST" != "compliance" ]; then docker pull $IMAGE; fi
-  - if [ "$TEST" != "compliance" ]; then docker run -t --rm -v $(pwd):/opt/fiware-orion $IMAGE build -ms $TEST; fi
+before_script: true
 script:
-  - if [ "$TEST" != "compliance" ]; then docker run -t --rm -v $(pwd):/opt/fiware-orion $IMAGE build -idqts $TEST; else ci/rpm7/build.sh -s compliance -tp $(pwd); fi
+  - docker build --build-arg USER=${USER} --build-arg PASSWORD=${PASSWORD} --build-arg REV=${TRAVIS_COMMIT} -t ${IMAGE} -f docker/Dockerfile docker/
+  - docker push ${IMAGE}

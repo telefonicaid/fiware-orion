@@ -27,7 +27,7 @@ Follow these steps:
 		  image: mongo:3.4
 		  command: --nojournal
 		orion:
-		  image: fiware/orion
+		  image: fiware/orion-ld
 		  links:
 		    - mongo
 		  ports:
@@ -44,7 +44,7 @@ Check that everything works with
 
 	curl localhost:1026/version
 
-What you have done with this method is download images for [Orion Context Broker](https://hub.docker.com/r/fiware/orion/) and [MongoDB](https://hub.docker.com/_/mongo/) from the public repository of images called [Docker Hub](https://hub.docker.com/). Then you have created two containers based on both images.
+What you have done with this method is download images for [Orion Context Broker](https://hub.docker.com/r/fiware/orion-ld/) and [MongoDB](https://hub.docker.com/_/mongo/) from the public repository of images called [Docker Hub](https://hub.docker.com/). Then you have created two containers based on both images.
 
 If you want to stop the scenario you have to press Control+C on the terminal where docker-compose is running. Note that you will lose any data that was being used in Orion using this method.
 
@@ -61,7 +61,7 @@ Keep in mind that if you use these commands you get access to the tags and speci
 
 To do this run this command
 
-	sudo docker run -d --name orion1 -p 1026:1026 fiware/orion
+	sudo docker run -d --name orion1 -p 1026:1026 fiware/orion-ld
 
 Check that everything works with
 
@@ -74,7 +74,7 @@ In case you want to run MongoDB on another container you can launch it like this
 
 And then run Orion with this command
 
-	sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 fiware/orion -dbhost mongodb
+	sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 fiware/orion-ld -dbhost mongodb
 
 Check that everything works with
 
@@ -86,7 +86,7 @@ This method is functionally equivalent as the one described in section 1, but do
 
 If you want to connect to a different MongoDB instance do the following command **instead of** the previous one
 
-	sudo docker run -d --name orion1 -p 1026:1026 fiware/orion -dbhost <MongoDB Host>
+	sudo docker run -d --name orion1 -p 1026:1026 fiware/orion-ld -dbhost <MongoDB Host>
 
 Check that everything works with
 
@@ -139,7 +139,7 @@ on your machine you should change this value to something else, for example `-p 
 
 ### 4.4 Extra parameters for Orion
 
-Anything after the name of the container image (`orion` if you are building, or `fiware/orion` if you are pulling from the repository) is interpreted as a parameter for the Orion Context Broker. In this case we are telling the broker where the MongoDB host is, represented by the name of our other MongoDB container. Take a look at the [documentation](https://github.com/telefonicaid/fiware-orion) for other command-line options.
+Anything after the name of the container image (`orion` if you are building, or `fiware/orion-ld` if you are pulling from the repository) is interpreted as a parameter for the Orion Context Broker. In this case we are telling the broker where the MongoDB host is, represented by the name of our other MongoDB container. Take a look at the [documentation](https://github.com/telefonicaid/fiware-orion) for other command-line options.
 
 Orion will be running on [multi-tenant](https://fiware-orion.readthedocs.io/en/master/user/multitenancy/index.html) mode.
    

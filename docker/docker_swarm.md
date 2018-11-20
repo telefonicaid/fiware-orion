@@ -184,7 +184,7 @@ Details on how to deploy a MongoDB ReplicaSet in Docker Swarm are available
     services:
 
       orion:
-        image: fiware/orion:latest
+        image: fiware/orion-ld:latest
         ports:
           - "1026:1026"
         command: -logLevel DEBUG -dbhost mongo_mongo -rplSet rs -dbTimeout 10000
