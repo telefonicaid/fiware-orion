@@ -172,9 +172,6 @@ endif (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
 
 SET (ORION_LIBS
     common
-    serviceRoutines
-    serviceRoutinesV2
-    ngsiNotify
     rest          # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o; jsonRequestTreat from payloadParse@RestService.cpp.o;
     orionld_rest
     orionld_serviceRoutines
@@ -182,6 +179,9 @@ SET (ORION_LIBS
     orionld_context
     orionld_common
     orionld_context
+    serviceRoutines
+    serviceRoutinesV2
+    ngsiNotify
     jsonParse
     jsonParseV2
     rest          # this is repeated for linking str2Verb from parseSubscription@parseSubscription.cpp.o;

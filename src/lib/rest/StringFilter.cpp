@@ -34,13 +34,27 @@
 #include "common/errorMessages.h"
 #include "parse/forbiddenChars.h"
 #include "parse/CompoundValueNode.h"
-#include "rest/StringFilter.h"
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi/ContextAttribute.h"
 #include "ngsi/Metadata.h"
 #include "mongoBackend/dbConstants.h"
 
+#ifdef ORIONLD
+#include "orionld/context/OrionldContext.h"
+#endif
+#include "rest/StringFilter.h"
+
 using namespace mongo;
+
+
+#ifdef ORIONLD
+// -----------------------------------------------------------------------------
+//
+// FIXME: move uriExpand() from orionldGetEntities.cpp to src/lib/orionld/uriExpand/uriExpand.*
+//
+extern bool uriExpand(OrionldContext* contextP, char* shortName, char* longName, int longNameLen, char** detailsP);
+
+#endif
 
 
 
@@ -523,6 +537,8 @@ static StringFilterOp opFind(char* expression, char** lhsP, char** rhsP)
   }
 
   *rhsP = expression;
+
+  LM_TMP(("KZ: Q: Op is 'Exists': attr is '%s'", expression));
   return SfopExists;
 }
 
@@ -559,6 +575,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   char* rhs     = NULL;
   char* lhs     = NULL;
 
+  LM_TMP(("KZ: IN StringFilterItem::parse"));
   type = _type;
 
   s = wsStrip(s);
@@ -646,6 +663,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   bool b = true;
   if ((op == SfopNotExists) || (op == SfopExists))
   {
+    LM_TMP(("KZ: op == SfopNotExists || op == SfopExists"));
     if (forbiddenQuotes(rhs))
     {
       *errorStringP = std::string("forbidden characters in String Filter");
@@ -1745,6 +1763,36 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     BSONObj            f;
     std::string        left = std::string(itemP->left.c_str());
 
+#ifdef ORIONLD
+    extern __thread OrionldContext* orionldContextP;
+
+    char  expanded[256];
+    char* details;
+
+    LM_TMP(("KZ: attribute name: '%s' (itemP->attributeName: '%s')", left.c_str(), itemP->attributeName.c_str()));
+    LM_TMP(("KZ: Context: %s", (orionldContextP != NULL)? orionldContextP->url : "NULL"));
+
+    if (uriExpand(orionldContextP, (char*) itemP->attributeName.c_str(), expanded, sizeof(expanded), &details) == false)
+    {
+      *errorStringP = details;
+      return false;
+    }
+
+    //
+    // After expanding we need to replace all dots ('.') with equal signs ('='), because, that is how the attribute name is stored in mongo
+    //
+    for (unsigned int ix = 0; ix < sizeof(expanded); ix++)
+    {
+      if (expanded[ix] == '.')
+        expanded[ix] = '=';
+      else if (expanded[ix] == 0)
+        break;
+    }
+
+    LM_TMP(("KZ: Changing itemP->attributeName from '%s' to '%s'", itemP->attributeName.c_str(), expanded));
+    itemP->attributeName = expanded;
+#endif
+
     //
     // Left hand side might have to change, in case of Metadata filters (mq)
     // The change consists in adding a '.md.' between attribute-name and metadata-name.
@@ -1813,12 +1861,16 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     }
     else
     {
-      k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
+      LM_TMP(("KZ: left == '%s'", left.c_str()));
+      LM_TMP(("KZ: itemP->attributeName == '%s'", itemP->attributeName.c_str()));
+      k = std::string(ENT_ATTRS) + "." + itemP->attributeName + "." ENT_ATTRS_VALUE;
+      LM_TMP(("KZ: k == '%s'", k.c_str()));
     }
 
     switch (itemP->op)
     {
     case SfopExists:
+      LM_TMP(("Appending $exists to mongo-filter"));
       bb.append("$exists", true);
       bob.append(k, bb.obj());
       f = bob.obj();
@@ -2066,6 +2118,7 @@ bool StringFilter::match(ContextElementResponse* cerP)
 */
 bool StringFilter::mqMatch(ContextElementResponse* cerP)
 {
+  LM_TMP(("KZ: IN StringFilter::mqMatch"));
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
   {
     StringFilterItem*  itemP = filters[ix];
@@ -2174,6 +2227,8 @@ bool StringFilter::mqMatch(ContextElementResponse* cerP)
 */
 bool StringFilter::qMatch(ContextElementResponse* cerP)
 {
+  LM_TMP(("KZ: IN StringFilter::qMatch"));
+
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
   {
     StringFilterItem* itemP = filters[ix];

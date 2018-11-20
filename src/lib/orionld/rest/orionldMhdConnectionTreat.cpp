@@ -50,6 +50,19 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// orionldContextP -
+//
+// 'orionldContextP' is a thread global variable that is set by orionldMhdConnectionTreat
+// if the context found is in the HTTP Headers (Link) - for Content-Type "application/json".
+// If in the payload (for Content-Type "application/ld+json") then 'orionldContextP' is set
+// by the service routine.
+//
+__thread OrionldContext* orionldContextP = NULL;
+
+
+
+// -----------------------------------------------------------------------------
+//
 // contentTypeCheck -
 //
 // - Content-Type: application/json + no context at all - OK
@@ -128,8 +141,8 @@ static bool contentTypeCheck(ConnectionInfo* ciP, KjNode* contextNodeP, char** e
 //
 static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** detailsP)
 {
-  LM_TMP(("KZ: ciP->httpHeaders.accept == %s", ciP->httpHeaders.accept.c_str()));
-  LM_TMP(("KZ: ciP->httpHeaders.acceptHeaederV.size() == %d", ciP->httpHeaders.acceptHeaderV.size()));
+  // LM_TMP(("KZ: ciP->httpHeaders.accept == %s", ciP->httpHeaders.accept.c_str()));
+  // LM_TMP(("KZ: ciP->httpHeaders.acceptHeaederV.size() == %d", ciP->httpHeaders.acceptHeaderV.size()));
 
   if (ciP->httpHeaders.acceptHeaderV.size() == 0)
   {
@@ -141,7 +154,7 @@ static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** de
   {
     const char* mediaRange = ciP->httpHeaders.acceptHeaderV[ix]->mediaRange.c_str();
 
-    LM_TMP(("KZ: ciP->Accept header %d: '%s'", ix, mediaRange));
+    // LM_TMP(("KZ: ciP->Accept header %d: '%s'", ix, mediaRange));
     if (SCOMPARE12(mediaRange, 'a', 'p', 'p', 'l', 'i', 'c', 'a', 't', 'i', 'o', 'n', '/'))
     {
       const char* appType = &mediaRange[12];
@@ -152,14 +165,14 @@ static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** de
       {
         ciP->httpHeaders.acceptJsonld = true;
         ciP->httpHeaders.acceptJson   = true;
-        LM_TMP(("KZ: application/* - both json and jsonld OK"));
+        // LM_TMP(("KZ: application/* - both json and jsonld OK"));
       }
     }
     else if (SCOMPARE4(mediaRange, '*', '/', '*', 0))
     {
       ciP->httpHeaders.acceptJsonld = true;
       ciP->httpHeaders.acceptJson   = true;
-      LM_TMP(("KZ: */* - both json and jsonld OK"));
+      // LM_TMP(("KZ: */* - both json and jsonld OK"));
     }
   }
 
@@ -170,11 +183,6 @@ static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** de
 
     return false;
   }
-
-  if (ciP->httpHeaders.acceptJsonld == true)
-    LM_TMP(("KZ: acceptJsonld == true"));
-  if (ciP->httpHeaders.acceptJson == true)
-    LM_TMP(("KZ: acceptJson == true"));
 
   return true;
 }
@@ -286,7 +294,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     if (jsonldLinkInHttpHeader == true)
     {
-      LM_TMP(("KZ: Calling linkCheck with: '%s'", ciP->httpHeaders.link.c_str()));
+      // LM_TMP(("KZ: Calling linkCheck with: '%s'", ciP->httpHeaders.link.c_str()));
       if (linkCheck((char*) ciP->httpHeaders.link.c_str(), &ciP->httpHeaders.linkUrl, &details) == false)
       {
         LM_E(("linkCheck: %s", details));
@@ -306,6 +314,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     {
       ciP->contextP = NULL;
     }
+
+    orionldContextP = ciP->contextP;  // orionldContextP is a thread variable;
 
     //
     // FIXME: Checking the @context from payload ... move from orionldPostEntities()

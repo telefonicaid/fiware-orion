@@ -74,6 +74,12 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
     return NULL;
   }
 
+  if (contextP->tree == NULL)
+  {
+    LM_T(LmtContextItemLookup, ("The context '%s' HAS NO CONTENT TREE - ContextItem '%s' not found", contextP->url, itemName));
+    return NULL;
+  }
+
   LM_T(LmtContextItemLookup, ("Looking up ContextItem '%s' in context '%s', contextTree at %p", itemName, contextP->url, contextP->tree));
   if (contextP->tree->type == KjString)
   {

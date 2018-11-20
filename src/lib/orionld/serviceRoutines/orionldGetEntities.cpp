@@ -104,6 +104,8 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   char*        id             = (ciP->uriParam["id"].empty())?          NULL : (char*) ciP->uriParam["id"].c_str();
   char*        type           = (ciP->uriParam["type"].empty())?        (char*) "" : (char*) ciP->uriParam["type"].c_str();
   char*        idPattern      = (ciP->uriParam["idPattern"].empty())?   NULL : (char*) ciP->uriParam["idPattern"].c_str();
+  char*        q              = (ciP->uriParam["q"].empty())?           NULL : (char*) ciP->uriParam["q"].c_str();
+
   char*        idString       = (id != NULL)? id      : idPattern;
   const char*  isIdPattern    = (id != NULL)? "false" : "true";
   bool         isTypePattern  = (*type != 0)? false : true;
@@ -223,6 +225,23 @@ bool orionldGetEntities(ConnectionInfo* ciP)
         return false;
       }
     }
+  }
+
+  if (q != NULL)
+  {
+    Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, q);
+    std::string  details;
+
+    scopeP->stringFilterP = new StringFilter(SftQ);
+    if (scopeP->stringFilterP->parse(q, &details) == false)
+    {
+      scopeP->release();
+      delete scopeP;
+
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "", details.c_str(), OrionldDetailsString);
+    }
+
+    parseData.qcr.res.restriction.scopeVector.push_back(scopeP);
   }
 
   // Call standard op postQueryContext
