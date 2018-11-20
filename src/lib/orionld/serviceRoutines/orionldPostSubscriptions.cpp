@@ -25,6 +25,11 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+extern "C"
+{
+#include "kjson/kjRender.h"                                    // kjRender
+}
+
 #include "common/globals.h"                                    // parse8601Time
 #include "rest/OrionError.h"                                   // OrionError
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
@@ -343,6 +348,8 @@ static bool ktreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, S
   char*    georelP            = NULL;
   char*    geoPropertyP       = NULL;
 
+  LM_TMP(("KZ: In ktreeToSubscriptionExpression"));
+
   for (itemP = kNodeP->children; itemP != NULL; itemP = itemP->next)
   {
     if (SCOMPARE9(itemP->name, 'g', 'e', 'o', 'm', 'e', 't', 'r', 'y', 0))
@@ -365,6 +372,7 @@ static bool ktreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, S
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value type (not String nor Array)", "GeoQuery::coordinates", OrionldDetailsString);
         return false;
       }
+      LM_TMP(("KZ: coordinatesNodeP->type: %s", kjValueType(coordinatesNodeP->type)));
     }
     else if (SCOMPARE7(itemP->name, 'g', 'e', 'o', 'r', 'e', 'l', 0))
     {
@@ -401,10 +409,21 @@ static bool ktreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, S
     return false;
   }
 
+  LM_TMP(("KZ: coordinatesNodeP->type: %s", kjValueType(coordinatesNodeP->type)));
   if (coordinatesNodeP->type == KjArray)
   {
-    // FIXME: ktreeToNumberArray();
-    // SubscriptionExpression::coords is a std::string ... translate to "[ N1, N2, Nx ]" ?
+    char coords[512];
+
+    //
+    // We have a little problem here ...
+    // SubscriptionExpression::coords is a std::string in APIv2.
+    // NGSI-LD needs it to be an array.
+    // Easiest way to fix this is to render the JSON Array and translate it to a string, and then removing the '[]' 
+    //
+    kjRender(ciP->kjsonP, coordinatesNodeP, coords, sizeof(coords));
+    coords[strlen(coords) - 1] = 0;
+    LM_TMP(("KZ: Rendered array: '%s'", &coords[1]));
+    subExpressionP->coords = &coords[1];
   }
   else
     subExpressionP->coords = coordinatesNodeP->value.s;

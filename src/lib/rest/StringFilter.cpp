@@ -359,7 +359,7 @@ bool StringFilterItem::listParse(char* s, std::string* errorStringP)
   {
     if (*cP == '\'')
     {
-      inString = (inString)? false :true;
+      inString = (inString)? false : true;
     }
 
     if ((*cP == ',') && (inString == false))
@@ -1011,6 +1011,8 @@ MatchResult StringFilterItem::matchEquals(Metadata* mdP)
 */
 MatchResult StringFilterItem::matchEquals(orion::CompoundValueNode* cvP)
 {
+  LM_TMP(("KZ: In StringFilterItem::matchEquals"));
+
   if ((valueType == SfvtNumberRange) || (valueType == SfvtDateRange))
   {
     if ((cvP->numberValue < numberRangeFrom) || (cvP->numberValue > numberRangeTo))
@@ -1080,6 +1082,7 @@ MatchResult StringFilterItem::matchEquals(orion::CompoundValueNode* cvP)
   }
   else if (valueType == SfvtString)
   {
+    LM_TMP(("KZ: valueType == SfvtString: Comparing '%s' to '%s'", cvP->stringValue.c_str(), stringValue.c_str()));
     if (cvP->stringValue != stringValue)
     {
       return MrNoMatch;
