@@ -231,21 +231,28 @@ ContextElementResponse::ContextElementResponse
       {
         std::string currentMd = *i;
         Metadata*   md = new Metadata(dbDotDecode(currentMd), getObjectFieldF(mds, currentMd));
-        caP->metadataVector.push_back(md);
 
-        /* The flag below indicates that a location metadata was found during iteration.
-        * It needs to the NGSIV1 check below, in order to add it if the flag is false */
+        /* The flag below indicates that a location metadata with WGS84 was found during iteration.
+        *  It needs to the NGSIV1 check below, in order to add it if the flag is false
+        *  In addition, adjust old wrong WSG84 metadata value with WGS84 */
         if (md->name == NGSI_MD_LOCATION)
         {
           noLocationMetadata = false;
+
+          if (md->valueType == orion::ValueTypeString && md->stringValue == LOCATION_WGS84_LEGACY)
+          {
+            md->stringValue = LOCATION_WGS84;
+          }
         }
+
+        caP->metadataVector.push_back(md);
       }
     }
 
     if (apiVersion == V1)
     {
       /* Setting location metadata (if location attr found
-       *  and the location metadata was not present) */
+       *  and the location metadata was not present or was present but with old wrong WSG84 value) */
       if ((locAttr == ca.name) && (ca.type != GEO_POINT) && noLocationMetadata)
       {
         /* Note that if attribute type is geo:point then the user is using the "new way"

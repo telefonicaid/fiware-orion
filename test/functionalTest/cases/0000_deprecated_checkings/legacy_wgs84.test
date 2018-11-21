@@ -46,7 +46,7 @@ payload='{
         {
           "name": "location",
           "type": "string",
-          "value": "WGS84"
+          "value": "WSG84"
         }
       ]
     }
@@ -76,7 +76,7 @@ payload='{
         {
           "name": "location",
           "type": "string",
-          "value": "WGS84"
+          "value": "WSG84"
         }
       ]
     }
@@ -107,7 +107,7 @@ payload='{
         {
           "name": "location",
           "type": "string",
-          "value": "WGS84"
+          "value": "WSG84"
         }
       ]
     }
@@ -222,7 +222,7 @@ Date: REGEX(.*)
                             {
                                 "name": "location",
                                 "type": "string",
-                                "value": "WGS84"
+                                "value": "WSG84"
                             }
                         ],
                         "name": "location",
@@ -259,7 +259,7 @@ Date: REGEX(.*)
                             {
                                 "name": "location",
                                 "type": "string",
-                                "value": "WGS84"
+                                "value": "WSG84"
                             }
                         ],
                         "name": "location",
@@ -296,7 +296,7 @@ Date: REGEX(.*)
                             {
                                 "name": "location",
                                 "type": "string",
-                                "value": "WGS84"
+                                "value": "WSG84"
                             }
                         ],
                         "name": "location",
