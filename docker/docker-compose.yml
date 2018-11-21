@@ -6,7 +6,7 @@ mongo:
   command: --nojournal
 
 orion:
-  image: fiware/orion
+  image: fiware/orion-ld
   links:
     - mongo
   ports:

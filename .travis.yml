@@ -1,20 +1,17 @@
-if: branch = master and type IN (pull_request)
+if: type not IN (pull_request)
 dist: trusty
 sudo: false
 language: minimal
 env:
   global:
-    - IMAGE=fiware/orion-ci:rpm7
-  matrix:
-    - TEST=compliance
-    - TEST=unit
-    - TEST=functional
+  - IMAGE=fiware/orion-ld
+  - secure: LMyEdV2WBxupHjMgvci1DR70RYJ3A7x8Ht1GrOFgtbNs6vbN4VR36y+uNZG3HDO5rgakDJt58ypV1IM+hMK2ZSnz2ZtsyXysUXEAN+q0VBETOexgTG5hW4DUS3MwwHRbFcMvM0Z1RzrfFoGodbYqIivDDRRWxmYpR9RWvZJtov1Zpkwp+zwX4IaoE7T2CCW+rkV6OzGfwuH2xM4hT1pomQ/e5hFVUaJIeQEBl253efCEOD3VufOaU0S9o/Ackqt3IefhzB9eenQj4io6BhrHjL8a3D0ObTvs+WSJ5E0h+G1Nr4syhCAg/pMAzOYGOB4xSo+QEZLCiMko4cZ3zCjXw6B8HMYyYSaS0u/bk68eJ7Fei7vpaMajgrQqtKv7Yul/jKCSH1SWeYbPkF5fyyfqjCgsZUcigYO8ugOf7+8ukQwrToxwXGyr74MneV3NTh6rXJUeWAfuW1JJIru9jVW2vqCX1SHf2dVffNyyLECY5Tjf8xfRvW5GxoIuz2R/uuX6syRLUz1awpnkWqWX6RGG0t/Q2IEaTy+Zk3/mc6a7082P1OffHPGkcpR3fJ5ML0PLUtSmhXXCHDg04cHvxAKC1/HkDXMFw//SuoaLU4aT2humxTgke4dfvlCS4Q5n3vHrLCNwrc0wXOVBlu02eA7AmXq1Icpr1kg1osqGwZr59oE=
+  - secure: A+46kVfpyr4HTJDO0X9asQ9MH+PjySDq6Tt2ehzKyJUUTpZhegemVoeVBmohlAgQIPAIFiS4CQZQgoDkoSnYrq3LDQgLUfEDr0bj06Fo6Gy1daCFyy7K0qHK5OkGVK2pv44xrNNxhXq0Xi8Ur/IP5eTAWW0R/ipSO6if4PNWRVFtsqn5zbgJYSrse/GWtQ24UBzRiVlwAhU8zOu85pgAYfdAjtWi5M7eRWm9T/qlWyQbWtqqtqNEXDmorQy9yb019Zql7ECZcoAKzoumGSjKgLHwaOC/r7Wjd23bF3aDR9esUZ/TNSnhmQclCHo1aeAZe2X4Cu26Ufp8EdPCUtvJc1lH0l1g9wtiDAb6b+ubg7a/7qxvAzZYQP+39LXFkjoMmLPrFCXxmj8adr7W9Mn7tqC5emj3BM8fZS5QlnApmJ6Bu1AfSMQnEklaPvvlJP5JO5XobagZmWIoHJw+2ei8/pSJ/o+K/hsmEjkO6ZyUfKf+NRBjqCS9z8onErJdw0GwSFuTnzfs7wQQHT687BjKTC0Zm9PXag/tLbTi4aST5U4QZwDlSw8BIOrqhslNT5nPHIDsjwrtWFnEJ1PvhwIshDWlU1ZpQHjH5RzICjgcg58kBhtF+xr5nC/qDF5Qchi/uc/naTW9su7VPonHLuBXMf7ikFhoXhSvLUdaWAjUteg=
+  - secure: UoxBQcD6ouYn/uhtmrlMcrTDdZCF5pDrdGSN10S60fTlr8YUXJGVmX2W6XLvukMSowuvxw8rhBI5ygNfy8EhbTLYuYWzmdCsbkBRtBObzYqTlionrq+nDhHxgdahbLKTvVAM9qqiYhDKFy9+vlM9xnTg2tYy5cfdCl66PWqIUw7yY/iylTQXUTQVPjHT5iHCA0XNDCAKqxZRxc0Fd1hEFdOoZQVVpS4RWa1z/IusE/SYJ42BlOZs6qPatU0u+wdjP1lN6y/QValtdJLauZpt8EjTRi8wFIvIxbaGqO9xURtTa3qCRmUb6VikVDCuxvsHoKG77F+K/KG8rie70/F/EmEHfOTFji/TMelfSjfLqHkNZvmCHhNsq3y6cXA1QDqaviEqBCWarSE6H7aZDRzBHqGchaMsG4dd6FnzIegI9o652rh0knRUalg6lEkjxt/but+bH1ifRc1dCZTl7mgaL+mzJ90O12DHudAdc+bFwgQZVljtIbxJxVNZY5ypg3jeklUvT7S3+IOiEQIAO2p8Ir/79pasZzXermZJ7JlrvxcUVY8pePi+crIIxUZgKdE5ak+7/p48gyy2rwzfOsdkT6NR9LwJPnKDH9Rul32I4sYPKu2cOGnlhiOQFEO7w8/y1uhKyv5MA5WHx6k7Ccnze9dZNyhtLqe5gC8C0/EDC4g=
 before_install: true
 install: true
-before_script:
-  - if [ "$TEST" != "compliance" ]; then echo '{"ipv6":true,"fixed-cidr-v6":"2001:db8:1::/64"}' | sudo tee /etc/docker/daemon.json; fi
-  - if [ "$TEST" != "compliance" ]; then sudo service docker restart; fi
-  - if [ "$TEST" != "compliance" ]; then docker pull $IMAGE; fi
-  - if [ "$TEST" != "compliance" ]; then docker run -t --rm -v $(pwd):/opt/fiware-orion $IMAGE build -ms $TEST; fi
+before_script: git lfs pull
 script:
-  - if [ "$TEST" != "compliance" ]; then docker run -t --rm -v $(pwd):/opt/fiware-orion $IMAGE build -idqts $TEST; else ci/rpm7/build.sh -s compliance -tp $(pwd); fi
+- echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
+- docker build --build-arg TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} -t ${IMAGE} -f docker/Dockerfile docker/
+- docker push ${IMAGE}
