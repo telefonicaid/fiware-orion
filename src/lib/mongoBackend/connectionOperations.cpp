@@ -175,6 +175,7 @@ bool collectionRangedQuery
       throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
     }
     LM_I(("Database Operation Successful (query: %s)", q.toString().c_str()));
+    LM_TMP(("KZ: DB Query: %s", q.toString().c_str()));
   }
   catch (const std::exception &e)
   {

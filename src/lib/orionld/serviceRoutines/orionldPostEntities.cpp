@@ -942,7 +942,7 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       else if (SCOMPARE17(nodeP->value.s, 'T', 'e', 'm', 'p', 'o', 'r', 'a', 'l', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
       {
         isProperty         = true;
-        isTemporalProperty = false;
+        isTemporalProperty = true;
       }
       else
       {
@@ -1095,15 +1095,15 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     }
     else if (isTemporalProperty == true)
     {
+      int64_t dateTime;
+
       if (valueP->type != KjString)
         ATTRIBUTE_ERROR("temporal-property attribute must have a value of type JSON String", kjValueType(valueP->type));
-      else if (parse8601Time(valueP->value.s) == -1)
+      else if ((dateTime = parse8601Time(valueP->value.s)) == -1)
         ATTRIBUTE_ERROR("temporal-property attribute must have a valid ISO8601 as value", NULL);
 
-      caP->valueType   = orion::ValueTypeString;
-      caP->stringValue = valueP->value.s;
-
-      // FIXME: Change the value type from string to Number, for easier check with filters?
+      caP->valueType   = orion::ValueTypeNumber;
+      caP->numberValue = dateTime;
     }
     else
     {
