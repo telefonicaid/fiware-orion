@@ -211,14 +211,11 @@ static unsigned int countCmd(const std::string& tenant, const BSONArray& pipelin
 
   if (result.hasField("cursor"))
   {
+    // abcense of "count" field in the "firtBatch" array means "zero result"
     resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
     if ((resultsArray.size() > 0) && (resultsArray[0].embeddedObject().hasField("count")))
     {
       return getIntFieldF(resultsArray[0].embeddedObject(), "count");
-    }
-    else
-    {
-      LM_E(("Runtime Error (executing: %s, firstBatch does not have a count", cmd.toString().c_str()));
     }
   }
   else
