@@ -875,10 +875,11 @@ do                                                                              
 //
 // specialCompoundCheck - 
 //
-bool specialCompoundCheck(KjNode* compoundValueP, char** details)
+bool specialCompoundCheck(ConnectionInfo* ciP, KjNode* compoundValueP)
 {
-//  KjNode*  typeNodeP  = NULL;
-//  KjNode*  valueNodeP = NULL;
+  KjNode*  typeNodeP  = NULL;
+  KjNode*  valueNodeP = NULL;
+  KjNode*  otherNodeP = NULL;
 
   for (KjNode* nodeP = compoundValueP->children; nodeP != NULL; nodeP = nodeP->next)
   {
@@ -886,7 +887,53 @@ bool specialCompoundCheck(KjNode* compoundValueP, char** details)
     {
       if (SCOMPARE6(nodeP->name, '@', 't', 'y', 'p', 'e', 0))
       {
+        DUPLICATE_CHECK(nodeP, typeNodeP, "@type");
+        STRING_CHECK(nodeP, "@type");
       }
+      else if (SCOMPARE7(nodeP->name, '@', 'v', 'a', 'l', 'u', 'e', 0))
+      {
+        DUPLICATE_CHECK(nodeP, valueNodeP, "@value");
+      }
+      else
+        otherNodeP = nodeP;
+    }
+    else
+      otherNodeP = nodeP;
+  }
+
+  if ((typeNodeP != NULL) && (valueNodeP != NULL))
+  {
+    if (otherNodeP != NULL)
+    {
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "unwanted extra items in @value/@type compound", otherNodeP->name, OrionldDetailsString);
+      return false;
+    }
+
+    // All info needed to check validity of @value
+    if (SCOMPARE9(typeNodeP->value.s, 'D', 'a', 't', 'e', 'T', 'i', 'm', 'e', 0))
+    {
+      STRING_CHECK(valueNodeP, "@value of DateTime @type");
+
+      if (parse8601Time(valueNodeP->value.s) == -1)
+      {
+        ATTRIBUTE_ERROR("DateTime value of @value/@type compound must be a valid ISO8601", NULL);
+      }
+    }
+  }
+  else if (valueNodeP != NULL)
+  {
+    if (otherNodeP != NULL)
+    {
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "unwanted extra items in @value/@type compound", otherNodeP->name, OrionldDetailsString);
+      return false;
+    }
+  }
+  else if (typeNodeP != NULL)
+  {
+    if (valueNodeP == NULL)
+    {
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "missing @value in @value/@type compound", "@value is mandatory", OrionldDetailsString);
+      return false;
     }
   }
 
@@ -1150,12 +1197,8 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
 
       if (valueP->type == KjObject)
       {
-        char* details;
-
-        if (specialCompoundCheck(valueP, &details) != true)
-        {
-          orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during special type check in compound", details, OrionldDetailsString);
-        }
+        if (specialCompoundCheck(ciP, valueP) == false)
+          return false;
       }
     }
   }

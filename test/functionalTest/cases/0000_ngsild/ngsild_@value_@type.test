@@ -1,0 +1,424 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+@value, @type error handling
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255 --prettyPrint
+
+--SHELL--
+
+#
+# 01. Attempt to create a @value/@type with a non-string @type - see error
+# 02. Attempt to create a @value/@type with TWO @type items - see error
+# 03. Attempt to create a @value/@type with TWO @value items - see error
+# 04. Attempt to create a @value/@type with an extra unwanted non-@ item - see error
+# 05. Attempt to create a @value/@type with an extra unwanted @X item - see error
+# 06. Attempt to create a @value/@type without @value - see error
+# 07. Attempt to create a @value/@type with DateTime @type and non-string @value - see error
+# 08. Attempt to create a @value/@type with DateTime @type and string @value that is not a correct ISO8601 datetime - see error
+# 09. Correct creation of a @value/@type with DateTime @type and correct ISO8601 value
+# 10. Correct creation of a compound without @value/@type
+# 11. GET entity E09
+# 12. GET entity E10
+#
+
+echo "01. Attempt to create a @value/@type with a non-string @type - see error"
+echo "========================================================================"
+payload='{
+  "id": "urn:ngsi-ld:E01",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": {
+      "@type": 1,
+      "@value": "2018-12-04T12:00:00"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to create a @value/@type with TWO @type items - see error"
+echo "====================================================================="
+payload='{
+  "id": "urn:ngsi-ld:E02",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": {
+      "@type": "DateTime",
+      "@type": "DateTime",
+      "@value": "2018-12-04T12:00:00"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "03. Attempt to create a @value/@type with TWO @value items - see error"
+echo "======================================================================"
+payload='{
+  "id": "urn:ngsi-ld:E03",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": {
+      "@type": "DateTime",
+      "@value": "2018-12-04T12:00:00",
+      "@value": "2018-12-04T12:00:00"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "04. Attempt to create a @value/@type with an extra unwanted non-@ item - see error"
+echo "=================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:E04",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": {
+      "@type": "DateTime",
+      "a": 19,
+      "@value": "2018-12-04T12:00:00"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "05. Attempt to create a @value/@type with an extra unwanted @X item - see error"
+echo "==============================================================================="
+payload='{
+  "id": "urn:ngsi-ld:E05",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": {
+      "@type": "DateTime",
+      "@X": 22,
+      "@value": "2018-12-04T12:00:00"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "06. Attempt to create a @value/@type without @value - see error"
+echo "==============================================================="
+payload='{
+  "id": "urn:ngsi-ld:E06",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": {
+      "@type": "DateTime"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "07. Attempt to create a @value/@type with DateTime @type and non-string @value - see error"
+echo "=========================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:E07",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": {
+      "@type": "DateTime",
+      "@value": true
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "08. Attempt to create a @value/@type with DateTime @type and string @value that is not a correct ISO8601 datetime - see error"
+echo "============================================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:E08",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": {
+      "@type": "DateTime",
+      "@value": "2018-12-04X12:00:00"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "09. Correct creation of a @value/@type with DateTime @type and correct ISO8601 value"
+echo "===================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:E09",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": {
+      "@type": "DateTime",
+      "@value": "2018-12-04T12:00:00"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "10. Correct creation of a compound without @value/@type"
+echo "======================================================="
+payload='{
+  "id": "urn:ngsi-ld:E10",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": {
+      "A": 1,
+      "B": "2"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "11. GET entity E09"
+echo "=================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:E09?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "12. GET entity E10"
+echo "=================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:E10?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Attempt to create a @value/@type with a non-string @type - see error
+========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 105
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "@type",
+    "title": "Not a JSON string",
+    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. Attempt to create a @value/@type with TWO @type items - see error
+=====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 104
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "@type",
+    "title": "Duplicated field",
+    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. Attempt to create a @value/@type with TWO @value items - see error
+======================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 105
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "@value",
+    "title": "Duplicated field",
+    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+04. Attempt to create a @value/@type with an extra unwanted non-@ item - see error
+==================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 129
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "a",
+    "title": "unwanted extra items in @value/@type compound",
+    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+05. Attempt to create a @value/@type with an extra unwanted @X item - see error
+===============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 130
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "@X",
+    "title": "unwanted extra items in @value/@type compound",
+    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+06. Attempt to create a @value/@type without @value - see error
+===============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 141
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "@value is mandatory",
+    "title": "missing @value in @value/@type compound",
+    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+07. Attempt to create a @value/@type with DateTime @type and non-string @value - see error
+==========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 124
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "@value of DateTime @type",
+    "title": "Not a JSON string",
+    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+08. Attempt to create a @value/@type with DateTime @type and string @value that is not a correct ISO8601 datetime - see error
+=============================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 156
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "no details",
+    "title": "DateTime value of @value/@type compound must be a valid ISO8601",
+    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+09. Correct creation of a @value/@type with DateTime @type and correct ISO8601 value
+====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:E09
+Date: REGEX(.*)
+
+
+
+10. Correct creation of a compound without @value/@type
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:E10
+Date: REGEX(.*)
+
+
+
+11. GET entity E09
+==================
+HTTP/1.1 200 OK
+Content-Length: 170
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:E09",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": {
+      "@type": "DateTime",
+      "@value": "2018-12-04T12:00:00"
+    }
+  }
+}
+
+
+
+12. GET entity E10
+==================
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:E10",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": {
+      "A": 1.000000,
+      "B": "2"
+    }
+  }
+}
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
