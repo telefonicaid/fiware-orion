@@ -873,6 +873,30 @@ do                                                                              
 
 // -----------------------------------------------------------------------------
 //
+// specialCompoundCheck - 
+//
+bool specialCompoundCheck(KjNode* compoundValueP, char** details)
+{
+//  KjNode*  typeNodeP  = NULL;
+//  KjNode*  valueNodeP = NULL;
+
+  for (KjNode* nodeP = compoundValueP->children; nodeP != NULL; nodeP = nodeP->next)
+  {
+    if (nodeP->name[0] == '@')
+    {
+      if (SCOMPARE6(nodeP->name, '@', 't', 'y', 'p', 'e', 0))
+      {
+      }
+    }
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // attributeTreat -
 //
 // We will need more than one function;
@@ -1117,11 +1141,21 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       case KjFloat:      caP->valueType = orion::ValueTypeNumber;  caP->numberValue    = valueP->value.f; break;
       case KjString:     caP->valueType = orion::ValueTypeString;  caP->stringValue    = valueP->value.s; break;
       case KjObject:     caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(ciP, valueP, NULL); break;
-      case KjArray:      caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(ciP, valueP, NULL);  break;
+      case KjArray:      caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(ciP, valueP, NULL); break;
       case KjNull:       caP->valueType = orion::ValueTypeNull;    break;
       case KjNone:
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal error", "Invalid type from kjson", OrionldDetailsString);
         return false;
+      }
+
+      if (valueP->type == KjObject)
+      {
+        char* details;
+
+        if (specialCompoundCheck(valueP, &details) != true)
+        {
+          orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during special type check in compound", details, OrionldDetailsString);
+        }
       }
     }
   }
