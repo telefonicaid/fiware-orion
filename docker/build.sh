@@ -14,7 +14,6 @@ DEPS=(
   'libssl1.1' \
 )
 
-
 DEPS_BOOST=(
  'libboost-thread' \
  'libboost-filesystem' \
@@ -31,9 +30,13 @@ DEPS_BUILD=(
  'uuid-dev' \
 )
 
+TOOLS_DEPS=(
+ 'ca-certificates' \
+ 'curl' \
+)
+
 TOOLS=(
  'apt-transport-https' \
- 'ca-certificates' \
  'cmake' \
  'g++' \
  'gcc' \
@@ -42,10 +45,6 @@ TOOLS=(
  'gnupg' \
  'make' \
  'scons' \
-)
-
-TOOLS_REQ=(
-  'curl' \
 )
 
 TOOLS_TEST=(
@@ -76,9 +75,11 @@ cd ${HOME}
 
 apt-get -y update
 apt-get -y upgrade
+
 apt-get -y install --no-install-recommends \
   ${TOOLS[@]} \
-  ${TOOLS_REQ[@]}
+  ${TOOLS_DEPS[@]}
+
 apt-get -y install --no-install-recommends \
   ${DEPS_BUILD[@]}
 
@@ -147,19 +148,16 @@ apt-get autoremove -y
 
 for i in ${DEPS_BOOST[@]}; do TO_INSTALL="${TO_INSTALL} ${i}${BOOST_VER}"; done
 apt-get install -y ${TO_INSTALL[@]}
-apt-get install -y --no-install-recommends \
-  ${DEPS[@]}
 
 apt-get -y remove --purge \
   ${TO_CLEAN[@]} \
   ${TOOLS[@]}
 
-if [ -z "${TEST}" ]; then
-  apt-get -y remove --purge \
-    ${DEPS_REQ[@]}
-fi
 apt-get autoremove -y
 apt-get clean autoclean
+
+apt-get install -y --no-install-recommends \
+  ${TOOLS_DEPS[@]}
 
 rm -Rf \
   /usr/local/include/microhttpd.h \
