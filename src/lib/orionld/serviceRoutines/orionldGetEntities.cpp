@@ -87,7 +87,7 @@ bool uriExpand(OrionldContext* contextP, char* shortName, char* longName, int lo
 //
 // orionldGetEntities -
 //
-// URI params supported by APIv2 getEntities():
+// URI params:
 // - id
 // - idPattern
 // - type

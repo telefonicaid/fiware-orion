@@ -22,6 +22,11 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kbase/kStringSplit.h"                                // kStringSplit
+}
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
@@ -37,19 +42,56 @@
 
 
 
+//
+// FIXME: URI Expansion from 'orionldPostEntities.cpp' to its own module!
+//
+extern int uriExpansion(OrionldContext* contextP, const char* name, char** expandedNameP, char** expandedTypeP, char** detailsPP);
+extern bool uriExpand(OrionldContext* contextP, char* shortName, char* longName, int longNameLen, char** detailsP);
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldGetEntity -
 //
+// URI params:
+// - attrs
+//
 bool orionldGetEntity(ConnectionInfo* ciP)
 {
+  char*                 attrs = (ciP->uriParam["attrs"].empty())? NULL : (char*) ciP->uriParam["attrs"].c_str();
   QueryContextRequest   request;
-  EntityId              entityId(ciP->wildcard[0], "", "false", false);
   QueryContextResponse  response;
+  EntityId              entityId(ciP->wildcard[0], "", "false", false);
 
   LM_T(LmtServiceRoutine, ("In orionldGetEntity: %s", ciP->wildcard[0]));
 
   request.entityIdVector.push_back(&entityId);
+
+  if (attrs != NULL)
+  {
+    char  longName[256];
+    char* details;
+    char* shortName;
+    char* shortNameVector[32];
+    int   vecItems = (int) sizeof(shortNameVector) / sizeof(shortNameVector[0]);;
+
+    vecItems = kStringSplit(attrs, ',', (char**) shortNameVector, vecItems);
+
+    for (int ix = 0; ix < vecItems; ix++)
+    {
+      shortName = shortNameVector[ix];
+
+      if (uriExpand(ciP->contextP, shortName, longName, sizeof(longName), &details) == true)
+        request.attributeList.push_back(longName);
+      else
+      {
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of attribute", shortName, OrionldDetailsString);
+        return false;
+      }
+    }
+  }
+
   LM_TMP(("Calling mongoQueryContext"));
   //
   // FIXME: mongoQueryContext should respond with a KJson tree -
