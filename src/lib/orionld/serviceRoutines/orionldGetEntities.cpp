@@ -50,7 +50,7 @@ extern int uriExpansion(OrionldContext* contextP, const char* name, char** expan
 
 // -----------------------------------------------------------------------------
 //
-// uriExpand - FIXME: move to src/lib/orionld/uriExpand/uriExpand.*
+// uriExpand - FIXME: move to src/lib/orionld/uriExpand/uriExpand.cpp/h
 //
 bool uriExpand(OrionldContext* contextP, char* shortName, char* longName, int longNameLen, char** detailsP)
 {
@@ -126,8 +126,8 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   // "observedAt" is stored as a metadata and with the current implementation (not to change TOO much),
   // we would need to use 'mw' even though 'q' was give by the user.
   //
-  // Also, createdAt and modifiedAt corresponds 1 to 1 to datewCreated and dateModified of APIv2, so, those two
-  // "only" need a slight modification in strings
+  // Also, createdAt and modifiedAt corresponds 1 to 1 to dateCreated and dateModified of APIv2, so, those two
+  // should "only" need a slight modification in strings
   //
   LM_TMP(("KZ: q == '%s'", q));
   if (q != NULL)
