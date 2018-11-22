@@ -13,5 +13,5 @@ install: true
 before_script: git lfs pull
 script:
 - echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
-- docker build --build-arg TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} -t ${IMAGE} -f docker/Dockerfile docker/
+- docker build --build-arg TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg TEST=True -t ${IMAGE} -f docker/Dockerfile docker/
 - docker push ${IMAGE}
