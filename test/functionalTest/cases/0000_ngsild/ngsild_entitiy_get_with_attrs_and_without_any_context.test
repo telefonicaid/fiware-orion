@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-attrs filter without contexts
+context in Link HTTP Header if application/json, in payload if application/ld+json
 
 --SHELL-INIT--
 export BROKER=orionld
