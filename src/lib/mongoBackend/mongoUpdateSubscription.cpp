@@ -341,7 +341,8 @@ static void setCondsAndInitialNotifyNgsiv1
                                             status,
                                             fiwareCorrelator,
                                             sub.notification.attributes,
-                                            sub.notification.blacklist);
+                                            sub.notification.blacklist,
+                                            V1);
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
@@ -452,7 +453,8 @@ static void setCondsAndInitialNotify
                                xauthToken,
                                fiwareCorrelator,
                                b,
-                               notificationDone);
+                               notificationDone,
+                               V2);
     }
   }
   else
@@ -825,7 +827,8 @@ std::string mongoUpdateSubscription
   const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator
+  const std::string&               fiwareCorrelator,
+  ApiVersion                       apiVersion
 )
 {
   bool reqSemTaken = false;

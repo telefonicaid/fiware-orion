@@ -124,7 +124,8 @@ extern void setCondsAndInitialNotify
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   mongo::BSONObjBuilder*           b,
-  bool*                            notificationDone
+  bool*                            notificationDone,
+  ApiVersion                       apiVersion
 );
 
 
