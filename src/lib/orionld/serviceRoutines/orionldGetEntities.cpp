@@ -34,6 +34,7 @@ extern "C"
 #include "serviceRoutines/postQueryContext.h"                  // V1 service routine that does the whole work ...
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "mongoBackend/mongoQueryContext.h"                    // mongoQueryContext
+#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
@@ -119,6 +120,35 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   int          typeVecItems = (int) sizeof(typeVector) / sizeof(typeVector[0]);
 
   LM_T(LmtServiceRoutine, ("In orionldGetEntities"));
+
+  //
+  // Special case of 'q' filter instead of 'mq' filter, to follow the ngsild spec.
+  // "observedAt" is stored as a metadata and with the current implementation (not to change TOO much),
+  // we would need to use 'mw' even though 'q' was give by the user.
+  //
+  // Also, createdAt and modifiedAt corresponds 1 to 1 to datewCreated and dateModified of APIv2, so, those two
+  // "only" need a slight modification in strings
+  //
+  LM_TMP(("KZ: q == '%s'", q));
+  if (q != NULL)
+  {
+    char*  qP    = q;
+
+    while (*qP != 0)
+    {
+      if (*qP == '.')
+      {
+        ++qP;
+
+        if (SCOMPARE11(qP, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
+        {
+          LM_TMP(("KZ: Got an q=attr.observedAt: '%s'", q));
+        }
+        break;
+      }
+      ++qP;
+    }
+  }
 
   if ((idPattern != NULL) && (id != NULL))
   {
