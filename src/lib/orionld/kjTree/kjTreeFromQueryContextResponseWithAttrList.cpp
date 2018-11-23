@@ -63,6 +63,14 @@ extern void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP);
 
 // -----------------------------------------------------------------------------
 //
+// uriExpand - FIXME: move to src/lib/orionld/uriExpand/uriExpand.cpp/h
+//
+extern bool uriExpand(OrionldContext* contextP, char* shortName, char* longName, int longNameLen, char** detailsP);
+
+  
+
+// -----------------------------------------------------------------------------
+//
 // kjTreeFromQueryContextResponseWithAttrList -
 //
 // PARAMETERS
@@ -319,9 +327,20 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
           attrName = aliasNodeP->name;
       }
 
-      if (strstr(attrName, attrList) == NULL)
+      LM_TMP(("attrList: '%s'", attrList));
+      LM_TMP(("aP->name: '%s'", aP->name.c_str()));
+
+      char* match;
+      if ((match = (char*) strstr(attrList, aP->name.c_str())) == NULL)
       {
-        LM_TMP(("Filtering out attribute '%s'", attrName));
+        LM_TMP(("Filtering out attribute '%s'", aP->name.c_str()));
+        continue;
+      }
+
+      // Need to check ",{attr name}," also
+      if ((match[-1] != ',') || (match[strlen(aP->name.c_str())] != ','))
+      {
+        LM_TMP(("Filtering out attribute '%s'", aP->name.c_str()));
         continue;
       }
       
