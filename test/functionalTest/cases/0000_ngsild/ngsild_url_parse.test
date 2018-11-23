@@ -232,84 +232,84 @@ Date: REGEX(.*)
 02. GET /ngsi-ld/v1/entities/E1
 ===============================
 HTTP/1.1 404 Not Found
-Content-Length: 119
+Content-Length: 120
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "no details",
     "title": "No context element found",
-    "type": "http://example.org/ngsi-ld/errors/ResourceNotFound"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 
 03. GET /ngsi-ld/v1/subscriptions
 =================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 140
+Content-Length: 141
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "no details",
     "title": "not implemented - GET /ngsi-ld/v1/subscriptions",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 04. GET /ngsi-ld/v1/subscriptions/S1
 ====================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 134
+Content-Length: 135
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "S1",
     "title": "not implemented - GET /ngsi-ld/v1/subscriptions/*",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 05. GET /ngsi-ld/v1/csourceRegistrations
 ========================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 147
+Content-Length: 148
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "no details",
     "title": "not implemented - GET /ngsi-ld/v1/csourceRegistrations",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 06. GET /ngsi-ld/v1/csourceRegistrations/R1
 ===========================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 141
+Content-Length: 142
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "R1",
     "title": "not implemented - GET /ngsi-ld/v1/csourceRegistrations/*",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 07. GET /ngsi-ld/ex/v1/contexts/C1
 ==================================
 HTTP/1.1 404 Not Found
-Content-Length: 102
+Content-Length: 103
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "C1",
     "title": "Context Not Found",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -326,14 +326,14 @@ Date: REGEX(.*)
 09. POST /ngsi-ld/v1/entities/E1/attrs
 ======================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 170
+Content-Length: 171
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "http://a.b.c/list/of/entities/E1.xxx",
     "title": "not implemented - POST /ngsi-ld/v1/entities/*/attrs",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -350,89 +350,33 @@ Date: REGEX(.*)
 11. POST /ngsi-ld/v1/csourceRegistrations
 =========================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 147
+Content-Length: 148
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "no details",
     "title": "not implemented - GET /ngsi-ld/v1/csourceRegistrations",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 12. PATCH /ngsi-ld/v1/entities/E1/attrs
 =======================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 171
+Content-Length: 172
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "http://a.b.c/list/of/entities/E1.xxx",
     "title": "not implemented - PATCH /ngsi-ld/v1/entities/*/attrs",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 13. PATCH /ngsi-ld/v1/subscriptions/S1
 ======================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 136
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "details": "S1",
-    "title": "not implemented - PATCH /ngsi-ld/v1/subscriptions/*",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-14. PATCH /ngsi-ld/v1/csourceRegistrations/R1
-=============================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 143
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "details": "R1",
-    "title": "not implemented - PATCH /ngsi-ld/v1/csourceRegistrations/*",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-15. DELETE /ngsi-ld/v1/entities/E1
-==================================
-HTTP/1.1 404 Not Found
-Content-Length: 179
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "details": "http://a.b.c/list/of/entities/E1.xxx",
-    "title": "The requested entity has not been found. Check type and id",
-    "type": "http://example.org/ngsi-ld/errors/ResourceNotFound"
-}
-
-
-16. DELETE /ngsi-ld/v1/entities/E1/attrs/A1
-===========================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 174
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "details": "http://a.b.c/list/of/entities/E1.xxx",
-    "title": "not implemented - DELETE /ngsi-ld/v1/entities/*/attrs/*",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-17. DELETE /ngsi-ld/v1/subscriptions/S1
-=======================================
 HTTP/1.1 501 Not Implemented
 Content-Length: 137
 Content-Type: application/json
@@ -440,13 +384,13 @@ Date: REGEX(.*)
 
 {
     "details": "S1",
-    "title": "not implemented - DELETE /ngsi-ld/v1/subscriptions/*",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "title": "not implemented - PATCH /ngsi-ld/v1/subscriptions/*",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
-18. DELETE /ngsi-ld/v1/csourceRegistrations/R1
-==============================================
+14. PATCH /ngsi-ld/v1/csourceRegistrations/R1
+=============================================
 HTTP/1.1 501 Not Implemented
 Content-Length: 144
 Content-Type: application/json
@@ -454,22 +398,78 @@ Date: REGEX(.*)
 
 {
     "details": "R1",
+    "title": "not implemented - PATCH /ngsi-ld/v1/csourceRegistrations/*",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+15. DELETE /ngsi-ld/v1/entities/E1
+==================================
+HTTP/1.1 404 Not Found
+Content-Length: 180
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "http://a.b.c/list/of/entities/E1.xxx",
+    "title": "The requested entity has not been found. Check type and id",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+16. DELETE /ngsi-ld/v1/entities/E1/attrs/A1
+===========================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 175
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "http://a.b.c/list/of/entities/E1.xxx",
+    "title": "not implemented - DELETE /ngsi-ld/v1/entities/*/attrs/*",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+17. DELETE /ngsi-ld/v1/subscriptions/S1
+=======================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "S1",
+    "title": "not implemented - DELETE /ngsi-ld/v1/subscriptions/*",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+18. DELETE /ngsi-ld/v1/csourceRegistrations/R1
+==============================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 145
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "R1",
     "title": "not implemented - DELETE /ngsi-ld/v1/csourceRegistrations/*",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 19. GET /ngsi-ld/nada
 =====================
 HTTP/1.1 404 Not Found
-Content-Length: 113
+Content-Length: 114
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "/ngsi-ld/nada",
     "title": "Service Not Found",
-    "type": "http://example.org/ngsi-ld/errors/InvalidRequest"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
 }
 
 

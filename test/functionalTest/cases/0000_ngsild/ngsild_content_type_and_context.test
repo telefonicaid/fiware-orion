@@ -164,28 +164,28 @@ Date: REGEX(.*)
 02. Content-Type: application/ld+json + no context at all - see error
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 188
+Content-Length: 189
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "For application/ld+json, the @context must be present in the JSON payload",
     "title": "@context missing in JSON payload",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 03. Content-Type: application/json + context in payload - see error
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 190
+Content-Length: 191
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "For @context in payload, the MIME type must be application/ld+json",
     "title": "Invalid MIME-type for @context in payload",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -212,28 +212,28 @@ Date: REGEX(.*)
 06. Content-Type: application/ld+json + context in HTTP Header - see error
 ==========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 202
+Content-Length: 203
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "For application/ld+json, the @context must come inside the JSON payload, NOT in HTTP Header",
     "title": "@context in Link HTTP Header",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 07. Content-Type: application/ld+json + context in HTTP Header + context in payload - see error
 ===============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 202
+Content-Length: 203
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "For application/ld+json, the @context must come inside the JSON payload, NOT in HTTP Header",
     "title": "@context in Link HTTP Header",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

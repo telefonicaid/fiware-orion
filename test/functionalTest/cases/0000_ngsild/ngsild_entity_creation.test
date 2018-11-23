@@ -264,70 +264,70 @@ echo
 01. POST /ngsi-ld/v1/entities, with a non-object payload - see error
 ====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 108
+Content-Length: 109
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "toplevel",
     "title": "Not a JSON object",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 02. POST /ngsi-ld/v1/entities, with an 'id' that is not a string - see error
 ============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 109
+Content-Length: 110
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "entity id",
     "title": "Not a JSON string",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 03. POST /ngsi-ld/v1/entities, with a 'type' that is not a string - see error
 =============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 111
+Content-Length: 112
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "entity type",
     "title": "Not a JSON string",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 04. POST /ngsi-ld/v1/entities, with a '@context' that is not a vector - see error
 =================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 118
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "@context",
     "title": "Not a JSON array nor string",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 05. POST /ngsi-ld/v1/entities, with a '@context item' that is not a string - see error
 ======================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 132
+Content-Length: 133
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "no details",
     "title": "Context Array Item is not a JSON String",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -344,75 +344,89 @@ Date: REGEX(.*)
 07. POST /ngsi-ld/v1/entities, with invalid URL for a context - see error
 =========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 132
+Content-Length: 133
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "no details",
     "title": "Context Array Item is not a JSON String",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 08. POST /ngsi-ld/v1/entities, with an attribute without a type - see error
 ===========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 152
+Content-Length: 153
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "http://example.org/ngsi-ld/default/name",
     "title": "attribute without 'type' field",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 09. POST /ngsi-ld/v1/entities, with an attribute with type that is not a string - see error
 ===========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 114
+Content-Length: 115
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "attribute type",
     "title": "Not a JSON string",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 10. POST /ngsi-ld/v1/entities, with an attribute with invalid type 'Propperty' - see error
 ==========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 118
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "Propperty",
     "title": "Invalid type for attribute",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 11. POST /ngsi-ld/v1/entities, with a Property without a 'value'
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 162
+Content-Length: 163
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "http://example.org/ngsi-ld/default/name",
     "title": "property attribute without 'value' field",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 12. POST /ngsi-ld/v1/entities, with a Relationship without an 'object'
 ======================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 168
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "http://example.org/ngsi-ld/default/name",
+    "title": "relationship attribute without 'object' field",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+13. POST /ngsi-ld/v1/entities, with a GeoProperty without a 'value'
+===================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 167
 Content-Type: application/json
@@ -420,22 +434,8 @@ Date: REGEX(.*)
 
 {
     "details": "http://example.org/ngsi-ld/default/name",
-    "title": "relationship attribute without 'object' field",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-13. POST /ngsi-ld/v1/entities, with a GeoProperty without a 'value'
-===================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 166
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "details": "http://example.org/ngsi-ld/default/name",
     "title": "geo-property attribute without 'value' field",
-    "type": "http://example.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
