@@ -37,6 +37,7 @@ extern "C"
 #include "orionld/common/urnCheck.h"                           // urnCheck
 #include "orionld/context/orionldContextAdd.h"                 // Add a context to the context list
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
+#include "orionld/kjTree/kjTreeFromQueryContextResponseWithAttrList.h"     // kjTreeFromQueryContextResponseWithAttrList
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/serviceRoutines/orionldGetEntity.h"          // Own Interface
 
@@ -68,30 +69,6 @@ bool orionldGetEntity(ConnectionInfo* ciP)
 
   request.entityIdVector.push_back(&entityId);
 
-  if (attrs != NULL)
-  {
-    char  longName[256];
-    char* details;
-    char* shortName;
-    char* shortNameVector[32];
-    int   vecItems = (int) sizeof(shortNameVector) / sizeof(shortNameVector[0]);;
-
-    vecItems = kStringSplit(attrs, ',', (char**) shortNameVector, vecItems);
-
-    for (int ix = 0; ix < vecItems; ix++)
-    {
-      shortName = shortNameVector[ix];
-
-      if (uriExpand(ciP->contextP, shortName, longName, sizeof(longName), &details) == true)
-        request.attributeList.push_back(longName);
-      else
-      {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of attribute", shortName, OrionldDetailsString);
-        return false;
-      }
-    }
-  }
-
   LM_TMP(("Calling mongoQueryContext"));
   //
   // FIXME: mongoQueryContext should respond with a KJson tree -
@@ -118,14 +95,71 @@ bool orionldGetEntity(ConnectionInfo* ciP)
   // But first, check for "404 Not Found"
   //
   LM_TMP(("response.contextElementResponseVector.size: %d", response.contextElementResponseVector.size()));
-  
-  ciP->responseTree = kjTreeFromQueryContextResponse(ciP, true, &response);
+
+  if (attrs != NULL)
+  {
+    char  longName[256];
+    char* details;
+    char* shortName;
+    char* shortNameVector[32];
+    int   vecItems = (int) sizeof(shortNameVector) / sizeof(shortNameVector[0]);;
+
+    vecItems = kStringSplit(attrs, ',', (char**) shortNameVector, vecItems);
+
+    int   attrListLen = 1024;
+    char* attrList    = (char*) malloc(attrListLen);
+    char* attrListEnd = &attrList[1];
+
+    attrList[0] = ',';
+    attrList[1] = 0;
+
+    for (int ix = 0; ix < vecItems; ix++)
+    {
+      shortName = shortNameVector[ix];
+
+      if (uriExpand(ciP->contextP, shortName, longName, sizeof(longName), &details) == true)
+      {
+        int       len  = strlen(longName);
+        long long used = (long long) attrListEnd - (long long) attrList;
+
+        if (used + len > attrListLen + 1)
+        {
+          attrListLen += 1024;
+          attrList     = (char*) realloc(attrList, attrListLen);
+
+          if (attrList == NULL)
+          {
+            orionldErrorResponseCreate(ciP, OrionldInternalError, "Out of memory", NULL, OrionldDetailsString);
+            return false;
+          }
+
+          attrListEnd = &attrList[used];
+        }
+
+        strcpy(attrListEnd, longName);
+        attrListEnd += len;
+        *attrListEnd = ',';
+        ++attrListEnd;
+      }
+      else
+      {
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of attribute", shortName, OrionldDetailsString);
+        return false;
+      }
+    }
+    ciP->responseTree = kjTreeFromQueryContextResponseWithAttrList(ciP, true, attrList, &response);
+    free(attrList);
+  }
+  else
+    ciP->responseTree = kjTreeFromQueryContextResponse(ciP, true, &response);
+
+
   if (ciP->responseTree == NULL)
   {
     ciP->httpStatusCode = SccContextElementNotFound;
   }
 
   // request.entityIdVector.vec.erase(0);  // Remove 'entityId' from entityIdVector
-  
+
   return true;
 }

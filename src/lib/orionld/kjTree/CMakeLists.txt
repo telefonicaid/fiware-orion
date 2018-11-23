@@ -25,6 +25,7 @@ SET (SOURCES
     kjTreeFromContextAttribute.cpp
     kjTreeFromContextContextAttribute.cpp
     kjTreeFromCompoundValue.cpp
+    kjTreeFromQueryContextResponseWithAttrList.cpp
 )
 
 # Include directories
