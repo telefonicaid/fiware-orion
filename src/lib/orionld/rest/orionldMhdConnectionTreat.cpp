@@ -141,8 +141,8 @@ static bool contentTypeCheck(ConnectionInfo* ciP, KjNode* contextNodeP, char** e
 //
 static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** detailsP)
 {
-  // LM_TMP(("KZ: ciP->httpHeaders.accept == %s", ciP->httpHeaders.accept.c_str()));
-  // LM_TMP(("KZ: ciP->httpHeaders.acceptHeaederV.size() == %d", ciP->httpHeaders.acceptHeaderV.size()));
+  LM_TMP(("ciP->httpHeaders.accept == %s", ciP->httpHeaders.accept.c_str()));
+  LM_TMP(("ciP->httpHeaders.acceptHeaederV.size() == %d", ciP->httpHeaders.acceptHeaderV.size()));
 
   if (ciP->httpHeaders.acceptHeaderV.size() == 0)
   {
@@ -154,7 +154,7 @@ static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** de
   {
     const char* mediaRange = ciP->httpHeaders.acceptHeaderV[ix]->mediaRange.c_str();
 
-    // LM_TMP(("KZ: ciP->Accept header %d: '%s'", ix, mediaRange));
+    LM_TMP(("ciP->Accept header %d: '%s'", ix, mediaRange));
     if (SCOMPARE12(mediaRange, 'a', 'p', 'p', 'l', 'i', 'c', 'a', 't', 'i', 'o', 'n', '/'))
     {
       const char* appType = &mediaRange[12];
@@ -165,14 +165,14 @@ static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** de
       {
         ciP->httpHeaders.acceptJsonld = true;
         ciP->httpHeaders.acceptJson   = true;
-        // LM_TMP(("KZ: application/* - both json and jsonld OK"));
+        LM_TMP(("application/* - both json and jsonld OK"));
       }
     }
     else if (SCOMPARE4(mediaRange, '*', '/', '*', 0))
     {
       ciP->httpHeaders.acceptJsonld = true;
       ciP->httpHeaders.acceptJson   = true;
-      // LM_TMP(("KZ: */* - both json and jsonld OK"));
+      LM_TMP(("*/* - both json and jsonld OK"));
     }
   }
 
@@ -294,7 +294,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     if (jsonldLinkInHttpHeader == true)
     {
-      // LM_TMP(("KZ: Calling linkCheck with: '%s'", ciP->httpHeaders.link.c_str()));
+      LM_TMP(("Calling linkCheck with: '%s'", ciP->httpHeaders.link.c_str()));
       if (linkCheck((char*) ciP->httpHeaders.link.c_str(), &ciP->httpHeaders.linkUrl, &details) == false)
       {
         LM_E(("linkCheck: %s", details));

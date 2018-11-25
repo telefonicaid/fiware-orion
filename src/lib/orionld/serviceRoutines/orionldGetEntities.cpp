@@ -121,35 +121,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   LM_T(LmtServiceRoutine, ("In orionldGetEntities"));
 
-  //
-  // Special case of 'q' filter instead of 'mq' filter, to follow the ngsild spec.
-  // "observedAt" is stored as a metadata and with the current implementation (not to change TOO much),
-  // we would need to use 'mw' even though 'q' was give by the user.
-  //
-  // Also, createdAt and modifiedAt corresponds 1 to 1 to dateCreated and dateModified of APIv2, so, those two
-  // should "only" need a slight modification in strings
-  //
-  LM_TMP(("KZ: q == '%s'", q));
-  if (q != NULL)
-  {
-    char*  qP    = q;
-
-    while (*qP != 0)
-    {
-      if (*qP == '.')
-      {
-        ++qP;
-
-        if (SCOMPARE11(qP, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
-        {
-          LM_TMP(("KZ: Got an q=attr.observedAt: '%s'", q));
-        }
-        break;
-      }
-      ++qP;
-    }
-  }
-
   if ((idPattern != NULL) && (id != NULL))
   {
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Incompatible parameters", "id, idPattern", OrionldDetailsString);
@@ -225,14 +196,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   }
 
 
-#if 0
-  LM_TMP(("KZ: ------------- Created EntityId --------------"));
-  LM_TMP(("KZ: entityId.id:            '%s'", entityIdP->id.c_str()));
-  LM_TMP(("KZ: entityId.isPattern:     '%s'", entityIdP->isPattern.c_str()));
-  LM_TMP(("KZ: entityId.type:          '%s'", entityIdP->type.c_str()));
-  LM_TMP(("KZ: entityId.isTypePattern: '%s'", entityIdP->isTypePattern? "true" : "false"));
-#endif
-
   if (attrs != NULL)
   {
     char  longName[256];
@@ -259,16 +222,98 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   if (q != NULL)
   {
-    Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, q);
-    std::string  details;
+    //
+    // ngsi-ld doesn't aupport metadata which orion APIv1 and v2 does.
+    // However, for simplicity, the metadata vector is used for properties of an attribute.
+    // As metadata "isn't supported", the mq filter isn't supported, but as attribute properties are stored as metadata,
+    // we need to use the mq mechanism internally, if a property of a property is in the left hand side of a q filter item.
+    //
+    // So, the entire StringFilter is considered a MQ filter, but if the left hand side is just an attribute name (the metadata part is empty)
+    // then we must turn the parsed filter into a Q filter instead.
+    //
+    // The problem with this approach us that we can't reach inside compound valus of a Property,
+    // For example, consider the following entity:
+    // {
+    //   "id": "http:...",
+    //   "type": "",
+    //   "P1": {
+    //     "type": "Property",
+    //     "value": { "P2": 13 },
+    //     "P2": {
+    //       "type": "Property",
+    //       "value": 12
+    //     }
+    //   },
+    //   ...
+    // }
+    //
+    // And this StringFilter;    ?q=P1.P2==13.
+    //
+    // Which "P2" is the 'P1.P2==13' referring to?
+    // Well, as the string filter is always MQ filters if "complex" (left hand side contains a dot),
+    // it refers to the Property P2, NOT the field P2 inside the compound value of P1.
+    //
+    // One way of fixing this problem (in orion the problem was fixed by separation q and mq filters, q operating on compound values and
+    // mq oprating on metadata) is to add the "value" keyword as part of the left hand side:  "?q=P1.value.P2==13".
+    // This filter would refer to the P2 of the compound value of P1.
+    // The implementation would have to remove the "value" keyword and change from MQ to Q filter, but it would work.
+    //
+    // FIXME: Need to do this witgh wach q-item. Not only the first one
+    //
+    LM_TMP(("KZ: q == '%s'", q));
 
-    scopeP->stringFilterP = new StringFilter(SftQ);
-    if (scopeP->stringFilterP->parse(q, &details) == false)
+    char* qP = q;
+    while (*qP != 0)
     {
-      scopeP->release();
+      char c = *qP;
+
+      if ((c == '=') || (c == '>') || (c == '<') || (c == '!') || (c == '~'))
+        break;
+      if (c == '.')
+        break;
+
+      ++qP;
+    }
+
+    //
+    // If qP points to a '.', then it's a compound and a change to MQ filter must be done.
+    // Except if "value" comes after the dot.
+    // If that happens, then the ".value" should be removed from 'q'
+    //
+    StringFilterType filterType = SftQ;
+
+    if (*qP == '.')
+    {
+      LM_TMP(("KZ: Found a DOT in the Q before any operator!!!  '%s'", qP));
+      if (SCOMPARE6(qP, '.', 'v', 'a', 'l', 'u', 'e'))
+      {
+        strcpy(qP, &qP[6]);
+        LM_TMP(("KZ; Found a '.value' - removing it: '%s'", q));
+      }
+      else
+      {
+        LM_TMP(("KZ; Found a '.' but not '.value'- changing to MQ: '%s'", qP));
+        filterType = SftMq;
+      }
+    }
+
+    Scope*        scopeP = new Scope((filterType == SftMq)? SCOPE_TYPE_SIMPLE_QUERY_MD : SCOPE_TYPE_SIMPLE_QUERY, q);
+    StringFilter* sfP    = new StringFilter(filterType);
+
+    if (filterType == SftMq)
+      scopeP->mdStringFilterP = sfP;
+    else
+      scopeP->stringFilterP = sfP;
+
+    LM_TMP(("KZ: Created %s StringFilter of q: '%s'", (filterType == SftMq)? "MQ" : "Q", q));
+
+    std::string details;
+    if (sfP->parse(q, &details) == false)
+    {
       delete scopeP;
 
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "", details.c_str(), OrionldDetailsString);
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error parsing q StringFilter", details.c_str(), OrionldDetailsString);
+      return false;
     }
 
     parseData.qcr.res.restriction.scopeVector.push_back(scopeP);
@@ -285,7 +330,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   if (attrs != NULL)  // FIXME: Move all this to a separate function
   {
-    LM_TMP(("KZ: 'attrs' URI option was used, so we now need to query the '@context' from all these entities", entities));
+    LM_TMP(("'attrs' URI option was used, so we now need to query the '@context' from all these entities", entities));
     //
     // Unfortunately, we need to do a second query now, to get the attribute "@context" of all the matching entities
     //

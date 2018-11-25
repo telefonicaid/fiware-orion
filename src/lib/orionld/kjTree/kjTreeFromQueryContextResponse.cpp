@@ -122,7 +122,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, QueryCo
     if (oneHit == false)
     {
       ciP->responseTree = kjArray(ciP->kjsonP, NULL);
-      LM_TMP(("KZ: Nothing found - returning empty array"));
+      LM_TMP(("Nothing found - returning empty array"));
     }
     else
       ciP->responseTree = NULL;

@@ -1367,26 +1367,35 @@ bool entitiesQuery
     }
     else if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
+      LM_TMP(("SCOPE_TYPE_SIMPLE_QUERY"));
       if (scopeP->stringFilterP)
       {
         for (unsigned int ix = 0; ix < scopeP->stringFilterP->mongoFilters.size(); ++ix)
         {
+          LM_TMP(("Adding Q filter"));
           finalQuery.appendElements(scopeP->stringFilterP->mongoFilters[ix]);
         }
       }
+      else
+        LM_TMP(("NULL Q filter"));
     }
     else if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY_MD)
     {
+      LM_TMP(("SCOPE_TYPE_SIMPLE_QUERY_MD"));
       if (scopeP->mdStringFilterP)
       {
         for (unsigned int ix = 0; ix < scopeP->mdStringFilterP->mongoFilters.size(); ++ix)
         {
+          LM_TMP(("Adding MQ filter"));
           finalQuery.appendElements(scopeP->mdStringFilterP->mongoFilters[ix]);
         }
       }
+      else
+        LM_TMP(("NULL MD filter"));
     }
     else
     {
+      LM_TMP(("unknown scope type"));
       std::string details = std::string("unknown scope type '") + scopeP->type + "', ignoring";
       alarmMgr.badInput(clientIp, details);
     }

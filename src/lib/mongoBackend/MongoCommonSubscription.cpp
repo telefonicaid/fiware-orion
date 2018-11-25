@@ -462,11 +462,11 @@ void setMetadata(const Subscription& sub, BSONObjBuilder* b)
 */
 void setContext(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP)
 {
-  LM_TMP(("KZ: sub.ldContext == '%s'", sub.ldContext.c_str()));
+  LM_TMP(("sub.ldContext == '%s'", sub.ldContext.c_str()));
 
   if (sub.ldContext != "")
   {
-    LM_TMP(("KZ: Appending '%s': '%s' to mongo::BSONObjBuilder", CSUB_LDCONTEXT, sub.ldContext.c_str()));
+    LM_TMP(("Appending '%s': '%s' to mongo::BSONObjBuilder", CSUB_LDCONTEXT, sub.ldContext.c_str()));
 
     bobP->append(CSUB_LDCONTEXT, sub.ldContext);
     LM_T(LmtMongo, ("Subscription context: %s", sub.ldContext.c_str()));

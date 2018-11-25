@@ -327,7 +327,7 @@ static bool ktreeToStringList(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<s
       return false;
     }
 
-    LM_TMP(("KZ: Pushing string '%s' to string-list", expanded));
+    LM_TMP(("Pushing string '%s' to string-list", expanded));
     stringListP->push_back(expanded);
   }
 
@@ -348,7 +348,7 @@ static bool ktreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, S
   char*    georelP            = NULL;
   char*    geoPropertyP       = NULL;
 
-  LM_TMP(("KZ: In ktreeToSubscriptionExpression"));
+  LM_TMP(("In ktreeToSubscriptionExpression"));
 
   for (itemP = kNodeP->children; itemP != NULL; itemP = itemP->next)
   {
@@ -372,7 +372,7 @@ static bool ktreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, S
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value type (not String nor Array)", "GeoQuery::coordinates", OrionldDetailsString);
         return false;
       }
-      LM_TMP(("KZ: coordinatesNodeP->type: %s", kjValueType(coordinatesNodeP->type)));
+      LM_TMP(("coordinatesNodeP->type: %s", kjValueType(coordinatesNodeP->type)));
     }
     else if (SCOMPARE7(itemP->name, 'g', 'e', 'o', 'r', 'e', 'l', 0))
     {
@@ -409,7 +409,7 @@ static bool ktreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, S
     return false;
   }
 
-  LM_TMP(("KZ: coordinatesNodeP->type: %s", kjValueType(coordinatesNodeP->type)));
+  LM_TMP(("coordinatesNodeP->type: %s", kjValueType(coordinatesNodeP->type)));
   if (coordinatesNodeP->type == KjArray)
   {
     char coords[512];
@@ -422,7 +422,7 @@ static bool ktreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, S
     //
     kjRender(ciP->kjsonP, coordinatesNodeP, coords, sizeof(coords));
     coords[strlen(coords) - 1] = 0;
-    LM_TMP(("KZ: Rendered array: '%s'", &coords[1]));
+    LM_TMP(("Rendered array: '%s'", &coords[1]));
     subExpressionP->coords = &coords[1];
   }
   else

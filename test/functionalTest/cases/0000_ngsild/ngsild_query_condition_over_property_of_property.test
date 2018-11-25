@@ -87,8 +87,8 @@ echo
 echo
 
 
-echo "03. Query the property P100 over its 'observedAt'"
-echo "================================================="
+echo "03. Query the property P100 over its property 'P1_P1'"
+echo "====================================================="
 orionCurl --url '/ngsi-ld/v1/entities?q=P100.P1_P1>0.70&prettyPrint=yes' --noPayloadCheck
 echo
 echo
@@ -129,7 +129,7 @@ MongoDB server version: REGEX(.*)
 			"value" : 12,
 			"md" : {
 				"observedAt" : {
-					"value" : "2018-12-04T12:00:00Z"
+					"value" : 1543924800
 				},
 				"P1_R1" : {
 					"type" : "Relationship",
@@ -187,14 +187,55 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-03. Query the property P100 over its 'observedAt'
-=================================================
+03. Query the property P100 over its property 'P1_P1'
+=====================================================
 HTTP/1.1 200 OK
-Content-Length: 3
+Content-Length: 821
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
-[]
+[
+  {
+    "id": "urn:ngsi-ld:T_Query:EntityForQuery2345",
+    "type": "T_Query",
+    "P100": {
+      "type": "Property",
+      "value": 12.000000,
+      "P1_P1": {
+        "type": "Property",
+        "value": 0.790000
+      },
+      "P1_R1": {
+        "type": "Relationship",
+        "object": "urn:ngsi-ld:T2:6789"
+      },
+      "observedAt": 1543924736.000000
+    },
+    "R100": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:T2:6789",
+      "R1_P1": {
+        "type": "Property",
+        "value": false
+      },
+      "R1_R1": {
+        "type": "Relationship",
+        "object": "urn:ngsi-ld:T3:A2345"
+      }
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          -30.010000,
+          75.010002
+        ]
+      }
+    }
+  }
+]
 
 
 

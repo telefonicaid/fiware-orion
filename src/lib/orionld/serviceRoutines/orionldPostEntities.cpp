@@ -823,7 +823,7 @@ static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* node
     {
     case KjBoolean:    mdP->valueType = orion::ValueTypeBoolean; mdP->boolValue      = valueNodeP->value.b; break;
     case KjInt:        mdP->valueType = orion::ValueTypeNumber;  mdP->numberValue    = valueNodeP->value.i; break;
-    case KjFloat:      mdP->valueType = orion::ValueTypeNumber;  mdP->numberValue    = valueNodeP->value.f; break;
+    case KjFloat:      mdP->valueType = orion::ValueTypeNumber;  mdP->numberValue    = valueNodeP->value.f; LM_TMP(("Created Float MD with value %f", mdP->numberValue)); break;
     case KjString:     mdP->valueType = orion::ValueTypeString;  mdP->stringValue    = valueNodeP->value.s; break;
     case KjObject:     mdP->valueType = orion::ValueTypeObject;  mdP->compoundValueP = compoundCreate(ciP, valueNodeP, NULL); break;
     case KjArray:      mdP->valueType = orion::ValueTypeObject;  mdP->compoundValueP = compoundCreate(ciP, valueNodeP, NULL);  break;
@@ -1047,6 +1047,26 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     else if (SCOMPARE11(nodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
     {
       DUPLICATE_CHECK(nodeP, observedAtP, "observed at");
+      STRING_CHECK(nodeP, "observed at");
+
+      //
+      // This is a very special attribute.
+      // It's value must be a JSON String and the string must be a valid ISO8601 dateTime
+      // The string is changed for a Number before stored in the database
+      //
+      int64_t dateTime;
+
+      // Check for valid ISO8601
+      if ((dateTime = parse8601Time(nodeP->value.s)) == -1)
+      {
+        LM_E(("parse8601Time failed"));
+        ATTRIBUTE_ERROR("The 'observedAt' attribute must have a valid ISO8601 as value", NULL);
+      }
+
+      // Change to Number
+      nodeP->type    = KjInt;
+      nodeP->value.i = dateTime;
+
       if (metadataAdd(ciP, caP, nodeP, caName) == false)
       {
         LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
@@ -1513,7 +1533,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       char*  expandedName;
       char*  expandedType;
       int    expansions = uriExpansion(ciP->contextP, typeNodeP->value.s, &expandedName, &expandedType, &details);
-      LM_TMP(("KZ: URI Expansion for type '%s': '%s'", typeNodeP->value.s, expandedName));
+      LM_TMP(("URI Expansion for type '%s': '%s'", typeNodeP->value.s, expandedName));
       LM_T(LmtUriExpansion, ("Got %d expansions", expansions));
 
       if (expansions == -1)
