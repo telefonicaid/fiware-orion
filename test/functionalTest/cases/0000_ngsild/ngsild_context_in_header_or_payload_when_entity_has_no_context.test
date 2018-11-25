@@ -116,7 +116,7 @@ Date: REGEX(.*)
         "type": "Relationship",
         "object": "urn:ngsi-ld:T2:6789"
       },
-      "observedAt": 1543924736.000000
+      "observedAt": 1543924800.000000
     }
   }
 ]
@@ -141,7 +141,7 @@ Date: REGEX(.*)
         "type": "Relationship",
         "object": "urn:ngsi-ld:T2:6789"
       },
-      "observedAt": 1543924736.000000
+      "observedAt": 1543924800.000000
     },
     "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json"
   }
@@ -167,7 +167,7 @@ Date: REGEX(.*)
       "type": "Relationship",
       "object": "urn:ngsi-ld:T2:6789"
     },
-    "observedAt": 1543924736.000000
+    "observedAt": 1543924800.000000
   }
 }
 
@@ -190,7 +190,7 @@ Date: REGEX(.*)
       "type": "Relationship",
       "object": "urn:ngsi-ld:T2:6789"
     },
-    "observedAt": 1543924736.000000
+    "observedAt": 1543924800.000000
   },
   "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json"
 }

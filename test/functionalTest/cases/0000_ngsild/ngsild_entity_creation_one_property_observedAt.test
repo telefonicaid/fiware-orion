@@ -128,7 +128,7 @@ Date: REGEX(.*)
   "P1": {
     "type": "Property",
     "value": 12.000000,
-    "observedAt": 1543924736.000000
+    "observedAt": 1543924800.000000
   }
 }
 

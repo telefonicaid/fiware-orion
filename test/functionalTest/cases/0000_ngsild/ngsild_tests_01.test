@@ -158,7 +158,7 @@ Date: REGEX(.*)
       "type": "Relationship",
       "object": "urn:ngsi-ld:T2:6789"
     },
-    "observedAt": 1543924736.000000
+    "observedAt": 1543924800.000000
   }
 }
 
