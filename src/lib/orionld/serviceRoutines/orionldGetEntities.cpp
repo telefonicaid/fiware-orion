@@ -258,7 +258,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     // This filter would refer to the P2 of the compound value of P1.
     // The implementation would have to remove the "value" keyword and change from MQ to Q filter, but it would work.
     //
-    // FIXME: Need to do this witgh wach q-item. Not only the first one
+    // FIXME: Need to do this with each q-item. Not only the first one
     //
     LM_TMP(("KZ: q == '%s'", q));
 
@@ -271,30 +271,75 @@ bool orionldGetEntities(ConnectionInfo* ciP)
         break;
       if (c == '.')
         break;
+      if (c == '[')
+        break;
 
       ++qP;
     }
 
     //
-    // If qP points to a '.', then it's a compound and a change to MQ filter must be done.
-    // Except if "value" comes after the dot.
-    // If that happens, then the ".value" should be removed from 'q'
+    // If qP points to a '.', then it's a "metadata path" and a change to MQ filter must be done.
+    // If qP points to a '[', then it's a "compound path" and the '[]' must be removed
     //
     StringFilterType filterType = SftQ;
 
     if (*qP == '.')
     {
-      LM_TMP(("KZ: Found a DOT in the Q before any operator!!!  '%s'", qP));
-      if (SCOMPARE6(qP, '.', 'v', 'a', 'l', 'u', 'e'))
+      LM_TMP(("KZ: Found a DOT in the Q - changing to MQ: '%s'", qP));
+      filterType = SftMq;
+    }
+    else if (*qP == '[')
+    {
+      qP = q;
+
+      LM_TMP(("KZ: Found a [ in the Q: '%s'", qP));
+      //
+      // Copy char by char, replacing '[' for '.' and ']' for nothing ...
+      // ... until reaching the operator.
+      // The operator and all that comes after is simply copied
+      //
+      char* toP = q;
+
+      LM_TMP(("KZ: Compound Q: '%s'", q));
+      while (*qP != 0)
       {
-        strcpy(qP, &qP[6]);
-        LM_TMP(("KZ; Found a '.value' - removing it: '%s'", q));
+        char c = *qP;
+
+        if ((c == '=') || (c == '>') || (c == '<') || (c == '!') || (c == '~'))
+        {
+          // Just copy the rest of chars
+          LM_TMP(("KZ: Found operator - rest: %s", qP));
+          while (*qP != 0)
+          {
+            *toP = *qP;
+            ++toP;
+            ++qP;
+          }
+          *toP = 0;
+          LM_TMP(("KZ: Transformation Done: %s", toP));
+          break;
+        }
+        else if (c == '[')  // Replace [ for .
+        {
+          *toP = '.';
+          ++toP;
+          ++qP;
+        }
+        else if (c == ']')  // Skip ]
+        {
+          ++qP;
+        }
+        else
+        {
+          *toP = *qP;
+          ++toP;
+          ++qP;
+        }
       }
-      else
-      {
-        LM_TMP(("KZ; Found a '.' but not '.value'- changing to MQ: '%s'", qP));
-        filterType = SftMq;
-      }
+
+      // The resulting string is shorter than the original string - DON'T FORGET to terminate !!!
+      *qP = 0;
+      LM_TMP(("KZ: Compound Q Transformed: '%s'", q));
     }
 
     Scope*        scopeP = new Scope((filterType == SftMq)? SCOPE_TYPE_SIMPLE_QUERY_MD : SCOPE_TYPE_SIMPLE_QUERY, q);
