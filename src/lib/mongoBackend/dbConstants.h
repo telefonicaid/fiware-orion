@@ -133,5 +133,6 @@
 */
 #define STATUS_ACTIVE        "active"
 #define STATUS_INACTIVE      "inactive"
+#define STATUS_ONESHOT       "oneshot"
 
 #endif  // SRC_LIB_MONGOBACKEND_DBCONSTANTS_H_

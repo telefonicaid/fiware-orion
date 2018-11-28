@@ -1912,6 +1912,16 @@ static bool processSubscriptions
 
         if (cSubP != NULL)
         {
+          if (cSubP->status == STATUS_ONESHOT)
+          {
+            BSONObj query  = BSON("_id" << OID(mapSubId));
+            BSONObj update = BSON("$set" << BSON(CSUB_STATUS << STATUS_INACTIVE));
+            //update the status to inactive as status is oneshot
+            ret = collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
+            cSubP->status = STATUS_INACTIVE;
+
+            LM_T(LmtSubCache, ("set status to '%s' as Subscription status is oneshot", cSubP->status.c_str()));
+          }
           cSubP->lastNotificationTime = rightNow;
           cSubP->count               += 1;
 
