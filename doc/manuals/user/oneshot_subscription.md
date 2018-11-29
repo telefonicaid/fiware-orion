@@ -59,6 +59,6 @@ EOF
 ```
 
 Once the status is updated to "oneshot" again, the consumer will again get the notification or one time whenever the entity will 
-be updated and the subscription status will again be changed to “inactive” automatically.
+be updated and the subscription status will again be changed to "inactive" automatically.
 
 
