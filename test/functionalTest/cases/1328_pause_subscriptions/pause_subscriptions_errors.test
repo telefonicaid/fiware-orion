@@ -193,7 +193,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "status is not valid: it has to be either active or inactive or oneshot",
+    "description": "status is not valid: it has to be either active, inactive or oneshot",
     "error": "BadRequest"
 }
 
@@ -231,7 +231,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "status is not valid: it has to be either active or inactive or oneshot",
+    "description": "status is not valid: it has to be either active, inactive or oneshot",
     "error": "BadRequest"
 }
 
