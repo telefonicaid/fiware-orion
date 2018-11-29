@@ -187,7 +187,7 @@ Date: REGEX(.*)
 02. POST /v2/subscriptions with string status but not valid (fail)
 ==================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 109
+Content-Length: 107
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -225,7 +225,7 @@ Date: REGEX(.*)
 05. PATCH /v2/subscriptions/ID with string status but not valid (fail)
 ======================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 109
+Content-Length: 107
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
