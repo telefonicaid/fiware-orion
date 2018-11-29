@@ -1,7 +1,7 @@
 # <a name="top"></a>Oneshot Subscription
 
 Oneshot subscription provides an option to subscribe an entity only for one time notification. When consumer creates a subscription 
-with status “oneshot”, a subscription is created as similar to the [normal subscription](user/walkthrough_apiv2.md#subscriptions) request with a slight difference.
+with status “oneshot”, a subscription is created as similar to the [normal subscription](walkthrough_apiv2.md#subscriptions) request with a slight difference.
 
 In the normal case, the consumer gets initial and continuous notifications whenever the entity is updated until unsubscription 
 request isn’t made. 
@@ -10,7 +10,7 @@ While, in the case of oneshot subscription, the consumer gets notified only one 
 the subscription. Once a notification is triggered, the subscription transitions to "status": "inactive". Once in this status, 
 the consumer may update it with "oneshot" to repeat the same behavior (i.e. to get the one time notification again). 
 
-![](user/oneshot_subscription.png "oneshot_subscription.png")
+![](oneshot_subscription.png "oneshot_subscription.png")
 
 * Assuming an entity with id Room1 and type Room already exists in the database. 
 
