@@ -15,7 +15,7 @@
 * [Ordering between:$
  different attribute value types](#ordering-between-different-attribute-value-types)
 * [Initial notifications](#initial_notifications)
-* [Oneshot Subscription](#Oneshot subscriptions)
+* [Oneshot Subscription](#oneshot-subscriptions)
 * [Registrations](#registrations)
 * [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
