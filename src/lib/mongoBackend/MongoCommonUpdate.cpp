@@ -1916,7 +1916,7 @@ static bool processSubscriptions
           {
             BSONObj query  = BSON("_id" << OID(mapSubId));
             BSONObj update = BSON("$set" << BSON(CSUB_STATUS << STATUS_INACTIVE));
-            //update the status to inactive as status is oneshot
+            // update the status to inactive as status is oneshot
             ret = collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
             cSubP->status = STATUS_INACTIVE;
 
