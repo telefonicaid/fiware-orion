@@ -1,10 +1,9 @@
-# <a name="top"></a>Oneshot Subscription
+# Oneshot Subscription
 
 Oneshot subscription provides an option to subscribe an entity only for one time notification. When consumer creates a subscription 
-with status “oneshot”, a subscription is created as similar to the [normal subscription](walkthrough_apiv2.md#subscriptions) request with a slight difference.
+with status "oneshot", a subscription is created as similar to the [normal subscription](walkthrough_apiv2.md#subscriptions) request with a slight difference.
 
-In the normal case, the consumer gets initial and continuous notifications whenever the entity is updated until unsubscription 
-request isn’t made. 
+In the normal case, the consumer gets initial and continuous notifications whenever the entity is updated until subscription is removed or its status passes to inactive after a subscription update.
 
 While, in the case of oneshot subscription, the consumer gets notified only one time whenever the entity is updated after creating 
 the subscription. Once a notification is triggered, the subscription transitions to "status": "inactive". Once in this status, 
@@ -48,7 +47,7 @@ EOF
 
 As the value of pressure attribute is updated, context consumer will get the notification for temperature attribute and status 
 of this subscription will automatically be turned to inactive and no further notification will be triggered until the consumer 
-updates it again to “oneshot” in below manner:
+updates it again to "oneshot" in below manner:
 
 ```
 curl localhost:1026/v2/subscriptions/<subscription_id> -s -S \
@@ -59,7 +58,7 @@ curl localhost:1026/v2/subscriptions/<subscription_id> -s -S \
 EOF
 ```
 
-Once the status is updated to “oneshot” again, the consumer will again get the notification or one time whenever the entity will 
+Once the status is updated to "oneshot" again, the consumer will again get the notification or one time whenever the entity will 
 be updated and the subscription status will again be changed to “inactive” automatically.
 
 
