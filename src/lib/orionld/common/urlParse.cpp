@@ -42,7 +42,17 @@
 // NOTE
 //   The called MUST make sure 'protocol' and 'ip' have enough room
 //
-bool urlParse(const char* url, char* protocol, int protocolSize, char* ip, int ipSize, short* portP, char** urlPathPP, char** detailsPP)
+bool urlParse
+(
+  const char*  url,
+  char*        protocol,
+  int          protocolSize,
+  char*        ip,
+  int          ipSize,
+  uint16_t*    portP,
+  char**       urlPathPP,
+  char**       detailsPP
+)
 {
   int urlIx  = 0;
   int toIx   = 0;
@@ -73,7 +83,7 @@ bool urlParse(const char* url, char* protocol, int protocolSize, char* ip, int i
 
   protocol[toIx] = 0;
 
-  
+
   //
   // 2. Make sure "//" comes after ':'
   //
@@ -89,7 +99,7 @@ bool urlParse(const char* url, char* protocol, int protocolSize, char* ip, int i
   // 3. Getting the IP address
   //
   toIx = 0;
-  while((url[urlIx] != 0) && (url[urlIx] != '/'))
+  while ((url[urlIx] != 0) && (url[urlIx] != '/'))
   {
     if (toIx < ipSize - 1)
       ip[toIx] = url[urlIx];
@@ -103,7 +113,7 @@ bool urlParse(const char* url, char* protocol, int protocolSize, char* ip, int i
     ++toIx;
     ++urlIx;
   }
-  
+
   if (url[urlIx] == 0)
   {
     *detailsPP = (char*) "URL parse error - no slash found after IP address";

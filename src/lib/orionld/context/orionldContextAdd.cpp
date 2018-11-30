@@ -92,8 +92,9 @@ extern "C"
 //    }
 //
 // The first three cases are taken care of by orionldPostEntities (case 3 is not implemented in the first round)
-// 
-// So, in this routine, the payload of the downloaded url (by calling orionldContextDownloadAndParse) must be a jSON Object with a single member "@context",
+//
+// So, in this routine, the payload of the downloaded url (by calling orionldContextDownloadAndParse)
+// must be a jSON Object with a single member "@context",
 // This member is either a JSON Array or an Object.
 //
 //
@@ -104,9 +105,16 @@ extern "C"
 // If JSON Array,  the contents of the array must be URL strings naming new contexts
 //
 // If it is an object, the list of key-values is the context and the URL is the 'name' of the context.
-// If it is an array, the array itself (naming X contexts) is the context and the the URL is the 'name' of this "complex" context.
+// If it is an array, the array itself (naming X contexts) is the context and the the URL is the 'name'
+// of this "complex" context.
 //
-OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, OrionldContextType contextType, char** detailsPP)
+OrionldContext* orionldContextAdd
+(
+  ConnectionInfo*     ciP,
+  const char*         url,
+  OrionldContextType  contextType,
+  char**              detailsPP
+)
 {
   OrionldContext* contextP = NULL;
 
@@ -158,7 +166,7 @@ OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, OrionldC
     return NULL;
   }
   LM_T(LmtContext, ("The tree has at least one child - OK"));
-  
+
   if (tree->children->next != NULL)
   {
     *detailsPP = (char*) "Invalid payload for a context - only one member allowed for context payloads";
@@ -166,7 +174,7 @@ OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, OrionldC
     return NULL;
   }
   LM_T(LmtContext, ("The tree has exactly one child - OK"));
-  LM_T(LmtContext, ("Only member is named '%s' and is of type %s", tree->children->name, kjValueType(tree->children->type)));
+  LM_T(LmtContext, ("Only member is '%s' and of type %s", tree->children->name, kjValueType(tree->children->type)));
 
   // 3. Is the single member called '@context' ?
   if (!SCOMPARE9(tree->children->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
@@ -212,7 +220,6 @@ OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, OrionldC
   }
 
 
-  
   LM_T(LmtContext, ("Context is an array of strings (URLs) - download and create new contexts"));
 
   //
@@ -229,15 +236,15 @@ OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, OrionldC
       kjFree(tree);
       free(contextP->url);
       free(contextP);
-      
+
       return NULL;
     }
 
-    char  protocol[128];
-    char  ip[256];
-    short port;
-    char* urlPath;
-    
+    char      protocol[128];
+    char      ip[256];
+    uint16_t  port;
+    char*     urlPath;
+
     if (urlParse(contextItemP->value.s, protocol, sizeof(protocol), ip, sizeof(ip), &port, &urlPath, detailsPP) == false)
     {
       LM_E(("urlParse(%s): %s", contextItemP->value.s, *detailsPP));
@@ -256,7 +263,7 @@ OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, OrionldC
   for (KjNode* contextItemP = contextP->tree->children; contextItemP != NULL; contextItemP = contextItemP->next)
   {
     char* url = contextItemP->value.s;
-        
+
     LM_T(LmtContext, ("Context is a string - meaning a new URL - download and create context: %s", url));
 
     // If already in "cache", no need to download and parse
@@ -284,6 +291,6 @@ OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, OrionldC
       return NULL;
     }
   }
-      
+
   return contextP;
 }

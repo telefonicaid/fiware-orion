@@ -77,15 +77,21 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
 //
 // orionldRequestSend - send a request and await its response
 //
-bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoInMilliSeconds, char** detailsPP, bool* tryAgainP)
+bool orionldRequestSend
+(
+  OrionldResponseBuffer*  rBufP,
+  const char*             url,
+  int                     tmoInMilliSeconds,
+  char**                  detailsPP,
+  bool*                   tryAgainP
+)
 {
   CURLcode             cCode;
   struct curl_context  cc;
-
-  char   protocol[16];
-  char   ip[256];
-  short  port    = 0;
-  char*  urlPath = NULL;
+  char                 protocol[16];
+  char                 ip[256];
+  uint16_t             port    = 0;
+  char*                urlPath = NULL;
 
   *tryAgainP = false;
 
@@ -120,7 +126,7 @@ bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoIn
     return false;
   }
 
-  
+
   //
   // Prepare the CURL handle
   //
@@ -133,7 +139,7 @@ bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoIn
   curl_easy_setopt(cc.curl, CURLOPT_FAILONERROR, true);                    // Fail On Error - to detect 404 etc.
 
 #if 0
-  curl_easy_setopt(cc.curl, CURLOPT_HEADER, 1);                            // Activate include the header in the body output
+  curl_easy_setopt(cc.curl, CURLOPT_HEADER, 1);                            // Include header in body output
   curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);                  // Put headers in place
 #endif
 

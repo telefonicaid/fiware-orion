@@ -65,7 +65,6 @@ static bool orionldUserContextKeyValuesCheck2(KjNode* tree, char* url, char** de
   if (tree->type != KjObject)
   {
     LM_TMP(("Context Tree '%s' is a JSON %s", tree->name, kjValueType(tree->type)));
-    
     LM_X(1, ("Context Tree is not a JSON Object - this is a bug!"));
     *detailsPP = (char*) "not a JSON Object";
     return false;
@@ -83,7 +82,8 @@ static bool orionldUserContextKeyValuesCheck2(KjNode* tree, char* url, char** de
     {
       if (orionldContextValueLookup(&orionldCoreContext, childP->value.s) != NULL)
       {
-        LM_E(("In context '%s', the context item '%s' uses a value from the Core Context (%s)", url, childP->name, childP->value.s));
+        LM_E(("In context '%s', the context item '%s' uses a value from the Core Context (%s)",
+              url, childP->name, childP->value.s));
         *detailsPP = (char*) "Invalid context - values from the Core Context cannot be used";
         return false;
       }
@@ -107,7 +107,8 @@ static bool orionldUserContextKeyValuesCheck2(KjNode* tree, char* url, char** de
           LM_TMP(("Checking value '%s' for iten named '%s'", itemP->value.s, itemP->name));
           if (orionldContextValueLookup(&orionldCoreContext, itemP->value.s) != NULL)
           {
-            LM_E(("In context '%s', the context item '%s' of '%s' uses a value from the Core Context (%s)", url, itemP->name, childP->name, itemP->value.s));
+            LM_E(("In context '%s', the context item '%s' of '%s' uses a value from the Core Context (%s)",
+                  url, itemP->name, childP->name, itemP->value.s));
             *detailsPP = (char*) "Invalid context - values from the Core Context cannot be used";
             return false;
           }
@@ -185,7 +186,8 @@ bool orionldUserContextKeyValuesCheck(KjNode* contextTreeP, char* url, char** de
 
   if (contextTreeP->children == NULL)
   {
-    LM_E(("contextTreeP '%s' is of type '%s' (next at %p)", url, kjValueType(contextTreeP->type), contextTreeP->name, contextTreeP->next));
+    LM_E(("contextTreeP '%s' is of type '%s' (next at %p)",
+          url, kjValueType(contextTreeP->type), contextTreeP->name, contextTreeP->next));
     *detailsPP = (char*) "Context tree is empty";
     return NULL;
   }
@@ -199,7 +201,8 @@ bool orionldUserContextKeyValuesCheck(KjNode* contextTreeP, char* url, char** de
   if (contextTreeP->type == KjObject)
   {
     // Case 1-3
-    if ((contextTreeP->children->next == NULL) && SCOMPARE9(contextTreeP->children->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
+    if ((contextTreeP->children->next == NULL) &&
+        SCOMPARE9(contextTreeP->children->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
     {
       KjNode* contextNodeP = contextTreeP->children;
 

@@ -104,7 +104,10 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value)
     // Now, either we have an inline context, with many key-values, or
     // the object has a single member "@context".
     //
-    LM_T(LmtContextValueLookup, ("Looking up '%s' in the %s context '%s'", value, kjValueType(contextP->tree->type), contextP->url));
+    LM_T(LmtContextValueLookup, ("Looking up '%s' in the %s context '%s'",
+                                 value,
+                                 kjValueType(contextP->tree->type),
+                                 contextP->url));
 
     if (contextP->tree->children == NULL)
     {
@@ -120,13 +123,15 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value)
 
     if (strcmp(contextP->tree->children->name, "@context") != 0)
     {
-      LM_E(("Context tree is a JSON object, and it has exactly one child, but its name must be '@context', not '%s'", contextP->tree->children->name));
+      LM_E(("Context tree is a JSON object, and it has exactly one child, but its name must be '@context', not '%s'",
+            contextP->tree->children->name));
       return NULL;
     }
   }
   else
   {
-    LM_E(("The '@context' is a %s - must be either Object, String or Array", kjValueType(contextP->tree->children->type)));
+    LM_E(("The '@context' is a %s - must be either Object, String or Array",
+          kjValueType(contextP->tree->children->type)));
     return NULL;
   }
 
@@ -143,7 +148,8 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value)
     {
       if ((contextItemP->type != KjString) && (contextItemP->type !=  KjObject))
       {
-        LM_E(("Invalid @context - items of contexts must be JSON Strings or jSOn objects - not %s", kjValueType(contextItemP->type)));
+        LM_E(("Invalid @context - items of contexts must be JSON Strings or jSOn objects - not %s",
+              kjValueType(contextItemP->type)));
         return NULL;
       }
 

@@ -37,5 +37,5 @@ extern "C"
 // orionldUserContextKeyValuesCheck -
 //
 extern bool orionldUserContextKeyValuesCheck(KjNode* contextTreeP, char* url, char** detailsPP);
- 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDUSERCONTEXTCHECK_H_
+
+#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDUSERCONTEXTKEYVALUESCHECK_H_

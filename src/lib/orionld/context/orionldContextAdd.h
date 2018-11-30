@@ -34,6 +34,12 @@
 //
 // orionldContextAdd -
 //
-extern OrionldContext* orionldContextAdd(ConnectionInfo* ciP, const char* url, OrionldContextType contextType, char** detailsP);
+extern OrionldContext* orionldContextAdd
+(
+  ConnectionInfo*     ciP,
+  const char*         url,
+  OrionldContextType  contextType,
+  char**              detailsP
+);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTADD_H_

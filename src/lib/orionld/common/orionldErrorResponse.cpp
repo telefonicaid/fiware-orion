@@ -62,7 +62,14 @@ static const char* errorTypeStringV[] =
 //   Only service routines should use this function.
 //   Lower level functions should just return the 'details' string.
 //
-void orionldErrorResponseCreate(ConnectionInfo* ciP, OrionldResponseErrorType errorType, const char* title, const char* details, OrionldDetailsType detailsType)
+void orionldErrorResponseCreate
+(
+  ConnectionInfo*           ciP,
+  OrionldResponseErrorType  errorType,
+  const char*               title,
+  const char*               details,
+  OrionldDetailsType        detailsType
+  )
 {
   LM_T(LmtErrorResponse, ("Creating error response: %s (%s)", title, details));
 

@@ -74,7 +74,7 @@ static void stringContextPresent(OrionldContext* contextP)
 static void arrayContextPresent(OrionldContext* contextP)
 {
   KjNode* itemP;
-    
+
   LM_T(LmtContextPresent, ("Context ARRAY: %s (ignored: %s):", contextP->url, (contextP->ignore == true)? "YES" : "NO"));
 
   for (itemP = contextP->tree->children; itemP != NULL; itemP = itemP->next)
@@ -103,7 +103,7 @@ static void objectContextPresent(ConnectionInfo* ciP, OrionldContext* contextP)
     kjsonBuffer = kjBufferCreate();
     if (kjsonBuffer == NULL)
       LM_X(1, ("Out of memory"));
-    
+
     kjsonBuffer->spacesPerIndent   = 0;
     kjsonBuffer->nlString          = (char*) "";
     kjsonBuffer->stringBeforeColon = (char*) "";
@@ -113,12 +113,12 @@ static void objectContextPresent(ConnectionInfo* ciP, OrionldContext* contextP)
   LM_T(LmtContextPresent, ("Context '%s' (ignored: %s):", contextP->url, (contextP->ignore == true)? "YES" : "NO"));
 
   char buf[1024];
-  
+
   kjRender(kjsonBuffer, contextP->tree, buf, sizeof(buf));
   buf[120] = 0;
   LM_T(LmtContextPresent, ("Context Tree: %s", buf));
 
-#if 0  
+#if 0
   if (contextP->tree == NULL)
   {
     LM_T(LmtContextPresent, ("contextP->tree is NULL"));
@@ -127,7 +127,7 @@ static void objectContextPresent(ConnectionInfo* ciP, OrionldContext* contextP)
   {
     LM_T(LmtContextPresent, ("contextP->tree is of type '%s'", kjValueType(contextP->tree->type)));
     LM_T(LmtContextPresent, ("contextP->tree->children is NULL"));
-  }    
+  }
   else if (contextP->tree->children->children == NULL)
   {
     LM_T(LmtContextPresent, ("contextP->tree->children->children is NULL"));
@@ -157,7 +157,7 @@ static void objectContextPresent(ConnectionInfo* ciP, OrionldContext* contextP)
       }
     }
   }
-#endif  
+#endif
 }
 
 

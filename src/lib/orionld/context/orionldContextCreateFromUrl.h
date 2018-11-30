@@ -38,6 +38,12 @@ extern "C"
 //
 // orionldContextCreateFromUrl -
 //
-extern OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url, OrionldContextType contextType, char** detailsPP);
+extern OrionldContext* orionldContextCreateFromUrl
+(
+  ConnectionInfo*     ciP,
+  const char*         url,
+  OrionldContextType  contextType,
+  char**              detailsPP
+);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCREATEFROMURL_H_

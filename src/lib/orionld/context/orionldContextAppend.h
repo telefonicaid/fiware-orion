@@ -39,6 +39,12 @@ extern "C"
 //
 // orionldContextAppend -
 //
-extern OrionldContext* orionldContextAppend(const char* url, KjNode* tree, OrionldContextType contextType, char** detailsPP);
+extern OrionldContext* orionldContextAppend
+(
+  const char*         url,
+  KjNode*             tree,
+  OrionldContextType  contextType,
+  char**              detailsPP
+);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTAPPEND_H_

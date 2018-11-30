@@ -35,7 +35,7 @@
 // linkCheck -
 //
 // Example link:
-//   <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+//   <https://fiware.github.io/X/Y/Z.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 //
 bool linkCheck(char* link, char** uriP, char** detailsP)
 {

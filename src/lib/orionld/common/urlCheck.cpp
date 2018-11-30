@@ -69,7 +69,7 @@ bool urlCheck(char* url, char** detailsPP)
     return false;
   }
 
-  
+
   //
   // 3. Getting the IP address
   //
@@ -77,7 +77,7 @@ bool urlCheck(char* url, char** detailsPP)
   int  ipSize = sizeof(ip);
 
   int toIx = 0;
-  while((*urlP != 0) && (*urlP != '/'))
+  while ((*urlP != 0) && (*urlP != '/'))
   {
     if (toIx < ipSize - 1)
       ip[toIx] = *urlP;
@@ -139,7 +139,6 @@ bool urlCheck(char* url, char** detailsPP)
         return false;
       }
     }
-    
   }
 
   //

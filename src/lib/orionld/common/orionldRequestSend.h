@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMOM_ORIONLDREQUESTSEND_H_
-#define SRC_LIB_ORIONLD_COMOM_ORIONLDREQUESTSEND_H_
+#ifndef SRC_LIB_ORIONLD_COMMON_ORIONLDREQUESTSEND_H_
+#define SRC_LIB_ORIONLD_COMMON_ORIONLDREQUESTSEND_H_
 
 /*
 *
@@ -35,4 +35,4 @@
 //
 extern bool orionldRequestSend(OrionldResponseBuffer* rBufP, const char* url, int tmoInMilliSeconds, char** detailsPP, bool* tryAgainP);
 
-#endif  // SRC_LIB_ORIONLD_COMOM_ORIONLDREQUESTSEND_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDREQUESTSEND_H_

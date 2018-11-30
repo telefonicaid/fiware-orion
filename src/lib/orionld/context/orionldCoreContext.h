@@ -36,9 +36,10 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// ORIONLD_CORE_CONTEXT_URL - 
+// ORIONLD_CORE_CONTEXT_URL -
 //
-#define ORIONLD_CORE_CONTEXT_URL (char*) "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json"
+#define ORIONLD_CORE_CONTEXT_URL (char*) \
+  "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json"
 
 
 
@@ -46,7 +47,8 @@ extern "C"
 //
 // ORIONLD_DEFAULT_URL_CONTEXT_URL -
 //
-#define ORIONLD_DEFAULT_URL_CONTEXT_URL (char*) "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContextVocab.jsonld"
+#define ORIONLD_DEFAULT_URL_CONTEXT_URL (char*) \
+  "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContextVocab.jsonld"
 
 
 
@@ -54,7 +56,8 @@ extern "C"
 //
 // ORIONLD_DEFAULT_CONTEXT_URL -
 //
-#define ORIONLD_DEFAULT_CONTEXT_URL (char*) "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
+#define ORIONLD_DEFAULT_CONTEXT_URL (char*) \
+  "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
 
 
 

@@ -60,122 +60,122 @@ OrionldContext orionldDefaultContext;
 //
 // orionldCoreContextString - to avoid download during functest
 //
-const char* orionldCoreContextString = "{  \
+const char* orionldCoreContextString = " {  \
   \"@context\": {  \
-   \"id\": \"@id\",  \
-   \"type\": \"@type\",  \
-   \"value\": \"http://uri.etsi.org/ngsi-ld/hasValue\",  \
-   \"object\": {  \
-    \"@id\": \"http://uri.etsi.org/ngsi-ld/hasObject\",  \
-    \"@type\":\"@id\"  \
-   },  \
-   \"Property\": \"http://uri.etsi.org/ngsi-ld/Property\",  \
-   \"Relationship\": \"http://uri.etsi.org/ngsi-ld/Relationship\",  \
-   \"DateTime\": \"http://uri.etsi.org/ngsi-ld/DateTime\",  \
-   \"Date\": \"http://uri.etsi.org/ngsi-ld/Date\",  \
-   \"Time\": \"http://uri.etsi.org/ngsi-ld/Time\",  \
-   \"createdAt\": {  \
-    \"@id\": \"http://uri.etsi.org/ngsi-ld/createdAt\",  \
-    \"@type\": \"DateTime\"  \
-   },  \
-   \"modifiedAt\": {  \
-    \"@id\": \"http://uri.etsi.org/ngsi-ld/modifiedAt\",  \
-    \"@type\": \"DateTime\"  \
-   },  \
-   \"observedAt\": {  \
-    \"@id\": \"http://uri.etsi.org/ngsi-ld/observedAt\",  \
-    \"@type\": \"DateTime\"  \
-   },  \
-   \"datasetId\": {  \
-       \"@id\": \"http://uri.etsi.org/ngsi-ld/datasetId\",  \
-    \"@type\": \"@id\"  \
-   },  \
-   \"instanceId\": {  \
-       \"@id\": \"http://uri.etsi.org/ngsi-ld/instanceId\",  \
-    \"@type\": \"@id\"  \
-   },  \
-   \"unitCode\": \"http://uri.etsi.org/ngsi-ld/unitCode\",  \
-   \"location\": \"http://uri.etsi.org/ngsi-ld/location\",  \
-   \"observationSpace\": \"http://uri.etsi.org/ngsi-ld/observationSpace\",  \
-   \"operationSpace\": \"http://uri.etsi.org/ngsi-ld/operationSpace\",  \
-   \"GeoProperty\": \"http://uri.etsi.org/ngsi-ld/GeoProperty\",  \
-   \"TemporalProperty\": \"http://uri.etsi.org/ngsi-ld/TemporalProperty\",  \
-   \"ContextSourceRegistration\": \"http://uri.etsi.org/ngsi-ld/ContextSourceRegistration\",  \
-   \"Subscription\": \"http://uri.etsi.org/ngsi-ld/Subscription\",   \
-   \"Notification\": \"http://uri.etsi.org/ngsi-ld/Notification\",  \
-   \"ContextSourceNotification\": \"http://uri.etsi.org/ngsi-ld/ContextSourceNotification\",  \
-   \"title\": \"http://uri.etsi.org/ngsi-ld/title\",  \
-   \"detail\": \"http://uri.etsi.org/ngsi-ld/detail\",  \
-   \"idPattern\": \"http://uri.etsi.org/ngsi-ld/idPattern\",  \
-   \"name\": \"http://uri.etsi.org/ngsi-ld/name\",  \
-   \"description\": \"http://uri.etsi.org/ngsi-ld/description\",  \
-   \"information\": \"http://uri.etsi.org/ngsi-ld/information\",  \
-   \"timestamp\": \"http://uri.etsi.org/ngsi-ld/timestamp\",  \
-   \"expires\": {  \
-    \"@id\": \"http://uri.etsi.org/ngsi-ld/expires\",  \
-    \"@type\": \"DateTime\"  \
-   },  \
-   \"endpoint\": \"http://uri.etsi.org/ngsi-ld/endpoint\",  \
-   \"entities\": \"http://uri.etsi.org/ngsi-ld/entities\",  \
-   \"properties\": {  \
-    \"@id\": \"http://uri.etsi.org/ngsi-ld/properties\",  \
-    \"@type\": \"@id\"  \
-   },  \
-   \"relationships\": {  \
-    \"@id\": \"http://uri.etsi.org/ngsi-ld/relationships\",  \
-    \"@type\": \"@id\"  \
-   },  \
-   \"start\": {  \
-    \"@id\": \"http://uri.etsi.org/ngsi-ld/start\",  \
-    \"@type\": \"DateTime\"  \
-   },  \
-   \"end\": {  \
-    \"@id\": \"http://uri.etsi.org/ngsi-ld/end\",  \
-    \"@type\": \"DateTime\"  \
-   },  \
-   \"watchedAttributes\":{  \
-    \"@id\": \"http://uri.etsi.org/ngsi-ld/watchedAttributes\",  \
-    \"@type\": \"@id\"  \
-   },  \
-   \"timeInterval\": \"http://uri.etsi.org/ngsi-ld/timeInterval\",  \
-   \"q\": \"http://uri.etsi.org/ngsi-ld/q\",  \
-   \"geoQ\": \"http://uri.etsi.org/ngsi-ld/geoQ\",  \
-   \"notification\": \"http://uri.etsi.org/ngsi-ld/notification\",  \
-   \"status\": \"http://uri.etsi.org/ngsi-ld/status\",  \
-   \"throttling\": \"http://uri.etsi.org/ngsi-ld/throttling\",  \
-   \"geometry\": \"http://uri.etsi.org/ngsi-ld/geometry\",  \
-   \"coordinates\": \"http://uri.etsi.org/ngsi-ld/coordinates\",  \
-   \"georel\": \"http://uri.etsi.org/ngsi-ld/georel\",  \
-   \"attributes\": {  \
-    \"@id\": \"http://uri.etsi.org/ngsi-ld/attributes\",  \
-    \"@type\": \"@id\"  \
-   },  \
-   \"format\": \"http://uri.etsi.org/ngsi-ld/format\",  \
-   \"timesSent\": \"http://uri.etsi.org/ngsi-ld/timesSent\",  \
-   \"lastNotification\":{  \
-    \"@id\": \"http://uri.etsi.org/ngsi-ld/lastNotification\",  \
-    \"@type\": \"DateTime\"  \
-   },  \
-   \"lastFailure\":{  \
-    \"@id\": \"http://uri.etsi.org/ngsi-ld/lastFailure \",  \
-    \"@type\": \"DateTime\"  \
-   },  \
-   \"lastSuccess\":{  \
-    \"@id\": \"http://uri.etsi.org/ngsi-ld/lastSuccess\",  \
-    \"@type\": \"DateTime\"  \
-   },  \
-   \"uri\": \"http://uri.etsi.org/ngsi-ld/uri\",  \
-   \"accept\": \"http://uri.etsi.org/ngsi-ld/accept\",  \
-   \"subscriptionId\": {  \
-    \"@id\": \"http://uri.etsi.org/ngsi-ld/subscriptionId\",  \
-    \"@type\": \"@id\"  \
-   },  \
-   \"notifiedAt\":{  \
-    \"@id\": \"http://uri.etsi.org/ngsi-ld/notifiedAt\",  \
-    \"@type\": \"DateTime\"  \
-   },  \
-   \"data\": \"http://uri.etsi.org/ngsi-ld/data\",  \
-   \"triggerReason\": \"http://uri.etsi.org/ngsi-ld/triggerReason\"  \
+  \"id\": \"@id\",  \
+  \"type\": \"@type\",  \
+  \"value\": \"http://uri.etsi.org/ngsi-ld/hasValue\",  \
+  \"object\": {  \
+  \"@id\": \"http://uri.etsi.org/ngsi-ld/hasObject\",  \
+  \"@type\":\"@id\"  \
+  },  \
+  \"Property\": \"http://uri.etsi.org/ngsi-ld/Property\",  \
+  \"Relationship\": \"http://uri.etsi.org/ngsi-ld/Relationship\",  \
+  \"DateTime\": \"http://uri.etsi.org/ngsi-ld/DateTime\",  \
+  \"Date\": \"http://uri.etsi.org/ngsi-ld/Date\",  \
+  \"Time\": \"http://uri.etsi.org/ngsi-ld/Time\",  \
+  \"createdAt\": {  \
+  \"@id\": \"http://uri.etsi.org/ngsi-ld/createdAt\",  \
+  \"@type\": \"DateTime\"  \
+  },  \
+  \"modifiedAt\": {  \
+  \"@id\": \"http://uri.etsi.org/ngsi-ld/modifiedAt\",  \
+  \"@type\": \"DateTime\"  \
+  },  \
+  \"observedAt\": {  \
+  \"@id\": \"http://uri.etsi.org/ngsi-ld/observedAt\",  \
+  \"@type\": \"DateTime\"  \
+  },  \
+  \"datasetId\": {  \
+  \"@id\": \"http://uri.etsi.org/ngsi-ld/datasetId\",  \
+  \"@type\": \"@id\"  \
+  },  \
+  \"instanceId\": {  \
+  \"@id\": \"http://uri.etsi.org/ngsi-ld/instanceId\",  \
+  \"@type\": \"@id\"  \
+  },  \
+  \"unitCode\": \"http://uri.etsi.org/ngsi-ld/unitCode\",  \
+  \"location\": \"http://uri.etsi.org/ngsi-ld/location\",  \
+  \"observationSpace\": \"http://uri.etsi.org/ngsi-ld/observationSpace\",  \
+  \"operationSpace\": \"http://uri.etsi.org/ngsi-ld/operationSpace\",  \
+  \"GeoProperty\": \"http://uri.etsi.org/ngsi-ld/GeoProperty\",  \
+  \"TemporalProperty\": \"http://uri.etsi.org/ngsi-ld/TemporalProperty\",  \
+  \"ContextSourceRegistration\": \"http://uri.etsi.org/ngsi-ld/ContextSourceRegistration\",  \
+  \"Subscription\": \"http://uri.etsi.org/ngsi-ld/Subscription\",   \
+  \"Notification\": \"http://uri.etsi.org/ngsi-ld/Notification\",  \
+  \"ContextSourceNotification\": \"http://uri.etsi.org/ngsi-ld/ContextSourceNotification\",  \
+  \"title\": \"http://uri.etsi.org/ngsi-ld/title\",  \
+  \"detail\": \"http://uri.etsi.org/ngsi-ld/detail\",  \
+  \"idPattern\": \"http://uri.etsi.org/ngsi-ld/idPattern\",  \
+  \"name\": \"http://uri.etsi.org/ngsi-ld/name\",  \
+  \"description\": \"http://uri.etsi.org/ngsi-ld/description\",  \
+  \"information\": \"http://uri.etsi.org/ngsi-ld/information\",  \
+  \"timestamp\": \"http://uri.etsi.org/ngsi-ld/timestamp\",  \
+  \"expires\": {  \
+  \"@id\": \"http://uri.etsi.org/ngsi-ld/expires\",  \
+  \"@type\": \"DateTime\"  \
+  },  \
+  \"endpoint\": \"http://uri.etsi.org/ngsi-ld/endpoint\",  \
+  \"entities\": \"http://uri.etsi.org/ngsi-ld/entities\",  \
+  \"properties\": {  \
+  \"@id\": \"http://uri.etsi.org/ngsi-ld/properties\",  \
+  \"@type\": \"@id\"  \
+  },  \
+  \"relationships\": {  \
+  \"@id\": \"http://uri.etsi.org/ngsi-ld/relationships\",  \
+  \"@type\": \"@id\"  \
+  },  \
+  \"start\": {  \
+  \"@id\": \"http://uri.etsi.org/ngsi-ld/start\",  \
+  \"@type\": \"DateTime\"  \
+  },  \
+  \"end\": {  \
+  \"@id\": \"http://uri.etsi.org/ngsi-ld/end\",  \
+  \"@type\": \"DateTime\"  \
+  },  \
+  \"watchedAttributes\":{  \
+  \"@id\": \"http://uri.etsi.org/ngsi-ld/watchedAttributes\",  \
+  \"@type\": \"@id\"  \
+  },  \
+  \"timeInterval\": \"http://uri.etsi.org/ngsi-ld/timeInterval\",  \
+  \"q\": \"http://uri.etsi.org/ngsi-ld/q\",  \
+  \"geoQ\": \"http://uri.etsi.org/ngsi-ld/geoQ\",  \
+  \"notification\": \"http://uri.etsi.org/ngsi-ld/notification\",  \
+  \"status\": \"http://uri.etsi.org/ngsi-ld/status\",  \
+  \"throttling\": \"http://uri.etsi.org/ngsi-ld/throttling\",  \
+  \"geometry\": \"http://uri.etsi.org/ngsi-ld/geometry\",  \
+  \"coordinates\": \"http://uri.etsi.org/ngsi-ld/coordinates\",  \
+  \"georel\": \"http://uri.etsi.org/ngsi-ld/georel\",  \
+  \"attributes\": {  \
+  \"@id\": \"http://uri.etsi.org/ngsi-ld/attributes\",  \
+  \"@type\": \"@id\"  \
+  },  \
+  \"format\": \"http://uri.etsi.org/ngsi-ld/format\",  \
+  \"timesSent\": \"http://uri.etsi.org/ngsi-ld/timesSent\",  \
+  \"lastNotification\":{  \
+  \"@id\": \"http://uri.etsi.org/ngsi-ld/lastNotification\",  \
+  \"@type\": \"DateTime\"  \
+  },  \
+  \"lastFailure\":{  \
+  \"@id\": \"http://uri.etsi.org/ngsi-ld/lastFailure \",  \
+  \"@type\": \"DateTime\"  \
+  },  \
+  \"lastSuccess\":{  \
+  \"@id\": \"http://uri.etsi.org/ngsi-ld/lastSuccess\",  \
+  \"@type\": \"DateTime\"  \
+  },  \
+  \"uri\": \"http://uri.etsi.org/ngsi-ld/uri\",  \
+  \"accept\": \"http://uri.etsi.org/ngsi-ld/accept\",  \
+  \"subscriptionId\": {  \
+  \"@id\": \"http://uri.etsi.org/ngsi-ld/subscriptionId\",  \
+  \"@type\": \"@id\"  \
+  },  \
+  \"notifiedAt\":{  \
+  \"@id\": \"http://uri.etsi.org/ngsi-ld/notifiedAt\",  \
+  \"@type\": \"DateTime\"  \
+  },  \
+  \"data\": \"http://uri.etsi.org/ngsi-ld/data\",  \
+  \"triggerReason\": \"http://uri.etsi.org/ngsi-ld/triggerReason\"  \
   }  \
 }";
 
@@ -198,7 +198,7 @@ const char* orionldDefaultUrlContextString = "{  \
 //
 // orionldDefaultContextString - to avoid download during functest
 //
-const char* orionldDefaultContextString = "{  \
+const char* orionldDefaultContextString = " {  \
   \"@context\": [  \
     \"https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContextVocab.jsonld\",  \
     \"https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json\"  \
