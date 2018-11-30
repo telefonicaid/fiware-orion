@@ -33,7 +33,7 @@ accumulatorStart --pretty-print
 #
 # 01. POST /v2/entities, to create Room1 with temperature and pressure.
 # 02. POST /v2/subscriptions, to create subscription with status oneshot.
-# 03. Restart broker and wait a second
+# 03. Restart broker and wait a second.
 # 04. GET /v2/subscriptions/subscription_id, to check the status oneshot.
 # 05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 # 06. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
@@ -98,8 +98,8 @@ echo
 echo
 
 
-echo "03. Restart broker and wait a second"
-echo "===================================="
+echo '03. Restart broker and wait a second.'
+echo '====================================='
 brokerStop -v CB
 echo "Broker Stopped"
 sleep 1
@@ -246,8 +246,8 @@ Date: REGEX(.*)
 
 
 
-03. Restart broker and wait a second
-====================================
+03. Restart broker and wait a second.
+=====================================
 Broker Stopped
 Broker Restarted
 
