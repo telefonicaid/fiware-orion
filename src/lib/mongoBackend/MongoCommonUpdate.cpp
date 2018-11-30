@@ -1909,14 +1909,16 @@ static bool processSubscriptions
         // Update the value of status (in case of oneshot) in DB when broker is running without subscription cache
         if (status == STATUS_ONESHOT)
         {	
-          update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << rightNow) <<
-                                "$inc" << BSON(CSUB_COUNT << (long long) 1) <<
-                                "$set" << BSON(CSUB_STATUS << STATUS_INACTIVE));
+          update = BSON("$set" << 
+	  		BSON(CSUB_LASTNOTIFICATION << rightNow) <<
+                        "$inc" << BSON(CSUB_COUNT << (long long) 1) <<
+                        "$set" << BSON(CSUB_STATUS << STATUS_INACTIVE));
         }
         else 
         {
-	  update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << rightNow) <<
-                                "$inc" << BSON(CSUB_COUNT << (long long) 1));
+	  update = BSON("$set" << 
+	  		BSON(CSUB_LASTNOTIFICATION << rightNow) <<
+                        "$inc" << BSON(CSUB_COUNT << (long long) 1));
         }
         ret = collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, &err);
       }
