@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Oneshot subscription with POST /v2/entities, POST /v2/subscriptions, PATCH /v2/entities/id/attrs, GET /v2/subscriptions/subscription_id, PATCH /v2/subscriptions/subscription_id and PATCH /v2/entities/id/attrs
+Oneshot subscription with POST /v2/entities, POST /v2/subscriptions, GET /v2/subscriptions/subscription_id, PATCH /v2/entities/id/attrs, PATCH /v2/entities/id/attrs, Dump and reset accumulator, GET /v2/subscriptions/subscription_id, PATCH /v2/subscriptions/subscription_id, GET /v2/subscriptions/subscription_id, PATCH /v2/entities/Room1/attrs, PATCH /v2/entities/Room1/attrs, Dump and reset accumulator
 
 --SHELL-INIT--
 dbInit CB
@@ -33,12 +33,16 @@ accumulatorStart --pretty-print
 #
 # 01. POST /v2/entities, to create Room1 with temperature and pressure.
 # 02. POST /v2/subscriptions, to create subscription with status oneshot.
-# 03. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 04. Dump and reset accumulator, see one notification.
-# 05. GET /v2/subscriptions/subscription_id, to check the status.
-# 06. PATCH /v2/subscriptions/subscription_id, to update status with oneshot.
-# 07. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 08. Dump and reset accumulator, see one notification.
+# 03. GET /v2/subscriptions/subscription_id, to check the status oneshot.
+# 04. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 06. Dump and reset accumulator, see one notification.
+# 07. GET /v2/subscriptions/subscription_id, to check the status inactive.
+# 08. PATCH /v2/subscriptions/subscription_id, to update status with oneshot.
+# 09. GET /v2/subscriptions/subscription_id, to check the update status.
+# 10. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 11. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 12. Dump and reset accumulator, see one notification.
 #
 
 echo '01. POST /v2/entities, to create Room1 with temperature and pressure.'
@@ -87,14 +91,20 @@ payload='{
   },
   "status" : "oneshot"
 }'
-
 orionCurl --url /v2/subscriptions --payload "$payload"
 subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 echo
 echo
 
 
-echo '03. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '03. GET /v2/subscriptions/subscription_id, to check the status oneshot.'
+echo '======================================================================='
+orionCurl --url /v2/subscriptions/${subId}
+echo
+echo
+
+
+echo '04. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
 echo '=============================================================================='
 payload='{
   "temperature": {
@@ -111,32 +121,7 @@ echo
 echo
 
 
-echo '04. Dump and reset accumulator, see one notification.'
-echo '====================================================='
-accumulatorDump
-accumulatorReset
-echo
-echo
-
-
-echo '05. GET /v2/subscriptions/subscription_id, to check the status.'
-echo '==============================================================='
-orionCurl --url /v2/subscriptions/${subId}
-echo
-echo
-
-
-echo '06. PATCH /v2/subscriptions/subscription_id, to update status with oneshot.'
-echo '==========================================================================='
-payload='{
-	"status" : "oneshot"
-}'
-orionCurl --url /v2/subscriptions/${subId} --payload "$payload" -X PATCH
-echo
-echo
-
-
-echo '07. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
 echo '=============================================================================='
 payload='{
   "temperature": {
@@ -153,7 +138,73 @@ echo
 echo
 
 
-echo '08. Dump and reset accumulator, see one notification.'
+echo '06. Dump and reset accumulator, see one notification.'
+echo '====================================================='
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '07. GET /v2/subscriptions/subscription_id, to check the status inactive.'
+echo '========================================================================'
+orionCurl --url /v2/subscriptions/${subId}
+echo
+echo
+
+
+echo '08. PATCH /v2/subscriptions/subscription_id, to update status with oneshot.'
+echo '==========================================================================='
+payload='{
+	"status" : "oneshot"
+}'
+orionCurl --url /v2/subscriptions/${subId} --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '09. GET /v2/subscriptions/subscription_id, to check the update status.'
+echo '======================================================================'
+orionCurl --url /v2/subscriptions/${subId}
+echo
+echo
+
+
+echo '10. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '=============================================================================='
+payload='{
+  "temperature": {
+    "value": 26,
+    "type": "Float"
+  },
+  "pressure": {
+    "value": 750,
+    "type": "Float"
+  }
+}'
+orionCurl --url /v2/entities/Room1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '11. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '=============================================================================='
+payload='{
+  "temperature": {
+    "value": 24,
+    "type": "Float"
+  },
+  "pressure": {
+    "value": 720,
+    "type": "Float"
+  }
+}'
+orionCurl --url /v2/entities/Room1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '12. Dump and reset accumulator, see one notification.'
 echo '====================================================='
 accumulatorDump
 accumulatorReset
@@ -182,7 +233,44 @@ Date: REGEX(.*)
 
 
 
-03. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+03. GET /v2/subscriptions/subscription_id, to check the status oneshot.
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 310
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "A subscription to get info about Room1", 
+    "id": "REGEX([0-9a-f]{24})", 
+    "notification": {
+        "attrs": [
+            "temperature"
+        ], 
+        "attrsFormat": "normalized", 
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/notify"
+        }
+    }, 
+    "status": "oneshot", 
+    "subject": {
+        "condition": {
+            "attrs": [
+                "pressure"
+            ]
+        }, 
+        "entities": [
+            {
+                "id": "Room1", 
+                "type": "Room"
+            }
+        ]
+    }
+}
+
+
+04. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -191,7 +279,16 @@ Date: REGEX(.*)
 
 
 
-04. Dump and reset accumulator, see one notification.
+05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+==============================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Dump and reset accumulator, see one notification.
 =====================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
@@ -220,8 +317,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-05. GET /v2/subscriptions/subscription_id, to check the status.
-===============================================================
+07. GET /v2/subscriptions/subscription_id, to check the status inactive.
+========================================================================
 HTTP/1.1 200 OK
 Content-Length: 410
 Content-Type: application/json
@@ -260,7 +357,7 @@ Date: REGEX(.*)
 }
 
 
-06. PATCH /v2/subscriptions/subscription_id, to update status with oneshot.
+08. PATCH /v2/subscriptions/subscription_id, to update status with oneshot.
 ===========================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -269,7 +366,45 @@ Date: REGEX(.*)
 
 
 
-07. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+09. GET /v2/subscriptions/subscription_id, to check the update status.
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 350
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "A subscription to get info about Room1", 
+    "id": "REGEX([0-9a-f]{24})", 
+    "notification": {
+        "attrs": [
+            "temperature"
+        ], 
+        "attrsFormat": "normalized", 
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/notify"
+        }, 
+        "lastSuccess": "REGEX(.*)"
+    }, 
+    "status": "oneshot", 
+    "subject": {
+        "condition": {
+            "attrs": [
+                "pressure"
+            ]
+        }, 
+        "entities": [
+            {
+                "id": "Room1", 
+                "type": "Room"
+            }
+        ]
+    }
+}
+
+
+10. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -278,7 +413,16 @@ Date: REGEX(.*)
 
 
 
-08. Dump and reset accumulator, see one notification.
+11. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+==============================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+12. Dump and reset accumulator, see one notification.
 =====================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
@@ -297,7 +441,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "temperature": {
                 "metadata": {}, 
                 "type": "Float", 
-                "value": 25
+                "value": 26
             }, 
             "type": "Room"
         }
