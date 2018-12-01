@@ -1892,14 +1892,14 @@ static bool processSubscriptions
       //
       if (subCacheActive == false)
       {
-	BSONObj subOrig;
+        BSONObj subOrig;
         std::string err;
         collectionFindOne(getSubscribeContextCollectionName(tenant), BSON("_id" << OID(mapSubId)), &subOrig, &err);
         std::string status;
         if (!subOrig.isEmpty())
         {
-	  if (subOrig.hasField(CSUB_STATUS))
-	  {
+          if (subOrig.hasField(CSUB_STATUS))
+          {
             status = getStringFieldF(subOrig, CSUB_STATUS);
           }
         }
@@ -1908,16 +1908,14 @@ static bool processSubscriptions
         BSONObj update;
         // Update the value of status (in case of oneshot) in DB when broker is running without subscription cache
         if (status == STATUS_ONESHOT)
-        {	
-          update = BSON("$set" << 
-	  		BSON(CSUB_LASTNOTIFICATION << rightNow) <<
+        {
+          update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << rightNow) <<
                         "$inc" << BSON(CSUB_COUNT << (long long) 1) <<
                         "$set" << BSON(CSUB_STATUS << STATUS_INACTIVE));
         }
-        else 
+        else
         {
-	  update = BSON("$set" << 
-	  		BSON(CSUB_LASTNOTIFICATION << rightNow) <<
+          update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << rightNow) <<
                         "$inc" << BSON(CSUB_COUNT << (long long) 1));
         }
         ret = collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, &err);
