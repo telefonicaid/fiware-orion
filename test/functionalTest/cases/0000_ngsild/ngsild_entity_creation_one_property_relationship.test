@@ -126,7 +126,7 @@ bye
 03. GET entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 241
+Content-Length: 245
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -141,7 +141,7 @@ Date: REGEX(.*)
       "type": "Relationship",
       "object": "urn:ngsi-ld:T2:6789"
     },
-    "observedAt": 1543924800.000000
+    "observedAt": "2018-12-04T12:00:00"
   }
 }
 
