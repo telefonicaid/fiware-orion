@@ -162,7 +162,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     parseData.qcr.res.entityIdVector.push_back(entityIdP);
   }
 
-
   if (attrs != NULL)
   {
     char  longName[256];
@@ -190,7 +189,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   if (q != NULL)
   {
     //
-    // ngsi-ld doesn't aupport metadata which orion APIv1 and v2 does.
+    // ngsi-ld doesn't support metadata which orion APIv1 and v2 does.
     // However, for simplicity, the metadata vector is used for properties of an attribute.
     // As metadata "isn't supported", the mq filter isn't supported, but as attribute properties are stored as metadata,
     // we need to use the mq mechanism internally, if a property of a property is in the left hand side of a q filter item.
