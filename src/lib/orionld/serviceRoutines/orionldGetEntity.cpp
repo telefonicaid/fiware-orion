@@ -50,10 +50,12 @@ extern "C"
 //
 // URI params:
 // - attrs
+// - options=keyValues
 //
 bool orionldGetEntity(ConnectionInfo* ciP)
 {
-  char*                 attrs = (ciP->uriParam["attrs"].empty())? NULL : (char*) ciP->uriParam["attrs"].c_str();
+  char*                 attrs     = (ciP->uriParam["attrs"].empty())? NULL : (char*) ciP->uriParam["attrs"].c_str();
+  bool                  keyValues = ciP->uriParamOptions[OPT_KEY_VALUES];
   QueryContextRequest   request;
   QueryContextResponse  response;
   EntityId              entityId(ciP->wildcard[0], "", "false", false);
@@ -140,11 +142,11 @@ bool orionldGetEntity(ConnectionInfo* ciP)
         return false;
       }
     }
-    ciP->responseTree = kjTreeFromQueryContextResponseWithAttrList(ciP, true, attrList, &response);
+    ciP->responseTree = kjTreeFromQueryContextResponseWithAttrList(ciP, true, attrList, keyValues, &response);
     free(attrList);
   }
   else
-    ciP->responseTree = kjTreeFromQueryContextResponse(ciP, true, &response);
+    ciP->responseTree = kjTreeFromQueryContextResponse(ciP, true, keyValues, &response);
 
 
   if (ciP->responseTree == NULL)

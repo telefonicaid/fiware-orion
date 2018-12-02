@@ -63,6 +63,7 @@ extern int uriExpansion(OrionldContext* contextP, const char* name, char** expan
 // - geometry    - Not interesting for ngsi-ld
 // - coords      - Not interesting for ngsi-ld
 // - georel      - Not interesting for ngsi-ld
+// - options=keyValues
 //
 bool orionldGetEntities(ConnectionInfo* ciP)
 {
@@ -83,7 +84,8 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   char*        typeVector[32];
   int          idVecItems   = (int) sizeof(idVector) / sizeof(idVector[0]);
   int          typeVecItems = (int) sizeof(typeVector) / sizeof(typeVector[0]);
-
+  bool         keyValues    = ciP->uriParamOptions[OPT_KEY_VALUES];
+    
   LM_T(LmtServiceRoutine, ("In orionldGetEntities"));
 
   if ((idPattern != NULL) && (id != NULL))
@@ -412,7 +414,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   //
   ciP->httpStatusCode = SccOk;
   LM_TMP(("Transform QueryContextResponse to KJ-Tree"));
-  ciP->responseTree   = kjTreeFromQueryContextResponse(ciP, false, &parseData.qcrs.res);
+  ciP->responseTree   = kjTreeFromQueryContextResponse(ciP, false, keyValues, &parseData.qcrs.res);
 
   return true;
 }

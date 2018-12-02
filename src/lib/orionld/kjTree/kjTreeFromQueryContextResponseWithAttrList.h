@@ -33,6 +33,13 @@
 //
 // kjTreeFromQueryContextResponseWithAttrList -
 //
-extern KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool oneHit, const char* attrList, QueryContextResponse* responseP);
+extern KjNode* kjTreeFromQueryContextResponseWithAttrList
+(
+  ConnectionInfo*        ciP,
+  bool                   oneHit,
+  const char*            attrList,
+  bool                   keyValues,
+  QueryContextResponse*  responseP
+);
 
 #endif  // SRC_LIB_ORIONLD_COMOM_KJTREEFROMQUERYCONTEXTRESPONSEWITHATTRLIST_H_
