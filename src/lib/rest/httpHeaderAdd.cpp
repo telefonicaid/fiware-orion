@@ -38,3 +38,64 @@ void httpHeaderAdd(ConnectionInfo* ciP, const char* key, const char* value)
   ciP->httpHeader.push_back(key);
   ciP->httpHeaderValue.push_back(value);
 }
+
+
+
+#ifdef ORIONLD
+#include "orionld/context/orionldCoreContext.h" // orionldDefaultContext
+
+// -----------------------------------------------------------------------------
+//
+// httpHeaderLocationAdd -
+//
+void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, const char* entityId)
+{
+  char location[512];
+
+  snprintf(location, sizeof(location), "%s%s", uriPathWithSlash, entityId);
+
+  ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
+  ciP->httpHeaderValue.push_back(location);
+}
+
+
+
+#define LINK_REL_AND_TYPE        "rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\""
+#define LINK_REL_AND_TYPE_SIZE   70
+// ----------------------------------------------------------------------------
+//
+// httpHeaderLinkAdd -
+//
+void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP)
+{
+  char             link[256];
+  char*            linkP     = link;
+  OrionldContext*  contextP  = (_contextP != NULL)? _contextP : &orionldDefaultContext;
+  char*            url;
+  unsigned int     urlLen;
+
+  if (_contextP == &orionldCoreContext)
+    _contextP = &orionldDefaultContext;
+
+  url    = contextP->url;
+  urlLen = strlen(url);
+
+  if (urlLen > sizeof(link) + LINK_REL_AND_TYPE_SIZE + 3)
+  {
+    linkP = (char*) malloc(sizeof(link) + LINK_REL_AND_TYPE_SIZE + 3);
+    if (linkP == NULL)
+    {
+      LM_E(("Out-of-memory allocating roome for HTTP Link Header"));
+      return;
+    }
+  }
+
+  sprintf(linkP, "<%s>; %s", url, LINK_REL_AND_TYPE);
+
+  ciP->httpHeader.push_back("Link");
+  ciP->httpHeaderValue.push_back(linkP);
+
+  if (linkP != link)
+    free(linkP);
+}
+#endif

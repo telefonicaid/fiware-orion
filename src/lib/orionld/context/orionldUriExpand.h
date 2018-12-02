@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_REST_HTTPHEADERADD_H_
-#define SRC_LIB_REST_HTTPHEADERADD_H_
+#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDURIEXPAND_H_
+#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDURIEXPAND_H_
 
 /*
 *
@@ -25,39 +25,14 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/context/OrionldContext.h"                  // OrionldContext
 
 
 
 // -----------------------------------------------------------------------------
 //
-// ConnectionInfo - to avoid to include "ConnectionInfo.h"
+// orionldUriExpand -
 //
-class ConnectionInfo;
+extern bool orionldUriExpand(OrionldContext* contextP, char* shortName, char* longName, int longNameLen, char** detailsP);
 
-
-
-// -----------------------------------------------------------------------------
-//
-// httpHeaderAdd -
-//
-extern void httpHeaderAdd(ConnectionInfo* ciP, const char* key, const char* value);
-
-
-
-#ifdef ORIONLD
-// -----------------------------------------------------------------------------
-//
-// httpHeaderLocationAdd -
-//
-extern void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, const char* entityId);
-
-
-struct OrionldContext;
-// ----------------------------------------------------------------------------
-//
-// httpHeaderLinkAdd -
-//
-extern void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP);
-
-#endif  // ORIONLD
-#endif  // SRC_LIB_REST_HTTPHEADERADD_H_
+#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDURIEXPAND_H_

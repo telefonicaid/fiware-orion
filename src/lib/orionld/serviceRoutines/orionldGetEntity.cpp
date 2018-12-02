@@ -39,15 +39,8 @@ extern "C"
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjTreeFromQueryContextResponseWithAttrList.h"     // kjTreeFromQueryContextResponseWithAttrList
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
 #include "orionld/serviceRoutines/orionldGetEntity.h"          // Own Interface
-
-
-
-//
-// FIXME: URI Expansion from 'orionldPostEntities.cpp' to its own module!
-//
-extern int uriExpansion(OrionldContext* contextP, const char* name, char** expandedNameP, char** expandedTypeP, char** detailsPP);
-extern bool uriExpand(OrionldContext* contextP, char* shortName, char* longName, int longNameLen, char** detailsP);
 
 
 
@@ -117,7 +110,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
     {
       shortName = shortNameVector[ix];
 
-      if (uriExpand(ciP->contextP, shortName, longName, sizeof(longName), &details) == true)
+      if (orionldUriExpand(ciP->contextP, shortName, longName, sizeof(longName), &details) == true)
       {
         int       len  = strlen(longName);
         long long used = (long long) attrListEnd - (long long) attrList;

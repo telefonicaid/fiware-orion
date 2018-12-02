@@ -33,6 +33,7 @@ extern "C"
 #include "common/globals.h"                                    // parse8601Time
 #include "rest/OrionError.h"                                   // OrionError
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "rest/httpHeaderAdd.h"                                // httpHeaderAdd, httpHeaderLinkAdd, httpHeaderLocationAdd
 #include "apiTypesV2/HttpInfo.h"                               // HttpInfo
 #include "apiTypesV2/Subscription.h"                           // Subscription
 #include "apiTypesV2/EntID.h"                                  // EntID
@@ -40,171 +41,12 @@ extern "C"
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/common/CHECK.h"                              // CHECKx(U)
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
+#include "orionld/context/orionldContextTreat.h"               // orionldContextTreat
+#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // Own Interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// FIXME: move uriExpand() from orionldGetEntities.cpp to src/lib/orionld/uriExpand/uriExpand.*
-//
-extern bool uriExpand(OrionldContext* contextP, char* shortName, char* longName, int longNameLen, char** detailsP);
-
-
-
-// -----------------------------------------------------------------------------
-//
-// FIXME: move contextTreat() from orionldPostEntities.cpp to src/lib/orionld/contexts/contextTreat.*
-//
-extern ContextAttribute* contextTreat
-(
-  ConnectionInfo*  ciP,
-  KjNode*          contextNodeP,
-  char*            entityId
-);
-
-
-
-// -----------------------------------------------------------------------------
-//
-// httpHeaderLocationAdd -
-// httpHeaderLinkAdd -
-//
-// FIXME: move to orionld/common
-//
-extern void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, const char* subscriptionId);
-extern void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP);
-
-
-
-// -----------------------------------------------------------------------------
-//
-// DUPLICATE_CHECK -
-//
-#define DUPLICATE_CHECK(pointer, fieldName, value)                                                                                    \
-do                                                                                                                                    \
-{                                                                                                                                     \
-  if (pointer != NULL)                                                                                                                \
-  {                                                                                                                                   \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field in request payload", fieldName, OrionldDetailsString);   \
-    return false;                                                                                                                     \
-  }                                                                                                                                   \
-  pointer = value;                                                                                                                    \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// INTEGER_DUPLICATE_CHECK -
-//
-#define INTEGER_DUPLICATE_CHECK(alreadyPresent, valueHolder, fieldName, value)                                                        \
-do                                                                                                                                    \
-{                                                                                                                                     \
-  if (alreadyPresent == true)                                                                                                         \
-  {                                                                                                                                   \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field in request payload", fieldName, OrionldDetailsString);   \
-    return false;                                                                                                                     \
-  }                                                                                                                                   \
-  valueHolder = value;                                                                                                                \
-} while (0)
-
-
-// -----------------------------------------------------------------------------
-//
-// STRING_CHECK -
-//
-#define STRING_CHECK(kNodeP, fieldName)                                                                                               \
-do                                                                                                                                    \
-{                                                                                                                                     \
-  if (kNodeP->type != KjString)                                                                                                       \
-  {                                                                                                                                   \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value type (not String)", fieldName, OrionldDetailsString);       \
-    return false;                                                                                                                     \
-  }                                                                                                                                   \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// ARRAY_CHECK -
-//
-#define ARRAY_CHECK(kNodeP, fieldName)                                                                                                \
-do                                                                                                                                    \
-{                                                                                                                                     \
-  if (kNodeP->type != KjArray)                                                                                                        \
-  {                                                                                                                                   \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value type (not Array)", fieldName, OrionldDetailsString);        \
-    return false;                                                                                                                     \
-  }                                                                                                                                   \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// OBJECT_CHECK -
-//
-#define OBJECT_CHECK(kNodeP, fieldName)                                                                                               \
-do                                                                                                                                    \
-{                                                                                                                                     \
-  if (kNodeP->type != KjObject)                                                                                                       \
-  {                                                                                                                                   \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value type (not Object)", fieldName, OrionldDetailsString);       \
-    return false;                                                                                                                     \
-  }                                                                                                                                   \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// INTEGER_CHECK -
-//
-#define INTEGER_CHECK(kNodeP, fieldName)                                                                                              \
-do                                                                                                                                    \
-{                                                                                                                                     \
-  if (kNodeP->type != KjInt)                                                                                                          \
-  {                                                                                                                                   \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value type (not Integer)", fieldName, OrionldDetailsString);      \
-    return false;                                                                                                                     \
-  }                                                                                                                                   \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// BOOL_CHECK -
-//
-#define BOOL_CHECK(kNodeP, fieldName)                                                                                                 \
-do                                                                                                                                    \
-{                                                                                                                                     \
-  if (kNodeP->type != KjBoolean)                                                                                                      \
-  {                                                                                                                                   \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value type (not Boolean)", fieldName, OrionldDetailsString);      \
-    return false;                                                                                                                     \
-  }                                                                                                                                   \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// DATETIME_CHECK -
-//
-#define DATETIME_CHECK(stringValue, fieldName)                                                                                        \
-do                                                                                                                                    \
-{                                                                                                                                     \
-  if (parse8601Time(stringValue) == -1)                                                                                               \
-  {                                                                                                                                   \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid DateTime value", fieldName, OrionldDetailsString);                \
-    return false;                                                                                                                     \
-  }                                                                                                                                   \
-} while (0)
 
 
 
@@ -283,7 +125,7 @@ static bool ktreeToEntities(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngs
       char  typeExpanded[256];
       char* details;
 
-      if (uriExpand(ciP->contextP, typeP, typeExpanded, sizeof(typeExpanded), &details) == false)
+      if (orionldUriExpand(ciP->contextP, typeP, typeExpanded, sizeof(typeExpanded), &details) == false)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
         delete entitiesP;
@@ -320,7 +162,7 @@ static bool ktreeToStringList(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<s
 
     STRING_CHECK(attributeP, "String-List item");
 
-    if (uriExpand(ciP->contextP, attributeP->value.s, expanded, sizeof(expanded), &details) == false)
+    if (orionldUriExpand(ciP->contextP, attributeP->value.s, expanded, sizeof(expanded), &details) == false)
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
       delete stringListP;  // ?
@@ -646,7 +488,7 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
       return false;
     }
 
-    ContextAttribute* caP = contextTreat(ciP, contextNodeP, subId);
+    ContextAttribute* caP = orionldContextTreat(ciP, contextNodeP, subId);
     if (caP == NULL)
     {
       // error

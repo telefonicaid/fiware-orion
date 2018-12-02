@@ -33,7 +33,7 @@ extern "C"
 
 #include "common/globals.h"                                    // parse8601Time
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/rest.h"                                         // restPortGet
+#include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd, httpHeaderLinkAdd
 #include "orionTypes/OrionValueType.h"                         // orion::ValueType
 #include "orionTypes/UpdateActionType.h"                       // ActionType
 #include "parse/CompoundValueNode.h"                           // CompoundValueNode
@@ -46,197 +46,20 @@ extern "C"
 #include "orionld/rest/orionldServiceInit.h"                   // orionldHostName, orionldHostNameLen
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/common/CHECK.h"                              // CHECK
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl, orionldCoreContext
 #include "orionld/context/orionldContextAdd.h"                 // Add a context to the context list
-#include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
-#include "orionld/context/orionldContextCreateFromUrl.h"       // orionldContextCreateFromUrl
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
 #include "orionld/context/orionldContextItemLookup.h"          // orionldContextItemLookup
 #include "orionld/context/orionldContextList.h"                // orionldContextHead, orionldContextTail
 #include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
 #include "orionld/context/orionldUserContextKeyValuesCheck.h"  // orionldUserContextKeyValuesCheck
+#include "orionld/context/orionldContextTreat.h"               // orionldContextTreat
+#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
 #include "orionld/serviceRoutines/orionldPostEntities.h"       // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// DUPLICATE_CHECK -
-//
-#define DUPLICATE_CHECK(nodeP, pointer, what)                                                               \
-do                                                                                                          \
-{                                                                                                           \
-  if (pointer != NULL)                                                                                      \
-  {                                                                                                         \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", what, OrionldDetailsString); \
-    return false;                                                                                           \
-  }                                                                                                         \
-                                                                                                            \
-  pointer = nodeP;                                                                                          \
-                                                                                                            \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// OBJECT_CHECK -
-//
-#define OBJECT_CHECK(nodeP, what)                                                                            \
-do                                                                                                           \
-{                                                                                                            \
-  if (nodeP->type != KjObject)                                                                               \
-  {                                                                                                          \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON object", what, OrionldDetailsString); \
-    return false;                                                                                            \
-  }                                                                                                          \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// ATTRIBUTE_IS_OBJECT_CHECK -
-//
-#define ATTRIBUTE_IS_OBJECT_CHECK(nodeP)                                                                                          \
-do                                                                                                                                \
-{                                                                                                                                 \
-  if (nodeP->type != KjObject)                                                                                                    \
-  {                                                                                                                               \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute must be a JSON object", nodeP->name, OrionldDetailsString); \
-    return false;                                                                                                                 \
-  }                                                                                                                               \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// STRING_CHECK -
-//
-#define STRING_CHECK(nodeP, what)                                                                            \
-do                                                                                                           \
-{                                                                                                            \
-  if (nodeP->type != KjString)                                                                               \
-  {                                                                                                          \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON string", what, OrionldDetailsString); \
-    return false;                                                                                            \
-  }                                                                                                          \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// ARRAY_CHECK -
-//
-#define ARRAY_CHECK(nodeP, what)                                                                            \
-do                                                                                                          \
-{                                                                                                           \
-  if (nodeP->type != KjArray)                                                                               \
-  {                                                                                                         \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON array", what, OrionldDetailsString); \
-    return false;                                                                                           \
-  }                                                                                                         \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// ARRAY_OR_STRING_CHECK -
-//
-#define ARRAY_OR_STRING_CHECK(nodeP, what)                                                                             \
-do                                                                                                                     \
-{                                                                                                                      \
-  if ((nodeP->type != KjArray) && (nodeP->type != KjString))                                                           \
-  {                                                                                                                    \
-    LM_T(LmtPayloadCheck, ("the node is a '%s'", kjValueType(nodeP->type)));                                           \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON array nor string", what, OrionldDetailsString); \
-    return false;                                                                                                      \
-  }                                                                                                                    \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// httpHeaderLocationAdd -
-//
-void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, const char* entityId)
-{
-  char location[512];
-
-  snprintf(location, sizeof(location), "%s%s", uriPathWithSlash, entityId);
-
-  ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
-  ciP->httpHeaderValue.push_back(location);
-}
-
-
-
-#define LINK_REL_AND_TYPE        "rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\""
-#define LINK_REL_AND_TYPE_SIZE   70
-// ----------------------------------------------------------------------------
-//
-// httpHeaderLinkAdd -
-//
-void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP)
-{
-  char             link[256];
-  char*            linkP     = link;
-  OrionldContext*  contextP  = (_contextP != NULL)? _contextP : &orionldDefaultContext;
-  char*            url;
-  unsigned int     urlLen;
-
-  if (_contextP == &orionldCoreContext)
-    _contextP = &orionldDefaultContext;
-
-  url    = contextP->url;
-  urlLen = strlen(url);
-
-  if (urlLen > sizeof(link) + LINK_REL_AND_TYPE_SIZE + 3)
-  {
-    linkP = (char*) malloc(sizeof(link) + LINK_REL_AND_TYPE_SIZE + 3);
-    if (linkP == NULL)
-    {
-      LM_E(("Out-of-memory allocating roome for HTTP Link Header"));
-      return;
-    }
-  }
-
-  sprintf(linkP, "<%s>; %s", url, LINK_REL_AND_TYPE);
-
-  ciP->httpHeader.push_back("Link");
-  ciP->httpHeaderValue.push_back(linkP);
-
-  if (linkP != link)
-    free(linkP);
-}
-
-
-
-// ----------------------------------------------------------------------------
-//
-// contextItemNodeTreat -
-//
-static OrionldContext* contextItemNodeTreat(ConnectionInfo* ciP, char* url)
-{
-  char*            details;
-  OrionldContext*  contextP = orionldContextAdd(ciP, url, OrionldUserContext, &details);
-
-  if (contextP == NULL)
-  {
-    LM_E(("Invalid context '%s': %s", url, details));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", details, OrionldDetailsString);
-    return NULL;
-  }
-
-  return contextP;
-}
 
 
 
@@ -315,12 +138,12 @@ static bool payloadCheck
 
     if (SCOMPARE3(kNodeP->name, 'i', 'd', 0))
     {
-      DUPLICATE_CHECK(kNodeP, idNodeP, "entity id");
+      DUPLICATE_CHECK(idNodeP, "entity id", kNodeP);
       STRING_CHECK(kNodeP, "entity id");
     }
     else if (SCOMPARE5(kNodeP->name, 't', 'y', 'p', 'e', 0))
     {
-      DUPLICATE_CHECK(kNodeP, typeNodeP, "entity type");
+      DUPLICATE_CHECK(typeNodeP, "entity type", kNodeP);
       STRING_CHECK(kNodeP, "entity type");
       if (stringContentCheck(kNodeP->value.s, &detailsP) == false)
       {
@@ -330,22 +153,22 @@ static bool payloadCheck
     }
     else if (SCOMPARE9(kNodeP->name, 'l', 'o', 'c', 'a', 't', 'i', 'o', 'n', 0))
     {
-      DUPLICATE_CHECK(kNodeP, locationNodeP, "location");
+      DUPLICATE_CHECK(locationNodeP, "location", kNodeP);
       // FIXME: check validity of location - GeoProperty
     }
     else if (SCOMPARE9(kNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
     {
-      DUPLICATE_CHECK(kNodeP, contextNodeP, "context");
+      DUPLICATE_CHECK(contextNodeP, "context", kNodeP);
       ARRAY_OR_STRING_CHECK(kNodeP, "@context");
     }
     else if (SCOMPARE17(kNodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
     {
-      DUPLICATE_CHECK(kNodeP, observationSpaceNodeP, "context");
+      DUPLICATE_CHECK(observationSpaceNodeP, "context", kNodeP);
       // FIXME: check validity of observationSpace - GeoProperty
     }
     else if (SCOMPARE15(kNodeP->name, 'o', 'p', 'e', 'r', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
     {
-      DUPLICATE_CHECK(kNodeP, operationSpaceNodeP, "context");
+      DUPLICATE_CHECK(operationSpaceNodeP, "context", kNodeP);
       // FIXME: check validity of operationSpaceP - GeoProperty
     }
     else  // Property/Relationshiop - must check chars in the name of the attribute
@@ -388,135 +211,6 @@ static bool payloadCheck
   *operationSpaceNodePP   = operationSpaceNodeP;
 
   return true;
-}
-
-
-
-// ----------------------------------------------------------------------------
-//
-// uriExpansion -
-//
-// 1. Lookup in user context, expand if found
-// 2. Lookup in Core Context - if found there, no expansion is made, just return from function
-// 3. Expand using the default context
-//
-// Returns the number of expansions done.
-//  -2: expansion NOT found in the context - use default URL
-//  -1: an error has occurred
-//   0: found in Core context only. No expansion is to be made
-//   1: expansion found only for the attr-name/entity-type
-//   2: expansions found both for attr-name and attr-type
-//
-int uriExpansion(OrionldContext* contextP, const char* name, char** expandedNameP, char** expandedTypeP, char** detailsPP)
-{
-  KjNode* contextValueP = NULL;
-
-  *expandedNameP = NULL;
-  *expandedTypeP = NULL;
-
-  LM_T(LmtUriExpansion, ("looking up alias for '%s'", name));
-
-  //
-  // Use the default context?
-  // Two possibilities for default context:
-  // 1. No user context present
-  // 2. Not found in user context
-  //
-  // But, if found in Core Context, then NO Expansion is to be made
-  //
-  if (contextP != NULL)
-  {
-    LM_T(LmtUriExpansion, ("looking up context item for '%s', in context '%s'", name, contextP->url));
-    contextValueP = orionldContextItemLookup(contextP, name);
-  }
-
-  if (contextValueP == NULL)
-  {
-    //
-    // Not found.
-    // Now, if found in Core context, no expansion is to be made (return 0).
-    // If not, then the default URL should be used (return 3).
-    //
-    contextValueP = orionldContextItemLookup(&orionldCoreContext, name);
-
-    if (contextValueP != NULL)
-      return 0;
-    else
-      return -2;
-  }
-
-
-  //
-  // Context Item found - must be either a string or an object containing two strings
-  //
-  LM_T(LmtUriExpansion, ("contextValueP at %p", contextValueP));
-  if (contextValueP->type == KjString)
-  {
-    LM_T(LmtUriExpansion, ("got a string - expanded name is '%s'", contextValueP->value.s));
-    *expandedNameP = contextValueP->value.s;
-
-    return 1;
-  }
-
-  if (contextValueP->type != KjObject)
-  {
-    // FIXME: I need ciP here to fill in the error-response
-    return -1;
-  }
-
-  //
-  // The context item has a complex value: "@id" and "@type".
-  // The value of:
-  // - "@id":     corresponds to the 'name' of the attribute
-  // - "@type":   corresponds to the 'type' of the attribute??? FIXME
-  //
-  int children = 0;
-  for (KjNode* nodeP = contextValueP->children; nodeP != NULL; nodeP = nodeP->next)
-  {
-    if (SCOMPARE4(nodeP->name, '@', 'i', 'd', 0))
-    {
-      *expandedNameP = nodeP->value.s;
-      LM_T(LmtUriExpansion, ("got an object - expanded name is '%s'", nodeP->value.s));
-    }
-    else if (SCOMPARE6(nodeP->name, '@', 't', 'y', 'p', 'e', 0))
-    {
-      *expandedTypeP = nodeP->value.s;
-      LM_T(LmtUriExpansion, ("got an object - expanded type is '%s'", nodeP->value.s));
-    }
-    else
-    {
-      *detailsPP = (char*) "Invalid context - invalid field in context item object";
-      LM_E(("uriExpansion: Invalid context - invalid field in context item object: '%s'", nodeP->name));
-      return -1;
-    }
-    ++children;
-  }
-
-  //
-  // If an expansion has been found, we MUST have a "@id", if not - ERROR
-  //
-  if ((children >= 1) && (*expandedNameP == NULL))
-  {
-    *detailsPP = (char*) "Invalid context - no @id in complex context item";
-    return -1;
-  }
-
-
-  //
-  // FIXME: Is this assumption true?
-  //        If the value of a @context item is an object, must it have exactly TWO members, @id and @type?
-  //
-  // FIXME: This check should NOT be done here, every time, but ONCE when the context is first downloaded
-  //
-  if ((children != 2) || (*expandedNameP == NULL) || (*expandedTypeP == NULL))
-  {
-    *detailsPP = (char*) "Invalid context - field in context item object not matching the rules";
-    LM_E(("uriExpansion: invalid @context item '%s' in @context '%s'", name, contextP->url));
-    return -1;
-  }
-
-  LM_T(LmtUriExpansion, ("returning %d (expansions found): name='%s', type='%s'", children, *expandedNameP, *expandedTypeP));
-  return children;
 }
 
 
@@ -676,7 +370,7 @@ static bool geojsonCheck(ConnectionInfo* ciP, KjNode* geoJsonNodeP, char** detai
 
     if (SCOMPARE5(itemP->name, 't', 'y', 'p', 'e', 0))
     {
-      DUPLICATE_CHECK(itemP, typeP, geoJsonNodeP->name);
+      DUPLICATE_CHECK(typeP, geoJsonNodeP->name, itemP);
 
       if (itemP->type != KjString)
       {
@@ -689,7 +383,7 @@ static bool geojsonCheck(ConnectionInfo* ciP, KjNode* geoJsonNodeP, char** detai
     }
     else if (SCOMPARE12(itemP->name, 'c', 'o', 'o', 'r', 'd', 'i', 'n', 'a', 't', 'e', 's', 0))
     {
-      DUPLICATE_CHECK(itemP, coordsP, geoJsonNodeP->name);
+      DUPLICATE_CHECK(coordsP, geoJsonNodeP->name, itemP);
 
       if (itemP->type != KjArray)
       {
@@ -745,7 +439,7 @@ static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* node
     {
       if (SCOMPARE5(kNodeP->name, 't', 'y', 'p', 'e', 0))
       {
-        DUPLICATE_CHECK(kNodeP, typeNodeP, "metadata type");
+        DUPLICATE_CHECK(typeNodeP, "metadata type", kNodeP);
         STRING_CHECK(kNodeP, "metadata type");
 
         if (SCOMPARE9(kNodeP->value.s, 'P', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
@@ -767,12 +461,12 @@ static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* node
       }
       else if (SCOMPARE6(kNodeP->name, 'v', 'a', 'l', 'u', 'e', 0))
       {
-        DUPLICATE_CHECK(kNodeP, valueNodeP, "metadata value");
+        DUPLICATE_CHECK(valueNodeP, "metadata value", kNodeP);
         valueNodeP = kNodeP;
       }
       else if (SCOMPARE7(kNodeP->name, 'o', 'b', 'j', 'e', 'c', 't', 0))
       {
-        DUPLICATE_CHECK(kNodeP, objectNodeP, "metadata object");
+        DUPLICATE_CHECK(objectNodeP, "metadata object", kNodeP);
         objectNodeP = kNodeP;
       }
     }
@@ -887,12 +581,12 @@ bool specialCompoundCheck(ConnectionInfo* ciP, KjNode* compoundValueP)
     {
       if (SCOMPARE6(nodeP->name, '@', 't', 'y', 'p', 'e', 0))
       {
-        DUPLICATE_CHECK(nodeP, typeNodeP, "@type");
+        DUPLICATE_CHECK(typeNodeP, "@type", nodeP);
         STRING_CHECK(nodeP, "@type");
       }
       else if (SCOMPARE7(nodeP->name, '@', 'v', 'a', 'l', 'u', 'e', 0))
       {
-        DUPLICATE_CHECK(nodeP, valueNodeP, "@value");
+        DUPLICATE_CHECK(valueNodeP, "@value", nodeP);
       }
       else
         otherNodeP = nodeP;
@@ -951,7 +645,9 @@ bool specialCompoundCheck(ConnectionInfo* ciP, KjNode* compoundValueP)
 // - geoPropertyTreat ?
 // - relationshipTreat
 //
-static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP)
+// FIXME: Move to separate file attributeTreat.[cpp/h]
+//
+bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP)
 {
   char* caName = kNodeP->name;
 
@@ -994,7 +690,7 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
 
     if (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0))
     {
-      DUPLICATE_CHECK(nodeP, typeP, "attribute type");
+      DUPLICATE_CHECK(typeP, "attribute type", nodeP);
       STRING_CHECK(nodeP, "attribute type");
 
       if (SCOMPARE9(nodeP->value.s, 'P', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
@@ -1026,12 +722,12 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     }
     else if (SCOMPARE6(nodeP->name, 'v', 'a', 'l', 'u', 'e', 0))
     {
-      DUPLICATE_CHECK(nodeP, valueP, "attribute value");
+      DUPLICATE_CHECK(valueP, "attribute value", nodeP);
       // FIXME: "value" for Relationship Attribute should be added as metadata
    }
     else if (SCOMPARE9(nodeP->name, 'u', 'n', 'i', 't', 'C', 'o', 'd', 'e', 0))
     {
-      DUPLICATE_CHECK(nodeP, unitCodeP, "unit code");
+      DUPLICATE_CHECK(unitCodeP, "unit code", nodeP);
       if (metadataAdd(ciP, caP, nodeP, caName) == false)
       {
         LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
@@ -1041,12 +737,12 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     }
     else if (SCOMPARE7(nodeP->name, 'o', 'b', 'j', 'e', 'c', 't', 0))
     {
-      DUPLICATE_CHECK(nodeP, objectP, "object");
+      DUPLICATE_CHECK(objectP, "object", nodeP);
       // FIXME: "object" for Property Attribute should be added as metadata
     }
     else if (SCOMPARE11(nodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
     {
-      DUPLICATE_CHECK(nodeP, observedAtP, "observed at");
+      DUPLICATE_CHECK(observedAtP, "observed at", nodeP);
       STRING_CHECK(nodeP, "observed at");
 
       //
@@ -1076,7 +772,7 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     }
     else if (SCOMPARE17(nodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
     {
-      DUPLICATE_CHECK(nodeP, observationSpaceP, "observation space");
+      DUPLICATE_CHECK(observationSpaceP, "observation space", nodeP);
       if (metadataAdd(ciP, caP, nodeP, caName) == false)
       {
         LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
@@ -1086,7 +782,7 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     }
     else if (SCOMPARE15(nodeP->name, 'o', 'p', 'e', 'r', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
     {
-      DUPLICATE_CHECK(nodeP, operationSpaceP, "operation space");
+      DUPLICATE_CHECK(operationSpaceP, "operation space", nodeP);
       if (metadataAdd(ciP, caP, nodeP, caName) == false)
       {
         LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
@@ -1242,207 +938,6 @@ static bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
 
 
 
-// -----------------------------------------------------------------------------
-//
-// contextTreat -
-//
-ContextAttribute* contextTreat
-(
-  ConnectionInfo*  ciP,
-  KjNode*          contextNodeP,
-  char*            entityId
-)
-{
-  LM_TMP(("contextNodeP at %p", contextNodeP));
-  //
-  // The allowed payloads for the @context member are:
-  //
-  // 1. ARRAY - An array of URL strings:
-  //    "@context": [
-  //      "http://...",
-  //      "http://...",
-  //      "http://..."
-  //    }
-  //
-  // 2. STRING - A single URL string:
-  //    "@context": "http://..."
-  //
-  // 3. OBJECT - Direct context:
-  //    "@context": {
-  //      "Property": "http://...",
-  //      "XXX";      "YYY"
-  //    }
-  //
-  // -----------------------------------------------------------
-  // Case 3 is not implemented in the first round. coming later.
-  // -----------------------------------------------------------
-  //
-  // As the payload is already parsed, what needs to be done here is to call orionldContextAdd() for each of these URLs
-  //
-  // The content of these "Context URLs" can be:
-  //
-  // 4. An object with a single member '@context' that is an object containing key-values:
-  //    "@context" {
-  //      "Property": "http://...",
-  //      "XXX";      ""
-  //    }
-  //
-  // 5. An object with a single member '@context', that is a vector of URL strings (https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld):
-  //    {
-  //      "@context": [
-  //        "http://...",
-  //        "http://...",
-  //        "http://..."
-  //      }
-  //    }
-  //
-  LM_T(LmtContextTreat, ("Got @context for '%s', type %s", entityId, kjValueType(contextNodeP->type)));
-
-  if (contextNodeP->type == KjString)
-  {
-    char* details;
-
-    LM_TMP(("Calling orionldContextCreateFromUrl"));
-    if ((ciP->contextP = orionldContextCreateFromUrl(ciP, contextNodeP->value.s, OrionldUserContext, &details)) == NULL)
-    {
-      LM_E(("Failed to create context from URL: %s", details));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from URL", details, OrionldDetailsString);
-      return NULL;
-    }
-    LM_TMP(("orionldContextCreateFromUrl OK"));
-    ciP->contextToBeFreed = false;  // context has been added to public list - must not be freed
-  }
-  else if (contextNodeP->type == KjArray)
-  {
-    char* details;
-
-    //
-    // REMEMBER
-    //   This context is just the array of context-strings: [ "url1", "url2" ]
-    //   The individual contexts (the items of the vector - "url1", ...) are treated a few lines down
-    //
-    // contextUrl = "http://" host + ":" + port + "/ngsi-ld/ex/v1/contexts/" + entity.id;
-    //
-    int   linkPathLen = 7 + orionldHostNameLen + 1 + 5 + 27 + strlen(entityId) + 1;
-    char* linkPath    = (char*) malloc(linkPathLen);
-
-    if (linkPath == NULL)
-    {
-      LM_E(("out of memory creating Link HTTP Header"));
-      orionldErrorResponseCreate(ciP, OrionldInternalError, "cannot create Link HTTP Header", "out of memory", OrionldDetailsString);
-      return NULL;
-    }
-    sprintf(linkPath, "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", orionldHostName, restPortGet(), entityId);
-
-    ciP->contextP = orionldContextCreateFromTree(contextNodeP, linkPath, OrionldUserContext, &details);
-    free(linkPath);  // orionldContextCreateFromTree strdups the URL
-
-    if (ciP->contextP == NULL)
-    {
-      LM_E(("Failed to create context from Tree : %s", details));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from tree", details, OrionldDetailsString);
-      return NULL;
-    }
-
-    //
-    // The context containing a vector of X context strings (URLs) must be freed
-    // The downloaded contexts though are added to the public list and will not be freed)
-    //
-    ciP->contextToBeFreed = true;
-
-    for (KjNode* contextStringNodeP = contextNodeP->children; contextStringNodeP != NULL; contextStringNodeP = contextStringNodeP->next)
-    {
-      if (contextStringNodeP->type != KjString)
-      {
-        LM_E(("Context Array Item is not a JSON String, but of type '%s'", kjValueType(contextStringNodeP->type)));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Context Array Item is not a JSON String", NULL, OrionldDetailsString);
-        return NULL;
-      }
-
-      if (contextItemNodeTreat(ciP, contextStringNodeP->value.s) == NULL)
-      {
-        LM_E(("contextItemNodeTreat failed"));
-        // Error payload set by contextItemNodeTreat
-        return NULL;
-      }
-    }
-  }
-  else if (contextNodeP->type == KjObject)
-  {
-    // FIXME: seems like an inline context - not supported for now
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", "inline contexts not supported in current version of orionld", OrionldDetailsString);
-    LM_E(("inline contexts not supported in current version of orionld"));
-    return NULL;
-  }
-  else
-  {
-    LM_E(("invalid JSON type of @context member"));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", "invalid JSON type of @context member", OrionldDetailsString);
-    return NULL;
-  }
-
-
-#if 0
-  //
-  // Check the validity of the context
-  //
-
-  //
-  // FIXME: task/28.orionld-user-context-cannot-use-core-context-values
-  //        The check is implemented, but ... six different types of contexts ... just too much
-  //        This test (orionldUserContextKeyValuesCheck) is postponed until hardening/xx.orionld-order-in-contexts
-  //        is implemented.
-  //
-  char* details;
-
-  LM_TMP(("orionldPostEntities calling orionldUserContextKeyValuesCheck"));
-  if (orionldUserContextKeyValuesCheck(ciP->contextP->tree, ciP->contextP->url, &details) == false)
-  {
-    LM_TMP(("orionldPostEntities called orionldUserContextKeyValuesCheck(%s): %s", ciP->contextP->url, details));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", details, OrionldDetailsString);
-    return false;
-  }
-  LM_TMP(("orionldPostEntities called orionldUserContextKeyValuesCheck: %s", "OK"));
-#endif
-
-  LM_T(LmtContextTreat, ("The @context is treated as an attribute"));
-  // The @context is treated as an attribute
-  ContextAttribute* caP;
-
-  // The attribute's value is either a string or a vector (compound)
-  if (contextNodeP->type == KjString)
-  {
-    caP = new ContextAttribute("@context", "ContextString", contextNodeP->value.s);
-  }
-  else
-  {
-    // Create the Compound, just a vector of strings
-    orion::CompoundValueNode* compoundP = new orion::CompoundValueNode(orion::ValueTypeVector);
-    int                       siblingNo = 0;
-
-    // Loop over the kNode vector and create the strings
-    for (KjNode* contextItemNodeP = contextNodeP->children; contextItemNodeP != NULL; contextItemNodeP = contextItemNodeP->next)
-    {
-      LM_T(LmtContextTreat, ("string: %s", contextItemNodeP->value.s));
-      orion::CompoundValueNode* stringNode = new orion::CompoundValueNode(compoundP, "", "", contextItemNodeP->value.s, siblingNo++, orion::ValueTypeString);
-
-      compoundP->add(stringNode);
-    }
-
-    // Now set 'compoundP' as value of the attribute
-    caP = new ContextAttribute();
-
-    caP->type           = "ContextVector";
-    caP->name           = "@context";
-    caP->valueType      = orion::ValueTypeObject;  // All compounds have Object as value type (I think)
-    caP->compoundValueP = compoundP;
-  }
-
-  return caP;
-}
-
-
-
 // ----------------------------------------------------------------------------
 //
 // orionldPostEntities -
@@ -1472,15 +967,15 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
   //
   // First treat the @context, if none, use the default context
-  // contextTreat needs ceP to push the '@context' attribute to the ContextElement.
+  // orionldContextTreat needs ceP to push the '@context' attribute to the ContextElement.
   //
   if (contextNodeP != NULL)
   {
     ContextAttribute* caP;
 
-    if ((caP = contextTreat(ciP, contextNodeP, idNodeP->value.s)) == NULL)
+    if ((caP = orionldContextTreat(ciP, contextNodeP, idNodeP->value.s)) == NULL)
     {
-      // Error payload set by contextTreat
+      // Error payload set by orionldContextTreat
       mongoRequest.release();
       return false;
     }
@@ -1530,8 +1025,12 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
       LM_T(LmtUriExpansion, ("Looking up uri expansion for the entity type '%s'", typeNodeP->value.s));
       LM_T(LmtUriExpansion, ("------------- uriExpansion for Entity Type starts here ------------------------------"));
+
       char*  expandedName;
       char*  expandedType;
+
+      // FIXME: Call orionldUriExpand() - this here is a "copy" of what orionldUriExpand does
+      extern int uriExpansion(OrionldContext* contextP, const char* name, char** expandedNameP, char** expandedTypeP, char** detailsPP);
       int    expansions = uriExpansion(ciP->contextP, typeNodeP->value.s, &expandedName, &expandedType, &details);
       LM_TMP(("URI Expansion for type '%s': '%s'", typeNodeP->value.s, expandedName));
       LM_T(LmtUriExpansion, ("Got %d expansions", expansions));
@@ -1578,14 +1077,16 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       ContextAttribute* caP            = new ContextAttribute();
       KjNode*           attrTypeNodeP  = NULL;
 
+      LM_TMP(("Calling attributeTreat"));
       if (attributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
       {
-        ciP->httpStatusCode = SccBadRequest;  // FIXME: Should be set inside 'attributeTreat' - could be 500, not 400 ...
         LM_TMP(("attributeTreat failed"));
+        ciP->httpStatusCode = SccBadRequest;  // FIXME: Should be set inside 'attributeTreat' - could be 500, not 400 ...
         delete caP;
         mongoRequest.release();
         return false;
       }
+      LM_TMP(("attributeTreat OK"));
 
 
       //
@@ -1599,6 +1100,65 @@ bool orionldPostEntities(ConnectionInfo* ciP)
         caP->name = kNodeP->name;
       }
       else
+      {
+        char longName[256];
+
+        if (orionldUriExpand(ciP->contextP, kNodeP->name, longName, sizeof(longName), &details) == false)
+        {
+          LM_TMP(("orionldUriExpand failed"));
+          delete caP;
+          mongoRequest.release();
+          orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, kNodeP->name, OrionldDetailsAttribute);
+          return false;
+        }
+
+        caP->name = longName;
+      }
+
+
+      //
+      // NO URI Expansion for Attribute TYPE
+      //
+      caP->type = attrTypeNodeP->value.s;
+
+      LM_TMP(("Adding attribute '%s' to contextAttributeVector", caP->name.c_str()));
+      ceP->contextAttributeVector.push_back(caP);
+    }
+  }
+
+  LM_TMP(("Calling mongoUpdateContext"));
+  ciP->httpStatusCode = mongoUpdateContext(&mongoRequest,
+                                           &mongoResponse,
+                                           ciP->httpHeaders.tenant,
+                                           ciP->servicePathV,
+                                           ciP->uriParam,
+                                           ciP->httpHeaders.xauthToken,
+                                           ciP->httpHeaders.correlator,
+                                           ciP->httpHeaders.ngsiv2AttrsFormat,
+                                           ciP->apiVersion,
+                                           NGSIV2_NO_FLAVOUR);
+  LM_TMP(("mongoUpdateContext returned %d", ciP->httpStatusCode));
+  mongoRequest.release();
+  mongoResponse.release();
+
+  if (ciP->httpStatusCode != SccOk)
+  {
+    LM_E(("mongoUpdateContext: HTTP Status Code: %d", ciP->httpStatusCode));
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal Error", "Error from mongo backend", OrionldDetailsString);
+    return false;
+  }
+
+  ciP->httpStatusCode = SccCreated;
+  httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/entities/", idNodeP->value.s);
+  httpHeaderLinkAdd(ciP, ciP->contextP);  // FIXME: Remove the Link HTTP Header?
+
+  LM_TMP(("Function Done"));
+  return true;
+}
+
+
+
+#if 0
       {
         LM_T(LmtUriExpansion, ("------------- URI-Expansion for attribute named '%s' starts here ------------------------------", kNodeP->name));
         char*  details;
@@ -1639,42 +1199,5 @@ bool orionldPostEntities(ConnectionInfo* ciP)
             caP->name = expandedName;
         }
       }
-
-      //
-      // NO URI Expansion for Attribute TYPE
-      //
-      caP->type = attrTypeNodeP->value.s;
-
-      ceP->contextAttributeVector.push_back(caP);
-    }
-  }
-
-  LM_TMP(("Calling mongoUpdateContext"));
-  ciP->httpStatusCode = mongoUpdateContext(&mongoRequest,
-                                           &mongoResponse,
-                                           ciP->httpHeaders.tenant,
-                                           ciP->servicePathV,
-                                           ciP->uriParam,
-                                           ciP->httpHeaders.xauthToken,
-                                           ciP->httpHeaders.correlator,
-                                           ciP->httpHeaders.ngsiv2AttrsFormat,
-                                           ciP->apiVersion,
-                                           NGSIV2_NO_FLAVOUR);
-  LM_TMP(("mongoUpdateContext returned %d", ciP->httpStatusCode));
-  mongoRequest.release();
-  mongoResponse.release();
-
-  if (ciP->httpStatusCode != SccOk)
-  {
-    LM_E(("mongoUpdateContext: HTTP Status Code: %d", ciP->httpStatusCode));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal Error", "Error from mongo backend", OrionldDetailsString);
-    return false;
-  }
-
-  ciP->httpStatusCode = SccCreated;
-  httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/entities/", idNodeP->value.s);
-  httpHeaderLinkAdd(ciP, ciP->contextP);
-
-  LM_TMP(("Function Done"));
-  return true;
-}
+#endif
+  

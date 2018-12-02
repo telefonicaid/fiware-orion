@@ -33,7 +33,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                // httpHeaderAdd
+#include "rest/httpHeaderAdd.h"                                // httpHeaderAdd, httpHeaderLinkAdd
 #include "ngsi10/QueryContextResponse.h"                       // QueryContextResponse
 
 #include "orionld/common/orionldErrorResponse.h"               // OrionldResponseErrorType, orionldErrorResponse
@@ -48,16 +48,6 @@ extern "C"
 #include "orionld/kjTree/kjTreeFromContextContextAttribute.h"  // kjTreeFromContextContextAttribute
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"            // kjTreeFromCompoundValue
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// httpHeaderLinkAdd -
-//
-// FIXME: move to orionld/common
-//
-extern void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP);
 
 
 

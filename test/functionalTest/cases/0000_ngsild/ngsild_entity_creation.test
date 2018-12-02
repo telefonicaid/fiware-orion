@@ -270,7 +270,7 @@ Date: REGEX(.*)
 
 {
     "details": "toplevel",
-    "title": "Not a JSON object",
+    "title": "Not a JSON Object",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -284,7 +284,7 @@ Date: REGEX(.*)
 
 {
     "details": "entity id",
-    "title": "Not a JSON string",
+    "title": "Not a JSON String",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -298,7 +298,7 @@ Date: REGEX(.*)
 
 {
     "details": "entity type",
-    "title": "Not a JSON string",
+    "title": "Not a JSON String",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -312,7 +312,7 @@ Date: REGEX(.*)
 
 {
     "details": "@context",
-    "title": "Not a JSON array nor string",
+    "title": "Not a JSON Array nor String",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -378,7 +378,7 @@ Date: REGEX(.*)
 
 {
     "details": "attribute type",
-    "title": "Not a JSON string",
+    "title": "Not a JSON String",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

@@ -157,7 +157,7 @@ Date: REGEX(.*)
 
 {
     "details": "@context",
-    "title": "Not a JSON array nor string",
+    "title": "Not a JSON Array nor String",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -171,7 +171,7 @@ Date: REGEX(.*)
 
 {
     "details": "@context",
-    "title": "Not a JSON array nor string",
+    "title": "Not a JSON Array nor String",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -185,7 +185,7 @@ Date: REGEX(.*)
 
 {
     "details": "@context",
-    "title": "Not a JSON array nor string",
+    "title": "Not a JSON Array nor String",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

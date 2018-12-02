@@ -252,7 +252,7 @@ Date: REGEX(.*)
 
 {
     "details": "@type",
-    "title": "Not a JSON string",
+    "title": "Not a JSON String",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -336,7 +336,7 @@ Date: REGEX(.*)
 
 {
     "details": "@value of DateTime @type",
-    "title": "Not a JSON string",
+    "title": "Not a JSON String",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

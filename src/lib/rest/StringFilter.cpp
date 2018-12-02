@@ -41,20 +41,11 @@
 
 #ifdef ORIONLD
 #include "orionld/context/OrionldContext.h"
+#include "orionld/context/orionldUriExpand.h"
 #endif
 #include "rest/StringFilter.h"
 
 using namespace mongo;
-
-
-#ifdef ORIONLD
-// -----------------------------------------------------------------------------
-//
-// FIXME: move uriExpand() from orionldGetEntities.cpp to src/lib/orionld/uriExpand/uriExpand.*
-//
-extern bool uriExpand(OrionldContext* contextP, char* shortName, char* longName, int longNameLen, char** detailsP);
-
-#endif
 
 
 
@@ -1793,7 +1784,7 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     LM_TMP(("attribute name: '%s' (itemP->attributeName: '%s')", left.c_str(), itemP->attributeName.c_str()));
     LM_TMP(("Context: %s", (orionldContextP != NULL)? orionldContextP->url : "NULL"));
 
-    if (uriExpand(orionldContextP, (char*) itemP->attributeName.c_str(), expanded, sizeof(expanded), &details) == false)
+    if (orionldUriExpand(orionldContextP, (char*) itemP->attributeName.c_str(), expanded, sizeof(expanded), &details) == false)
     {
       *errorStringP = details;
       return false;

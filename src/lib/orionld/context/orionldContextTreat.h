@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_REST_HTTPHEADERADD_H_
-#define SRC_LIB_REST_HTTPHEADERADD_H_
+#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTTREAT_H_
+#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTTREAT_H_
 
 /*
 *
@@ -25,39 +25,25 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kjson/KjNode.h"                                    // KjNode
+}
+
+#include "rest/ConnectionInfo.h"                             // ConnectionInfo
+#include "ngsi/ContextAttribute.h"                           // ContextAttribute
 
 
 
 // -----------------------------------------------------------------------------
 //
-// ConnectionInfo - to avoid to include "ConnectionInfo.h"
+// orionldContextTreat -
 //
-class ConnectionInfo;
+extern ContextAttribute* orionldContextTreat
+(
+  ConnectionInfo*  ciP,
+  KjNode*          contextNodeP,
+  char*            entityId
+);
 
-
-
-// -----------------------------------------------------------------------------
-//
-// httpHeaderAdd -
-//
-extern void httpHeaderAdd(ConnectionInfo* ciP, const char* key, const char* value);
-
-
-
-#ifdef ORIONLD
-// -----------------------------------------------------------------------------
-//
-// httpHeaderLocationAdd -
-//
-extern void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, const char* entityId);
-
-
-struct OrionldContext;
-// ----------------------------------------------------------------------------
-//
-// httpHeaderLinkAdd -
-//
-extern void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP);
-
-#endif  // ORIONLD
-#endif  // SRC_LIB_REST_HTTPHEADERADD_H_
+#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTTREAT_H_

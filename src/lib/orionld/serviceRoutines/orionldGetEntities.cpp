@@ -37,6 +37,7 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
+#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/serviceRoutines/orionldGetEntities.h"        // Own Interface
 
@@ -45,42 +46,6 @@ extern "C"
 // FIXME: URI Expansion from 'orionldPostEntities.cpp' to its own module!
 //
 extern int uriExpansion(OrionldContext* contextP, const char* name, char** expandedNameP, char** expandedTypeP, char** detailsPP);
-
-
-
-// -----------------------------------------------------------------------------
-//
-// uriExpand - FIXME: move to src/lib/orionld/uriExpand/uriExpand.cpp/h
-//
-bool uriExpand(OrionldContext* contextP, char* shortName, char* longName, int longNameLen, char** detailsP)
-{
-  char* expandedName;
-  char* expandedType;
-  int   n;
-
-  n = uriExpansion(contextP, shortName, &expandedName, &expandedType, detailsP);
-  if (n == -1)
-  {
-    LM_E(("uriExpansion error: %s", *detailsP));
-    return false;
-  }
-  else if (n == -2)  // expansion NOT found in the context - use default URL
-  {
-    //
-    // FIXME:
-    //   What if it is not a shortname in URI param?
-    //   Check for http:// in typeName?
-    //
-    snprintf(longName, longNameLen, "%s%s", orionldDefaultUrl, shortName);
-  }
-  else  // expansion found
-  {
-    snprintf(longName, longNameLen, "%s", expandedName);
-  }
-
-  LM_TMP(("KZ: uriExpand expanded '%s' to '%s'", shortName, longName));
-  return true;
-}
 
 
 
@@ -156,7 +121,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   if (typeVecItems == 1)  // type needs to be modified according to @context
   {
-    if (uriExpand(ciP->contextP, type, typeExpanded, sizeof(typeExpanded), &details) == false)
+    if (orionldUriExpand(ciP->contextP, type, typeExpanded, sizeof(typeExpanded), &details) == false)
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
       return false;
@@ -179,7 +144,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   {
     for (int ix = 0; ix < typeVecItems; ix++)
     {
-      if (uriExpand(ciP->contextP, typeVector[ix], typeExpanded, sizeof(typeExpanded), &details) == false)
+      if (orionldUriExpand(ciP->contextP, typeVector[ix], typeExpanded, sizeof(typeExpanded), &details) == false)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
         return false;
@@ -210,7 +175,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     {
       shortName = shortNameVector[ix];
 
-      if (uriExpand(ciP->contextP, shortName, longName, sizeof(longName), &details) == true)
+      if (orionldUriExpand(ciP->contextP, shortName, longName, sizeof(longName), &details) == true)
         parseData.qcr.res.attributeList.push_back(longName);
       else
       {

@@ -33,7 +33,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                // httpHeaderAdd
+#include "rest/httpHeaderAdd.h"                                // httpHeaderAdd, httpHeaderLinkAdd
 #include "ngsi10/QueryContextResponse.h"                       // QueryContextResponse
 
 #include "orionld/common/orionldErrorResponse.h"               // OrionldResponseErrorType, orionldErrorResponse
@@ -51,23 +51,6 @@ extern "C"
 
 
 
-// -----------------------------------------------------------------------------
-//
-// httpHeaderLinkAdd -
-//
-// FIXME: move to orionld/common
-//
-extern void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP);
-
-
-
-// -----------------------------------------------------------------------------
-//
-// uriExpand - FIXME: move to src/lib/orionld/uriExpand/uriExpand.cpp/h
-//
-extern bool uriExpand(OrionldContext* contextP, char* shortName, char* longName, int longNameLen, char** detailsP);
-
-  
 
 // -----------------------------------------------------------------------------
 //
