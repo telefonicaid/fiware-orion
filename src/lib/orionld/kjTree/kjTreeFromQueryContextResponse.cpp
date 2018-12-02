@@ -34,6 +34,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "common/string.h"                                     // FT
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "rest/httpHeaderAdd.h"                                // httpHeaderAdd, httpHeaderLinkAdd
 #include "ngsi10/QueryContextResponse.h"                       // QueryContextResponse
@@ -72,6 +73,45 @@ static bool numberToDate(time_t fromEpoch, char* date, int dateLen, char** detai
 
 // -----------------------------------------------------------------------------
 //
+// orionldSysAttrs -
+//
+bool orionldSysAttrs(ConnectionInfo* ciP, double creDate, double modDate, KjNode* containerP)
+{
+  char     date[128];
+  char*    details;
+  KjNode*  nodeP;
+
+  // FIXME: Always "keyValues" for 'createdAt' and 'modifiedAt' ?
+
+  // createdAt
+  if (numberToDate((time_t) creDate, date, sizeof(date), &details) == false)
+  {
+    LM_E(("Error creating a stringified date for 'createdAt'"));
+    orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create a stringified date", details, OrionldDetailsEntity);
+    return false;
+  }
+
+  nodeP = kjString(ciP->kjsonP, "createdAt", date);
+  kjChildAdd(containerP, nodeP);
+
+  // modifiedAt
+  if (numberToDate((time_t) modDate, date, sizeof(date), &details) == false)
+  {
+    LM_E(("Error creating a stringified date for 'modifiedAt'"));
+    orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create a stringified date", details, OrionldDetailsEntity);
+    return false;
+  }
+
+  nodeP = kjString(ciP->kjsonP, "modifiedAt", date);
+  kjChildAdd(containerP, nodeP);
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // kjTreeFromQueryContextResponse -
 //
 // PARAMETERS
@@ -88,7 +128,8 @@ static bool numberToDate(time_t fromEpoch, char* date, int dateLen, char** detai
 //
 KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool keyValues, QueryContextResponse* responseP)
 {
-  char* details = NULL;
+  char* details  = NULL;
+  bool  sysAttrs = ciP->uriParamOptions["sysAttrs"];
 
   //
   // No hits when "oneHit == false" is not an error.
@@ -290,6 +331,18 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
     else
       LM_TMP(("NOT Calling orionldContextValueLookup for entity Type as it is EMPTY!!!"));
 
+
+    // System Attributes?
+    if (sysAttrs == true)
+    {
+      if (orionldSysAttrs(ciP, ceP->entityId.creDate, ceP->entityId.modDate, top) == false)
+      {
+        LM_E(("sysAttrs error"));
+        return NULL;
+      }
+    }
+
+
     //
     // Attributes, including @context
     //
@@ -439,6 +492,16 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
 
         kjChildAdd(aTop, nodeP);  // Add the value to the attribute
         kjChildAdd(top, aTop);    // Adding the attribute to the tree
+
+        // System Attributes?
+        if (sysAttrs == true)
+        {
+          if (orionldSysAttrs(ciP, aP->creDate, aP->modDate, aTop) == false)
+          {
+            LM_E(("sysAttrs error"));
+            return NULL;
+          }
+        }
 
         // Metadata
         for (unsigned int ix = 0; ix < aP->metadataVector.size(); ix++)

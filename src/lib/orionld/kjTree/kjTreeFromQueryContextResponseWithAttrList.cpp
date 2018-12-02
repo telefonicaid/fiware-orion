@@ -51,6 +51,10 @@ extern "C"
 
 
 
+// FIXME: Move function to separate file
+extern bool orionldSysAttrs(ConnectionInfo* ciP, double creDate, double modDate, KjNode* containerP);
+
+
 
 // -----------------------------------------------------------------------------
 //
@@ -70,7 +74,8 @@ extern "C"
 //
 KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool oneHit, const char* attrList, bool keyValues, QueryContextResponse* responseP)
 {
-  char* details = NULL;
+  char* details  = NULL;
+  bool  sysAttrs = ciP->uriParamOptions["sysAttrs"];
 
   //
   // No hits when "oneHit == false" is not an error.
@@ -272,6 +277,17 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
     else
       LM_TMP(("NOT Calling orionldContextValueLookup for entity Type as it is EMPTY!!!"));
 
+    // System Attributes?
+    if (sysAttrs == true)
+    {
+      if (orionldSysAttrs(ciP, ceP->entityId.creDate, ceP->entityId.modDate, top) == false)
+      {
+        LM_E(("sysAttrs error"));
+        return NULL;
+      }
+    }
+
+
     //
     // Attributes, including @context
     //
@@ -360,7 +376,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
           return NULL;
         }
 
-        kjChildAdd(top, aTop);    // Adding the attribute to the tree        
+        kjChildAdd(top, aTop);    // Adding the attribute to the tree
       }
       else
       {
@@ -418,6 +434,16 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
 
         kjChildAdd(aTop, nodeP);  // Add the value to the attribute
         kjChildAdd(top, aTop);    // Adding the attribute to the tree
+
+        // System Attributes?
+        if (sysAttrs == true)
+        {
+          if (orionldSysAttrs(ciP, aP->creDate, aP->modDate, aTop) == false)
+          {
+            LM_E(("sysAttrs error"));
+            return NULL;
+          }
+        }
 
         // Metadata
         for (unsigned int ix = 0; ix < aP->metadataVector.size(); ix++)

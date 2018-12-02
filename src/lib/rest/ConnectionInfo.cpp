@@ -54,6 +54,9 @@ static const char* validOptions[] =
   OPT_DATE_MODIFIED,
   OPT_NO_ATTR_DETAIL,
   OPT_UPSERT
+#ifdef ORIONLD
+  , OPT_SYS_ATTRS
+#endif
 };
 
 

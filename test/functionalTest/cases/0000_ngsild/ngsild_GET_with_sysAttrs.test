@@ -1,0 +1,155 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET entity with sysAttrs
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create an entity with attribute P1
+# 02. GET the entity with options=sysAttrs, see 'createdAt' and 'modifiedAt' as text strings
+# 03. GET the entity with options=sysAttrs AND attrs=P1, see 'createdAt' and 'modifiedAt' as text strings"
+# 04. GET the entity with options=sysAttrs,keyValues AND attrs=P1, see 'createdAt' and 'modifiedAt' as text strings but only for the entity, not for P1
+#
+
+echo "01. Create an entity with attribute P1"
+echo "======================================"
+payload='{
+  "id": "urn:ngsi-ld:T:2018-11-22T10:00:00",
+  "type": "T",
+  "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
+  "P1": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+
+echo "02. GET the entity with options=sysAttrs, see 'createdAt' and 'modifiedAt' as text strings"
+echo "=========================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:2018-11-22T10:00:00?prettyPrint=yes&spaces=2&options=sysAttrs' --noPayloadCheck
+echo
+echo
+
+
+echo "03. GET the entity with options=sysAttrs AND attrs=P1, see 'createdAt' and 'modifiedAt' as text strings"
+echo "======================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:2018-11-22T10:00:00?prettyPrint=yes&spaces=2&options=sysAttrs&attrs=P1' --noPayloadCheck
+echo
+echo
+
+
+echo "04. GET the entity with options=sysAttrs,keyValues AND attrs=P1, see 'createdAt' and 'modifiedAt' as text strings but only for the entity, not for P1"
+echo "====================================================================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:2018-11-22T10:00:00?prettyPrint=yes&spaces=2&options=sysAttrs,keyValues&attrs=P1' --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with attribute P1
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:2018-11-22T10:00:00
+Date: REGEX(.*)
+
+
+
+02. GET the entity with options=sysAttrs, see 'createdAt' and 'modifiedAt' as text strings
+==========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 282
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:T:2018-11-22T10:00:00",
+  "type": "T",
+  "createdAt": "REGEX(.*)",
+  "modifiedAt": "REGEX(.*)",
+  "P1": {
+    "type": "Property",
+    "value": 1.000000,
+    "createdAt": "REGEX(.*)",
+    "modifiedAt": "REGEX(.*)"
+  }
+}
+
+
+
+03. GET the entity with options=sysAttrs AND attrs=P1, see 'createdAt' and 'modifiedAt' as text strings
+=======================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 282
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:T:2018-11-22T10:00:00",
+  "type": "T",
+  "createdAt": "REGEX(.*)",
+  "modifiedAt": "REGEX(.*)",
+  "P1": {
+    "type": "Property",
+    "value": 1.000000,
+    "createdAt": "REGEX(.*)",
+    "modifiedAt": "REGEX(.*)"
+  }
+}
+
+
+
+04. GET the entity with options=sysAttrs,keyValues AND attrs=P1, see 'createdAt' and 'modifiedAt' as text strings but only for the entity, not for P1
+=====================================================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 158
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:T:2018-11-22T10:00:00",
+  "type": "T",
+  "createdAt": "REGEX(.*)",
+  "modifiedAt": "REGEX(.*)",
+  "P1": 1.000000
+}
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
