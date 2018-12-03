@@ -57,8 +57,4 @@ curl localhost:1026/v2/subscriptions/<subscription_id> -s -S \
 }
 EOF
 ```
-
-Once the status is updated to "oneshot" again, the consumer will again get the notification or one time whenever the entity will 
-be updated and the subscription status will again be changed to "inactive" automatically.
-
-
+Once the status is updated to "oneshot" again, the consumer will again get the notification one time whenever the entity will be updated and the subscription status will again be changed to "inactive" automatically.
