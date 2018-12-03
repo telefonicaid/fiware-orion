@@ -1886,15 +1886,16 @@ static bool processSubscriptions
     if (notificationSent)
     {
       long long rightNow = getCurrentTime();
-
+      BSONObj query  = BSON("_id" << OID(mapSubId));
+      BSONObj update;
       //
       // If broker running without subscription cache, put lastNotificationTime and count in DB
       //
       if (subCacheActive == false)
       {
         BSONObj subOrig;
-        std::string err;
-        collectionFindOne(getSubscribeContextCollectionName(tenant), BSON("_id" << OID(mapSubId)), &subOrig, &err);
+        std::string newErr;
+        collectionFindOne(getSubscribeContextCollectionName(tenant), BSON("_id" << OID(mapSubId)), &subOrig, &newErr);
         std::string status;
         if (!subOrig.isEmpty())
         {
@@ -1904,21 +1905,19 @@ static bool processSubscriptions
           }
         }
 
-        BSONObj query  = BSON("_id" << OID(mapSubId));
-        BSONObj update;
         // Update the value of status (in case of oneshot) in DB when broker is running without subscription cache
         if (status == STATUS_ONESHOT)
         {
           update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << rightNow) <<
-                        "$inc" << BSON(CSUB_COUNT << (long long) 1) <<
-                        "$set" << BSON(CSUB_STATUS << STATUS_INACTIVE));
+                        "$set" << BSON(CSUB_STATUS << STATUS_INACTIVE) <<
+                        "$inc" << BSON(CSUB_COUNT << (long long) 1));
         }
         else
         {
           update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << rightNow) <<
                         "$inc" << BSON(CSUB_COUNT << (long long) 1));
         }
-        ret = collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, &err);
+        ret = collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
       }
 
 
@@ -1935,8 +1934,7 @@ static bool processSubscriptions
         {
           if (cSubP->status == STATUS_ONESHOT)
           {
-            BSONObj query  = BSON("_id" << OID(mapSubId));
-            BSONObj update = BSON("$set" << BSON(CSUB_STATUS << STATUS_INACTIVE));
+            update = BSON("$set" << BSON(CSUB_STATUS << STATUS_INACTIVE));
             // update the status to inactive as status is oneshot (in both DB and csubs cache)
             ret = collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
             cSubP->status = STATUS_INACTIVE;
