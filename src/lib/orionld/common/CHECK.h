@@ -25,6 +25,7 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate, OrionldDetailsString, ...
 
 
 // -----------------------------------------------------------------------------
@@ -36,7 +37,7 @@ do                                                                              
 {                                                                                                                                     \
   if (pointer != NULL)                                                                                                                \
   {                                                                                                                                   \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", fieldName, OrionldDetailsString);   \
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", fieldName, OrionldDetailsString);                      \
     return false;                                                                                                                     \
   }                                                                                                                                   \
   pointer = value;                                                                                                                    \

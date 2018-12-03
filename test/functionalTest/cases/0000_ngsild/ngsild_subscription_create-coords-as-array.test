@@ -44,7 +44,7 @@ payload='{
   "name": "Test subscription 01",
   "description": "Description of Test subscription 01",
   "watchedAttributes": [ "P2" ],
-  "q": "no check of Subscription::q implemented so far",
+  "q": "P2==1",
   "geoQ": {
     "geometry": "valid geometry",
     "coordinates": [ 1, 2 ],
@@ -124,7 +124,7 @@ MongoDB server version: REGEX(.*)
 		"http://example.org/P2"
 	],
 	"expression" : {
-		"q" : "",
+		"q" : "P2==1",
 		"mq" : "",
 		"geometry" : "valid geometry",
 		"coords" : "1,2",

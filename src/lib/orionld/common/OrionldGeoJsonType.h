@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_REST_HTTPHEADERADD_H_
-#define SRC_LIB_REST_HTTPHEADERADD_H_
+#ifndef SRC_LIB_ORIONLD_COMMON_ORIONLDGEOJSONTYPE_H_
+#define SRC_LIB_ORIONLD_COMMON_ORIONLDGEOJSONTYPE_H_
 
 /*
 *
@@ -25,40 +25,22 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/common/OrionldGeoJsonType.h"                 // OrionldGeoJsonType
 
 
 
 // -----------------------------------------------------------------------------
 //
-// ConnectionInfo - to avoid to include "ConnectionInfo.h"
+// OrionldGeoJsonType -
 //
-class ConnectionInfo;
+typedef enum OrionldGeoJsonType
+{
+  GeoJsonPoint,
+  GeoJsonMultiPoint,
+  GeoJsonLineString,
+  GeoJsonMultiLineString,
+  GeoJsonPolygon,
+  GeoJsonMultiPolygon
+} GeoJsonType;
 
-
-
-// -----------------------------------------------------------------------------
-//
-// httpHeaderAdd -
-//
-extern void httpHeaderAdd(ConnectionInfo* ciP, const char* key, const char* value);
-
-
-
-#ifdef ORIONLD
-// -----------------------------------------------------------------------------
-//
-// httpHeaderLocationAdd -
-//
-extern void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, const char* entityId);
-
-
-
-struct OrionldContext;
-// ----------------------------------------------------------------------------
-//
-// httpHeaderLinkAdd -
-//
-extern void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP, const char* _url);
-
-#endif  // ORIONLD
-#endif  // SRC_LIB_REST_HTTPHEADERADD_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDGEOJSONTYPE_H_

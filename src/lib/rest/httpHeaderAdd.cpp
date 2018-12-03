@@ -66,20 +66,29 @@ void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, co
 //
 // httpHeaderLinkAdd -
 //
-void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP)
+void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP, const char* _url)
 {
   char             link[256];
-  char*            linkP     = link;
-  OrionldContext*  contextP  = (_contextP != NULL)? _contextP : &orionldDefaultContext;
+  char*            linkP = link;
   char*            url;
   unsigned int     urlLen;
 
-  if (_contextP == &orionldCoreContext)
-    _contextP = &orionldDefaultContext;
+  // Special case: No context object, just a string
+  if ((_contextP == NULL) && (_url != NULL))
+  {
+    url = (char*) _url;
+  }
+  else
+  {
+    OrionldContext*  contextP  = (_contextP != NULL)? _contextP : &orionldDefaultContext;
 
-  url    = contextP->url;
+    if (_contextP == &orionldCoreContext)
+      _contextP = &orionldDefaultContext;
+
+    url = contextP->url;
+  }
+
   urlLen = strlen(url);
-
   if (urlLen > sizeof(link) + LINK_REL_AND_TYPE_SIZE + 3)
   {
     linkP = (char*) malloc(sizeof(link) + LINK_REL_AND_TYPE_SIZE + 3);

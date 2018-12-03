@@ -111,27 +111,41 @@ static bool ktreeToEntities(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngs
 
     if ((idP != NULL) && (idPatternP != NULL))
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Both 'id' and 'idPattern given in EntityInfo object", NULL, OrionldDetailsString);
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Both 'id' and 'idPattern' given in EntityInfo object", NULL, OrionldDetailsString);
       delete entitiesP;
       return false;
     }
 
-    //
-    // FIXME: Is 'type' mandatory?
-    //
-
-    if (typeP != NULL)
+    if (idP != NULL)
     {
-      char  typeExpanded[256];
+      // The entity id must be a URI
       char* details;
 
-      if (orionldUriExpand(ciP->contextP, typeP, typeExpanded, sizeof(typeExpanded), &details) == false)
+      if ((urlCheck(idP, &details) == false) && (urnCheck(idP, &details) == false))
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
-        delete entitiesP;
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Entity ID", details, OrionldDetailsString);
+        ciP->httpStatusCode = SccBadRequest;
         return false;
       }
     }
+
+    if (typeP == NULL)
+    {
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Missing field in EntityInfo object", "type", OrionldDetailsString);
+      delete entitiesP;
+      return false;
+    }
+
+    char  typeExpanded[256];
+    char* details;
+
+    if (orionldUriExpand(ciP->contextP, typeP, typeExpanded, sizeof(typeExpanded), &details) == false)
+    {
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
+      delete entitiesP;
+      return false;
+    }
+    typeP = typeExpanded;
 
     ngsiv2::EntID entityInfo;
 
@@ -259,8 +273,8 @@ static bool ktreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, S
     //
     // We have a little problem here ...
     // SubscriptionExpression::coords is a std::string in APIv2.
-    // NGSI-LD needs it to be an array.
-    // Easiest way to fix this is to render the JSON Array and translate it to a string, and then removing the '[]' 
+    // NGSI-LD needs it to be able to be an array.
+    // Easiest way to fix this is to render the JSON Array and translate it to a string, and then removing the '[]'
     //
     kjRender(ciP->kjsonP, coordinatesNodeP, coords, sizeof(coords));
     coords[strlen(coords) - 1] = 0;
@@ -517,6 +531,15 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
     }
     else if (SCOMPARE5(kNodeP->name, 't', 'y', 'p', 'e', 0))
     {
+      //
+      // NOTE
+      //   The spec of ngsi-ld states that the field "type" is MANDATORY and MUST be set to "Subscription".
+      //   A bit funny in my opinion.
+      //   However, here we make sure that the spec is followed, but we add nothing to the database.
+      //   When rendering (serializing) subscriptions for GET /subscriptions, the field
+      //     "type": "Subscription"
+      //   is added to the response payload.
+      //
       DUPLICATE_CHECK(typeP, "Subscription::type", kNodeP->value.s);
       STRING_CHECK(kNodeP, "Subscription::type");
 
@@ -571,6 +594,9 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
     {
       DUPLICATE_CHECK(qP, "Subscription::q", kNodeP->value.s);
       STRING_CHECK(kNodeP, "Subscription::q");
+
+      // FIXME: Need to parse the Q and to URI Expansion
+      subP->subject.condition.expression.q = kNodeP->value.s;
     }
     else if (SCOMPARE5(kNodeP->name, 'g', 'e', 'o', 'Q', 0))
     {
@@ -728,7 +754,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   LM_TMP(("After mongoCreateSubscription"));
   ciP->httpStatusCode = SccCreated;
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/subscriptions/", subId.c_str());
-  httpHeaderLinkAdd(ciP, ciP->contextP);
+  httpHeaderLinkAdd(ciP, ciP->contextP, NULL);
 
   return true;
 }

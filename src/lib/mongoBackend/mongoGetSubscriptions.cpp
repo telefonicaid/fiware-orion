@@ -516,19 +516,12 @@ bool mongoGetLdSubscription
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
     setSubscriptionId(subP, r);
-    LM_TMP(("Here"));
     setDescription(subP, r);
-    LM_TMP(("Here"));
     setSubject(subP, r);
-    LM_TMP(("Here"));
     setNotification(subP, r, tenant);
-    LM_TMP(("Here"));
     setStatus(subP, r);
-    LM_TMP(("Here"));
     setName(subP, r);
-    LM_TMP(("Here"));
     setContext(subP, r);
-    LM_TMP(("Here"));
 
     if (moreSafe(cursor))
     {

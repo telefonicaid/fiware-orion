@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_REST_HTTPHEADERADD_H_
-#define SRC_LIB_REST_HTTPHEADERADD_H_
+#ifndef SRC_LIB_ORIONLD_COMMON_NUMBERTODATE_H_
+#define SRC_LIB_ORIONLD_COMMON_NUMBERTODATE_H_
 
 /*
 *
@@ -25,40 +25,14 @@
 *
 * Author: Ken Zangelin
 */
+#include <time.h>                                              // time, gmtime_r
 
 
 
 // -----------------------------------------------------------------------------
 //
-// ConnectionInfo - to avoid to include "ConnectionInfo.h"
+// numberToDate -
 //
-class ConnectionInfo;
+extern bool numberToDate(time_t fromEpoch, char* date, int dateLen, char** detailsP);
 
-
-
-// -----------------------------------------------------------------------------
-//
-// httpHeaderAdd -
-//
-extern void httpHeaderAdd(ConnectionInfo* ciP, const char* key, const char* value);
-
-
-
-#ifdef ORIONLD
-// -----------------------------------------------------------------------------
-//
-// httpHeaderLocationAdd -
-//
-extern void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, const char* entityId);
-
-
-
-struct OrionldContext;
-// ----------------------------------------------------------------------------
-//
-// httpHeaderLinkAdd -
-//
-extern void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP, const char* _url);
-
-#endif  // ORIONLD
-#endif  // SRC_LIB_REST_HTTPHEADERADD_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_NUMBERTODATE_H_

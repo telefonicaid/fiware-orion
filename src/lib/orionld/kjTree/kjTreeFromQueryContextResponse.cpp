@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include <time.h>                                              // time, gmtime_r
-
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
@@ -40,6 +38,7 @@ extern "C"
 #include "ngsi10/QueryContextResponse.h"                       // QueryContextResponse
 
 #include "orionld/common/orionldErrorResponse.h"               // OrionldResponseErrorType, orionldErrorResponse
+#include "orionld/common/numberToDate.h"                       // numberToDate
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
 #include "orionld/context/orionldContextValueLookup.h"         // orionldContextValueLookup
@@ -52,22 +51,6 @@ extern "C"
 #include "orionld/kjTree/kjTreeFromContextContextAttribute.h"  // kjTreeFromContextContextAttribute
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"            // kjTreeFromCompoundValue
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// numberToDate -
-//
-static bool numberToDate(time_t fromEpoch, char* date, int dateLen, char** detailsP)
-{
-  struct tm  tm;
-
-  gmtime_r(&fromEpoch, &tm);
-  strftime(date, dateLen, "%Y-%m-%dT%H:%M:%S", &tm);
-
-  return true;
-}
 
 
 
@@ -618,7 +601,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
         kjChildAdd(top, nodeP);
       }
       else
-        httpHeaderLinkAdd(ciP, &orionldDefaultContext);
+        httpHeaderLinkAdd(ciP, &orionldDefaultContext, NULL);
     }
     else
     {
@@ -627,7 +610,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
         if (contextAttrP->valueType == orion::ValueTypeString)
         {
           OrionldContext context = { (char*) contextAttrP->stringValue.c_str(), NULL, OrionldUserContext, false, NULL };
-          httpHeaderLinkAdd(ciP, &context);
+          httpHeaderLinkAdd(ciP, &context, NULL);
         }
         else
         {
@@ -637,7 +620,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
           // We now need to create a context in the broker, able to serve it, and in the Link HTTP Header
           // return this Link
           //
-          httpHeaderLinkAdd(ciP, NULL);
+          httpHeaderLinkAdd(ciP, NULL, NULL);
         }
       }
       else

@@ -33,7 +33,8 @@ brokerStart CB 0-255
 #
 # 01. POST /ngsi-ld/v1/subscriptions, with sub-id http://a.b.c/subs/sub01
 # 02. Check mongo
-# 03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01
+# 03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, see @context in HTTP header
+# 04. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, accepting jsonld - see @context in payload
 #
 
 
@@ -44,12 +45,26 @@ payload='{
   "type": "Subscription",
   "name": "Test subscription 01",
   "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    },
+    {
+      "id": "http://a.b.c/E02",
+      "type": "T2"
+    },
+    {
+      "idPattern": ".*E03.*",
+      "type": "T3"
+    }
+  ],
   "watchedAttributes": [ "P2" ],
-  "q": "no check of Subscription::q implemented so far",
+  "q": "P2>10",
   "geoQ": {
-    "geometry": "valid geometry",
-    "coordinates": "1, 2",
-    "georel": "valid georel",
+    "geometry": "circle",
+    "coordinates": "1,2",
+    "georel": "near",
     "geoproperty": "not supported"
   },
   "csf": "not implemented",
@@ -86,9 +101,16 @@ echo
 echo
 
 
-echo "03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01"
-echo "========================================================"
+echo "03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, see @context in HTTP header"
+echo "====================================================================================="
 orionCurl --url '/ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "04. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, accepting jsonld - see @context in payload"
+echo "===================================================================================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01?prettyPrint=yes&spaces=2' --noPayloadCheck -H "Accept: application/ld+json"
 echo
 echo
 
@@ -118,7 +140,26 @@ MongoDB server version: REGEX(.*)
 	"servicePath" : "/",
 	"description" : "Description of Test subscription 01",
 	"status" : "paused",
-	"entities" : [ ],
+	"entities" : [
+		{
+			"id" : "urn:ngsi-ld:E01",
+			"isPattern" : "false",
+			"type" : "http://example.org/ngsi-ld/default/T1",
+			"isTypePattern" : false
+		},
+		{
+			"id" : "http://a.b.c/E02",
+			"isPattern" : "false",
+			"type" : "http://example.org/T2",
+			"isTypePattern" : false
+		},
+		{
+			"id" : ".*E03.*",
+			"isPattern" : "true",
+			"type" : "http://example.org/T3",
+			"isTypePattern" : false
+		}
+	],
 	"attrs" : [
 		"http://example.org/P1",
 		"http://example.org/P2",
@@ -132,26 +173,125 @@ MongoDB server version: REGEX(.*)
 		"http://example.org/P2"
 	],
 	"expression" : {
-		"q" : "",
+		"q" : "P2>10",
 		"mq" : "",
-		"geometry" : "valid geometry",
-		"coords" : "1, 2",
-		"georel" : "valid georel"
+		"geometry" : "circle",
+		"coords" : "1,2",
+		"georel" : "near"
 	},
 	"format" : "keyValues"
 }
 bye
 
 
-03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01
-========================================================
+03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, see @context in HTTP header
+=====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 984
+Content-Type: application/json
+Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "http://a.b.c/subs/sub01",
+  "type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "http://example.org/ngsi-ld/default/T1"
+    },
+    {
+      "id": "http://a.b.c/E02",
+      "type": "http://example.org/T2"
+    },
+    {
+      "idPattern": ".*E03.*",
+      "type": "http://example.org/T3"
+    }
+  ],
+  "watchedAttributes": [
+    "http://example.org/P2"
+  ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "circle",
+    "coordinates": "1,2",
+    "georel": "near"
+  },
+  "isActive": false,
+  "notification": {
+    "attributes": [
+      "http://example.org/P1",
+      "http://example.org/P2",
+      "http://example.org/ngsi-ld/default/A3"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 5,
+  "status": "paused"
+}
+
+
+
+04. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, accepting jsonld - see @context in payload
+====================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 1069
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "id": "http://a.b.c/subs/sub01"
+  "id": "http://a.b.c/subs/sub01",
+  "type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "http://example.org/ngsi-ld/default/T1"
+    },
+    {
+      "id": "http://a.b.c/E02",
+      "type": "http://example.org/T2"
+    },
+    {
+      "idPattern": ".*E03.*",
+      "type": "http://example.org/T3"
+    }
+  ],
+  "watchedAttributes": [
+    "http://example.org/P2"
+  ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "circle",
+    "coordinates": "1,2",
+    "georel": "near"
+  },
+  "isActive": false,
+  "notification": {
+    "attributes": [
+      "http://example.org/P1",
+      "http://example.org/P2",
+      "http://example.org/ngsi-ld/default/A3"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 5,
+  "status": "paused",
+  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
 }
 
 

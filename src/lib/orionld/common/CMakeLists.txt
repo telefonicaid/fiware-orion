@@ -28,6 +28,9 @@ SET (SOURCES
     urnCheck.cpp
     linkCheck.cpp
     httpStatusCodeToOrionldErrorType.cpp
+    geoJsonTypeCheck.cpp
+    geoJsonCheck.cpp
+    numberToDate.cpp
 )
 
 # Include directories

@@ -344,11 +344,11 @@ respond:
   if (ciP->responseTree != NULL)
   {
     LM_T(LmtJsonResponse, ("Rendering KJSON response tree"));
-    ciP->responsePayload = (char*) malloc(1024);
+    ciP->responsePayload = (char*) malloc(2048);
     if (ciP->responsePayload != NULL)
     {
       ciP->responsePayloadAllocated = true;
-      kjRender(ciP->kjsonP, ciP->responseTree, ciP->responsePayload, 1024);
+      kjRender(ciP->kjsonP, ciP->responseTree, ciP->responsePayload, 2048);
     }
     else
     {

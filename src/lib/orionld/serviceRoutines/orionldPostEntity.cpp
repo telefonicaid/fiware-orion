@@ -163,7 +163,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   }
 
   ciP->httpStatusCode = SccNoContent;
-  httpHeaderLinkAdd(ciP, ciP->contextP);  // FIXME: Remove the Link HTTP Header?
+  httpHeaderLinkAdd(ciP, ciP->contextP, NULL);
 
   return true;
 }

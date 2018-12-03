@@ -262,14 +262,14 @@ Date: REGEX(.*)
 
 04. GET /ngsi-ld/v1/subscriptions/S1
 ====================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 135
+HTTP/1.1 404 Not Found
+Content-Length: 108
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "S1",
-    "title": "not implemented - GET /ngsi-ld/v1/subscriptions/*",
+    "title": "subscription not found",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

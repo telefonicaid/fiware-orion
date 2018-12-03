@@ -27,6 +27,7 @@
 
 extern "C"
 {
+#include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjString, kjObject, ...
 #include "kjson/kjRender.h"                                    // kjRender
 }
@@ -49,6 +50,7 @@ extern "C"
 #include "orionld/common/CHECK.h"                              // CHECK
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
+#include "orionld/common/geoJsonCheck.h"                       // geoJsonCheck
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl, orionldCoreContext
 #include "orionld/context/orionldContextAdd.h"                 // Add a context to the context list
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
@@ -280,141 +282,6 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
   }
 
   return cNodeP;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// GeoJSON -
-//
-// The value of a GeoJSON Property must be a JSON Object.
-// The Object must have exactly two members:
-// - type:        a JSON String that is a supported GeoJSON type (Point, Polygon, ...)
-// - coordinates: a JSON Array of Numbers. The number of members depends on the 'type'
-//
-//
-// ACCEPTED TYPES:
-// First of all, a Position is an Array of 2-3 Numbers  (Implementations SHOULD NOT extend positions beyond three elements)
-//
-//   Point:            a Position                        [ 1, 2 ]
-//   MultiPoint:       an Array of Positions             [ [ 1, 2 ], [ 1, 2 ], [ 1, 2 ], ... ]
-//   LineString:       an Array of 2+ Positions          [ [ 1, 2 ], [ 1, 2 ], ... ]
-//   MultiLineString:  an Array of LineString            [ [ [ 1, 2 ], [ 1, 2 ] ], [ [ 1, 2 ], [ 1, 2 ] ], ... ]
-//   Polygon:          closed LineString with 4+ pos     [ [ 1, 2 ], [ 3, 4 ], [ 5, 6 ], ..., [ 1, 2 ] ]
-//   MultiPolygon:     an Array of Polygon               [ [ [ [ 1, 2 ], [ 1, 2 ] ], [ [ 1, 2 ], [ 1, 2 ] ], ... ], [ [ [ 1, 2 ], [ 1, 2 ] ], [ [ 1, 2 ], [ 1, 2 ] ], ... ], ... ]
-//
-
-
-
-// -----------------------------------------------------------------------------
-//
-// GeoJsonType -
-//
-typedef enum GeoJsonType
-{
-  GeoJsonPoint,
-  GeoJsonMultiPoint,
-  GeoJsonLineString,
-  GeoJsonMultiLineString,
-  GeoJsonPolygon,
-  GeoJsonMultiPolygon
-} GeoJsonType;
-
-
-
-// -----------------------------------------------------------------------------
-//
-// geoJsonTypeCheck -
-//
-static bool geoJsonTypeCheck(char* typeName, GeoJsonType* typeP, char** detailsP)
-{
-  if      (SCOMPARE6(typeName, 'P', 'o', 'i', 'n', 't', 0))                                                       *typeP = GeoJsonPoint;
-  else if (SCOMPARE11(typeName, 'M', 'u', 'l', 't', 'i', 'P', 'o', 'i', 'n', 't', 0))                             *typeP = GeoJsonMultiPoint;
-  else if (SCOMPARE11(typeName, 'L', 'i', 'n', 'e', 'S', 't', 'r', 'i', 'n', 'g', 0))                             *typeP = GeoJsonLineString;
-  else if (SCOMPARE16(typeName, 'M', 'u', 'l', 't', 'i', 'L', 'i', 'n', 'e', 'S', 't', 'r', 'i', 'n', 'g', 0))    *typeP = GeoJsonLineString;
-  else if (SCOMPARE8(typeName, 'P', 'o', 'l', 'y', 'g', 'o', 'n', 0))                                             *typeP = GeoJsonPolygon;
-  else if (SCOMPARE13(typeName, 'M', 'u', 'l', 't', 'i', 'P', 'o', 'l', 'y', 'g', 'o', 'n', 0))                   *typeP = GeoJsonMultiPolygon;
-  else
-  {
-    LM_E(("Invalid GeoJSON type: %s", typeName));
-    *detailsP = (char*) "invalid GeoJSON type";
-
-    return false;
-  }
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// geojsonCheck - check validity of any geo-property
-//
-static bool geojsonCheck(ConnectionInfo* ciP, KjNode* geoJsonNodeP, char** detailsP)
-{
-  KjNode*     typeP    = NULL;
-  KjNode*     coordsP  = NULL;
-  GeoJsonType geoJsonType  = (GeoJsonType) -1;
-
-  if (geoJsonNodeP->type != KjObject)
-  {
-    *detailsP = (char*) "A GeoProperty value must be a JSON Object";
-    return false;
-  }
-
-  for (KjNode* itemP = geoJsonNodeP->children; itemP != NULL; itemP = itemP->next)
-  {
-    LM_TMP(("Item '%s'", itemP->name));
-
-    if (SCOMPARE5(itemP->name, 't', 'y', 'p', 'e', 0))
-    {
-      DUPLICATE_CHECK(typeP, geoJsonNodeP->name, itemP);
-
-      if (itemP->type != KjString)
-      {
-        *detailsP = (char*) "the 'type' field of a GeoJSON object must be a JSON String";
-        return false;
-      }
-
-      if (geoJsonTypeCheck(itemP->value.s, &geoJsonType, detailsP) == false)
-        return false;
-    }
-    else if (SCOMPARE12(itemP->name, 'c', 'o', 'o', 'r', 'd', 'i', 'n', 'a', 't', 'e', 's', 0))
-    {
-      DUPLICATE_CHECK(coordsP, geoJsonNodeP->name, itemP);
-
-      if (itemP->type != KjArray)
-      {
-        *detailsP = (char*) "the 'coordinates' field of a GeoJSON object must be a JSON Array";
-        return false;
-      }
-    }
-    else
-    {
-      *detailsP = (char*) "invalid field in a GeoJSON object";
-      return false;
-    }
-  }
-
-  if (typeP == NULL)
-  {
-    *detailsP = (char*) "Mandatory 'type' field missing for a GeoJSON Property";
-    return false;
-  }
-
-  if (coordsP == NULL)
-  {
-    *detailsP = (char*) "Mandatory 'coordinates' field missing for a GeoJSON Property";
-    return false;
-  }
-
-  // FIXME: Check all types of GeoJSON - Point, Polygon, etc (different Arrays of Number)
-  // if (geoJsonCoordinatesCheck(coordsP->children, detailsP) == false)
-  //   return false;
-
-  return true;
 }
 
 
@@ -871,9 +738,9 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
 
       if (valueP->type != KjObject)
         ATTRIBUTE_ERROR("geo-property attribute value must be a JSON Object", kjValueType(valueP->type));
-      else if (geojsonCheck(ciP, valueP, &details) == false)
+      else if (geoJsonCheck(ciP, valueP, &details) == false)
       {
-        LM_TMP(("geojsonCheck error for %s: %s", caName, details));
+        LM_TMP(("geoJsonCheck error for %s: %s", caName, details));
         ATTRIBUTE_ERROR("geo-property attribute must have a valid GeoJson value", details);
       }
 
@@ -1150,7 +1017,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
   ciP->httpStatusCode = SccCreated;
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/entities/", idNodeP->value.s);
-  httpHeaderLinkAdd(ciP, ciP->contextP);  // FIXME: Remove the Link HTTP Header?
+  httpHeaderLinkAdd(ciP, ciP->contextP, NULL);
 
   LM_TMP(("Function Done"));
   return true;

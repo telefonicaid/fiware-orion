@@ -523,7 +523,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
         kjChildAdd(top, nodeP);
       }
       else
-        httpHeaderLinkAdd(ciP, &orionldDefaultContext);
+        httpHeaderLinkAdd(ciP, &orionldDefaultContext, NULL);
     }
     else
     {
@@ -532,7 +532,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
         if (contextAttrP->valueType == orion::ValueTypeString)
         {
           OrionldContext context = { (char*) contextAttrP->stringValue.c_str(), NULL, OrionldUserContext, false, NULL };
-          httpHeaderLinkAdd(ciP, &context);
+          httpHeaderLinkAdd(ciP, &context, NULL);
         }
         else
         {
@@ -542,7 +542,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
           // We now need to create a context in the broker, able to serve it, and in the Link HTTP Header
           // return this Link
           //
-          httpHeaderLinkAdd(ciP, NULL);
+          httpHeaderLinkAdd(ciP, NULL, NULL);
         }
       }
       else
