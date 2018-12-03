@@ -243,6 +243,40 @@ static void setStatus(Subscription* s, const BSONObj& r)
 }
 
 
+#ifdef ORIONLD
+/* ****************************************************************************
+*
+* setSubscriptionId -
+*/
+static void setSubscriptionId(Subscription* s, const BSONObj& r)
+{
+  s->id = getStringFieldF(r, "_id");
+}
+
+
+
+/* ****************************************************************************
+*
+* setName -
+*/
+static void setName(Subscription* s, const BSONObj& r)
+{
+  s->name = r.hasField(CSUB_NAME) ? getStringFieldF(r, CSUB_NAME) : "";
+}
+
+
+
+/* ****************************************************************************
+*
+* setContext -
+*/
+static void setContext(Subscription* s, const BSONObj& r)
+{
+  s->ldContext = r.hasField(CSUB_LDCONTEXT) ? getStringFieldF(r, CSUB_LDCONTEXT) : "";
+}
+
+#endif
+
 
 /* ****************************************************************************
 *
@@ -426,3 +460,103 @@ void mongoGetSubscription
 
   *oe = OrionError(SccOk);
 }
+
+
+
+#ifdef ORIONLD
+/* ****************************************************************************
+*
+* mongoGetLdSubscription -
+*/
+bool mongoGetLdSubscription
+(
+  ngsiv2::Subscription*  subP,
+  const char*            subId,
+  const char*            tenant,
+  HttpStatusCode*        statusCodeP,
+  char**                 detailsP
+)
+{
+  bool                           reqSemTaken = false;
+  std::string                    err;
+  std::auto_ptr<DBClientCursor>  cursor;
+  BSONObj                        q     = BSON("_id" << subId);
+
+  reqSemTake(__FUNCTION__, "Mongo Get Subscription", SemReadOp, &reqSemTaken);
+
+  LM_T(LmtMongo, ("Mongo Get Subscription"));
+
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionQuery(connection, getSubscribeContextCollectionName(tenant), q, &cursor, &err))
+  {
+    releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+    reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
+    *detailsP    = (char*) "Internal Error during DB-query";
+    *statusCodeP = SccReceiverInternalError;
+    return false;
+  }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
+
+  /* Process query result */
+  if (moreSafe(cursor))
+  {
+    BSONObj r;
+
+    if (!nextSafeOrErrorF(cursor, &r, &err))
+    {
+      releaseMongoConnection(connection);
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
+      reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
+      *detailsP    = (char*) "Runtime Error (exception in nextSafe)";
+      *statusCodeP = SccReceiverInternalError;
+      return false;
+    }
+    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+
+    setSubscriptionId(subP, r);
+    LM_TMP(("Here"));
+    setDescription(subP, r);
+    LM_TMP(("Here"));
+    setSubject(subP, r);
+    LM_TMP(("Here"));
+    setNotification(subP, r, tenant);
+    LM_TMP(("Here"));
+    setStatus(subP, r);
+    LM_TMP(("Here"));
+    setName(subP, r);
+    LM_TMP(("Here"));
+    setContext(subP, r);
+    LM_TMP(("Here"));
+
+    if (moreSafe(cursor))
+    {
+      releaseMongoConnection(connection);
+
+      // Ooops, we expected only one
+      LM_T(LmtMongo, ("more than one subscription: '%s'", subId));
+      reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
+      *detailsP    = (char*) "more than one subscription matched";
+      *statusCodeP = SccConflict;
+      return false;
+    }
+  }
+  else
+  {
+    releaseMongoConnection(connection);
+    LM_T(LmtMongo, ("subscription not found: '%s'", subId));
+    reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
+    *detailsP    = (char*) "subscription not found";
+    *statusCodeP = SccContextElementNotFound;
+    return false;
+  }
+
+  releaseMongoConnection(connection);
+  reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
+
+  *statusCodeP = SccOk;
+  return true;
+}
+
+#endif

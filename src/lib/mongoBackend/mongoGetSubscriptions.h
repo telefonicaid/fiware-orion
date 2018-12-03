@@ -65,4 +65,22 @@ extern void mongoGetSubscription
   const std::string&                   tenant
 );
 
+
+
+#ifdef ORIONLD
+/* ****************************************************************************
+*
+* mongoGetLdSubscription -
+*/
+extern bool mongoGetLdSubscription
+(
+  ngsiv2::Subscription*  subP,
+  const char*            subId,
+  const char*            tenant,
+  HttpStatusCode*        statusCodeP,
+  char**                 detailsP
+);
+
+#endif  // ORIONLD
+
 #endif  // SRC_LIB_MONGOBACKEND_MONGOGETSUBSCRIPTIONS_H_

@@ -26,7 +26,9 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "mongoBackend/mongoGetSubscriptions.h"                // mongoGetSubscription
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/kjTree/kjTreeFromSubscription.h"             // kjTreeFromSubscription
 #include "orionld/serviceRoutines/orionldGetSubscription.h"    // Own Interface
 
 
@@ -37,11 +39,23 @@
 //
 bool orionldGetSubscription(ConnectionInfo* ciP)
 {
+  ngsiv2::Subscription  subscription;
+  char*                 details;
+
   LM_T(LmtServiceRoutine, ("In orionldGetSubscription"));
+  LM_TMP(("In orionldGetSubscription: %s", ciP->wildcard[0]));
 
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - GET /ngsi-ld/v1/subscriptions/*", ciP->wildcard[0], OrionldDetailsString);
+  if (mongoGetLdSubscription(&subscription, ciP->wildcard[0], ciP->tenant.c_str(), &ciP->httpStatusCode, &details) != true)
+  {
+    LM_E(("mongoGetLdSubscription error: %s", details));
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, ciP->wildcard[0], OrionldDetailsString);
+    return false;
+  }
+  LM_TMP(("mongoGetLdSubscription OK"));
 
-  ciP->httpStatusCode  = SccNotImplemented;
-
+  // Transform to KjNode tree
+  ciP->httpStatusCode = SccOk;
+  ciP->responseTree = kjTreeFromSubscription(ciP, &subscription);
+  
   return true;
 }

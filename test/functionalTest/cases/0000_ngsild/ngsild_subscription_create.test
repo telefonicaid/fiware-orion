@@ -26,13 +26,14 @@ Subscription Creation and DB Contebt
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 212-249
+brokerStart CB 0-255
 
 --SHELL--
 
 #
-# 01. POST /ngsi-ld/v1/subscriptions, with a sub-id
-# 02. Check mongo 
+# 01. POST /ngsi-ld/v1/subscriptions, with sub-id http://a.b.c/subs/sub01
+# 02. Check mongo
+# 03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01
 #
 
 
@@ -85,6 +86,13 @@ echo
 echo
 
 
+echo "03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01"
+echo "========================================================"
+orionCurl --url '/ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
 --REGEXPECT--
 01. POST /ngsi-ld/v1/subscriptions, with a sub-id
 =================================================
@@ -133,6 +141,19 @@ MongoDB server version: REGEX(.*)
 	"format" : "keyValues"
 }
 bye
+
+
+03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "id": "http://a.b.c/subs/sub01"
+}
+
 
 
 --TEARDOWN--
