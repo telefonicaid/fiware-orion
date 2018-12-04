@@ -507,4 +507,15 @@ extern void cprLookupByAttribute
   MimeType*                                perAttrPaMimeType
 );
 
+
+
+#ifdef ORIONLD
+/* ****************************************************************************
+*
+* mongoIdentifier - create a unique identifier using OID
+*/
+extern char* mongoIdentifier(char* buffer);
+
+#endif  // ORIONLD
+
 #endif  // SRC_LIB_MONGOBACKEND_MONGOGLOBAL_H_

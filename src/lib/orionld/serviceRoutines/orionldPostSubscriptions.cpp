@@ -38,6 +38,7 @@ extern "C"
 #include "apiTypesV2/Subscription.h"                           // Subscription
 #include "apiTypesV2/EntID.h"                                  // EntID
 #include "mongoBackend/mongoCreateSubscription.h"              // mongoCreateSubscription
+#include "mongoBackend/MongoGlobal.h"                          // mongoIdentifier
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
@@ -461,7 +462,6 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
   bool                      throttlingPresent  = false;
   KjNode*                   idNodeP            = NULL;
   KjNode*                   contextNodeP       = NULL;
-  char*                     subId;
 
   LM_TMP(("In ktreeToSubscription"));
 
@@ -489,10 +489,19 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
   if (idNodeP != NULL)
   {
     STRING_CHECK(idNodeP, "Subscription::id");
-    subId = idNodeP->value.s;
+    subP->id = idNodeP->value.s;
   }
   else
-    subId = (char*) "http://invent.an.subId/NOW";
+  {
+    char randomId[32];
+
+    mongoIdentifier(randomId);
+
+    subP->id  = "urn:ngsi-ld:Subscription:";
+    subP->id += randomId;
+
+    LM_TMP(("Invented a sub-id '%s'", subP->id.c_str()));
+  }
 
   if (ciP->httpHeaders.ngsildContent)  // Context in payload
   {
@@ -502,7 +511,7 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
       return false;
     }
 
-    ContextAttribute* caP = orionldContextTreat(ciP, contextNodeP, subId);
+    ContextAttribute* caP = orionldContextTreat(ciP, contextNodeP, (char*) subP->id.c_str());
     if (caP == NULL)
     {
       // error

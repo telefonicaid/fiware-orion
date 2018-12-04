@@ -2688,3 +2688,21 @@ void cprLookupByAttribute
     }
   }
 }
+
+
+
+#ifdef ORIONLD
+/* ****************************************************************************
+*
+* mongoIdentifier - create a unique identifier using OID
+*/
+char* mongoIdentifier(char* buffer)
+{
+  OID oid;
+
+  oid.init();
+  strcpy(buffer, oid.toString().c_str());
+
+  return buffer;
+}
+#endif  // ORIONLD
