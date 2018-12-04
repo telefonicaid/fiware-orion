@@ -14,8 +14,8 @@
 * [Notification throttling](#notification-throttling)
 * [Ordering between:$
  different attribute value types](#ordering-between-different-attribute-value-types)
-* [Initial notifications](#initial_notifications)
-* [Oneshot Subscription](#oneshot_subscriptions)
+* [Initial notifications](#initial-notifications)
+* [Oneshot Subscription](#oneshot-subscriptions)
 * [Registrations](#registrations)
 * [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
@@ -281,7 +281,7 @@ subscription creation/update time. Check details in the document about [initial 
 
 ## Oneshot subscriptions
 
-Apart from the `status` values defined for subscription in the NGSIv2, Orion also allows to use `oneshot`. Please find details in this [Oneshot_Subscriptions](oneshot_subscription.md)
+Apart from the `status` values defined for subscription in the NGSIv2 specification, Orion also allows to use `oneshot`. Please find details in [the oneshot subscription document](oneshot_subscription.md)
 
 [Top](#top)
 
