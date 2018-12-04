@@ -217,7 +217,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   {
     std::string statusString = statusOpt.value;
 
-    if ((statusString != "active") && (statusString != "inactive"))
+    if ((statusString != "active") && (statusString != "inactive") && (statusString != "oneshot"))
     {
       return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_STATUS);
     }

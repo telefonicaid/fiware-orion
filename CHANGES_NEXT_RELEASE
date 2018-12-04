@@ -4,3 +4,4 @@
 - Remove: isDomain field in NGSIv1 registrations (it was never used)
 - Fix: NGSIv2-NGSIv1 location metadata issues (#3122)
 - Fix: Wrong inclusion of "location" metadata in geo:json notifications (#3045)
+- Add: Oneshot Subscription (#3189)

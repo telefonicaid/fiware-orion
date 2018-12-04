@@ -14,7 +14,8 @@
 * [Notification throttling](#notification-throttling)
 * [Ordering between:$
  different attribute value types](#ordering-between-different-attribute-value-types)
-* [Initial notifications](#initial_notifications)
+* [Initial notifications](#initial-notifications)
+* [Oneshot Subscription](#oneshot-subscriptions)
 * [Registrations](#registrations)
 * [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
@@ -275,6 +276,12 @@ The NGSIv2 specification describes in section "Subscriptions" the rules that tri
 corresponding to a given subscription, based on updates to the entities covered by the subscription.
 Apart from that kind of regular notifications, Orion may send also an initial notification at
 subscription creation/update time. Check details in the document about [initial notifications](initial_notification.md)
+
+[Top](#top)
+
+## Oneshot subscriptions
+
+Apart from the `status` values defined for subscription in the NGSIv2 specification, Orion also allows to use `oneshot`. Please find details in [the oneshot subscription document](oneshot_subscription.md)
 
 [Top](#top)
 
