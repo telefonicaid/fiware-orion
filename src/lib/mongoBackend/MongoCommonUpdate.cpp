@@ -87,18 +87,18 @@ using orion::CompoundValueNode;
 * Check that the parameter is a not custom metadata, i.e. one metadata without
 * an special semantic to be interpreted by the context broker itself
 *
-* NGSIv2 builtin metadata (dateCreated, dateModifie, etc.) are considered custom
+* NGSIv2 builtin metadata (dateCreated, dateModified, etc.) are considered custom
 *
-* FIXME P2: this function probably could be moved to another place "closer" to metadata
+* FIXME P6: this function probably could be removed. By the moment we leave it
+* and we decide what to do in some time (if we add a new custom metadata it could be
+* a convenient placeholder). If kept, it should be moved to another place
+* "closer" to metadata
 */
 static bool isNotCustomMetadata(std::string md)
 {
-  if (md != NGSI_MD_LOCATION)
-  {
-    return false;
-  }
-
-  return true;
+  // After removing ID and deprecating location, all metadata are custom so
+  // we always return false
+  return false;
 }
 
 
@@ -1886,25 +1886,14 @@ static void buildGeneralErrorResponse
 */
 static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes)
 {
-  Metadata*  md;
-
-  /* Not custom */
-  if ((caReq->getLocation().length() > 0) && (caReq->type != GEO_POINT))
-  {
-    /* Note that if attribute type is geo:point then the user is using the "new way"
-     * of locating entities in NGSIv1, thus location metadata is not rendered */
-    md = new Metadata(NGSI_MD_LOCATION, "string", caReq->getLocation());
-    caRes->metadataVector.push_back(md);
-  }
-
-  /* Custom (just "mirroring" in the response) */
+  /* Custom metadata (just "mirroring" in the response) */
   for (unsigned int ix = 0; ix < caReq->metadataVector.size(); ++ix)
   {
     Metadata* mdReq = caReq->metadataVector[ix];
 
     if (!isNotCustomMetadata(mdReq->name))
     {
-      md = new Metadata(mdReq);
+      Metadata* md = new Metadata(mdReq);
       caRes->metadataVector.push_back(md);
     }
   }
