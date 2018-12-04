@@ -745,6 +745,10 @@ void subCacheItemInsert
   StringFilter*                      stringFilterP,
   StringFilter*                      mdStringFilterP,
   const std::string&                 status,
+#ifdef ORIONLD
+  const std::string&                 name,
+  const std::string&                 ldContext,
+#endif
   const std::string&                 q,
   const std::string&                 geometry,
   const std::string&                 coords,
@@ -775,6 +779,10 @@ void subCacheItemInsert
   cSubP->next                  = NULL;
   cSubP->count                 = (notificationDone == true)? 1 : 0;
   cSubP->status                = status;
+#ifdef ORIONLD
+  cSubP->name                  = name;
+  cSubP->ldContext             = ldContext;
+#endif
   cSubP->expression.q          = q;
   cSubP->expression.geometry   = geometry;
   cSubP->expression.coords     = coords;

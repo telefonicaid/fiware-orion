@@ -104,6 +104,10 @@ struct CachedSubscription
   int64_t                     expirationTime;
   int64_t                     lastNotificationTime;
   std::string                 status;
+#ifdef ORIONLD
+  std::string                 name;
+  std::string                 ldContext;
+#endif
   int64_t                     count;
   RenderFormat                renderFormat;
   SubscriptionExpression      expression;
@@ -200,6 +204,10 @@ extern void subCacheItemInsert
   StringFilter*                      stringFilterP,
   StringFilter*                      mdStringFilterP,
   const std::string&                 status,
+#ifdef ORIONLD
+  const std::string&                 name,
+  const std::string&                 ldContext,
+#endif
   const std::string&                 q,
   const std::string&                 geometry,
   const std::string&                 coords,

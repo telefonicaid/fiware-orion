@@ -230,15 +230,10 @@ bool mongoDeleteLdSubscription
     return false;
   }
 
-#if 0
-  // FIXME - sub-cache comes later
-
   //
   // Removing subscription from mongo subscription cache
   //
-  LM_T(LmtSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache",
-                     requestP->subscriptionId.get().c_str(),
-                     tenant.c_str()));
+  LM_T(LmtSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache", subId, tenant));
 
   cacheSemTake(__FUNCTION__, "Removing subscription from cache");
 
@@ -247,7 +242,6 @@ bool mongoDeleteLdSubscription
     subCacheItemRemove(cSubP);
 
   cacheSemGive(__FUNCTION__, "Removing subscription from cache");
-#endif
 
   reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
   *statusCodeP = SccOk;

@@ -110,6 +110,10 @@ static void insertInCache
                      stringFilterP,
                      mdStringFilterP,
                      sub.status,
+#ifdef ORIONLD
+                     sub.name,
+                     sub.ldContext,
+#endif
                      sub.subject.condition.expression.q,
                      sub.subject.condition.expression.geometry,
                      sub.subject.condition.expression.coords,
