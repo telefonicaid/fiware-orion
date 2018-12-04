@@ -169,3 +169,88 @@ HttpStatusCode mongoUnsubscribeContext
 
   return SccOk;
 }
+
+
+
+#ifdef ORIONLD
+/* ****************************************************************************
+*
+* mongoDeleteLdSubscription -
+*/
+bool mongoDeleteLdSubscription
+(
+  const char*     subId,
+  const char*     tenant,
+  HttpStatusCode* statusCodeP,
+  char**          details
+)
+{
+  bool         reqSemTaken;
+  std::string  err;
+
+  reqSemTake(__FUNCTION__, "ngsi-ld unsubscribe request", SemWriteOp, &reqSemTaken);
+
+  BSONObj sub;
+  if (!collectionFindOne(getSubscribeContextCollectionName(tenant), BSON("_id" << subId), &sub, &err))
+  {
+    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
+
+    LM_E(("collectionFindOne error: %s", err.c_str()));
+    *details     = (char*) "error finding the subscription";
+    *statusCodeP = SccReceiverInternalError;
+
+    return false;
+  }
+
+  if (sub.isEmpty())
+  {
+    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
+
+    *details     = (char*) ERROR_DESC_NOT_FOUND_SUBSCRIPTION;
+    *statusCodeP = SccContextElementNotFound;
+
+    return false;
+  }
+
+  /* Remove document in MongoDB */
+
+  //
+  // FIXME: I would prefer to do the find and remove in a single operation. Is there something similar
+  // to findAndModify for this?
+  //
+  std::string colName = getSubscribeContextCollectionName(tenant);
+
+  if (!collectionRemove(colName, BSON("_id" << subId), &err))
+  {
+    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
+
+    *details     = (char*) "error removing subscription";
+    *statusCodeP = SccReceiverInternalError;
+
+    return false;
+  }
+
+#if 0
+  // FIXME - sub-cache comes later
+
+  //
+  // Removing subscription from mongo subscription cache
+  //
+  LM_T(LmtSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache",
+                     requestP->subscriptionId.get().c_str(),
+                     tenant.c_str()));
+
+  cacheSemTake(__FUNCTION__, "Removing subscription from cache");
+
+  CachedSubscription* cSubP = subCacheItemLookup(tenant, subId);
+  if (cSubP != NULL)
+    subCacheItemRemove(cSubP);
+
+  cacheSemGive(__FUNCTION__, "Removing subscription from cache");
+#endif
+
+  reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
+  *statusCodeP = SccOk;
+  return true;
+}
+#endif

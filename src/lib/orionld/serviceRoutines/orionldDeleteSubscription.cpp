@@ -26,6 +26,9 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "ngsi10/UnsubscribeContextRequest.h"                  // UnsubscribeContextRequest
+#include "ngsi10/UnsubscribeContextResponse.h"                 // UnsubscribeContextResponse
+#include "mongoBackend/mongoUnsubscribeContext.h"              // mongoUnsubscribeContext
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/serviceRoutines/orionldDeleteSubscription.h" // Own Interface
 
@@ -37,11 +40,15 @@
 //
 bool orionldDeleteSubscription(ConnectionInfo* ciP)
 {
-  LM_T(LmtServiceRoutine, ("In orionldDeleteSubscription"));
+  char* details;
 
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - DELETE /ngsi-ld/v1/subscriptions/*", ciP->wildcard[0], OrionldDetailsString);
+  if (mongoDeleteLdSubscription(ciP->wildcard[0], ciP->tenant.c_str(), &ciP->httpStatusCode, &details) == false)
+  {
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, ciP->wildcard[0], OrionldDetailsString);
+    return false;
+  }
 
-  ciP->httpStatusCode = SccNotImplemented;
+  ciP->httpStatusCode = SccNoContent;
 
   return true;
 }

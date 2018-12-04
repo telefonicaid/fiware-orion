@@ -44,4 +44,20 @@ extern HttpStatusCode mongoUnsubscribeContext
   const std::string&           tenant = ""
 );
 
+
+
+#ifdef ORIONLD
+/* ****************************************************************************
+*
+* mongoDeleteLdSubscription -
+*/
+extern bool mongoDeleteLdSubscription
+(
+  const char*     subId,
+  const char*     tenant,
+  HttpStatusCode* statusCodeP,
+  char**          details
+);
+#endif  // ORIONLD
+
 #endif  // SRC_LIB_MONGOBACKEND_MONGOUNSUBSCRIBECONTEXT_H_

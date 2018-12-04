@@ -431,14 +431,14 @@ Date: REGEX(.*)
 
 17. DELETE /ngsi-ld/v1/subscriptions/S1
 =======================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 138
+HTTP/1.1 404 Not Found
+Content-Length: 141
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "S1",
-    "title": "not implemented - DELETE /ngsi-ld/v1/subscriptions/*",
+    "title": "The requested subscription has not been found. Check id",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
