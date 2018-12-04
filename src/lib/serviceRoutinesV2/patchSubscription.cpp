@@ -74,7 +74,8 @@ std::string patchSubscription
                                       ciP->tenant,
                                       ciP->servicePathV,
                                       ciP->httpHeaders.xauthToken,
-                                      ciP->httpHeaders.correlator));
+                                      ciP->httpHeaders.correlator,
+                                      ciP->apiVersion));
 
   std::string  answer = "";
   if (beError.code != SccNone)

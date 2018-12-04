@@ -1,14 +1,14 @@
 # Deprecated functionality
 
 Deprecated features are features that Orion stills support but that are
-not mantained or evolved any longer. In particular:
+not maintained or evolved any longer. In particular:
 
 -   Bugs or issues related with deprecated features and not affecting
     any other feature are not addressed (they are closed in github.com
     as soon as they are spotted).
 -   Documentation on deprecated features is removed from the repository documentation.
     Documentation is still available in the documentation set associated to older versions
-    (either in the respository release branches or the pre-0.23.0 documentation in the FIWARE wiki).
+    (either in the repository release branches or the pre-0.23.0 documentation in the FIWARE wiki).
 -   Deprecated functionality is eventually removed from Orion. Thus you
     are strongly encouraged to change your implementations using Orion
     in order not rely on deprecated functionality.
@@ -63,7 +63,7 @@ Although you are encouraged to use always the newest Orion version, take into ac
 information in the case you want to use old versions:
 
 * Old RPMs (since Orion 0.1.1) are available at the [FIWARE yum repository](http://repositories.lab.fiware.org/repo/rpm/6/x86_64).
-* Code correponding to old releases (since Orion 0.8.1, the first one available as open source) is
+* Code corresponding to old releases (since Orion 0.8.1, the first one available as open source) is
   available at the [Orion github repository](http://github.com/telefonicaid/fiware-orion). Each release number
   (e.g. 0.23.0) has associated the following:
 	* A tag, e.g. `0.23.0`. It points to the base version.

@@ -1766,17 +1766,36 @@ static bool processSubscriptions
     if (notificationSent)
     {
       long long rightNow = getCurrentTime();
-
+      BSONObj query  = BSON("_id" << OID(mapSubId));
+      BSONObj update;
       //
       // If broker running without subscription cache, put lastNotificationTime and count in DB
       //
       if (subCacheActive == false)
       {
-        BSONObj query  = BSON("_id" << OID(mapSubId));
-        BSONObj update = BSON("$set" <<
-                              BSON(CSUB_LASTNOTIFICATION << rightNow) <<
-                              "$inc" << BSON(CSUB_COUNT << (long long) 1));
+        BSONObj subOrig;
+        std::string newErr;
+        collectionFindOne(getSubscribeContextCollectionName(tenant), query, &subOrig, &newErr);
+        std::string status;
+        if (!subOrig.isEmpty())
+        {
+          if (subOrig.hasField(CSUB_STATUS))
+          {
+            status = getStringFieldF(subOrig, CSUB_STATUS);
+          }
+        }
 
+        // Update the value of status (in case of oneshot) in DB when broker is running without subscription cache
+        if (status == STATUS_ONESHOT)
+        {
+          update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << rightNow << CSUB_STATUS << STATUS_INACTIVE) <<
+                        "$inc" << BSON(CSUB_COUNT << (long long) 1));
+        }
+        else
+        {
+          update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << rightNow) <<
+                        "$inc" << BSON(CSUB_COUNT << (long long) 1));
+        }
         ret = collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
       }
 
@@ -1792,6 +1811,15 @@ static bool processSubscriptions
 
         if (cSubP != NULL)
         {
+          if (cSubP->status == STATUS_ONESHOT)
+          {
+            update = BSON("$set" << BSON(CSUB_STATUS << STATUS_INACTIVE));
+            // update the status to inactive as status is oneshot (in both DB and csubs cache)
+            ret = collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
+            cSubP->status = STATUS_INACTIVE;
+
+            LM_T(LmtSubCache, ("set status to '%s' as Subscription status is oneshot", cSubP->status.c_str()));
+          }
           cSubP->lastNotificationTime = rightNow;
           cSubP->count               += 1;
 
@@ -2885,7 +2913,7 @@ static void updateEntity
 
   /* Build CER used for notifying (if needed) */
   StringList               emptyAttrL;
-  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL);
+  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL, true, apiVersion);
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
