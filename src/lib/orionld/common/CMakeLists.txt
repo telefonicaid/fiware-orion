@@ -31,6 +31,7 @@ SET (SOURCES
     geoJsonTypeCheck.cpp
     geoJsonCheck.cpp
     numberToDate.cpp
+    OrionldConnection.cpp
 )
 
 # Include directories

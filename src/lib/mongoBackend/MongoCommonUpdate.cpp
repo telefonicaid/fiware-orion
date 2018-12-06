@@ -1086,13 +1086,17 @@ static bool addTriggeredSubscriptions_withCache
   std::string                       servicePath = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::vector<CachedSubscription*>  subVec;
 
+  LM_TMP(("KZ: In addTriggeredSubscriptions_withCache"));
+
   cacheSemTake(__FUNCTION__, "match subs for notifications");
   subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
+  LM_TMP(("KZ: In addTriggeredSubscriptions_withCache; subVec.size: %d", subVec.size()));
   int now = getCurrentTime();
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
   {
+    LM_TMP(("KZ: In addTriggeredSubscriptions_withCache: ix: %d", ix));
     CachedSubscription* cSubP = subVec[ix];
 
     // Outdated subscriptions are skipped
@@ -1100,6 +1104,7 @@ static bool addTriggeredSubscriptions_withCache
     {
       LM_T(LmtSubCache, ("%s is EXPIRED (EXP:%lu, NOW:%lu, DIFF: %d)",
                          cSubP->subscriptionId, cSubP->expirationTime, now, now - cSubP->expirationTime));
+      LM_TMP(("KZ: addTriggeredSubscriptions_withCache: EXPIRED"));
       continue;
     }
 
@@ -1107,6 +1112,7 @@ static bool addTriggeredSubscriptions_withCache
     if (cSubP->status == STATUS_INACTIVE)
     {
       LM_T(LmtSubCache, ("%s is INACTIVE", cSubP->subscriptionId));
+      LM_TMP(("KZ: addTriggeredSubscriptions_withCache: INACTIVE"));
       continue;
     }
 
@@ -1138,6 +1144,7 @@ static bool addTriggeredSubscriptions_withCache
                            now,
                            now - cSubP->lastNotificationTime,
                            cSubP->throttling));
+        LM_TMP(("KZ: addTriggeredSubscriptions_withCache: THROTTLING"));
         continue;
       }
       else
@@ -1150,6 +1157,7 @@ static bool addTriggeredSubscriptions_withCache
                            now,
                            now - cSubP->lastNotificationTime,
                            cSubP->throttling));
+        LM_TMP(("KZ: addTriggeredSubscriptions_withCache: OK"));
       }
     }
     else
@@ -1162,8 +1170,10 @@ static bool addTriggeredSubscriptions_withCache
                          now,
                          now - cSubP->lastNotificationTime,
                          cSubP->throttling));
+        LM_TMP(("KZ: addTriggeredSubscriptions_withCache: OK II"));
     }
 
+    LM_TMP(("KZ: Creating a new TriggeredSubscription"));
     TriggeredSubscription* subP = new TriggeredSubscription((long long) cSubP->throttling,
                                                            (long long) cSubP->lastNotificationTime,
                                                            cSubP->renderFormat,
@@ -1183,6 +1193,7 @@ static bool addTriggeredSubscriptions_withCache
       LM_E(("Runtime Error (error setting string filter: %s)", errorString.c_str()));
       delete subP;
       cacheSemGive(__FUNCTION__, "match subs for notifications");
+      LM_TMP(("KZ: Runtime Error (error setting string filter)"));
       return false;
     }
 
@@ -1191,9 +1202,11 @@ static bool addTriggeredSubscriptions_withCache
       LM_E(("Runtime Error (error setting metadata string filter: %s)", errorString.c_str()));
       delete subP;
       cacheSemGive(__FUNCTION__, "match subs for notifications");
+      LM_TMP(("KZ: Runtime Error (error setting metadata string filter"));
       return false;
     }
 
+    LM_TMP(("KZ: Inserting subscription into the list of Triggered Subscriptions"));
     subs.insert(std::pair<std::string, TriggeredSubscription*>(cSubP->subscriptionId, subP));
   }
 
@@ -1740,6 +1753,7 @@ static bool processOnChangeConditionForUpdateContext
   ncr.originator.set("localhost");
 
   ncr.subscriptionId.set(subId);
+  LM_TMP(("KZ: Calling sendNotifyContextRequest III"));
   getNotifier()->sendNotifyContextRequest(&ncr,
                                           httpInfo,
                                           tenant,
@@ -1929,11 +1943,14 @@ static bool processSubscriptions
 
   *err = "";
 
+  LM_TMP(("KZ: In processSubscriptions"));
   for (std::map<std::string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
   {
     std::string             mapSubId  = it->first;
     TriggeredSubscription*  tSubP     = it->second;
+    char*                   subId     = (char*) tSubP->cacheSubId.c_str();
 
+    LM_TMP(("KZ: Subscription: %s", subId));
 
     /* There are some checks to perform on TriggeredSubscription in order to see if the notification has to be actually sent. Note
      * that checks are done in increasing cost order (e.g. georel check is done at the end).
@@ -1952,7 +1969,7 @@ static bool processSubscriptions
       {
         LM_T(LmtMongo, ("blocked due to throttling, current time is: %l", current));
         LM_T(LmtSubCache, ("ignored '%s' due to throttling, current time is: %l", tSubP->cacheSubId.c_str(), current));
-
+        LM_TMP(("KZ: NO Notification for %s: throttling", subId));
         continue;
       }
     }
@@ -1960,11 +1977,13 @@ static bool processSubscriptions
     /* Check 2: String Filters */
     if ((tSubP->stringFilterP != NULL) && (!tSubP->stringFilterP->match(notifyCerP)))
     {
+      LM_TMP(("KZ: NO Notification for %s: stringFilter", subId));
       continue;
     }
 
     if ((tSubP->mdStringFilterP != NULL) && (!tSubP->mdStringFilterP->match(notifyCerP)))
     {
+      LM_TMP(("KZ: NO Notification for %s: MD stringFilter", subId));
       continue;
     }
 
@@ -1985,6 +2004,7 @@ static bool processSubscriptions
         // moving geo-stuff strings to a filter object in TriggeredSubscription class
 
         LM_E(("Runtime Error (code cannot reach this point, error: %s)", filterErr.c_str()));
+        LM_TMP(("KZ: NO Notification for %s: Runtime Error", subId));
         continue;
       }
 
@@ -1992,6 +2012,7 @@ static bool processSubscriptions
       if (!processAreaScopeV2(&geoScope, &areaFilter))
       {
         // Error in processAreaScopeV2 is interpreted as no-match (conservative approach)
+        LM_TMP(("KZ: NO Notification for %s: Error in processAreaScopeV2", subId));
         continue;
       }
 
@@ -2010,12 +2031,14 @@ static bool processSubscriptions
       if (!collectionCount(getEntitiesCollectionName(tenant), query, &n, &filterErr))
       {
         // Error in database access is interpreted as no-match (conservative approach)
+        LM_TMP(("KZ: NO Notification for %s: Error in database access", subId));
         continue;
       }
 
       // No result? Then no-match
       if (n == 0)
       {
+        LM_TMP(("KZ: NO Notification for %s: No result", subId));
         continue;
       }
     }
@@ -2055,9 +2078,11 @@ static bool processSubscriptions
 
     /* Send notification */
     LM_T(LmtSubCache, ("NOT ignored: %s", tSubP->cacheSubId.c_str()));
+    LM_TMP(("KZ: Sending Notification for %s!", subId));
 
     bool  notificationSent;
 
+    LM_TMP(("KZ: Calling processOnChangeConditionForUpdateContext (here the subscription is known. renderFormat: %d)", tSubP->renderFormat));
     notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
                                                                 tSubP->attrL,
                                                                 tSubP->metadata,
@@ -2069,6 +2094,11 @@ static bool processSubscriptions
                                                                 tSubP->attrL.stringV,
                                                                 tSubP->httpInfo,
                                                                 tSubP->blacklist);
+
+    if (notificationSent)
+      LM_TMP(("KZ: Notification for %s: SENT", subId));
+    else
+      LM_TMP(("KZ: Notification for %s: NOT SENT", subId));
 
     if (notificationSent)
     {
@@ -3181,6 +3211,7 @@ static void updateEntity
   std::string        entityType        = idField.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(idField, ENT_ENTITY_TYPE) : "";
   std::string        entitySPath       = getStringFieldF(idField, ENT_SERVICE_PATH);
 
+  LM_TMP(("KZ: In updateEntity"));
   LM_T(LmtServicePath, ("Found entity '%s' in ServicePath '%s'", entityId.c_str(), entitySPath.c_str()));
 
   ContextElementResponse* cerP = new ContextElementResponse();
@@ -3628,9 +3659,11 @@ void processContextElement
   Ngsiv2Flavour                        ngsiv2Flavour
 )
 {
+  LM_TMP(("KZ: In processContextElement"));
   /* Check preconditions */
   if (!contextElementPreconditionsCheck(ceP, responseP, action, apiVersion))
   {
+    LM_TMP(("KZ: Error in responseP"));
     return;  // Error already in responseP
   }
 
@@ -3642,9 +3675,15 @@ void processContextElement
   BSONObjBuilder     bob;
 
   bob.append(idString, enP->id);
+  LM_TMP(("KZ: entity: '%s'", enP->id.c_str()));
 
   if (enP->type != "")
   {
+    if (apiVersion == NGSI_LD_V1)
+    {
+      LM_TMP(("KZ: the entity type should be changed? (URI Expansion)"));
+    }
+
     bob.append(typeString, enP->type);
   }
 
@@ -3712,6 +3751,7 @@ void processContextElement
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
 
+  LM_TMP(("KZ: Query: %s", query.toString().c_str()));
   if (!collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err))
   {
     releaseMongoConnection(connection);
@@ -3741,6 +3781,7 @@ void processContextElement
     if (!nextSafeOrErrorF(cursor, &r, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
+      LM_TMP(("KZ: Runtime Error (exception in nextSafe()"));
       continue;
     }
 
@@ -3759,6 +3800,7 @@ void processContextElement
     {
       std::string details = std::string("error retrieving _id field in doc: '") + r.toString() + "'";
       alarmMgr.dbError(details);
+      LM_TMP(("KZ: error retrieving _id field in doc"));
       continue;
     }
 
@@ -3767,11 +3809,13 @@ void processContextElement
     // (see http://stackoverflow.com/questions/36917731/context-broker-crashing-with-certain-update-queries)
     //
     results.push_back(r.getOwned());
+    LM_TMP(("KZ: pushed to results"));
   }
 
   releaseMongoConnection(connection);
 
   LM_T(LmtServicePath, ("Docs found: %d", results.size()));
+  LM_TMP(("KZ: Docs found: %d", results.size()));
 
   // Used to accumulate error response information, checked at the end
   bool         attributeAlreadyExistsError = false;
@@ -3781,6 +3825,7 @@ void processContextElement
    * 'if' just below to create a new entity */
   for (unsigned int ix = 0; ix < results.size(); ix++)
   {
+    LM_TMP(("KZ: Calling updateEntity"));
     updateEntity(results[ix],
                  action,
                  tenant,

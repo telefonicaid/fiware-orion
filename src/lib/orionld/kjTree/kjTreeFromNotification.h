@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_REST_ORIONLDMHDCONNECTIONINIT_H_
-#define SRC_LIB_ORIONLD_REST_ORIONLDMHDCONNECTIONINIT_H_
+#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREEFROMNOTIFICATION_H_
+#define SRC_LIB_ORIONLD_KJTREE_KJTREEFROMNOTIFICATION_H_
 
 /*
 *
@@ -25,25 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-#include <microhttpd.h>
-
-extern "C" {  
-#include "kjson/kjson.h"                            // Kjson
-}
+#include "ngsi10/NotifyContextRequest.h"                       // NotifyContextRequest
 
 
 
-/* ****************************************************************************
-*
-* orionldMhdConnectionInit - 
-*/
-extern int orionldMhdConnectionInit
-(
-  MHD_Connection*  connection,
-  const char*      url,
-  const char*      method,
-  const char*      version,
-  void**           con_cls
-);
+// -----------------------------------------------------------------------------
+//
+// kjTreeFromNotification -
+//
+extern KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, char** detailsP);
 
-#endif  // SRC_LIB_ORIONLD_REST_ORIONLDMHDCONNECTIONINIT_H_
+#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMNOTIFICATION_H_

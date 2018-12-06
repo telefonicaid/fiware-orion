@@ -22,7 +22,6 @@
 *
 * Author: Fermin Galan
 */
-
 #include <vector>
 
 #include <curl/curl.h>
@@ -41,6 +40,17 @@
 #include "ngsiNotify/senderThread.h"
 #include "rest/uriParamNames.h"
 #include "rest/ConnectionInfo.h"
+
+#ifdef ORIONLD
+extern "C" {  
+#include "kjson/kjRender.h"                                    // kjRender
+#include "kjson/kjson.h"                                       // Kjson
+}
+#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/rest/orionldMhdConnectionInit.h"             // orionldState
+#include "orionld/kjTree/kjTreeFromNotification.h"             // kjTreeFromNotification
+#endif
+
 #include "ngsiNotify/Notifier.h"
 
 
@@ -76,6 +86,7 @@ void Notifier::sendNotifyContextRequest
 )
 {
   pthread_t                         tid;
+
   std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncrP,
                                                                           httpInfo,
                                                                           tenant,
@@ -481,6 +492,25 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
       bool asJsonObject = (ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON);
       payloadString = ncrP->render(ci.apiVersion, asJsonObject);
     }
+#ifdef ORIONLD
+    else if ((renderFormat == NGSI_LD_V1_NORMALIZED) || (renderFormat == NGSI_LD_V1_KEYVALUES))
+    {
+      char buf[2048];
+
+      LM_TMP(("KZ: Rendering payload of a NGSI-LD notification"));
+      char*   details;
+      KjNode* kjTree = kjTreeFromNotification(ncrP, &details);
+
+      if (kjTree == NULL)
+      {
+        LM_E(("kjTreeFromNotification error: %s", details));
+        return paramsV;
+      }
+      else
+        kjRender(orionldState.kjsonP, kjTree, buf, sizeof(buf));
+      payloadString = buf;
+    }
+#endif
     else
     {
       payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);

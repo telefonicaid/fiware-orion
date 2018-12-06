@@ -49,7 +49,9 @@ typedef enum RenderFormat
   NGSI_V2_KEYVALUES      = 3,
   NGSI_V2_VALUES         = 4,
   NGSI_V2_UNIQUE_VALUES  = 5,
-  NGSI_V2_CUSTOM         = 6
+  NGSI_V2_CUSTOM         = 6,
+  NGSI_LD_V1_NORMALIZED  = 10,
+  NGSI_LD_V1_KEYVALUES   = 11
 } RenderFormat;
 
 

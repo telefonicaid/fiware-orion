@@ -182,6 +182,7 @@ SET (ORION_LIBS
     serviceRoutines
     serviceRoutinesV2
     ngsiNotify
+    orionld_kjTree
     jsonParse
     jsonParseV2
     rest          # this is repeated for linking str2Verb from parseSubscription@parseSubscription.cpp.o;

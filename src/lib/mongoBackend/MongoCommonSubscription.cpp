@@ -417,6 +417,7 @@ void setFormat(const Subscription& sub, BSONObjBuilder* b)
 
   b->append(CSUB_FORMAT, format);
   LM_T(LmtMongo, ("Subscription format: %s", format.c_str()));
+  LM_TMP(("KZ: Subscription format: %s", format.c_str()));
 }
 
 

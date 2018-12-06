@@ -344,9 +344,9 @@ static bool ktreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInf
 static bool formatExtract(ConnectionInfo* ciP, char* format, ngsiv2::Subscription* subP)
 {
   if (SCOMPARE10(format, 'k', 'e', 'y', 'V', 'a', 'l', 'u', 'e', 's', 0))
-    subP->attrsFormat = NGSI_V2_KEYVALUES;
+    subP->attrsFormat = NGSI_LD_V1_KEYVALUES;
   else if (SCOMPARE11(format, 'n', 'o', 'r', 'm', 'a', 'l', 'i', 'z', 'e', 'd', 0))
-    subP->attrsFormat = NGSI_V2_NORMALIZED;
+    subP->attrsFormat = NGSI_LD_V1_NORMALIZED;
   else
   {
     LM_E(("Invalid value for Notification::format: '%s'", format));
@@ -375,6 +375,10 @@ static bool ktreeToNotification(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::Sub
   KjNode*   endpointP     = NULL;
   KjNode*   itemP;
 
+  // Set default values
+  subP->attrsFormat = NGSI_LD_V1_NORMALIZED; 
+
+  // Extract the info from the kjTree
   for (itemP = kNodeP->children; itemP != NULL; itemP = itemP->next)
   {
     LM_TMP(("Translating node '%s'", itemP->name));
@@ -392,8 +396,10 @@ static bool ktreeToNotification(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::Sub
       DUPLICATE_CHECK(formatP, "Notification::format", itemP->value.s);
       STRING_CHECK(itemP, "Notification::format");
 
+      LM_TMP(("Got a subscription format: '%s'", itemP->value.s));
       if (formatExtract(ciP, formatP, subP) == false)
         return false;
+      LM_TMP(("Extracted subscription format: %d", subP->attrsFormat));
     }
     else if (SCOMPARE9(itemP->name, 'e', 'n', 'd', 'p', 'o', 'i', 'n', 't', 0))
     {
@@ -444,24 +450,28 @@ static bool ktreeToNotification(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::Sub
 static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
 {
   KjNode*                   kNodeP;
-  char*                     idP                = NULL;
-  char*                     typeP              = NULL;
-  char*                     nameP              = NULL;
-  char*                     descriptionP       = NULL;
-  char*                     timeIntervalP      = NULL;
-  KjNode*                   entitiesP          = NULL;
-  KjNode*                   watchedAttributesP = NULL;
-  char*                     qP                 = NULL;
-  KjNode*                   geoQP              = NULL;
-  char*                     csfP               = NULL;
-  bool                      isActive           = true;
-  bool                      isActivePresent    = false;
-  KjNode*                   notificationP      = NULL;
-  char*                     expiresP           = NULL;
-  long long                 throttling         = -1;
-  bool                      throttlingPresent  = false;
-  KjNode*                   idNodeP            = NULL;
-  KjNode*                   contextNodeP       = NULL;
+  char*                     idP                       = NULL;
+  char*                     typeP                     = NULL;
+  char*                     nameP                     = NULL;
+  char*                     descriptionP              = NULL;
+  char*                     timeIntervalP             = NULL;
+  KjNode*                   entitiesP                 = NULL;
+  bool                      entitiesPresent           = false;
+  KjNode*                   watchedAttributesP        = NULL;
+  bool                      watchedAttributesPresent  = false;
+  char*                     qP                        = NULL;
+  KjNode*                   geoQP                     = NULL;
+  bool                      geoQPresent               = false;
+  char*                     csfP                      = NULL;
+  bool                      isActive                  = true;
+  bool                      isActivePresent           = false;
+  KjNode*                   notificationP             = NULL;
+  bool                      notificationPresent       = false;
+  char*                     expiresP                  = NULL;
+  long long                 throttling                = -1;
+  bool                      throttlingPresent         = false;
+  KjNode*                   idNodeP                   = NULL;
+  KjNode*                   contextNodeP              = NULL;
 
   LM_TMP(("In ktreeToSubscription"));
 
@@ -572,10 +582,10 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
     }
     else if (SCOMPARE9(kNodeP->name, 'e', 'n', 't', 'i', 't', 'i', 'e', 's', 0))
     {
-      DUPLICATE_CHECK(entitiesP, "Subscription::entities", kNodeP->children);
+      DUPLICATE_CHECK_WITH_PRESENCE(entitiesPresent, entitiesP, "Subscription::entities", kNodeP);
       ARRAY_CHECK(kNodeP, "Subscription::entities");
       LM_TMP(("Calling ktreeToEntities"));
-      if (ktreeToEntities(ciP, kNodeP, &subP->subject.entities) == false)
+      if (ktreeToEntities(ciP, entitiesP, &subP->subject.entities) == false)
       {
         LM_E(("ktreeToEntities failed"));
         return false;  // orionldErrorResponseCreate is invoked by ktreeToEntities
@@ -584,9 +594,9 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
     }
     else if (SCOMPARE18(kNodeP->name, 'w', 'a', 't', 'c', 'h', 'e', 'd', 'A', 't', 't', 'r', 'i', 'b', 'u', 't', 'e', 's', 0))
     {
-      DUPLICATE_CHECK(watchedAttributesP, "Subscription::watchedAttributes", kNodeP->children);
+      DUPLICATE_CHECK_WITH_PRESENCE(watchedAttributesPresent, watchedAttributesP, "Subscription::watchedAttributes", kNodeP->children);
       ARRAY_CHECK(kNodeP, "Subscription::watchedAttributes");
-
+      LM_TMP(("watchedAttributesP at %p", watchedAttributesP));
       if (ktreeToStringList(ciP, kNodeP, &subP->subject.condition.attributes) == false)
       {
         LM_TMP(("ktreeToStringList failed"));
@@ -609,10 +619,10 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
     }
     else if (SCOMPARE5(kNodeP->name, 'g', 'e', 'o', 'Q', 0))
     {
-      DUPLICATE_CHECK(geoQP, "Subscription::geoQ", kNodeP->children);
+      DUPLICATE_CHECK_WITH_PRESENCE(geoQPresent, geoQP, "Subscription::geoQ", kNodeP);
       OBJECT_CHECK(kNodeP, "Subscription::geoQ");
 
-      if (ktreeToSubscriptionExpression(ciP, kNodeP, &subP->subject.condition.expression) == false)
+      if (ktreeToSubscriptionExpression(ciP, geoQP, &subP->subject.condition.expression) == false)
       {
         LM_TMP(("ktreeToSubscriptionExpression failed"));
         return false;  // orionldErrorResponseCreate is invoked by ktreeToSubscriptionExpression
@@ -627,16 +637,16 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
     }
     else if (SCOMPARE9(kNodeP->name, 'i', 's', 'A', 'c', 't', 'i', 'v', 'e', 0))
     {
-      INTEGER_DUPLICATE_CHECK(isActivePresent, isActive, "Subscription::isActive", kNodeP->value.b);
+      DUPLICATE_CHECK_WITH_PRESENCE(isActivePresent, isActive, "Subscription::isActive", kNodeP->value.b);
       BOOL_CHECK(kNodeP, "Subscription::isActive");
       subP->status = (isActive == true)? "active" : "paused";
     }
     else if (SCOMPARE13(kNodeP->name, 'n', 'o', 't', 'i', 'f', 'i', 'c', 'a', 't', 'i', 'o', 'n', 0))
     {
-      DUPLICATE_CHECK(notificationP, "Subscription::notification", kNodeP->children);
+      DUPLICATE_CHECK_WITH_PRESENCE(notificationPresent, notificationP, "Subscription::notification", kNodeP);
       OBJECT_CHECK(kNodeP, "Subscription::notification");
 
-      if (ktreeToNotification(ciP, kNodeP, subP) == false)
+      if (ktreeToNotification(ciP, notificationP, subP) == false)
       {
         LM_E(("ktreeToNotification failed"));
         return false;  // orionldErrorResponseCreate is invoked by ktreeToNotification
@@ -652,7 +662,7 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
     }
     else if (SCOMPARE11(kNodeP->name, 't', 'h', 'r', 'o', 't', 't', 'l', 'i', 'n', 'g', 0))
     {
-      INTEGER_DUPLICATE_CHECK(throttlingPresent, throttling, "Subscription::throttling", kNodeP->value.i);
+      DUPLICATE_CHECK_WITH_PRESENCE(throttlingPresent, throttling, "Subscription::throttling", kNodeP->value.i);
       INTEGER_CHECK(kNodeP, "Subscription::throttling");
 
       subP->throttling = throttling;
@@ -685,21 +695,21 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
 
   LM_TMP(("Subscription translated"));
 
-  if ((entitiesP == NULL) && (watchedAttributesP == NULL))
+  if ((entitiesPresent == false) && (watchedAttributesPresent == false))
   {
     LM_E(("At least one of 'entities' and 'watchedAttributes' must be present"));
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "At least one of 'entities' and 'watchedAttributes' must be present", NULL, OrionldDetailsString);
     return false;
   }
 
-  if ((timeIntervalP == NULL) && (watchedAttributesP == NULL))
+  if ((timeIntervalP == NULL) && (watchedAttributesPresent == false))
   {
     LM_E(("Either 'timeInterval' or 'watchedAttributes' must be present. But not both of them"));
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Either 'timeInterval' or 'watchedAttributes' must be present. But not both of them", "None of them", OrionldDetailsString);
     return false;
   }
 
-  if ((timeIntervalP != NULL) && (watchedAttributesP != NULL))
+  if ((timeIntervalP != NULL) && (watchedAttributesPresent == true))
   {
     LM_E(("Either 'timeInterval' or 'watchedAttributes' must be present. But not both of them"));
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Either 'timeInterval' or 'watchedAttributes' must be present. But not both of them", "Both of them", OrionldDetailsString);

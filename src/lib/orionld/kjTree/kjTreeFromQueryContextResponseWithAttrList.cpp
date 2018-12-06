@@ -36,13 +36,14 @@ extern "C"
 #include "ngsi10/QueryContextResponse.h"                       // QueryContextResponse
 
 #include "orionld/common/orionldErrorResponse.h"               // OrionldResponseErrorType, orionldErrorResponse
+#include "orionld/common/httpStatusCodeToOrionldErrorType.h"   // httpStatusCodeToOrionldErrorType
+#include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
 #include "orionld/context/orionldContextValueLookup.h"         // orionldContextValueLookup
 #include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
 #include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
 #include "orionld/context/orionldContextListPresent.h"         // orionldContextListPresent
-#include "orionld/common/httpStatusCodeToOrionldErrorType.h"   // httpStatusCodeToOrionldErrorType
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
 #include "orionld/kjTree/kjTreeFromContextContextAttribute.h"  // kjTreeFromContextContextAttribute
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"            // kjTreeFromCompoundValue
@@ -82,7 +83,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
   //
   if ((oneHit == false) && (responseP->contextElementResponseVector.size() == 0))
   {
-    ciP->responseTree = kjArray(ciP->kjsonP, NULL);
+    ciP->responseTree = kjArray(orionldState.kjsonP, NULL);
     ciP->httpStatusCode = SccOk;
     return ciP->responseTree;
   }
@@ -113,7 +114,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
   {
     if (oneHit == false)
     {
-      ciP->responseTree = kjArray(ciP->kjsonP, NULL);
+      ciP->responseTree = kjArray(orionldState.kjsonP, NULL);
       LM_TMP(("Nothing found - returning empty array"));
     }
     else
@@ -220,7 +221,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
     KjNode*  nodeP;
 
     // id
-    nodeP = kjString(ciP->kjsonP, "id", ceP->entityId.id.c_str());
+    nodeP = kjString(orionldState.kjsonP, "id", ceP->entityId.id.c_str());
     // FIXME: uridecode nodeP->value.s
     kjChildAdd(top, nodeP);
 
@@ -237,7 +238,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
       {
         if (strncmp(ceP->entityId.type.c_str(), orionldDefaultUrl, orionldDefaultUrlLen) == 0)
         {
-          nodeP = kjString(ciP->kjsonP, "type", &ceP->entityId.type.c_str()[orionldDefaultUrlLen]);
+          nodeP = kjString(orionldState.kjsonP, "type", &ceP->entityId.type.c_str()[orionldDefaultUrlLen]);
           if (nodeP == NULL)
           {
             LM_E(("out of memory"));
@@ -255,12 +256,12 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
         if (aliasNodeP != NULL)
         {
           LM_TMP(("Found the alias: '%s' => '%s'", ceP->entityId.type.c_str(), aliasNodeP->name));
-          nodeP = kjString(ciP->kjsonP, "type", aliasNodeP->name);
+          nodeP = kjString(orionldState.kjsonP, "type", aliasNodeP->name);
         }
         else
         {
           LM_TMP(("No alias found, keeping long name '%s'", ceP->entityId.type.c_str()));
-          nodeP = kjString(ciP->kjsonP, "type", ceP->entityId.type.c_str());
+          nodeP = kjString(orionldState.kjsonP, "type", ceP->entityId.type.c_str());
         }
 
         if (nodeP == NULL)
@@ -344,17 +345,17 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
         // If keyValues, then just the value of the attribute is to be rendered (built)
         switch (aP->valueType)
         {
-        case orion::ValueTypeNumber:    aTop = kjFloat(ciP->kjsonP, attrName,   aP->numberValue);          break;
-        case orion::ValueTypeBoolean:   aTop = kjBoolean(ciP->kjsonP, attrName, aP->boolValue);            break;
-        case orion::ValueTypeString:    aTop = kjString(ciP->kjsonP, attrName,  aP->stringValue.c_str());  break;
-        case orion::ValueTypeNull:      aTop = kjNull(ciP->kjsonP, attrName);                              break;
+        case orion::ValueTypeNumber:    aTop = kjFloat(orionldState.kjsonP, attrName,   aP->numberValue);          break;
+        case orion::ValueTypeBoolean:   aTop = kjBoolean(orionldState.kjsonP, attrName, aP->boolValue);            break;
+        case orion::ValueTypeString:    aTop = kjString(orionldState.kjsonP, attrName,  aP->stringValue.c_str());  break;
+        case orion::ValueTypeNull:      aTop = kjNull(orionldState.kjsonP, attrName);                              break;
         case orion::ValueTypeVector:
         case orion::ValueTypeObject:
-          aTop = (aP->compoundValueP->valueType == orion::ValueTypeVector)? kjArray(ciP->kjsonP, attrName) : kjObject(ciP->kjsonP, attrName);
+          aTop = (aP->compoundValueP->valueType == orion::ValueTypeVector)? kjArray(orionldState.kjsonP, attrName) : kjObject(orionldState.kjsonP, attrName);
 
           if (aTop != NULL)
           {
-            if (kjTreeFromCompoundValue(ciP, aP->compoundValueP, aTop, &details) == NULL)
+            if (kjTreeFromCompoundValue(aP->compoundValueP, aTop, &details) == NULL)
             {
               LM_E(("kjTreeFromCompoundValue: %s", details));
               orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create tree node from compound value", details, OrionldDetailsEntity);
@@ -379,7 +380,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
       }
       else
       {
-        aTop = kjObject(ciP->kjsonP, attrName);
+        aTop = kjObject(orionldState.kjsonP, attrName);
         if (aTop == NULL)
         {
           LM_E(("Error creating a KjNode Object"));
@@ -390,7 +391,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
         // type
         if (aP->type != "")
         {
-          nodeP = kjString(ciP->kjsonP, "type", aP->type.c_str());
+          nodeP = kjString(orionldState.kjsonP, "type", aP->type.c_str());
           if (nodeP == NULL)
           {
             LM_E(("Error creating a KjNode String"));
@@ -406,15 +407,15 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
 
         switch (aP->valueType)
         {
-        case orion::ValueTypeString:    nodeP = kjString(ciP->kjsonP, valueFieldName, aP->stringValue.c_str());      break;
-        case orion::ValueTypeNumber:    nodeP = kjFloat(ciP->kjsonP, valueFieldName, aP->numberValue);               break;
-        case orion::ValueTypeBoolean:   nodeP = kjBoolean(ciP->kjsonP, valueFieldName, (KBool) aP->boolValue);       break;
-        case orion::ValueTypeNull:      nodeP = kjNull(ciP->kjsonP, valueFieldName);                                 break;
-        case orion::ValueTypeNotGiven:  nodeP = kjString(ciP->kjsonP, valueFieldName, "UNKNOWN TYPE");               break;
+        case orion::ValueTypeString:    nodeP = kjString(orionldState.kjsonP, valueFieldName, aP->stringValue.c_str());      break;
+        case orion::ValueTypeNumber:    nodeP = kjFloat(orionldState.kjsonP, valueFieldName, aP->numberValue);               break;
+        case orion::ValueTypeBoolean:   nodeP = kjBoolean(orionldState.kjsonP, valueFieldName, (KBool) aP->boolValue);       break;
+        case orion::ValueTypeNull:      nodeP = kjNull(orionldState.kjsonP, valueFieldName);                                 break;
+        case orion::ValueTypeNotGiven:  nodeP = kjString(orionldState.kjsonP, valueFieldName, "UNKNOWN TYPE");               break;
 
         case orion::ValueTypeVector:
         case orion::ValueTypeObject:
-          nodeP = (aP->valueType == orion::ValueTypeVector)? kjArray(ciP->kjsonP, valueFieldName) : kjObject(ciP->kjsonP, valueFieldName);
+          nodeP = (aP->valueType == orion::ValueTypeVector)? kjArray(orionldState.kjsonP, valueFieldName) : kjObject(orionldState.kjsonP, valueFieldName);
           if (nodeP == NULL)
           {
             LM_E(("kjTreeFromCompoundValue: %s", details));
@@ -422,7 +423,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
             return NULL;
           }
 
-          if (kjTreeFromCompoundValue(ciP, aP->compoundValueP, nodeP, &details) == NULL)
+          if (kjTreeFromCompoundValue(aP->compoundValueP, nodeP, &details) == NULL)
           {
             LM_E(("kjTreeFromCompoundValue: %s", details));
             orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create tree node from compound value", details, OrionldDetailsEntity);
@@ -459,22 +460,22 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
             KjNode*      typeP;
             KjNode*      valueP = NULL;
 
-            nodeP = kjObject(ciP->kjsonP, mdName);
+            nodeP = kjObject(orionldState.kjsonP, mdName);
 
-            typeP = kjString(ciP->kjsonP, "type", mdP->type.c_str());
+            typeP = kjString(orionldState.kjsonP, "type", mdP->type.c_str());
             kjChildAdd(nodeP, typeP);
 
             details = NULL;
             switch (mdP->valueType)
             {
-            case orion::ValueTypeString:   valueP = kjString(ciP->kjsonP, valueFieldName, mdP->stringValue.c_str());   break;
-            case orion::ValueTypeNumber:   valueP = kjFloat(ciP->kjsonP, valueFieldName, mdP->numberValue);            break;
-            case orion::ValueTypeBoolean:  valueP = kjBoolean(ciP->kjsonP, valueFieldName, mdP->boolValue);            break;
-            case orion::ValueTypeNull:     valueP = kjNull(ciP->kjsonP, valueFieldName);                               break;
-            case orion::ValueTypeNotGiven: valueP = kjString(ciP->kjsonP, valueFieldName, "UNKNOWN TYPE IN MONGODB");  break;
+            case orion::ValueTypeString:   valueP = kjString(orionldState.kjsonP, valueFieldName, mdP->stringValue.c_str());   break;
+            case orion::ValueTypeNumber:   valueP = kjFloat(orionldState.kjsonP, valueFieldName, mdP->numberValue);            break;
+            case orion::ValueTypeBoolean:  valueP = kjBoolean(orionldState.kjsonP, valueFieldName, mdP->boolValue);            break;
+            case orion::ValueTypeNull:     valueP = kjNull(orionldState.kjsonP, valueFieldName);                               break;
+            case orion::ValueTypeNotGiven: valueP = kjString(orionldState.kjsonP, valueFieldName, "UNKNOWN TYPE IN MONGODB");  break;
 
-            case orion::ValueTypeObject:   valueP = kjTreeFromCompoundValue(ciP, mdP->compoundValueP, NULL, &details); valueP->name = (char*) "value"; break;
-            case orion::ValueTypeVector:   valueP = kjTreeFromCompoundValue(ciP, mdP->compoundValueP, NULL, &details); valueP->name = (char*) "value"; break;
+            case orion::ValueTypeObject:   valueP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, &details); valueP->name = (char*) "value"; break;
+            case orion::ValueTypeVector:   valueP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, &details); valueP->name = (char*) "value"; break;
             }
 
             kjChildAdd(nodeP, valueP);
@@ -484,14 +485,14 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
             details = NULL;
             switch (mdP->valueType)
             {
-            case orion::ValueTypeString:   nodeP = kjString(ciP->kjsonP, mdName, mdP->stringValue.c_str());            break;
-            case orion::ValueTypeNumber:   nodeP = kjFloat(ciP->kjsonP, mdName, mdP->numberValue);                     break;
-            case orion::ValueTypeBoolean:  nodeP = kjBoolean(ciP->kjsonP, mdName, mdP->boolValue);                     break;
-            case orion::ValueTypeNull:     nodeP = kjNull(ciP->kjsonP, mdName);                                        break;
-            case orion::ValueTypeNotGiven: nodeP = kjString(ciP->kjsonP, mdName, "UNKNOWN TYPE IN MONGODB");           break;
+            case orion::ValueTypeString:   nodeP = kjString(orionldState.kjsonP, mdName, mdP->stringValue.c_str());            break;
+            case orion::ValueTypeNumber:   nodeP = kjFloat(orionldState.kjsonP, mdName, mdP->numberValue);                     break;
+            case orion::ValueTypeBoolean:  nodeP = kjBoolean(orionldState.kjsonP, mdName, mdP->boolValue);                     break;
+            case orion::ValueTypeNull:     nodeP = kjNull(orionldState.kjsonP, mdName);                                        break;
+            case orion::ValueTypeNotGiven: nodeP = kjString(orionldState.kjsonP, mdName, "UNKNOWN TYPE IN MONGODB");           break;
 
-            case orion::ValueTypeObject:   nodeP = kjTreeFromCompoundValue(ciP, mdP->compoundValueP, NULL, &details);  nodeP->name = (char*) "value"; break;
-            case orion::ValueTypeVector:   nodeP = kjTreeFromCompoundValue(ciP, mdP->compoundValueP, NULL, &details);  nodeP->name = (char*) "value"; break;
+            case orion::ValueTypeObject:   nodeP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, &details);  nodeP->name = (char*) "value"; break;
+            case orion::ValueTypeVector:   nodeP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, &details);  nodeP->name = (char*) "value"; break;
             }
           }
 
@@ -519,7 +520,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
     {
       if (ciP->httpHeaders.acceptJsonld == true)
       {
-        nodeP = kjString(ciP->kjsonP, "@context", orionldCoreContext.url);
+        nodeP = kjString(orionldState.kjsonP, "@context", orionldCoreContext.url);
         kjChildAdd(top, nodeP);
       }
       else
@@ -549,20 +550,20 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
       {
         if (contextAttrP->valueType == orion::ValueTypeString)
         {
-          nodeP = kjString(ciP->kjsonP, "@context", contextAttrP->stringValue.c_str());
+          nodeP = kjString(orionldState.kjsonP, "@context", contextAttrP->stringValue.c_str());
           kjChildAdd(top, nodeP);
         }
         else if (contextAttrP->compoundValueP != NULL)
         {
           if (contextAttrP->compoundValueP->valueType == orion::ValueTypeVector)
           {
-            nodeP = kjArray(ciP->kjsonP, "@context");
+            nodeP = kjArray(orionldState.kjsonP, "@context");
             kjChildAdd(top, nodeP);
 
             for (unsigned int ix = 0; ix < contextAttrP->compoundValueP->childV.size(); ix++)
             {
               orion::CompoundValueNode*  compoundP     = contextAttrP->compoundValueP->childV[ix];
-              KjNode*                    contextItemP  = kjString(ciP->kjsonP, NULL, compoundP->stringValue.c_str());
+              KjNode*                    contextItemP  = kjString(orionldState.kjsonP, NULL, compoundP->stringValue.c_str());
               kjChildAdd(nodeP, contextItemP);
             }
           }

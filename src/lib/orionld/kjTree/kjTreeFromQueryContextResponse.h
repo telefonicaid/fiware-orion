@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMOM_KJTREEFROMQUERYCONTEXTRESPONSE_H_
-#define SRC_LIB_ORIONLD_COMOM_KJTREEFROMQUERYCONTEXTRESPONSE_H_
+#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREEFROMQUERYCONTEXTRESPONSE_H_
+#define SRC_LIB_ORIONLD_KJTREE_KJTREEFROMQUERYCONTEXTRESPONSE_H_
 
 /*
 *
@@ -29,10 +29,11 @@
 #include "ngsi10/QueryContextResponse.h"                       // QueryContextResponse
 
 
+
 // -----------------------------------------------------------------------------
 //
 // kjTreeFromQueryContextResponse -
 //
 extern KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool keyValues, QueryContextResponse* responseP);
 
-#endif  // SRC_LIB_ORIONLD_COMOM_KJTREEFROMQUERYCONTEXTRESPONSE_H_
+#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMQUERYCONTEXTRESPONSE_H_

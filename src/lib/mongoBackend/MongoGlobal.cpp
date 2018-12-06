@@ -2695,6 +2695,9 @@ void cprLookupByAttribute
 /* ****************************************************************************
 *
 * mongoIdentifier - create a unique identifier using OID
+*
+* NOTE
+* 'buffer' must point to a buffer of at least 25 bytes
 */
 char* mongoIdentifier(char* buffer)
 {

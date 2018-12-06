@@ -25,11 +25,12 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjFree.h"                                      // kjFree
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "parse/CompoundValueNode.h"                           // CompoundValueNode
+#include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"            // Own interface
 
 
@@ -38,7 +39,7 @@ extern "C"
 //
 // kjTreeFromCompoundValue2
 //
-static KjNode* kjTreeFromCompoundValue2(ConnectionInfo* ciP, KjNode* parentP, orion::CompoundValueNode* compoundP, char** detailsP)
+static KjNode* kjTreeFromCompoundValue2(KjNode* parentP, orion::CompoundValueNode* compoundP, char** detailsP)
 {
   KjNode*       nodeP = NULL;
   char*         name  = (char*) compoundP->name.c_str();
@@ -47,36 +48,36 @@ static KjNode* kjTreeFromCompoundValue2(ConnectionInfo* ciP, KjNode* parentP, or
   switch (compoundP->valueType)
   {
   case orion::ValueTypeString:
-    nodeP = kjString(ciP->kjsonP, name, compoundP->stringValue.c_str());
+    nodeP = kjString(orionldState.kjsonP, name, compoundP->stringValue.c_str());
     kjChildAdd(parentP, nodeP);
     break;
 
   case orion::ValueTypeNumber:
-    nodeP = kjFloat(ciP->kjsonP, name, compoundP->numberValue);  // FIXME: kjInteger or kjFloat ...
+    nodeP = kjFloat(orionldState.kjsonP, name, compoundP->numberValue);  // FIXME: kjInteger or kjFloat ...
     kjChildAdd(parentP, nodeP);
     break;
 
   case orion::ValueTypeBoolean:
-    nodeP = kjBoolean(ciP->kjsonP, name, (KBool) compoundP->boolValue);
+    nodeP = kjBoolean(orionldState.kjsonP, name, (KBool) compoundP->boolValue);
     kjChildAdd(parentP, nodeP);
     break;
 
   case orion::ValueTypeNull:
-    nodeP = kjNull(ciP->kjsonP, name);
+    nodeP = kjNull(orionldState.kjsonP, name);
     kjChildAdd(parentP, nodeP);
     break;
 
   case orion::ValueTypeObject:
   case orion::ValueTypeVector:
     if (compoundP->valueType == orion::ValueTypeVector)
-      nodeP = kjArray(ciP->kjsonP, name);
+      nodeP = kjArray(orionldState.kjsonP, name);
     else
-      nodeP = kjObject(ciP->kjsonP, name);
+      nodeP = kjObject(orionldState.kjsonP, name);
 
     size = compoundP->childV.size();
     for (unsigned int ix = 0; ix < size; ++ix)
     {
-      KjNode* itemP = kjTreeFromCompoundValue2(ciP, nodeP,  compoundP->childV[ix], detailsP);
+      KjNode* itemP = kjTreeFromCompoundValue2(nodeP, compoundP->childV[ix], detailsP);
 
       if (itemP == NULL)
         return NULL;
@@ -89,7 +90,7 @@ static KjNode* kjTreeFromCompoundValue2(ConnectionInfo* ciP, KjNode* parentP, or
 
   case orion::ValueTypeNotGiven:
   default:
-    nodeP = kjString(ciP->kjsonP, name, "UNKNOWN TYPE");
+    nodeP = kjString(orionldState.kjsonP, name, "UNKNOWN TYPE");
     kjChildAdd(parentP, nodeP);
     break;
   }
@@ -103,16 +104,16 @@ static KjNode* kjTreeFromCompoundValue2(ConnectionInfo* ciP, KjNode* parentP, or
 //
 // kjTreeFromCompoundValue -
 //
-KjNode* kjTreeFromCompoundValue(ConnectionInfo* ciP, orion::CompoundValueNode* compoundP, KjNode* containerP, char** detailsP)
+KjNode* kjTreeFromCompoundValue(orion::CompoundValueNode* compoundP, KjNode* containerP, char** detailsP)
 {
   KjNode* topNodeP = containerP;
 
   if (topNodeP == NULL)
   {
     if (compoundP->valueType == orion::ValueTypeObject)
-      topNodeP = kjObject(ciP->kjsonP, NULL);
+      topNodeP = kjObject(orionldState.kjsonP, NULL);
     else if (compoundP->valueType == orion::ValueTypeVector)
-      topNodeP = kjArray(ciP->kjsonP, NULL);
+      topNodeP = kjArray(orionldState.kjsonP, NULL);
     else
     {
       *detailsP = (char*) "not a compound";
@@ -129,7 +130,7 @@ KjNode* kjTreeFromCompoundValue(ConnectionInfo* ciP, orion::CompoundValueNode* c
   unsigned int size = compoundP->childV.size();
   for (unsigned int ix = 0; ix < size; ++ix)
   {
-    KjNode* nodeP = kjTreeFromCompoundValue2(ciP, topNodeP, compoundP->childV[ix], detailsP);
+    KjNode* nodeP = kjTreeFromCompoundValue2(topNodeP, compoundP->childV[ix], detailsP);
     if (nodeP == NULL)
     {
       kjFree(topNodeP);

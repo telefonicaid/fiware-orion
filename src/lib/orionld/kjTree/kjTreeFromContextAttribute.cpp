@@ -32,10 +32,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "rest/httpHeaderAdd.h"                                // httpHeaderAdd
 #include "ngsi/ContextAttribute.h"                             // ContextAttribute
-#include "orionld/common/orionldErrorResponse.h"               // OrionldResponseErrorType, orionldErrorResponse
+#include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
 #include "orionld/context/orionldContextValueLookup.h"         // orionldContextValueLookup
 #include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
@@ -62,9 +61,9 @@ extern "C"
 //
 // kjTreeFromContextAttribute -
 //
-KjNode* kjTreeFromContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP, char** detailsP)
+KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, char** detailsP)
 {
-  KjNode* aTopNodeP = kjObject(ciP->kjsonP, caP->name.c_str());  // Top node for the attribute
+  KjNode* aTopNodeP = kjObject(orionldState.kjsonP, caP->name.c_str());  // Top node for the attribute
 
   if (aTopNodeP == NULL)
   {
@@ -74,7 +73,7 @@ KjNode* kjTreeFromContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP, c
 
   if (caP->type != "")
   {
-    KjNode* typeNodeP = kjString(ciP->kjsonP, "type", caP->type.c_str());
+    KjNode* typeNodeP = kjString(orionldState.kjsonP, "type", caP->type.c_str());
 
     if (typeNodeP == NULL)
     {
@@ -92,39 +91,39 @@ KjNode* kjTreeFromContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP, c
   switch (caP->valueType)
   {
   case orion::ValueTypeString:
-    nodeP = kjString(ciP->kjsonP, "value", caP->stringValue.c_str());
+    nodeP = kjString(orionldState.kjsonP, "value", caP->stringValue.c_str());
     ALLOCATION_CHECK(nodeP);
     kjChildAdd(aTopNodeP, nodeP);
     break;
 
   case orion::ValueTypeNumber:
-    nodeP = kjFloat(ciP->kjsonP, "value", caP->numberValue);  // FIXME: kjInteger or kjFloat ...
+    nodeP = kjFloat(orionldState.kjsonP, "value", caP->numberValue);  // FIXME: kjInteger or kjFloat ...
     ALLOCATION_CHECK(nodeP);
     kjChildAdd(aTopNodeP, nodeP);
     break;
 
   case orion::ValueTypeBoolean:
-    nodeP = kjBoolean(ciP->kjsonP, "value", (KBool) caP->boolValue);
+    nodeP = kjBoolean(orionldState.kjsonP, "value", (KBool) caP->boolValue);
     ALLOCATION_CHECK(nodeP);
     kjChildAdd(aTopNodeP, nodeP);
     break;
 
   case orion::ValueTypeNull:
-    nodeP = kjNull(ciP->kjsonP, "value");
+    nodeP = kjNull(orionldState.kjsonP, "value");
     ALLOCATION_CHECK(nodeP);
     kjChildAdd(aTopNodeP, nodeP);
     break;
 
   case orion::ValueTypeVector:
   case orion::ValueTypeObject:
-    nodeP = kjTreeFromCompoundValue(ciP, caP->compoundValueP, NULL, detailsP);
+    nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, detailsP);
     if (nodeP == NULL)
       return NULL;
     kjChildAdd(aTopNodeP, nodeP);
     break;
 
   case orion::ValueTypeNotGiven:
-    nodeP = kjString(ciP->kjsonP, "value", "UNKNOWN TYPE");
+    nodeP = kjString(orionldState.kjsonP, "value", "UNKNOWN TYPE");
     ALLOCATION_CHECK(nodeP);
     kjChildAdd(aTopNodeP, nodeP);
     break;
@@ -136,7 +135,7 @@ KjNode* kjTreeFromContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP, c
     Metadata* mdP = caP->metadataVector[ix];
 
     // They are all strings for now ...
-    nodeP = kjString(ciP->kjsonP, mdP->name.c_str(), mdP->stringValue.c_str());
+    nodeP = kjString(orionldState.kjsonP, mdP->name.c_str(), mdP->stringValue.c_str());
     kjChildAdd(aTopNodeP, nodeP);
   }
 

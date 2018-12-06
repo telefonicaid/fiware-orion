@@ -377,7 +377,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
 
           if (aTop != NULL)
           {
-            if (kjTreeFromCompoundValue(ciP, aP->compoundValueP, aTop, &details) == NULL)
+            if (kjTreeFromCompoundValue(aP->compoundValueP, aTop, &details) == NULL)
             {
               LM_E(("kjTreeFromCompoundValue: %s", details));
               orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create tree node from compound value", details, OrionldDetailsEntity);
@@ -464,7 +464,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
             return NULL;
           }
 
-          if (kjTreeFromCompoundValue(ciP, aP->compoundValueP, nodeP, &details) == NULL)
+          if (kjTreeFromCompoundValue(aP->compoundValueP, nodeP, &details) == NULL)
           {
             LM_E(("kjTreeFromCompoundValue: %s", details));
             orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create tree node from compound value", details, OrionldDetailsEntity);
@@ -533,8 +533,8 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
             case orion::ValueTypeNull:     valueP = kjNull(ciP->kjsonP, valueFieldName);                               break;
             case orion::ValueTypeNotGiven: valueP = kjString(ciP->kjsonP, valueFieldName, "UNKNOWN TYPE IN MONGODB");  break;
 
-            case orion::ValueTypeObject:   valueP = kjTreeFromCompoundValue(ciP, mdP->compoundValueP, NULL, &details); valueP->name = (char*) "value"; break;
-            case orion::ValueTypeVector:   valueP = kjTreeFromCompoundValue(ciP, mdP->compoundValueP, NULL, &details); valueP->name = (char*) "value"; break;
+            case orion::ValueTypeObject:   valueP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, &details); valueP->name = (char*) "value"; break;
+            case orion::ValueTypeVector:   valueP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, &details); valueP->name = (char*) "value"; break;
             }
 
             kjChildAdd(nodeP, valueP);
@@ -568,8 +568,8 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
             case orion::ValueTypeNull:     nodeP = kjNull(ciP->kjsonP, mdName);                                        break;
             case orion::ValueTypeNotGiven: nodeP = kjString(ciP->kjsonP, mdName, "UNKNOWN TYPE IN MONGODB");           break;
 
-            case orion::ValueTypeObject:   nodeP = kjTreeFromCompoundValue(ciP, mdP->compoundValueP, NULL, &details);  nodeP->name = (char*) "value"; break;
-            case orion::ValueTypeVector:   nodeP = kjTreeFromCompoundValue(ciP, mdP->compoundValueP, NULL, &details);  nodeP->name = (char*) "value"; break;
+            case orion::ValueTypeObject:   nodeP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, &details);  nodeP->name = (char*) "value"; break;
+            case orion::ValueTypeVector:   nodeP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, &details);  nodeP->name = (char*) "value"; break;
             }
           }
 

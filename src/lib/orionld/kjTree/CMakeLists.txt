@@ -27,6 +27,7 @@ SET (SOURCES
     kjTreeFromCompoundValue.cpp
     kjTreeFromQueryContextResponseWithAttrList.cpp
     kjTreeFromSubscription.cpp
+    kjTreeFromNotification.cpp
 )
 
 # Include directories

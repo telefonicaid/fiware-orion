@@ -37,6 +37,7 @@ do                                                                              
 {                                                                                                                                     \
   if (pointer != NULL)                                                                                                                \
   {                                                                                                                                   \
+    LM_E(("Duplicated attribute: '%s'", fieldName));                                                                                  \
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", fieldName, OrionldDetailsString);                      \
     return false;                                                                                                                     \
   }                                                                                                                                   \
@@ -47,17 +48,18 @@ do                                                                              
 
 // -----------------------------------------------------------------------------
 //
-// INTEGER_DUPLICATE_CHECK -
+// DUPLICATE_CHECK_WITH_PRESENCE -
 //
-#define INTEGER_DUPLICATE_CHECK(alreadyPresent, valueHolder, fieldName, value)                                                        \
+#define DUPLICATE_CHECK_WITH_PRESENCE(alreadyPresent, valueHolder, fieldName, value)                                                  \
 do                                                                                                                                    \
 {                                                                                                                                     \
   if (alreadyPresent == true)                                                                                                         \
   {                                                                                                                                   \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", fieldName, OrionldDetailsString);   \
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", fieldName, OrionldDetailsString);                      \
     return false;                                                                                                                     \
   }                                                                                                                                   \
-  valueHolder = value;                                                                                                                \
+  valueHolder    = value;                                                                                                             \
+  alreadyPresent = true;                                                                                                              \
 } while (0)
 
 

@@ -27,17 +27,18 @@
 
 extern "C"
 {
-#include "kjson/kjBufferCreate.h"                           // kjBufferCreate
+#include "kjson/kjBufferCreate.h"                              // kjBufferCreate
 }
 
-#include "logMsg/logMsg.h"                                  // LM_*
-#include "logMsg/traceLevels.h"                             // Lmt*
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/Verb.h"                                      // Verb
-#include "rest/ConnectionInfo.h"                            // ConnectionInfo
-#include "orionld/rest/temporaryErrorPayloads.h"            // Temporary Error Payloads
-#include "orionld/common/orionldErrorResponse.h"            // OrionldBadRequestData, OrionldDetailsString, ...
-#include "orionld/rest/orionldMhdConnectionInit.h"          // Own interface
+#include "rest/Verb.h"                                         // Verb
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/common/orionldErrorResponse.h"               // OrionldBadRequestData, OrionldDetailsString, ...
+#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/rest/temporaryErrorPayloads.h"               // Temporary Error Payloads
+#include "orionld/rest/orionldMhdConnectionInit.h"             // Own interface
 
 
 
@@ -51,7 +52,7 @@ extern __thread char  clientIp[IP_LENGTH_MAX + 1];
 
 // ----------------------------------------------------------------------------
 //
-// External declarations - tmp - should be in their own files and included here
+// External declarations - tmp - should be in their own files (not rest.cpp) and included here
 //
 extern int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* value);
 extern int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val);
@@ -214,10 +215,11 @@ int orionldMhdConnectionInit
   //
   // Creating kjson environment for KJson parse and render
   //
-  ciP->kjsonP = kjBufferCreate();      
-  if (ciP->kjsonP == NULL)
+  orionldState.kjsonP = kjBufferCreate();
+  if (orionldState.kjsonP == NULL)
     LM_X(1, ("Out of memory"));
 
+  ciP->kjsonP = orionldState.kjsonP;  // FIXME: ciP->kjsonP is to BE REMOVED. orionld.kjsonP should beused instead
 
   //
   // The 'connection', as given by MHD is very important. No responses can be sent without it

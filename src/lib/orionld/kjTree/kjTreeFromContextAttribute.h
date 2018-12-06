@@ -30,7 +30,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "ngsi/ContextAttribute.h"                             // ContextAttribute
 
 
@@ -39,6 +38,6 @@ extern "C"
 //
 // kjTreeFromContextAttribute -
 //
-extern KjNode* kjTreeFromContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP, char** detailsP);
+extern KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, char** detailsP);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_KJTREEFROMCONTEXTATTRIBUTE_H_
