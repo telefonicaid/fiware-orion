@@ -84,7 +84,7 @@ payload='{
     }
   },
   "expires": "2028-12-31T10:00:00",
-  "throttling": 5,
+  "throttling": 0,
   "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
@@ -258,6 +258,43 @@ Date: REGEX(.*)
 
 07. Dump accumulator to see one notification
 ============================================
+POST http://REGEX(.*)/notify
+Fiware-Servicepath: /
+Content-Length: 481
+User-Agent: orion/REGEX(.*)
+Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+    "data": [
+        {
+            "@context": {
+                "type": "ContextString", 
+                "value": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+            }, 
+            "http://example.org/P1": {
+                "type": "Property", 
+                "value": 11.0
+            }, 
+            "http://example.org/P2": {
+                "type": "Property", 
+                "value": "ok"
+            }, 
+            "http://example.org/P3": {
+                "type": "Property",
+                "value": 3.0
+            },
+            "id": "urn:ngsi-ld:E01", 
+            "type": "http://example.org/T"
+        }
+    ], 
+    "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{24})", 
+    "subscriptionId": "http://a.b.c/subs/sub01", 
+    "type": "Notification"
+}
+=======================================
 
 
 --TEARDOWN--
