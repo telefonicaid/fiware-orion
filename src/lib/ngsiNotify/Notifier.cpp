@@ -42,7 +42,7 @@
 #include "rest/ConnectionInfo.h"
 
 #ifdef ORIONLD
-extern "C" {  
+extern "C" {
 #include "kjson/kjRender.h"                                    // kjRender
 #include "kjson/kjson.h"                                       // Kjson
 }
@@ -415,6 +415,9 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     ConnectionInfo                    ci;
     Verb                              verb    = httpInfo.verb;
     std::vector<SenderThreadParams*>* paramsV = NULL;
+#ifdef ORIONLD
+    CachedSubscription*  subP = NULL;
+#endif
 
     if ((verb == NOVERB) || (verb == UNKNOWNVERB) || disableCusNotif)
     {
@@ -496,18 +499,19 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 #ifdef ORIONLD
     else if ((renderFormat == NGSI_LD_V1_NORMALIZED) || (renderFormat == NGSI_LD_V1_KEYVALUES))
     {
-      char                 buf[2048];
-      CachedSubscription*  subP = subCacheItemLookup(tenant.c_str(), ncrP->subscriptionId.c_str());
+      char buf[2048];
 
+      subP = subCacheItemLookup(tenant.c_str(), ncrP->subscriptionId.c_str());
       if (subP == NULL)
       {
         LM_E(("Unable to find subscription: %s", ncrP->subscriptionId.c_str()));
         return paramsV;
       }
+      LM_TMP(("Subscription '%s' has mimeType %d", ncrP->subscriptionId.c_str(), subP->httpInfo.mimeType));
 
       LM_TMP(("KZ: Rendering payload of a NGSI-LD notification"));
-      char*   details;
-      KjNode* kjTree = kjTreeFromNotification(ncrP, subP->ldContext.c_str(), &details);
+      char*    details;
+      KjNode*  kjTree = kjTreeFromNotification(ncrP, subP->ldContext.c_str(), subP->httpInfo.mimeType, &details);
 
       if (kjTree == NULL)
       {
@@ -516,6 +520,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
       }
       else
         kjRender(orionldState.kjsonP, kjTree, buf, sizeof(buf));
+
       payloadString = buf;
     }
 #endif
@@ -552,11 +557,41 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->resource         = uriPath;
     params->content_type     = content_type;
     params->content          = payloadString;
+#ifdef ORIONLD
+    params->mimeType         = httpInfo.mimeType;
+#else
     params->mimeType         = JSON;
+#endif
     params->renderFormat     = renderFormatToString(renderFormat);
     params->fiwareCorrelator = fiwareCorrelator;
     params->subscriptionId   = ncrP->subscriptionId.get();
     params->registration     = false;
+
+#ifdef ORIONLD
+    //
+    // If mime-type is application/ld+json, then the @context goes in the payload
+    // If application/json, then @context goes in the "LInk" HTTP Header
+    // - Only if the subscription is ngsi-ld, of course
+    //
+
+    if (subP == NULL)
+      subP = subCacheItemLookup(tenant.c_str(), ncrP->subscriptionId.c_str());
+
+    if (subP != NULL)
+    {
+      if (httpInfo.mimeType == JSON)
+        params->extraHeaders["Link"] = subP->ldContext;
+    }
+    else
+    {
+      //
+      // Not that this would ever happen, but, what do we do here ?
+      // Best choice seems to be to simply send the notification without the Link header.
+      //
+
+      LM_E(("Unable to find subscription: %s", ncrP->subscriptionId.c_str()));
+    }
+#endif
 
     paramsV->push_back(params);
     return paramsV;

@@ -46,7 +46,7 @@ extern "C"
 //
 // kjTreeFromNotification -
 //
-KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, char** detailsP)
+KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, MimeType mimeType, char** detailsP)
 {
   KjNode*          nodeP;
   char             buf[32];
@@ -69,9 +69,15 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   kjChildAdd(rootP, nodeP);
 
   // Context
-  // FIXME: @context in HTTP Header "Link" if not ld+json
-  nodeP = kjString(orionldState.kjsonP, "@context", contextP->url);
-  kjChildAdd(rootP, nodeP);
+  LM_TMP(("mimeType: %d", mimeType));
+  if (mimeType == JSONLD)
+  {
+    LM_TMP(("Adding @context to payload as mimeType == JSONLD"));
+    nodeP = kjString(orionldState.kjsonP, "@context", contextP->url);
+    kjChildAdd(rootP, nodeP);
+  }
+  else
+    LM_TMP(("No @context in payload as mimeType == JSON"));
 
   // notifiedAt
   time_t  now = time(NULL);  // FIXME - use an already existing timestamp?

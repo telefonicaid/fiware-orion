@@ -208,6 +208,7 @@ MongoDB server version: REGEX(.*)
 	"expiration" : NumberLong(1861869600),
 	"reference" : "http://valid.url/url",
 	"custom" : false,
+	"mimeType" : 4,
 	"throttling" : NumberLong(5),
 	"servicePath" : "/",
 	"description" : "Description of Test subscription 01",

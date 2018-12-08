@@ -308,6 +308,9 @@ static bool ktreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInf
   char* acceptP = NULL;
   char* details;
 
+  // Set default values
+  httpInfoP->mimeType = JSON;
+  
   for (KjNode* itemP = kNodeP->children; itemP != NULL; itemP = itemP->next)
   {
     if (SCOMPARE4(itemP->name, 'u', 'r', 'i', 0))
@@ -327,9 +330,37 @@ static bool ktreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInf
     {
       DUPLICATE_CHECK(acceptP, "Endpoint::accept", itemP->value.s);
       STRING_CHECK(itemP, "Endpoint::accept");
+      char* mimeType = itemP->value.s;
 
-      // FIXME: This is new. Need to modify broker for this ...
+      if (!SCOMPARE12(mimeType, 'a', 'p', 'p', 'l', 'i', 'c', 'a', 't', 'i', 'o', 'n', '/'))
+      {
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Endpoint::accept value", mimeType, OrionldDetailsString);
+        return false;
+      }
+
+      // Already accepted the first 12 chars (application/), step over them
+      mimeType = &mimeType[12];
+      if (SCOMPARE5(mimeType, 'j', 's', 'o', 'n', 0))
+        httpInfoP->mimeType = JSON;
+      else if (SCOMPARE8(mimeType, 'l', 'd', '+', 'j', 's', 'o', 'n', 0))
+        httpInfoP->mimeType = JSONLD;
+      else
+      {
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Endpoint::accept value", itemP->value.s, OrionldDetailsString);
+        return false;
+      }
     }
+    else
+    {
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Unrecognized field in Endpoint", itemP->name, OrionldDetailsString);
+      return false;
+    }
+  }
+
+  if (uriP == NULL)
+  {
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Mandatory field missing", "Endpoint::uri", OrionldDetailsString);
+    return false;
   }
 
   return true;

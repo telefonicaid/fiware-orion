@@ -33,12 +33,10 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 #
 # 01. Create an Entity E01 with attr P1 and P2
-# 02. Create a subscription with accumulator receiving notifications for ALL attributes of E01
-# 03. Dump accumulator to see one notification, then reset the accumulator
-# 04. Update E01/P1
-# 05. Dump accumulator to see one notification, then reset the accumulator
-# 06. Add a property P3 to E01
-# 07. Dump accumulator to see one notification
+# 02. Create a subscription with accumulator receiving notifications for ALL attributes of E01, using "accept": "application/json"
+# 03. Dump accumulator to see one notification with @context in HTTP Link Header, then reset the accumulator
+# 04. Create a subscription with accumulator receiving notifications for ALL attributes of E01, using "accept": "application/ld+json"
+# 05. Dump accumulator to see one notification with @context in the payload
 #
 
 echo "01. Create an Entity E01 with attr P1 and P2"
@@ -61,10 +59,49 @@ echo
 echo
 
 
-echo "02. Create a subscription with accumulator receiving notifications for ALL attributes of E01"
-echo "============================================================================================"
+echo '02. Create a subscription with accumulator receiving notifications for ALL attributes of E01, using "accept": "application/json"'
+echo '================================================================================================================================'
 payload='{
   "id": "http://a.b.c/subs/sub01",
+  "type": "Subscription",
+  "name": "Sub 01",
+  "description": "receiving notifications for ALL attributes of urn:ngsi-ld:E01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T"
+    }
+  ],
+  "watchedAttributes": [ ],
+  "notification": {
+    "attributes": [ ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 0,
+  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "03. Dump accumulator to see one notification with @context in HTTP Link Header, then reset the accumulator"
+echo "=========================================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '04. Create a subscription with accumulator receiving notifications for ALL attributes of E01, using "accept": "application/ld+json"'
+echo '==================================================================================================================================='
+payload='{
+  "id": "http://a.b.c/subs/sub02",
   "type": "Subscription",
   "name": "Sub 01",
   "description": "receiving notifications for ALL attributes of urn:ngsi-ld:E01",
@@ -92,52 +129,9 @@ echo
 echo
 
 
-echo "03. Dump accumulator to see one notification, then reset the accumulator"
-echo "========================================================================"
-accumulatorDump
-accumulatorReset
-echo
-echo
 
-
-echo "04. Update E01/P1"
-echo "================="
-payload='{
-  "P1": {
-    "type": "Property",
-    "value": 11
-  },
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
-}'
-orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:E01/attrs' --payload "$payload" -H "Content-Type: application/ld+json"
-echo
-echo
-
-
-echo "05. Dump accumulator to see one notification, then reset the accumulator"
-echo "========================================================================"
-accumulatorDump
-accumulatorReset
-echo
-echo
-
-
-echo "06. Add a property P3 to E01"
-echo "============================"
-payload='{
-  "P3": {
-    "type": "Property",
-    "value": 3
-  },
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
-}'
-orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:E01/attrs' --payload "$payload" -H "Content-Type: application/ld+json"
-echo
-echo
-
-
-echo "07. Dump accumulator to see one notification"
-echo "============================================"
+echo "05. Dump accumulator to see one notification with @context in the payload"
+echo "========================================================================="
 accumulatorDump
 echo
 echo
@@ -154,8 +148,8 @@ Date: REGEX(.*)
 
 
 
-02. Create a subscription with accumulator receiving notifications for ALL attributes of E01
-============================================================================================
+02. Create a subscription with accumulator receiving notifications for ALL attributes of E01, using "accept": "application/json"
+================================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -164,8 +158,52 @@ Date: REGEX(.*)
 
 
 
-03. Dump accumulator to see one notification, then reset the accumulator
-========================================================================
+03. Dump accumulator to see one notification with @context in HTTP Link Header, then reset the accumulator
+==========================================================================================================
+POST http://REGEX(.*)/notify
+Fiware-Servicepath: /
+Content-Length: 248
+User-Agent: orion/REGEX(.*)
+Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
+Accept: application/json
+Link: https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld
+Content-Type: application/json; charset=utf-8
+
+{
+    "data": [
+        {
+            "P1": {
+                "type": "Property",
+                "value": 1.0
+            },
+            "P2": {
+                "type": "Property",
+                "value": "ok"
+            },
+            "id": "urn:ngsi-ld:E01",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{24})",
+    "subscriptionId": "http://a.b.c/subs/sub01",
+    "type": "Notification"
+}
+=======================================
+
+
+04. Create a subscription with accumulator receiving notifications for ALL attributes of E01, using "accept": "application/ld+json"
+===================================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub02
+Date: REGEX(.*)
+
+
+
+05. Dump accumulator to see one notification with @context in the payload
+=========================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
 Content-Length: 329
@@ -192,97 +230,7 @@ Content-Type: application/json; charset=utf-8
         }
     ],
     "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{24})",
-    "subscriptionId": "http://a.b.c/subs/sub01",
-    "type": "Notification"
-}
-=======================================
-
-
-04. Update E01/P1
-=================
-HTTP/1.1 204 No Content
-Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-Date: REGEX(.*)
-
-
-
-05. Dump accumulator to see one notification, then reset the accumulator
-========================================================================
-POST http://REGEX(.*)/notify
-Fiware-Servicepath: /
-Content-Length: 330
-User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: normalized
-Host: REGEX(.*)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-
-{
-    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
-    "data": [
-        {
-            "P1": {
-                "type": "Property",
-                "value": 11.0
-            },
-            "P2": {
-                "type": "Property",
-                "value": "ok"
-            },
-            "id": "urn:ngsi-ld:E01",
-            "type": "T"
-        }
-    ],
-    "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{24})",
-    "subscriptionId": "http://a.b.c/subs/sub01",
-    "type": "Notification"
-}
-=======================================
-
-
-06. Add a property P3 to E01
-============================
-HTTP/1.1 204 No Content
-Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-Date: REGEX(.*)
-
-
-
-07. Dump accumulator to see one notification
-============================================
-POST http://REGEX(.*)/notify
-Fiware-Servicepath: /
-Content-Length: 372
-User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: normalized
-Host: REGEX(.*)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-
-{
-    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
-    "data": [
-        {
-            "P1": {
-                "type": "Property",
-                "value": 11.0
-            },
-            "P2": {
-                "type": "Property",
-                "value": "ok"
-            },
-            "P3": {
-                "type": "Property",
-                "value": 3.0
-            },
-            "id": "urn:ngsi-ld:E01",
-            "type": "T"
-        }
-    ],
-    "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{24})",
-    "subscriptionId": "http://a.b.c/subs/sub01",
+    "subscriptionId": "http://a.b.c/subs/sub02",
     "type": "Notification"
 }
 =======================================

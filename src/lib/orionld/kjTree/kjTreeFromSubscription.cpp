@@ -209,7 +209,8 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   nodeP = kjString(ciP->kjsonP, "uri", subscriptionP->notification.httpInfo.url.c_str());
   kjChildAdd(endpointP, nodeP);
 
-  nodeP = kjString(ciP->kjsonP, "accept", "application/ld+json");  // FIXME: Add field in DB and in struct HttpInfo
+  const char* mimeType = (subscriptionP->notification.httpInfo.mimeType == JSON)? "application/json" : "application/ld+json";
+  nodeP = kjString(ciP->kjsonP, "accept", mimeType);
   kjChildAdd(endpointP, nodeP);
 
   kjChildAdd(objectP, endpointP);

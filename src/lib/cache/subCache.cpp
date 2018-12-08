@@ -788,7 +788,7 @@ void subCacheItemInsert
 #ifdef ORIONLD
   cSubP->name                  = name;
   cSubP->ldContext             = ldContext;
-  LM_TMP(("KZ: Inserting sub ib sub-cache. renderFormat: %d", cSubP->renderFormat));
+  LM_TMP(("Inserting subscription with mimeType==%d into cache", cSubP->httpInfo.mimeType));
 #endif
   cSubP->expression.q          = q;
   cSubP->expression.geometry   = geometry;
@@ -816,7 +816,7 @@ void subCacheItemInsert
     //   This 'but' should be minimized once the issue 2082 gets implemented.
     //   [ Only reason for fill() to fail (apart from out-of-memory) seems to be an invalid regex ]
     //
-    cSubP->expression.stringFilter.fill(stringFilterP, &errorString);
+   cSubP->expression.stringFilter.fill(stringFilterP, &errorString);
   }
 
   if (mdStringFilterP != NULL)
@@ -1252,7 +1252,7 @@ void subCacheStart(void)
 extern bool noCache;
 /* ****************************************************************************
 *
-* subCacheItemNotificationErrorStatus - 
+* subCacheItemNotificationErrorStatus -
 *
 * This function marks a subscription to be erroneous, i.e. notifications are
 * not working.

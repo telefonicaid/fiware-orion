@@ -142,6 +142,13 @@ void setHttpInfo(const Subscription& sub, BSONObjBuilder* b)
   b->append(CSUB_REFERENCE, sub.notification.httpInfo.url);
   b->append(CSUB_CUSTOM,    sub.notification.httpInfo.custom);
 
+#ifdef ORIONLD
+  LM_TMP(("mimeType: '%d'", sub.notification.httpInfo.mimeType));
+  // FIXME: Store mimeType as a string in mongo (application/json)
+  b->append("mimeType", sub.notification.httpInfo.mimeType);
+  LM_T(LmtMongo, ("Subscription mimeType: %d", sub.notification.httpInfo.mimeType));
+#endif
+
   LM_T(LmtMongo, ("Subscription reference: %s", sub.notification.httpInfo.url.c_str()));
   LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.httpInfo.custom? "true" : "false"));
 

@@ -31,6 +31,10 @@
 #include "mongo/client/dbclient.h"
 #include "rest/Verb.h"
 
+#ifdef ORIONLD
+#include "common/MimeType.h"              // MimeType
+#endif
+
 
 
 namespace ngsiv2
@@ -47,7 +51,9 @@ struct HttpInfo
   std::map<std::string, std::string>  headers;
   std::string                         payload;
   bool                                custom;
-
+#ifdef ORIONLD
+  MimeType                            mimeType;
+#endif
   HttpInfo();
   explicit HttpInfo(const std::string& _url);
 

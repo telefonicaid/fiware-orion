@@ -26,6 +26,7 @@
 * Author: Ken Zangelin
 */
 #include "ngsi10/NotifyContextRequest.h"                       // NotifyContextRequest
+#include "common/MimeType.h"                                   // MimeType
 
 
 
@@ -33,6 +34,6 @@
 //
 // kjTreeFromNotification -
 //
-extern KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, char** detailsP);
+extern KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, MimeType mimeType, char** detailsP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMNOTIFICATION_H_
