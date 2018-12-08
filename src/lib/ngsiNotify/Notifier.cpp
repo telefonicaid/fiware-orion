@@ -49,6 +49,7 @@ extern "C" {
 #include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/rest/orionldMhdConnectionInit.h"             // orionldState
 #include "orionld/kjTree/kjTreeFromNotification.h"             // kjTreeFromNotification
+#include "cache/subCache.h"                                    // CachedSubscription
 #endif
 
 #include "ngsiNotify/Notifier.h"
@@ -495,11 +496,18 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 #ifdef ORIONLD
     else if ((renderFormat == NGSI_LD_V1_NORMALIZED) || (renderFormat == NGSI_LD_V1_KEYVALUES))
     {
-      char buf[2048];
+      char                 buf[2048];
+      CachedSubscription*  subP = subCacheItemLookup(tenant.c_str(), ncrP->subscriptionId.c_str());
+
+      if (subP == NULL)
+      {
+        LM_E(("Unable to find subscription: %s", ncrP->subscriptionId.c_str()));
+        return paramsV;
+      }
 
       LM_TMP(("KZ: Rendering payload of a NGSI-LD notification"));
       char*   details;
-      KjNode* kjTree = kjTreeFromNotification(ncrP, &details);
+      KjNode* kjTree = kjTreeFromNotification(ncrP, subP->ldContext.c_str(), &details);
 
       if (kjTree == NULL)
       {

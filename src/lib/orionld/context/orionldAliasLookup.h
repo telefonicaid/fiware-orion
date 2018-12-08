@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREEFROMNOTIFICATION_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREEFROMNOTIFICATION_H_
+#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDALIASLOOKUP_H_
+#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDALIASLOOKUP_H_
 
 /*
 *
@@ -25,14 +25,19 @@
 *
 * Author: Ken Zangelin
 */
-#include "ngsi10/NotifyContextRequest.h"                       // NotifyContextRequest
+extern "C"
+{
+#include "kjson/KjNode.h"                               // KjNode
+}
+
+#include "orionld/context/OrionldContext.h"             // OrionldContext
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeFromNotification -
+// orionldAliasLookup -
 //
-extern KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, char** detailsP);
+extern char* orionldAliasLookup(OrionldContext* contextP, const char* longName);
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMNOTIFICATION_H_
+#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDALIASLOOKUP_H_

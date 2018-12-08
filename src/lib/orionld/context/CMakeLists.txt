@@ -39,6 +39,7 @@ SET (SOURCES
     orionldUserContextKeyValuesCheck.cpp
     orionldContextTreat.cpp
     orionldUriExpand.cpp
+    orionldAliasLookup.cpp
 )
 
 # Include directories

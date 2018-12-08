@@ -39,6 +39,7 @@ extern "C"
 #include "orionld/context/orionldContextValueLookup.h"         // orionldContextValueLookup
 #include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
 #include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
+#include "orionld/context/orionldAliasLookup.h"                // orionldAliasLookup
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"            // kjTreeFromCompoundValue
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // Own interface
 
@@ -61,9 +62,10 @@ extern "C"
 //
 // kjTreeFromContextAttribute -
 //
-KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, char** detailsP)
+KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contextP, char** detailsP)
 {
-  KjNode* aTopNodeP = kjObject(orionldState.kjsonP, caP->name.c_str());  // Top node for the attribute
+  char*   nameAlias = orionldAliasLookup(contextP, caP->name.c_str());
+  KjNode* aTopNodeP = kjObject(orionldState.kjsonP, nameAlias);  // Top node for the attribute
 
   if (aTopNodeP == NULL)
   {

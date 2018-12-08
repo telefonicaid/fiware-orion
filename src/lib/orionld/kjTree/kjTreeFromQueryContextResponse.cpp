@@ -28,7 +28,6 @@ extern "C"
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
 }
 
-#include "parseArgs/baStd.h"                                   // BA_FT - for debugging only
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
@@ -39,14 +38,16 @@ extern "C"
 
 #include "orionld/common/orionldErrorResponse.h"               // OrionldResponseErrorType, orionldErrorResponse
 #include "orionld/common/numberToDate.h"                       // numberToDate
+#include "orionld/common/httpStatusCodeToOrionldErrorType.h"   // httpStatusCodeToOrionldErrorType
+#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/context/OrionldContext.h"                    // OrionldContext
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
 #include "orionld/context/orionldContextValueLookup.h"         // orionldContextValueLookup
 #include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
 #include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
 #include "orionld/context/orionldContextListPresent.h"         // orionldContextListPresent
-#include "orionld/common/httpStatusCodeToOrionldErrorType.h"   // httpStatusCodeToOrionldErrorType
-#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/context/orionldAliasLookup.h"                // orionldAliasLookup
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
 #include "orionld/kjTree/kjTreeFromContextContextAttribute.h"  // kjTreeFromContextContextAttribute
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"            // kjTreeFromCompoundValue
@@ -125,7 +126,6 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
     return ciP->responseTree;
   }
 
-  LM_TMP(("In kjTreeFromQueryContextResponse - later will be calling orionldContextValueLookup"));
   //
   // Error?
   //
@@ -152,7 +152,6 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
     if (oneHit == false)
     {
       ciP->responseTree = kjArray(ciP->kjsonP, NULL);
-      LM_TMP(("Nothing found - returning empty array"));
     }
     else
       ciP->responseTree = NULL;
@@ -190,11 +189,8 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
       kjChildAdd(root, top);
     }
 
-    LM_TMP(("Getting the @context for the entity '%s'", eId));
-
     if (contextP == NULL)
     {
-      LM_TMP(("The @context for '%s' was not found in the cache - adding it", eId));
       ContextAttribute* contextAttributeP = ceP->contextAttributeVector.lookup("@context");
 
       if (contextAttributeP != NULL)
@@ -224,9 +220,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
         // The function kjTreeFromContextContextAttribute does just this
         //
 
-        LM_TMP(("Found an attribute called context @context for entity '%s'", eId));
         char*    details;
-        LM_TMP(("Creating a KjNode tree for the @context attribute"));
         KjNode*  contextTree = kjTreeFromContextContextAttribute(ciP, contextAttributeP, &details);
 
         if (contextTree == NULL)
@@ -235,7 +229,6 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
           orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create context tree for @context attribute", details, OrionldDetailsEntity);
           return NULL;
         }
-        LM_TMP(("Created a KjNode tree for the @context attribute. Now creating a orionldContext for the tree"));
 
         contextP = orionldContextCreateFromTree(contextTree, eId, OrionldUserContext, &details);
         if (contextP == NULL)
@@ -245,7 +238,6 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
           return NULL;
         }
 
-        LM_TMP(("Inserting the new context in the context-cache"));
         orionldContextListInsert(contextP);
         orionldContextListPresent(ciP);
       }
@@ -266,53 +258,19 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
     // type
     if (ceP->entityId.type != "")
     {
-      nodeP = NULL;
+      char* alias;
 
-      LM_TMP(("=================== Reverse alias-search for Entity-Type '%s'", ceP->entityId.type.c_str()));
-
-      // Is it the default URL ?
-      if (orionldDefaultUrlLen != -1)
-      {
-        if (strncmp(ceP->entityId.type.c_str(), orionldDefaultUrl, orionldDefaultUrlLen) == 0)
-        {
-          nodeP = kjString(ciP->kjsonP, "type", &ceP->entityId.type.c_str()[orionldDefaultUrlLen]);
-          if (nodeP == NULL)
-          {
-            LM_E(("out of memory"));
-            orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create tree node", "out of memory", OrionldDetailsEntity);
-            return NULL;
-          }
-        }
-      }
-
+      alias = orionldAliasLookup(contextP, ceP->entityId.type.c_str());
+      nodeP = kjString(ciP->kjsonP, "type", alias);
       if (nodeP == NULL)
       {
-        LM_TMP(("Calling orionldContextValueLookup for %s", ceP->entityId.type.c_str()));
-        KjNode* aliasNodeP = orionldContextValueLookup(contextP, ceP->entityId.type.c_str());
-
-        if (aliasNodeP != NULL)
-        {
-          LM_TMP(("Found the alias: '%s' => '%s'", ceP->entityId.type.c_str(), aliasNodeP->name));
-          nodeP = kjString(ciP->kjsonP, "type", aliasNodeP->name);
-        }
-        else
-        {
-          LM_TMP(("No alias found, keeping long name '%s'", ceP->entityId.type.c_str()));
-          nodeP = kjString(ciP->kjsonP, "type", ceP->entityId.type.c_str());
-        }
-
-        if (nodeP == NULL)
-        {
-          LM_E(("out of memory"));
-          orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create tree node", "out of memory", OrionldDetailsEntity);
-          return NULL;
-        }
+        LM_E(("out of memory"));
+        orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create tree node", "out of memory", OrionldDetailsEntity);
+        return NULL;
       }
 
       kjChildAdd(top, nodeP);
     }
-    else
-      LM_TMP(("NOT Calling orionldContextValueLookup for entity Type as it is EMPTY!!!"));
 
 
     // System Attributes?
@@ -336,30 +294,16 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
     for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); aIx++)
     {
       ContextAttribute* aP       = ceP->contextAttributeVector[aIx];
-      char*             attrName = (char*) aP->name.c_str();
+      char*             attrName;
       KjNode*           aTop;
 
-      if (strcmp(attrName, "@context") == 0)
+      if (strcmp(aP->name.c_str(), "@context") == 0)
       {
         contextAttrP = aP;
         continue;
       }
 
-      // Is it the default URL ?
-      if ((orionldDefaultUrlLen != -1) && (strncmp(attrName, orionldDefaultUrl, orionldDefaultUrlLen) == 0))
-      {
-        attrName = &attrName[orionldDefaultUrlLen];
-      }
-      else
-      {
-        //
-        // Lookup alias for the Attribute Name
-        //
-        KjNode* aliasNodeP = orionldContextValueLookup(contextP, aP->name.c_str());
-
-        if (aliasNodeP != NULL)
-          attrName = aliasNodeP->name;
-      }
+      attrName = orionldAliasLookup(contextP, aP->name.c_str());
 
       char* valueFieldName;
       if (keyValues)

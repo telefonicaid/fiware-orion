@@ -27,10 +27,16 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
 }
+
 #include "ngsi10/NotifyContextRequest.h"                       // NotifyContextRequest
 #include "mongoBackend/MongoGlobal.h"                          // mongoIdentifier
+
 #include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/common/numberToDate.h"                       // numberToDate
+#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/context/OrionldContext.h"                    // OrionldContext
+#include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
+#include "orionld/context/orionldAliasLookup.h"                // orionldAliasLookup
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
 #include "orionld/kjTree/kjTreeFromNotification.h"             // Own interface
 
@@ -40,26 +46,32 @@ extern "C"
 //
 // kjTreeFromNotification -
 //
-KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, char** detailsP)
+KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, char** detailsP)
 {
-  KjNode* nodeP;
-  char    buf[32];
-  KjNode* root = kjObject(NULL, NULL);
-  char*   id   = mongoIdentifier(buf);
-  char    idBuffer[] = "urn:ngsi-ld:Notification:012345678901234567890123";  // The 012345678901234567890123 will be overwritten
+  KjNode*          nodeP;
+  char             buf[32];
+  KjNode*          rootP      = kjObject(NULL, NULL);
+  char*            id         = mongoIdentifier(buf);
+  char             idBuffer[] = "urn:ngsi-ld:Notification:012345678901234567890123";  // The 012345678901234567890123 will be overwritten
+  OrionldContext*  contextP   = orionldContextLookup(context);
 
   // id
   strcpy(&idBuffer[25], id);
   nodeP = kjString(orionldState.kjsonP, "id", idBuffer);
-  kjChildAdd(root, nodeP);
+  kjChildAdd(rootP, nodeP);
 
   // type
   nodeP = kjString(orionldState.kjsonP, "type", "Notification");
-  kjChildAdd(root, nodeP);
+  kjChildAdd(rootP, nodeP);
 
   // subscriptionId
   nodeP = kjString(orionldState.kjsonP, "subscriptionId", (char*) ncrP->subscriptionId.get().c_str());
-  kjChildAdd(root, nodeP);
+  kjChildAdd(rootP, nodeP);
+
+  // Context
+  // FIXME: @context in HTTP Header "Link" if not ld+json
+  nodeP = kjString(orionldState.kjsonP, "@context", contextP->url);
+  kjChildAdd(rootP, nodeP);
 
   // notifiedAt
   time_t  now = time(NULL);  // FIXME - use an already existing timestamp?
@@ -74,16 +86,17 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, char** detailsP)
 
   // data
   KjNode* dataP = kjArray(orionldState.kjsonP, "data");
-  kjChildAdd(root, dataP);
-  
+  kjChildAdd(rootP, dataP);
+
   //
   // loop over ContextElements in NotifyContextRequest::contextElementResponseVector
   //
   LM_TMP(("KZ: Adding %d contextElementResponses to the Notification kjTree", (int) ncrP->contextElementResponseVector.size()));
-  for (unsigned int ix; ix < ncrP->contextElementResponseVector.size(); ix++)
+  for (unsigned int ix = 0; ix < ncrP->contextElementResponseVector.size(); ix++)
   {
     ContextElement* ceP     = &ncrP->contextElementResponseVector[ix]->contextElement;
     KjNode*         objectP = kjObject(orionldState.kjsonP, NULL);
+    char*           alias;
     KjNode*         nodeP;
 
     kjChildAdd(dataP, objectP);
@@ -91,16 +104,27 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, char** detailsP)
     // entity id - Mandatory URI
     nodeP = kjString(orionldState.kjsonP, "id", ceP->entityId.id.c_str());
     kjChildAdd(objectP, nodeP);
-    
+
     // entity type - Mandatory URI
-    nodeP = kjString(orionldState.kjsonP, "type", ceP->entityId.type.c_str());
+    LM_TMP(("KZ: Calling orionldAliasLookup for '%s'", ceP->entityId.type.c_str()));
+    alias = orionldAliasLookup(contextP, ceP->entityId.type.c_str());
+    LM_TMP(("KZ: orionldAliasLookup gave '%s'", alias));
+    nodeP = kjString(orionldState.kjsonP, "type", alias);
     kjChildAdd(objectP, nodeP);
 
+
+    // Attributes
     LM_TMP(("KZ: Adding %d attributes to the Notification kjTree", (int) ceP->contextAttributeVector.size()));
     for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); aIx++)
     {
+      ContextAttribute*  aP       = ceP->contextAttributeVector[aIx];
+      const char*        attrName = aP->name.c_str();
+
+      if (SCOMPARE9(attrName, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
+        continue;
+
       LM_TMP(("KZ: Adding attribute '%s' to the Notification kjTree", ceP->contextAttributeVector[aIx]->name.c_str()));
-      nodeP = kjTreeFromContextAttribute(ceP->contextAttributeVector[aIx], detailsP);
+      nodeP = kjTreeFromContextAttribute(aP, contextP, detailsP);
       kjChildAdd(objectP, nodeP);
     }
     // location                        GeoProperty
@@ -111,6 +135,6 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, char** detailsP)
     //
 
   }
-  
-  return root;
+
+  return rootP;
 }
