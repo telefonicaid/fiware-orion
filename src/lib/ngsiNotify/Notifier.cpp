@@ -511,7 +511,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
       LM_TMP(("KZ: Rendering payload of a NGSI-LD notification"));
       char*    details;
-      KjNode*  kjTree = kjTreeFromNotification(ncrP, subP->ldContext.c_str(), subP->httpInfo.mimeType, &details);
+      LM_TMP(("Calling kjTreeFromNotification for a notification of type '%s'", renderFormatToString(subP->renderFormat)));
+      KjNode*  kjTree = kjTreeFromNotification(ncrP, subP->ldContext.c_str(), subP->httpInfo.mimeType, subP->renderFormat, &details);
 
       if (kjTree == NULL)
       {

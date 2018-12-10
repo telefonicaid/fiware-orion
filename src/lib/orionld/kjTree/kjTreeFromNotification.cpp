@@ -31,6 +31,7 @@ extern "C"
 #include "ngsi10/NotifyContextRequest.h"                       // NotifyContextRequest
 #include "mongoBackend/MongoGlobal.h"                          // mongoIdentifier
 
+#include "common/RenderFormat.h"                               // RenderFormat
 #include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/common/numberToDate.h"                       // numberToDate
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
@@ -46,7 +47,7 @@ extern "C"
 //
 // kjTreeFromNotification -
 //
-KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, MimeType mimeType, char** detailsP)
+KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, MimeType mimeType, RenderFormat renderFormat, char** detailsP)
 {
   KjNode*          nodeP;
   char             buf[32];
@@ -89,8 +90,13 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
     LM_E(("Runtime Error (numberToDate: %s)", details));
     return NULL;
   }
+  nodeP = kjString(orionldState.kjsonP, "notifiedAt", date);
+  kjChildAdd(rootP, nodeP);
 
+
+  //
   // data
+  //
   KjNode* dataP = kjArray(orionldState.kjsonP, "data");
   kjChildAdd(rootP, dataP);
 
@@ -114,10 +120,8 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
     // entity type - Mandatory URI
     LM_TMP(("KZ: Calling orionldAliasLookup for '%s'", ceP->entityId.type.c_str()));
     alias = orionldAliasLookup(contextP, ceP->entityId.type.c_str());
-    LM_TMP(("KZ: orionldAliasLookup gave '%s'", alias));
     nodeP = kjString(orionldState.kjsonP, "type", alias);
     kjChildAdd(objectP, nodeP);
-
 
     // Attributes
     LM_TMP(("KZ: Adding %d attributes to the Notification kjTree", (int) ceP->contextAttributeVector.size()));
@@ -130,7 +134,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
         continue;
 
       LM_TMP(("KZ: Adding attribute '%s' to the Notification kjTree", ceP->contextAttributeVector[aIx]->name.c_str()));
-      nodeP = kjTreeFromContextAttribute(aP, contextP, detailsP);
+      nodeP = kjTreeFromContextAttribute(aP, contextP, renderFormat, detailsP);
       kjChildAdd(objectP, nodeP);
     }
     // location                        GeoProperty
@@ -139,7 +143,6 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
     // Property 0..N
     // Relationship 0..N
     //
-
   }
 
   return rootP;

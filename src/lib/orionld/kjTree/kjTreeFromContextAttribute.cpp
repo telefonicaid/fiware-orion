@@ -32,6 +32,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "common/RenderFormat.h"                               // RenderFormat
 #include "rest/httpHeaderAdd.h"                                // httpHeaderAdd
 #include "ngsi/ContextAttribute.h"                             // ContextAttribute
 #include "orionld/common/OrionldConnection.h"                  // orionldState
@@ -62,9 +63,55 @@ extern "C"
 //
 // kjTreeFromContextAttribute -
 //
-KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contextP, char** detailsP)
+KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contextP, RenderFormat renderFormat, char** detailsP)
 {
-  char*   nameAlias = orionldAliasLookup(contextP, caP->name.c_str());
+  char*    nameAlias = orionldAliasLookup(contextP, caP->name.c_str());
+  KjNode*  nodeP;
+
+  if (renderFormat == NGSI_LD_V1_KEYVALUES)
+  {
+    //
+    // FIXME: This almost identical switch is in many places. Time to unite ...
+    //        KjNode* kjTreeValue(ContextAttribute* aP, const char* fieldName) ?
+    //
+    switch (caP->valueType)
+    {
+    case orion::ValueTypeString:
+      nodeP = kjString(orionldState.kjsonP, nameAlias, caP->stringValue.c_str());
+      ALLOCATION_CHECK(nodeP);
+      break;
+
+    case orion::ValueTypeNumber:
+      nodeP = kjFloat(orionldState.kjsonP, nameAlias, caP->numberValue);  // FIXME: kjInteger or kjFloat ...
+      ALLOCATION_CHECK(nodeP);
+      break;
+
+    case orion::ValueTypeBoolean:
+      nodeP = kjBoolean(orionldState.kjsonP, nameAlias, (KBool) caP->boolValue);
+      ALLOCATION_CHECK(nodeP);
+      break;
+
+    case orion::ValueTypeNull:
+      nodeP = kjNull(orionldState.kjsonP, nameAlias);
+      ALLOCATION_CHECK(nodeP);
+      break;
+
+    case orion::ValueTypeVector:
+    case orion::ValueTypeObject:
+      nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, detailsP);
+      if (nodeP == NULL)
+        return NULL;
+      break;
+
+    case orion::ValueTypeNotGiven:
+      nodeP = kjString(orionldState.kjsonP, nameAlias, "UNKNOWN TYPE");
+      ALLOCATION_CHECK(nodeP);
+      break;
+    }
+
+    return nodeP;
+  }
+
   KjNode* aTopNodeP = kjObject(orionldState.kjsonP, nameAlias);  // Top node for the attribute
 
   if (aTopNodeP == NULL)
@@ -86,10 +133,8 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 
     kjChildAdd(aTopNodeP, typeNodeP);
   }
-  
-  // Value
-  KjNode* nodeP;
 
+  // Value
   switch (caP->valueType)
   {
   case orion::ValueTypeString:
