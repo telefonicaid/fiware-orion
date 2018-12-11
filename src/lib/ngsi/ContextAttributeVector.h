@@ -47,8 +47,8 @@ typedef struct ContextAttributeVector
   void                     push_back(ContextAttribute* item);
   void                     push_back(const ContextAttributeVector& caV);
   unsigned int             size(void) const;
-  void                     release(void);
-  void                     fill(const ContextAttributeVector& caV, bool useDefaultType = false);
+  void                     release(bool skipCompounds = false);
+  void                     fill(const ContextAttributeVector& caV, bool useDefaultType = false, bool cloneCompounds = false);
   int                      get(const std::string& attributeName) const;
   void                     getAll(const std::string& attributeName, std::vector<int>* foundP) const;
   

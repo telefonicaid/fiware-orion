@@ -52,7 +52,7 @@ public:
   void            push_back(Metadata* item);
   unsigned int    size(void) const;
   Metadata*       lookupByName(const std::string& _name);
-  void            release();
+  void            release(bool skipCompound = false);
   void            fill(MetadataVector* mV);
  
   

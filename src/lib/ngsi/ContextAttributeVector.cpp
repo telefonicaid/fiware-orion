@@ -292,11 +292,11 @@ ContextAttribute*  ContextAttributeVector::operator[](unsigned int ix) const
 *
 * ContextAttributeVector::release -
 */
-void ContextAttributeVector::release(void)
+void ContextAttributeVector::release(bool skipCompounds)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->release();
+    vec[ix]->release(skipCompounds);
     delete vec[ix];
   }
 
@@ -310,7 +310,7 @@ void ContextAttributeVector::release(void)
 * ContextAttributeVector::fill - 
 *
 */
-void ContextAttributeVector::fill(const ContextAttributeVector& caV, bool useDefaultType)
+void ContextAttributeVector::fill(const ContextAttributeVector& caV, bool useDefaultType, bool cloneCompounds)
 {
   if (caV.size() == 0)
   {
@@ -320,7 +320,7 @@ void ContextAttributeVector::fill(const ContextAttributeVector& caV, bool useDef
   for (unsigned int ix = 0; ix < caV.size(); ++ix)
   {
     ContextAttribute* from = caV[ix];
-    ContextAttribute* caP = new ContextAttribute(from, useDefaultType);
+    ContextAttribute* caP = new ContextAttribute(from, useDefaultType, cloneCompounds);
 
     push_back(caP);
   }

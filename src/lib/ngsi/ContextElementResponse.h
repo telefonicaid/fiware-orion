@@ -59,7 +59,7 @@ typedef struct ContextElementResponse
 
   ContextElementResponse();
   ContextElementResponse(EntityId* eP, ContextAttribute* aP);
-  ContextElementResponse(ContextElementResponse* cerP);
+  ContextElementResponse(ContextElementResponse* cerP, bool cloneCompound = false);
   ContextElementResponse(const mongo::BSONObj&  entityDoc,
                          const StringList&      attrL,
                          bool                   includeEmpty = true,
@@ -79,7 +79,7 @@ typedef struct ContextElementResponse
                       bool                             blacklist,
                       const std::vector<std::string>&  metadataFilter);
 
-  void         release(void);
+  void         release(bool skipCompounds = false);
 
   std::string  check(ApiVersion          apiVersion,
                      RequestType         requestType,

@@ -163,11 +163,11 @@ ContextElementResponse*  ContextElementResponseVector::operator[] (unsigned int 
 *
 * ContextElementResponseVector::release -
 */
-void ContextElementResponseVector::release(void)
+void ContextElementResponseVector::release(bool skipCompounds)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->release();
+    vec[ix]->release(skipCompounds);
     delete vec[ix];
   }
 

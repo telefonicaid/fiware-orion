@@ -89,7 +89,7 @@ class Entity
 
   std::string  check(ApiVersion apiVersion, RequestType requestType);
 
-  void         release(void);
+  void         release(bool skipCompounds = false);
 
   void         fill(const std::string&             id,
                     const std::string&             type,
@@ -109,7 +109,7 @@ class Entity
                     const std::string&  type,
                     const std::string&  isPattern);
 
-  void         fill(const Entity& en, bool useDefaultType = false);
+  void         fill(const Entity& en, bool useDefaultType = false, bool cloneCompounds = false);
 
   void         fill(const QueryContextResponse& qcrs, OrionError* oeP);
 

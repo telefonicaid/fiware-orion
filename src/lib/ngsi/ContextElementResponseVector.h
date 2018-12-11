@@ -56,7 +56,7 @@ typedef struct ContextElementResponseVector
   void                     push_back(ContextElementResponse* item);
   unsigned int             size(void) const;
   ContextElementResponse*  lookup(Entity* eP, HttpStatusCode code = SccNone);
-  void                     release();
+  void                     release(bool skipCompounds = false);
   void                     fill(ContextElementResponseVector& cerV);
   ContextElementResponse*  operator[] (unsigned int ix) const;
   

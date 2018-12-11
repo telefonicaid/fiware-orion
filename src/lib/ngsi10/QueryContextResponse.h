@@ -54,7 +54,7 @@ typedef struct QueryContextResponse
 
   std::string            toJsonV1(bool asJsonObject);
   std::string            check(ApiVersion apiVersion, bool asJsonObject, const std::string&  predetectedError);
-  void                   release(void);
+  void                   release(bool skipCompounds = false);
   void                   fill(QueryContextResponse* qcrsP);
   QueryContextResponse*  clone(void);
 } QueryContextResponse;

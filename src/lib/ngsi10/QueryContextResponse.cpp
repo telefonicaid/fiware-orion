@@ -191,9 +191,9 @@ std::string QueryContextResponse::check(ApiVersion apiVersion, bool asJsonObject
 *
 * QueryContextResponse::release -
 */
-void QueryContextResponse::release(void)
+void QueryContextResponse::release(bool skipCompounds)
 {
-  contextElementResponseVector.release();
+  contextElementResponseVector.release(skipCompounds);
   errorCode.release();
 }
 

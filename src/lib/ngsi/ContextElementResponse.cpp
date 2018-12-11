@@ -76,11 +76,11 @@ ContextElementResponse::ContextElementResponse(EntityId* eP, ContextAttribute* a
 *
 * ContextElementResponse::ContextElementResponse - 
 */
-ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP)
+ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP, bool cloneCompounds)
 {
   prune = false;
 
-  entity.fill(cerP->entity);
+  entity.fill(cerP->entity, false, cloneCompounds);
   statusCode.fill(cerP->statusCode);
 }
 
@@ -354,9 +354,9 @@ std::string ContextElementResponse::toJson
 *
 * ContextElementResponse::release - 
 */
-void ContextElementResponse::release(void)
+void ContextElementResponse::release(bool skipCompounds)
 {
-  entity.release();
+  entity.release(skipCompounds);
   statusCode.release();
 }
 

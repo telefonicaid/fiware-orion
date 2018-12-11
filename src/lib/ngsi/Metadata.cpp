@@ -363,13 +363,13 @@ std::string Metadata::check(ApiVersion apiVersion)
 *
 * release -
 */
-void Metadata::release(void)
+void Metadata::release(bool skipCompounds)
 {
-  if (compoundValueP != NULL)
+  if ((compoundValueP != NULL) && (!skipCompounds))
   {
     delete compoundValueP;
-    compoundValueP = NULL;
   }
+  compoundValueP = NULL;
 }
 
 
@@ -484,7 +484,7 @@ std::string Metadata::toJson(void)
   }
   else
   {
-    LM_E(("Runtime Error (invalid value type for metadata %s)", name.c_str()));
+    LM_E(("Runtime Error (invalid value type %s for metadata %s)", valueTypeName(valueType), name.c_str()));
   }
 
   return jh.str();

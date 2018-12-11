@@ -94,7 +94,7 @@ typedef struct Metadata
 
   std::string  toJsonV1(bool comma);
   std::string  toJson(void);
-  void         release(void);
+  void         release(bool skipCompound = false);
   void         fill(const struct Metadata& md);
   std::string  toStringValue(void) const;
   bool         compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
