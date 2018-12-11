@@ -197,7 +197,8 @@ std::string QueryContextResponseVector::toJsonV1(bool asJsonObject, bool details
   }
 
   answer = responseP->toJsonV1(asJsonObject);
-  responseP->release(true);
+  //responseP->release(true);
+  responseP->release();
   delete responseP;
 
   return answer;
