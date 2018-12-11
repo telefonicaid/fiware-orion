@@ -292,11 +292,11 @@ ContextAttribute*  ContextAttributeVector::operator[](unsigned int ix) const
 *
 * ContextAttributeVector::release -
 */
-void ContextAttributeVector::release(bool skipCompounds)
+void ContextAttributeVector::release(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->release(skipCompounds);
+    vec[ix]->release();
     delete vec[ix];
   }
 

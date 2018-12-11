@@ -680,9 +680,9 @@ void Entity::fill(const QueryContextResponse& qcrs, OrionError* oeP)
 *
 * Entity::release - 
 */
-void Entity::release(bool skipCompounds)
+void Entity::release(void)
 {
-  attributeVector.release(skipCompounds);
+  attributeVector.release();
 }
 
 

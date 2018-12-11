@@ -354,9 +354,9 @@ std::string ContextElementResponse::toJson
 *
 * ContextElementResponse::release - 
 */
-void ContextElementResponse::release(bool skipCompounds)
+void ContextElementResponse::release(void)
 {
-  entity.release(skipCompounds);
+  entity.release();
   statusCode.release();
 }
 

@@ -79,7 +79,7 @@ typedef struct ContextElementResponse
                       bool                             blacklist,
                       const std::vector<std::string>&  metadataFilter);
 
-  void         release(bool skipCompounds = false);
+  void         release(void);
 
   std::string  check(ApiVersion          apiVersion,
                      RequestType         requestType,

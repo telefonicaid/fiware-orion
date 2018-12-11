@@ -89,7 +89,7 @@ class Entity
 
   std::string  check(ApiVersion apiVersion, RequestType requestType);
 
-  void         release(bool skipCompounds = false);
+  void         release(void);
 
   void         fill(const std::string&             id,
                     const std::string&             type,

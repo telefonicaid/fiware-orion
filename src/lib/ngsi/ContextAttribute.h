@@ -118,7 +118,7 @@ public:
                              MimeType*        outMimeTypeP,
                              HttpStatusCode*  scP);
 
-  void         release(bool skipCompounds = false);
+  void         release(void);
   std::string  getName(void);
 
   /* Used to render attribute value to BSON */

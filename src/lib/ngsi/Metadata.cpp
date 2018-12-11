@@ -363,13 +363,13 @@ std::string Metadata::check(ApiVersion apiVersion)
 *
 * release -
 */
-void Metadata::release(bool skipCompounds)
+void Metadata::release(void)
 {
-  if ((compoundValueP != NULL) && (!skipCompounds))
+  if (compoundValueP != NULL)
   {
     delete compoundValueP;
+    compoundValueP = NULL;
   }
-  compoundValueP = NULL;
 }
 
 
@@ -407,7 +407,7 @@ std::string Metadata::toStringValue(void) const
     else // regular number
     {
       return double2string(numberValue);
-    }    
+    }
     break;
 
   case orion::ValueTypeBoolean:

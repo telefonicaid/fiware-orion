@@ -1185,15 +1185,15 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
 *
 * ContextAttribute::release - 
 */
-void ContextAttribute::release(bool skipCompounds)
+void ContextAttribute::release(void)
 {
-  if ((compoundValueP != NULL) && (!skipCompounds))
+  if (compoundValueP != NULL)
   {
     delete compoundValueP;
+    compoundValueP = NULL;
   }
-  compoundValueP = NULL;
 
-  metadataVector.release(skipCompounds);
+  metadataVector.release();
 
   if (previousValue != NULL)
   {

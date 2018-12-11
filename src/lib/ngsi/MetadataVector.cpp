@@ -180,13 +180,13 @@ unsigned int MetadataVector::size(void) const
 *
 * MetadataVector::release -
 */
-void MetadataVector::release(bool skipCompounds)
+void MetadataVector::release(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     if (vec[ix] != NULL)
     {
-      vec[ix]->release(skipCompounds);
+      vec[ix]->release();
       delete vec[ix];
       vec[ix] = NULL;
     }

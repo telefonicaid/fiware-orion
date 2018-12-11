@@ -527,12 +527,10 @@ std::string postQueryContext
     }
   }
 
-#if 1
   std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
   bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
 
   TIMED_RENDER(answer = responseV.toJsonV1(asJsonObject, details, qcrsP->errorCode.details));
-#endif
 
 
   //
