@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription Creation and a simple notification
+Subscription Creation and a simple notification with keyValues
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -33,7 +33,7 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 #
 # 01. Create an Entity E01 with attr P1 and P2
-# 02. Create a subscription with accumulator receiving notificationd with keyValues
+# 02. Create a subscription with accumulator receiving notifications with keyValues
 # 03. Dump accumulator to see one notification, then reset the accumulator
 # 04. Update E01/P1
 # 05. Dump accumulator to see one notification, then reset the accumulator
@@ -61,8 +61,8 @@ echo
 echo
 
 
-echo "02. Create a subscription with accumulator receiving notifications for ALL attributes of E01"
-echo "============================================================================================"
+echo "02. Create a subscription with accumulator receiving notifications with keyValues"
+echo "================================================================================="
 payload='{
   "id": "http://a.b.c/subs/sub01",
   "type": "Subscription",
@@ -154,8 +154,8 @@ Date: REGEX(.*)
 
 
 
-02. Create a subscription with accumulator receiving notifications for ALL attributes of E01
-============================================================================================
+02. Create a subscription with accumulator receiving notifications with keyValues
+=================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -168,7 +168,7 @@ Date: REGEX(.*)
 ========================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 273
+Content-Length: 308
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: keyValues
 Host: REGEX(.*)
@@ -186,6 +186,7 @@ Content-Type: application/json; charset=utf-8
         }
     ],
     "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{24})",
+    "notifiedAt": "REGEX(.*)", 
     "subscriptionId": "http://a.b.c/subs/sub01",
     "type": "Notification"
 }
@@ -205,7 +206,7 @@ Date: REGEX(.*)
 ========================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 274
+Content-Length: 309
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: keyValues
 Host: REGEX(.*)
@@ -223,6 +224,7 @@ Content-Type: application/json; charset=utf-8
         }
     ],
     "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{24})",
+    "notifiedAt": "REGEX(.*)", 
     "subscriptionId": "http://a.b.c/subs/sub01",
     "type": "Notification"
 }
@@ -242,7 +244,7 @@ Date: REGEX(.*)
 ============================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 288
+Content-Length: 323
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: keyValues
 Host: REGEX(.*)
@@ -261,6 +263,7 @@ Content-Type: application/json; charset=utf-8
         }
     ],
     "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{24})",
+    "notifiedAt": "REGEX(.*)", 
     "subscriptionId": "http://a.b.c/subs/sub01",
     "type": "Notification"
 }

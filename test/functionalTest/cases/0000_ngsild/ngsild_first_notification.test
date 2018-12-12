@@ -168,7 +168,7 @@ Date: REGEX(.*)
 ========================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 329
+Content-Length: 364
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -192,6 +192,7 @@ Content-Type: application/json; charset=utf-8
         }
     ],
     "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{24})",
+    "notifiedAt": "REGEX(.*)", 
     "subscriptionId": "http://a.b.c/subs/sub01",
     "type": "Notification"
 }
@@ -211,7 +212,7 @@ Date: REGEX(.*)
 ========================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 330
+Content-Length: 365
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -235,6 +236,7 @@ Content-Type: application/json; charset=utf-8
         }
     ],
     "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{24})",
+    "notifiedAt": "REGEX(.*)", 
     "subscriptionId": "http://a.b.c/subs/sub01",
     "type": "Notification"
 }
@@ -254,7 +256,7 @@ Date: REGEX(.*)
 ============================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 372
+Content-Length: 407
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -282,6 +284,7 @@ Content-Type: application/json; charset=utf-8
         }
     ],
     "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{24})",
+    "notifiedAt": "REGEX(.*)", 
     "subscriptionId": "http://a.b.c/subs/sub01",
     "type": "Notification"
 }
