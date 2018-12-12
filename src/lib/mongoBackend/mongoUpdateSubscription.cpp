@@ -888,7 +888,11 @@ std::string mongoUpdateSubscription
 
   if (!noCache)
   {
+    cacheSemTake(__FUNCTION__, "Looking for subscription in cache subscription");
+
     subCacheP = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
+
+    cacheSemGive(__FUNCTION__, "Looking for subscription in cache subscription");
   }
 
   setExpiration(subUp, subOrig, &b);
