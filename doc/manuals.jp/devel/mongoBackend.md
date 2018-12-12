@@ -378,7 +378,7 @@ _MB-12: mongoUpdateSubscription_
 * `mongoUpdateSubscription()` は、サービス・ルーチンから呼び出されます (ステップ1)。これは、 `lib/serviceRoutinesV2/patchSubscription.cpp` の `patchSubscription()` または ` lib/mongoBackend/mongoUpdateContextSubscription.cpp` の `mongoUpdateContextSubscription()` のいずれかです
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
 * 更新されるサブスクリプションは、`connectionOperations` モジュールの `collectionFindOne()` を使ってデータベースから取得されます (ステップ3と4)
-* サブスクリプション・キャッシュが有効な場合 (つまり、`noCache` が `false` に設定されている場合)、サブスクリプション・キャッシュのオブジェクトは `cache` モジュールの `subCacheItemLoopkup()` を使用してサブスクリプション・キャッシュから取得されます (ステップ5)。これはサブスクリプション・キャッシュ・セマフォによって保護されるべきですが、現在はありません。詳細は[この issue](https://github.com/telefonicaid/fiware-orion/issues/2882) を参照してください
+* サブスクリプション・キャッシュが有効な場合 (つまり、`noCache` が `false` に設定されている場合)、サブスクリプション・キャッシュのオブジェクトは `cache` モジュールの `subCacheItemLoopkup()` を使用してサブスクリプション・キャッシュから取得されます (ステップ5)
 * オリジナル・サブスクリプションの BSON オブジェクトは、サブスクリプションの作成ケース `setExpiration()`,  `setHttpInfo()` と同様の異なる `set*()` 関数を使用して、元のサブスクリプションの BSON オブジェクトに基づいて構築されます。これらの関数の1つ、`setCondsAndInitialNotify()` は、ステップ6で呼び出された更新されたサブスクリプションに対応する初期通知を送信する可能性のある "副作用" を持っています
 * この関数は `MongoGlobal` モジュール・セクションの一部として記述された通知を実際に送信するために `processConditionVector()` を順番に使用します (ステップ7)。図 [MD-03](#flow-md-03) を参照してください
 * `update`, `count` および `lastNotification` フィールドはサブスクリプションキャッシュで更新されます (ステップ9)。この操作は、ステップ8とステップ10で受け入れられて受け入れられたサブスクリプション・キャッシュ・セマフォによって保護されます。セマフォの[詳細はこのドキュメント](semaphores.md#subscription-cache-semaphore) を参照してください
