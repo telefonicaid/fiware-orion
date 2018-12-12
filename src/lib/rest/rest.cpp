@@ -51,6 +51,7 @@
 #include "parse/forbiddenChars.h"
 
 #ifdef ORIONLD
+#include "orionld/common/OrionldConnection.h"    // orionldState
 #include "orionld/rest/orionldMhdConnectionInit.h"
 #include "orionld/rest/orionldMhdConnectionPayloadRead.h"
 #include "orionld/rest/orionldMhdConnectionTreat.h"
@@ -1555,6 +1556,8 @@ static int connectionTreat
     //
     if ((url[0] == '/') && (url[1] == 'n') && (url[2] == 'g') && (url[3] == 's') && (url[4] == 'i') && (url[6] == 'l') && (url[7] == 'd') && (url[8] == '/'))
     {
+      orionldState.apiVersion = NGSI_LD_V1;
+
       if      (*con_cls == NULL)        return orionldMhdConnectionInit(connection, url, method, version, con_cls);
       else if (*upload_data_size != 0)  return orionldMhdConnectionPayloadRead((ConnectionInfo*) *con_cls, upload_data_size, upload_data);
 

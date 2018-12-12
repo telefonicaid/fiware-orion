@@ -30,4 +30,4 @@
 //
 // orionldState - the state of the connection
 //
-__thread OrionldConnection orionldState;
+__thread OrionldConnection orionldState = { 0 };

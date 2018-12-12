@@ -27,8 +27,10 @@
 */
 extern "C"
 {
-#include "kjson/kjson.h"                                    // Kjson
+#include "kjson/kjson.h"                                       // Kjson
 }
+#include "common/globals.h"                                    // ApiVersion
+#include "orionld/context/OrionldContext.h"                    // OrionldContext
 
 
 
@@ -45,7 +47,9 @@ extern "C"
 //
 typedef struct OrionldConnectionState
 {
-  Kjson* kjsonP;
+  Kjson*           kjsonP;
+  OrionldContext*  contextP;
+  ApiVersion       apiVersion;
 } OrionldConnection;
 
 
