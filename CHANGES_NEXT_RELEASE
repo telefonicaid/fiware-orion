@@ -7,3 +7,4 @@
 - Add: Oneshot Subscription (#3189)
 - Fix: local structured attributes values were not shown when overlapping with forwarded query (#3363)
 - Fix: cache sem is not taken before subCacheItemLookup() call (#2882)
+- Fix: wrong Runtime Error logs on GET /v2/registrations and GET /v2/registrations/{id} calls (#3375)
