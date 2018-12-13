@@ -6,3 +6,4 @@
 - Fix: Wrong inclusion of "location" metadata in geo:json notifications (#3045)
 - Add: Oneshot Subscription (#3189)
 - Fix: local structured attributes values were not shown when overlapping with forwarded query (#3363)
+- Fix: cache sem is not taken before subCacheItemLookup() call (#2882)
