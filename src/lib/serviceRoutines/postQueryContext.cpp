@@ -143,7 +143,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
 
   if (r != 0)
   {
-    LM_W(("Runtime Error (error forwarding 'Query' to providing application)"));
+    LM_W(("Runtime Error (error %d forwarding 'Query' to providing application)", r));
     return false;
   }
 

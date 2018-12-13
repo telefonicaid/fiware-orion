@@ -615,7 +615,7 @@ void Entity::fill
 *
 * This constructor was ported from old ContextElement class
 */
-void Entity::fill(const Entity& en, bool useDefaultType)
+void Entity::fill(const Entity& en, bool useDefaultType, bool cloneCompounds)
 {
   id            = en.id;
   type          = en.type;
@@ -630,7 +630,7 @@ void Entity::fill(const Entity& en, bool useDefaultType)
     type = DEFAULT_ENTITY_TYPE;
   }
 
-  attributeVector.fill(en.attributeVector, useDefaultType);
+  attributeVector.fill(en.attributeVector, useDefaultType, cloneCompounds);
 
   providingApplicationList = en.providingApplicationList;
 }

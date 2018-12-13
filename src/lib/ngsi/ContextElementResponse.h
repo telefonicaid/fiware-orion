@@ -59,7 +59,7 @@ typedef struct ContextElementResponse
 
   ContextElementResponse();
   ContextElementResponse(EntityId* eP, ContextAttribute* aP);
-  ContextElementResponse(ContextElementResponse* cerP);
+  ContextElementResponse(ContextElementResponse* cerP, bool cloneCompound = false);
   ContextElementResponse(const mongo::BSONObj&  entityDoc,
                          const StringList&      attrL,
                          bool                   includeEmpty = true,
