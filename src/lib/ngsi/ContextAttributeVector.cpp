@@ -253,11 +253,11 @@ void ContextAttributeVector::push_back(ContextAttribute* item)
 * ContextAttributeVector::push_back - 
 *
 */
-void ContextAttributeVector::push_back(const ContextAttributeVector& caV)
+void ContextAttributeVector::push_back(const ContextAttributeVector& caV, bool cloneCompound)
 {
   for (unsigned int ix = 0; ix < caV.size(); ++ix)
   {
-    vec.push_back(new ContextAttribute(caV[ix]));
+    vec.push_back(new ContextAttribute(caV[ix], false, cloneCompound));
   }
 }
 

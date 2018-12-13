@@ -155,9 +155,6 @@ Some additional comments:
     opposite doesn't work, so if you have registrations with types, then you must use `?type` in NGSIv2  update/query in
     order to obtain a match. Otherwise you may encounter problems, like the one described in this
     [post at StackOverflow](https://stackoverflow.com/questions/48163972/orion-cb-doesnt-update-lazy-attributes-on-iot-agent).
--   At the present moment, Context Broker is not able to include compound attributes in forwarded updates. A
-    blank (`""`) if forwarded for them instead. Please have a look to 
-    [the following issue](https://github.com/telefonicaid/fiware-orion/issues/3162) for more information.    
 -   Query filtering (e.g. `GET /v2/entities?q=temperature>40`) is not supported on query forwarding. First, Orion
     doesn't include the filter in the `POST /v1/queryContext` operation forwarded to CPr. Second, Orion doesn't filter
     the CPr results before responding them back to client. An issue corresponding to this limitation has been created:

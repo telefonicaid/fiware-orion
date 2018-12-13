@@ -45,7 +45,7 @@ typedef struct ContextAttributeVector
   ContextAttributeVector();
 
   void                     push_back(ContextAttribute* item);
-  void                     push_back(const ContextAttributeVector& caV);
+  void                     push_back(const ContextAttributeVector& caV, bool cloneCompound = false);
   unsigned int             size(void) const;
   void                     release(void);
   void                     fill(const ContextAttributeVector& caV, bool useDefaultType = false, bool cloneCompounds = false);

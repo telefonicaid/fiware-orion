@@ -23,15 +23,13 @@
 #
 # Uncached/Cached query
 #
-# 01. Start the contextBroker 'CB'
-# 02. Start contextProvider 'CP' (contextBroker functioning as contextProvider)
-# 03. Register an entity/attribute E1/A1 in broker, with CP as providing application
-# 04. Update/APPEND E1/A1(=CP) in CP - this is a non-primitive element e.g. an Array
-# 05. Query CP for E1/A1
-# 06. Query broker for E1/A1 (will go to CP and it will work, A1=CP is returned)
-# 07. Update/APPEND E1/A2(=broker) in broker - this is also a non-primitive element e.g. an Array
-# 08. Query broker for E1/A2 (broker's local info is returned (A2=broker))
-# 09. Query E1 in CB
+# 01. Register an entity/attribute E1/A1 in broker, with CP as providing application
+# 02. Update/APPEND E1/A1(=CP) in CP - this is a non-primitive element e.g. an Array
+# 03. Query CP for E1/A1
+# 04. Query broker for E1/A1 (will go to CP and it should work, A1=CP array is returned)
+# 05. Update/APPEND E1/A2(=broker) in broker - this is also a non-primitive element e.g. an Array
+# 06. Query broker for E1/A2 (broker's local info is returned (A2=broker))
+# 07. Query E1 in CB
 
 --NAME--
 Query Redirect Operation
@@ -44,14 +42,10 @@ brokerStart CP1 0
 
 
 --SHELL--
-echo "01. contextBroker running"
-echo "02. contextProvider running (contextBroker functioning as contextProvider)"
-echo
-echo
 
-echo "03. Register an entity/attribute E1/A1 in broker, with CP as providing application"
-url3="/v2/registrations"
-payload3='{
+echo "01. Register an entity/attribute E1/A1 in broker, with CP as providing application"
+echo "=================================================================================="
+payload='{
   "description": "Register a E1/A1 with CP as provider",
   "dataProvided": {
     "entities": [
@@ -71,14 +65,14 @@ payload3='{
      "legacyForwarding": true
   }
 }'
-orionCurl --url "$url3" --payload "$payload3"
+orionCurl --url /v2/registrations --payload "$payload"
 echo
 echo
 
 
-echo "04. Update/APPEND E1/A1(=CP) in CP"
-url4="/v1/updateContext"
-payload4='{
+echo "02. Update/APPEND E1/A1(=CP) in CP"
+echo "=================================="
+payload='{
   "contextElements": [
     {
       "type": "E",
@@ -95,14 +89,14 @@ payload4='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url4" --payload "$payload4" --port $CP1_PORT
+orionCurl --url /v1/updateContext --payload "$payload" --port $CP1_PORT
 echo
 echo
 
 
-echo "05. Query CP for E1/A1"
-url5="/v1/queryContext"
-payload5='{
+echo "03. Query CP for E1/A1"
+echo "======================"
+payload='{
   "entities": [
     {
       "type": "E",
@@ -114,20 +108,21 @@ payload5='{
     "A1"
   ]
 }'
-orionCurl --url "$url5" --payload "$payload5" --port $CP1_PORT
+orionCurl --url /v1/queryContext --payload "$payload" --port $CP1_PORT
 echo
 echo
 
 
-echo "06. Query broker for E1/A1 (will go to CP and it should work, A1=CP array is returned)"
+echo "04. Query broker for E1/A1 (will go to CP and it should work, A1=CP array is returned)"
+echo "======================================================================================"
 orionCurl --url /v2/entities/E1/attrs/A1/value
 echo
 echo
 
 
-echo "07. Update/APPEND E1/A2(=broker) in broker"
-url7="/v1/updateContext"
-payload7='{
+echo "05. Update/APPEND E1/A2(=broker) in broker"
+echo "=========================================="
+payload='{
   "contextElements": [
     {
       "type": "E",
@@ -144,44 +139,40 @@ payload7='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url7" --payload "$payload7"
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
-echo "08. Query broker for E1/A2 (will go to CB and should work, A2 array is returned)"
+echo "06. Query broker for E1/A2 (will go to CB and should work, A2 array is returned)"
+echo "================================================================================"
 orionCurl --url /v2/entities/E1/attrs/A2/value --out "text/plain"
 echo
 echo
 
 
-echo "09. Query E1 in CB - expect two arrays returned"
+echo "07. Query E1 in CB - expect two arrays returned"
+echo "==============================================="
 orionCurl --url /v2/entities/E1
 echo
 echo
 
 
 --REGEXPECT--
-01. contextBroker running
-02. contextProvider running (contextBroker functioning as contextProvider)
-
-
-03. Register an entity/attribute E1/A1 in broker, with CP as providing application
-HTTP/1.1 200 OK
-Content-Length: 64
-Content-Type: application/json
+01. Register an entity/attribute E1/A1 in broker, with CP as providing application
+==================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "duration": "PT24H",
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
 
 
-04. Update/APPEND E1/A1(=CP) in CP
+02. Update/APPEND E1/A1(=CP) in CP
+==================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
+Content-Length: 187
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -194,7 +185,7 @@ Date: REGEX(.*)
                     {
                         "name": "A1",
                         "type": "Array",
-                        "value": ["Data", "from CP"]
+                        "value": ""
                     }
                 ],
                 "id": "E1",
@@ -210,9 +201,10 @@ Date: REGEX(.*)
 }
 
 
-05. Query CP for E1/A1
+03. Query CP for E1/A1
+======================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
+Content-Length: 203
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -225,7 +217,10 @@ Date: REGEX(.*)
                     {
                         "name": "A1",
                         "type": "Array",
-                        "value": ["Data", "from CP"]
+                        "value": [
+                            "Data",
+                            "from CP"
+                        ]
                     }
                 ],
                 "id": "E1",
@@ -241,23 +236,24 @@ Date: REGEX(.*)
 }
 
 
-06. Query broker for E1/A1 (will go to CP and it will work, A1=CP is returned)
+04. Query broker for E1/A1 (will go to CP and it should work, A1=CP array is returned)
+======================================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
+Content-Length: 18
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "metadata": {},
-    "type": "Array",
-    "value": ["Data", "from CP"]
-}
+[
+    "Data",
+    "from CP"
+]
 
 
-07. Update/APPEND E1/A2(=broker) in broker
+05. Update/APPEND E1/A2(=broker) in broker
+==========================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
+Content-Length: 187
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -270,7 +266,7 @@ Date: REGEX(.*)
                     {
                         "name": "A2",
                         "type": "Array",
-                        "value": ["Data", "from CB"]
+                        "value": ""
                     }
                 ],
                 "id": "E1",
@@ -286,22 +282,21 @@ Date: REGEX(.*)
 }
 
 
-08. Query broker for E1/A2 (will go to CB and should work, A2 array is returned)
+06. Query broker for E1/A2 (will go to CB and should work, A2 array is returned)
+================================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
+Content-Length: 18
+Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "metadata": {},
-    "type": "Array",
-    "value": ["Data", "from CB"]
-}
+["Data","from CB"]
 
-09. Query E1 in CB - expect two arrays returned
+
+07. Query E1 in CB - expect two arrays returned
+===============================================
 HTTP/1.1 200 OK
-Content-Length: 80
+Content-Length: 148
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -309,22 +304,27 @@ Date: REGEX(.*)
 {
     "A1": {
         "metadata": {},
-        "type": "string",
-        "value": ["Data", "from CP"]
+        "type": "Array",
+        "value": [
+            "Data",
+            "from CP"
+        ]
     },
     "A2": {
         "metadata": {},
-        "type": "string",
-        "value": ["Data", "from CB"]
+        "type": "Array",
+        "value": [
+            "Data",
+            "from CB"
+        ]
     },
     "id": "E1",
-    "type": "T1"
+    "type": "E"
 }
 
 
 --TEARDOWN--
 brokerStop CB
 brokerStop CP1
-
 dbDrop CB
 dbDrop CP1
