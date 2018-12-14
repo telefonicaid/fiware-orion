@@ -8,5 +8,4 @@
 - Fix: problems rendering structured attribute values when forwarded queries are involved (#3162, #3363, #3282)
 - Fix: cache sem is not taken before subCacheItemLookup() call (#2882)
 - Fix: local structured attributes values were not shown when overlapping with forwarded query (#3363)
-- Fix: cache sem is not taken before subCacheItemLookup() call (#2882)
 - Fix: wrong Runtime Error logs on GET /v2/registrations and GET /v2/registrations/{id} calls (#3375)
