@@ -26,6 +26,7 @@
 
 #include "apiTypesV2/Registration.h"
 #include "common/JsonHelper.h"
+#include "common/globals.h"
 
 
 
@@ -76,7 +77,7 @@ std::string Registration::toJson(void)
     jh.addString("description", description);
   }
 
-  if (expires != -1)
+  if (expires < PERMANENT_EXPIRES_DATETIME)
   {
     jh.addDate("expires", expires);
   }
