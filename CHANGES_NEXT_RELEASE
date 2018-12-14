@@ -5,5 +5,5 @@
 - Fix: NGSIv2-NGSIv1 location metadata issues (#3122)
 - Fix: Wrong inclusion of "location" metadata in geo:json notifications (#3045)
 - Add: Oneshot Subscription (#3189)
-- Fix: problems rendering structured attribute values when forwarded queries are involved (#3162, #3363)
+- Fix: problems rendering structured attribute values when forwarded queries are involved (#3162, #3363, #3282)
 - Fix: cache sem is not taken before subCacheItemLookup() call (#2882)
