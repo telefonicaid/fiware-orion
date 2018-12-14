@@ -42,9 +42,6 @@ The list of available options is the following:
 -   **-ipv6**. Runs broker in IPv6 only mode (by default, the broker
     runs in both IPv4 and IPv6). Cannot be used at the same time
     as -ipv4.
--   **-rush <host:port>**. Use **rush** in *host* and
-    *port*. Default behavior is to *not* use Rush. See section
-    on [using Rush relayer](rush.md).
 -   **-multiservice**. Enables multiservice/multitenant mode (see [multi
     service tenant section](../user/multitenancy.md)).
 -   **-db <db>**. The MongoDB database to use or

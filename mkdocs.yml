@@ -46,7 +46,6 @@ pages:
       - 'Data model': 'admin/database_model.md'
       - 'Logs': 'admin/logs.md'
       - 'Watchdog': 'admin/watchdog.md'
-      - 'Rush relayer': 'admin/rush.md'
       - 'Management REST interface': 'admin/management_api.md'
       - 'Metrics API': 'admin/metrics_api.md'
       - 'Statistics': 'admin/statistics.md'
