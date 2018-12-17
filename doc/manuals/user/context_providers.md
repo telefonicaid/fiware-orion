@@ -62,10 +62,7 @@ EOF
 ```
       
       
-* Next, consider that a client queries the 
-
-temperature
-  (message number 2).
+* Next, consider that a client queries the temperature  (message number 2).
 
       
 ```
