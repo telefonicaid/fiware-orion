@@ -116,5 +116,7 @@ curl localhost:1026/v2/entities/Street4/attrs/temperature?type=Street -s -S \
 -   あるリクエストが複数のコンテキスト・プロバイダ (例えば、3つのコンテキスト要素を含む更新で、それぞれが異なるコンテキスト・プロバイダによって管理されるエンティティ) を含む場合、Orion はリクエストの対応する "ピース (piece)" を各コンテキスト・プロバイダに転送し、クライアントにレスポンスする前にすべての結果を収集します。現在のインプリメンテーション・プロセスは、複数のフォワードを順番に処理します。つまり、フォワードリクエストを次のものに送信する前に、特定の CPr からのレスポンスを待ちます (またはタイムアウト満了します)
 -   -`cprForwardLimit` [CLI パラメータ](../admin/cli.md)を使用して、単一のクライアントリクエストに対するコンテキスト・プロバイダへの転送リクエストの最大数を制限することができます。コンテキスト・プロバイダの転送を無効にするには、"0" を使用します
 -   転送時には、NGSIv2 の更新/クエリ内のどの型のエンティティも、エンティティ型のないレジストレーションと一致します。しかし、その逆は機能しないので、型を持つレジストレーションがあれば、NGSIv2 の更新/クエリで `?type` を使って一致を得る必要があります。それ以外の場合、この [StackOverflow での投稿](https://stackoverflow.com/questions/48163972/orion-cb-doesnt-update-lazy-attributes-on-iot-agent)のような問題が発生する可能性があります
--   クエリの転送では、クエリ・フィルタリングはサポートされていません (たとえば、`GET /v2/entities?q=temperature>40`)。まず、Orion は CPr に転送された `POST /v1/queryContext` オペレーションにフィルタを含めません。第2に、Orion はクライアントに返信する前に CPr の結果をフィルタリングしません。この制限に対応する issue が作成されました : https://github.com/telefonicaid/fiware-orion/issues/2282
+-   現時点では、Context Broker はフォワードされたクエリの結果に複合属性値 (compound attribute values) を含めることができません。この場合、ブランク (`""`) 値が表示されます。詳細については、
+[次の issue](https://github.com/telefonicaid/fiware-orion/issues/3162) を参照してください。ただし、複合値 (compound values) を含む更新にはこの問題はなく、正しく転送されます。
+    - 一方、[Dockerhub](https://hub.docker.com/r/fiware/orion/) には、"fiware/orion:fix3162" と書かれた Docker イメージがあり、これには修正が含まれています。 ただし、このイメージは、メモリリークの問題 (未確認) の可能性があるため、プロダクションでの使用はお勧めしません。
 -   部分的な更新の場合 (たとえば、いくつかのエンティティ/属性が更新され、他のエンティティ/属性が CPrs の失敗または欠落のために更新されない結果をもたらす `POST /v2/op/entities`)、404 Not Found がクライアントに返されます。この場合の `error` フィールドは `PartialUpdate` であり、`description` フィールドは更新に失敗したエンティティ属性に関する情報を含んでいます
