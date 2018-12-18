@@ -918,7 +918,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   }
   else
   {
-    LM_E(("Runtime Error (invalid value type for attribute %s)", name.c_str()));
+    LM_E(("Runtime Error (invalid value type %s for attribute %s)", valueTypeName(valueType), name.c_str()));
   }
 
   std::vector<Metadata*> orderedMetadata;
@@ -981,7 +981,7 @@ std::string ContextAttribute::toJsonValue(void)
   }
   else
   {
-    LM_E(("Runtime Error (invalid value type for attribute %s)", name.c_str()));
+    LM_E(("Runtime Error (invalid value type %s for attribute %s)", valueTypeName(valueType), name.c_str()));
   }
 
   return "";

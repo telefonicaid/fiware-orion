@@ -220,11 +220,11 @@ void ContextAttributeVector::push_back(ContextAttribute* item)
 * ContextAttributeVector::push_back - 
 *
 */
-void ContextAttributeVector::push_back(const ContextAttributeVector& caV)
+void ContextAttributeVector::push_back(const ContextAttributeVector& caV, bool cloneCompound)
 {
   for (unsigned int ix = 0; ix < caV.size(); ++ix)
   {
-    vec.push_back(new ContextAttribute(caV[ix]));
+    vec.push_back(new ContextAttribute(caV[ix], false, cloneCompound));
   }
 }
 
@@ -277,7 +277,7 @@ void ContextAttributeVector::release(void)
 * ContextAttributeVector::fill - 
 *
 */
-void ContextAttributeVector::fill(const ContextAttributeVector& caV, bool useDefaultType)
+void ContextAttributeVector::fill(const ContextAttributeVector& caV, bool useDefaultType, bool cloneCompounds)
 {
   if (caV.size() == 0)
   {
@@ -287,7 +287,7 @@ void ContextAttributeVector::fill(const ContextAttributeVector& caV, bool useDef
   for (unsigned int ix = 0; ix < caV.size(); ++ix)
   {
     ContextAttribute* from = caV[ix];
-    ContextAttribute* caP = new ContextAttribute(from, useDefaultType);
+    ContextAttribute* caP = new ContextAttribute(from, useDefaultType, cloneCompounds);
 
     push_back(caP);
   }

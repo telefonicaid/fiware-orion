@@ -184,11 +184,11 @@ std::string QueryContextResponseVector::toJsonV1(bool asJsonObject, bool details
 
       if (targetCerP != NULL)
       {
-        targetCerP->entity.attributeVector.push_back(cerP->entity.attributeVector);
+        targetCerP->entity.attributeVector.push_back(cerP->entity.attributeVector, true);
       }
       else  // Not found so we will have to create a new ContextElementResponse
       {
-        ContextElementResponse* newCerP = new ContextElementResponse(cerP);
+        ContextElementResponse* newCerP = new ContextElementResponse(cerP, true);
 
         newCerP->statusCode.fill(SccOk);
         responseP->contextElementResponseVector.push_back(newCerP);

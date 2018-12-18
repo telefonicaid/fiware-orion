@@ -14,7 +14,6 @@ Orion Context Broker: インストール&管理マニュアル
 * [データ・モデル](database_model.md) (Data model)
 * [ログ](logs.md) (Logs)
 * [ウォッチドッグ](watchdog.md) (Watchdog)
-* [ラッシュ・リレー](rush.md) (Rush relayer)
 * [管理用 REST インタフェース](management_api.md) (Management REST inferface)
 * [メトリック API](metrics_api.md) (Metrics API)
 * [統計情報](statistics.md) (Statistics)

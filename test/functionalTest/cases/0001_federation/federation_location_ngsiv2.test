@@ -1,0 +1,283 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+
+--NAME--
+Federation scenario with location (NGSIv2 subs)
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+brokerStart CB 0
+brokerStart CP1 0
+
+--SHELL--
+
+#
+# 01. Make CP1 subscribe to all in CB
+# 02. Create entity with geodata
+# 03. Check entity in CB
+# 04. Check entity in CP1
+# 05. Update the entity, using /v2/op/update, in CB
+# 06. Check entity in CB
+# 07. Check entity in CP1
+#
+
+echo "01. Make CP1 subscribe to all in CB"
+echo "==================================="
+payload='{
+  "description": "TEST",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$CP1_PORT'/v2/op/notify"
+    }
+  },
+  "expires": "2040-01-01T14:00:00.00Z",
+  "throttling": 0
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity with geodata"
+echo "=============================="
+payload='{
+  "actionType": "append",
+  "entities": [
+    {
+      "id": "Spain-WeatherObserved-6172O-latest",
+      "type": "WeatherObserved",
+      "location": {
+        "type": "geo:json",
+        "value": {
+          "type": "Point",
+          "coordinates": [ -4, 36 ]
+        },
+        "metadata": {}
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "03. Check entity in CB"
+echo "======================"
+orionCurl --url /v2/entities
+echo
+echo
+
+
+echo "04. Check entity in CP1"
+echo "======================="
+orionCurl --url /v2/entities --port $CP1_PORT
+echo
+echo
+
+sleep 2
+
+echo "05. Update the entity, using /v2/op/update, in CB"
+echo "================================================="
+payload='{
+  "actionType": "update",
+  "entities": [
+    {
+      "id": "Spain-WeatherObserved-6172O-latest",
+      "type": "WeatherObserved",
+      "location": {
+        "type": "geo:json",
+        "value": {
+          "type": "Point",
+          "coordinates": [ 10.1, 10.2 ]
+        },
+        "metadata": {}
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "06. Check entity in CB"
+echo "======================"
+orionCurl --url /v2/entities
+echo
+echo
+
+
+echo "07. Check entity in CP1"
+echo "======================="
+orionCurl --url /v2/entities --port $CP1_PORT
+echo
+echo
+
+
+--REGEXPECT--
+01. Make CP1 subscribe to all in CB
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity with geodata
+==============================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Check entity in CB
+======================
+HTTP/1.1 200 OK
+Content-Length: 162
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "Spain-WeatherObserved-6172O-latest",
+        "location": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    -4,
+                    36
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "WeatherObserved"
+    }
+]
+
+
+04. Check entity in CP1
+=======================
+HTTP/1.1 200 OK
+Content-Length: 162
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "Spain-WeatherObserved-6172O-latest",
+        "location": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    -4,
+                    36
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "WeatherObserved"
+    }
+]
+
+
+05. Update the entity, using /v2/op/update, in CB
+=================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Check entity in CB
+======================
+HTTP/1.1 200 OK
+Content-Length: 166
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "Spain-WeatherObserved-6172O-latest",
+        "location": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    10.1,
+                    10.2
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "WeatherObserved"
+    }
+]
+
+
+07. Check entity in CP1
+=======================
+HTTP/1.1 200 OK
+Content-Length: 166
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "Spain-WeatherObserved-6172O-latest",
+        "location": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    10.1,
+                    10.2
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "WeatherObserved"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

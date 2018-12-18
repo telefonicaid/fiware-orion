@@ -407,7 +407,7 @@ std::string Metadata::toStringValue(void) const
     else // regular number
     {
       return double2string(numberValue);
-    }    
+    }
     break;
 
   case orion::ValueTypeBoolean:
@@ -484,7 +484,7 @@ std::string Metadata::toJson(void)
   }
   else
   {
-    LM_E(("Runtime Error (invalid value type for metadata %s)", name.c_str()));
+    LM_E(("Runtime Error (invalid value type %s for metadata %s)", valueTypeName(valueType), name.c_str()));
   }
 
   return jh.str();

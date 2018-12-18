@@ -200,7 +200,7 @@ def qnoresponse():
     return Response(status=200)
 
 # This response has been designed to test the #2360 case, but is general enough to be
-# used in other future cases
+# used in other future cases (e.e. #3363)
 @app.route("/badresponse/queryContext", methods=['POST'])
 def bad_response():
     r = Response(status=404)

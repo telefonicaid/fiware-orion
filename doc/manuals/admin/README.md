@@ -14,7 +14,6 @@ Orion Context Broker: Installation & Administration Manual.
 * [Data model](database_model.md)
 * [Logs](logs.md)
 * [Watchdog](watchdog.md)
-* [Rush relayer](rush.md)
 * [Management REST inferface](management_api.md)
 * [Metrics API](metrics_api.md)
 * [Statistics](statistics.md)

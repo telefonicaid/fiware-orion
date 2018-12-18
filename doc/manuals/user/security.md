@@ -38,9 +38,7 @@ subscriptions, e.g.
   ...
 ```
 
-If you use Rush relayer (see [how to run Orion using Rush](../admin/rush.md)) then Orion to Rush request
-is sent in HTTP, then Rush will encrypt it using HTTPS towards the final receiver. If you don't use Rush
-relayer, then Orion will send HTTPS notification natively. In that case, note that by default Orion will
+Orion will send HTTPS notification natively. Note that by default Orion will
 reject connections to non-trusted endpoints (i.e. the ones which certificate cannot be authenticated
 with known CA certificates). If you want to avoid this behaviour you need to use the `-insecureNotif`
 [CLI parameter](../admin/cli.md) but note that doing so is an insecure configuration (e.g. you could suffer

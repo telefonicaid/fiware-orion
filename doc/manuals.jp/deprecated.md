@@ -8,6 +8,7 @@
 
 推奨されなくなった機能のリストと、廃止された機能のバージョンは次のとおりです :
 
+* Orion 2.1.0 の Rush サポート (関連するCLIパラメータ : `-rush`)
 * Orion 2.0.0 での NGSIv1 (関連する CLI パラメータ : `-strictNgsiv1Ids`, `-ngsiv1Autocast`)。代わりに NGSIv2 API を使用してください
 * `POST /v2/op/query` の `attributes` フィールドは、Orion 1.15.0 にあります。これらの属性を持つエンティティのみを返すためには、クエリに対するレスポンスにどの属性を含めるかを選択する `attrs` と、`expression` 内の `q` の単項属性フィルタ (unary attribute filter) の組み合わせです。それらを代わりに指定していください
 * Orion 1.14.0 では `POST /v2/op/update` の `APPEND`, `APPEND_STRICT`, `UPDATE`, `DELETE`,  `REPLACE` の使用は非推奨です。`append`, `appendStrict`, `update`, `delete`, `replace` を代わりに使ってください
@@ -46,6 +47,7 @@
 
 | **削除された機能**                                                         | **機能をサポートする Orion ラスト・バージョン** | **バージョンのリリース日**      |
 |----------------------------------------------------------------------------|-------------------------------------------------|---------------------------------|
+| Rush (関連する CLI パラメータ : `-rush`)                                   | まだ定義されていません                          | まだ定義されていません          |
 | NGSIv1 (関連する CLI パラメータ : `-strictNgsiv1Ids`, `-ngsiv1Autocast`)   | まだ定義されていません                          | まだ定義されていません          |
 | `POST /v2/entities` オペレーションの `attributes` フィールド               | まだ定義されていません                          | まだ定義されていません          |
 | `APPEND`, `UPDATE`, など。`POST /v2/op/update` でのアクション・タイプ      | まだ定義されていません                          | まだ定義されていません          |

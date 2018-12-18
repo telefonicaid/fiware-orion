@@ -25,11 +25,16 @@ Oneshot subscription with POST /v2/entities, POST /v2/subscriptions, GET /v2/sub
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 0 IPv4 -subCacheIval 1
 accumulatorStart --pretty-print
 
 --SHELL--
 
+#
+# Note we use sleep in some point to let time the DB to sync with regards to
+# cache timeSent value (WAIT_TIME = 1.5 * subCacheIval)
+#
+WAIT_TIME=1.5s
 #
 # 01. POST /v2/entities, to create Room1 with temperature and pressure.
 # 02. POST /v2/subscriptions, to create subscription with status oneshot.
@@ -142,6 +147,7 @@ echo '06. Dump and reset accumulator, see one notification.'
 echo '====================================================='
 accumulatorDump
 accumulatorReset
+sleep $WAIT_TIME
 echo
 echo
 
@@ -369,7 +375,7 @@ Date: REGEX(.*)
 09. GET /v2/subscriptions/subscription_id, to check the update status.
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 350
+Content-Length: 409
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -385,7 +391,9 @@ Date: REGEX(.*)
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
         }, 
-        "lastSuccess": "REGEX(.*)"
+        "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
+        "timesSent": 1
     }, 
     "status": "oneshot", 
     "subject": {

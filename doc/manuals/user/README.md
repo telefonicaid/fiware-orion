@@ -21,6 +21,7 @@
   * [Forbidden characters](forbidden_characters.md)
   * [Using regular expressions in payloads](regex_in_payload.md)
   * [Initial notification](initial_notification.md)
+  * [Onseshot subcriptions](oneshot_subscription.md)
   * [Security considerations](security.md)
   * [Known Limitations](known_limitations.md)
   * [Docker](docker.md)

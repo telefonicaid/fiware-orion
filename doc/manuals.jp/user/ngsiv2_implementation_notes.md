@@ -13,7 +13,8 @@
 * [`noAttrDetail` オプション](#noattrdetail-option)
 * [通知スロットリング](#notification-throttling)
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
-* [初期通知](#initial_notifications)
+* [初期通知](#initial-notifications)
+* [Oneshot サブスクリプション](#oneshot-subscriptions)
 * [レジストレーション](#registrations)
 * [`POST /v2/op/notify` でサポートされない `keyValues`](#keyvalues-not-supported-in-post-v2opnotify)
 * [廃止予定の機能](#deprecated-features)
@@ -225,12 +226,21 @@ NGISv2 仕様 "Ordering Results" セクションから :
 
 [Top](#top)
 
-<a name="initial_notifications"></a>
+<a name="initial-notifications"></a>
 ## 初期通知
 
 NGSIv2 仕様では、サブスクリプションの対象となるエンティティの更新に基づいて、特定のサブスクリプションに対応する通知をトリガするルールを "サブスクリプション" セクションで説明しています。そのような定期的な通知以外にも、サブスクリプションの作成/更新時に初期通知を送信することがあります。[初期通知](initial_notification.md)については、ドキュメントの詳細を確認してください。
 
 [トップ](#top)
+
+<a name="oneshot-subscriptions"></a>
+## Oneshot サブスクリプション
+
+Orionは、NGSIv2 仕様のサブスクリプション用に定義された `status` 値の他に、
+`oneshot`を使用することもできます。
+[Oneshot サブスクリプションのドキュメント](oneshot_subscription.md)で詳細を確認してください
+
+[Top](#top)
 
 <a name="registrations"></a>
 ## レジストレーション

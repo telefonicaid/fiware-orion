@@ -26,4 +26,4 @@ Orion によってエクスポートされた API サーバで HTTPS を使用�
   ...
 ```
 
-Rush relayer ([Rush を使用して Orion を実行する方法](../admin/rush.md)を参照) を使用し、Orion から Rush へのリクエストが HTTP で送信される場合、Rush は HTTPS を使用して最終的な受信者に向けて暗号化します。Rush relayer を使用しない場合、Orion はネイティブに HTTPS 通知を送信します。その場合、デフォルトでは、Orion は信頼できないエンドポイント (つまり、既知の CA 証明書で認証できない証明書) への接続を拒否します。この動作を避けたい場合は、`-insecureNotif` [CLI パラメータ](../admin/cli.md)を使用する必要がありますが、そうすることは安全ではない設定です (例 : [man-in-the-middle 攻撃](https://en.wikipedia.org/wiki/Man-in-the-middle_attack)に苦しむ可能性があります)。
+Orion はネイティブに HTTPS 通知を送信します。その場合、デフォルトでは、Orion は信頼できないエンドポイント (つまり、既知の CA 証明書で認証できない証明書) への接続を拒否します。この動作を避けたい場合は、`-insecureNotif` [CLI パラメータ](../admin/cli.md)を使用する必要がありますが、そうすることは安全ではない設定です (例 : [man-in-the-middle 攻撃](https://en.wikipedia.org/wiki/Man-in-the-middle_attack)に苦しむ可能性があります)。
