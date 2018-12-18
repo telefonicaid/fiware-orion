@@ -82,9 +82,11 @@ void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP, const cha
   {
     OrionldContext*  contextP  = (_contextP != NULL)? _contextP : &orionldDefaultContext;
 
-    if (_contextP == &orionldCoreContext)
-      _contextP = &orionldDefaultContext;
-
+    if (contextP == &orionldCoreContext)
+      contextP = &orionldDefaultContext;
+    else if (strcmp(contextP->url, ORIONLD_CORE_CONTEXT_URL) == 0)
+      contextP = &orionldDefaultContext;
+             
     url = contextP->url;
   }
 

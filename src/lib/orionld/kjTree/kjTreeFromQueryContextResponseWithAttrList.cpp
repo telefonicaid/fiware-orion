@@ -508,7 +508,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
     {
       if (ciP->httpHeaders.acceptJsonld == true)
       {
-        nodeP = kjString(orionldState.kjsonP, "@context", orionldCoreContext.url);
+        nodeP = kjString(orionldState.kjsonP, "@context", orionldDefaultContext.url);
         kjChildAdd(top, nodeP);
       }
       else

@@ -21,108 +21,61 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Entity Creation, Retrieval, and Deletion
+Create an entity without context, amke sure it has the DEFAULT context, not the CORE context
 
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 212-249
+brokerStart CB 0-255
 
 --SHELL--
 
 #
-# 01. Create Entity 'http://a.b.c/entity/E1'
-# 02. GET E1
-# 03. Delete E1
-# 04. GET E1, see error
+# 01. Create an entity without context
+# 02. GET the entity and see the DEFAULT context
 #
 
-
-echo "01. Create Entity 'http://a.b.c/entity/E1'"
-echo "=========================================="
+echo "01. Create an entity without context"
+echo "===================================="
 payload='{
-  "id": "http://a.b.c/entity/E1",
-  "type": "A",
-  "name": {
-    "type": "Property",
-    "value": "1"
-  }
+  "id": "urn:ngsi-ld:Vehicle:V233",
+  "type": "Vehicle"
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
 echo
 echo
 
 
-echo "02. GET E1"
-echo "=========="
-orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E1?prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json"
-echo
-echo
 
-
-echo "03. Delete E1"
-echo "============="
-orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E1' -X DELETE
-echo
-echo
-
-
-echo "04. GET E1, see error"
-echo "====================="
-orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E1?prettyPrint=yes' --noPayloadCheck
+echo "02. GET the entity and see the DEFAULT context"
+echo "=============================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:V233?prettyPrint=yes&spaces=2' --noPayloadCheck -H "Accept: application/ld+json"
 echo
 echo
 
 
 --REGEXPECT--
-01. Create Entity 'http://a.b.c/entity/E1'
-==========================================
+01. Create an entity without context
+====================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:V233
 Date: REGEX(.*)
 
 
 
-02. GET E1
-==========
+02. GET the entity and see the DEFAULT context
+==============================================
 HTTP/1.1 200 OK
-Content-Length: 221
+Content-Length: 171
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-  "id": "http://a.b.c/entity/E1",
-  "type": "A",
-  "name": {
-    "type": "Property",
-    "value": "1"
-  },
+  "id": "urn:ngsi-ld:Vehicle:V233",
+  "type": "Vehicle",
   "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
-}
-
-
-
-03. Delete E1
-=============
-HTTP/1.1 204 No Content
-Content-Length: 0
-Date: REGEX(.*)
-
-
-
-04. GET E1, see error
-=====================
-HTTP/1.1 404 Not Found
-Content-Length: 134
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-  "type": "http://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
-  "title": "No context element found",
-  "details": "no details"
 }
 
 
