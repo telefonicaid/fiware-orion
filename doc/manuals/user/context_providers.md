@@ -43,7 +43,7 @@ curl localhost:1026/v2/registrations -s -S -H 'Content-Type: application/json' -
   "dataProvided": {
     "entities": [
       {
-        "id": "Strret4",
+        "id": "Street4",
         "type": "Street"
       }
     ],
@@ -62,8 +62,7 @@ EOF
 ```
       
       
-* Next, consider that a client queries the Street4 temperature
-  (message number 2).
+* Next, consider that a client queries the temperature  (message number 2).
 
       
 ```
