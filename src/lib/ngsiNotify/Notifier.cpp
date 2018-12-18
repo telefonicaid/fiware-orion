@@ -88,6 +88,7 @@ void Notifier::sendNotifyContextRequest
 {
   pthread_t                         tid;
 
+  LM_TMP(("VALGRIND: Calling Notifier::buildSenderParams. httpInfo.mimeType: %d", httpInfo.mimeType));
   std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncrP,
                                                                           httpInfo,
                                                                           tenant,

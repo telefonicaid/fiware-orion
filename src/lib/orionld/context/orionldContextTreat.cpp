@@ -64,58 +64,56 @@ static OrionldContext* contextItemNodeTreat(ConnectionInfo* ciP, char* url)
 //
 // orionldContextTreat -
 //
-ContextAttribute* orionldContextTreat
+//
+// The allowed payloads for the @context member are:
+//
+// 1. ARRAY - An array of URL strings:
+//    "@context": [
+//      "http://...",
+//      "http://...",
+//      "http://..."
+//    }
+//
+// 2. STRING - A single URL string:
+//    "@context": "http://..."
+//
+// 3. OBJECT - Direct context:
+//    "@context": {
+//      "Property": "http://...",
+//      "XXX";      "YYY"
+//    }
+//
+// -----------------------------------------------------------
+// Case 3 is not implemented in the first round. coming later.
+// -----------------------------------------------------------
+//
+// As the payload is already parsed, what needs to be done here is to call orionldContextAdd() for each of these URLs
+//
+// The content of these "Context URLs" can be:
+//
+// 4. An object with a single member '@context' that is an object containing key-values:
+//    "@context" {
+//      "Property": "http://...",
+//      "XXX";      ""
+//    }
+//
+// 5. An object with a single member '@context', that is a vector of URL strings (https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld):
+//    {
+//      "@context": [
+//        "http://...",
+//        "http://...",
+//        "http://..."
+//      }
+//    }
+//
+bool orionldContextTreat
 (
-  ConnectionInfo*  ciP,
-  KjNode*          contextNodeP,
-  char*            entityId
+  ConnectionInfo*     ciP,
+  KjNode*             contextNodeP,
+  char*               entityId,
+  ContextAttribute**  caPP
 )
 {
-  LM_TMP(("contextNodeP at %p", contextNodeP));
-  //
-  // The allowed payloads for the @context member are:
-  //
-  // 1. ARRAY - An array of URL strings:
-  //    "@context": [
-  //      "http://...",
-  //      "http://...",
-  //      "http://..."
-  //    }
-  //
-  // 2. STRING - A single URL string:
-  //    "@context": "http://..."
-  //
-  // 3. OBJECT - Direct context:
-  //    "@context": {
-  //      "Property": "http://...",
-  //      "XXX";      "YYY"
-  //    }
-  //
-  // -----------------------------------------------------------
-  // Case 3 is not implemented in the first round. coming later.
-  // -----------------------------------------------------------
-  //
-  // As the payload is already parsed, what needs to be done here is to call orionldContextAdd() for each of these URLs
-  //
-  // The content of these "Context URLs" can be:
-  //
-  // 4. An object with a single member '@context' that is an object containing key-values:
-  //    "@context" {
-  //      "Property": "http://...",
-  //      "XXX";      ""
-  //    }
-  //
-  // 5. An object with a single member '@context', that is a vector of URL strings (https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld):
-  //    {
-  //      "@context": [
-  //        "http://...",
-  //        "http://...",
-  //        "http://..."
-  //      }
-  //    }
-  //
-  LM_T(LmtContextTreat, ("Got @context for '%s', type %s", entityId, kjValueType(contextNodeP->type)));
-
   if (contextNodeP->type == KjString)
   {
     char* details;
@@ -125,7 +123,7 @@ ContextAttribute* orionldContextTreat
     {
       LM_E(("Failed to create context from URL: %s", details));
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from URL", details, OrionldDetailsString);
-      return NULL;
+      return false;
     }
     LM_TMP(("orionldContextCreateFromUrl OK"));
     ciP->contextToBeFreed = false;  // context has been added to public list - must not be freed
@@ -141,25 +139,35 @@ ContextAttribute* orionldContextTreat
     //
     // contextUrl = "http://" host + ":" + port + "/ngsi-ld/ex/v1/contexts/" + entity.id;
     //
-    int   linkPathLen = 7 + orionldHostNameLen + 1 + 5 + 27 + strlen(entityId) + 1;
-    char* linkPath    = (char*) malloc(linkPathLen);
+    unsigned int  linkPathLen = 7 + orionldHostNameLen + 1 + 5 + 27 + strlen(entityId) + 1;
+    char          linkPathV[256];
+    char*         linkPath;
 
-    if (linkPath == NULL)
+    if (linkPathLen > sizeof(linkPathV))
     {
-      LM_E(("out of memory creating Link HTTP Header"));
-      orionldErrorResponseCreate(ciP, OrionldInternalError, "cannot create Link HTTP Header", "out of memory", OrionldDetailsString);
-      return NULL;
+      linkPath = (char*) malloc(linkPathLen);
+      if (linkPath == NULL)
+      {
+        LM_E(("out of memory creating Link HTTP Header"));
+        orionldErrorResponseCreate(ciP, OrionldInternalError, "cannot create Link HTTP Header", "out of memory", OrionldDetailsString);
+        return false;
+      }
     }
+    else
+      linkPath = linkPathV;
+
     sprintf(linkPath, "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", orionldHostName, restPortGet(), entityId);
 
     ciP->contextP = orionldContextCreateFromTree(contextNodeP, linkPath, OrionldUserContext, &details);
-    free(linkPath);  // orionldContextCreateFromTree strdups the URL
+
+    if (linkPath != linkPathV)
+      free(linkPath);  // orionldContextCreateFromTree strdups the URL
 
     if (ciP->contextP == NULL)
     {
       LM_E(("Failed to create context from Tree : %s", details));
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from tree", details, OrionldDetailsString);
-      return NULL;
+      return false;
     }
 
     //
@@ -174,14 +182,14 @@ ContextAttribute* orionldContextTreat
       {
         LM_E(("Context Array Item is not a JSON String, but of type '%s'", kjValueType(contextStringNodeP->type)));
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Context Array Item is not a JSON String", NULL, OrionldDetailsString);
-        return NULL;
+        return false;
       }
 
       if (contextItemNodeTreat(ciP, contextStringNodeP->value.s) == NULL)
       {
         LM_E(("contextItemNodeTreat failed"));
         // Error payload set by contextItemNodeTreat
-        return NULL;
+        return false;
       }
     }
   }
@@ -190,13 +198,13 @@ ContextAttribute* orionldContextTreat
     // FIXME: seems like an inline context - not supported for now
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", "inline contexts not supported in current version of orionld", OrionldDetailsString);
     LM_E(("inline contexts not supported in current version of orionld"));
-    return NULL;
+    return false;
   }
   else
   {
     LM_E(("invalid JSON type of @context member"));
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", "invalid JSON type of @context member", OrionldDetailsString);
-    return NULL;
+    return false;
   }
 
 
@@ -223,9 +231,12 @@ ContextAttribute* orionldContextTreat
   LM_TMP(("orionldPostEntities called orionldUserContextKeyValuesCheck: %s", "OK"));
 #endif
 
-  LM_T(LmtContextTreat, ("The @context is treated as an attribute"));
-  // The @context is treated as an attribute
+  if (caPP == NULL)
+    return true;
+
+  // Create a context attribute of the context
   ContextAttribute* caP;
+  LM_T(LmtContextTreat, ("The @context is treated as an attribute"));
 
   // The attribute's value is either a string or a vector (compound)
   if (contextNodeP->type == KjString)
@@ -255,6 +266,8 @@ ContextAttribute* orionldContextTreat
     caP->valueType      = orion::ValueTypeObject;  // All compounds have Object as value type (I think)
     caP->compoundValueP = compoundP;
   }
+
+  *caPP = caP;
 
   return caP;
 }

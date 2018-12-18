@@ -2237,6 +2237,7 @@ static bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
+        LM_TMP(("VALGRIND: Calling sendNotifyContextRequest I"));
         getNotifier()->sendNotifyContextRequest(&ncr,
                                                 notifyHttpInfo,
                                                 tenant,
@@ -2256,6 +2257,7 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
+      LM_TMP(("VALGRIND: Calling sendNotifyContextRequest I"));
       getNotifier()->sendNotifyContextRequest(&ncr,
                                               notifyHttpInfo,
                                               tenant,

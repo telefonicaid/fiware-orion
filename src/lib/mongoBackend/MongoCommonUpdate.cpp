@@ -1753,7 +1753,7 @@ static bool processOnChangeConditionForUpdateContext
   ncr.originator.set("localhost");
 
   ncr.subscriptionId.set(subId);
-  LM_TMP(("KZ: Calling sendNotifyContextRequest III"));
+  LM_TMP(("VALGRIND: Calling sendNotifyContextRequest III"));
   getNotifier()->sendNotifyContextRequest(&ncr,
                                           httpInfo,
                                           tenant,

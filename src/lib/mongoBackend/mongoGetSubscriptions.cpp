@@ -135,11 +135,11 @@ static void setSubject(Subscription* s, const BSONObj& r)
     std::string  coords = expression.hasField(CSUB_EXPR_COORDS) ? getStringFieldF(expression, CSUB_EXPR_COORDS) : "";
     std::string  georel = expression.hasField(CSUB_EXPR_GEOREL) ? getStringFieldF(expression, CSUB_EXPR_GEOREL) : "";
 
-    s->subject.condition.expression.q        = q;
-    s->subject.condition.expression.mq       = mq;
-    s->subject.condition.expression.geometry = geo;
-    s->subject.condition.expression.coords   = coords;
-    s->subject.condition.expression.georel   = georel;
+    if (q  != "")      s->subject.condition.expression.q        = q;
+    if (mq != "")      s->subject.condition.expression.mq       = mq;
+    if (geo != "")     s->subject.condition.expression.geometry = geo;
+    if (coords != "")  s->subject.condition.expression.coords   = coords;
+    if (georel != "")  s->subject.condition.expression.georel   = georel;
   }
 }
 

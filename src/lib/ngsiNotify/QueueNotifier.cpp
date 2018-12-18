@@ -73,6 +73,7 @@ void QueueNotifier::sendNotifyContextRequest
   bool                             blacklist
 )
 {
+  LM_TMP(("VALGRIND: Calling Notifier::buildSenderParams. httpInfo.mimeType: %d", httpInfo.mimeType));
   std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncr,
                                                                           httpInfo,
                                                                           tenant,

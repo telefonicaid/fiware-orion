@@ -142,6 +142,8 @@ bool orionldGetEntity(ConnectionInfo* ciP)
         return false;
       }
     }
+    *attrListEnd = 0;
+
     ciP->responseTree = kjTreeFromQueryContextResponseWithAttrList(ciP, true, attrList, keyValues, &response);
     free(attrList);
   }

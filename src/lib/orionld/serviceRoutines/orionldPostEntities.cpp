@@ -840,7 +840,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   {
     ContextAttribute* caP;
 
-    if ((caP = orionldContextTreat(ciP, contextNodeP, idNodeP->value.s)) == NULL)
+    if (orionldContextTreat(ciP, contextNodeP, idNodeP->value.s, &caP) == false)
     {
       // Error payload set by orionldContextTreat
       mongoRequest.release();

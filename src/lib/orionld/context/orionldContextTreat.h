@@ -39,11 +39,12 @@ extern "C"
 //
 // orionldContextTreat -
 //
-extern ContextAttribute* orionldContextTreat
+extern bool orionldContextTreat
 (
-  ConnectionInfo*  ciP,
-  KjNode*          contextNodeP,
-  char*            entityId
+  ConnectionInfo*     ciP,
+  KjNode*             contextNodeP,
+  char*               entityId,
+  ContextAttribute**  csPP
 );
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTTREAT_H_

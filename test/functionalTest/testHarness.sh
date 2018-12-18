@@ -203,7 +203,10 @@ function exitFunction()
 
     if [ "$errorFile" != "" ] && [ -f "$errorFile" ]
     then
-      cat $errorFile 2> /dev/null
+      if [ "$verbose" == "on" ]
+      then
+        cat $errorFile 2> /dev/null
+      fi
     fi
 
     exit $exitCode
@@ -1063,11 +1066,15 @@ exitCode=0
 if [ "$testError" != "0" ]
 then
   echo
-  echo "Orion Functional Test Log File:"
-  echo "================================================================================"
-  cat $LOG_FILE 2> /dev/null
-  echo "================================================================================"
-  echo
+  if [ "$verbose" == "on" ]
+  then
+    echo "Orion Functional Test Log File:"
+    echo "================================================================================"
+    cat $LOG_FILE 2> /dev/null
+    echo "================================================================================"
+    echo
+  fi
+
   echo "----------- Failing tests ------------------"
 
   ix=0

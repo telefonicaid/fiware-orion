@@ -75,7 +75,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 
       // FIXME: Lookup context - it probably already exists (from the creation of the entity)
       
-      if ((caP = orionldContextTreat(ciP, contextNodeP, (char*) entityIdP->id.c_str())) == NULL)
+      if (orionldContextTreat(ciP, contextNodeP, (char*) entityIdP->id.c_str(), &caP) == false)
       {
         // Error payload set by orionldContextTreat
         mongoRequest.release();

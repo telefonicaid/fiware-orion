@@ -239,9 +239,9 @@ Date: REGEX(.*)
 ** Too large errors:
 1
 ** Notification sizes:
-Sending message 1 to HTTP server: sending message of REGEX((19490|19491|19492|19493|19494|19495|19496)) bytes to HTTP server
+Sending message 1 to HTTP server: sending message of REGEX((19490|19491|19492|19493|19494|19495|19496|19497)) bytes to HTTP server
 Sending message 2 to HTTP server: sending message of REGEX((21491|21492|21493|21494|21495|21496|21497)) bytes to HTTP server
-Sending message 3 to HTTP server: sending message of REGEX((8100492|8100493|8100494|8100495|8100496|8100497|8100498)) bytes to HTTP server
+Sending message 3 to HTTP server: sending message of REGEX((8100492|8100493|8100494|8100495|8100496|8100497|8100498|8100499)) bytes to HTTP server
 --TEARDOWN--
 #
 # NOTE: the six different sizes above is to cover for different sizes in the version string

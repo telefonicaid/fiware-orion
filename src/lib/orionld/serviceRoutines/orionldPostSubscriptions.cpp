@@ -506,6 +506,21 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
 
   LM_TMP(("In ktreeToSubscription"));
 
+  // Default values
+  subP->attrsFormat = NGSI_LD_V1_KEYVALUES;
+  subP->descriptionProvided = false;
+  subP->expires = 0;
+  subP->throttling = 0;
+  subP->subject.condition.expression.isSet = false;
+  subP->notification.blacklist             = false;
+  subP->notification.timesSent             = 0;
+  subP->notification.lastNotification      = 0;
+  subP->notification.lastFailure           = 0;
+  subP->notification.lastSuccess           = 0;
+  subP->notification.httpInfo.verb         = POST;
+  subP->notification.httpInfo.custom       = false;
+  subP->notification.httpInfo.mimeType     = JSON;
+
   //
   // 1. First lookup the tree nodes of 'id' and '@context'
   // 2. Then create a context attribute for the context - FIXME: combine code with POST Entities
@@ -552,8 +567,8 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
       return false;
     }
 
-    ContextAttribute* caP = orionldContextTreat(ciP, contextNodeP, (char*) subP->id.c_str());
-    if (caP == NULL)
+    
+    if (orionldContextTreat(ciP, contextNodeP, (char*) subP->id.c_str(), NULL) == false)
     {
       // error
       return false;
@@ -567,6 +582,8 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
   }
 #endif
 
+  // Add caP
+  
   //
   // Now loop over the tree
   //
@@ -609,7 +626,10 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
     {
       DUPLICATE_CHECK(descriptionP, "Subscription::description", kNodeP->value.s);
       STRING_CHECK(kNodeP, "Subscription::description");
-      subP->description = descriptionP;
+
+      subP->description         = descriptionP;
+      subP->descriptionProvided = true;
+      LM_TMP(("KZ: Got description: %s", descriptionP));
     }
     else if (SCOMPARE9(kNodeP->name, 'e', 'n', 't', 'i', 't', 'i', 'e', 's', 0))
     {
@@ -720,8 +740,6 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid field for Subscription", kNodeP->name, OrionldDetailsString);
       return false;
     }
-
-    LM_TMP(("Here"));
   }
 
   LM_TMP(("Subscription translated"));
@@ -784,6 +802,9 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   OrionError           oError;
 
   LM_T(LmtServiceRoutine, ("In orionldPostSubscriptions - calling ktreeToSubscription"));
+
+  // FIXME: attrsFormat should be set to default by constructor
+  sub.attrsFormat = DEFAULT_RENDER_FORMAT;  // FIXME: 
 
   if (ktreeToSubscription(ciP, &sub) == false)
   {

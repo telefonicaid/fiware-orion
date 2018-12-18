@@ -76,7 +76,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
 
 
   // description
-  if ((subscriptionP->descriptionProvided) && (subscriptionP->description != ""))
+  if (subscriptionP->description != "")
   {
     nodeP  = kjString(ciP->kjsonP, "description", subscriptionP->description.c_str());
     kjChildAdd(topP, nodeP);

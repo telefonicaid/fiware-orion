@@ -85,7 +85,7 @@ bool StringFilterItem::fill(StringFilterItem* sfiP, std::string* errorStringP)
   compiledPattern       = sfiP->compiledPattern;
   type                  = sfiP->type;
   compoundPath          = sfiP->compoundPath;
-  LM_TMP(("numberValue: %d", numberValue));
+
   if (compiledPattern)
   {
     //
@@ -132,10 +132,7 @@ bool StringFilterItem::valueParse(char* s, std::string* errorStringP)
 {
   bool b;
 
-  LM_TMP(("Parsing a RHS value"));
   b = valueGet(s, &valueType, &numberValue, &stringValue, &boolValue, errorStringP);
-  LM_TMP(("numberValue: %f", numberValue));
-  LM_TMP(("valueType: %d", valueType));
   if (b == false)
   {
     LM_E(("valueGet FAILED!"));
@@ -156,7 +153,7 @@ bool StringFilterItem::valueParse(char* s, std::string* errorStringP)
       *errorStringP = std::string("values of type /") + valueTypeName() + "/ not supported for operator /" + opName() + "/";
       return false;
     }
-    LM_TMP(("OK"));
+
     return true;
   }
 
@@ -436,7 +433,6 @@ bool StringFilterItem::valueGet
   }
   else if ((*doubleP = parse8601Time(s)) != -1)
   {
-    LM_TMP(("parse8601Time gave %f", *doubleP));
     *valueTypeP = SfvtDate;
   }
   else if (strcmp(s, "true") == 0)
@@ -455,7 +451,6 @@ bool StringFilterItem::valueGet
   }
   else  // must be a string then ...
   {
-    LM_TMP(("It's a STRING: '%s'", s));
     *valueTypeP = SfvtString;
     *stringP = s;
   }
@@ -537,7 +532,6 @@ static StringFilterOp opFind(char* expression, char** lhsP, char** rhsP)
 
   *rhsP = expression;
 
-  LM_TMP(("Q: Op is 'Exists': attr is '%s'", expression));
   return SfopExists;
 }
 
@@ -574,7 +568,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   char* rhs     = NULL;
   char* lhs     = NULL;
 
-  LM_TMP(("IN StringFilterItem::parse"));
   type = _type;
 
   s = wsStrip(s);
@@ -607,8 +600,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   lhs  = wsStrip(lhs);
   rhs  = wsStrip(rhs);
 
-  LM_TMP(("lhs: %s", lhs));
-  LM_TMP(("rhs: %s", rhs));
   //
   // Check for invalid LHS
   // LHS can be empty ONLY if UNARY OP, i.e. SfopNotExists OR SfopExists
@@ -663,7 +654,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   bool b = true;
   if ((op == SfopNotExists) || (op == SfopExists))
   {
-    LM_TMP(("op == SfopNotExists || op == SfopExists"));
     if (forbiddenQuotes(rhs))
     {
       *errorStringP = std::string("forbidden characters in String Filter");
@@ -714,12 +704,9 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     // Forbidden char check is performed inside rangeParse, listParse, and valueParse
     // as only there the component of RHS are known
     //
-    LM_TMP(("Calling valuePare?"));
     if      (strstr(rhs, "..") != NULL)   b = rangeParse(rhs, errorStringP);
     else if (strstr(rhs, ",")  != NULL)   b = listParse(rhs, errorStringP);
     else                                  b = valueParse(rhs, errorStringP);
-
-    LM_TMP(("numberValue: %f", numberValue));
   }
 
   free(toFree);
@@ -1014,8 +1001,6 @@ MatchResult StringFilterItem::matchEquals(Metadata* mdP)
 */
 MatchResult StringFilterItem::matchEquals(orion::CompoundValueNode* cvP)
 {
-  LM_TMP(("In StringFilterItem::matchEquals"));
-
   if ((valueType == SfvtNumberRange) || (valueType == SfvtDateRange))
   {
     if ((cvP->numberValue < numberRangeFrom) || (cvP->numberValue > numberRangeTo))
@@ -1085,7 +1070,6 @@ MatchResult StringFilterItem::matchEquals(orion::CompoundValueNode* cvP)
   }
   else if (valueType == SfvtString)
   {
-    LM_TMP(("valueType == SfvtString: Comparing '%s' to '%s'", cvP->stringValue.c_str(), stringValue.c_str()));
     if (cvP->stringValue != stringValue)
     {
       return MrNoMatch;
@@ -1732,15 +1716,12 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
 
     StringFilterItem* item = new StringFilterItem();
 
-    LM_TMP(("Calling item->parse"));
     if (item->parse(s, errorStringP, type) == true)
     {
-      LM_TMP(("item->parse OK"));
       filters.push_back(item);
     }
     else
     {
-      LM_TMP(("item->parse ERROR"));
       delete item;
       free(toFree);
       return false;
@@ -1750,7 +1731,6 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
   }
 
   free(toFree);
-  LM_TMP(("numberValue: %f", filters[0]->numberValue));
   return mongoFilterPopulate(errorStringP);
 }
 
@@ -1762,7 +1742,6 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
 */
 bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
 {
-  LM_TMP(("numberValue: %f", filters[0]->numberValue));
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
   {
     StringFilterItem*  itemP = filters[ix];
@@ -1782,10 +1761,6 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       char  expanded[256];
       char* details;
     
-      LM_TMP(("item[%d].numberValue: %f", ix, itemP->numberValue));
-      LM_TMP(("attribute name: '%s' (itemP->attributeName: '%s')", left.c_str(), itemP->attributeName.c_str()));
-      LM_TMP(("Context: %s", (orionldContextP != NULL)? orionldContextP->url : "NULL"));
-
       if (orionldUriExpand(orionldContextP, (char*) itemP->attributeName.c_str(), expanded, sizeof(expanded), &details) == false)
       {
         *errorStringP = details;
@@ -1803,7 +1778,6 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
           break;
       }
 
-      LM_TMP(("Changing itemP->attributeName from '%s' to '%s'", itemP->attributeName.c_str(), expanded));
       itemP->attributeName = expanded;
     }
 #endif
@@ -1815,7 +1789,6 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     //
     // This is to make the queries in mongo work.
     //
-    LM_TMP(("item[%d].numberValue: %f", ix, itemP->numberValue));
     if (type == SftMq)
     {
       if (itemP->attributeName == "")
@@ -1831,8 +1804,6 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       }
 
       left = itemP->attributeName + "." + ENT_ATTRS_MD + "." + itemP->metadataName;
-      LM_TMP(("It was a MQ: left = '%s'", left.c_str()));
-      LM_TMP(("item[%d].numberValue: %f", ix, itemP->numberValue));
     }
     else if ((itemP->op == SfopExists) || (itemP->op == SfopNotExists))
     {
@@ -1843,21 +1814,15 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     // Also, if the left hand side contains a compound path, then we are
     // dealing with matching of a compound item.
     //
-    LM_TMP(("compoundPath: '%s'", itemP->compoundPath.c_str()));
-    LM_TMP(("metadataName: '%s'", itemP->metadataName.c_str()));
     if (itemP->compoundPath.size() != 0)
     {
-      LM_TMP(("There is a non-NULL compoundPath: %s", itemP->compoundPath.c_str()));
       if (itemP->type == SftQ)
       {
-        LM_TMP(("Q filter"));
         left = std::string(ENT_ATTRS) + "." + itemP->attributeName + "." + ENT_ATTRS_VALUE + "." + itemP->compoundPath;
         k = left;
       }
       else if (itemP->type == SftMq)
       {
-        LM_TMP(("MQ filter"));
-        LM_TMP(("item[%d].numberValue: %f", ix, itemP->numberValue));
         left = std::string(ENT_ATTRS) + "." +
                itemP->attributeName   + "." +
                ENT_ATTRS_MD           + "." +
@@ -1885,23 +1850,15 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     }
     else
     {
-      LM_TMP(("item[%d].numberValue: %f", ix, itemP->numberValue));
-      LM_TMP(("left == '%s'", left.c_str()));
-      LM_TMP(("itemP->attributeName == '%s'", itemP->attributeName.c_str()));
-      LM_TMP(("k == '%s'", k));
-
       if (itemP->metadataName != "")
         k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
       else
         k = std::string(ENT_ATTRS) + "." + itemP->attributeName + "." ENT_ATTRS_VALUE;
-      LM_TMP(("new k == '%s'", k.c_str()));
     }
 
-    LM_TMP(("Operator is %d", itemP->op));
     switch (itemP->op)
     {
     case SfopExists:
-      LM_TMP(("Appending $exists to mongo-filter"));
       bb.append("$exists", true);
       bob.append(k, bb.obj());
       f = bob.obj();
@@ -1956,7 +1913,6 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
 
       case SfvtNumber:
       case SfvtDate:
-        LM_TMP(("item[%d].numberValue: %f", ix, itemP->numberValue));
         bb.append("$exists", true).append("$in", BSON_ARRAY(itemP->numberValue));
         break;
 
@@ -2042,16 +1998,12 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       break;
 
     case SfopGreaterThan:
-      LM_TMP(("OP is Greater Than"));
-      LM_TMP(("item[%d].numberValue: %f", ix, itemP->numberValue));
       if (itemP->valueType == SfvtString)
       {
-        LM_TMP(("It's a String - appending $gt %s", itemP->stringValue.c_str()));
         bb.append("$gt", itemP->stringValue);
       }
       else
       {
-        LM_TMP(("It's a Number (%d) - appending $gt %f", itemP->valueType, itemP->numberValue));
         bb.append("$gt", itemP->numberValue);
       }
       bob.append(k, bb.obj());
@@ -2109,11 +2061,9 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       break;
     }
 
-    LM_TMP(("Pushing the filter to mongoFilters"));
     mongoFilters.push_back(f);
   }
 
-  LM_TMP(("All OK"));
   return true;
 }
 
@@ -2156,7 +2106,6 @@ bool StringFilter::match(ContextElementResponse* cerP)
 */
 bool StringFilter::mqMatch(ContextElementResponse* cerP)
 {
-  LM_TMP(("IN StringFilter::mqMatch"));
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
   {
     StringFilterItem*  itemP = filters[ix];
@@ -2265,8 +2214,6 @@ bool StringFilter::mqMatch(ContextElementResponse* cerP)
 */
 bool StringFilter::qMatch(ContextElementResponse* cerP)
 {
-  LM_TMP(("IN StringFilter::qMatch"));
-
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
   {
     StringFilterItem* itemP = filters[ix];

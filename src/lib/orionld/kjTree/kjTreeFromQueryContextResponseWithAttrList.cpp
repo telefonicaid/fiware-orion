@@ -88,7 +88,6 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
     return ciP->responseTree;
   }
 
-  LM_TMP(("In kjTreeFromQueryContextResponse - later will be calling orionldContextValueLookup"));
   //
   // Error?
   //
@@ -113,10 +112,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
   if (hits == 0)  // No hit
   {
     if (oneHit == false)
-    {
       ciP->responseTree = kjArray(orionldState.kjsonP, NULL);
-      LM_TMP(("Nothing found - returning empty array"));
-    }
     else
       ciP->responseTree = NULL;
 
@@ -189,7 +185,6 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
 
         LM_TMP(("Found an attribute called context @context for entity '%s'", eId));
         char*    details;
-        LM_TMP(("Creating a KjNode tree for the @context attribute"));
         KjNode*  contextTree = kjTreeFromContextContextAttribute(ciP, contextAttributeP, &details);
 
         if (contextTree == NULL)
@@ -198,7 +193,6 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
           orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create context tree for @context attribute", details, OrionldDetailsEntity);
           return NULL;
         }
-        LM_TMP(("Created a KjNode tree for the @context attribute. Now creating a orionldContext for the tree"));
 
         contextP = orionldContextCreateFromTree(contextTree, eId, OrionldUserContext, &details);
         if (contextP == NULL)
@@ -208,7 +202,6 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
           return NULL;
         }
 
-        LM_TMP(("Inserting the new context in the context-cache"));
         orionldContextListInsert(contextP);
         orionldContextListPresent(ciP);
       }
@@ -250,7 +243,6 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
 
       if (nodeP == NULL)
       {
-        LM_TMP(("Calling orionldContextValueLookup for %s", ceP->entityId.type.c_str()));
         KjNode* aliasNodeP = orionldContextValueLookup(contextP, ceP->entityId.type.c_str());
 
         if (aliasNodeP != NULL)
@@ -274,8 +266,6 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
 
       kjChildAdd(top, nodeP);
     }
-    else
-      LM_TMP(("NOT Calling orionldContextValueLookup for entity Type as it is EMPTY!!!"));
 
     // System Attributes?
     if (sysAttrs == true)
@@ -323,20 +313,18 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
           attrName = aliasNodeP->name;
       }
 
-      LM_TMP(("attrList: '%s'", attrList));
-      LM_TMP(("aP->name: '%s'", aP->name.c_str()));
-
       char* match;
+      LM_TMP(("KZ: attrList at %p", attrList));
+      LM_TMP(("KZ: attrList: '%s'", attrList));
+      LM_TMP(("KZ: aP: %s", aP->name.c_str()));
       if ((match = (char*) strstr(attrList, aP->name.c_str())) == NULL)
       {
-        LM_TMP(("Filtering out attribute '%s'", aP->name.c_str()));
         continue;
       }
 
       // Need to check ",{attr name}," also
       if ((match[-1] != ',') || (match[strlen(aP->name.c_str())] != ','))
       {
-        LM_TMP(("Filtering out attribute '%s'", aP->name.c_str()));
         continue;
       }
 
