@@ -54,7 +54,7 @@ payload='{
     }
   },
   "@context": [
-    "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json",
+    "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.jsonld",
     "http://example.org/cim/commonTerms.jsonld",
     "http://example.org/cim/vehicle.jsonld",
     "http://example.org/cim/parking.jsonld"

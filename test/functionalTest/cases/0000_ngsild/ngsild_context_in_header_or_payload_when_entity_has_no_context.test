@@ -126,7 +126,7 @@ Date: REGEX(.*)
 03. GET all entities using application/ld+json - see context in payload
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 400
+Content-Length: 402
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -143,7 +143,7 @@ Date: REGEX(.*)
       },
       "observedAt": "2018-12-04T12:00:00"
     },
-    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json"
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.jsonld"
   }
 ]
 
@@ -176,7 +176,7 @@ Date: REGEX(.*)
 05. GET the entity using application/ld+json - see context in payload
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 368
+Content-Length: 370
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -192,7 +192,7 @@ Date: REGEX(.*)
     },
     "observedAt": "2018-12-04T12:00:00"
   },
-  "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json"
+  "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.jsonld"
 }
 
 

@@ -35,7 +35,7 @@ brokerStart CB 212-249
 # {
 #   "@context": [
 #     "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
-#     "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json"
+#     "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.jsonld"
 #   ]
 # }
 #
@@ -58,7 +58,7 @@ brokerStart CB 212-249
 #   }
 # }
 #
-# https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json:
+# https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.jsonld:
 # {
 #   "@context": {
 #     "id": "@id",
@@ -89,7 +89,7 @@ payload='{
     "type": "Property",
     "value": "John 2"
   },
-  "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json"
+  "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.jsonld"
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
@@ -108,7 +108,7 @@ echo
 ========================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
 Date: REGEX(.*)
 
@@ -134,7 +134,7 @@ MongoDB server version: REGEX(.*)
 			"type" : "ContextString",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json",
+			"value" : "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.jsonld",
 			"mdNames" : [ ]
 		},
 		"http://example=org/ngsi-ld/default/name" : {

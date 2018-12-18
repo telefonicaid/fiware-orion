@@ -201,7 +201,7 @@ const char* orionldDefaultUrlContextString = "{  \
 const char* orionldDefaultContextString = " {  \
   \"@context\": [  \
     \"https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContextVocab.jsonld\",  \
-    \"https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.json\"  \
+    \"https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.jsonld\"  \
   ]  \
 }";
 
