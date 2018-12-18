@@ -29,7 +29,7 @@ curl localhost:1026/v2/registrations -s -S -H 'Content-Type: application/json' -
   "dataProvided": {
     "entities": [
       {
-        "id": "Strret4",
+        "id": "Street4",
         "type": "Street"
       }
     ],
@@ -48,7 +48,7 @@ curl localhost:1026/v2/registrations -s -S -H 'Content-Type: application/json' -
 EOF
 ```
      
-* 次に、クライアントが Street4 の温度 (メッセージ番号2) をクエリするとします
+* 次に、クライアントが 温度 (メッセージ番号2) をクエリするとします
      
 ``` 
 curl localhost:1026/v2/entities/Street4/attrs/temperature?type=Street -s -S \
