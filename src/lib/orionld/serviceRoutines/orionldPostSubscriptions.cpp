@@ -760,17 +760,10 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
     return false;
   }
 
-  if ((timeIntervalP == NULL) && (watchedAttributesPresent == false))
-  {
-    LM_E(("Either 'timeInterval' or 'watchedAttributes' must be present. But not both of them"));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Either 'timeInterval' or 'watchedAttributes' must be present. But not both of them", "None of them", OrionldDetailsString);
-    return false;
-  }
-
   if ((timeIntervalP != NULL) && (watchedAttributesPresent == true))
   {
-    LM_E(("Either 'timeInterval' or 'watchedAttributes' must be present. But not both of them"));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Either 'timeInterval' or 'watchedAttributes' must be present. But not both of them", "Both of them", OrionldDetailsString);
+    LM_E(("Both 'timeInterval' and 'watchedAttributes' present"));
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Both 'timeInterval' and 'watchedAttributes' present", NULL, OrionldDetailsString);
     return false;
   }
 
