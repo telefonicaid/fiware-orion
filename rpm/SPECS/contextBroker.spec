@@ -173,6 +173,19 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Wed Dec 19 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.1.0-1
+- Add: Oneshot Subscription (#3189)
+- Add: support to MongoDB 3.6 (#3079)
+- Fix: problems rendering structured attribute values when forwarded queries are involved (#3162, #3363, #3282)
+- Fix: NGSIv2-NGSIv1 location metadata issues (#3122)
+- Fix: wrong inclusion of "location" metadata in geo:json notifications (#3045)
+- Fix: metadata filter was lost during csub cache refresh (#3290)
+- Fix: NGSIv1-like error responses were used in some NGSIv2 operations
+- Fix: cache sem is not taken before subCacheItemLookup() call (#2882)
+- Fix: wrong Runtime Error logs on GET /v2/registrations and GET /v2/registrations/{id} calls (#3375)
+- Deprecate: Rush support (along with -rush CLI parameter)
+- Remove: isDomain field in NGSIv1 registrations (it was never used)
+
 * Fri Sep 28 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.0.0-1
 - Fix: GET /v2/subscriptions and GET /v2/subscriptions/{id} crashes for permanent subscriptions created before version 1.13.0 (#3256)
 - Fix: correct processing of JSON special characters  (such as \n) in NGSIv2 rendering (#3280, #2938)
