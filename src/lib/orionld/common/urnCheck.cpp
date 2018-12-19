@@ -22,8 +22,11 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/SCOMPARE.h"              // SCOMPAREx
-#include "orionld/common/urnCheck.h"              // Own interface
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
+#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/common/urnCheck.h"                           // Own interface
 
 
 
@@ -37,7 +40,8 @@ bool urnCheck(char* urn, char** detailsPP)
 
   if (!SCOMPARE4(urn, 'u', 'r', 'n', ':'))
   {
-    *detailsPP = (char*) "protocol doesn't start with 'urn:'";
+    if (detailsPP != NULL)
+      *detailsPP = (char*) "protocol doesn't start with 'urn:'";
     return false;
   }
 

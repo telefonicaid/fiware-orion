@@ -545,6 +545,15 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
   if (idNodeP != NULL)
   {
     STRING_CHECK(idNodeP, "Subscription::id");
+
+    // Must be a URI
+    if ((urlCheck(idNodeP->value.s, NULL) == false) && (urnCheck(idNodeP->value.s, NULL) == false))
+    {
+      LM_E(("Subscription::id is not a URI"));
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Subscription::id is not a URI", idNodeP->value.s, OrionldDetailsAttribute);
+      return false;
+    }
+
     subP->id = idNodeP->value.s;
   }
   else

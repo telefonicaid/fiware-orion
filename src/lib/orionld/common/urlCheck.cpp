@@ -22,12 +22,13 @@
 *
 * Author: Ken Zangelin
 */
-#include <stdlib.h>                               // atoi
+#include <stdlib.h>                                            // atoi
 
-#include "logMsg/logMsg.h"                        // LM_*
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/common/SCOMPARE.h"              // SCOMPAREx
-#include "orionld/common/urlCheck.h"              // Own interface
+#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/common/urlCheck.h"                           // Own interface
 
 
 
@@ -54,7 +55,8 @@ bool urlCheck(char* url, char** detailsPP)
   //
   if (!SCOMPARE4(url, 'h', 't', 't', 'p'))
   {
-    *detailsPP = (char*) "protocol doesn't start with 'http' nor 'https'";
+    if (detailsPP != NULL)
+      *detailsPP = (char*) "protocol doesn't start with 'http' nor 'https'";
     return false;
   }
 
@@ -65,7 +67,8 @@ bool urlCheck(char* url, char** detailsPP)
 
   if (!SCOMPARE3(urlP, ':', '/', '/'))
   {
-    *detailsPP = (char*) "protocol doesn't start with 'http://' nor 'https://'";
+    if (detailsPP != NULL)
+      *detailsPP = (char*) "protocol doesn't start with 'http://' nor 'https://'";
     return false;
   }
 
@@ -83,7 +86,8 @@ bool urlCheck(char* url, char** detailsPP)
       ip[toIx] = *urlP;
     else
     {
-      *detailsPP = (char*) "assumed IP address too long";
+      if (detailsPP != NULL)
+        *detailsPP = (char*) "assumed IP address too long";
       ip[toIx] = 0;
       return false;
     }
@@ -94,7 +98,8 @@ bool urlCheck(char* url, char** detailsPP)
 
   if (*urlP == 0)
   {
-    *detailsPP = (char*) "URL parse error - no slash found after IP address";
+    if (detailsPP != NULL)
+      *detailsPP = (char*) "URL parse error - no slash found after IP address";
     return false;
   }
   ip[toIx] = 0;
@@ -118,7 +123,9 @@ bool urlCheck(char* url, char** detailsPP)
     {
       if (toIx >= portNumberStringSize - 1)  // One char left for nuling the string
       {
-        *detailsPP = (char*) "port number too big";
+        if (detailsPP != NULL)
+          *detailsPP = (char*) "port number too big";
+        return false;
       }
 
       portNumberString[toIx++] = *urlP;
@@ -126,7 +133,8 @@ bool urlCheck(char* url, char** detailsPP)
     }
     if (*urlP == 0)
     {
-      *detailsPP = (char*) "URL parse error - no slash found after port number";
+      if (detailsPP != NULL)
+        *detailsPP = (char*) "URL parse error - no slash found after port number";
       return false;
     }
     portNumberString[toIx] = 0;
@@ -135,7 +143,8 @@ bool urlCheck(char* url, char** detailsPP)
     {
       if ((*portCharP < '0') || (*portCharP > '9'))
       {
-        *detailsPP = (char*) "URL parse error - invalid port number";
+        if (detailsPP != NULL)
+          *detailsPP = (char*) "URL parse error - invalid port number";
         return false;
       }
     }
@@ -146,7 +155,8 @@ bool urlCheck(char* url, char** detailsPP)
   //
   if (*urlP != '/')
   {
-    *detailsPP = (char*) "URL parse error - no slash found to start the URL PATH";
+    if (detailsPP != NULL)
+      *detailsPP = (char*) "URL parse error - no slash found to start the URL PATH";
     return false;
   }
 

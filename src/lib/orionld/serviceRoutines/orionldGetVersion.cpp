@@ -47,7 +47,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 
   ciP->responseTree = kjObject(NULL, NULL);
 
-  nodeP = kjString(orionldState.kjsonP, "branch", "90.orionld-branch-name-in-extra-service");
+  nodeP = kjString(orionldState.kjsonP, "branch", "bug/91.orionld-issue-25-subscription-must-be-a-uri");
   
   kjChildAdd(ciP->responseTree, nodeP);
 
