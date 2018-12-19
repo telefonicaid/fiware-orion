@@ -175,7 +175,7 @@ fi
 %changelog
 * Wed Dec 19 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.1.0-1
 - Add: Oneshot Subscription (#3189)
-- Add: support to MongoDB 3.6 (#3079)
+- Add: support to MongoDB 3.6 (#3070)
 - Fix: problems rendering structured attribute values when forwarded queries are involved (#3162, #3363, #3282)
 - Fix: NGSIv2-NGSIv1 location metadata issues (#3122)
 - Fix: wrong inclusion of "location" metadata in geo:json notifications (#3045)
