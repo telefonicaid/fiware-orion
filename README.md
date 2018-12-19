@@ -9,7 +9,7 @@
 [![SOF support badge](https://nexus.lab.fiware.org/repository/raw/public/badges/stackoverflow/orion.svg)](http://stackoverflow.com/questions/tagged/fiware-orion)
 [![NGSI v2](https://nexus.lab.fiware.org/repository/raw/public/badges/specifications/ngsiv2.svg)](http://fiware.github.io/context.Orion/api/v2/stable/)
 <br>
-[![Documentation badge](https://img.shields.io/readthedocs/fiware-orion/2.1.0.svg)](https://fiware-orion.rtfd.io/en/2.1.0/)
+[![Documentation badge](https://img.shields.io/readthedocs/fiware-orion.svg)](https://fiware-orion.rtfd.io)
 [![Build badge](https://img.shields.io/travis/telefonicaid/fiware-orion.svg)](https://travis-ci.org/telefonicaid/fiware-orion/)
 ![Status](https://nexus.lab.fiware.org/static/badges/statuses/orion.svg)
 
