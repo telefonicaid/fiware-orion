@@ -39,6 +39,10 @@
 #include "rest/StringFilter.h"
 #include "cache/subCache.h"
 
+#ifdef ORIONLD
+#include "orionld/common/OrionldConnection.h"                  // orionldState
+#endif
+
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
@@ -112,7 +116,16 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   RenderFormat   renderFormat       = stringToRenderFormat(renderFormatString);
 
   cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);
+
+#ifdef ORIONLD
+  if (orionldState.apiVersion == NGSI_LD_V1)
+    cSubP->subscriptionId        = strdup(idField.toString().c_str());
+  else
+    cSubP->subscriptionId        = strdup(idField.OID().toString().c_str());
+#else
   cSubP->subscriptionId        = strdup(idField.OID().toString().c_str());
+#endif
+
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(sub, CSUB_SERVICE_PATH).c_str() : "/");
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;

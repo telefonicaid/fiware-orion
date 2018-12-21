@@ -180,7 +180,7 @@ bye
 03. Grep mongo content for subscription id and do a GET /ngsi-ld/v1/subscription/$SUB_ID
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1010
+Content-Length: 1011
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -226,7 +226,7 @@ Date: REGEX(.*)
       "accept": "application/ld+json"
     }
   },
-  "expires": "2028-12-31T10:00:00",
+  "expires": "2028-12-31T10:00:00Z",
   "throttling": 5,
   "status": "paused"
 }

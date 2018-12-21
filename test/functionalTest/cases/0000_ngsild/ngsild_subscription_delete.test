@@ -145,7 +145,7 @@ Date: REGEX(.*)
 02. GET subscription 'http://a.b.c/subs/sub01' and see it
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 984
+Content-Length: 985
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -191,7 +191,7 @@ Date: REGEX(.*)
       "accept": "application/ld+json"
     }
   },
-  "expires": "2028-12-31T10:00:00",
+  "expires": "2028-12-31T10:00:00Z",
   "throttling": 5,
   "status": "paused"
 }

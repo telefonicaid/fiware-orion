@@ -47,7 +47,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 
   ciP->responseTree = kjObject(NULL, NULL);
 
-  nodeP = kjString(orionldState.kjsonP, "branch", "hardening/94.orionld-crashes");
+  nodeP = kjString(orionldState.kjsonP, "branch", "bug/95.orionld-iso8601-strings-with-Z");
   
   kjChildAdd(ciP->responseTree, nodeP);
 

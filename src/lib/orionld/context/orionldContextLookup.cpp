@@ -43,7 +43,13 @@ OrionldContext* orionldContextLookup(const char* url)
 {
   OrionldContext* contextP = orionldContextHead;
 
-  LM_T(LmtContext, ("Looking up context '%s'", url));
+  LM_TMP(("----- In orionldContextLookup"));
+
+  LM_TMP(("orionldContextLookup: url: '%s'", url));
+  if (contextP != NULL)
+    LM_TMP(("orionldContextLookup: contextP->url: '%s'", contextP->url));
+  else
+    LM_TMP(("orionldContextLookup: NULL contextP"));
 
   while (contextP != NULL)
   {

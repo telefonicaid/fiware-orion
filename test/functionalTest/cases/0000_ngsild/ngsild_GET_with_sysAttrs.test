@@ -89,7 +89,7 @@ Date: REGEX(.*)
 02. GET the entity with options=sysAttrs, see 'createdAt' and 'modifiedAt' as text strings
 ==========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 282
+Content-Length: 286
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -112,7 +112,7 @@ Date: REGEX(.*)
 03. GET the entity with options=sysAttrs AND attrs=P1, see 'createdAt' and 'modifiedAt' as text strings
 =======================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 282
+Content-Length: 286
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -135,7 +135,7 @@ Date: REGEX(.*)
 04. GET the entity with options=sysAttrs,keyValues AND attrs=P1, see 'createdAt' and 'modifiedAt' as text strings but only for the entity, not for P1
 =====================================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 158
+Content-Length: 160
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
