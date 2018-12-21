@@ -47,7 +47,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 
   ciP->responseTree = kjObject(NULL, NULL);
 
-  nodeP = kjString(orionldState.kjsonP, "branch", "bug/95.orionld-iso8601-strings-with-Z");
+  nodeP = kjString(orionldState.kjsonP, "branch", "bug/96.orionld-reject-subscription-with-watched-attributes-array-is-empty");
   
   kjChildAdd(ciP->responseTree, nodeP);
 

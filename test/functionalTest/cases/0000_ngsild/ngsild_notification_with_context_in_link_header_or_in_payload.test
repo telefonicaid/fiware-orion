@@ -72,7 +72,6 @@ payload='{
       "type": "T"
     }
   ],
-  "watchedAttributes": [ ],
   "notification": {
     "attributes": [ ],
     "format": "normalized",
@@ -111,7 +110,6 @@ payload='{
       "type": "T"
     }
   ],
-  "watchedAttributes": [ ],
   "notification": {
     "attributes": [ ],
     "format": "normalized",
