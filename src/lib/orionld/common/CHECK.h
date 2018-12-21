@@ -73,7 +73,7 @@ do                                                                              
 {                                                                                                                                 \
   if (nodeP->type != KjObject)                                                                                                    \
   {                                                                                                                               \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON Object", what, OrionldDetailsString); \
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON Object", what, OrionldDetailsString);                      \
     return false;                                                                                                                 \
   }                                                                                                                               \
 } while (0)
@@ -89,9 +89,26 @@ do                                                                              
 {                                                                                                                                            \
   if (kNodeP->type != KjArray)                                                                                                               \
   {                                                                                                                                          \
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not a JSON Array", fieldName, OrionldDetailsString);        \
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not a JSON Array", fieldName, OrionldDetailsString);                             \
     return false;                                                                                                                            \
   }                                                                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// EMPTY_ARRAY_CHECK -
+//
+#define EMPTY_ARRAY_CHECK(kNodeP, what)                                                                                  \
+do                                                                                                                       \
+{                                                                                                                        \
+  if (kNodeP->children == NULL)                                                                                          \
+  {                                                                                                                      \
+    ciP->httpStatusCode = SccBadRequest;                                                                                 \
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Empty Array", what, OrionldDetailsString);                   \
+    return false;                                                                                                        \
+  }                                                                                                                      \
 } while (0)
 
 

@@ -638,7 +638,8 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
     {
       DUPLICATE_CHECK_WITH_PRESENCE(entitiesPresent, entitiesP, "Subscription::entities", kNodeP);
       ARRAY_CHECK(kNodeP, "Subscription::entities");
-      LM_TMP(("Calling ktreeToEntities"));
+      EMPTY_ARRAY_CHECK(kNodeP, "Subscription::entities");
+
       if (ktreeToEntities(ciP, entitiesP, &subP->subject.entities) == false)
       {
         LM_E(("ktreeToEntities failed"));
@@ -648,21 +649,11 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
     }
     else if (SCOMPARE18(kNodeP->name, 'w', 'a', 't', 'c', 'h', 'e', 'd', 'A', 't', 't', 'r', 'i', 'b', 'u', 't', 'e', 's', 0))
     {
-      DUPLICATE_CHECK_WITH_PRESENCE(watchedAttributesPresent, watchedAttributesP, "Subscription::watchedAttributes", kNodeP->children);
+      DUPLICATE_CHECK_WITH_PRESENCE(watchedAttributesPresent, watchedAttributesP, "Subscription::watchedAttributes", kNodeP);
       ARRAY_CHECK(kNodeP, "Subscription::watchedAttributes");
-      LM_TMP(("watchedAttributesP at %p", watchedAttributesP));
+      EMPTY_ARRAY_CHECK(kNodeP,"Subscription::watchedAttributes");
 
-      //
-      // The array cannot be empty
-      //
-      if (kNodeP->children == NULL)
-      {
-        ciP->httpStatusCode = SccBadRequest;
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Empty Array", kNodeP->name, OrionldDetailsString);
-        return false;
-      }
-      
-      if (ktreeToStringList(ciP, kNodeP, &subP->subject.condition.attributes) == false)
+      if (ktreeToStringList(ciP, watchedAttributesP, &subP->subject.condition.attributes) == false)
       {
         LM_TMP(("ktreeToStringList failed"));
         return false;  // orionldErrorResponseCreate is invoked by ktreeToStringList

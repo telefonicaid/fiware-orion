@@ -31,30 +31,16 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# 01. Attempt to create a subscription with an empty watchedAttributes array - see it fail
+# 01. Attempt to create a subscription with an empty entities array - see it fail
 #
 
-echo "01. Attempt to create a subscription with an empty watchedAttributes array - see it fail"
-echo "========================================================================================"
+echo "01. Attempt to create a subscription with an empty entities array - see it fail"
+echo "==============================================================================="
 payload='{
   "type": "Subscription",
   "name": "Test subscription 01",
   "description": "Description of Test subscription 01",
-  "entities": [
-    {
-      "id": "urn:ngsi-ld:E01",
-      "type": "T1"
-    },
-    {
-      "id": "http://a.b.c/E02",
-      "type": "T2"
-    },
-    {
-      "idPattern": ".*E03.*",
-      "type": "T3"
-    }
-  ],
-  "watchedAttributes": [ ],
+  "entities": [  ],
   "q": "P2>10",
   "geoQ": {
     "geometry": "circle",
@@ -90,15 +76,15 @@ echo
 
 
 --REGEXPECT--
-01. Attempt to create a subscription with an empty watchedAttributes array - see it fail
-========================================================================================
+01. Attempt to create a subscription with an empty entities array - see it fail
+===============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 126
+Content-Length: 117
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "Subscription::watchedAttributes",
+    "details": "Subscription::entities",
     "title": "Empty Array",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
