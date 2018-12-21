@@ -69,7 +69,6 @@ static bool ktreeToEntities(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngs
     if (entityP->type != KjObject)
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "EntityInfo array member not a JSON Object", NULL, OrionldDetailsString);
-      delete entitiesP;
       return false;
     }
 
@@ -98,7 +97,6 @@ static bool ktreeToEntities(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngs
       else
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Unknown EntityInfo field", itemP->name, OrionldDetailsString);
-        delete entitiesP;
         return false;
       }
     }
@@ -106,14 +104,12 @@ static bool ktreeToEntities(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngs
     if ((idP == NULL) && (idPatternP == NULL) && (typeP == NULL))
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Empty EntityInfo object", NULL, OrionldDetailsString);
-      delete entitiesP;
       return false;
     }
 
     if ((idP != NULL) && (idPatternP != NULL))
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Both 'id' and 'idPattern' given in EntityInfo object", NULL, OrionldDetailsString);
-      delete entitiesP;
       return false;
     }
 
@@ -133,7 +129,6 @@ static bool ktreeToEntities(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngs
     if (typeP == NULL)
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Missing field in EntityInfo object", "type", OrionldDetailsString);
-      delete entitiesP;
       return false;
     }
 
@@ -143,7 +138,6 @@ static bool ktreeToEntities(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngs
     if (orionldUriExpand(ciP->contextP, typeP, typeExpanded, sizeof(typeExpanded), &details) == false)
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
-      delete entitiesP;
       return false;
     }
     typeP = typeExpanded;
