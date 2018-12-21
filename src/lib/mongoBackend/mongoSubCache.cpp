@@ -115,9 +115,14 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   std::string    renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
   RenderFormat   renderFormat       = stringToRenderFormat(renderFormatString);
 
-  cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);
+  cSubP->tenant = (tenant[0] == 0)? strdup("") : strdup(tenant);
 
 #ifdef ORIONLD
+  //
+  // FIXME: Check whether idField is an OID before calling OID
+  //        Should check whether the subscription was created with NGSI-LD or not
+  //        I can always check idField.toString().c_str() ...
+  //
   if (orionldState.apiVersion == NGSI_LD_V1)
     cSubP->subscriptionId        = strdup(idField.toString().c_str());
   else

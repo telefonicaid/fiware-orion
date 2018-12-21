@@ -651,6 +651,17 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
       DUPLICATE_CHECK_WITH_PRESENCE(watchedAttributesPresent, watchedAttributesP, "Subscription::watchedAttributes", kNodeP->children);
       ARRAY_CHECK(kNodeP, "Subscription::watchedAttributes");
       LM_TMP(("watchedAttributesP at %p", watchedAttributesP));
+
+      //
+      // The array cannot be empty
+      //
+      if (kNodeP->children == NULL)
+      {
+        ciP->httpStatusCode = SccBadRequest;
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Empty Array", kNodeP->name, OrionldDetailsString);
+        return false;
+      }
+      
       if (ktreeToStringList(ciP, kNodeP, &subP->subject.condition.attributes) == false)
       {
         LM_TMP(("ktreeToStringList failed"));
