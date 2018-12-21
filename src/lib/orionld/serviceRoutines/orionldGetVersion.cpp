@@ -47,7 +47,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 
   ciP->responseTree = kjObject(NULL, NULL);
 
-  nodeP = kjString(orionldState.kjsonP, "branch", "bug/92.orionld-issue-24-timeInterval-vs-watchedAttributes");
+  nodeP = kjString(orionldState.kjsonP, "branch", "bug/93.observedAt-number-when-attrList");
   
   kjChildAdd(ciP->responseTree, nodeP);
 

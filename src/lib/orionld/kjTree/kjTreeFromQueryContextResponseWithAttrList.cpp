@@ -38,6 +38,9 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"               // OrionldResponseErrorType, orionldErrorResponse
 #include "orionld/common/httpStatusCodeToOrionldErrorType.h"   // httpStatusCodeToOrionldErrorType
 #include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/numberToDate.h"                       // numberToDate
+#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "common/string.h"                                     // FT
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
 #include "orionld/context/orionldContextValueLookup.h"         // orionldContextValueLookup
@@ -137,6 +140,8 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
   if (oneHit == true)
     top = root;
 
+  LM_TMP(("oneHit: %s", FT(oneHit)));
+  
   for (int ix = 0; ix < hits; ix++)
   {
     ContextElement* ceP      = &responseP->contextElementResponseVector[ix]->contextElement;
@@ -393,10 +398,30 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
         // value
         const char*  valueFieldName = (aP->type == "Relationship")? "object" : "value";
 
+        LM_TMP(("KZ: valueFieldName: '%s' for attr %s", valueFieldName, aP->name.c_str()));
         switch (aP->valueType)
         {
+        case orion::ValueTypeNumber:
+          LM_TMP(("KZ: it's a number. "));
+          if (SCOMPARE11(attrName, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
+          {
+            char   date[128];
+            char*  details;
+
+            if (numberToDate((time_t) aP->numberValue, date, sizeof(date), &details) == false)
+            {
+              LM_E(("Error creating a stringified date"));
+              orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create a stringified date", details, OrionldDetailsEntity);
+              return NULL;
+            }
+
+            nodeP = kjString(ciP->kjsonP, "observedAt", date);
+          }
+          else
+            nodeP = kjFloat(ciP->kjsonP, valueFieldName, aP->numberValue);
+          break;
+
         case orion::ValueTypeString:    nodeP = kjString(orionldState.kjsonP, valueFieldName, aP->stringValue.c_str());      break;
-        case orion::ValueTypeNumber:    nodeP = kjFloat(orionldState.kjsonP, valueFieldName, aP->numberValue);               break;
         case orion::ValueTypeBoolean:   nodeP = kjBoolean(orionldState.kjsonP, valueFieldName, (KBool) aP->boolValue);       break;
         case orion::ValueTypeNull:      nodeP = kjNull(orionldState.kjsonP, valueFieldName);                                 break;
         case orion::ValueTypeNotGiven:  nodeP = kjString(orionldState.kjsonP, valueFieldName, "UNKNOWN TYPE");               break;
@@ -456,8 +481,26 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
             details = NULL;
             switch (mdP->valueType)
             {
+            case orion::ValueTypeNumber:
+              if (SCOMPARE11(mdName, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
+              {
+                char   date[128];
+                char*  details;
+
+                if (numberToDate((time_t) mdP->numberValue, date, sizeof(date), &details) == false)
+                {
+                  LM_E(("Error creating a stringified date"));
+                  orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create a stringified date", details, OrionldDetailsEntity);
+                  return NULL;
+                }
+
+                valueP = kjString(ciP->kjsonP, "observedAt", date);
+              }
+              else
+                valueP = kjFloat(ciP->kjsonP, valueFieldName, mdP->numberValue);
+              break;
+
             case orion::ValueTypeString:   valueP = kjString(orionldState.kjsonP, valueFieldName, mdP->stringValue.c_str());   break;
-            case orion::ValueTypeNumber:   valueP = kjFloat(orionldState.kjsonP, valueFieldName, mdP->numberValue);            break;
             case orion::ValueTypeBoolean:  valueP = kjBoolean(orionldState.kjsonP, valueFieldName, mdP->boolValue);            break;
             case orion::ValueTypeNull:     valueP = kjNull(orionldState.kjsonP, valueFieldName);                               break;
             case orion::ValueTypeNotGiven: valueP = kjString(orionldState.kjsonP, valueFieldName, "UNKNOWN TYPE IN MONGODB");  break;
@@ -473,8 +516,26 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
             details = NULL;
             switch (mdP->valueType)
             {
+            case orion::ValueTypeNumber:
+              if (SCOMPARE11(mdName, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
+              {
+                char   date[128];
+                char*  details;
+
+                if (numberToDate((time_t) mdP->numberValue, date, sizeof(date), &details) == false)
+                {
+                  LM_E(("Error creating a stringified date"));
+                  orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create a stringified date", details, OrionldDetailsEntity);
+                  return NULL;
+                }
+
+                nodeP = kjString(ciP->kjsonP, "observedAt", date);
+              }
+              else
+                nodeP = kjFloat(ciP->kjsonP, valueFieldName, mdP->numberValue);
+              break;
+
             case orion::ValueTypeString:   nodeP = kjString(orionldState.kjsonP, mdName, mdP->stringValue.c_str());            break;
-            case orion::ValueTypeNumber:   nodeP = kjFloat(orionldState.kjsonP, mdName, mdP->numberValue);                     break;
             case orion::ValueTypeBoolean:  nodeP = kjBoolean(orionldState.kjsonP, mdName, mdP->boolValue);                     break;
             case orion::ValueTypeNull:     nodeP = kjNull(orionldState.kjsonP, mdName);                                        break;
             case orion::ValueTypeNotGiven: nodeP = kjString(orionldState.kjsonP, mdName, "UNKNOWN TYPE IN MONGODB");           break;

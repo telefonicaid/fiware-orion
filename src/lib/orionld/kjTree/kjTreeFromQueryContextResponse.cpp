@@ -295,6 +295,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
     {
       ContextAttribute* aP       = ceP->contextAttributeVector[aIx];
       char*             attrName;
+      const char*       aName    = aP->name.c_str();
       KjNode*           aTop;
 
       if (strcmp(aP->name.c_str(), "@context") == 0)
@@ -375,7 +376,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
         switch (aP->valueType)
         {
         case orion::ValueTypeNumber:
-          if (SCOMPARE11(valueFieldName, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
+          if (SCOMPARE11(aName, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
           {
             char   date[128];
             char*  details;
@@ -387,7 +388,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
               return NULL;
             }
 
-            nodeP = kjString(ciP->kjsonP, valueFieldName, date);
+            nodeP = kjString(ciP->kjsonP, "observedAt", date);
           }
           else
             nodeP = kjFloat(ciP->kjsonP, valueFieldName, aP->numberValue);
@@ -454,7 +455,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
             switch (mdP->valueType)
             {
             case orion::ValueTypeNumber:
-              if (SCOMPARE11(valueFieldName, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
+              if (SCOMPARE11(mdName, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
               {
                 char   date[128];
                 char*  details;
@@ -466,7 +467,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
                   return NULL;
                 }
 
-                valueP = kjString(ciP->kjsonP, valueFieldName, date);
+                valueP = kjString(ciP->kjsonP, "observedAt", date);
               }
               else
                 valueP = kjFloat(ciP->kjsonP, valueFieldName, mdP->numberValue);
@@ -501,7 +502,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
                   return NULL;
                 }
 
-                nodeP = kjString(ciP->kjsonP, mdName, date);
+                nodeP = kjString(ciP->kjsonP, "observedAt", date);
               }
               else
                 nodeP = kjFloat(ciP->kjsonP, mdName, mdP->numberValue);
