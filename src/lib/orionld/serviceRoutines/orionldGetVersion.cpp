@@ -47,7 +47,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 
   ciP->responseTree = kjObject(NULL, NULL);
 
-  nodeP = kjString(orionldState.kjsonP, "branch", "bug/97.orionld-reject-subscription-if-empty-entities-array");
+  nodeP = kjString(orionldState.kjsonP, "branch", "bug/98.orionld-reject-subscription-if-no-notification-parameters");
   
   kjChildAdd(ciP->responseTree, nodeP);
 

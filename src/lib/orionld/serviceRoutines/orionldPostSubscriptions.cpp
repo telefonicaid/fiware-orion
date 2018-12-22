@@ -763,6 +763,13 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
     return false;
   }
 
+  if (notificationP == NULL)
+  {
+    LM_E(("Notification Parameters missing in Subscription"));
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Mandatory Field Missing", "Subscription::notification", OrionldDetailsString);
+    return false;
+  }
+
   return true;
 }
 

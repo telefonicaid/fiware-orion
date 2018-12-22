@@ -134,7 +134,20 @@ echo "10. POST /ngsi-ld/v1/subscriptions"
 echo "=================================="
 payload='{
   "watchedAttributes": [ "A1", "A2" ],
-  "isActive": false
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    },
+    "status": "ignored",
+    "timesSent": "ignored",
+    "lastNotification": "ignored",
+    "lastFailure": "ignored",
+    "lastSuccess": "ignored"
+  }
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
 echo
