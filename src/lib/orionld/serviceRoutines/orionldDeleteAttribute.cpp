@@ -26,7 +26,13 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "ngsi10/UpdateContextRequest.h"                       // UpdateContextRequest
+#include "ngsi10/UpdateContextResponse.h"                      // UpdateContextResponse
+#include "mongoBackend/mongoUpdateContext.h"                   // mongoUpdateContext
+
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/common/httpStatusCodeToOrionldErrorType.h"   // httpStatusCodeToOrionldErrorType
+#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
 #include "orionld/serviceRoutines/orionldDeleteAttribute.h"    // Own Interface
 
 
@@ -37,11 +43,54 @@
 //
 bool orionldDeleteAttribute(ConnectionInfo* ciP)
 {
-  LM_T(LmtServiceRoutine, ("In orionldDeleteAttribute"));
+  Entity*      eP;
+  char*        type = (char*) ((ciP->uriParam["type"] != "")? ciP->uriParam["type"].c_str() : NULL);
+  char         longName[256];
+  char*        details;
 
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - DELETE /ngsi-ld/v1/entities/*/attrs/*", ciP->wildcard[0], OrionldDetailsString);
+  // Get the long name of the Context Attribute name
+  if (orionldUriExpand(ciP->contextP, ciP->wildcard[1], longName, sizeof(longName), &details) == false)
+  {
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, type, OrionldDetailsAttribute);
+    return false;
+  }
+  
+  // Create and fill in the entity
+  eP       = new Entity();
+  eP->id   = ciP->wildcard[0];
 
-  ciP->httpStatusCode = SccNotImplemented;
+  // Create and fill in the attribute
+  ContextAttribute* caP = new ContextAttribute;
 
+  caP->name = longName;
+  eP->attributeVector.push_back(caP);
+  
+  LM_T(LmtServiceRoutine, ("Deleting attribute '%s' of entity '%s'", ciP->wildcard[1], ciP->wildcard[0]));
+
+  UpdateContextRequest  ucr;
+  UpdateContextResponse ucResponse;
+
+  ucr.fill(eP, ActionTypeDelete);
+  ciP->httpStatusCode = mongoUpdateContext(&ucr,
+                                           &ucResponse,
+                                           ciP->tenant,
+                                           ciP->servicePathV,
+                                           ciP->uriParam,
+                                           ciP->httpHeaders.xauthToken,
+                                           ciP->httpHeaders.correlator,
+                                           ciP->httpHeaders.ngsiv2AttrsFormat,
+                                           ciP->apiVersion,
+                                           NGSIV2_NO_FLAVOUR);
+
+  LM_TMP(("KZ: ciP->httpStatusCode: %d", (int) ciP->httpStatusCode));
+  if (ciP->httpStatusCode != SccOk)
+  {
+    orionldErrorResponseCreate(ciP, httpStatusCodeToOrionldErrorType(ciP->httpStatusCode), "DELETE /ngsi-ld/v1/entities/*/attrs/*", ciP->wildcard[0], OrionldDetailsString);
+    ucr.release();
+    return false;
+  }
+
+  ucr.release();
+  ciP->httpStatusCode = SccNoContent;
   return true;
 }

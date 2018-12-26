@@ -47,7 +47,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 
   ciP->responseTree = kjObject(NULL, NULL);
 
-  nodeP = kjString(orionldState.kjsonP, "branch", "bug/98.orionld-reject-subscription-if-no-notification-parameters");
+  nodeP = kjString(orionldState.kjsonP, "branch", "task/99.orionld-delete-entity-attribute");
   
   kjChildAdd(ciP->responseTree, nodeP);
 
