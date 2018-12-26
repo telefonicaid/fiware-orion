@@ -48,7 +48,7 @@ void orionldContextFree(OrionldContext* contextP)
     return;
   }
   
-  LM_TMP(("Freeing LIST context '%s' at %p, tree at %p", contextP->url, contextP, contextP->tree));
+  LM_TMP(("Freeing context %p, tree:%p, next:%p, url:%s", contextP, contextP->tree, contextP->next, contextP->url));
 
   if (contextP->tree != NULL)
   {

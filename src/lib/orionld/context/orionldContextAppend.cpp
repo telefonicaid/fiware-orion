@@ -34,6 +34,7 @@ extern "C"
 #include "orionld/context/orionldContextList.h"                // orionldContextHead, orionldContextTail
 #include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
 #include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
+#include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
 #include "orionld/context/orionldContextAppend.h"              // Own interface
 
 
@@ -44,21 +45,21 @@ extern "C"
 //
 OrionldContext* orionldContextAppend(const char* url, KjNode* tree, OrionldContextType contextType, char** detailsPP)
 {
-  OrionldContext* contextP = orionldContextCreateFromTree(tree, url, contextType, detailsPP);
+  OrionldContext* contextP;
+
+  // What if the context already exists ... ?
+  if ((contextP = orionldContextLookup(url)) != NULL)
+    return contextP;
+
+  contextP = orionldContextCreateFromTree(tree, url, contextType, detailsPP);
 
   if (contextP == NULL)
+  {
+    LM_E(("Error creating context: %s", *detailsPP));
     return NULL;
+  }
 
   orionldContextListInsert(contextP);
-
-  //
-  // Presenting the list  (TMP)
-  //
-  LM_TMP(("Current context LIST:"));
-  for (OrionldContext* ctxP = orionldContextHead; ctxP != NULL; ctxP = ctxP->next)
-    LM_TMP(("o %p: %s, tree at %p", ctxP, ctxP->url, ctxP->tree));
-  LM_TMP(("-------------------------------------------------------------------------------------------------------"));
-  LM_TMP((""));
 
   return contextP;
 }

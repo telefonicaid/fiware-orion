@@ -43,10 +43,10 @@
 //
 bool orionldDeleteAttribute(ConnectionInfo* ciP)
 {
-  Entity*      eP;
-  char*        type = (char*) ((ciP->uriParam["type"] != "")? ciP->uriParam["type"].c_str() : NULL);
-  char         longName[256];
-  char*        details;
+  char*   type = (char*) ((ciP->uriParam["type"] != "")? ciP->uriParam["type"].c_str() : NULL);
+  char    longName[256];
+  char*   details;
+  Entity  entity;
 
   // Get the long name of the Context Attribute name
   if (orionldUriExpand(ciP->contextP, ciP->wildcard[1], longName, sizeof(longName), &details) == false)
@@ -55,22 +55,20 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
     return false;
   }
   
-  // Create and fill in the entity
-  eP       = new Entity();
-  eP->id   = ciP->wildcard[0];
+  // Create and fill in attribute and entity
+  entity.id = ciP->wildcard[0];
 
-  // Create and fill in the attribute
   ContextAttribute* caP = new ContextAttribute;
 
   caP->name = longName;
-  eP->attributeVector.push_back(caP);
+  entity.attributeVector.push_back(caP);
   
   LM_T(LmtServiceRoutine, ("Deleting attribute '%s' of entity '%s'", ciP->wildcard[1], ciP->wildcard[0]));
 
   UpdateContextRequest  ucr;
   UpdateContextResponse ucResponse;
 
-  ucr.fill(eP, ActionTypeDelete);
+  ucr.fill(&entity, ActionTypeDelete);
   ciP->httpStatusCode = mongoUpdateContext(&ucr,
                                            &ucResponse,
                                            ciP->tenant,

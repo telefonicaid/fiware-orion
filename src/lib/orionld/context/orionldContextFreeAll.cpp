@@ -44,17 +44,13 @@ extern "C"
 //
 void orionldContextFreeAll(void)
 {
-  OrionldContext* contextP = orionldContextHead->next;  // Skipping Core Context
+  OrionldContext* contextP = orionldContextHead;
 
   while (contextP != NULL)
   {
     OrionldContext* next = contextP->next;
 
-    LM_TMP(("Calling orionldContextFree for context '%s', next at %p", contextP->url, contextP->next));
     orionldContextFree(contextP);
     contextP = next;
   }
-
-  // Lastly, freeing the Core Context
-  orionldContextFree(&orionldCoreContext);
 }

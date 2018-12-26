@@ -82,7 +82,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
 
   // notifiedAt
   time_t  now = time(NULL);  // FIXME - use an already existing timestamp?
-  char    date[25];
+  char    date[128];
   char*   details;
 
   if (numberToDate(now, date, sizeof(date), &details) == false)

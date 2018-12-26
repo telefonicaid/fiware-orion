@@ -118,7 +118,7 @@ static void objectContextPresent(ConnectionInfo* ciP, OrionldContext* contextP)
   buf[120] = 0;
   LM_T(LmtContextPresent, ("Context Tree: %s", buf));
 
-#if 0
+#if 1
   if (contextP->tree == NULL)
   {
     LM_T(LmtContextPresent, ("contextP->tree is NULL"));
@@ -179,6 +179,8 @@ void orionldContextPresent(ConnectionInfo* ciP, OrionldContext* contextP)
 
   if (contextP == NULL)
     allCachedContextsPresent(ciP);
+  else if (contextP->tree == NULL)
+    LM_TMP(("contextP->tree == NULL!!!"));
   else if (contextP->tree->type == KjObject)
     objectContextPresent(ciP, contextP);
   else if (contextP->tree->type == KjString)

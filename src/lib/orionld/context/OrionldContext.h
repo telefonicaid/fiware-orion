@@ -56,7 +56,8 @@ typedef struct OrionldContext
   char*                   url;
   KjNode*                 tree;
   OrionldContextType      type;
-  bool                    ignore;
+  bool                    ignore;     // Core/Default URL Context inside USER contexts
+  bool                    temporary;  // true by default, false when inserted in context list
   struct OrionldContext*  next;
 } OrionldContext;
 

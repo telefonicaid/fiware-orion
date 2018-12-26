@@ -234,14 +234,16 @@ ConnectionInfo::~ConnectionInfo()
     responseTree = NULL;
   }
 
-  if ((contextP != NULL) && (contextP != &orionldCoreContext) && (contextToBeFreed == true))
+#if 1
+  if ((contextP != NULL) && (contextP->temporary == true))
   {
-    LM_TMP(("Freeing REQUEST context '%s' at %p, tree at %p", contextP->url, contextP, contextP->tree));
-    // The tree is part of the requestTree, so it's already freed
+    LM_TMP(("Freeing temporary context '%s' at %p, tree at %p", contextP->url, contextP, contextP->tree));
+
     free(contextP->url);
     free(contextP);
     contextP = NULL;
   }
+#endif
 
   if (kjsonP != NULL)
   {

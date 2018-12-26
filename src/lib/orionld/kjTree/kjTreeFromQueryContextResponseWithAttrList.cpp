@@ -207,7 +207,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
           return NULL;
         }
 
-        orionldContextListInsert(contextP);
+        orionldContextListInsert(contextP);  // Inserting the context of an Entity, after not finding it in the context list
         orionldContextListPresent(ciP);
       }
     }

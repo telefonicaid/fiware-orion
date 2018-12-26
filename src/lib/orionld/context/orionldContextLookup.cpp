@@ -30,6 +30,7 @@ extern "C"
 #include "kjson/KjNode.h"                                   // KjNode
 }
 
+#include "common/string.h"                                  // FT
 #include "orionld/context/OrionldContext.h"                 // OrionldContext
 #include "orionld/context/orionldContextList.h"             // orionldContextHead
 
@@ -51,20 +52,39 @@ OrionldContext* orionldContextLookup(const char* url)
   else
     LM_TMP(("orionldContextLookup: NULL contextP"));
 
+  int contextIx = 0;
+
   while (contextP != NULL)
   {
-    LM_T(LmtContextLookup, ("Comparing '%s' with '%s'", contextP->url, url));
+    LM_TMP(("contextP: %p", contextP));
+
+    if (contextP->url == NULL)
+    {
+      LM_E(("KZ: This seems like a bug. Every context should have a URL ..."));
+      LM_E(("KZ: tree at %p", contextP->tree));
+      LM_E(("KZ: type: %d", contextP->type));
+      LM_E(("KZ: ignore: %s", FT(contextP->ignore)));
+      LM_E(("KZ: next at %p", contextP->next));
+      return NULL;
+    }
+    
+    LM_T(LmtContextLookup, ("Comparing context %d: '%s' with '%s'", contextIx, contextP->url, url));
+    LM_TMP(("Comparing '%s' with '%s'", contextP->url, url));
     if (strcmp(contextP->url, url) == 0)
     {
       LM_T(LmtContextLookup, ("Found it!"));
+      LM_TMP(("Found it!"));
       return contextP;
     }
 
     contextP = contextP->next;
     LM_T(LmtContextLookup, ("No match. Next context at %p", contextP));
+    LM_TMP(("No match. Next context at %p", contextP));
+    ++contextIx;
   }
 
   LM_T(LmtContextLookup, ("NOT Found"));
+  LM_TMP(("NOT Found"));
 
   return NULL;
 }  

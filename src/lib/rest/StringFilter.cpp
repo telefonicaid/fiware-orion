@@ -407,6 +407,7 @@ bool StringFilterItem::valueGet
   std::string*            errorStringP
 )
 {
+  LM_TMP(("KZ: In valueGet"));
   if (*s == '\'')
   {
     ++s;
@@ -451,6 +452,7 @@ bool StringFilterItem::valueGet
   }
   else  // must be a string then ...
   {
+    LM_TMP(("KZ: It's a string: '%s'", s));
     *valueTypeP = SfvtString;
     *stringP = s;
   }
@@ -459,6 +461,7 @@ bool StringFilterItem::valueGet
   {
     if (forbiddenChars(s, ""))
     {
+      LM_E(("forbidden characters in String Filter"));
       *errorStringP = std::string("forbidden characters in String Filter");
       return false;
     }

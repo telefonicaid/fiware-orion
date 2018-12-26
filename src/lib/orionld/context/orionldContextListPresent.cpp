@@ -52,6 +52,9 @@ void orionldContextListPresent(ConnectionInfo* ciP)
 
   LM_TMP(("---------------- %d Contexts in Cache ------------------------", contexts));
 
+  for (OrionldContext* ctxP = orionldContextHead; ctxP != NULL; ctxP = ctxP->next)
+    LM_TMP(("o %p: tree:%p, next:%p, url:%s", ctxP, ctxP->tree, ctxP->next, ctxP->url));
+
   for (OrionldContext* contextP = orionldContextHead; contextP != NULL; contextP = contextP->next)
   {
     LM_TMP(("=================== %s ======================", contextP->url));

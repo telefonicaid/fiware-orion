@@ -61,6 +61,7 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
   //
   // Else, create a new tree
   //
+  LM_TMP(("Did not find context '%s', creating it", url));
   contextP = orionldContextCreateFromTree(NULL, url, contextType, detailsPP);
 
   if (contextP == NULL)

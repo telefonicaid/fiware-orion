@@ -57,11 +57,12 @@ OrionldContext* orionldContextCreateFromTree(KjNode* tree, const char* url, Orio
     return NULL;
   }
 
-  contextP->url     = strdup(url);
-  contextP->tree    = tree;
-  contextP->type    = contextType;
-  contextP->ignore  = false;
-  contextP->next    = NULL;
+  contextP->url        = strdup(url);
+  contextP->tree       = tree;
+  contextP->type       = contextType;
+  contextP->ignore     = false;  // Meaning: Core/Default URL Context inside USER contexts
+  contextP->temporary  = true;   // Meaning: WILL be freed in ~ConnectionInfo - is set to false when inserted in context list
+  contextP->next       = NULL;
 
   //
   // Lookups in USER contexts must not include the Core Context nor the Default URL Context

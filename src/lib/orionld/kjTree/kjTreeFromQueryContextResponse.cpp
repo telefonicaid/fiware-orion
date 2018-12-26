@@ -238,7 +238,8 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
           return NULL;
         }
 
-        orionldContextListInsert(contextP);
+        orionldContextListInsert(contextP);  // Inserting context for an entity
+        
         orionldContextListPresent(ciP);
       }
     }

@@ -618,6 +618,7 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
       // The string is changed for a Number before stored in the database
       //
       int64_t dateTime;
+      char*   stringValueToFree = nodeP->value.s;
 
       // Check for valid ISO8601
       if ((dateTime = parse8601Time(nodeP->value.s)) == -1)
@@ -629,6 +630,9 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
       // Change to Number
       nodeP->type    = KjInt;
       nodeP->value.i = dateTime;
+
+      // And free the old string
+      free(stringValueToFree);
 
       if (metadataAdd(ciP, caP, nodeP, caName) == false)
       {

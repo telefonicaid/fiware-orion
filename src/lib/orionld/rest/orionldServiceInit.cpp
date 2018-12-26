@@ -37,7 +37,7 @@ extern "C"
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/context/orionldContextDownloadAndParse.h"    // orionldContextDownloadAndParse
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext, ORIONLD_CORE_CONTEXT_URL
-#include "orionld/context/orionldContextList.h"                // orionldContextHead, orionldContextTail
+#include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
 #include "orionld/rest/temporaryErrorPayloads.h"               // Temporary Error Payloads
 #include "orionld/rest/orionldMhdConnection.h"                 // Own Interface
@@ -305,11 +305,10 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   LM_TMP(("Downloaded Core Context '%s'. json tree at %p", orionldCoreContext.url, orionldCoreContext.tree));
 
   // Adding the core context to the list of contexts
-  orionldContextHead = &orionldCoreContext;
+  orionldContextListInsert(&orionldCoreContext);
 
   // Adding the Default URL context to the list of contexts
-  orionldCoreContext.next = &orionldDefaultUrlContext;
-  orionldContextTail      = &orionldDefaultUrlContext;
+  orionldContextListInsert(&orionldDefaultUrlContext);
 
   //
   // Checking the "Default URL Context" and extracting the Default URL path.
