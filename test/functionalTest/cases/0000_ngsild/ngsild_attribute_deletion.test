@@ -35,7 +35,7 @@ brokerStart CB 0-255 --prettyPrint
 # 02. GET entity, see P1, P2, and P3
 # 03. Delete attribute P2
 # 04. GET entity, see P1 and P3
-# 05. Attempt to delete non-existing attribute P4. FIXME: Should be a 404
+# 05. Attempt to delete non-existing attribute P4
 #
 
 echo "01. Create an entity with three attrs P1-P3"
@@ -82,8 +82,8 @@ echo
 echo
 
 
-echo "05. Attempt to delete non-existing attribute P4. FIXME: Should be a 404"
-echo "======================================================================="
+echo "05. Attempt to delete non-existing attribute P4"
+echo "==============================================="
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14/attrs/P4 -X DELETE
 echo
 echo
@@ -158,12 +158,18 @@ Date: REGEX(.*)
 
 
 
-05. Attempt to delete non-existing attribute P4. FIXME: Should be a 404
-=======================================================================
-HTTP/1.1 204 No Content
-Content-Length: 0
+05. Attempt to delete non-existing attribute P4
+===============================================
+HTTP/1.1 404 Not Found
+Content-Length: 140
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "details": "http://example.org/ngsi-ld/default/P4",
+    "title": "Attribute Not Found",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
 
 
 --TEARDOWN--

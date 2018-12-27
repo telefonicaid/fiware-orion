@@ -47,7 +47,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 
   ciP->responseTree = kjObject(NULL, NULL);
 
-  nodeP = kjString(orionldState.kjsonP, "branch", "hardening/100.orionld-fixed-a-crash-due-to-a-double-free");
+  nodeP = kjString(orionldState.kjsonP, "branch", "bug/101.orionld-delete-non-existing-attribute-with-ifdefs");
   
   kjChildAdd(ciP->responseTree, nodeP);
 

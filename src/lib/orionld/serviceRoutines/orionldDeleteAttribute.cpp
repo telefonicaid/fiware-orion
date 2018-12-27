@@ -26,8 +26,10 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "rest/HttpStatusCode.h"                               // SccContextElementNotFound
 #include "ngsi10/UpdateContextRequest.h"                       // UpdateContextRequest
 #include "ngsi10/UpdateContextResponse.h"                      // UpdateContextResponse
+#include "mongoBackend/mongoAttributeExists.h"                 // mongoAttributeExists
 #include "mongoBackend/mongoUpdateContext.h"                   // mongoUpdateContext
 
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
@@ -44,12 +46,12 @@
 bool orionldDeleteAttribute(ConnectionInfo* ciP)
 {
   char*   type = (char*) ((ciP->uriParam["type"] != "")? ciP->uriParam["type"].c_str() : NULL);
-  char    longName[256];
+  char    longAttrName[256];
   char*   details;
   Entity  entity;
 
   // Get the long name of the Context Attribute name
-  if (orionldUriExpand(ciP->contextP, ciP->wildcard[1], longName, sizeof(longName), &details) == false)
+  if (orionldUriExpand(ciP->contextP, ciP->wildcard[1], longAttrName, sizeof(longAttrName), &details) == false)
   {
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, type, OrionldDetailsAttribute);
     return false;
@@ -58,9 +60,17 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
   // Create and fill in attribute and entity
   entity.id = ciP->wildcard[0];
 
+  // Does the attribute to be deleted even exist?
+  if (mongoAttributeExists(ciP->wildcard[0], longAttrName, ciP->tenant.c_str()) == false)
+  {
+    ciP->httpStatusCode = SccContextElementNotFound;
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute Not Found", ciP->wildcard[1], OrionldDetailsAttribute);
+    return false;
+  }
+
   ContextAttribute* caP = new ContextAttribute;
 
-  caP->name = longName;
+  caP->name = longAttrName;
   entity.attributeVector.push_back(caP);
   
   LM_T(LmtServiceRoutine, ("Deleting attribute '%s' of entity '%s'", ciP->wildcard[1], ciP->wildcard[0]));
