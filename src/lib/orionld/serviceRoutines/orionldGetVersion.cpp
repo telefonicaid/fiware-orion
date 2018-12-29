@@ -47,7 +47,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 
   ciP->responseTree = kjObject(NULL, NULL);
 
-  nodeP = kjString(orionldState.kjsonP, "branch", "bug/102.orionld-T_Query-in-test-context-vs-T_Query-in-default-context-mismatch-expected");
+  nodeP = kjString(orionldState.kjsonP, "branch", "hardening/103.orionld-pre-downloaded-contexts");
   
   kjChildAdd(ciP->responseTree, nodeP);
 

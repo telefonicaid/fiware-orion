@@ -993,7 +993,7 @@ int main(int argC, char* argV[])
   // Otherwise, we have empirically checked that CB may randomly crash
   //
   contextBrokerInit(dbName, mtenant);
-  orionldServiceInit(restServiceVV, 9, false);  // FIXME: 'true' means no downloading of default context
+  orionldServiceInit(restServiceVV, 9, true);  // 'true' means no downloading of default context
 
   if (https)
   {
@@ -1055,6 +1055,8 @@ int main(int argC, char* argV[])
   {
     LM_W(("simulatedNotification is 'true', outgoing notifications won't be sent"));
   }
+
+  LM_TMP(("Initialization Ready - Accepting Requests on Port %d", port));
 
   while (1)
   {
