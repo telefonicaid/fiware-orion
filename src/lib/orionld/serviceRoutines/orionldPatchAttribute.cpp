@@ -30,17 +30,17 @@
 #include "mongoBackend/mongoEntityExists.h"                    // mongoEntityExists
 #include "mongoBackend/mongoAttributeExists.h"                 // mongoAttributeExists
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/serviceRoutines/orionldPatchEntity.h"        // Own Interface
+#include "orionld/serviceRoutines/orionldPatchAttribute.h"     // Own Interface
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldPatchEntity -
+// orionldPatchAttribute -
 //
-bool orionldPatchEntity(ConnectionInfo* ciP)
+bool orionldPatchAttribute(ConnectionInfo* ciP)
 {
-  LM_T(LmtServiceRoutine, ("In orionldPatchEntity"));
+  LM_T(LmtServiceRoutine, ("In orionldPatchAttribute"));
 
   if (mongoEntityExists(ciP->wildcard[0], ciP->tenant.c_str()) == false)
   {
@@ -73,15 +73,12 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     return false;
   }
 
-  // Make sure the attributes to be patched exist
-  for (KjNode* attrNodeP = ciP->requestTree->children; attrNodeP != NULL; attrNodeP = attrNodeP->next)
+  // Make sure the attribute to be patched exists
+  if (mongoAttributeExists(ciP->wildcard[0], ciP->wildcard[1], ciP->tenant.c_str()) == false)
   {
-    if (mongoAttributeExists(ciP->wildcard[0], attrNodeP->name, ciP->tenant.c_str()) == false)
-    {
-      ciP->httpStatusCode = SccNotFound;
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute does not exist", attrNodeP->name, OrionldDetailsString);
-      return false;
-    }
+    ciP->httpStatusCode = SccNotFound;
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute does not exist", ciP->wildcard[1], OrionldDetailsString);
+    return false;
   }
 
   ciP->httpStatusCode = SccNotImplemented;

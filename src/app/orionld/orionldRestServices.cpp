@@ -33,6 +33,7 @@
 #include "orionld/serviceRoutines/orionldGetRegistrations.h"
 #include "orionld/serviceRoutines/orionldGetRegistration.h"
 #include "orionld/serviceRoutines/orionldPatchEntity.h"
+#include "orionld/serviceRoutines/orionldPatchAttribute.h"
 #include "orionld/serviceRoutines/orionldPatchSubscription.h"
 #include "orionld/serviceRoutines/orionldPatchRegistration.h"
 #include "orionld/serviceRoutines/orionldDeleteEntity.h"
@@ -85,6 +86,7 @@ static OrionLdRestServiceSimplified postServices[] =
 //
 static OrionLdRestServiceSimplified patchServices[] =
 {
+  { "/ngsi-ld/v1/entities/*/attrs/*",      orionldPatchAttribute     },
   { "/ngsi-ld/v1/entities/*/attrs",        orionldPatchEntity        },
   { "/ngsi-ld/v1/subscriptions/*",         orionldPatchSubscription  },
   { "/ngsi-ld/v1/csourceRegistrations/*",  orionldPatchRegistration  }

@@ -42,6 +42,7 @@ typedef enum HttpStatusCode
   SccBadRequest             = 400,   // The request is not well formed
   SccForbidden              = 403,   // The request is not allowed
   SccContextElementNotFound = 404,   // No context element found
+  SccNotFound               = 404,   // Not Found
   SccBadVerb                = 405,   // Request ok but verb/method NOT OK
   SccNotAcceptable          = 406,   // The Accept header in the request is not supported
   SccConflict               = 409,

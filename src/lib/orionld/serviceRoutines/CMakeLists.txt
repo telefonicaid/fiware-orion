@@ -36,6 +36,7 @@ SET (SOURCES
     orionldDeleteRegistration.cpp
     orionldDeleteSubscription.cpp
     orionldPatchEntity.cpp
+    orionldPatchAttribute.cpp
     orionldPatchSubscription.cpp
     orionldPatchRegistration.cpp
     orionldBadVerb.cpp

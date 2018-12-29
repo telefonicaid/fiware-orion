@@ -26,6 +26,7 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "mongoBackend/mongoUpdateContext.h"                   // mongoUpdateContext
+#include "mongoBackend/mongoEntityExists.h"                    // mongoEntityExists
 #include "ngsi10/UpdateContextRequest.h"                       // UpdateContextRequest
 #include "ngsi10/UpdateContextResponse.h"                      // UpdateContextResponse
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
@@ -46,7 +47,32 @@
 bool orionldPostEntity(ConnectionInfo* ciP)
 {
   // 1. Check that the entity exists
-  OBJECT_CHECK(ciP->requestTree, "toplevel");
+  if (mongoEntityExists(ciP->wildcard[0], ciP->tenant.c_str()) == false)
+  {
+    ciP->httpStatusCode = SccNotFound;
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Entity does not exist", ciP->wildcard[0], OrionldDetailsString);
+    return false;
+  }
+
+  // Is the payload empty?
+  if (ciP->requestTree == NULL)
+  {
+    ciP->httpStatusCode = SccBadRequest;
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "No payload", NULL, OrionldDetailsString);
+    return false;
+  }
+
+  // Is the payload not a JSON object?
+  OBJECT_CHECK(ciP->requestTree, kjValueType(ciP->requestTree->type));
+
+  // Is the payload an empty object?
+  if (ciP->requestTree->children == NULL)
+  {
+    ciP->httpStatusCode = SccBadRequest;
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Payload is an empty JSON object", NULL, OrionldDetailsString);
+    return false;
+  }
+
 
   UpdateContextRequest   mongoRequest;
   UpdateContextResponse  mongoResponse;

@@ -47,7 +47,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 
   ciP->responseTree = kjObject(NULL, NULL);
 
-  nodeP = kjString(orionldState.kjsonP, "branch", "hardening/103.orionld-pre-downloaded-contexts");
+  nodeP = kjString(orionldState.kjsonP, "branch", "task/104.orionld-patch-entity");
   
   kjChildAdd(ciP->responseTree, nodeP);
 
