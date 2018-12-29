@@ -1,0 +1,143 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity created with Type T_Query and context that defines it. Then a query with T_Query but without context - no match
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 243,246-247
+
+--SHELL--
+
+#
+# 01. Create entity E1 with Type T_Query and test context that defines it
+# 02. See E1 in mongo
+# 03. Query E1/T_Query but with default context that does NOT define T_Query - no match
+#
+
+
+echo "01. Create entity E1 with Type T_Query and test context that defines it"
+echo "======================================================================="
+payload='{
+    "id": "urn:ngsi-ld:T:I123k467:Context",
+    "type": "T_Query",
+    "P100": {
+      "type": "Property",
+      "value": 12
+    },
+    "R100": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:T2:6789"
+    },
+    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. See E1 in mongo"
+echo "==================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. Query E1/T_Query but with default context that does NOT define T_Query - no match"
+echo "====================================================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T_Query
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with Type T_Query and test context that defines it
+=======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:I123k467:Context
+Date: REGEX(.*)
+
+
+
+02. See E1 in mongo
+===================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb://localhost:27017/ftest
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:I123k467:Context",
+		"type" : "http://example.org/T_Query",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"@context",
+		"http://example.org/P100",
+		"http://example.org/R100"
+	],
+	"attrs" : {
+		"@context" : {
+			"type" : "ContextString",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld",
+			"mdNames" : [ ]
+		},
+		"http://example=org/P100" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 12,
+			"mdNames" : [ ]
+		},
+		"http://example=org/R100" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "urn:ngsi-ld:T2:6789",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. Query E1/T_Query but with default context that does NOT define T_Query - no match
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

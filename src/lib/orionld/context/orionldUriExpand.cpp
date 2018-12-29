@@ -54,12 +54,13 @@ extern "C"
 //
 int uriExpansion(OrionldContext* contextP, const char* name, char** expandedNameP, char** expandedTypeP, char** detailsPP)
 {
-  KjNode* contextValueP = NULL;
+  KjNode*      contextValueP = NULL;
+  const char*  contextUrl    = (contextP == NULL)? "NULL" : contextP->url;  // For debugging only
 
   *expandedNameP = NULL;
   *expandedTypeP = NULL;
 
-  LM_T(LmtUriExpansion, ("looking up alias for '%s'", name));
+  LM_T(LmtUriExpansion, ("expanding '%s'", name));
 
   //
   // Use the default context?
@@ -71,12 +72,13 @@ int uriExpansion(OrionldContext* contextP, const char* name, char** expandedName
   //
   if (contextP != NULL)
   {
-    LM_T(LmtUriExpansion, ("looking up context item for '%s', in context '%s'", name, contextP->url));
+    LM_T(LmtUriExpansion, ("looking up context item for '%s', in context '%s'", name, contextUrl));
     contextValueP = orionldContextItemLookup(contextP, name);
   }
 
   if (contextValueP == NULL)
   {
+    LM_T(LmtUriExpansion, ("'%s' was not found in context '%s'", name, contextUrl));
     //
     // Not found.
     // Now, if found in Core context, no expansion is to be made (return 0).
@@ -85,11 +87,16 @@ int uriExpansion(OrionldContext* contextP, const char* name, char** expandedName
     contextValueP = orionldContextItemLookup(&orionldCoreContext, name);
 
     if (contextValueP != NULL)
+    {
+      LM_T(LmtUriExpansion, ("'%s' found in Core Context - no expansion to be made", name));
       return 0;
-    else
-      return -2;
+    }
+
+    LM_T(LmtUriExpansion, ("'%s' NOT found in Core Context - DEFAULT expansion to be made", name));
+    return -2;
   }
 
+  LM_T(LmtUriExpansion, ("Found '%s', in context '%s'", name, contextUrl));
 
   //
   // Context Item found - must be either a string or an object containing two strings
@@ -97,7 +104,7 @@ int uriExpansion(OrionldContext* contextP, const char* name, char** expandedName
   LM_T(LmtUriExpansion, ("contextValueP at %p", contextValueP));
   if (contextValueP->type == KjString)
   {
-    LM_T(LmtUriExpansion, ("got a string - expanded name is '%s'", contextValueP->value.s));
+    LM_T(LmtUriExpansion, ("got a string - expanded name for '%s' is '%s'", name, contextValueP->value.s));
     *expandedNameP = contextValueP->value.s;
 
     return 1;
@@ -156,7 +163,7 @@ int uriExpansion(OrionldContext* contextP, const char* name, char** expandedName
   if ((children != 2) || (*expandedNameP == NULL) || (*expandedTypeP == NULL))
   {
     *detailsPP = (char*) "Invalid context - field in context item object not matching the rules";
-    LM_E(("uriExpansion: invalid @context item '%s' in @context '%s'", name, contextP->url));
+    LM_E(("uriExpansion: invalid @context item '%s' in @context '%s'", name, contextUrl));
     return -1;
   }
 

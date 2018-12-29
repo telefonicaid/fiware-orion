@@ -33,6 +33,8 @@ extern "C"
 }
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+
+#include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
 #include "orionld/context/orionldContextDownloadAndParse.h"    // orionldContextDownloadAndParse
 #include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
@@ -60,6 +62,8 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
 
   //
   // Else, create a new tree
+  // - First the context is allocated by calling orionldContextCreateFromTree (with tree set to NULL)
+  // - Then the context is downloaded and parsed and the tree is created
   //
   LM_TMP(("Did not find context '%s', creating it", url));
   contextP = orionldContextCreateFromTree(NULL, url, contextType, detailsPP);
@@ -68,6 +72,7 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
   {
     LM_E(("orionldContextCreateFromTree: %s", *detailsPP));
     ciP->contextToBeFreed = false;
+    ciP->httpStatusCode = SccBadRequest;
     return NULL;
   }
 
@@ -80,13 +85,63 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
     free(contextP->url);
     free(contextP);
     ciP->contextToBeFreed = false;
+    ciP->httpStatusCode = SccBadRequest;
     return NULL;
   }
 
+  if (contextP->tree && contextP->tree->children)
+    LM_T(LmtContextList, ("The downloaded context (%s) is of type '%s'", contextP->url, kjValueType(contextP->tree->children->type)));
+  else
+    LM_E(("contextP->tree->children: %p", contextP->tree->children));
+
   ciP->contextToBeFreed = true;
-  LM_TMP(("Inserting context '%s' in common list", url));
+  LM_T(LmtContextList, ("Inserting context '%s' in common list", url));
   orionldContextListInsert(contextP);
-  LM_TMP(("Inserted context '%s' in common list", url));
+
+  if (contextP->tree->children->type == KjArray)
+  {
+    KjNode* arrayP = contextP->tree->children;
+
+    LM_T(LmtContextList, ("We got an array - need to download more contexts"));
+    for (KjNode* aItemP = arrayP->children; aItemP != NULL; aItemP = aItemP->next)
+    {
+      // All items must be strings
+      if (aItemP->type != KjString)
+      {
+        LM_E(("Context Array item not a string"));
+        ciP->httpStatusCode = SccBadRequest;
+        return NULL;
+      }
+      LM_T(LmtContextList, ("Array item: %s", aItemP->value.s));
+
+      //
+      // Is the context already present in the list?
+      // If so, no need to download, parse and insert into the context list
+      //
+      if (orionldContextLookup(aItemP->value.s) != NULL)
+        continue;
+
+      if (urlCheck(aItemP->value.s, detailsPP) == false)
+      {
+        LM_E(("Context Array string-item is not a URL: %s", *detailsPP));
+        ciP->httpStatusCode = SccBadRequest;
+        return NULL;
+      }
+
+      OrionldContext*  arrayItemContextP;
+
+      if ((arrayItemContextP = orionldContextCreateFromUrl(ciP, aItemP->value.s, OrionldUserContext, detailsPP)) == NULL)
+      {
+        LM_E(("orionldContextCreateFromUrl error: %s", *detailsPP));
+        ciP->httpStatusCode = SccBadRequest;
+        return NULL;
+      }
+
+      ciP->contextToBeFreed = true;
+      LM_T(LmtContextList, ("Inserting context '%s' in common list", url));
+      orionldContextListInsert(arrayItemContextP);
+    }
+  }
 
   return contextP;
 }

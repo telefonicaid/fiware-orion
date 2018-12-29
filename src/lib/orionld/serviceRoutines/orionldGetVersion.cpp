@@ -47,7 +47,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 
   ciP->responseTree = kjObject(NULL, NULL);
 
-  nodeP = kjString(orionldState.kjsonP, "branch", "bug/101.orionld-delete-non-existing-attribute-with-ifdefs");
+  nodeP = kjString(orionldState.kjsonP, "branch", "bug/102.orionld-T_Query-in-test-context-vs-T_Query-in-default-context-mismatch-expected");
   
   kjChildAdd(ciP->responseTree, nodeP);
 

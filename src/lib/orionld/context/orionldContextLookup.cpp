@@ -44,20 +44,12 @@ OrionldContext* orionldContextLookup(const char* url)
 {
   OrionldContext* contextP = orionldContextHead;
 
-  LM_TMP(("----- In orionldContextLookup"));
-
-  LM_TMP(("orionldContextLookup: url: '%s'", url));
-  if (contextP != NULL)
-    LM_TMP(("orionldContextLookup: contextP->url: '%s'", contextP->url));
-  else
-    LM_TMP(("orionldContextLookup: NULL contextP"));
+  LM_T(LmtContextLookup, ("----- In orionldContextLookup. Looking for context '%s'", url));
 
   int contextIx = 0;
 
   while (contextP != NULL)
   {
-    LM_TMP(("contextP: %p", contextP));
-
     if (contextP->url == NULL)
     {
       LM_E(("KZ: This seems like a bug. Every context should have a URL ..."));
@@ -69,22 +61,18 @@ OrionldContext* orionldContextLookup(const char* url)
     }
     
     LM_T(LmtContextLookup, ("Comparing context %d: '%s' with '%s'", contextIx, contextP->url, url));
-    LM_TMP(("Comparing '%s' with '%s'", contextP->url, url));
     if (strcmp(contextP->url, url) == 0)
     {
       LM_T(LmtContextLookup, ("Found it!"));
-      LM_TMP(("Found it!"));
       return contextP;
     }
 
     contextP = contextP->next;
     LM_T(LmtContextLookup, ("No match. Next context at %p", contextP));
-    LM_TMP(("No match. Next context at %p", contextP));
     ++contextIx;
   }
 
   LM_T(LmtContextLookup, ("NOT Found"));
-  LM_TMP(("NOT Found"));
 
   return NULL;
 }  

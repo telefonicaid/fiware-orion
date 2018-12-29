@@ -38,7 +38,7 @@
 //
 char* orionldAliasLookup(OrionldContext* contextP, const char* longName)
 {
-  LM_TMP(("=================== Reverse alias-search for '%s'", longName));
+  LM_T(LmtAlias, ("=================== Reverse alias-search for '%s'", longName));
 
   // Is it the default URL ?
   if (orionldDefaultUrlLen != -1)
@@ -47,15 +47,18 @@ char* orionldAliasLookup(OrionldContext* contextP, const char* longName)
       return (char*) &longName[orionldDefaultUrlLen];
   }
 
-  LM_TMP(("Calling orionldContextValueLookup for %s", longName));
-  KjNode* aliasNodeP = orionldContextValueLookup(contextP, longName);
+  LM_T(LmtAlias, ("Calling orionldContextValueLookup for %s", longName));
+  bool    useStringValue = false;
+  KjNode* aliasNodeP     = orionldContextValueLookup(contextP, longName, &useStringValue);
 
   if (aliasNodeP != NULL)
   {
-    LM_TMP(("Found the alias: '%s' => '%s'", longName, aliasNodeP->name));
-    return aliasNodeP->name;
+    char* alias = (useStringValue == false)? aliasNodeP->name : aliasNodeP->value.s;
+
+    LM_T(LmtAlias, ("Found the alias: '%s' => '%s'", longName, alias));
+    return alias;
   }
 
-  LM_TMP(("No alias found, keeping long name '%s'", longName));
+  LM_T(LmtAlias, ("No alias found, keeping long name '%s'", longName));
   return (char*) longName;
-} 
+}

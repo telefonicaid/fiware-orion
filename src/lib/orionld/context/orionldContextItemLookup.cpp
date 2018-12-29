@@ -80,10 +80,10 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
     return NULL;
   }
 
-  LM_T(LmtContextItemLookup, ("Looking up ContextItem '%s' in context '%s', contextTree at %p", itemName, contextP->url, contextP->tree));
+  LM_T(LmtContextItemLookup, ("Looking up ContextItem '%s' in context '%s' that is of type '%s', contextTree at %p", itemName, contextP->url, kjValueType(contextP->tree->type), contextP->tree));
   if (contextP->tree->type == KjString)
   {
-    LM_T(LmtContextItemLookup, ("The context is of type String - must lookup a new context"));
+    LM_T(LmtContextItemLookup, ("The context '%s' is of type String - must lookup a new context (%s)", contextP->url, contextP->tree->value.s));
 
     // Lookup the context
     OrionldContext* dereferencedContextP = orionldContextLookup(contextP->tree->value.s);
@@ -94,12 +94,12 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
     }
 
     // Lookup the item
-    LM_T(LmtContextItemLookup, ("Now we can search for '%s' (in context '%s')", itemName, dereferencedContextP->url));
+    LM_T(LmtContextItemLookup, ("Found the context - now we can search for '%s' (in '%s')", itemName, dereferencedContextP->url));
     return orionldContextItemLookup(dereferencedContextP, itemName);
   }
   else if (contextP->tree->type == KjArray)
   {
-    LM_T(LmtContextItemLookup, ("The context is of type Array"));
+    LM_T(LmtContextItemLookup, ("The context '%s' is of type Array", contextP->url));
 
     for (KjNode* contextNodeP = contextP->tree->children; contextNodeP != NULL; contextNodeP = contextNodeP->next)
     {
@@ -109,11 +109,13 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
         return NULL;
       }
 
+      LM_T(LmtContextItemLookup, ("Calling orionldContextLookup to lookup context '%s'", contextNodeP->value.s));
+
       OrionldContext* dereferencedContextP = orionldContextLookup(contextNodeP->value.s);
 
       if (dereferencedContextP == NULL)
       {
-        LM_W(("Can't find context '%s' - trying with the nexy context in the Array", contextNodeP->value.s));
+        LM_W(("Can't find context '%s' - trying with the next context in the Array", contextNodeP->value.s));
         continue;   // Or: download it?
       }
 
@@ -158,6 +160,8 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
   //
   // If we reach this point, the context is a JSON Object
   //
+  LM_T(LmtContextItemLookup, ("Lookup of item '%s' in JSON Object Context '%s'", itemName, contextP->url));
+
   KjNode* atContextP = contextP->tree->children;
 
   //
@@ -183,7 +187,7 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
     {
       if ((contextItemP->type != KjString) && (contextItemP->type != KjObject))
       {
-        LM_E(("Invalid @context - items of contexts must be JSON Strings or jSOn objects - not %s", kjValueType(contextItemP->type)));
+        LM_E(("Invalid @context - items of contexts must be JSON Strings or JSON objects - not %s", kjValueType(contextItemP->type)));
         return NULL;
       }
 
@@ -199,12 +203,12 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
       // LM_T(LmtContextItemLookup, ("looking for '%s', comparing with '%s'", itemName, contextItemP->name));
       if (strcmp(contextItemP->name, itemName) == 0)
       {
-        LM_T(LmtContextItemLookup, ("found it!"));
+        LM_T(LmtContextItemLookup, ("found it! '%s' -> '%s'", itemName, contextItemP->value.s));
         return contextItemP;
       }
     }
   }
-  else if (atContextP->type == KjArray)
+  else if (atContextP->type == KjArray)  // FIXME: What is this? Can we really get here ... ?
   {
     for (KjNode* contextP = atContextP->children; contextP != NULL; contextP = contextP->next)
     {
@@ -221,7 +225,7 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
     }
   }
   
-  LM_T(LmtContextItemLookup, ("found no expansion: returning NULL :("));
+  LM_T(LmtContextItemLookup, ("found no expansion for '%s': returning NULL :(", itemName));
   return NULL;
 }
 

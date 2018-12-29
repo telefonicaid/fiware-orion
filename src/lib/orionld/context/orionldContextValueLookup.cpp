@@ -30,6 +30,7 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
+#include "orionld/common/SCOMPARE.h"                           // SCOMPARE
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
 #include "orionld/context/orionldContextList.h"                // orionldContextHead
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
@@ -41,8 +42,10 @@ extern "C"
 //
 // orionldContextValueLookup -
 //
-KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value)
+KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value, bool* useStringValueP)
 {
+  *useStringValueP = false;
+
   if (contextP == NULL)
     return NULL;
 
@@ -60,7 +63,7 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value)
 
     // Lookup the value
     LM_T(LmtContextValueLookup, ("Now we can search for '%s' (in context '%s'", value, dereferencedContextP->url));
-    return orionldContextValueLookup(dereferencedContextP, value);
+    return orionldContextValueLookup(dereferencedContextP, value, useStringValueP);
   }
   else if (contextP->tree->type == KjArray)
   {
@@ -84,7 +87,7 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value)
 
       // Lookup the value
       LM_T(LmtContextValueLookup, ("Now we can search for '%s' in context '%s'", value, dereferencedContextP->url));
-      KjNode* kNodeP = orionldContextValueLookup(dereferencedContextP, value);
+      KjNode* kNodeP = orionldContextValueLookup(dereferencedContextP, value, useStringValueP);
 
       if (kNodeP != NULL)
       {
@@ -162,17 +165,30 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value)
         continue;
       }
 
-      LM_T(LmtContextValueLookup, ("looking for '%s', comparing with '%s'", value, contextItemP->name));
-      LM_TMP(("contextItemP at %p", contextItemP));
-      LM_TMP(("contextItemP->value.s: '%s'", contextItemP->value.s));
-      LM_TMP(("value: '%s'", value));
 
       if (contextItemP->type == KjObject)
       {
         // Lookup item "@id" inside contextItemP that is a JSON object
+        KjNode* idNodeP;
+        for (idNodeP = contextItemP->children; idNodeP != NULL; idNodeP = idNodeP->next)
+        {
+          if (SCOMPARE4(idNodeP->name, '@', 'i', 'd', 0))
+          {
+            *useStringValueP = false;  // FIXME - useStringValueP not needed!
+            LM_T(LmtContextValueLookup, ("found it!"));
+            return contextItemP;
+          }
+        }
+
+        //
+        // No '@id' found ...
+        //
+        LM_E(("No '@id' in object type @context item"));
+        return NULL;
       }
       else if (contextItemP->type == KjString)
       {
+        LM_T(LmtContextValueLookup, ("looking for '%s', comparing with '%s' that has the value '%s'", value, contextItemP->name, contextItemP->value.s));
         if (strcmp(contextItemP->value.s, value) == 0)
         {
           LM_T(LmtContextValueLookup, ("found it!"));
@@ -195,7 +211,7 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value)
         return NULL;
       }
 
-      KjNode* nodeP = orionldContextValueLookup(contextP->value.s, value);
+      KjNode* nodeP = orionldContextValueLookup(contextP->value.s, value, useStringValueP);
 
       if (nodeP != NULL)
         return nodeP;
@@ -203,7 +219,7 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value)
   }
   else if (atContextP->type == KjString)
   {
-    KjNode* nodeP = orionldContextValueLookup(atContextP->value.s, value);
+    KjNode* nodeP = orionldContextValueLookup(atContextP->value.s, value, useStringValueP);
     if (nodeP != NULL)
       return nodeP;
   }
@@ -218,14 +234,14 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value)
 //
 // orionldContextValueLookup -
 //
-KjNode* orionldContextValueLookup(char* contextUrl, const char* value)
+KjNode* orionldContextValueLookup(char* contextUrl, const char* value, bool* useStringValueP)
 {
   OrionldContext* contextP = orionldContextLookup(contextUrl);
 
   if (contextP == NULL)
     return NULL;
 
-  return orionldContextValueLookup(contextP, value);
+  return orionldContextValueLookup(contextP, value, useStringValueP);
 }
 
 
@@ -234,7 +250,7 @@ KjNode* orionldContextValueLookup(char* contextUrl, const char* value)
 //
 // orionldContextValueLookup -
 //
-KjNode* orionldContextValueLookup(KjNode* contextVector, const char* value)
+KjNode* orionldContextValueLookup(KjNode* contextVector, const char* value, bool* useStringValueP)
 {
   if (contextVector->type != KjArray)
   {
@@ -252,7 +268,7 @@ KjNode* orionldContextValueLookup(KjNode* contextVector, const char* value)
     if (contextP == NULL)
       return NULL;
 
-    itemP = orionldContextValueLookup(contextP, value);
+    itemP = orionldContextValueLookup(contextP, value, useStringValueP);
     if (itemP != NULL)
       return itemP;
 

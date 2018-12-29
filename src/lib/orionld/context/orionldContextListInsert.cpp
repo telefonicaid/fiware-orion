@@ -37,10 +37,7 @@
 void orionldContextListInsert(OrionldContext* contextP)
 {
   LM_T(LmtContextList, ("Adding context '%s' to the list (context at %p, tree at %p)", contextP->url, contextP, contextP->tree));
-  LM_TMP(("Adding context '%s' to the list (context at %p, tree at %p)", contextP->url, contextP, contextP->tree));
 
-  contextP->next      = NULL;
-  contextP->temporary = false;
   if (orionldContextHead == NULL)
   {
     orionldContextHead = contextP;
@@ -52,14 +49,17 @@ void orionldContextListInsert(OrionldContext* contextP)
     orionldContextTail       = contextP;
   }
 
+  contextP->next      = NULL;
+  contextP->temporary = false;
+
   //
   // Presenting the list  (TMP)
   //
-  LM_TMP(("-------------------------------------------------------------------------------------------------------"));
-  LM_TMP(("Current context LIST:"));
+  LM_T(LmtContextList, ("-------------------------------------------------------------------------------------------------------"));
+  LM_T(LmtContextList, ("Current context LIST:"));
   for (OrionldContext* ctxP = orionldContextHead; ctxP != NULL; ctxP = ctxP->next)
-    LM_TMP(("o %p: tree:%p, next:%p, url:%s", ctxP, ctxP->tree, ctxP->next, ctxP->url));
-  LM_TMP(("-------------------------------------------------------------------------------------------------------"));
-  LM_TMP((""));
+    LM_T(LmtContextList, ("o %p: tree:%p, next:%p, url:%s, type:%s", ctxP, ctxP->tree, ctxP->next, ctxP->url, kjValueType(ctxP->tree->type)));
+  LM_T(LmtContextList, ("-------------------------------------------------------------------------------------------------------"));
+  LM_T(LmtContextList, (""));
 
 }

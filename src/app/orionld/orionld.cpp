@@ -993,7 +993,7 @@ int main(int argC, char* argV[])
   // Otherwise, we have empirically checked that CB may randomly crash
   //
   contextBrokerInit(dbName, mtenant);
-  orionldServiceInit(restServiceVV, 9, true);  // FIXME: 'true' means no downloading of default context
+  orionldServiceInit(restServiceVV, 9, false);  // FIXME: 'true' means no downloading of default context
 
   if (https)
   {

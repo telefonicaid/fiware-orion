@@ -148,6 +148,7 @@ static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** de
   {
     ciP->httpHeaders.acceptJson   = true;
     ciP->httpHeaders.acceptJsonld = false;
+    ciP->outMimeType              = JSON;
   }
 
   for (unsigned int ix = 0; ix < ciP->httpHeaders.acceptHeaderV.size(); ix++)
@@ -183,6 +184,9 @@ static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** de
 
     return false;
   }
+
+  if (ciP->httpHeaders.acceptJsonld == true)
+    ciP->outMimeType = JSONLD;
 
   return true;
 }

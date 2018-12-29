@@ -90,8 +90,6 @@ std::string deleteEntity
   // Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
-  ciP->outMimeType = JSON;
-
   // Check for potential error
   string  answer = "";
   if (parseDataP->upcrs.res.oe.code != SccNone)

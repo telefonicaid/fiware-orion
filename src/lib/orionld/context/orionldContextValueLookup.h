@@ -38,7 +38,7 @@ extern "C"
 //
 // orionldContextValueLookup -
 //
-extern KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value);
+extern KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value, bool* useStringValueP);
 
 
 
@@ -46,7 +46,7 @@ extern KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* v
 //
 // orionldContextValueLookup -
 //
-extern KjNode* orionldContextValueLookup(char* contextUrl, const char* value);
+extern KjNode* orionldContextValueLookup(char* contextUrl, const char* value, bool* useStringValueP);
 
 
 
@@ -54,7 +54,7 @@ extern KjNode* orionldContextValueLookup(char* contextUrl, const char* value);
 //
 // orionldContextValueLookup -
 //
-extern KjNode* orionldContextValueLookup(KjNode* contextVector, const char* value);
+extern KjNode* orionldContextValueLookup(KjNode* contextVector, const char* value, bool* useStringValueP);
 
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTVALUELOOKUP_H_

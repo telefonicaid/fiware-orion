@@ -167,9 +167,10 @@ typedef enum TraceLevels
   LmtContextItemLookup,
   LmtContextValueLookup,
   LmtContextPresent,
+  LmtAlias,
 #endif
 
-  LmtBug = 250
+  LmtBug = 254
 } TraceLevels;
 
 

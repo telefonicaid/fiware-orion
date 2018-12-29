@@ -248,12 +248,15 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
 
       if (nodeP == NULL)
       {
-        KjNode* aliasNodeP = orionldContextValueLookup(contextP, ceP->entityId.type.c_str());
+        bool    useStringValue = false;
+        KjNode* aliasNodeP     = orionldContextValueLookup(contextP, ceP->entityId.type.c_str(), &useStringValue);
 
         if (aliasNodeP != NULL)
         {
-          LM_TMP(("Found the alias: '%s' => '%s'", ceP->entityId.type.c_str(), aliasNodeP->name));
-          nodeP = kjString(orionldState.kjsonP, "type", aliasNodeP->name);
+          char* alias = (useStringValue == false)? aliasNodeP->name: aliasNodeP->value.s;
+
+          LM_TMP(("Found the alias: '%s' => '%s'", ceP->entityId.type.c_str(), alias));
+          nodeP = kjString(orionldState.kjsonP, "type", alias);
         }
         else
         {
@@ -312,16 +315,14 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
         //
         // Lookup alias for the Attribute Name
         //
-        KjNode* aliasNodeP = orionldContextValueLookup(contextP, aP->name.c_str());
+        bool    useStringValue = false;
+        KjNode* aliasNodeP     = orionldContextValueLookup(contextP, aP->name.c_str(), &useStringValue);
 
         if (aliasNodeP != NULL)
-          attrName = aliasNodeP->name;
+          attrName = (useStringValue == false)? aliasNodeP->name : aliasNodeP->value.s;
       }
 
       char* match;
-      LM_TMP(("KZ: attrList at %p", attrList));
-      LM_TMP(("KZ: attrList: '%s'", attrList));
-      LM_TMP(("KZ: aP: %s", aP->name.c_str()));
       if ((match = (char*) strstr(attrList, aP->name.c_str())) == NULL)
       {
         continue;
@@ -555,6 +556,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
 
     //
     // Set MIME Type to JSONLD if JSONLD is in the Accept header of the incoming request
+    // FIXME: probably no longer necessary - done in orionldMhdConnectionTreat.cpp::acceptHeaderCheck()
     //
     if (ciP->httpHeaders.acceptJsonld == true)
     {

@@ -345,7 +345,7 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
   HttpAcceptHeader*  acceptHeaderP;
   char*              delimiter;
 
-  LM_TMP(("Initial value of Accept header: %s", value));
+  LM_T(LmtHttpHeaders, ("Initial value of Accept header: %s", value));
 
   if (value[0] == 0)
   {
@@ -618,8 +618,6 @@ static void requestCompleted
   MHD_RequestTerminationCode  toe
 )
 {
-  LM_TMP(("In requestCompleted"));
-
   ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
   std::string      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
   struct timespec  reqEndTime;
@@ -708,9 +706,7 @@ static void requestCompleted
   extern void delayedReleaseExecute(void);
   delayedReleaseExecute();
 
-  LM_TMP(("Destroying ConnectionInfo"));
   delete(ciP);
-  LM_TMP(("Destroyed ConnectionInfo"));
 
   *con_cls = NULL;
 }

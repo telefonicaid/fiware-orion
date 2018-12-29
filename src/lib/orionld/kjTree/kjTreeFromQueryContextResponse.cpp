@@ -529,6 +529,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
 
     //
     // Set MIME Type to JSONLD if JSONLD is in the Accept header of the incoming request
+    // FIXME: Probably not necessary, as it is done in orionldMhdConnectionTreat.cpp::acceptHeaderCheck()
     //
     if (ciP->httpHeaders.acceptJsonld == true)
     {

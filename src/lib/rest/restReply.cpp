@@ -117,14 +117,17 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
 
   if (answer != "")
   {
+    LM_TMP(("ciP->outMimeType == %d", ciP->outMimeType));
     if (ciP->outMimeType == JSON)
     {
       MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/json");
     }
-    else if (ciP->outMimeType == JSONLD)
+#ifdef ORIONLD
+     else if ((ciP->outMimeType == JSONLD) || (ciP->httpHeaders.accept == "application/ld+json"))
     {
       MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/ld+json");
     }
+#endif
     else if (ciP->outMimeType == TEXT)
     {
       MHD_add_response_header(response, HTTP_CONTENT_TYPE, "text/plain");

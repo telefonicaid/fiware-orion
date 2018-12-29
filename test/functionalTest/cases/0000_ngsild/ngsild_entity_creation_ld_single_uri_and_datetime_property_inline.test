@@ -32,7 +32,8 @@ brokerStart CB 0-255 --prettyPrint
 
 #
 # 01. POST /ngsi-ld/v1/entities with JSON-LD @context and DateTime Property inline
-# 02. GET entity
+# 02. See entity in database
+# 03. GET entity
 #
 
 echo "01. POST /ngsi-ld/v1/entities with JSON-LD @context and DateTime Property inline"
@@ -69,7 +70,14 @@ echo
 echo
 
 
-echo "02. GET entity"
+echo "02. See entity in database"
+echo "=========================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. GET entity"
 echo "=============="
 orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14?prettyPrint=yes&spaces=2' --noPayloadCheck  -H "Accept: application/ld+json"
 echo
@@ -87,7 +95,78 @@ Date: REGEX(.*)
 
 
 
-02. GET entity
+02. See entity in database
+==========================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb://localhost:27017/ftest
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:12:13:14",
+		"type" : "http://example.org/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"@context",
+		"http://example.org/DateProp",
+		"http://example.org/P2",
+		"http://example.org/P3",
+		"http://example.org/R1"
+	],
+	"attrs" : {
+		"@context" : {
+			"type" : "ContextString",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld",
+			"mdNames" : [ ]
+		},
+		"http://example=org/DateProp" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"@type" : "DateTime",
+				"@value" : "2018-12-04T12:00:00"
+			},
+			"mdNames" : [ ]
+		},
+		"http://example=org/P2" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					-8,
+					40
+				]
+			},
+			"mdNames" : [ ]
+		},
+		"http://example=org/P3" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "Hola",
+			"mdNames" : [ ]
+		},
+		"http://example=org/R1" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "urn:ngsi-ld:T2:6789",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. GET entity
 ==============
 HTTP/1.1 200 OK
 Content-Length: 564

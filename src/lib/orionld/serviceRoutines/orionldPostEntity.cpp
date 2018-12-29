@@ -45,7 +45,7 @@
 //
 bool orionldPostEntity(ConnectionInfo* ciP)
 {
-  // 1. Check that the entity exists?
+  // 1. Check that the entity exists
   OBJECT_CHECK(ciP->requestTree, "toplevel");
 
   UpdateContextRequest   mongoRequest;
