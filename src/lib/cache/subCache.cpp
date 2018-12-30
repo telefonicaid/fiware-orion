@@ -154,12 +154,10 @@ bool EntityInfo::match
   else if (id == entityId)
   {
     matchedId =  true;
-    LM_TMP(("KZ: entity id matches"));
   }
   else
   {
     matchedId = false;
-    LM_TMP(("KZ: matchedId == false ('%s' vs '%s')", id.c_str(), entityId.c_str()));
   }
 
   // short-circuit, optimization
@@ -170,17 +168,14 @@ bool EntityInfo::match
     {
       // REGEX-comparison this->entityTypePattern VS type
       matchedType = (regexec(&entityTypePattern, type.c_str(), 0, NULL, 0) == 0);
-      LM_TMP(("KZ: entity type matches?", FT(matchedType)));
     }
     else if ((type != "")  && (entityType != "") && (entityType != type))
     {
       matchedType = false;
-      LM_TMP(("KZ: entity type doesn't match ('%s' vs '%s')", type.c_str(), entityType.c_str()));
     }
     else
     {
       matchedType = true;
-      LM_TMP(("KZ: entity type matches"));
     }
   }
 
@@ -490,7 +485,6 @@ void subCacheMatch
 
     attrV.push_back(attr);
 
-    LM_TMP(("Checking sub '%s'", cSubP->name.c_str()));
     if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV))
     {
       subVecP->push_back(cSubP);
@@ -788,7 +782,6 @@ void subCacheItemInsert
 #ifdef ORIONLD
   cSubP->name                  = name;
   cSubP->ldContext             = ldContext;
-  LM_TMP(("Inserting subscription with mimeType==%d into cache", cSubP->httpInfo.mimeType));
 #endif
   cSubP->expression.q          = q;
   cSubP->expression.geometry   = geometry;

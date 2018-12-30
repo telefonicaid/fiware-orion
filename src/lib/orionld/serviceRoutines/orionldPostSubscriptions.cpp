@@ -178,7 +178,6 @@ static bool ktreeToStringList(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<s
       return false;
     }
 
-    LM_TMP(("Pushing string '%s' to string-list", expanded));
     stringListP->push_back(expanded);
   }
 
@@ -198,8 +197,6 @@ static bool ktreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, S
   KjNode*  coordinatesNodeP   = NULL;
   char*    georelP            = NULL;
   char*    geoPropertyP       = NULL;
-
-  LM_TMP(("In ktreeToSubscriptionExpression"));
 
   for (itemP = kNodeP->children; itemP != NULL; itemP = itemP->next)
   {
@@ -223,7 +220,7 @@ static bool ktreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, S
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value type (not String nor Array)", "GeoQuery::coordinates", OrionldDetailsString);
         return false;
       }
-      LM_TMP(("coordinatesNodeP->type: %s", kjValueType(coordinatesNodeP->type)));
+      LM_T(LmtGeoJson, ("coordinatesNodeP->type: %s", kjValueType(coordinatesNodeP->type)));
     }
     else if (SCOMPARE7(itemP->name, 'g', 'e', 'o', 'r', 'e', 'l', 0))
     {
@@ -260,7 +257,7 @@ static bool ktreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, S
     return false;
   }
 
-  LM_TMP(("coordinatesNodeP->type: %s", kjValueType(coordinatesNodeP->type)));
+  LM_T(LmtGeoJson, ("coordinatesNodeP->type: %s", kjValueType(coordinatesNodeP->type)));
   if (coordinatesNodeP->type == KjArray)
   {
     char coords[512];
@@ -273,7 +270,7 @@ static bool ktreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, S
     //
     kjRender(ciP->kjsonP, coordinatesNodeP, coords, sizeof(coords));
     coords[strlen(coords) - 1] = 0;
-    LM_TMP(("Rendered array: '%s'", &coords[1]));
+    LM_T(LmtGeoJson, ("Rendered coords array: '%s'", &coords[1]));
     subExpressionP->coords = &coords[1];
   }
   else
@@ -406,8 +403,6 @@ static bool ktreeToNotification(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::Sub
   // Extract the info from the kjTree
   for (itemP = kNodeP->children; itemP != NULL; itemP = itemP->next)
   {
-    LM_TMP(("Translating node '%s'", itemP->name));
-
     if (SCOMPARE11(itemP->name, 'a', 't', 't', 'r', 'i', 'b', 'u', 't', 'e', 's', 0))
     {
       DUPLICATE_CHECK(attributesP, "Notification::attributes", itemP);
@@ -421,10 +416,10 @@ static bool ktreeToNotification(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::Sub
       DUPLICATE_CHECK(formatP, "Notification::format", itemP->value.s);
       STRING_CHECK(itemP, "Notification::format");
 
-      LM_TMP(("Got a subscription format: '%s'", itemP->value.s));
+      LM_T(LmtNotificationFormat, ("Got a subscription format: '%s'", itemP->value.s));
       if (formatExtract(ciP, formatP, subP) == false)
         return false;
-      LM_TMP(("Extracted subscription format: %d", subP->attrsFormat));
+      LM_T(LmtNotificationFormat, ("Extracted subscription format: %d", subP->attrsFormat));
     }
     else if (SCOMPARE9(itemP->name, 'e', 'n', 'd', 'p', 'o', 'i', 'n', 't', 0))
     {
@@ -461,7 +456,6 @@ static bool ktreeToNotification(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::Sub
     }
   }
 
-  LM_TMP(("Notification translated"));
   return true;
 }
 
@@ -498,8 +492,6 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
   KjNode*                   idNodeP                   = NULL;
   KjNode*                   contextNodeP              = NULL;
 
-  LM_TMP(("In ktreeToSubscription"));
-
   // Default values
   subP->attrsFormat = NGSI_LD_V1_KEYVALUES;
   subP->descriptionProvided = false;
@@ -521,7 +513,6 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
   //
   for (kNodeP = ciP->requestTree->children; kNodeP != NULL; kNodeP = kNodeP->next)
   {
-    LM_TMP(("Treating node '%s'", kNodeP->name));
     if (SCOMPARE9(kNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
     {
       contextNodeP = kNodeP;
@@ -558,8 +549,6 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
 
     subP->id  = "urn:ngsi-ld:Subscription:";
     subP->id += randomId;
-
-    LM_TMP(("Invented a sub-id '%s'", subP->id.c_str()));
   }
 
   if (ciP->httpHeaders.ngsildContent)  // Context in payload
@@ -592,7 +581,6 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
   //
   for (kNodeP = ciP->requestTree->children; kNodeP != NULL; kNodeP = kNodeP->next)
   {
-    LM_TMP(("Treating '%s'", kNodeP->name));
     if (SCOMPARE3(kNodeP->name, 'i', 'd', 0))
     {
       DUPLICATE_CHECK(idP, "Subscription::id", kNodeP->value.s);
@@ -632,7 +620,6 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
 
       subP->description         = descriptionP;
       subP->descriptionProvided = true;
-      LM_TMP(("KZ: Got description: %s", descriptionP));
     }
     else if (SCOMPARE9(kNodeP->name, 'e', 'n', 't', 'i', 't', 'i', 'e', 's', 0))
     {
@@ -645,7 +632,6 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
         LM_E(("ktreeToEntities failed"));
         return false;  // orionldErrorResponseCreate is invoked by ktreeToEntities
       }
-      LM_TMP(("After ktreeToEntities"));
     }
     else if (SCOMPARE18(kNodeP->name, 'w', 'a', 't', 'c', 'h', 'e', 'd', 'A', 't', 't', 'r', 'i', 'b', 'u', 't', 'e', 's', 0))
     {
@@ -655,7 +641,7 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
 
       if (ktreeToStringList(ciP, watchedAttributesP, &subP->subject.condition.attributes) == false)
       {
-        LM_TMP(("ktreeToStringList failed"));
+        LM_E(("ktreeToStringList failed"));
         return false;  // orionldErrorResponseCreate is invoked by ktreeToStringList
       }
     }
@@ -680,10 +666,9 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
 
       if (ktreeToSubscriptionExpression(ciP, geoQP, &subP->subject.condition.expression) == false)
       {
-        LM_TMP(("ktreeToSubscriptionExpression failed"));
+        LM_E(("ktreeToSubscriptionExpression failed"));
         return false;  // orionldErrorResponseCreate is invoked by ktreeToSubscriptionExpression
       }
-      LM_TMP(("After ktreeToSubscriptionExpression"));
     }
     else if (SCOMPARE4(kNodeP->name, 'c', 's', 'f', 0))
     {
@@ -746,8 +731,6 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
       return false;
     }
   }
-
-  LM_TMP(("Subscription translated"));
 
   if ((entitiesPresent == false) && (watchedAttributesPresent == false))
   {
@@ -818,7 +801,6 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
     return false;
   }
 
-  LM_TMP(("After ktreeToSubscription - calling mongoCreateSubscription"));
   subId = mongoCreateSubscription(sub,
                                   &oError,
                                   ciP->httpHeaders.tenant,
@@ -827,7 +809,6 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
                                   ciP->httpHeaders.correlator,
                                   sub.ldContext);
 
-  LM_TMP(("After mongoCreateSubscription"));
   ciP->httpStatusCode = SccCreated;
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/subscriptions/", subId.c_str());
   httpHeaderLinkAdd(ciP, ciP->contextP, NULL);

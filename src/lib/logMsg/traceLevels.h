@@ -98,6 +98,8 @@ typedef enum TraceLevels
 
   /* Notifications (160-179) */
   LmtNotifier = 160,
+  LmtNotificationFormat,
+  LmtNotifications,
 
   /* Input/Output payloads (180-199) */
   LmtServiceInputPayload = 180,
@@ -158,6 +160,7 @@ typedef enum TraceLevels
   LmtPayloadParse,
   LmtJsonResponse,
   LmtFree,
+  LmtMetadata,
 
   LmtContext = 242,
   LmtContextList,
@@ -168,9 +171,14 @@ typedef enum TraceLevels
   LmtContextValueLookup,
   LmtContextPresent,
   LmtAlias,
+  LmtGeoJson,
+  LmtAccept,
+  LmtBadVerb,
+  LmtStringFilter = 254,
+  
 #endif
 
-  LmtBug = 254
+  LmtBug = 255
 } TraceLevels;
 
 

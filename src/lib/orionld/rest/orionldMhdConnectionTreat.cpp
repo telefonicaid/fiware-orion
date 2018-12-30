@@ -97,12 +97,12 @@ static bool contentTypeCheck(ConnectionInfo* ciP, KjNode* contextNodeP, char** e
   bool  contextInPayload     = (contextNodeP != NULL);
   bool  contextInHttpHeader  = (ciP->httpHeaders.link != "");
 
-  LM_TMP(("Context In JSON Payload: %s", (contextInPayload == true)?    "YES" : "NO"));
-  LM_TMP(("Context In HTTP Header:  %s", (contextInHttpHeader == true)? "YES" : "NO"));
+  LM_T(LmtContext, ("Context In JSON Payload: %s", (contextInPayload == true)?    "YES" : "NO"));
+  LM_T(LmtContext, ("Context In HTTP Header:  %s", (contextInHttpHeader == true)? "YES" : "NO"));
 
   if (strcmp(ciP->httpHeaders.contentType.c_str(), "application/json") == 0)
   {
-    LM_TMP(("Content-Type is: application/json"));
+    LM_T(LmtContext, ("Content-Type is: application/json"));
 
     if (contextInPayload == true)
     {
@@ -113,7 +113,7 @@ static bool contentTypeCheck(ConnectionInfo* ciP, KjNode* contextNodeP, char** e
   }
   else if (ciP->httpHeaders.ngsildContent == true)
   {
-    LM_TMP(("Content-Type is: application/ld+json"));
+    LM_T(LmtContext, ("Content-Type is: application/ld+json"));
 
     if (contextInHttpHeader == true)
     {
@@ -141,8 +141,8 @@ static bool contentTypeCheck(ConnectionInfo* ciP, KjNode* contextNodeP, char** e
 //
 static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** detailsP)
 {
-  LM_TMP(("ciP->httpHeaders.accept == %s", ciP->httpHeaders.accept.c_str()));
-  LM_TMP(("ciP->httpHeaders.acceptHeaederV.size() == %d", ciP->httpHeaders.acceptHeaderV.size()));
+  LM_T(LmtAccept, ("ciP->httpHeaders.accept == %s", ciP->httpHeaders.accept.c_str()));
+  LM_T(LmtAccept, ("ciP->httpHeaders.acceptHeaederV.size() == %d", ciP->httpHeaders.acceptHeaderV.size()));
 
   if (ciP->httpHeaders.acceptHeaderV.size() == 0)
   {
@@ -155,7 +155,7 @@ static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** de
   {
     const char* mediaRange = ciP->httpHeaders.acceptHeaderV[ix]->mediaRange.c_str();
 
-    LM_TMP(("ciP->Accept header %d: '%s'", ix, mediaRange));
+    LM_T(LmtAccept, ("ciP->Accept header %d: '%s'", ix, mediaRange));
     if (SCOMPARE12(mediaRange, 'a', 'p', 'p', 'l', 'i', 'c', 'a', 't', 'i', 'o', 'n', '/'))
     {
       const char* appType = &mediaRange[12];
@@ -166,14 +166,14 @@ static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** de
       {
         ciP->httpHeaders.acceptJsonld = true;
         ciP->httpHeaders.acceptJson   = true;
-        LM_TMP(("application/* - both json and jsonld OK"));
+        LM_T(LmtAccept, ("application/* - both json and jsonld OK"));
       }
     }
     else if (SCOMPARE4(mediaRange, '*', '/', '*', 0))
     {
       ciP->httpHeaders.acceptJsonld = true;
       ciP->httpHeaders.acceptJson   = true;
-      LM_TMP(("*/* - both json and jsonld OK"));
+      LM_T(LmtAccept, ("*/* - both json and jsonld OK"));
     }
   }
 
@@ -213,9 +213,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     // orionldMhdConnectionInit guarantees that a valid verb is used. I.e. POST, GET, DELETE or PATCH
     // orionldServiceLookup makes sure the URL supprts the verb
     //
-    LM_TMP(("Calling orionldServiceLookup"));
     ciP->serviceP = orionldServiceLookup(ciP, &orionldRestServiceV[ciP->verb]);
-    LM_TMP(("orionldServiceLookup returned service pointer at %p", ciP->serviceP));
 
     if (ciP->serviceP == NULL)
     {
@@ -243,7 +241,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       LM_T(LmtPayloadParse, ("After kjParse: %p", ciP->requestTree));
       if (ciP->requestTree == NULL)
       {
-        LM_TMP(("Creating Error Response for JSON Parse Error (%s)", ciP->kjsonP->errorString));
         orionldErrorResponseCreate(ciP, OrionldInvalidRequest, "JSON Parse Error", ciP->kjsonP->errorString, OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;
         goto respond;
@@ -258,20 +255,17 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
         if (attrNodeP->name == NULL)
           continue;
 
-        LM_TMP(("Attr '%s'", attrNodeP->name));
         if (SCOMPARE9(attrNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
         {
           contextNodeP = attrNodeP;
-          LM_TMP(("Found a @context in the payload"));
+          LM_T(LmtContext, ("Found a @context in the payload"));
           break;
         }
       }
     }
 
-    LM_TMP(("Here"));
-
     if (contextNodeP == NULL)
-      LM_TMP(("No @context in payload"));
+      LM_T(LmtContext, ("No @context in payload"));
 
     //
     // ContentType Check
@@ -290,7 +284,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       ciP->httpStatusCode = SccBadRequest;
       goto respond;
     }
-    LM_TMP(("After acceptHeaderCheck"));
 
 
     //
@@ -298,7 +291,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     if (jsonldLinkInHttpHeader == true)
     {
-      LM_TMP(("Calling linkCheck with: '%s'", ciP->httpHeaders.link.c_str()));
       if (linkCheck((char*) ciP->httpHeaders.link.c_str(), &ciP->httpHeaders.linkUrl, &details) == false)
       {
         LM_E(("linkCheck: %s", details));
@@ -330,7 +322,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
     if (b == false)
     {
-      LM_TMP(("Service Routine for %s %s returned FALSE (%d)", verbName(ciP->verb), ciP->urlPath, ciP->httpStatusCode));
       //
       // If the service routine failed (returned FALSE), but no HTTP status ERROR code is set,
       // the HTTP status code defaults to 400
@@ -364,7 +355,6 @@ respond:
   {
     LM_T(LmtJsonResponse, ("Responding with %d: '%s'", ciP->httpStatusCode, ciP->responsePayload));
     restReply(ciP, ciP->responsePayload);
-    LM_TMP(("After restReply"));
     // ciP->responsePayload freed and NULLed by restReply()
   }
   else
@@ -373,6 +363,5 @@ respond:
     restReply(ciP, "");
   }
 
-  LM_TMP(("End of service routine: ciP->contextP at %p", ciP->contextP));
   return MHD_YES;
 }

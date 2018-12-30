@@ -64,7 +64,6 @@ static bool orionldUserContextKeyValuesCheck2(KjNode* tree, char* url, char** de
 {
   if (tree->type != KjObject)
   {
-    LM_TMP(("Context Tree '%s' is a JSON %s", tree->name, kjValueType(tree->type)));
     LM_X(1, ("Context Tree is not a JSON Object - this is a bug!"));
     *detailsPP = (char*) "not a JSON Object";
     return false;
@@ -108,7 +107,7 @@ static bool orionldUserContextKeyValuesCheck2(KjNode* tree, char* url, char** de
           bool useStringValue = false;
 
           atidP = itemP;
-          LM_TMP(("Checking value '%s' for iten named '%s'", itemP->value.s, itemP->name));
+          LM_T(LmtContext, ("Checking value '%s' for iten named '%s'", itemP->value.s, itemP->name));
           if (orionldContextValueLookup(&orionldCoreContext, itemP->value.s, &useStringValue) != NULL)
           {
             LM_E(("In context '%s', the context item '%s' of '%s' uses a value from the Core Context (%s)",
@@ -212,7 +211,6 @@ bool orionldUserContextKeyValuesCheck(KjNode* contextTreeP, char* url, char** de
 
       if (contextTreeP->children->type == KjObject)
       {
-        LM_TMP(("Calling orionldUserContextKeyValuesCheck2"));
         return orionldUserContextKeyValuesCheck2(contextTreeP->children, url, detailsPP);
       }
       else if (contextNodeP->type == KjString)
@@ -244,7 +242,6 @@ bool orionldUserContextKeyValuesCheck(KjNode* contextTreeP, char* url, char** de
     }
     else  // Case 6 - Simple Object
     {
-      LM_TMP(("Calling orionldUserContextKeyValuesCheck2"));
       return orionldUserContextKeyValuesCheck2(contextTreeP, url, detailsPP);
     }
   }

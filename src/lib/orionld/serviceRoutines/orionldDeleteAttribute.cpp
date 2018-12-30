@@ -90,7 +90,6 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
                                            ciP->apiVersion,
                                            NGSIV2_NO_FLAVOUR);
 
-  LM_TMP(("KZ: ciP->httpStatusCode: %d", (int) ciP->httpStatusCode));
   if (ciP->httpStatusCode != SccOk)
   {
     orionldErrorResponseCreate(ciP, httpStatusCodeToOrionldErrorType(ciP->httpStatusCode), "DELETE /ngsi-ld/v1/entities/*/attrs/*", ciP->wildcard[0], OrionldDetailsString);

@@ -83,7 +83,6 @@ static void libLogFunction
   
   /* Print message to variable */
   vsnprintf(libLogBuffer, sizeof(libLogBuffer), format, args);
-  // LM_TMP(("S:%d %s[%d]: %s", severity, fileName, lineNo, libLogBuffer));
   va_end(args);
 
   if (severity == 1)
@@ -295,14 +294,11 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
     }
   }
 
-  LM_TMP(("orionldCoreContext.tree at %p", orionldCoreContext.tree));
   if ((orionldCoreContext.tree == NULL) || (orionldDefaultUrlContext.tree == NULL) || (orionldDefaultContext.tree == NULL))
   {
     // Without default context, orionld cannot function
     LM_X(1, ("EXITING - Without default context, orionld cannot function - error downloading default context '%s': %s", ORIONLD_CORE_CONTEXT_URL, details));
   }
-
-  LM_TMP(("Downloaded Core Context '%s'. json tree at %p", orionldCoreContext.url, orionldCoreContext.tree));
 
   // Adding the core context to the list of contexts
   orionldContextListInsert(&orionldCoreContext);

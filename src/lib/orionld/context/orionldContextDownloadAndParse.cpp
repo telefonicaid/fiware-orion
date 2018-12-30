@@ -97,9 +97,9 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
   }
 
   // Now parse the payload
-  LM_TMP(("Got @context - parsing it"));
+  LM_T(LmtContext, ("Got @context - parsing it"));
   KjNode* tree = kjParse(kjsonP, httpResponse.buf);
-  LM_TMP(("Got @context - parsed it"));
+  LM_T(LmtContext, ("Got @context - parsed it"));
 
   // Now we can free the httpResponse buffer
   if (httpResponse.buf != httpResponse.internalBuffer)
@@ -141,7 +141,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
   //
   if (orionldCoreContext.tree == NULL)
   {
-    LM_TMP(("This is the Core Context - we are done here"));
+    LM_T(LmtContext, ("This is the Core Context - we are done here"));
     return tree;
   }
   
@@ -154,7 +154,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
   }
 
   KjNode* contextNodeP = tree->children;
-  LM_TMP(("contextNodeP is named '%s'", contextNodeP->name));
+  LM_T(LmtContext, ("contextNodeP is named '%s'", contextNodeP->name));
 
   if (contextNodeP == NULL)
   {
@@ -191,18 +191,19 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
   // Now, we have '@context' - is it an object?
   if (contextNodeP->type != KjObject)
   {
-    LM_TMP(("Not an object ('@context' in '%s' is of type '%s') - we are done here (no collision check necessary)", url, kjValueType(contextNodeP->type)));
+    LM_T(LmtContext,  ("Not an object ('@context' in '%s' is of type '%s') - we are done here (no collision check necessary)",
+                       url, kjValueType(contextNodeP->type)));
     return tree;
   }
 
-  LM_TMP(("Starting collision loop"));
+  LM_T(LmtContext, ("Starting collision loop"));
   for (KjNode* kNodeP = contextNodeP->children; kNodeP != NULL; kNodeP = kNodeP->next)
   {
-    LM_TMP(("Checking collision for '%s'", kNodeP->name));
+    LM_T(LmtContext, ("Checking for collisions for context '%s'", kNodeP->name));
 
     for (KjNode* coreNodeP = orionldCoreContext.tree->children; coreNodeP != NULL; coreNodeP = coreNodeP->next)
     {
-      LM_TMP(("Comparing '%s' to '%s'", kNodeP->name, coreNodeP->name));
+      // LM_T(LmtContext, ("Comparing '%s' to '%s'", kNodeP->name, coreNodeP->name));
       if (strcmp(kNodeP->name, coreNodeP->name) == 0)
       {
         LM_E(("New context collides with core context. Offending alias: '%s'", kNodeP->name));

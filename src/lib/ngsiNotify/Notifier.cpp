@@ -88,7 +88,6 @@ void Notifier::sendNotifyContextRequest
 {
   pthread_t                         tid;
 
-  LM_TMP(("VALGRIND: Calling Notifier::buildSenderParams. httpInfo.mimeType: %d", httpInfo.mimeType));
   std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncrP,
                                                                           httpInfo,
                                                                           tenant,
@@ -508,11 +507,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
         LM_E(("Unable to find subscription: %s", ncrP->subscriptionId.c_str()));
         return paramsV;
       }
-      LM_TMP(("Subscription '%s' has mimeType %d", ncrP->subscriptionId.c_str(), subP->httpInfo.mimeType));
 
-      LM_TMP(("KZ: Rendering payload of a NGSI-LD notification"));
       char*    details;
-      LM_TMP(("Calling kjTreeFromNotification for a notification of type '%s'", renderFormatToString(subP->renderFormat)));
       KjNode*  kjTree = kjTreeFromNotification(ncrP, subP->ldContext.c_str(), subP->httpInfo.mimeType, subP->renderFormat, &details);
 
       if (kjTree == NULL)

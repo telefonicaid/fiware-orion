@@ -140,8 +140,6 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
   if (oneHit == true)
     top = root;
 
-  LM_TMP(("oneHit: %s", FT(oneHit)));
-  
   for (int ix = 0; ix < hits; ix++)
   {
     ContextElement* ceP      = &responseP->contextElementResponseVector[ix]->contextElement;
@@ -154,11 +152,11 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
       kjChildAdd(root, top);
     }
 
-    LM_TMP(("Getting the @context for the entity '%s'", eId));
+    LM_T(LmtContext, ("Getting the @context for the entity '%s'", eId));
 
     if (contextP == NULL)
     {
-      LM_TMP(("The @context for '%s' was not found in the cache - adding it", eId));
+      LM_T(LmtContextList, ("The @context for '%s' was not found in the cache - adding it", eId));
       ContextAttribute* contextAttributeP = ceP->contextAttributeVector.lookup("@context");
 
       if (contextAttributeP != NULL)
@@ -188,7 +186,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
         // The function kjTreeFromContextContextAttribute does just this
         //
 
-        LM_TMP(("Found an attribute called context @context for entity '%s'", eId));
+        LM_T(LmtContext, ("Found an attribute called context @context for entity '%s'", eId));
         char*    details;
         KjNode*  contextTree = kjTreeFromContextContextAttribute(ciP, contextAttributeP, &details);
 
@@ -229,7 +227,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
     {
       nodeP = NULL;
 
-      LM_TMP(("=================== Reverse alias-search for Entity-Type '%s'", ceP->entityId.type.c_str()));
+      LM_T(LmtAlias, ("=================== Reverse alias-search for Entity-Type '%s'", ceP->entityId.type.c_str()));
 
       // Is it the default URL ?
       if (orionldDefaultUrlLen != -1)
@@ -255,12 +253,12 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
         {
           char* alias = (useStringValue == false)? aliasNodeP->name: aliasNodeP->value.s;
 
-          LM_TMP(("Found the alias: '%s' => '%s'", ceP->entityId.type.c_str(), alias));
+          LM_T(LmtAlias, ("Found the alias: '%s' => '%s'", ceP->entityId.type.c_str(), alias));
           nodeP = kjString(orionldState.kjsonP, "type", alias);
         }
         else
         {
-          LM_TMP(("No alias found, keeping long name '%s'", ceP->entityId.type.c_str()));
+          LM_T(LmtAlias, ("No alias found, keeping long name '%s'", ceP->entityId.type.c_str()));
           nodeP = kjString(orionldState.kjsonP, "type", ceP->entityId.type.c_str());
         }
 
@@ -399,11 +397,10 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
         // value
         const char*  valueFieldName = (aP->type == "Relationship")? "object" : "value";
 
-        LM_TMP(("KZ: valueFieldName: '%s' for attr %s", valueFieldName, aP->name.c_str()));
+        LM_T(LmtAlias, ("KZ: valueFieldName: '%s' for attr %s", valueFieldName, aP->name.c_str()));
         switch (aP->valueType)
         {
         case orion::ValueTypeNumber:
-          LM_TMP(("KZ: it's a number. "));
           if (SCOMPARE11(attrName, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
           {
             char   date[128];

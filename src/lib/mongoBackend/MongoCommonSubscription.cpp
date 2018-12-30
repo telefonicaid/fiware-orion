@@ -143,7 +143,6 @@ void setHttpInfo(const Subscription& sub, BSONObjBuilder* b)
   b->append(CSUB_CUSTOM,    sub.notification.httpInfo.custom);
 
 #ifdef ORIONLD
-  LM_TMP(("mimeType: '%d'", sub.notification.httpInfo.mimeType));
   // FIXME: Store mimeType as a string in mongo (application/json)
   b->append("mimeType", sub.notification.httpInfo.mimeType);
   LM_T(LmtMongo, ("Subscription mimeType: %d", sub.notification.httpInfo.mimeType));
@@ -424,7 +423,6 @@ void setFormat(const Subscription& sub, BSONObjBuilder* b)
 
   b->append(CSUB_FORMAT, format);
   LM_T(LmtMongo, ("Subscription format: %s", format.c_str()));
-  LM_TMP(("KZ: Subscription format: %s", format.c_str()));
 }
 
 
@@ -470,12 +468,8 @@ void setMetadata(const Subscription& sub, BSONObjBuilder* b)
 */
 void setContext(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP)
 {
-  LM_TMP(("sub.ldContext == '%s'", sub.ldContext.c_str()));
-
   if (sub.ldContext != "")
   {
-    LM_TMP(("Appending '%s': '%s' to mongo::BSONObjBuilder", CSUB_LDCONTEXT, sub.ldContext.c_str()));
-
     bobP->append(CSUB_LDCONTEXT, sub.ldContext);
     LM_T(LmtMongo, ("Subscription context: %s", sub.ldContext.c_str()));
   }

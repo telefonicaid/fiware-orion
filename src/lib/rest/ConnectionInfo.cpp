@@ -220,10 +220,8 @@ ConnectionInfo::~ConnectionInfo()
   httpHeaders.release();
 
 #ifdef ORIONLD
-  LM_TMP(("In ~ConnectionInfo"));
   if (requestTree != NULL)
   {
-    LM_TMP(("Releasing requestTree at %p", requestTree));
     kjFree(requestTree);
     requestTree = NULL;
   }
@@ -234,30 +232,22 @@ ConnectionInfo::~ConnectionInfo()
     responseTree = NULL;
   }
 
-#if 1
   if ((contextP != NULL) && (contextP->temporary == true))
   {
-    LM_TMP(("Freeing temporary context '%s' at %p, tree at %p", contextP->url, contextP, contextP->tree));
-
     free(contextP->url);
     free(contextP);
     contextP = NULL;
   }
-#endif
 
   if (kjsonP != NULL)
   {
-    LM_TMP(("Freeing kjsonP. iVec at %p", kjsonP->iVec));
     if (kjsonP->iVec != NULL)
       free(kjsonP->iVec);
 
-    LM_TMP(("Freeing kjsonP"));
     if (kjsonP->iStrings != NULL)
       free(kjsonP->iStrings);
   
-    LM_TMP(("Freeing kjsonP"));
     free(kjsonP);
-    LM_TMP(("Freed kjsonP"));
     kjsonP = NULL;
   }
 #endif

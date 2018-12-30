@@ -292,7 +292,7 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
 //
 static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* nodeP, char* caName)
 {
-  LM_TMP(("Create metadata '%s' (a JSON %s) and add to attribute '%s'", nodeP->name, kjValueType(nodeP->type), caName));
+  LM_T(LmtMetadata, ("Create metadata '%s' (a JSON %s) and add to attribute '%s'", nodeP->name, kjValueType(nodeP->type), caName));
 
   KjNode*   typeNodeP       = NULL;
   KjNode*   valueNodeP      = NULL;
@@ -384,7 +384,7 @@ static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* node
     {
     case KjBoolean:    mdP->valueType = orion::ValueTypeBoolean; mdP->boolValue      = valueNodeP->value.b; break;
     case KjInt:        mdP->valueType = orion::ValueTypeNumber;  mdP->numberValue    = valueNodeP->value.i; break;
-    case KjFloat:      mdP->valueType = orion::ValueTypeNumber;  mdP->numberValue    = valueNodeP->value.f; LM_TMP(("Created Float MD with value %f", mdP->numberValue)); break;
+    case KjFloat:      mdP->valueType = orion::ValueTypeNumber;  mdP->numberValue    = valueNodeP->value.f; break;
     case KjString:     mdP->valueType = orion::ValueTypeString;  mdP->stringValue    = valueNodeP->value.s; break;
     case KjObject:     mdP->valueType = orion::ValueTypeObject;  mdP->compoundValueP = compoundCreate(ciP, valueNodeP, NULL); break;
     case KjArray:      mdP->valueType = orion::ValueTypeObject;  mdP->compoundValueP = compoundCreate(ciP, valueNodeP, NULL);  break;
@@ -679,10 +679,7 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
     }
 
     nodeP = nodeP->next;
-    LM_TMP(("Next Node: %p", nodeP));
   }
-
-  LM_TMP(("After loop"));
 
   //
   // Mandatory fields for Property:
@@ -744,7 +741,7 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
         ATTRIBUTE_ERROR("geo-property attribute value must be a JSON Object", kjValueType(valueP->type));
       else if (geoJsonCheck(ciP, valueP, &details) == false)
       {
-        LM_TMP(("geoJsonCheck error for %s: %s", caName, details));
+        LM_E(("geoJsonCheck error for %s: %s", caName, details));
         ATTRIBUTE_ERROR("geo-property attribute must have a valid GeoJson value", details);
       }
 
@@ -903,7 +900,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       // FIXME: Call orionldUriExpand() - this here is a "copy" of what orionldUriExpand does
       extern int uriExpansion(OrionldContext* contextP, const char* name, char** expandedNameP, char** expandedTypeP, char** detailsPP);
       int    expansions = uriExpansion(ciP->contextP, typeNodeP->value.s, &expandedName, &expandedType, &details);
-      LM_TMP(("URI Expansion for type '%s': '%s'", typeNodeP->value.s, expandedName));
+      LM_T(LmtUriExpansion, ("URI Expansion for type '%s': '%s'", typeNodeP->value.s, expandedName));
       LM_T(LmtUriExpansion, ("Got %d expansions", expansions));
 
       if (expansions == -1)
@@ -919,7 +916,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       else if (expansions == -2)
       {
         // No expansion found in Core Context, and in no other contexts either - use default URL
-        LM_TMP(("EXPANSION: use default URL for entity type '%s'", typeNodeP->value.s));
+        LM_T(LmtUriExpansion, ("EXPANSION: use default URL for entity type '%s'", typeNodeP->value.s));
         entityIdP->type = orionldDefaultUrl;
         entityIdP->type += typeNodeP->value.s;
       }
@@ -948,16 +945,14 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       ContextAttribute* caP            = new ContextAttribute();
       KjNode*           attrTypeNodeP  = NULL;
 
-      LM_TMP(("Calling attributeTreat"));
       if (attributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
       {
-        LM_TMP(("attributeTreat failed"));
+        LM_E(("attributeTreat failed"));
         ciP->httpStatusCode = SccBadRequest;  // FIXME: Should be set inside 'attributeTreat' - could be 500, not 400 ...
         delete caP;
         mongoRequest.release();
         return false;
       }
-      LM_TMP(("attributeTreat OK"));
 
 
       //
@@ -976,7 +971,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
         if (orionldUriExpand(ciP->contextP, kNodeP->name, longName, sizeof(longName), &details) == false)
         {
-          LM_TMP(("orionldUriExpand failed"));
+          LM_E(("orionldUriExpand failed"));
           delete caP;
           mongoRequest.release();
           orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, kNodeP->name, OrionldDetailsAttribute);
@@ -992,12 +987,10 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       //
       caP->type = attrTypeNodeP->value.s;
 
-      LM_TMP(("Adding attribute '%s' to contextAttributeVector", caP->name.c_str()));
       ceP->contextAttributeVector.push_back(caP);
     }
   }
 
-  LM_TMP(("Calling mongoUpdateContext"));
   ciP->httpStatusCode = mongoUpdateContext(&mongoRequest,
                                            &mongoResponse,
                                            ciP->httpHeaders.tenant,
@@ -1008,7 +1001,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
                                            ciP->httpHeaders.ngsiv2AttrsFormat,
                                            ciP->apiVersion,
                                            NGSIV2_NO_FLAVOUR);
-  LM_TMP(("mongoUpdateContext returned %d", ciP->httpStatusCode));
+
   mongoRequest.release();
   mongoResponse.release();
 
@@ -1023,7 +1016,6 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/entities/", idNodeP->value.s);
   httpHeaderLinkAdd(ciP, ciP->contextP, NULL);
 
-  LM_TMP(("Function Done"));
   return true;
 }
 
@@ -1037,7 +1029,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
         char*  expandedType  = NULL;
         int    expansions    = uriExpansion(ciP->contextP, kNodeP->name, &expandedName, &expandedType, &details);
 
-        LM_TMP(("EXPANSION: uriExpansion returned %d for '%s'", expansions, kNodeP->name));
+        LM_T(LmtUriExpansion, ("EXPANSION: uriExpansion returned %d for '%s'", expansions, kNodeP->name));
         if (expansions == -1)
         {
           delete caP;
@@ -1048,7 +1040,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
         else if (expansions == -2)
         {
           // No expansion found in Core Context, and in no other contexts either - use default URL
-          LM_TMP(("EXPANSION: use default URL for attribute '%s'", kNodeP->name));
+          LM_T(LmtUriExpansion, ("EXPANSION: use default URL for attribute '%s'", kNodeP->name));
           caP->name     = orionldDefaultUrl;
           caP->name    += kNodeP->name;
         }

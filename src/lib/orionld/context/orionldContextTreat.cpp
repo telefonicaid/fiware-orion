@@ -118,14 +118,13 @@ bool orionldContextTreat
   {
     char* details;
 
-    LM_TMP(("Calling orionldContextCreateFromUrl"));
     if ((ciP->contextP = orionldContextCreateFromUrl(ciP, contextNodeP->value.s, OrionldUserContext, &details)) == NULL)
     {
       LM_E(("Failed to create context from URL: %s", details));
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from URL", details, OrionldDetailsString);
       return false;
     }
-    LM_TMP(("orionldContextCreateFromUrl OK"));
+
     ciP->contextToBeFreed = false;  // context has been added to public list - must not be freed
   }
   else if (contextNodeP->type == KjArray)
@@ -222,14 +221,11 @@ bool orionldContextTreat
   //
   char* details;
 
-  LM_TMP(("orionldPostEntities calling orionldUserContextKeyValuesCheck"));
   if (orionldUserContextKeyValuesCheck(ciP->contextP->tree, ciP->contextP->url, &details) == false)
   {
-    LM_TMP(("orionldPostEntities called orionldUserContextKeyValuesCheck(%s): %s", ciP->contextP->url, details));
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", details, OrionldDetailsString);
     return false;
   }
-  LM_TMP(("orionldPostEntities called orionldUserContextKeyValuesCheck: %s", "OK"));
 #endif
 
   if (caPP == NULL)

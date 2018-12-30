@@ -28,6 +28,9 @@ extern "C"
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
 }
 
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
 #include "ngsi10/NotifyContextRequest.h"                       // NotifyContextRequest
 #include "mongoBackend/MongoGlobal.h"                          // mongoIdentifier
 
@@ -70,15 +73,15 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   kjChildAdd(rootP, nodeP);
 
   // Context
-  LM_TMP(("mimeType: %d", mimeType));
+  LM_T(LmtAccept, ("mimeType: %d", mimeType));
   if (mimeType == JSONLD)
   {
-    LM_TMP(("Adding @context to payload as mimeType == JSONLD"));
+    LM_T(LmtContext, ("Adding @context to payload as mimeType == JSONLD"));
     nodeP = kjString(orionldState.kjsonP, "@context", contextP->url);
     kjChildAdd(rootP, nodeP);
   }
   else
-    LM_TMP(("No @context in payload as mimeType == JSON"));
+    LM_T(LmtContext, ("No @context in payload as mimeType == JSON"));
 
   // notifiedAt
   time_t  now = time(NULL);  // FIXME - use an already existing timestamp?
@@ -103,7 +106,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   //
   // loop over ContextElements in NotifyContextRequest::contextElementResponseVector
   //
-  LM_TMP(("KZ: Adding %d contextElementResponses to the Notification kjTree", (int) ncrP->contextElementResponseVector.size()));
+  LM_T(LmtNotifications, ("Adding %d contextElementResponses to the Notification kjTree", (int) ncrP->contextElementResponseVector.size()));
   for (unsigned int ix = 0; ix < ncrP->contextElementResponseVector.size(); ix++)
   {
     ContextElement* ceP     = &ncrP->contextElementResponseVector[ix]->contextElement;
@@ -118,13 +121,12 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
     kjChildAdd(objectP, nodeP);
 
     // entity type - Mandatory URI
-    LM_TMP(("KZ: Calling orionldAliasLookup for '%s'", ceP->entityId.type.c_str()));
     alias = orionldAliasLookup(contextP, ceP->entityId.type.c_str());
     nodeP = kjString(orionldState.kjsonP, "type", alias);
     kjChildAdd(objectP, nodeP);
 
     // Attributes
-    LM_TMP(("KZ: Adding %d attributes to the Notification kjTree", (int) ceP->contextAttributeVector.size()));
+    LM_T(LmtNotifications, ("Adding %d attributes to the Notification kjTree", (int) ceP->contextAttributeVector.size()));
     for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); aIx++)
     {
       ContextAttribute*  aP       = ceP->contextAttributeVector[aIx];
@@ -133,7 +135,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
       if (SCOMPARE9(attrName, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
         continue;
 
-      LM_TMP(("KZ: Adding attribute '%s' to the Notification kjTree", ceP->contextAttributeVector[aIx]->name.c_str()));
+      LM_T(LmtNotifications, ("Adding attribute '%s' to the Notification kjTree", ceP->contextAttributeVector[aIx]->name.c_str()));
       nodeP = kjTreeFromContextAttribute(aP, contextP, renderFormat, detailsP);
       kjChildAdd(objectP, nodeP);
     }

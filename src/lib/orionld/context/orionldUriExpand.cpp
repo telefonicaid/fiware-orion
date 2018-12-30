@@ -203,6 +203,6 @@ bool orionldUriExpand(OrionldContext* contextP, char* shortName, char* longName,
     snprintf(longName, longNameLen, "%s", expandedName);
   }
 
-  LM_TMP(("KZ: expanded '%s' to '%s'", shortName, longName));
+  LM_T(LmtUriExpansion, ("KZ: expanded '%s' to '%s'", shortName, longName));
   return true;
 }

@@ -47,7 +47,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 
   ciP->responseTree = kjObject(NULL, NULL);
 
-  nodeP = kjString(orionldState.kjsonP, "branch", "task/104.orionld-patch-entity");
+  nodeP = kjString(orionldState.kjsonP, "branch", "hardening/105.orionld.no-more-lm_tmp");
   
   kjChildAdd(ciP->responseTree, nodeP);
 

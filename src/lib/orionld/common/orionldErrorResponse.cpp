@@ -113,5 +113,4 @@ void orionldErrorResponseCreate
   kjChildAdd(ciP->responseTree, typeP);
   kjChildAdd(ciP->responseTree, titleP);
   kjChildAdd(ciP->responseTree, detailsP);
-  LM_TMP(("From"));
 }

@@ -226,7 +226,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     //
     // FIXME: Need to do this with each q-item. Not only the first one
     //
-    LM_TMP(("KZ: q == '%s'", q));
+    LM_T(LmtStringFilter, ("KZ: q == '%s'", q));
 
     char* qP = q;
     while (*qP != 0)
@@ -251,14 +251,14 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
     if (*qP == '.')
     {
-      LM_TMP(("KZ: Found a DOT in the Q - changing to MQ: '%s'", qP));
+      LM_T(LmtStringFilter, ("KZ: Found a DOT in the Q - changing to MQ: '%s'", qP));
       filterType = SftMq;
     }
     else if (*qP == '[')
     {
       qP = q;
 
-      LM_TMP(("KZ: Found a [ in the Q: '%s'", qP));
+      LM_T(LmtStringFilter, ("KZ: Found a [ in the Q: '%s'", qP));
       //
       // Copy char by char, replacing '[' for '.' and ']' for nothing ...
       // ... until reaching the operator.
@@ -266,7 +266,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       //
       char* toP = q;
 
-      LM_TMP(("KZ: Compound Q: '%s'", q));
+      LM_T(LmtStringFilter, ("KZ: Compound Q: '%s'", q));
       while (*qP != 0)
       {
         char c = *qP;
@@ -274,7 +274,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
         if ((c == '=') || (c == '>') || (c == '<') || (c == '!') || (c == '~'))
         {
           // Just copy the rest of chars
-          LM_TMP(("KZ: Found operator - rest: %s", qP));
+          LM_T(LmtStringFilter, ("KZ: Found operator - rest: %s", qP));
           while (*qP != 0)
           {
             *toP = *qP;
@@ -282,7 +282,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
             ++qP;
           }
           *toP = 0;
-          LM_TMP(("KZ: Transformation Done: %s", toP));
+          LM_T(LmtStringFilter, ("KZ: Transformation Done: %s", toP));
           break;
         }
         else if (c == '[')  // Replace [ for .
@@ -305,7 +305,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
       // The resulting string is shorter than the original string - DON'T FORGET to terminate !!!
       *qP = 0;
-      LM_TMP(("KZ: Compound Q Transformed: '%s'", q));
+      LM_T(LmtStringFilter, ("KZ: Compound Q Transformed: '%s'", q));
     }
 
     Scope*        scopeP = new Scope((filterType == SftMq)? SCOPE_TYPE_SIMPLE_QUERY_MD : SCOPE_TYPE_SIMPLE_QUERY, q);
@@ -316,7 +316,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     else
       scopeP->stringFilterP = sfP;
 
-    LM_TMP(("KZ: Created %s StringFilter of q: '%s'", (filterType == SftMq)? "MQ" : "Q", q));
+    LM_T(LmtStringFilter, ("KZ: Created %s StringFilter of q: '%s'", (filterType == SftMq)? "MQ" : "Q", q));
 
     std::string details;
     if (sfP->parse(q, &details) == false)
@@ -333,15 +333,11 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   // Call standard op postQueryContext
   std::vector<std::string>  compV;    // Not used but part of signature for postQueryContext
 
-  LM_TMP(("Calling postQueryContext"));
   std::string answer   = postQueryContext(ciP, 0, compV, &parseData);
   int         entities = parseData.qcrs.res.contextElementResponseVector.size();
 
-  LM_TMP(("KZ: postQueryContext gave %d results", entities));
-
   if (attrs != NULL)  // FIXME: Move all this to a separate function
   {
-    LM_TMP(("'attrs' URI option was used, so we now need to query the '@context' from all these entities", entities));
     //
     // Unfortunately, we need to do a second query now, to get the attribute "@context" of all the matching entities
     //
@@ -412,7 +408,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   // Transform QueryContextResponse to KJ-Tree
   //
   ciP->httpStatusCode = SccOk;
-  LM_TMP(("Transform QueryContextResponse to KJ-Tree"));
   ciP->responseTree   = kjTreeFromQueryContextResponse(ciP, false, keyValues, &parseData.qcrs.res);
 
   return true;

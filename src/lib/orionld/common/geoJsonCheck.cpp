@@ -73,7 +73,7 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoJsonNodeP, char** detailsP)
 
   for (KjNode* itemP = geoJsonNodeP->children; itemP != NULL; itemP = itemP->next)
   {
-    LM_TMP(("Item '%s'", itemP->name));
+    LM_T(LmtGeoJson, ("Item '%s'", itemP->name));
 
     if (SCOMPARE5(itemP->name, 't', 'y', 'p', 'e', 0))
     {

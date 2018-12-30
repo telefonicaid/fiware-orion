@@ -42,7 +42,6 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
   OrionldResponseBuffer*  rBufP      = (OrionldResponseBuffer*) userP;
   int                     xtraBytes  = 512;
 
-  LM_TMP(("Here"));
   LM_T(LmtWriteCallback, ("Got a chunk of %d bytes: %s", realSize, (char*) contents));
 
   if (realSize + rBufP->used > rBufP->size)

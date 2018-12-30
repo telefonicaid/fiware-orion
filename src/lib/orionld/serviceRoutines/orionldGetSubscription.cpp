@@ -46,8 +46,7 @@ bool orionldGetSubscription(ConnectionInfo* ciP)
 
   bzero(&subscription, sizeof(subscription));
 
-  LM_T(LmtServiceRoutine, ("In orionldGetSubscription"));
-  LM_TMP(("In orionldGetSubscription: %s", ciP->wildcard[0]));
+  LM_T(LmtServiceRoutine, ("In orionldGetSubscription (%s)", ciP->wildcard[0]));
 
   if (mongoGetLdSubscription(&subscription, ciP->wildcard[0], ciP->tenant.c_str(), &ciP->httpStatusCode, &details) != true)
   {
@@ -55,7 +54,6 @@ bool orionldGetSubscription(ConnectionInfo* ciP)
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, ciP->wildcard[0], OrionldDetailsString);
     return false;
   }
-  LM_TMP(("mongoGetLdSubscription OK"));
 
   // Transform to KjNode tree
   ciP->httpStatusCode = SccOk;

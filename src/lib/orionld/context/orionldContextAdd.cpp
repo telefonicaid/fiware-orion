@@ -128,8 +128,6 @@ OrionldContext* orionldContextAdd
     return contextP;
   }
 
-  LM_TMP(("Adding a context '%s'", url));
-
   LM_T(LmtContext, ("Downloading and parsing context of URL '%s'", url));
   KjNode* tree = orionldContextDownloadAndParse(ciP->kjsonP, url, detailsPP);
 

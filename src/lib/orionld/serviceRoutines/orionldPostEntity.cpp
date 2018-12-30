@@ -128,7 +128,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
       {
         mongoRequest.release();
         ciP->httpStatusCode = SccBadRequest;  // FIXME: Should be set inside 'attributeTreat' - could be 500, not 400 ...
-        LM_TMP(("attributeTreat failed"));
+        LM_E(("attributeTreat failed"));
         delete caP;
         return false;
       }
@@ -166,7 +166,6 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     }
   }
 
-  LM_TMP(("Calling mongoUpdateContext"));
   ciP->httpStatusCode = mongoUpdateContext(&mongoRequest,
                                            &mongoResponse,
                                            ciP->httpHeaders.tenant,
@@ -177,7 +176,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
                                            ciP->httpHeaders.ngsiv2AttrsFormat,
                                            ciP->apiVersion,
                                            NGSIV2_NO_FLAVOUR);
-  LM_TMP(("mongoUpdateContext returned %d", ciP->httpStatusCode));
+
   mongoRequest.release();
   mongoResponse.release();
 

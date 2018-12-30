@@ -59,7 +59,6 @@ bool orionldGetContext(ConnectionInfo* ciP)
 
     request.entityIdVector.push_back(&entityId);
 
-    LM_TMP(("Calling mongoQueryContext"));
     ciP->httpStatusCode = mongoQueryContext(&request,
                                             &response,
                                             ciP->tenant,
@@ -68,7 +67,6 @@ bool orionldGetContext(ConnectionInfo* ciP)
                                             ciP->uriParamOptions,
                                             NULL,
                                             ciP->apiVersion);
-    LM_TMP(("Back from mongoQueryContext. httpStatusCode == %d", ciP->httpStatusCode));
     
     if (response.errorCode.code == SccBadRequest)
     {
@@ -77,26 +75,18 @@ bool orionldGetContext(ConnectionInfo* ciP)
     }
     else if (response.contextElementResponseVector.size() > 0)
     {
-      LM_TMP(("Looking up '@context' attribute"));
       ContextAttribute* contextAttributeP = response.contextElementResponseVector[0]->contextElement.contextAttributeVector.lookup("@context");
 
       if (contextAttributeP != NULL)
       {
         char* details;
 
-        LM_TMP(("Found '@context' attribute"));
-
         contextTree = kjTreeFromContextContextAttribute(ciP, contextAttributeP, &details);
-        if (contextTree != NULL)
-          LM_TMP(("Got a responseTree for the @context :-)"));
-        else
-          LM_TMP(("No responseTree for the @context :-("));
       }
     }
     
     if (contextTree == NULL)
     {
-      LM_TMP(("context '%s' not found", ciP->wildcard[0]));
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Context Not Found", ciP->wildcard[0], OrionldDetailsString);
       ciP->httpStatusCode = SccContextElementNotFound;
       return false;

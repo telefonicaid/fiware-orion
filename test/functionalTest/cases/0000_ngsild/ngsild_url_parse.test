@@ -40,7 +40,7 @@ brokerStart CB 212-249
 # 07. GET /ngsi-ld/ex/v1/contexts/C1
 #
 # 08. POST /ngsi-ld/v1/entities
-# 09. POST /ngsi-ld/v1/entities/E1/attrs
+# 09. POST /ngsi-ld/v1/entities/E9/attrs
 # 10. POST /ngsi-ld/v1/subscriptions
 # 11. POST /ngsi-ld/v1/csourceRegistrations
 #
@@ -108,7 +108,7 @@ echo
 echo "08. POST /ngsi-ld/v1/entities"
 echo "============================="
 payload='{
-  "id": "http://a.b.c/E7",
+  "id": "http://a.b.c/E8",
   "type": "A",
   "name": { "type": "Property", "value": "John" }
 }'
@@ -117,7 +117,7 @@ echo
 echo
 
 
-echo "09. POST /ngsi-ld/v1/entities/E1/attrs"
+echo "09. POST /ngsi-ld/v1/entities/E9/attrs"
 echo "======================================"
 payload='{
   "A1": {
@@ -125,7 +125,7 @@ payload='{
     "value": 1
   }
 }'
-orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/list/of/entities/E1.xxx/attrs --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/list/of/entities/E9.xxx/attrs --payload "$payload"
 echo
 echo
 
@@ -334,18 +334,23 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-Location: /ngsi-ld/v1/entities/http://a.b.c/E7
+Location: /ngsi-ld/v1/entities/http://a.b.c/E8
 Date: REGEX(.*)
 
 
 
-09. POST /ngsi-ld/v1/entities/E1/attrs
+09. POST /ngsi-ld/v1/entities/E9/attrs
 ======================================
-HTTP/1.1 204 No Content
-Content-Length: 0
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+HTTP/1.1 404 Not Found
+Content-Length: 141
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "details": "http://a.b.c/list/of/entities/E9.xxx",
+    "title": "Entity does not exist",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
 
 
 10. POST /ngsi-ld/v1/subscriptions
@@ -374,14 +379,14 @@ Date: REGEX(.*)
 
 12. PATCH /ngsi-ld/v1/entities/E1/attrs
 =======================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 172
+HTTP/1.1 404 Not Found
+Content-Length: 141
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "http://a.b.c/list/of/entities/E1.xxx",
-    "title": "not implemented - PATCH /ngsi-ld/v1/entities/*/attrs",
+    "title": "Entity does not exist",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

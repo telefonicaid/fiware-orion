@@ -117,7 +117,6 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
 
   if (answer != "")
   {
-    LM_TMP(("ciP->outMimeType == %d", ciP->outMimeType));
     if (ciP->outMimeType == JSON)
     {
       MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/json");

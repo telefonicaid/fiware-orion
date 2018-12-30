@@ -56,7 +56,7 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
   //
   if (contextP != NULL)
   {
-    LM_TMP(("Found context '%s' - no need for creation", url));
+    LM_T(LmtContextList, ("Found context '%s' - no need for creation", url));
     return contextP;
   }
 
@@ -65,7 +65,7 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
   // - First the context is allocated by calling orionldContextCreateFromTree (with tree set to NULL)
   // - Then the context is downloaded and parsed and the tree is created
   //
-  LM_TMP(("Did not find context '%s', creating it", url));
+  LM_T(LmtContextList, ("Did not find context '%s', creating it", url));
   contextP = orionldContextCreateFromTree(NULL, url, contextType, detailsPP);
 
   if (contextP == NULL)
@@ -76,9 +76,7 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
     return NULL;
   }
 
-  LM_TMP(("Calling orionldContextDownloadAndParse"));
   contextP->tree = orionldContextDownloadAndParse(ciP->kjsonP, url, detailsPP);
-  LM_TMP(("orionldContextDownloadAndParse returned tree at %p", contextP->tree));
   if (contextP->tree == NULL)
   {
     LM_E(("orionldContextDownloadAndParse: %s", *detailsPP));

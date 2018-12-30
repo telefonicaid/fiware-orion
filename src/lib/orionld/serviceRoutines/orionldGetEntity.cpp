@@ -64,7 +64,6 @@ bool orionldGetEntity(ConnectionInfo* ciP)
 
   request.entityIdVector.push_back(&entityId);
 
-  LM_TMP(("Calling mongoQueryContext"));
   //
   // FIXME: mongoQueryContext should respond with a KJson tree -
   //        next year perhaps, and when starting with new mongo driver
@@ -77,7 +76,6 @@ bool orionldGetEntity(ConnectionInfo* ciP)
                                           ciP->uriParamOptions,
                                           NULL,
                                           ciP->apiVersion);
-  LM_TMP(("Back from mongoQueryContext. httpStatusCode == %d", ciP->httpStatusCode));
 
   if (response.errorCode.code == SccBadRequest)
   {
@@ -89,8 +87,6 @@ bool orionldGetEntity(ConnectionInfo* ciP)
   // Create response by converting "QueryContextResponse response" into a KJson tree
   // But first, check for "404 Not Found"
   //
-  LM_TMP(("response.contextElementResponseVector.size: %d", response.contextElementResponseVector.size()));
-
   if (attrs != NULL)
   {
     char  longName[256];
