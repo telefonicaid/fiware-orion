@@ -39,6 +39,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"            // orionldErrorResponseCreate
 #include "orionld/common/linkCheck.h"                       // linkCheck
 #include "orionld/common/SCOMPARE.h"                        // SCOMPARE
+#include "orionld/common/OrionldConnection.h"               // orionldState
 #include "orionld/context/orionldContextCreateFromUrl.h"    // orionldContextCreateFromUrl
 #include "orionld/serviceRoutines/orionldBadVerb.h"         // orionldBadVerb
 #include "orionld/rest/orionldServiceInit.h"                // orionldRestServiceV
@@ -203,7 +204,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   char* details;
 
   LM_T(LmtMhd, ("Read all the payload - treating the request!"));
-
+  LM_TMP(("----------------------- Treating NGSI-LD request %03d: %s %s: %s --------------------------", requestNo, ciP->verbString, ciP->urlPath, ciP->payload));
+  
   // If no error predetected, lookup the service and call its service routine
   if (ciP->httpStatusCode == SccOk)
   {
@@ -348,18 +350,25 @@ respond:
     else
     {
       LM_E(("Error allocating buffer for response payload"));
+      //
+      // To have any response at all, use a pre-fabricated string:
+      //   ciP->responsePayload = ErrorPayloadForAllocationErrors;
+      //
+      // And in restReply() make sure that (ciP->responsePayload != ErrorPayloadForAllocationErrors)
+      // before calling 'free()'
+      //
     }
   }
 
   if (ciP->responsePayload != NULL)
   {
-    LM_T(LmtJsonResponse, ("Responding with %d: '%s'", ciP->httpStatusCode, ciP->responsePayload));
+    LM_TMP(("Responding to request %d with %d and payload: %s", orionldState.requestNo, ciP->httpStatusCode, ciP->responsePayload));
     restReply(ciP, ciP->responsePayload);
     // ciP->responsePayload freed and NULLed by restReply()
   }
   else
   {
-    LM_T(LmtJsonResponse, ("Responding without payload"));
+    LM_TMP(("Responding to request %d with %d and without payload", orionldState.requestNo, ciP->httpStatusCode));
     restReply(ciP, "");
   }
 

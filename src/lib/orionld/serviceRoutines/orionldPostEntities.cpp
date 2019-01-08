@@ -824,6 +824,8 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     return false;
 
   LM_T(LmtUriExpansion, ("type node at %p", typeNodeP));
+  LM_TMP(("ID: '%s'", idNodeP->value.s));
+
   UpdateContextRequest   mongoRequest;
   UpdateContextResponse  mongoResponse;
   ContextElement*        ceP       = new ContextElement();  // FIXME: Any way I can avoid to allocate ?

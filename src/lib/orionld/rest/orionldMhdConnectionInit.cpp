@@ -183,14 +183,13 @@ int orionldMhdConnectionInit
   void**           con_cls
 )
 {
-  static int reqNo = 0;
-
-  ++reqNo;
+  ++requestNo;
+  orionldState.requestNo = requestNo;
 
   //
   // This call to LM_TMP should not be removed. Only commented out
   //
-  LM_TMP(("------------------------- KZ: Servicing NGSI-LD request %03d: %s %s --------------------------", reqNo, method, url));
+  LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));
 
   //
   // 0. Prepare connectionInfo
@@ -215,7 +214,7 @@ int orionldMhdConnectionInit
   //
   // Creating kjson environment for KJson parse and render
   //
-  orionldState.kjsonP = kjBufferCreate();
+  orionldState.kjsonP = kjBufferCreate(NULL, NULL);
   if (orionldState.kjsonP == NULL)
     LM_X(1, ("Out of memory"));
 

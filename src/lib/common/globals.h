@@ -132,6 +132,7 @@
 #define OPT_UPSERT          "upsert"
 #ifdef ORIONLD
 #define OPT_SYS_ATTRS       "sysAttrs"
+#define OPT_NO_OVERWRITE    "noOverwrite"
 #endif
 
 

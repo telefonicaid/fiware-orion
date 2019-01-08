@@ -81,7 +81,19 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 
   mongoRequest.contextElementVector.push_back(ceP);
   entityIdP = &mongoRequest.contextElementVector[0]->entityId;
-  mongoRequest.updateActionType = ActionTypeAppendStrict;      // So that is fails if the entity doesn't exist
+
+  if (ciP->uriParamOptions["noOverwrite"] == true)
+  {
+    LM_T(LmtUriParams, ("options=noOverwrite is Set"));
+    LM_TMP(("options=noOverwrite is Set"));
+    mongoRequest.updateActionType = ActionTypeAppendStrict;
+  }
+  else
+  {
+    LM_T(LmtUriParams, ("options=noOverwrite is Not Set"));
+    LM_TMP(("options=noOverwrite is Not Set"));
+    mongoRequest.updateActionType = ActionTypeReplace;
+  }
 
   entityIdP->id = ciP->wildcard[0];
 

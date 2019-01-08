@@ -77,6 +77,7 @@ static void setNewSubscriptionId(Subscription* s, const BSONObj& r)
 */
 static void setDescription(Subscription* s, const BSONObj& r)
 {
+  LM_TMP(("s: %p", s));
   s->description = r.hasField(CSUB_DESCRIPTION) ? getStringFieldF(r, CSUB_DESCRIPTION) : "";
 }
 

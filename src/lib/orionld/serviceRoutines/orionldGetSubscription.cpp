@@ -44,7 +44,9 @@ bool orionldGetSubscription(ConnectionInfo* ciP)
   ngsiv2::Subscription  subscription;
   char*                 details;
 
-  bzero(&subscription, sizeof(subscription));
+  subscription.descriptionProvided = false;
+  subscription.expires             = -1;  // 0?
+  subscription.throttling          = -1;  // 0?
 
   LM_T(LmtServiceRoutine, ("In orionldGetSubscription (%s)", ciP->wildcard[0]));
 

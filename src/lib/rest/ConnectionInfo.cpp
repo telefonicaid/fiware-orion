@@ -56,6 +56,7 @@ static const char* validOptions[] =
   OPT_UPSERT
 #ifdef ORIONLD
   , OPT_SYS_ATTRS
+  , OPT_NO_OVERWRITE
 #endif
 };
 

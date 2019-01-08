@@ -32,6 +32,7 @@ extern "C"
 #include "ngsi/ContextAttribute.h"                             // ContextAttribute
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/rest/orionldServiceInit.h"                   // orionldHostNameLen
+#include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
 #include "orionld/context/orionldContextCreateFromUrl.h"       // orionldContextCreateFromUrl
 #include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
 #include "orionld/context/orionldContextAdd.h"                 // orionldContextAdd
@@ -114,6 +115,14 @@ bool orionldContextTreat
   ContextAttribute**  caPP
 )
 {
+#if 1  // TMP - perhaps it fixes the multiple copies of contexts ... ?
+  if ((ciP->contextP = orionldContextLookup(contextNodeP->name)) != NULL)
+  {
+    LM_TMP(("Context '%s' already exists", contextNodeP->name));
+    return true;
+  }
+#endif
+
   if (contextNodeP->type == KjString)
   {
     char* details;

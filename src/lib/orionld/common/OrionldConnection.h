@@ -50,6 +50,7 @@ typedef struct OrionldConnectionState
   Kjson*           kjsonP;
   OrionldContext*  contextP;
   ApiVersion       apiVersion;
+  int              requestNo;
 } OrionldConnection;
 
 
@@ -59,5 +60,13 @@ typedef struct OrionldConnectionState
 // orionldState - 
 //
 extern __thread OrionldConnectionState orionldState;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// Global state
+//
+extern int requestNo;  // Never mind protecting with semaphore. Just a debugging help
 
 #endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDCONNECTION_H_

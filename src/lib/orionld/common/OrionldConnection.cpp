@@ -31,3 +31,11 @@
 // orionldState - the state of the connection
 //
 __thread OrionldConnection orionldState = { 0 };
+
+
+
+// -----------------------------------------------------------------------------
+//
+// Global state
+//
+int requestNo = 0;  // Never mind protecting with semaphore. Just a debugging help
