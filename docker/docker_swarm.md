@@ -86,9 +86,7 @@ Details on how to deploy a MongoDB ReplicaSet in Docker Swarm are available
     services:
 
       mongo:
-        image: mongo:3.2
-        # the bind_ip option is required from MONGO Version 3.6, alternatively you can use --bind_ip_all
-        # However, note that Orion doesn't work yet with MongoDB 3.6. Have a look to issue https://github.com/telefonicaid/fiware-orion/issues/3070
+        image: mongo:3.6
         entrypoint: [ "/usr/bin/mongod", "--replSet", "rs", "--journal", "--smallfiles", "--bind_ip", "0.0.0.0"]
         volumes:
           - mongodata:/data/db
