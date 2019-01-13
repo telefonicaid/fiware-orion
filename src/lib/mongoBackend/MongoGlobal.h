@@ -427,7 +427,8 @@ extern mongo::BSONArray processConditionVector
   const std::string&                 fiwareCorrelator,
   const std::vector<std::string>&    attrsOrder,
   bool                               blacklist,
-  ApiVersion                         apiVersion
+  ApiVersion                         apiVersion,
+  const bool&                         skipInitialNotification
 );
 
 

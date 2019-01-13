@@ -46,6 +46,7 @@ HttpStatusCode mongoUpdateContextSubscription
   const std::string&                  tenant,
   const std::string&                  xauthToken,
   const std::vector<std::string>&     servicePathV,
+  const bool&                         skipInitialNotification,
   const std::string&                  fiwareCorrelator
 )
 {
@@ -54,7 +55,7 @@ HttpStatusCode mongoUpdateContextSubscription
 
   requestP->toNgsiv2Subscription(&sub);
 
-  std::string subId = mongoUpdateSubscription(sub, &oe, tenant, servicePathV, xauthToken, fiwareCorrelator, V1);
+  std::string subId = mongoUpdateSubscription(sub, &oe, tenant, servicePathV, xauthToken, fiwareCorrelator, V1, skipInitialNotification);
 
   if (subId != "")
   {

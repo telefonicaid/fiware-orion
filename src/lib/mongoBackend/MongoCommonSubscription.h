@@ -125,7 +125,8 @@ extern void setCondsAndInitialNotify
   const std::string&               fiwareCorrelator,
   mongo::BSONObjBuilder*           b,
   bool*                            notificationDone,
-  ApiVersion                       apiVersion
+  ApiVersion                       apiVersion,
+  const bool&                      skipInitialNotification
 );
 
 

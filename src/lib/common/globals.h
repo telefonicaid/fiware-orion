@@ -120,16 +120,17 @@
 *
 * Values for the URI param 'options'
 */
-#define OPT_COUNT           "count"
-#define OPT_APPEND          "append"
-#define OPT_NORMALIZED      "normalized"
-#define OPT_VALUES          "values"
-#define OPT_KEY_VALUES      "keyValues"
-#define OPT_UNIQUE_VALUES   "unique"
-#define OPT_DATE_CREATED    DATE_CREATED
-#define OPT_DATE_MODIFIED   DATE_MODIFIED
-#define OPT_NO_ATTR_DETAIL  "noAttrDetail"
-#define OPT_UPSERT          "upsert"
+#define OPT_COUNT                       "count"
+#define OPT_APPEND                      "append"
+#define OPT_NORMALIZED                  "normalized"
+#define OPT_VALUES                      "values"
+#define OPT_KEY_VALUES                  "keyValues"
+#define OPT_UNIQUE_VALUES               "unique"
+#define OPT_DATE_CREATED                DATE_CREATED
+#define OPT_DATE_MODIFIED               DATE_MODIFIED
+#define OPT_NO_ATTR_DETAIL              "noAttrDetail"
+#define OPT_UPSERT                      "upsert"
+#define OPT_SKIPINITALNOTIFICATION      "skipInitialNotification"
 
 
 

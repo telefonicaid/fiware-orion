@@ -28,6 +28,7 @@
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/limits.h"
+#include "common/globals.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/mongoSubscribeContext.h"
@@ -61,7 +62,7 @@ std::string postSubscribeContext
 {
   SubscribeContextResponse  scr;
   std::string               answer;
-
+  bool skipInitialNotification = ciP->uriParamOptions[OPT_SKIPINITALNOTIFICATION];
   //
   // FIXME P0: Only *one* service path is allowed for subscriptions.
   //           Personally (kz) I kind of like that. If you want additional service-paths, just add another subscription!
@@ -82,7 +83,7 @@ std::string postSubscribeContext
     return answer;
   }
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->httpHeaders.xauthToken, ciP->servicePathV, ciP->httpHeaders.correlator));
+  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->httpHeaders.xauthToken, ciP->servicePathV, skipInitialNotification, ciP->httpHeaders.correlator));
   TIMED_RENDER(answer = scr.toJsonV1());
 
   parseDataP->scr.res.release();

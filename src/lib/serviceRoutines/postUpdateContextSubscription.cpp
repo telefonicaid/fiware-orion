@@ -51,6 +51,7 @@ std::string postUpdateContextSubscription
 {
   UpdateContextSubscriptionResponse  ucsr;
   std::string                        answer;
+  bool skipInitialNotification = ciP->uriParamOptions[OPT_SKIPINITALNOTIFICATION];  
 
   ucsr.subscribeError.subscriptionId = parseDataP->ucsr.res.subscriptionId;
 
@@ -59,6 +60,7 @@ std::string postUpdateContextSubscription
                                                                    ciP->tenant,
                                                                    ciP->httpHeaders.xauthToken,
                                                                    ciP->servicePathV,
+                                                                   skipInitialNotification,
                                                                    ciP->httpHeaders.correlator));
 
   TIMED_RENDER(answer = ucsr.toJsonV1());
