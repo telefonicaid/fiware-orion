@@ -275,7 +275,7 @@ From lowest to highest:
 The NGSIv2 specification describes in section "Subscriptions" the rules that trigger notifications
 corresponding to a given subscription, based on updates to the entities covered by the subscription.
 Apart from that kind of regular notifications, Orion may send also an initial notification at
-subscription creation/update time. Check details in the document about [initial notifications](initial_notification.md)
+subscription creation/update time. Initial Notification can be configurable using URI parameter `skipInitialNotification`. Check details in the document about [initial notifications](initial_notification.md)
 
 [Top](#top)
 
