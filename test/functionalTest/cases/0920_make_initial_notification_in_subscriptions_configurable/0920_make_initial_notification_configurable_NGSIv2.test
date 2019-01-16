@@ -33,9 +33,9 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 #
 # 01. POST /v2/entities, to create Room1 with temperature and pressure.
 # 02. POST /v2/subscriptions, to create subscription with skipInitialNotification.
-# 03. Dump and reset accumulator, see notification.
+# 03. Dump and reset accumulator, see no notification.
 # 04. PATCH /v2/subscriptions/subscription_id, to update description.
-# 05. Dump and reset accumulator, see notification.
+# 05. Dump and reset accumulator, see no notification.
 #
 
 echo '01. POST /v2/entities, to create Room1 with temperature and pressure.'
@@ -89,8 +89,8 @@ echo
 echo
 
 
-echo '03. Dump and reset accumulator, see notification.'
-echo '================================================='
+echo '03. Dump and reset accumulator, see no notification.'
+echo '===================================================='
 accumulatorDump
 accumulatorReset
 echo
@@ -107,8 +107,8 @@ echo
 echo
 
 
-echo '05. Dump and reset accumulator, see notification.'
-echo '================================================='
+echo '05. Dump and reset accumulator, see no notification.'
+echo '===================================================='
 accumulatorDump
 accumulatorReset
 echo
@@ -136,8 +136,8 @@ Date: REGEX(.*)
 
 
 
-03. Dump and reset accumulator, see notification.
-=================================================
+03. Dump and reset accumulator, see no notification.
+====================================================
 
 
 04. PATCH /v2/subscriptions/subscription_id, to update description.
@@ -149,8 +149,8 @@ Date: REGEX(.*)
 
 
 
-05. Dump and reset accumulator, see notification.
-=================================================
+05. Dump and reset accumulator, see no notification.
+====================================================
 
 
 --TEARDOWN--
