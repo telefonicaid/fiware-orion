@@ -279,8 +279,8 @@ static void setCondsAndInitialNotifyNgsiv1
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   BSONObjBuilder*                  b,
-  bool*                            notificationDone,
-  const bool&                      skipInitialNotification
+  const bool&                      skipInitialNotification,
+  bool*                            notificationDone
 )
 {
   //
@@ -343,8 +343,8 @@ static void setCondsAndInitialNotifyNgsiv1
                                             fiwareCorrelator,
                                             sub.notification.attributes,
                                             sub.notification.blacklist,
-                                            V1,
-                                            skipInitialNotification);
+                                            skipInitialNotification,
+                                            V1);
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
@@ -365,8 +365,8 @@ static void setCondsAndInitialNotify
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   BSONObjBuilder*                  b,
-  bool*                            notificationDone,
-  const bool&                      skipInitialNotification
+  const bool&                      skipInitialNotification,
+  bool*                            notificationDone
 )
 {
   // notification can be changed to true by setCondsAndInitialNotify()
@@ -439,8 +439,8 @@ static void setCondsAndInitialNotify
                                      xauthToken,
                                      fiwareCorrelator,
                                      b,
-                                     notificationDone,
-                                     skipInitialNotification);
+                                     skipInitialNotification,
+                                     notificationDone);
     }
     else
     {
@@ -458,8 +458,8 @@ static void setCondsAndInitialNotify
                                fiwareCorrelator,
                                b,
                                notificationDone,
-                               V2,
-                               skipInitialNotification);
+                               skipInitialNotification,
+                               V2);
     }
   }
   else
@@ -833,8 +833,8 @@ std::string mongoUpdateSubscription
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
-  ApiVersion                       apiVersion,
-  const bool&                      skipInitialNotification
+  const bool&                      skipInitialNotification,
+  ApiVersion                       apiVersion
 
 )
 {
@@ -920,8 +920,8 @@ std::string mongoUpdateSubscription
                            xauthToken,
                            fiwareCorrelator,
                            &b,
-                           &notificationDone,
-                           skipInitialNotification);
+                           skipInitialNotification,
+                           &notificationDone);
 
   if (notificationDone)
   {

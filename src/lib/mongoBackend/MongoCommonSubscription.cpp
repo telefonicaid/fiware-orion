@@ -307,8 +307,8 @@ void setCondsAndInitialNotify
   const std::string&               fiwareCorrelator,
   BSONObjBuilder*                  b,
   bool*                            notificationDone,
-  ApiVersion                       apiVersion,
-  const bool&                      skipInitialNotification
+  const bool&                      skipInitialNotification,
+  ApiVersion                       apiVersion
 )
 {
   //
@@ -336,8 +336,8 @@ void setCondsAndInitialNotify
                                             fiwareCorrelator,
                                             notifAttributesV,
                                             blacklist,
-                                            apiVersion,
-                                            skipInitialNotification);
+                                            skipInitialNotification,
+                                            apiVersion);
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));

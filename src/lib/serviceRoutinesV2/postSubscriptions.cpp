@@ -83,8 +83,8 @@ extern std::string postSubscriptions
                           ciP->servicePathV,
                           ciP->httpHeaders.xauthToken,
                           ciP->httpHeaders.correlator,
-                          ciP->apiVersion,
-                          skipInitialNotification));
+                          skipInitialNotification,
+                          ciP->apiVersion));
 
   // Check potential error
   if (beError.code != SccNone)

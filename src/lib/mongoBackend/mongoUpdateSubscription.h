@@ -50,8 +50,8 @@ extern std::string mongoUpdateSubscription
   const std::vector<std::string>&      servicePathV,
   const std::string&                   xauthToken,
   const std::string&                   fiwareCorrelator,
-  ApiVersion                           apiVersion,
-  const bool&                          skipInitialNotification
+  const bool&                          skipInitialNotification,
+  ApiVersion                           apiVersion
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOUPDATESUBSCRIPTION_H_

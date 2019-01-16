@@ -2478,8 +2478,8 @@ static BSONArray processConditionVector
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
   bool                             blacklist,
-  ApiVersion                       apiVersion,
-  const bool&                      skipInitialNotification
+  const bool&                      skipInitialNotification,
+  ApiVersion                       apiVersion
 )
 {
   BSONArrayBuilder conds;
@@ -2553,8 +2553,8 @@ BSONArray processConditionVector
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
   bool                             blacklist,
-  ApiVersion                       apiVersion,
-  const bool&                      skipInitialNotification
+  const bool&                      skipInitialNotification,
+  ApiVersion                       apiVersion
 )
 {
   NotifyConditionVector ncV;
@@ -2581,8 +2581,8 @@ BSONArray processConditionVector
                                          fiwareCorrelator,
                                          attrsOrder,
                                          blacklist,
-                                         apiVersion,
-                                         skipInitialNotification);
+                                         skipInitialNotification,
+                                         apiVersion);
 
   enV.release();
   ncV.release();

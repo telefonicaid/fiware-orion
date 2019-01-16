@@ -138,8 +138,8 @@ std::string mongoCreateSubscription
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
-  ApiVersion                       apiVersion,
-  const bool&                      skipInitialNotification
+  const bool&                      skipInitialNotification,
+  ApiVersion                       apiVersion
 )
 {
   bool reqSemTaken = false;
@@ -186,8 +186,8 @@ std::string mongoCreateSubscription
                            fiwareCorrelator,
                            &b,
                            &notificationDone,
-                           apiVersion,
-                           skipInitialNotification);
+                           skipInitialNotification,
+                           apiVersion);
 
   if (notificationDone)
   {
