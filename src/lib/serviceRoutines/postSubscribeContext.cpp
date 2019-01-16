@@ -28,7 +28,6 @@
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/limits.h"
-#include "common/globals.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/mongoSubscribeContext.h"
