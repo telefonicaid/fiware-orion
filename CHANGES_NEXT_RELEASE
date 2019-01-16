@@ -1,1 +1,1 @@
-- Add: Make initial notification in ONCHANGE notifications configurable (#920)
+- Add: skipInitialNotification URI param to make initial notification in subscriptions configurable (#920)
