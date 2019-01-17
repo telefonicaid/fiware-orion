@@ -307,6 +307,7 @@ void setCondsAndInitialNotify
   const std::string&               fiwareCorrelator,
   BSONObjBuilder*                  b,
   bool*                            notificationDone,
+  const bool&                      skipInitialNotification,
   ApiVersion                       apiVersion
 )
 {
@@ -335,6 +336,7 @@ void setCondsAndInitialNotify
                                             fiwareCorrelator,
                                             notifAttributesV,
                                             blacklist,
+                                            skipInitialNotification,
                                             apiVersion);
 
   b->append(CSUB_CONDITIONS, conds);

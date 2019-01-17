@@ -279,6 +279,7 @@ static void setCondsAndInitialNotifyNgsiv1
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   BSONObjBuilder*                  b,
+  const bool&                      skipInitialNotification,
   bool*                            notificationDone
 )
 {
@@ -342,6 +343,7 @@ static void setCondsAndInitialNotifyNgsiv1
                                             fiwareCorrelator,
                                             sub.notification.attributes,
                                             sub.notification.blacklist,
+                                            skipInitialNotification,
                                             V1);
 
   b->append(CSUB_CONDITIONS, conds);
@@ -363,6 +365,7 @@ static void setCondsAndInitialNotify
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   BSONObjBuilder*                  b,
+  const bool&                      skipInitialNotification,
   bool*                            notificationDone
 )
 {
@@ -436,6 +439,7 @@ static void setCondsAndInitialNotify
                                      xauthToken,
                                      fiwareCorrelator,
                                      b,
+                                     skipInitialNotification,
                                      notificationDone);
     }
     else
@@ -454,6 +458,7 @@ static void setCondsAndInitialNotify
                                fiwareCorrelator,
                                b,
                                notificationDone,
+                               skipInitialNotification,
                                V2);
     }
   }
@@ -828,7 +833,9 @@ std::string mongoUpdateSubscription
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
+  const bool&                      skipInitialNotification,
   ApiVersion                       apiVersion
+
 )
 {
   bool reqSemTaken = false;
@@ -913,6 +920,7 @@ std::string mongoUpdateSubscription
                            xauthToken,
                            fiwareCorrelator,
                            &b,
+                           skipInitialNotification,
                            &notificationDone);
 
   if (notificationDone)

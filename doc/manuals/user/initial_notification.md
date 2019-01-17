@@ -121,12 +121,19 @@ initial notification is required.
 Between both options, We have opted to implement the more flexible approach, which provide 
 the initial notification to users who can exploit is and can be ignore for who doesn't need it.
 
+## Avoid initial notification
+
+For ignoring the initial notification, a URI parameter option `skipInitialNotification` can be used. Using this URI 
+option, initial notification is always skipped at subscription creation/updation time. In particular:
+
+* `POST /v2/subscriptions?options=skipInitialNotification`
+* `PATCH /v2/subscriptions/<subId>?options=skipInitialNotification`
+
 ## Additional considerations
 
 Note that initial notification is not always sent. It is sent only in the case some entity 
-matches the subscription criteria at subscription creation/update time. But if the matching
-occurs, it is not possible at the present moment to avoid it. Such possibility has been 
-proposed and it is [part of the present backlog](https://github.com/telefonicaid/fiware-orion/issues/920).
+matches the subscription criteria at subscription creation/update time. If the matching occurs, 
+it is possible to avoid it by using URI option (check [above section](#avoid-initial-notification)).
 
 Initial notification uses the same entities limit that synchronous queries. That is, as much 
 as 20 entities are included in the initial notification, no matter how much entities got covered 

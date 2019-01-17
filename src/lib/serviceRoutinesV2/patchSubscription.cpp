@@ -47,7 +47,7 @@
 * Payload Out: None
 *
 * URI parameters:
-*   -
+*   - skipInitialNotification
 */
 std::string patchSubscription
 (
@@ -58,7 +58,7 @@ std::string patchSubscription
 )
 {
   std::string  subscriptionId = compV[2];
-
+  bool skipInitialNotification = ciP->uriParamOptions[OPT_SKIPINITALNOTIFICATION];
   // 'Fill In' SusbcriptionUpdate
   parseDataP->subsV2.id = subscriptionId;
 
@@ -75,6 +75,7 @@ std::string patchSubscription
                                       ciP->servicePathV,
                                       ciP->httpHeaders.xauthToken,
                                       ciP->httpHeaders.correlator,
+                                      skipInitialNotification,
                                       ciP->apiVersion));
 
   std::string  answer = "";
