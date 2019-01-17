@@ -133,7 +133,7 @@ option, initial notification is always skipped at subscription creation/updation
 
 Note that initial notification is not always sent. It is sent only in the case some entity 
 matches the subscription criteria at subscription creation/update time. If the matching occurs, 
-it is possible to avoid it by using URI option (check [above section](#avoid-initial-notification))
+it is possible to avoid it by using URI option (check [above section](#avoid-initial-notification)).
 
 Initial notification uses the same entities limit that synchronous queries. That is, as much 
 as 20 entities are included in the initial notification, no matter how much entities got covered 
