@@ -121,9 +121,13 @@ initial notification is required.
 Between both options, We have opted to implement the more flexible approach, which provide 
 the initial notification to users who can exploit is and can be ignore for who doesn't need it.
 
-For ignoring the initial notification, a URI parameter `options=skipInitialNotification can` be 
-used. Using this URI parameter, initial notification can be skipped at Subscription 
-creation/updation time. 
+## Avoid initial notification
+
+For ignoring the initial notification, a URI parameter option `skipInitialNotification` can be used. Using this URI 
+option, initial notification is always skipped at subscription creation/updation time. In particular:
+
+* `POST /v2/subscriptions?options=skipInitialNotification`
+* `PATCH /v2/subscriptions/<subId>?options=skipInitialNotification`
 
 ## Additional considerations
 
