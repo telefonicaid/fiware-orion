@@ -103,7 +103,7 @@ do                                                                              
 #define EMPTY_ARRAY_CHECK(kNodeP, what)                                                                                  \
 do                                                                                                                       \
 {                                                                                                                        \
-  if (kNodeP->children == NULL)                                                                                          \
+  if (kNodeP->value.firstChildP == NULL)                                                                                 \
   {                                                                                                                      \
     ciP->httpStatusCode = SccBadRequest;                                                                                 \
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Empty Array", what, OrionldDetailsString);                   \

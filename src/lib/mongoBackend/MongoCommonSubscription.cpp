@@ -143,8 +143,7 @@ void setHttpInfo(const Subscription& sub, BSONObjBuilder* b)
   b->append(CSUB_CUSTOM,    sub.notification.httpInfo.custom);
 
 #ifdef ORIONLD
-  // FIXME: Store mimeType as a string in mongo (application/json)
-  b->append("mimeType", sub.notification.httpInfo.mimeType);
+  b->append("mimeType", mimeTypeToLongString(sub.notification.httpInfo.mimeType));
   LM_T(LmtMongo, ("Subscription mimeType: %d", sub.notification.httpInfo.mimeType));
 #endif
 
@@ -504,6 +503,18 @@ void setName(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP)
     bobP->append(CSUB_NAME, sub.name);
     LM_T(LmtMongo, ("Subscription name: %s", sub.name.c_str()));
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* setMimeType -
+*/
+void setMimeType(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP)
+{
+  bobP->append(CSUB_MIMETYPE, sub.notification.httpInfo.mimeType);
+  LM_T(LmtMongo, ("Subscription mimeType: %s", mimeTypeToLongString(sub.notification.httpInfo.mimeType)));
 }
 
 #endif

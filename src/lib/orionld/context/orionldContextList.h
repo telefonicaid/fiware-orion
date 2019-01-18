@@ -36,4 +36,28 @@
 extern OrionldContext* orionldContextHead;
 extern OrionldContext* orionldContextTail;
 
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldContextListInit -
+//
+extern int orionldContextListInit(char** detailsP);
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldContextListSemTake -
+//
+extern void orionldContextListSemTake(const char* who);
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldContextListSemGive -
+//
+extern void orionldContextListSemGive(const char* who);
+
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTLIST_H_

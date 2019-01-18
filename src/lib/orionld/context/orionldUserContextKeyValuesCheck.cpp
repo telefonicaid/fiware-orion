@@ -69,7 +69,7 @@ static bool orionldUserContextKeyValuesCheck2(KjNode* tree, char* url, char** de
     return false;
   }
 
-  for (KjNode* childP = tree->children; childP != NULL; childP = childP->next)
+  for (KjNode* childP = tree->value.firstChildP; childP != NULL; childP = childP->next)
   {
     if (SCOMPARE7(childP->name, '@', 'v', 'o', 'c', 'a', 'b', 0))
     {
@@ -93,7 +93,7 @@ static bool orionldUserContextKeyValuesCheck2(KjNode* tree, char* url, char** de
     {
       KjNode* atidP = NULL;
 
-      for (KjNode* itemP = childP->children; itemP != NULL; itemP = itemP->next)
+      for (KjNode* itemP = childP->value.firstChildP; itemP != NULL; itemP = itemP->next)
       {
         if (itemP->type != KjString)
         {
@@ -187,7 +187,7 @@ bool orionldUserContextKeyValuesCheck(KjNode* contextTreeP, char* url, char** de
     return NULL;
   }
 
-  if (contextTreeP->children == NULL)
+  if (contextTreeP->value.firstChildP == NULL)
   {
     LM_E(("contextTreeP '%s' is of type '%s' (next at %p)",
           url, kjValueType(contextTreeP->type), contextTreeP->name, contextTreeP->next));
@@ -204,14 +204,14 @@ bool orionldUserContextKeyValuesCheck(KjNode* contextTreeP, char* url, char** de
   if (contextTreeP->type == KjObject)
   {
     // Case 1-3
-    if ((contextTreeP->children->next == NULL) &&
-        SCOMPARE9(contextTreeP->children->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
+    if ((contextTreeP->value.firstChildP->next == NULL) &&
+        SCOMPARE9(contextTreeP->value.firstChildP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
     {
-      KjNode* contextNodeP = contextTreeP->children;
+      KjNode* contextNodeP = contextTreeP->value.firstChildP;
 
-      if (contextTreeP->children->type == KjObject)
+      if (contextTreeP->value.firstChildP->type == KjObject)
       {
-        return orionldUserContextKeyValuesCheck2(contextTreeP->children, url, detailsPP);
+        return orionldUserContextKeyValuesCheck2(contextTreeP->value.firstChildP, url, detailsPP);
       }
       else if (contextNodeP->type == KjString)
       {
@@ -259,7 +259,7 @@ bool orionldUserContextKeyValuesCheck(KjNode* contextTreeP, char* url, char** de
   }
   else if (contextTreeP->type == KjArray)
   {
-    for (KjNode* itemP = contextTreeP->children; itemP != NULL; itemP = itemP->next)
+    for (KjNode* itemP = contextTreeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
     {
       if (orionldUserContextKeyValuesCheck(itemP, itemP->name, detailsPP) == false)
         return false;

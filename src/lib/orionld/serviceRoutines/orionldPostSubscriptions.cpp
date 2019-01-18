@@ -64,7 +64,7 @@ static bool ktreeToEntities(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngs
 {
   KjNode* entityP;
 
-  for (entityP = kNodeP->children; entityP != NULL; entityP = entityP->next)
+  for (entityP = kNodeP->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
     if (entityP->type != KjObject)
     {
@@ -77,7 +77,7 @@ static bool ktreeToEntities(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngs
     char*    idPatternP = NULL;
     char*    typeP      = NULL;
 
-    for (itemP = entityP->children; itemP != NULL; itemP = itemP->next)
+    for (itemP = entityP->value.firstChildP; itemP != NULL; itemP = itemP->next)
     {
       if (SCOMPARE3(itemP->name, 'i', 'd', 0))
       {
@@ -164,7 +164,7 @@ static bool ktreeToStringList(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<s
 {
   KjNode* attributeP;
 
-  for (attributeP = kNodeP->children; attributeP != NULL; attributeP = attributeP->next)
+  for (attributeP = kNodeP->value.firstChildP; attributeP != NULL; attributeP = attributeP->next)
   {
     char  expanded[256];
     char* details;
@@ -198,7 +198,7 @@ static bool ktreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, S
   char*    georelP            = NULL;
   char*    geoPropertyP       = NULL;
 
-  for (itemP = kNodeP->children; itemP != NULL; itemP = itemP->next)
+  for (itemP = kNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
     if (SCOMPARE9(itemP->name, 'g', 'e', 'o', 'm', 'e', 't', 'r', 'y', 0))
     {
@@ -302,7 +302,7 @@ static bool ktreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInf
   // Set default values
   httpInfoP->mimeType = JSON;
   
-  for (KjNode* itemP = kNodeP->children; itemP != NULL; itemP = itemP->next)
+  for (KjNode* itemP = kNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
     if (SCOMPARE4(itemP->name, 'u', 'r', 'i', 0))
     {
@@ -322,7 +322,7 @@ static bool ktreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInf
       DUPLICATE_CHECK(acceptP, "Endpoint::accept", itemP->value.s);
       STRING_CHECK(itemP, "Endpoint::accept");
       char* mimeType = itemP->value.s;
-
+      LM_TMP(("Accept: %s", mimeType));
       if (!SCOMPARE12(mimeType, 'a', 'p', 'p', 'l', 'i', 'c', 'a', 't', 'i', 'o', 'n', '/'))
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Endpoint::accept value", mimeType, OrionldDetailsString);
@@ -401,7 +401,7 @@ static bool ktreeToNotification(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::Sub
   subP->attrsFormat = NGSI_LD_V1_NORMALIZED; 
 
   // Extract the info from the kjTree
-  for (itemP = kNodeP->children; itemP != NULL; itemP = itemP->next)
+  for (itemP = kNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
     if (SCOMPARE11(itemP->name, 'a', 't', 't', 'r', 'i', 'b', 'u', 't', 'e', 's', 0))
     {
@@ -511,7 +511,7 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
   // 1. First lookup the tree nodes of 'id' and '@context'
   // 2. Then create a context attribute for the context - FIXME: combine code with POST Entities
   //
-  for (kNodeP = ciP->requestTree->children; kNodeP != NULL; kNodeP = kNodeP->next)
+  for (kNodeP = ciP->requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     if (SCOMPARE9(kNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
     {
@@ -579,7 +579,7 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
   //
   // Now loop over the tree
   //
-  for (kNodeP = ciP->requestTree->children; kNodeP != NULL; kNodeP = kNodeP->next)
+  for (kNodeP = ciP->requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     if (SCOMPARE3(kNodeP->name, 'i', 'd', 0))
     {

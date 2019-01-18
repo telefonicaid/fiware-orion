@@ -501,6 +501,11 @@ function brokerStart()
   traceLevels=$2
   ipVersion=$3
 
+  if [ "$ORION_FT_DONT_START_BROKER" == "on" ]
+  then
+    return
+  fi
+
   shift
   shift
   shift

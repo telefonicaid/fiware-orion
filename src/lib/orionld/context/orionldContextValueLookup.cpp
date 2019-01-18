@@ -69,7 +69,7 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value, b
   {
     LM_T(LmtContextValueLookup, ("The context is of type Array"));
 
-    for (KjNode* contextNodeP = contextP->tree->children; contextNodeP != NULL; contextNodeP = contextNodeP->next)
+    for (KjNode* contextNodeP = contextP->tree->value.firstChildP; contextNodeP != NULL; contextNodeP = contextNodeP->next)
     {
       if (contextNodeP->type != KjString)
       {
@@ -112,42 +112,42 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value, b
                                  kjValueType(contextP->tree->type),
                                  contextP->url));
 
-    if (contextP->tree->children == NULL)
+    if (contextP->tree->value.firstChildP == NULL)
     {
       LM_E(("ERROR: Context tree is a JSON object, but, it has no children!"));
       return NULL;
     }
 
-    if (contextP->tree->children->next != NULL)
+    if (contextP->tree->value.firstChildP->next != NULL)
     {
       LM_E(("ERROR: Context tree is a JSON object, but, it has more than one child! (%s)", contextP->url));
       return NULL;
     }
 
-    if (strcmp(contextP->tree->children->name, "@context") != 0)
+    if (strcmp(contextP->tree->value.firstChildP->name, "@context") != 0)
     {
       LM_E(("Context tree is a JSON object, and it has exactly one child, but its name must be '@context', not '%s'",
-            contextP->tree->children->name));
+            contextP->tree->value.firstChildP->name));
       return NULL;
     }
   }
   else
   {
     LM_E(("The '@context' is a %s - must be either Object, String or Array",
-          kjValueType(contextP->tree->children->type)));
+          kjValueType(contextP->tree->value.firstChildP->type)));
     return NULL;
   }
 
   //
   // If we reach this point, the context is a JSON Object
   //
-  KjNode*  atContextP    = contextP->tree->children;
+  KjNode*  atContextP    = contextP->tree->value.firstChildP;
 
   LM_T(LmtContextValueLookup, ("@atcontext is of type '%s'", kjValueType(atContextP->type)));
 
   if (atContextP->type == KjObject)
   {
-    for (KjNode* contextItemP = atContextP->children; contextItemP != NULL; contextItemP = contextItemP->next)
+    for (KjNode* contextItemP = atContextP->value.firstChildP; contextItemP != NULL; contextItemP = contextItemP->next)
     {
       if ((contextItemP->type != KjString) && (contextItemP->type !=  KjObject))
       {
@@ -170,7 +170,7 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value, b
       {
         // Lookup item "@id" inside contextItemP that is a JSON object
         KjNode* idNodeP;
-        for (idNodeP = contextItemP->children; idNodeP != NULL; idNodeP = idNodeP->next)
+        for (idNodeP = contextItemP->value.firstChildP; idNodeP != NULL; idNodeP = idNodeP->next)
         {
           if (SCOMPARE4(idNodeP->name, '@', 'i', 'd', 0))
           {
@@ -203,7 +203,7 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value, b
   }
   else if (atContextP->type == KjArray)
   {
-    for (KjNode* contextP = atContextP->children; contextP != NULL; contextP = contextP->next)
+    for (KjNode* contextP = atContextP->value.firstChildP; contextP != NULL; contextP = contextP->next)
     {
       if (contextP->type != KjString)
       {
@@ -258,7 +258,7 @@ KjNode* orionldContextValueLookup(KjNode* contextVector, const char* value, bool
     return NULL;
   }
 
-  KjNode* contextNodeP = contextVector->children;
+  KjNode* contextNodeP = contextVector->value.firstChildP;
   KjNode* itemP;
 
   while (contextNodeP != NULL)

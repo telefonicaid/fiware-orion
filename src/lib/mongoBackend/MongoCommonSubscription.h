@@ -216,6 +216,14 @@ extern std::string setSubscriptionId(const ngsiv2::Subscription& sub, mongo::BSO
 */
 extern void setName(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP);
 
+
+
+/* ****************************************************************************
+*
+* setMimeType -
+*/
+extern void setMimeType(ngsiv2::Subscription* subP, mongo::BSONObjBuilder* bobP);
+
 #endif
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOCOMMONSUBSCRIPTION_H_

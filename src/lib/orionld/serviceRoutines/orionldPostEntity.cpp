@@ -66,7 +66,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   OBJECT_CHECK(ciP->requestTree, kjValueType(ciP->requestTree->type));
 
   // Is the payload an empty object?
-  if (ciP->requestTree->children == NULL)
+  if (ciP->requestTree->value.firstChildP == NULL)
   {
     ciP->httpStatusCode = SccBadRequest;
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Payload is an empty JSON object", NULL, OrionldDetailsString);
@@ -82,18 +82,14 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   mongoRequest.contextElementVector.push_back(ceP);
   entityIdP = &mongoRequest.contextElementVector[0]->entityId;
 
+  mongoRequest.updateActionType = ActionTypeAppendStrict;
+
+#if 0
   if (ciP->uriParamOptions["noOverwrite"] == true)
   {
-    LM_T(LmtUriParams, ("options=noOverwrite is Set"));
-    LM_TMP(("options=noOverwrite is Set"));
-    mongoRequest.updateActionType = ActionTypeAppendStrict;
+    // noOverwrite will be used in the future
   }
-  else
-  {
-    LM_T(LmtUriParams, ("options=noOverwrite is Not Set"));
-    LM_TMP(("options=noOverwrite is Not Set"));
-    mongoRequest.updateActionType = ActionTypeReplace;
-  }
+#endif
 
   entityIdP->id = ciP->wildcard[0];
 
@@ -104,7 +100,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   //
   KjNode* contextNodeP = NULL;
   
-  for (KjNode* kNodeP = ciP->requestTree->children; kNodeP != NULL; kNodeP = kNodeP->next)
+  for (KjNode* kNodeP = ciP->requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     if (SCOMPARE9(kNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
     {
@@ -112,7 +108,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
       contextNodeP = kNodeP;
 
       // FIXME: Lookup context - it probably already exists (from the creation of the entity)
-      
+
       if (orionldContextTreat(ciP, contextNodeP, (char*) entityIdP->id.c_str(), &caP) == false)
       {
         // Error payload set by orionldContextTreat
@@ -126,7 +122,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   }
 
   // 3. Iterate over the object, to get all attributes
-  for (KjNode* kNodeP = ciP->requestTree->children; kNodeP != NULL; kNodeP = kNodeP->next)
+  for (KjNode* kNodeP = ciP->requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     KjNode* attrTypeNodeP = NULL;
 

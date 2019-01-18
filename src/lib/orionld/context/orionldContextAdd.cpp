@@ -33,6 +33,7 @@ extern "C"
 }
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponse
 #include "orionld/common/urlParse.h"                           // urlParse
@@ -129,7 +130,8 @@ OrionldContext* orionldContextAdd
   }
 
   LM_T(LmtContext, ("Downloading and parsing context of URL '%s'", url));
-  KjNode* tree = orionldContextDownloadAndParse(ciP->kjsonP, url, detailsPP);
+  LM_TMP(("Downloading and parsing context '%s' (using global kjsonP - as the context needs to survive between requests)", url));
+  KjNode* tree = orionldContextDownloadAndParse(kjsonP, url, detailsPP);
 
   if (tree == NULL)
   {
@@ -157,7 +159,7 @@ OrionldContext* orionldContextAdd
   LM_T(LmtContext, ("the JSON type of the tree is Object - OK"));
 
   // 2. Does it have one single member?
-  if (tree->children == NULL)
+  if (tree->value.firstChildP == NULL)
   {
     *detailsPP = (char*) "Invalid payload for a context - the payload is empty";
     kjFree(tree);
@@ -165,17 +167,17 @@ OrionldContext* orionldContextAdd
   }
   LM_T(LmtContext, ("The tree has at least one child - OK"));
 
-  if (tree->children->next != NULL)
+  if (tree->value.firstChildP->next != NULL)
   {
     *detailsPP = (char*) "Invalid payload for a context - only one member allowed for context payloads";
     kjFree(tree);
     return NULL;
   }
   LM_T(LmtContext, ("The tree has exactly one child - OK"));
-  LM_T(LmtContext, ("Only member is '%s' and of type %s", tree->children->name, kjValueType(tree->children->type)));
+  LM_T(LmtContext, ("Only member is '%s' and of type %s", tree->value.firstChildP->name, kjValueType(tree->value.firstChildP->type)));
 
   // 3. Is the single member called '@context' ?
-  if (!SCOMPARE9(tree->children->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
+  if (!SCOMPARE9(tree->value.firstChildP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
   {
     *detailsPP = (char*) "Invalid payload for a context - the member '@context' not present";
     kjFree(tree);
@@ -183,7 +185,7 @@ OrionldContext* orionldContextAdd
   }
 
   // 4. Is it a JSON Object or Array?
-  if ((tree->children->type != KjObject) && (tree->children->type != KjArray))
+  if ((tree->value.firstChildP->type != KjObject) && (tree->value.firstChildP->type != KjArray))
   {
     *detailsPP = (char*) "Invalid JSON type for the @context member - must be a JSON Object or a JSON Array";
     kjFree(tree);
@@ -223,7 +225,7 @@ OrionldContext* orionldContextAdd
   //
   // All items in the vector must be strings, containing syntactically correct URLs
   //
-  for (KjNode* contextItemP = contextP->tree->children; contextItemP != NULL; contextItemP = contextItemP->next)
+  for (KjNode* contextItemP = contextP->tree->value.firstChildP; contextItemP != NULL; contextItemP = contextItemP->next)
   {
     LM_T(LmtContext, ("URL in context array: %s", contextItemP->value.s));
     if (contextItemP->type != KjString)
@@ -258,7 +260,7 @@ OrionldContext* orionldContextAdd
   }
 
   // Now go over the vector
-  for (KjNode* contextItemP = contextP->tree->children; contextItemP != NULL; contextItemP = contextItemP->next)
+  for (KjNode* contextItemP = contextP->tree->value.firstChildP; contextItemP != NULL; contextItemP = contextItemP->next)
   {
     char* url = contextItemP->value.s;
 
@@ -268,7 +270,7 @@ OrionldContext* orionldContextAdd
     if (orionldContextLookup(url) != NULL)
       continue;
 
-    tree = orionldContextDownloadAndParse(ciP->kjsonP, url, detailsPP);
+    tree = orionldContextDownloadAndParse(orionldState.kjsonP, url, detailsPP);
     if (tree == NULL)
     {
       LM_T(LmtContext, ("orionldContextDownloadAndParse failed: %s", *detailsPP));
@@ -279,6 +281,7 @@ OrionldContext* orionldContextAdd
       return NULL;
     }
 
+    // FIXME: tree = kjClone(tree); ?
     if (orionldContextAppend(url, tree, contextType, detailsPP) == NULL)
     {
       LM_T(LmtContext, (*detailsPP));

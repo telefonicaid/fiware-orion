@@ -44,14 +44,17 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
 
   LM_T(LmtWriteCallback, ("Got a chunk of %d bytes: %s", realSize, (char*) contents));
 
+  // LM_TMP(("In writeCallback: Got a chunk of %d bytes", realSize));
   if (realSize + rBufP->used > rBufP->size)
   {
     if (rBufP->buf == rBufP->internalBuffer)
     {
+      // LM_TMP(("In writeCallback: need to allocate (size: %d)", rBufP->size + realSize + xtraBytes));
       rBufP->buf = (char*) malloc(rBufP->size + realSize + xtraBytes);
     }
     else
     {
+      // LM_TMP(("In writeCallback: need to reallocate (new size: %d)", rBufP->size + realSize + xtraBytes));
       rBufP->buf = (char*) realloc(rBufP->buf, rBufP->size + realSize + xtraBytes);
     }
 
@@ -62,6 +65,7 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
     }
   }
 
+  // LM_TMP(("In writeCallback: copying to position %d in rBufP->buf (%d bytes copied)", rBufP->used, realSize));
   memcpy(&rBufP->buf[rBufP->used], contents, realSize);
   rBufP->used += realSize;
   rBufP->size += realSize + xtraBytes;
@@ -143,8 +147,10 @@ bool orionldRequestSend
 #endif
 
   LM_T(LmtRequestSend, ("Calling curl_easy_perform for GET %s", url));
+  // LM_TMP(("Calling curl_easy_perform for GET %s", url));
   cCode = curl_easy_perform(cc.curl);
   LM_T(LmtRequestSend, ("curl_easy_perform returned %d", cCode));
+  // LM_TMP(("curl_easy_perform returned %d", cCode));
   if (cCode != CURLE_OK)
   {
     *detailsPP = (char*) url;
@@ -165,6 +171,7 @@ bool orionldRequestSend
 
   // The downloaded buffer is in rBufP->buf
   LM_T(LmtRequestSend, ("Got response: %s", rBufP->buf));
+  // LM_TMP(("Got response: %s", rBufP->buf));
 
   release_curl_context(&cc);
 

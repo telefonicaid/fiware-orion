@@ -115,18 +115,15 @@ bool orionldContextTreat
   ContextAttribute**  caPP
 )
 {
-#if 1  // TMP - perhaps it fixes the multiple copies of contexts ... ?
-  if ((ciP->contextP = orionldContextLookup(contextNodeP->name)) != NULL)
-  {
-    LM_TMP(("Context '%s' already exists", contextNodeP->name));
-    return true;
-  }
-#endif
+  LM_TMP(("In orionldContextTreat. contextNodeP->type == %d", contextNodeP->type));
 
   if (contextNodeP->type == KjString)
   {
     char* details;
 
+    LM_TMP(("The context is a STRING: '%s'", contextNodeP->value.s));
+
+    LM_TMP(("Calling orionldContextCreateFromUrl for context '%s'", contextNodeP->value.s));
     if ((ciP->contextP = orionldContextCreateFromUrl(ciP, contextNodeP->value.s, OrionldUserContext, &details)) == NULL)
     {
       LM_E(("Failed to create context from URL: %s", details));
@@ -140,6 +137,7 @@ bool orionldContextTreat
   {
     char* details;
 
+    LM_TMP(("The context is an ARRAY"));
     //
     // REMEMBER
     //   This context is just the array of context-strings: [ "url1", "url2" ]
@@ -184,7 +182,7 @@ bool orionldContextTreat
     //
     ciP->contextToBeFreed = true;
 
-    for (KjNode* contextStringNodeP = contextNodeP->children; contextStringNodeP != NULL; contextStringNodeP = contextStringNodeP->next)
+    for (KjNode* contextStringNodeP = contextNodeP->value.firstChildP; contextStringNodeP != NULL; contextStringNodeP = contextStringNodeP->next)
     {
       if (contextStringNodeP->type != KjString)
       {
@@ -204,6 +202,8 @@ bool orionldContextTreat
   }
   else if (contextNodeP->type == KjObject)
   {
+    LM_TMP(("The context is an OBJECT"));
+
     // FIXME: seems like an inline context - not supported for now
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", "inline contexts not supported in current version of orionld", OrionldDetailsString);
     LM_E(("inline contexts not supported in current version of orionld"));
@@ -256,7 +256,7 @@ bool orionldContextTreat
     int                       siblingNo = 0;
 
     // Loop over the kNode vector and create the strings
-    for (KjNode* contextItemNodeP = contextNodeP->children; contextItemNodeP != NULL; contextItemNodeP = contextItemNodeP->next)
+    for (KjNode* contextItemNodeP = contextNodeP->value.firstChildP; contextItemNodeP != NULL; contextItemNodeP = contextItemNodeP->next)
     {
       LM_T(LmtContextTreat, ("string: %s", contextItemNodeP->value.s));
       orion::CompoundValueNode* stringNode = new orion::CompoundValueNode(compoundP, "", "", contextItemNodeP->value.s, siblingNo++, orion::ValueTypeString);

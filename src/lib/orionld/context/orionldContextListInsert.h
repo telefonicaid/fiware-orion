@@ -36,8 +36,16 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// orionldContextListInit
+//
+extern int orionldContextListInit(char** detailsP);
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldContextListInsert -
 //
-extern void orionldContextListInsert(OrionldContext* contextP);
+extern void orionldContextListInsert(OrionldContext* contextP, bool semAlreadyTaken);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTLISTINSERT_H_

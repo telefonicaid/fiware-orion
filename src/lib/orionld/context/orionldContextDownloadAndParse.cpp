@@ -40,6 +40,23 @@ extern "C"
 
 
 
+void contextArrayPresent(KjNode* tree, const char* what)
+{
+  if ((tree->type == KjObject) && (tree->value.firstChildP->type == KjArray))
+  {
+    int childNo = 0;
+
+    LM_T(LmtContext, ("Got a @context array (%s):", what));
+    for (KjNode* kP = tree->value.firstChildP->value.firstChildP; kP != NULL; kP = kP->next)
+    {
+      LM_T(LmtContext, ("  Child %d: %s (at %p)", childNo, kP->value.s, kP));
+      ++childNo;
+    }
+  }
+}
+
+
+static __thread OrionldResponseBuffer  httpResponse;
 // -----------------------------------------------------------------------------
 //
 // orionldContextDownloadAndParse -
@@ -51,15 +68,11 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
   //
   // Prepare the httpResponse buffer
   //
-  // A faster way would be to use a thread local buffer and allocate only if that buffer is not big enough.
-  // This to avoid calling malloc for smaller 
-  //
-  OrionldResponseBuffer  httpResponse;
-  bool                   ok = false;
+  bool ok = false;
 
   for (int tries = 0; tries < 5; tries++)
   {
-    httpResponse.buf       = httpResponse.internalBuffer;
+    httpResponse.buf       = httpResponse.internalBuffer;  // Contexts to be saved will need to be cloned
     httpResponse.size      = sizeof(httpResponse.internalBuffer);
     httpResponse.used      = 0;
     httpResponse.allocated = true;
@@ -97,14 +110,15 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
   }
 
   // Now parse the payload
+  LM_T(LmtContext, ("Got @context: %s", httpResponse.buf));
   LM_T(LmtContext, ("Got @context - parsing it"));
   KjNode* tree = kjParse(kjsonP, httpResponse.buf);
   LM_T(LmtContext, ("Got @context - parsed it"));
 
-  // Now we can free the httpResponse buffer
-  if (httpResponse.buf != httpResponse.internalBuffer)
-    free(httpResponse.buf);
-  httpResponse.buf = NULL;
+  // <DEBUG>
+  extern void contextArrayPresent(KjNode* tree, const char* what);
+  contextArrayPresent(tree, "Just after parsing");
+  // </DEBUG>
 
   if (tree == NULL)
   {
@@ -113,8 +127,14 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
     return NULL;
   }
 
+  // <DEBUG>
+  extern void contextArrayPresent(KjNode* tree, const char* what);
+  contextArrayPresent(tree, "Just after freeing httpResponse");
+  // </DEBUG>
+  
   if ((tree->type != KjArray) && (tree->type != KjString) && (tree->type != KjObject))
   {
+    LM_T(LmtContext, ("Freeing tree as wrong json type"));
     kjFree(tree);
     *detailsPP = (char*) "Invalid JSON type of response";
     LM_E((*detailsPP));
@@ -147,13 +167,14 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
   
   if (tree->type != KjObject)
   {
+    LM_T(LmtContext, ("tree->type != KjObject : freeing context tree"));
     kjFree(tree);
     *detailsPP = (char*) "Not a JSON Object - invalid @context";
     LM_E((*detailsPP));
     return NULL;
   }
 
-  KjNode* contextNodeP = tree->children;
+  KjNode* contextNodeP = tree->value.firstChildP;
   LM_T(LmtContext, ("contextNodeP is named '%s'", contextNodeP->name));
 
   if (contextNodeP == NULL)
@@ -172,7 +193,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
     return NULL;
   }
 
-  if (contextNodeP->children == NULL)
+  if (contextNodeP->value.firstChildP == NULL)
   {
     kjFree(tree);
     *detailsPP = (char*) "Invalid context - '@context' is empty";
@@ -193,15 +214,30 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
   {
     LM_T(LmtContext,  ("Not an object ('@context' in '%s' is of type '%s') - we are done here (no collision check necessary)",
                        url, kjValueType(contextNodeP->type)));
+
+    // <DEBUG>
+    if ((tree->type == KjObject) && (tree->value.firstChildP->type == KjArray))
+    {
+      int childNo = 0;
+
+      LM_T(LmtContext, ("Just before returning the tree: got a @context array:"));
+      for (KjNode* kP = tree->value.firstChildP->value.firstChildP; kP != NULL; kP = kP->next)
+      {
+        LM_T(LmtContext, ("  Child %d: %s", childNo, kP->value.s));
+        ++childNo;
+      }
+    }
+    // </DEBUG>
+
     return tree;
   }
 
   LM_T(LmtContext, ("Starting collision loop"));
-  for (KjNode* kNodeP = contextNodeP->children; kNodeP != NULL; kNodeP = kNodeP->next)
+  for (KjNode* kNodeP = contextNodeP->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     LM_T(LmtContext, ("Checking for collisions for context '%s'", kNodeP->name));
 
-    for (KjNode* coreNodeP = orionldCoreContext.tree->children; coreNodeP != NULL; coreNodeP = coreNodeP->next)
+    for (KjNode* coreNodeP = orionldCoreContext.tree->value.firstChildP; coreNodeP != NULL; coreNodeP = coreNodeP->next)
     {
       // LM_T(LmtContext, ("Comparing '%s' to '%s'", kNodeP->name, coreNodeP->name));
       if (strcmp(kNodeP->name, coreNodeP->name) == 0)

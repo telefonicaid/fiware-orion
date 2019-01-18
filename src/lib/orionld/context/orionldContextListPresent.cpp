@@ -22,18 +22,18 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                  // LM_*
-#include "logMsg/traceLevels.h"                             // Lmt*
-
 extern "C"
 {
-#include "kjson/KjNode.h"                                   // KjNode
+#include "kjson/KjNode.h"                                      // KjNode, kjValueType
 }
 
-#include "orionld/context/OrionldContext.h"                 // OrionldContext
-#include "orionld/context/orionldContextList.h"             // orionldContextHead
-#include "orionld/context/orionldContextPresent.h"          // orionldContextPresent
-#include "orionld/context/orionldContextListPresent.h"      // Own interface
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
+#include "orionld/context/OrionldContext.h"                    // OrionldContext
+#include "orionld/context/orionldContextList.h"                // orionldContextHead
+#include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
+#include "orionld/context/orionldContextListPresent.h"         // Own interface
 
 
 
@@ -41,7 +41,7 @@ extern "C"
 //
 // orionldContextListPresent -
 //
-void orionldContextListPresent(ConnectionInfo* ciP)
+void orionldContextListPresent(void)
 {
   int contexts = 0;
 
@@ -53,13 +53,34 @@ void orionldContextListPresent(ConnectionInfo* ciP)
   LM_TMP(("---------------- %d Contexts in Cache ------------------------", contexts));
 
   for (OrionldContext* ctxP = orionldContextHead; ctxP != NULL; ctxP = ctxP->next)
-    LM_TMP(("o %p: tree:%p, next:%p, url:%s", ctxP, ctxP->tree, ctxP->next, ctxP->url));
+  {
+    if ((ctxP->tree != NULL) && (ctxP->tree->value.firstChildP != NULL))
+    {
+      LM_TMP(("o Context at:     %p", ctxP));
+      LM_TMP(("o tree at:        %p", ctxP->tree));
+      LM_TMP(("o next at:        %p", ctxP->next));
+      LM_TMP(("o url:            %s", ctxP->url));
+      LM_TMP(("o firstChildP at: %p", ctxP->tree->value.firstChildP));
+      LM_TMP(("o type:           %s", kjValueType(ctxP->tree->value.firstChildP->type)));
+    }
+    else
+    {
+      LM_TMP(("o Context at:     %p", ctxP));
+      LM_TMP(("o tree at:        %p", ctxP->tree));
+      LM_TMP(("o next at:        %p", ctxP->next));
+      LM_TMP(("o url:            %s", ctxP->url));
+      LM_TMP(("o firstChildP     NULL"));
+    }
+    LM_TMP(("--------------------------"));
+  }
 
+#if 0
   for (OrionldContext* contextP = orionldContextHead; contextP != NULL; contextP = contextP->next)
   {
     LM_TMP(("=================== %s ======================", contextP->url));
-    orionldContextPresent(ciP, contextP);
+    orionldContextPresent(contextP);
     LM_TMP(("==============================================================="));
     LM_TMP((""));
   }
+#endif
 }

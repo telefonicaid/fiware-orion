@@ -24,6 +24,9 @@
 */
 extern "C"
 {
+#include "kbase/version.h"                                     // kbaseVersion
+#include "kalloc/version.h"                                    // kallocVersion
+#include "kjson/version.h"                                     // kjsonVersion
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
 }
@@ -45,10 +48,16 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 {
   KjNode* nodeP;
 
-  ciP->responseTree = kjObject(NULL, NULL);
+  ciP->responseTree = kjObject(orionldState.kjsonP, NULL);
 
-  nodeP = kjString(orionldState.kjsonP, "branch", "hardening/105.orionld.no-more-lm_tmp");
-  
+  nodeP = kjString(orionldState.kjsonP, "branch", "task/106.orionld-improved-kjson-lib-and-more-stuff");
+  kjChildAdd(ciP->responseTree, nodeP);
+
+  nodeP = kjString(orionldState.kjsonP, "kbase version", kbaseVersion);
+  kjChildAdd(ciP->responseTree, nodeP);
+  nodeP = kjString(orionldState.kjsonP, "kalloc version", kallocVersion);
+  kjChildAdd(ciP->responseTree, nodeP);
+  nodeP = kjString(orionldState.kjsonP, "kjson version", kjsonVersion);
   kjChildAdd(ciP->responseTree, nodeP);
 
   // This request is ALWAYS returned with pretty-print
@@ -56,6 +65,6 @@ bool orionldGetVersion(ConnectionInfo* ciP)
   orionldState.kjsonP->nlString          = (char*) "\n";
   orionldState.kjsonP->stringBeforeColon = (char*) "";
   orionldState.kjsonP->stringAfterColon  = (char*) " ";
-    
+
   return true;
 }

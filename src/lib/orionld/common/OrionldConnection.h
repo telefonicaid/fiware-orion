@@ -47,7 +47,10 @@ extern "C"
 //
 typedef struct OrionldConnectionState
 {
+  Kjson            kjson;
   Kjson*           kjsonP;
+  KAlloc           kalloc;
+  char             kallocBuffer[8 * 1024];
   OrionldContext*  contextP;
   ApiVersion       apiVersion;
   int              requestNo;
@@ -67,6 +70,10 @@ extern __thread OrionldConnectionState orionldState;
 //
 // Global state
 //
-extern int requestNo;  // Never mind protecting with semaphore. Just a debugging help
+extern int     requestNo;  // Never mind protecting with semaphore. Just a debugging help
+extern char    kallocBuffer[32 * 1024];
+extern KAlloc  kalloc;
+extern Kjson   kjson;
+extern Kjson*  kjsonP;
 
 #endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDCONNECTION_H_

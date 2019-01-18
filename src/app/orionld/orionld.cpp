@@ -70,6 +70,11 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "cache/subCache.h"
 
+extern "C"
+{
+#include "kalloc/kaBufferReset.h"                           // kaBufferReset
+}
+
 #include "parseArgs/parseArgs.h"
 #include "parseArgs/paConfig.h"
 #include "parseArgs/paBuiltin.h"
@@ -103,7 +108,7 @@
 #include "logSummary/logSummary.h"
 
 #include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
-#include "orionld/context/orionldContextFreeAll.h"          // orionldContextFreeAll
+#include "orionld/common/OrionldConnection.h"               // kjFree - FIXME: call instead orionldGlobalFree();
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
@@ -538,8 +543,8 @@ void exitFunc(void)
   curl_context_cleanup();
   curl_global_cleanup();
 
-  LM_T(LmtFree, ("Calling orionldContextFreeAll"));
-  orionldContextFreeAll();
+  LM_T(LmtFree, ("Calling kaBufferReset"));
+  kaBufferReset(&kalloc, false);
   
   if (unlink(pidPath) != 0)
   {

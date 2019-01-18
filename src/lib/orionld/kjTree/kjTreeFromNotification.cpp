@@ -54,7 +54,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
 {
   KjNode*          nodeP;
   char             buf[32];
-  KjNode*          rootP      = kjObject(NULL, NULL);
+  KjNode*          rootP      = kjObject(orionldState.kjsonP, NULL);
   char*            id         = mongoIdentifier(buf);
   char             idBuffer[] = "urn:ngsi-ld:Notification:012345678901234567890123";  // The 012345678901234567890123 will be overwritten
   OrionldContext*  contextP   = orionldContextLookup(context);

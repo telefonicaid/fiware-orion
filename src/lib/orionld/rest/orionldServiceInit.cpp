@@ -29,15 +29,19 @@
 
 extern "C"
 {
+#include "kalloc/kaBufferInit.h"                               // kaBufferInit
 #include "kjson/kjInit.h"                                      // kjInit
 #include "kjson/kjBufferCreate.h"                              // kjBufferCreate
 #include "kjson/kjParse.h"                                     // kjParse
+#include "kjson/kjClone.h"                                     // kjClone
 }
 
+#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/OrionldConnection.h"                  // Global vars: kjson, kalloc, kallocBuffer, ...
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/context/orionldContextDownloadAndParse.h"    // orionldContextDownloadAndParse
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext, ORIONLD_CORE_CONTEXT_URL
-#include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
+#include "orionld/context/orionldContextListInsert.h"          // orionldContextListInit, orionldContextListInsert
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
 #include "orionld/rest/temporaryErrorPayloads.h"               // Temporary Error Payloads
 #include "orionld/rest/orionldMhdConnection.h"                 // Own Interface
@@ -78,12 +82,14 @@ static void libLogFunction
 {
   va_list  args;
 
-  /* "Parse" the varible arguments */
+  /* "Parse" the variable arguments */
   va_start(args, format);
-  
+
   /* Print message to variable */
   vsnprintf(libLogBuffer, sizeof(libLogBuffer), format, args);
   va_end(args);
+
+  // LM_TMP(("Got a message, severity: %d", severity));
 
   if (severity == 1)
     lmOut(libLogBuffer, 'E', fileName, lineNo, functionName, 0, NULL);
@@ -132,7 +138,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
         wildCardStart = &serviceP->url[ix + 1];
       else if (serviceP->wildcards == 1)
         wildCardEnd = &serviceP->url[ix];
-        
+
       LM_T(LmtUrlParse, ("Found a wildcard in index %d of '%s'", ix, serviceP->url));
       serviceP->wildcards += 1;
       continue;
@@ -180,7 +186,9 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 //
 void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int vecItems, bool defContextFromFile)
 {
-  int svIx;  // Service Vector Index
+  int    svIx;    // Service Vector Index
+  char*  details;
+  int    retries;
 
   bzero(orionldRestServiceV, sizeof(orionldRestServiceV));
 
@@ -193,7 +201,7 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
       continue;
 
     int services = restServiceVV[svIx].services;
-    
+
     orionldRestServiceV[svIx].serviceV  = (OrionLdRestService*) calloc(sizeof(OrionLdRestService), services);
     orionldRestServiceV[svIx].services  = services;
 
@@ -206,21 +214,29 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
     }
   }
 
+  //
+  // Initialize the KSON library
+  //
   kjInit(libLogFunction);
+
+  // Set up the global kjson instance with preallocated kalloc buffer
+  kaBufferInit(&kalloc, kallocBuffer, sizeof(kallocBuffer), 2 * 1024, NULL, "Global KAlloc buffer");
+  kjsonP = kjBufferCreate(&kjson, &kalloc);
+
+
+  //
+  // Initialize the global Context List
+  //
+  if (orionldContextListInit(&details) != 0)
+    LM_X(1, ("Internal Error (orionldContextListInit failed: %s)", details));
+
 
   //
   // Now download the default context
   // FIXME: Save the default context in mongo?
   //
-  char*  details  = (char*) "OK";
-  Kjson* kjsonP   = kjBufferCreate();
-  int    retries  = 0;
-
-  if (kjsonP == NULL)
-  {
-    // Out-of-memory ... Already???
-    LM_X(1, ("EXITING - Out-of-memory at startup :("));
-  }
+  details  = (char*) "OK";
+  retries  = 0;
 
   orionldCoreContext.url           = ORIONLD_CORE_CONTEXT_URL;
   orionldCoreContext.next          = NULL;
@@ -239,22 +255,19 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   orionldDefaultContext.tree       = NULL;
   orionldDefaultContext.type       = OrionldDefaultContext;
   orionldDefaultContext.ignore     = true;
-  
+
   if (defContextFromFile == true)
   {
     char* buf;
 
     buf = strdup(orionldCoreContextString);
     orionldCoreContext.tree = kjParse(kjsonP, buf);
-    free(buf);
 
     buf = strdup(orionldDefaultUrlContextString);
     orionldDefaultUrlContext.tree = kjParse(kjsonP, buf);
-    free(buf);
 
     buf = strdup(orionldDefaultContextString);
     orionldDefaultContext.tree = kjParse(kjsonP, buf);
-    free(buf);
   }
   else
   {
@@ -295,63 +308,44 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   }
 
   if ((orionldCoreContext.tree == NULL) || (orionldDefaultUrlContext.tree == NULL) || (orionldDefaultContext.tree == NULL))
-  {
-    // Without default context, orionld cannot function
     LM_X(1, ("EXITING - Without default context, orionld cannot function - error downloading default context '%s': %s", ORIONLD_CORE_CONTEXT_URL, details));
-  }
 
   // Adding the core context to the list of contexts
-  orionldContextListInsert(&orionldCoreContext);
+  orionldContextListInsert(&orionldCoreContext, false);
 
   // Adding the Default URL context to the list of contexts
-  orionldContextListInsert(&orionldDefaultUrlContext);
+  orionldContextListInsert(&orionldDefaultUrlContext, false);
 
   //
   // Checking the "Default URL Context" and extracting the Default URL path.
   //
-  KjNode* contextNodeP = orionldDefaultUrlContext.tree->children;
+  KjNode* contextNodeP = orionldDefaultUrlContext.tree->value.firstChildP;
 
   if (contextNodeP == NULL)
-  {
     LM_X(1, ("Invalid Default URL Context - Empty JSON object"));
-  }
 
   if (strcmp(contextNodeP->name, "@context") != 0)
-  {
     LM_X(1, ("Invalid Default URL Context - first (and only) member must be called '@context'"));
-  }
 
   if (contextNodeP->type != KjObject)
-  {
     LM_X(1, ("Invalid Default URL Context - not a JSON object"));
-  }
 
   if (contextNodeP->next != NULL)
-  {
     LM_X(1, ("Invalid Default URL Context - '@context' must be the only member of the toplevel object"));
-  }
 
-  KjNode* vocabNodeP = contextNodeP->children;
+  KjNode* vocabNodeP = contextNodeP->value.firstChildP;
 
   if (strcmp(vocabNodeP->name, "@vocab") != 0)
-  {
     LM_X(1, ("Invalid Default URL Context - first (and only) member of '@context' must be called '@vocab'"));
-  }
 
   if (vocabNodeP->type != KjString)
-  {
     LM_X(1, ("Invalid Default URL Context - the member '@vocab' must be of 'String' type"));
-  }
 
   orionldDefaultUrl    = strdup(vocabNodeP->value.s);
   orionldDefaultUrlLen = strlen(orionldDefaultUrl);
 
   if (urlCheck(orionldDefaultUrl, &details) == false)
-  {
     LM_X(1, ("Invalid Default URL Context - the value (%s) of the only member '@vocab' must be a valid URL: %s", orionldDefaultUrl, details));
-  }
-
-  free(kjsonP);
 
   // Finally, get the hostname
   gethostname(orionldHostName, sizeof(orionldHostName));

@@ -122,7 +122,7 @@ static bool payloadCheck
 {
   OBJECT_CHECK(ciP->requestTree, "toplevel");
 
-  KjNode*  kNodeP                 = ciP->requestTree->children;
+  KjNode*  kNodeP                 = ciP->requestTree->value.firstChildP;
   KjNode*  idNodeP                = NULL;
   KjNode*  typeNodeP              = NULL;
   KjNode*  contextNodeP           = NULL;
@@ -262,7 +262,7 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
     ++level;
     cNodeP->valueType = orion::ValueTypeObject;
 
-    for (KjNode* kChildP = kNodeP->children; kChildP != NULL; kChildP = kChildP->next)
+    for (KjNode* kChildP = kNodeP->value.firstChildP; kChildP != NULL; kChildP = kChildP->next)
     {
       orion::CompoundValueNode* cChildP = compoundCreate(ciP, kChildP, kNodeP, level);
       cNodeP->childV.push_back(cChildP);
@@ -273,7 +273,7 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
     ++level;
     cNodeP->valueType = orion::ValueTypeVector;
 
-    for (KjNode* kChildP = kNodeP->children; kChildP != NULL; kChildP = kChildP->next)
+    for (KjNode* kChildP = kNodeP->value.firstChildP; kChildP != NULL; kChildP = kChildP->next)
     {
       orion::CompoundValueNode* cChildP = compoundCreate(ciP, kChildP, kNodeP, level);
 
@@ -302,7 +302,7 @@ static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* node
 
   if (nodeP->type == KjObject)
   {
-    for (KjNode* kNodeP = nodeP->children; kNodeP != NULL; kNodeP = kNodeP->next)
+    for (KjNode* kNodeP = nodeP->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
     {
       if (SCOMPARE5(kNodeP->name, 't', 'y', 'p', 'e', 0))
       {
@@ -442,7 +442,7 @@ bool specialCompoundCheck(ConnectionInfo* ciP, KjNode* compoundValueP)
   KjNode*  valueNodeP = NULL;
   KjNode*  otherNodeP = NULL;
 
-  for (KjNode* nodeP = compoundValueP->children; nodeP != NULL; nodeP = nodeP->next)
+  for (KjNode* nodeP = compoundValueP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
     if (nodeP->name[0] == '@')
     {
@@ -549,7 +549,7 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
   bool    isGeoProperty      = false;
   bool    isTemporalProperty = false;
   bool    isRelationship     = false;
-  KjNode* nodeP              = kNodeP->children;
+  KjNode* nodeP              = kNodeP->value.firstChildP;
 
   while (nodeP != NULL)
   {
@@ -618,7 +618,6 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
       // The string is changed for a Number before stored in the database
       //
       int64_t dateTime;
-      char*   stringValueToFree = nodeP->value.s;
 
       // Check for valid ISO8601
       if ((dateTime = parse8601Time(nodeP->value.s)) == -1)
@@ -630,9 +629,6 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
       // Change to Number
       nodeP->type    = KjInt;
       nodeP->value.i = dateTime;
-
-      // And free the old string
-      free(stringValueToFree);
 
       if (metadataAdd(ciP, caP, nodeP, caName) == false)
       {
@@ -775,6 +771,7 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
       case KjArray:      caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(ciP, valueP, NULL); break;
       case KjNull:       caP->valueType = orion::ValueTypeNull;    break;
       case KjNone:
+        LM_E(("Invalid type from kjson"));
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal error", "Invalid type from kjson", OrionldDetailsString);
         return false;
       }
@@ -824,7 +821,6 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     return false;
 
   LM_T(LmtUriExpansion, ("type node at %p", typeNodeP));
-  LM_TMP(("ID: '%s'", idNodeP->value.s));
 
   UpdateContextRequest   mongoRequest;
   UpdateContextResponse  mongoResponse;
@@ -854,7 +850,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   }
 
   // Treat the entire payload
-  for (KjNode* kNodeP = ciP->requestTree->children; kNodeP != NULL; kNodeP = kNodeP->next)
+  for (KjNode* kNodeP = ciP->requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     LM_T(LmtUriExpansion, ("treating entity node '%s'", kNodeP->name));
 

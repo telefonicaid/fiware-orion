@@ -121,6 +121,13 @@ void HttpInfo::fill(const BSONObj& bo)
   this->url    = bo.hasField(CSUB_REFERENCE)? getStringFieldF(bo, CSUB_REFERENCE) : "";
   this->custom = bo.hasField(CSUB_CUSTOM)?    getBoolFieldF(bo,   CSUB_CUSTOM)    : false;
 
+#ifdef ORIONLD
+  std::string mimeTypeString;
+
+  mimeTypeString = bo.hasField(CSUB_MIMETYPE)? getStringFieldF(bo,CSUB_MIMETYPE) : "application/json";  // Default
+  this->mimeType = longStringToMimeType(mimeTypeString);
+#endif
+
   if (this->custom)
   {
     this->payload  = bo.hasField(CSUB_PAYLOAD)? getStringFieldF(bo, CSUB_PAYLOAD) : "";

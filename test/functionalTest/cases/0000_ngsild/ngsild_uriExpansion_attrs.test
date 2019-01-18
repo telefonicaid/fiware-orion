@@ -32,7 +32,7 @@ brokerStart CB 212-249
 
 #
 # As no @context is given, the default context will be used:
-# https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.jsonld
+# http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld
 # {
 #   "@context": {
 #     ...

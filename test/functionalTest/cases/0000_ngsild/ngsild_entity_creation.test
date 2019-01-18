@@ -146,7 +146,7 @@ payload='{
     "value": "John 6"
   },
   "@context": [
-    "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/coreContext/ngsi-ld-core-context.jsonld",
+    "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
   ]
 }'

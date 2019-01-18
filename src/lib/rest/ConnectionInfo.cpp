@@ -221,6 +221,9 @@ ConnectionInfo::~ConnectionInfo()
   httpHeaders.release();
 
 #ifdef ORIONLD
+
+#if 0
+  // The request tree is now allocated under KAlloc - another free to be done
   if (requestTree != NULL)
   {
     kjFree(requestTree);
@@ -232,6 +235,7 @@ ConnectionInfo::~ConnectionInfo()
     kjFree(responseTree);
     responseTree = NULL;
   }
+#endif
 
   if ((contextP != NULL) && (contextP->temporary == true))
   {
@@ -240,6 +244,8 @@ ConnectionInfo::~ConnectionInfo()
     contextP = NULL;
   }
 
+#if 0
+  // This pointer is no longer to be used - the one in orionldState is to be used instead
   if (kjsonP != NULL)
   {
     if (kjsonP->iVec != NULL)
@@ -251,6 +257,7 @@ ConnectionInfo::~ConnectionInfo()
     free(kjsonP);
     kjsonP = NULL;
   }
+#endif
 #endif
 }
 

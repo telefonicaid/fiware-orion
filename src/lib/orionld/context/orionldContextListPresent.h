@@ -25,8 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
-#include "orionld/context/OrionldContext.h"
 
 
 
@@ -34,6 +32,6 @@
 //
 // orionldContextListPresent -
 //
-extern void orionldContextListPresent(ConnectionInfo* ciP);
+extern void orionldContextListPresent(void);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTLISTPRESENT_H_

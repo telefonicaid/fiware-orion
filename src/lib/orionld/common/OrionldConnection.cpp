@@ -36,6 +36,14 @@ __thread OrionldConnection orionldState = { 0 };
 
 // -----------------------------------------------------------------------------
 //
-// Global state
+// Global state - move all this to another file
 //
-int requestNo = 0;  // Never mind protecting with semaphore. Just a debugging help
+// Actually, create two new files to replace this one:
+// orionldThreadState.cpp/h
+// orionldGlobalState.cpp/h
+//
+int     requestNo = 0;             // Never mind protecting with semaphore. Just a debugging help
+char    kallocBuffer[32 * 1024];
+KAlloc  kalloc;
+Kjson   kjson;
+Kjson*  kjsonP;

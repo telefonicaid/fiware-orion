@@ -66,7 +66,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   }
 
   // Is the payload an empty object?
-  if  (ciP->requestTree->children == NULL)
+  if  (ciP->requestTree->value.firstChildP == NULL)
   {
     ciP->httpStatusCode = SccBadRequest;
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Payload is an empty JSON object", NULL, OrionldDetailsString);
@@ -74,7 +74,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   }
 
   // Make sure the attributes to be patched exist
-  for (KjNode* attrNodeP = ciP->requestTree->children; attrNodeP != NULL; attrNodeP = attrNodeP->next)
+  for (KjNode* attrNodeP = ciP->requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
   {
     if (mongoAttributeExists(ciP->wildcard[0], attrNodeP->name, ciP->tenant.c_str()) == false)
     {

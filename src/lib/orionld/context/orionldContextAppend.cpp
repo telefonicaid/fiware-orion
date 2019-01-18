@@ -59,7 +59,8 @@ OrionldContext* orionldContextAppend(const char* url, KjNode* tree, OrionldConte
     return NULL;
   }
 
-  orionldContextListInsert(contextP);
+  LM_TMP(("Calling orionldContextListInsert for '%s' (after creation by orionldContextCreateFromTree)", contextP->url));
+  orionldContextListInsert(contextP, false);
 
   return contextP;
 }

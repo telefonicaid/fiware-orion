@@ -22,10 +22,16 @@
 *
 * Author: Ken Zangelin
 */
-#include <stddef.h>                                  // NULL
+#include <string.h>                                            // strerror
+#include <errno.h>                                             // errno
+#include <stddef.h>                                            // NULL
+#include <semaphore.h>                                         // sem_t
 
-#include "orionld/context/OrionldContext.h"          // OrionldContext
-#include "orionld/context/orionldContextList.h"      // Own interface
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
+#include "orionld/context/OrionldContext.h"                    // OrionldContext
+#include "orionld/context/orionldContextList.h"                // Own interface
 
 
 
@@ -35,3 +41,58 @@
 //
 OrionldContext* orionldContextHead = NULL;
 OrionldContext* orionldContextTail = NULL;
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldContextListSem - semaphore for the context list
+//
+static sem_t orionldContextListSem;
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldContextListInit -
+//
+int orionldContextListInit(char** detailsP)
+{
+  orionldContextHead = NULL;
+  orionldContextTail = NULL;
+
+  if (sem_init(&orionldContextListSem, 0, 1) == -1)
+  {
+    LM_E(("Runtime Error (error initializing semaphore for orionld context list; %s)", strerror(errno)));
+    *detailsP = (char*) "error initializing semaphore for orionld context list";
+    return -1;
+  }
+
+  return 0;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldContextListSemTake -
+//
+void orionldContextListSemTake(const char* who)
+{
+  LM_T(LmtContextList, ("%s taking semaphore", who));
+  sem_wait(&orionldContextListSem);
+  LM_T(LmtContextList, ("%s got semaphore", who));
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldContextListSemGive -
+//
+void orionldContextListSemGive(const char* who)
+{
+  LM_T(LmtContextList, ("%s giving semaphore", who));
+  sem_post(&orionldContextListSem);
+  LM_T(LmtContextList, ("%s gave semaphore", who));
+}

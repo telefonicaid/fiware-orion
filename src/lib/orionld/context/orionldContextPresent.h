@@ -34,6 +34,6 @@
 //
 // orionldContextPresent -
 //
-extern void orionldContextPresent(ConnectionInfo* ciP, OrionldContext* contextP);
+extern void orionldContextPresent(OrionldContext* contextP);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTPRESENT_H_

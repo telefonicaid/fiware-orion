@@ -123,7 +123,7 @@ int uriExpansion(OrionldContext* contextP, const char* name, char** expandedName
   // - "@type":   corresponds to the 'type' of the attribute??? FIXME
   //
   int children = 0;
-  for (KjNode* nodeP = contextValueP->children; nodeP != NULL; nodeP = nodeP->next)
+  for (KjNode* nodeP = contextValueP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
     if (SCOMPARE4(nodeP->name, '@', 'i', 'd', 0))
     {
@@ -203,6 +203,6 @@ bool orionldUriExpand(OrionldContext* contextP, char* shortName, char* longName,
     snprintf(longName, longNameLen, "%s", expandedName);
   }
 
-  LM_T(LmtUriExpansion, ("KZ: expanded '%s' to '%s'", shortName, longName));
+  LM_T(LmtUriExpansion, ("Expanded '%s' to '%s'", shortName, longName));
   return true;
 }

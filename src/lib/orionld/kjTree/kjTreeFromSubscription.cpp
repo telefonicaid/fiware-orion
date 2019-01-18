@@ -37,6 +37,7 @@ extern "C"
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultContext
 #include "orionld/common/numberToDate.h"                       // numberToDate
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate, OrionldInternalError
+#include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/kjTree/kjTreeFromSubscription.h"             // Own interface
 
 
@@ -47,7 +48,7 @@ extern "C"
 //
 KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscriptionP)
 {
-  KjNode*       topP = kjObject(NULL, NULL);
+  KjNode*       topP = kjObject(orionldState.kjsonP, NULL);
   KjNode*       objectP;
   KjNode*       arrayP;
   KjNode*       nodeP;
@@ -58,19 +59,19 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   unsigned int  ix;
 
   // id
-  nodeP = kjString(ciP->kjsonP, "id", subscriptionP->id.c_str());
+  nodeP = kjString(orionldState.kjsonP, "id", subscriptionP->id.c_str());
   kjChildAdd(topP, nodeP);
 
 
   // type
-  nodeP = kjString(ciP->kjsonP, "type", "Subscription");
+  nodeP = kjString(orionldState.kjsonP, "type", "Subscription");
   kjChildAdd(topP, nodeP);
 
 
   // name
   if (subscriptionP->name != "")
   {
-    nodeP = kjString(ciP->kjsonP, "name", subscriptionP->name.c_str());
+    nodeP = kjString(orionldState.kjsonP, "name", subscriptionP->name.c_str());
     kjChildAdd(topP, nodeP);
   }
 
@@ -78,7 +79,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   // description
   if (subscriptionP->description != "")
   {
-    nodeP  = kjString(ciP->kjsonP, "description", subscriptionP->description.c_str());
+    nodeP  = kjString(orionldState.kjsonP, "description", subscriptionP->description.c_str());
     kjChildAdd(topP, nodeP);
   }
 
@@ -86,26 +87,26 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   size = subscriptionP->subject.entities.size();
   if (size != 0)
   {
-    arrayP = kjArray(ciP->kjsonP, "entities");
+    arrayP = kjArray(orionldState.kjsonP, "entities");
     for (ix = 0; ix < size; ix++)
     {
       ngsiv2::EntID* eP = &subscriptionP->subject.entities[ix];
 
-      objectP = kjObject(ciP->kjsonP, NULL);
+      objectP = kjObject(orionldState.kjsonP, NULL);
 
       if (eP->id != "")
       {
-        nodeP = kjString(ciP->kjsonP, "id", eP->id.c_str());
+        nodeP = kjString(orionldState.kjsonP, "id", eP->id.c_str());
         kjChildAdd(objectP, nodeP);
       }
 
       if (eP->idPattern != "")
       {
-        nodeP = kjString(ciP->kjsonP, "idPattern", eP->idPattern.c_str());
+        nodeP = kjString(orionldState.kjsonP, "idPattern", eP->idPattern.c_str());
         kjChildAdd(objectP, nodeP);
       }
 
-      nodeP = kjString(ciP->kjsonP, "type", eP->type.c_str());
+      nodeP = kjString(orionldState.kjsonP, "type", eP->type.c_str());
       kjChildAdd(objectP, nodeP);
 
       kjChildAdd(arrayP, objectP);
@@ -119,11 +120,11 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   if (size > 0)
   {
     watchedAttributesPresent = true;
-    arrayP = kjArray(ciP->kjsonP, "watchedAttributes");
+    arrayP = kjArray(orionldState.kjsonP, "watchedAttributes");
 
     for (ix = 0; ix < size; ix++)
     {
-      nodeP = kjString(ciP->kjsonP, NULL, subscriptionP->subject.condition.attributes[ix].c_str());
+      nodeP = kjString(orionldState.kjsonP, NULL, subscriptionP->subject.condition.attributes[ix].c_str());
       kjChildAdd(arrayP, nodeP);
     }
     kjChildAdd(topP, arrayP);
@@ -140,7 +141,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
       orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create a stringified date", details, OrionldDetailsEntity);
       return false;
     }
-    nodeP = kjString(ciP->kjsonP, "timeInterval", date);
+    nodeP = kjString(orionldState.kjsonP, "timeInterval", date);
     kjChildAdd(topP, nodeP);
 #endif
   }
@@ -150,7 +151,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   const char* q = subscriptionP->subject.condition.expression.q.c_str();
   if (q[0] != 0)
   {
-    nodeP = kjString(ciP->kjsonP, "q", q);
+    nodeP = kjString(orionldState.kjsonP, "q", q);
     kjChildAdd(topP, nodeP);
   }
 
@@ -158,15 +159,15 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   // geoQ
   if (subscriptionP->subject.condition.expression.geometry != "")
   {
-    objectP = kjObject(ciP->kjsonP, "geoQ");
+    objectP = kjObject(orionldState.kjsonP, "geoQ");
 
-    nodeP = kjString(ciP->kjsonP, "geometry", subscriptionP->subject.condition.expression.geometry.c_str());
+    nodeP = kjString(orionldState.kjsonP, "geometry", subscriptionP->subject.condition.expression.geometry.c_str());
     kjChildAdd(objectP, nodeP);
 
-    nodeP = kjString(ciP->kjsonP, "coordinates", subscriptionP->subject.condition.expression.coords.c_str());
+    nodeP = kjString(orionldState.kjsonP, "coordinates", subscriptionP->subject.condition.expression.coords.c_str());
     kjChildAdd(objectP, nodeP);
 
-    nodeP = kjString(ciP->kjsonP, "georel", subscriptionP->subject.condition.expression.georel.c_str());
+    nodeP = kjString(orionldState.kjsonP, "georel", subscriptionP->subject.condition.expression.georel.c_str());
     kjChildAdd(objectP, nodeP);
 
     // FIXME: geoproperty not supported for now
@@ -177,20 +178,20 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
 
   // isActive
   bool isActive = (subscriptionP->status == "active")? true : false;
-  nodeP = kjBoolean(ciP->kjsonP, "isActive", isActive);
+  nodeP = kjBoolean(orionldState.kjsonP, "isActive", isActive);
   kjChildAdd(topP, nodeP);
 
   // notification
-  objectP = kjObject(ciP->kjsonP, "notification");
+  objectP = kjObject(orionldState.kjsonP, "notification");
 
   // notification::attributes
   size = subscriptionP->notification.attributes.size();
   if (size > 0)
   {
-    arrayP = kjArray(ciP->kjsonP, "attributes");
+    arrayP = kjArray(orionldState.kjsonP, "attributes");
     for (ix = 0; ix < size; ++ix)
     {
-      nodeP = kjString(ciP->kjsonP, NULL, subscriptionP->notification.attributes[ix].c_str());
+      nodeP = kjString(orionldState.kjsonP, NULL, subscriptionP->notification.attributes[ix].c_str());
       kjChildAdd(arrayP, nodeP);
     }
     kjChildAdd(objectP, arrayP);
@@ -198,19 +199,20 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
 
   // notification::format
   if (subscriptionP->attrsFormat == NGSI_V2_KEYVALUES)
-    nodeP = kjString(ciP->kjsonP, "format", "keyValues");
+    nodeP = kjString(orionldState.kjsonP, "format", "keyValues");
   else
-    nodeP = kjString(ciP->kjsonP, "format", "normalized");
+    nodeP = kjString(orionldState.kjsonP, "format", "normalized");
   kjChildAdd(objectP, nodeP);
 
   // notification::endpoint
-  KjNode* endpointP = kjObject(ciP->kjsonP, "endpoint");
+  KjNode* endpointP = kjObject(orionldState.kjsonP, "endpoint");
 
-  nodeP = kjString(ciP->kjsonP, "uri", subscriptionP->notification.httpInfo.url.c_str());
+  nodeP = kjString(orionldState.kjsonP, "uri", subscriptionP->notification.httpInfo.url.c_str());
   kjChildAdd(endpointP, nodeP);
 
   const char* mimeType = (subscriptionP->notification.httpInfo.mimeType == JSON)? "application/json" : "application/ld+json";
-  nodeP = kjString(ciP->kjsonP, "accept", mimeType);
+
+  nodeP = kjString(orionldState.kjsonP, "accept", mimeType);
   kjChildAdd(endpointP, nodeP);
 
   kjChildAdd(objectP, endpointP);
@@ -219,28 +221,28 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   // notification::timesSent
   if (subscriptionP->notification.timesSent > 0)
   {
-    nodeP = kjInteger(ciP->kjsonP, "timesSent", subscriptionP->notification.timesSent);
+    nodeP = kjInteger(orionldState.kjsonP, "timesSent", subscriptionP->notification.timesSent);
     kjChildAdd(objectP, nodeP);
   }
 
   // notification::lastNotification
   if (subscriptionP->notification.lastNotification > 0)
   {
-    nodeP = kjInteger(ciP->kjsonP, "lastNotification", subscriptionP->notification.lastNotification);
+    nodeP = kjInteger(orionldState.kjsonP, "lastNotification", subscriptionP->notification.lastNotification);
     kjChildAdd(objectP, nodeP);
   }
 
   // notification::lastFailure
   if (subscriptionP->notification.lastFailure > 0)
   {
-    nodeP = kjInteger(ciP->kjsonP, "lastFailure", subscriptionP->notification.lastFailure);
+    nodeP = kjInteger(orionldState.kjsonP, "lastFailure", subscriptionP->notification.lastFailure);
     kjChildAdd(objectP, nodeP);
   }
 
   // notification::lastSuccess
   if (subscriptionP->notification.lastSuccess > 0)
   {
-    nodeP = kjInteger(ciP->kjsonP, "lastSuccess", subscriptionP->notification.lastSuccess);
+    nodeP = kjInteger(orionldState.kjsonP, "lastSuccess", subscriptionP->notification.lastSuccess);
     kjChildAdd(objectP, nodeP);
   }
 
@@ -254,24 +256,24 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
     orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create a stringified date", details, OrionldDetailsEntity);
     return NULL;
   }
-  nodeP = kjString(ciP->kjsonP, "expires", date);
+  nodeP = kjString(orionldState.kjsonP, "expires", date);
   kjChildAdd(topP, nodeP);
 
   // throttling
-  nodeP = kjInteger(ciP->kjsonP, "throttling", subscriptionP->throttling);
+  nodeP = kjInteger(orionldState.kjsonP, "throttling", subscriptionP->throttling);
   kjChildAdd(topP, nodeP);
 
   // status
-  nodeP = kjString(ciP->kjsonP, "status", subscriptionP->status.c_str());
+  nodeP = kjString(orionldState.kjsonP, "status", subscriptionP->status.c_str());
   kjChildAdd(topP, nodeP);
 
   // @context - in payload if Mime Type is application/ld+json, else in Link header
   if (ciP->httpHeaders.acceptJsonld)
   {
     if (subscriptionP->ldContext != "")
-      nodeP = kjString(ciP->kjsonP, "@context", subscriptionP->ldContext.c_str());
+      nodeP = kjString(orionldState.kjsonP, "@context", subscriptionP->ldContext.c_str());
     else
-      nodeP = kjString(ciP->kjsonP, "@context", orionldDefaultContext.url);
+      nodeP = kjString(orionldState.kjsonP, "@context", orionldDefaultContext.url);
 
     kjChildAdd(topP, nodeP);
   }

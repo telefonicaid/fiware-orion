@@ -28,6 +28,7 @@
 extern "C"
 {
 #include "kjson/kjBufferCreate.h"                              // kjBufferCreate
+#include "kalloc/kaBufferInit.h"                               // kaBufferInit
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -37,6 +38,7 @@ extern "C"
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldErrorResponse.h"               // OrionldBadRequestData, OrionldDetailsString, ...
 #include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/context/orionldContextListPresent.h"         // orionldContextListPresent
 #include "orionld/rest/temporaryErrorPayloads.h"               // Temporary Error Payloads
 #include "orionld/rest/orionldMhdConnectionInit.h"             // Own interface
 
@@ -190,7 +192,7 @@ int orionldMhdConnectionInit
   // This call to LM_TMP should not be removed. Only commented out
   //
   LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));
-
+  orionldContextListPresent();
   //
   // 0. Prepare connectionInfo
   //
@@ -214,11 +216,10 @@ int orionldMhdConnectionInit
   //
   // Creating kjson environment for KJson parse and render
   //
-  orionldState.kjsonP = kjBufferCreate(NULL, NULL);
-  if (orionldState.kjsonP == NULL)
-    LM_X(1, ("Out of memory"));
+  kaBufferInit(&orionldState.kalloc, orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer), 2 * 1024, NULL, "Thread KAlloc buffer");
+  orionldState.kjsonP = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
 
-  ciP->kjsonP = orionldState.kjsonP;  // FIXME: ciP->kjsonP is to BE REMOVED. orionld.kjsonP should beused instead
+  ciP->kjsonP = orionldState.kjsonP;  // FIXME: ciP->kjsonP is to BE REMOVED. orionldState.kjsonP should be used instead
 
   //
   // The 'connection', as given by MHD is very important. No responses can be sent without it

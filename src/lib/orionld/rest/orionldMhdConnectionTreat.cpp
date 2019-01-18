@@ -84,7 +84,7 @@ static bool contentTypeCheck(ConnectionInfo* ciP, KjNode* contextNodeP, char** e
     return true;  // No error detected about Content-Type, error postponed to later check
   }
 
-  if (ciP->requestTree->children == NULL)
+  if (ciP->requestTree->value.firstChildP == NULL)
   {
     return true;  // No error detected about Content-Type, error postponed to later check
   }
@@ -249,10 +249,12 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       }
       LM_T(LmtPayloadParse, ("All good - payload parsed. ciP->requestTree at %p", ciP->requestTree));
 
+      if (ciP->requestTree->value.firstChildP != NULL)
+        LM_T(LmtPayloadParse, ("Right after kjParse, first child of request is: '%s'", ciP->requestTree->value.firstChildP->name));
       //
       // Looking up "@context" attribute at first level in payload
       //
-      for (KjNode* attrNodeP = ciP->requestTree->children; attrNodeP != NULL; attrNodeP = attrNodeP->next)
+      for (KjNode* attrNodeP = ciP->requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
       {
         if (attrNodeP->name == NULL)
           continue;
@@ -321,6 +323,9 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     LM_T(LmtServiceRoutine, ("Calling Service Routine %s", ciP->serviceP->url));
     bool b = ciP->serviceP->serviceRoutine(ciP);
     LM_T(LmtServiceRoutine,("service routine '%s' done", ciP->serviceP->url));
+
+    if ((ciP->responseTree != NULL) && (ciP->responseTree->value.firstChildP != NULL))
+      LM_T(LmtPayloadParse, ("Right after serviceRoutine, first child of response is: '%s'", ciP->responseTree->value.firstChildP->name));
 
     if (b == false)
     {

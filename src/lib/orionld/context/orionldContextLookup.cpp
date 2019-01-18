@@ -48,6 +48,7 @@ OrionldContext* orionldContextLookup(const char* url)
 
   int contextIx = 0;
 
+  orionldContextListSemTake("Looking up a context");
   while (contextP != NULL)
   {
     if (contextP->url == NULL)
@@ -57,6 +58,7 @@ OrionldContext* orionldContextLookup(const char* url)
       LM_E(("KZ: type: %d", contextP->type));
       LM_E(("KZ: ignore: %s", FT(contextP->ignore)));
       LM_E(("KZ: next at %p", contextP->next));
+      orionldContextListSemGive("Looking up a context - no luck");
       return NULL;
     }
     
@@ -64,6 +66,7 @@ OrionldContext* orionldContextLookup(const char* url)
     if (strcmp(contextP->url, url) == 0)
     {
       LM_T(LmtContextLookup, ("Found it!"));
+      orionldContextListSemGive("Looking up a context - Found it");
       return contextP;
     }
 
@@ -74,5 +77,6 @@ OrionldContext* orionldContextLookup(const char* url)
 
   LM_T(LmtContextLookup, ("NOT Found"));
 
+  orionldContextListSemGive("Looking up a context - NOT Found");
   return NULL;
 }  

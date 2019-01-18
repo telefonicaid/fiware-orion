@@ -66,7 +66,7 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   }
 
   // Is the payload an empty object?
-  if  (ciP->requestTree->children == NULL)
+  if  (ciP->requestTree->value.firstChildP == NULL)
   {
     ciP->httpStatusCode = SccBadRequest;
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Payload is an empty JSON object", NULL, OrionldDetailsString);

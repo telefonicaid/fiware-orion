@@ -35,7 +35,7 @@
 typedef struct OrionldResponseBuffer
 {
   char*   buf;
-  char    internalBuffer[1024];
+  char    internalBuffer[1024 * 32];
   size_t  used;
   size_t  size;
   bool    allocated;

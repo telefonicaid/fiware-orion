@@ -29,12 +29,15 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjParse.h"                                     // kjParse
+#include "kjson/kjClone.h"                                     // kjClone
 #include "kjson/kjFree.h"                                      // kjFree
 }
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 
+#include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/common/urlCheck.h"                           // urlCheck
+#include "orionld/context/orionldContextList.h"                // orionldContextListSemTake/Give
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
 #include "orionld/context/orionldContextDownloadAndParse.h"    // orionldContextDownloadAndParse
 #include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
@@ -76,7 +79,7 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
     return NULL;
   }
 
-  contextP->tree = orionldContextDownloadAndParse(ciP->kjsonP, url, detailsPP);
+  contextP->tree = orionldContextDownloadAndParse(orionldState.kjsonP, url, detailsPP);
   if (contextP->tree == NULL)
   {
     LM_E(("orionldContextDownloadAndParse: %s", *detailsPP));
@@ -87,21 +90,43 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
     return NULL;
   }
 
-  if (contextP->tree && contextP->tree->children)
-    LM_T(LmtContextList, ("The downloaded context (%s) is of type '%s'", contextP->url, kjValueType(contextP->tree->children->type)));
+  // <DEBUG>
+  extern void contextArrayPresent(KjNode* tree, const char* what);
+  contextArrayPresent(contextP->tree, "Just after orionldContextDownloadAndParse");
+  // </DEBUG>
+
+  if (contextP->tree && contextP->tree->value.firstChildP)
+    LM_T(LmtContextList, ("The downloaded context (%s) is of type '%s'", contextP->url, kjValueType(contextP->tree->value.firstChildP->type)));
   else
-    LM_E(("contextP->tree->children: %p", contextP->tree->children));
+    LM_E(("contextP->tree->value.firstChildP: %p", contextP->tree->value.firstChildP));
 
   ciP->contextToBeFreed = true;
-  LM_T(LmtContextList, ("Inserting context '%s' in common list", url));
-  orionldContextListInsert(contextP);
+  LM_T(LmtContextList, ("Context is to be inserted into the common context list, so, it needs to be cloned"));
 
-  if (contextP->tree->children->type == KjArray)
+  // <DEBUG>
+  contextArrayPresent(contextP->tree, "Before cloning");
+  // </DEBUG>
+
+  // FIXME: Don't clone if core or vocab context
+  LM_TMP(("Cloning context tree"));
+  contextP->tree = kjClone(contextP->tree);
+
+  // <DEBUG>
+  contextArrayPresent(contextP->tree, "Just after cloning");
+  // </DEBUG>
+
+
+  LM_T(LmtContextList, ("Inserting context '%s' in common list", url));
+
+  LM_TMP(("Calling orionldContextListInsert for '%s' (after cloning tree)", contextP->url));
+  orionldContextListInsert(contextP, false);
+
+  if (contextP->tree->value.firstChildP->type == KjArray)
   {
-    KjNode* arrayP = contextP->tree->children;
+    KjNode* arrayP = contextP->tree->value.firstChildP;
 
     LM_T(LmtContextList, ("We got an array - need to download more contexts"));
-    for (KjNode* aItemP = arrayP->children; aItemP != NULL; aItemP = aItemP->next)
+    for (KjNode* aItemP = arrayP->value.firstChildP; aItemP != NULL; aItemP = aItemP->next)
     {
       // All items must be strings
       if (aItemP->type != KjString)
@@ -110,7 +135,7 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
         ciP->httpStatusCode = SccBadRequest;
         return NULL;
       }
-      LM_T(LmtContextList, ("Array item: %s", aItemP->value.s));
+      LM_T(LmtContextList, ("Array item (URL of context that needs to be downloaded): %s", aItemP->value.s));
 
       //
       // Is the context already present in the list?
@@ -135,9 +160,9 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
         return NULL;
       }
 
-      ciP->contextToBeFreed = true;
       LM_T(LmtContextList, ("Inserting context '%s' in common list", url));
-      orionldContextListInsert(arrayItemContextP);
+      LM_TMP(("Calling orionldContextListInsert for '%s' (after NOT cloning tree)", arrayItemContextP->url));
+      orionldContextListInsert(arrayItemContextP, false);
     }
   }
 

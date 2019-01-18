@@ -38,6 +38,7 @@
 #include "apiTypesV2/Subscription.h"
 
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/MongoCommonSubscription.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
@@ -47,7 +48,7 @@
 
 /* ****************************************************************************
 *
-* USING - 
+* USING -
 */
 using mongo::BSONObj;
 using mongo::BSONElement;
@@ -274,6 +275,22 @@ static void setName(Subscription* s, const BSONObj& r)
 static void setContext(Subscription* s, const BSONObj& r)
 {
   s->ldContext = r.hasField(CSUB_LDCONTEXT) ? getStringFieldF(r, CSUB_LDCONTEXT) : "";
+}
+
+
+
+/* ****************************************************************************
+*
+* setMimeType -
+*/
+static void setMimeType(Subscription* s, const BSONObj& r)
+{
+  if (r.hasField(CSUB_NAME))
+  {
+    std::string mimeTypeString = getStringFieldF(r, CSUB_MIMETYPE);
+
+    s->notification.httpInfo.mimeType = longStringToMimeType(mimeTypeString);
+  }
 }
 
 #endif
@@ -518,6 +535,7 @@ bool mongoGetLdSubscription
 
     setSubscriptionId(subP, r);
     setDescription(subP, r);
+    setMimeType(subP, r);
     setSubject(subP, r);
     setNotification(subP, r, tenant);
     setStatus(subP, r);

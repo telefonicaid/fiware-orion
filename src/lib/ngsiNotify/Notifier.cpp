@@ -520,7 +520,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
         kjRender(orionldState.kjsonP, kjTree, buf, sizeof(buf));
 
       payloadString = buf;
-      kjFree(kjTree);
     }
 #endif
     else

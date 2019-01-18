@@ -342,7 +342,7 @@ MongoDB server version: REGEX(.*)
 	"expiration" : NumberLong(REGEX(.*)),
 	"reference" : "http://valid.url/url",
 	"custom" : false,
-	"mimeType" : 4,
+	"mimeType" : "application/ld+json",
 	"throttling" : NumberLong(5),
 	"servicePath" : "/",
 	"description" : "Description of Test subscription 01",

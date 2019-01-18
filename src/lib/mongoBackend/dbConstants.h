@@ -118,6 +118,7 @@
 #ifdef ORIONLD
 #define CSUB_LDCONTEXT               "ldContext"
 #define CSUB_NAME                    "name"
+#define CSUB_MIMETYPE                "mimeType"
 #endif
 
 #define CASUB_EXPIRATION             "expiration"

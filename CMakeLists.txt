@@ -223,6 +223,7 @@ SET (COMMON_STATIC_LIBS
     microhttpd.a
     mongoclient.a
     kjson.a
+    kalloc.a
     kbase.a
 )
 
@@ -267,6 +268,7 @@ endif ("${BUILD_ARCH}" STREQUAL "x86_64")
 
 link_directories("/usr/lib/x86_64-linux-gnu")
 link_directories("${PROJECT_SOURCE_DIR}/../kjson")
+link_directories("${PROJECT_SOURCE_DIR}/../kalloc")
 link_directories("${PROJECT_SOURCE_DIR}/../kbase")
 
 #

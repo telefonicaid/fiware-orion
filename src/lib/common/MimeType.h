@@ -55,6 +55,14 @@ typedef enum MimeType
 
 /* ****************************************************************************
 *
+* mimeTypeToLongString - 
+*/
+extern const char* mimeTypeToLongString(MimeType mimeType);
+
+
+
+/* ****************************************************************************
+*
 * mimeTypeToString - 
 */
 extern const char* mimeTypeToString(MimeType mimeType);
@@ -66,6 +74,7 @@ extern const char* mimeTypeToString(MimeType mimeType);
 * stringToMimeType
 */
 extern MimeType stringToMimeType(const std::string& s);
+extern MimeType longStringToMimeType(const std::string& s);
 
 
 

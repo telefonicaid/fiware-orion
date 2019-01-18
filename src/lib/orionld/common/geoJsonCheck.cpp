@@ -71,7 +71,7 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoJsonNodeP, char** detailsP)
     return false;
   }
 
-  for (KjNode* itemP = geoJsonNodeP->children; itemP != NULL; itemP = itemP->next)
+  for (KjNode* itemP = geoJsonNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
     LM_T(LmtGeoJson, ("Item '%s'", itemP->name));
 
@@ -118,7 +118,7 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoJsonNodeP, char** detailsP)
   }
 
   // FIXME: Check all types of GeoJSON - Point, Polygon, etc (different Arrays of Number)
-  // if (geoJsonCoordinatesCheck(coordsP->children, detailsP) == false)
+  // if (geoJsonCoordinatesCheck(coordsP->value.firstChildP, detailsP) == false)
   //   return false;
 
   return true;

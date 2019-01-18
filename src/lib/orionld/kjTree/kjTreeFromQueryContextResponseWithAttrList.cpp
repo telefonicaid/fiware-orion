@@ -26,6 +26,7 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
+#include "kjson/kjClone.h"                                     // kjClone
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -40,6 +41,7 @@ extern "C"
 #include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/common/numberToDate.h"                       // numberToDate
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "common/string.h"                                     // FT
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
@@ -134,7 +136,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
   // If this is the first time the context is used, we may need to retrieve the context from the entity and add it to the cache.
   // If the entity has no context, then all is ok as well.
   //
-  KjNode*  root = (oneHit == true)? kjObject(NULL, NULL) : kjArray(NULL, NULL);
+  KjNode*  root = (oneHit == true)? kjObject(orionldState.kjsonP, NULL) : kjArray(orionldState.kjsonP, NULL);
   KjNode*  top  = NULL;
 
   if (oneHit == true)
@@ -148,7 +150,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
 
     if (oneHit == false)
     {
-      top = kjObject(NULL, NULL);
+      top = kjObject(orionldState.kjsonP, NULL);
       kjChildAdd(root, top);
     }
 
@@ -188,7 +190,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
 
         LM_T(LmtContext, ("Found an attribute called context @context for entity '%s'", eId));
         char*    details;
-        KjNode*  contextTree = kjTreeFromContextContextAttribute(ciP, contextAttributeP, &details);
+        KjNode*  contextTree = kjTreeFromContextContextAttribute(ciP, contextAttributeP, &details);  // FIXME: Use global kalloc buffer somehow - to avoid kjClone()
 
         if (contextTree == NULL)
         {
@@ -205,8 +207,10 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
           return NULL;
         }
 
-        orionldContextListInsert(contextP);  // Inserting the context of an Entity, after not finding it in the context list
-        orionldContextListPresent(ciP);
+        contextP->tree = kjClone(contextP->tree);   // This call may be avoided by using non-thread allocation, see FIXME on call to kjTreeFromContextContextAttribute()
+        LM_TMP(("Calling orionldContextListInsert for '%s' (after cloning it)", contextP->url));
+        orionldContextListInsert(contextP, false);  // Inserting the context of an Entity, after not finding it in the context list
+        orionldContextListPresent();
       }
     }
 
@@ -413,10 +417,10 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
               return NULL;
             }
 
-            nodeP = kjString(ciP->kjsonP, "observedAt", date);
+            nodeP = kjString(orionldState.kjsonP, "observedAt", date);
           }
           else
-            nodeP = kjFloat(ciP->kjsonP, valueFieldName, aP->numberValue);
+            nodeP = kjFloat(orionldState.kjsonP, valueFieldName, aP->numberValue);
           break;
 
         case orion::ValueTypeString:    nodeP = kjString(orionldState.kjsonP, valueFieldName, aP->stringValue.c_str());      break;
@@ -492,10 +496,10 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
                   return NULL;
                 }
 
-                valueP = kjString(ciP->kjsonP, "observedAt", date);
+                valueP = kjString(orionldState.kjsonP, "observedAt", date);
               }
               else
-                valueP = kjFloat(ciP->kjsonP, valueFieldName, mdP->numberValue);
+                valueP = kjFloat(orionldState.kjsonP, valueFieldName, mdP->numberValue);
               break;
 
             case orion::ValueTypeString:   valueP = kjString(orionldState.kjsonP, valueFieldName, mdP->stringValue.c_str());   break;
@@ -527,10 +531,10 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
                   return NULL;
                 }
 
-                nodeP = kjString(ciP->kjsonP, "observedAt", date);
+                nodeP = kjString(orionldState.kjsonP, "observedAt", date);
               }
               else
-                nodeP = kjFloat(ciP->kjsonP, valueFieldName, mdP->numberValue);
+                nodeP = kjFloat(orionldState.kjsonP, valueFieldName, mdP->numberValue);
               break;
 
             case orion::ValueTypeString:   nodeP = kjString(orionldState.kjsonP, mdName, mdP->stringValue.c_str());            break;

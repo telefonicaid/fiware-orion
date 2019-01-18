@@ -42,13 +42,13 @@ extern "C"
 //
 // allCachedContextsPresent -
 //
-static void allCachedContextsPresent(ConnectionInfo* ciP)
+static void allCachedContextsPresent(void)
 {
   OrionldContext* contextP = orionldContextHead;
 
   while (contextP != NULL)
   {
-    orionldContextPresent(ciP, contextP);
+    orionldContextPresent(contextP);
     contextP = contextP->next;
   }
 }
@@ -77,7 +77,7 @@ static void arrayContextPresent(OrionldContext* contextP)
 
   LM_T(LmtContextPresent, ("Context ARRAY: %s (ignored: %s):", contextP->url, (contextP->ignore == true)? "YES" : "NO"));
 
-  for (itemP = contextP->tree->children; itemP != NULL; itemP = itemP->next)
+  for (itemP = contextP->tree->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
     LM_T(LmtContextPresent, ("  %s", itemP->value.s));
   }
@@ -90,7 +90,7 @@ static void arrayContextPresent(OrionldContext* contextP)
 // objectContextPresent -
 //
 static Kjson* kjsonBuffer = NULL;
-static void objectContextPresent(ConnectionInfo* ciP, OrionldContext* contextP)
+static void objectContextPresent(OrionldContext* contextP)
 {
   if (contextP == NULL)
   {
@@ -100,7 +100,7 @@ static void objectContextPresent(ConnectionInfo* ciP, OrionldContext* contextP)
 
   if (kjsonBuffer == NULL)
   {
-    kjsonBuffer = kjBufferCreate();
+    kjsonBuffer = kjBufferCreate(NULL, NULL);
     if (kjsonBuffer == NULL)
       LM_X(1, ("Out of memory"));
 
@@ -123,24 +123,24 @@ static void objectContextPresent(ConnectionInfo* ciP, OrionldContext* contextP)
   {
     LM_T(LmtContextPresent, ("contextP->tree is NULL"));
   }
-  else if (contextP->tree->children == NULL)
+  else if (contextP->tree->value.firstChildP == NULL)
   {
     LM_T(LmtContextPresent, ("contextP->tree is of type '%s'", kjValueType(contextP->tree->type)));
-    LM_T(LmtContextPresent, ("contextP->tree->children is NULL"));
+    LM_T(LmtContextPresent, ("contextP->tree->value.firstChildP is NULL"));
   }
-  else if (contextP->tree->children->children == NULL)
+  else if (contextP->tree->value.firstChildP->value.firstChildP == NULL)
   {
-    LM_T(LmtContextPresent, ("contextP->tree->children->children is NULL"));
+    LM_T(LmtContextPresent, ("contextP->tree->value.firstChildP->value.firstChildP is NULL"));
   }
   else
   {
-    if (contextP->tree->children->type == KjString)
+    if (contextP->tree->value.firstChildP->type == KjString)
     {
-      LM_T(LmtContextPresent, ("    %s: %s", contextP->tree->children->name, contextP->tree->children->value.s));
+      LM_T(LmtContextPresent, ("    %s: %s", contextP->tree->value.firstChildP->name, contextP->tree->value.firstChildP->value.s));
     }
-    else if (contextP->tree->children->type == KjObject)
+    else if (contextP->tree->value.firstChildP->type == KjObject)
     {
-      for (KjNode* nodeP = contextP->tree->children->children; nodeP != NULL; nodeP = nodeP->next)
+      for (KjNode* nodeP = contextP->tree->value.firstChildP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
       {
         if (nodeP->type == KjString)
         {
@@ -150,7 +150,7 @@ static void objectContextPresent(ConnectionInfo* ciP, OrionldContext* contextP)
         {
           LM_T(LmtContextPresent, ("  %s: {", nodeP->name));
 
-          for (KjNode* childP = nodeP->children; childP != NULL; childP = childP->next)
+          for (KjNode* childP = nodeP->value.firstChildP; childP != NULL; childP = childP->next)
             LM_T(LmtContextPresent, ("    %s: %s", childP->name, childP->value.s));
           LM_T(LmtContextPresent, ("  }"));
         }
@@ -165,7 +165,7 @@ static void objectContextPresent(ConnectionInfo* ciP, OrionldContext* contextP)
 //
 // orionldContextPresent -
 //
-void orionldContextPresent(ConnectionInfo* ciP, OrionldContext* contextP)
+void orionldContextPresent(OrionldContext* contextP)
 {
   //
   // Three types of contexts;
@@ -178,11 +178,11 @@ void orionldContextPresent(ConnectionInfo* ciP, OrionldContext* contextP)
   //
 
   if (contextP == NULL)
-    allCachedContextsPresent(ciP);
+    allCachedContextsPresent();
   else if (contextP->tree == NULL)
     LM_TMP(("contextP->tree == NULL!!!"));
   else if (contextP->tree->type == KjObject)
-    objectContextPresent(ciP, contextP);
+    objectContextPresent(contextP);
   else if (contextP->tree->type == KjString)
     stringContextPresent(contextP);
   else if (contextP->tree->type == KjArray)

@@ -32,6 +32,11 @@
 #include <string>
 #include <map>
 
+extern "C"
+{
+#include "kalloc/kaBufferReset.h"                              // kaBufferReset
+}
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -707,6 +712,10 @@ static void requestCompleted
   delayedReleaseExecute();
 
   delete(ciP);
+
+#ifdef ORIONLD
+  kaBufferReset(&orionldState.kalloc, false);  // 'false: it reused, but in a different thread ...
+#endif
 
   *con_cls = NULL;
 }
