@@ -789,13 +789,33 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
 
     if (objectP == NULL)
       ATTRIBUTE_ERROR("relationship attribute without 'object' field", caName);
-    if (objectP->type != KjString)
-      ATTRIBUTE_ERROR("relationship attribute with 'object' field of non-string type", caName);
-    if ((urlCheck(objectP->value.s, &details) == false) && (urnCheck(objectP->value.s, &details) == false))
-      ATTRIBUTE_ERROR("relationship attribute with 'object' field having invalid URI", objectP->value.s);
 
-    caP->valueType   = orion::ValueTypeString;
-    caP->stringValue = objectP->value.s;
+    if (objectP->type == KjString)
+    {
+      if ((urlCheck(objectP->value.s, &details) == false) && (urnCheck(objectP->value.s, &details) == false))
+        ATTRIBUTE_ERROR("relationship attribute with 'object' field having invalid URI", objectP->value.s);
+
+      caP->valueType   = orion::ValueTypeString;
+      caP->stringValue = objectP->value.s;
+    }
+    else if (objectP->type == KjArray)
+    {
+      for (KjNode* nodeP = objectP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+      {
+        if (nodeP->type != KjString)
+          ATTRIBUTE_ERROR("relationship attribute with 'object' array item having invalid URI", objectP->value.s);
+
+        char* uri = nodeP->value.s;
+        if ((urlCheck(uri, &details) == false) && (urnCheck(uri, &details) == false))
+          ATTRIBUTE_ERROR("relationship attribute with 'object array' field having invalid URI", objectP->value.s);
+      }
+      caP->valueType      = orion::ValueTypeVector;
+      caP->compoundValueP = compoundCreate(ciP, objectP, NULL);
+    }
+    else
+    {
+      ATTRIBUTE_ERROR("relationship attribute with 'object' field of invalid type (must be a String or an Array or Strings)", caName);
+    }
   }
 
   return true;

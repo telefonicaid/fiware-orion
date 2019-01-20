@@ -50,37 +50,37 @@ void orionldContextListPresent(void)
     ++contexts;
   }
 
-  LM_TMP(("---------------- %d Contexts in Cache ------------------------", contexts));
+  LM_T(LmtContextList, ("---------------- %d Contexts in Cache ------------------------", contexts));
 
   for (OrionldContext* ctxP = orionldContextHead; ctxP != NULL; ctxP = ctxP->next)
   {
     if ((ctxP->tree != NULL) && (ctxP->tree->value.firstChildP != NULL))
     {
-      LM_TMP(("o Context at:     %p", ctxP));
-      LM_TMP(("o tree at:        %p", ctxP->tree));
-      LM_TMP(("o next at:        %p", ctxP->next));
-      LM_TMP(("o url:            %s", ctxP->url));
-      LM_TMP(("o firstChildP at: %p", ctxP->tree->value.firstChildP));
-      LM_TMP(("o type:           %s", kjValueType(ctxP->tree->value.firstChildP->type)));
+      LM_T(LmtContextList, ("o Context at:     %p", ctxP));
+      LM_T(LmtContextList, ("o tree at:        %p", ctxP->tree));
+      LM_T(LmtContextList, ("o next at:        %p", ctxP->next));
+      LM_T(LmtContextList, ("o url:            %s", ctxP->url));
+      LM_T(LmtContextList, ("o firstChildP at: %p", ctxP->tree->value.firstChildP));
+      LM_T(LmtContextList, ("o type:           %s", kjValueType(ctxP->tree->value.firstChildP->type)));
     }
     else
     {
-      LM_TMP(("o Context at:     %p", ctxP));
-      LM_TMP(("o tree at:        %p", ctxP->tree));
-      LM_TMP(("o next at:        %p", ctxP->next));
-      LM_TMP(("o url:            %s", ctxP->url));
-      LM_TMP(("o firstChildP     NULL"));
+      LM_T(LmtContextList, ("o Context at:     %p", ctxP));
+      LM_T(LmtContextList, ("o tree at:        %p", ctxP->tree));
+      LM_T(LmtContextList, ("o next at:        %p", ctxP->next));
+      LM_T(LmtContextList, ("o url:            %s", ctxP->url));
+      LM_T(LmtContextList, ("o firstChildP     NULL"));
     }
-    LM_TMP(("--------------------------"));
+    LM_T(LmtContextList, ("--------------------------"));
   }
 
 #if 0
   for (OrionldContext* contextP = orionldContextHead; contextP != NULL; contextP = contextP->next)
   {
-    LM_TMP(("=================== %s ======================", contextP->url));
+    LM_T(LmtContextList, ("=================== %s ======================", contextP->url));
     orionldContextPresent(contextP);
-    LM_TMP(("==============================================================="));
-    LM_TMP((""));
+    LM_T(LmtContextList, ("==============================================================="));
+    LM_T(LmtContextList, (""));
   }
 #endif
 }

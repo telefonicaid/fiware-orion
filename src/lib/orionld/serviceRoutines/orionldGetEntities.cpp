@@ -62,7 +62,7 @@ extern int uriExpansion(OrionldContext* contextP, const char* name, char** expan
 // - mq          - Not interesting for ngsi-ld
 // - geometry    - Not interesting for ngsi-ld
 // - coords      - Not interesting for ngsi-ld
-// - georel      - Not interesting for ngsi-ld
+// - georel
 // - options=keyValues
 //
 bool orionldGetEntities(ConnectionInfo* ciP)
@@ -72,11 +72,12 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   char*        type           = (ciP->uriParam["type"].empty())?        (char*) "" : (char*) ciP->uriParam["type"].c_str();
   char*        idPattern      = (ciP->uriParam["idPattern"].empty())?   NULL : (char*) ciP->uriParam["idPattern"].c_str();
   char*        q              = (ciP->uriParam["q"].empty())?           NULL : (char*) ciP->uriParam["q"].c_str();
-
+  char*        attrs          = (ciP->uriParam["attrs"].empty())?       NULL : (char*) ciP->uriParam["attrs"].c_str();
+  char*        georel         = (ciP->uriParam["georel"].empty())?      NULL : (char*) ciP->uriParam["georel"].c_str();
   char*        idString       = (id != NULL)? id      : idPattern;
   const char*  isIdPattern    = (id != NULL)? "false" : "true";
   bool         isTypePattern  = (*type != 0)? false : true;
-  char*        attrs          = (ciP->uriParam["attrs"].empty())?       NULL : (char*) ciP->uriParam["attrs"].c_str();
+     
   EntityId*    entityIdP;
   char         typeExpanded[256];
   char*        details;
@@ -86,13 +87,55 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   int          typeVecItems = (int) sizeof(typeVector) / sizeof(typeVector[0]);
   bool         keyValues    = ciP->uriParamOptions[OPT_KEY_VALUES];
     
+  //
+  // Can't query on EVERYTHING - at least one of the following URI params must be present:
+  // - id
+  // - idPattern
+  // - type
+  // - attrs
+  //
+  if ((*type == 0) && (attrs == NULL) && (id == NULL) && (idPattern == NULL))
+  {
+    LM_W(("Bad Input (too broad query - attempt to query on ALL entities)"));
+    
+    orionldErrorResponseCreate(ciP,
+                               OrionldBadRequestData,
+                               "too broad query", "no entity type, attribute-list, id, nor idPattern provided",
+                               OrionldDetailsString);
+
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
+  }
+
   LM_T(LmtServiceRoutine, ("In orionldGetEntities"));
+  LM_TMP(("In orionldGetEntities"));
 
   if ((idPattern != NULL) && (id != NULL))
   {
+    LM_W(("Bad Input (both 'idPattern' and 'id' used)"));
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Incompatible parameters", "id, idPattern", OrionldDetailsString);
     ciP->httpStatusCode = SccBadRequest;
     return false;
+  }
+
+  //
+  // If 'georel' is present, make sure it has a valid value
+  //
+  if (georel != NULL)
+  {
+    if ((strcmp(georel, "nearRel")       != 0) &&
+        (strcmp(georel, "withinRel")     != 0) &&
+        (strcmp(georel, "containsRel")   != 0) &&
+        (strcmp(georel, "overlapsRel")   != 0) &&
+        (strcmp(georel, "intersectsRel") != 0) &&
+        (strcmp(georel, "equalsRel")     != 0) &&
+        (strcmp(georel, "disjointRel")   != 0))
+    {
+      LM_W(("Bad Input (invalid value for georel)"));
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "invalid value for georel", georel, OrionldDetailsString);
+      ciP->httpStatusCode = SccBadRequest;
+      return false;
+    }
   }
 
   if (idString == NULL)
@@ -111,7 +154,8 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     typeVecItems = kStringSplit(type, ',', (char**) typeVector, typeVecItems);
 
   idVecItems   = kStringSplit(id, ',', (char**) idVector, idVecItems);
-
+  LM_TMP(("In orionldGetEntities"));
+  
   //
   // ID-list and Type-list at the same time is not supported
   //
@@ -133,6 +177,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     isTypePattern = false;  // Just in case ...
   }
 
+  LM_TMP(("In orionldGetEntities"));
 
   if (idVecItems > 1)  // A list of Entity IDs
   {
@@ -162,6 +207,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     parseData.qcr.res.entityIdVector.push_back(entityIdP);
   }
 
+  LM_TMP(("In orionldGetEntities"));
   if (attrs != NULL)
   {
     char  longName[256];
@@ -169,6 +215,8 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     char* shortName;
     char* shortNameVector[32];
     int   vecItems = (int) sizeof(shortNameVector) / sizeof(shortNameVector[0]);;
+
+    LM_TMP(("In orionldGetEntities - attrs != NULL"));
 
     vecItems = kStringSplit(attrs, ',', (char**) shortNameVector, vecItems);
 
@@ -181,6 +229,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       else
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of attribute", shortName, OrionldDetailsString);
+        parseData.qcr.res.release();
         return false;
       }
     }
@@ -188,6 +237,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   if (q != NULL)
   {
+    LM_TMP(("In orionldGetEntities - q != NULL"));
     //
     // ngsi-ld doesn't support metadata which orion APIv1 and v2 does.
     // However, for simplicity, the metadata vector is used for properties of an attribute.
@@ -322,8 +372,11 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     if (sfP->parse(q, &details) == false)
     {
       delete scopeP;
+      delete sfP;
 
+      parseData.qcr.res.release();
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error parsing q StringFilter", details.c_str(), OrionldDetailsString);
+
       return false;
     }
 
@@ -333,11 +386,13 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   // Call standard op postQueryContext
   std::vector<std::string>  compV;    // Not used but part of signature for postQueryContext
 
+  LM_TMP(("In orionldGetEntities - calling standard op postQueryContext"));
   std::string answer   = postQueryContext(ciP, 0, compV, &parseData);
   int         entities = parseData.qcrs.res.contextElementResponseVector.size();
-
+  LM_TMP(("In orionldGetEntities - entities: %d", entities));
   if (attrs != NULL)  // FIXME: Move all this to a separate function
   {
+    LM_TMP(("In orionldGetEntities -  attrs != NULL"));
     //
     // Unfortunately, we need to do a second query now, to get the attribute "@context" of all the matching entities
     //
@@ -366,17 +421,20 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       // mongoQueryContext requires a ServicePath, even though ngsi-ld doesn't support service paths
       servicePathV.push_back("/#");
 
+      LM_TMP(("Calling mongoQueryContext"));
       HttpStatusCode sCode = mongoQueryContext(&qReq, &qResForContextAttr, ciP->tenant, servicePathV, ciP->uriParam, ciP->uriParamOptions, NULL, ciP->apiVersion);
 
       if (sCode != SccOk)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error querying for @context attributes", NULL, OrionldDetailsString);
+        parseData.qcr.res.release();
         return false;
       }
     }
 
     // Now we need to add the "@context" member to each entity in parseData.qcrs.res
     QueryContextResponse* responseP = &parseData.qcrs.res;
+    LM_TMP(("mongoQueryContext gave back %d contextElementResponses", responseP->contextElementResponseVector.size()));
 
     for (unsigned int ix = 0; ix < responseP->contextElementResponseVector.size(); ix++)
     {
@@ -408,6 +466,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   // Transform QueryContextResponse to KJ-Tree
   //
   ciP->httpStatusCode = SccOk;
+  LM_TMP(("In orionldGetEntities -  Calling kjTreeFromQueryContextResponse"));
   ciP->responseTree   = kjTreeFromQueryContextResponse(ciP, false, keyValues, &parseData.qcrs.res);
 
   return true;
