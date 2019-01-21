@@ -122,21 +122,21 @@ echo
 
 echo "05. GET all entities with attr A1, see E1 only"
 echo "=============================================="
-orionCurl --url '/ngsi-ld/v1/entities?attrs=A1&prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities?attrs=A1&prettyPrint=yes&type=T' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "06. GET all entities with attr A2, see E1 and E2"
 echo "================================================"
-orionCurl --url '/ngsi-ld/v1/entities?attrs=A2&prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json"  -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities?attrs=A2&prettyPrint=yes&type=T' --noPayloadCheck -H "Accept: application/ld+json"  -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "07. GET all entities with attr A6, see empty array"
 echo "=================================================="
-orionCurl --url '/ngsi-ld/v1/entities?attrs=A6&prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json"  -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities?attrs=A6&prettyPrint=yes&type=T' --noPayloadCheck -H "Accept: application/ld+json"  -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 

@@ -92,28 +92,28 @@ echo
 
 echo "03. Query the property P100 over 'observedAt' before 2018-12-04 - see nothing"
 echo "============================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?q=P100.observedAt<2018-12-03&prettyPrint=yes' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities?q=P100.observedAt<2018-12-03&prettyPrint=yes&type=T_Query' --noPayloadCheck
 echo
 echo
 
 
 echo "04. Query the property P100 over 'observedAt' after 2018-12-04 - see entity urn:ngsi-ld:T_Query:EntityForQuery2345"
 echo "=================================================================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?q=P100.observedAt>2018-12-03&prettyPrint=yes' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities?q=P100.observedAt>2018-12-03&prettyPrint=yes&type=T_Query' --noPayloadCheck
 echo
 echo
 
 
 echo "05. Query the property P100 over 'observedAt' of EXACT 2018-12-04T12:00:00.00Z - see entity urn:ngsi-ld:T_Query:EntityForQuery2345"
 echo "=================================================================================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?q=P100.observedAt==2018-12-04T12:00:00.00Z&prettyPrint=yes' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities?q=P100.observedAt==2018-12-04T12:00:00.00Z&prettyPrint=yes&type=T_Query' --noPayloadCheck
 echo
 echo
 
 
 echo "06. Query the property P100 over 'observedAt' of EXACT 2018-12-04T11:00:00.00Z - see nothing"
 echo "============================================================================================"
-orionCurl --url '/ngsi-ld/v1/entities?q=P100.observedAt==2018-12-04T11:00:00.00Z&prettyPrint=yes' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities?q=P100.observedAt==2018-12-04T11:00:00.00Z&prettyPrint=yes&type=T_Query' --noPayloadCheck
 echo
 echo
 

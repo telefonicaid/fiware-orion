@@ -36,7 +36,7 @@ brokerStart CB 212-249
 # 03. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E3, with test context, and type T
 # 04. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E4, with test context, and type T2
 # 05. GET entities with id E2 or E4 - see E2 and E4
-# 06. GET entities with id E1 or E2, and E5 - see E1 and E2
+# 06. GET entities with id E1 or E5 - see E1
 # 07. GET entities with id E6, see empty array
 #
 echo "01. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E1, with test context, and type T"
@@ -105,21 +105,21 @@ echo
 
 echo "05. GET entities with id E2 or E4 - see E2 and E4"
 echo "================================================="
-orionCurl --url '/ngsi-ld/v1/entities?id=http://a.b.c/entity/E2,http://a.b.c/entity/E4&prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities?id=http://a.b.c/entity/E2,http://a.b.c/entity/E4&prettyPrint=yes&type=T2' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
-echo "06. GET entities with id E1 or E2, and E5 - see E1 and E2"
-echo "========================================================="
-orionCurl --url '/ngsi-ld/v1/entities?id=http://a.b.c/entity/E1,http://a.b.c/entity/E2,http://a.b.c/entity/E5&prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo "06. GET entities with id E1 or E5 - see E1"
+echo "=========================================="
+orionCurl --url '/ngsi-ld/v1/entities?id=http://a.b.c/entity/E1,http://a.b.c/entity/E5&prettyPrint=yes&type=T' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "07. GET entities with id E6, see empty array"
 echo "============================================"
-orionCurl --url '/ngsi-ld/v1/entities?id=http://a.b.c/entity/E6&prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities?id=http://a.b.c/entity/E6&prettyPrint=yes&type=T,T2' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -195,10 +195,10 @@ Date: REGEX(.*)
 
 
 
-06. GET entities with id E1 or E2, and E5 - see E1 and E2
-=========================================================
+06. GET entities with id E1 or E5 - see E1
+==========================================
 HTTP/1.1 200 OK
-Content-Length: 430
+Content-Length: 216
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -209,15 +209,6 @@ Date: REGEX(.*)
     "A1": {
       "type": "Property",
       "value": "E1"
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
-  },
-  {
-    "id": "http://a.b.c/entity/E2",
-    "type": "T2",
-    "A1": {
-      "type": "Property",
-      "value": "E2"
     },
     "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
   }

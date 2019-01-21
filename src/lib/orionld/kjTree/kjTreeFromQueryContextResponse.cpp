@@ -128,12 +128,6 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
     ciP->responseTree = kjArray(orionldState.kjsonP, NULL);
     ciP->httpStatusCode = SccOk;
 
-    // ------------- Attempt to return Context in Link Header --------------
-    LM_TMP(("KZ: In kjTreeFromQueryContextResponse - oneHit == false AND contextElementResponseVector is EMPTY - leaving"));
-    if (ciP->httpHeaders.acceptJsonld == false)
-      httpHeaderLinkAdd(ciP, &orionldDefaultContext, NULL);
-    // ---------------------------------------------------------------------
-    
     return ciP->responseTree;
   }
 

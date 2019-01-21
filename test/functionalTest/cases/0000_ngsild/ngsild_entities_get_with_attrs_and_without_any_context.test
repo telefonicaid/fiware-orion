@@ -73,7 +73,7 @@ echo
 
 echo "02. GET the entity with P1 in URI param 'attrs' - see entity with P1 only (not R1)"
 echo "=================================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?attrs=P1&prettyPrint=yes&spaces=2' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities?attrs=P1&type=T&prettyPrint=yes&spaces=2' --noPayloadCheck
 echo
 echo
 

@@ -58,14 +58,14 @@ echo
 
 echo "02. GET /ngsi-ld/v1/entities/http://a.b.c/entity/E1 with URI param 'attrs' set to 'A3' - see E1 but without any attributes"
 echo "=========================================================================================================================="
-orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E1?attrs=A3&prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E1?attrs=A3&prettyPrint=yes&type=T' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "03. GET all entities with attr A3 - see no matching entities"
 echo "============================================================"
-orionCurl --url '/ngsi-ld/v1/entities?attrs=A3&prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities?attrs=A3&prettyPrint=yes&type=T' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 

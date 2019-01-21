@@ -64,13 +64,13 @@ echo
 
 echo "02. Query the property P over its compound value L1.L2.L3.L4, in the fifth level for correct value 12, see the entity"
 echo "====================================================================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?q=P\[L1\]\[L2\]\[L3\]\[L4\]\[val\]==12&prettyPrint=yes' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities?q=P\[L1\]\[L2\]\[L3\]\[L4\]\[val\]==12&prettyPrint=yes&type=T_Query' --noPayloadCheck
 echo
 echo
 
 echo "03. Query the property P over its compound value L1.L2.L3.L4, in the fifth level for incorrect value 13, see empty array"
 echo "========================================================================================================================"
-orionCurl --url '/ngsi-ld/v1/entities?q=P\[L1\]\[L2\]\[L3\]\[L4\]\[val\]==13&prettyPrint=yes' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities?q=P\[L1\]\[L2\]\[L3\]\[L4\]\[val\]==13&prettyPrint=yes&type=T_Query' --noPayloadCheck
 echo
 echo
 

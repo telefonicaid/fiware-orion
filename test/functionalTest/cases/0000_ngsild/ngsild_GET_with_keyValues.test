@@ -86,7 +86,7 @@ echo
 
 echo "04. GET all entities with options=keyValues"
 echo "==========================================="
-orionCurl --url '/ngsi-ld/v1/entities?prettyPrint=yes&spaces=2&options=keyValues' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities?prettyPrint=yes&spaces=2&options=keyValues&type=T' --noPayloadCheck
 echo
 echo
 

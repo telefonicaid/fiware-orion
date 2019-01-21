@@ -60,14 +60,14 @@ echo
 
 echo "02. GET all entities using application/json - see context in Link HTTP Header"
 echo "============================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?prettyPrint=yes&spaces=2' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities?prettyPrint=yes&spaces=2&type=T' --noPayloadCheck
 echo
 echo
 
 
 echo "03. GET all entities using application/ld+json - see context in payload"
 echo "======================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?prettyPrint=yes&spaces=2' --noPayloadCheck -H "Accept: application/ld+json"
+orionCurl --url '/ngsi-ld/v1/entities?prettyPrint=yes&spaces=2&type=T' --noPayloadCheck -H "Accept: application/ld+json"
 echo
 echo
 

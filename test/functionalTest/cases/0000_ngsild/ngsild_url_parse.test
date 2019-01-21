@@ -58,7 +58,7 @@ brokerStart CB 212-249
 
 echo "01. GET /ngsi-ld/v1/entities"
 echo "============================"
-orionCurl --url /ngsi-ld/v1/entities
+orionCurl --url /ngsi-ld/v1/entities?type=T
 echo
 echo
 

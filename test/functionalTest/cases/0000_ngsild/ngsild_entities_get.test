@@ -122,21 +122,21 @@ echo
 
 echo "07. GET all entities with id E1, see entity E1 only"
 echo "==================================================="
-orionCurl --url '/ngsi-ld/v1/entities?id=http://a.b.c/entity/E1&prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json"  -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities?id=http://a.b.c/entity/E1&prettyPrint=yes&type=T' --noPayloadCheck -H "Accept: application/ld+json"  -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "08. GET all entities with id E.*, see all four entities"
 echo "======================================================="
-orionCurl --url '/ngsi-ld/v1/entities?idPattern=http://a.b.c/entity/E.*&prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json"  -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities?idPattern=http://a.b.c/entity/E.*&prettyPrint=yes&type=T,T2' --noPayloadCheck -H "Accept: application/ld+json"  -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "09. GET all entities with id E5, see empty array"
 echo "================================================"
-orionCurl --url '/ngsi-ld/v1/entities?id=http://a.b.c/entity/E5&prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json"  -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities?id=http://a.b.c/entity/E5&prettyPrint=yes&type=T,T2' --noPayloadCheck -H "Accept: application/ld+json"  -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 

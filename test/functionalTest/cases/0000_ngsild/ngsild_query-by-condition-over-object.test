@@ -82,14 +82,14 @@ echo
 
 echo '02. Query with q=R100=="urn:ngsi-ld:T2:6789"'
 echo '============================================'
-orionCurl --url '/ngsi-ld/v1/entities?q=R100=="urn:ngsi-ld:T2:6789"'
+orionCurl --url '/ngsi-ld/v1/entities?q=R100=="urn:ngsi-ld:T2:6789"&type=T_Query'
 echo
 echo
 
 
 echo "03. Same query, but with id=urn:ngsi-ld:T_Query:EntityForQuery2345 also"
 echo "======================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?id=urn:ngsi-ld:T_Query:EntityForQuery2345&q=R100=="urn:ngsi-ld:T2:6789"'
+orionCurl --url '/ngsi-ld/v1/entities?id=urn:ngsi-ld:T_Query:EntityForQuery2345&type=T_Query&q=R100=="urn:ngsi-ld:T2:6789"'
 echo
 echo
 

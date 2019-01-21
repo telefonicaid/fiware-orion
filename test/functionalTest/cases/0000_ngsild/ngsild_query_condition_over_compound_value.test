@@ -33,7 +33,7 @@ brokerStart CB 212-249
 #
 # 01. Create Entity with an attribute P100 having a property P1=2 and a compound value containing a top level field P1=1
 # 02. Get mongo content
-# 03. Query the property P100 over its property 'P1' using q=P100.P1==2, see the entity as P100.P1==2 (the property P!, not the compound vslue item P1)
+# 03. Query the property P100 over its property 'P1' using q=P100.P1==2, see the entity as P100.P1==2 (the property P!, not the compound value item P1)
 # 04. Query the compound value P100[P1]==1, see the entity as P1 inside compound value == 1
 # 05. Now try q=P100.P1==1, see empty array
 # 06. And finally q=P100[P1]==2, see empty array
@@ -66,29 +66,30 @@ echo
 echo
 
 
-echo "03. Query the property P100 over its property 'P1' using q=P100.P1==2, see the entity as P100.P1==2 (the property P!, not the compound vslue item P1)"
+echo "03. Query the property P100 over its property 'P1' using q=P100.P1==2, see the entity as P100.P1==2 (the property P!, not the compound value item P1)"
 echo "====================================================================================================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?q=P100.P1==2&prettyPrint=yes' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities?q=P100.P1==2&prettyPrint=yes&type=T_Query' --noPayloadCheck
 echo
 echo
 
 echo "04. Query the compound value P100[P1]==1, see the entity as P1 inside compound value == 1"
 echo "========================================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?q=P100\[P1\]==1&prettyPrint=yes' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities?q=P100\[P1\]==1&prettyPrint=yes&type=T_Query' --noPayloadCheck
 echo
 echo
 
 echo "05. Now try q=P100.P1==1, see empty array"
 echo "========================================="
-orionCurl --url '/ngsi-ld/v1/entities?q=P100.P1==1&prettyPrint=yes' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities?q=P100.P1==1&prettyPrint=yes&type=T_Query' --noPayloadCheck
 echo
 echo
 
 echo "06. And finally q=P100[P1]==2, see empty array"
 echo "=============================================="
-orionCurl --url '/ngsi-ld/v1/entities?q=P100\[P1\]==2&prettyPrint=yes' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities?q=P100\[P1\]==2&prettyPrint=yes&type=T_Query' --noPayloadCheck
 echo
 echo
+
 
 --REGEXPECT--
 01. Create Entity with an attribute P100 having a property P1=2 and a compound value containing a top level field P1=1
@@ -142,7 +143,7 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-03. Query the property P100 over its property 'P1' using q=P100.P1==2, see the entity as P100.P1==2 (the property P!, not the compound vslue item P1)
+03. Query the property P100 over its property 'P1' using q=P100.P1==2, see the entity as P100.P1==2 (the property P!, not the compound value item P1)
 =====================================================================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 282

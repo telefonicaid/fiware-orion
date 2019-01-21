@@ -64,7 +64,7 @@ echo
 
 echo "02. Query Relationship over its object (really: value)"
 echo "======================================================"
-orionCurl --url '/ngsi-ld/v1/entities?q=R100=="urn:ngsi-ld:T2:6789"&prettyPrint=yes' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities?q=R100=="urn:ngsi-ld:T2:6789"&prettyPrint=yes&type=T_Query' --noPayloadCheck
 echo
 echo
 

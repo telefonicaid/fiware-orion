@@ -35,6 +35,8 @@ extern "C"
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "mongoBackend/mongoQueryContext.h"                    // mongoQueryContext
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/common/urlCheck.h"                           // urlCheck
+#include "orionld/common/urnCheck.h"                           // urnCheck
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
 #include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
@@ -88,25 +90,41 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   bool         keyValues    = ciP->uriParamOptions[OPT_KEY_VALUES];
     
   //
-  // Can't query on EVERYTHING - at least one of the following URI params must be present:
-  // - id
-  // - idPattern
-  // - type
-  // - attrs
+  // Preconditions
+  // - 1. If neither Entity types nor Attribute names are provided, an error of type BadRequestData shall be raised.
+  // - 2. If an Entity type or Entity id is not provided then an error of type BadRequestData shall be raised.
+  // - 3. If the list of Entity identifiers includes a URI which it is not valid, or the query or geo-query are not
+  //      syntactically valid (as per the referred clauses 4.9 and 4.10) an error of type BadRequestData shall be raised.
   //
-  if ((*type == 0) && (attrs == NULL) && (id == NULL) && (idPattern == NULL))
+  if ((*type == 0) && (attrs == NULL))
   {
-    LM_W(("Bad Input (too broad query - attempt to query on ALL entities)"));
+    LM_W(("Bad Input (too broad query - entity type/id not given nor attribute list)"));
     
     orionldErrorResponseCreate(ciP,
                                OrionldBadRequestData,
-                               "too broad query", "no entity type, attribute-list, id, nor idPattern provided",
+                               "too broad query",
+                               "entity type/id not given nor attribute list",
                                OrionldDetailsString);
 
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }
 
+  if ((*type == 0) && (idPattern == NULL) && (id == NULL))
+  {
+    LM_W(("Bad Input (too broad query - entity type not given nor entity id)"));
+
+    orionldErrorResponseCreate(ciP,
+                               OrionldBadRequestData,
+                               "too broad query",
+                               "entity type not given nor entity id",
+                               OrionldDetailsString);
+
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
+  }
+
+  
   LM_T(LmtServiceRoutine, ("In orionldGetEntities"));
   LM_TMP(("In orionldGetEntities"));
 
@@ -163,6 +181,19 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   {
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "URI params /id/ and /type/ are both lists", "Not Permitted", OrionldDetailsString);
     return false;
+  }
+
+  //
+  // Make sure all IDs are valid URIs
+  //
+  for (int ix = 0; ix < idVecItems; ix++)
+  {
+    if ((urlCheck(idVector[ix], &details) == false) && (urnCheck(idVector[ix], &details) == false))
+    {
+      LM_W(("Bad Input (Invalid Entity ID - Not a URL nor a URN)"));
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN", OrionldDetailsString);
+      return false;
+    }
   }
 
   if (typeVecItems == 1)  // type needs to be modified according to @context

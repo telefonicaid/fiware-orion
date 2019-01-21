@@ -55,7 +55,7 @@ echo
 
 echo "02. Get the entity from broker, see speed::observedAt as a string"
 echo "================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?id=urn:ngsi-ld:T:E1a&prettyPrint=yes' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities?id=urn:ngsi-ld:T:E1a&prettyPrint=yes&type=Vehicle' --noPayloadCheck
 echo
 echo
 

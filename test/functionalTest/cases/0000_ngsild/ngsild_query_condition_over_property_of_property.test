@@ -89,7 +89,7 @@ echo
 
 echo "03. Query the property P100 over its property 'P1_P1'"
 echo "====================================================="
-orionCurl --url '/ngsi-ld/v1/entities?q=P100.P1_P1>0.70&prettyPrint=yes' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities?q=P100.P1_P1>0.70&prettyPrint=yes&type=T_Query' --noPayloadCheck
 echo
 echo
 
