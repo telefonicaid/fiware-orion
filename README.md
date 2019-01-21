@@ -18,15 +18,14 @@ Broker GE, providing an
 [NGSI](https://swagger.lab.fiware.org/?url=https://raw.githubusercontent.com/Fiware/specifications/master/OpenAPI/ngsiv2/ngsiv2-openapi.json)
 interface. Using this interface, clients can do several operations:
 
--   Register context producer applications, e.g. a temperature sensor within a
-    room
+-   Query context information. The Orion Context Broker stores context
+    information (consiting on *entities* and their *attributes*) updated from applications, 
+    so queries are resolved based on that information.
 -   Update context information, e.g. send updates of temperature
 -   Get notified when changes on context information take place (e.g. the
-    temperature has changed) or with a given frequency (e.g. get the temperature
-    each minute)
--   Query context information. The Orion Context Broker stores context
-    information updated from applications, so queries are resolved based on that
-    information.
+    temperature has changed)
+-   Register context provider applications, e.g. the provider for the temperature sensor within a
+    room
 
 This project is part of [FIWARE](https://www.fiware.org/). For more information
 check the FIWARE Catalogue entry for
@@ -77,12 +76,12 @@ of the FIWARE platform.
 
 Orion Context Broker allows you to manage the entire lifecycle of context
 information including updates, queries, registrations and subscriptions. It is
-an NGSIv2 server implementation to manage context information and its
-availability. Using the Orion Context Broker, you are able to create context
-elements and manage them through updates and queries. In addition, you can
-subscribe to context information so when some condition occurs (e.g. the context
-elements have changed) you receive a notification. These usage scenarios and the
-Orion Context Broker features are described in this documentation.
+an NGSIv2 server implementation to manage context information (consiting on 
+*entities* and their *attributes*)and its availability. Using the Orion Context Broker, 
+you are able to create context elements and manage them through updates and queries. 
+In addition, you can subscribe to context information so when some condition occurs 
+(e.g. the context elements have changed) you receive a notification. These usage 
+scenarios and the Orion Context Broker features are described in this documentation.
 
 If this is your first contact with the Orion Context Broker, it is highly
 recommended to have a look to the brief
