@@ -7,8 +7,8 @@ Orion Context Broker は、[FIWARE NGSI バージョン2 API](http://fiware.gith
 
 まず、FIWARE Lab にアカウントが必要です。もし、アカウントがなければ、[次のリンク](https://account.lab.fiware.org/sign_up)で登録してください。無料ですが、有効なメールアドレスが必要です。このアカウントを使用すると、Orion への REST API コールで使用する有効な認証トークンを取得できます。そのトークンを取得するには、`token_script.sh` スクリプトを取得して実行します。あなたの FIWARE Lab のユーザとパスワードを入力してスクリプトを入力します。**電子メールドメインを含む完全なユーザ名を使用する必要があります**。例えば、電子メールが "foo@gmail.com" の場合は "foo" だけでなく、"foo@gmail.com" です :
 
-    # wget --no-check-certificate https://raw.githubusercontent.com/fgalan/oauth2-example-orion-client/master/token_script.sh
-    # bash token_script.sh
+    # wget --no-check-certificate https://raw.githubusercontent.com/FIWARE-Ops/Tools/master/GetToken/get_token.sh
+    # bash get_token.sh orion-gi
     Username: your_email@example.com
     Password:
     Token: <this is the token you need>
