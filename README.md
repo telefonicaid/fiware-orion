@@ -19,8 +19,9 @@ Broker GE, providing an
 interface. Using this interface, clients can do several operations:
 
 -   Query context information. The Orion Context Broker stores context
-    information (consiting on *entities* and their *attributes*) updated from applications, 
-    so queries are resolved based on that information.
+    information updated from applications, so queries are resolved based 
+    on that information. Context information consists on *entities* (e.g. a car) 
+    and their *attributes* (e.g. the speed or location of the car).
 -   Update context information, e.g. send updates of temperature
 -   Get notified when changes on context information take place (e.g. the
     temperature has changed)
@@ -76,12 +77,15 @@ of the FIWARE platform.
 
 Orion Context Broker allows you to manage the entire lifecycle of context
 information including updates, queries, registrations and subscriptions. It is
-an NGSIv2 server implementation to manage context information (consiting on 
-*entities* and their *attributes*)and its availability. Using the Orion Context Broker, 
-you are able to create context elements and manage them through updates and queries. 
-In addition, you can subscribe to context information so when some condition occurs 
-(e.g. the context elements have changed) you receive a notification. These usage 
-scenarios and the Orion Context Broker features are described in this documentation.
+an NGSIv2 server implementation to manage context information and its availability.
+Context information consists on *entities* (e.g. a car) and their *attributes* 
+(e.g. the speed or location of the car).
+
+Using the Orion Context Broker, you are able to create context elements and manage 
+them through updates and queries. In addition, you can subscribe to context 
+information so when some condition occurs (e.g. the context elements have changed) 
+you receive a notification. These usage scenarios and the Orion Context Broker 
+features are described in this documentation.
 
 If this is your first contact with the Orion Context Broker, it is highly
 recommended to have a look to the brief
