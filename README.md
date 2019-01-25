@@ -32,6 +32,8 @@ This project is part of [FIWARE](https://www.fiware.org/). For more information
 check the FIWARE Catalogue entry for
 [Core Context Management](https://github.com/Fiware/catalogue/tree/master/core).
 
+The roadmap of this FIWARE GE is described [here](doc/roadmap.md).
+
 | :books: [Documentation](https://fiware-orion.rtfd.io) | :mortar_board: [Academy](https://fiware-academy.readthedocs.io/en/latest/core/orion) | :whale: [Docker Hub](https://hub.docker.com/r/fiware/orion/)| 
 |---|---|---|
 
