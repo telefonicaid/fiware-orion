@@ -1,1 +1,2 @@
 - Add: skipInitialNotification URI param to make initial notification in subscriptions configurable (#920)
+- Add: Forced Update option (#3389)
