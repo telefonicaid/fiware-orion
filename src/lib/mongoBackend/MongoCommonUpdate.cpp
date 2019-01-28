@@ -3009,7 +3009,7 @@ static void updateEntity
   UpdateContextResponse*          responseP,
   bool*                           attributeAlreadyExistsError,
   std::string*                    attributeAlreadyExistsList,
-  const bool& 			  forcedUpdate,
+  const bool&                     forcedUpdate,
   ApiVersion                      apiVersion,
   const std::string&              fiwareCorrelator,
   const std::string&              ngsiV2AttrsFormat
