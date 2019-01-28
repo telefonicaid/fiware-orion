@@ -49,7 +49,7 @@ extern HttpStatusCode mongoUpdateContext
   const std::string&                    xauthToken,
   const std::string&                    fiwareCorrelator,
   const std::string&                    ngsiV2AttrsFormat,
-  const bool&                           forcedUpdate,
+  const bool&                           forcedUpdate     = false,
   ApiVersion                            apiVersion       = V1,
   Ngsiv2Flavour                         ngsiv2Flavour    = NGSIV2_NO_FLAVOUR
 );
