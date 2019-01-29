@@ -301,7 +301,7 @@ int httpRequestSendWithCurl
   if (port == 0)
   {
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
-    LM_E(("Runtime Error (port is ZERO)"))
+    LM_E(("Runtime Error (port is ZERO)"));
 
     *outP = "error";
     return -1;
