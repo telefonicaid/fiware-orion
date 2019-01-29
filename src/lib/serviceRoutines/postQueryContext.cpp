@@ -123,7 +123,8 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   LM_T(LmtCPrForwardRequestPayload, ("forward queryContext request payload: %s", payload.c_str()));
 
   std::map<std::string, std::string> noHeaders;
-  r = httpRequestSend(ip,
+  r = httpRequestSend(fromIp,  // thread variable
+                      ip,
                       port,
                       protocol,
                       verb,
@@ -136,14 +137,13 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
                       ciP->httpHeaders.correlator,
                       "",
                       false,
-                      true,
                       &out,
                       noHeaders,
                       mimeType);
 
   if (r != 0)
   {
-    LM_W(("Runtime Error (error %d forwarding 'Query' to providing application)", r));
+    LM_E(("Runtime Error (error '%s' forwarding 'Query' to providing application)", httpRequestErrString(r).c_str()));
     return false;
   }
 

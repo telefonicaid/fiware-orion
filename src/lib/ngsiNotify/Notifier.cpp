@@ -147,6 +147,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
     pthread_t            tid;
     SenderThreadParams*  params = new SenderThreadParams();
 
+    params->from             = fromIp;  // note fromIp is a thread variable
     params->ip               = host;
     params->port             = port;
     params->protocol         = protocol;
@@ -361,6 +362,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 
     SenderThreadParams*  params = new SenderThreadParams();
 
+    params->from             = fromIp;  // note fromIp is a thread variable
     params->ip               = host;
     params->port             = port;
     params->protocol         = protocol;
@@ -508,6 +510,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
     SenderThreadParams*  params = new SenderThreadParams();
 
+    params->from             = fromIp;  // note fromIp is a thread variable
     params->ip               = host;
     params->port             = port;
     params->protocol         = protocol;

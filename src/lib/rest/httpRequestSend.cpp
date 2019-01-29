@@ -241,6 +241,7 @@ static int contentLenParse(char* s)
 int httpRequestSendWithCurl
 (
    CURL*                                      curl,
+   const std::string&                         from,
    const std::string&                         _ip,
    unsigned short                             port,
    const std::string&                         _protocol,
@@ -254,7 +255,6 @@ int httpRequestSendWithCurl
    const std::string&                         fiwareCorrelation,
    const std::string&                         ngsiv2AttrFormat,
    bool                                       useRush,
-   bool                                       waitForResponse,
    std::string*                               outP,
    const std::map<std::string, std::string>&  extraHeaders,
    const std::string&                         acceptFormat,
@@ -289,15 +289,19 @@ int httpRequestSendWithCurl
     timeoutInMilliseconds = defaultTimeout;
   }
 
+  // Note that the corresponding lmTransactionEnd() is not in this function, but in the caller, as we
+  // need to wait to subCacheItemNotificationErrorStatus() before ending (or the logs in this operation
+  // will show unwanted N/A fields)
   std::string protocol = _protocol + "//";
-  lmTransactionStart("to", protocol.c_str(), + ip.c_str(), port, resource.c_str());
+  correlatorIdSet(fiwareCorrelation.c_str());
+  lmTransactionStart("to", protocol.c_str(), + ip.c_str(), port, resource.c_str(),
+                     tenant.c_str(), servicePath.c_str(), from.c_str());
 
   // Preconditions check
   if (port == 0)
   {
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
-    LM_E(("Runtime Error (port is ZERO)"));
-    lmTransactionEnd();
+    LM_E(("Runtime Error (port is ZERO)"))
 
     *outP = "error";
     return -1;
@@ -307,7 +311,6 @@ int httpRequestSendWithCurl
   {
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (ip is empty)"));
-    lmTransactionEnd();
 
     *outP = "error";
     return -2;
@@ -317,7 +320,6 @@ int httpRequestSendWithCurl
   {
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (verb is empty)"));
-    lmTransactionEnd();
 
     *outP = "error";
     return -3;
@@ -327,7 +329,6 @@ int httpRequestSendWithCurl
   {
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (resource is empty)"));
-    lmTransactionEnd();
 
     *outP = "error";
     return -4;
@@ -337,7 +338,6 @@ int httpRequestSendWithCurl
   {
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
-    lmTransactionEnd();
 
     *outP = "error";
     return -5;
@@ -347,7 +347,6 @@ int httpRequestSendWithCurl
   {
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
-    lmTransactionEnd();
 
     *outP = "error";
     return -6;
@@ -529,7 +528,6 @@ int httpRequestSendWithCurl
     free(httpResponse->memory);
     delete httpResponse;
 
-    lmTransactionEnd();
     *outP = "error";
     return -7;
   }
@@ -630,8 +628,6 @@ int httpRequestSendWithCurl
   free(httpResponse->memory);
   delete httpResponse;
 
-  lmTransactionEnd();
-
   return res == CURLE_OK ? 0 : -9;
 }
 
@@ -657,6 +653,7 @@ int httpRequestSendWithCurl
 */
 int httpRequestSend
 (
+   const std::string&                         from,
    const std::string&                         _ip,
    unsigned short                             port,
    const std::string&                         protocol,
@@ -670,7 +667,6 @@ int httpRequestSend
    const std::string&                         fiwareCorrelation,
    const std::string&                         ngsiv2AttrFormat,
    bool                                       useRush,
-   bool                                       waitForResponse,
    std::string*                               outP,
    const std::map<std::string, std::string>&  extraHeaders,
    const std::string&                         acceptFormat,
@@ -692,13 +688,13 @@ int httpRequestSend
 
     release_curl_context(&cc);
     LM_E(("Runtime Error (could not init libcurl)"));
-    lmTransactionEnd();
 
     *outP = "error";
     return -8;
   }
 
   response = httpRequestSendWithCurl(cc.curl,
+                                     from,
                                      _ip,
                                      port,
                                      protocol,
@@ -712,7 +708,6 @@ int httpRequestSend
                                      fiwareCorrelation,
                                      ngsiv2AttrFormat,
                                      useRush,
-                                     waitForResponse,
                                      outP,
                                      extraHeaders,
                                      acceptFormat,
@@ -720,4 +715,50 @@ int httpRequestSend
 
   release_curl_context(&cc);
   return response;
+}
+
+
+/* ****************************************************************************
+*
+* httpRequestSendErr -
+*
+* Translate the error code returned by httpRequestSendWithCurl and httpRequestSend
+* to a meaninfull string
+*/
+std::string httpRequestErrString(int r) {
+  switch (r)
+  {
+  case 0:
+    return "no error";
+    break;
+  case -1:
+    return "invalid port";
+    break;
+  case -2:
+    return "invalid IP";
+    break;
+  case -3:
+    return "invalid verb";
+    break;
+  case -4:
+    return "invalid resource";
+    break;
+  case -5:
+    return "no Content-Type but content present";
+    break;
+  case -6:
+    return "Content-Type present but there is no content";
+    break;
+  case -7:
+    return "total outgoing message size is too big";
+    break;
+  case -8:
+    return "unable to initialize libcurl";
+    break;
+  case -9:
+    return "error making HTTP request";
+    break;
+  default:
+    return "unkown error";
+  }
 }

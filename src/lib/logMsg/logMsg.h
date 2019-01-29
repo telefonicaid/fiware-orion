@@ -1822,13 +1822,22 @@ inline void lmTransactionReset()
 *
 * lmTransactionStart -
 */
-inline void lmTransactionStart(const char* keyword, const char* schema, const char* ip, int port, const char* path)
+inline void lmTransactionStart(
+  const char* keyword,
+  const char* schema,
+  const char* ip,
+  int port,
+  const char* path,
+  const char* _service,
+  const char* _subService,
+  const char* _fromIp
+)
 {
   transactionIdSet();
 
-  snprintf(service,    sizeof(service),    "pending");
-  snprintf(subService, sizeof(subService), "pending");
-  snprintf(fromIp,     sizeof(fromIp),     "pending");
+  snprintf(service,    sizeof(service),    _service);
+  snprintf(subService, sizeof(subService), _subService);
+  snprintf(fromIp,     sizeof(fromIp),     _fromIp);
   LM_I(("Starting transaction %s %s%s:%d%s", keyword, schema, ip, port, path));
 }
 

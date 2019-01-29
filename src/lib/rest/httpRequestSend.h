@@ -57,6 +57,7 @@ extern int httpRequestConnect(const std::string& host, unsigned short port);
 */
 extern int httpRequestSend
 (
+  const std::string&                         from,
   const std::string&                         ip,
   unsigned short                             port,
   const std::string&                         protocol,
@@ -70,7 +71,6 @@ extern int httpRequestSend
   const std::string&                         fiwareCorrelation,
   const std::string&                         ngisv2AttrFormat,
   bool                                       useRush,
-  bool                                       waitForResponse,
   std::string*                               outP,
   const std::map<std::string, std::string>&  extraHeaders,
   const std::string&                         acceptFormat          = "",
@@ -86,6 +86,7 @@ extern int httpRequestSend
 extern int httpRequestSendWithCurl
 (
   CURL*                                      curl,
+  const std::string&                         from,
   const std::string&                         ip,
   unsigned short                             port,
   const std::string&                         protocol,
@@ -99,11 +100,20 @@ extern int httpRequestSendWithCurl
   const std::string&                         fiwareCorrelation,
   const std::string&                         ngisv2AttrFormat,
   bool                                       useRush,
-  bool                                       waitForResponse,
   std::string*                               outP,
   const std::map<std::string, std::string>&  extraHeaders,
   const std::string&                         acceptFormat          = "",
   long                                       timeoutInMilliseconds = -1
 );
+
+
+
+/* ****************************************************************************
+*
+* httpRequestErrString -
+*/
+extern std::string httpRequestErrString(int r);
+
+
 
 #endif  // SRC_LIB_REST_HTTPREQUESTSEND_H_

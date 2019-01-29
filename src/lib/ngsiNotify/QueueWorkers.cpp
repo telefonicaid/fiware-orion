@@ -130,6 +130,7 @@ static void* workerFunc(void* pSyncQ)
         int          r;
 
         r =  httpRequestSendWithCurl(curl,
+                                     params->from,
                                      params->ip,
                                      params->port,
                                      params->protocol,
@@ -143,7 +144,6 @@ static void* workerFunc(void* pSyncQ)
                                      params->fiwareCorrelator,
                                      params->renderFormat,
                                      true,
-                                     NOTIFICATION_WAIT_MODE,
                                      &out,
                                      params->extraHeaders);
 
@@ -169,7 +169,7 @@ static void* workerFunc(void* pSyncQ)
         else
         {
           QueueStatistics::incSentError();
-          alarmMgr.notificationError(url, "notification failure for queue worker");
+          alarmMgr.notificationError(url, "notification failure for queue worker: " + httpRequestErrString(r));
 
           if (params->registration == false)
           {
@@ -177,6 +177,9 @@ static void* workerFunc(void* pSyncQ)
           }
         }
       }
+
+      // End transaction
+      lmTransactionEnd();
 
       // Free params memory
       delete params;

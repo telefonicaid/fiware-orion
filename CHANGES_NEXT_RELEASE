@@ -1,1 +1,4 @@
 - Add: skipInitialNotification URI param to make initial notification in subscriptions configurable (#920)
+- Fix: specify notication/forwarding error cause in log messages (#3077)
+- Fix: from=, corr=, srv=, subsrv= correctly propagated to logs in notifications (#3073)
+- Fix: bug in notification alarm rasing in -notificationMode transient and persistent
