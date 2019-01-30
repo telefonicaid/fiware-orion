@@ -184,7 +184,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   if (r != 0)
   {
     upcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding update");
-    LM_E(("Runtime Error (error '%s' forwarding 'Update' to providing application)", httpRequestErrString(r).c_str()));
+    LM_E(("Runtime Error (error '%s' forwarding 'Update' to providing application)", out.c_str()));
     return;
   }
 

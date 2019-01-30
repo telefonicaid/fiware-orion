@@ -1354,7 +1354,7 @@ static int connectionTreat
 
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
 
-    // Mark the init of the tranaction - Incoming REST request starts
+    // Mark the init of the transaction - Incoming REST request starts
     lmTransactionStart("from", "", ip, port, url, ciP->tenantFromHttpHeader.c_str(), ciP->httpHeaders.servicePath.c_str(), from.c_str());
 
     return MHD_YES;

@@ -33,6 +33,8 @@ __author__ = 'fermin'
 # to be used in tests with this program.
 
 """
+### Subscriptions (8 cases)
+
 curl -v localhost:1026/v2/subscriptions -s -S -H 'fiware-service: AAA' -H 'fiware-servicepath: /BBB' -H 'Content-Type: application/json' -d @- <<EOF
 {
   "description": "Test 200 reponses",
@@ -185,18 +187,96 @@ curl -v localhost:1026/v2/subscriptions -s -S -H 'fiware-service: AAA' -H 'fiwar
 }
 EOF
 
-# To create entities (adjust entityID)
+### To create entities (8 cases):
 
 curl -v localhost:1026/v2/entities -s -S -H 'fiware-service: AAA' -H 'fiware-servicepath: /BBB' -H 'Content-Type: application/json' -d @- <<EOF
 {
-  "id": "",
+  "id": "E200",
   "type": "T",
-  "A": {
+  "A": {//alarmMgr.notificationError(url, "(curl_easy_perform failed: " + std::string(curl_easy_strerror(res)) + ")");
     "value": 1,
-    "type": "Number"    
+    "type": "Number"
   }
 }
 EOF
+
+curl -v localhost:1026/v2/entities -s -S -H 'fiware-service: AAA' -H 'fiware-servicepath: /BBB' -H 'Content-Type: application/json' -d @- <<EOF
+{
+  "id": "E400",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}
+EOF
+
+curl -v localhost:1026/v2/entities -s -S -H 'fiware-service: AAA' -H 'fiware-servicepath: /BBB' -H 'Content-Type: application/json' -d @- <<EOF
+{
+  "id": "E404",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}
+EOF
+
+curl -v localhost:1026/v2/entities -s -S -H 'fiware-service: AAA' -H 'fiware-servicepath: /BBB' -H 'Content-Type: application/json' -d @- <<EOF
+{
+  "id": "E500",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}
+EOF
+
+curl -v localhost:1026/v2/entities -s -S -H 'fiware-service: AAA' -H 'fiware-servicepath: /BBB' -H 'Content-Type: application/json' -d @- <<EOF
+{
+  "id": "EDelay",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}
+EOF
+
+curl -v localhost:1026/v2/entities -s -S -H 'fiware-service: AAA' -H 'fiware-servicepath: /BBB' -H 'Content-Type: application/json' -d @- <<EOF
+{
+  "id": "EUnknownPort",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}
+EOF
+
+curl -v localhost:1026/v2/entities -s -S -H 'fiware-service: AAA' -H 'fiware-servicepath: /BBB' -H 'Content-Type: application/json' -d @- <<EOF
+{
+  "id": "EUnknownName",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}
+EOF
+
+curl -v localhost:1026/v2/entities -s -S -H 'fiware-service: AAA' -H 'fiware-servicepath: /BBB' -H 'Content-Type: application/json' -d @- <<EOF
+{
+  "id": "EInvalidIP",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}
+EOF
+
 """
 
 # FIXME: they come from accumulator-server.py, maybe some of them are now uneeded and should be removed

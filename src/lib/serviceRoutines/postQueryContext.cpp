@@ -143,7 +143,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
 
   if (r != 0)
   {
-    LM_E(("Runtime Error (error '%s' forwarding 'Query' to providing application)", httpRequestErrString(r).c_str()));
+    LM_E(("Runtime Error (error '%s' forwarding 'Query' to providing application)", out.c_str()));
     return false;
   }
 

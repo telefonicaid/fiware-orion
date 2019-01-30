@@ -95,7 +95,7 @@ void* startSenderThread(void* p)
       }
       else
       {
-        alarmMgr.notificationError(url, "notification failure for sender-thread: " + httpRequestErrString(r));
+        alarmMgr.notificationError(url, "notification failure for sender-thread: " + out);
 
         if (params->registration == false)
         {

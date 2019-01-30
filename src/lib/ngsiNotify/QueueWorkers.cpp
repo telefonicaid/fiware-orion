@@ -169,7 +169,7 @@ static void* workerFunc(void* pSyncQ)
         else
         {
           QueueStatistics::incSentError();
-          alarmMgr.notificationError(url, "notification failure for queue worker: " + httpRequestErrString(r));
+          alarmMgr.notificationError(url, "notification failure for queue worker: " + out);
 
           if (params->registration == false)
           {

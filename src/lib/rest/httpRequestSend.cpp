@@ -303,7 +303,7 @@ int httpRequestSendWithCurl
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (port is ZERO)"));
 
-    *outP = "error";
+    *outP = "invalid port";
     return -1;
   }
 
@@ -312,7 +312,7 @@ int httpRequestSendWithCurl
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (ip is empty)"));
 
-    *outP = "error";
+    *outP = "invalid IP";
     return -2;
   }
 
@@ -321,7 +321,7 @@ int httpRequestSendWithCurl
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (verb is empty)"));
 
-    *outP = "error";
+    *outP = "invalid verb";
     return -3;
   }
 
@@ -330,7 +330,7 @@ int httpRequestSendWithCurl
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (resource is empty)"));
 
-    *outP = "error";
+    *outP = "invalid resource";
     return -4;
   }
 
@@ -339,7 +339,7 @@ int httpRequestSendWithCurl
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
 
-    *outP = "error";
+    *outP = "no Content-Type but content present";
     return -5;
   }
 
@@ -348,7 +348,7 @@ int httpRequestSendWithCurl
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
 
-    *outP = "error";
+    *outP = "Content-Type present but there is no content";
     return -6;
   }
 
@@ -527,7 +527,7 @@ int httpRequestSendWithCurl
     free(httpResponse->memory);
     delete httpResponse;
 
-    *outP = "error";
+    *outP = "total outgoing message size is too big";
     return -7;
   }
 
@@ -597,8 +597,7 @@ int httpRequestSendWithCurl
     // NOTE: This log line is used by the functional tests in cases/880_timeout_for_forward_and_notifications/
     //       So, this line should not be removed/altered, at least not without also modifying the functests.
     //
-    alarmMgr.notificationError(url, "(curl_easy_perform failed: " + std::string(curl_easy_strerror(res)) + ")");
-    *outP = "notification failure";
+    *outP = "(curl_easy_perform failed: " + std::string(curl_easy_strerror(res)) + ")";
 
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
   }
@@ -700,7 +699,7 @@ int httpRequestSend
     release_curl_context(&cc);
     LM_E(("Runtime Error (could not init libcurl)"));
 
-    *outP = "error";
+    *outP = "unable to initialize libcurl";
     return -8;
   }
 
@@ -726,50 +725,4 @@ int httpRequestSend
 
   release_curl_context(&cc);
   return response;
-}
-
-
-/* ****************************************************************************
-*
-* httpRequestSendErr -
-*
-* Translate the error code returned by httpRequestSendWithCurl and httpRequestSend
-* to a meaninfull string
-*/
-std::string httpRequestErrString(int r) {
-  switch (r)
-  {
-  case 0:
-    return "no error";
-    break;
-  case -1:
-    return "invalid port";
-    break;
-  case -2:
-    return "invalid IP";
-    break;
-  case -3:
-    return "invalid verb";
-    break;
-  case -4:
-    return "invalid resource";
-    break;
-  case -5:
-    return "no Content-Type but content present";
-    break;
-  case -6:
-    return "Content-Type present but there is no content";
-    break;
-  case -7:
-    return "total outgoing message size is too big";
-    break;
-  case -8:
-    return "unable to initialize libcurl";
-    break;
-  case -9:
-    return "error making HTTP request";
-    break;
-  default:
-    return "unkown error";
-  }
 }

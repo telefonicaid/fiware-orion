@@ -108,12 +108,4 @@ extern int httpRequestSendWithCurl
 
 
 
-/* ****************************************************************************
-*
-* httpRequestErrString -
-*/
-extern std::string httpRequestErrString(int r);
-
-
-
 #endif  // SRC_LIB_REST_HTTPREQUESTSEND_H_
