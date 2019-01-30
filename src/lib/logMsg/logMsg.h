@@ -1843,60 +1843,6 @@ inline void lmTransactionStart(
 
 
 
-/* ****************************************************************************
-*
-* lmTransactionSetService -
-*/
-inline void lmTransactionSetService(const char* _service)
-{
-  if (strlen(_service) != 0)
-  {
-    snprintf(service, sizeof(service), "%s", _service);
-  }
-  else
-  {
-    snprintf(service, sizeof(service), "%s", "<default>");
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* lmTransactionSetSubservice -
-*/
-inline void lmTransactionSetSubservice(const char* _subService)
-{
-  if (strlen(_subService) != 0)
-  {
-    snprintf(subService, sizeof(service), "%s", _subService);
-  }
-  else
-  {
-    snprintf(subService, sizeof(service), "%s", "<default>");
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* lmTransactionSetFrom -
-*/
-inline void lmTransactionSetFrom(const char* _fromIp)
-{
-  if (strlen(_fromIp) != 0)
-  {
-    snprintf(fromIp, sizeof(fromIp), "%s", _fromIp);
-  }
-  else
-  {
-    snprintf(fromIp, sizeof(fromIp), "%s", "<no ip>");
-  }
-}
-
-
-
 #if 0
 
 // This piece of code seems not be in use. Maybe it is related with ONTIMENOTIFICATION

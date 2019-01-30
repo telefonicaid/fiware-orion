@@ -1330,26 +1330,21 @@ static int connectionTreat
       return MHD_YES;
     }
 
-    //
-    // Transaction starts here
-    //
-    // FIXME P7: what about using actual srv/subsrv/from instead of "pending"?
-    //
-    lmTransactionStart("from", "", ip, port, url, "pending", "pending", "pending");  // Incoming REST request starts
-
     /* X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides ip.
        X-Real-IP takes preference over X-Forwarded-For, if both appear */
+    std::string from;
     if (ciP->httpHeaders.xrealIp != "")
     {
-      lmTransactionSetFrom(ciP->httpHeaders.xrealIp.c_str());
+      from = ciP->httpHeaders.xrealIp;
+
     }
     else if (ciP->httpHeaders.xforwardedFor != "")
     {
-      lmTransactionSetFrom(ciP->httpHeaders.xforwardedFor.c_str());
+      from = ciP->httpHeaders.xforwardedFor;
     }
     else
     {
-      lmTransactionSetFrom(ip);
+      from = ip;
     }
 
     char tenant[DB_AND_SERVICE_NAME_MAX_LEN];
@@ -1358,6 +1353,9 @@ static int connectionTreat
     ciP->outMimeType          = mimeTypeSelect(ciP);
 
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
+
+    // Mark the init of the tranaction - Incoming REST request starts
+    lmTransactionStart("from", "", ip, port, url, ciP->tenantFromHttpHeader.c_str(), ciP->httpHeaders.servicePath.c_str(), from.c_str());
 
     return MHD_YES;
   }
@@ -1433,8 +1431,6 @@ static int connectionTreat
   // URL and headers checks are delayed to the "third" MHD call, as no
   // errors can be sent before all the request has been read
   //
-  lmTransactionSetSubservice(ciP->httpHeaders.servicePath.c_str());
-
   if (urlCheck(ciP, ciP->url) == false)
   {
     alarmMgr.badInput(clientIp, "error in URI path");
