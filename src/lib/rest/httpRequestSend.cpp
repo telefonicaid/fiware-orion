@@ -489,7 +489,6 @@ int httpRequestSendWithCurl
   // Notify Format
   if ((ngsiv2AttrFormat != "") && (ngsiv2AttrFormat != "JSON") && (ngsiv2AttrFormat != "legacy"))
   {
-    std::string nFormatHeaderName  = HTTP_NGSIV2_ATTRSFORMAT;
     std::string nFormatHeaderValue = ngsiv2AttrFormat;
 
     httpHeaderAdd(&headers, HTTP_NGSIV2_ATTRSFORMAT, nFormatHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
@@ -614,6 +613,18 @@ int httpRequestSendWithCurl
     outP->assign(httpResponse->memory, httpResponse->size);
 
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_RESP_SIZE, payloadLen);
+
+    // Get and log response code
+    long httpCode;
+    curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if ((httpCode < 300) && (httpCode > 199))
+    {
+      LM_I(("Notification response OK, http code: %d", httpCode));
+    }
+    else
+    {
+      LM_W(("Notification response NOT OK, http code: %d", httpCode));
+    }
   }
 
   if (payloadSize > 0)
