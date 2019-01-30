@@ -90,7 +90,8 @@ void* startSenderThread(void* p)
 
         if (params->registration == false)
         {
-          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0);
+          // FIXME PR: unhardwire 999
+          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0, 999, "");
         }
       }
       else
@@ -99,7 +100,7 @@ void* startSenderThread(void* p)
 
         if (params->registration == false)
         {
-          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 1);
+          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, -1, -1, out);
         }
       }
     }

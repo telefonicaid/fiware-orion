@@ -105,8 +105,10 @@ static void insertInCache
                      sub.attrsFormat,
                      notificationDone,
                      lastNotification,
+                     lastSuccess,  // FIXME PR: bug???
                      lastFailure,
-                     lastSuccess,
+                     -1,
+                     "",
                      stringFilterP,
                      mdStringFilterP,
                      sub.status,

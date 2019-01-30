@@ -193,7 +193,7 @@ curl -v localhost:1026/v2/entities -s -S -H 'fiware-service: AAA' -H 'fiware-ser
 {
   "id": "E200",
   "type": "T",
-  "A": {//alarmMgr.notificationError(url, "(curl_easy_perform failed: " + std::string(curl_easy_strerror(res)) + ")");
+  "A": {
     "value": 1,
     "type": "Number"
   }

@@ -88,7 +88,9 @@ extern void mongoSubCountersUpdate
   long long           count,
   long long           lastNotificationTime,
   long long           lastFailure,
-  long long           lastSuccess
+  long long           lastSuccess,
+  const std::string&  failureReason,
+  long long           statusCode
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOSUBCACHE_H_

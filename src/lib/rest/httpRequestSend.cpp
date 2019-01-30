@@ -289,7 +289,7 @@ int httpRequestSendWithCurl
     timeoutInMilliseconds = defaultTimeout;
   }
 
-  // Note that the corresponding lmTransactionEnd() is not in this function, but in the caller, as we
+  // Note that the corresponding lmTransactionEnd() is not done in this function, but in the caller, as we
   // need to wait to subCacheItemNotificationErrorStatus() before ending (or the logs in this operation
   // will show unwanted N/A fields)
   std::string protocol = _protocol + "//";
