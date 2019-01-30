@@ -596,9 +596,6 @@ curl localhost:1026/v2/entities/Room1/attrs/temperature/value -s -S -H 'Content-
 Finally, the `PUT /v2/entities/{id}/attrs` operation can be used to replace all the attributes
 of a given entity, i.e. removing previously existing ones.
 
-You can also update entity with forcedUpdate URI option for discarding previous value and update 
-with the newly requested value, details about forcedUpdate URI option are described [here](ngsiv2_implementation_notes.md#force-updatation-of-entity).
-
 As in the case of entity creation, apart from simple values corresponding to
 JSON datatypes (i.e. numbers, strings, booleans, etc.) for attribute values, you can also
 use complex structures or custom metadata. These are advanced topics, described in
@@ -791,9 +788,9 @@ notifications due to throttling):
     clever enough to know that the value previous to the updateContext
     request was also 765 so no actual update has occurred and
     consequently no notification is sent.
--   update Room1 pressure to 765 with forcedUpdate URI option: In this 
-    case broker will send the notification, because of the forcedUpdate 
-    URI option, details about forcedUpdate URI option are described [here](ngsiv2_implementation_notes.md#force-updatation-of-entity).
+-   update Room1 pressure to 765 adding `?options=forcedUpdate` to the request URL: 
+    In this case broker will send the notification, because of the `forcedUpdate`
+    URI option, details about `forcedUpdate` URI option are described [here](ngsiv2_implementation_notes.md#forcedupdate-option).
 -   update Room2 pressure to 740: nothing happens, as the subscription
     is for Room1, not Room2.
 
