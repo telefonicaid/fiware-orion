@@ -16,7 +16,7 @@
  different attribute value types](#ordering-between-different-attribute-value-types)
 * [Initial notifications](#initial-notifications)
 * [Oneshot Subscription](#oneshot-subscriptions)
-* [Force Updatation of Entity](#force-updatation-of-entity)
+* [`forcedUpdate` option](#forcedupdate-option)
 * [Registrations](#registrations)
 * [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
@@ -290,12 +290,15 @@ Apart from the `status` values defined for subscription in the NGSIv2 specificat
 
 [Top](#top)
 
-## Force Updatation of Entity
-NGSIv2 introduced a new URI param option(forcedUpdate) for updating the entity if the value of the attribute is same as previous value.
-If this forcedUpdate URI param option is provided along with the request of update, previous value of entity would be forcefully 
-updated with requested value irrespective of the fact that whether the value is same as previous or newly updated.
+## `forcedUpdate` option
+As extra URI param option to the ones included in the NGSIv2 specification, Orion implements forcedUpdate, 
+than can be used to specify that an update operation have to trigger any matching subscription (and send 
+corresponding notification) no matter if there is an actual attribute update or not. Remember that the 
+default behaviour (i.e. without using the forcedUpdate URI param option) is to updated only if attribute 
+is effectively updated.
 
-Below requests can be formed with forcedUpdate:
+The following requests can use the forcedUpdate URI param option:
+* `POST /v2/entities?options=forcedUpdate`
 * `POST /v2/entities/E?options=forcedUpdate`
 * `POST /v2/entities/E?options=append,forcedUpdate`
 * `POST /v2/op/update?options=forcedUpdate`
