@@ -203,7 +203,7 @@ echo
 echo '08. POST /v2/op/update?options=forcedUpdate, to update Room1 and Room2 with same values.'
 echo '========================================================================================'
 payload='{
-  "actionType": "update",
+  "actionType": "append",
   "entities": [
     {
       "type": "Room",

@@ -187,7 +187,7 @@ echo
 echo '08. POST /v2/op/update?options=forcedUpdate, to update Slot1 and Slot2 with same values.'
 echo '========================================================================================'
 payload='{
-  "actionType": "update",
+  "actionType": "append",
   "entities": [
     {
       "type": "Slot",
