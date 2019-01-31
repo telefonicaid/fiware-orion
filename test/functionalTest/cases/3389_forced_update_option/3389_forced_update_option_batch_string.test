@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Force update for NGSIv2 POST /v2/op/update, POST /v2/subscriptions, Dump and reset accumulator, POST /v2/subscriptions, Dump and reset accumulator, POST /v2/op/update?options=forcedUpdate, Dump and reset accumulator.
+Force update for NGSIv2 POST /v2/op/update, POST /v2/subscriptions, Dump and reset accumulator, POST /v2/subscriptions, Dump and reset accumulator, POST /v2/op/update, Dump and reset accumulator, POST /v2/op/update?options=forcedUpdate, Dump and reset accumulator.
 
 --SHELL-INIT--
 dbInit CB
@@ -31,42 +31,36 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 --SHELL--
 
 #
-# 01. POST /v2/op/update, to create Room1 and Room2 with temperature and pressure.
-# 02. POST /v2/subscriptions, to create subscription for Room1.
+# 01. POST /v2/op/update, create Slot1 and Slot2 entity with availability attribute set to available.
+# 02. POST /v2/subscriptions, to create subscription for Slot1.
 # 03. Dump and reset accumulator, see notification.
-# 04. POST /v2/subscriptions, to create subscription for Room2.
+# 04. POST /v2/subscriptions, to create subscription for Slot2.
 # 05. Dump and reset accumulator, see notification.
-# 06. POST /v2/op/update?options=forcedUpdate, to update Room1 and Room2.
-# 07. Dump and reset accumulator, see notification.
+# 06. POST /v2/op/update without forcedUpdate, to update Slot1 and Slot2 with the same values.
+# 07. Dump and reset accumulator, see no notification (as there was no actual update).
+# 08. POST /v2/op/update?options=forcedUpdate, to update Slot1 and Slot2 with same values.
+# 09. Dump and reset accumulator, see notification.
 #
 
-echo '01. POST /v2/op/update, to create Room1 and Room2 with temperature and pressure.'
-echo '================================================================================'
+echo '01. POST /v2/op/update, create Slot1 and Slot2 entity with availability attribute set to available.'
+echo '==================================================================================================='
 payload='{
   "actionType": "append",
   "entities": [
     {
-      "type": "Room",
-      "id": "Room1",
-      "temperature": {
-        "value": 21.2,
-        "type": "Float"
-      },
-      "pressure": {
-        "value": 722,
-        "type": "Integer"
+      "type": "Slot",
+      "id": "Slot1",
+      "availability": {
+        "value": "available",
+        "type": "Text"
       }
     },
     {
-      "type": "Room",
-      "id": "Room2",
-      "temperature": {
-        "value": 31.8,
-        "type": "Float"
-      },
-      "pressure": {
-        "value": 712,
-        "type": "Integer"
+      "type": "Slot",
+      "id": "Slot2",
+      "availability": {
+        "value": "available",
+        "type": "Text"
       }
     }
   ]
@@ -76,20 +70,20 @@ echo
 echo
 
 
-echo '02. POST /v2/subscriptions, to create subscription for Room1.'
+echo '02. POST /v2/subscriptions, to create subscription for Slot1.'
 echo '============================================================='
 payload='{
   "description": "A subscription to get info about Room1",
   "subject": {
     "entities": [
       {
-        "id": "Room1",
-        "type": "Room"
+        "id": "Slot1",
+        "type": "Slot"
       }
     ],
     "condition": {
       "attrs": [
-        "pressure"
+        "availability"
       ]
     }
   },
@@ -98,7 +92,7 @@ payload='{
       "url": "http://localhost:'$LISTENER_PORT'/notify"
     },
     "attrs": [
-      "temperature"
+      "availability"
     ]
   }
 }'
@@ -115,20 +109,20 @@ echo
 echo
 
 
-echo '04. POST /v2/subscriptions, to create subscription for Room2.'
+echo '04. POST /v2/subscriptions, to create subscription for Slot2.'
 echo '============================================================='
 payload='{
   "description": "A subscription to get info about Room2",
   "subject": {
     "entities": [
       {
-        "id": "Room2",
-        "type": "Room"
+        "id": "Slot2",
+        "type": "Slot"
       }
     ],
     "condition": {
       "attrs": [
-        "pressure"
+        "availability"
       ]
     }
   },
@@ -137,7 +131,7 @@ payload='{
       "url": "http://localhost:'$LISTENER_PORT'/notify"
     },
     "attrs": [
-      "temperature"
+      "availability"
     ]
   }
 }'
@@ -154,33 +148,61 @@ echo
 echo
 
 
-echo '06. POST /v2/op/update?options=forcedUpdate, to update Room1 and Room2.'
-echo '======================================================================='
+echo '06. POST /v2/op/update without forcedUpdate, to update Slot1 and Slot2 with the same values.'
+echo '============================================================================================'
 payload='{
   "actionType": "update",
   "entities": [
     {
-      "type": "Room",
-      "id": "Room1",
-      "temperature": {
-        "value": 21.2,
-        "type": "Float"
-      },
-      "pressure": {
-        "value": 722,
-        "type": "Integer"
+      "type": "Slot",
+      "id": "Slot1",
+      "availability": {
+        "value": "available",
+        "type": "Text"
       }
     },
     {
-      "type": "Room",
-      "id": "Room2",
-      "temperature": {
-        "value": 31.8,
-        "type": "Float"
-      },
-      "pressure": {
-        "value": 712,
-        "type": "Integer"
+      "type": "Slot",
+      "id": "Slot2",
+      "availability": {
+        "value": "available",
+        "type": "Text"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo '07. Dump and reset accumulator, see no notification (as there was no actual update).'
+echo '===================================================================================='
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '08. POST /v2/op/update?options=forcedUpdate, to update Slot1 and Slot2 with same values.'
+echo '========================================================================================'
+payload='{
+  "actionType": "update",
+  "entities": [
+    {
+      "type": "Slot",
+      "id": "Slot1",
+      "availability": {
+        "value": "available",
+        "type": "Text"
+      }
+    },
+    {
+      "type": "Slot",
+      "id": "Slot2",
+      "availability": {
+        "value": "available",
+        "type": "Text"
       }
     }
   ]
@@ -190,7 +212,7 @@ echo
 echo
 
 
-echo '07. Dump and reset accumulator, see notification.'
+echo '09. Dump and reset accumulator, see notification.'
 echo '================================================='
 accumulatorDump
 accumulatorReset
@@ -199,8 +221,8 @@ echo
 
 
 --REGEXPECT--
-01. POST /v2/op/update, to create Room1 and Room2 with temperature and pressure.
-================================================================================
+01. POST /v2/op/update, create Slot1 and Slot2 entity with availability attribute set to available.
+===================================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -208,7 +230,7 @@ Date: REGEX(.*)
 
 
 
-02. POST /v2/subscriptions, to create subscription for Room1.
+02. POST /v2/subscriptions, to create subscription for Slot1.
 =============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -222,7 +244,7 @@ Date: REGEX(.*)
 =================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 141
+Content-Length: 148
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -233,13 +255,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 {
     "data": [
         {
-            "id": "Room1", 
-            "temperature": {
+            "availability": {
                 "metadata": {}, 
-                "type": "Float", 
-                "value": 21.2
+                "type": "Text", 
+                "value": "available"
             }, 
-            "type": "Room"
+            "id": "Slot1", 
+            "type": "Slot"
         }
     ], 
     "subscriptionId": "REGEX([0-9a-f]{24})"
@@ -247,7 +269,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-04. POST /v2/subscriptions, to create subscription for Room2.
+04. POST /v2/subscriptions, to create subscription for Slot2.
 =============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -261,7 +283,7 @@ Date: REGEX(.*)
 =================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 141
+Content-Length: 148
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -272,13 +294,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 {
     "data": [
         {
-            "id": "Room2", 
-            "temperature": {
+            "availability": {
                 "metadata": {}, 
-                "type": "Float", 
-                "value": 31.8
+                "type": "Text", 
+                "value": "available"
             }, 
-            "type": "Room"
+            "id": "Slot2", 
+            "type": "Slot"
         }
     ], 
     "subscriptionId": "REGEX([0-9a-f]{24})"
@@ -286,8 +308,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-06. POST /v2/op/update?options=forcedUpdate, to update Room1 and Room2.
-=======================================================================
+06. POST /v2/op/update without forcedUpdate, to update Slot1 and Slot2 with the same values.
+============================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -295,11 +317,24 @@ Date: REGEX(.*)
 
 
 
-07. Dump and reset accumulator, see notification.
+07. Dump and reset accumulator, see no notification (as there was no actual update).
+====================================================================================
+
+
+08. POST /v2/op/update?options=forcedUpdate, to update Slot1 and Slot2 with same values.
+========================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. Dump and reset accumulator, see notification.
 =================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 141
+Content-Length: 148
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -310,13 +345,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 {
     "data": [
         {
-            "id": "Room1", 
-            "temperature": {
+            "availability": {
                 "metadata": {}, 
-                "type": "Float", 
-                "value": 21.2
+                "type": "Text", 
+                "value": "available"
             }, 
-            "type": "Room"
+            "id": "Slot1", 
+            "type": "Slot"
         }
     ], 
     "subscriptionId": "REGEX([0-9a-f]{24})"
@@ -324,7 +359,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 141
+Content-Length: 148
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -335,13 +370,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 {
     "data": [
         {
-            "id": "Room2", 
-            "temperature": {
+            "availability": {
                 "metadata": {}, 
-                "type": "Float", 
-                "value": 31.8
+                "type": "Text", 
+                "value": "available"
             }, 
-            "type": "Room"
+            "id": "Slot2", 
+            "type": "Slot"
         }
     ], 
     "subscriptionId": "REGEX([0-9a-f]{24})"
