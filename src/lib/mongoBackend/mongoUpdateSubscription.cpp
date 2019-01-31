@@ -542,7 +542,8 @@ static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subC
 */
 static void setLastFailure(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
-  long long lastFailure = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTFAILURE);
+  long long   lastFailure       = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTFAILURE);
+  std::string lastFailureReason = getStringFieldF(subOrig, CSUB_LASTFAILUREASON);
 
   //
   // Compare with 'lastFailure' from the sub-cache.
@@ -550,10 +551,11 @@ static void setLastFailure(const BSONObj& subOrig, CachedSubscription* subCacheP
   //
   if ((subCacheP != NULL) && (subCacheP->lastFailure > lastFailure))
   {
-    lastFailure = subCacheP->lastFailure;
+    lastFailure       = subCacheP->lastFailure;
+    lastFailureReason = subCacheP->lastFailureReason;
   }
 
-  setLastFailure(lastFailure, b);
+  setLastFailure(lastFailure, lastFailureReason, b);
 }
 
 
@@ -564,7 +566,8 @@ static void setLastFailure(const BSONObj& subOrig, CachedSubscription* subCacheP
 */
 static void setLastSuccess(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
-  long long lastSuccess = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESS);
+  long long lastSuccess     = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESS);
+  long long lastSuccessCode = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESSCODE);
 
   //
   // Compare with 'lastSuccess' from the sub-cache.
@@ -572,10 +575,11 @@ static void setLastSuccess(const BSONObj& subOrig, CachedSubscription* subCacheP
   //
   if ((subCacheP != NULL) && (subCacheP->lastSuccess > lastSuccess))
   {
-    lastSuccess = subCacheP->lastSuccess;
+    lastSuccess     = subCacheP->lastSuccess;
+    lastSuccessCode = subCacheP->lastSuccessCode;
   }
 
-  setLastSuccess(lastSuccess, b);
+  setLastSuccess(lastSuccess, lastSuccessCode, b);
 }
 
 

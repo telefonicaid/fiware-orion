@@ -158,7 +158,7 @@ Date: REGEX(.*)
 03. Check subscription timesSent value (1)
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 379
+Content-Length: 400
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -174,6 +174,7 @@ Date: REGEX(.*)
         },
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
+        "lastSucessCode": 200,
         "timesSent": 1
     },
     "status": "active",

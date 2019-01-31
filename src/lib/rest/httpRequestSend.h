@@ -72,6 +72,7 @@ extern int httpRequestSend
   const std::string&                         ngisv2AttrFormat,
   bool                                       useRush,
   std::string*                               outP,
+  long long*                                 statusCodeP,
   const std::map<std::string, std::string>&  extraHeaders,
   const std::string&                         acceptFormat          = "",
   long                                       timeoutInMilliseconds = -1
@@ -79,7 +80,7 @@ extern int httpRequestSend
 
 
 
-/* ****************************************************************************
+/* ****************************************** **********************************
 *
 * httpRequestSendWithCurl -
 */
@@ -101,6 +102,7 @@ extern int httpRequestSendWithCurl
   const std::string&                         ngisv2AttrFormat,
   bool                                       useRush,
   std::string*                               outP,
+  long long*                                 statusCodeP,
   const std::map<std::string, std::string>&  extraHeaders,
   const std::string&                         acceptFormat          = "",
   long                                       timeoutInMilliseconds = -1

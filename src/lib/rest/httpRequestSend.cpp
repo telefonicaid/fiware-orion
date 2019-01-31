@@ -256,6 +256,7 @@ int httpRequestSendWithCurl
    const std::string&                         ngsiv2AttrFormat,
    bool                                       useRush,
    std::string*                               outP,
+   long long*                                 statusCodeP,
    const std::map<std::string, std::string>&  extraHeaders,
    const std::string&                         acceptFormat,
    long                                       timeoutInMilliseconds
@@ -597,7 +598,7 @@ int httpRequestSendWithCurl
     // NOTE: This log line is used by the functional tests in cases/880_timeout_for_forward_and_notifications/
     //       So, this line should not be removed/altered, at least not without also modifying the functests.
     //
-    *outP = "(curl_easy_perform failed: " + std::string(curl_easy_strerror(res)) + ")";
+    *outP = std::string(curl_easy_strerror(res));
 
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
   }
@@ -614,15 +615,14 @@ int httpRequestSendWithCurl
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_RESP_SIZE, payloadLen);
 
     // Get and log response code
-    long httpCode;
-    curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &httpCode);
-    if ((httpCode < 300) && (httpCode > 199))
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, statusCodeP);
+    if ((*statusCodeP < 300) && (*statusCodeP > 199))
     {
-      LM_I(("Notification response OK, http code: %d", httpCode));
+      LM_I(("Notification response OK, http code: %d", *statusCodeP));
     }
     else
     {
-      LM_W(("Notification response NOT OK, http code: %d", httpCode));
+      LM_W(("Notification response NOT OK, http code: %d", *statusCodeP));
     }
   }
 
@@ -678,6 +678,7 @@ int httpRequestSend
    const std::string&                         ngsiv2AttrFormat,
    bool                                       useRush,
    std::string*                               outP,
+   long long*                                 statusCodeP,
    const std::map<std::string, std::string>&  extraHeaders,
    const std::string&                         acceptFormat,
    long                                       timeoutInMilliseconds
@@ -719,6 +720,7 @@ int httpRequestSend
                                      ngsiv2AttrFormat,
                                      useRush,
                                      outP,
+                                     statusCodeP,
                                      extraHeaders,
                                      acceptFormat,
                                      timeoutInMilliseconds);

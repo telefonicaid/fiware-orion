@@ -86,7 +86,7 @@ echo
 
 echo "04. Look in the CB log for the warning about cert not accepted"
 echo "=============================================================="
-grep "(curl_easy_perform failed: Peer certificate cannot be authenticated" /tmp/contextBroker.log | awk -F "curl_easy_perform" '{ print $2 }' | awk -F ")" '{ print $1 }'
+grep "Peer certificate cannot be authenticated" /tmp/contextBroker.log | awk -F 'notification failure for queue worker: ' '{print $2}'
 echo
 echo
 
@@ -118,7 +118,7 @@ Date: REGEX(.*)
 
 04. Look in the CB log for the warning about cert not accepted
 ==============================================================
- failed: Peer certificate cannot be authenticated with REGEX(\S+) CA certificates
+Peer certificate cannot be authenticated with given CA certificates
 
 
 --TEARDOWN--

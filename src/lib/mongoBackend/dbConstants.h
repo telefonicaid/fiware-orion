@@ -84,7 +84,6 @@
 #define CSUB_DESCRIPTION             "description"
 #define CSUB_EXPIRATION              "expiration"
 #define CSUB_LASTNOTIFICATION        "lastNotification"
-#define CSUB_LASTFAILUREASON         "lastFailureReason"
 #define CSUB_REFERENCE               "reference"
 #define CSUB_CONDITIONS              "conditions"
 #define CSUB_EXPR                    "expression"
@@ -113,6 +112,7 @@
 #define CSUB_PAYLOAD                 "payload"
 #define CSUB_BLACKLIST               "blacklist"
 #define CSUB_LASTFAILURE             "lastFailure"
+#define CSUB_LASTFAILUREASON         "lastFailureReason"
 #define CSUB_LASTSUCCESS             "lastSuccess"
 #define CSUB_LASTSUCCESSCODE         "lastSuccessCode"
 

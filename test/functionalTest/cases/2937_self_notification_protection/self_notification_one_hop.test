@@ -125,7 +125,7 @@ Date: REGEX(.*)
 03. Wait for a while and check that only one notification was sent
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 471
+Content-Length: 492
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -145,6 +145,7 @@ Date: REGEX(.*)
             },
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
+            "lastSucessCode": 204,
             "timesSent": 1
         },
         "status": "active",

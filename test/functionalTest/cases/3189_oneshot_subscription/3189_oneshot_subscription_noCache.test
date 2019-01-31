@@ -339,7 +339,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 08. GET /v2/subscriptions/subscription_id, to check the status inactive.
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 410
+Content-Length: 431
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -357,6 +357,7 @@ Date: REGEX(.*)
         }, 
         "lastNotification": "REGEX(.*)", 
         "lastSuccess": "REGEX(.*)", 
+        "lastSucessCode": 200,
         "timesSent": 1
     }, 
     "status": "inactive", 
@@ -388,7 +389,7 @@ Date: REGEX(.*)
 10. GET /v2/subscriptions/subscription_id, to check the update status.
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 350
+Content-Length: 371
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -404,7 +405,8 @@ Date: REGEX(.*)
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
         }, 
-        "lastSuccess": "REGEX(.*)"
+        "lastSuccess": "REGEX(.*)",
+        "lastSucessCode": 200
     }, 
     "status": "oneshot", 
     "subject": {

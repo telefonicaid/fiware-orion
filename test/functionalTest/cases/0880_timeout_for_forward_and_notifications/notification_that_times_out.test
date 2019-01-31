@@ -94,7 +94,7 @@ echo
 
 echo "04. Grep in brokers logfile to see that the notification failed and that the broker thread continued"
 echo "===================================================================================================="
-grep "(curl_easy_perform failed: Timeout was reached)" /tmp/contextBroker.log | awk -F "curl_easy_perform" '{ print "(curl_easy_perform" $2 }'
+grep "Timeout was reached" /tmp/contextBroker.log | awk -F 'notification failure for sender-thread: ' '{ print $2 }'
 echo
 echo
 
@@ -141,7 +141,7 @@ Date: REGEX(.*)
 
 04. Grep in brokers logfile to see that the notification failed and that the broker thread continued
 ====================================================================================================
-(curl_easy_perform failed: Timeout was reached)
+Timeout was reached
 
 
 05. Dump notifications in accumulator - see nothing

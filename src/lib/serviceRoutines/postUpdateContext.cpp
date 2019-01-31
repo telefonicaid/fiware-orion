@@ -162,7 +162,9 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   LM_T(LmtCPrForwardRequestPayload, ("forward updateContext request payload: %s", payload.c_str()));
 
-  std::map<std::string, std::string> noHeaders;
+  std::map<std::string, std::string>  noHeaders;
+  long long                           statusCode; // not used by the moment
+
   r = httpRequestSend(fromIp,   // thread variable
                       ip,
                       port,
@@ -178,6 +180,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
                       "",
                       false,
                       &out,
+                      &statusCode,
                       noHeaders,
                       mimeType);
 

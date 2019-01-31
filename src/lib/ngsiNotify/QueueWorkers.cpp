@@ -128,6 +128,7 @@ static void* workerFunc(void* pSyncQ)
       {
         std::string  out;
         int          r;
+        long long    statusCode = -1;
 
         r =  httpRequestSendWithCurl(curl,
                                      params->from,
@@ -145,6 +146,7 @@ static void* workerFunc(void* pSyncQ)
                                      params->renderFormat,
                                      true,
                                      &out,
+                                     &statusCode,
                                      params->extraHeaders);
 
         //
@@ -163,8 +165,7 @@ static void* workerFunc(void* pSyncQ)
 
           if (params->registration == false)
           {
-            // FIXME PR: unhardwire 999
-            subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0, 999, "");
+            subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "");
           }
         }
         else

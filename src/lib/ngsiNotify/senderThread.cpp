@@ -65,6 +65,7 @@ void* startSenderThread(void* p)
     {
       std::string  out;
       int          r;
+      long long    statusCode = -1;
 
       r = httpRequestSend(params->from,
                           params->ip,
@@ -81,6 +82,7 @@ void* startSenderThread(void* p)
                           params->renderFormat,
                           true,
                           &out,
+                          &statusCode,
                           params->extraHeaders);
 
       if (r == 0)
@@ -90,8 +92,7 @@ void* startSenderThread(void* p)
 
         if (params->registration == false)
         {
-          // FIXME PR: unhardwire 999
-          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0, 999, "");
+          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "");
         }
       }
       else

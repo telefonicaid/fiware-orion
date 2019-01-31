@@ -99,7 +99,7 @@ echo
 
 echo "04. Grep in brokers logfile to see that the forward failed and that the broker thread continued"
 echo "==============================================================================================="
-grep "(curl_easy_perform failed: Timeout was reached)" /tmp/contextBroker.log | awk -F "curl_easy_perform" '{ print "(curl_easy_perform" $2 }'
+grep "Timeout was reached" /tmp/contextBroker.log |  awk -F 'Runtime Error ' '{print $2}'
 echo
 echo
 
@@ -132,7 +132,7 @@ echo
 
 echo "07. Grep in brokers logfile to see that the forward failed and that the broker thread continued"
 echo "==============================================================================================="
-grep "(curl_easy_perform failed: Timeout was reached)" /tmp/contextBroker.log | awk -F "curl_easy_perform" '{ print "(curl_easy_perform" $2 }'
+grep "Timeout was reached" /tmp/contextBroker.log |  awk -F 'Runtime Error ' '{print $2}'
 echo
 echo
 
@@ -175,7 +175,7 @@ Date: REGEX(.*)
 
 04. Grep in brokers logfile to see that the forward failed and that the broker thread continued
 ===============================================================================================
-(curl_easy_perform failed: Timeout was reached)' forwarding 'Update' to providing application)
+(error 'Timeout was reached' forwarding 'Update' to providing application)
 
 
 05. Query E1/T1/A1 on CB (provoking forward to accumulator)
@@ -201,8 +201,8 @@ Date: REGEX(.*)
 
 07. Grep in brokers logfile to see that the forward failed and that the broker thread continued
 ===============================================================================================
-(curl_easy_perform failed: Timeout was reached)' forwarding 'Update' to providing application)
-(curl_easy_perform failed: Timeout was reached)' forwarding 'Query' to providing application)
+(error 'Timeout was reached' forwarding 'Update' to providing application)
+(error 'Timeout was reached' forwarding 'Query' to providing application)
 
 
 --TEARDOWN--
