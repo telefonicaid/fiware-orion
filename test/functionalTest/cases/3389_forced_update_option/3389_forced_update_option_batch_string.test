@@ -38,8 +38,11 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 # 05. Dump and reset accumulator, see notification.
 # 06. POST /v2/op/update without forcedUpdate, to update Slot1 and Slot2 with the same values.
 # 07. Dump and reset accumulator, see no notification (as there was no actual update).
-# 08. POST /v2/op/update?options=forcedUpdate, to update Slot1 and Slot2 with same values.
+# 08. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Slot1 and Slot2 with same values.
 # 09. Dump and reset accumulator, see notification.
+# 10. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Slot1 and Slot2 with same values.
+# 11. Dump and reset accumulator, see notification.
+#
 #
 
 echo '01. POST /v2/op/update, create Slot1 and Slot2 entity with availability attribute set to available.'
@@ -184,8 +187,44 @@ echo
 echo
 
 
-echo '08. POST /v2/op/update?options=forcedUpdate, to update Slot1 and Slot2 with same values.'
-echo '========================================================================================'
+echo '08. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Slot1 and Slot2 with same values.'
+echo '=============================================================================================================='
+payload='{
+  "actionType": "update",
+  "entities": [
+    {
+      "type": "Slot",
+      "id": "Slot1",
+      "availability": {
+        "value": "available",
+        "type": "Text"
+      }
+    },
+    {
+      "type": "Slot",
+      "id": "Slot2",
+      "availability": {
+        "value": "available",
+        "type": "Text"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update?options=forcedUpdate --payload "$payload"
+echo
+echo
+
+
+echo '09. Dump and reset accumulator, see notification.'
+echo '================================================='
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '10. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Slot1 and Slot2 with same values.'
+echo '=============================================================================================================='
 payload='{
   "actionType": "append",
   "entities": [
@@ -212,7 +251,7 @@ echo
 echo
 
 
-echo '09. Dump and reset accumulator, see notification.'
+echo '11. Dump and reset accumulator, see notification.'
 echo '================================================='
 accumulatorDump
 accumulatorReset
@@ -321,8 +360,8 @@ Date: REGEX(.*)
 ====================================================================================
 
 
-08. POST /v2/op/update?options=forcedUpdate, to update Slot1 and Slot2 with same values.
-========================================================================================
+08. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Slot1 and Slot2 with same values.
+==============================================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -331,6 +370,69 @@ Date: REGEX(.*)
 
 
 09. Dump and reset accumulator, see notification.
+=================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 148
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {}, 
+                "type": "Text", 
+                "value": "available"
+            }, 
+            "id": "Slot1", 
+            "type": "Slot"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 148
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {}, 
+                "type": "Text", 
+                "value": "available"
+            }, 
+            "id": "Slot2", 
+            "type": "Slot"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+10. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Slot1 and Slot2 with same values.
+==============================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+11. Dump and reset accumulator, see notification.
 =================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /

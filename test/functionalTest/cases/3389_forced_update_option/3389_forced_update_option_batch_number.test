@@ -38,8 +38,10 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 # 05. Dump and reset accumulator, see notification.
 # 06. POST /v2/op/update without forcedUpdate, to update Room1 and Room2 with the same values.
 # 07. Dump and reset accumulator, see no notification (as there was no actual update).
-# 08. POST /v2/op/update?options=forcedUpdate, to update Room1 and Room2 with same values.
+# 08. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Room1 and Room1 with same values.
 # 09. Dump and reset accumulator, see notification.
+# 10. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Room1 and Room2 with same values.
+# 11. Dump and reset accumulator, see notification.
 #
 
 echo '01. POST /v2/op/update, to create Room1 and Room2 with temperature and pressure.'
@@ -200,8 +202,52 @@ echo
 echo
 
 
-echo '08. POST /v2/op/update?options=forcedUpdate, to update Room1 and Room2 with same values.'
-echo '========================================================================================'
+echo '08. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Room1 and Room2 with same values.'
+echo '=============================================================================================================='
+payload='{
+  "actionType": "update",
+  "entities": [
+    {
+      "type": "Room",
+      "id": "Room1",
+      "temperature": {
+        "value": 21.2,
+        "type": "Float"
+      },
+      "pressure": {
+        "value": 722,
+        "type": "Integer"
+      }
+    },
+    {
+      "type": "Room",
+      "id": "Room2",
+      "temperature": {
+        "value": 31.8,
+        "type": "Float"
+      },
+      "pressure": {
+        "value": 712,
+        "type": "Integer"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update?options=forcedUpdate --payload "$payload"
+echo
+echo
+
+
+echo '09. Dump and reset accumulator, see notification.'
+echo '================================================='
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '10. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Room1 and Room2 with same values.'
+echo '=============================================================================================================='
 payload='{
   "actionType": "append",
   "entities": [
@@ -236,7 +282,7 @@ echo
 echo
 
 
-echo '09. Dump and reset accumulator, see notification.'
+echo '11. Dump and reset accumulator, see notification.'
 echo '================================================='
 accumulatorDump
 accumulatorReset
@@ -345,8 +391,8 @@ Date: REGEX(.*)
 ====================================================================================
 
 
-08. POST /v2/op/update?options=forcedUpdate, to update Room1 and Room2 with same values.
-========================================================================================
+08. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Room1 and Room2 with same values.
+==============================================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -355,6 +401,69 @@ Date: REGEX(.*)
 
 
 09. Dump and reset accumulator, see notification.
+=================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 141
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "id": "Room1", 
+            "temperature": {
+                "metadata": {}, 
+                "type": "Float", 
+                "value": 21.2
+            }, 
+            "type": "Room"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 141
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "id": "Room2", 
+            "temperature": {
+                "metadata": {}, 
+                "type": "Float", 
+                "value": 31.8
+            }, 
+            "type": "Room"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+10. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Room1 and Room2 with same values.
+==============================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+11. Dump and reset accumulator, see notification.
 =================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
