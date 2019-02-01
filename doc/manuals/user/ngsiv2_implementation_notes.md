@@ -63,7 +63,7 @@ The following headers cannot be overwritten in custom notifications:
 * `Fiware-Correlator`
 * `Ngsiv2-AttrsFormat`
 
-Any attemp of doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be
+Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be
 ignored.
 
 [Top](#top)
@@ -121,15 +121,15 @@ The following considerations have to be taken into account at attribute creation
     * `hh:mm:ss` or `hhmmss`.
     * `hh:mm` or `hhmm`. Seconds are set to `00` in this case.
     * `hh`. Minutes and seconds are set to `00` in this case.
-    * If `<time>` is ommited, then hours, minutes and seconds are set to `00`.
+    * If `<time>` is omitted, then hours, minutes and seconds are set to `00`.
 * Regarding `<timezones>` it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators):
     * `Z`
     * `±hh:mm`
     * `±hhmm`
     * `±hh`
 * ISO8601 specifies that *"if no UTC relation information is given with a time representation, the time is assumed to be in local time"*.
-  However, this is ambiguous when client and server are in different zones. Thus, in order to solve this ambiguety, Orion will always
-  assume timezone `Z` when timezone designator is ommited.
+  However, this is ambiguous when client and server are in different zones. Thus, in order to solve this ambiguity, Orion will always
+  assume timezone `Z` when timezone designator is omitted.
 
 Orion always provides datetime attributes/metadata using the format `YYYY-MM-DDThh:mm:ss.ssZ`. Note it uses UTC/Zulu
 timezone (which is the best default option, as clients/receivers may be running in any timezone). This may change in the
@@ -238,11 +238,11 @@ From NGSIv2 specification regarding subscription throttling:
 
 > throttling: Minimal period of time in seconds which must elapse between two consecutive notifications. It is optional.
 
-The way in which Orion implements this is discarding notifications during the throttling guard period. Thus, nofications may be lost
+The way in which Orion implements this is discarding notifications during the throttling guard period. Thus, notifications may be lost
 if they arrive too close in time. If your use case doesn't support losing notifications this way, then you should not use throttling.
 
 In addition, Orion implements throttling in a local way. In multi-CB configurations, take into account that the last-notification
-measure is local to each Orion node. Although each node periodically synchronizes with the DB in order to get potencially newer
+measure is local to each Orion node. Although each node periodically synchronizes with the DB in order to get potentially newer
 values (more on this [here](perf_tuning.md#subscription-cache)) it may happen that a particular node has an old value, so throttling
 is not 100% accurate.
 
@@ -253,7 +253,7 @@ is not 100% accurate.
 From NGISv2 specification "Ordering Results" section:
 
 > Operations that retrieve lists of entities permit the `orderBy` URI parameter to specify 
-> the attributes or properties to be be used as criteria when ordering results
+> the attributes or properties to be used as criteria when ordering results
 
 It is an implementation aspect how each type is ordered with regard to other types. In the case of Orion,
 we use the same criteria as the one used by the underlying implementation (MongoDB). See
@@ -353,7 +353,7 @@ to use it you would get a 400 Bad Request error.
 Although we try to minimize the changes in the stable version of the NGSIv2 specification, a few changes
 have been needed in the end. Thus, there is changed functionality that doesn't appear in the current
 NGSIv2 stable specification document but that Orion still supports
-(as [deprecated functionality](../deprecated.md)) in order to keep backward compability.
+(as [deprecated functionality](../deprecated.md)) in order to keep backward compatibility.
 
 In particular:
 
