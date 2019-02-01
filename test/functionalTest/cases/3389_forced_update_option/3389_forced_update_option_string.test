@@ -1,0 +1,479 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Force update for NGSIv2 POST /v2/entities, POST /v2/subscriptions, Dump and reset accumulator, POST /v2/entities/Slot1?options=forcedUpdate, Dump and reset accumulator, POST /v2/entities/Slot1?options=append,forcedUpdate, Dump and reset accumulator, PUT /v2/entities/Slot1?options=forcedUpdate, Dump and reset accumulator,PUT /v2/entities/Slot1/attrs/availability?options=forcedUpdate, Dump and reset accumulator, PUT /v2/entities/Slot1/attrs/availability/value?options=forcedUpdate, Dump and reset accumulator, PATCH /v2/entities/Slot1?options=forcedUpdate, Dump and reset accumulator.
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print localhost $LISTENER_PORT
+
+--SHELL--
+
+#
+# 01. POST /v2/entities, to create Slot1 with availability set to "Avaliable".
+# 02. POST /v2/subscriptions, to create subscription.
+# 03. Dump and reset accumulator, see notification.
+# 04. POST /v2/entities/Slot1?options=forcedUpdate, update entity with same value.
+# 05. Dump and reset accumulator, see notification.
+# 06. POST /v2/entities/Slot1?options=append,forcedUpdate, update entity with same value.
+# 07. Dump and reset accumulator, see notification.
+# 08. PUT /v2/entities/Slot1?options=forcedUpdate, update entity with same value.
+# 09. Dump and reset accumulator, see notification.
+# 10. PUT /v2/entities/Slot1/attrs/availability?options=forcedUpdate, update entity with same value.
+# 11. Dump and reset accumulator, see notification.
+# 12. PUT /v2/entities/Slot1/attrs/availability/value?options=forcedUpdate, update entity with same value.
+# 13. Dump and reset accumulator, see notification.
+# 14. PATCH /v2/entities/Slot1?options=forcedUpdate, update entity with same value.
+# 15. Dump and reset accumulator, see notification.
+#
+
+echo '01. POST /v2/entities, to create Slot1 with availability set to "Avaliable".'
+echo '============================================================================'
+payload='{
+  "id": "Slot1",
+  "type": "Slot",
+  "availability": {
+    "value": "Avaliable",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '02. POST /v2/subscriptions, to create subscription.'
+echo '==================================================='
+payload='{
+  "description": "A subscription to get info about Slot1",
+  "subject": {
+    "entities": [
+      {
+        "id": "Slot1",
+        "type": "Slot"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "availability"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "availability"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '03. Dump and reset accumulator, see notification.'
+echo '================================================='
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '04. POST /v2/entities/Slot1?options=forcedUpdate, update entity with same value.'
+echo '================================================================================'
+payload='{
+  "availability": {
+    "value": "Avaliable",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities/Slot1/attrs?options=forcedUpdate --payload "$payload"
+echo
+echo
+
+
+echo '05. Dump and reset accumulator, see notification.'
+echo '================================================='
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '06. POST /v2/entities/Slot1/attrs?options=append,forcedUpdate, update entity with same value.'
+echo '============================================================================================='
+payload='{
+  "lift": {
+    "value": "Avaliable",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities/Slot1/attrs?options=append,forcedUpdate --payload "$payload"
+echo
+echo
+
+
+echo '07. Dump and reset accumulator, see notification.'
+echo '================================================='
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '08. PUT /v2/entities/Slot1?options=forcedUpdate, update entity with same value.'
+echo '==============================================================================='
+payload='{
+  "availability": {
+    "value": "Avaliable",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities/Slot1/attrs?options=forcedUpdate --payload "$payload" -X PUT
+echo
+echo
+
+
+echo '09. Dump and reset accumulator, see notification.'
+echo '================================================='
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '10. PUT /v2/entities/Slot1/attrs/availability?options=forcedUpdate, update entity with same value.'
+echo '=================================================================================================='
+payload='{
+  "value" : "Avaliable"
+}'
+orionCurl --url /v2/entities/Slot1/attrs/availability?options=forcedUpdate --payload "$payload" -X PUT
+echo
+echo
+
+
+echo '11. Dump and reset accumulator, see notification.'
+echo '================================================='
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '12. PUT /v2/entities/Slot1/attrs/availability/value?options=forcedUpdate, update entity with same value.'
+echo '========================================================================================================'
+payload='"Avaliable"'
+orionCurl --url /v2/entities/Slot1/attrs/availability/value?options=forcedUpdate --payload "$payload" --out json --in text/plain -X PUT
+echo
+echo
+
+
+echo '13. Dump and reset accumulator, see notification.'
+echo '================================================='
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '14. PATCH /v2/entities/Slot1/attrs?options=forcedUpdate, update entity with same value.'
+echo '======================================================================================='
+payload='{
+  "availability": {
+    "value": "Avaliable",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities/Slot1/attrs?options=forcedUpdate --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '15. Dump and reset accumulator, see notification.'
+echo '================================================='
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/entities, to create Slot1 with availability set to "Avaliable".
+============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Slot1?type=Slot
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. POST /v2/subscriptions, to create subscription.
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Dump and reset accumulator, see notification.
+=================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 148
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {}, 
+                "type": "Text", 
+                "value": "Avaliable"
+            }, 
+            "id": "Slot1", 
+            "type": "Slot"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+04. POST /v2/entities/Slot1?options=forcedUpdate, update entity with same value.
+================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Dump and reset accumulator, see notification.
+=================================================
+POST http://localhost:9997/notify
+Fiware-Servicepath: /
+Content-Length: 148
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX(.*)
+
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {}, 
+                "type": "Text", 
+                "value": "Avaliable"
+            }, 
+            "id": "Slot1", 
+            "type": "Slot"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+06. POST /v2/entities/Slot1/attrs?options=append,forcedUpdate, update entity with same value.
+=============================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Dump and reset accumulator, see notification.
+=================================================
+
+
+08. PUT /v2/entities/Slot1?options=forcedUpdate, update entity with same value.
+===============================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. Dump and reset accumulator, see notification.
+=================================================
+POST http://localhost:9997/notify
+Fiware-Servicepath: /
+Content-Length: 148
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {}, 
+                "type": "Text", 
+                "value": "Avaliable"
+            }, 
+            "id": "Slot1", 
+            "type": "Slot"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+10. PUT /v2/entities/Slot1/attrs/availability?options=forcedUpdate, update entity with same value.
+==================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+11. Dump and reset accumulator, see notification.
+=================================================
+POST http://localhost:9997/notify
+Fiware-Servicepath: /
+Content-Length: 148
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {}, 
+                "type": "Text", 
+                "value": "Avaliable"
+            }, 
+            "id": "Slot1", 
+            "type": "Slot"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+12. PUT /v2/entities/Slot1/attrs/availability/value?options=forcedUpdate, update entity with same value.
+========================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+13. Dump and reset accumulator, see notification.
+=================================================
+POST http://localhost:9997/notify
+Fiware-Servicepath: /
+Content-Length: 148
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {}, 
+                "type": "Text", 
+                "value": "Avaliable"
+            }, 
+            "id": "Slot1", 
+            "type": "Slot"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+14. PATCH /v2/entities/Slot1/attrs?options=forcedUpdate, update entity with same value.
+=======================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+15. Dump and reset accumulator, see notification.
+=================================================
+POST http://localhost:9997/notify
+Fiware-Servicepath: /
+Content-Length: 148
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {}, 
+                "type": "Text", 
+                "value": "Avaliable"
+            }, 
+            "id": "Slot1", 
+            "type": "Slot"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop $LISTENER_PORT
+dbDrop CB

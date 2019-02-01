@@ -1,4 +1,5 @@
-- Add: skipInitialNotification URI param to make initial notification in subscriptions configurable (#920)
+- Add: skipInitialNotification URI param option to make initial notification in subscriptions configurable (#920)
+- Add: forcedUpdate URI param option to always trigger notifications, no matter if actual update or not (#3389)
 - Add: log notification HTTP response (as INFO for 2xx or WARN for other codes)
 - Add: notification.lastFailureReason field in subscriptions to get the reason of the last notification failure
 - Add: notification.lastSuccessCode field in subscriptions to get the HTTP responde code of the last successful notification

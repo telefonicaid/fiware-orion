@@ -4372,8 +4372,9 @@ TEST(mongoUpdateContextRequest, tooManyEntitiesNGSIv2)
   req.entityVector.push_back(eP);
   req.updateActionType = ActionTypeUpdate;
 
+  bool forcedUpdate = false;
   /* Invoke the function in mongoBackend library (note the 2 to activate NGSIv2 special behaviours) */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", V2);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", forcedUpdate, V2);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
