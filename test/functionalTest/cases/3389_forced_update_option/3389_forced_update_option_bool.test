@@ -31,25 +31,25 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 --SHELL--
 
 #
-# 01. POST /v2/entities, to create Slot1 with availability.
+# 01. POST /v2/entities, to create Slot1 with availability set to true.
 # 02. POST /v2/subscriptions, to create subscription.
 # 03. Dump and reset accumulator, see notification.
-# 04. POST /v2/entities/Slot1?options=forcedUpdate, update entity.
+# 04. POST /v2/entities/Slot1?options=forcedUpdate, update entity with same value.
 # 05. Dump and reset accumulator, see notification.
-# 06. POST /v2/entities/Slot1?options=append,forcedUpdate, update entity.
+# 06. POST /v2/entities/Slot1?options=append,forcedUpdate, update entity with same value.
 # 07. Dump and reset accumulator, see notification.
-# 08. PUT /v2/entities/Slot1?options=forcedUpdate, update entity.
+# 08. PUT /v2/entities/Slot1?options=forcedUpdate, update entity with same value.
 # 09. Dump and reset accumulator, see notification.
-# 10. PUT /v2/entities/Slot1/attrs/availability?options=forcedUpdate, update entity.
+# 10. PUT /v2/entities/Slot1/attrs/availability?options=forcedUpdate, update entity with same value.
 # 11. Dump and reset accumulator, see notification.
-# 12. PUT /v2/entities/Slot1/attrs/availability/value?options=forcedUpdate, update entity.
+# 12. PUT /v2/entities/Slot1/attrs/availability/value?options=forcedUpdate, update entity with same value.
 # 13. Dump and reset accumulator, see notification.
-# 14. PATCH /v2/entities/Slot1?options=forcedUpdate, update entity.
+# 14. PATCH /v2/entities/Slot1?options=forcedUpdate, update entity with same value.
 # 15. Dump and reset accumulator, see notification.
 #
 
-echo '01. POST /v2/entities, to create Slot1 with availability.'
-echo '========================================================='
+echo '01. POST /v2/entities, to create Slot1 with availability set to true.'
+echo '====================================================================='
 payload='{
   "id": "Slot1",
   "type": "Slot",
@@ -102,8 +102,8 @@ echo
 echo
 
 
-echo '04. POST /v2/entities/Slot1?options=forcedUpdate, update entity.'
-echo '================================================================'
+echo '04. POST /v2/entities/Slot1?options=forcedUpdate, update entity with same value.'
+echo '================================================================================'
 payload='{
   "availability": {
     "value": true,
@@ -123,8 +123,8 @@ echo
 echo
 
 
-echo '06. POST /v2/entities/Slot1/attrs?options=append,forcedUpdate, update entity.'
-echo '============================================================================='
+echo '06. POST /v2/entities/Slot1/attrs?options=append,forcedUpdate, update entity with same value.'
+echo '============================================================================================='
 payload='{
   "lift": {
     "value": true,
@@ -144,8 +144,8 @@ echo
 echo
 
 
-echo '08. PUT /v2/entities/Slot1?options=forcedUpdate, update entity.'
-echo '==============================================================='
+echo '08. PUT /v2/entities/Slot1?options=forcedUpdate, update entity with same value.'
+echo '==============================================================================='
 payload='{
   "availability": {
     "value": true,
@@ -165,8 +165,8 @@ echo
 echo
 
 
-echo '10. PUT /v2/entities/Slot1/attrs/availability?options=forcedUpdate, update entity.'
-echo '=================================================================================='
+echo '10. PUT /v2/entities/Slot1/attrs/availability?options=forcedUpdate, update entity with same value.'
+echo '=================================================================================================='
 payload='{
   "value" : true
 }'
@@ -183,8 +183,8 @@ echo
 echo
 
 
-echo '12. PUT /v2/entities/Slot1/attrs/availability/value?options=forcedUpdate, update entity.'
-echo '========================================================================================'
+echo '12. PUT /v2/entities/Slot1/attrs/availability/value?options=forcedUpdate, update entity with same value.'
+echo '========================================================================================================'
 payload='true'
 orionCurl --url /v2/entities/Slot1/attrs/availability/value?options=forcedUpdate --payload "$payload" --out json --in text/plain -X PUT
 echo
@@ -199,8 +199,8 @@ echo
 echo
 
 
-echo '14. PATCH /v2/entities/Slot1/attrs?options=forcedUpdate, update entity.'
-echo '======================================================================='
+echo '14. PATCH /v2/entities/Slot1/attrs?options=forcedUpdate, update entity with same value.'
+echo '======================================================================================='
 payload='{
   "availability": {
     "value": true,
@@ -221,8 +221,8 @@ echo
 
 
 --REGEXPECT--
-01. POST /v2/entities, to create Slot1 with availability.
-=========================================================
+01. POST /v2/entities, to create Slot1 with availability set to true.
+=====================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/Slot1?type=Slot
@@ -270,8 +270,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-04. POST /v2/entities/Slot1?options=forcedUpdate, update entity.
-================================================================
+04. POST /v2/entities/Slot1?options=forcedUpdate, update entity with same value.
+================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -308,8 +308,8 @@ Fiware-Correlator: REGEX(.*)
 =======================================
 
 
-06. POST /v2/entities/Slot1/attrs?options=append,forcedUpdate, update entity.
-=============================================================================
+06. POST /v2/entities/Slot1/attrs?options=append,forcedUpdate, update entity with same value.
+=============================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -321,8 +321,8 @@ Date: REGEX(.*)
 =================================================
 
 
-08. PUT /v2/entities/Slot1?options=forcedUpdate, update entity.
-===============================================================
+08. PUT /v2/entities/Slot1?options=forcedUpdate, update entity with same value.
+===============================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -359,8 +359,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-10. PUT /v2/entities/Slot1/attrs/availability?options=forcedUpdate, update entity.
-==================================================================================
+10. PUT /v2/entities/Slot1/attrs/availability?options=forcedUpdate, update entity with same value.
+==================================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -397,8 +397,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-12. PUT /v2/entities/Slot1/attrs/availability/value?options=forcedUpdate, update entity.
-========================================================================================
+12. PUT /v2/entities/Slot1/attrs/availability/value?options=forcedUpdate, update entity with same value.
+========================================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -435,8 +435,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-14. PATCH /v2/entities/Slot1/attrs?options=forcedUpdate, update entity.
-=======================================================================
+14. PATCH /v2/entities/Slot1/attrs?options=forcedUpdate, update entity with same value.
+=======================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

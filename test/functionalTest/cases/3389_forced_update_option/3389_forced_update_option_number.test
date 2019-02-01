@@ -34,17 +34,17 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 # 01. POST /v2/entities, to create Room1 with temperature and pressure.
 # 02. POST /v2/subscriptions, to create subscription.
 # 03. Dump and reset accumulator, see notification.
-# 04. POST /v2/entities/Room1?options=forcedUpdate, update entity.
+# 04. POST /v2/entities/Room1?options=forcedUpdate, update entity with same value.
 # 05. Dump and reset accumulator, see notification.
-# 06. POST /v2/entities/Room1?options=append,forcedUpdate, update entity.
+# 06. POST /v2/entities/Room1?options=append,forcedUpdate, update entity with same value.
 # 07. Dump and reset accumulator, see notification.
-# 08. PUT /v2/entities/Room1?options=forcedUpdate, update entity.
+# 08. PUT /v2/entities/Room1?options=forcedUpdate, update entity with same value.
 # 09. Dump and reset accumulator, see notification.
-# 10. PUT /v2/entities/Room1/attrs/pressure?options=forcedUpdate, update entity.
+# 10. PUT /v2/entities/Room1/attrs/pressure?options=forcedUpdate, update entity with same value.
 # 11. Dump and reset accumulator, see notification.
-# 12. PUT /v2/entities/Room1/attrs/pressure/value?options=forcedUpdate, update entity.
+# 12. PUT /v2/entities/Room1/attrs/pressure/value?options=forcedUpdate, update entity with same value.
 # 13. Dump and reset accumulator, see notification.
-# 14. PATCH /v2/entities/Room1?options=forcedUpdate, update entity.
+# 14. PATCH /v2/entities/Room1?options=forcedUpdate, update entity with same value.
 # 15. Dump and reset accumulator, see notification.
 #
 
@@ -67,8 +67,8 @@ echo
 echo
 
 
-echo '02. POST /v2/subscriptions, to create subscription with skipInitialNotification.'
-echo '================================================================================'
+echo '02. POST /v2/subscriptions, to create subscription.'
+echo '==================================================='
 payload='{
   "description": "A subscription to get info about Room1",
   "subject": {
@@ -106,8 +106,8 @@ echo
 echo
 
 
-echo '04. POST /v2/entities/Room1?options=forcedUpdate, update entity.'
-echo '================================================================'
+echo '04. POST /v2/entities/Room1?options=forcedUpdate, update entity with same value.'
+echo '================================================================================'
 payload='{
   "temperature": {
     "value": 28,
@@ -131,8 +131,8 @@ echo
 echo
 
 
-echo '06. POST /v2/entities/Room1/attrs?options=append,forcedUpdate, update entity.'
-echo '============================================================================='
+echo '06. POST /v2/entities/Room1/attrs?options=append,forcedUpdate, update entity with same value.'
+echo '============================================================================================='
 payload='{
   "humidity": {
     "value": 45,
@@ -152,8 +152,8 @@ echo
 echo
 
 
-echo '08. PUT /v2/entities/Room1?options=forcedUpdate, update entity.'
-echo '==============================================================='
+echo '08. PUT /v2/entities/Room1?options=forcedUpdate, update entity with same value.'
+echo '==============================================================================='
 payload='{
   "temperature": {
     "value": 28,
@@ -177,8 +177,8 @@ echo
 echo
 
 
-echo '10. PUT /v2/entities/Room1/attrs/pressure?options=forcedUpdate, update entity.'
-echo '=============================================================================='
+echo '10. PUT /v2/entities/Room1/attrs/pressure?options=forcedUpdate, update entity with same value.'
+echo '=============================================================================================='
 payload='{
   "value" : "600"
 }'
@@ -195,8 +195,8 @@ echo
 echo
 
 
-echo '12. PUT /v2/entities/Room1/attrs/pressure/value?options=forcedUpdate, update entity.'
-echo '===================================================================================='
+echo '12. PUT /v2/entities/Room1/attrs/pressure/value?options=forcedUpdate, update entity with same value.'
+echo '===================================================================================================='
 payload='600'
 orionCurl --url /v2/entities/Room1/attrs/pressure/value?options=forcedUpdate --payload "$payload" --out json --in text/plain -X PUT
 echo
@@ -211,8 +211,8 @@ echo
 echo
 
 
-echo '14. PATCH /v2/entities/Room1/attrs?options=forcedUpdate, update entity.'
-echo '======================================================================='
+echo '14. PATCH /v2/entities/Room1/attrs?options=forcedUpdate, update entity with same value.'
+echo '======================================================================================='
 payload='{
   "temperature": {
     "value": 28,
@@ -247,8 +247,8 @@ Date: REGEX(.*)
 
 
 
-02. POST /v2/subscriptions, to create subscription with skipInitialNotification.
-================================================================================
+02. POST /v2/subscriptions, to create subscription.
+===================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -286,8 +286,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-04. POST /v2/entities/Room1?options=forcedUpdate, update entity.
-================================================================
+04. POST /v2/entities/Room1?options=forcedUpdate, update entity with same value.
+================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -324,8 +324,8 @@ Fiware-Correlator: REGEX(.*)
 =======================================
 
 
-06. POST /v2/entities/Room1/attrs?options=append,forcedUpdate, update entity.
-=============================================================================
+06. POST /v2/entities/Room1/attrs?options=append,forcedUpdate, update entity with same value.
+=============================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -337,8 +337,8 @@ Date: REGEX(.*)
 =================================================
 
 
-08. PUT /v2/entities/Room1?options=forcedUpdate, update entity.
-===============================================================
+08. PUT /v2/entities/Room1?options=forcedUpdate, update entity with same value.
+===============================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -375,8 +375,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-10. PUT /v2/entities/Room1/attrs/pressure?options=forcedUpdate, update entity.
-==============================================================================
+10. PUT /v2/entities/Room1/attrs/pressure?options=forcedUpdate, update entity with same value.
+==============================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -413,8 +413,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-12. PUT /v2/entities/Room1/attrs/pressure/value?options=forcedUpdate, update entity.
-====================================================================================
+12. PUT /v2/entities/Room1/attrs/pressure/value?options=forcedUpdate, update entity with same value.
+====================================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -451,8 +451,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-14. PATCH /v2/entities/Room1/attrs?options=forcedUpdate, update entity.
-=======================================================================
+14. PATCH /v2/entities/Room1/attrs?options=forcedUpdate, update entity with same value.
+=======================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
