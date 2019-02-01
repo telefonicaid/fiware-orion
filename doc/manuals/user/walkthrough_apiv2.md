@@ -788,6 +788,9 @@ notifications due to throttling):
     clever enough to know that the value previous to the updateContext
     request was also 765 so no actual update has occurred and
     consequently no notification is sent.
+-   update Room1 pressure to 765 adding `?options=forcedUpdate` to the request URL: 
+    In this case broker will send the notification, because of the `forcedUpdate`
+    URI option, details about `forcedUpdate` URI option are described [here](ngsiv2_implementation_notes.md#forcedupdate-option).
 -   update Room2 pressure to 740: nothing happens, as the subscription
     is for Room1, not Room2.
 

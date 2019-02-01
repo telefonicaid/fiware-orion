@@ -617,9 +617,10 @@ TEST(mongoUpdateContextGeoRequest, replaceLocAttributeWithDifferentLocAttribute)
     req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeReplace;
 
+    bool forcedUpdate = false;
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", V2);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", forcedUpdate,  V2);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -717,9 +718,10 @@ TEST(mongoUpdateContextGeoRequest, replaceLocAttributeWithNoLocAttribute)
     req.entityVector.push_back(eP);
     req.updateActionType = ActionTypeReplace;
 
+    bool forcedUpdate = false;
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", V2);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", forcedUpdate,  V2);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);

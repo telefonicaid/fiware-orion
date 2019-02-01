@@ -452,7 +452,7 @@ std::string postUpdateContext
   std::string             answer;
 
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-
+  bool forcedUpdate = ciP->uriParamOptions[OPT_FORCEDUPDATE];
   //
   // 01. Check service-path consistency
   //
@@ -503,6 +503,7 @@ std::string postUpdateContext
                                                   ciP->httpHeaders.xauthToken,
                                                   ciP->httpHeaders.correlator,
                                                   ciP->httpHeaders.ngsiv2AttrsFormat,
+                                                  forcedUpdate,
                                                   ciP->apiVersion,
                                                   ngsiV2Flavour));
 
