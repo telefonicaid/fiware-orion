@@ -260,6 +260,7 @@ NGSIv2 仕様に含まれるものに対する追加の URI パラメータ・�
 更新されることに注意してください。
 
 次のリクエストでは、forcedUpdate URI param オプションを使用できます :
+
 * `POST /v2/entities/E/attrs?options=forcedUpdate`
 * `POST /v2/entities/E/attrs?options=append,forcedUpdate`
 * `POST /v2/op/update?options=forcedUpdate`

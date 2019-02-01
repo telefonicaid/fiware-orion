@@ -298,6 +298,7 @@ default behaviour (i.e. without using the forcedUpdate URI param option) is to u
 is effectively updated.
 
 The following requests can use the forcedUpdate URI param option:
+
 * `POST /v2/entities/E/attrs?options=forcedUpdate`
 * `POST /v2/entities/E/attrs?options=append,forcedUpdate`
 * `POST /v2/op/update?options=forcedUpdate`
