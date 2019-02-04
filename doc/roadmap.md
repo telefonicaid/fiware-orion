@@ -30,7 +30,7 @@ Disclaimer:
 ## Short term
 
 The following list of features are planned to be addressed in the short term,
-and incorporated in the next releases of the product:
+and incorporated in the release of the product matching the FIWARE 7.7 Release:
 
 - NGSI-LD Basic Functionality. Entity creation, Entity update, Entity delete, Basic Query Support. 
 - Notification improvements (initial notification skip, always-notify updates, etc.) (community)
