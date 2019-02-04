@@ -9,6 +9,7 @@
     * [Diagnose memory exhaustion problem](#diagnose-memory-exhaustion-problem)
     * [Diagnose spontaneous binary corruption problem](#diagnose-spontaneous-binary-corruption-problem)
 * [I/O Flows](#io-flows)
+    * [Diagnose notification reception problems](#diagnose-notification-reception-problems)
     * [Diagnose database connection problems](#diagnose-database-connection-problems)
 
 The Diagnosis Procedures are the first steps that a System Administrator
@@ -230,6 +231,40 @@ context consumer and producers and the nature of the requests issued by
 consumers/producers.
 
 ![](Orion-ioflows.png "Orion-ioflows.png")
+
+### Diagnose notification reception problems
+
+In order to diagnose possible notification problems (i.e. you expect notifications
+arriving to a given endpoint but it is not working) have a look to the information
+provided by `GET /v2/subscriptions/<subId>` and consider the following flowchart:
+
+![](notifications-debug-flowchart.png "notifications-debug-flowchart.png")
+
+Some possible values for `lastFailureReason` (non exahustive list):
+
+* "Timeout was reached". Context Broker was unable to deliver the notification within
+  the timeout (configured by `-httpTimeout` [CLI parameter](../admin/cli.md)). It may be
+  due to a failing endpoint or a network connection problem (e.g. notification
+  host cannot be reached).
+* "Couldn't connect to server". Context Broker was unable to establish HTTP connection
+  to send the notification. Typically means that Context Broker was able to reach the
+  host in notification URL but that nobody is listening in the notification URL port.
+* "Couldn't resolve host name". The name provided in the notification URL cannot be
+  resolved to a valid IP. It may be due to a wrongly introduced hostname or to a fail
+  in the DNS resolution system/configuration in the ContextBroker host.
+* "Peer certificate cannot be authenticated". In HTTPS notifications, it means that the
+  certificate provided by the notification endpoint is not valid due to it cannot be
+  authenticated. This typically happens with self-signed certificated when ContextBroker
+  doesn't run in insecure mode (i.e. without `-insecureNotif` [CLI parameters](../admin/cli.md)).
+
+More detail about `status`, `lastFailureReason` and `lastSuccessCode` in the
+[NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/) and
+in the [NGSIv2 implementation notes document](ngsiv2_implementation_notes.md).
+
+In addition, you may find useful the notification log examples shown in
+[the corresponding section of the administration manual](../admin/logs.md#log-examples-for-notification-transactions).
+
+[Top](#top)
 
 ### Diagnose database connection problems
 

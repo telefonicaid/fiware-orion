@@ -306,7 +306,12 @@ Fields:
 -   **payload**: optional field to store the payload for notification customization functionality in NGSIv2.
 -   **lastFailure**: the time when last notification failure occurred.
     Not present if the subscription has never failed.
+-   **lastFailureReason**: text describing the cause of the last failure.
+    Not present if the subscription has never failed.
 -   **lastSuccess**: the time when last successful notification occurred.
+    Not present if the subscription has never provoked a successful notification.
+-   **lastSuccessCode**: HTTP code (200, 400, 404, 500, etc.) returned by receiving endpoint last
+    time a successful notification was sent.
     Not present if the subscription has never provoked a successful notification.
 
 Example document:
