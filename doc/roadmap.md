@@ -30,7 +30,7 @@ Disclaimer:
 ## Short term
 
 The following list of features are planned to be addressed in the short term,
-and incorporated in the next release of the product:
+and incorporated in the next releases of the product:
 
 - NGSI-LD Basic Functionality. Entity creation, Entity update, Entity delete, Basic Query Support. 
 - Notification improvements (initial notification skip, always-notify updates, etc.) (community)
@@ -53,3 +53,4 @@ you wish to get involved in the implementation or influence the roadmap
 
 - Lightweight communications with Cygnus
 - Lightweight ingestion (updates)
+- Integration with FastRTPS (a robotics middleware incorporated into ROS2)
