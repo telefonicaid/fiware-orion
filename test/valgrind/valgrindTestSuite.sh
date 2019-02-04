@@ -102,24 +102,6 @@ function vMsg()
 
 # -----------------------------------------------------------------------------
 #
-# fileCleanup
-#
-function fileCleanup()
-{
-  vtest=$1
-
-  rm -f $vtest.contextBroker.log
-  rm -f $vtest.valgrindTestSuite.stderr
-  rm -f $vtest.valgrindTestSuite.stdout
-  rm -f $vtest.configManager.log
-  rm -f $vtest.accumulator_$LISTENER_PORT
-  rm -f $vtest.accumulator_$LISTENER2_PORT
-}
-
-
-
-# -----------------------------------------------------------------------------
-#
 # If any mongo database ftest-ftest exists, strange memory leaks appear ...
 # So, before starting, it's important to remove all ftest DBs
 #
@@ -255,64 +237,6 @@ function add()
   done
 
   echo $sum
-}
-
-
-
-# -----------------------------------------------------------------------------
-#
-# Start broker
-#
-function brokerStart()
-{
-    # Starting contextBroker in valgrind with a clean database
-    bsResult=0
-    dbReset "$1"
-    killall contextBroker 2> /dev/null
-    echo 'db.dropDatabase()' | mongo valgrindtest --quiet > /dev/null
-    valgrind --memcheck:leak-check=full --show-reachable=yes --trace-children=yes contextBroker -port ${CB_TEST_PORT} -db leaktest -harakiri -t0-255 > ${NAME}.out 2>&1 &
-    valgrindPid=$!
-
-    # Awaiting valgrind to start contextBroker (sleep a maximum of 10 seconds)
-    typeset -i loopNo
-    typeset -i loops
-    loopNo=0
-    loops=100
-
-    while [ $loopNo -lt $loops ]
-    do
-      nc -w 2 localhost ${CB_TEST_PORT} &>/dev/null </dev/null
-      if [ "$?" == "0" ]
-      then
-        vMsg The orion context broker has started, listening on port $CB_TEST_PORT
-        sleep 1
-        break;
-      fi
-      vMsg Awaiting valgrind to fully start the orion context broker '('$loopNo')' ...
-      sleep .2
-      loopNo=$loopNo+1
-    done
-
-    if [ $loops == 100 ]
-    then
-        bsResult=tmo
-    fi
-}
-
-
-
-# -----------------------------------------------------------------------------
-#
-# Stop broker
-#
-function brokerStop()
-{
-  # Sending REST exit to contextBroker
-  vMsg Sending REST exit to contextBroker on port $CB_TEST_PORT
-  curl -s localhost:${CB_TEST_PORT}/exit/harakiri >> ${NAME}.stop.out
-
-  vMsg Waiting for valgrind to terminate - PID: $valgrindPid
-  wait $valgrindPid
 }
 
 
@@ -624,6 +548,11 @@ then
       vMsg "------------------------------------------------"
       vMsg running harnessTest.sh with $file in $(pwd)
       vMsg "------------------------------------------------"
+
+      # Sometimes the Orion pid file is not deleted and this cause all the next tests to fail
+      # We ensure it is deleted before launch the test
+      # FIXME: this could be improved (using /tmp/orion_9*.pid is a bit hardwired...)
+      rm -f /tmp/orion_9*.pid 
 
       startTime=$(date +%s.%2N)
       VALGRIND=1 test/functionalTest/testHarness.sh --filter $file > /tmp/testHarness 2>&1
