@@ -302,7 +302,7 @@ field:
   time a successful notification was sent (i.e. the success occurred at `lastSuccess` time).
 
 Both can be used to analyze possible problems with notifications. See section in the
-[problem diagnosis procedures document](diagnosis.md#diagnose-notification-reception-problems)
+[problem diagnosis procedures document](../admin/diagnosis.md#diagnose-notification-reception-problems)
 for more details.
 
 [Top](#top)
