@@ -53,4 +53,4 @@ you wish to get involved in the implementation or influence the roadmap
 
 - Lightweight communications with Cygnus
 - Lightweight ingestion (updates)
-- Integration with FastRTPS (a robotics middleware incorporated into ROS2)
+- Integration with FastRTPS (the default robotics middleware of ROS2)
