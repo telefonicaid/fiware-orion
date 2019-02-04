@@ -3,7 +3,8 @@
 - Add: log notification HTTP response (as INFO for 2xx or WARN for other codes)
 - Add: notification.lastFailureReason field in subscriptions to get the reason of the last notification failure
 - Add: notification.lastSuccessCode field in subscriptions to get the HTTP responde code of the last successful notification
-- Fix: specify notication/forwarding error cause in log messages (#3077)
+- Fix: specify notification/forwarding error cause in log messages (#3077)
 - Fix: from=, corr=, srv=, subsrv= correctly propagated to logs in notifications (#3073)
 - Fix: avoid "pending" fields in logs
-- Fix: bug in notification alarm rasing in -notificationMode transient and persistent
+- Fix: use "<none>" for srv= and subsrv= in logs when service/subservice header is not provided
+- Fix: bug in notification alarm raising in -notificationMode transient and persistent

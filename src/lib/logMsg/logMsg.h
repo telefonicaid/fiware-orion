@@ -1835,8 +1835,11 @@ inline void lmTransactionStart(
 {
   transactionIdSet();
 
-  snprintf(service,    sizeof(service),    _service);
-  snprintf(subService, sizeof(subService), _subService);
+  const char* __service    = strlen(_service)    == 0? "<none>" : _service;
+  const char* __subService = strlen(_subService) == 0? "<none>" : _subService;
+
+  snprintf(service,    sizeof(service),    __service);
+  snprintf(subService, sizeof(subService), __subService);
   snprintf(fromIp,     sizeof(fromIp),     _fromIp);
   LM_I(("Starting transaction %s %s%s:%d%s", keyword, schema, ip, port, path));
 }

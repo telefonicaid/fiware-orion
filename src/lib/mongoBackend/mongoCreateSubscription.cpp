@@ -105,7 +105,7 @@ static void insertInCache
                      sub.attrsFormat,
                      notificationDone,
                      lastNotification,
-                     lastSuccess,  // FIXME PR: bug???
+                     lastSuccess,
                      lastFailure,
                      -1,
                      "",
