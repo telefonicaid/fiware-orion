@@ -5,6 +5,7 @@
 * [Alarms](#alarms)
 * [Summary traces](#summary-traces)
 * [Log rotation](#log-rotation)
+* [Log examples for notification transactions](#log-examples-for-notification-transactions)
 
 ## Log file
 
@@ -44,14 +45,14 @@ separed by the pipe character (`|`). Example:
     time=2014-07-18T16:39:06.266Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1055]:mongoInit | msg=Connected to mongo at localhost:orion
     time=2014-07-18T16:39:06.452Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1290]:main | msg=Startup completed
     ...
-    time=2014-07-18T16:39:22.920Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=pending | srv=pending | subsrv=pending | comp=Orion | op=rest.cpp[615]:connectionTreat | msg=Starting transaction from 10.0.0.1:v1/v1/updateContext
+    time=2014-07-18T16:39:22.920Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=rest.cpp[615]:connectionTreat | msg=Starting transaction from 10.0.0.1:v1/v1/updateContext
     time=2014-07-18T16:39:22.922Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[1499]:processContextElement | msg=Database Operation Successful (...)
     time=2014-07-18T16:39:22.922Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[1318]:createEntity | msg=Database Operation Successful (...)
     time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[811]:addTriggeredSubscriptions | msg=Database Operation Successful (...)
     time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[811]:addTriggeredSubscriptions | msg=Database Operation Successful (...)
     time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=rest.cpp[745]:connectionTreat | msg=Transaction ended
     ...
-    time=2014-07-18T16:39:35.415Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | from=pending | srv=pending | subsrv=pending | comp=Orion | op=rest.cpp[615]:connectionTreat | msg=Starting transaction from 10.0.0.2:48373/v1/queryContext
+    time=2014-07-18T16:39:35.415Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | from=10.0.0.2 | srv=s1 | subsrv=/A | comp=Orion | op=rest.cpp[615]:connectionTreat | msg=Starting transaction from 10.0.0.2:48373/v1/queryContext
     time=2014-07-18T16:39:35.416Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | from=10.0.0.2 | srv=s1 | subsrv=/A | comp=Orion | op=MongoGlobal.cpp[877]:entitiesQuery | msg=Database Operation Successful (...)
     time=2014-07-18T16:39:35.416Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | from=10.0.0.2 | srv=s1 | subsrv=/A | comp=Orion | op=rest.cpp[745]:connectionTreat | msg=Transaction ended
     ...
@@ -116,10 +117,10 @@ The different fields in each line are as follows:
 -   **from**. Source IP of the HTTP request associated to the transaction, except
     if the request includes `X-Forwarded-For` header (which overrides the former)
     or `X-Real-IP` (which overrides `X-Forwarded-For` and source IP).
--   **srv**. Service associated to the transaction, or "pending" if the
-    transaction has started but the service has not been yet obtained.
--   **subsrv**. Subservice associated to the transaction, or "pending" if the
-    transaction has started but the subservice has not been yet obtained.
+-   **srv**. Service associated to the transaction. If request didn't include
+    a service (i.e. `fiware-service` header was missing) then `<none>` is used.
+-   **subsrv**. Subservice associated to the transaction. If request didn't include
+    subservice (i.e. `fiware-servicepath` header was missing) then `<none>` is used.
 -   **comp (component)**. Current version always uses "Orion" in
     this field.
 -   **op**. The function in the source code that generated the
@@ -222,5 +223,95 @@ settings. In this sense, take into account that in INFO log level every transact
 consume around 1-2 KB (measured with Orion 0.14.1), e.g. if your
 expected load is around 200 TPS, then your log file will grow 200-400 KB
 per second.
+
+[Top](#top)
+
+## Log examples for notification transactions
+
+This section illustrates some log examples corresponding to notification transactions.
+Note this has been generated with Orion 2.2.0 release and although no big changes are 
+expected in the future, the exact log traces could be slightly different in newer versions.
+
+For this test, ContextBroker was started this way:
+
+```
+contextBroker -fg -httpTimeout 10000 -logLevel INFO -notificationMode threadpool:100:10 -multiservice -subCacheIval 180
+```
+
+Successful sent (response code 200):
+
+```
+time=2019-02-04T14:36:00.463Z | lvl=INFO | corr=31060508-288a-11e9-b1fa-000c29173617 | trans=1549290912-942-00000000002 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://localhost:1028/giveme200
+time=2019-02-04T14:36:00.463Z | lvl=INFO | corr=31060508-288a-11e9-b1fa-000c29173617 | trans=1549290912-942-00000000002 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 1 to HTTP server: sending message of 413 bytes to HTTP server
+time=2019-02-04T14:36:00.469Z | lvl=INFO | corr=31060508-288a-11e9-b1fa-000c29173617 | trans=1549290912-942-00000000002 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[612]:httpRequestSendWithCurl | msg=Notification Successfully Sent to http://localhost:1028/giveme200
+time=2019-02-04T14:36:00.469Z | lvl=INFO | corr=31060508-288a-11e9-b1fa-000c29173617 | trans=1549290912-942-00000000002 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[621]:httpRequestSendWithCurl | msg=Notification response OK, http code: 200
+time=2019-02-04T14:36:00.469Z | lvl=INFO | corr=31060508-288a-11e9-b1fa-000c29173617 | trans=1549290912-942-00000000002 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+```
+
+Notification endpoint response with 400 (a WARN trace is printed):
+
+```
+time=2019-02-04T14:36:00.526Z | lvl=INFO | corr=310ea136-288a-11e9-98f5-000c29173617 | trans=1549290912-942-00000000004 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://localhost:1028/giveme400
+time=2019-02-04T14:36:00.526Z | lvl=INFO | corr=310ea136-288a-11e9-98f5-000c29173617 | trans=1549290912-942-00000000004 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 2 to HTTP server: sending message of 413 bytes to HTTP server
+time=2019-02-04T14:36:00.531Z | lvl=INFO | corr=310ea136-288a-11e9-98f5-000c29173617 | trans=1549290912-942-00000000004 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[612]:httpRequestSendWithCurl | msg=Notification Successfully Sent to http://localhost:1028/giveme400
+time=2019-02-04T14:36:00.532Z | lvl=WARN | corr=310ea136-288a-11e9-98f5-000c29173617 | trans=1549290912-942-00000000004 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[625]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 400
+time=2019-02-04T14:36:00.532Z | lvl=INFO | corr=310ea136-288a-11e9-98f5-000c29173617 | trans=1549290912-942-00000000004 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+```
+
+Notification endpoint response with 404 (a WARN trace is printed):
+
+```
+time=2019-02-04T14:36:00.564Z | lvl=INFO | corr=31151d2c-288a-11e9-b5eb-000c29173617 | trans=1549290912-942-00000000006 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://localhost:1028/giveme404
+time=2019-02-04T14:36:00.568Z | lvl=INFO | corr=31151d2c-288a-11e9-b5eb-000c29173617 | trans=1549290912-942-00000000006 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 3 to HTTP server: sending message of 413 bytes to HTTP server
+time=2019-02-04T14:36:00.576Z | lvl=INFO | corr=31151d2c-288a-11e9-b5eb-000c29173617 | trans=1549290912-942-00000000006 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[612]:httpRequestSendWithCurl | msg=Notification Successfully Sent to http://localhost:1028/giveme404
+time=2019-02-04T14:36:00.576Z | lvl=WARN | corr=31151d2c-288a-11e9-b5eb-000c29173617 | trans=1549290912-942-00000000006 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[625]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 404
+time=2019-02-04T14:36:00.577Z | lvl=INFO | corr=31151d2c-288a-11e9-b5eb-000c29173617 | trans=1549290912-942-00000000006 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+```
+
+Notification endpoint response with 500 (a WARN trace is printed)
+
+```
+time=2019-02-04T14:36:00.597Z | lvl=INFO | corr=3119c48a-288a-11e9-b7aa-000c29173617 | trans=1549290912-942-00000000008 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://localhost:1028/giveme500
+time=2019-02-04T14:36:00.597Z | lvl=INFO | corr=3119c48a-288a-11e9-b7aa-000c29173617 | trans=1549290912-942-00000000008 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 4 to HTTP server: sending message of 413 bytes to HTTP server
+time=2019-02-04T14:36:00.612Z | lvl=INFO | corr=3119c48a-288a-11e9-b7aa-000c29173617 | trans=1549290912-942-00000000008 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[612]:httpRequestSendWithCurl | msg=Notification Successfully Sent to http://localhost:1028/giveme500
+time=2019-02-04T14:36:00.612Z | lvl=WARN | corr=3119c48a-288a-11e9-b7aa-000c29173617 | trans=1549290912-942-00000000008 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[625]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 500
+time=2019-02-04T14:36:00.613Z | lvl=INFO | corr=3119c48a-288a-11e9-b7aa-000c29173617 | trans=1549290912-942-00000000008 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+```
+
+Endpoint not responding within 10 seconds timeout or some other connection error (alarm is raised in WARN level):
+
+```
+time=2019-02-04T14:36:00.609Z | lvl=INFO | corr=311c9d4a-288a-11e9-9301-000c29173617 | trans=1549290912-942-00000000010 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://localhost:1028/givemeDelay
+time=2019-02-04T14:36:00.609Z | lvl=INFO | corr=311c9d4a-288a-11e9-9301-000c29173617 | trans=1549290912-942-00000000010 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 5 to HTTP server: sending message of 415 bytes to HTTP server
+time=2019-02-04T14:36:10.611Z | lvl=WARN | corr=311c9d4a-288a-11e9-9301-000c29173617 | trans=1549290912-942-00000000010 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError localhost:1028/givemeDelay: notification failure for queue worker: Timeout was reached
+time=2019-02-04T14:36:10.611Z | lvl=INFO | corr=311c9d4a-288a-11e9-9301-000c29173617 | trans=1549290912-942-00000000010 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+```
+
+Endpoint in not responding port, e.g. localhost:9999 (alarm is raised in WARN log level):
+
+```
+time=2019-02-04T14:36:00.629Z | lvl=INFO | corr=311fc164-288a-11e9-a611-000c29173617 | trans=1549290912-942-00000000012 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://localhost:9999/giveme
+time=2019-02-04T14:36:00.629Z | lvl=INFO | corr=311fc164-288a-11e9-a611-000c29173617 | trans=1549290912-942-00000000012 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 6 to HTTP server: sending message of 421 bytes to HTTP server
+time=2019-02-04T14:36:00.661Z | lvl=WARN | corr=311fc164-288a-11e9-a611-000c29173617 | trans=1549290912-942-00000000012 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError localhost:9999/giveme: notification failure for queue worker: Couldn't connect to server
+time=2019-02-04T14:36:00.661Z | lvl=INFO | corr=311fc164-288a-11e9-a611-000c29173617 | trans=1549290912-942-00000000012 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+```
+
+Endpoint in unresolvable name, e.g. foo.bar.bar.com (alarm is raised in WARN log level):
+
+```
+time=2019-02-04T14:36:00.653Z | lvl=INFO | corr=31235e78-288a-11e9-a0ac-000c29173617 | trans=1549290912-942-00000000014 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://foo.bar.bar.com:9999/giveme
+time=2019-02-04T14:36:00.653Z | lvl=INFO | corr=31235e78-288a-11e9-a0ac-000c29173617 | trans=1549290912-942-00000000014 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 7 to HTTP server: sending message of 427 bytes to HTTP server
+time=2019-02-04T14:36:01.184Z | lvl=WARN | corr=31235e78-288a-11e9-a0ac-000c29173617 | trans=1549290912-942-00000000014 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError foo.bar.bar.com:9999/giveme: notification failure for queue worker: Couldn't resolve host name
+time=2019-02-04T14:36:01.184Z | lvl=INFO | corr=31235e78-288a-11e9-a0ac-000c29173617 | trans=1549290912-942-00000000014 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+```
+
+Endpoint in unreachable IP, e.g. 12.34.56.87 (alarm is raised in WARN log level):
+
+```
+time=2019-02-04T14:36:01.534Z | lvl=INFO | corr=31a9ac30-288a-11e9-9444-000c29173617 | trans=1549290912-942-00000000016 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://12.34.56.78:9999/giveme
+time=2019-02-04T14:36:01.534Z | lvl=INFO | corr=31a9ac30-288a-11e9-9444-000c29173617 | trans=1549290912-942-00000000016 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 8 to HTTP server: sending message of 421 bytes to HTTP server
+time=2019-02-04T14:36:11.535Z | lvl=WARN | corr=31a9ac30-288a-11e9-9444-000c29173617 | trans=1549290912-942-00000000016 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError 12.34.56.78:9999/giveme: notification failure for queue worker: Timeout was reached
+time=2019-02-04T14:36:11.535Z | lvl=INFO | corr=31a9ac30-288a-11e9-9444-000c29173617 | trans=1549290912-942-00000000016 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+```
 
 [Top](#top)

@@ -373,10 +373,16 @@ void setCount(long long count, BSONObjBuilder* b)
 *
 * setLastFailure -
 */
-void setLastFailure(long long lastFailure, BSONObjBuilder* b)
+void setLastFailure(long long lastFailure, const std::string& lastFailureReason, BSONObjBuilder* b)
 {
   b->append(CSUB_LASTFAILURE, lastFailure);
   LM_T(LmtMongo, ("Subscription lastFailure: %lu", lastFailure));
+
+  if (lastFailureReason != "")
+  {
+    b->append(CSUB_LASTFAILUREASON, lastFailureReason);
+    LM_T(LmtMongo, ("Subscription lastFailureReason: %s", lastFailureReason.c_str()));
+  }
 }
 
 
@@ -385,10 +391,16 @@ void setLastFailure(long long lastFailure, BSONObjBuilder* b)
 *
 * setLastSuccess -
 */
-void setLastSuccess(long long lastSuccess, BSONObjBuilder* b)
+void setLastSuccess(long long lastSuccess, long long lastSuccessCode, BSONObjBuilder* b)
 {
   b->append(CSUB_LASTSUCCESS, lastSuccess);
   LM_T(LmtMongo, ("Subscription lastSuccess: %lu", lastSuccess));
+
+  if (lastSuccessCode != -1)
+  {
+    b->append(CSUB_LASTSUCCESSCODE, lastSuccessCode);
+    LM_T(LmtMongo, ("Subscription lastSuccessCode: %lu", lastSuccessCode));
+  }
 }
 
 

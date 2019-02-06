@@ -12,10 +12,10 @@
 * [`actionType` metadata](#actiontype-metadata)
 * [`noAttrDetail` option](#noattrdetail-option)
 * [Notification throttling](#notification-throttling)
-* [Ordering between:$
- different attribute value types](#ordering-between-different-attribute-value-types)
+* [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
 * [Initial notifications](#initial-notifications)
 * [Oneshot Subscription](#oneshot-subscriptions)
+* [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`forcedUpdate` option](#forcedupdate-option)
 * [Registrations](#registrations)
 * [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
@@ -287,6 +287,23 @@ Check details in the document about [initial notifications](initial_notification
 ## Oneshot subscriptions
 
 Apart from the `status` values defined for subscription in the NGSIv2 specification, Orion also allows to use `oneshot`. Please find details in [the oneshot subscription document](oneshot_subscription.md)
+
+[Top](#top)
+
+# `lastFailureReason` and `lastSuccessCode` subscriptions fields
+
+Apart from the subscription fields described in NGSIv2 specification for `GET /v2/subscriptions` and
+`GET /v2/subscriptions/subId` requests, Orion supports this two extra fields within the `notification`
+field:
+
+* `lastFailureReason`: a text string describing the cause of the last failure (i.e. the failure
+  occurred at `lastFailure` time).
+* `lastSuccessCode`: the HTTP code (200, 400, 404, 500, etc.) returned by receiving endpoint last
+  time a successful notification was sent (i.e. the success occurred at `lastSuccess` time).
+
+Both can be used to analyze possible problems with notifications. See section in the
+[problem diagnosis procedures document](../admin/diagnosis.md#diagnose-notification-reception-problems)
+for more details.
 
 [Top](#top)
 

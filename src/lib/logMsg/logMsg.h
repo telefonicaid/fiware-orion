@@ -1822,68 +1822,26 @@ inline void lmTransactionReset()
 *
 * lmTransactionStart -
 */
-inline void lmTransactionStart(const char* keyword, const char* schema, const char* ip, int port, const char* path)
+inline void lmTransactionStart(
+  const char* keyword,
+  const char* schema,
+  const char* ip,
+  int port,
+  const char* path,
+  const char* _service,
+  const char* _subService,
+  const char* _fromIp
+)
 {
   transactionIdSet();
 
-  snprintf(service,    sizeof(service),    "pending");
-  snprintf(subService, sizeof(subService), "pending");
-  snprintf(fromIp,     sizeof(fromIp),     "pending");
+  const char* __service    = strlen(_service)    == 0? "<none>" : _service;
+  const char* __subService = strlen(_subService) == 0? "<none>" : _subService;
+
+  snprintf(service,    sizeof(service),    __service);
+  snprintf(subService, sizeof(subService), __subService);
+  snprintf(fromIp,     sizeof(fromIp),     _fromIp);
   LM_I(("Starting transaction %s %s%s:%d%s", keyword, schema, ip, port, path));
-}
-
-
-
-/* ****************************************************************************
-*
-* lmTransactionSetService -
-*/
-inline void lmTransactionSetService(const char* _service)
-{
-  if (strlen(_service) != 0)
-  {
-    snprintf(service, sizeof(service), "%s", _service);
-  }
-  else
-  {
-    snprintf(service, sizeof(service), "%s", "<default>");
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* lmTransactionSetSubservice -
-*/
-inline void lmTransactionSetSubservice(const char* _subService)
-{
-  if (strlen(_subService) != 0)
-  {
-    snprintf(subService, sizeof(service), "%s", _subService);
-  }
-  else
-  {
-    snprintf(subService, sizeof(service), "%s", "<default>");
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* lmTransactionSetFrom -
-*/
-inline void lmTransactionSetFrom(const char* _fromIp)
-{
-  if (strlen(_fromIp) != 0)
-  {
-    snprintf(fromIp, sizeof(fromIp), "%s", _fromIp);
-  }
-  else
-  {
-    snprintf(fromIp, sizeof(fromIp), "%s", "<no ip>");
-  }
 }
 
 

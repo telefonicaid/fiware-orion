@@ -742,6 +742,8 @@ void subCacheItemInsert
   int64_t                            lastNotificationTime,
   int64_t                            lastNotificationSuccessTime,
   int64_t                            lastNotificationFailureTime,
+  int64_t                            lastSuccessCode,
+  const std::string&                 lastFailureReason,
   StringFilter*                      stringFilterP,
   StringFilter*                      mdStringFilterP,
   const std::string&                 status,
@@ -771,6 +773,8 @@ void subCacheItemInsert
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->lastFailure           = lastNotificationFailureTime;
   cSubP->lastSuccess           = lastNotificationSuccessTime;
+  cSubP->lastFailureReason     = lastFailureReason;
+  cSubP->lastSuccessCode       = lastSuccessCode;
   cSubP->renderFormat          = renderFormat;
   cSubP->next                  = NULL;
   cSubP->count                 = (notificationDone == true)? 1 : 0;
@@ -1033,10 +1037,12 @@ void subCacheRefresh(void)
 */
 typedef struct CachedSubSaved
 {
-  int64_t  lastNotificationTime;
-  int64_t  count;
-  int64_t  lastFailure;
-  int64_t  lastSuccess;
+  int64_t      lastNotificationTime;
+  int64_t      count;
+  int64_t      lastFailure;
+  int64_t      lastSuccess;
+  std::string  lastFailureReason;
+  int64_t      lastSuccessCode;
 } CachedSubSaved;
 
 
@@ -1099,6 +1105,8 @@ void subCacheSync(void)
     cssP->count                = cSubP->count;
     cssP->lastFailure          = cSubP->lastFailure;
     cssP->lastSuccess          = cSubP->lastSuccess;
+    cssP->lastFailureReason    = cSubP->lastFailureReason;
+    cssP->lastSuccessCode      = cSubP->lastSuccessCode;
 
     savedSubV[cSubP->subscriptionId] = cssP;
     cSubP = cSubP->next;
@@ -1164,11 +1172,15 @@ void subCacheSync(void)
                              cssP->count,
                              cssP->lastNotificationTime,
                              cssP->lastFailure,
-                             cssP->lastSuccess);
+                             cssP->lastSuccess,
+                             cssP->lastFailureReason,
+                             cssP->lastSuccessCode);
 
       // Keeping lastFailure and lastSuccess in sub cache
-      cSubP->lastFailure = cssP->lastFailure;
-      cSubP->lastSuccess = cssP->lastSuccess;
+      cSubP->lastFailure       = cssP->lastFailure;
+      cSubP->lastSuccess       = cssP->lastSuccess;
+      cSubP->lastFailureReason = cssP->lastFailureReason;
+      cSubP->lastSuccessCode   = cssP->lastSuccessCode;
     }
 
     cSubP = cSubP->next;
@@ -1246,7 +1258,14 @@ extern bool noCache;
 *
 * If 'errors' == 0, then the subscription is marked as non-erroneous.
 */
-void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::string& subscriptionId, int errors)
+void subCacheItemNotificationErrorStatus
+(
+  const std::string&  tenant,
+  const std::string&  subscriptionId,
+  int                 errors,
+  long long           statusCode,
+  const std::string&  failureReason
+)
 {
   if (noCache)
   {
@@ -1256,11 +1275,13 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
 
     if (errors == 0)
     {
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, -1, now);  // lastFailure == -1
+      // count == 0 (inc is done in another part), lastFailure == -1, failureReason == -1
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, -1, now, "", statusCode);
     }
     else
     {
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, now, -1);  // lastSuccess == -1, count == 0
+      // count == 0 (inc is done in another part), lastSuccess == -1, failureReason == -1
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, now, -1, failureReason, -1);
     }
 
     return;
@@ -1283,11 +1304,13 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
 
   if (errors == 0)
   {
-    subP->lastSuccess  = now;
+    subP->lastSuccess     = now;
+    subP->lastSuccessCode = statusCode;
   }
   else
   {
-    subP->lastFailure  = now;
+    subP->lastFailure       = now;
+    subP->lastFailureReason = failureReason;
   }
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");

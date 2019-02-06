@@ -334,6 +334,29 @@ def record_2871():
         r.data = '{"contextResponses":[{"contextElement":{"attributes":[{"name":"turn","type":"string","value":""}],"id":"entity1","isPattern":false,"type":"device"},"statusCode":{"code":200,"reasonPhrase":"OK"}}]}'
         return r
 
+# Next 6 ones are for testing subscription status and failure logic. They are used by test
+# 1126_GET_v2_subscriptions/lastsuccesscode_and_lastfailurereason.test
+
+@app.route("/giveme200", methods=['POST'])
+def giveme200():
+    return Response(status=200)
+
+@app.route("/giveme400", methods=['POST'])
+def giveme400():
+    return Response(status=400)
+
+@app.route("/giveme404", methods=['POST'])
+def giveme404():
+    return Response(status=404)
+
+@app.route("/giveme500", methods=['POST'])
+def giveme500():
+    return Response(status=500)
+
+@app.route("/givemeDelay", methods=['POST'])
+def givemeDelay():
+    sleep(60)
+    return Response(status=200)
 
 @app.route('/dump', methods=['GET'])
 def dump():

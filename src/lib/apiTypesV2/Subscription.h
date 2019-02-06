@@ -50,9 +50,13 @@ struct Notification
   long long                timesSent;
   long long                lastNotification;
   HttpInfo                 httpInfo;
-  std::string              toJson(const std::string& attrsFormat);
   int                      lastFailure;  // FIXME P4: should be long long, like lastNotification
   int                      lastSuccess;  // FIXME P4: should be long long, like lastNotification
+  std::string              lastFailureReason;
+  long long                lastSuccessCode;
+
+  std::string              toJson(const std::string& attrsFormat);
+
   Notification():
     attributes(),
     blacklist(false),
@@ -60,7 +64,9 @@ struct Notification
     lastNotification(-1),
     httpInfo(),
     lastFailure(-1),
-    lastSuccess(-1)
+    lastSuccess(-1),
+    lastFailureReason(""),
+    lastSuccessCode(-1)
   {}
 };
 
