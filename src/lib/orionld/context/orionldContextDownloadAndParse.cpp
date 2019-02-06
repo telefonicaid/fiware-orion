@@ -42,6 +42,9 @@ extern "C"
 
 void contextArrayPresent(KjNode* tree, const char* what)
 {
+  if (tree == NULL)
+    return;
+
   if ((tree->type == KjObject) && (tree->value.firstChildP->type == KjArray))
   {
     int childNo = 0;
@@ -112,6 +115,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
   // Now parse the payload
   LM_T(LmtContext, ("Got @context: %s", httpResponse.buf));
   LM_T(LmtContext, ("Got @context - parsing it"));
+  LM_TMP(("Got @context: %s", httpResponse.buf));
   KjNode* tree = kjParse(kjsonP, httpResponse.buf);
   LM_T(LmtContext, ("Got @context - parsed it"));
 

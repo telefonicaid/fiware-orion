@@ -22,14 +22,32 @@
 *
 * Author: Ken Zangelin
 */
-#include <curl/curl.h>
+#include <strings.h>                                      // bcopy
+#include <curl/curl.h>                                    // curl
 
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
+#include "logMsg/logMsg.h"                                // LM_*
+#include "logMsg/traceLevels.h"                           // Lmt*
 
 #include "orionld/common/urlParse.h"                      // urlParse
 #include "orionld/common/orionldRequestSend.h"            // Own interface
 
+
+#if 0
+// -----------------------------------------------------------------------------
+//
+// memcpyKz -
+//
+static void memcpyKz(char* to, char* from, int size)
+{
+  while (size > 0)
+  {
+    *to = *from;
+    --size;
+    ++to;
+    ++from;
+  }
+}
+#endif
 
 
 // -----------------------------------------------------------------------------
@@ -43,19 +61,26 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
   int                     xtraBytes  = 512;
 
   LM_T(LmtWriteCallback, ("Got a chunk of %d bytes: %s", realSize, (char*) contents));
-
+  LM_TMP(("Buffer so far: %s", rBufP->buf));
   // LM_TMP(("In writeCallback: Got a chunk of %d bytes", realSize));
-  if (realSize + rBufP->used > rBufP->size)
+  if (realSize + rBufP->used >= rBufP->size)
   {
     if (rBufP->buf == rBufP->internalBuffer)
     {
       // LM_TMP(("In writeCallback: need to allocate (size: %d)", rBufP->size + realSize + xtraBytes));
-      rBufP->buf = (char*) malloc(rBufP->size + realSize + xtraBytes);
+      rBufP->buf  = (char*) malloc(rBufP->size + realSize + xtraBytes);
+
+      if ((rBufP->buf != NULL) && (rBufP->used > 0))  // Copy contents from internal buffer that got too small
+      {
+        memcpy(rBufP->buf, rBufP->internalBuffer, rBufP->used);
+        rBufP->size = rBufP->size + realSize + xtraBytes;
+      }
     }
     else
     {
       // LM_TMP(("In writeCallback: need to reallocate (new size: %d)", rBufP->size + realSize + xtraBytes));
       rBufP->buf = (char*) realloc(rBufP->buf, rBufP->size + realSize + xtraBytes);
+      rBufP->size = rBufP->size + realSize + xtraBytes;
     }
 
     if (rBufP->buf == NULL)
@@ -65,10 +90,11 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
     }
   }
 
-  // LM_TMP(("In writeCallback: copying to position %d in rBufP->buf (%d bytes copied)", rBufP->used, realSize));
-  memcpy(&rBufP->buf[rBufP->used], contents, realSize);
+  LM_TMP(("In writeCallback: copying to position %d-%d in rBufP->buf (%d bytes to be copied). Buf size: %d", rBufP->used, rBufP->used + realSize, realSize, rBufP->size));
+  bcopy(contents, &rBufP->buf[rBufP->used], realSize);
+  LM_TMP(("Copy worked!"));
+
   rBufP->used += realSize;
-  rBufP->size += realSize + xtraBytes;
   rBufP->buf[rBufP->used] = 0;
 
   return realSize;

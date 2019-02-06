@@ -62,9 +62,10 @@ extern int uriExpansion(OrionldContext* contextP, const char* name, char** expan
 // - typePattern - Not possible - ignored (need an exact type name to lookup alias)
 // - q
 // - mq          - Not interesting for ngsi-ld
-// - geometry    - Not interesting for ngsi-ld
-// - coords      - Not interesting for ngsi-ld
+// - geometry
+// - coordinates
 // - georel
+// - maxDistance
 // - options=keyValues
 //
 bool orionldGetEntities(ConnectionInfo* ciP)
@@ -75,7 +76,11 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   char*        idPattern      = (ciP->uriParam["idPattern"].empty())?   NULL : (char*) ciP->uriParam["idPattern"].c_str();
   char*        q              = (ciP->uriParam["q"].empty())?           NULL : (char*) ciP->uriParam["q"].c_str();
   char*        attrs          = (ciP->uriParam["attrs"].empty())?       NULL : (char*) ciP->uriParam["attrs"].c_str();
+
+  char*        geometry       = (ciP->uriParam["geometry"].empty())?    NULL : (char*) ciP->uriParam["geometry"].c_str();
   char*        georel         = (ciP->uriParam["georel"].empty())?      NULL : (char*) ciP->uriParam["georel"].c_str();
+  char*        coordinates    = (ciP->uriParam["coordinates"].empty())? NULL : (char*) ciP->uriParam["coordinates"].c_str();
+
   char*        idString       = (id != NULL)? id      : idPattern;
   const char*  isIdPattern    = (id != NULL)? "false" : "true";
   bool         isTypePattern  = (*type != 0)? false : true;
@@ -139,23 +144,59 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   //
   // If 'georel' is present, make sure it has a valid value
   //
+
   if (georel != NULL)
   {
-    if ((strcmp(georel, "nearRel")       != 0) &&
-        (strcmp(georel, "withinRel")     != 0) &&
-        (strcmp(georel, "containsRel")   != 0) &&
-        (strcmp(georel, "overlapsRel")   != 0) &&
-        (strcmp(georel, "intersectsRel") != 0) &&
-        (strcmp(georel, "equalsRel")     != 0) &&
-        (strcmp(georel, "disjointRel")   != 0))
+    if ((strncmp(georel, "near", 4)       != 0) &&
+        (strncmp(georel, "within", 6)     != 0) &&
+        (strncmp(georel, "contains", 8)   != 0) &&
+        (strncmp(georel, "overlaps", 8)   != 0) &&
+        (strncmp(georel, "intersects", 10) != 0) &&
+        (strncmp(georel, "equals", 6)     != 0) &&
+        (strncmp(georel, "disjoint", 8)   != 0))
     {
       LM_W(("Bad Input (invalid value for georel)"));
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "invalid value for georel", georel, OrionldDetailsString);
       ciP->httpStatusCode = SccBadRequest;
       return false;
     }
+
+    char* georelExtra = strstr(georel, ";");
+
+    if (georelExtra != NULL)
+    {
+      *georelExtra = 0;
+      ++georelExtra;
+      if ((strncmp(georelExtra, "minDistance==", 11) != 0) && (strncmp(georelExtra, "maxDistance==", 11) != 0))
+      {
+        LM_W(("Bad Input (invalid value for georel parameter: %s)", georelExtra));
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "invalid value for georel parameter", georel, OrionldDetailsString);
+        ciP->httpStatusCode = SccBadRequest;
+        return false;
+      }
+    }
   }
 
+  if (geometry != NULL)
+  {
+    Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
+    std::string  errorString;
+
+    LM_TMP(("KZ: Filling a geometry scope with { geometry='%s', coordinates='%s', georel='%s' }", geometry, coordinates, georel));
+    if (scopeP->fill(ciP->apiVersion, geometry, coordinates, georel, &errorString) != 0)
+    {
+      scopeP->release();
+      delete scopeP;
+
+      LM_E(("Scope::fill failed"));
+      orionldErrorResponseCreate(ciP, OrionldInternalError, "error filling a scope", errorString.c_str(), OrionldDetailsString);
+      ciP->httpStatusCode = SccReceiverInternalError;
+      return false;
+    }
+
+    parseData.qcr.res.restriction.scopeVector.push_back(scopeP);
+  }
+  
   if (idString == NULL)
   {
     idString    = (char*) ".*";
