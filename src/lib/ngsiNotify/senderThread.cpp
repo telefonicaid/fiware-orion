@@ -65,8 +65,10 @@ void* startSenderThread(void* p)
     {
       std::string  out;
       int          r;
+      long long    statusCode = -1;
 
-      r = httpRequestSend(params->ip,
+      r = httpRequestSend(params->from,
+                          params->ip,
                           params->port,
                           params->protocol,
                           params->verb,
@@ -79,8 +81,8 @@ void* startSenderThread(void* p)
                           params->fiwareCorrelator,
                           params->renderFormat,
                           true,
-                          NOTIFICATION_WAIT_MODE,
                           &out,
+                          &statusCode,
                           params->extraHeaders);
 
       if (r == 0)
@@ -90,14 +92,16 @@ void* startSenderThread(void* p)
 
         if (params->registration == false)
         {
-          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0);
+          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "");
         }
       }
       else
       {
+        alarmMgr.notificationError(url, "notification failure for sender-thread: " + out);
+
         if (params->registration == false)
         {
-          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 1);
+          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, -1, -1, out);
         }
       }
     }
@@ -105,8 +109,10 @@ void* startSenderThread(void* p)
     {
       LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
       __sync_fetch_and_add(&noOfSimulatedNotifications, 1);
-      alarmMgr.notificationError(url, "notification failure for sender-thread");
     }
+
+    // End transaction
+    lmTransactionEnd();
 
     /* Delete the parameters after using them */
     delete params;

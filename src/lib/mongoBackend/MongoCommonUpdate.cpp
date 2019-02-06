@@ -277,7 +277,7 @@ static bool equalMetadata(const BSONObj& md1, const BSONObj& md2)
 *
 * changedAttr -
 */
-static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVersion apiVersion)
+static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, const bool& forcedUpdate, ApiVersion apiVersion)
 {
   /* Not finding the attribute field at MongoDB is considered as an implicit "" */
   if (!attr.hasField(ENT_ATTRS_VALUE))
@@ -300,13 +300,13 @@ static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVers
     return true;
 
   case mongo::NumberDouble:
-    return caP->valueType != orion::ValueTypeNumber || caP->numberValue != getNumberFieldF(attr, ENT_ATTRS_VALUE);
+    return caP->valueType != orion::ValueTypeNumber || caP->numberValue != getNumberFieldF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
 
   case mongo::Bool:
-    return caP->valueType != orion::ValueTypeBoolean || caP->boolValue != getBoolFieldF(attr, ENT_ATTRS_VALUE);
+    return caP->valueType != orion::ValueTypeBoolean || caP->boolValue != getBoolFieldF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
 
   case mongo::String:
-    return caP->valueType != orion::ValueTypeString || caP->stringValue != getStringFieldF(attr, ENT_ATTRS_VALUE);
+    return caP->valueType != orion::ValueTypeString || caP->stringValue != getStringFieldF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
 
   case mongo::jstNULL:
     return caP->valueType != orion::ValueTypeNull;
@@ -441,7 +441,7 @@ static void appendMetadata
 * request (caP), and merged them producing the mergedAttr output. The function returns
 * true if it was an actual update, false otherwise.
 */
-static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* mergedAttr, ApiVersion apiVersion)
+static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* mergedAttr, const bool& forcedUpdate, ApiVersion apiVersion)
 {
   BSONObjBuilder ab;
 
@@ -581,7 +581,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
      * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
      *    different and, if they are of the same size, checking if the vectors are not equal)
      */
-    actualUpdate = (attrValueChanges(attr, caP, apiVersion) ||
+    actualUpdate = (attrValueChanges(attr, caP, forcedUpdate, apiVersion) ||
                     ((caP->type != "") &&
                      (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
                     mdNew.nFields() != mdSize || !equalMetadata(md, mdNew));
@@ -690,6 +690,7 @@ static bool updateAttribute
   ContextAttribute*   caP,
   bool*               actualUpdate,
   bool                isReplace,
+  const bool&         forcedUpdate,
   ApiVersion          apiVersion
 )
 {
@@ -750,7 +751,7 @@ static bool updateAttribute
     BSONObj newAttr;
     BSONObj attr = getObjectFieldF(attrs, effectiveName);
 
-    *actualUpdate = mergeAttrInfo(attr, caP, &newAttr, apiVersion);
+    *actualUpdate = mergeAttrInfo(attr, caP, &newAttr, forcedUpdate, apiVersion);
     if (*actualUpdate)
     {
       const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
@@ -783,6 +784,7 @@ static bool appendAttribute
   BSONArrayBuilder*   toPush,
   ContextAttribute*   caP,
   bool*               actualUpdate,
+  const bool&         forcedUpdate,
   ApiVersion          apiVersion
 )
 {
@@ -791,7 +793,7 @@ static bool appendAttribute
   /* APPEND with existing attribute equals to UPDATE */
   if (attrs.hasField(effectiveName.c_str()))
   {
-    updateAttribute(attrs, toSet, toPush, caP, actualUpdate, false, apiVersion);
+    updateAttribute(attrs, toSet, toPush, caP, actualUpdate, false, forcedUpdate, apiVersion);
     return false;
   }
 
@@ -2102,13 +2104,14 @@ static bool updateContextAttributeItem
   mongo::Date_t*            dateExpiration,
   bool*                     dateExpirationInPayload,
   bool                      isReplace,
+  const bool&               forcedUpdate,
   ApiVersion                apiVersion,
   OrionError*               oe
 )
 {
   std::string err;
 
-  if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace, apiVersion))
+  if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace, forcedUpdate, apiVersion))
   {
     // Attribute was found
     *entityModified = (*actualUpdate) || (*entityModified);
@@ -2180,13 +2183,14 @@ static bool appendContextAttributeItem
   std::string*              currentLocAttrName,
   BSONObjBuilder*           geoJson,
   mongo::Date_t*            dateExpiration,
+  const bool&               forcedUpdate,
   ApiVersion                apiVersion,
   OrionError*               oe
 )
 {
   std::string err;
 
-  bool actualAppend = appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, apiVersion);
+  bool actualAppend = appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, forcedUpdate, apiVersion);
 
   *entityModified = (*actualUpdate) || (*entityModified);
 
@@ -2325,6 +2329,7 @@ static bool processContextAttributeVector
   bool*                                           dateExpirationInPayload,
   std::string                                     tenant,
   const std::vector<std::string>&                 servicePathV,
+  const bool&                                     forcedUpdate,
   ApiVersion                                      apiVersion,
   bool                                            loopDetected,
   OrionError*                                     oe
@@ -2371,6 +2376,7 @@ static bool processContextAttributeVector
                                       dateExpiration,
                                       dateExpirationInPayload,
                                       action == ActionTypeReplace,
+                                      forcedUpdate,
                                       apiVersion,
                                       oe))
       {
@@ -2391,6 +2397,7 @@ static bool processContextAttributeVector
                                       currentLocAttrName,
                                       geoJson,
                                       dateExpiration,
+                                      forcedUpdate,
                                       apiVersion,
                                       oe))
       {
@@ -2789,6 +2796,7 @@ static void updateEntity
   UpdateContextResponse*          responseP,
   bool*                           attributeAlreadyExistsError,
   std::string*                    attributeAlreadyExistsList,
+  const bool&                     forcedUpdate,
   ApiVersion                      apiVersion,
   const std::string&              fiwareCorrelator,
   const std::string&              ngsiV2AttrsFormat
@@ -2933,6 +2941,7 @@ static void updateEntity
                                      &dateExpirationInPayload,
                                      tenant,
                                      servicePathV,
+                                     forcedUpdate,
                                      apiVersion,
                                      loopDetected,
                                      &(responseP->oe)))
@@ -3266,6 +3275,7 @@ void processContextElement
   const std::string&                   xauthToken,
   const std::string&                   fiwareCorrelator,
   const std::string&                   ngsiV2AttrsFormat,
+  const bool&                          forcedUpdate,
   ApiVersion                           apiVersion,
   Ngsiv2Flavour                        ngsiv2Flavour
 )
@@ -3419,7 +3429,6 @@ void processContextElement
   // Used to accumulate error response information, checked at the end
   bool         attributeAlreadyExistsError = false;
   std::string  attributeAlreadyExistsList  = "[ ";
-
   /* Note that the following loop is not executed if result size is 0, which leads to the
    * 'if' just below to create a new entity */
   for (unsigned int ix = 0; ix < results.size(); ix++)
@@ -3433,6 +3442,7 @@ void processContextElement
                  responseP,
                  &attributeAlreadyExistsError,
                  &attributeAlreadyExistsList,
+                 forcedUpdate,
                  apiVersion,
                  fiwareCorrelator,
                  ngsiV2AttrsFormat);

@@ -15,6 +15,7 @@
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
 * [初期通知](#initial-notifications)
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
+* [`forcedUpdate` オプション](#forcedupdate-option)
 * [レジストレーション](#registrations)
 * [`POST /v2/op/notify` でサポートされない `keyValues`](#keyvalues-not-supported-in-post-v2opnotify)
 * [廃止予定の機能](#deprecated-features)
@@ -229,7 +230,14 @@ NGISv2 仕様 "Ordering Results" セクションから :
 <a name="initial-notifications"></a>
 ## 初期通知
 
-NGSIv2 仕様では、サブスクリプションの対象となるエンティティの更新に基づいて、特定のサブスクリプションに対応する通知をトリガするルールを "サブスクリプション" セクションで説明しています。そのような定期的な通知以外にも、サブスクリプションの作成/更新時に初期通知を送信することがあります。[初期通知](initial_notification.md)については、ドキュメントの詳細を確認してください。
+NGSIv2 仕様では、サブスクリプションの対象となるエンティティの更新に基づいて、特定のサブスクリプションに対応する通知をトリガするルールを "サブスクリプション" セクションで説明しています。そのような定期的な通知以外にも、Orion は、また、サブスクリプションの作成/更新時時に初期通知を送信することがあります。
+
+初期通知は、新しい URI パラメータオプション `skipInitialNotification`
+を使用して設定できます。
+例えば、`POST /v2/subscriptions?options=skipInitialNotification` です。
+
+[初期通知](initial_notification.md) について、ドキュメントで詳細を
+確認してください。
 
 [トップ](#top)
 
@@ -239,6 +247,27 @@ NGSIv2 仕様では、サブスクリプションの対象となるエンティ�
 Orionは、NGSIv2 仕様のサブスクリプション用に定義された `status` 値の他に、
 `oneshot`を使用することもできます。
 [Oneshot サブスクリプションのドキュメント](oneshot_subscription.md)で詳細を確認してください
+
+[Top](#top)
+
+<a name="forcedupdate-option"></a>
+## `forcedUpdate` オプション
+
+NGSIv2 仕様に含まれるものに対する追加の URI パラメータ・オプションとして、Orion は forcedUpdate
+を実装します。実際の属性の更新があってもなくても、更新オペレーションが一致するサブスクリプションを
+トリガして、対応する通知を送信する必要があることを指定するために使用できます。デフォルトの動作
+(つまり、forcedUpdate URI param オプションを使用しない場合) は、属性が実際に更新された場合にのみ
+更新されることに注意してください。
+
+次のリクエストでは、forcedUpdate URI param オプションを使用できます :
+
+* `POST /v2/entities/E/attrs?options=forcedUpdate`
+* `POST /v2/entities/E/attrs?options=append,forcedUpdate`
+* `POST /v2/op/update?options=forcedUpdate`
+* `PUT /v2/entities/E/attrs?options=forcedUpdate`
+* `PUT /v2/entities/E/attrs/A?options=forcedUpdate`
+* `PUT /v2/entities/E/attrs/A/value?options=forcedUpdate`
+* `PATCH /v2/entities/E/attrs?options=forcedUpdate`
 
 [Top](#top)
 

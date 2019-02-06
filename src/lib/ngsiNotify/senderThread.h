@@ -33,18 +33,11 @@
 
 /* ****************************************************************************
 *
-* NOTIFICATION_WAIT_MODE - 
-*/
-#define NOTIFICATION_WAIT_MODE false
-
-
-
-/* ****************************************************************************
-*
 * SenderThreadParams - 
 */
 typedef struct SenderThreadParams
 {
+  std::string                        from;
   std::string                        ip;
   unsigned short                     port;
   std::string                        protocol;

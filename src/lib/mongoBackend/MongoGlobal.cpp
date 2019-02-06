@@ -2478,6 +2478,7 @@ static BSONArray processConditionVector
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
   bool                             blacklist,
+  const bool&                      skipInitialNotification,
   ApiVersion                       apiVersion
 )
 {
@@ -2496,7 +2497,7 @@ static BSONArray processConditionVector
         conds.append(nc->condValueList[jx]);
       }
 
-      if ((status == STATUS_ACTIVE) &&
+      if ((status == STATUS_ACTIVE) && !skipInitialNotification &&
           (processOnChangeConditionForSubscription(enV,
                                                    attrL,
                                                    metadataV,
@@ -2552,6 +2553,7 @@ BSONArray processConditionVector
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
   bool                             blacklist,
+  const bool&                      skipInitialNotification,
   ApiVersion                       apiVersion
 )
 {
@@ -2579,6 +2581,7 @@ BSONArray processConditionVector
                                          fiwareCorrelator,
                                          attrsOrder,
                                          blacklist,
+                                         skipInitialNotification,
                                          apiVersion);
 
   enV.release();

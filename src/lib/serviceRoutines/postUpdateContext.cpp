@@ -162,8 +162,11 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   LM_T(LmtCPrForwardRequestPayload, ("forward updateContext request payload: %s", payload.c_str()));
 
-  std::map<std::string, std::string> noHeaders;
-  r = httpRequestSend(ip,
+  std::map<std::string, std::string>  noHeaders;
+  long long                           statusCode; // not used by the moment
+
+  r = httpRequestSend(fromIp,   // thread variable
+                      ip,
                       port,
                       protocol,
                       verb,
@@ -176,15 +179,15 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
                       ciP->httpHeaders.correlator,
                       "",
                       false,
-                      true,
                       &out,
+                      &statusCode,
                       noHeaders,
                       mimeType);
 
   if (r != 0)
   {
     upcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding update");
-    LM_E(("Runtime Error (error forwarding 'Update' to providing application)"));
+    LM_E(("Runtime Error (error '%s' forwarding 'Update' to providing application)", out.c_str()));
     return;
   }
 
@@ -452,7 +455,7 @@ std::string postUpdateContext
   std::string             answer;
 
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-
+  bool forcedUpdate = ciP->uriParamOptions[OPT_FORCEDUPDATE];
   //
   // 01. Check service-path consistency
   //
@@ -503,6 +506,7 @@ std::string postUpdateContext
                                                   ciP->httpHeaders.xauthToken,
                                                   ciP->httpHeaders.correlator,
                                                   ciP->httpHeaders.ngsiv2AttrsFormat,
+                                                  forcedUpdate,
                                                   ciP->apiVersion,
                                                   ngsiV2Flavour));
 

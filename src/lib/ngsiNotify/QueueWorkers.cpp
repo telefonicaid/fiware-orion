@@ -128,8 +128,10 @@ static void* workerFunc(void* pSyncQ)
       {
         std::string  out;
         int          r;
+        long long    statusCode = -1;
 
         r =  httpRequestSendWithCurl(curl,
+                                     params->from,
                                      params->ip,
                                      params->port,
                                      params->protocol,
@@ -143,8 +145,8 @@ static void* workerFunc(void* pSyncQ)
                                      params->fiwareCorrelator,
                                      params->renderFormat,
                                      true,
-                                     NOTIFICATION_WAIT_MODE,
                                      &out,
+                                     &statusCode,
                                      params->extraHeaders);
 
         //
@@ -163,20 +165,23 @@ static void* workerFunc(void* pSyncQ)
 
           if (params->registration == false)
           {
-            subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0);
+            subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "");
           }
         }
         else
         {
           QueueStatistics::incSentError();
-          alarmMgr.notificationError(url, "notification failure for queue worker");
+          alarmMgr.notificationError(url, "notification failure for queue worker: " + out);
 
           if (params->registration == false)
           {
-            subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 1);
+            subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 1, -1, out);
           }
         }
       }
+
+      // End transaction
+      lmTransactionEnd();
 
       // Free params memory
       delete params;

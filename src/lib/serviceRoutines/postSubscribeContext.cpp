@@ -61,7 +61,6 @@ std::string postSubscribeContext
 {
   SubscribeContextResponse  scr;
   std::string               answer;
-
   //
   // FIXME P0: Only *one* service path is allowed for subscriptions.
   //           Personally (kz) I kind of like that. If you want additional service-paths, just add another subscription!

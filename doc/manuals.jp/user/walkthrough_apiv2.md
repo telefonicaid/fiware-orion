@@ -598,6 +598,10 @@ Orion Context Broker は、POST HTTP メソッド (サブスクリプション�
 -   Room1 温度を27に更新 : 温度がトリガ属性ではないため、何も起こりません
 -   Room1 の気圧を765に更新 : Room1 の現在の値 (27) を通知します
 -   Room1 の気圧を765に更新 : broker が賢明であるため、updateContext リクエストの前の値も765なので、実際の更新は行われず、したがって通知は送信されません
+-   リクエスト URL に `?options=forcedUpdate` を追加し、Room1 の気圧を765に更新 :
+    この場合、`forcedUpdate` URI オプションにより、Broker は通知を送信します。
+    [ここ](ngsiv2_implementation_notes.md#forcedupdate-option) に
+    `forcedUpdate` URI オプションの詳細が記述されています。
 -   Room2 の気圧を740に更新 : サブスクリプションは Room1 で Room2 ではないため、何も起こりません
 
 次に、スロットリングがどのように強制されているかを確認します。5秒経過することなく Room1 の気圧を速やかに更新すると、2番目の通知が accumulator-server.py に到着しないことがわかります。

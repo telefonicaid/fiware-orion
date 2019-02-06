@@ -1,12 +1,11 @@
-- Fix: metadata filter was lost during csub cache refresh (#3290)
-- Fix: NGSIv1-like error responses were used in some NGSIv2 operations
-- Add: support to MongoDB 3.6 (#3079)
-- Remove: isDomain field in NGSIv1 registrations (it was never used)
-- Fix: NGSIv2-NGSIv1 location metadata issues (#3122)
-- Fix: Wrong inclusion of "location" metadata in geo:json notifications (#3045)
-- Add: Oneshot Subscription (#3189)
-- Fix: problems rendering structured attribute values when forwarded queries are involved (#3162, #3363, #3282)
-- Fix: cache sem is not taken before subCacheItemLookup() call (#2882)
-- Fix: wrong Runtime Error logs on GET /v2/registrations and GET /v2/registrations/{id} calls (#3375)
-- Deprecate: Rush support (along with -rush CLI parameter)
+- Add: skipInitialNotification URI param option to make initial notification in subscriptions configurable (#920)
+- Add: forcedUpdate URI param option to always trigger notifications, no matter if actual update or not (#3389)
+- Add: log notification HTTP response (as INFO for 2xx or WARN for other codes)
+- Add: notification.lastFailureReason field in subscriptions to get the reason of the last notification failure
+- Add: notification.lastSuccessCode field in subscriptions to get the HTTP responde code of the last successful notification
+- Fix: specify notification/forwarding error cause in log messages (#3077)
+- Fix: from=, corr=, srv=, subsrv= correctly propagated to logs in notifications (#3073)
+- Fix: avoid "pending" fields in logs
+- Fix: use "<none>" for srv= and subsrv= in logs when service/subservice header is not provided
+- Fix: bug in notification alarm raising in -notificationMode transient and persistent
 - Remove: deprecated feature ID metadata (and associated NGSIv1 operations)

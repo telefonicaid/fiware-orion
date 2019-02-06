@@ -279,6 +279,7 @@ static void setCondsAndInitialNotifyNgsiv1
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   BSONObjBuilder*                  b,
+  const bool&                      skipInitialNotification,
   bool*                            notificationDone
 )
 {
@@ -342,6 +343,7 @@ static void setCondsAndInitialNotifyNgsiv1
                                             fiwareCorrelator,
                                             sub.notification.attributes,
                                             sub.notification.blacklist,
+                                            skipInitialNotification,
                                             V1);
 
   b->append(CSUB_CONDITIONS, conds);
@@ -363,6 +365,7 @@ static void setCondsAndInitialNotify
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   BSONObjBuilder*                  b,
+  const bool&                      skipInitialNotification,
   bool*                            notificationDone
 )
 {
@@ -436,6 +439,7 @@ static void setCondsAndInitialNotify
                                      xauthToken,
                                      fiwareCorrelator,
                                      b,
+                                     skipInitialNotification,
                                      notificationDone);
     }
     else
@@ -454,6 +458,7 @@ static void setCondsAndInitialNotify
                                fiwareCorrelator,
                                b,
                                notificationDone,
+                               skipInitialNotification,
                                V2);
     }
   }
@@ -537,7 +542,8 @@ static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subC
 */
 static void setLastFailure(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
-  long long lastFailure = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTFAILURE);
+  long long   lastFailure       = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTFAILURE);
+  std::string lastFailureReason = getStringFieldF(subOrig, CSUB_LASTFAILUREASON);
 
   //
   // Compare with 'lastFailure' from the sub-cache.
@@ -545,10 +551,11 @@ static void setLastFailure(const BSONObj& subOrig, CachedSubscription* subCacheP
   //
   if ((subCacheP != NULL) && (subCacheP->lastFailure > lastFailure))
   {
-    lastFailure = subCacheP->lastFailure;
+    lastFailure       = subCacheP->lastFailure;
+    lastFailureReason = subCacheP->lastFailureReason;
   }
 
-  setLastFailure(lastFailure, b);
+  setLastFailure(lastFailure, lastFailureReason, b);
 }
 
 
@@ -559,7 +566,8 @@ static void setLastFailure(const BSONObj& subOrig, CachedSubscription* subCacheP
 */
 static void setLastSuccess(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
-  long long lastSuccess = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESS);
+  long long lastSuccess     = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESS);
+  long long lastSuccessCode = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESSCODE);
 
   //
   // Compare with 'lastSuccess' from the sub-cache.
@@ -567,10 +575,11 @@ static void setLastSuccess(const BSONObj& subOrig, CachedSubscription* subCacheP
   //
   if ((subCacheP != NULL) && (subCacheP->lastSuccess > lastSuccess))
   {
-    lastSuccess = subCacheP->lastSuccess;
+    lastSuccess     = subCacheP->lastSuccess;
+    lastSuccessCode = subCacheP->lastSuccessCode;
   }
 
-  setLastSuccess(lastSuccess, b);
+  setLastSuccess(lastSuccess, lastSuccessCode, b);
 }
 
 
@@ -828,7 +837,9 @@ std::string mongoUpdateSubscription
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
+  const bool&                      skipInitialNotification,
   ApiVersion                       apiVersion
+
 )
 {
   bool reqSemTaken = false;
@@ -913,6 +924,7 @@ std::string mongoUpdateSubscription
                            xauthToken,
                            fiwareCorrelator,
                            &b,
+                           skipInitialNotification,
                            &notificationDone);
 
   if (notificationDone)

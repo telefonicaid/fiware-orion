@@ -216,7 +216,7 @@ Date: REGEX(.*)
 03. GET subscription, see error stats in notification field
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 312
+Content-Length: 361
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -231,6 +231,7 @@ Date: REGEX(.*)
                 "url": "http://nohost:REGEX(\d+)/notify"
             },
             "lastFailure": "REGEX(.*)",
+            "lastFailureReason": "Couldn't resolve host name",
             "lastNotification": "REGEX(.*)",
             "timesSent": 1
         },
@@ -261,7 +262,7 @@ Date: REGEX(.*)
 05. GET subscription, see NO error stats in notification field
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 355
+Content-Length: 425
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -276,8 +277,10 @@ Date: REGEX(.*)
                 "url": "http://localhost:REGEX(\d+)/notify"
             },
             "lastFailure": "REGEX(.*)",
+            "lastFailureReason": "Couldn't resolve host name",
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
+            "lastSucessCode": 200,
             "timesSent": 2
         },
         "status": "active",
@@ -307,7 +310,7 @@ Date: REGEX(.*)
 07. GET subscription, see NO error stats in notification field
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 355
+Content-Length: 425
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -322,8 +325,10 @@ Date: REGEX(.*)
                 "url": "http://localhost:REGEX(\d+)/notify"
             },
             "lastFailure": "REGEX(.*)",
+            "lastFailureReason": "Couldn't resolve host name",
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
+            "lastSucessCode": 200,
             "timesSent": 3
         },
         "status": "active",
@@ -407,7 +412,7 @@ Date: REGEX(.*)
 10. GET subscription, see error stats in notification field
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 352
+Content-Length: 422
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -422,8 +427,10 @@ Date: REGEX(.*)
                 "url": "http://nohost:REGEX(\d+)/notify"
             },
             "lastFailure": "REGEX(.*)",
+            "lastFailureReason": "Couldn't resolve host name",
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
+            "lastSucessCode": 200,
             "timesSent": 4
         },
         "status": "failed",

@@ -153,9 +153,19 @@ std::string Notification::toJson(const std::string& attrsFormat)
     jh.addDate("lastFailure", this->lastFailure);
   }
 
+  if (this->lastFailureReason != "")
+  {
+    jh.addString("lastFailureReason", this->lastFailureReason);
+  }
+
   if (this->lastSuccess > 0)
   {
     jh.addDate("lastSuccess", this->lastSuccess);
+  }
+
+  if (this->lastSuccessCode != -1)
+  {
+    jh.addNumber("lastSucessCode", this->lastSuccessCode);
   }
 
   return jh.str();
