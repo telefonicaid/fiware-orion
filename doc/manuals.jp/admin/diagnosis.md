@@ -9,6 +9,7 @@
     * [メモリ枯渇問題を診断](#diagnose-memory-exhaustion-problem)
     * [自発的なバイナリの破損の問題を診断](#diagnose-spontaneous-binary-corruption-problem)
 * [I/O フロー](#io-flows)
+    * [通知受信の問題を診断](#diagnose-notification-reception-problems)
     * [データベース接続の問題を診断](#diagnose-database-connection-problems)
 
 診断手順は、システム管理者が Orion のエラーの原因を特定するための最初の手順です。これらのテストでエラーの元が特定されると、システム管理者は、正確な障害箇所と可能な解決策を特定するために、より具体的で具体的なテストに頼らなければならないことがよくあります。このような特定のテストは、このセクションの範囲外です。
@@ -160,6 +161,42 @@ Orion Context Broker は、次のフローを使用します :
 これらのフローのスループットは、コンテキスト・コンシューマとプロデューサの外部接続の量とコンシューマ/プロデューサのリクエストの性質に完全に依存するため、事前に推定することはできません。
 
 ![](../../manuals/admin/Orion-ioflows.png "Orion-ioflows.png")
+
+<a name="diagnose-notification-reception-problems"></a>
+### 通知受信の問題を診断
+
+起こりうる通知の問題を診断するには (つまり、通知が特定のエンドポイントに
+届いていても機能していないと予想します)、`GET /v2/subscriptions/<subId>`
+によって提供される情報を調べて次のフローチャートを検討してください :
+
+![Notifications debug flowchart](../../manuals/admin/notifications-debug-flowchart.png)
+
+`lastFailureReason` に可能ないくつかの値 (非網羅的リスト) :
+
+* "タイムアウトに達しました"。Context Broker は、`-httpTimeout`
+  [CLI パラメータ](cli.md) で構成された、タイムアウト内に通知を配信できませんで
+  した。エンドポイントの障害やネットワーク接続の問題
+  (通知ホストにアクセスできないなど) が原因である可能性があります。
+* "サーバに接続できませんでした"。Context Broker は、通知を送信するための
+  HTTP 接続を確立できませんでした。通常、Context Broker は通知 URL で
+  ホストにアクセスできましたが、通知 URL ポートでは誰も待機していません。
+* "ホスト名を解決できませんでした"。通知 URL に指定されている名前を
+  有効な IP に解決できません。ホスト名が誤って入力されたか、または
+  Context Broker ホストの DNS 解決システム/設定に失敗したことが
+  原因である可能性があります。
+* "ピア証明書を認証できません"。HTTPS 通知で、通知エンドポイントから提供された
+  証明書を認証できないため無効です。これは通常、Context Broker が安全でない
+  モードで実行されていない場合 (つまり、`-insecureNotif`
+  [CLI パラメータ](cli.md)) に自己署名証明書が発行された場合に発生します。
+
+NGSIv2 仕様および NGSIv2 実装ノートのドキュメントの文書に、
+`status`, `lastFailureReason`, `lastSuccessCode` の詳細があります。
+
+さらに、
+[管理マニュアルの対応するセクション](logs.md#log-examples-for-notification-transactions)
+に示されている通知ログの例が役に立つことがあります。
+
+[トップ](#top)
 
 <a name="diagnose-database-connection-problems"></a>
 ### データベース接続の問題を診断

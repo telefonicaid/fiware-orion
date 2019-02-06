@@ -5,6 +5,7 @@
 * [アラーム](#alarms)
 * [サマリ・トレース](#summary-traces)
 * [ログ・ローテーション](#log-rotation)
+* [通知トランザクションのログの例](#log-examples-for-notification-transactions)
 
 <a name="log-file"></a>
 ## ログ・ファイル
@@ -43,14 +44,14 @@ Orion によって公開される [admin API](management_api.md) を使用して
     time=2014-07-18T16:39:06.266Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1055]:mongoInit | msg=Connected to mongo at localhost:orion
     time=2014-07-18T16:39:06.452Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1290]:main | msg=Startup completed
     ...
-    time=2014-07-18T16:39:22.920Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=pending | srv=pending | subsrv=pending | comp=Orion | op=rest.cpp[615]:connectionTreat | msg=Starting transaction from 10.0.0.1:v1/v1/updateContext
+    time=2014-07-18T16:39:22.920Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=rest.cpp[615]:connectionTreat | msg=Starting transaction from 10.0.0.1:v1/v1/updateContext
     time=2014-07-18T16:39:22.922Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[1499]:processContextElement | msg=Database Operation Successful (...)
     time=2014-07-18T16:39:22.922Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[1318]:createEntity | msg=Database Operation Successful (...)
     time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[811]:addTriggeredSubscriptions | msg=Database Operation Successful (...)
     time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[811]:addTriggeredSubscriptions | msg=Database Operation Successful (...)
     time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=rest.cpp[745]:connectionTreat | msg=Transaction ended
     ...
-    time=2014-07-18T16:39:35.415Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | from=pending | srv=pending | subsrv=pending | comp=Orion | op=rest.cpp[615]:connectionTreat | msg=Starting transaction from 10.0.0.2:48373/v1/queryContext
+    time=2014-07-18T16:39:35.415Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | from=10.0.0.2 | srv=s1 | subsrv=/A | comp=Orion | op=rest.cpp[615]:connectionTreat | msg=Starting transaction from 10.0.0.2:48373/v1/queryContext
     time=2014-07-18T16:39:35.416Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | from=10.0.0.2 | srv=s1 | subsrv=/A | comp=Orion | op=MongoGlobal.cpp[877]:entitiesQuery | msg=Database Operation Successful (...)
     time=2014-07-18T16:39:35.416Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | from=10.0.0.2 | srv=s1 | subsrv=/A | comp=Orion | op=rest.cpp[745]:connectionTreat | msg=Transaction ended
     ...
@@ -73,8 +74,12 @@ Orion によって公開される [admin API](management_api.md) を使用して
     -   Orion によって公開された REST API を呼び出す外部クライアントによって開始されたものです。これらのトランザクションの最初のメッセージは、*url* に操作を呼び出すクライアントの IP とポートが含まれ、パスが Orion で呼び出された実際の操作である "Starting transaction **from** *url*" パターンを使用します。これらのトランザクションの最後のメッセージは "Transaction ended" です
     -   Orion が通知を送信するときに開始するものです。これらのトランザクションの最初のメッセージは、"Starting transaction **to** *url*" というパターンを使用します。*url* は、サブスクリプションの参照要素で使用される URL です。つまり、通知を送信するコールバックの URL です。両方の取引型の最後のメッセージは "Transaction ended" です
 -   **from** : トランザクションに関連付けられた HTTP 要求のソース IP です。リクエストに `X-Forwarded-For` ヘッダ (前者を上書きする) または `X-Real-IP` (上書き `X-Forwarded-For` と source IP を上書き) が含まれている場合を除きます
--   **srv** : トランザクションに関連付けられたサービスです。またはトランザクションが開始されてもサービスがまだ取得されていない場合は "pending" です
--   **subsrv** : トランザクションに関連付けられたサブサービスです。またはトランザクションが開始されたがサブサービスがまだ取得されていない場合は "pending" です
+-   **srv** : トランザクションに関連付けられているサービスです。リクエストに
+    サービスが含まれていない場合 (つまり、`fiware-service`
+    ヘッダが欠落している場合)、`<none>` が使用されます
+-   **subsrv** :トランザクションに関連付けられているサブサービスです。
+    リクエストにサブ・サービスが含まれていなかった場合 (つまり、
+    `fiware-servicepath` ヘッダが欠落していた場合)、`<none>` が使用されます
 -   **comp (component)** : 現在のバージョンでは常にこのフィールドに "Orion" が使用されます
 -   **op** : ログメッセージを生成したソースコード内の関数です。この情報は、開発者だけに役立ちます。
 -   **msg (message)** : 実際のログメッセージです。メッセージのテキストには、ファイルの名前とトレースを生成する行番号が含まれます (この情報は、主に Orion 開発者にとって役に立ちます)
@@ -158,5 +163,96 @@ Logrotate は、contextBroker とともに RPM としてインストールされ
     -   `/etc/cron.d/cron-logrotate-contextBroker-size` : 通常の周期 (デフォルトは30分です) で /etc/sysconfig/logrotate-contextBroker-size の実行を保証します
 
 予想される負荷に応じて、デフォルト設定を調整する必要があります。この意味で、INFO ログレベルでは、すべてのトランザクションが約 1-2 KB (Orion 0.14.1 で測定) を消費する可能性があります。たとえば、予想される負荷が約200 TPS の場合、ログ・ファイルは毎秒 200-400 KB 大きくなります。
+
+[トップ](#top)
+
+<a name="log-examples-for-notification-transactions"></a>
+## 通知トランザクションのログの例
+
+このセクションでは、通知トランザクションに対応するログの例をいくつか示します。
+これは Orion 2.2.0 リリースで生成されたものであり、将来大きな変更は予定されていませんが、
+正確なログトレースは新しいバージョンでは多少異なる可能性があります。
+
+このテストでは、Context Broker は次のように開始されました :
+
+```
+contextBroker -fg -httpTimeout 10000 -logLevel INFO -notificationMode threadpool:100:10 -multiservice -subCacheIval 180
+```
+
+送信成功 (レスポンス・コード 200) :
+
+```
+time=2019-02-04T14:36:00.463Z | lvl=INFO | corr=31060508-288a-11e9-b1fa-000c29173617 | trans=1549290912-942-00000000002 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://localhost:1028/giveme200
+time=2019-02-04T14:36:00.463Z | lvl=INFO | corr=31060508-288a-11e9-b1fa-000c29173617 | trans=1549290912-942-00000000002 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 1 to HTTP server: sending message of 413 bytes to HTTP server
+time=2019-02-04T14:36:00.469Z | lvl=INFO | corr=31060508-288a-11e9-b1fa-000c29173617 | trans=1549290912-942-00000000002 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[612]:httpRequestSendWithCurl | msg=Notification Successfully Sent to http://localhost:1028/giveme200
+time=2019-02-04T14:36:00.469Z | lvl=INFO | corr=31060508-288a-11e9-b1fa-000c29173617 | trans=1549290912-942-00000000002 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[621]:httpRequestSendWithCurl | msg=Notification response OK, http code: 200
+time=2019-02-04T14:36:00.469Z | lvl=INFO | corr=31060508-288a-11e9-b1fa-000c29173617 | trans=1549290912-942-00000000002 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+```
+
+400 での通知エンドポイントのレスポンス (WARN トレースがプリントされます) :
+
+```
+time=2019-02-04T14:36:00.526Z | lvl=INFO | corr=310ea136-288a-11e9-98f5-000c29173617 | trans=1549290912-942-00000000004 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://localhost:1028/giveme400
+time=2019-02-04T14:36:00.526Z | lvl=INFO | corr=310ea136-288a-11e9-98f5-000c29173617 | trans=1549290912-942-00000000004 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 2 to HTTP server: sending message of 413 bytes to HTTP server
+time=2019-02-04T14:36:00.531Z | lvl=INFO | corr=310ea136-288a-11e9-98f5-000c29173617 | trans=1549290912-942-00000000004 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[612]:httpRequestSendWithCurl | msg=Notification Successfully Sent to http://localhost:1028/giveme400
+time=2019-02-04T14:36:00.532Z | lvl=WARN | corr=310ea136-288a-11e9-98f5-000c29173617 | trans=1549290912-942-00000000004 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[625]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 400
+time=2019-02-04T14:36:00.532Z | lvl=INFO | corr=310ea136-288a-11e9-98f5-000c29173617 | trans=1549290912-942-00000000004 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+```
+
+404 での通知エンドポイントのレスポンス (WARN トレースがプリントされます) :
+
+```
+time=2019-02-04T14:36:00.564Z | lvl=INFO | corr=31151d2c-288a-11e9-b5eb-000c29173617 | trans=1549290912-942-00000000006 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://localhost:1028/giveme404
+time=2019-02-04T14:36:00.568Z | lvl=INFO | corr=31151d2c-288a-11e9-b5eb-000c29173617 | trans=1549290912-942-00000000006 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 3 to HTTP server: sending message of 413 bytes to HTTP server
+time=2019-02-04T14:36:00.576Z | lvl=INFO | corr=31151d2c-288a-11e9-b5eb-000c29173617 | trans=1549290912-942-00000000006 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[612]:httpRequestSendWithCurl | msg=Notification Successfully Sent to http://localhost:1028/giveme404
+time=2019-02-04T14:36:00.576Z | lvl=WARN | corr=31151d2c-288a-11e9-b5eb-000c29173617 | trans=1549290912-942-00000000006 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[625]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 404
+time=2019-02-04T14:36:00.577Z | lvl=INFO | corr=31151d2c-288a-11e9-b5eb-000c29173617 | trans=1549290912-942-00000000006 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+```
+
+500 での通知エンドポイントのレスポンス (WARN トレースがプリントされます) :
+
+```
+time=2019-02-04T14:36:00.597Z | lvl=INFO | corr=3119c48a-288a-11e9-b7aa-000c29173617 | trans=1549290912-942-00000000008 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://localhost:1028/giveme500
+time=2019-02-04T14:36:00.597Z | lvl=INFO | corr=3119c48a-288a-11e9-b7aa-000c29173617 | trans=1549290912-942-00000000008 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 4 to HTTP server: sending message of 413 bytes to HTTP server
+time=2019-02-04T14:36:00.612Z | lvl=INFO | corr=3119c48a-288a-11e9-b7aa-000c29173617 | trans=1549290912-942-00000000008 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[612]:httpRequestSendWithCurl | msg=Notification Successfully Sent to http://localhost:1028/giveme500
+time=2019-02-04T14:36:00.612Z | lvl=WARN | corr=3119c48a-288a-11e9-b7aa-000c29173617 | trans=1549290912-942-00000000008 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[625]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 500
+time=2019-02-04T14:36:00.613Z | lvl=INFO | corr=3119c48a-288a-11e9-b7aa-000c29173617 | trans=1549290912-942-00000000008 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+```
+
+10 秒以内にエンドポイントが応答しない、またはその他の何らかの接続エラーが発生しました (アラームは WARN レベルで発生します) :
+
+```
+time=2019-02-04T14:36:00.609Z | lvl=INFO | corr=311c9d4a-288a-11e9-9301-000c29173617 | trans=1549290912-942-00000000010 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://localhost:1028/givemeDelay
+time=2019-02-04T14:36:00.609Z | lvl=INFO | corr=311c9d4a-288a-11e9-9301-000c29173617 | trans=1549290912-942-00000000010 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 5 to HTTP server: sending message of 415 bytes to HTTP server
+time=2019-02-04T14:36:10.611Z | lvl=WARN | corr=311c9d4a-288a-11e9-9301-000c29173617 | trans=1549290912-942-00000000010 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError localhost:1028/givemeDelay: notification failure for queue worker: Timeout was reached
+time=2019-02-04T14:36:10.611Z | lvl=INFO | corr=311c9d4a-288a-11e9-9301-000c29173617 | trans=1549290912-942-00000000010 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+```
+
+応答しないポートのエンドポイント。例えば、localhost：9999 (アラームは WARN ログ・レベルで発生します) :
+
+```
+time=2019-02-04T14:36:00.629Z | lvl=INFO | corr=311fc164-288a-11e9-a611-000c29173617 | trans=1549290912-942-00000000012 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://localhost:9999/giveme
+time=2019-02-04T14:36:00.629Z | lvl=INFO | corr=311fc164-288a-11e9-a611-000c29173617 | trans=1549290912-942-00000000012 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 6 to HTTP server: sending message of 421 bytes to HTTP server
+time=2019-02-04T14:36:00.661Z | lvl=WARN | corr=311fc164-288a-11e9-a611-000c29173617 | trans=1549290912-942-00000000012 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError localhost:9999/giveme: notification failure for queue worker: Couldn't connect to server
+time=2019-02-04T14:36:00.661Z | lvl=INFO | corr=311fc164-288a-11e9-a611-000c29173617 | trans=1549290912-942-00000000012 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+```
+
+解決できない名前のエンドポイント。例えば、foo.bar.bar.com (アラームは WARN ログ・レベルで発生します) :
+
+```
+time=2019-02-04T14:36:00.653Z | lvl=INFO | corr=31235e78-288a-11e9-a0ac-000c29173617 | trans=1549290912-942-00000000014 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://foo.bar.bar.com:9999/giveme
+time=2019-02-04T14:36:00.653Z | lvl=INFO | corr=31235e78-288a-11e9-a0ac-000c29173617 | trans=1549290912-942-00000000014 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 7 to HTTP server: sending message of 427 bytes to HTTP server
+time=2019-02-04T14:36:01.184Z | lvl=WARN | corr=31235e78-288a-11e9-a0ac-000c29173617 | trans=1549290912-942-00000000014 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError foo.bar.bar.com:9999/giveme: notification failure for queue worker: Couldn't resolve host name
+time=2019-02-04T14:36:01.184Z | lvl=INFO | corr=31235e78-288a-11e9-a0ac-000c29173617 | trans=1549290912-942-00000000014 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+```
+
+到達不能な IP のエンドポイント。例えば、12.34.56.87 (アラームは WARN ログ・レベルで発生します) :
+
+```
+time=2019-02-04T14:36:01.534Z | lvl=INFO | corr=31a9ac30-288a-11e9-9444-000c29173617 | trans=1549290912-942-00000000016 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://12.34.56.78:9999/giveme
+time=2019-02-04T14:36:01.534Z | lvl=INFO | corr=31a9ac30-288a-11e9-9444-000c29173617 | trans=1549290912-942-00000000016 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 8 to HTTP server: sending message of 421 bytes to HTTP server
+time=2019-02-04T14:36:11.535Z | lvl=WARN | corr=31a9ac30-288a-11e9-9444-000c29173617 | trans=1549290912-942-00000000016 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError 12.34.56.78:9999/giveme: notification failure for queue worker: Timeout was reached
+time=2019-02-04T14:36:11.535Z | lvl=INFO | corr=31a9ac30-288a-11e9-9444-000c29173617 | trans=1549290912-942-00000000016 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+```
 
 [トップ](#top)

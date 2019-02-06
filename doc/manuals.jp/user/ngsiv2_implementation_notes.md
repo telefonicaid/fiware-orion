@@ -15,6 +15,7 @@
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
 * [初期通知](#initial-notifications)
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
+* [`lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`forcedUpdate` オプション](#forcedupdate-option)
 * [レジストレーション](#registrations)
 * [`POST /v2/op/notify` でサポートされない `keyValues`](#keyvalues-not-supported-in-post-v2opnotify)
@@ -248,7 +249,26 @@ Orionは、NGSIv2 仕様のサブスクリプション用に定義された `sta
 `oneshot`を使用することもできます。
 [Oneshot サブスクリプションのドキュメント](oneshot_subscription.md)で詳細を確認してください
 
-[Top](#top)
+[トップ](#top)
+
+<a name="lastfailurereason-and-lastsuccesscode-subscriptions-fields"></a>
+## `lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド
+
+`GET /v2/subscriptions` および `GET /v2/subscriptions/subId` リクエストの
+NGSIv2 仕様で説明されているサブスクリプション・フィールドとは別に、
+Orion は通知フィールド内でこの2つの追加フィールドをサポートしています  :
+
+* `lastFailureReason`: 最後の失敗の原因を記述するテキスト文字列
+  (すなわち、失敗が `lastFailure` の時点で発生した)
+* `lastSuccessCode`: 最後に成功した通知が送信されたときに
+  受信エンドポイントによって返された HTTP コード (200, 400, 404, 500 など)
+  (つまり、成功が `lastSuccess` の時点で発生した)
+
+どちらも通知に関する問題の分析に使用できます。 詳しくは、
+[問題診断ドキュメント](../admin/diagnosis.md#diagnose-notification-reception-problems)
+のセクションを参照してください。
+
+[トップ](#top)
 
 <a name="forcedupdate-option"></a>
 ## `forcedUpdate` オプション
