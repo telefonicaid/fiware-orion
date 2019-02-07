@@ -60,7 +60,7 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
   OrionldResponseBuffer*  rBufP      = (OrionldResponseBuffer*) userP;
   int                     xtraBytes  = 512;
 
-  LM_T(LmtWriteCallback, ("Got a chunk of %d bytes: %s", realSize, (char*) contents));
+  // LM_T(LmtWriteCallback, ("Got a chunk of %d bytes: %s", realSize, (char*) contents));
 
   char tmpBuf[128];
   strncpy(tmpBuf, rBufP->buf, 128);
