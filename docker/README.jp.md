@@ -23,7 +23,7 @@ Orion Context Broker を試してみたいし、データベースについて�
 2. ディレクトリ内に `docker-compose.yml` という名前の新しいファイルを次の内容で作成します :
 	
 		 mongo:
-		  image: mongo:3.4
+		  image: mongo:3.6
 		  command: --nojournal
 		 orion:
 		  image: fiware/orion
