@@ -1,0 +1,109 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Creation and retreival of a String Context
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. Create Entity urn:ngsi-ld:AirQualityObserved:RZ:Obsv4567 with BIG context
+# 02. GET /ngsild/ex/v1/contexts/rn:ngsi-ld:AirQualityObserved:RZ:Obsv4567, see context created in step 01
+#
+
+
+echo "01. Create Entity urn:ngsi-ld:AirQualityObserved:RZ:Obsv4567 with BIG context"
+echo "============================================================================="
+payload='{
+  "id": "urn:ngsi-ld:AirQualityObserved:RZ:Obsv4567",
+  "type": "AirQualityObserved",
+  "dateObserved": {
+    "type": "Property",
+    "value": {
+      "@type": "DateTime",
+      "@value": "2018-08-07T12:00:00Z"
+    }
+  },
+  "NO2": {
+    "type": "Property",
+    "value": 22,
+    "unitCode": "GP",
+    "accuracy": {
+      "type": "Property",
+      "value": 0.95
+    }
+  },
+  "refPointOfInterest": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:PointOfInterest:RZ:MainSquare"
+  },
+  "@context": [
+    "https://schema.lab.fiware.org/ld/jsonldcontext.jsonld",
+    "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. GET /ngsi-ld/ex/v1/contexts/urn:ngsi-ld:AirQualityObserved:RZ:Obsv4567, see context created in step 01"
+echo "=========================================================================================================="
+orionCurl --url /ngsi-ld/ex/v1/contexts/urn:ngsi-ld:AirQualityObserved:RZ:Obsv4567
+echo
+echo
+
+
+--REGEXPECT--
+01. Create Entity urn:ngsi-ld:AirQualityObserved:RZ:Obsv4567 with BIG context
+=============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:AirQualityObserved:RZ:Obsv4567
+Date: REGEX(.*)
+
+
+
+02. GET /ngsi-ld/ex/v1/contexts/urn:ngsi-ld:AirQualityObserved:RZ:Obsv4567, see context created in step 01
+==========================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 131
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "@context": [
+        "https://schema.lab.fiware.org/ld/jsonldcontext.jsonld",
+        "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
