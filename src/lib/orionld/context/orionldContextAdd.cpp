@@ -29,7 +29,6 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjParse.h"                                     // kjParse
-#include "kjson/kjFree.h"                                      // kjFree
 }
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
@@ -147,40 +146,45 @@ OrionldContext* orionldContextAdd
   //   2. with a single member,
   //   3. called '@context'
   //   4. that is either a JSON Object or a JSON Array
+  //   5. Optionally, one mor emember is allowed: "generatedAt", a String
   //
 
   // 1. Is the resulting payload a JSON object?
   if (tree->type != KjObject)
   {
     *detailsPP = (char*) "Invalid JSON type of payload for a context - must be a JSON Object";
-    kjFree(tree);
     return NULL;
   }
   LM_T(LmtContext, ("the JSON type of the tree is Object - OK"));
 
-  // 2. Does it have one single member?
+  // 2. Does it have one single member (and optionally "generatedAt")?
   if (tree->value.firstChildP == NULL)
   {
     *detailsPP = (char*) "Invalid payload for a context - the payload is empty";
-    kjFree(tree);
     return NULL;
   }
   LM_T(LmtContext, ("The tree has at least one child - OK"));
 
   if (tree->value.firstChildP->next != NULL)
   {
-    *detailsPP = (char*) "Invalid payload for a context - only one member allowed for context payloads";
-    kjFree(tree);
-    return NULL;
+    if ((strcmp(tree->value.firstChildP->next->name, "generatedAt") == 0) && (tree->value.firstChildP->next->type == KjString))
+    {
+      // OK
+    }
+    else
+    {
+      *detailsPP = (char*) "Invalid payload for a context - only members allowed for context payloads are '@context' and 'generatedAt'";
+      return NULL;
+    }
   }
-  LM_T(LmtContext, ("The tree has exactly one child - OK"));
-  LM_T(LmtContext, ("Only member is '%s' and of type %s", tree->value.firstChildP->name, kjValueType(tree->value.firstChildP->type)));
+
+  LM_T(LmtContext, ("The tree has one child, optionally two - OK"));
+  LM_T(LmtContext, ("First member is '%s' and of type %s", tree->value.firstChildP->name, kjValueType(tree->value.firstChildP->type)));
 
   // 3. Is the single member called '@context' ?
   if (!SCOMPARE9(tree->value.firstChildP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
   {
     *detailsPP = (char*) "Invalid payload for a context - the member '@context' not present";
-    kjFree(tree);
     return NULL;
   }
 
@@ -188,7 +192,6 @@ OrionldContext* orionldContextAdd
   if ((tree->value.firstChildP->type != KjObject) && (tree->value.firstChildP->type != KjArray))
   {
     *detailsPP = (char*) "Invalid JSON type for the @context member - must be a JSON Object or a JSON Array";
-    kjFree(tree);
     return NULL;
   }
 
@@ -202,10 +205,7 @@ OrionldContext* orionldContextAdd
   //
 
   if ((contextP = orionldContextAppend(url, tree, contextType, detailsPP)) == NULL)
-  {
-    kjFree(tree);
     return NULL;
-  }
 
   //
   // Now, if the context was an Object, then we are done,
@@ -233,7 +233,6 @@ OrionldContext* orionldContextAdd
       *detailsPP = (char*) "Non-string found in context vector";
       LM_T(LmtContext, (*detailsPP));
 
-      kjFree(tree);
       free(contextP->url);
       free(contextP);
 
@@ -251,7 +250,6 @@ OrionldContext* orionldContextAdd
       *detailsPP = (char*) "invalid URL in context vector";  // overwriting the detailsPP from urlParse
       LM_T(LmtContext, (*detailsPP));
 
-      kjFree(tree);
       free(contextP->url);
       free(contextP);
 

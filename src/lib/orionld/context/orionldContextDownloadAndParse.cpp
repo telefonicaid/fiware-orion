@@ -30,7 +30,6 @@ extern "C"
 #include "kjson/kjson.h"                                    // Kjson
 #include "kjson/KjNode.h"                                   // KjNode
 #include "kjson/kjParse.h"                                  // kjParse
-#include "kjson/kjFree.h"                                   // kjFree
 }
 
 #include "orionld/common/OrionldResponseBuffer.h"              // OrionldResponseBuffer
@@ -113,9 +112,12 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
   }
 
   // Now parse the payload
-  LM_T(LmtContext, ("Got @context: %s", httpResponse.buf));
-  LM_T(LmtContext, ("Got @context - parsing it"));
-  LM_TMP(("Got @context: %s", httpResponse.buf));
+  // LM_T(LmtContext, ("Got @context: %s", httpResponse.buf));
+  // LM_T(LmtContext, ("Got @context - parsing it"));
+  char tmpBuf[128];
+  strncpy(tmpBuf, httpResponse.buf, 128);
+  tmpBuf[127] = 0;
+  LM_TMP(("Got @context: %s", tmpBuf));
   KjNode* tree = kjParse(kjsonP, httpResponse.buf);
   LM_T(LmtContext, ("Got @context - parsed it"));
 
@@ -139,7 +141,6 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
   if ((tree->type != KjArray) && (tree->type != KjString) && (tree->type != KjObject))
   {
     LM_T(LmtContext, ("Freeing tree as wrong json type"));
-    kjFree(tree);
     *detailsPP = (char*) "Invalid JSON type of response";
     LM_E((*detailsPP));
     return NULL;
@@ -172,7 +173,6 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
   if (tree->type != KjObject)
   {
     LM_T(LmtContext, ("tree->type != KjObject : freeing context tree"));
-    kjFree(tree);
     *detailsPP = (char*) "Not a JSON Object - invalid @context";
     LM_E((*detailsPP));
     return NULL;
@@ -183,7 +183,6 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
 
   if (contextNodeP == NULL)
   {
-    kjFree(tree);
     *detailsPP = (char*) "Invalid context - object must have a single member, called '@context'";
     LM_E((*detailsPP));
     return NULL;
@@ -191,7 +190,6 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
 
   if (strcmp(contextNodeP->name, "@context") != 0)
   {
-    kjFree(tree);
     *detailsPP = (char*) "Invalid context - object must have a single member, called '@context'";
     LM_E((*detailsPP));
     return NULL;
@@ -199,7 +197,6 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
 
   if (contextNodeP->value.firstChildP == NULL)
   {
-    kjFree(tree);
     *detailsPP = (char*) "Invalid context - '@context' is empty";
     LM_E((*detailsPP));
     return NULL;
@@ -207,10 +204,16 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
 
   if (contextNodeP->next != NULL)
   {
-    kjFree(tree);
-    *detailsPP = (char*) "Invalid context - '@context' must be the only member of the JSON object";
-    LM_E((*detailsPP));
-    return NULL;
+    if ((strcmp(contextNodeP->next->name, "generatedAt") == 0) && (contextNodeP->next->type == KjString))
+    {
+      // OK
+    }
+    else
+    {
+      *detailsPP = (char*) "Invalid context - '@context' and optionally 'generatedAt' must be the only members of the JSON object";
+      LM_E((*detailsPP));
+      return NULL;
+    }
   }
 
   // Now, we have '@context' - is it an object?
@@ -247,7 +250,6 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
       if (strcmp(kNodeP->name, coreNodeP->name) == 0)
       {
         LM_E(("New context collides with core context. Offending alias: '%s'", kNodeP->name));
-        kjFree(tree);
         *detailsPP = (char*) "Invalid context - colliding with Core Context";
         LM_E((*detailsPP));
         return NULL;

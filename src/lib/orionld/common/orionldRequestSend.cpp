@@ -61,7 +61,12 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
   int                     xtraBytes  = 512;
 
   LM_T(LmtWriteCallback, ("Got a chunk of %d bytes: %s", realSize, (char*) contents));
-  LM_TMP(("Buffer so far: %s", rBufP->buf));
+
+  char tmpBuf[128];
+  strncpy(tmpBuf, rBufP->buf, 128);
+  tmpBuf[127] = 0;
+  LM_TMP(("Buffer so far (only the first 127 bytes): %s", tmpBuf));
+
   // LM_TMP(("In writeCallback: Got a chunk of %d bytes", realSize));
   if (realSize + rBufP->used >= rBufP->size)
   {
@@ -91,7 +96,7 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
   }
 
   LM_TMP(("In writeCallback: copying to position %d-%d in rBufP->buf (%d bytes to be copied). Buf size: %d", rBufP->used, rBufP->used + realSize, realSize, rBufP->size));
-  bcopy(contents, &rBufP->buf[rBufP->used], realSize);
+  memcpy(&rBufP->buf[rBufP->used], contents, realSize);
   LM_TMP(("Copy worked!"));
 
   rBufP->used += realSize;
