@@ -30,7 +30,7 @@ Disclaimer:
 ## Short term
 
 The following list of features are planned to be addressed in the short term,
-and incorporated in the release of the product matching the FIWARE 7.7 Release:
+and incorporated into the coming release(s) of the product:
 
 - NGSI-LD Basic Functionality. Entity creation, Entity update, Entity delete, Basic Query Support. 
 - Notification improvements (initial notification skip, always-notify updates, etc.) (community)
@@ -51,6 +51,7 @@ of the product even though development of these features has not yet been
 scheduled for a release in the near future. Please feel free to contact us if
 you wish to get involved in the implementation or influence the roadmap
 
-- Lightweight communications with Cygnus
-- Lightweight ingestion (updates)
-- Integration with FastRTPS (the default robotics middleware of ROS2)
+- Lightweight ingestion for connection oriented updates. The following technologies are under study for its integration:
+  - Apache Avro
+  - [FastRTPS](https://github.com/eProsima/Fast-RTPS) (the default robotics middleware of ROS2)
+  - Apache Kafka
