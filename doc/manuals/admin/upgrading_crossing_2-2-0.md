@@ -1,6 +1,6 @@
-# Upgrading to 1.14.0 and beyond from a pre-1.14.0 version
+# Upgrading to 2.2.0 and beyond from a pre-2.2.0 version
 
-Orion 1.14.0 removes the metadata ID feature and this involves a change in DB model. This procedure check if you
+Orion 2.2.0 removes the metadata ID feature and this involves a change in DB model. This procedure check if you
 have such metadata ID in your data and, in that case, explains how to deal with that situation.
 
 -   Stop contextBroker
@@ -11,7 +11,7 @@ have such metadata ID in your data and, in that case, explains how to deal with 
 -   [Take a backup of your DBs](database_admin.md#backup) (this is just a safety measure in case any problem occurs,
     e.g some script gets interrupted before finished and your database data ends in an incoherent state)
 -   Download the following script:
-    -   [check_metadata_id.py](https://github.com/telefonicaid/fiware-orion/blob/1.14.0/scripts/managedb/check_metadata_id.py)
+    -   [check_metadata_id.py](https://github.com/telefonicaid/fiware-orion/blob/2.2.0/scripts/managedb/check_metadata_id.py)
 -   Install pymongo (it is a script dependency) in case you don't have it previously installed
 
         pip-python install pymongo
@@ -50,12 +50,16 @@ In the case you have metadata ID in your database, you need to remove them. Ther
     `DELETE /v1/contextEntities/{entityId}/attributes/{attrName}/{attrId}` or
     `DELETE /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}` operations.
 
--   Using the script check_metadata_id.py in autofix mode. In order to do so, edit the script and change the line `autofix = False`
-    to `autofix = True`. In autofix mode and automatic transformation procedure is applied, so each attribute with ID is transformed
-    to a new attribute in the form `<attrName>:<id>` (e.g. if you have an attribute `temperature` with metadata ID `id1` then it will
-    be transformed to `temperature:id1`. In the rare case the destination attribute already exists in the entity then you will get
-    a `- ERROR: attribute <...> already exist in entity ... Cannot be automatically fixed` message and you need to deal with it manually.
-
+-   Using the script `check_metadata_id.py` in autofix mode. In order to do so, edit the script and change the line `autofix = None`
+    to either `autofix = 'as_new_attrs'` or `autofix = 'as_metadata'`.
+    - In `as_new_attrs` mode each attribute with ID is transformed to a new attribute in the form `<attrName>:<id>` (e.g. if you
+      have an attribute `temperature` with metadata ID `id1` then it will be transformed to `temperature:id1`. In the rare case the
+      destination attribute already exists in the entity then you will get a `- ERROR: attribute <...> already exist in entity ...
+      Cannot be automatically fixed` message and you need to deal with it manually.
+    - In `as_metadata` mode the attributes don't change their names and the ID is transformed in a regular metadata. Thus, from a point of view
+      of external clients (i.e. a system doing `GET /v2/entities`) there wouldn't be any difference. However, this assumes that no attribute
+      exists with more than one ID (i.e. `entities w/ at least one attr w/ more than one ID` is zero in the first pass of the script),
+      otherwise it will fail.
 
 ## Troubleshooting
 

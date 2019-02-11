@@ -79,7 +79,7 @@ you can flush your DB before upgrading.
 * [Upgrading to 0.21.0 and beyond from a pre-0.21.0 version](upgrading_crossing_0-21-0.md)
 * [Upgrading to 1.3.0 and beyond from a pre-1.3.0 version](upgrading_crossing_1-3-0.md)
 * [Upgrading to 1.5.0 and beyond from a pre-1.5.0 version](upgrading_crossing_1-5-0.md)
-* [Upgrading to 1.14.0 and beyond from a pre-1.14.0 version](upgrading_crossing_1-14-0.md)
+* [Upgrading to 2.2.0 and beyond from a pre-2.2.0 version](upgrading_crossing_2-2-0.md)
 
 If your upgrade cover several segments (e.g. you are using 0.13.0 and
 want to upgrade to 0.19.0, so both "upgrading to 0.14.1 and beyond from
