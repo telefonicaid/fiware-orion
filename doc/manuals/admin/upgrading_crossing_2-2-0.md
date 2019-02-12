@@ -40,7 +40,7 @@ have such metadata ID in your data and, in that case, explains how to deal with 
 
 -   Start contextBroker
 
-Note that the rpm command demands superuser privileges, so you have to run it as root or using the sudo command.
+Note that the yum command demands superuser privileges, so you have to run it as root or using the sudo command.
 
 ## Dealing with metadata ID
 
@@ -53,7 +53,7 @@ In the case you have metadata ID in your database, you need to remove them. Ther
 -   Using the script `check_metadata_id.py` in autofix mode. In order to do so, edit the script and change the line `autofix = None`
     to either `autofix = 'as_new_attrs'` or `autofix = 'as_metadata'`.
     - In `as_new_attrs` mode each attribute with ID is transformed to a new attribute in the form `<attrName>:<id>` (e.g. if you
-      have an attribute `temperature` with metadata ID `id1` then it will be transformed to `temperature:id1`. In the rare case the
+      have an attribute `temperature` with metadata ID `id1` then it will be transformed to `temperature:id1`). In the rare case the
       destination attribute already exists in the entity then you will get a `- ERROR: attribute <...> already exist in entity ...
       Cannot be automatically fixed` message and you need to deal with it manually.
     - In `as_metadata` mode the attributes don't change their names and the ID is transformed in a regular metadata. Thus, from a point of view
