@@ -639,7 +639,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 16. Check sub counts in order to see sub1, sub4 and sub6 has been triggered twice
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 408
+Content-Length: 409
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -655,7 +655,7 @@ Date: REGEX(.*)
         },
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
-        "lastSucessCode": 200,
+        "lastSuccessCode": 200,
         "timesSent": 2
     },
     "status": "active",
@@ -664,6 +664,43 @@ Date: REGEX(.*)
             "attrs": [],
             "expression": {
                 "mq": "A1.M1.i"
+            }
+        },
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ]
+    }
+}
+
+
+HTTP/1.1 200 OK
+Content-Length: 411
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "expires": "2050-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/notify"
+        },
+        "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "timesSent": 2
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "expression": {
+                "mq": "!A1.M1.i2"
             }
         },
         "entities": [
@@ -692,44 +729,7 @@ Date: REGEX(.*)
         },
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
-        "lastSucessCode": 200,
-        "timesSent": 2
-    },
-    "status": "active",
-    "subject": {
-        "condition": {
-            "attrs": [],
-            "expression": {
-                "mq": "!A1.M1.i2"
-            }
-        },
-        "entities": [
-            {
-                "idPattern": "E.*"
-            }
-        ]
-    }
-}
-
-
-HTTP/1.1 200 OK
-Content-Length: 409
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "expires": "2050-04-05T14:00:00.00Z",
-    "id": "REGEX([0-9a-f]{24})",
-    "notification": {
-        "attrs": [],
-        "attrsFormat": "normalized",
-        "http": {
-            "url": "http://localhost:REGEX(\d+)/notify"
-        },
-        "lastNotification": "REGEX(.*)",
-        "lastSuccess": "REGEX(.*)",
-        "lastSucessCode": 200,
+        "lastSuccessCode": 200,
         "timesSent": 2
     },
     "status": "active",
