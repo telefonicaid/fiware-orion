@@ -224,7 +224,7 @@ Date: REGEX(.*)
 07. Get subscription see status: active, lastSuccessCode: 200 (and also old lastFailure fields*)
 ================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 461
+Content-Length: 462
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -242,7 +242,7 @@ Date: REGEX(.*)
         "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
         "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
-        "lastSucessCode": 200,
+        "lastSuccessCode": 200,
         "timesSent": 2
     },
     "status": "active",

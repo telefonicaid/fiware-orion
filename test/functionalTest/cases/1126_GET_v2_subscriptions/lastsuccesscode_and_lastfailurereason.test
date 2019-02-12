@@ -516,7 +516,7 @@ Date: REGEX(.*)
 10. Get sub1 see status: active, lastSuccessCode: 200
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 382
+Content-Length: 383
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -532,7 +532,7 @@ Date: REGEX(.*)
         },
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
         "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
-        "lastSucessCode": 200,
+        "lastSuccessCode": 200,
         "timesSent": 1
     },
     "status": "active",
@@ -553,7 +553,7 @@ Date: REGEX(.*)
 11. Get sub2 see status: active, lastSuccessCode: 400
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 382
+Content-Length: 383
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -569,7 +569,7 @@ Date: REGEX(.*)
         },
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
         "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
-        "lastSucessCode": 400,
+        "lastSuccessCode": 400,
         "timesSent": 1
     },
     "status": "active",
@@ -590,7 +590,7 @@ Date: REGEX(.*)
 12. Get sub3 see status: active, lastSuccessCode: 404
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 382
+Content-Length: 383
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -606,7 +606,7 @@ Date: REGEX(.*)
         },
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
         "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
-        "lastSucessCode": 404,
+        "lastSuccessCode": 404,
         "timesSent": 1
     },
     "status": "active",
@@ -627,7 +627,7 @@ Date: REGEX(.*)
 13. Get sub4 see status: active, lastSuccessCode: 500
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 382
+Content-Length: 383
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -643,7 +643,7 @@ Date: REGEX(.*)
         },
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
         "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
-        "lastSucessCode": 500,
+        "lastSuccessCode": 500,
         "timesSent": 1
     },
     "status": "active",
