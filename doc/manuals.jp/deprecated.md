@@ -12,10 +12,14 @@
 * Orion 2.0.0 での NGSIv1 (関連する CLI パラメータ : `-strictNgsiv1Ids`, `-ngsiv1Autocast`)。代わりに NGSIv2 API を使用してください
 * `POST /v2/op/query` の `attributes` フィールドは、Orion 1.15.0 にあります。これらの属性を持つエンティティのみを返すためには、クエリに対するレスポンスにどの属性を含めるかを選択する `attrs` と、`expression` 内の `q` の単項属性フィルタ (unary attribute filter) の組み合わせです。それらを代わりに指定していください
 * Orion 1.14.0 では `POST /v2/op/update` の `APPEND`, `APPEND_STRICT`, `UPDATE`, `DELETE`,  `REPLACE` の使用は非推奨です。`append`, `appendStrict`, `update`, `delete`, `replace` を代わりに使ってください
-* Orion 1.13.0 ではメタデータ ID が推奨されていません。一方、この機能は NGSIv2 と互換性がありません。JSON 表現形式の属性名は JSON オブジェクトのキーとして使用されるため、名前を複製することはできません。一方、IDs は、属性名にプレフィックス/サフィックスを使用して簡単に実装することができます。たとえば、`temperature:ground` および `temperature:ceiling` です。 この非推奨の結果、次のオペレーションも非推奨になりました :
-    * `GET /v1/contextEntities/Room1/attributes/{attrName}/{id}`
-    * `PUT /v1/contextEntities/Room1/attributes/{attrName}/{id}`
-    * `DELETE /v1/contextEntities/Room1/attributes/{attrName}/{id}`
+* Orion 1.13.0 ではメタデータ ID が推奨されていません (Orion 2.2.0 で削除されました)。一方、この機能は NGSIv2 と互換性がありません。JSON 表現形式の属性名は JSON オブジェクトのキーとして使用されるため、名前を複製することはできません。一方、IDs は、属性名にプレフィックス/サフィックスを使用して簡単に実装することができます。たとえば、`temperature:ground` および `temperature:ceiling` です。 この非推奨の結果、次のオペレーションも非推奨になりました :
+    * `GET /v1/contextEntities/{entityId}/attributes/{attrName}/{attrId}`
+    * `GET /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
+    * `POST /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
+    * `PUT /v1/contextEntities/{entityId}/attributes/{attrName}/{attrId}`
+    * `PUT /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
+    * `DELETE /v1/contextEntities/{entityId}/attributes/{attrName}/{attrId}`
+    * `DELETE /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
 * Orion 1.5.0 では、NGSIv2 で `dateCreated` および/または `dateModified` 属性を含めるために `optionsURL` パラメータ使用することは推奨されていません。代わりに `attrs`URI パラメータを使用してください
 * パス・プレフィックスとして /ngsi10 そして /ngsi9URL は、orion 1.2.0 で廃止されました。代わりに `/v1` と `/v1/registry` を使用してください
 * エンティティの場所を指定する `location` メタデータは、Orion 1.1.0 では非推奨です。エンティティの場所を指定する新しい方法は、属性の `geo:point` 型を使用することです。[ユーザ・マニュアルの対応するセクション](user/geolocation.md)を参照してください) 
@@ -54,7 +58,7 @@
 | URI パラメータでの `dateCreated` および `dateModified`                     | まだ定義されていません                          | まだ定義されていません          |
 | `/ngsi10` および `/ngsi9` URL プレフィックス                                  | まだ定義されていません                          | まだ定義されていません          |
 | エンティティのロケーションを指定する `location` メタデータ                 | まだ定義されていません                          | まだ定義されていません          |
-| `id` メタデータとそれに関連する NGSIv1 オペレーション                      | まだ定義されていません                          | まだ定義されていません          |
+| `id` メタデータとそれに関連する NGSIv1 オペレーション                      | 2.2.0                                           | 2018年12月19日                  |
 | XML API                                                                    | 0.28.0                                          | 2016年2月29日                   |
 | ONTIMEINTERVAL subscription                                                | 0.28.0                                          | 2016年2月29日                   |
 | CLI `--silent`                                                             | 0.28.0                                          | 2016年2月29日                   |
