@@ -493,10 +493,10 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
   KjNode*                   contextNodeP              = NULL;
 
   // Default values
-  subP->attrsFormat = NGSI_LD_V1_KEYVALUES;
-  subP->descriptionProvided = false;
-  subP->expires = 0;
-  subP->throttling = 0;
+  subP->attrsFormat                        = NGSI_LD_V1_KEYVALUES;
+  subP->descriptionProvided                = false;
+  subP->expires                            = 0x7FFFFFFF;
+  subP->throttling                         = 0;
   subP->subject.condition.expression.isSet = false;
   subP->notification.blacklist             = false;
   subP->notification.timesSent             = 0;
