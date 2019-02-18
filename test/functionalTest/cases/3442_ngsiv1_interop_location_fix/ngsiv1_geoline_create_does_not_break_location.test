@@ -1,0 +1,150 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Check create NGSIv1 geo:line doesn't break location at DB
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity with geo:line with NGSIv1 (APPEND)
+# 02. Check location field is not broken in database
+#
+
+
+echo "01. Create entity with geo:line with NGSIv1 (APPEND)"
+echo "===================================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "E",
+    "isPattern": "false",
+    "id": "E1",
+    "attributes": [
+    {
+      "name": "position",
+      "type": "geo:line",
+      "value": ["7.7, 8.8", "9.9, -10.10"]
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" -X POST
+echo
+echo
+
+
+echo "02. Check location field is not broken in database"
+echo "=================================================="
+mongoCmd ${CB_DB_NAME} 'db.entities.find()' | python -mjson.tool
+echo
+echo
+
+
+
+--REGEXPECT--
+01. Create entity with geo:line with NGSIv1 (APPEND)
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 196
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "position",
+                        "type": "geo:line",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+02. Check location field is not broken in database
+==================================================
+{
+    "_id": {
+        "id": "E1",
+        "servicePath": "/",
+        "type": "E"
+    },
+    "attrNames": [
+        "position"
+    ],
+    "attrs": {
+        "position": {
+            "creDate": REGEX(\d+),
+            "mdNames": [],
+            "modDate": REGEX(\d+),
+            "type": "geo:line",
+            "value": [
+                "7.7, 8.8",
+                "9.9, -10.10"
+            ]
+        }
+    },
+    "creDate": REGEX(\d+),
+    "lastCorrelator": "REGEX(.*)",
+    "location": {
+        "attrName": "position",
+        "coords": {
+            "coordinates": [
+                [
+                    8.8,
+                    7.7
+                ],
+                [
+                    -10.1,
+                    9.9
+                ]
+            ],
+            "type": "LineString"
+        }
+    },
+    "modDate": REGEX(\d+)
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -118,7 +118,28 @@ static bool getGeoJson
   std::vector<double>  coordLong;
   BSONArrayBuilder     ba;
 
-  if ((apiVersion == V1) || (caP->type == GEO_POINT))
+  if ((apiVersion == V1) && (caP->type != GEO_POINT) && (caP->type != GEO_LINE) && (caP->type != GEO_BOX) &&
+      (caP->type != GEO_POLYGON) && (caP->type != GEO_JSON))
+  {
+    // This corresponds to the legacy way in NGSIv1 based in metadata
+    // The block is the same that for GEO_POINT but it is clearer if we keep it separated
+
+    double  aLat;
+    double  aLong;
+
+    if (!string2coords(caP->stringValue, aLat, aLong))
+    {
+      *errDetail = "geo coordinates format error [see Orion user manual]: " + caP->stringValue;
+      return false;
+    }
+
+    geoJson->append("type", "Point");
+    geoJson->append("coordinates", BSON_ARRAY(aLong << aLat));
+
+    return true;
+  }
+
+  if (caP->type == GEO_POINT)
   {
     double  aLat;
     double  aLong;
@@ -156,8 +177,8 @@ static bool getGeoJson
      */
     BSONObjBuilder bo;
 
-    // Autocast doesn't make sense in this context
-    caP->valueBson(bo, "", false);
+    // Autocast doesn't make sense in this context, strings2numbers enabled in the case of NGSIv1
+    caP->valueBson(bo, "", true, apiVersion == V1);
     geoJson->appendElements(getObjectFieldF(bo.obj(), ENT_ATTRS_VALUE));
 
     return true;
