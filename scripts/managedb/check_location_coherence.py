@@ -332,6 +332,8 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
                             counter_update['error'] += 1
                             need_help = True
                     else:
+                        msg('   - {0}: entity w/ geo:point but wo/ location  {1} ({2})'.format(processed, json.dumps(doc['_id']),
+                                                                                               date2string(doc['modDate'])))
                         counter_update['untouched'] += 1
                         need_help = True
             else:
