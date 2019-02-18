@@ -125,12 +125,50 @@ def fix_location(entity, geo_attr, coords):
 
     try:
         # Update document with the new attribute fields
-        db[COL].update(flatten(doc['_id']), {'$set': {'location': location}})
+        db[COL].update(flatten(entity['_id']), {'$set': {'location': location}})
 
         # Check update was ok (this is not an exhaustive checking that is better than nothing :)
-        check_doc = db[COL].find_one(flatten(doc['_id']))
+        check_doc = db[COL].find_one(flatten(entity['_id']))
 
-        if update_ok(check_doc, doc[ATTRS]):
+        if update_ok(check_doc, entity[ATTRS]):
+            return 'OK'
+        else:
+            return 'FAIL'
+
+    except pymongo.errors.WriteError as e:
+        return 'FAIL mongo error %d' % e.code
+
+
+def fix_empty_geopoint(entity, geo_attr):
+    """
+    Fix location with empty geo:point, seting it to 0,0
+
+    :param entity: entity to fix
+    :param geo_attr: name of the geo:point attribute
+    :return: "OK" if update when ok, "FAIL xxxx" otherwise
+    """
+
+    # Location example for reference:
+    # { "attrName" : "position", "coords" : { "type" : "Point", "coordinates" : [ -1.52363, 42.9113 ] } }
+
+    entity[ATTRS][geo_attr]['value'] = '0,0'
+
+    location = {
+        'attrName': geo_attr,
+        'coords': {
+            'type': 'Point',
+            'coordinates': [0, 0]
+        }
+    }
+
+    try:
+        # Update document with the new attribute fields
+        db[COL].update(flatten(entity['_id']), {'$set': {ATTRS: entity[ATTRS], 'location': location}})
+
+        # Check update was ok (this is not an exhaustive checking that is better than nothing :)
+        check_doc = db[COL].find_one(flatten(entity['_id']))
+
+        if update_ok(check_doc, entity[ATTRS]):
             return 'OK'
         else:
             return 'FAIL'
@@ -315,10 +353,23 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
             if geo_type == 'geo:point':
 
                 if geo_value == '':
-                    # Entity with empty geo:point is a degenerated case. Not fixable.
+                    # Entity with empty geo:point is a degenerated case. Fixable, setting 0,0 as coordinates.
                     counter_analysis['emptygeopoint'] += 1
-                    counter_update['untouched'] += 1
-                    need_help = True
+                    if autofix:
+                        result = fix_empty_geopoint(doc, geo_attr)
+                        msg('   - {0}: fixing empty geo:point {1} ({2}): {3}'.format(processed, json.dumps(doc['_id']),
+                                                                                     date2string(doc['modDate']), result))
+                        if result == 'OK':
+                            counter_update['changed'] += 1
+                        else:
+                            counter_update['error'] += 1
+                            need_help = True
+                    else:
+                        msg('   - {0}: empty geo:point {1} ({2})'.format(processed, json.dumps(doc['_id']),
+                                                                              date2string(doc['modDate'])))
+
+                        counter_update['untouched'] += 1
+                        need_help = True
                 else:
                     # Entity with geo:point attribute but without location field. Fixable
                     counter_analysis['geo-nloc'] += 1
@@ -374,7 +425,7 @@ print '  * entities w/  geo: and w/  location field (ok):                       
 print '  * entities wo/ geo: and w/  location field - coherent (legacy NGSIv1, ok):   %d' % counter_analysis['legacy']
 print '  ! entities wo/ geo: and w/  location field - not coherent (unfixable):       %d' % counter_analysis['ngeo-loc']
 print '  ! entities w/ geo:point and wo/ location field (fixable):                    %d' % counter_analysis['geo-nloc']
-print '  ! entities w/ empty string in geo:point (unfixable)                          %d' % counter_analysis['emptygeopoint']
+print '  ! entities w/ empty string in geo:point (fixable)                            %d' % counter_analysis['emptygeopoint']
 print '  ! entities w/ other geo: and wo/ location field (unfixable)                  %d' % counter_analysis['unfixable']
 
 if len(erroneous_geo_types.keys()) > 0:
