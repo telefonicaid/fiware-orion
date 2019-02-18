@@ -93,10 +93,11 @@ def extract_attr_with_md_id(attrs):
 
     r = {}
     for attr in attrs.keys():
-        if attr.find('()') > 0:
-            tokens = attr.split("()")
-            name = tokens[0]
-            md_id = tokens[1]
+        # We cannot use split here, as the metadata part could have ()
+        separator = attr.find('()')
+        if separator > 0:
+            name = attr[:separator]
+            md_id = attr[separator+2:]
             if name in r.keys():
                 r[name].append(md_id)
             else:
@@ -160,26 +161,26 @@ def fix_entity(entity, attrs_with_md_id):
                 print '     * ERROR: entity has at least one attribute with more than one ID. Cannot be automaticaly fixed.'
                 return 'error'
 
-        # Composing old name and new name, eg. temperature()ID1 and temperature:ID1
-        md_id = attrs_with_md_id[base_name][0]
-        old_name = base_name + '()' + md_id
+            # Composing old name and new name, eg. temperature()ID1 and temperature:ID1
+            md_id = attrs_with_md_id[base_name][0]
+            old_name = base_name + '()' + md_id
 
-        # Changing temperature()ID1 for temperature in the attrs key-map...
-        new_attrs[base_name] = new_attrs.pop(old_name)
+            # Changing temperature()ID1 for temperature in the attrs key-map...
+            new_attrs[base_name] = new_attrs.pop(old_name)
 
-        # ...and add the corresponding metadata ID (as regular metatada)
-        new_md_id = {
-            'type': 'string',   # This is the hardwired type used for metadata ID in Orion <= 1.13.0
-            'value': md_id
-        }
-        if MD in new_attrs[base_name].keys():
-            new_attrs[base_name][MD]['id'] = new_md_id
-        else:
-            new_attrs[base_name][MD] = {'id': new_md_id}
+            # ...and add the corresponding metadata ID (as regular metatada)
+            new_md_id = {
+                'type': 'string',   # This is the hardwired type used for metadata ID in Orion <= 1.13.0
+                'value': md_id
+            }
+            if MD in new_attrs[base_name].keys():
+                new_attrs[base_name][MD]['ID'] = new_md_id
+            else:
+                new_attrs[base_name][MD] = {'ID': new_md_id}
 
-        check_attrs.append(base_name)
+            check_attrs.append(base_name)
 
-        entity_touched = True
+            entity_touched = True
 
     # Now that new_attrs and new_attrsname are prepared, lest's do the actual update at MongoDB
     if entity_touched:

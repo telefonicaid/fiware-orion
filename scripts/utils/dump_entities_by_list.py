@@ -102,7 +102,7 @@ def dump_entity(id):
         return False
 
     entity_body = res.json()['contextResponses'][0]['contextElement']
-    print json.dumps(entity_body)
+    print json.dumps(entity_body).decode('unicode-escape')
 
     return True
 
