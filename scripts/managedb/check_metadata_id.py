@@ -207,7 +207,7 @@ autofix = None
 #autofix = 'as_metadata'
 
 if len(sys.argv) != 2:
-    print "invalid number of arguments, please check https://fiware-orion.readthedocs.io/en/master/admin/upgrading_crossing_1-14-0/index.html"
+    print "invalid number of arguments, please check https://fiware-orion.readthedocs.io/en/master/admin/upgrading_crossing_2-2-0/index.html"
     sys.exit()
 
 DB = sys.argv[1]
@@ -307,4 +307,4 @@ print '  * attempt to change but error:                                      %d'
 
 if need_fix:
     print "------------------------------------------------------"
-    print "WARNING: some problem was found during the process. Please check the documentation at https://fiware-orion.readthedocs.io/en/master/admin/upgrading_crossing_1-14-0/index.html"
+    print "WARNING: some problem was found during the process. Please check the documentation at https://fiware-orion.readthedocs.io/en/master/admin/upgrading_crossing_2-2-0/index.html"
