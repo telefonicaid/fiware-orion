@@ -579,8 +579,9 @@ std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
       }
     }
 
-    // Current way of declaring location in NGSIv1, aligned with NGSIv2 (note that not all NGSIv1 geo:xxxx
-    // are supported, only geo:point)
+    // Current way of declaring location in NGSIv1, aligned with NGSIv2 (originally only only geo:point was supported
+    // but doing so have problems so we need to support all them at the end, 
+    // see https://github.com/telefonicaid/fiware-orion/issues/3442 for details)
     if ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON))
     {
       return LOCATION_WGS84;
