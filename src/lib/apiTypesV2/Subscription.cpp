@@ -165,7 +165,7 @@ std::string Notification::toJson(const std::string& attrsFormat)
 
   if (this->lastSuccessCode != -1)
   {
-    jh.addNumber("lastSucessCode", this->lastSuccessCode);
+    jh.addNumber("lastSuccessCode", this->lastSuccessCode);
   }
 
   return jh.str();

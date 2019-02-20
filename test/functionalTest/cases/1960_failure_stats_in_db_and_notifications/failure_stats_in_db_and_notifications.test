@@ -262,7 +262,7 @@ Date: REGEX(.*)
 05. GET subscription, see NO error stats in notification field
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 425
+Content-Length: 426
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -280,7 +280,7 @@ Date: REGEX(.*)
             "lastFailureReason": "Couldn't resolve host name",
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
-            "lastSucessCode": 200,
+            "lastSuccessCode": 200,
             "timesSent": 2
         },
         "status": "active",
@@ -310,7 +310,7 @@ Date: REGEX(.*)
 07. GET subscription, see NO error stats in notification field
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 425
+Content-Length: 426
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -328,7 +328,7 @@ Date: REGEX(.*)
             "lastFailureReason": "Couldn't resolve host name",
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
-            "lastSucessCode": 200,
+            "lastSuccessCode": 200,
             "timesSent": 3
         },
         "status": "active",
@@ -412,7 +412,7 @@ Date: REGEX(.*)
 10. GET subscription, see error stats in notification field
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 422
+Content-Length: 423
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -430,7 +430,7 @@ Date: REGEX(.*)
             "lastFailureReason": "Couldn't resolve host name",
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
-            "lastSucessCode": 200,
+            "lastSuccessCode": 200,
             "timesSent": 4
         },
         "status": "failed",
