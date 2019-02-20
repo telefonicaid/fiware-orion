@@ -139,7 +139,7 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::
 *
 * Used to render attribute value to BSON, appended into the bsonAttr builder
 */
-void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast) const
+void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast, bool strings2numbers) const
 {
   if (compoundValueP == NULL)
   {
@@ -150,14 +150,14 @@ void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr, const std::string& at
     if (compoundValueP->valueType == ValueTypeVector)
     {
       BSONArrayBuilder b;
-      compoundValueBson(compoundValueP->childV, b);
+      compoundValueBson(compoundValueP->childV, b, strings2numbers);
       bsonAttr.append(ENT_ATTRS_VALUE, b.arr());
     }
     else if (compoundValueP->valueType == ValueTypeObject)
     {
       BSONObjBuilder b;
 
-      compoundValueBson(compoundValueP->childV, b);
+      compoundValueBson(compoundValueP->childV, b, strings2numbers);
       bsonAttr.append(ENT_ATTRS_VALUE, b.obj());
     }
     else if (compoundValueP->valueType == ValueTypeString)
@@ -579,9 +579,10 @@ std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
       }
     }
 
-    // Current way of declaring location in NGSIv1, aligned with NGSIv2 (note that not all NGSIv1 geo:xxxx
-    // are supported, only geo:point)
-    if (type == GEO_POINT)
+    // Current way of declaring location in NGSIv1, aligned with NGSIv2 (originally only only geo:point was supported
+    // but doing so have problems so we need to support all them at the end, 
+    // see https://github.com/telefonicaid/fiware-orion/issues/3442 for details)
+    if ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON))
     {
       return LOCATION_WGS84;
     }
@@ -812,6 +813,7 @@ std::string ContextAttribute::toJsonV1
 
   return out;
 }
+
 
 
 /* ****************************************************************************
