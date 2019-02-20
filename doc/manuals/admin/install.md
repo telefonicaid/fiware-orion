@@ -70,7 +70,7 @@ Upgrade procedure depends on whether the *upgrade path* (i.e. from the installed
 
 ### Migrating the data stored in DB
 
-You only need to pay attention to this if your upgrade path crosses 0.14.1, 0.19.0, 0.21.0, 1.3.0, 1.5.0 and 1.14.0.
+You only need to pay attention to this if your upgrade path crosses 0.14.1, 0.19.0, 0.21.0, 1.3.0, 1.5.0 and 2.2.0.
 Otherwise, you can skip this section. You can also skip this section if your DB are not valuable (e.g. debug/testing environments) and
 you can flush your DB before upgrading.
 

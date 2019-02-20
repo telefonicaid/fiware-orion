@@ -11,7 +11,7 @@ have such metadata ID in your data and, in that case, explains how to deal with 
 -   [Take a backup of your DBs](database_admin.md#backup) (this is just a safety measure in case any problem occurs,
     e.g some script gets interrupted before finished and your database data ends in an incoherent state)
 -   Download the following script:
-    -   [check_metadata_id.py](https://github.com/telefonicaid/fiware-orion/blob/2.2.0/scripts/managedb/check_metadata_id.py)
+    -   [check_metadata_id.py](https://github.com/telefonicaid/fiware-orion/blob/2.2.0/scripts/managedb/upgrade-2.2.0/check_metadata_id.py)
 -   Install pymongo (it is a script dependency) in case you don't have it previously installed
 
         pip-python install pymongo
