@@ -13,7 +13,7 @@ Orion 2.2.0 ではメタデータ ID 機能が削除されており、これに�
     (これは問題が発生した場合の安全対策です。例えば、スクリプトが終了する前に
     中断され、データベースのデータが一貫性のない状態で終了する場合などです)
 -   次のスクリプトをダウンロードしてください :
-    -   [check_metadata_id.py](https://github.com/telefonicaid/fiware-orion/blob/2.2.0/scripts/managedb/check_metadata_id.py)
+    -   [check_metadata_id.py](https://github.com/telefonicaid/fiware-orion/blob/2.2.0/scripts/managedb/upgrade-2.2.0/check_metadata_id.py)
 -   以前に pymongo をインストールしていない場合は、pymongo をインストールします
     (これはスクリプト依存です)
 
