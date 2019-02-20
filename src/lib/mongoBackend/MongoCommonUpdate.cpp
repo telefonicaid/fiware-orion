@@ -87,18 +87,18 @@ using orion::CompoundValueNode;
 * Check that the parameter is a not custom metadata, i.e. one metadata without
 * an special semantic to be interpreted by the context broker itself
 *
-* NGSIv2 builtin metadata (dateCreated, dateModifie, etc.) are considered custom
+* NGSIv2 builtin metadata (dateCreated, dateModified, etc.) are considered custom
 *
-* FIXME P2: this function probably could be moved to another place "closer" to metadata
+* FIXME P6: this function probably could be removed. By the moment we leave it
+* and we decide what to do in some time (if we add a new custom metadata it could be
+* a convenient placeholder). If kept, it should be moved to another place
+* "closer" to metadata
 */
 static bool isNotCustomMetadata(std::string md)
 {
-  if (md != NGSI_MD_ID)
-  {
-    return false;
-  }
-
-  return true;
+  // After removing ID and deprecating location, all metadata are custom so
+  // we always return false
+  return false;
 }
 
 
@@ -696,12 +696,7 @@ static bool updateAttribute
 {
   *actualUpdate = false;
 
-  /* Attributes with metadata ID are stored as <attrName>()<ID> in the attributes embedded document */
   std::string effectiveName = dbDotEncode(caP->name);
-  if (caP->getId() != "")
-  {
-    effectiveName += MD_ID_SEPARATOR + caP->getId();
-  }
 
   if (isReplace)
   {
@@ -781,8 +776,6 @@ static bool updateAttribute
 * In addition, return value is as follows:
 * - true: there was an actual append change
 * - false: there was an append-as-update change
-*
-* Attributes with metadata ID are stored as <attrName>_<ID> in the attributes embedded document
 */
 static bool appendAttribute
 (
@@ -796,11 +789,6 @@ static bool appendAttribute
 )
 {
   std::string effectiveName = dbDotEncode(caP->name);
-
-  if (caP->getId() != "")
-  {
-    effectiveName += MD_ID_SEPARATOR + caP->getId();
-  }
 
   /* APPEND with existing attribute equals to UPDATE */
   if (attrs.hasField(effectiveName.c_str()))
@@ -863,117 +851,20 @@ static bool appendAttribute
 
 /* ****************************************************************************
 *
-* legalIdUsage -
-*
-* Check that the client is not trying to mix attributes ID and no ID for the same
-* name
-*
-*/
-static bool legalIdUsage(const BSONObj& attrs, ContextAttribute* caP)
-{
-  std::string prefix = caP->name + MD_ID_SEPARATOR;
-
-  if (caP->getId() == "")
-  {
-    /* Attribute attempting to append doesn't have any ID. Thus, no attribute with same name can have ID in attrs,
-     * i.e. no attribute starting with "<attrName>" can at the same time start with "<attrName>()" */
-    std::set<std::string> attrNames;
-
-    attrs.getFieldNames(attrNames);
-
-    for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
-    {
-      std::string attrName = *i;
-
-      if (strncmp(caP->name.c_str(), attrName.c_str(), caP->name.length()) == 0 &&
-          strncmp(prefix.c_str(), attrName.c_str(), strlen(prefix.c_str())) == 0)
-      {
-        return false;
-      }
-    }
-  }
-  else
-  {
-    /* Attribute attempting to append has ID. Thus, no attribute with same name can have ID in attrs,
-     * i.e. no attribute starting with "<attrName>" can at the same time have a name not starting with "<attrName>()"
-     */
-    std::set<std::string> attrNames;
-
-    attrs.getFieldNames(attrNames);
-
-    for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
-    {
-      std::string attrName = *i;
-
-      if (strncmp(caP->name.c_str(), attrName.c_str(), strlen(caP->name.c_str())) == 0 &&
-          strncmp(prefix.c_str(), attrName.c_str(), strlen(prefix.c_str())) != 0)
-      {
-        return false;
-      }
-    }
-  }
-
-  return true;
-}
-
-
-
-/* ****************************************************************************
-*
-* legalIdUsage -
-*
-* Check that the client is not trying to mix attributes ID and no ID for the same name
-*/
-static bool legalIdUsage(const ContextAttributeVector& caV)
-{
-  for (unsigned int ix = 0; ix < caV.size(); ++ix)
-  {
-    std::string  attrName  = caV[ix]->name;
-    std::string  attrType  = caV[ix]->type;
-    std::string  attrId    = caV[ix]->getId();
-
-    if (attrId == "")
-    {
-      /* Search for attribute with same name and type, but with actual ID to detect inconsistency */
-      for (unsigned int jx = 0; jx < caV.size(); ++jx)
-      {
-        const ContextAttribute* ca = caV[jx];
-
-        if (attrName == ca->name && attrType == ca->type && ca->getId() != "")
-        {
-          return false;
-        }
-      }
-    }
-  }
-
-  return true;
-}
-
-
-
-/* ****************************************************************************
-*
 * deleteAttribute -
 *
 * Returns true if an attribute was deleted, false otherwise
 *
-* Attributes with metadata ID are stored as <attrName>()<ID> in the attributes embedded document
 */
 static bool deleteAttribute
 (
   BSONObj&                              attrs,
   BSONObjBuilder*                       toUnset,
-  std::map<std::string, unsigned int>*  deleted,
+  BSONArrayBuilder*                     toPull,
   ContextAttribute*                     caP
 )
 {
   std::string effectiveName = dbDotEncode(caP->name);
-
-  if (caP->getId() != "")
-  {
-    effectiveName += MD_ID_SEPARATOR + caP->getId();
-  }
 
   if (!attrs.hasField(effectiveName.c_str()))
   {
@@ -983,18 +874,7 @@ static bool deleteAttribute
   const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
 
   toUnset->append(composedName, 1);
-
-  /* Record the ocurrence of this attribute. Only attributes using ID may have a value greater than 1 */
-  if (deleted->count(caP->name))
-  {
-    std::map<std::string, unsigned int>::iterator it = deleted->find(caP->name);
-
-    it->second++;
-  }
-  else
-  {
-    deleted->insert(std::make_pair(caP->name, 1));
-  }
+  toPull->append(caP->name);
 
   return true;
 }
@@ -2008,55 +1888,18 @@ static void buildGeneralErrorResponse
 */
 static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes)
 {
-  Metadata*  md;
-
-  /* Not custom */
-  if (caReq->getId().length() > 0)
-  {
-    md = new Metadata(NGSI_MD_ID, "string", caReq->getId());
-    caRes->metadataVector.push_back(md);
-  }
-
-  /* Custom (just "mirroring" in the response) */
+  /* Custom metadata (just "mirroring" in the response) */
   for (unsigned int ix = 0; ix < caReq->metadataVector.size(); ++ix)
   {
     Metadata* mdReq = caReq->metadataVector[ix];
 
     if (!isNotCustomMetadata(mdReq->name))
     {
-      md = new Metadata(mdReq);
+      Metadata* md = new Metadata(mdReq);
       caRes->metadataVector.push_back(md);
     }
   }
 }
-
-
-
-/* ****************************************************************************
-*
-* howManyAttrs -
-*
-* Returns the number of occurences of the attrName attribute (e.g. "A1") in the attrs
-* BSON (taken from DB). This use to be 1, except in the case of using ID.
-*
-*/
-static unsigned int howManyAttrs(BSONObj& attrs, const std::string& attrName)
-{
-  unsigned int           c = 0;
-  std::set<std::string>  attrNames;
-
-  attrs.getFieldNames(attrNames);
-  for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
-  {
-    if (basePart(*i) == attrName)
-    {
-      c++;
-    }
-  }
-
-  return c;
-}
-
 
 
 /* ****************************************************************************
@@ -2347,23 +2190,6 @@ static bool appendContextAttributeItem
 {
   std::string err;
 
-  if (!legalIdUsage(attrs, targetAttr))
-  {
-    /* If legalIdUsage() returns false, then that particular attribute can not be appended. In this case,
-     * we interrupt the processing and early return with
-     * a error StatusCode */
-    std::string details = std::string("action: APPEND") +
-                          " - entity: [" + entityDetail + "]" +
-                          " - offending attribute: " + targetAttr->getName() +
-                          " - attribute cannot be appended";
-
-    cerP->statusCode.fill(SccInvalidParameter, details);
-    oe->fill(SccInvalidModification, details, "Unprocessable");
-
-    alarmMgr.badInput(clientIp, "attribute cannot be appended");
-    return false;
-  }
-
   bool actualAppend = appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, forcedUpdate, apiVersion);
 
   *entityModified = (*actualUpdate) || (*entityModified);
@@ -2410,15 +2236,15 @@ static bool deleteContextAttributeItem
   ContextElementResponse*               notifyCerP,
   const std::string&                    entityDetail,
   BSONObjBuilder*                       toUnset,
-  bool*                                 entityModified,
+  BSONArrayBuilder*                     toPull,
   std::string*                          currentLocAttrName,
+  bool*                                 entityModified,
   mongo::Date_t*                        dateExpiration,
-  std::map<std::string, unsigned int>*  deletedAttributesCounter,
   ApiVersion                            apiVersion,
   OrionError*                           oe
 )
 {
-  if (deleteAttribute(attrs, toUnset, deletedAttributesCounter, targetAttr))
+  if (deleteAttribute(attrs, toUnset, toPull, targetAttr))
   {
     deleteAttrInNotifyCer(notifyCerP, targetAttr);
     *entityModified = true;
@@ -2509,12 +2335,11 @@ static bool processContextAttributeVector
   OrionError*                                     oe
 )
 {
-  std::string                          entityId        = cerP->entity.id;
-  std::string                          entityType      = cerP->entity.type;
-  std::string                          entityDetail    = cerP->entity.toString();
-  bool                                 entityModified  = false;
-  std::map<std::string, unsigned int>  deletedAttributesCounter;  // Aux var for DELETE operations
-  std::vector<std::string>             modifiedAttrs;
+  std::string               entityId        = cerP->entity.id;
+  std::string               entityType      = cerP->entity.type;
+  std::string               entityDetail    = cerP->entity.toString();
+  bool                      entityModified  = false;
+  std::vector<std::string>  modifiedAttrs;
 
   for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
   {
@@ -2588,10 +2413,10 @@ static bool processContextAttributeVector
                                       notifyCerP,
                                       entityDetail,
                                       toUnset,
-                                      &entityModified,
+                                      toPull,
                                       currentLocAttrName,
+                                      &entityModified,
                                       dateExpiration,
-                                      &deletedAttributesCounter,
                                       apiVersion,
                                       oe))
       {
@@ -2616,29 +2441,6 @@ static bool processContextAttributeVector
     if (actualUpdate)
     {
       modifiedAttrs.push_back(ca->name);
-    }
-  }
-
-  /* Special processing in the case of DELETE, to avoid "deleting too much" in the case of using
-   * metadata ID. If metadata ID feature were removed, this ugly piece of code wouldn't be needed ;)
-   * FIXME P3: note that in the case of Active/Active configuration it could happen that
-   * the attrsName get desynchronized, e.g. starting situation is A-ID1 and A-ID2, node
-   * #1 process DELETE A-ID1 and node #2 process DELETE A-ID2, each one thinking than the
-   * other A-IDx copy will be there at the end, thus nobody includes it in the toPull array
-   */
-  if (action == ActionTypeDelete)
-  {
-    std::map<std::string, unsigned int>::iterator it;
-
-    for (it = deletedAttributesCounter.begin(); it != deletedAttributesCounter.end(); ++it)
-    {
-      std::string  attrName     = it->first;
-      unsigned int deletedTimes = it->second;
-
-      if (howManyAttrs(attrs, attrName) <= deletedTimes)
-      {
-        toPull->append(attrName);
-      }
     }
   }
 
@@ -2706,16 +2508,6 @@ static bool createEntity
   ensureLocationIndex(tenant);
   ensureDateExpirationIndex(tenant);
 
-  if (!legalIdUsage(attrsV))
-  {
-    *errDetail =
-      "Attributes with same name with ID and not ID at the same time "
-      "in the same entity are forbidden: entity: [" + eP->toString() + "]";
-
-    oeP->fill(SccInvalidModification, *errDetail, "Unprocessable");
-    return false;
-  }
-
   /* Search for a potential location attribute */
   std::string     locAttr;
   BSONObjBuilder  geoJson;
@@ -2740,7 +2532,6 @@ static bool createEntity
 
   for (unsigned int ix = 0; ix < attrsV.size(); ++ix)
   {
-    std::string     attrId = attrsV[ix]->getId();
     BSONObjBuilder  bsonAttr;
 
     std::string attrType;
@@ -2768,10 +2559,6 @@ static bool createEntity
     attrsV[ix]->valueBson(bsonAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
     std::string effectiveName = dbDotEncode(attrsV[ix]->name);
-    if (attrId.length() != 0)
-    {
-      effectiveName += MD_ID_SEPARATOR + attrId;
-    }
 
     LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s}",
                     effectiveName.c_str(),
@@ -3099,7 +2886,7 @@ static void updateEntity
   {
     for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
     {
-      if (howManyAttrs(attrs, eP->attributeVector[ix]->name) != 0)
+      if (attrs.hasField(eP->attributeVector[ix]->name))
       {
         alarmMgr.badInput(clientIp, "attribute already exists");
         *attributeAlreadyExistsError = true;
@@ -3397,13 +3184,12 @@ static bool contextElementPreconditionsCheck
   for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
   {
     std::string name = eP->attributeVector[ix]->name;
-    std::string id   = eP->attributeVector[ix]->getId();
     for (unsigned int jx = ix + 1; jx < eP->attributeVector.size(); ++jx)
     {
-      if ((name == eP->attributeVector[jx]->name) && (id == eP->attributeVector[jx]->getId()))
+      if ((name == eP->attributeVector[jx]->name))
       {
         ContextAttribute* ca = new ContextAttribute(eP->attributeVector[ix]);
-        std::string details = std::string("duplicated attribute name: name=<") + name + "> id=<" + id + ">";
+        std::string details = std::string("duplicated attribute name: name=<") + name + ">";
         alarmMgr.badInput(clientIp, details);
         buildGeneralErrorResponse(eP, ca, responseP, SccInvalidModification,
                                   "duplicated attribute /" + name + "/");

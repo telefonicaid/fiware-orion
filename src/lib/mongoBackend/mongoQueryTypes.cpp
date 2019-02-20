@@ -123,31 +123,9 @@ static void getAttributeTypes
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    /* Previous versions of this function used a simpler approach:
-     *
-     *   BSONObj attrs = getObjectFieldF(r, ENT_ATTRS);
-     *   BSONObj attr  = getObjectFieldF(attrs, attrName);
-     *   attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
-     *
-     * However, it doesn't work when the attribute uses metadata ID
-     *
-     */
-
-    BSONObj                attrs = getObjectFieldF(r, ENT_ATTRS);
-    std::set<std::string>  attrsSet;
-
-    attrs.getFieldNames(attrsSet);
-
-    for (std::set<std::string>::iterator i = attrsSet.begin(); i != attrsSet.end(); ++i)
-    {
-      std::string currentAttr = *i;
-
-      if (basePart(currentAttr) == attrName)
-      {
-        BSONObj attr = getObjectFieldF(attrs, currentAttr);
-        attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
-      }
-    }
+    BSONObj attrs = getObjectFieldF(r, ENT_ATTRS);
+    BSONObj attr  = getObjectFieldF(attrs, attrName);
+    attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
   }
 
   releaseMongoConnection(connection);

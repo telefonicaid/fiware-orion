@@ -336,44 +336,8 @@ echo
 echo
 
 
-echo "9.1. GET /v1/contextEntities/EID/attributes/A1/left"
-echo "==================================================="
-orionCurl --url /v1/contextEntities/EID/attributes/A1/left
-echo
-echo
-
-
-echo "9.2. PUT /v1/contextEntities/EID/attributes/A1/left"
-echo "==================================================="
-payload='{
-  "type" : "T",
-  "value" : "10",
-  "metadatas" : [
-    {
-      "name": "ID",
-      "type": "none",
-      "value": "left"
-    }
-  ]
-}'
-orionCurl --url /v1/contextEntities/EID/attributes/A1/left --payload "${payload}" -X PUT
-echo
-echo
-
-
-echo "9.3. DELETE /v1/contextEntities/EID/attributes/A1/left"
-echo "======================================================"
-orionCurl --url /v1/contextEntities/EID/attributes/A1/left -X DELETE
-echo
-echo
-
-
-echo "9.4. NOP /v1/contextEntities/EID/attributes/A1/left"
-echo "==================================================="
-orionCurl --url /v1/contextEntities/EID/attributes/A1/left -X NOP
-echo
-echo
-
+# Old verion of thi test include URLs with metadata ID, that was removed in Orion 1.14.0. However,
+# we keep the old numeration by the moment (so step 10 has not be renumbered as 9 and so on)
 
 
 echo "10.1. GET /v1/contextEntityTypes/T"
@@ -925,7 +889,7 @@ Date: REGEX(.*)
 8.5. GET /v1/contextEntities/EID/attributes/A1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 161
+Content-Length: 159
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -936,7 +900,7 @@ Date: REGEX(.*)
             "metadatas": [
                 {
                     "name": "ID",
-                    "type": "string",
+                    "type": "none",
                     "value": "left"
                 }
             ],
@@ -955,15 +919,14 @@ Date: REGEX(.*)
 8.6. DELETE /v1/contextEntities/EID/attributes/A1
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 165
+Content-Length: 34
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "472",
-    "details": "action: DELETE - entity: [EID, ] - offending attribute: A1 - attribute not found",
-    "reasonPhrase": "request parameter is invalid/not allowed"
+    "code": "200",
+    "reasonPhrase": "OK"
 }
 
 
@@ -972,74 +935,6 @@ Date: REGEX(.*)
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
 Allow: POST, GET, PUT, DELETE
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-9.1. GET /v1/contextEntities/EID/attributes/A1/left
-===================================================
-HTTP/1.1 200 OK
-Content-Length: 161
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "attributes": [
-        {
-            "metadatas": [
-                {
-                    "name": "ID",
-                    "type": "string",
-                    "value": "left"
-                }
-            ],
-            "name": "A1",
-            "type": "T",
-            "value": "10"
-        }
-    ],
-    "statusCode": {
-        "code": "200",
-        "reasonPhrase": "OK"
-    }
-}
-
-
-9.2. PUT /v1/contextEntities/EID/attributes/A1/left
-===================================================
-HTTP/1.1 200 OK
-Content-Length: 34
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "code": "200",
-    "reasonPhrase": "OK"
-}
-
-
-9.3. DELETE /v1/contextEntities/EID/attributes/A1/left
-======================================================
-HTTP/1.1 200 OK
-Content-Length: 34
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "code": "200",
-    "reasonPhrase": "OK"
-}
-
-
-9.4. NOP /v1/contextEntities/EID/attributes/A1/left
-===================================================
-HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: GET, PUT, DELETE
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

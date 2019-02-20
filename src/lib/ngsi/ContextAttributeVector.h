@@ -50,8 +50,7 @@ typedef struct ContextAttributeVector
   void                     release(void);
   void                     fill(const ContextAttributeVector& caV, bool useDefaultType = false, bool cloneCompounds = false);
   int                      get(const std::string& attributeName) const;
-  void                     getAll(const std::string& attributeName, std::vector<int>* foundP) const;
-  
+
   ContextAttribute*  operator[](unsigned int ix) const;
 
 
