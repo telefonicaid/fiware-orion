@@ -9,3 +9,4 @@
 - Fix: avoid "pending" fields in logs
 - Fix: use "<none>" for srv= and subsrv= in logs when service/subservice header is not provided
 - Fix: bug in notification alarm raising in -notificationMode transient and persistent
+- Remove: deprecated feature ID metadata (and associated NGSIv1 operations)
