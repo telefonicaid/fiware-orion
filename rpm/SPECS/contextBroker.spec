@@ -173,6 +173,20 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Thu Feb 21 2019 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.2.0-1
+- Add: skipInitialNotification URI param option to make initial notification in subscriptions configurable (#920)
+- Add: forcedUpdate URI param option to always trigger notifications, no matter if actual update or not (#3389)
+- Add: log notification HTTP response (as INFO for 2xx or WARN for other codes)
+- Add: notification.lastFailureReason field in subscriptions to get the reason of the last notification failure
+- Add: notification.lastSuccessCode field in subscriptions to get the HTTP responde code of the last successful notification
+- Fix: NGSIv1 updates with geo:line|box|polygon|json removes location DB field of NGSIv2-located entities (#3442)
+- Fix: specify notification/forwarding error cause in log messages (#3077)
+- Fix: from=, corr=, srv=, subsrv= correctly propagated to logs in notifications (#3073)
+- Fix: avoid "pending" fields in logs
+- Fix: use "<none>" for srv= and subsrv= in logs when service/subservice header is not provided
+- Fix: bug in notification alarm raising in -notificationMode transient and persistent
+- Remove: deprecated feature ID metadata (and associated NGSIv1 operations)
+
 * Wed Dec 19 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.1.0-1
 - Add: Oneshot Subscription (#3189)
 - Add: support to MongoDB 3.6 (#3070)
