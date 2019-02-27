@@ -46,6 +46,7 @@ verbose = False
 
 
 ATTRS = 'attrs'
+GEO_TYPES = [ 'geo:point', 'geo:line', 'geo:box', 'geo:polygon', 'geo:json']
 
 def flatten(_id):
     """
@@ -187,7 +188,7 @@ def extract_geo_attr(attrs):
     """
 
     for attr in attrs.keys():
-        if attrs[attr]['type'].startswith('geo:'):
+        if attrs[attr]['type'] in GEO_TYPES:
             return attr
 
     return None
