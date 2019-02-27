@@ -110,7 +110,6 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
 
   //
   // 3. Send the request to the Context Provider (and await the reply)
-  // FIXME P7: Should Rush be used?
   //
   std::string     verb         = "POST";
   std::string     resource     = prefix + "/queryContext";
@@ -138,7 +137,6 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
                       payload,
                       ciP->httpHeaders.correlator,
                       "",
-                      false,
                       &out,
                       &statusCode,
                       noHeaders,

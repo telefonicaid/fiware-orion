@@ -67,8 +67,6 @@ typedef enum IpVersion
 * Global vars -
 */
 extern IpVersion               ipVersionUsed;
-extern std::string             rushHost;
-extern unsigned short          rushPort;
 extern bool                    multitenant;
 extern bool                    corsEnabled;
 extern char                    corsOrigin[64];
@@ -105,8 +103,6 @@ extern void restInit
    unsigned int        _connectionMemory,
    unsigned int        _maxConnections,
    unsigned int        _mhdThreadPoolSize,
-   const std::string&  _rushHost,
-   unsigned short      _rushPort,
    const char*         _allowedOrigin,
    int                 _corsMaxAge,
    int                 _mhdTimeoutInSeconds,

@@ -144,7 +144,6 @@ static void* workerFunc(void* pSyncQ)
                                      params->content,
                                      params->fiwareCorrelator,
                                      params->renderFormat,
-                                     true,
                                      &out,
                                      &statusCode,
                                      params->extraHeaders);

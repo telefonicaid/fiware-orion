@@ -143,7 +143,6 @@ char            httpsKeyFile[1024];
 char            httpsCertFile[1024];
 bool            https;
 bool            mtenant;
-char            rush[256];
 char            allowedOrigin[64];
 int             maxAge;
 long            dbTimeout;
@@ -203,7 +202,6 @@ bool            ngsiv1Autocast;
 #define HTTPS_DESC             "use the https 'protocol'"
 #define HTTPSKEYFILE_DESC      "private server key file (for https)"
 #define HTTPSCERTFILE_DESC     "certificate key file (for https)"
-#define RUSH_DESC              "rush host (IP:port)"
 #define MULTISERVICE_DESC      "service multi tenancy mode"
 #define ALLOWED_ORIGIN_DESC    "enable Cross-Origin Resource Sharing with allowed origin. Use '__ALL' for any"
 #define CORS_MAX_AGE_DESC      "maximum time in seconds preflight requests are allowed to be cached. Default: 86400"
@@ -269,7 +267,6 @@ PaArgument paArgs[] =
   { "-key",           httpsKeyFile,  "HTTPS_KEYFILE",  PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSKEYFILE_DESC  },
   { "-cert",          httpsCertFile, "HTTPS_CERTFILE", PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSCERTFILE_DESC },
 
-  { "-rush",          rush,          "RUSH",           PaString, PaOpt, _i "",      PaNL,   PaNL,  RUSH_DESC          },
   { "-multiservice",  &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
 
   { "-httpTimeout",   &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
@@ -642,41 +639,6 @@ static int loadFile(char* path, char* out, int outSize)
 
 /* ****************************************************************************
 *
-* rushParse - parse rush host and port from CLI argument
-*
-* The '-rush' CLI argument has the format "host:port" and this function
-* splits that argument into rushHost and rushPort.
-* If there is a syntax error in the argument, the function exists the program
-* with an error message
-*/
-static void rushParse(char* rush, std::string* rushHostP, uint16_t* rushPortP)
-{
-  char* colon = strchr(rush, ':');
-  char* copy  = strdup(rush);
-
-  if (colon == NULL)
-  {
-    LM_X(1, ("Fatal Error (Bad syntax of '-rush' value: '%s' - expected syntax: 'host:port')", rush));
-  }
-
-  *colon = 0;
-  ++colon;
-
-  *rushHostP = rush;
-  *rushPortP = atoi(colon);
-
-  if ((*rushHostP == "") || (*rushPortP == 0))
-  {
-    LM_X(1, ("Fatal Error (bad syntax of '-rush' value: '%s' - expected syntax: 'host:port')", copy));
-  }
-
-  free(copy);
-}
-
-
-
-/* ****************************************************************************
-*
 * policyGet -
 */
 static SemOpType policyGet(std::string mutexPolicy)
@@ -770,9 +732,6 @@ int main(int argC, char* argV[])
   int s;
 
   lmTransactionReset();
-
-  uint16_t       rushPort = 0;
-  std::string    rushHost = "";
 
   signal(SIGINT,  sigHandler);
   signal(SIGTERM, sigHandler);
@@ -953,12 +912,6 @@ int main(int argC, char* argV[])
     LM_X(1, ("Fatal Error (could not initialize libcurl)"));
   }
 
-  if (rush[0] != 0)
-  {
-    rushParse(rush, &rushHost, &rushPort);
-    LM_T(LmtRush, ("rush host: '%s', rush port: %d", rushHost.c_str(), rushPort));
-  }
-
   if (noCache == false)
   {
     subCacheInit(mtenant);
@@ -1008,8 +961,6 @@ int main(int argC, char* argV[])
                           connectionMemory,
                           maxConnections,
                           reqPoolSize,
-                          rushHost,
-                          rushPort,
                           allowedOrigin,
                           maxAge,
                           reqTimeout,
@@ -1028,8 +979,6 @@ int main(int argC, char* argV[])
                           connectionMemory,
                           maxConnections,
                           reqPoolSize,
-                          rushHost,
-                          rushPort,
                           allowedOrigin,
                           maxAge,
                           reqTimeout,
