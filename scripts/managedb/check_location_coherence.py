@@ -433,7 +433,7 @@ counter_analysis = {
     'ngeo-loc': 0,
     'legacy': 0,
     'ngeo-locpoint': 0,
-    'unfixable': 0,
+    'unknown-geo': 0,
     'corrupted-location': 0,
     'emptygeopoint': 0,
 }
@@ -542,7 +542,7 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
 
                 safe_add(not_fixable_types_found, geo_type)
 
-                counter_analysis['unfixable'] += 1
+                counter_analysis['unknown-geo'] += 1
                 counter_update['untouched'] += 1
                 need_help = True
 
@@ -612,7 +612,7 @@ print '  ! entities wo/ geo: attr & w/ loc field - not coherent         (unfixab
 print '  ! entities w/ geo:point attr & wo/ loc field                     (fixable)   %d' % counter_analysis['geopoint-nloc']
 print '  ! entities w/ empty string in geo:point attr                     (fixable)   %d' % counter_analysis['emptygeopoint']
 print '  ! entities w/ geo:json attr and wo/ loc field                    (fixable)   %d' % counter_analysis['geojson-nloc']
-print '  ! entities w/ other geo: attr and wo/ loc field                (unfixable)   %d' % counter_analysis['unfixable']
+print '  ! entities w/ other geo: attr and wo/ loc field                (unfixable)   %d' % counter_analysis['unknown-geo']
 print '  ! entities w/ detected corrupted location                      (unfixable)   %d' % counter_analysis['corrupted-location']
 
 if len(not_fixable_types_found.keys()) > 0:
