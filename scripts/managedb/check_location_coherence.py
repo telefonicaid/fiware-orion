@@ -434,6 +434,7 @@ counter_analysis = {
     'legacy': 0,
     'ngeo-locpoint': 0,
     'unfixable': 0,
+    'corrupted-location': 0,
     'emptygeopoint': 0,
 }
 # At the end, processed = untouched + changed + error
@@ -546,49 +547,60 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
                 need_help = True
 
     else:  # location is not None
-        loc_type = location['coords']['type']
-        loc_attr = location['attrName']
+        try:
+            loc_type = location['coords']['type']
+            loc_attr = location['attrName']
 
-        if geo_attr is None:
-            # Entity without geo: attribute location but with location field. They may come from NGSIv1
-            # or be a real problem.
-            if loc_type == 'Point' and check_ngsiv1_location(doc[ATTRS], location):
-                counter_analysis['legacy'] += 1
-                counter_update['untouched'] += 1
-            else:
-                if loc_type == 'Point' and not loc_attr in doc[ATTRS]:
-                    # Location type is Point and attribute doesn't not exist. We can fix adding the corresponding
-                    # attribute
-                    counter_analysis['ngeo-locpoint'] += 1
-                    if autofix:
-                        result = add_loc_point_attr(doc, location)
-                        msg('   - {0}: fixing loc (Point) {1} ({2}): {3}'.format(processed, json.dumps(doc['_id']),
-                                                                                 date2string(doc['modDate']), result))
-                        if result == 'OK':
-                            counter_update['changed'] += 1
+            if geo_attr is None:
+                # Entity without geo: attribute location but with location field. They may come from NGSIv1
+                # or be a real problem.
+                if loc_type == 'Point' and check_ngsiv1_location(doc[ATTRS], location):
+                    counter_analysis['legacy'] += 1
+                    counter_update['untouched'] += 1
+                else:
+                    if loc_type == 'Point' and not loc_attr in doc[ATTRS]:
+                        # Location type is Point and attribute doesn't not exist. We can fix adding the corresponding
+                        # attribute
+                        counter_analysis['ngeo-locpoint'] += 1
+                        if autofix:
+                            result = add_loc_point_attr(doc, location)
+                            msg('   - {0}: fixing loc (Point) {1} ({2}): {3}'.format(processed, json.dumps(doc['_id']),
+                                                     date2string(doc['modDate']), result))
+                            if result == 'OK':
+                                counter_update['changed'] += 1
+                            else:
+                                counter_update['error'] += 1
+                                need_help = True
                         else:
-                            counter_update['error'] += 1
-                            need_help = True
-                    else:
-                        msg('   - {0}: entity w/ location Point but wo/ geo:point or NGSIv1 point  {1} ({2})'.format(processed,
+                            msg('   - {0}: entity w/ location Point but wo/ geo:point or NGSIv1 point  {1} ({2})'.format(processed,
                                                                                               json.dumps(doc['_id']),
                                                                                               date2string(doc['modDate'])))
+                            counter_update['untouched'] += 1
+                            need_help = True
+                    else:
+                        # Location type is not point. Not fixable
+                        counter_analysis['ngeo-loc'] += 1
                         counter_update['untouched'] += 1
+                        safe_add(location_types_found, loc_type)
                         need_help = True
-                else:
-                    # Location type is not point. Not fixable
-                    counter_analysis['ngeo-loc'] += 1
-                    counter_update['untouched'] += 1
-                    safe_add(location_types_found, loc_type)
-                    need_help = True
 
-        else:  # geo_attr is not None
-            # Entity with geo: attribute and with location field. It's ok
-            # FIXME: it may happen that the GeoJSON at location field doesn't correspond with the one calculated
-            # from geo: attribute. However, we consider that possibility very rare so we are not checking it
-            counter_analysis['geo-loc'] += 1
+            else:  # geo_attr is not None
+                # Entity with geo: attribute and with location field. It's ok
+                # FIXME: it may happen that the GeoJSON at location field doesn't correspond with the one calculated
+                # from geo: attribute. However, we consider that possibility very rare so we are not checking it
+                counter_analysis['geo-loc'] += 1
+                counter_update['untouched'] += 1
+
+        except KeyError:
+            # Location format is wrong
+            counter_analysis['corrupted-location'] += 1
             counter_update['untouched'] += 1
 
+            msg('   - {0}: entity w/ corrupted location {1} ({2}): {3}'.format(processed, json.dumps(doc['_id']),
+                                                                               date2string(doc['modDate']),
+                                                                               json.dumps(location)))
+
+            need_help = True
 
 print '- processing entity: %d/%d' % (processed, total)
 print '- documents analyzed:                                                          %d' % processed
@@ -601,6 +613,7 @@ print '  ! entities w/ geo:point attr & wo/ loc field                     (fixab
 print '  ! entities w/ empty string in geo:point attr                     (fixable)   %d' % counter_analysis['emptygeopoint']
 print '  ! entities w/ geo:json attr and wo/ loc field                    (fixable)   %d' % counter_analysis['geojson-nloc']
 print '  ! entities w/ other geo: attr and wo/ loc field                (unfixable)   %d' % counter_analysis['unfixable']
+print '  ! entities w/ detected corrupted location                      (unfixable)   %d' % counter_analysis['corrupted-location']
 
 if len(not_fixable_types_found.keys()) > 0:
     print '* geo: types found without associated location field (except geo:point):       %s' % ','.join(not_fixable_types_found.keys())
