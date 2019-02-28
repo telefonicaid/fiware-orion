@@ -23,12 +23,17 @@
 # Hint: use 'PYTHONIOENCODING=utf8 python check_metadata_id.py' if you are going to redirect the output of this
 # script to a file
 
+# This script requires:
+#
+#   pymongo==3.0.3
+#   geojson==2.4.1
 
 __author__ = 'fermin'
 
 import sys
 import json
 import pymongo
+import geojson
 from datetime import datetime
 
 
@@ -93,9 +98,9 @@ def update_ok(doc, check_attrs):
     return True
 
 
-def fix_location(entity, geo_attr, coords):
+def fix_location_geopoint(entity, geo_attr, coords):
     """
-    Fix location entity, adding the missing field.
+    Fix location entity (geo:point), adding the missing field.
 
     :param entity: entity to fix
     :param geo_attr: name of the geo:point attribute
@@ -134,10 +139,10 @@ def fix_location(entity, geo_attr, coords):
         if update_ok(check_doc, entity[ATTRS]):
             return 'OK'
         else:
-            return 'FAIL'
+            return 'FAIL attrs check after update in DB'
 
     except pymongo.errors.WriteError as e:
-        return 'FAIL mongo error %d' % e.code
+        return 'FAIL mongo error %d - location was %s' % (e.code, json.dumps(location))
 
 
 def fix_empty_geopoint(entity, geo_attr):
@@ -172,10 +177,84 @@ def fix_empty_geopoint(entity, geo_attr):
         if update_ok(check_doc, entity[ATTRS]):
             return 'OK'
         else:
-            return 'FAIL'
+            return 'FAIL attrs check after update in DB'
 
     except pymongo.errors.WriteError as e:
-        return 'FAIL mongo error %d' % e.code
+        return 'FAIL mongo error %d - location was %s' % (e.code, json.dumps(location))
+
+
+def str2number(d):
+    """
+    Returns a vector of parsed numbers (other elements are not touched)
+
+    :param d: the vector to parse
+    :return: the parsed vector
+    """
+
+    if type(d) == list:
+        return map(str2number, d)
+    else:
+        try:
+            return float(d)
+        except:  # Not a float, leave as it is
+            return d
+
+
+def fix_location_geojson(entity, geo_attr, geo_json):
+    """
+    Fix location entity (geo:json), adding the missing field.
+
+    :param entity: entity to fix
+    :param geo_attr: name of the geo:json attribute
+    :param geo_json: GeoJSON object to use for location
+    :return: "OK" if update when ok, "FAIL xxxx" otherwise
+    """
+
+    # Location example for reference:
+    # { "attrName" : "position", "coords" : { "type" : "Point", "coordinates" : [ -1.52363, 42.9113 ] } }
+
+    if type(geo_json) != dict or not 'type' in geo_json.keys() or not 'coordinates' in geo_json.keys():
+        return 'FAIL not a valid GeoJSON: %s' % json.dumps(geo_json)
+
+    # If the geo:json was updated using NGSIv1, numbers would be string and the GeoJSON will not be valid. Thus,
+    # we first parse strings to number
+    geo_json_parsed = {
+        'type': geo_json['type'],
+        'coordinates': str2number(geo_json['coordinates'])
+    }
+
+    # This is weird... :)
+    #
+    # As far as I have checked and at least for this version of geojson module (2.4.1), the geojson.loads(string
+    # function returns either a geojson object (if string corresponds to a valid GeoJSON) or the string
+    # passed as argument. In the first case, is_valid is a property of the object to check for True. In the
+    # second case a AttributeError: 'dict' object has no attribute 'is_valid' error is raised
+
+    try:
+        if not geojson.loads(json.dumps(geo_json_parsed)).is_valid:
+            return 'FAIL not a valid GeoJSON: %s' % json.dumps(geo_json_parsed)
+    except:
+        return 'FAIL not a valid GeoJSON: %s' % json.dumps(geo_json_parsed)
+
+    location = {
+        'attrName': geo_attr,
+        'coords': geo_json_parsed
+    }
+
+    try:
+        # Update document with the new attribute fields
+        db[COL].update(flatten(entity['_id']), {'$set': {'location': location}})
+
+        # Check update was ok (this is not an exhaustive checking that is better than nothing :)
+        check_doc = db[COL].find_one(flatten(entity['_id']))
+
+        if update_ok(check_doc, entity[ATTRS]):
+            return 'OK'
+        else:
+            return 'FAIL attrs check after update in DB'
+
+    except pymongo.errors.WriteError as e:
+        return 'FAIL mongo error %d - location was %s' % (e.code, json.dumps(location))
 
 
 def extract_geo_attr(attrs):
@@ -306,7 +385,8 @@ processed = 0
 counter_analysis = {
     'ngeo-nloc': 0,
     'geo-loc': 0,
-    'geo-nloc': 0,
+    'geopoint-nloc': 0,
+    'geojson-nloc': 0,
     'ngeo-loc': 0,
     'legacy': 0,
     'unfixable': 0,
@@ -367,17 +447,17 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
                             need_help = True
                     else:
                         msg('   - {0}: empty geo:point {1} ({2})'.format(processed, json.dumps(doc['_id']),
-                                                                              date2string(doc['modDate'])))
+                                                                         date2string(doc['modDate'])))
 
                         counter_update['untouched'] += 1
                         need_help = True
                 else:
                     # Entity with geo:point attribute but without location field. Fixable
-                    counter_analysis['geo-nloc'] += 1
+                    counter_analysis['geopoint-nloc'] += 1
                     if autofix:
                         result = fix_location(doc, geo_attr, geo_value)
-                        msg('   - {0}: fixing entity {1} ({2}): {3}'.format(processed, json.dumps(doc['_id']),
-                                                                            date2string(doc['modDate']), result))
+                        msg('   - {0}: fixing loc (geo:point) {1} ({2}): {3}'.format(processed, json.dumps(doc['_id']),
+                                                                                     date2string(doc['modDate']), result))
                         if result == 'OK':
                             counter_update['changed'] += 1
                         else:
@@ -388,8 +468,28 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
                                                                                                date2string(doc['modDate'])))
                         counter_update['untouched'] += 1
                         need_help = True
+
+            elif geo_type == 'geo:json':
+                # Entity with geo:point attribute but without location field. Fixable
+                counter_analysis['geojson-nloc'] += 1
+                if autofix:
+                    result = fix_location_geojson(doc, geo_attr, geo_value)
+                    msg('   - {0}: fixing loc (geo:json) {1} ({2}): {3}'.format(processed, json.dumps(doc['_id']),
+                                                                                date2string(doc['modDate']), result))
+                    if result == 'OK':
+                        counter_update['changed'] += 1
+                    else:
+                        counter_update['error'] += 1
+                        need_help = True
+                else:
+                    msg('   - {0}: entity w/ geo:json but wo/ location  {1} ({2})'.format(processed,
+                                                                                          json.dumps(doc['_id']),
+                                                                                          date2string(doc['modDate'])))
+                    counter_update['untouched'] += 1
+                    need_help = True
+
             else:
-                # Entity with geo: attribute different than geo:point but without location field. Not fixable
+                # Entity with geo: attribute different than geo:point or geo:json but without location field. Not fixable
                 msg('   - {0}: unfixable {1} {2} ({3})'.format(processed, geo_type, json.dumps(doc['_id']),
                                                                date2string(doc['modDate'])))
 
@@ -420,23 +520,24 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
 
 
 print '- processing entity: %d/%d' % (processed, total)
-print '- documents analyzed:                                                          %d' % processed
-print '  * entities wo/ geo: and wo/ location field (ok):                             %d' % counter_analysis['ngeo-nloc']
-print '  * entities w/  geo: and w/  location field (ok):                             %d' % counter_analysis['geo-loc']
-print '  * entities wo/ geo: and w/  location field - coherent (legacy NGSIv1, ok):   %d' % counter_analysis['legacy']
-print '  ! entities wo/ geo: and w/  location field - not coherent (unfixable):       %d' % counter_analysis['ngeo-loc']
-print '  ! entities w/ geo:point and wo/ location field (fixable):                    %d' % counter_analysis['geo-nloc']
-print '  ! entities w/ empty string in geo:point (fixable)                            %d' % counter_analysis['emptygeopoint']
-print '  ! entities w/ other geo: and wo/ location field (unfixable)                  %d' % counter_analysis['unfixable']
+print '- documents analyzed:                                                               %d' % processed
+print '  * entities wo/ geo: attr & wo/ loc field                                   (ok)   %d' % counter_analysis['ngeo-nloc']
+print '  * entities w/  geo: attr & w/ loc field                                    (ok)   %d' % counter_analysis['geo-loc']
+print '  * entities wo/ geo: attr & w/ loc field - coherent (legacy NGSIv1)         (ok)   %d' % counter_analysis['legacy']
+print '  ! entities wo/ geo: attr & w/ loc field - not coherent              (unfixable)   %d' % counter_analysis['ngeo-loc']
+print '  ! entities w/ geo:point attr & wo/ loc field                          (fixable)   %d' % counter_analysis['geopoint-nloc']
+print '  ! entities w/ empty string in geo:point attr                          (fixable)   %d' % counter_analysis['emptygeopoint']
+print '  ! entities w/ geo:json attr and wo/ loc field                         (fixable)   %d' % counter_analysis['geojson-nloc']
+print '  ! entities w/ other geo: attr and wo/ loc field                     (unfixable)   %d' % counter_analysis['unfixable']
 
 if len(erroneous_geo_types.keys()) > 0:
 
     print '* geo: types found without associated location field (except geo:point):       %s' % ','.join(erroneous_geo_types.keys())
 
-print '- documents processed:                                                         %d' % processed
-print '  * untouched:                                                                 %d' % counter_update['untouched']
-print '  * changed:                                                                   %d' % counter_update['changed']
-print '  * attempt to change but error:                                               %d' % counter_update['error']
+print '- documents processed:                                                              %d' % processed
+print '  * untouched:                                                                      %d' % counter_update['untouched']
+print '  * changed:                                                                        %d' % counter_update['changed']
+print '  * attempt to change but error:                                                    %d' % counter_update['error']
 
 if need_help:
     print "------------------------------------------------------"
