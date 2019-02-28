@@ -257,6 +257,49 @@ def fix_location_geojson(entity, geo_attr, geo_json):
         return 'FAIL mongo error %d - location was %s' % (e.code, json.dumps(location))
 
 
+def add_loc_point_attr(entity, location):
+    """
+    Fix entity adding an attribute that match the location (of type Point)
+
+    :param entity: the entity to fix
+    :param location: the location field
+    :return:
+    """
+
+    # Location example for reference:
+    # { "attrName" : "position", "coords" : { "type" : "Point", "coordinates" : [ -1.52363, 42.9113 ] } }
+
+    attr_name = location['attrName']
+
+    # Get coordinates and revert it (GeoJSON uses that)
+    coords0 = location['coords']['coordinates'][0]
+    coords1 = location['coords']['coordinates'][1]
+
+    # Note coordinates are in opposite orden in attribute that in location
+    attr = {
+        'type': 'geo:point',
+        'value': "%d, %d" % (coords1, coords0)
+    }
+
+    entity[ATTRS][attr_name] = attr
+
+    try:
+        # Update document with the new attribute fields
+        db[COL].update(flatten(entity['_id']), {'$set': {ATTRS: entity[ATTRS]}})
+
+        # Check update was ok (this is not an exhaustive checking that is better than nothing :)
+        check_doc = db[COL].find_one(flatten(entity['_id']))
+
+        if update_ok(check_doc, entity[ATTRS]):
+            return 'OK'
+        else:
+            return 'FAIL attrs check after update in DB'
+
+    except pymongo.errors.WriteError as e:
+        return 'FAIL mongo error %d - location was %s' % (e.code, json.dumps(location))
+
+
+
 def extract_geo_attr(attrs):
     """
     Given a key-value of attributes, returns the attribute with geo: type or None
@@ -389,6 +432,7 @@ counter_analysis = {
     'geojson-nloc': 0,
     'ngeo-loc': 0,
     'legacy': 0,
+    'ngeo-locpoint': 0,
     'unfixable': 0,
     'emptygeopoint': 0,
 }
@@ -400,6 +444,7 @@ counter_update = {
 }
 
 not_fixable_types_found = {}
+location_types_found = {}
 
 total = db[COL].count()
 
@@ -501,16 +546,42 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
                 need_help = True
 
     else:  # location is not None
+        loc_type = location['coords']['type']
+        loc_attr = location['attrName']
+
         if geo_attr is None:
             # Entity without geo: attribute location but with location field. They may come from NGSIv1
             # or be a real problem.
-            if check_ngsiv1_location(doc[ATTRS], location):
+            if loc_type == 'Point' and check_ngsiv1_location(doc[ATTRS], location):
                 counter_analysis['legacy'] += 1
                 counter_update['untouched'] += 1
             else:
-                counter_analysis['ngeo-loc'] += 1
-                counter_update['untouched'] += 1
-                need_help = True
+                if loc_type == 'Point' and not loc_attr in doc[ATTRS]:
+                    # Location type is Point and attribute doesn't not exist. We can fix adding the corresponding
+                    # attribute
+                    counter_analysis['ngeo-locpoint'] += 1
+                    if autofix:
+                        result = add_loc_point_attr(doc, location)
+                        msg('   - {0}: fixing loc (Point) {1} ({2}): {3}'.format(processed, json.dumps(doc['_id']),
+                                                                                 date2string(doc['modDate']), result))
+                        if result == 'OK':
+                            counter_update['changed'] += 1
+                        else:
+                            counter_update['error'] += 1
+                            need_help = True
+                    else:
+                        msg('   - {0}: entity w/ location Point but wo/ geo:point or NGSIv1 point  {1} ({2})'.format(processed,
+                                                                                              json.dumps(doc['_id']),
+                                                                                              date2string(doc['modDate'])))
+                        counter_update['untouched'] += 1
+                        need_help = True
+                else:
+                    # Location type is not point. Not fixable
+                    counter_analysis['ngeo-loc'] += 1
+                    counter_update['untouched'] += 1
+                    safe_add(location_types_found, loc_type)
+                    need_help = True
+
         else:  # geo_attr is not None
             # Entity with geo: attribute and with location field. It's ok
             # FIXME: it may happen that the GeoJSON at location field doesn't correspond with the one calculated
@@ -520,24 +591,28 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
 
 
 print '- processing entity: %d/%d' % (processed, total)
-print '- documents analyzed:                                                               %d' % processed
-print '  * entities wo/ geo: attr & wo/ loc field                                   (ok)   %d' % counter_analysis['ngeo-nloc']
-print '  * entities w/  geo: attr & w/ loc field                                    (ok)   %d' % counter_analysis['geo-loc']
-print '  * entities wo/ geo: attr & w/ loc field - coherent (legacy NGSIv1)         (ok)   %d' % counter_analysis['legacy']
-print '  ! entities wo/ geo: attr & w/ loc field - not coherent              (unfixable)   %d' % counter_analysis['ngeo-loc']
-print '  ! entities w/ geo:point attr & wo/ loc field                          (fixable)   %d' % counter_analysis['geopoint-nloc']
-print '  ! entities w/ empty string in geo:point attr                          (fixable)   %d' % counter_analysis['emptygeopoint']
-print '  ! entities w/ geo:json attr and wo/ loc field                         (fixable)   %d' % counter_analysis['geojson-nloc']
-print '  ! entities w/ other geo: attr and wo/ loc field                     (unfixable)   %d' % counter_analysis['unfixable']
+print '- documents analyzed:                                                          %d' % processed
+print '  * entities wo/ geo: attr & wo/ loc field                              (ok)   %d' % counter_analysis['ngeo-nloc']
+print '  * entities w/  geo: attr & w/ loc field                               (ok)   %d' % counter_analysis['geo-loc']
+print '  * entities wo/ geo: attr & w/ loc field - coherent (leg NGSIv1)       (ok)   %d' % counter_analysis['legacy']
+print '  ! entities wo/ geo: attr & w/ loc field - not coherent           (fixable)   %d' % counter_analysis['ngeo-locpoint']
+print '  ! entities wo/ geo: attr & w/ loc field - not coherent         (unfixable)   %d' % counter_analysis['ngeo-loc']
+print '  ! entities w/ geo:point attr & wo/ loc field                     (fixable)   %d' % counter_analysis['geopoint-nloc']
+print '  ! entities w/ empty string in geo:point attr                     (fixable)   %d' % counter_analysis['emptygeopoint']
+print '  ! entities w/ geo:json attr and wo/ loc field                    (fixable)   %d' % counter_analysis['geojson-nloc']
+print '  ! entities w/ other geo: attr and wo/ loc field                (unfixable)   %d' % counter_analysis['unfixable']
 
 if len(not_fixable_types_found.keys()) > 0:
-
     print '* geo: types found without associated location field (except geo:point):       %s' % ','.join(not_fixable_types_found.keys())
 
-print '- documents processed:                                                              %d' % processed
-print '  * untouched:                                                                      %d' % counter_update['untouched']
-print '  * changed:                                                                        %d' % counter_update['changed']
-print '  * attempt to change but error:                                                    %d' % counter_update['error']
+if len(location_types_found.keys()) > 0:
+    print '* loc types found without associated geo: attr not fixable:                    %s' % ','.join(location_types_found.keys())
+
+
+print '- documents processed:                                                         %d' % processed
+print '  * untouched:                                                                 %d' % counter_update['untouched']
+print '  * changed:                                                                   %d' % counter_update['changed']
+print '  * attempt to change but error:                                               %d' % counter_update['error']
 
 if need_help:
     print "------------------------------------------------------"
