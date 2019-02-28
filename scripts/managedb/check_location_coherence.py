@@ -414,6 +414,23 @@ def date2string(time):
     return datetime.fromtimestamp(time).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def entity_dates(entity):
+    """
+    Return a string describing entity creation and modification dates
+    :param entity:
+    :return:
+    """
+    cre = '...'
+    if 'creDate' in entity:
+        cre = date2string(doc['creDate'])
+
+    mod = '...'
+    if 'modDate' in entity:
+        mod = date2string(doc['modDate'])
+
+    return '%s -> %s' % (cre, mod)
+
+
 def safe_add(d, k):
     """
     Add or create a key to dictionary if it doesn't already exists.
@@ -505,6 +522,9 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
     #sys.stdout.write('- processing entity: %d/%d   \r' % (processed, total) )
     #sys.stdout.flush()
 
+    # FIXME: code should be refactored in per-case function blocks. Currently it is an awful piece of
+    # nested if-then code... but ok, this is just a quick and dirty script :)
+
     location = None
     geo_attr = extract_geo_attr(doc[ATTRS])
     if 'location' in doc:
@@ -527,7 +547,7 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
                     if autofix:
                         result = fix_empty_geopoint(doc, geo_attr)
                         msg('   - {0}: fixing empty geo:point {1} ({2}): {3}'.format(processed, json.dumps(doc['_id']),
-                                                                                     date2string(doc['modDate']), result))
+                                                                                     entity_dates(doc), result))
                         if result == 'OK':
                             counter_update['changed'] += 1
                         else:
@@ -535,7 +555,7 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
                             need_help = True
                     else:
                         msg('   - {0}: empty geo:point {1} ({2})'.format(processed, json.dumps(doc['_id']),
-                                                                         date2string(doc['modDate'])))
+                                                                         entity_dates(doc)))
 
                         counter_update['untouched'] += 1
                         need_help = True
@@ -545,7 +565,7 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
                     if autofix:
                         result = fix_location_geopoint(doc, geo_attr, geo_value)
                         msg('   - {0}: fixing loc (geo:point) {1} ({2}): {3}'.format(processed, json.dumps(doc['_id']),
-                                                                                     date2string(doc['modDate']), result))
+                                                                                     entity_dates(doc), result))
                         if result == 'OK':
                             counter_update['changed'] += 1
                         else:
@@ -553,7 +573,7 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
                             need_help = True
                     else:
                         msg('   - {0}: entity w/ geo:point but wo/ location  {1} ({2})'.format(processed, json.dumps(doc['_id']),
-                                                                                               date2string(doc['modDate'])))
+                                                                                               entity_dates(doc)))
                         counter_update['untouched'] += 1
                         need_help = True
 
@@ -565,7 +585,7 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
                     if autofix:
                         result = fix_empty_geojson(doc, geo_attr)
                         msg('   - {0}: fixing empty geo:json {1} ({2}): {3}'.format(processed, json.dumps(doc['_id']),
-                                                                                    date2string(doc['modDate']), result))
+                                                                                    entity_dates(doc), result))
                         if result == 'OK':
                             counter_update['changed'] += 1
                         else:
@@ -573,7 +593,7 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
                             need_help = True
                     else:
                         msg('   - {0}: empty geo:json {1} ({2})'.format(processed, json.dumps(doc['_id']),
-                                                                        date2string(doc['modDate'])))
+                                                                        entity_dates(doc)))
 
                         counter_update['untouched'] += 1
                         need_help = True
@@ -583,7 +603,7 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
                     if autofix:
                         result = fix_location_geojson(doc, geo_attr, geo_value)
                         msg('   - {0}: fixing loc (geo:json) {1} ({2}): {3}'.format(processed, json.dumps(doc['_id']),
-                                                                                    date2string(doc['modDate']), result))
+                                                                                    entity_dates(doc), result))
                         if result == 'OK':
                             counter_update['changed'] += 1
                         else:
@@ -592,14 +612,14 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
                     else:
                         msg('   - {0}: entity w/ geo:json but wo/ location  {1} ({2})'.format(processed,
                                                                                               json.dumps(doc['_id']),
-                                                                                              date2string(doc['modDate'])))
+                                                                                              entity_dates(doc)))
                         counter_update['untouched'] += 1
                         need_help = True
 
             else:
                 # Entity with geo: attribute different than geo:point or geo:json but without location field. Not fixable
                 msg('   - {0}: unfixable {1} {2} ({3})'.format(processed, geo_type, json.dumps(doc['_id']),
-                                                               date2string(doc['modDate'])))
+                                                               entity_dates(doc)))
 
 
                 safe_add(not_fixable_types_found, geo_type)
@@ -627,7 +647,7 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
                         if autofix:
                             result = add_loc_point_attr(doc, location)
                             msg('   - {0}: fixing loc (Point) {1} ({2}): {3}'.format(processed, json.dumps(doc['_id']),
-                                                     date2string(doc['modDate']), result))
+                                                                                     entity_dates(doc), result))
                             if result == 'OK':
                                 counter_update['changed'] += 1
                             else:
@@ -635,15 +655,14 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
                                 need_help = True
                         else:
                             msg('   - {0}: entity w/ location Point but wo/ geo:point or NGSIv1 point  {1} ({2})'.format(processed,
-                                                                                              json.dumps(doc['_id']),
-                                                                                              date2string(doc['modDate'])))
+                                                                                              json.dumps(doc['_id']), entity_dates(doc)))
                             counter_update['untouched'] += 1
                             need_help = True
                     else:
                         # Location type is not point or attribute exits. Not fixable
-                        msg('   - {0}: entity w/ location but not Point or attribute exits  {1} ({2}) - location is {3}'.format(processed,
+                        msg('   - {0}: entity w/ location but not Point or attribute exists  {1} ({2}) - location is {3}'.format(processed,
                                                                                                                                 json.dumps(doc['_id']),
-                                                                                                                                date2string(doc['modDate']),
+                                                                                                                                entity_dates(doc),
                                                                                                                                 json.dumps(location)))
                         counter_analysis['ngeo-loc'] += 1
                         counter_update['untouched'] += 1
@@ -663,7 +682,7 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
             counter_update['untouched'] += 1
 
             msg('   - {0}: entity w/ corrupted location {1} ({2}): {3}'.format(processed, json.dumps(doc['_id']),
-                                                                               date2string(doc['modDate']),
+                                                                               entity_dates(doc),
                                                                                json.dumps(location)))
 
             need_help = True
