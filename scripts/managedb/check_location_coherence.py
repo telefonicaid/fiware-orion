@@ -399,7 +399,7 @@ counter_update = {
     'error': 0,
 }
 
-erroneous_geo_types = {}
+not_fixable_types_found = {}
 
 total = db[COL].count()
 
@@ -494,7 +494,7 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
                                                                date2string(doc['modDate'])))
 
 
-                safe_add(erroneous_geo_types, geo_type)
+                safe_add(not_fixable_types_found, geo_type)
 
                 counter_analysis['unfixable'] += 1
                 counter_update['untouched'] += 1
@@ -530,9 +530,9 @@ print '  ! entities w/ empty string in geo:point attr                          (
 print '  ! entities w/ geo:json attr and wo/ loc field                         (fixable)   %d' % counter_analysis['geojson-nloc']
 print '  ! entities w/ other geo: attr and wo/ loc field                     (unfixable)   %d' % counter_analysis['unfixable']
 
-if len(erroneous_geo_types.keys()) > 0:
+if len(not_fixable_types_found.keys()) > 0:
 
-    print '* geo: types found without associated location field (except geo:point):       %s' % ','.join(erroneous_geo_types.keys())
+    print '* geo: types found without associated location field (except geo:point):       %s' % ','.join(not_fixable_types_found.keys())
 
 print '- documents processed:                                                              %d' % processed
 print '  * untouched:                                                                      %d' % counter_update['untouched']
