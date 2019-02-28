@@ -501,7 +501,7 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
                     # Entity with geo:point attribute but without location field. Fixable
                     counter_analysis['geopoint-nloc'] += 1
                     if autofix:
-                        result = fix_location(doc, geo_attr, geo_value)
+                        result = fix_location_geopoint(doc, geo_attr, geo_value)
                         msg('   - {0}: fixing loc (geo:point) {1} ({2}): {3}'.format(processed, json.dumps(doc['_id']),
                                                                                      date2string(doc['modDate']), result))
                         if result == 'OK':
