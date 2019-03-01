@@ -33,6 +33,7 @@ extern "C"
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/CHECK.h"                              // CHECKx(U)
+#include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/common/OrionldGeoJsonType.h"                 // OrionldGeoJsonType
 #include "orionld/common/geoJsonTypeCheck.h"                   // geoJsonTypeCheck
 #include "orionld/common/geoJsonCheck.h"                       // Own interface
@@ -116,6 +117,12 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoJsonNodeP, char** detailsP)
     *detailsP = (char*) "Mandatory 'coordinates' field missing for a GeoJSON Property";
     return false;
   }
+
+  //
+  // Keep coordsP and typeP for later use (in mongoBackend)
+  //
+  orionldState.geoTypeP   = typeP;
+  orionldState.geoCoordsP = coordsP;
 
   // FIXME: Check all types of GeoJSON - Point, Polygon, etc (different Arrays of Number)
   // if (geoJsonCoordinatesCheck(coordsP->value.firstChildP, detailsP) == false)

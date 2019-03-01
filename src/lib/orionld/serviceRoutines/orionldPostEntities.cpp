@@ -51,6 +51,7 @@ extern "C"
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
 #include "orionld/common/geoJsonCheck.h"                       // geoJsonCheck
+#include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl, orionldCoreContext
 #include "orionld/context/orionldContextAdd.h"                 // Add a context to the context list
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
@@ -572,6 +573,14 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
       {
         isProperty    = true;
         isGeoProperty = true;
+
+        if (orionldState.locationAttributeP != NULL)
+        {
+          orionldErrorResponseCreate(ciP, OrionldBadRequestData, "More than one Geo Location attribute", nodeP->name, OrionldDetailsString);
+          return false;
+        }
+
+        orionldState.locationAttributeP = kNodeP;
       }
       else if (SCOMPARE17(nodeP->value.s, 'T', 'e', 'm', 'p', 'o', 'r', 'a', 'l', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
       {

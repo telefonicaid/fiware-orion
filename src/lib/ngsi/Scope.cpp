@@ -121,6 +121,7 @@ int Scope::fill
   if (geometry.parse(apiVersion, geometryString.c_str(), &errorString) != 0)
   {
     *errorStringP = std::string("error parsing geometry: ") + errorString;
+    LM_E(("geometry.parse: %s", errorStringP->c_str()));
     return -1;
   }
 
@@ -132,9 +133,12 @@ int Scope::fill
   {
     if (georel.parse(georelString.c_str(), errorStringP) != 0)
     {
+      LM_E(("geometry.parse: %s", errorStringP->c_str()));
       return -1;
     }
   }
+
+  LM_TMP(("Geo: creating scope. areaType: '%s', Rel: '%s'", geometry.areaType.c_str(), georel.type.c_str()));
 
   // Check invalid combinations
   if ((geometry.areaType == "line") && (georel.type == "coveredBy"))
@@ -146,6 +150,7 @@ int Scope::fill
      */
 
     *errorStringP = "line geometry cannot be used with coveredBy georel";
+    LM_E(("geometry.parse: %s", errorStringP->c_str()));
     return -1;
   }
 
@@ -158,6 +163,7 @@ int Scope::fill
      */
 
     *errorStringP = "point geometry cannot be used with coveredBy georel";
+    LM_E(("geometry.parse: %s", errorStringP->c_str()));
     return -1;
   }
 
@@ -170,6 +176,7 @@ int Scope::fill
      */
 
     *errorStringP = "georel /near/ used with geometry different than point";
+    LM_E(("geometry.parse: %s", errorStringP->c_str()));
     return -1;
   }
 
@@ -179,6 +186,7 @@ int Scope::fill
   if (coordsString == "")
   {
     *errorStringP = "no coordinates for geometry";
+    LM_E(("geometry.parse: %s", errorStringP->c_str()));
     return -1;
   }
   points = stringSplit(coordsString, ';', pointStringV);
@@ -186,6 +194,7 @@ int Scope::fill
   if (points == 0)
   {
     *errorStringP = "erroneous coordinates for geometry";
+    LM_E(("geometry.parse: %s", errorStringP->c_str()));
     return -1;
   }
 
@@ -199,19 +208,23 @@ int Scope::fill
     double                    latitude;
     double                    longitude;
 
+    LM_TMP(("KZ: Calling stringSplit for '%s'", pointStringV[ix].c_str()));
     coords = stringSplit(pointStringV[ix], ',', coordV);
 
     if (coords != 2)
     {
       *errorStringP = "invalid point in URI param /coords/";
+      LM_E(("geometry.parse: %s", errorStringP->c_str()));
       pointVectorRelease(pointV);
       pointV.clear();
       return -1;
     }
 
+    LM_TMP(("Calling str2double for '%s'", coordV[0].c_str()));
     if (!str2double(coordV[0].c_str(), &latitude))
     {
       *errorStringP = "invalid coordinates";
+      LM_E(("geometry.parse: %s", errorStringP->c_str()));
       pointVectorRelease(pointV);
       pointV.clear();
       return -1;
@@ -220,6 +233,7 @@ int Scope::fill
     if (!str2double(coordV[1].c_str(), &longitude))
     {
       *errorStringP = "invalid coordinates";
+      LM_E(("geometry.parse: %s", errorStringP->c_str()));
       pointVectorRelease(pointV);
       pointV.clear();
       return -1;
@@ -235,6 +249,7 @@ int Scope::fill
     if (apiVersion == V2)
     {
       *errorStringP = "circle geometry is not supported by Orion API v2";
+      LM_E(("geometry.parse: %s", errorStringP->c_str()));
       pointVectorRelease(pointV);
       pointV.clear();
       return -1;
@@ -244,6 +259,7 @@ int Scope::fill
       if (pointV.size() != 1)
       {
         *errorStringP = "Too many coordinates for circle";
+        LM_E(("geometry.parse: %s", errorStringP->c_str()));
         pointVectorRelease(pointV);
         pointV.clear();
         return -1;
@@ -266,6 +282,7 @@ int Scope::fill
     if ((apiVersion == V1) && (pointV.size() < 3))
     {
       *errorStringP = "Too few coordinates for polygon";
+      LM_E(("geometry.parse: %s", errorStringP->c_str()));
       pointVectorRelease(pointV);
       pointV.clear();
       return -1;
@@ -273,6 +290,7 @@ int Scope::fill
     else if ((apiVersion == V2) && (pointV.size() < 4))
     {
       *errorStringP = "Too few coordinates for polygon";
+      LM_E(("geometry.parse: %s", errorStringP->c_str()));
       pointVectorRelease(pointV);
       pointV.clear();
       return -1;
@@ -284,6 +302,7 @@ int Scope::fill
     if ((apiVersion == V2) && (pointV[0]->equals(pointV[pointV.size() - 1]) == false))
     {
       *errorStringP = "First and last point in polygon not the same";
+      LM_E(("geometry.parse: %s", errorStringP->c_str()));
       pointVectorRelease(pointV);
       pointV.clear();
       return -1;
@@ -304,6 +323,7 @@ int Scope::fill
     if (pointV.size() < 2)
     {
       *errorStringP = "invalid number of coordinates for /line/";
+      LM_E(("geometry.parse: %s", errorStringP->c_str()));
       pointVectorRelease(pointV);
       pointV.clear();
       return -1;
@@ -322,6 +342,7 @@ int Scope::fill
     if (pointV.size() != 2)
     {
       *errorStringP = "invalid number of coordinates for /box/";
+      LM_E(("geometry.parse: %s", errorStringP->c_str()));
       pointVectorRelease(pointV);
       pointV.clear();
       return -1;
@@ -334,6 +355,7 @@ int Scope::fill
     if (!orderCoordsForBox(&minLat, &maxLat, &minLon, &maxLon, pointV[0]->latitude(), pointV[1]->latitude(), pointV[0]->longitude(), pointV[1]->longitude()))
     {
       *errorStringP = "box coordinates are not defining an actual box";
+      LM_E(("geometry.parse: %s", errorStringP->c_str()));
       pointVectorRelease(pointV);
       pointV.clear();
       return -1;
@@ -358,6 +380,7 @@ int Scope::fill
     if (pointV.size() != 1)
     {
       *errorStringP = "invalid number of coordinates for /point/";
+      LM_E(("geometry.parse: %s", errorStringP->c_str()));
       pointVectorRelease(pointV);
       pointV.clear();
       return -1;
@@ -371,6 +394,7 @@ int Scope::fill
   {
     areaType = orion::NoArea;    
     *errorStringP = "invalid area-type";
+    LM_E(("geometry.parse: %s", errorStringP->c_str()));
 
     pointVectorRelease(pointV);
     pointV.clear();

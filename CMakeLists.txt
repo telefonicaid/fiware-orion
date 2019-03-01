@@ -193,6 +193,7 @@ SET (ORION_LIBS
     ngsi
     cache
     mongoBackend
+    orionld_common      # mongoBackend calls geoJsonCreate from orionld_common
     parse
     apiTypesV2
     orionTypes

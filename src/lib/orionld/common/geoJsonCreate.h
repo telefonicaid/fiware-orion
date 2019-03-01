@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_COMMON_GEOJSONCREATE_H_
+#define SRC_LIB_ORIONLD_COMMON_GEOJSONCREATE_H_
+
 /*
 *
 * Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
@@ -22,28 +25,22 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/OrionldConnection.h"                  // OrionldConnectionState
+#include "mongo/client/dbclient.h"                             // BSONObjBuilder
+
+extern "C"
+{
+#include "kjson/KjNode.h"                                      // KjNode
+}
+
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/common/OrionldGeoJsonType.h"                 // OrionldGeoJsonType
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldState - the state of the connection
+// geoJsonCreate -
 //
-__thread OrionldConnectionState orionldState = { 0 };
+extern bool geoJsonCreate(KjNode* attrP, mongo::BSONObjBuilder* geoJsonP, char** errorStringP);
 
-
-
-// -----------------------------------------------------------------------------
-//
-// Global state - move all this to another file
-//
-// Actually, create two new files to replace this one:
-// orionldThreadState.cpp/h
-// orionldGlobalState.cpp/h
-//
-int     requestNo = 0;             // Never mind protecting with semaphore. Just a debugging help
-char    kallocBuffer[32 * 1024];
-KAlloc  kalloc;
-Kjson   kjson;
-Kjson*  kjsonP;
+#endif  // SRC_LIB_ORIONLD_COMMON_GEOJSONTYPECREATE_H_

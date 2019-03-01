@@ -147,6 +147,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   if (georel != NULL)
   {
+    LM_TMP(("Geo: georel: %s", georel));
     if ((strncmp(georel, "near", 4)       != 0) &&
         (strncmp(georel, "within", 6)     != 0) &&
         (strncmp(georel, "contains", 8)   != 0) &&
@@ -165,8 +166,10 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
     if (georelExtra != NULL)
     {
-      *georelExtra = 0;
-      ++georelExtra;
+      ++georelExtra;  // Step over ';', but don't "destroy" the string - it is used as is later on
+      LM_TMP(("Geo: georel: %s", georel));
+      LM_TMP(("Geo: georelExtra: %s", georelExtra));
+
       if ((strncmp(georelExtra, "minDistance==", 11) != 0) && (strncmp(georelExtra, "maxDistance==", 11) != 0))
       {
         LM_W(("Bad Input (invalid value for georel parameter: %s)", georelExtra));
@@ -182,18 +185,34 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
     std::string  errorString;
 
-    LM_TMP(("KZ: Filling a geometry scope with { geometry='%s', coordinates='%s', georel='%s' }", geometry, coordinates, georel));
+    LM_TMP(("Geo: Filling a geometry scope with { geometry='%s', coordinates='%s', georel='%s' }", geometry, coordinates, georel));
+
+    //
+    // In APIv2, the vector is a string without [], in NGSI-LD, [] are present. Must remove ...
+    //
+    if (coordinates[0] == '[')
+    {
+      int len;
+      ++coordinates;
+
+      len = strlen(coordinates);
+      if (coordinates[len - 1] == ']')
+        coordinates[len - 1] = 0;
+    }
+
+    LM_TMP(("Geo: coordinates for '%s' in GET Entities: %s. Rel: %s", geometry, coordinates, georel));
     if (scopeP->fill(ciP->apiVersion, geometry, coordinates, georel, &errorString) != 0)
     {
       scopeP->release();
       delete scopeP;
 
-      LM_E(("Scope::fill failed"));
+      LM_E(("Geo: Scope::fill failed"));
       orionldErrorResponseCreate(ciP, OrionldInternalError, "error filling a scope", errorString.c_str(), OrionldDetailsString);
       ciP->httpStatusCode = SccReceiverInternalError;
       return false;
     }
 
+    LM_E(("Geo: Scope::fill OK"));
     parseData.qcr.res.restriction.scopeVector.push_back(scopeP);
   }
   
@@ -348,7 +367,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     //
     // FIXME: Need to do this with each q-item. Not only the first one
     //
-    LM_T(LmtStringFilter, ("KZ: q == '%s'", q));
+    LM_T(LmtStringFilter, ("Q: q == '%s'", q));
 
     char* qP = q;
     while (*qP != 0)
@@ -373,14 +392,14 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
     if (*qP == '.')
     {
-      LM_T(LmtStringFilter, ("KZ: Found a DOT in the Q - changing to MQ: '%s'", qP));
+      LM_T(LmtStringFilter, ("Q: Found a DOT in the Q - changing to MQ: '%s'", qP));
       filterType = SftMq;
     }
     else if (*qP == '[')
     {
       qP = q;
 
-      LM_T(LmtStringFilter, ("KZ: Found a [ in the Q: '%s'", qP));
+      LM_T(LmtStringFilter, ("Q: Found a [ in the Q: '%s'", qP));
       //
       // Copy char by char, replacing '[' for '.' and ']' for nothing ...
       // ... until reaching the operator.
@@ -388,7 +407,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       //
       char* toP = q;
 
-      LM_T(LmtStringFilter, ("KZ: Compound Q: '%s'", q));
+      LM_T(LmtStringFilter, ("Q: Compound Q: '%s'", q));
       while (*qP != 0)
       {
         char c = *qP;
@@ -396,7 +415,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
         if ((c == '=') || (c == '>') || (c == '<') || (c == '!') || (c == '~'))
         {
           // Just copy the rest of chars
-          LM_T(LmtStringFilter, ("KZ: Found operator - rest: %s", qP));
+          LM_T(LmtStringFilter, ("Q: Found operator - rest: %s", qP));
           while (*qP != 0)
           {
             *toP = *qP;
@@ -404,7 +423,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
             ++qP;
           }
           *toP = 0;
-          LM_T(LmtStringFilter, ("KZ: Transformation Done: %s", toP));
+          LM_T(LmtStringFilter, ("Q: Transformation Done: %s", toP));
           break;
         }
         else if (c == '[')  // Replace [ for .
@@ -427,7 +446,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
       // The resulting string is shorter than the original string - DON'T FORGET to terminate !!!
       *qP = 0;
-      LM_T(LmtStringFilter, ("KZ: Compound Q Transformed: '%s'", q));
+      LM_T(LmtStringFilter, ("Q: Compound Q Transformed: '%s'", q));
     }
 
     Scope*        scopeP = new Scope((filterType == SftMq)? SCOPE_TYPE_SIMPLE_QUERY_MD : SCOPE_TYPE_SIMPLE_QUERY, q);
@@ -438,7 +457,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     else
       scopeP->stringFilterP = sfP;
 
-    LM_T(LmtStringFilter, ("KZ: Created %s StringFilter of q: '%s'", (filterType == SftMq)? "MQ" : "Q", q));
+    LM_T(LmtStringFilter, ("Q: Created %s StringFilter of q: '%s'", (filterType == SftMq)? "MQ" : "Q", q));
 
     std::string details;
     if (sfP->parse(q, &details) == false)

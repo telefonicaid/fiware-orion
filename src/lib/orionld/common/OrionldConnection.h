@@ -28,6 +28,7 @@
 extern "C"
 {
 #include "kjson/kjson.h"                                       // Kjson
+#include "kjson/KjNode.h"                                      // KjNode
 }
 #include "common/globals.h"                                    // ApiVersion
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
@@ -54,7 +55,10 @@ typedef struct OrionldConnectionState
   OrionldContext*  contextP;
   ApiVersion       apiVersion;
   int              requestNo;
-} OrionldConnection;
+  KjNode*          locationAttributeP;
+  KjNode*          geoTypeP;
+  KjNode*          geoCoordsP;
+} OrionldConnectionState;
 
 
 

@@ -1,0 +1,359 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Geoquery
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create Entity 01 - Madrid
+# 02. Create Entity 02 - Leganes
+# 03. Create Entity 03 - Alcobendas
+# 04. Geoquery with Max Distance 15 - nothing found
+# 05. Geoquery with Max Distance 100000 - all three matching
+# 06. Geoquery with Max Distance 10 at GeoPoint Madrid - only Madrid matching
+# 07. Geoquery with Max Distance 10 at GeoPoint Leganes - only Leganes matching
+# 08. Geoquery with Max Distance 10 at GeoPoint Alcobendas - only Alcobendas matching
+# 09. Geoquery with Max Distance 10000 at GeoPoint between Madrid and Alcobendas - both found but not Leganes
+#
+
+echo "01. Create Entity 01 - Madrid"
+echo "============================="
+payload='{
+  "id": "urn:ngsi-ld:City:Madrid",
+  "type": "T_City",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [-3.691944, 40.418889]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "02. Create Entity 02 - Leganes"
+echo "=============================="
+payload='{
+  "id": "urn:ngsi-ld:City:Leganes",
+  "type": "T_City",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [-3.75, 40.316667]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "03. Create Entity 03 - Alcobendas"
+echo "================================="
+payload='{
+  "id": "urn:ngsi-ld:City:Alcobendas",
+  "type": "T_City",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [-3.633333, 40.533333]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "04. Geoquery with Max Distance 15 - nothing found"
+echo "================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&coordinates=\[-3.7,40.4\]&georel=near;maxDistance==15'
+echo
+echo
+
+
+echo "05. Geoquery with Max Distance 100000 - all three matching"
+echo "=========================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&coordinates=\[-3.7,40.4\]&georel=near;maxDistance==100000'
+echo
+echo
+
+
+echo "06. Geoquery with Max Distance 10 at GeoPoint Madrid - only Madrid matching"
+echo "==========================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&coordinates=\[-3.691944,40.418889\]&georel=near;maxDistance==10'
+echo
+echo
+
+
+echo "07. Geoquery with Max Distance 10 at GeoPoint Leganes - only Leganes matching"
+echo "============================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&coordinates=\[-3.75,40.316667\]&georel=near;maxDistance==10'
+echo
+echo
+
+
+echo "08. Geoquery with Max Distance 10 at GeoPoint Alcobendas - only Alcobendas matching"
+echo "==================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&coordinates=\[-3.633333,40.533333\]&georel=near;maxDistance==10'
+echo
+echo
+
+
+echo "09. Geoquery with Max Distance 10000 at GeoPoint between Madrid and Alcobendas - both found but not Leganes"
+echo "==========================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&coordinates=\[-3.6626385,40.476111\]&georel=near;maxDistance==10000'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create Entity 01 - Madrid
+=============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:City:Madrid
+Date: REGEX(.*)
+
+
+
+02. Create Entity 02 - Leganes
+==============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:City:Leganes
+Date: REGEX(.*)
+
+
+
+03. Create Entity 03 - Alcobendas
+=================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:City:Alcobendas
+Date: REGEX(.*)
+
+
+
+04. Geoquery with Max Distance 15 - nothing found
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+05. Geoquery with Max Distance 100000 - all three matching
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 438
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:ngsi-ld:City:Madrid",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    -3.691944,
+                    40.418889
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "T_City"
+    },
+    {
+        "id": "urn:ngsi-ld:City:Leganes",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    -3.75,
+                    40.316667
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "T_City"
+    },
+    {
+        "id": "urn:ngsi-ld:City:Alcobendas",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    -3.633333,
+                    40.533333
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "T_City"
+    }
+]
+
+
+06. Geoquery with Max Distance 10 at GeoPoint Madrid - only Madrid matching
+===========================================================================
+HTTP/1.1 200 OK
+Content-Length: 145
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:ngsi-ld:City:Madrid",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    -3.691944,
+                    40.418889
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "T_City"
+    }
+]
+
+
+07. Geoquery with Max Distance 10 at GeoPoint Leganes - only Leganes matching
+=============================================================================
+HTTP/1.1 200 OK
+Content-Length: 146
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:ngsi-ld:City:Leganes",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    -3.75,
+                    40.316667
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "T_City"
+    }
+]
+
+
+08. Geoquery with Max Distance 10 at GeoPoint Alcobendas - only Alcobendas matching
+===================================================================================
+HTTP/1.1 200 OK
+Content-Length: 149
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:ngsi-ld:City:Alcobendas",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    -3.633333,
+                    40.533333
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "T_City"
+    }
+]
+
+
+09. Geoquery with Max Distance 10000 at GeoPoint between Madrid and Alcobendas - both found but not Leganes
+===========================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 293
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:ngsi-ld:City:Madrid",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    -3.691944,
+                    40.418889
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "T_City"
+    },
+    {
+        "id": "urn:ngsi-ld:City:Alcobendas",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    -3.633333,
+                    40.533333
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "T_City"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+#dbDrop CB

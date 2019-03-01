@@ -30,6 +30,7 @@ SET (SOURCES
     httpStatusCodeToOrionldErrorType.cpp
     geoJsonTypeCheck.cpp
     geoJsonCheck.cpp
+    geoJsonCreate.cpp
     numberToDate.cpp
     OrionldConnection.cpp
 )

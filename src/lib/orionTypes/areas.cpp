@@ -471,6 +471,8 @@ int Georel::parse(const char* in, std::string* errorString)
   bool                      maxDistanceSet = false;
   bool                      minDistanceSet = false;
 
+  LM_TMP(("KZ: parsing georel: '%s'", in));
+
   maxDistance = -1;
   minDistance = -1;
 
@@ -526,6 +528,42 @@ int Georel::parse(const char* in, std::string* errorString)
 
       minDistanceSet = true;
     }
+#ifdef ORIONLD
+    else if (strncmp(item, "maxDistance==", 13) == 0)
+    {
+      LM_TMP(("KZ: Got maxDistance==X"));
+      if (maxDistanceSet)
+      {
+        *errorString = "maxDistance present more than once";
+        return -1;
+      }
+
+      if (str2double(&item[13], &maxDistance) == false)
+      {
+        *errorString = "invalid number for maxDistance";
+        return -1;
+      }
+
+      maxDistanceSet = true;
+    }
+    else if (strncmp(item, "minDistance==", 13) == 0)
+    {
+      LM_TMP(("KZ: Got minDistance==X"));
+      if (minDistanceSet)
+      {
+        *errorString = "minDistance present more than once";
+        return -1;
+      }
+
+      if (str2double(&item[13], &minDistance) == false)
+      {
+        *errorString = "invalid number for minDistance";
+        return -1;
+      }
+
+      minDistanceSet = true;
+    }
+#endif
     else
     {
       *errorString = "Invalid modifier in georel parameter";
@@ -604,7 +642,7 @@ int Geometry::parse(ApiVersion apiVersion, const char* in, std::string* errorStr
       }
       areaType = items[ix];
     }
-    else if ((apiVersion == V2) && ((items[ix] == "point") || (items[ix] == "line") || (items[ix] == "box") || (items[ix] == "polygon")))
+    else if ((apiVersion != V1) && ((items[ix] == "point") || (items[ix] == "line") || (items[ix] == "box") || (items[ix] == "polygon")))
     {
       if (areaType != "")
       {
@@ -630,6 +668,7 @@ int Geometry::parse(ApiVersion apiVersion, const char* in, std::string* errorStr
     }
     else
     {
+      LM_E(("items[ix] == '%s' - invalid selector in geometry specification", items[ix].c_str()));
       *errorString = "Invalid selector in geometry specification";
       return -1;
     }

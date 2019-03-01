@@ -272,6 +272,7 @@ int httpRequestSendWithCurl
   std::map<std::string, bool>     usedExtraHeaders;
   char                            servicePath0[SERVICE_PATH_MAX_COMPONENT_LEN + 1];  // +1 for zero termination
 
+  LM_TMP(("KZ: In httpRequestSendWithCurl - (sending a notification?) to %s:%d%s", _ip.c_str(), port, resource.c_str()));
   firstServicePath(servicePath.c_str(), servicePath0, sizeof(servicePath0));
 
   metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT, 1);
@@ -417,6 +418,8 @@ int httpRequestSendWithCurl
 
   snprintf(userAgentHeaderValue, sizeof(userAgentHeaderValue), "orion/%s libcurl/%s", versionGet(), curlVersionGet(cvBuf, sizeof(cvBuf)));
   LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (userAgentHeaderName + ": " + userAgentHeaderValue).c_str()));
+
+  LM_TMP(("HTTP-HEADERS: '%s'", (userAgentHeaderName + ": " + userAgentHeaderValue).c_str()));
   httpHeaderAdd(&headers, userAgentHeaderName, userAgentHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Host
@@ -425,6 +428,7 @@ int httpRequestSendWithCurl
 
   snprintf(hostHeaderValue, sizeof(hostHeaderValue), "%s:%d", ip.c_str(), (int) port);
   LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (hostHeaderName + ": " + hostHeaderValue).c_str()));
+  LM_TMP(("HTTP-HEADERS: '%s'", (hostHeaderName + ": " + hostHeaderValue).c_str()));
   httpHeaderAdd(&headers, hostHeaderName, hostHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Tenant
@@ -488,6 +492,7 @@ int httpRequestSendWithCurl
   httpHeaderAdd(&headers, HTTP_FIWARE_CORRELATOR, correlationHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // Notify Format
+  LM_TMP(("Notify Format: '%s'", ngsiv2AttrFormat.c_str()));
   if ((ngsiv2AttrFormat != "") && (ngsiv2AttrFormat != "JSON") && (ngsiv2AttrFormat != "legacy"))
   {
     std::string nFormatHeaderName  = HTTP_NGSIV2_ATTRSFORMAT;
@@ -549,7 +554,8 @@ int httpRequestSendWithCurl
     url = ip;
   }
   url = protocol + url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
-
+  LM_TMP(("url: %s", url.c_str()));
+  LM_TMP(("payload: %s", payload));
   if (insecureNotif)
   {
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); // ignore self-signed certificates for SSL end-points
@@ -593,6 +599,7 @@ int httpRequestSendWithCurl
   //
   LM_I(("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
 
+  LM_TMP(("Sending notification/forward using curl_easy_perform"));
   res = curl_easy_perform(curl);
   if (res != CURLE_OK)
   {
@@ -600,6 +607,7 @@ int httpRequestSendWithCurl
     // NOTE: This log line is used by the functional tests in cases/880_timeout_for_forward_and_notifications/
     //       So, this line should not be removed/altered, at least not without also modifying the functests.
     //
+    LM_E(("curl_easy_perform failed: %d", res));
     alarmMgr.notificationError(url, "(curl_easy_perform failed: " + std::string(curl_easy_strerror(res)) + ")");
     *outP = "notification failure";
 

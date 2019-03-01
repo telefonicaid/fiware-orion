@@ -50,6 +50,16 @@
 #include "ngsi/Scope.h"
 #include "rest/uriParamNames.h"
 
+#ifdef ORIONLD
+extern "C"
+{
+#include "kjson/KjNode.h"                                      // KjNode, kjValueType
+}
+
+#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/geoJsonCreate.h"                      // geoJsonCreate
+#endif
+
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
@@ -2974,6 +2984,27 @@ static bool createEntity
     insertedDoc.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
                                           ENT_LOCATION_COORDS   << geoJson.obj()));
   }
+
+  //
+  // Location attributes for NGSI-LD
+  //
+#ifdef ORIONLD
+  if (orionldState.locationAttributeP != NULL)
+  {
+    char* errorString;
+
+    LM_TMP(("ToDo: Append location attribute '%s' to insertedDoc", orionldState.locationAttributeP->name));
+
+    if (geoJsonCreate(orionldState.locationAttributeP, &geoJson, &errorString) ==  false)
+    {
+      oeP->fill(SccReceiverInternalError, errorString, "InternalError");
+      return false;
+    }
+
+    insertedDoc.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << orionldState.locationAttributeP->name <<
+                                          ENT_LOCATION_COORDS   << geoJson.obj()));
+  }
+#endif
 
   /* Add date expiration in the case it was found */
   if (dateExpiration != NO_EXPIRATION_DATE)
