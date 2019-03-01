@@ -111,7 +111,7 @@ git checkout release/0.2
 make
 make install
 
-git clone https://gitlab-ci-token:${TOKEN}@gitlab.com/kzangeli/kalloc.git ${HOME}/klog
+git clone https://gitlab-ci-token:${TOKEN}@gitlab.com/kzangeli/kalloc.git ${HOME}/kalloc
 cd ${HOME}/kalloc
 git checkout release/0.2
 make
