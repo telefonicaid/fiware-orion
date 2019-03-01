@@ -53,7 +53,7 @@ payload='{
     "type": "Property",
     "value": "E1/A2"
   },
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
@@ -73,7 +73,7 @@ payload='{
     "type": "Property",
     "value": "E2/A3"
   },
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
@@ -93,7 +93,7 @@ payload='{
     "type": "Property",
     "value": "E3/A4"
   },
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
@@ -113,7 +113,7 @@ payload='{
     "type": "Property",
     "value": "E4/A5"
   },
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
@@ -122,21 +122,21 @@ echo
 
 echo "05. GET all entities with attr A1, see E1 only"
 echo "=============================================="
-orionCurl --url '/ngsi-ld/v1/entities?attrs=A1&prettyPrint=yes&type=T' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities?attrs=A1&prettyPrint=yes&type=T' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "06. GET all entities with attr A2, see E1 and E2"
 echo "================================================"
-orionCurl --url '/ngsi-ld/v1/entities?attrs=A2&prettyPrint=yes&type=T' --noPayloadCheck -H "Accept: application/ld+json"  -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities?attrs=A2&prettyPrint=yes&type=T' --noPayloadCheck -H "Accept: application/ld+json"  -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "07. GET all entities with attr A6, see empty array"
 echo "=================================================="
-orionCurl --url '/ngsi-ld/v1/entities?attrs=A6&prettyPrint=yes&type=T' --noPayloadCheck -H "Accept: application/ld+json"  -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities?attrs=A6&prettyPrint=yes&type=T' --noPayloadCheck -H "Accept: application/ld+json"  -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -146,7 +146,7 @@ echo
 ================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 
@@ -156,7 +156,7 @@ Date: REGEX(.*)
 ================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
 Date: REGEX(.*)
 
@@ -166,7 +166,7 @@ Date: REGEX(.*)
 ================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
 Date: REGEX(.*)
 
@@ -176,7 +176,7 @@ Date: REGEX(.*)
 ================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E4
 Date: REGEX(.*)
 
@@ -185,7 +185,7 @@ Date: REGEX(.*)
 05. GET all entities with attr A1, see E1 only
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 219
+Content-Length: 223
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -197,7 +197,7 @@ Date: REGEX(.*)
       "type": "Property",
       "value": "E1/A1"
     },
-    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   }
 ]
 
@@ -206,7 +206,7 @@ Date: REGEX(.*)
 06. GET all entities with attr A2, see E1 and E2
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 435
+Content-Length: 443
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -218,7 +218,7 @@ Date: REGEX(.*)
       "type": "Property",
       "value": "E1/A2"
     },
-    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   },
   {
     "id": "http://a.b.c/entity/E2",
@@ -227,7 +227,7 @@ Date: REGEX(.*)
       "type": "Property",
       "value": "E2/A2"
     },
-    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   }
 ]
 

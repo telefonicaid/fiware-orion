@@ -41,7 +41,7 @@ echo "====================================================="
 payload='{
   "id": "http://a.b.c/E1",
   "type": "A",
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
@@ -60,7 +60,7 @@ echo
 =====================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/E1
 Date: REGEX(.*)
 
@@ -69,12 +69,12 @@ Date: REGEX(.*)
 02. GET /ngsild/ex/v1/contexts/http://a.b.c/E1, see context created in step 01
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 82
+Content-Length: 86
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }
 
 

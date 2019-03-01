@@ -50,7 +50,7 @@ payload='{
       "type": "Relationship",
       "object": "urn:ngsi-ld:T2:6789"
     },
-    "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld"
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
@@ -76,7 +76,7 @@ echo
 =======================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:I123k467:Context
 Date: REGEX(.*)
 
@@ -103,7 +103,7 @@ MongoDB server version: REGEX(.*)
 			"type" : "ContextString",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : "https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld",
+			"value" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
 			"mdNames" : [ ]
 		},
 		"http://example=org/P100" : {

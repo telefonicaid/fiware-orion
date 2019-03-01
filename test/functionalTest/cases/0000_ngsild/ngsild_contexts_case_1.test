@@ -31,15 +31,15 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld:
+# https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld:
 # {
 #   "@context": [
-#     "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
+#     "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
 #     "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
 #   ]
 # }
 #
-# https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld:
+# https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld:
 # {
 #   "@context": {
 #     "name": "http://schema.org/name",
@@ -98,7 +98,7 @@ payload='{
     "type": "Property",
     "value": "John 2"
   },
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld"
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
@@ -118,7 +118,7 @@ echo
 =======================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 
@@ -144,7 +144,7 @@ MongoDB server version: REGEX(.*)
 			"type" : "ContextString",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : "https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld",
+			"value" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
 			"mdNames" : [ ]
 		},
 		"http://schema=org/name" : {

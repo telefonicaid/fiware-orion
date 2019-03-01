@@ -45,7 +45,7 @@ payload='{
     "type": "Property",
     "value": "John 1"
   },
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
@@ -72,7 +72,7 @@ echo
 ======================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 
@@ -98,7 +98,7 @@ MongoDB server version: REGEX(.*)
 			"type" : "ContextString",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
+			"value" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
 			"mdNames" : [ ]
 		},
 		"http://schema=org/name" : {
@@ -119,7 +119,7 @@ bye
 03. GET E1, see short name for 'name', not its long name
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 200
+Content-Length: 204
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -130,7 +130,7 @@ Date: REGEX(.*)
     "type": "Property",
     "value": "John 1"
   },
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }
 
 

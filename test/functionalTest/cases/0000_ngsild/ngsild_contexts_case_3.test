@@ -31,15 +31,15 @@ brokerStart CB 212-249
 --SHELL--
 
 #
-# https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld:
+# https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld:
 # {
 #   "@context": [
-#     "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
+#     "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
 #     "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
 #   ]
 # }
 #
-# https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld:
+# https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld:
 # {
 #   "@context": {
 #     "T": "http://example.org/T",
@@ -91,7 +91,7 @@ payload='{
   },
   "@context": [
     "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-    "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   ]
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
@@ -139,7 +139,7 @@ MongoDB server version: REGEX(.*)
 			"modDate" : REGEX(.*),
 			"value" : [
 				"http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-				"https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+				"https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 			],
 			"mdNames" : [ ]
 		},

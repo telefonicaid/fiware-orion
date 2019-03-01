@@ -89,7 +89,7 @@ payload='{
   "expires": "2028-12-31T10:00:00",
   "throttling": 5,
   "status": "to be ignored - read-only",
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
   "createdAt": "ignored",
   "modifiedAt": "ignored"
 }'
@@ -167,7 +167,7 @@ payload='{
   "expires": "2028-12-31T10:00:00Z",
   "throttling": 5,
   "status": "to be ignored - read-only",
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
   "createdAt": "ignored",
   "modifiedAt": "ignored"
 }'
@@ -208,7 +208,7 @@ payload='{
   "expires": "2028-12-31T10:00:00",
   "throttling": 5,
   "status": "to be ignored - read-only",
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
   "createdAt": "ignored",
   "modifiedAt": "ignored"
 }'
@@ -265,7 +265,7 @@ payload='{
   "expires": "2028-12-31T10:00:00",
   "throttling": 5,
   "status": "to be ignored - read-only",
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
   "createdAt": "ignored",
   "modifiedAt": "ignored"
 }'
@@ -312,7 +312,7 @@ payload='{
   "expires": "2028-12-31T10:00:00",
   "throttling": 5,
   "status": "to be ignored - read-only",
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
   "createdAt": "ignored",
   "modifiedAt": "ignored"
 }'
@@ -326,7 +326,7 @@ echo
 =================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01
 Date: REGEX(.*)
 
@@ -375,7 +375,7 @@ MongoDB server version: REGEX(.*)
 	"metadata" : [ ],
 	"blacklist" : false,
 	"name" : "Test subscription 01",
-	"ldContext" : "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
+	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
 	"conditions" : [
 		"http://example.org/P2"
 	],
@@ -396,7 +396,7 @@ bye
 HTTP/1.1 200 OK
 Content-Length: 985
 Content-Type: application/json
-Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -450,7 +450,7 @@ Date: REGEX(.*)
 04. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, accepting jsonld - see @context in payload
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1070
+Content-Length: 1074
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -498,7 +498,7 @@ Date: REGEX(.*)
   "expires": "2028-12-31T10:00:00Z",
   "throttling": 5,
   "status": "paused",
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }
 
 
@@ -549,7 +549,7 @@ Date: REGEX(.*)
 =============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub03
 Date: REGEX(.*)
 

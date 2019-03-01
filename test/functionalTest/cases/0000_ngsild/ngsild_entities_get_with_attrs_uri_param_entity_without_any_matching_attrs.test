@@ -49,7 +49,7 @@ payload='{
     "type": "Property",
     "value": "E1/A2"
   },
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
@@ -58,14 +58,14 @@ echo
 
 echo "02. GET /ngsi-ld/v1/entities/http://a.b.c/entity/E1 with URI param 'attrs' set to 'A3' - see E1 but without any attributes"
 echo "=========================================================================================================================="
-orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E1?attrs=A3&prettyPrint=yes&type=T' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E1?attrs=A3&prettyPrint=yes&type=T' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "03. GET all entities with attr A3 - see no matching entities"
 echo "============================================================"
-orionCurl --url '/ngsi-ld/v1/entities?attrs=A3&prettyPrint=yes&type=T' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities?attrs=A3&prettyPrint=yes&type=T' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -75,7 +75,7 @@ echo
 ================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 
@@ -84,14 +84,14 @@ Date: REGEX(.*)
 02. GET /ngsi-ld/v1/entities/http://a.b.c/entity/E1 with URI param 'attrs' set to 'A3' - see E1 but without any attributes
 ==========================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 137
+Content-Length: 141
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
   "id": "http://a.b.c/entity/E1",
   "type": "T",
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }
 
 

@@ -39,7 +39,7 @@ echo "====================================================================="
 payload='{
   "id": "urn:ngsi-ld:T:12:13:14",
   "type": "T",
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld"
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: image/gif"
 echo

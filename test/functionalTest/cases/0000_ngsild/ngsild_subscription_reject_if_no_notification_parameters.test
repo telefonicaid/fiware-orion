@@ -67,7 +67,7 @@ payload='{
   "expires": "2028-12-31T10:00:00",
   "throttling": 5,
   "status": "to be ignored - read-only",
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
   "createdAt": "ignored",
   "modifiedAt": "ignored"
 }'
@@ -109,7 +109,7 @@ payload='{
   "expires": "2028-12-31T10:00:00",
   "throttling": 5,
   "status": "to be ignored - read-only",
-  "@context": "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
   "createdAt": "ignored",
   "modifiedAt": "ignored"
 }'

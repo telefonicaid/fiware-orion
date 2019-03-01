@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-https://github.com/Fiware/NGSI-LD_Tests/blob/master/contextProvision/append_entity_attrs_test.js
+Corresponding to test suite append_entity_attrs_test.js
 
 --SHELL-INIT--
 export BROKER=orionld

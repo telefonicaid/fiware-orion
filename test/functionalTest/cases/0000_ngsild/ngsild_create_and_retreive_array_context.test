@@ -43,7 +43,7 @@ payload='{
   "type": "A",
   "@context": [
     "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-    "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   ]
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
@@ -72,14 +72,14 @@ Date: REGEX(.*)
 02. GET /ngsild/ex/v1/contexts/http://a.b.c/E1, see context created in step 01
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 145
+Content-Length: 149
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "@context": [
         "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-        "https://fiware.github.io/NGSI-LD_Tests/ldContext/testContext.jsonld"
+        "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
     ]
 }
 

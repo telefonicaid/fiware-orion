@@ -44,7 +44,7 @@ payload='{
     "type": "Property",
     "value": "2018-12-04T12:00:00"
   },
-  "@context": [ "https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld" ]
+  "@context": [ "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld" ]
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
 echo
@@ -97,7 +97,7 @@ MongoDB server version: REGEX(.*)
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : [
-				"https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld"
+				"https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
 			],
 			"mdNames" : [ ]
 		},
@@ -119,7 +119,7 @@ bye
 03. GET entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 231
+Content-Length: 235
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -131,7 +131,7 @@ Date: REGEX(.*)
     "value": "2018-12-04T12:00:00"
   },
   "@context": [
-    "https://fiware.github.io/NGSI-LD_Tests/ldContext/testFullContext.jsonld"
+    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
   ]
 }
 
