@@ -101,16 +101,25 @@ ldconfig
 
 git clone https://gitlab-ci-token:${TOKEN}@gitlab.com/kzangeli/kbase.git ${HOME}/kbase
 cd ${HOME}/kbase
+git checkout release/0.2
 make
 make install
 
 git clone https://gitlab-ci-token:${TOKEN}@gitlab.com/kzangeli/klog.git ${HOME}/klog
 cd ${HOME}/klog
+git checkout release/0.2
+make
+make install
+
+git clone https://gitlab-ci-token:${TOKEN}@gitlab.com/kzangeli/kalloc.git ${HOME}/klog
+cd ${HOME}/kalloc
+git checkout release/0.2
 make
 make install
 
 git clone https://gitlab-ci-token:${TOKEN}@gitlab.com/kzangeli/kjson.git ${HOME}/kjson
 cd ${HOME}/kjson
+git checkout release/0.2
 mkdir bin
 make
 make install
