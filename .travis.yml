@@ -1,4 +1,5 @@
-if: type not IN (pull_request)
+if: type not IN (pull_request) and branch not IN('develop')
+
 dist: trusty
 sudo: false
 language: minimal
