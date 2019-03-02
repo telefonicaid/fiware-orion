@@ -111,9 +111,106 @@ int Scope::fill
   std::vector<std::string>    pointStringV;
   int                         points;
   std::vector<orion::Point*>  pointV;
+  std::string                 coordsString2 = coordsString;
+  std::string                 georelString2 = georelString;
 
   type = (apiVersion == V1)? FIWARE_LOCATION : FIWARE_LOCATION_V2;
 
+  LM_TMP(("Geo: geometryString: '%s'", geometryString.c_str()));
+  LM_TMP(("Geo: coordsString:   '%s'", coordsString2.c_str()));
+  LM_TMP(("Geo: georelString:   '%s'", georelString2.c_str()));
+
+#ifdef ORIONLD
+  char* convertedCoordsString = NULL;
+
+  if ((apiVersion == NGSI_LD_V1) && (geometryString == "Polygon"))
+  {
+    char* cP    = (char*) coordsString2.c_str();
+    char* in    = cP;
+    int   ccsIx = 0;
+
+    convertedCoordsString = (char*) calloc(1, strlen(cP));
+    LM_TMP(("Geo: ***** Initial coordsString: '%s'", coordsString2.c_str()));
+    
+    if (*cP != '[')
+    {
+      // Error
+      LM_E(("Geo: Converting NGSI-LD polygon coordinates: not starting with '['"));
+      *errorStringP = std::string("Converting NGSI-LD polygon coordinates: not starting with '['");
+      free(convertedCoordsString);
+      return -1;
+    }
+    ++cP;  // Skipping initial '['
+    
+    if (*cP != '[')
+    {
+      // Error
+      LM_E(("Geo: Converting NGSI-LD polygon coordinates: not starting with '[['"));
+      *errorStringP = std::string("Converting NGSI-LD polygon coordinates: not starting with '[['");
+      free(convertedCoordsString);
+      return -1;
+    }
+    ++cP;  // Skipping second '['
+    
+    while (*cP != 0)
+    {
+      if (*cP != ']')
+      {
+        // Must be 0..9, a dot, a '-' or a comma
+
+        if ((*cP >= '0') && (*cP <= '9'))
+          ;
+        else if ((*cP == '.') || (*cP == ',') || (*cP == '-'))
+          ;
+        else
+        {
+          LM_E(("Geo: Converting NGSI-LD polygon coordinates: invalid character: '%c'", *cP));
+          *errorStringP = std::string("Converting NGSI-LD polygon coordinates: invalid character");
+          free(convertedCoordsString);
+          return -1;
+        }
+        
+        convertedCoordsString[ccsIx] = *cP;
+        ++ccsIx;
+      }
+      else  // Must be '],[' or ']]\0'
+      {
+        ++cP;  // Skip first ']'
+
+        if ((*cP == ',') && (cP[1] == '['))
+        {
+          // Insert ';' instead of "],["
+          ++cP;
+          convertedCoordsString[ccsIx] = ';';
+          ++ccsIx;
+        }
+        else if ((*cP == ']') && (cP[1] == 0))
+        {
+          // Done - after ++cP, the while loop will end
+        }
+        else  // Error
+        {
+          LM_E(("Geo: Invalid polygon: '%s'", in));
+          *errorStringP = std::string("Invalid polygon");
+          free(convertedCoordsString);
+          return -1;
+        }
+      }
+
+      ++cP;
+    }
+    convertedCoordsString[ccsIx] = 0;
+    coordsString2 = convertedCoordsString;
+    free(convertedCoordsString);
+
+    if (georelString == "within")
+      georelString2 = "coveredBy";
+
+    LM_TMP(("Geo: ***** Converted coords string: '%s', georel: %s", coordsString2.c_str(), georelString2.c_str()));
+  }
+#endif
+
+  
   //
   // parse geometry
   //
@@ -129,9 +226,9 @@ int Scope::fill
   //
   // Parse georel?
   //
-  if (georelString != "")
+  if (georelString2 != "")
   {
-    if (georel.parse(georelString.c_str(), errorStringP) != 0)
+    if (georel.parse(georelString2.c_str(), errorStringP) != 0)
     {
       LM_E(("geometry.parse: %s", errorStringP->c_str()));
       return -1;
@@ -183,13 +280,13 @@ int Scope::fill
   //
   // Split coordsString into a vector of points, or pairs of coordinates
   //
-  if (coordsString == "")
+  if (coordsString2 == "")
   {
     *errorStringP = "no coordinates for geometry";
     LM_E(("geometry.parse: %s", errorStringP->c_str()));
     return -1;
   }
-  points = stringSplit(coordsString, ';', pointStringV);
+  points = stringSplit(coordsString2, ';', pointStringV);
 
   if (points == 0)
   {
@@ -211,10 +308,10 @@ int Scope::fill
     LM_TMP(("KZ: Calling stringSplit for '%s'", pointStringV[ix].c_str()));
     coords = stringSplit(pointStringV[ix], ',', coordV);
 
-    if (coords != 2)
+    if ((coords != 2) && (geometry.areaType == "point"))
     {
       *errorStringP = "invalid point in URI param /coords/";
-      LM_E(("geometry.parse: %s", errorStringP->c_str()));
+      LM_E(("geometry.parse: %s (%d coords)", errorStringP->c_str(), coords));
       pointVectorRelease(pointV);
       pointV.clear();
       return -1;
@@ -644,5 +741,9 @@ void Scope::areaTypeSet(const std::string& areaTypeString)
   else if (areaTypeString == "circle")  areaType = orion::CircleType;
   else if (areaTypeString == "point")   areaType = orion::PointType;
   else if (areaTypeString == "box")     areaType = orion::BoxType;
+#ifdef ORIONLD
+  else if (areaTypeString == "Point")   areaType = orion::PointType;
+  else if (areaTypeString == "Polygon") areaType = orion::PolygonType;  
+#endif
   else                                  areaType = orion::NoArea;       
 }

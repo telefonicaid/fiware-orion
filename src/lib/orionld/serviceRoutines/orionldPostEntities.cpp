@@ -849,6 +849,8 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   if (payloadCheck(ciP, &idNodeP, &typeNodeP, &locationP, &contextNodeP, &observationSpaceP, &operationSpaceP) == false)
     return false;
 
+  LM_TMP(("Geo: Creating entity '%s'", idNodeP->value.s));
+
   LM_T(LmtUriExpansion, ("type node at %p", typeNodeP));
 
   UpdateContextRequest   mongoRequest;
@@ -1042,6 +1044,8 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   ciP->httpStatusCode = SccCreated;
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/entities/", idNodeP->value.s);
   httpHeaderLinkAdd(ciP, ciP->contextP, NULL);
+
+  LM_TMP(("Geo: Created entity '%s'", idNodeP->value.s));
 
   return true;
 }

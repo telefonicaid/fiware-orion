@@ -41,20 +41,20 @@ extern "C"
 //
 // pointCoordsGet -
 //
-static bool pointCoordsGet(double* aLongP, double* aLatP, char** errorStringP)
+static bool pointCoordsGet(KjNode* coordsNodeP, double* aLongP, double* aLatP, char** errorStringP)
 {
   KjNode* aLongNodeP;
   KjNode* aLatNodeP;
 
-  if (orionldState.geoCoordsP->type != KjArray)
+  if (coordsNodeP->type != KjArray)
   {
     LM_E(("The coordinates must be a JSON Array"));
     *errorStringP = (char*) "The coordinates must be a JSON Array";
     return false;
   }
 
-  aLatNodeP  = orionldState.geoCoordsP->value.firstChildP;
-  aLongNodeP = orionldState.geoCoordsP->value.firstChildP->next;
+  aLatNodeP  = coordsNodeP->value.firstChildP;
+  aLongNodeP = coordsNodeP->value.firstChildP->next;
 
   if ((aLatNodeP == NULL) || (aLongNodeP == NULL) || (aLongNodeP->next != NULL))
   {
@@ -106,7 +106,7 @@ bool geoJsonCreate(KjNode* attrP, mongo::BSONObjBuilder* geoJsonP, char** errorS
 
     LM_TMP(("Geo: Got a point!"));
 
-    if (pointCoordsGet(&aLong, &aLat, errorStringP) == false)
+    if (pointCoordsGet(orionldState.geoCoordsP, &aLong, &aLat, errorStringP) == false)
     {
       LM_E(("coordsGet: %s", *errorStringP));
       return false;
@@ -117,6 +117,73 @@ bool geoJsonCreate(KjNode* attrP, mongo::BSONObjBuilder* geoJsonP, char** errorS
 
     geoJsonP->append("type", "Point");
     geoJsonP->append("coordinates", BSON_ARRAY(aLong << aLat));
+  }
+  else if (strcmp(orionldState.geoTypeP->value.s, "Polygon") == 0)
+  {
+    //
+    // In its simplest case, a polygon is a vector of vector of positio-vectors. E.g.:
+    //   [[ [0,0], [0,6], [-4,6], [-4,0], [0,0] ]]
+    // The points that form the polygon must go in counter-clockwise direction and the last
+    // point must be identical to the first, to close the polygon.
+    //
+    // If clockwise direction, a HOLE is formed.
+    // FIXME: This is a bit more complex and not implemented in the first "round".
+    // To make a big rectangle { 0,0 -> -4,6 } with a hole in it { -1,1 -> -2,2 }:
+    //
+    // [[ [0,0], [0,6], [-4,6], [-4,0], [0,0] ], [ [-1,1], [-1,2], [-2,2], [-2,0], [0,0], ]]
+    // 
+
+    // First level
+    if (orionldState.geoCoordsP->type != KjArray)
+    {
+      LM_E(("The coordinates must be a JSON Array in the first level of a Polygon"));
+      *errorStringP = (char*) "The coordinates must be a JSON Array";
+      return false;
+    }
+
+    // Second level
+    KjNode* l2P = orionldState.geoCoordsP->value.firstChildP;
+    if (l2P->type != KjArray)
+    {
+      LM_E(("The coordinates must be a JSON Array in the second level of a Polygon"));
+      *errorStringP = (char*) "The coordinates must be a JSON Array";
+      return false;
+    }      
+
+    //
+    // More than one linear ring is not implemented yet => l2P->next must be NULL
+    //
+    if (l2P->next != NULL)
+    {
+      LM_E(("More than one linear ring is not implemented"));
+      *errorStringP = (char*) "More than one linear ring is not implemented";
+      return false;
+    }
+    
+    // Third level
+    mongo::BSONArrayBuilder  ba;
+    int                      ix  = 0;    // Just for debugging
+
+    for (KjNode* l3P = l2P->value.firstChildP; l3P != NULL; l3P = l3P->next)
+    {
+      double aLat;
+      double aLong;
+
+      if (pointCoordsGet(l3P, &aLong, &aLat, errorStringP) == false)
+      {
+        LM_E(("error extracting coordinates from third level of polygon: %s", *errorStringP));
+        *errorStringP = (char*) "error extracting coordinates from third level of polygon";
+        return false;
+      }
+
+      LM_TMP(("Geo: Latitude of Point %d of the polygon:  %f", ix, aLat));
+      LM_TMP(("Geo: Longitude of Point %d of the polygon: %f", ix, aLong));
+
+      ba.append(BSON_ARRAY(aLong << aLat));
+    }
+
+    geoJsonP->append("type", "Polygon");
+    geoJsonP->append("coordinates", BSON_ARRAY(ba.arr()));
   }
   else
   {
