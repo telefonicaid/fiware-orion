@@ -458,6 +458,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       scopeP->stringFilterP = sfP;
 
     LM_T(LmtStringFilter, ("Q: Created %s StringFilter of q: '%s'", (filterType == SftMq)? "MQ" : "Q", q));
+    LM_TMP(("Q: Created %s StringFilter of q: '%s'", (filterType == SftMq)? "MQ" : "Q", q));
 
     std::string details;
     if (sfP->parse(q, &details) == false)
@@ -467,7 +468,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
       parseData.qcr.res.release();
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error parsing q StringFilter", details.c_str(), OrionldDetailsString);
-
+      LM_E(("Error parsing q StringFilter"));
       return false;
     }
 

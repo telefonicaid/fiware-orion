@@ -486,7 +486,11 @@ int Georel::parse(const char* in, std::string* errorString)
   {
     const char* item = items[ix].c_str();
 
+#ifdef ORIONLD
+    if ((items[ix] == "near") || (items[ix] == "coveredBy") || (items[ix] == "intersects") || (items[ix] == "equals") || (items[ix] == "disjoint") || (items[ix] == "within"))
+#else
     if ((items[ix] == "near") || (items[ix] == "coveredBy") || (items[ix] == "intersects") || (items[ix] == "equals") || (items[ix] == "disjoint"))
+#endif
     {
       if (type != "")
       {
@@ -567,6 +571,7 @@ int Georel::parse(const char* in, std::string* errorString)
     else
     {
       *errorString = "Invalid modifier in georel parameter";
+      LM_E(("Invalid modifier in georel parameter: '%s'", item));
       return -1;
     }
   }
@@ -633,6 +638,15 @@ int Geometry::parse(ApiVersion apiVersion, const char* in, std::string* errorStr
 
   for (unsigned int ix = 0; ix < items.size(); ++ix)
   {
+#ifdef ORIONLD
+    if (apiVersion == NGSI_LD_V1)
+    {
+      if (items[ix] == "Point")
+        items[ix] = "point";
+      else if (items[ix] == "Polygon")
+        items[ix] = "polygon";
+    }
+#endif    
     if ((apiVersion == V1) && ((items[ix] == "polygon") || (items[ix] == "circle")))
     {
       if (areaType != "")
