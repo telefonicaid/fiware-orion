@@ -131,6 +131,9 @@ int Scope::fill
 
     convertedCoordsString = (char*) calloc(1, strlen(cP));
     LM_TMP(("Geo: ***** Initial coordsString: '%s'", coordsString2.c_str()));
+
+    // Skip whitespace
+    while (*cP == ' ') ++cP;
     
     if (*cP != '[')
     {
@@ -142,6 +145,9 @@ int Scope::fill
     }
     ++cP;  // Skipping initial '['
     
+    // Skip whitespace
+    while (*cP == ' ') ++cP;
+
     if (*cP != '[')
     {
       // Error
@@ -152,6 +158,9 @@ int Scope::fill
     }
     ++cP;  // Skipping second '['
     
+    // Skip whitespace
+    while (*cP == ' ') ++cP;
+
     while (*cP != 0)
     {
       if (*cP != ']')
@@ -160,11 +169,11 @@ int Scope::fill
 
         if ((*cP >= '0') && (*cP <= '9'))
           ;
-        else if ((*cP == '.') || (*cP == ',') || (*cP == '-'))
+        else if ((*cP == '.') || (*cP == ',') || (*cP == '-') || (*cP == ' '))
           ;
         else
         {
-          LM_E(("Geo: Converting NGSI-LD polygon coordinates: invalid character: '%c'", *cP));
+          LM_E(("Geo: Converting NGSI-LD polygon coordinates: invalid character: '%c' (whole string: %s)", *cP, in));
           *errorStringP = std::string("Converting NGSI-LD polygon coordinates: invalid character");
           free(convertedCoordsString);
           return -1;
@@ -184,13 +193,31 @@ int Scope::fill
           convertedCoordsString[ccsIx] = ';';
           ++ccsIx;
         }
+        else if ((*cP == ',') && (cP[1] == ' ') && (cP[2] == '['))
+        {
+          // Insert ';' instead of "], ["
+          cP += 2;
+          convertedCoordsString[ccsIx] = ';';
+          ++ccsIx;
+        }
         else if ((*cP == ']') && (cP[1] == 0))
         {
-          // Done - after ++cP, the while loop will end
+          // Done
+          break;
+        }
+        else if ((*cP == ' ') && (cP[1] == ']') && (cP[2] == 0))
+        {
+          // Done
+          break;
+        }
+        else if (*cP == 0)  // ???
+        {
+          // Done - must break here to not advance cP
+          break;
         }
         else  // Error
         {
-          LM_E(("Geo: Invalid polygon: '%s'", in));
+          LM_E(("Geo: Invalid polygon: '%s' (at: '%s')", in, cP));
           *errorStringP = std::string("Invalid polygon");
           free(convertedCoordsString);
           return -1;
@@ -327,6 +354,7 @@ int Scope::fill
       return -1;
     }
 
+    LM_TMP(("Calling str2double for '%s'", coordV[1].c_str()));
     if (!str2double(coordV[1].c_str(), &longitude))
     {
       *errorStringP = "invalid coordinates";
@@ -336,6 +364,7 @@ int Scope::fill
       return -1;
     }
 
+    LM_TMP(("Got coords lat-long == %f, %f", latitude, longitude));
     orion::Point* pointP = new Point(latitude, longitude);
     pointV.push_back(pointP);
   }
