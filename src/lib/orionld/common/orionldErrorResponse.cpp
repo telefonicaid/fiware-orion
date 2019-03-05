@@ -113,4 +113,8 @@ void orionldErrorResponseCreate
   kjChildAdd(ciP->responseTree, typeP);
   kjChildAdd(ciP->responseTree, titleP);
   kjChildAdd(ciP->responseTree, detailsP);
+
+  LM_TMP(("Error type:    %s", typeP->value.s));
+  LM_TMP(("Error title:   %s", titleP->value.s));
+  LM_TMP(("Error details: %s (%d - 0:String, 1:Attribute, 2:Entity, 3:Other)", detailsP->value.s, detailsType));
 }

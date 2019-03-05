@@ -82,7 +82,7 @@ Scope::Scope(const std::string& _type, const std::string& _value, const std::str
 
 /* ****************************************************************************
 *
-* pointVectorRelease - 
+* pointVectorRelease -
 */
 static void pointVectorRelease(const std::vector<orion::Point*>& pointV)
 {
@@ -96,7 +96,7 @@ static void pointVectorRelease(const std::vector<orion::Point*>& pointV)
 
 /* ****************************************************************************
 *
-* Scope::fill - 
+* Scope::fill -
 */
 int Scope::fill
 (
@@ -134,7 +134,7 @@ int Scope::fill
 
     // Skip whitespace
     while (*cP == ' ') ++cP;
-    
+
     if (*cP != '[')
     {
       // Error
@@ -144,7 +144,7 @@ int Scope::fill
       return -1;
     }
     ++cP;  // Skipping initial '['
-    
+
     // Skip whitespace
     while (*cP == ' ') ++cP;
 
@@ -157,9 +157,12 @@ int Scope::fill
       return -1;
     }
     ++cP;  // Skipping second '['
-    
+
     // Skip whitespace
     while (*cP == ' ') ++cP;
+
+    int  coords    = 1;
+    bool something = false;
 
     while (*cP != 0)
     {
@@ -168,8 +171,10 @@ int Scope::fill
         // Must be 0..9, a dot, a '-' or a comma
 
         if ((*cP >= '0') && (*cP <= '9'))
-          ;
-        else if ((*cP == '.') || (*cP == ',') || (*cP == '-') || (*cP == ' '))
+          something = true;
+        else if (*cP == ',')
+          ++coords;
+        else if ((*cP == '.') || (*cP == '-') || (*cP == ' '))
           ;
         else
         {
@@ -178,7 +183,7 @@ int Scope::fill
           free(convertedCoordsString);
           return -1;
         }
-        
+
         convertedCoordsString[ccsIx] = *cP;
         ++ccsIx;
       }
@@ -226,6 +231,22 @@ int Scope::fill
 
       ++cP;
     }
+
+    if (something == false)
+    {
+      LM_E(("Garbage coordinates URI param?"));
+      *errorStringP = std::string("Garbage coordinates URI param?");
+      free(convertedCoordsString);
+      return -1;
+    }
+    else if (coords == 1)
+    {
+      LM_E(("At least TWO coordinates must be present"));
+      *errorStringP = std::string("At least TWO coordinates must be present");
+      free(convertedCoordsString);
+      return -1;
+    }
+
     convertedCoordsString[ccsIx] = 0;
     coordsString2 = convertedCoordsString;
     free(convertedCoordsString);
@@ -237,7 +258,7 @@ int Scope::fill
   }
 #endif
 
-  
+
   //
   // parse geometry
   //
@@ -344,6 +365,14 @@ int Scope::fill
       return -1;
     }
 
+    if (coords < 2)
+    {
+      *errorStringP = "invalid point in URI param /coords/";
+      pointVectorRelease(pointV);
+      pointV.clear();
+      return -1;
+    }
+
     LM_TMP(("Calling str2double for '%s'", coordV[0].c_str()));
     if (!str2double(coordV[0].c_str(), &latitude))
     {
@@ -404,7 +433,7 @@ int Scope::fill
   else if (geometry.areaType == "polygon")
   {
     areaType = orion::PolygonType;
-    
+
     if ((apiVersion == V1) && (pointV.size() < 3))
     {
       *errorStringP = "Too few coordinates for polygon";
@@ -518,7 +547,7 @@ int Scope::fill
   }
   else
   {
-    areaType = orion::NoArea;    
+    areaType = orion::NoArea;
     *errorStringP = "invalid area-type";
     LM_E(("geometry.parse: %s", errorStringP->c_str()));
 
@@ -594,7 +623,7 @@ std::string Scope::check(void)
       {
         if (!isTrue(circle.invertedString()) && !isFalse(circle.invertedString()))
         {
-          std::string details = std::string("bad value for circle/inverted: '") + circle.invertedString() + "'"; 
+          std::string details = std::string("bad value for circle/inverted: '") + circle.invertedString() + "'";
           alarmMgr.badInput(clientIp, details);
           return "bad value for circle/inverted: /" + circle.invertedString() + "/";
         }
@@ -739,7 +768,7 @@ std::string Scope::check(void)
 * release -
 */
 void Scope::release(void)
-{  
+{
   // NOTE: georel, circle, box, and point don't use dynamic memory, so they don't need release methods
   polygon.release();
   line.release();
@@ -772,7 +801,7 @@ void Scope::areaTypeSet(const std::string& areaTypeString)
   else if (areaTypeString == "box")     areaType = orion::BoxType;
 #ifdef ORIONLD
   else if (areaTypeString == "Point")   areaType = orion::PointType;
-  else if (areaTypeString == "Polygon") areaType = orion::PolygonType;  
+  else if (areaTypeString == "Polygon") areaType = orion::PolygonType;
 #endif
-  else                                  areaType = orion::NoArea;       
+  else                                  areaType = orion::NoArea;
 }
