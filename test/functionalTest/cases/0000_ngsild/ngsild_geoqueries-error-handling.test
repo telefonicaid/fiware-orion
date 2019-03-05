@@ -1,0 +1,359 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Geoquery error handling
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# Madrid: "coordinates": [-3.691944, 40.418889]
+#
+# 01. 'coordinates' member missing in value of a GeoProperty - see error
+# 02. Non array 'coordinate' in payload for creation - see error
+# 03. Only one 'coordinate' in payload for creation - see error
+# 04. Zero 'coordinates' in payload for creation - see error
+# 05. 'type' member missing in value of a GeoProperty - see error
+# 06. Non string 'type' in payload for creation - see error
+# 07. Invalid value for 'type' in payload for creation - see error
+#
+# 11. 'coordinates' missing in URI param for query - see error
+# 12. Non array 'coordinate' in URI param for query - see error
+# 13. Only one coordinate in URI param for query - see error
+# 14. Zero 'coordinates' in URI param for query - see error
+#
+
+echo "01. 'coordinates' member missing in value of a GeoProperty - see error"
+echo "======================================================================"
+payload='{
+  "id": "urn:ngsi-ld:City:Madrid",
+  "type": "T_City",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "02. Non array 'coordinate' in payload for creation - see error"
+echo "=============================================================="
+payload='{
+  "id": "urn:ngsi-ld:City:Madrid",
+  "type": "T_City",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": "A string and not an array"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "03. Only one 'coordinate' in payload for creation - see error"
+echo "============================================================="
+payload='{
+  "id": "urn:ngsi-ld:City:Madrid",
+  "type": "T_City",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ -3.691944 ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "04. Zero 'coordinates' in payload for creation - see error"
+echo "=========================================================="
+payload='{
+  "id": "urn:ngsi-ld:City:Madrid",
+  "type": "T_City",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": []
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "05. 'type' member missing in value of a GeoProperty - see error"
+echo "==============================================================="
+payload='{
+  "id": "urn:ngsi-ld:City:Madrid",
+  "type": "T_City",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "coordinates": [1,2]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "06. Non string 'type' in payload for creation - see error"
+echo "========================================================="
+payload='{
+  "id": "urn:ngsi-ld:City:Madrid",
+  "type": "T_City",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": 14,
+      "coordinates": [1,2]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "07. Invalid value for 'type' in payload for creation - see error"
+echo "================================================================"
+payload='{
+  "id": "urn:ngsi-ld:City:Madrid",
+  "type": "T_City",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "invalid string for geo type",
+      "coordinates": [1,2]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "11. 'coordinates' missing in URI param for query - see error"
+echo "============================================================"
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&georel=near;maxDistance==15'
+echo
+echo
+
+
+echo "12. Non array 'coordinate' in URI param for query - see error"
+echo "============================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&coordinates=12&georel=near;maxDistance==15'
+echo
+echo
+
+
+echo "13. Only one coordinate in URI param for query - see error"
+echo "=========================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&coordinates=\[-3.7\]&georel=near;maxDistance==15'
+echo
+echo
+
+
+echo "14. Zero 'coordinates' in URI param for query - see error"
+echo "========================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&coordinates=\[\]&georel=near;maxDistance==15'
+echo
+echo
+
+
+--REGEXPECT--
+01. 'coordinates' member missing in value of a GeoProperty - see error
+======================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 198
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "Mandatory 'coordinates' field missing for a GeoJSON Property",
+    "title": "geo-property attribute must have a valid GeoJson value",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. Non array 'coordinate' in payload for creation - see error
+==============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 202
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "the 'coordinates' field of a GeoJSON object must be a JSON Array",
+    "title": "geo-property attribute must have a valid GeoJson value",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. Only one 'coordinate' in payload for creation - see error
+=============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 182
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "array with only ONE member for 'coordinates'",
+    "title": "geo-property attribute must have a valid GeoJson value",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+04. Zero 'coordinates' in payload for creation - see error
+==========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 167
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "empty array for 'coordinates'",
+    "title": "geo-property attribute must have a valid GeoJson value",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+05. 'type' member missing in value of a GeoProperty - see error
+===============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 191
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "Mandatory 'type' field missing for a GeoJSON Property",
+    "title": "geo-property attribute must have a valid GeoJson value",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+06. Non string 'type' in payload for creation - see error
+=========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 196
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "the 'type' field of a GeoJSON object must be a JSON String",
+    "title": "geo-property attribute must have a valid GeoJson value",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+07. Invalid value for 'type' in payload for creation - see error
+================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 158
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "invalid GeoJSON type",
+    "title": "geo-property attribute must have a valid GeoJson value",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+11. 'coordinates' missing in URI param for query - see error
+============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 130
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "geometry without coordinates ,,,",
+    "title": "no coordinates",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+12. Non array 'coordinate' in URI param for query - see error
+=============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 139
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "invalid point in URI param /coords/",
+    "title": "error filling a scope",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/InternalError"
+}
+
+
+13. Only one coordinate in URI param for query - see error
+==========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 139
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "invalid point in URI param /coords/",
+    "title": "error filling a scope",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/InternalError"
+}
+
+
+14. Zero 'coordinates' in URI param for query - see error
+=========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 131
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "no coordinates for geometry",
+    "title": "error filling a scope",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/InternalError"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

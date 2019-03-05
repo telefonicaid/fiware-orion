@@ -98,6 +98,46 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoJsonNodeP, char** detailsP)
         *detailsP = (char*) "the 'coordinates' field of a GeoJSON object must be a JSON Array";
         return false;
       }
+
+      // Must be an array of Number, and at least two members
+      // Or, an array of arrays
+      int numbers = 0;
+      int arrays  = 0;
+      for (KjNode* memberP = itemP->value.firstChildP; memberP != NULL; memberP = memberP->next)
+      {
+        if ((memberP->type == KjInt) || (memberP->type == KjFloat))
+        {
+          ++numbers;
+        }
+        else if (memberP->type == KjArray)
+        {
+          ++arrays;
+        }
+        else
+        {
+          LM_E(("Member of 'coordinates array is not a number but of type: '%s'", kjValueType(memberP->type)));
+          *detailsP = (char*) "all members of 'coordinates' must be of type 'Number'";
+          return false;
+        }
+      }
+
+      if ((numbers != 0) && (arrays != 0))
+      {
+        *detailsP = (char*) "invalid coordinates'";
+        return false;
+      }
+
+      if ((numbers == 0) && (arrays == 0))
+      {
+        *detailsP = (char*) "empty array for 'coordinates'";
+        return false;
+      }
+
+      if (numbers == 1)
+      {
+        *detailsP = (char*) "array with only ONE member for 'coordinates'";
+        return false;
+      }
     }
     else
     {

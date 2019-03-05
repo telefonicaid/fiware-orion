@@ -84,7 +84,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   char*        idString       = (id != NULL)? id      : idPattern;
   const char*  isIdPattern    = (id != NULL)? "false" : "true";
   bool         isTypePattern  = (*type != 0)? false : true;
-     
+
   EntityId*    entityIdP;
   char         typeExpanded[256];
   char*        details;
@@ -93,7 +93,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   int          idVecItems   = (int) sizeof(idVector) / sizeof(idVector[0]);
   int          typeVecItems = (int) sizeof(typeVector) / sizeof(typeVector[0]);
   bool         keyValues    = ciP->uriParamOptions[OPT_KEY_VALUES];
-    
+
   //
   // Preconditions
   // - 1. If neither Entity types nor Attribute names are provided, an error of type BadRequestData shall be raised.
@@ -104,7 +104,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   if ((*type == 0) && (attrs == NULL))
   {
     LM_W(("Bad Input (too broad query - entity type/id not given nor attribute list)"));
-    
+
     orionldErrorResponseCreate(ciP,
                                OrionldBadRequestData,
                                "too broad query",
@@ -129,7 +129,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     return false;
   }
 
-  
   LM_T(LmtServiceRoutine, ("In orionldGetEntities"));
   LM_TMP(("In orionldGetEntities"));
 
@@ -182,6 +181,20 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   if (geometry != NULL)
   {
+    if (coordinates == NULL)
+    {
+      LM_W(("Bad Input (No coordinates)"));
+
+      orionldErrorResponseCreate(ciP,
+                                 OrionldBadRequestData,
+                                 "no coordinates",
+                                 "geometry without coordinates ,,,",
+                                 OrionldDetailsString);
+
+      ciP->httpStatusCode = SccBadRequest;
+      return false;
+    }
+
     Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
     std::string  errorString;
 
@@ -192,10 +205,9 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     //
     if (coordinates[0] == '[')
     {
-      int len;
       ++coordinates;
 
-      len = strlen(coordinates);
+      int len = strlen(coordinates);
       if (coordinates[len - 1] == ']')
         coordinates[len - 1] = 0;
     }
@@ -208,14 +220,14 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
       LM_E(("Geo: Scope::fill failed"));
       orionldErrorResponseCreate(ciP, OrionldInternalError, "error filling a scope", errorString.c_str(), OrionldDetailsString);
-      ciP->httpStatusCode = SccReceiverInternalError;
+      ciP->httpStatusCode = SccBadRequest;
       return false;
     }
 
     LM_E(("Geo: Scope::fill OK"));
     parseData.qcr.res.restriction.scopeVector.push_back(scopeP);
   }
-  
+
   if (idString == NULL)
   {
     idString    = (char*) ".*";
@@ -233,7 +245,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   idVecItems   = kStringSplit(id, ',', (char**) idVector, idVecItems);
   LM_TMP(("In orionldGetEntities"));
-  
+
   //
   // ID-list and Type-list at the same time is not supported
   //

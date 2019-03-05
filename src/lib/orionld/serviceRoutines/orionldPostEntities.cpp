@@ -478,7 +478,7 @@ bool specialCompoundCheck(ConnectionInfo* ciP, KjNode* compoundValueP)
 
       if (parse8601Time(valueNodeP->value.s) == -1)
       {
-        ATTRIBUTE_ERROR("DateTime value of @value/@type compound must be a valid ISO8601", NULL);
+        ATTRIBUTE_ERROR("DateTime value of @value/@type compound must be a valid ISO8601", compoundValueP->name);
       }
     }
   }
@@ -600,7 +600,7 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
     {
       DUPLICATE_CHECK(valueP, "attribute value", nodeP);
       // FIXME: "value" for Relationship Attribute should be added as metadata
-   }
+    }
     else if (SCOMPARE9(nodeP->name, 'u', 'n', 'i', 't', 'C', 'o', 'd', 'e', 0))
     {
       DUPLICATE_CHECK(unitCodeP, "unit code", nodeP);
@@ -632,7 +632,7 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
       if ((dateTime = parse8601Time(nodeP->value.s)) == -1)
       {
         LM_E(("parse8601Time failed"));
-        ATTRIBUTE_ERROR("The 'observedAt' attribute must have a valid ISO8601 as value", NULL);
+        ATTRIBUTE_ERROR("The 'observedAt' attribute must have a valid ISO8601 as value", nodeP->name);
       }
 
       // Change to Number
@@ -743,13 +743,18 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
       char* details = (char*) "no details";
 
       if (valueP->type != KjObject)
-        ATTRIBUTE_ERROR("geo-property attribute value must be a JSON Object", kjValueType(valueP->type));
-      else if (geoJsonCheck(ciP, valueP, &details) == false)
       {
-        LM_E(("geoJsonCheck error for %s: %s", caName, details));
-        ATTRIBUTE_ERROR("geo-property attribute must have a valid GeoJson value", details);
+        LM_E(("geo-property attribute value must be a JSON Object: %s", kNodeP->name));
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The value must be a JSON Object for a GeoProperty", kNodeP->name, OrionldDetailsString);
+        return false;
       }
 
+      if (geoJsonCheck(ciP, valueP, &details) == false)
+      {
+        LM_E(("geoJsonCheck error for %s: %s", caName, details));
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "geo-property attribute must have a valid GeoJson value", details, OrionldDetailsString);
+        return false;
+      }
       caP->valueType       = orion::ValueTypeObject;
       caP->compoundValueP  = compoundCreate(ciP, valueP, NULL, 0);
     }
@@ -760,7 +765,7 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
       if (valueP->type != KjString)
         ATTRIBUTE_ERROR("temporal-property attribute must have a value of type JSON String", kjValueType(valueP->type));
       else if ((dateTime = parse8601Time(valueP->value.s)) == -1)
-        ATTRIBUTE_ERROR("temporal-property attribute must have a valid ISO8601 as value", NULL);
+        ATTRIBUTE_ERROR("temporal-property attribute must have a valid ISO8601 as value", kNodeP->name);
 
       caP->valueType   = orion::ValueTypeNumber;
       caP->numberValue = dateTime;
@@ -848,8 +853,6 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
   if (payloadCheck(ciP, &idNodeP, &typeNodeP, &locationP, &contextNodeP, &observationSpaceP, &operationSpaceP) == false)
     return false;
-
-  LM_TMP(("Geo: Creating entity '%s'", idNodeP->value.s));
 
   LM_T(LmtUriExpansion, ("type node at %p", typeNodeP));
 
@@ -977,7 +980,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       if (attributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
       {
         LM_E(("attributeTreat failed"));
-        ciP->httpStatusCode = SccBadRequest;  // FIXME: Should be set inside 'attributeTreat' - could be 500, not 400 ...
+        ciP->httpStatusCode = SccBadRequest;  // FIXME: set HTTP Status Code inside 'attributeTreat'?
         delete caP;
         mongoRequest.release();
         return false;
@@ -1044,8 +1047,6 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   ciP->httpStatusCode = SccCreated;
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/entities/", idNodeP->value.s);
   httpHeaderLinkAdd(ciP, ciP->contextP, NULL);
-
-  LM_TMP(("Geo: Created entity '%s'", idNodeP->value.s));
 
   return true;
 }
