@@ -26,6 +26,7 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
+#include "kjson/kjParse.h"                                     // kjParse
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -41,6 +42,43 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate, OrionldInternalError
 #include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/kjTree/kjTreeFromSubscription.h"             // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// coordinateTransform -
+//
+void coordinateTransform(const char* geometry, char* to, int toLen, char* from)
+{
+  if (strcmp(geometry, "Point") == 0)
+  {
+    snprintf(to, toLen, "[%s]", from);
+    return;
+  }
+
+  int toIx = 0;
+
+  to[0] = '[';
+  ++toIx;
+
+  while (*from != 0)
+  {
+    if (*from == ';')
+    {
+      to[toIx++] = ']';
+      to[toIx++] = ',';
+      to[toIx++] = '[';
+    }
+    else
+    {
+      to[toIx++] = *from;
+    }
+    ++from;
+  }
+
+  to[toIx] = ']';
+}
 
 
 
@@ -153,7 +191,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
     {
       LM_E(("Error creating a stringified date for 'timeInterval'"));
       orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create a stringified date", details, OrionldDetailsEntity);
-      return false;
+      return NULL;
     }
     nodeP = kjString(orionldState.kjsonP, "timeInterval", date);
     kjChildAdd(topP, nodeP);
@@ -178,8 +216,39 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
     nodeP = kjString(orionldState.kjsonP, "geometry", subscriptionP->subject.condition.expression.geometry.c_str());
     kjChildAdd(objectP, nodeP);
 
-    nodeP = kjString(orionldState.kjsonP, "coordinates", subscriptionP->subject.condition.expression.coords.c_str());
-    kjChildAdd(objectP, nodeP);
+    if (subscriptionP->subject.condition.expression.geometry == "Point")
+    {
+      //
+      // The "coordinates" have been saved as a string but should be a json array.
+      // Easiest way is to parse the string and simply add the output tree as value of "coordinates"
+      //
+      char*    coordinateString    = (char*) subscriptionP->subject.condition.expression.coords.c_str();
+      int      coordinateVectorLen = strlen(coordinateString) * 4 + 10;
+      char*    coordinateVector    = (char*) malloc(coordinateVectorLen);
+      KjNode*  coordValueP;
+
+      LM_TMP(("Geo: Transforming coordinates: '%s'", coordinateString));
+      coordinateTransform(subscriptionP->subject.condition.expression.geometry.c_str(), coordinateVector, coordinateVectorLen, coordinateString);
+      LM_TMP(("Geo: Parsing coordinates: '%s'", coordinateVector));
+      coordValueP = kjParse(orionldState.kjsonP, coordinateVector);
+
+      LM_TMP(("Geo: Parse returned %p", coordValueP));
+      if (coordValueP == NULL)
+      {
+        LM_E(("error parsing coordinates: '%s'", coordinateString));
+        orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to parse coordinates string", coordinateString, OrionldDetailsEntity);
+        return NULL;
+      }
+
+      coordValueP->name = (char*) "coordinates";
+
+      kjChildAdd(objectP, coordValueP);
+    }
+    else
+    {
+      nodeP = kjString(orionldState.kjsonP, "coordinates", subscriptionP->subject.condition.expression.coords.c_str());
+      kjChildAdd(objectP, nodeP);
+    }
 
     nodeP = kjString(orionldState.kjsonP, "georel", subscriptionP->subject.condition.expression.georel.c_str());
     kjChildAdd(objectP, nodeP);
