@@ -34,6 +34,8 @@ extern "C"
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "rest/httpHeaderAdd.h"                                // httpHeaderAdd, httpHeaderLinkAdd
 #include "apiTypesV2/Subscription.h"                           // Subscription
+#include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
+#include "orionld/context/orionldAliasLookup.h"                // orionldAliasLookup
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultContext
 #include "orionld/common/numberToDate.h"                       // numberToDate
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate, OrionldInternalError
@@ -48,15 +50,16 @@ extern "C"
 //
 KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscriptionP)
 {
-  KjNode*       topP = kjObject(orionldState.kjsonP, NULL);
-  KjNode*       objectP;
-  KjNode*       arrayP;
-  KjNode*       nodeP;
-  char*         details;
-  bool          watchedAttributesPresent = false;
-  char          date[64];
-  unsigned int  size;
-  unsigned int  ix;
+  KjNode*          topP = kjObject(orionldState.kjsonP, NULL);
+  KjNode*          objectP;
+  KjNode*          arrayP;
+  KjNode*          nodeP;
+  char*            details;
+  bool             watchedAttributesPresent = false;
+  char             date[64];
+  unsigned int     size;
+  unsigned int     ix;
+  OrionldContext*  contextP = orionldContextLookup(subscriptionP->ldContext.c_str());
 
   // id
   nodeP = kjString(orionldState.kjsonP, "id", subscriptionP->id.c_str());
@@ -88,6 +91,9 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   if (size != 0)
   {
     arrayP = kjArray(orionldState.kjsonP, "entities");
+
+    LM_TMP(("Alias: got a list of %d entities", size));
+
     for (ix = 0; ix < size; ix++)
     {
       ngsiv2::EntID* eP = &subscriptionP->subject.entities[ix];
@@ -106,9 +112,12 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
         kjChildAdd(objectP, nodeP);
       }
 
-      nodeP = kjString(orionldState.kjsonP, "type", eP->type.c_str());
-      kjChildAdd(objectP, nodeP);
+      char* alias = orionldAliasLookup(contextP, eP->type.c_str());
 
+      LM_TMP(("Alias: found alias '%s' for entity type long-name '%s', in context '%s'", alias, eP->type.c_str(), (contextP != NULL)? contextP->url : "None"));
+
+      nodeP = kjString(orionldState.kjsonP, "type", alias);
+      kjChildAdd(objectP, nodeP);
       kjChildAdd(arrayP, objectP);
     }
     kjChildAdd(topP, arrayP);
@@ -124,7 +133,12 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
 
     for (ix = 0; ix < size; ix++)
     {
-      nodeP = kjString(orionldState.kjsonP, NULL, subscriptionP->subject.condition.attributes[ix].c_str());
+      char* attrName = (char*) subscriptionP->subject.condition.attributes[ix].c_str();
+      char* alias    = orionldAliasLookup(contextP, attrName);
+
+      LM_TMP(("Alias: found alias '%s' for watched-attribute long-name '%s', in context '%s'", alias, attrName, (contextP != NULL)? contextP->url : "None"));
+
+      nodeP = kjString(orionldState.kjsonP, NULL, alias);
       kjChildAdd(arrayP, nodeP);
     }
     kjChildAdd(topP, arrayP);
@@ -191,7 +205,12 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
     arrayP = kjArray(orionldState.kjsonP, "attributes");
     for (ix = 0; ix < size; ++ix)
     {
-      nodeP = kjString(orionldState.kjsonP, NULL, subscriptionP->notification.attributes[ix].c_str());
+      char* attrName = (char*) subscriptionP->notification.attributes[ix].c_str();
+      char* alias    = orionldAliasLookup(contextP, attrName);
+
+      LM_TMP(("Alias: found alias '%s' for notification-attribute long-name '%s', in context '%s'", alias, attrName, (contextP != NULL)? contextP->url : "None"));
+
+      nodeP = kjString(orionldState.kjsonP, NULL, alias);
       kjChildAdd(arrayP, nodeP);
     }
     kjChildAdd(objectP, arrayP);

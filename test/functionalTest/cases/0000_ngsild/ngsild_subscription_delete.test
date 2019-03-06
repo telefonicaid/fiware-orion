@@ -145,7 +145,7 @@ Date: REGEX(.*)
 02. GET subscription 'http://a.b.c/subs/sub01' and see it
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 985
+Content-Length: 820
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -158,19 +158,19 @@ Date: REGEX(.*)
   "entities": [
     {
       "id": "urn:ngsi-ld:E01",
-      "type": "http://example.org/ngsi-ld/default/T1"
+      "type": "T1"
     },
     {
       "id": "http://a.b.c/E02",
-      "type": "http://example.org/T2"
+      "type": "T2"
     },
     {
       "idPattern": ".*E03.*",
-      "type": "http://example.org/T3"
+      "type": "T3"
     }
   ],
   "watchedAttributes": [
-    "http://example.org/P2"
+    "P2"
   ],
   "q": "P2>10",
   "geoQ": {
@@ -181,9 +181,9 @@ Date: REGEX(.*)
   "isActive": false,
   "notification": {
     "attributes": [
-      "http://example.org/P1",
-      "http://example.org/P2",
-      "http://example.org/ngsi-ld/default/A3"
+      "P1",
+      "P2",
+      "A3"
     ],
     "format": "keyValues",
     "endpoint": {
