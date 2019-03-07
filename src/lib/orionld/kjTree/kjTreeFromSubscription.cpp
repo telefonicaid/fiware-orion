@@ -51,12 +51,12 @@ extern "C"
 //
 void coordinateTransform(const char* geometry, char* to, int toLen, char* from)
 {
-  if (strcmp(geometry, "Point") == 0)
+  if ((strcmp(geometry, "Point") == 0) || (strcmp(geometry, "Polygon") == 0))
   {
     snprintf(to, toLen, "[%s]", from);
     return;
   }
-
+#if 0
   int toIx = 0;
 
   to[0] = '[';
@@ -78,6 +78,7 @@ void coordinateTransform(const char* geometry, char* to, int toLen, char* from)
   }
 
   to[toIx] = ']';
+#endif
 }
 
 
@@ -216,7 +217,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
     nodeP = kjString(orionldState.kjsonP, "geometry", subscriptionP->subject.condition.expression.geometry.c_str());
     kjChildAdd(objectP, nodeP);
 
-    if (subscriptionP->subject.condition.expression.geometry == "Point")
+    if ((subscriptionP->subject.condition.expression.geometry == "Point") || (subscriptionP->subject.condition.expression.geometry == "Polygon"))
     {
       //
       // The "coordinates" have been saved as a string but should be a json array.
@@ -230,6 +231,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
       LM_TMP(("Geo: Transforming coordinates: '%s'", coordinateString));
       coordinateTransform(subscriptionP->subject.condition.expression.geometry.c_str(), coordinateVector, coordinateVectorLen, coordinateString);
       LM_TMP(("Geo: Parsing coordinates: '%s'", coordinateVector));
+      LM_TMP(("Geo: -------------------------------------------"));
       coordValueP = kjParse(orionldState.kjsonP, coordinateVector);
 
       LM_TMP(("Geo: Parse returned %p", coordValueP));
