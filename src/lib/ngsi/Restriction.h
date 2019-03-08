@@ -43,15 +43,11 @@ typedef struct Restriction
   AttributeExpression  attributeExpression;   // Optional (FI-WARE changes - MANDATORY in OMA spec)
   ScopeVector          scopeVector;           // Optional
 
-  std::string   render(const std::string& indent, int restrictions = 1, bool comma = false);
-  void          present(const std::string& indent);
+  std::string   toJsonV1(int restrictions, bool comma);
   void          release();
   void          fill(Restriction* rP);
 
-  std::string   check(RequestType         requestType,
-                      const std::string&  indent,
-                      const std::string&  predetectedError,
-                      int                 counter);
+  std::string   check(int counter);
 } Restriction;
 
 #endif  // SRC_LIB_NGSI_RESTRICTION_H_

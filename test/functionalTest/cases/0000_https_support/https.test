@@ -50,8 +50,7 @@ payload='{
       ],
       "attributes": [
         {
-          "name": "temperature",
-          "isDomain": "false"
+          "name": "temperature"
         }
       ],
       "providingApplication": "http://kz.org"
@@ -87,7 +86,7 @@ orionCurl --host "https://localhost" --url "$url" --payload "${payload}" "--cace
 --REGEXPECT--
 +++ 1: Register a Sensor of temperature
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -100,7 +99,7 @@ Date: REGEX(.*)
 
 +++ 2: Discover the Sensor of temperature
 HTTP/1.1 200 OK
-Content-Length: 453
+Content-Length: 213
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -111,7 +110,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "temperature",
                         "type": ""
                     }

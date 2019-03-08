@@ -151,7 +151,7 @@ static std::string duration(const std::string& path, const std::string& value, P
 
   reqDataP->scar.res.duration.set(value);
 
-  if ((s = reqDataP->scar.res.duration.check(SubscribeContextAvailability, "", "", 0)) != "OK")
+  if ((s = reqDataP->scar.res.duration.check()) != "OK")
   {
     std::string details = std::string("error parsing duration '") + reqDataP->scar.res.duration.get() + "': " + s;
     alarmMgr.badInput(clientIp, details);
@@ -298,24 +298,6 @@ void jsonScarRelease(ParseData* reqDataP)
 std::string jsonScarCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
   std::string s;
-  s = reqData->scar.res.check("", reqData->errorString, 0);
+  s = reqData->scar.res.check(reqData->errorString);
   return s;
-}
-
-
-
-/* ****************************************************************************
-*
-* jsonScarPresent - 
-*/
-void jsonScarPresent(ParseData* reqDataP)
-{
-  printf("jsonScarPresent\n");
-
-  if (!lmTraceIsSet(LmtPresent))
-  {
-    return;
-  }
-
-  reqDataP->scar.res.present("");
 }

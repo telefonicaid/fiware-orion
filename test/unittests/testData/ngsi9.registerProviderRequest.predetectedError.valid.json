@@ -1,7 +1,1 @@
-{
-  "errorCode" : {
-    "code" : "400",
-    "reasonPhrase" : "Bad Request",
-    "details" : "forced predetectedError"
-  }
-}
+{"errorCode":{"code":"400","reasonPhrase":"Bad Request","details":"forced predetectedError"}}

@@ -42,203 +42,163 @@ payload='{
       "attributes": [
         {
           "name": "cra1",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra2",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra3",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra4",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra5",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra6",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra7",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra8",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra9",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra10",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra11",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra12",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra13",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra14",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra15",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra16",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra17",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra18",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra19",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra20",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra21",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra22",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra23",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra24",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra25",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra26",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra27",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra28",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra29",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra30",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra31",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra32",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra33",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra34",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra35",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra36",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra37",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra38",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra39",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "cra40",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         }
       ],
       "providingApplication": "http://localhost:1028/application"
@@ -268,7 +228,7 @@ orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -279,7 +239,7 @@ Date: REGEX(.*)
 }
 ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 477
+Content-Length: 237
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -290,7 +250,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "cra1",
                         "type": "string"
                     }

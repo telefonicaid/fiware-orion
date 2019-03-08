@@ -1,0 +1,272 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Notification Templates, with refresh of the subscription cache
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create custom subscription
+# 02. Create entity to trigger the subscription
+# 03. Dump accumulator to see the notification
+# 04. GET the subscription
+# 05. Create custom subscription with payload inside httpCustom and with "attrsFormat" == "legacy"
+# 06. Dump accumulator to see the second notification, not in legacy mode, as custom payload overrides
+#
+
+echo "01. Create custom subscription"
+echo "=============================="
+payload='{
+  "description": "x_yz4hahh",
+  "expires": "2040-01-01T14:00:00.00Z",                  
+  "subject": {
+    "entities": [
+      {
+        "idPattern" : ".*"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "attrs": [],
+    "attrsFormat": "legacy",
+    "httpCustom": {
+      "url":      "http://localhost:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity to trigger the subscription"
+echo "============================================="
+payload='{
+  "id": "E1",
+  "A1": "a1",
+  "A2": "a2",
+  "A3": 13
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "03. Dump accumulator to see the notification"
+echo "============================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04. GET the subscription"
+echo "========================"
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo '05. Create custom subscription with payload inside httpCustom and with "attrsFormat" == "legacy"'
+echo "================================================================================================"
+payload='{
+  "description": "x_yz4hahh",
+  "expires": "2040-01-01T14:00:00.00Z",                  
+  "subject": {
+    "entities": [
+      {
+        "idPattern" : ".*"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "attrs": [],
+    "attrsFormat": "legacy",
+    "httpCustom": {
+      "url":      "http://localhost:'${LISTENER_PORT}'/notify",
+      "payload": "{ %22A1%22: %22Value of A1: ${A1}%22 }"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "06. Dump accumulator to see the second notification, not in legacy mode, as custom payload overrides"
+echo "===================================================================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create custom subscription
+==============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity to trigger the subscription
+=============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Dump accumulator to see the notification
+============================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 316
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "Text", 
+                        "value": "a1"
+                    }, 
+                    {
+                        "name": "A2", 
+                        "type": "Text", 
+                        "value": "a2"
+                    }, 
+                    {
+                        "name": "A3", 
+                        "type": "Number", 
+                        "value": 13
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "Thing"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": ""
+            }
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+
+
+04. GET the subscription
+========================
+HTTP/1.1 200 OK
+Content-Length: 408
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "description": "x_yz4hahh",
+        "expires": "2040-01-01T14:00:00.00Z",
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "legacy",
+            "httpCustom": {
+                "url": "http://localhost:9997/notify"
+            },
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "lastSuccessCode": 200,
+            "timesSent": 1
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "idPattern": ".*"
+                }
+            ]
+        }
+    }
+]
+
+
+05. Create custom subscription with payload inside httpCustom and with "attrsFormat" == "legacy"
+================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Dump accumulator to see the second notification, not in legacy mode, as custom payload overrides
+====================================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 27
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: text/plain; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "A1": "Value of A1: a1"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

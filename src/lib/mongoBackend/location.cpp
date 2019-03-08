@@ -118,7 +118,28 @@ static bool getGeoJson
   std::vector<double>  coordLong;
   BSONArrayBuilder     ba;
 
-  if ((apiVersion == V1) || (caP->type == GEO_POINT))
+  if ((apiVersion == V1) && (caP->type != GEO_POINT) && (caP->type != GEO_LINE) && (caP->type != GEO_BOX) &&
+      (caP->type != GEO_POLYGON) && (caP->type != GEO_JSON))
+  {
+    // This corresponds to the legacy way in NGSIv1 based in metadata
+    // The block is the same that for GEO_POINT but it is clearer if we keep it separated
+
+    double  aLat;
+    double  aLong;
+
+    if (!string2coords(caP->stringValue, aLat, aLong))
+    {
+      *errDetail = "geo coordinates format error [see Orion user manual]: " + caP->stringValue;
+      return false;
+    }
+
+    geoJson->append("type", "Point");
+    geoJson->append("coordinates", BSON_ARRAY(aLong << aLat));
+
+    return true;
+  }
+
+  if (caP->type == GEO_POINT)
   {
     double  aLat;
     double  aLong;
@@ -156,7 +177,8 @@ static bool getGeoJson
      */
     BSONObjBuilder bo;
 
-    caP->valueBson(bo);
+    // Autocast doesn't make sense in this context, strings2numbers enabled in the case of NGSIv1
+    caP->valueBson(bo, "", true, apiVersion == V1);
     geoJson->appendElements(getObjectFieldF(bo.obj(), ENT_ATTRS_VALUE));
 
     return true;
@@ -332,15 +354,6 @@ bool processLocationAtUpdateAttribute
 )
 {
   std::string subErr;
-
-  //
-  // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
-  // note that with the current logic, the name of the attribute meaning location
-  // is preserved on a replace operation. By the moment, we can leave this as it is now
-  // given that the logic in NGSIv2 for specifying location attributes is gogint to change
-  // (the best moment to address this FIXME is probably once NGSIv1 has been deprecated and
-  // removed from the code)
-  //
   std::string locationString = targetAttr->getLocation(apiVersion);
 
   /* Check that location (if any) is using the correct coordinates string (it only
@@ -377,20 +390,34 @@ bool processLocationAtUpdateAttribute
 
     //
     // Case 1b:
-    //   currently we have a loation but the attribute holding it is different from the target attribute -> error
+    //   currently we have a loation but the attribute holding it is different from the target attribute.
+    //   The behaviour is different depending on NGSI version
     //
     if (*currentLocAttrName != targetAttr->name)
     {
-      *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
-                   " when another one has been previously defined [" + *currentLocAttrName + "]";
+      if (apiVersion == V1)
+      {
+        *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
+                     " when another one has been previously defined [" + *currentLocAttrName + "]";
 
-      oe->fill(SccRequestEntityTooLarge,
-               "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
-               "NoResourcesAvailable");
+        oe->fill(SccRequestEntityTooLarge,
+                 "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
+                 "NoResourcesAvailable");
 
-      return false;
+        return false;
+      }
+      else
+      {
+        if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
+        {
+          *errDetail = "error parsing location attribute: " + subErr;
+          oe->fill(SccBadRequest, *errDetail, "BadRequest");
+          return false;
+        }
+        *currentLocAttrName = targetAttr->name;
+        return true;
+      }
     }
-
     //
     // Case 1c:
     //   currently we have a location and the attribute holding it is the target attribute -> update the current location
@@ -411,7 +438,7 @@ bool processLocationAtUpdateAttribute
   //
   // Case 2:
   //   update *to* no-location and the attribute previously holding it is the same than the target attribute
-  //   The behaviour is differenet depending on NGSI version
+  //   The behaviour is different depending on NGSI version
   //
   else if (*currentLocAttrName == targetAttr->name)
   {

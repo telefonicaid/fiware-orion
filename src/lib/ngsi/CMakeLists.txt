@@ -21,14 +21,10 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    AttributeDomainName.cpp
     AttributeExpression.cpp
-    AttributeList.cpp
     ConditionValueList.cpp
     ContextAttribute.cpp
     ContextAttributeVector.cpp
-    ContextElement.cpp
-    ContextElementVector.cpp
     ContextElementResponse.cpp
     ContextElementResponseVector.cpp
     ContextRegistration.cpp
@@ -54,21 +50,18 @@ SET (SOURCES
     Scope.cpp
     ScopeVector.cpp
     StatusCode.cpp
+    StringList.cpp
     SubscribeResponse.cpp
     SubscribeError.cpp
     SubscriptionId.cpp
     Throttling.cpp
-    UpdateActionType.cpp
 )
 
 SET (HEADERS
-    AttributeDomainName.h
     AttributeExpression.h
-    AttributeList.h
     ConditionValueList.h
     ContextAttribute.h
     ContextAttributeVector.h
-    ContextElement.h
     ContextElementResponse.h
     ContextElementResponseVector.h
     ContextRegistrationAttribute.h
@@ -92,11 +85,11 @@ SET (HEADERS
     RestrictionString.h
     Scope.h
     StatusCode.h
+    StringList.h
     SubscribeError.h
     SubscribeResponse.h
     SubscriptionId.h
     Throttling.h
-    UpdateActionType.h
 )
 
 

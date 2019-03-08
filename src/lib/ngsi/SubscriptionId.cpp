@@ -61,13 +61,7 @@ SubscriptionId::SubscriptionId(const std::string& subId)
 *
 * SubscriptionId::check -
 */
-std::string SubscriptionId::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string SubscriptionId::check(void)
 {
   std::string out = "OK";
 
@@ -127,29 +121,9 @@ const char* SubscriptionId::c_str(void) const
 
 /* ****************************************************************************
 *
-* SubscriptionId::present -
+* SubscriptionId::toJsonV1 -
 */
-void SubscriptionId::present(const std::string& indent)
-{
-  if (string != "")
-  {
-    LM_T(LmtPresent, ("%sSubscriptionId: %s\n", 
-		      indent.c_str(), 
-		      string.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNo SubscriptionId\n", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* SubscriptionId::render -
-*/
-std::string SubscriptionId::render(RequestType container, const std::string& indent, bool comma)
+std::string SubscriptionId::toJsonV1(RequestType container, bool comma)
 {
   std::string xString = string;
 
@@ -175,7 +149,7 @@ std::string SubscriptionId::render(RequestType container, const std::string& ind
     }
   }
 
-  return valueTag(indent, "subscriptionId", xString, comma);
+  return valueTag("subscriptionId", xString, comma);
 }
 
 

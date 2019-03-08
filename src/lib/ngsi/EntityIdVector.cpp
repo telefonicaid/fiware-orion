@@ -41,9 +41,9 @@
 
 /* ****************************************************************************
 *
-* EntityIdVector::render -
+* EntityIdVector::toJsonV1 -
 */
-std::string EntityIdVector::render(const std::string& indent, bool comma)
+std::string EntityIdVector::toJsonV1(bool comma)
 {
   std::string out = "";
 
@@ -52,13 +52,13 @@ std::string EntityIdVector::render(const std::string& indent, bool comma)
     return "";
   }
 
-  out += startTag(indent, "entities", true);
+  out += startTag("entities", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(indent + "  ", ix != vec.size() - 1, true);
+    out += vec[ix]->toJsonV1(ix != vec.size() - 1, true);
   }
 
-  out += endTag(indent, comma, true);
+  out += endTag(comma, true);
 
   return out;
 }
@@ -69,11 +69,7 @@ std::string EntityIdVector::render(const std::string& indent, bool comma)
 *
 * EntityIdVector::check -
 */
-std::string EntityIdVector::check
-(
-  RequestType         requestType,
-  const std::string&  indent
-)
+std::string EntityIdVector::check(RequestType requestType)
 {
   // Only OK to be empty if part of a ContextRegistration
   if ((requestType == DiscoverContextAvailability)           ||
@@ -93,7 +89,7 @@ std::string EntityIdVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType, indent)) != "OK")
+    if ((res = vec[ix]->check(requestType)) != "OK")
     {
       alarmMgr.badInput(clientIp, "invalid vector of EntityIds");
       return res;
@@ -101,22 +97,6 @@ std::string EntityIdVector::check
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityIdVector::present -
-*/
-void EntityIdVector::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%lu EntityIds:\n", (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent, ix);
-  }
 }
 
 

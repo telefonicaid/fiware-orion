@@ -50,8 +50,14 @@ orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
-echo "02. Query E1-T1 (Access-Control-Allow-Origin included)"
-echo "======================================================"
+echo "02. Query E1-T1 With Origin Header (Access-Control-Allow-Origin included)"
+echo "========================================================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1 -X GET --origin TEST_ORIGIN
+echo
+echo
+
+echo "03. Query E1-T1 Without Origin Header (Access-Control-Allow-Origin not included)"
+echo "================================================================================"
 orionCurl --url /v1/contextEntities/type/T1/id/E1 -X GET
 echo
 echo
@@ -60,7 +66,7 @@ echo
 01. Update/APPEND E1-T1-A1 (Access-Control-Allow-Origin not included for POST)
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -89,11 +95,40 @@ Date: REGEX(.*)
 }
 
 
-02. Query E1-T1 (Access-Control-Allow-Origin included)
-======================================================
+02. Query E1-T1 With Origin Header (Access-Control-Allow-Origin included)
+=========================================================================
 HTTP/1.1 200 OK
-Content-Length: 279
+Content-Length: 167
+Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: *
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "A1",
+                "type": "string",
+                "value": "1"
+            }
+        ],
+        "id": "E1",
+        "isPattern": "false",
+        "type": "T1"
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
+
+
+03. Query E1-T1 Without Origin Header (Access-Control-Allow-Origin not included)
+================================================================================
+HTTP/1.1 200 OK
+Content-Length: 167
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

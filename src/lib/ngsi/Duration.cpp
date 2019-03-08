@@ -58,13 +58,7 @@ Duration::Duration()
 *
 * Duration::check -
 */
-std::string Duration::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string Duration::check(void)
 {
   if (string == "")
   {
@@ -142,27 +136,9 @@ int64_t Duration::parse(void)
 
 /* ****************************************************************************
 *
-* Duration::present
+* Duration::toJsonV1 -
 */
-void Duration::present(const std::string& indent)
-{
-  if (string != "")
-  {
-    LM_T(LmtPresent, ("%sDuration: %s\n", indent.c_str(), string.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNo Duration\n", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* Duration::render -
-*/
-std::string Duration::render(const std::string& indent, bool comma)
+std::string Duration::toJsonV1(bool comma)
 {
   if (string == "")
   {
@@ -174,7 +150,7 @@ std::string Duration::render(const std::string& indent, bool comma)
     return "";
   }
 
-  return valueTag(indent, "duration", string, comma);
+  return valueTag("duration", string, comma);
 }
 
 

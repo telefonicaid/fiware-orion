@@ -33,17 +33,6 @@ orionCurl --url /statistics
 echo
 echo
 
-#
-# About
-#   "versionRequests": "REGEX((0|1))"
-# When running under valgrind, an additional "GET /version" is issued to make sure the broker is running
-#
-#
-# About
-#   <subCacheRefreshs>REGEX((0|1))</subCacheRefreshs>
-# When the broker is started with -noCache, there are no refreshes performed
-#
-
 --REGEXPECT--
 +++++ 1. statistics in JSON
 HTTP/1.1 200 OK

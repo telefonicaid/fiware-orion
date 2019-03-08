@@ -36,6 +36,7 @@
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
 #include "serviceRoutinesV2/getEntities.h"
+#include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "alarmMgr/alarmMgr.h"
 
@@ -61,6 +62,8 @@
 *   - geometry
 *   - coords
 *   - georel
+*   - attrs
+*   - metadata
 *   - options=keyValues
 *   - type=TYPE
 *   - type=TYPE1,TYPE2,...TYPEN
@@ -299,11 +302,18 @@ std::string getEntities
     }
   }
 
+  // Get attrs and metadata filters from URL params
+  // Note we cannot set the attrs filter on &parseDataP->qcr.res.attrsFilterList given that parameter is used for querying on DB
+  // and some .test would break. We use a fresh variable (attributeFilter) for that
+  StringList attributeFilter;
+  setAttrsFilter(ciP->uriParam, ciP->uriParamOptions, &attributeFilter);
+  setMetadataFilter(ciP->uriParam, &parseDataP->qcr.res.metadataList);
 
   // 02. Call standard op postQueryContext
   answer = postQueryContext(ciP, components, compV, parseDataP);
 
   // 03. Render Entities response
+
   if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)
   {
     ciP->httpStatusCode = SccOk;
@@ -311,16 +321,20 @@ std::string getEntities
   }
   else
   {
-    entities.fill(&parseDataP->qcrs.res);
+    OrionError oe;
+    entities.fill(parseDataP->qcrs.res, &oe);
 
-    if (entities.oe.code != SccNone)
+    if (oe.code != SccNone)
     {
-      TIMED_RENDER(answer = entities.oe.toJson());
-      ciP->httpStatusCode = entities.oe.code;
+      TIMED_RENDER(answer = oe.toJson());
+      ciP->httpStatusCode = oe.code;
     }
     else
     {
-      TIMED_RENDER(answer = entities.render(ciP->uriParamOptions, ciP->uriParam));
+      TIMED_RENDER(answer = entities.toJson(getRenderFormat(ciP->uriParamOptions),
+                                            attributeFilter.stringV,
+                                            false,
+                                            parseDataP->qcr.res.metadataList.stringV));
       ciP->httpStatusCode = SccOk;
     }
   }

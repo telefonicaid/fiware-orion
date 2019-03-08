@@ -178,8 +178,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -207,8 +206,7 @@ payload='{
     "attributes": [
       {
         "name": "A2",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -236,8 +234,7 @@ payload='{
     "attributes": [
       {
         "name": "A3",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -265,8 +262,7 @@ payload='{
     "attributes": [
       {
         "name": "A4",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP2_PORT}'/v1"
@@ -294,8 +290,7 @@ payload='{
     "attributes": [
       {
         "name": "A5",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP2_PORT}'/v1"
@@ -334,7 +329,7 @@ echo
 01. Update/APPEND E1/T1/A1 in CP1
 =================================
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -366,7 +361,7 @@ Date: REGEX(.*)
 02. Update/APPEND E1/T1/A2 in CP1
 =================================
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -398,7 +393,7 @@ Date: REGEX(.*)
 03. Update/APPEND E1/T1/A3 in CP1
 =================================
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -430,7 +425,7 @@ Date: REGEX(.*)
 04. Update/APPEND E1/T1/A4 in CP2
 =================================
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -462,7 +457,7 @@ Date: REGEX(.*)
 05. Update/APPEND E1/T1/A5 in CP2
 =================================
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -494,7 +489,7 @@ Date: REGEX(.*)
 06. Register E1/T1/A1 in CB, provApp: CP1
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -508,7 +503,7 @@ Date: REGEX(.*)
 07. Register E1/T1/A2 in CB, provApp: CP1
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -522,7 +517,7 @@ Date: REGEX(.*)
 08. Register E1/T1/A3 in CB, provApp: CP1
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -536,7 +531,7 @@ Date: REGEX(.*)
 09. Register E1/T1/A4 in CB, provApp: CP2
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -550,7 +545,7 @@ Date: REGEX(.*)
 10. Register E1/T1/A5 in CB, provApp: CP2
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -564,7 +559,7 @@ Date: REGEX(.*)
 11. Query E1/T1/A1+A2+A3+A4+A5 (A1-A3 in CP1, A4-A5 in CP2)
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 860
+Content-Length: 398
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

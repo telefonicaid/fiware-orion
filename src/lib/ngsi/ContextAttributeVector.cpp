@@ -34,6 +34,7 @@
 #include "common/tag.h"
 #include "common/string.h"
 #include "common/RenderFormat.h"
+#include "common/JsonHelper.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/Request.h"
 
@@ -52,26 +53,8 @@ ContextAttributeVector::ContextAttributeVector()
 
 /* ****************************************************************************
 *
-* addedLookup - 
-*/
-static std::string addedLookup(const std::vector<std::string>& added, std::string value)
-{
-  for (unsigned int ix = 0; ix < added.size(); ++ix)
-  {
-    if (added[ix] == value)
-    {
-      return value;
-    }
-  }
-
-  return "";
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextAttributeVector::toJsonTypes -
+*
 */
 std::string ContextAttributeVector::toJsonTypes(void)
 {
@@ -85,7 +68,7 @@ std::string ContextAttributeVector::toJsonTypes(void)
   }
 
   // Pass 2 - generate JSON
-  std::string out;
+  JsonObjectHelper jh;
 
   std::map<std::string, std::map<std::string, int> >::iterator it;
   unsigned int                                                 ix;
@@ -94,10 +77,12 @@ std::string ContextAttributeVector::toJsonTypes(void)
     std::string                 attrName  = it->first;
     std::map<std::string, int>  attrTypes = it->second;
 
-    out += JSON_STR(attrName) + ":{" + JSON_STR("types") + ":[";
+    JsonVectorHelper jvh;
 
     std::map<std::string, int>::iterator jt;
     unsigned int                         jx;
+
+    JsonObjectHelper jhTypes;
 
     for (jt = attrTypes.begin(), jx = 0; jt != attrTypes.end(); ++jt, ++jx)
     {
@@ -113,195 +98,42 @@ std::string ContextAttributeVector::toJsonTypes(void)
       //
       if ((type != "") || (attrTypes.size() != 1))
       {
-        out += JSON_STR(type);
+        jvh.addString(type);
       }
 
-      if (jx != attrTypes.size() - 1)
-      {
-        out += ",";
-      }
     }
 
-    out += "]}";
+    jhTypes.addRaw("types", jvh.str());
 
-    if (ix != perAttrTypes.size() - 1)
-    {
-      out += ",";
-    }
+    jh.addRaw(attrName, jhTypes.str());
   }
 
-  return out;
+  return jh.str();
 }
 
 
 
 /* ****************************************************************************
 *
-* ContextAttributeVector::toJson - 
+* ContextAttributeVector::toJsonV1 -
 *
-* Attributes named 'id' or 'type' are not rendered in API version 2, due to the 
-* compact way in which API v2 is rendered. Attributes named 'id' or 'type' would simply
-* collide with the 'id' and 'type' of the entity itself (holder of the attribute).
-*
-* If anybody needs an attribute named 'id' or 'type', then API v1
-* will have to be used to retrieve that information.
+* FIXME P5: this method doesn't depend on the class object. Should be moved out of the class?
+* Maybe included in the Entiy class render logic.
 */
-std::string ContextAttributeVector::toJson
-(
-  RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsFilter,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             blacklist
-) const
-{
-  if (vec.size() == 0)
-  {
-    return "";
-  }
-
-
-  //
-  // Pass 1 - count the total number of attributes valid for rendering.
-  //
-  // Attributes named 'id' or 'type' are not rendered.
-  // This gives us a small problem in the logic here, about knowing whether the
-  // comma should be rendered or not.
-  //
-  // To fix this problem we need to do two passes over the vector, the first pass to
-  // count the number of valid attributes and the second to do the work.
-  // In the second pass, if the number of rendered attributes "so far" is less than the total
-  // number of valid attributes, then the comma must be rendered.
-  //
-  int validAttributes = 0;
-  std::map<std::string, bool>  uniqueMap;
-  if ((attrsFilter.size() == 0) || (std::find(attrsFilter.begin(), attrsFilter.end(), ALL_ATTRS) != attrsFilter.end()))
-  {
-    for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    {
-      if ((vec[ix]->name == "id") || (vec[ix]->name == "type"))
-      {
-        continue;
-      }
-
-      if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
-      {
-        if (uniqueMap[vec[ix]->stringValue] == true)
-        {
-          continue;
-        }
-      }
-
-      ++validAttributes;
-
-      if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
-      {
-        uniqueMap[vec[ix]->stringValue] = true;
-      }
-    }
-  }
-  else if (!blacklist)
-  {
-    for (std::vector<std::string>::const_iterator it = attrsFilter.begin(); it != attrsFilter.end(); ++it)
-    {
-      if (lookup(*it) != NULL)
-      {
-        ++validAttributes;
-      }
-    }
-  }
-  else // attrsFilter is black list
-  {
-    for (unsigned ix = 0; ix < vec.size(); ++ix)
-    {
-      if (std::find(attrsFilter.begin(), attrsFilter.end(), vec[ix]->name) == attrsFilter.end())
-      {
-         ++validAttributes;
-      }
-    }
-  }
-
-  //
-  // Pass 2 - do the work, helped by the value of 'validAttributes'.
-  //
-  std::string  out;
-  int          renderedAttributes = 0;
-
-  uniqueMap.clear();
-
-  if (attrsFilter.size() == 0 || (std::find(attrsFilter.begin(), attrsFilter.end(), ALL_ATTRS) != attrsFilter.end()))
-  {
-    for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    {
-      if ((vec[ix]->name == "id") || (vec[ix]->name == "type"))
-      {
-        continue;
-      }
-
-      ++renderedAttributes;
-
-      if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
-      {
-        if (uniqueMap[vec[ix]->stringValue] == true)
-        {
-          continue;
-        }
-      }
-
-      out += vec[ix]->toJson(renderedAttributes == validAttributes, renderFormat, metadataFilter);
-
-      if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
-      {
-        uniqueMap[vec[ix]->stringValue] = true;
-      }
-    }
-  }
-  else if (!blacklist)
-  {
-    for (std::vector<std::string>::const_iterator it = attrsFilter.begin(); it != attrsFilter.end(); ++it)
-    {
-      ContextAttribute* caP = lookup(*it);
-      if (caP != NULL)
-      {
-        ++renderedAttributes;
-        out += caP->toJson(renderedAttributes == validAttributes, renderFormat, metadataFilter);
-      }
-    }
-  }
-  else // attrsFilter is black list
-  {
-    for (unsigned ix = 0; ix < vec.size(); ++ix)
-    {
-      if (std::find(attrsFilter.begin(), attrsFilter.end(), vec[ix]->name) == attrsFilter.end())
-      {
-        ++renderedAttributes;
-        out += vec[ix]->toJson(renderedAttributes == validAttributes, renderFormat, metadataFilter);
-      }
-    }
-  }
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextAttributeVector::render - 
-*/
-std::string ContextAttributeVector::render
-(
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         request,
-  const std::string&  indent,
-  bool                comma,
-  bool                omitValue,
-  bool                attrsAsName
+std::string ContextAttributeVector::toJsonV1
+(  
+  bool                                   asJsonObject,
+  RequestType                            request,
+  const std::vector<ContextAttribute*>&  orderedAttrs,
+  const std::vector<std::string>&        metadataFilter,
+  bool                                   comma,
+  bool                                   omitValue,
+  bool                                   attrsAsName
 )
 {
   std::string out = "";
 
-  if (vec.size() == 0)
+  if (orderedAttrs.size() == 0)
   {
     return "";
   }
@@ -310,63 +142,41 @@ std::string ContextAttributeVector::render
   // NOTE:
   // If the URI parameter 'attributeFormat' is set to 'object', then the attribute vector
   // is to be rendered as objects for JSON, and not as a vector.
-  // Also, if we have more than one attribute with the same name (possible if different metaID),
-  // only one of them should be included in the vector. Any one of them.
-  // So, step 1 is to purge the context attribute vector from 'copies'.
   //
   if (asJsonObject)
   {
-    std::vector<std::string> added;
-
-    // 1. Remove attributes with attribute names already used.
-    for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    {
-      if (addedLookup(added, vec[ix]->name) == "")
-      {
-        added.push_back(vec[ix]->name);
-        LM_T(LmtJsonAttributes, ("Keeping attribute '%s'", vec[ix]->name.c_str()));
-      }
-      else
-      {
-        LM_T(LmtJsonAttributes, ("Removing attribute '%s'", vec[ix]->name.c_str()));
-        vec[ix]->release();
-        delete vec[ix];
-        vec.erase(vec.begin() + ix);
-      }
-    }
-
-    // 2. Now it's time to render
     // Note that in the case of attribute as name, we have to use a vector, thus using
     // attrsAsName variable as value for isVector parameter
-    out += startTag(indent, "attributes", attrsAsName);
-    for (unsigned int ix = 0; ix < vec.size(); ++ix)
+    out += startTag("attributes", attrsAsName);
+    for (unsigned int ix = 0; ix < orderedAttrs.size(); ++ix)
     {
+      bool comma = (ix != orderedAttrs.size() -1);
       if (attrsAsName)
       {
-        out += vec[ix]->renderAsNameString(indent + "  ", ix != vec.size() - 1);
+        out += orderedAttrs[ix]->toJsonV1AsNameString(comma);
       }
       else
       {
-        out += vec[ix]->render(apiVersion, asJsonObject, request, indent + "  ", ix != vec.size() - 1, omitValue);
+        out += orderedAttrs[ix]->toJsonV1(asJsonObject, request, metadataFilter, comma, omitValue);
       }
-    }
-    out += endTag(indent, comma, attrsAsName);
+    }   
+    out += endTag(comma, attrsAsName);
   }
   else
   {
-    out += startTag(indent, "attributes", true);
-    for (unsigned int ix = 0; ix < vec.size(); ++ix)
+    out += startTag("attributes", true);
+    for (unsigned int ix = 0; ix < orderedAttrs.size(); ++ix)
     {
       if (attrsAsName)
       {
-        out += vec[ix]->renderAsNameString(indent + "  ", ix != vec.size() - 1);
+        out += orderedAttrs[ix]->toJsonV1AsNameString(ix != orderedAttrs.size() - 1);
       }
       else
       {
-        out += vec[ix]->render(apiVersion, asJsonObject, request, indent + "  ", ix != vec.size() - 1, omitValue);
+        out += orderedAttrs[ix]->toJsonV1(asJsonObject, request, metadataFilter, ix != orderedAttrs.size() - 1, omitValue);
       }
     }
-    out += endTag(indent, comma, true);
+    out += endTag(comma, true);
   }
 
   return out;
@@ -395,25 +205,8 @@ std::string ContextAttributeVector::check(ApiVersion apiVersion, RequestType req
 
 /* ****************************************************************************
 *
-* ContextAttributeVector::present - 
-*/
-void ContextAttributeVector::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%s%lu ContextAttributes", 
-		    indent.c_str(), 
-		    (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent + "  ", ix);
-  }
-}
-
-
-
-/* ****************************************************************************
+* ContextAttributeVector::push_back -
 *
-* ContextAttributeVector::push_back - 
 */
 void ContextAttributeVector::push_back(ContextAttribute* item)
 {
@@ -425,14 +218,17 @@ void ContextAttributeVector::push_back(ContextAttribute* item)
 /* ****************************************************************************
 *
 * ContextAttributeVector::push_back - 
+*
 */
-void ContextAttributeVector::push_back(ContextAttributeVector* aVec)
+void ContextAttributeVector::push_back(const ContextAttributeVector& caV, bool cloneCompound)
 {
-  for (unsigned int ix = 0; ix < aVec->size(); ++ix)
+  for (unsigned int ix = 0; ix < caV.size(); ++ix)
   {
-    vec.push_back(new ContextAttribute((*aVec)[ix]));
+    vec.push_back(new ContextAttribute(caV[ix], false, cloneCompound));
   }
 }
+
+
 
 /* ****************************************************************************
 *
@@ -479,18 +275,19 @@ void ContextAttributeVector::release(void)
 /* ****************************************************************************
 *
 * ContextAttributeVector::fill - 
+*
 */
-void ContextAttributeVector::fill(ContextAttributeVector* cavP, bool useDefaultType)
+void ContextAttributeVector::fill(const ContextAttributeVector& caV, bool useDefaultType, bool cloneCompounds)
 {
-  if (cavP == NULL)
+  if (caV.size() == 0)
   {
     return;
   }
 
-  for (unsigned int ix = 0; ix < cavP->size(); ++ix)
+  for (unsigned int ix = 0; ix < caV.size(); ++ix)
   {
-    ContextAttribute* from = (*cavP)[ix];
-    ContextAttribute* caP = new ContextAttribute(from, useDefaultType);
+    ContextAttribute* from = caV[ix];
+    ContextAttribute* caP = new ContextAttribute(from, useDefaultType, cloneCompounds);
 
     push_back(caP);
   }
@@ -500,17 +297,17 @@ void ContextAttributeVector::fill(ContextAttributeVector* cavP, bool useDefaultT
 
 /* ****************************************************************************
 *
-* lookup -
+* get -
 */
-ContextAttribute* ContextAttributeVector::lookup(const std::string& attributeName) const
+int ContextAttributeVector::get(const std::string& attributeName) const
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     if (vec[ix]->name == attributeName)
     {
-      return vec[ix];
+      return ix;
     }
   }
 
-  return NULL;
+  return -1;
 }

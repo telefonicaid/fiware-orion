@@ -37,9 +37,9 @@
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttributeVector::render -
+* ContextRegistrationAttributeVector::toJsonV1 -
 */
-std::string ContextRegistrationAttributeVector::render(const std::string& indent, bool comma)
+std::string ContextRegistrationAttributeVector::toJsonV1(bool comma)
 {
   std::string out = "";
 
@@ -48,12 +48,12 @@ std::string ContextRegistrationAttributeVector::render(const std::string& indent
     return "";
   }
 
-  out += startTag(indent, "attributes", true);
+  out += startTag("attributes", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);
+    out += vec[ix]->toJsonV1(ix != vec.size() - 1);
   }
-  out += endTag(indent, comma, true);
+  out += endTag(comma, true);
 
   return out;
 }
@@ -77,22 +77,6 @@ std::string ContextRegistrationAttributeVector::check(ApiVersion apiVersion)
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextRegistrationAttributeVector::present -
-*/
-void ContextRegistrationAttributeVector::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%lu ContextRegistrationAttributes", (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(ix, indent);
-  }
 }
 
 
@@ -142,7 +126,6 @@ void ContextRegistrationAttributeVector::release(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->release();
     delete(vec[ix]);
   }
 

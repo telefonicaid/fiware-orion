@@ -56,6 +56,7 @@
 #include "apiTypesV2/BatchQuery.h"
 #include "apiTypesV2/BatchUpdate.h"
 #include "apiTypesV2/SubscriptionUpdate.h"
+#include "apiTypesV2/Registration.h"
 
 
 
@@ -135,12 +136,12 @@ struct QueryContextData
 */
 struct QueryContextResponseData
 {
-  QueryContextResponseData(): cerP(NULL), attributeP(NULL), metadataP(NULL), domainMetadataP(NULL) {}
+  QueryContextResponseData(): cerP(NULL), attributeP(NULL), metadataP(NULL) {}
   QueryContextResponse     res;
   ContextElementResponse*  cerP;
   ContextAttribute*        attributeP;
   Metadata*                metadataP;
-  Metadata*                domainMetadataP;
+
 };
 
 
@@ -205,12 +206,11 @@ typedef struct UnsubscribeContextData
 */
 struct NotifyContextData
 {
-  NotifyContextData(): cerP(NULL), attributeP(NULL), attributeMetadataP(NULL), domainMetadataP(NULL) {}
+  NotifyContextData(): cerP(NULL), attributeP(NULL), attributeMetadataP(NULL) {}
   NotifyContextRequest     res;
   ContextElementResponse*  cerP;
   ContextAttribute*        attributeP;
   Metadata*                attributeMetadataP;
-  Metadata*                domainMetadataP;
 };
 
 
@@ -252,13 +252,12 @@ struct UpdateContextAvailabilitySubscriptionData
 */
 struct UpdateContextData
 {
-  UpdateContextData(): ceP(NULL), entityIdP(NULL), attributeP(NULL), contextMetadataP(NULL), domainMetadataP(NULL) {}
+  UpdateContextData(): eP(NULL), entityIdP(NULL), attributeP(NULL), contextMetadataP(NULL) {}
   UpdateContextRequest   res;
-  ContextElement*        ceP;
+  Entity*                eP;
   EntityId*              entityIdP;
   ContextAttribute*      attributeP;
   Metadata*              contextMetadataP;
-  Metadata*              domainMetadataP;
 };
 
 
@@ -269,12 +268,11 @@ struct UpdateContextData
 */
 struct UpdateContextResponseData
 {
-  UpdateContextResponseData(): cerP(NULL), attributeP(NULL), metadataP(NULL), domainMetadataP(NULL) {}
+  UpdateContextResponseData(): cerP(NULL), attributeP(NULL), metadataP(NULL) {}
   UpdateContextResponse    res;
   ContextElementResponse*  cerP;
   ContextAttribute*        attributeP;
   Metadata*                metadataP;
-  Metadata*                domainMetadataP;
 };
 
 
@@ -327,11 +325,10 @@ struct UpdateContextElementData
 */
 struct AppendContextElementData
 {
-  AppendContextElementData(): attributeP(NULL), metadataP(NULL), domainMetadataP(NULL) {}
+  AppendContextElementData(): attributeP(NULL), metadataP(NULL) {}
   AppendContextElementRequest  res;
   ContextAttribute*            attributeP;
   Metadata*                    metadataP;
-  Metadata*                    domainMetadataP;
 };
 
 
@@ -445,7 +442,7 @@ typedef struct ParseData
   BatchUpdateData                             bu;
 
   ngsiv2::SubscriptionUpdate                  subsV2;
-
+  ngsiv2::Registration                        reg;
 } ParseData;
 
 #endif  // SRC_LIB_NGSI_PARSEDATA_H_

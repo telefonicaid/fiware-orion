@@ -33,51 +33,6 @@
 
 /* ****************************************************************************
 *
-* basePart, idPart -
-*
-* Helper functions for entityQuery to split the attribute name string into part,
-* e.g. "A1()ID1" into "A1" and "ID1"
-*/
-inline std::string basePart(std::string name)
-{
-  /* Search for "()" */
-  std::size_t pos = name.find(MD_ID_SEPARATOR);
-
-  if (pos == std::string::npos)
-  {
-    /* If not found, return just 'name' */
-    return name;
-  }
-
-  /* If found, return substring */
-  return name.substr(0, pos);
-}
-
-
-
-/* ****************************************************************************
-*
-* idPart - 
-*/
-inline std::string idPart(std::string name)
-{
-  /* Search for "()" */
-  std::size_t pos = name.find(MD_ID_SEPARATOR);
-
-  if (pos == std::string::npos)
-  {
-    /* If not found, return just "" */
-    return "";
-  }
-
-  /* If found, return substring */
-  return name.substr(pos + 2, name.length());
-}
-
-
-
-/* ****************************************************************************
-*
 * ESC decoded/encoded
 */
 #define ESCAPE_1_DECODED  '.'

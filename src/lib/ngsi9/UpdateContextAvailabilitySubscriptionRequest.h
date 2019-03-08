@@ -29,7 +29,7 @@
 #include <vector>
 
 #include "ngsi/Request.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Duration.h"
 #include "ngsi/Restriction.h"
@@ -44,7 +44,7 @@
 typedef struct UpdateContextAvailabilitySubscriptionRequest
 {
   EntityIdVector  entityIdVector;    // Mandatory
-  AttributeList   attributeList;     // Optional
+  StringList      attributeList;     // Optional
   Duration        duration;          // Optional
   Restriction     restriction;       // Optional
   SubscriptionId  subscriptionId;    // Mandatory (error in OMA spec?  OMA spec says it's optional ...)
@@ -54,9 +54,8 @@ typedef struct UpdateContextAvailabilitySubscriptionRequest
 
   UpdateContextAvailabilitySubscriptionRequest();
 
-  std::string     render(const std::string& indent);
-  void            present(const std::string& indent);
-  std::string     check(const std::string& indent, const std::string& predetectedError, int counter);
+  std::string     toJsonV1(void);
+  std::string     check(const std::string& predetectedError, int counter);
   void            release(void);
 } UpdateContextAvailabilitySubscriptionRequest;
 

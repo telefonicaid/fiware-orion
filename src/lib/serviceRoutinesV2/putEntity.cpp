@@ -78,7 +78,7 @@ std::string putEntity
   }
 
   // 01. Fill in UpdateContextRequest
-  parseDataP->upcr.res.fill(eP, "REPLACE");
+  parseDataP->upcr.res.fill(eP, ActionTypeReplace);
 
 
   // 02. Call standard op postUpdateContext

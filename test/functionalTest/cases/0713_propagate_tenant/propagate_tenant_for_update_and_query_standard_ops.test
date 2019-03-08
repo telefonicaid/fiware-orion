@@ -110,8 +110,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -139,8 +138,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -260,7 +258,7 @@ echo
 01. Update/APPEND E1/A1=T1-CP1 in CP1 with tenant T1
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 382
+Content-Length: 188
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -292,7 +290,7 @@ Date: REGEX(.*)
 02. Update/APPEND E1/A1=T2-CP1 in CP1 with tenant T2
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 382
+Content-Length: 188
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -324,7 +322,7 @@ Date: REGEX(.*)
 03. Register E1/A1 in CB with tenant T1, CP1 as provApp
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -338,7 +336,7 @@ Date: REGEX(.*)
 04. Register E1/A1 in CB with tenant T1, CP1 as provApp
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -352,7 +350,7 @@ Date: REGEX(.*)
 05. Update/UPDATE E1/A1=T1-CB in CB with tenant T1
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 382
+Content-Length: 188
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -384,7 +382,7 @@ Date: REGEX(.*)
 06. Update/UPDATE E1/A1=T2-CB in CB with tenant T2
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 382
+Content-Length: 188
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -416,7 +414,7 @@ Date: REGEX(.*)
 07. Query E1/A1 in CP1 with tenant T1 (A1 == T1-CB)
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 387
+Content-Length: 193
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -448,7 +446,7 @@ Date: REGEX(.*)
 08. Query E1/A1 in CP1 with tenant T2 (A1 == T2-CB)
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 387
+Content-Length: 193
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -480,7 +478,7 @@ Date: REGEX(.*)
 09. Query E1/A1 in CP1 without tenant (no hits)
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

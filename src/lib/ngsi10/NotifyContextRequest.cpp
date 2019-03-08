@@ -27,6 +27,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/RenderFormat.h"
+#include "common/JsonHelper.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
 #include "rest/OrionError.h"
@@ -36,9 +37,15 @@
 
 /* ****************************************************************************
 *
-* NotifyContextRequest::render -
+* NotifyContextRequest::toJsonV1 -
 */
-std::string NotifyContextRequest::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
+std::string NotifyContextRequest::toJsonV1
+(
+  bool                             asJsonObject,
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter
+)
 {
   std::string  out                                  = "";
   bool         contextElementResponseVectorRendered = contextElementResponseVector.size() != 0;
@@ -49,11 +56,11 @@ std::string NotifyContextRequest::render(ApiVersion apiVersion, bool asJsonObjec
   //   The only doubt here if whether originator should end in a comma.
   //   This doubt is taken care of by the variable 'contextElementResponseVectorRendered'
   //
-  out += startTag(indent);
-  out += subscriptionId.render(NotifyContext, indent + "  ", true);
-  out += originator.render(indent  + "  ", contextElementResponseVectorRendered);
-  out += contextElementResponseVector.render(apiVersion, asJsonObject, NotifyContext, indent  + "  ", false);
-  out += endTag(indent);
+  out += startTag();
+  out += subscriptionId.toJsonV1(NotifyContext, true);
+  out += originator.toJsonV1(contextElementResponseVectorRendered);
+  out += contextElementResponseVector.toJsonV1(asJsonObject, NotifyContext, attrsFilter, blacklist, metadataFilter, false);
+  out += endTag();
 
   return out;
 }
@@ -68,8 +75,8 @@ std::string NotifyContextRequest::toJson
 (
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             blacklist
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter    
 )
 {
   if ((renderFormat != NGSI_V2_NORMALIZED) && (renderFormat != NGSI_V2_KEYVALUES) && (renderFormat != NGSI_V2_VALUES))
@@ -78,21 +85,14 @@ std::string NotifyContextRequest::toJson
     alarmMgr.badInput(clientIp, "Invalid notification format");
 
     return oe.toJson();
-  }
+  }  
 
-  std::string out;
+  JsonObjectHelper jh;
 
-  out += "{";
-  out += JSON_STR("subscriptionId") + ":";
-  out += JSON_STR(subscriptionId.get());
-  out += ",";
-  out += JSON_STR("data") + ":[";
+  jh.addString("subscriptionId", subscriptionId.get());
+  jh.addRaw("data", contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter));
 
-  out += contextElementResponseVector.toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
-  out += "]";
-  out += "}";
-
-  return out;
+  return jh.str();
 }
 
 
@@ -101,7 +101,7 @@ std::string NotifyContextRequest::toJson
 *
 * NotifyContextRequest::check
 */
-std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string& indent, const std::string& predetectedError)
+std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string& predetectedError)
 {
   std::string            res;
   NotifyContextResponse  response;
@@ -110,9 +110,9 @@ std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string
   {
     response.responseCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = subscriptionId.check(QueryContext, indent, predetectedError, 0))                    != "OK") ||
-           ((res = originator.check(QueryContext, indent, predetectedError, 0))                        != "OK") ||
-           ((res = contextElementResponseVector.check(apiVersion, QueryContext, indent, predetectedError, 0)) != "OK"))
+  else if (((res = subscriptionId.check())                    != "OK") ||
+           ((res = originator.check())                        != "OK") ||
+           ((res = contextElementResponseVector.check(apiVersion, QueryContext, predetectedError, 0)) != "OK"))
   {
     response.responseCode.fill(SccBadRequest, res);
   }
@@ -121,20 +121,7 @@ std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string
     return "OK";
   }
 
-  return response.render(indent);
-}
-
-
-
-/* ****************************************************************************
-*
-* NotifyContextRequest::present -
-*/
-void NotifyContextRequest::present(const std::string& indent)
-{
-  subscriptionId.present(indent);
-  originator.present(indent);
-  contextElementResponseVector.present(indent);
+  return response.toJsonV1();
 }
 
 

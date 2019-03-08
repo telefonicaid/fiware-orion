@@ -39,7 +39,6 @@ payload='{
         "type": "Room",
         "isPattern": "false",
         "id": "ConferenceRoom",
-        "attributeDomainName" : "ADN",
         "attributes": [
           {
             "name": "temperature",
@@ -75,18 +74,6 @@ payload='{
               }
             ]
           }
-        ],
-        "metadatas": [
-          {
-            "name": "m1",
-            "type": "t1",
-            "value": "v1"
-          },
-          {
-            "name": "m2",
-            "type": "t2",
-            "value": "v2"
-          }
         ]
       },
       "statusCode": {
@@ -103,7 +90,7 @@ echo "2: ***********************************"
 --REGEXPECT--
 1: ***********************************
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 51
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

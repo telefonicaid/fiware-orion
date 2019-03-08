@@ -51,10 +51,11 @@ HttpStatusCode mongoUpdateContextSubscription
 {
   OrionError                  oe;
   ngsiv2::SubscriptionUpdate  sub;
+  bool skipInitialNotification = false;
 
   requestP->toNgsiv2Subscription(&sub);
 
-  std::string subId = mongoUpdateSubscription(sub, &oe, tenant, servicePathV, xauthToken, fiwareCorrelator);
+  std::string subId = mongoUpdateSubscription(sub, &oe, tenant, servicePathV, xauthToken, fiwareCorrelator, skipInitialNotification, V1);
 
   if (subId != "")
   {

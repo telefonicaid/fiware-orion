@@ -40,9 +40,9 @@
 
 /* ****************************************************************************
 *
-* RegisterContextRequest::render -
+* RegisterContextRequest::toJsonV1 -
 */
-std::string RegisterContextRequest::render(const std::string& indent)
+std::string RegisterContextRequest::toJsonV1(void)
 {
   std::string  out                                 = "";
   bool         durationRendered                    = duration.get() != "";
@@ -51,13 +51,13 @@ std::string RegisterContextRequest::render(const std::string& indent)
   bool         commaAfterDuration                  = registrationIdRendered;
   bool         commaAfterContextRegistrationVector = registrationIdRendered || durationRendered;
 
-  out += startTag(indent);
+  out += startTag();
 
-  out += contextRegistrationVector.render(      indent + "  ", commaAfterContextRegistrationVector);
-  out += duration.render(                       indent + "  ", commaAfterDuration);
-  out += registrationId.render(RegisterContext, indent + "  ", commaAfterRegistrationId);
+  out += contextRegistrationVector.toJsonV1(      commaAfterContextRegistrationVector);
+  out += duration.toJsonV1(                       commaAfterDuration);
+  out += registrationId.toJsonV1(RegisterContext, commaAfterRegistrationId);
 
-  out += endTag(indent, false);
+  out += endTag(false);
 
   return out;
 }
@@ -68,7 +68,7 @@ std::string RegisterContextRequest::render(const std::string& indent)
 *
 * RegisterContextRequest::check -
 */
-std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::string& indent, const std::string& predetectedError, int counter)
+std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::string& predetectedError, int counter)
 {
   RegisterContextResponse  response(this);
   std::string              res;
@@ -82,10 +82,10 @@ std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::stri
   {
     alarmMgr.badInput(clientIp, "empty contextRegistration list");
     response.errorCode.fill(SccBadRequest, "Empty Context Registration List");
-  }
-  else if (((res = contextRegistrationVector.check(apiVersion, RegisterContext, indent, predetectedError, counter)) != "OK") ||
-           ((res = duration.check(RegisterContext, indent, predetectedError, counter))                  != "OK") ||
-           ((res = registrationId.check(RegisterContext, indent, predetectedError, counter))            != "OK"))
+  } 
+  else if (((res = contextRegistrationVector.check(apiVersion, RegisterContext, predetectedError, counter)) != "OK") ||
+           ((res = duration.check())                                                                        != "OK") ||
+           ((res = registrationId.check())                                                                  != "OK"))
   {
     alarmMgr.badInput(clientIp, res);
     response.errorCode.fill(SccBadRequest, res);
@@ -95,7 +95,7 @@ std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::stri
     return "OK";
   }
 
-  return response.render(indent);
+  return response.toJsonV1();
 }
 
 
@@ -125,7 +125,6 @@ void RegisterContextRequest::fill(RegisterProviderRequest& rpr, const std::strin
   duration       = rpr.duration;
   registrationId = rpr.registrationId;
 
-  crP->registrationMetadataVector.fill((MetadataVector*) &rpr.metadataVector);
   crP->providingApplication = rpr.providingApplication;
 
   crP->entityIdVector.push_back(entityIdP);
@@ -133,7 +132,7 @@ void RegisterContextRequest::fill(RegisterProviderRequest& rpr, const std::strin
 
   if (attributeName != "")
   {
-    ContextRegistrationAttribute* attributeP = new ContextRegistrationAttribute(attributeName, "", "false");
+    ContextRegistrationAttribute* attributeP = new ContextRegistrationAttribute(attributeName, "");
 
     crP->contextRegistrationAttributeVector.push_back(attributeP);
   }

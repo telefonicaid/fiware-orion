@@ -78,7 +78,7 @@ std::string postIndividualContextEntityAttribute
   StatusCode   response;
 
   // 1. Fill in UpdateContextRequest from UpdateContextAttributeRequest and URL-path components
-  parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, "", "APPEND");
+  parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, ActionTypeAppend);
 
 
   // 2. Call postUpdateContext standard service routine
@@ -90,7 +90,7 @@ std::string postIndividualContextEntityAttribute
 
 
   // 4. Cleanup and return result
-  TIMED_RENDER(answer = response.render("", false, false));
+  TIMED_RENDER(answer = response.toJsonV1(false, false));
 
   response.release();
   parseDataP->upcr.res.release();

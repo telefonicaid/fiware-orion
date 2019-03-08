@@ -118,10 +118,12 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       : 0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
-  cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS).c_str()            : "active";
+  cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS)                    : "active";
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                   : false;
   cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(sub, CSUB_LASTFAILURE)      : -1;
   cSubP->lastSuccess           = sub.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongF(sub, CSUB_LASTSUCCESS)      : -1;
+  cSubP->lastFailureReason     = sub.hasField(CSUB_LASTFAILUREASON)?  getStringFieldF(sub, CSUB_LASTFAILUREASON)           : "";
+  cSubP->lastSuccessCode       = sub.hasField(CSUB_LASTSUCCESSCODE)?  getIntOrLongFieldAsLongF(sub, CSUB_LASTSUCCESSCODE)  : -1;
   cSubP->count                 = 0;
   cSubP->next                  = NULL;
 
@@ -229,9 +231,16 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   setStringVectorF(sub, CSUB_ATTRS, &(cSubP->attributes));
 
+  //
+  // 07. Push metadata names to Metadata Vector (cSubP->metadatas)
+  //
+  if (sub.hasField(CSUB_METADATA))
+  {
+    setStringVectorF(sub, CSUB_METADATA, &(cSubP->metadata));
+  }
 
   //
-  // 07. Fill in cSubP->notifyConditionV from condVec
+  // 08. Fill in cSubP->notifyConditionV from condVec
   //
   setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
 
@@ -266,8 +275,6 @@ int mongoSubCacheItemInsert
   const char*         subscriptionId,
   const char*         servicePath,
   int                 lastNotificationTime,
-  int                 lastFailure,
-  int                 lastSuccess,
   long long           expirationTime,
   const std::string&  status,
   const std::string&  q,
@@ -360,7 +367,7 @@ int mongoSubCacheItemInsert
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->servicePath           = strdup(servicePath);
   cSubP->renderFormat          = renderFormat;
-  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->count                 = 0;
@@ -555,7 +562,8 @@ static void mongoSubCountersUpdateLastFailure
 (
   const std::string&  collection,
   const std::string&  subId,
-  long long           lastFailure
+  long long           lastFailure,
+  const std::string&  failureReason
 )
 {
   BSONObj      condition;
@@ -565,7 +573,7 @@ static void mongoSubCountersUpdateLastFailure
   condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
                      BSON(CSUB_LASTFAILURE << BSON("$lt" << lastFailure)) <<
                      BSON(CSUB_LASTFAILURE << BSON("$exists" << false))));
-  update    = BSON("$set" << BSON(CSUB_LASTFAILURE << lastFailure));
+  update    = BSON("$set" << BSON(CSUB_LASTFAILURE << lastFailure << CSUB_LASTFAILUREASON << failureReason));
 
   if (collectionUpdate(collection, condition, update, false, &err) != true)
   {
@@ -583,7 +591,8 @@ static void mongoSubCountersUpdateLastSuccess
 (
   const std::string&  collection,
   const std::string&  subId,
-  long long           lastSuccess
+  long long           lastSuccess,
+  long long           statusCode
 )
 {
   BSONObj      condition;
@@ -593,7 +602,7 @@ static void mongoSubCountersUpdateLastSuccess
   condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
                      BSON(CSUB_LASTSUCCESS << BSON("$lt" << lastSuccess)) <<
                      BSON(CSUB_LASTSUCCESS << BSON("$exists" << false))));
-  update    = BSON("$set" << BSON(CSUB_LASTSUCCESS << lastSuccess));
+  update    = BSON("$set" << BSON(CSUB_LASTSUCCESS << lastSuccess << CSUB_LASTSUCCESSCODE << statusCode));
 
   if (collectionUpdate(collection, condition, update, false, &err) != true)
   {
@@ -610,12 +619,14 @@ static void mongoSubCountersUpdateLastSuccess
 */
 void mongoSubCountersUpdate
 (
-  const std::string& tenant,
-  const std::string& subId,
-  long long          count,
-  long long          lastNotificationTime,
-  long long          lastFailure,
-  long long          lastSuccess
+  const std::string&  tenant,
+  const std::string&  subId,
+  long long           count,
+  long long           lastNotificationTime,
+  long long           lastFailure,
+  long long           lastSuccess,
+  const std::string&  failureReason,
+  long long           statusCode
 )
 {
   std::string  collection = getSubscribeContextCollectionName(tenant);
@@ -638,11 +649,11 @@ void mongoSubCountersUpdate
 
   if (lastFailure > 0)
   {
-    mongoSubCountersUpdateLastFailure(collection, subId, lastFailure);
+    mongoSubCountersUpdateLastFailure(collection, subId, lastFailure, failureReason);
   }
 
   if (lastSuccess > 0)
   {
-    mongoSubCountersUpdateLastSuccess(collection, subId, lastSuccess);
+    mongoSubCountersUpdateLastSuccess(collection, subId, lastSuccess, statusCode);
   }
 }

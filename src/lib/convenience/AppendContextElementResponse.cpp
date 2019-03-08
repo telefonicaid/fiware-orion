@@ -50,34 +50,33 @@ AppendContextElementResponse::AppendContextElementResponse() : errorCode("errorC
 
 /* ****************************************************************************
 *
-* AppendContextElementResponse::render - 
+* AppendContextElementResponse::toJsonV1 -
 */
-std::string AppendContextElementResponse::render
+std::string AppendContextElementResponse::toJsonV1
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         requestType,
-  const std::string&  indent)
+  bool         asJsonObject,
+  RequestType  requestType
+)
 {
   std::string out = "";
 
-  out += startTag(indent);
+  out += startTag();
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(indent + "  ");
+    out += errorCode.toJsonV1(false);
   }
   else
   {
     if (entity.id != "")
     {
-      out += entity.render(indent + "  ", true);
+      out += entity.toJsonV1(true);
     }
 
-    out += contextAttributeResponseVector.render(apiVersion, asJsonObject, requestType, indent + "  ");
+    out += contextAttributeResponseVector.toJsonV1(asJsonObject, requestType);
   }
 
-  out += endTag(indent);
+  out += endTag();
 
   return out;
 }
@@ -93,7 +92,6 @@ std::string AppendContextElementResponse::check
   ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
-  std::string         indent,
   const std::string&  predetectedError
 )
 {
@@ -103,7 +101,7 @@ std::string AppendContextElementResponse::check
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeResponseVector.check(apiVersion, asJsonObject, requestType, indent, "")) != "OK")
+  else if ((res = contextAttributeResponseVector.check(apiVersion, asJsonObject, requestType, "")) != "OK")
   {
     errorCode.fill(SccBadRequest, res);
   }
@@ -112,7 +110,7 @@ std::string AppendContextElementResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, requestType, indent);
+  return toJsonV1(asJsonObject, requestType);
 }
 
 
@@ -145,9 +143,9 @@ void AppendContextElementResponse::fill(UpdateContextResponse* ucrsP, const std:
   {
     ContextElementResponse* cerP = ucrsP->contextElementResponseVector[0];
 
-    contextAttributeResponseVector.fill(&cerP->contextElement.contextAttributeVector, cerP->statusCode);
+    contextAttributeResponseVector.fill(cerP->entity.attributeVector, cerP->statusCode);
     
-    entity.fill(&cerP->contextElement.entityId);
+    entity.fill(cerP->entity.id, cerP->entity.type, cerP->entity.isPattern);
   }
   else
   {
@@ -193,7 +191,7 @@ void AppendContextElementResponse::fill(UpdateContextResponse* ucrsP, const std:
   {
     if (ucrsP->contextElementResponseVector.size() == 1)
     {
-      errorCode.details = ucrsP->contextElementResponseVector[0]->contextElement.entityId.id;
+      errorCode.details = ucrsP->contextElementResponseVector[0]->entity.id;
     }
   }
 }

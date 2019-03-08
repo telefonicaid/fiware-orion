@@ -1,4 +1,4 @@
-FROM centos:centos6.6
+FROM centos:centos7.6.1810
 
 MAINTAINER FIWARE Orion Context Broker Team. Telefónica I+D
 
@@ -27,7 +27,8 @@ RUN \
       gcc-c++ \
       scons \
       tar \
-      which && \
+      which \
+      cyrus-sasl-devel && \
     # Install libmicrohttpd from source
     curl -kOL http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz && \
     tar xvf libmicrohttpd-0.9.48.tar.gz && \
@@ -40,7 +41,8 @@ RUN \
     curl -kOL https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz && \
     tar xfz legacy-1.1.2.tar.gz && \
     cd mongo-cxx-driver-legacy-1.1.2 && \
-    scons install --prefix=/usr/local && \
+    scons --use-sasl-client --ssl && \
+    scons install --prefix=/usr/local --use-sasl-client --ssl && \
     # Install rapidjson from source
     curl -kOL https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz && \
     tar xfz v1.0.2.tar.gz && \
@@ -113,6 +115,6 @@ RUN \
     rm -f /var/log/*log
 
 WORKDIR /
-ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice"]
+ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice", "-ngsiv1Autocast" ]
 EXPOSE 1026
 

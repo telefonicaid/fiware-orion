@@ -108,7 +108,7 @@ echo
 01. GET /v1/noService
 =====================
 HTTP/1.1 400 Bad Request
-Content-Length: 119
+Content-Length: 88
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -125,7 +125,7 @@ Date: REGEX(.*)
 02. POST /v1/updateContext with invalid JSON
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 117
+Content-Length: 86
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -152,7 +152,7 @@ Date: REGEX(.*)
 04. POST /v1/updateContext without payload
 ==========================================
 HTTP/1.1 411 Length Required
-Content-Length: 161
+Content-Length: 130
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -169,7 +169,7 @@ Date: REGEX(.*)
 05. POST /v1/queryContext to reset Bad Input
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

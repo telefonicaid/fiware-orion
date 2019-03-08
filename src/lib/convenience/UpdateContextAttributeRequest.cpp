@@ -44,44 +44,33 @@
 UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 {
   compoundValueP = NULL;
-  valueType = orion::ValueTypeNone;
+  valueType = orion::ValueTypeNotGiven;
 }
 
 
 
 /* ****************************************************************************
 *
-* render - 
+* toJsonV1 -
 */
-std::string UpdateContextAttributeRequest::render(ApiVersion apiVersion, std::string indent)
+std::string UpdateContextAttributeRequest::toJsonV1(void)
 {
   std::string out = "";
-  std::string indent2 = indent + "  ";
-  bool        commaAfterContextValue = metadataVector.size() != 0;
 
-  out += startTag(indent);
-  out += valueTag(indent2, "type", type, true);
+  out += startTag();
+  out += valueTag("type", type, true);
 
   if (compoundValueP == NULL)
   {
-    out += valueTag(indent2, "contextValue", contextValue, true);
+    out += valueTag("contextValue", contextValue, true);
   }
   else
   {
-    bool isCompoundVector = false;
-
-    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::ValueTypeVector))
-    {
-      isCompoundVector = true;
-    }
-
-    out += startTag(indent + "  ", "value", isCompoundVector);
-    out += compoundValueP->render(apiVersion, indent + "    ");
-    out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
+    out += JSON_STR("value") + ":" + compoundValueP->toJson();
   }
 
-  out += metadataVector.render(indent2);
-  out += endTag(indent);
+  out += metadataVector.toJsonV1(metadataVector.vec, false);
+  out += endTag();
 
   return out;
 }
@@ -95,14 +84,11 @@ std::string UpdateContextAttributeRequest::render(ApiVersion apiVersion, std::st
 std::string UpdateContextAttributeRequest::check
 (
   ApiVersion          apiVersion,
-  std::string         indent,
   const std::string&  predetectedError
 )
 {
   StatusCode       response;
   std::string      res;
-
-  indent = "  ";
 
   if (predetectedError != "")
   {
@@ -117,28 +103,11 @@ std::string UpdateContextAttributeRequest::check
     return "OK";
   }
 
-  std::string out = response.render(indent);
+  std::string out = response.toJsonV1(false);
 
-  out = "{\n" + out + "}\n";
+  out = "{" + out + "}";
 
   return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* present - 
-*/
-void UpdateContextAttributeRequest::present(std::string indent)
-{
-  LM_T(LmtPresent, ("%stype:         %s", 
-		    indent.c_str(), 
-		    type.c_str()));
-  LM_T(LmtPresent, ("%scontextValue: %s", 
-		    indent.c_str(), 
-		    contextValue.c_str()));
-  metadataVector.present("ContextMetadata", indent);
 }
 
 

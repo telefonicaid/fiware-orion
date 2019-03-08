@@ -50,29 +50,27 @@ EntityTypeVector::EntityTypeVector()
 
 /* ****************************************************************************
 *
-* EntityTypeVector::render -
+* EntityTypeVector::toJsonV1 -
 */
-std::string EntityTypeVector::render
+std::string EntityTypeVector::toJsonV1
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  bool                asJsonOut,
-  bool                collapsed,
-  const std::string&  indent,
-  bool                comma
+  bool        asJsonObject,
+  bool        asJsonOut,
+  bool        collapsed,
+  bool        comma
 )
 {
   std::string out  = "";
 
   if (vec.size() > 0)
   {
-    out += startTag(indent, "types", true);
+    out += startTag("types", true);
 
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
-      out += vec[ix]->render(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", ix != vec.size() - 1);
+      out += vec[ix]->toJsonV1(asJsonObject, asJsonOut, collapsed, ix != vec.size() - 1);
     }
-    out += endTag(indent, comma, true);
+    out += endTag(comma, true);
   }
 
   return out;
@@ -97,22 +95,6 @@ std::string EntityTypeVector::check(ApiVersion apiVersion, const std::string& pr
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityTypeVector::present -
-*/
-void EntityTypeVector::present(const std::string& indent)
-{
-  LM_T(LmtPresent,("%lu items in entityTypeVector", (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent);
-  }
 }
 
 

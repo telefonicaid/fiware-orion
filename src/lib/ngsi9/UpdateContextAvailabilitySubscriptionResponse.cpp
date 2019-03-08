@@ -70,23 +70,25 @@ UpdateContextAvailabilitySubscriptionResponse::~UpdateContextAvailabilitySubscri
 
 /* ****************************************************************************
 *
-* UpdateContextAvailabilitySubscriptionResponse::render - 
+* UpdateContextAvailabilitySubscriptionResponse::toJsonV1 -
 */
-std::string UpdateContextAvailabilitySubscriptionResponse::render(const std::string& indent, int counter)
+std::string UpdateContextAvailabilitySubscriptionResponse::toJsonV1(void)
 {
   std::string  out                = "";
   bool         durationRendered   = !duration.isEmpty();
   bool         errorCodeRendered  = (errorCode.code != SccNone);
 
-  out += startTag(indent);
+  out += startTag();
 
-  out += subscriptionId.render(RtUpdateContextAvailabilitySubscriptionResponse, indent + "  ", errorCodeRendered || durationRendered);
-  out += duration.render(      indent + "  ", errorCodeRendered);
+  out += subscriptionId.toJsonV1(RtUpdateContextAvailabilitySubscriptionResponse, errorCodeRendered || durationRendered);
+  out += duration.toJsonV1(errorCodeRendered);
 
   if (errorCodeRendered)
-     out += errorCode.render(indent + "  ", false);
+  {
+    out += errorCode.toJsonV1(false);
+  }
 
-  out += endTag(indent);
+  out += endTag();
 
   return out;
 }
@@ -95,7 +97,7 @@ std::string UpdateContextAvailabilitySubscriptionResponse::render(const std::str
 *
 * UpdateContextAvailabilitySubscriptionResponse::check - 
 */
-std::string UpdateContextAvailabilitySubscriptionResponse::check(const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateContextAvailabilitySubscriptionResponse::check(const std::string& predetectedError)
 {
   std::string  res;
 
@@ -103,13 +105,15 @@ std::string UpdateContextAvailabilitySubscriptionResponse::check(const std::stri
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = subscriptionId.check(UpdateContextAvailabilitySubscription, indent, predetectedError, counter)) != "OK") ||
-           ((res = duration.check(UpdateContextAvailabilitySubscription, indent, predetectedError, counter))       != "OK"))
+  else if (((res = subscriptionId.check()) != "OK") ||
+           ((res = duration.check())       != "OK"))
   {
     errorCode.fill(SccBadRequest, res);
   }
   else
+  {
     return "OK";
+  }
 
-  return render(indent, counter);
+  return toJsonV1();
 }

@@ -35,7 +35,8 @@ The configuration used by the contextBroker service is stored in the
 /etc/sysconfig/contextBroker file, which typical content is:
 
 ```
-# BROKER_USER - What user to run orion-broker as
+# BROKER_USER - Who to run orion-broker as. Note that you may need to use root if you want
+# to run Orion in a privileged port (<1024)
 BROKER_USER=orion
 
 # BROKER_PORT - the port/socket where orion-broker will listen for connections
@@ -44,14 +45,17 @@ BROKER_PORT=1026
 # BROKER_LOG_DIR - Where to log to
 BROKER_LOG_DIR=/var/log/contextBroker
 
+# BROKER_LOG_LEVEL - Log File Level
+BROKER_LOG_LEVEL=WARN
+
 # BROKER_PID_FILE - Where to store the pid for orion-broker
-BROKER_PID_FILE=/var/log/contextBroker/contextBroker.pid
+BROKER_PID_FILE=/var/run/contextBroker/contextBroker.pid
 
 ## Database configuration for orion-broker
 BROKER_DATABASE_HOST=localhost
 BROKER_DATABASE_NAME=orion
 
-## Replica set configuration. Note that if you set this parameter, the BROKER_DATBASE_HOST
+## Replica set configuration. Note that if you set this parameter, the BROKER_DATABASE_HOST
 ## is interpreted as the list of host (or host:port) separated by commas to use as
 ## replica set seed list (single element lists are also allowed). If BROKER_DATABASE_RPL_SET
 ## parameter is unset, Orion CB assumes that the BROKER_DATABASE_HOST is an stand-alone
@@ -62,7 +66,7 @@ BROKER_DATABASE_NAME=orion
 #BROKER_DATABASE_USER=orion
 #BROKER_DATABASE_PASSWORD=orion
 
-# Use the following variable if you need extra command line options
+# Use the following variable if you need extra ops
 #BROKER_EXTRA_OPS="-t 0-255"
 ```
 
@@ -70,8 +74,10 @@ All the fields except BROKER\_USER and BROKER\_EXTRA\_OPS map to *one*
 of the options described in [command line
 options](cli.md#command-line-options), as follows:
 
+-   BROKER\_USER doesn't map to CLI option but is used to the init.d script to set the owner of the contextBroker process
 -   BROKER\_PORT maps to -port
 -   BROKER\_LOG\_DIR maps to -logDir
+-   BROKER\_LOG\_LEVEL maps to -logLevel
 -   BROKER\_PID\_FILE maps to -pidpath
 -   BROKER\_DATABASE\_HOST maps to -dbhost
 -   BROKER\_DATABASE\_NAME maps to -db

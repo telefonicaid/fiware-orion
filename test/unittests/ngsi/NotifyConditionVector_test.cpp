@@ -44,19 +44,19 @@ TEST(NotifyConditionVector, render)
 
   utInit();
 
-  out = ncV.render("", false);
+  out = ncV.toJsonV1(false);
   EXPECT_STREQ("", out.c_str());
 
   ncP->type = "Type";
   ncV.push_back(ncP);
 
-  out = ncV.render("", false);
+  out = ncV.toJsonV1(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ncV.release();
 
-  out = ncV.render("", false);
+  out = ncV.toJsonV1(false);
   EXPECT_STREQ("", out.c_str());
 
   utExit();
@@ -78,39 +78,18 @@ TEST(NotifyConditionVector, check)
 
   utInit();
 
-  checked = ncV.check(RegisterContext, "", "", 0);
+  checked = ncV.check(RegisterContext, "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   nc.type = "Type";
   ncV.push_back(&nc);
 
-  checked = ncV.check(RegisterContext, "", "", 0);
+  checked = ncV.check(RegisterContext, "", 0);
   EXPECT_STREQ(expected2.c_str(), checked.c_str());
 
   nc.type = "";
-  checked = ncV.check(RegisterContext, "", "", 0);
+  checked = ncV.check(RegisterContext, "", 0);
   EXPECT_STREQ(expected3.c_str(), checked.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code
-*/
-TEST(NotifyConditionVector, present)
-{
-  NotifyCondition        nc;
-  NotifyConditionVector  ncV;
-
-  utInit();
-
-  nc.type = "Type";
-  ncV.push_back(&nc);
-
-  ncV.present("");
 
   utExit();
 }

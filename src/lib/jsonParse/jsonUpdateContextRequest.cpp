@@ -47,14 +47,13 @@
 static std::string contextElement(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("new contextElement"));
-  reqDataP->upcr.ceP = new ContextElement();
+  reqDataP->upcr.eP = new Entity();
 
-  reqDataP->upcr.res.contextElementVector.push_back(reqDataP->upcr.ceP);
+  reqDataP->upcr.res.entityVector.push_back(reqDataP->upcr.eP);
 
-  reqDataP->upcr.ceP->entityId.id          = "";
-  reqDataP->upcr.ceP->entityId.type        = "";
-  reqDataP->upcr.ceP->entityId.isPattern   = "false";
-  reqDataP->upcr.ceP->attributeDomainName.set("");
+  reqDataP->upcr.eP->id          = "";
+  reqDataP->upcr.eP->type        = "";
+  reqDataP->upcr.eP->isPattern   = "false";
 
   return "OK";
 }
@@ -67,8 +66,8 @@ static std::string contextElement(const std::string& path, const std::string& va
 */
 static std::string entityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  reqDataP->upcr.ceP->entityId.id = value;
-  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->upcr.ceP->entityId.id.c_str()));
+  reqDataP->upcr.eP->id = value;
+  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->upcr.eP->id.c_str()));
 
   return "OK";
 }
@@ -81,8 +80,8 @@ static std::string entityIdId(const std::string& path, const std::string& value,
 */
 static std::string entityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  reqDataP->upcr.ceP->entityId.type = value;
-  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->upcr.ceP->entityId.type.c_str()));
+  reqDataP->upcr.eP->type = value;
+  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->upcr.eP->type.c_str()));
 
   return "OK";
 }
@@ -97,21 +96,7 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
 {
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
 
-  reqDataP->upcr.ceP->entityId.isPattern = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* attributeDomainName - 
-*/
-static std::string attributeDomainName(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  reqDataP->upcr.ceP->attributeDomainName.set(value);
-  LM_T(LmtParse, ("Got an attributeDomainName: '%s'", reqDataP->upcr.ceP->attributeDomainName.get().c_str()));
+  reqDataP->upcr.eP->isPattern = value;
 
   return "OK";
 }
@@ -127,8 +112,8 @@ static std::string attribute(const std::string& path, const std::string& value, 
   LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
 
   reqDataP->upcr.attributeP = new ContextAttribute("", "", "");
-  reqDataP->upcr.attributeP->valueType = orion::ValueTypeNone;
-  reqDataP->upcr.ceP->contextAttributeVector.push_back(reqDataP->upcr.attributeP);
+  reqDataP->upcr.attributeP->valueType = orion::ValueTypeNotGiven;
+  reqDataP->upcr.eP->attributeVector.push_back(reqDataP->upcr.attributeP);
 
   return "OK";
 }
@@ -190,11 +175,6 @@ static std::string metadata(const std::string& path, const std::string& value, P
   LM_T(LmtParse, ("Creating a metadata"));
 
   reqDataP->upcr.contextMetadataP = new Metadata();
-
-  reqDataP->upcr.contextMetadataP->type  = "";
-  reqDataP->upcr.contextMetadataP->name  = "";
-  reqDataP->upcr.contextMetadataP->stringValue = "";
-
   reqDataP->upcr.attributeP->metadataVector.push_back(reqDataP->upcr.contextMetadataP);
 
   return "OK";
@@ -238,68 +218,7 @@ static std::string metadataValue(const std::string& path, const std::string& val
 {
   LM_T(LmtParse, ("Got a metadata value: '%s'", value.c_str()));
   reqDataP->upcr.contextMetadataP->stringValue = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadata - 
-*/
-static std::string domainMetadata(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Creating a reg metadata"));
-
-  reqDataP->upcr.domainMetadataP = new Metadata();
-  reqDataP->upcr.domainMetadataP->type  = "";
-  reqDataP->upcr.domainMetadataP->name  = "";
-  reqDataP->upcr.domainMetadataP->stringValue = "";
-  reqDataP->upcr.ceP->domainMetadataVector.push_back(reqDataP->upcr.domainMetadataP);
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataName - 
-*/
-static std::string domainMetadataName(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a reg metadata name: '%s'", value.c_str()));
-  reqDataP->upcr.domainMetadataP->name = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataType - 
-*/
-static std::string domainMetadataType(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a reg metadata type: '%s'", value.c_str()));
-  reqDataP->upcr.domainMetadataP->type = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataValue - 
-*/
-static std::string domainMetadataValue(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a reg metadata value: '%s'", value.c_str()));
-  reqDataP->upcr.domainMetadataP->stringValue = value;
-
+  reqDataP->upcr.contextMetadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 
@@ -311,8 +230,8 @@ static std::string domainMetadataValue(const std::string& path, const std::strin
 */
 static std::string updateAction(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got a registration id: '%s'", value.c_str()));
-  reqDataP->upcr.res.updateActionType.set(value);
+  LM_T(LmtParse, ("Got an updateAction: '%s'", value.c_str()));
+  reqDataP->upcr.res.updateActionType = parseActionTypeV1(value);
 
   return "OK";
 }
@@ -329,8 +248,7 @@ JsonNode jsonUpcrParseVector[] =
   { "/contextElements/contextElement",                                                contextElement      },
   { "/contextElements/contextElement/type",                                           entityIdType        },
   { "/contextElements/contextElement/isPattern",                                      entityIdIsPattern   },
-  { "/contextElements/contextElement/id",                                             entityIdId          },
-  { "/contextElements/contextElement/attributeDomainName",                            attributeDomainName },
+  { "/contextElements/contextElement/id",                                             entityIdId          },  
   { "/contextElements/contextElement/attributes",                                     jsonNullTreat       },
   { "/contextElements/contextElement/attributes/attribute",                           attribute           },
   { "/contextElements/contextElement/attributes/attribute/name",                      attributeName       },
@@ -341,11 +259,6 @@ JsonNode jsonUpcrParseVector[] =
   { "/contextElements/contextElement/attributes/attribute/metadatas/metadata/name",   metadataName        },
   { "/contextElements/contextElement/attributes/attribute/metadatas/metadata/type",   metadataType        },
   { "/contextElements/contextElement/attributes/attribute/metadatas/metadata/value",  metadataValue       },
-  { "/contextElements/contextElement/domainMetadatas",                                jsonNullTreat       },
-  { "/contextElements/contextElement/domainMetadatas/domainMetadata",                 domainMetadata      },
-  { "/contextElements/contextElement/domainMetadatas/domainMetadata/name",            domainMetadataName  },
-  { "/contextElements/contextElement/domainMetadatas/domainMetadata/type",            domainMetadataType  },
-  { "/contextElements/contextElement/domainMetadatas/domainMetadata/value",           domainMetadataValue },
   { "/updateAction",                                                                  updateAction        },
 
   { "LAST", NULL }
@@ -359,10 +272,9 @@ JsonNode jsonUpcrParseVector[] =
 */
 void jsonUpcrInit(ParseData* reqDataP)
 {
-  reqDataP->upcr.ceP                    = NULL;
+  reqDataP->upcr.eP                     = NULL;
   reqDataP->upcr.attributeP             = NULL;
   reqDataP->upcr.contextMetadataP       = NULL;
-  reqDataP->upcr.domainMetadataP        = NULL;
   reqDataP->errorString                 = "";
 }
 
@@ -386,22 +298,6 @@ void jsonUpcrRelease(ParseData* reqDataP)
 std::string jsonUpcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-  return reqData->upcr.res.check(ciP->apiVersion, asJsonObject, "", reqData->errorString, 0);
+  return reqData->upcr.res.check(ciP->apiVersion, asJsonObject, reqData->errorString);
 }
 
-
-
-/* ****************************************************************************
-*
-* jsonUpcrPresent - 
-*/
-void jsonUpcrPresent(ParseData* reqDataP)
-{
-  if (!lmTraceIsSet(LmtPresent))
-    return;
-
-  LM_T(LmtPresent, ("\n\n"));
-
-  reqDataP->upcr.res.contextElementVector.present("");
-  reqDataP->upcr.res.updateActionType.present("");
-}

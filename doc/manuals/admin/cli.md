@@ -42,9 +42,6 @@ The list of available options is the following:
 -   **-ipv6**. Runs broker in IPv6 only mode (by default, the broker
     runs in both IPv4 and IPv6). Cannot be used at the same time
     as -ipv4.
--   **-rush <host:port>**. Use **rush** in *host* and
-    *port*. Default behavior is to *not* use Rush. See section
-    on [using Rush relayer](rush.md).
 -   **-multiservice**. Enables multiservice/multitenant mode (see [multi
     service tenant section](../user/multitenancy.md)).
 -   **-db <db>**. The MongoDB database to use or
@@ -115,13 +112,16 @@ The list of available options is the following:
     for REST connections. Note that the default value is zero, i.e., no timeout (wait forever).
 -   **-cprForwardLimit**. Maximum number of forwarded requests to Context Providers for a single client request
     (default is no limit). Use 0 to disable Context Providers forwarding completely.
--   **-corsOrigin <domain>**. Configures CORS for GET requests,
-    specifing the allowed origin (use `__ALL` for `*`).
+-   **-corsOrigin <domain>**. Enables Cross-Origin Resource Sharing,
+    specifing the allowed origin (use `__ALL` for `*`). More information about CORS support in Orion can be found
+    in [the users manual](../user/cors.md).
+-   **-corsMaxAge <time>**. Specifies the maximum time (in seconds) preflight requests are allowed to be cached. Defaults
+    to 86400 if not set. More information about CORS support in Orion can be found in [the users manual](../user/cors.md).
 -   **-reqMutexPolicy <all|none|write|read>**. Specifies the internal
     mutex policy. See [performance tuning](perf_tuning.md#mutex-policy-impact-on-performance) documentation
     for details.
 -   **-subCacheIval**. Interval in seconds between calls to subscription cache refresh. A zero
-    value means "no refresh". Default value is 60 seconds, apt for mono-CB deployments (see more details on 
+    value means "no refresh". Default value is 60 seconds, apt for mono-CB deployments (see more details on
     the subscriptions cache in [this document](perf_tuning.md#subscription-cache)).
 -   **-noCache**. Disables the context subscription cache, so subscriptions searches are
     always done in DB (not recommended but useful for debugging).
@@ -134,7 +134,7 @@ The list of available options is the following:
     * In threadpool mode, notifications are enqueued into a queue of size `q` and `n` threads take the notifications
       from the queue and perform the outgoing requests asynchronously. Please have a look at the
       [thread model](perf_tuning.md#orion-thread-model-and-its-implications) section if you want to use this mode.
--   **-simulatedNotification**. Notifications are not sent, but recorded internally and shown in the 
+-   **-simulatedNotification**. Notifications are not sent, but recorded internally and shown in the
     [statistics](statistics.md) operation (`simulatedNotifications` counter). This is not aimed for production
     usage, but it is useful for debugging to calculate a maximum upper limit in notification rate from a CB
     internal logic point of view.
@@ -149,8 +149,6 @@ The list of available options is the following:
     See [logs documentation](logs.md#summary-traces) for more detail.
 -   **-relogAlarms**. To see *every* possible alarm-provoking failure in the log-file, even when an alarm is already active, use this option. See [logs documentation](logs.md#alarms)
     for more detail.
--   **-strictNgsiv1Ids**. To apply to the NGSIv1 API the same restrictions that apply to NGSIv2 for id fields regarding
-    forbidden characters and length limit. See also [this section of the documentation](../user/v1_v2_coexistence.md#checking-id-fields).
 -   **-disableCustomNotifications**. Disabled NGSIv2 custom notifications. In particular:
     * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
     * No `${...}` macro substitution is performed.
@@ -159,3 +157,4 @@ The list of available options is the following:
     Use this parameter to start the broker without metrics overhead.
 -   **-insecureNotif**. Allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates. This is similar
     to the `-k` or `--insecure` parameteres of the curl command.
+

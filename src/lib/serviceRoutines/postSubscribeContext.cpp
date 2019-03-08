@@ -61,7 +61,6 @@ std::string postSubscribeContext
 {
   SubscribeContextResponse  scr;
   std::string               answer;
-
   //
   // FIXME P0: Only *one* service path is allowed for subscriptions.
   //           Personally (kz) I kind of like that. If you want additional service-paths, just add another subscription!
@@ -71,18 +70,19 @@ std::string postSubscribeContext
   {
     char  noOfV[STRING_SIZE_FOR_INT];
     snprintf(noOfV, sizeof(noOfV), "%lu", ciP->servicePathV.size());
-    std::string details = std::string("max *one* service-path allowed for subscriptions (") + noOfV + " given";
+    ciP->httpStatusCode           = SccOk;  // NGSIv1 is weird... it uses 200 OK at HTTP level for errors
+    std::string details           = std::string("max *one* service-path allowed for subscriptions (") + noOfV + " given";
 
     alarmMgr.badInput(clientIp, details);
 
     scr.subscribeError.errorCode.fill(SccBadRequest, "max one service-path allowed for subscriptions");
 
-    TIMED_RENDER(answer = scr.render(""));
+    TIMED_RENDER(answer = scr.toJsonV1());
     return answer;
   }
 
   TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->httpHeaders.xauthToken, ciP->servicePathV, ciP->httpHeaders.correlator));
-  TIMED_RENDER(answer = scr.render(""));
+  TIMED_RENDER(answer = scr.toJsonV1());
 
   parseDataP->scr.res.release();
 

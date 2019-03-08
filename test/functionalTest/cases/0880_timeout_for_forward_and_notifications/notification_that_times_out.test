@@ -52,8 +52,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${LISTENER_PORT}'/v1"
@@ -95,7 +94,7 @@ echo
 
 echo "04. Grep in brokers logfile to see that the notification failed and that the broker thread continued"
 echo "===================================================================================================="
-grep "(curl_easy_perform failed: Timeout was reached)" /tmp/contextBroker.log | awk -F "curl_easy_perform" '{ print "(curl_easy_perform" $2 }'
+grep "Timeout was reached" /tmp/contextBroker.log | awk -F 'notification failure for sender-thread: ' '{ print $2 }'
 echo
 echo
 
@@ -111,7 +110,7 @@ echo
 01. Register E1/T1/A1
 =====================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -125,7 +124,7 @@ Date: REGEX(.*)
 02. Availability-Subscribe to E1/A1 for accumulator, on a non-responding URL
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -142,7 +141,7 @@ Date: REGEX(.*)
 
 04. Grep in brokers logfile to see that the notification failed and that the broker thread continued
 ====================================================================================================
-(curl_easy_perform failed: Timeout was reached)
+Timeout was reached
 
 
 05. Dump notifications in accumulator - see nothing

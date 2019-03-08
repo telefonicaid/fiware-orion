@@ -59,16 +59,16 @@ TEST(NotifyContextRequest, json_ok)
   ci.outMimeType = JSON;
 
   lmTraceLevelSet(LmtDump, true);
-  std::string result = jsonTreat(testBuf, &ci, &reqData, NotifyContext, "notifyContextRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, NotifyContext, NULL);
   EXPECT_EQ("OK", result);
   lmTraceLevelSet(LmtDump, false);
 
   //
   // With the data obtained, render, present and release methods are exercised
   //
-  ncrP->present("");
+  std::vector<std::string> emptyV;
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  rendered = ncrP->render(V1, false, "");
+  rendered = ncrP->toJsonV1(false, emptyV, false, emptyV);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   ncrP->release();
@@ -97,7 +97,7 @@ TEST(NotifyContextRequest, json_badIsPattern)
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
-  std::string out = jsonTreat(testBuf, &ci, &reqData, NotifyContext, "notifyContextRequest", NULL);
+  std::string out = jsonTreat(testBuf, &ci, &reqData, NotifyContext, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -117,7 +117,6 @@ TEST(NotifyContextResponse, Constructor)
   utInit();
 
   EXPECT_EQ(SccOk, ncr.responseCode.code);
-  ncr.present("");
   ncr.release();
 
   StatusCode ec(SccOk, "4");
@@ -149,31 +148,33 @@ TEST(NotifyContextRequest, json_render)
   ncrP->subscriptionId.set("012345678901234567890123");
   ncrP->originator.set("http://www.tid.es/NotifyContextRequestUnitTest");
 
+  std::vector<std::string> emptyV;
+
   // 1. Without ContextResponseList
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  rendered = ncrP->render(V1, false, "");
+  rendered = ncrP->toJsonV1(false, emptyV, false, emptyV);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
   // 2. With ContextResponseList
   cerP = new ContextElementResponse();
-  cerP->contextElement.entityId.fill("E01", "EType", "false");
+  cerP->entity.fill("E01", "EType", "false");
   ncrP->contextElementResponseVector.push_back(cerP);
   cerP->statusCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  rendered = ncrP->render(V1, false, "");
+  rendered = ncrP->toJsonV1(false, emptyV, false, emptyV);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
   // 3. ContextResponseList with two instances
   cerP = new ContextElementResponse();
-  cerP->contextElement.entityId.fill("E02", "EType", "false");
+  cerP->entity.fill("E02", "EType", "false");
   ncrP->contextElementResponseVector.push_back(cerP);
   cerP->statusCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
-  rendered = ncrP->render(V1, false, "");
+  rendered = ncrP->toJsonV1(false, emptyV, false, emptyV);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   utExit();

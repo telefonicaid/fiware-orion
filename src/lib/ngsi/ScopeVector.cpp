@@ -39,9 +39,9 @@
 
 /* ****************************************************************************
 *
-* ScopeVector::render -
+* ScopeVector::toJsonV1 -
 */
-std::string ScopeVector::render(const std::string& indent, bool comma)
+std::string ScopeVector::toJsonV1(bool comma)
 {
   std::string out = "";
 
@@ -50,12 +50,12 @@ std::string ScopeVector::render(const std::string& indent, bool comma)
     return "";
   }
 
-  out += startTag(indent, "scope", true);
+  out += startTag("scope", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-     out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);
+     out += vec[ix]->toJsonV1(ix != vec.size() - 1);
   }
-  out += endTag(indent, comma, true);
+  out += endTag(comma, true);
 
   return out;
 }
@@ -66,19 +66,13 @@ std::string ScopeVector::render(const std::string& indent, bool comma)
 *
 * ScopeVector::check -
 */
-std::string ScopeVector::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string ScopeVector::check(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check()) != "OK")
     {
       char ixV[STRING_SIZE_FOR_INT];
       snprintf(ixV, sizeof(ixV), "%d", ix);
@@ -89,31 +83,6 @@ std::string ScopeVector::check
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* ScopeVector::present -
-*/
-void ScopeVector::present(const std::string& indent)
-{
-  if (vec.size() == 0)
-  {
-    LM_T(LmtPresent, ("%sNo scopes", indent.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%s%lu Scopes:", 
-		      indent.c_str(), 
-		      (uint64_t) vec.size()));
-  }
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent + "  ", ix);
-  }
 }
 
 

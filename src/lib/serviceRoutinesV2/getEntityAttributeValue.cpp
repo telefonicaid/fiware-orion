@@ -37,6 +37,7 @@
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutinesV2/getEntityAttribute.h"
+#include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "parse/forbiddenChars.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
@@ -80,67 +81,60 @@ std::string getEntityAttributeValue
   parseDataP->qcr.res.fill(compV[2], type, "false", EntityTypeEmptyOrNotEmpty, "");
 
   // Call standard op postQueryContext
+  OrionError oe;
   postQueryContext(ciP, components, compV, parseDataP);
-  attribute.fill(&parseDataP->qcrs.res, compV[4]);
+  attribute.fill(parseDataP->qcrs.res, compV[4], &oe);
 
-  if (attribute.oe.code != SccNone)
+  if (oe.code != SccNone)
   {
-    TIMED_RENDER(answer = attribute.oe.toJson());
-    ciP->httpStatusCode = attribute.oe.code;
+    TIMED_RENDER(answer = oe.toJson());
+    ciP->httpStatusCode = oe.code;
   }
   else
   {
     // save the original attribute type
-    std::string attributeType = attribute.pcontextAttribute->type;
+    std::string attributeType = attribute.contextAttributeP->type;
 
     // the same of the wrapped operation
     ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
 
     // Remove unwanted fields from attribute before rendering
-    attribute.pcontextAttribute->type = "";
-    attribute.pcontextAttribute->metadataVector.release();
+    attribute.contextAttributeP->type = "";
+    attribute.contextAttributeP->metadataVector.release();
 
     if (ciP->outMimeType == JSON)
     {
       // Do not use attribute name, change to 'value'
-      attribute.pcontextAttribute->name = "value";
+      attribute.contextAttributeP->name = "value";
 
-      TIMED_RENDER(answer = attribute.render(ciP->apiVersion,
-                                             ciP->httpHeaders.accepted("text/plain"),
+      StringList metadataFilter;
+      setMetadataFilter(ciP->uriParam, &metadataFilter);
+
+      TIMED_RENDER(answer = attribute.toJson(ciP->httpHeaders.accepted("text/plain"),
                                              ciP->httpHeaders.accepted("application/json"),
                                              ciP->httpHeaders.outformatSelect(),
                                              &(ciP->outMimeType),
                                              &(ciP->httpStatusCode),
                                              ciP->uriParamOptions[OPT_KEY_VALUES],
-                                             ciP->uriParam[URI_PARAM_METADATA],
-                                             EntityAttributeValueRequest,
-                                             false));
+                                             metadataFilter.stringV,
+                                             EntityAttributeValueRequest));
     }
     else
     {
-      if (attribute.pcontextAttribute->compoundValueP != NULL)
+      if (attribute.contextAttributeP->compoundValueP != NULL)
       {
-        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->render(ciP->apiVersion, ""));
-
-        if (attribute.pcontextAttribute->compoundValueP->isObject())
-        {
-          answer = "{" + answer + "}";
-        }
-        else if (attribute.pcontextAttribute->compoundValueP->isVector())
-        {
-          answer = "[" + answer + "]";
-        }
+        TIMED_RENDER(answer = attribute.contextAttributeP->compoundValueP->toJson());
       }
       else
       {
         if ((attributeType == DATE_TYPE) || (attributeType == DATE_TYPE_ALT))
         {
-          TIMED_RENDER(answer = isodate2str(attribute.pcontextAttribute->numberValue));
+          TIMED_RENDER(answer = isodate2str(attribute.contextAttributeP->numberValue));
         }
         else
         {
-          TIMED_RENDER(answer = attribute.pcontextAttribute->getValue());
-          if (attribute.pcontextAttribute->valueType == orion::ValueTypeString)
+          TIMED_RENDER(answer = attribute.contextAttributeP->getValue());
+          if (attribute.contextAttributeP->valueType == orion::ValueTypeString)
           {
             answer = '"' + answer + '"';
           }

@@ -35,18 +35,6 @@ echo
 echo "1: ++++++++++++++++++++"
 url="/v1/registry/contextEntities/entity01"
 payload='{
-  "metadatas" : [
-    {
-      "name" : "ID",
-      "type" : "string",
-      "value" : "1110"
-    },
-    {
-      "name" : "cm2",
-      "type" : "string",
-      "value" : "XXX"
-    }
-  ],
   "duration" : "PT1H",
   "providingApplication" : "http://kz.tid.es/abc"
 }'
@@ -60,7 +48,7 @@ echo
 --REGEXPECT--
 0: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -74,7 +62,7 @@ Date: REGEX(.*)
 
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -86,7 +74,7 @@ Date: REGEX(.*)
 
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 301
+Content-Length: 167
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

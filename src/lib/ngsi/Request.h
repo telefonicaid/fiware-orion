@@ -128,6 +128,10 @@ typedef enum RequestType
   BatchQueryRequest,
   BatchUpdateRequest,
 
+  // v2 registration
+  RegistrationRequest,
+  RegistrationsRequest,
+
   InvalidRequest = 100
 } RequestType;
 

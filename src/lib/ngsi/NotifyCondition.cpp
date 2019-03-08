@@ -61,9 +61,9 @@ NotifyCondition::NotifyCondition(NotifyCondition* ncP)
 
 /* ****************************************************************************
 *
-* NotifyCondition::render -
+* NotifyCondition::toJsonV1 -
 */
-std::string NotifyCondition::render(const std::string& indent, bool notLastInVector)
+std::string NotifyCondition::toJsonV1(bool notLastInVector)
 {
   std::string out = "";
 
@@ -73,11 +73,11 @@ std::string NotifyCondition::render(const std::string& indent, bool notLastInVec
   bool commaAfterCondValueList = restrictionRendered;
   bool commaAfterType          = condValueListRendered || restrictionRendered;
 
-  out += startTag(indent);
-  out += valueTag(indent + "  ", "type", type, commaAfterType);
-  out += condValueList.render(indent + "  ",   commaAfterCondValueList);
-  out += restriction.render(  indent + "  ",   commaAfterRestriction);
-  out += endTag(indent);
+  out += startTag();
+  out += valueTag("type", type, commaAfterType);
+  out += condValueList.toJsonV1(commaAfterCondValueList);
+  out += restriction.toJsonV1(commaAfterRestriction);
+  out += endTag();
 
   return out;
 }
@@ -93,7 +93,6 @@ std::string NotifyCondition::render(const std::string& indent, bool notLastInVec
 std::string NotifyCondition::check
 (
   RequestType         requestType,
-  const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
 )
@@ -112,46 +111,17 @@ std::string NotifyCondition::check
     return std::string("invalid notify condition type: /") + type + "/";
   }
 
-  if ((res = condValueList.check(requestType, indent, predetectedError, counter)) != "OK")
+  if ((res = condValueList.check()) != "OK")
   {
     return res;
   }
 
-  if ((res = restriction.check(requestType, indent, predetectedError, counter)) != "OK")
+  if ((res = restriction.check()) != "OK")
   {
     return res;
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* NotifyCondition::present -
-*/
-void NotifyCondition::present(const std::string& indent, int ix)
-{
-  std::string indent2 = indent + "  ";
-
-  if (ix == -1)
-  {
-    LM_T(LmtPresent, ("%sNotify Condition:", 
-		      indent2.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNotify Condition %d:", 
-		      indent2.c_str(), 
-		      ix));
-  }
-
-  LM_T(LmtPresent, ("%stype: %s", 
-		    indent2.c_str(), 
-		    type.c_str()));
-  condValueList.present(indent2);
-  restriction.present(indent2);
 }
 
 

@@ -40,6 +40,7 @@
 #include "orionTypes/QueryContextRequestVector.h"
 #include "orionTypes/QueryContextResponseVector.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/HttpHeaders.h"
 #include "rest/httpRequestSend.h"
 #include "rest/uriParamNames.h"
 #include "rest/OrionError.h"
@@ -75,7 +76,7 @@ static char* jsonPayloadClean(const char* payload)
 * 7. Freeing memory
 *
 */
-static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryContextResponse* qcrsP)
+static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryContextResponse* qcrsP)
 {
   std::string     ip;
   std::string     protocol;
@@ -95,8 +96,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
     //  Somehow, if we accepted this providing application, it is the brokers fault ...
     //  SccBadRequest should have been returned before, when it was registered!
     //
-    qcrsP->errorCode.fill(SccContextElementNotFound, "");
-    return;
+    return false;
   }
 
 
@@ -104,7 +104,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   // 2. Render the string of the request we want to forward
   //
   std::string  payload;
-  TIMED_RENDER(payload = qcrP->render(""));
+  TIMED_RENDER(payload = qcrP->toJsonV1());
 
   char* cleanPayload = (char*) payload.c_str();;
 
@@ -122,8 +122,11 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
 
   LM_T(LmtCPrForwardRequestPayload, ("forward queryContext request payload: %s", payload.c_str()));
 
-  std::map<std::string, std::string> noHeaders;
-  r = httpRequestSend(ip,
+  std::map<std::string, std::string>  noHeaders;
+  long long                           statusCode; // not used by the moment
+
+  r = httpRequestSend(fromIp,  // thread variable
+                      ip,
                       port,
                       protocol,
                       verb,
@@ -136,16 +139,15 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
                       ciP->httpHeaders.correlator,
                       "",
                       false,
-                      true,
                       &out,
+                      &statusCode,
                       noHeaders,
                       mimeType);
 
   if (r != 0)
   {
-    qcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding query");
-    LM_W(("Runtime Error (error forwarding 'Query' to providing application)"));
-    return;
+    LM_E(("Runtime Error (error '%s' forwarding 'Query' to providing application)", out.c_str()));
+    return false;
   }
 
   LM_T(LmtCPrForwardRequestPayload, ("forward queryContext response payload: %s", out.c_str()));
@@ -167,8 +169,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
     // It is not in the orion broker though, so 404 is returned
     //
     LM_W(("Other Error (context provider response to QueryContext is empty)"));
-    qcrsP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
-    return;
+    return false;
   }
 
   //
@@ -190,16 +191,15 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   // to make JSON parsing logic (internal to jsonTreat()) independent of ciP (in fact, parsing process
   // hasn't anything to do with connection).
   HttpStatusCode sc = ciP->httpStatusCode;
-  s = jsonTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, "queryContextResponse", NULL);
+  s = jsonTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, NULL);
   ciP->httpStatusCode = sc;
 
   if (s != "OK")
   {
     LM_W(("Internal Error (error parsing reply from prov app: %s)", errorMsg.c_str()));
-    qcrsP->errorCode.fill(SccContextElementNotFound, "");
     parseData.qcr.res.release();
     parseData.qcrs.res.release();
-    return;
+    return false;
   }
 
 
@@ -217,17 +217,14 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
     qcrsP->errorCode.fill(SccOk);
   }
 
-  if ((qcrsP->contextElementResponseVector.size() == 1) && (qcrsP->contextElementResponseVector[0]->statusCode.code == SccContextElementNotFound))
-  {
-    qcrsP->errorCode.fill(SccContextElementNotFound);
-  }
-
 
   //
   // 7. Freeing memory
   //
   parseData.qcr.res.release();
   parseData.qcrs.res.release();
+
+  return true;
 }
 
 
@@ -242,14 +239,14 @@ static bool forwardsPending(QueryContextResponse* qcrsP)
   {
     ContextElementResponse* cerP  = qcrsP->contextElementResponseVector[ix];
 
-    if (cerP->contextElement.providingApplicationList.size() != 0)
+    if (cerP->entity.providingApplicationList.size() != 0)
     {
       return true;
     }
 
-    for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
+    for (unsigned int aIx = 0 ; aIx < cerP->entity.attributeVector.size(); ++aIx)
     {
-      ContextAttribute* aP  = cerP->contextElement.contextAttributeVector[aIx];
+      ContextAttribute* aP  = cerP->entity.attributeVector[aIx];
 
       if (aP->providingApplication.get() != "")
       {
@@ -328,7 +325,7 @@ std::string postQueryContext
     // Bad Input detected by Mongo Backend - request ends here !
     OrionError oe(qcrsP->errorCode);
 
-    TIMED_RENDER(answer = oe.render());
+    TIMED_RENDER(answer = oe.toJsonV1());
     qcrP->release();
     return answer;
   }
@@ -342,7 +339,7 @@ std::string postQueryContext
     char cV[32];
 
     snprintf(cV, sizeof(cV), "%llu", *countP);
-    ciP->httpHeader.push_back("Fiware-Total-Count");
+    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
     ciP->httpHeaderValue.push_back(cV);
   }
 
@@ -360,7 +357,7 @@ std::string postQueryContext
   //
   if (forwardsPending(qcrsP) == false)
   {
-    TIMED_RENDER(answer = qcrsP->render(ciP->apiVersion, asJsonObject, ""));
+    TIMED_RENDER(answer = qcrsP->toJsonV1(asJsonObject));
 
     qcrP->release();
     return answer;
@@ -388,7 +385,7 @@ std::string postQueryContext
   for (unsigned int ix = 0 ; ix < qcrsP->contextElementResponseVector.size(); ++ix)
   {
     ContextElementResponse* cerP  = qcrsP->contextElementResponseVector[ix];
-    EntityId*               eP    = &cerP->contextElement.entityId;
+    EntityId en(cerP->entity.id, cerP->entity.type, cerP->entity.isPattern);
 
     //
     // If a Context Provider has been registered with an empty attribute list for
@@ -398,78 +395,88 @@ std::string postQueryContext
     // When there is a Context Provider in ContextElement::providingApplicationList, then the
     // request must be sent to that Context Provider also
     //
-    for (unsigned int ix = 0; ix < cerP->contextElement.providingApplicationList.size(); ++ix)
+    for (unsigned int ix = 0; ix < cerP->entity.providingApplicationList.size(); ++ix)
     {
       QueryContextRequest* requestP;
 
-      requestP = new QueryContextRequest(cerP->contextElement.providingApplicationList[ix].get(), eP, qcrP->attributeList);
+      requestP = new QueryContextRequest(cerP->entity.providingApplicationList[ix].get(), &en, qcrP->attributeList);
       requestV.push_back(requestP);
     }
 
-    for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
+    //
+    // What if the Attribute Vector of the ContextElementResponse is empty?
+    // For now, just push it into localQcrsP, but only if its local, i.e. its contextElement.providingApplicationList is empty
+    //
+    if ((cerP->entity.attributeVector.size() == 0) && (cerP->entity.providingApplicationList.size() == 0))
     {
-      ContextAttribute*    aP  = cerP->contextElement.contextAttributeVector[aIx];
-
-      //
-      // An empty providingApplication means the attribute is local
-      // In such a case, the response is already in our hand, we just need to copy it to responseV
-      //
-      if (aP->providingApplication.get() == "")
+      localQcrsP->contextElementResponseVector.push_back(new ContextElementResponse(&en, NULL));
+    }
+    else
+    {
+      for (unsigned int aIx = 0; aIx < cerP->entity.attributeVector.size(); ++aIx)
       {
-        if (aP->found == false)
+        ContextAttribute*    aP  = cerP->entity.attributeVector[aIx];
+
+        //
+        // An empty providingApplication means the attribute is local
+        // In such a case, the response is already in our hand, we just need to copy it to responseV
+        //
+        if (aP->providingApplication.get() == "")
         {
-          continue;  // Non-found pairs of entity/attribute are thrown away
+          if (aP->found == false)
+          {
+            continue;  // Non-found pairs of entity/attribute are thrown away
+          }
+
+
+          //
+          // So, where can we put this attribute?
+          // If we find a suitable existing contextElementResponse, we put it there,
+          // otherwise, we have to create a new contextElementResponse.
+          //
+          ContextElementResponse* contextElementResponseP = localQcrsP->contextElementResponseVector.lookup(&cerP->entity);
+
+          if (contextElementResponseP == NULL)
+          {
+            contextElementResponseP = new ContextElementResponse(&en, aP);
+            localQcrsP->contextElementResponseVector.push_back(contextElementResponseP);
+          }
+          else
+          {
+            contextElementResponseP->entity.attributeVector.push_back(new ContextAttribute(aP));
+          }
+
+          continue;
         }
 
 
         //
-        // So, where can we put this attribute?
-        // If we find a suitable existing contextElementResponse, we put it there,
-        // otherwise, we have to create a new contextElementResponse.
+        // Not a local attribute - aP->providingApplication is not empty
         //
-        ContextElementResponse* contextElementResponseP = localQcrsP->contextElementResponseVector.lookup(eP);
+        QueryContextRequest* requestP = requestV.lookup(aP->providingApplication.get(), &en);
 
-        if (contextElementResponseP == NULL)
+        if (requestP == NULL)
         {
-          contextElementResponseP = new ContextElementResponse(eP, aP);
-          localQcrsP->contextElementResponseVector.push_back(contextElementResponseP);
+          requestP = new QueryContextRequest(aP->providingApplication.get(), &en, aP->name);
+          requestV.push_back(requestP);
         }
         else
         {
-          contextElementResponseP->contextElement.contextAttributeVector.push_back(new ContextAttribute(aP));
-        }
+          EntityId* entityP = new EntityId(&en);
+          bool      pushed;
 
-        continue;
-      }
+          requestP->attributeList.push_back_if_absent(aP->name);
 
-
-      //
-      // Not a local attribute - aP->providingApplication is not empty
-      //
-      QueryContextRequest* requestP = requestV.lookup(aP->providingApplication.get(), eP);
-
-      if (requestP == NULL)
-      {
-        requestP = new QueryContextRequest(aP->providingApplication.get(), eP, aP->name);
-        requestV.push_back(requestP);
-      }
-      else
-      {
-        EntityId* entityP = new EntityId(eP);
-        bool      pushed;
-
-        requestP->attributeList.push_back_if_absent(aP->name);
-
-        pushed = requestP->entityIdVector.push_back_if_absent(entityP);
-        if (pushed == false)
-        {
-          entityP->release();
-          delete entityP;
+          pushed = requestP->entityIdVector.push_back_if_absent(entityP);
+          if (pushed == false)
+          {
+            entityP->release();
+            delete entityP;
+          }
         }
       }
     }
   }
-
 
   //
   // Any local results in localQcrsP?
@@ -484,6 +491,7 @@ std::string postQueryContext
   {
     delete localQcrsP;
   }
+
 
   //
   // Now, forward the Query requests, each in a separate thread (to be implemented) and
@@ -506,18 +514,26 @@ std::string postQueryContext
 
     qP = new QueryContextResponse();
     qP->errorCode.fill(SccOk);
-    queryForward(ciP, requestV[fIx], qP);
 
-    //
-    // Now, each ContextElementResponse of qP should be tested to see whether there
-    // is already an existing ContextElementResponse in responseV
-    responseV.push_back(qP);
+    if (queryForward(ciP, requestV[fIx], qP) == true)
+    {
+      //
+      // Each ContextElementResponse of qP should be tested to see whether there
+      // is already an existing ContextElementResponse in responseV
+      //
+      responseV.push_back(qP);
+    }
+    else
+    {
+      qP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
+      responseV.push_back(qP);
+    }
   }
 
   std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
   bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
 
-  TIMED_RENDER(answer = responseV.render(ciP->apiVersion, asJsonObject, details, qcrsP->errorCode.details));
+  TIMED_RENDER(answer = responseV.toJsonV1(asJsonObject, details, qcrsP->errorCode.details));
 
 
   //

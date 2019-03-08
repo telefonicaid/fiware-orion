@@ -25,16 +25,24 @@ Cache sub behaviour after update context operation
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPv4 -subCacheIval 1
+brokerStart CB 0 IPv4 -subCacheIval 2
 accumulatorStart --pretty-print
 
 --SHELL--
 
 #
-# Note we use sleep in some point to let time the DB to sync with regards to
-# cache timeSent value (WAIT_TIME = 1.5 * subCacheIval)
+# Note that we use sleep in three places to give the DB time to sync with regards to
+# the cache (WAIT_TIME = 2.5 seconds)
 #
-WAIT_TIME=1.5s
+# Under valgrind we need to sleep a little longer (3 seconds)
+#
+WAIT_TIME=2.5s
+if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
+then
+  WAIT_TIME=3s
+fi
+
+
 #
 # 01. Create subscription
 # 02. Create entity (triggers notification)
@@ -194,7 +202,7 @@ Date: REGEX(.*)
 03. Check subscription timesSent value (1)
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 370
+Content-Length: 392
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -210,6 +218,7 @@ Date: REGEX(.*)
         },
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
         "timesSent": 1
     },
     "status": "active",
@@ -250,7 +259,7 @@ Date: REGEX(.*)
 06. Check subscription timesSent value (2)
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 370
+Content-Length: 392
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -266,6 +275,7 @@ Date: REGEX(.*)
         },
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
         "timesSent": 2
     },
     "status": "active",
@@ -306,7 +316,7 @@ Date: REGEX(.*)
 09. Check subscription timesSent value (3)
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 370
+Content-Length: 392
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -322,6 +332,7 @@ Date: REGEX(.*)
         },
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
         "timesSent": 3
     },
     "status": "active",

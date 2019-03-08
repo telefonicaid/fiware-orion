@@ -1,11 +1,11 @@
-# Entity service paths
+# Service paths
+
+## Entity service paths
 
 Orion Context Broker supports hierarchical scopes, so entities can be
-assigned to a scope at creation time with
-[updateContext](walkthrough_apiv1.md#update-context-elements) (or [related
-convenience operation](walkthrough_apiv1.md#convenience-update-context)). Then,
-[queryContext](walkthrough_apiv1.md#query-context-operation) and [subscribeContext](walkthrough_apiv1.md#context-subscriptions) (and related
-convenience operations) can be also scoped to locate entities in the corresponding scopes.
+assigned to a scope [at creation time](walkthrough_apiv2.md#entity-creation).
+Then, [query](walkthrough_apiv2.md#query-entity) and [subscription](walkthrough_apiv2.md#subscriptions)
+can be also scoped to locate entities in the corresponding scopes.
 
 For example, consider an Orion-based application using the following
 scopes (shown in the figure):
@@ -18,18 +18,18 @@ scopes (shown in the figure):
 
 ![](ServicePathExample.png "ServicePathExample.png")
 
-The scope to use is specified using the “Fiware-ServicePath” HTTP in
-update/query request. For example, to create the entity “Tree1” of type
-"Tree" in “Parterre1” the following Fiware-ServicePath will be used:
+The scope to use is specified using the "Fiware-ServicePath" HTTP in
+update/query request. For example, to create the entity "Tree1" of type
+"Tree" in "Parterre1" the following Fiware-ServicePath will be used:
 
     Fiware-ServicePath: /Madrid/Gardens/ParqueNorte/Parterre1
 
-In order to search for “Tree1” in that scope, the same
+In order to search for "Tree1" in that scope, the same
 Fiware-ServicePath will be used.
 
 Scopes are hierarchical and hierarchical search can be done. In order to
 do that the '\#' special keyword is used. Thus, a queryContext with
-pattern entity id “.\*” of type “Tree” in `/Madrid/Gardens/ParqueNorte/#`
+pattern entity id ".\*" of type "Tree" in `/Madrid/Gardens/ParqueNorte/#`
 will return all the trees in ParqueNorte, Parterre1 and Parterre2.
 
 Finally, you can query for disjoint scopes, using a comma-separated list
@@ -70,13 +70,12 @@ Some additional remarks:
 
 -   Entities belongs to one (and only one) scope.
 
--   Fiware-ServicePath
-    header is included in NGSI10 notifyContext requests sent by Orion.
+-   Fiware-ServicePath header is included in notification requests sent by Orion.
 
 -   The scopes entities can be combined orthogonally with the
     [multi-service/multi-tenant
     functionality](multitenancy.md#multi-service-tenancy). In that case,
-    each “scope tree” lives in a different service/tenant and they can
+    each "scope tree" lives in a different service/tenant and they can
     use even the same names with complete database-based isolation. See
     figure below.
 
@@ -85,3 +84,23 @@ Some additional remarks:
 -   Current version doesn’t allow to change the scope to which an entity
     belongs through the API (a workaround is to modify the
     \_id.servicePath field in the entities collection directly).
+
+## Service paths in subscriptions and registrations
+
+While entities belong to services *and* servicepaths, subscriptions and registrations
+belong *only* to the service. The servicepath in subscriptions and registrations
+doesn't denote sense of belonging, but is the expression of the query associated
+to the subscription or registration.
+
+Taking this into consideration, the following rules apply:
+
+* Fiware-ServicePath header is ignored in `GET /v2/subscriptions/{id}` and
+  `GET /v2/registrations/{id}` operations, as the id fully qualifies the subscription or registration
+  to retrieve.
+* Fiware-ServicePath header is taken into account in `GET /v2/subscriptions` and `GET /v2/registrations`
+  in order to narrow down the results to subscriptions/registrations that use *exactly*
+  that service path as query.
+* At the present moment hierarchical service paths (i.e. the ones using ending with `#`) are not allowed
+  in registrations. We have [an issue about it at Github](https://github.com/telefonicaid/fiware-orion/issues/3078) and 
+  the limitation could be eventually solved.
+

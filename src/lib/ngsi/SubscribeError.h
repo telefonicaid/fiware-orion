@@ -43,12 +43,9 @@ typedef struct SubscribeError
   StatusCode      errorCode;          // Mandatory
 
   SubscribeError();
-  std::string render(RequestType requestType, const std::string& indent, bool comma = false);
-
-  std::string check(RequestType         requestType,
-                    const std::string&  indent,
-                    const std::string&  predetectedError,
-                    int                 counter);
+  std::string toJsonV1(RequestType requestType, bool comma);
+  std::string toJson(void);
+  std::string check(void);
 } SubscribeError;
 
 #endif  // SRC_LIB_NGSI_SUBSCRIBEERROR_H_

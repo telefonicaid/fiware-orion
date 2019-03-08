@@ -1,12 +1,1 @@
-"metadatas" : [
-  {
-    "name" : "Name",
-    "type" : "Type",
-    "value" : "Value"
-  },
-  {
-    "name" : "Name2",
-    "type" : "Type2",
-    "value" : "Value2"
-  }
-]
+"metadatas":[{"name":"Name","type":"Type","value":"Value"},{"name":"Name2","type":"Type2","value":"Value2"}]

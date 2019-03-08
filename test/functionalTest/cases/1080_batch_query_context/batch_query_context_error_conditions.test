@@ -35,12 +35,19 @@ brokerStart CB
 # 03. POST /v2/op/query, with 'entities' as an object, see error
 # 04. POST /v2/op/query, with E.* and 'attributes' as an object, not an array - see error
 # 05. POST /v2/op/query, with E.* and 'attributes' as an array of integers, not strings - see error
-# 06. POST /v2/op/query, with 'scopes' as an object, not an array - see error
-# 07. POST /v2/op/query, with a scope being a vector, not an object - see error
-# 08. POST /v2/op/query, with a scope without 'type' - see error
-# 09. POST /v2/op/query, with a scope without 'value' - see error
-# 10. POST /v2/op/query, with a scope whose 'type' is not a String - see error
-# 11. POST /v2/op/query, with a scope whose 'value' is not a String - see error
+# 06. POST /v2/op/query, with expression not an object - see error
+# 07. POST /v2/op/query, with expression empty - see error
+# 08. POST /v2/op/query, with q not a string - see error
+# 09. POST /v2/op/query, with q empty - see error
+# 10. POST /v2/op/query, with mq not a string - see error
+# 11. POST /v2/op/query, with mq empty - see error
+# 12. POST /v2/op/query, with georel not a string - see error
+# 13. POST /v2/op/query, with georel empty - see error
+# 14. POST /v2/op/query, with geometry not a string - see error
+# 15. POST /v2/op/query, with geometry empty - see error
+# 16. POST /v2/op/query, with coords not a string - see error
+# 17. POST /v2/op/query, with coords empty - see error
+# 18. POST /v2/op/query, with not all geo fields - see error
 #
 
 echo "01. POST /v2/op/query, with empty payload, see error"
@@ -101,11 +108,31 @@ echo
 echo
 
 
-echo "06. POST /v2/op/query, with 'scopes' as an object, not an array - see error"
-echo "==========================================================================="
+echo "06. POST /v2/op/query, with expression not an object - see error"
+echo "================================================================"
 payload='{
-  "scopes": {
-    "invalid": "scopes must be a vector"
+  "expression": [1, 2, 3]
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "07. POST /v2/op/query, with expression empty - see error"
+echo "========================================================"
+payload='{
+  "expression": { }
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "08. POST /v2/op/query, with q not a string - see error"
+echo "======================================================"
+payload='{
+  "expression": {
+    "q": 42
   }
 }'
 orionCurl --url /v2/op/query --payload "$payload"
@@ -113,70 +140,121 @@ echo
 echo
 
 
-echo "07. POST /v2/op/query, with a scope being a vector, not an object - see error"
-echo "============================================================================="
+echo "09. POST /v2/op/query, with q empty - see error"
+echo "==============================================="
 payload='{
-  "scopes": [
-    [ 1,2,3 ]
-  ]
+  "expression": {
+    "q": ""
+  }
 }'
 orionCurl --url /v2/op/query --payload "$payload"
 echo
 echo
 
 
-echo "08. POST /v2/op/query, with a scope without 'type' - see error"
-echo "=============================================================="
+echo "10. POST /v2/op/query, with mq not a string - see error"
+echo "======================================================="
 payload='{
-  "scopes": [
-    {
-      "value": "scope-value"
-    }
-  ]
+  "expression": {
+    "mq": 42
+  }
 }'
 orionCurl --url /v2/op/query --payload "$payload"
 echo
 echo
 
 
-echo "09. POST /v2/op/query, with a scope without 'value' - see error"
-echo "==============================================================="
+echo "11. POST /v2/op/query, with mq empty - see error"
+echo "================================================"
 payload='{
-  "scopes": [
-    {
-      "type": "scope-type"
-    }
-  ]
+  "expression": {
+    "mq": ""
+  }
 }'
 orionCurl --url /v2/op/query --payload "$payload"
 echo
 echo
 
 
-echo "10. POST /v2/op/query, with a scope whose 'type' is not a String - see error"
-echo "============================================================================"
+echo "12. POST /v2/op/query, with georel not a string - see error"
+echo "=========================================================="
 payload='{
-  "scopes": [
-    {
-      "type": 24,
-      "value": "scope-value"
-    }
-  ]
+  "expression": {
+    "georel": 42
+  }
 }'
 orionCurl --url /v2/op/query --payload "$payload"
 echo
 echo
 
 
-echo "11. POST /v2/op/query, with a scope whose 'value' is not a String - see error"
-echo "============================================================================="
+echo "13. POST /v2/op/query, with georel empty - see error"
+echo "===================================================="
 payload='{
-  "scopes": [
-    {
-      "type": "scope-type",
-      "value": 25
-    }
-  ]
+  "expression": {
+    "georel": ""
+  }
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "14. POST /v2/op/query, with geometry not a string - see error"
+echo "============================================================="
+payload='{
+  "expression": {
+    "geometry": 42
+  }
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "15. POST /v2/op/query, with geometry empty - see error"
+echo "======================================================"
+payload='{
+  "expression": {
+    "geometry": ""
+  }
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "16. POST /v2/op/query, with coords not a string - see error"
+echo "==========================================================="
+payload='{
+  "expression": {
+    "coords": 42
+  }
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "17. POST /v2/op/query, with coords empty - see error"
+echo "===================================================="
+payload='{
+  "expression": {
+    "coords": ""
+  }
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "18. POST /v2/op/query, with not all geo fields - see error"
+echo "=========================================================="
+payload='{
+  "expression": {
+    "geometry": "point",
+    "coord": "20,10"
+  }
 }'
 orionCurl --url /v2/op/query --payload "$payload"
 echo
@@ -243,97 +321,195 @@ Date: REGEX(.*)
 05. POST /v2/op/query, with E.* and 'attributes' as an array of integers, not strings - see error
 =================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 82
+Content-Length: 83
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "only JSON Strings allowed in attribute list",
+    "description": "only JSON Strings allowed in attributes list",
     "error": "BadRequest"
 }
 
 
-06. POST /v2/op/query, with 'scopes' as an object, not an array - see error
-===========================================================================
+06. POST /v2/op/query, with expression not an object - see error
+================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 78
+Content-Length: 66
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "the field /scopes/ must be a JSON array",
+    "description": "expression is not an object",
     "error": "BadRequest"
 }
 
 
-07. POST /v2/op/query, with a scope being a vector, not an object - see error
-=============================================================================
+07. POST /v2/op/query, with expression empty - see error
+========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 65
+Content-Length: 58
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "scope is not a JSON object",
+    "description": "expression is empty",
     "error": "BadRequest"
 }
 
 
-08. POST /v2/op/query, with a scope without 'type' - see error
-==============================================================
+08. POST /v2/op/query, with q not a string - see error
+======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 59
+Content-Length: 56
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "scope without a type",
+    "description": "q is not a string",
     "error": "BadRequest"
 }
 
 
-09. POST /v2/op/query, with a scope without 'value' - see error
-===============================================================
+09. POST /v2/op/query, with q empty - see error
+===============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 60
+Content-Length: 49
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "scope without a value",
+    "description": "q is empty",
     "error": "BadRequest"
 }
 
 
-10. POST /v2/op/query, with a scope whose 'type' is not a String - see error
-============================================================================
+10. POST /v2/op/query, with mq not a string - see error
+=======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 71
+Content-Length: 57
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for scope type",
+    "description": "mq is not a string",
     "error": "BadRequest"
 }
 
 
-11. POST /v2/op/query, with a scope whose 'value' is not a String - see error
-=============================================================================
+11. POST /v2/op/query, with mq empty - see error
+================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 89
+Content-Length: 50
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for scope value (must be string)",
+    "description": "mq is empty",
+    "error": "BadRequest"
+}
+
+
+12. POST /v2/op/query, with georel not a string - see error
+==========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 61
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "georel is not a string",
+    "error": "BadRequest"
+}
+
+
+13. POST /v2/op/query, with georel empty - see error
+====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 54
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "georel is empty",
+    "error": "BadRequest"
+}
+
+
+14. POST /v2/op/query, with geometry not a string - see error
+=============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "geometry is not a string",
+    "error": "BadRequest"
+}
+
+
+15. POST /v2/op/query, with geometry empty - see error
+======================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "geometry is empty",
+    "error": "BadRequest"
+}
+
+
+16. POST /v2/op/query, with coords not a string - see error
+===========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 61
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "coords is not a string",
+    "error": "BadRequest"
+}
+
+
+17. POST /v2/op/query, with coords empty - see error
+====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 54
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "coords is empty",
+    "error": "BadRequest"
+}
+
+
+18. POST /v2/op/query, with not all geo fields - see error
+==========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 119
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "partial geo expression: geometry, georel and coords have to be provided together",
     "error": "BadRequest"
 }
 

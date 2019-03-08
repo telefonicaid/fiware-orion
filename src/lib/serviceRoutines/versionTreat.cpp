@@ -32,6 +32,9 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/compileInfo.h"
+#include "common/defaultValues.h"
+#include "rest/HttpHeaders.h"
+#include "rest/rest.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -41,7 +44,7 @@
 
 /* ****************************************************************************
 *
-* version - 
+* version -
 */
 static char versionString[30] = { 'a', 'l', 'p', 'h', 'a', 0 };
 
@@ -49,7 +52,7 @@ static char versionString[30] = { 'a', 'l', 'p', 'h', 'a', 0 };
 
 /* ****************************************************************************
 *
-* versionSet - 
+* versionSet -
 */
 void versionSet(const char* version)
 {
@@ -68,7 +71,7 @@ char* versionGet()
 
 /* ****************************************************************************
 *
-* versionTreat - 
+* versionTreat -
 */
 std::string versionTreat
 (
@@ -78,6 +81,23 @@ std::string versionTreat
   ParseData*                 parseDataP
 )
 {
+  if (isOriginAllowedForCORS(ciP->httpHeaders.origin))
+  {
+    ciP->httpHeader.push_back(HTTP_ACCESS_CONTROL_ALLOW_ORIGIN);
+    // If any origin is allowed, the header is always sent with the value "*"
+    if (strcmp(corsOrigin, "__ALL") == 0)
+    {
+      ciP->httpHeaderValue.push_back("*");
+    }
+    // If a specific origin is allowed, the header is only sent if the origins match
+    else
+    {
+      ciP->httpHeaderValue.push_back(corsOrigin);
+    }
+    ciP->httpHeader.push_back(HTTP_ACCESS_CONTROL_EXPOSE_HEADERS);
+    ciP->httpHeaderValue.push_back(CORS_EXPOSED_HEADERS);
+  }
+  
   std::string out     = "";
   std::string indent  = "";
 
@@ -88,14 +108,16 @@ std::string versionTreat
 #endif
 
   out += "{\n";
-  out += startTag(indent, "orion");
-  out += valueTag(indent + "  ", "version",       versionString,   true);
-  out += valueTag(indent + "  ", "uptime",        uptime,          true);
-  out += valueTag(indent + "  ", "git_hash",      GIT_HASH,        true);
-  out += valueTag(indent + "  ", "compile_time",  COMPILE_TIME,    true);
-  out += valueTag(indent + "  ", "compiled_by",   COMPILED_BY,     true);
-  out += valueTag(indent + "  ", "compiled_in",   COMPILED_IN,     false);
-  out += endTag(indent, false, false);
+  out += "\"orion\" : {\n";
+  out += "  \"version\" : \"" + std::string(versionString) + "\",\n";
+  out += "  \"uptime\" : \"" + std::string(uptime) + "\",\n";
+  out += "  \"git_hash\" : \"" + std::string(GIT_HASH) + "\",\n";
+  out += "  \"compile_time\" : \"" + std::string(COMPILE_TIME) + "\",\n";
+  out += "  \"compiled_by\" : \"" + std::string(COMPILED_BY) + "\",\n";
+  out += "  \"compiled_in\" : \"" + std::string(COMPILED_IN) + "\",\n";
+  out += "  \"release_date\" : \"" + std::string(RELEASE_DATE) + "\",\n";
+  out += "  \"doc\" : \"" + std::string(API_DOC) + "\"\n";
+  out += "}\n";
   out += "}\n";
 
   ciP->httpStatusCode = SccOk;

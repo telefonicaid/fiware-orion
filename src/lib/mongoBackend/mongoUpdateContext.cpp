@@ -58,6 +58,7 @@ HttpStatusCode mongoUpdateContext
   const std::string&                    xauthToken,
   const std::string&                    fiwareCorrelator,
   const std::string&                    ngsiV2AttrsFormat,
+  const bool&                           forcedUpdate,
   ApiVersion                            apiVersion,
   Ngsiv2Flavour                         ngsiv2Flavour
 )
@@ -81,17 +82,18 @@ HttpStatusCode mongoUpdateContext
   else
   {
     /* Process each ContextElement */
-    for (unsigned int ix = 0; ix < requestP->contextElementVector.size(); ++ix)
+    for (unsigned int ix = 0; ix < requestP->entityVector.size(); ++ix)
     {
-      processContextElement(requestP->contextElementVector[ix],
+      processContextElement(requestP->entityVector[ix],
                             responseP,
-                            requestP->updateActionType.get(),
+                            requestP->updateActionType,
                             tenant,
                             servicePathV,
                             uriParams,
                             xauthToken,
                             fiwareCorrelator,
                             ngsiV2AttrsFormat,
+                            forcedUpdate,
                             apiVersion,
                             ngsiv2Flavour);
     }

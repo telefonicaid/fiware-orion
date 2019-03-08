@@ -56,23 +56,23 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
   EXPECT_EQ("OK", testDataFromFile(testBuf,     sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   lmTraceLevelSet(LmtDump, true);
-  out = jsonTreat(testBuf, &ci, &parseData, UpdateContextAvailabilitySubscription, "updateContextAvailabilitySubscriptionRequest", NULL);
+  out = jsonTreat(testBuf, &ci, &parseData, UpdateContextAvailabilitySubscription, NULL);
   lmTraceLevelSet(LmtDump, false);
   EXPECT_EQ("OK", out) << "this test should be OK";
 
   UpdateContextAvailabilitySubscriptionRequest* ucasP = &parseData.ucas.res;
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out = ucasP->render("");
+  out = ucasP->toJsonV1();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  out = ucasP->check("", "predetected error", 0);
+  out = ucasP->check("predetected error", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   ucasP->duration.set("eeeee");
-  out = ucasP->check("", "", 0);
+  out = ucasP->check("", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -99,7 +99,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_invalidIsPattern)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  std::string out = jsonTreat(testBuf, &ci, &reqData, UpdateContextAvailabilitySubscription, "updateContextAvailabilitySubscriptionRequest", NULL);
+  std::string out = jsonTreat(testBuf, &ci, &reqData, UpdateContextAvailabilitySubscription, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -125,7 +125,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, response)
 
   ucas.subscriptionId.set("012345678901234567890123");
 
-  out = ucas.check("", "", 0);
+  out = ucas.check("");
   EXPECT_EQ("OK", out);
 
   utExit();

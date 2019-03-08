@@ -55,7 +55,7 @@ TEST(UnsubscribeContextAvailabilityRequest, constructorAndCheck)
 
   std::string   out;
 
-  out = ucar2.check("", "", 0);
+  out = ucar2.check("");
   EXPECT_EQ("OK", out);
 
   utExit();
@@ -82,7 +82,7 @@ TEST(UnsubscribeContextAvailabilityRequest, badSubscriptionId_json)
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
   lmTraceLevelSet(LmtDump, true);
-  std::string out = jsonTreat(testBuf, &ci, &reqData, UnsubscribeContextAvailability, "unsubscribeContextAvailabilityRequest", NULL);
+  std::string out = jsonTreat(testBuf, &ci, &reqData, UnsubscribeContextAvailability, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   lmTraceLevelSet(LmtDump, false);

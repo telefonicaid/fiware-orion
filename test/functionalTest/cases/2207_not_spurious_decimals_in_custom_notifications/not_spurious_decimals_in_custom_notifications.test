@@ -1,0 +1,185 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Avoid printing spurious decimals in custom notifications
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart
+
+--SHELL--
+
+#
+# 01. Create subscription for E1 with only URL in template part
+# 02. Create E1 with temperature: 34 (no decimals)
+# 03. Update E1 temperature: 34.4 (1 decimal)
+# 04. Update E1 temperature: 34.1234567 (7 decimals)
+# 05. Dump accumulator, see 3 notifications, all of them with the correct number of decimals
+#
+
+echo "01. Create subscription with custom notification"
+echo "================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpCustom": {
+      "url":     "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "headers": { "Content-Type": "text/plain" },
+      "payload": "The temperature is ${temperature} degrees"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E1 with temperature: 34 (no decimals)"
+echo "================================================"
+payload='{
+  "id": "E",
+  "type": "T",
+  "temperature": 34
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "03. Update E1 temperature: 34.4 (1 decimal)"
+echo "==========================================="
+payload='{
+  "temperature": 34.4
+}'
+orionCurl --url /v2/entities/E/attrs?options=keyValues -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "04. Update E1 temperature: 34.1234567 (7 decimals)"
+echo "=================================================="
+payload='{
+  "temperature": 34.1234567
+}'
+orionCurl --url /v2/entities/E/attrs?options=keyValues -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. Dump accumulator, see 3 notifications, all of them with the correct number of decimals"
+echo "=========================================================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription with custom notification
+================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create E1 with temperature: 34 (no decimals)
+================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Update E1 temperature: 34.4 (1 decimal)
+===========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Update E1 temperature: 34.1234567 (7 decimals)
+==================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Dump accumulator, see 3 notifications, all of them with the correct number of decimals
+==========================================================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 29
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+The temperature is 34 degrees=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 31
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+The temperature is 34.4 degrees=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 37
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+The temperature is 34.1234567 degrees=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

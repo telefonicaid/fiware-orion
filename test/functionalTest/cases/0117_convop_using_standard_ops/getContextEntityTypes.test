@@ -60,8 +60,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -89,8 +88,7 @@ payload='{
     "attributes": [
       {
         "name": "A2",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -118,8 +116,7 @@ payload='{
     "attributes": [
       {
         "name": "A3",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -147,8 +144,7 @@ payload='{
     "attributes": [
       {
         "name": "A4",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -176,8 +172,7 @@ payload='{
     "attributes": [
       {
         "name": "A5",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -250,7 +245,7 @@ echo
 01. Register E1/T1/A1 with Service-Path /A1
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -264,7 +259,7 @@ Date: REGEX(.*)
 02. Register E1/T1/A2 with Service-Path /A2
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -278,7 +273,7 @@ Date: REGEX(.*)
 03. Register E1//A3 (type is empty) with Service-Path /A3
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -292,7 +287,7 @@ Date: REGEX(.*)
 04. Register E1/T2/A4 with Service-Path /A4
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -306,7 +301,7 @@ Date: REGEX(.*)
 05. Register E1/T2/A5 with Service-Path /A5
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -320,7 +315,7 @@ Date: REGEX(.*)
 06. Discover entity type T1 using /v1/registry/contextEntityTypes/T1 with Service-Path /A1
 ==========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 448
+Content-Length: 208
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -331,7 +326,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -353,7 +347,7 @@ Date: REGEX(.*)
 07. Discover entity type T1 using /v1/registry/contextEntityTypes/T1 with Service-Path /A2
 ==========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 448
+Content-Length: 208
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -364,7 +358,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A2", 
                         "type": "string"
                     }
@@ -386,7 +379,7 @@ Date: REGEX(.*)
 08. Discover entity type T1 using /v1/registry/contextEntityTypes/T1 with Service-Path /A1,/A2
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 852
+Content-Length: 382
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -397,7 +390,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -416,7 +408,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A2", 
                         "type": "string"
                     }
@@ -438,7 +429,7 @@ Date: REGEX(.*)
 09. Discover entity type T2 using /v1/registry/contextEntityTypes/T2 with Service-Path /A4
 ==========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 448
+Content-Length: 208
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -449,7 +440,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A4", 
                         "type": "string"
                     }
@@ -471,7 +461,7 @@ Date: REGEX(.*)
 10. Discover entity type T2 using /v1/registry/contextEntityTypes/T2 with Service-Path /A5
 ==========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 448
+Content-Length: 208
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -482,7 +472,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A5", 
                         "type": "string"
                     }
@@ -504,7 +493,7 @@ Date: REGEX(.*)
 11. Discover entity type T2 using /v1/registry/contextEntityTypes/T2 with Service-Path /A4,/A5
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 852
+Content-Length: 382
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -515,7 +504,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A4", 
                         "type": "string"
                     }
@@ -534,7 +522,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A5", 
                         "type": "string"
                     }
@@ -556,7 +543,7 @@ Date: REGEX(.*)
 12. Discover entity type T1 using /v1/registry/contextEntityTypes/T1 without Service-Path
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 852
+Content-Length: 382
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -567,7 +554,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -586,7 +572,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A2", 
                         "type": "string"
                     }
@@ -608,7 +593,7 @@ Date: REGEX(.*)
 13. Discover entity type T2 using /v1/registry/contextEntityTypes/T2 with Service-Path /#
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 852
+Content-Length: 382
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -619,7 +604,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A4", 
                         "type": "string"
                     }
@@ -638,7 +622,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A5", 
                         "type": "string"
                     }

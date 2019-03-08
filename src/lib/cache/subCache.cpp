@@ -207,20 +207,6 @@ void EntityInfo::release(void)
 
 /* ****************************************************************************
 *
-* EntityInfo::present -
-*/
-void EntityInfo::present(const std::string& prefix)
-{
-  LM_T(LmtPresent, ("%sid:        %s", prefix.c_str(), entityId.c_str()));
-  LM_T(LmtPresent, ("%sisPattern: %s", prefix.c_str(), FT(isPattern)));
-  LM_T(LmtPresent, ("%stype:      %s", prefix.c_str(), entityType.c_str()));
-  LM_T(LmtPresent, ("%sisTypePattern: %s", prefix.c_str(), FT(isTypePattern)));
-}
-
-
-
-/* ****************************************************************************
-*
 * SubCache -
 */
 typedef struct SubCache
@@ -756,6 +742,8 @@ void subCacheItemInsert
   int64_t                            lastNotificationTime,
   int64_t                            lastNotificationSuccessTime,
   int64_t                            lastNotificationFailureTime,
+  int64_t                            lastSuccessCode,
+  const std::string&                 lastFailureReason,
   StringFilter*                      stringFilterP,
   StringFilter*                      mdStringFilterP,
   const std::string&                 status,
@@ -785,6 +773,8 @@ void subCacheItemInsert
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->lastFailure           = lastNotificationFailureTime;
   cSubP->lastSuccess           = lastNotificationSuccessTime;
+  cSubP->lastFailureReason     = lastFailureReason;
+  cSubP->lastSuccessCode       = lastSuccessCode;
   cSubP->renderFormat          = renderFormat;
   cSubP->next                  = NULL;
   cSubP->count                 = (notificationDone == true)? 1 : 0;
@@ -951,93 +941,6 @@ void subCacheStatisticsReset(const char* by)
 
 /* ****************************************************************************
 *
-* subCacheEntryPresent -
-*/
-void subCacheEntryPresent(CachedSubscription* cSubP)
-{
-  // FIXME P4: complete with the rest of fields in CachedSubscription
-
-  std::string entityIdInfo;
-  std::string attributes;
-  std::string metadata;
-  std::string notifyCondition;
-
-  for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
-  {
-    entityIdInfo +=  cSubP->entityIdInfos[ix]->entityId + "-" + cSubP->entityIdInfos[ix]->entityType;
-    if (ix != cSubP->entityIdInfos.size() -1)
-    {
-      entityIdInfo += ",";
-    }
-  }
-
-  for (unsigned int ix = 0; ix < cSubP->attributes.size(); ++ix)
-  {
-    attributes += cSubP->attributes[ix];
-    if (ix != cSubP->attributes.size() -1)
-    {
-      attributes += ",";
-    }
-  }
-
-  for (unsigned int ix = 0; ix < cSubP->metadata.size(); ++ix)
-  {
-    metadata += cSubP->metadata[ix];
-    if (ix != cSubP->metadata.size() -1)
-    {
-      metadata += ",";
-    }
-  }
-
-  for (unsigned int ix = 0; ix < cSubP->notifyConditionV.size(); ++ix)
-  {
-    notifyCondition += cSubP->notifyConditionV[ix];
-    if (ix != cSubP->notifyConditionV.size() -1)
-    {
-      notifyCondition += ",";
-    }
-  }
-
-  LM_T(LmtSubCache, ("o %s (tenant: %s, subservice: %s, entities: <%s>, attributes: <%s>, metadata: <%s>, "
-                     "notifyCondition: <%s>, LNT: %lu, count: %lu, status: %s, expiration: %lu, THR: %d)",
-                     cSubP->subscriptionId,
-                     cSubP->tenant,
-                     cSubP->servicePath,
-                     entityIdInfo.c_str(),
-                     attributes.c_str(),
-                     metadata.c_str(),
-                     notifyCondition.c_str(),
-                     cSubP->lastNotificationTime,
-                     cSubP->count,
-                     cSubP->status.c_str(),
-                     cSubP->expirationTime,
-                     cSubP->throttling));
-}
-
-
-/* ****************************************************************************
-*
-* subCachePresent -
-*/
-void subCachePresent(const char* title)
-{
-  CachedSubscription* cSubP = subCache.head;
-
-  LM_T(LmtSubCache, ("----------- %s ------------", title));
-
-  while (cSubP != NULL)
-  {
-    subCacheEntryPresent(cSubP);
-    cSubP = cSubP->next;
-  }
-
-  LM_T(LmtSubCache, ("--------------------------------"));
-}
-
-
-
-/* ****************************************************************************
-*
 * subCacheItemRemove -
 */
 int subCacheItemRemove(CachedSubscription* cSubP)
@@ -1134,10 +1037,12 @@ void subCacheRefresh(void)
 */
 typedef struct CachedSubSaved
 {
-  int64_t  lastNotificationTime;
-  int64_t  count;
-  int64_t  lastFailure;
-  int64_t  lastSuccess;
+  int64_t      lastNotificationTime;
+  int64_t      count;
+  int64_t      lastFailure;
+  int64_t      lastSuccess;
+  std::string  lastFailureReason;
+  int64_t      lastSuccessCode;
 } CachedSubSaved;
 
 
@@ -1200,6 +1105,8 @@ void subCacheSync(void)
     cssP->count                = cSubP->count;
     cssP->lastFailure          = cSubP->lastFailure;
     cssP->lastSuccess          = cSubP->lastSuccess;
+    cssP->lastFailureReason    = cSubP->lastFailureReason;
+    cssP->lastSuccessCode      = cSubP->lastSuccessCode;
 
     savedSubV[cSubP->subscriptionId] = cssP;
     cSubP = cSubP->next;
@@ -1265,11 +1172,15 @@ void subCacheSync(void)
                              cssP->count,
                              cssP->lastNotificationTime,
                              cssP->lastFailure,
-                             cssP->lastSuccess);
+                             cssP->lastSuccess,
+                             cssP->lastFailureReason,
+                             cssP->lastSuccessCode);
 
       // Keeping lastFailure and lastSuccess in sub cache
-      cSubP->lastFailure = cssP->lastFailure;
-      cSubP->lastSuccess = cssP->lastSuccess;
+      cSubP->lastFailure       = cssP->lastFailure;
+      cSubP->lastSuccess       = cssP->lastSuccess;
+      cSubP->lastFailureReason = cssP->lastFailureReason;
+      cSubP->lastSuccessCode   = cssP->lastSuccessCode;
     }
 
     cSubP = cSubP->next;
@@ -1347,7 +1258,14 @@ extern bool noCache;
 *
 * If 'errors' == 0, then the subscription is marked as non-erroneous.
 */
-void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::string& subscriptionId, int errors)
+void subCacheItemNotificationErrorStatus
+(
+  const std::string&  tenant,
+  const std::string&  subscriptionId,
+  int                 errors,
+  long long           statusCode,
+  const std::string&  failureReason
+)
 {
   if (noCache)
   {
@@ -1357,11 +1275,13 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
 
     if (errors == 0)
     {
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, -1, now);  // lastFailure == -1
+      // count == 0 (inc is done in another part), lastFailure == -1, failureReason == -1
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, -1, now, "", statusCode);
     }
     else
     {
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, now, -1);  // lastSuccess == -1, count == 0
+      // count == 0 (inc is done in another part), lastSuccess == -1, failureReason == -1
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, now, -1, failureReason, -1);
     }
 
     return;
@@ -1384,11 +1304,13 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
 
   if (errors == 0)
   {
-    subP->lastSuccess  = now;
+    subP->lastSuccess     = now;
+    subP->lastSuccessCode = statusCode;
   }
   else
   {
-    subP->lastFailure  = now;
+    subP->lastFailure       = now;
+    subP->lastFailureReason = failureReason;
   }
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");

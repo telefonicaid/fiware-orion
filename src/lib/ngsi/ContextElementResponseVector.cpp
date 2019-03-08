@@ -32,22 +32,24 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/RenderFormat.h"
+#include "common/JsonHelper.h"
 #include "ngsi/ContextElementResponseVector.h"
 
 
 
 /* ****************************************************************************
 *
-* ContextElementResponseVector::render -
+* ContextElementResponseVector::toJsonV1 -
 */
-std::string ContextElementResponseVector::render
+std::string ContextElementResponseVector::toJsonV1
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         requestType,
-  const std::string&  indent,
-  bool                comma,
-  bool                omitAttributeValues
+  bool                             asJsonObject,
+  RequestType                      requestType,
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter,
+  bool                             comma,
+  bool                             omitAttributeValues
 )
 {
   std::string out = "";
@@ -57,14 +59,14 @@ std::string ContextElementResponseVector::render
     return "";
   }
 
-  out += startTag(indent, "contextResponses", true);
+  out += startTag("contextResponses", true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(apiVersion, asJsonObject, requestType, indent + "  ", ix < (vec.size() - 1), omitAttributeValues);
+    out += vec[ix]->toJsonV1(asJsonObject, requestType, attrsFilter, blacklist, metadataFilter, ix < (vec.size() - 1), omitAttributeValues);
   }
 
-  out += endTag(indent, comma, true);
+  out += endTag(comma, true);
 
   return out;
 }
@@ -79,25 +81,18 @@ std::string ContextElementResponseVector::toJson
 (
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             blacklist
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter
 )
 {
-  std::string out;
+  JsonVectorHelper jvh;
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += (renderFormat == NGSI_V2_VALUES)? "[": "{";
-    out += vec[ix]->toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
-    out += (renderFormat == NGSI_V2_VALUES)? "]": "}";
-
-    if (ix != vec.size() - 1)
-    {
-      out += ",";
-    }
+    jvh.addRaw(vec[ix]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter));
   }
 
-  return out;
+  return jvh.str();
 }
 
 
@@ -110,7 +105,6 @@ std::string ContextElementResponseVector::check
 (
   ApiVersion          apiVersion,
   RequestType         requestType,
-  const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
 )
@@ -119,31 +113,13 @@ std::string ContextElementResponseVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion, requestType, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType, predetectedError, counter)) != "OK")
     {
       return res;
     }
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextElementResponseVector::present -
-*/
-void ContextElementResponseVector::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%s%lu ContextElementResponses", 
-		    indent.c_str(), 
-		    (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent + "  ", ix);
-  }
 }
 
 
@@ -204,11 +180,11 @@ void ContextElementResponseVector::release(void)
 *
 * ContextElementResponseVector::lookup -
 */
-ContextElementResponse* ContextElementResponseVector::lookup(EntityId* eP, HttpStatusCode code)
+ContextElementResponse* ContextElementResponseVector::lookup(Entity* eP, HttpStatusCode code)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    if (vec[ix]->contextElement.entityId.equal(eP) == true)
+    if (vec[ix]->entity.equal(eP) == true)
     {
       if ((code == SccNone) || (vec[ix]->statusCode.code == code))
       {

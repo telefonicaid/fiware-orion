@@ -24,10 +24,6 @@
 #
 # 1: Append entity E1 with two different attributes A1 and A2
 # 2. JsonAttributeObjectQuery for the entity E1 for attributes A1 and A2
-# 3. Append entity E2 with two attributes with identical names 'A3', but different meta IDs
-# 4. Normal Query for the entity E2 for attribute A3 - both attributes are returned
-# 5. JsonAttributeObjectQuery Query for the entity E2 for attribute A3 - only one attribute is returned
-#
 #
 
 --NAME--
@@ -38,6 +34,7 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
+echo "==========================================================="
 echo "1: Append entity E1 with two different attributes A1 and A2"
 url="/v1/updateContext"
 payload='{
@@ -66,6 +63,8 @@ orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
+
+echo "======================================================================"
 echo "2. JsonAttributeObjectQuery for the entity E1 for attributes A1 and A2"
 url="/v1/queryContext"
 payload='{
@@ -82,85 +81,12 @@ orionCurl --url "$url" --payload "$payload" --urlParams attributeFormat=object
 echo
 echo
 
-echo "3. Append entity E2 with two attributes with identical names 'A3', but different meta IDs"
-url="/v1/updateContext"
-payload='{
-    "contextElements": [
-        {
-            "type": "Test",
-            "isPattern": "false",
-            "id": "E2",
-            "attributes": [
-            {
-                "name": "A3",
-                "type": "test",
-                "value": "1",
-                "metadatas": [
-                  {
-                    "name": "ID",
-                    "type": "integer",
-                    "value": "A3-1"
-                  }
-                ]
-            },
-            {
-                "name": "A3",
-                "type": "test",
-                "value": "2",
-                "metadatas": [
-                  {
-                    "name": "ID",
-                    "type": "integer",
-                    "value": "A3-2"
-                  }
-                ]
-            }
-            ]
-        }
-    ],
-    "updateAction": "APPEND"
-}'
-orionCurl --url "$url" --payload "$payload"
-echo
-echo
-
-echo "4. Normal Query for the entity E2 for attribute A3 - both attributes are returned"
-url="/v1/queryContext"
-payload='{
-    "entities": [
-        {
-            "type": "Test",
-            "isPattern": "false",
-            "id": "E2"
-        }
-    ],
-    "attributes": [ "A3" ]
-}'
-orionCurl --url "$url" --payload "$payload"
-echo
-echo
-
-echo "5. JsonAttributeObjectQuery Query for the entity E2 for attribute A3 - only one attribute is returned"
-url="/v1/queryContext"
-payload='{
-    "entities": [
-        {
-            "type": "Test",
-            "isPattern": "false",
-            "id": "E2"
-        }
-    ],
-    "attributes": [ "A3" ]
-}'
-orionCurl --url "$url" --payload "$payload"  --urlParams attributeFormat=object
-echo
-echo
-
 
 --REGEXPECT--
+===========================================================
 1: Append entity E1 with two different attributes A1 and A2
 HTTP/1.1 200 OK
-Content-Length: 489
+Content-Length: 228
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -194,9 +120,10 @@ Date: REGEX(.*)
 }
 
 
+======================================================================
 2. JsonAttributeObjectQuery for the entity E1 for attributes A1 and A2
 HTTP/1.1 200 OK
-Content-Length: 451
+Content-Length: 216
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -216,143 +143,6 @@ Date: REGEX(.*)
                     }
                 }, 
                 "id": "E1", 
-                "isPattern": "false", 
-                "type": "Test"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-
-
-3. Append entity E2 with two attributes with identical names 'A3', but different meta IDs
-HTTP/1.1 200 OK
-Content-Length: 837
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "metadatas": [
-                            {
-                                "name": "ID", 
-                                "type": "string", 
-                                "value": "A3-1"
-                            }
-                        ], 
-                        "name": "A3", 
-                        "type": "test", 
-                        "value": ""
-                    }, 
-                    {
-                        "metadatas": [
-                            {
-                                "name": "ID", 
-                                "type": "string", 
-                                "value": "A3-2"
-                            }
-                        ], 
-                        "name": "A3", 
-                        "type": "test", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
-                "type": "Test"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-
-
-4. Normal Query for the entity E2 for attribute A3 - both attributes are returned
-HTTP/1.1 200 OK
-Content-Length: 839
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "metadatas": [
-                            {
-                                "name": "ID", 
-                                "type": "string", 
-                                "value": "A3-1"
-                            }
-                        ], 
-                        "name": "A3", 
-                        "type": "test", 
-                        "value": "1"
-                    }, 
-                    {
-                        "metadatas": [
-                            {
-                                "name": "ID", 
-                                "type": "string", 
-                                "value": "A3-2"
-                            }
-                        ], 
-                        "name": "A3", 
-                        "type": "test", 
-                        "value": "2"
-                    }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
-                "type": "Test"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-
-
-5. JsonAttributeObjectQuery Query for the entity E2 for attribute A3 - only one attribute is returned
-HTTP/1.1 200 OK
-Content-Length: 538
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": {
-                    "A3": {
-                        "metadatas": [
-                            {
-                                "name": "ID", 
-                                "type": "string", 
-                                "value": "A3-1"
-                            }
-                        ], 
-                        "type": "test", 
-                        "value": "1"
-                    }
-                }, 
-                "id": "E2", 
                 "isPattern": "false", 
                 "type": "Test"
             }, 

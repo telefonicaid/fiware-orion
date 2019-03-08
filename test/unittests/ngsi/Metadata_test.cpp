@@ -53,7 +53,6 @@ TEST(Metadata, constructor)
 *
 * render -
 *
-* FIXME P4 - extra newline at the end of expected3json
 */
 TEST(Metadata, render)
 {
@@ -66,11 +65,11 @@ TEST(Metadata, render)
 
   utInit();
 
-  out = m1.render("");
+  out = m1.toJsonV1(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = m2.render("");
+  out = m2.toJsonV1(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -100,24 +99,6 @@ TEST(Metadata, check)
 
   checked = m3.check(V1);
   EXPECT_STREQ("OK", checked.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code
-*/
-TEST(Metadata, present)
-{
-  Metadata     m4("Name", "Type", "Value");
-
-  utInit();
-
-  m4.present("Test", 0, "");
-  m4.release();
 
   utExit();
 }

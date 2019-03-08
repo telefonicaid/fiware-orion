@@ -203,7 +203,6 @@ echo
 
 
 echo "05a. POST /v2/op/query with attributes: dateCreated"
-echo "FIXME: this is not behaving as expect and would need a future change (see issue 2604)"
 echo "==================================================="
 payload='{
   "entities": [
@@ -212,7 +211,7 @@ payload='{
       "type": "T"
     }
   ],
-  "attributes": [
+  "attrs": [
     "dateCreated"
   ]
 }'
@@ -222,7 +221,6 @@ echo
 
 
 echo "05b. POST /v2/op/query with attributes: dateModified"
-echo "FIXME: this is not behaving as expect and would need a future change (see issue 2604)"
 echo "===================================================="
 payload='{
   "entities": [
@@ -231,7 +229,7 @@ payload='{
       "type": "T"
     }
   ],
-  "attributes": [
+  "attrs": [
     "dateModified"
   ]
 }'
@@ -241,7 +239,6 @@ echo
 
 
 echo "05c. POST /v2/op/query with attributes: dateCreated,dateModified"
-echo "FIXME: this is not behaving as expect and would need a future change (see issue 2604)"
 echo "================================================================"
 payload='{
   "entities": [
@@ -250,7 +247,7 @@ payload='{
       "type": "T"
     }
   ],
-  "attributes": [
+  "attrs": [
     "dateCreated",
     "dateModified"
   ]
@@ -261,7 +258,6 @@ echo
 
 
 echo "05d. POST /v2/op/query with attributes: dateModified,dateCreated,*"
-echo "FIXME: this is not behaving as expect and would need a future change (see issue 2604)"
 echo "=================================================================="
 payload='{
   "entities": [
@@ -270,7 +266,7 @@ payload='{
       "type": "T"
     }
   ],
-  "attributes": [
+  "attrs": [
     "dateModified",
     "dateCreated"
   ]
@@ -281,7 +277,6 @@ echo
 
 
 echo "05e. POST /v2/op/query with attributes: dateCreated,dateModified,A"
-echo "FIXME: this is not behaving as expect and would need a future change (see issue 2604)"
 echo "=================================================================="
 payload='{
   "entities": [
@@ -290,7 +285,7 @@ payload='{
       "type": "T"
     }
   ],
-  "attributes": [
+  "attrs": [
     "dateCreated",
     "dateModified",
     "A"
@@ -310,7 +305,7 @@ payload='{
       "type": "T"
     }
   ],
-  "attributes": [
+  "attrs": [
     "B"
   ]
 }'
@@ -763,16 +758,20 @@ Date: REGEX(.*)
 
 
 05a. POST /v2/op/query with attributes: dateCreated
-FIXME: this is not behaving as expect and would need a future change (see issue 2604)
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 24
+Content-Length: 106
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
     {
+        "dateCreated": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "REGEX(2\d\d\d\-.*)"
+        },
         "id": "E1",
         "type": "T"
     }
@@ -780,16 +779,20 @@ Date: REGEX(.*)
 
 
 05b. POST /v2/op/query with attributes: dateModified
-FIXME: this is not behaving as expect and would need a future change (see issue 2604)
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 24
+Content-Length: 107
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
     {
+        "dateModified": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "REGEX(2\d\d\d\-.*)"
+        },
         "id": "E1",
         "type": "T"
     }
@@ -797,16 +800,25 @@ Date: REGEX(.*)
 
 
 05c. POST /v2/op/query with attributes: dateCreated,dateModified
-FIXME: this is not behaving as expect and would need a future change (see issue 2604)
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 24
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
     {
+        "dateCreated": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "REGEX(2\d\d\d\-.*)"
+        },
+        "dateModified": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "REGEX(2\d\d\d\-.*)"
+        },
         "id": "E1",
         "type": "T"
     }
@@ -814,16 +826,25 @@ Date: REGEX(.*)
 
 
 05d. POST /v2/op/query with attributes: dateModified,dateCreated,*
-FIXME: this is not behaving as expect and would need a future change (see issue 2604)
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 24
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
     {
+        "dateCreated": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "REGEX(2\d\d\d\-.*)"
+        },
+        "dateModified": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "REGEX(2\d\d\d\-.*)"
+        },
         "id": "E1",
         "type": "T"
     }
@@ -831,10 +852,9 @@ Date: REGEX(.*)
 
 
 05e. POST /v2/op/query with attributes: dateCreated,dateModified,A
-FIXME: this is not behaving as expect and would need a future change (see issue 2604)
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 72
+Content-Length: 237
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -845,6 +865,16 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "Text",
             "value": "foo"
+        },
+        "dateCreated": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "REGEX(2\d\d\d\-.*)"
+        },
+        "dateModified": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "REGEX(2\d\d\d\-.*)"
         },
         "id": "E1",
         "type": "T"

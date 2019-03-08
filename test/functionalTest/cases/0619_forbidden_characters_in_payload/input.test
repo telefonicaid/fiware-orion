@@ -58,8 +58,7 @@ payload='{
     "attributes": [
       {
         "name": "temperature",
-        "type": "centigrade",
-        "isDomain": "false"
+        "type": "centigrade"
       }
     ],
     "providingApplication": "http://mysensors.com/Rooms"
@@ -103,8 +102,7 @@ payload='{
     "attributes": [
       {
         "name": "temperature",
-        "type": "centigrade",
-        "isDomain": "false"
+        "type": "centigrade"
       }
     ],
     "providingApplication": "pa=http://mysensors.com/Rooms"
@@ -217,8 +215,7 @@ payload='{
             "x3" : "3"
           }
         }
-      ],
-      "attributeDomainName" : "ATTR_DOMAIN_NAME"
+      ]
     }
   ],
   "updateAction": "APPEND"
@@ -254,7 +251,7 @@ echo
 01. Intent to register an entity with '<' as part of entity::id
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 178
+Content-Length: 142
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -272,7 +269,7 @@ Date: REGEX(.*)
 02. Intent to discover an entity with '>' as part of entity::type
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 129
+Content-Length: 98
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -289,7 +286,7 @@ Date: REGEX(.*)
 03. Intent to register an entity with '=' as part of providingApplication
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 178
+Content-Length: 142
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -307,7 +304,7 @@ Date: REGEX(.*)
 04. Intent to ngsi9-subscribe to an entity with ' as part of an attribute::name
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 178
+Content-Length: 142
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -325,7 +322,7 @@ Date: REGEX(.*)
 05. Intent to query an entity with  ';' as part of a scopeType
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 129
+Content-Length: 98
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -342,7 +339,7 @@ Date: REGEX(.*)
 06. Intent to update an entity with '(' as part of contextAttribute::type
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 129
+Content-Length: 98
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -359,7 +356,7 @@ Date: REGEX(.*)
 07. Intent to update an entity with '(' as part of a value in compound contextAttribute::value
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 129
+Content-Length: 98
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -376,7 +373,7 @@ Date: REGEX(.*)
 08: Intent to subscribe to an entity with ')' as part of reference
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 166
+Content-Length: 117
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

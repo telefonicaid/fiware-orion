@@ -27,28 +27,36 @@
 */
 #include <stdint.h>
 #include <time.h>
+#include <sys/time.h>
 #include <string>
 #include <vector>
 #include <map>
-#include <sys/time.h>
 
 #include "logMsg/logMsg.h"
 
 #include "common/MimeType.h"
+#include "ngsi/Request.h"
 #include "parse/CompoundValueNode.h"
+
 #include "rest/HttpStatusCode.h"
 #include "rest/mhd.h"
 #include "rest/Verb.h"
 #include "rest/HttpHeaders.h"
-#include "ngsi/Request.h"
-
-struct ParseData;
 
 
 
 /* ****************************************************************************
 *
-* ConnectionInfo - 
+* Forward declarations
+*/
+struct ParseData;
+struct RestService;
+
+
+
+/* ****************************************************************************
+*
+* ConnectionInfo -
 */
 class ConnectionInfo
 {
@@ -59,6 +67,7 @@ public:
     inMimeType             (JSON),
     outMimeType            (JSON),
     tenant                 (""),
+    restServiceP           (NULL),
     payload                (NULL),
     payloadSize            (0),
     callNo                 (1),
@@ -71,7 +80,6 @@ public:
     compoundValueRoot      (NULL),
     httpStatusCode         (SccOk)
   {
-    memset(payloadWord, 0, sizeof(payloadWord));
   }
 
   ConnectionInfo(MimeType _outMimeType):
@@ -80,6 +88,7 @@ public:
     inMimeType             (JSON),
     outMimeType            (_outMimeType),
     tenant                 (""),
+    restServiceP           (NULL),
     payload                (NULL),
     payloadSize            (0),
     callNo                 (1),
@@ -92,7 +101,6 @@ public:
     compoundValueRoot      (NULL),
     httpStatusCode         (SccOk)
   {
-    memset(payloadWord, 0, sizeof(payloadWord));
   }
 
   ConnectionInfo(std::string _url, std::string _method, std::string _version, MHD_Connection* _connection = NULL):
@@ -104,6 +112,7 @@ public:
     method                 (_method),
     version                (_version),
     tenant                 (""),
+    restServiceP           (NULL),
     payload                (NULL),
     payloadSize            (0),
     callNo                 (1),
@@ -117,13 +126,12 @@ public:
     httpStatusCode         (SccOk)
   {
 
-    memset(payloadWord, 0, sizeof(payloadWord));
-
     if      (_method == "POST")    verb = POST;
     else if (_method == "PUT")     verb = PUT;
     else if (_method == "GET")     verb = GET;
     else if (_method == "DELETE")  verb = DELETE;
     else if (_method == "PATCH")   verb = PATCH;
+    else if (_method == "OPTIONS") verb = OPTIONS;
     else                           verb = NOVERB;
   }
 
@@ -146,18 +154,18 @@ public:
   std::string                charset;
   std::string                tenantFromHttpHeader;
   std::string                tenant;
+  RestService*               restServiceP;
   std::vector<std::string>   servicePathV;
   HttpHeaders                httpHeaders;
   char*                      payload;
   int                        payloadSize;
-  char                       payloadWord[64];
   std::string                answer;
   int                        callNo;
   ParseData*                 parseDataP;
   unsigned short             port;
   std::string                ip;
   ApiVersion                 apiVersion;
-  RequestType                requestType;
+  RequestType                requestType;  // FIXME P2: To Be Removed (found inside restServiceP->request (restServiceP->type))
   std::string                acceptHeaderError;
   struct timeval             transactionStart;  // For metrics
 
@@ -183,7 +191,7 @@ public:
 
 /* ****************************************************************************
 *
-* uriParamOptionsParse - 
+* uriParamOptionsParse -
 */
 extern int uriParamOptionsParse(ConnectionInfo* ciP, const char* value);
 

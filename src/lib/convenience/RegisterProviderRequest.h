@@ -41,17 +41,15 @@
 */
 typedef struct RegisterProviderRequest
 {
-  MetadataVector             metadataVector;             // Optional
   Duration                   duration;                   // Optional
   ProvidingApplication       providingApplication;       // Mandatory
   RegistrationId             registrationId;             // Optional
 
   RegisterProviderRequest();
 
-  std::string  render(std::string indent);
-  std::string  check(ApiVersion apiVersion, RequestType requestType, std::string indent, const std::string& preError);
-  void         present(std::string indent);
-  void         release();
+  std::string  toJsonV1(void);
+  std::string  check(ApiVersion apiVersion, RequestType requestType, const std::string& preError);
+
 } RegisterProviderRequest;
 
 #endif  // SRC_LIB_CONVENIENCE_REGISTERPROVIDERREQUEST_H_

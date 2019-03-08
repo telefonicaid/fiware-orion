@@ -37,9 +37,9 @@
 
 /* ****************************************************************************
 *
-* render - 
+* toJsonV1 -
 */
-std::string ConditionValueList::render(const std::string& indent, bool comma)
+std::string ConditionValueList::toJsonV1(bool comma)
 {
   std::string  out = "";
 
@@ -48,14 +48,14 @@ std::string ConditionValueList::render(const std::string& indent, bool comma)
     return "";
   }
 
-  out += startTag(indent, "condValueList", true);
+  out += startTag("condValueList", true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += valueTag(indent + "  ", "", vec[ix], ix != vec.size() - 1, true);
+    out += valueTag("", vec[ix], ix != vec.size() - 1, true);
   }
 
-  out += endTag(indent, comma, true);
+  out += endTag(comma, true);
 
   return out;
 }
@@ -66,37 +66,17 @@ std::string ConditionValueList::render(const std::string& indent, bool comma)
 *
 * ConditionValueList::check - 
 */
-std::string ConditionValueList::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string ConditionValueList::check(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     if (vec[ix] == "")
+    {
       return "empty condValue name";
+    }
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* ConditionValueList::present - 
-*/
-void ConditionValueList::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%sConditionValue List",    indent.c_str()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    LM_T(LmtPresent, ("%s  %s", 
-		      indent.c_str(), 
-		      vec[ix].c_str()));
 }
 
 

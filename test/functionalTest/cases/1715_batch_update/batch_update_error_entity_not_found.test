@@ -38,7 +38,7 @@ brokerStart CB 0-255
 echo "01. Batch Update with actionType UPDATE on non-existing entity, see error"
 echo "========================================================================="
 payload='{
-  "actionType": "UPDATE",
+  "actionType": "update",
   "entities": [
     {
       "id": "E",
@@ -54,7 +54,7 @@ echo
 echo "02. Batch Update with actionType DELETE on non-existing entity, see error"
 echo "========================================================================="
 payload='{
-  "actionType": "DELETE",
+  "actionType": "delete",
   "entities": [
     {
       "id": "E",
@@ -70,7 +70,7 @@ echo
 echo "03. Batch Update with actionType REPLACE on non-existing entity, see error"
 echo "=========================================================================="
 payload='{
-  "actionType": "REPLACE",
+  "actionType": "replace",
   "entities": [
     {
       "id": "E",

@@ -148,7 +148,7 @@ echo
 01. Register E1 of CP1 in CB
 ============================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 64
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -214,7 +214,7 @@ Date: REGEX(.*)
 06. Ask for metrics, see 3 outgoing transactions
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 1122
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -226,10 +226,10 @@ Date: REGEX(.*)
                 "SP": {
                     "incomingTransactionErrors": 1,
                     "incomingTransactionRequestSize": 164,
-                    "incomingTransactionResponseSize": 242,
+                    "incomingTransactionResponseSize": 230,
                     "incomingTransactions": 4,
-                    "outgoingTransactionRequestSize": 473,
-                    "outgoingTransactionResponseSize": 861,
+                    "outgoingTransactionRequestSize": 254,
+                    "outgoingTransactionResponseSize": 449,
                     "outgoingTransactions": 3,
                     "serviceTime": REGEX(.*)
                 }
@@ -237,10 +237,10 @@ Date: REGEX(.*)
             "sum": {
                 "incomingTransactionErrors": 1,
                 "incomingTransactionRequestSize": 164,
-                "incomingTransactionResponseSize": 242,
+                "incomingTransactionResponseSize": REGEX(\d+),
                 "incomingTransactions": 4,
-                "outgoingTransactionRequestSize": 473,
-                "outgoingTransactionResponseSize": 861,
+                "outgoingTransactionRequestSize": 254,
+                "outgoingTransactionResponseSize": 449,
                 "outgoingTransactions": 3,
                 "serviceTime": REGEX(.*)
             }
@@ -251,10 +251,10 @@ Date: REGEX(.*)
             "SP": {
                 "incomingTransactionErrors": 1,
                 "incomingTransactionRequestSize": 164,
-                "incomingTransactionResponseSize": 242,
+                "incomingTransactionResponseSize": 230,
                 "incomingTransactions": 4,
-                "outgoingTransactionRequestSize": 473,
-                "outgoingTransactionResponseSize": 861,
+                "outgoingTransactionRequestSize": 254,
+                "outgoingTransactionResponseSize": 449,
                 "outgoingTransactions": 3,
                 "serviceTime": REGEX(.*)
             }
@@ -262,10 +262,10 @@ Date: REGEX(.*)
         "sum": {
             "incomingTransactionErrors": 1,
             "incomingTransactionRequestSize": 164,
-            "incomingTransactionResponseSize": 242,
+            "incomingTransactionResponseSize": REGEX(\d+),
             "incomingTransactions": 4,
-            "outgoingTransactionRequestSize": 473,
-            "outgoingTransactionResponseSize": 861,
+            "outgoingTransactionRequestSize": 254,
+            "outgoingTransactionResponseSize": 449,
             "outgoingTransactions": 3,
             "serviceTime": REGEX(.*)
         }
@@ -276,7 +276,7 @@ Date: REGEX(.*)
 07. Register E2 of CP2 in CB - note that CP2 is not running
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 64
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -304,7 +304,7 @@ Date: REGEX(.*)
 09. Ask for metrics, see 1 error in outgoing transactions
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 1910
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -316,25 +316,25 @@ Date: REGEX(.*)
                 "SP": {
                     "incomingTransactionErrors": 1,
                     "incomingTransactionRequestSize": 164,
-                    "incomingTransactionResponseSize": 242,
+                    "incomingTransactionResponseSize": 230,
                     "incomingTransactions": 4,
-                    "outgoingTransactionRequestSize": 473,
-                    "outgoingTransactionResponseSize": 861,
+                    "outgoingTransactionRequestSize": 254,
+                    "outgoingTransactionResponseSize": 449,
                     "outgoingTransactions": 3,
                     "serviceTime": REGEX(.*)
                 },
                 "SP2": {
                     "incomingTransactionErrors": 1,
                     "incomingTransactionRequestSize": 140,
-                    "incomingTransactionResponseSize": 171,
+                    "incomingTransactionResponseSize": 159,
                     "incomingTransactions": 2,
                     "outgoingTransactionErrors": 1,
-                    "outgoingTransactionRequestSize": 103,
+                    "outgoingTransactionRequestSize": 56,
                     "outgoingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 },
                 "root-subserv": {
-                    "incomingTransactionResponseSize": 1122,
+                    "incomingTransactionResponseSize": REGEX(\d+),
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
@@ -342,11 +342,11 @@ Date: REGEX(.*)
             "sum": {
                 "incomingTransactionErrors": 2,
                 "incomingTransactionRequestSize": 304,
-                "incomingTransactionResponseSize": 1535,
+                "incomingTransactionResponseSize": REGEX(\d+),
                 "incomingTransactions": 7,
                 "outgoingTransactionErrors": 1,
-                "outgoingTransactionRequestSize": 576,
-                "outgoingTransactionResponseSize": 861,
+                "outgoingTransactionRequestSize": 310,
+                "outgoingTransactionResponseSize": 449,
                 "outgoingTransactions": 4,
                 "serviceTime": REGEX(.*)
             }
@@ -357,25 +357,25 @@ Date: REGEX(.*)
             "SP": {
                 "incomingTransactionErrors": 1,
                 "incomingTransactionRequestSize": 164,
-                "incomingTransactionResponseSize": 242,
+                "incomingTransactionResponseSize": 230,
                 "incomingTransactions": 4,
-                "outgoingTransactionRequestSize": 473,
-                "outgoingTransactionResponseSize": 861,
+                "outgoingTransactionRequestSize": 254,
+                "outgoingTransactionResponseSize": 449,
                 "outgoingTransactions": 3,
                 "serviceTime": REGEX(.*)
             },
             "SP2": {
                 "incomingTransactionErrors": 1,
                 "incomingTransactionRequestSize": 140,
-                "incomingTransactionResponseSize": 171,
+                "incomingTransactionResponseSize": 159,
                 "incomingTransactions": 2,
                 "outgoingTransactionErrors": 1,
-                "outgoingTransactionRequestSize": 103,
+                "outgoingTransactionRequestSize": 56,
                 "outgoingTransactions": 1,
                 "serviceTime": REGEX(.*)
             },
             "root-subserv": {
-                "incomingTransactionResponseSize": 1122,
+                "incomingTransactionResponseSize": REGEX(\d+),
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
@@ -383,11 +383,11 @@ Date: REGEX(.*)
         "sum": {
             "incomingTransactionErrors": 2,
             "incomingTransactionRequestSize": 304,
-            "incomingTransactionResponseSize": 1535,
+            "incomingTransactionResponseSize": REGEX(\d+),
             "incomingTransactions": 7,
             "outgoingTransactionErrors": 1,
-            "outgoingTransactionRequestSize": 576,
-            "outgoingTransactionResponseSize": 861,
+            "outgoingTransactionRequestSize": 310,
+            "outgoingTransactionResponseSize": 449,
             "outgoingTransactions": 4,
             "serviceTime": REGEX(.*)
         }

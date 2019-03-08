@@ -50,9 +50,8 @@ typedef struct RegisterContextResponse
   RegisterContextResponse(const std::string& _registrationId, const std::string& _duration);
   RegisterContextResponse(const std::string& _registrationId, StatusCode& _errorCode);
 
-  std::string render(const std::string& indent);
-  std::string check(const std::string& indent, const std::string& predetectedError, int counter);
-  void        present(const std::string& indent);
+  std::string toJsonV1(void);
+  std::string check(const std::string& predetectedError);
   void        release(void);
 } RegisterContextResponse;
 

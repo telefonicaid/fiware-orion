@@ -86,8 +86,8 @@ static std::string contextResponse(const std::string& path, const std::string& v
 */
 static std::string entityIdId(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  parseDataP->ncr.cerP->contextElement.entityId.id = value;
-  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", parseDataP->ncr.cerP->contextElement.entityId.id.c_str()));
+  parseDataP->ncr.cerP->entity.id = value;
+  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", parseDataP->ncr.cerP->entity.id.c_str()));
 
   return "OK";
 }
@@ -100,8 +100,8 @@ static std::string entityIdId(const std::string& path, const std::string& value,
 */
 static std::string entityIdType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  parseDataP->ncr.cerP->contextElement.entityId.type = value;
-  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", parseDataP->ncr.cerP->contextElement.entityId.type.c_str()));
+  parseDataP->ncr.cerP->entity.type = value;
+  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", parseDataP->ncr.cerP->entity.type.c_str()));
 
   return "OK";
 }
@@ -115,7 +115,7 @@ static std::string entityIdType(const std::string& path, const std::string& valu
 static std::string entityIdIsPattern(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
-  parseDataP->ncr.cerP->contextElement.entityId.isPattern = value;
+  parseDataP->ncr.cerP->entity.isPattern = value;
 
   if (!isTrue(value) && !isFalse(value))
   {
@@ -129,27 +129,13 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
 
 /* ****************************************************************************
 *
-* attributeDomainName - 
-*/
-static std::string attributeDomainName(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got an attributeDomainName: '%s'", value.c_str()));
-  parseDataP->ncr.cerP->contextElement.attributeDomainName.set(value);
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * attribute - 
 */
 static std::string attribute(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Creating an attribute"));
   parseDataP->ncr.attributeP = new ContextAttribute();
-  parseDataP->ncr.attributeP->valueType = orion::ValueTypeNone;
-  parseDataP->ncr.cerP->contextElement.contextAttributeVector.push_back(parseDataP->ncr.attributeP);
+  parseDataP->ncr.cerP->entity.attributeVector.push_back(parseDataP->ncr.attributeP);
   return "OK";
 }
 
@@ -284,61 +270,10 @@ static std::string attributeMetadataValue(const std::string& path, const std::st
 {
   LM_T(LmtParse, ("Got an attributeMetadata value: '%s'", value.c_str()));
   parseDataP->ncr.attributeMetadataP->stringValue = value;
+  parseDataP->ncr.attributeMetadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 
-
-
-/* ****************************************************************************
-*
-* domainMetadata - 
-*/
-static std::string domainMetadata(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Creating a domainMetadata"));
-  parseDataP->ncr.domainMetadataP = new Metadata();
-  parseDataP->ncr.cerP->contextElement.domainMetadataVector.push_back(parseDataP->ncr.domainMetadataP);
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataName - 
-*/
-static std::string domainMetadataName(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a domainMetadata name: '%s'", value.c_str()));
-  parseDataP->ncr.domainMetadataP->name = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataType - 
-*/
-static std::string domainMetadataType(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a domainMetadata type: '%s'", value.c_str()));
-  parseDataP->ncr.domainMetadataP->type = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataValue - 
-*/
-static std::string domainMetadataValue(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a domainMetadata value: '%s'", value.c_str()));
-  parseDataP->ncr.domainMetadataP->stringValue = value;
-  return "OK";
-}
 
 
 #define CELEM "/contextResponses/contextResponse/contextElement"
@@ -358,8 +293,6 @@ JsonNode jsonNcrParseVector[] =
   { CELEM "/type",                                                entityIdType             },
   { CELEM "/isPattern",                                           entityIdIsPattern        },
 
-  { CELEM "/attributeDomainName",                                 attributeDomainName      },
-
   { CELEM "/attributes",                                          jsonNullTreat            },
   { CELEM "/attributes/attribute",                                attribute                },
   { CELEM "/attributes/attribute/name",                           attributeName            },
@@ -371,12 +304,6 @@ JsonNode jsonNcrParseVector[] =
   { CELEM "/attributes/attribute/metadatas/metadata/name",        attributeMetadataName    },
   { CELEM "/attributes/attribute/metadatas/metadata/type",        attributeMetadataType    },
   { CELEM "/attributes/attribute/metadatas/metadata/value",       attributeMetadataValue   },
-
-  { CELEM "/metadatas",                                           jsonNullTreat            },
-  { CELEM "/metadatas/metadata",                                  domainMetadata           },
-  { CELEM "/metadatas/metadata/name",                             domainMetadataName       },
-  { CELEM "/metadatas/metadata/type",                             domainMetadataType       },
-  { CELEM "/metadatas/metadata/value",                            domainMetadataValue      },
 
   { "/contextResponses/contextResponse/statusCode",               jsonNullTreat            },
   { "/contextResponses/contextResponse/statusCode/code",          statusCodeCode           },
@@ -399,7 +326,6 @@ void jsonNcrInit(ParseData* parseDataP)
   parseDataP->ncr.cerP                 = NULL;
   parseDataP->ncr.attributeP           = NULL;
   parseDataP->ncr.attributeMetadataP   = NULL;
-  parseDataP->ncr.domainMetadataP      = NULL;
 }
 
 
@@ -421,20 +347,5 @@ void jsonNcrRelease(ParseData* parseDataP)
 */
 std::string jsonNcrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
-  return parseDataP->ncr.res.check(ciP->apiVersion, "", parseDataP->errorString);
-}
-
-
-
-/* ****************************************************************************
-*
-* jsonNcrPresent -
-*/
-void jsonNcrPresent(ParseData* parseDataP)
-{
-  if (!lmTraceIsSet(LmtPresent))
-    return;
-
-  LM_T(LmtPresent,("\n\n"));
-  parseDataP->ncr.res.present("");
+  return parseDataP->ncr.res.check(ciP->apiVersion, parseDataP->errorString);
 }

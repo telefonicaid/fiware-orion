@@ -131,11 +131,11 @@ std::string getIndividualContextEntityAttributeWithTypeAndId
 
 
   // 06. Translate QueryContextResponse to ContextAttributeResponse
-  response.fill(&parseDataP->qcrs.res, entityId, entityType, attributeName, "");
+  response.fill(&parseDataP->qcrs.res, entityId, entityType, attributeName);
 
 
   // 07. Cleanup and return result
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, RtContextAttributeResponse, ""));
+  TIMED_RENDER(answer = response.toJsonV1(asJsonObject, RtContextAttributeResponse));
 
 
   parseDataP->qcr.res.release();

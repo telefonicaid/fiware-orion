@@ -36,6 +36,14 @@
 
 
 
+/* *****************************************************************************
+*
+* restServiceGet -
+*/
+extern RestService* restServiceGet(Verb verb);
+
+
+
 /* ****************************************************************************
 *
 * RestServiceHandler -
@@ -51,21 +59,11 @@ typedef std::string (*RestServiceHandler)(ConnectionInfo* ciP, int compononts, s
 typedef std::string (*RestTreat)(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* reqDataP);
 typedef struct RestService
 {
-  std::string   verb;             // The method of the service, as a plain string. ("*" matches ALL methods)
   RequestType   request;          // The type of the request
   int           components;       // Number of components in the URL path
   std::string   compV[10];        // Vector of URL path components. E.g. { "v2", "entities" }
-  std::string   payloadWord;      // No longer used, should be removed ... ?
   RestTreat     treat;            // service function pointer
 } RestService;
-
-
-
-/* ****************************************************************************
-*
-* restService -
-*/
-extern std::string restService(ConnectionInfo* ciP, RestService* serviceV);
 
 
 
@@ -90,5 +88,34 @@ extern std::string payloadParse
 * tenantCheck -
 */
 extern std::string tenantCheck(const std::string& tenant);
+
+
+
+/* ****************************************************************************
+*
+* serviceVectorsSet -
+*/
+extern void serviceVectorsSet
+(
+  RestService*        _getServiceV,
+  RestService*        _putServiceV,
+  RestService*        _postServiceV,
+  RestService*        _patchServiceV,
+  RestService*        _deleteServiceV,
+  RestService*        _optionsServiceV,
+  RestService*        _restBadVerbV
+);
+
+
+
+namespace orion
+{
+/* ****************************************************************************
+*
+* orion::requestServe -
+*/
+extern std::string requestServe(ConnectionInfo* ciP);
+
+}
 
 #endif

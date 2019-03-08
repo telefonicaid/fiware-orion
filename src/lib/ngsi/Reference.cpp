@@ -39,13 +39,7 @@
 *
 * Reference::check -
 */
-std::string Reference::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string Reference::check(RequestType requestType)
 {
   if (string == "")
   {
@@ -106,36 +100,16 @@ std::string Reference::get(void)
 
 /* ****************************************************************************
 *
-* Reference::present -
+* Reference::toJsonV1 -
 */
-void Reference::present(const std::string& indent)
-{
-  if (string != "")
-  {
-    LM_T(LmtPresent, ("%sReference: %s", 
-		      indent.c_str(), 
-		      string.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNo Reference", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* Reference::render -
-*/
-std::string Reference::render(const std::string& indent, bool comma)
+std::string Reference::toJsonV1(bool comma)
 {
   if (string == "")
   {
     return "";
   }
 
-  return valueTag(indent, "reference", string, comma);
+  return valueTag("reference", string, comma);
 }
 
 

@@ -1,7 +1,0 @@
-{
-  "errorCode" : {
-    "code" : "400",
-    "reasonPhrase" : "Bad Request",
-    "details" : "missing metadata name"
-  }
-}

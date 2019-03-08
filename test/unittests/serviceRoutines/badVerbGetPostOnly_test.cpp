@@ -28,17 +28,18 @@
 
 #include "serviceRoutines/badVerbGetPostOnly.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs -
+* badVerbV -
 */
-static RestService rs[] =
+static RestService badVerbV[] =
 {
-  { "*", ContextEntitiesByEntityId, 3, { "ngsi9", "contextEntities", "*" }, "", badVerbGetPostOnly },
-  { "",  InvalidRequest,            0, {                                 }, "", NULL               }
+  { ContextEntitiesByEntityId, 3, { "ngsi9", "contextEntities", "*" }, badVerbGetPostOnly },
+  { InvalidRequest,            0, {                                 }, NULL               }
 };
 
 
@@ -52,8 +53,13 @@ TEST(badVerbGetPostOnly, ok)
   ConnectionInfo  ci("/ngsi9/contextEntities/aaa",  "PUT", "1.1");
   std::string     expected = "";  // no payload for bad verb, only http headers to indicate the error
   std::string     out;
+  RestService     restService = { VersionRequest, 3, { "ngsi9", "contextEntities", "aaa" }, NULL };
 
-  out = restService(&ci, rs);
+  ci.apiVersion   = V1;
+  ci.restServiceP = &restService;
+
+  serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, badVerbV);
+  out = orion::requestServe(&ci);
 
   EXPECT_EQ(expected, out);
   EXPECT_EQ("Allow",      ci.httpHeader[0]);

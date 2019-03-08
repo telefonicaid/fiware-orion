@@ -72,7 +72,7 @@ HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(NOVERB), custom(fa
 */
 std::string HttpInfo::toJson()
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   jh.addString("url", this->url);
 

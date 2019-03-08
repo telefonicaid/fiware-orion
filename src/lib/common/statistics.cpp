@@ -159,6 +159,8 @@ int noOfIndividualSubscriptionRequest                    = -1;
 int noOfSimulatedNotifications                           = -1;
 int noOfBatchQueryRequest                                = -1;
 int noOfBatchUpdateRequest                               = -1;
+int noOfRegistrationRequest                              = -1;
+int noOfRegistrationsRequest                             = -1;
 
 
 
@@ -222,35 +224,35 @@ std::string renderTimingStatistics(void)
     return "{}";
   }
 
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   if (acc)
   {
-    JsonHelper accJh;
+    JsonObjectHelper accJh;
 
-    if (accJsonV1ParseTime)      accJh.addFloat("jsonV1Parse",      timeSpecToFloat(accTimeStat.jsonV1ParseTime));
-    if (accJsonV2ParseTime)      accJh.addFloat("jsonV2Parse",      timeSpecToFloat(accTimeStat.jsonV2ParseTime));
-    if (accMongoBackendTime)     accJh.addFloat("mongoBackend",     timeSpecToFloat(accTimeStat.mongoBackendTime));
-    if (accMongoReadWaitTime)    accJh.addFloat("mongoReadWait",    timeSpecToFloat(accTimeStat.mongoReadWaitTime));
-    if (accMongoWriteWaitTime)   accJh.addFloat("mongoWriteWait",   timeSpecToFloat(accTimeStat.mongoWriteWaitTime));
-    if (accMongoCommandWaitTime) accJh.addFloat("mongoCommandWait", timeSpecToFloat(accTimeStat.mongoCommandWaitTime));
-    if (accRenderTime)           accJh.addFloat("render",           timeSpecToFloat(accTimeStat.renderTime));
-    if (accReqTime)              accJh.addFloat("total",            timeSpecToFloat(accTimeStat.reqTime));
+    if (accJsonV1ParseTime)      accJh.addNumber("jsonV1Parse",      timeSpecToFloat(accTimeStat.jsonV1ParseTime));
+    if (accJsonV2ParseTime)      accJh.addNumber("jsonV2Parse",      timeSpecToFloat(accTimeStat.jsonV2ParseTime));
+    if (accMongoBackendTime)     accJh.addNumber("mongoBackend",     timeSpecToFloat(accTimeStat.mongoBackendTime));
+    if (accMongoReadWaitTime)    accJh.addNumber("mongoReadWait",    timeSpecToFloat(accTimeStat.mongoReadWaitTime));
+    if (accMongoWriteWaitTime)   accJh.addNumber("mongoWriteWait",   timeSpecToFloat(accTimeStat.mongoWriteWaitTime));
+    if (accMongoCommandWaitTime) accJh.addNumber("mongoCommandWait", timeSpecToFloat(accTimeStat.mongoCommandWaitTime));
+    if (accRenderTime)           accJh.addNumber("render",           timeSpecToFloat(accTimeStat.renderTime));
+    if (accReqTime)              accJh.addNumber("total",            timeSpecToFloat(accTimeStat.reqTime));
 
     jh.addRaw("accumulated", accJh.str());
   }
   if (last)
   {
-    JsonHelper lastJh;
+    JsonObjectHelper lastJh;
 
-    if (lastJsonV1ParseTime)      lastJh.addFloat("jsonV1Parse",      timeSpecToFloat(lastTimeStat.jsonV1ParseTime));
-    if (lastJsonV2ParseTime)      lastJh.addFloat("jsonV2Parse",      timeSpecToFloat(lastTimeStat.jsonV2ParseTime));
-    if (lastMongoBackendTime)     lastJh.addFloat("mongoBackend",     timeSpecToFloat(lastTimeStat.mongoBackendTime));
-    if (lastMongoReadWaitTime)    lastJh.addFloat("mongoReadWait",    timeSpecToFloat(lastTimeStat.mongoReadWaitTime));
-    if (lastMongoWriteWaitTime)   lastJh.addFloat("mongoWriteWait",   timeSpecToFloat(lastTimeStat.mongoWriteWaitTime));
-    if (lastMongoCommandWaitTime) lastJh.addFloat("mongoCommandWait", timeSpecToFloat(lastTimeStat.mongoCommandWaitTime));
-    if (lastRenderTime)           lastJh.addFloat("render",           timeSpecToFloat(lastTimeStat.renderTime));
-    if (lastReqTime)              lastJh.addFloat("total",            timeSpecToFloat(lastTimeStat.reqTime));
+    if (lastJsonV1ParseTime)      lastJh.addNumber("jsonV1Parse",      timeSpecToFloat(lastTimeStat.jsonV1ParseTime));
+    if (lastJsonV2ParseTime)      lastJh.addNumber("jsonV2Parse",      timeSpecToFloat(lastTimeStat.jsonV2ParseTime));
+    if (lastMongoBackendTime)     lastJh.addNumber("mongoBackend",     timeSpecToFloat(lastTimeStat.mongoBackendTime));
+    if (lastMongoReadWaitTime)    lastJh.addNumber("mongoReadWait",    timeSpecToFloat(lastTimeStat.mongoReadWaitTime));
+    if (lastMongoWriteWaitTime)   lastJh.addNumber("mongoWriteWait",   timeSpecToFloat(lastTimeStat.mongoWriteWaitTime));
+    if (lastMongoCommandWaitTime) lastJh.addNumber("mongoCommandWait", timeSpecToFloat(lastTimeStat.mongoCommandWaitTime));
+    if (lastRenderTime)           lastJh.addNumber("render",           timeSpecToFloat(lastTimeStat.renderTime));
+    if (lastReqTime)              lastJh.addNumber("total",            timeSpecToFloat(lastTimeStat.reqTime));
 
     jh.addRaw("last", lastJh.str());
   }
@@ -384,5 +386,8 @@ void statisticsUpdate(RequestType request, MimeType inMimeType)
   case IndividualSubscriptionRequest:                    ++noOfIndividualSubscriptionRequest; break;
   case BatchQueryRequest:                                ++noOfBatchQueryRequest; break;
   case BatchUpdateRequest:                               ++noOfBatchUpdateRequest; break;
+
+  case RegistrationRequest:                              ++noOfRegistrationRequest; break;
+  case RegistrationsRequest:                             ++noOfRegistrationsRequest; break;
   }
 }

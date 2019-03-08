@@ -47,9 +47,8 @@ struct UpdateContextSubscriptionRequest : public SubscribeContextRequest
 {
   SubscriptionId                 subscriptionId;         // Mandatory
 
-  UpdateContextSubscriptionRequest();
-  std::string check(const std::string& indent, const std::string& predetectedError, int counter);
-  void        present(const std::string& indent);
+  UpdateContextSubscriptionRequest();  
+  std::string check(const std::string& predetectedError, int counter);
   void        release(void);
   void        toNgsiv2Subscription(ngsiv2::SubscriptionUpdate* subUp);
 };

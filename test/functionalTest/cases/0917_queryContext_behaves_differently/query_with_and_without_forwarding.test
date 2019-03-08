@@ -1,0 +1,203 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Query With And Without Forwarding
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart
+
+--SHELL--
+
+#
+# 01. Update/APPEND E1/T WITHOUT ATTRIBUTES in CB
+# 02. Query E1/T/*
+# 03. Register E1/T/A2 for accumulator
+# 04. Query E1/T/*
+#
+
+echo "01. Update/APPEND E1/T WITHOUT ATTRIBUTES in CB"
+echo "==============================================="
+payload='{
+  "contextElements": [
+    {
+      "id": "E1",
+      "type": "T"
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Query E1/T/*"
+echo "================"
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "id": "E1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "${payload}" --json
+echo
+echo
+
+
+echo "03. Register E1/T/A2 for accumulator"
+echo "===================================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A2",
+        "type": "string"
+      }
+    ],
+    "providingApplication": "http://localhost:'${LISTENER_PORT}'/noresponse"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "04. Query E1/T/*"
+echo "================"
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "id": "E1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "${payload}" --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Update/APPEND E1/T WITHOUT ATTRIBUTES in CB
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 239
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+02. Query E1/T/*
+================
+HTTP/1.1 200 OK
+Content-Length: 239
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+03. Register E1/T/A2 for accumulator
+====================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+04. Query E1/T/*
+================
+HTTP/1.1 200 OK
+Content-Length: 239
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

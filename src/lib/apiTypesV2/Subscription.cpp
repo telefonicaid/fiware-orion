@@ -63,7 +63,7 @@ Subscription::~Subscription()
 */
 std::string Subscription::toJson(void)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   jh.addString("id", this->id);
 
@@ -72,7 +72,10 @@ std::string Subscription::toJson(void)
     jh.addString("description", this->description);
   }
 
-  if (this->expires != PERMANENT_SUBS_DATETIME)
+  // Orion versions previous to 1.13.0 where using (int64_t) 9e18 as expiration for permanent
+  // subscriptions. Now we use PERMANENT_EXPIRES_DATETIME, whichs is larger, but we need to be prepared
+  // for these old documents in DB (more info in issue #3256)
+  if (this->expires < (int64_t) 9e18)
   {
     jh.addDate("expires", this->expires);
   }
@@ -108,7 +111,7 @@ std::string Subscription::toJson(void)
 */
 std::string Notification::toJson(const std::string& attrsFormat)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   if (this->timesSent > 0)
   {
@@ -150,9 +153,19 @@ std::string Notification::toJson(const std::string& attrsFormat)
     jh.addDate("lastFailure", this->lastFailure);
   }
 
+  if (this->lastFailureReason != "")
+  {
+    jh.addString("lastFailureReason", this->lastFailureReason);
+  }
+
   if (this->lastSuccess > 0)
   {
     jh.addDate("lastSuccess", this->lastSuccess);
+  }
+
+  if (this->lastSuccessCode != -1)
+  {
+    jh.addNumber("lastSuccessCode", this->lastSuccessCode);
   }
 
   return jh.str();
@@ -166,7 +179,7 @@ std::string Notification::toJson(const std::string& attrsFormat)
 */
 std::string Subject::toJson()
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   jh.addRaw("entities", vectorToJson(this->entities));
   jh.addRaw("condition", this->condition.toJson());
@@ -182,11 +195,11 @@ std::string Subject::toJson()
 */
 std::string Condition::toJson()
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   jh.addRaw("attrs", vectorToJson(this->attributes));
 
-  JsonHelper jhe;
+  JsonObjectHelper jhe;
 
   if (this->expression.q        != "")  jhe.addString("q",        this->expression.q);
   if (this->expression.mq       != "")  jhe.addString("mq",       this->expression.mq);
@@ -202,35 +215,4 @@ std::string Condition::toJson()
 }
 
 
-
-/* ****************************************************************************
-*
-* EntID::toJson -
-*/
-std::string EntID::toJson()
-{
-  JsonHelper jh;
-
-  if (!this->id.empty())
-  {
-    jh.addString("id", this->id);
-  }
-
-  if (!this->idPattern.empty())
-  {
-    jh.addString("idPattern", this->idPattern);
-  }
-
-  if (!this->type.empty())
-  {
-    jh.addString("type", this->type);
-  }
-
-  if (!this->typePattern.empty())
-  {
-    jh.addString("typePattern", this->typePattern);
-  }
-
-  return jh.str();
-}
 }  // end namespace

@@ -46,7 +46,6 @@ typedef struct JsonRequest
   JsonNode*        parseVector;
   RequestInit      init;
   RequestCheck     check;
-  RequestPresent   present;
   RequestRelease   release;
 } JsonRequest;
 
@@ -62,7 +61,6 @@ extern std::string jsonTreat
   ConnectionInfo*     ciP,
   ParseData*          parseDataP,
   RequestType         request,
-  const std::string&  payloadWord,
   JsonRequest**       reqPP
 );
 

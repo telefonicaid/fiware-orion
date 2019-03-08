@@ -46,22 +46,7 @@ payload='{
       "attributes": [
         {
           "name": "temperature",
-          "type": "degree",
-          "isDomain": "false",
-          "metadatas": [
-            {
-              "name": "ID",
-              "type": "string",
-              "value": "1110"
-            }
-          ]
-        }
-      ],
-      "metadatas": [
-        {
-          "name": "ID",
-          "type": "string",
-          "value": "2212"
+          "type": "degree"
         }
       ],
       "providingApplication": "http://192.168.100.1:70/application"
@@ -74,7 +59,7 @@ orionCurl --url ${url} --payload "${payload}"
 echo "++++++++++++++++++++"
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 166
+Content-Length: 130
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

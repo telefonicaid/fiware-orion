@@ -129,6 +129,7 @@ sleep $WAIT_TIME
 
 echo '06. Check subscription timesSent value (1)'
 echo "=========================================="
+valgrindSleep 1
 orionCurl --url /v2/subscriptions/$id1
 echo
 echo
@@ -250,7 +251,7 @@ Date: REGEX(.*)
 06. Check subscription timesSent value (1)
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 370
+Content-Length: 392
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -266,6 +267,7 @@ Date: REGEX(.*)
         },
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
         "timesSent": 1
     },
     "status": "active",
@@ -306,7 +308,7 @@ Date: REGEX(.*)
 09. Check subscription timesSent value (1)
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 372
+Content-Length: 394
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -322,6 +324,7 @@ Date: REGEX(.*)
         },
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
         "timesSent": 1
     },
     "status": "inactive",

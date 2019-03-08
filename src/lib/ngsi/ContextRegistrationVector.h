@@ -42,13 +42,11 @@ typedef struct ContextRegistrationVector
 
   void                  push_back(ContextRegistration* item);
   unsigned int          size(void);
-  std::string           render(const std::string& indent, bool comma);
-  void                  present(const std::string& indent);
+  std::string           toJsonV1(bool comma);
   void                  release(void);
 
   std::string           check(ApiVersion          apiVersion,
                               RequestType         requestType,
-                              const std::string&  indent,
                               const std::string&  predetectedError,
                               int                 counter);
 

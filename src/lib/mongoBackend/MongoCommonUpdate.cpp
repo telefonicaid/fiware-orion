@@ -1,4 +1,4 @@
-﻿
+
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -44,6 +44,7 @@
 #include "apiTypesV2/HttpInfo.h"
 #include "alarmMgr/alarmMgr.h"
 #include "orionTypes/OrionValueType.h"
+#include "orionTypes/UpdateActionType.h"
 #include "cache/subCache.h"
 #include "rest/StringFilter.h"
 #include "ngsi/Scope.h"
@@ -56,6 +57,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
 #include "mongoBackend/location.h"
+#include "mongoBackend/dateExpiration.h"
 #include "mongoBackend/compoundValueBson.h"
 #include "mongoBackend/MongoCommonUpdate.h"
 
@@ -85,19 +87,18 @@ using orion::CompoundValueNode;
 * Check that the parameter is a not custom metadata, i.e. one metadata without
 * an special semantic to be interpreted by the context broker itself
 *
-* FIXME P2: this function probably could be moved to another place "closer" to metadata
+* NGSIv2 builtin metadata (dateCreated, dateModified, etc.) are considered custom
+*
+* FIXME P6: this function probably could be removed. By the moment we leave it
+* and we decide what to do in some time (if we add a new custom metadata it could be
+* a convenient placeholder). If kept, it should be moved to another place
+* "closer" to metadata
 */
 static bool isNotCustomMetadata(std::string md)
 {
-  if (md != NGSI_MD_ID            &&
-      md != NGSI_MD_LOCATION      &&
-      md != NGSI_MD_DATECREATED   &&
-      md != NGSI_MD_DATEMODIFIED)
-  {
-    return false;
-  }
-
-  return true;
+  // After removing ID and deprecating location, all metadata are custom so
+  // we always return false
+  return false;
 }
 
 
@@ -274,40 +275,9 @@ static bool equalMetadata(const BSONObj& md1, const BSONObj& md2)
 
 /* ****************************************************************************
 *
-* attributeValueAbsent -
-*
-* Check that the attribute doesn't have any value
-*
-*/
-static bool attributeValueAbsent(ContextAttribute* caP, ApiVersion apiVersion)
-{
-  /* In v2, absent attribute means "null", which has different semantics */
-  return ((caP->valueType == orion::ValueTypeNone) && (apiVersion == V1));
-}
-
-
-
-/* ****************************************************************************
-*
-* attributeTypeAbsent -
-*
-* Check that the attribute doesn't have any type
-*
-*/
-static bool attributeTypeAbsent(ContextAttribute* caP)
-{
-  // FIXME P10: this is a temporal solution while the ContextAttribute class gets
-  // modified to include a "NoneType" or similar. Type "" should be allowed in NGSIv2
-  return caP->type == "";
-}
-
-
-
-/* ****************************************************************************
-*
 * changedAttr -
 */
-static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVersion apiVersion)
+static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, const bool& forcedUpdate, ApiVersion apiVersion)
 {
   /* Not finding the attribute field at MongoDB is considered as an implicit "" */
   if (!attr.hasField(ENT_ATTRS_VALUE))
@@ -316,7 +286,7 @@ static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVers
   }
 
   /* No value in the request means that the value stays as it was before, so it is not a change */
-  if (caP->valueType == orion::ValueTypeNone && apiVersion != V2)
+  if (caP->valueType == orion::ValueTypeNotGiven)
   {
     return false;
   }
@@ -330,16 +300,16 @@ static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVers
     return true;
 
   case mongo::NumberDouble:
-    return caP->valueType != orion::ValueTypeNumber || caP->numberValue != getNumberFieldF(attr, ENT_ATTRS_VALUE);
+    return caP->valueType != orion::ValueTypeNumber || caP->numberValue != getNumberFieldF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
 
   case mongo::Bool:
-    return caP->valueType != orion::ValueTypeBoolean || caP->boolValue != getBoolFieldF(attr, ENT_ATTRS_VALUE);
+    return caP->valueType != orion::ValueTypeBoolean || caP->boolValue != getBoolFieldF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
 
   case mongo::String:
-    return caP->valueType != orion::ValueTypeString || caP->stringValue != getStringFieldF(attr, ENT_ATTRS_VALUE);
+    return caP->valueType != orion::ValueTypeString || caP->stringValue != getStringFieldF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
 
   case mongo::jstNULL:
-    return caP->valueType != orion::ValueTypeNone;
+    return caP->valueType != orion::ValueTypeNull;
 
   default:
     LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(attr, ENT_ATTRS_VALUE).type()));
@@ -394,7 +364,7 @@ static void appendMetadata
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->boolValue));
       return;
 
-    case orion::ValueTypeNone:
+    case orion::ValueTypeNull:
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mongo::BSONNULL));
       return;
 
@@ -434,7 +404,7 @@ static void appendMetadata
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mdP->boolValue));
       return;
 
-    case orion::ValueTypeNone:
+    case orion::ValueTypeNull:
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mongo::BSONNULL));
       return;
 
@@ -471,16 +441,16 @@ static void appendMetadata
 * request (caP), and merged them producing the mergedAttr output. The function returns
 * true if it was an actual update, false otherwise.
 */
-static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* mergedAttr, ApiVersion apiVersion)
+static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* mergedAttr, const bool& forcedUpdate, ApiVersion apiVersion)
 {
   BSONObjBuilder ab;
 
   /* 1. Add value, if present in the request (it could be omitted in the case of updating only metadata).
    *    When the value of the attribute is empty (no update needed/wanted), then the value of the attribute is
    *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
-  if (!attributeValueAbsent(caP, apiVersion))
+  if (caP->valueType != orion::ValueTypeNotGiven)
   {
-    caP->valueBson(ab);
+    caP->valueBson(ab, getStringFieldF(attr, ENT_ATTRS_TYPE), ngsiv1Autocast && (apiVersion == V1));
   }
   else
   {
@@ -611,7 +581,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
      * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
      *    different and, if they are of the same size, checking if the vectors are not equal)
      */
-    actualUpdate = (attrValueChanges(attr, caP, apiVersion) ||
+    actualUpdate = (attrValueChanges(attr, caP, forcedUpdate, apiVersion) ||
                     ((caP->type != "") &&
                      (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
                     mdNew.nFields() != mdSize || !equalMetadata(md, mdNew));
@@ -718,31 +688,26 @@ static bool updateAttribute
   BSONObjBuilder*     toSet,
   BSONArrayBuilder*   toPush,
   ContextAttribute*   caP,
-  bool&               actualUpdate,
+  bool*               actualUpdate,
   bool                isReplace,
+  const bool&         forcedUpdate,
   ApiVersion          apiVersion
 )
 {
-  actualUpdate = false;
+  *actualUpdate = false;
 
-  /* Attributes with metadata ID are stored as <attrName>()<ID> in the attributes embedded document */
   std::string effectiveName = dbDotEncode(caP->name);
-  if (caP->getId() != "")
-  {
-    effectiveName += MD_ID_SEPARATOR + caP->getId();
-  }
 
   if (isReplace)
   {
     BSONObjBuilder newAttr;
     int            now = getCurrentTime();
 
-    actualUpdate = true;
+    *actualUpdate = true;
 
+    std::string attrType;
     if (!caP->typeGiven && (apiVersion == V2))
     {
-      std::string attrType;
-
       if ((caP->compoundValueP == NULL) || (caP->compoundValueP->valueType != orion::ValueTypeVector))
       {
         attrType = defaultType(caP->valueType);
@@ -751,18 +716,17 @@ static bool updateAttribute
       {
         attrType = defaultType(orion::ValueTypeVector);
       }
-
-      newAttr.append(ENT_ATTRS_TYPE, attrType);
     }
     else
     {
-      newAttr.append(ENT_ATTRS_TYPE, caP->type);
+      attrType = caP->type;
     }
 
+    newAttr.append(ENT_ATTRS_TYPE, attrType);
     newAttr.append(ENT_ATTRS_CREATION_DATE, now);
     newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
-    caP->valueBson(newAttr);
+    caP->valueBson(newAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
     /* Custom metadata */
     BSONObj    md;
@@ -787,8 +751,8 @@ static bool updateAttribute
     BSONObj newAttr;
     BSONObj attr = getObjectFieldF(attrs, effectiveName);
 
-    actualUpdate = mergeAttrInfo(attr, caP, &newAttr, apiVersion);
-    if (actualUpdate)
+    *actualUpdate = mergeAttrInfo(attr, caP, &newAttr, forcedUpdate, apiVersion);
+    if (*actualUpdate)
     {
       const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
       toSet->append(composedName, newAttr);
@@ -812,8 +776,6 @@ static bool updateAttribute
 * In addition, return value is as follows:
 * - true: there was an actual append change
 * - false: there was an append-as-update change
-*
-* Attributes with metadata ID are stored as <attrName>_<ID> in the attributes embedded document
 */
 static bool appendAttribute
 (
@@ -821,21 +783,17 @@ static bool appendAttribute
   BSONObjBuilder*     toSet,
   BSONArrayBuilder*   toPush,
   ContextAttribute*   caP,
-  bool&               actualUpdate,
+  bool*               actualUpdate,
+  const bool&         forcedUpdate,
   ApiVersion          apiVersion
 )
 {
   std::string effectiveName = dbDotEncode(caP->name);
 
-  if (caP->getId() != "")
-  {
-    effectiveName += MD_ID_SEPARATOR + caP->getId();
-  }
-
   /* APPEND with existing attribute equals to UPDATE */
   if (attrs.hasField(effectiveName.c_str()))
   {
-    updateAttribute(attrs, toSet, toPush, caP, actualUpdate, false, apiVersion);
+    updateAttribute(attrs, toSet, toPush, caP, actualUpdate, false, forcedUpdate, apiVersion);
     return false;
   }
 
@@ -843,7 +801,7 @@ static bool appendAttribute
   BSONObjBuilder ab;
 
   /* 1. Value */
-  caP->valueBson(ab);
+  caP->valueBson(ab, caP->type, ngsiv1Autocast && (apiVersion == V1));
 
   /* 2. Type */
   if ((apiVersion == V2) && !caP->typeGiven)
@@ -885,98 +843,7 @@ static bool appendAttribute
   toSet->append(composedName, ab.obj());
   toPush->append(caP->name);
 
-  actualUpdate = true;
-  return true;
-}
-
-
-
-/* ****************************************************************************
-*
-* legalIdUsage -
-*
-* Check that the client is not trying to mix attributes ID and no ID for the same
-* name
-*
-*/
-static bool legalIdUsage(const BSONObj& attrs, ContextAttribute* caP)
-{
-  std::string prefix = caP->name + MD_ID_SEPARATOR;
-
-  if (caP->getId() == "")
-  {
-    /* Attribute attempting to append doesn't have any ID. Thus, no attribute with same name can have ID in attrs,
-     * i.e. no attribute starting with "<attrName>" can at the same time start with "<attrName>()" */
-    std::set<std::string> attrNames;
-
-    attrs.getFieldNames(attrNames);
-
-    for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
-    {
-      std::string attrName = *i;
-
-      if (strncmp(caP->name.c_str(), attrName.c_str(), caP->name.length()) == 0 &&
-          strncmp(prefix.c_str(), attrName.c_str(), strlen(prefix.c_str())) == 0)
-      {
-        return false;
-      }
-    }
-  }
-  else
-  {
-    /* Attribute attempting to append has ID. Thus, no attribute with same name can have ID in attrs,
-     * i.e. no attribute starting with "<attrName>" can at the same time have a name not starting with "<attrName>()"
-     */
-    std::set<std::string> attrNames;
-
-    attrs.getFieldNames(attrNames);
-
-    for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
-    {
-      std::string attrName = *i;
-
-      if (strncmp(caP->name.c_str(), attrName.c_str(), strlen(caP->name.c_str())) == 0 &&
-          strncmp(prefix.c_str(), attrName.c_str(), strlen(prefix.c_str())) != 0)
-      {
-        return false;
-      }
-    }
-  }
-
-  return true;
-}
-
-
-
-/* ****************************************************************************
-*
-* legalIdUsage -
-*
-* Check that the client is not trying to mix attributes ID and no ID for the same name
-*/
-static bool legalIdUsage(const ContextAttributeVector& caV)
-{
-  for (unsigned int ix = 0; ix < caV.size(); ++ix)
-  {
-    std::string  attrName  = caV[ix]->name;
-    std::string  attrType  = caV[ix]->type;
-    std::string  attrId    = caV[ix]->getId();
-
-    if (attrId == "")
-    {
-      /* Search for attribute with same name and type, but with actual ID to detect inconsistency */
-      for (unsigned int jx = 0; jx < caV.size(); ++jx)
-      {
-        const ContextAttribute* ca = caV[jx];
-
-        if (attrName == ca->name && attrType == ca->type && ca->getId() != "")
-        {
-          return false;
-        }
-      }
-    }
-  }
-
+  *actualUpdate = true;
   return true;
 }
 
@@ -988,22 +855,16 @@ static bool legalIdUsage(const ContextAttributeVector& caV)
 *
 * Returns true if an attribute was deleted, false otherwise
 *
-* Attributes with metadata ID are stored as <attrName>()<ID> in the attributes embedded document
 */
 static bool deleteAttribute
 (
   BSONObj&                              attrs,
   BSONObjBuilder*                       toUnset,
-  std::map<std::string, unsigned int>*  deleted,
+  BSONArrayBuilder*                     toPull,
   ContextAttribute*                     caP
 )
 {
   std::string effectiveName = dbDotEncode(caP->name);
-
-  if (caP->getId() != "")
-  {
-    effectiveName += MD_ID_SEPARATOR + caP->getId();
-  }
 
   if (!attrs.hasField(effectiveName.c_str()))
   {
@@ -1013,18 +874,7 @@ static bool deleteAttribute
   const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
 
   toUnset->append(composedName, 1);
-
-  /* Record the ocurrence of this attribute. Only attributes using ID may have a value greater than 1 */
-  if (deleted->count(caP->name))
-  {
-    std::map<std::string, unsigned int>::iterator it = deleted->find(caP->name);
-
-    it->second++;
-  }
-  else
-  {
-    deleted->insert(std::make_pair(caP->name, 1));
-  }
+  toPull->append(caP->name);
 
   return true;
 }
@@ -1152,7 +1002,7 @@ static bool addTriggeredSubscriptions_withCache
     //           Perhaps CachedSubscription should include an AttributeList (cSubP->attributes)
     //           instead of its std::vector<std::string> ... ?
     //
-    AttributeList aList;
+    StringList aList;
 
     aList.fill(cSubP->attributes);
 
@@ -1678,8 +1528,8 @@ static bool addTriggeredSubscriptions_noCache
 */
 static bool addTriggeredSubscriptions
 (
-  std::string                                    entityId,
-  std::string                                    entityType,
+  const std::string&                             entityId,
+  const std::string&                             entityType,
   const std::vector<std::string>&                modifiedAttrs,
   std::map<std::string, TriggeredSubscription*>& subs,
   std::string&                                   err,
@@ -1712,14 +1562,13 @@ static bool addTriggeredSubscriptions
 static bool processOnChangeConditionForUpdateContext
 (
   ContextElementResponse*          notifyCerP,
-  const AttributeList&             attrL,
+  const StringList&                attrL,
   const std::vector<std::string>&  metadataV,
   std::string                      subId,
   RenderFormat                     renderFormat,
   std::string                      tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
-  const std::vector<std::string>&  attrsOrder,
   const ngsiv2::HttpInfo&          httpInfo,
   bool                             blacklist = false
 )
@@ -1727,17 +1576,21 @@ static bool processOnChangeConditionForUpdateContext
   NotifyContextRequest   ncr;
   ContextElementResponse cer;
 
-  cer.contextElement.entityId.fill(&notifyCerP->contextElement.entityId);
+  cer.entity.fill(notifyCerP->entity.id,
+                  notifyCerP->entity.type,
+                  notifyCerP->entity.isPattern,
+                  notifyCerP->entity.servicePath);
 
-  /* Fill NotifyContextRequest with cerP, filtering by attrL */
-  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+  for (unsigned int ix = 0; ix < notifyCerP->entity.attributeVector.size(); ix++)
   {
-    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
+    ContextAttribute* caP = notifyCerP->entity.attributeVector[ix];
 
     if ((attrL.size() == 0) || attrL.lookup(ALL_ATTRS) || (blacklist == true))
     {
-      /* Empty attribute list in the subscription mean that all attributes are added */
-      cer.contextElement.contextAttributeVector.push_back(caP);
+      /* Empty attribute list in the subscription mean that all attributes are added
+       * Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
+       * cer.entity destructor does release() on the attrs vector */
+      cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
     }
     else
     {
@@ -1747,14 +1600,16 @@ static bool processOnChangeConditionForUpdateContext
          * notification (see deleteAttrInNotifyCer function for details) */
         if (caP->name == attrL[jx] && !caP->skip)
         {
-          cer.contextElement.contextAttributeVector.push_back(caP);
+          /* Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
+           * cer.entity destructor does release() on the attrs vector */
+          cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
         }
       }
     }
   }
 
   /* Early exit without sending notification if attribute list is empty */
-  if (cer.contextElement.contextAttributeVector.size() == 0)
+  if (cer.entity.attributeVector.size() == 0)
   {
     ncr.contextElementResponseVector.release();
     return false;
@@ -1771,169 +1626,16 @@ static bool processOnChangeConditionForUpdateContext
   ncr.originator.set("localhost");
 
   ncr.subscriptionId.set(subId);
-  getNotifier()->sendNotifyContextRequest(&ncr,
+  getNotifier()->sendNotifyContextRequest(ncr,
                                           httpInfo,
                                           tenant,
                                           xauthToken,
                                           fiwareCorrelator,
                                           renderFormat,
-                                          attrsOrder,
-                                          metadataV,
-                                          blacklist);
+                                          attrL.stringV,
+                                          blacklist,
+                                          metadataV);
   return true;
-}
-
-
-
-/* ****************************************************************************
-*
-* setActionTypeMetadata -
-*/
-static void setActionTypeMetadata(ContextElementResponse* notifyCerP)
-{
-  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
-  {
-    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
-
-    /* ActionType "" means that the attribute was not touched by the update triggering the
-     * notification, so no metadata must be added */
-    if (caP->actionType != "")
-    {
-      Metadata* mdP = new Metadata(NGSI_MD_ACTIONTYPE, DEFAULT_ATTR_STRING_TYPE, caP->actionType);
-      caP->metadataVector.push_back(mdP);
-    }
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setPreviousValueMetadata -
-*/
-static void setPreviousValueMetadata(ContextElementResponse* notifyCerP)
-{
-  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
-  {
-    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
-    ContextAttribute* previousValueP = caP->previousValue;
-
-    if (previousValueP == NULL)
-    {
-      // This CA doesn't have a previousValue. It may has been just created or not being
-      // touched by the update causing the notification. Thus, returning without adding metadata
-      continue;
-    }
-
-    Metadata* mdP = NULL;
-
-    if (previousValueP->compoundValueP == NULL)
-    {
-      switch (previousValueP->valueType)
-      {
-      case orion::ValueTypeString:
-        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->stringValue);
-        break;
-
-      case orion::ValueTypeBoolean:
-        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->boolValue);
-        break;
-
-      case orion::ValueTypeNumber:
-        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->numberValue);
-        break;
-
-      case orion::ValueTypeNone:
-        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, "");
-        mdP->valueType = orion::ValueTypeNone;
-        break;
-
-      default:
-        LM_E(("Runtime Error (unknown value type: %d)", previousValueP->valueType));
-      }
-    }
-    else
-    {
-      mdP            = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, "");
-      mdP->valueType = previousValueP->valueType;
-
-      // Steal the compound
-      mdP->compoundValueP = previousValueP->compoundValueP;
-      previousValueP->compoundValueP = NULL;
-    }
-
-    caP->metadataVector.push_back(mdP);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setDateCreatedAttribute -
-*/
-static void setDateCreatedAttribute(ContextElementResponse* notifyCerP)
-{
-  if (notifyCerP->contextElement.entityId.creDate != 0)
-  {
-    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, notifyCerP->contextElement.entityId.creDate);
-    notifyCerP->contextElement.contextAttributeVector.push_back(caP);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setDateModifiedAttribute -
-*/
-static void setDateModifiedAttribute(ContextElementResponse* notifyCerP)
-{
-  if (notifyCerP->contextElement.entityId.modDate != 0)
-  {
-    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, notifyCerP->contextElement.entityId.modDate);
-    notifyCerP->contextElement.contextAttributeVector.push_back(caP);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setDateCreatedMetadata -
-*/
-static void setDateCreatedMetadata(ContextElementResponse* notifyCerP)
-{
-  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
-  {
-    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
-
-    if (caP->creDate != 0)
-    {
-      Metadata* mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, caP->creDate);
-      caP->metadataVector.push_back(mdP);
-    }
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setDateModifiedMetadata -
-*/
-static void setDateModifiedMetadata(ContextElementResponse* notifyCerP)
-{
-  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
-  {
-    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
-
-    if (caP->modDate != 0)
-    {
-      Metadata* mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, caP->modDate);
-      caP->metadataVector.push_back(mdP);
-    }
-  }
 }
 
 
@@ -1969,7 +1671,7 @@ static bool processSubscriptions
      * before adding the subscription to the map.
      */
 
-    /* Check 1: timming (not expired and ok from throttling point of view) */
+    /* Check 1: timing (not expired and ok from throttling point of view) */
     if (tSubP->throttling != 1 && tSubP->lastNotification != 1)
     {
       long long  current               = getCurrentTime();
@@ -2028,9 +1730,9 @@ static bool processSubscriptions
       std::string  keyType = "_id." ENT_ENTITY_TYPE;
       std::string  keySp   = "_id." ENT_SERVICE_PATH;
       std::string  keyLoc  = ENT_LOCATION "." ENT_LOCATION_COORDS;
-      std::string  id      = notifyCerP->contextElement.entityId.id;
-      std::string  type    = notifyCerP->contextElement.entityId.type;
-      std::string  sp      = notifyCerP->contextElement.entityId.servicePath;
+      std::string  id      = notifyCerP->entity.id;
+      std::string  type    = notifyCerP->entity.type;
+      std::string  sp      = notifyCerP->entity.servicePath;
       BSONObj      query   = BSON(keyId << id << keyType << type << keySp << sp << keyLoc << areaFilter);
 
       unsigned long long n;
@@ -2047,39 +1749,6 @@ static bool processSubscriptions
       }
     }
 
-    /* Set special attributes */
-    if (tSubP->attrL.lookup(DATE_CREATED))
-    {
-      setDateCreatedAttribute(notifyCerP);
-    }
-
-    if (tSubP->attrL.lookup(DATE_MODIFIED))
-    {
-      setDateModifiedAttribute(notifyCerP);
-    }
-
-    /* Set special metadata */
-    if (std::find(tSubP->metadata.begin(), tSubP->metadata.end(), NGSI_MD_ACTIONTYPE) != tSubP->metadata.end())
-    {
-      setActionTypeMetadata(notifyCerP);
-    }
-
-    if (std::find(tSubP->metadata.begin(), tSubP->metadata.end(), NGSI_MD_PREVIOUSVALUE) != tSubP->metadata.end())
-    {
-      setPreviousValueMetadata(notifyCerP);
-    }
-
-    if (std::find(tSubP->metadata.begin(), tSubP->metadata.end(), NGSI_MD_DATECREATED) != tSubP->metadata.end())
-    {
-      setDateCreatedMetadata(notifyCerP);
-    }
-
-    if (std::find(tSubP->metadata.begin(), tSubP->metadata.end(), NGSI_MD_DATEMODIFIED) != tSubP->metadata.end())
-    {
-      setDateModifiedMetadata(notifyCerP);
-    }
-
-
     /* Send notification */
     LM_T(LmtSubCache, ("NOT ignored: %s", tSubP->cacheSubId.c_str()));
 
@@ -2093,24 +1762,42 @@ static bool processSubscriptions
                                                                 tenant,
                                                                 xauthToken,
                                                                 fiwareCorrelator,
-                                                                tSubP->attrL.attributeV,
                                                                 tSubP->httpInfo,
                                                                 tSubP->blacklist);
 
     if (notificationSent)
     {
       long long rightNow = getCurrentTime();
-
+      BSONObj query  = BSON("_id" << OID(mapSubId));
+      BSONObj update;
       //
       // If broker running without subscription cache, put lastNotificationTime and count in DB
       //
       if (subCacheActive == false)
       {
-        BSONObj query  = BSON("_id" << OID(mapSubId));
-        BSONObj update = BSON("$set" <<
-                              BSON(CSUB_LASTNOTIFICATION << rightNow) <<
-                              "$inc" << BSON(CSUB_COUNT << (long long) 1));
+        BSONObj subOrig;
+        std::string newErr;
+        collectionFindOne(getSubscribeContextCollectionName(tenant), query, &subOrig, &newErr);
+        std::string status;
+        if (!subOrig.isEmpty())
+        {
+          if (subOrig.hasField(CSUB_STATUS))
+          {
+            status = getStringFieldF(subOrig, CSUB_STATUS);
+          }
+        }
 
+        // Update the value of status (in case of oneshot) in DB when broker is running without subscription cache
+        if (status == STATUS_ONESHOT)
+        {
+          update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << rightNow << CSUB_STATUS << STATUS_INACTIVE) <<
+                        "$inc" << BSON(CSUB_COUNT << (long long) 1));
+        }
+        else
+        {
+          update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << rightNow) <<
+                        "$inc" << BSON(CSUB_COUNT << (long long) 1));
+        }
         ret = collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
       }
 
@@ -2126,6 +1813,15 @@ static bool processSubscriptions
 
         if (cSubP != NULL)
         {
+          if (cSubP->status == STATUS_ONESHOT)
+          {
+            update = BSON("$set" << BSON(CSUB_STATUS << STATUS_INACTIVE));
+            // update the status to inactive as status is oneshot (in both DB and csubs cache)
+            ret = collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
+            cSubP->status = STATUS_INACTIVE;
+
+            LM_T(LmtSubCache, ("set status to '%s' as Subscription status is oneshot", cSubP->status.c_str()));
+          }
           cSubP->lastNotificationTime = rightNow;
           cSubP->count               += 1;
 
@@ -2156,7 +1852,7 @@ static bool processSubscriptions
 */
 static void buildGeneralErrorResponse
 (
-  ContextElement*         ceP,
+  Entity*                 ceP,
   ContextAttribute*       caP,
   UpdateContextResponse*  responseP,
   HttpStatusCode          code,
@@ -2166,15 +1862,15 @@ static void buildGeneralErrorResponse
 {
   ContextElementResponse* cerP = new ContextElementResponse();
 
-  cerP->contextElement.entityId = ceP->entityId;
+  cerP->entity.fill(ceP->id, ceP->type, ceP->isPattern);
 
   if (caP != NULL)
   {
-    cerP->contextElement.contextAttributeVector.push_back(caP);
+    cerP->entity.attributeVector.push_back(caP);
   }
   else if (cavP != NULL)
   {
-    cerP->contextElement.contextAttributeVector.fill(cavP);
+    cerP->entity.attributeVector.fill(*cavP);
   }
 
   cerP->statusCode.fill(code, details);
@@ -2192,63 +1888,18 @@ static void buildGeneralErrorResponse
 */
 static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes)
 {
-  Metadata*  md;
-
-  /* Not custom */
-  if (caReq->getId().length() > 0)
-  {
-    md = new Metadata(NGSI_MD_ID, "string", caReq->getId());
-    caRes->metadataVector.push_back(md);
-  }
-
-  if ((caReq->getLocation().length() > 0) && (caReq->type != GEO_POINT))
-  {
-    /* Note that if attribute type is geo:point then the user is using the "new way"
-     * of locating entities in NGSIv1, thus location metadata is not rendered */
-    md = new Metadata(NGSI_MD_LOCATION, "string", caReq->getLocation());
-    caRes->metadataVector.push_back(md);
-  }
-
-  /* Custom (just "mirroring" in the response) */
+  /* Custom metadata (just "mirroring" in the response) */
   for (unsigned int ix = 0; ix < caReq->metadataVector.size(); ++ix)
   {
     Metadata* mdReq = caReq->metadataVector[ix];
 
     if (!isNotCustomMetadata(mdReq->name))
     {
-      md = new Metadata(mdReq);
+      Metadata* md = new Metadata(mdReq);
       caRes->metadataVector.push_back(md);
     }
   }
 }
-
-
-
-/* ****************************************************************************
-*
-* howManyAttrs -
-*
-* Returns the number of occurences of the attrName attribute (e.g. "A1") in the attrs
-* BSON (taken from DB). This use to be 1, except in the case of using ID.
-*
-*/
-static unsigned int howManyAttrs(BSONObj& attrs, const std::string& attrName)
-{
-  unsigned int           c = 0;
-  std::set<std::string>  attrNames;
-
-  attrs.getFieldNames(attrNames);
-  for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
-  {
-    if (basePart(*i) == attrName)
-    {
-      c++;
-    }
-  }
-
-  return c;
-}
-
 
 
 /* ****************************************************************************
@@ -2261,22 +1912,17 @@ static void updateAttrInNotifyCer
   ContextElementResponse* notifyCerP,
   ContextAttribute*       targetAttr,
   bool                    useDefaultType,
-  std::string             actionType
+  const std::string&      actionType
 )
 {
   /* Try to find the attribute in the notification CER */
-  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+  for (unsigned int ix = 0; ix < notifyCerP->entity.attributeVector.size(); ix++)
   {
-    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
+    ContextAttribute* caP = notifyCerP->entity.attributeVector[ix];
 
     if (caP->name == targetAttr->name)
     {
-      //
-      // FIXME P6: https://github.com/telefonicaid/fiware-orion/issues/2587
-      // If an attribute has no value, then its value is not updated (neither is previousValue).
-      // However this may be problematic ... see the issue
-      //
-      if (targetAttr->valueType != orion::ValueTypeNone)
+      if (targetAttr->valueType != orion::ValueTypeNotGiven)
       {
         /* Store previous value (it may be necessary to render previousValue metadata) */
         if (caP->previousValue == NULL)
@@ -2331,12 +1977,20 @@ static void updateAttrInNotifyCer
       int now = getCurrentTime();
       caP->modDate = now;
 
-      /* Metadata */
+      /* Metadata. Note we clean any previous content as updating an attribute means that all
+       * its previous values are removed (this may change if someday PATCH /v2/entities/E/attrs/A/metadata
+       * is implemented) */
+      // FIXME P3: ensure that location and ID metadata are not problematic (current .test suite doesn't raise
+      // any problem, but maybe the specific case is not covered)
+      caP->metadataVector.release();
       for (unsigned int jx = 0; jx < targetAttr->metadataVector.size(); jx++)
       {
         Metadata* targetMdP = targetAttr->metadataVector[jx];
 
         /* Search for matching metadata in the CER attribute */
+        // FIXME P5: maybe this can be optimized, as we started with an empty caP->metadataVector so probably
+        // we can assume that every metadata is new and the "for" block is not needed (although I'm
+        // not fully sure... we should test)
         bool matchMd = false;
         for (unsigned int kx = 0; kx < caP->metadataVector.size(); kx++)
         {
@@ -2398,7 +2052,7 @@ static void updateAttrInNotifyCer
   /* Set actionType */
   caP->actionType = actionType;
 
-  notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+  notifyCerP->entity.attributeVector.push_back(caP);
 }
 
 
@@ -2416,9 +2070,9 @@ static void deleteAttrInNotifyCer
   ContextAttribute*       targetAttr
 )
 {
-  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+  for (unsigned int ix = 0; ix < notifyCerP->entity.attributeVector.size(); ix++)
   {
-    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
+    ContextAttribute* caP = notifyCerP->entity.attributeVector[ix];
     if (caP->name == targetAttr->name)
     {
       caP->skip = true;
@@ -2440,24 +2094,27 @@ static bool updateContextAttributeItem
   BSONObj&                  attrs,
   ContextAttribute*         targetAttr,
   ContextElementResponse*   notifyCerP,
-  EntityId*                 eP,
+  const std::string&        entityDetail,
   BSONObjBuilder*           toSet,
   BSONArrayBuilder*         toPush,
-  bool&                     actualUpdate,
-  bool&                     entityModified,
+  bool*                     actualUpdate,
+  bool*                     entityModified,
   std::string*              currentLocAttrName,
   BSONObjBuilder*           geoJson,
+  mongo::Date_t*            dateExpiration,
+  bool*                     dateExpirationInPayload,
   bool                      isReplace,
+  const bool&               forcedUpdate,
   ApiVersion                apiVersion,
   OrionError*               oe
 )
 {
   std::string err;
 
-  if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace, apiVersion))
+  if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace, forcedUpdate, apiVersion))
   {
     // Attribute was found
-    entityModified = actualUpdate || entityModified;
+    *entityModified = (*actualUpdate) || (*entityModified);
   }
   else
   {
@@ -2474,7 +2131,7 @@ static bool updateContextAttributeItem
       // will removed when we refactor this function
       //
       std::string details = std::string("action: UPDATE") +
-                            " - entity: [" + eP->toString() + "]" +
+                            " - entity: [" + entityDetail + "]" +
                             " - offending attribute: " + targetAttr->getName();
 
       cerP->statusCode.fill(SccInvalidParameter, details);
@@ -2484,12 +2141,12 @@ static bool updateContextAttributeItem
       ca->found = false;
     }
   }
-
-  /* Check aspects related with location */
-  if (!processLocationAtUpdateAttribute(currentLocAttrName, targetAttr, geoJson, &err, apiVersion, oe))
+  /* Check aspects related with location and date expiration */
+  if (!processLocationAtUpdateAttribute(currentLocAttrName, targetAttr, geoJson, &err, apiVersion, oe)
+    || !processDateExpirationAtUpdateAttribute(targetAttr, dateExpiration, dateExpirationInPayload, &err, oe))
   {
     std::string details = std::string("action: UPDATE") +
-                          " - entity: [" + eP->toString() + "]" +
+                          " - entity: [" + entityDetail + "]" +
                           " - offending attribute: " + targetAttr->getName() +
                           " - " + err;
 
@@ -2518,46 +2175,32 @@ static bool appendContextAttributeItem
   BSONObj&                  attrs,
   ContextAttribute*         targetAttr,
   ContextElementResponse*   notifyCerP,
-  EntityId*                 eP,
+  const std::string&        entityDetail,
   BSONObjBuilder*           toSet,
   BSONArrayBuilder*         toPush,
-  bool&                     actualUpdate,
-  bool&                     entityModified,
+  bool*                     actualUpdate,
+  bool*                     entityModified,
   std::string*              currentLocAttrName,
   BSONObjBuilder*           geoJson,
+  mongo::Date_t*            dateExpiration,
+  const bool&               forcedUpdate,
   ApiVersion                apiVersion,
   OrionError*               oe
 )
 {
   std::string err;
 
-  if (!legalIdUsage(attrs, targetAttr))
-  {
-    /* If legalIdUsage() returns false, then that particular attribute can not be appended. In this case,
-     * we interrupt the processing and early return with
-     * a error StatusCode */
-    std::string details = std::string("action: APPEND") +
-                          " - entity: [" + eP->toString() + "]" +
-                          " - offending attribute: " + targetAttr->getName() +
-                          " - attribute cannot be appended";
+  bool actualAppend = appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, forcedUpdate, apiVersion);
 
-    cerP->statusCode.fill(SccInvalidParameter, details);
-    oe->fill(SccInvalidModification, details, "Unprocessable");
-
-    alarmMgr.badInput(clientIp, "attribute cannot be appended");
-    return false;
-  }
-
-  bool actualAppend = appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, apiVersion);
-
-  entityModified = actualUpdate || entityModified;
+  *entityModified = (*actualUpdate) || (*entityModified);
 
   /* Check aspects related with location */
   if (!processLocationAtAppendAttribute(currentLocAttrName, targetAttr, actualAppend, geoJson,
-                                        &err, apiVersion, oe))
+                                        &err, apiVersion, oe)
+      || !processDateExpirationAtAppendAttribute(dateExpiration, targetAttr, actualAppend, &err, oe))
   {
     std::string details = std::string("action: APPEND") +
-                          " - entity: [" + eP->toString() + "]" +
+                          " - entity: [" + entityDetail + "]" +
                           " - offending attribute: " + targetAttr->getName() +
                           " - " + err;
 
@@ -2591,25 +2234,26 @@ static bool deleteContextAttributeItem
   BSONObj&                              attrs,
   ContextAttribute*                     targetAttr,
   ContextElementResponse*               notifyCerP,
-  EntityId*                             eP,
+  const std::string&                    entityDetail,
   BSONObjBuilder*                       toUnset,
-  bool&                                 entityModified,
+  BSONArrayBuilder*                     toPull,
   std::string*                          currentLocAttrName,
-  std::map<std::string, unsigned int>*  deletedAttributesCounter,
+  bool*                                 entityModified,
+  mongo::Date_t*                        dateExpiration,
   ApiVersion                            apiVersion,
   OrionError*                           oe
 )
 {
-  if (deleteAttribute(attrs, toUnset, deletedAttributesCounter, targetAttr))
+  if (deleteAttribute(attrs, toUnset, toPull, targetAttr))
   {
     deleteAttrInNotifyCer(notifyCerP, targetAttr);
-    entityModified = true;
+    *entityModified = true;
 
     /* Check aspects related with location */
     if (targetAttr->getLocation(apiVersion).length() > 0)
     {
       std::string details = std::string("action: DELETE") +
-                            " - entity: [" + eP->toString() + "]" +
+                            " - entity: [" + entityDetail + "]" +
                             " - offending attribute: " + targetAttr->getName() +
                             " - location attribute has to be defined at creation time, with APPEND";
 
@@ -2627,6 +2271,14 @@ static bool deleteContextAttributeItem
       *currentLocAttrName = "";
     }
 
+    /* Check aspects related to date expiration.
+     * If the target attr is date expiration, nullifying dateExpiration ACTUAL value is the way
+     * of specifying that date expiration field is no longer used */
+    if (targetAttr->name == DATE_EXPIRES)
+    {
+      *dateExpiration = NO_EXPIRATION_DATE;
+    }
+
     ca->found = true;
   }
   else
@@ -2635,7 +2287,7 @@ static bool deleteContextAttributeItem
      * been found. In this case, we interrupt the processing and early return with
      * a error StatusCode */
     std::string details = std::string("action: DELETE") +
-                          " - entity: [" + eP->toString() + "]" +
+                          " - entity: [" + entityDetail + "]" +
                           " - offending attribute: " + targetAttr->getName() +
                           " - attribute not found";
 
@@ -2661,8 +2313,8 @@ static bool deleteContextAttributeItem
 */
 static bool processContextAttributeVector
 (
-  ContextElement*                                 ceP,
-  std::string                                     action,
+  Entity*                                         eP,
+  ActionType                                      action,
   std::map<std::string, TriggeredSubscription*>&  subsToNotify,
   ContextElementResponse*                         notifyCerP,
   BSONObj&                                        attrs,
@@ -2673,23 +2325,25 @@ static bool processContextAttributeVector
   ContextElementResponse*                         cerP,
   std::string*                                    currentLocAttrName,
   BSONObjBuilder*                                 geoJson,
+  mongo::Date_t*                                  dateExpiration,
+  bool*                                           dateExpirationInPayload,
   std::string                                     tenant,
   const std::vector<std::string>&                 servicePathV,
+  const bool&                                     forcedUpdate,
   ApiVersion                                      apiVersion,
   bool                                            loopDetected,
   OrionError*                                     oe
 )
 {
-  EntityId*                            eP              = &cerP->contextElement.entityId;
-  std::string                          entityId        = cerP->contextElement.entityId.id;
-  std::string                          entityType      = cerP->contextElement.entityId.type;
-  bool                                 entityModified  = false;
-  std::map<std::string, unsigned int>  deletedAttributesCounter;  // Aux var for DELETE operations
-  std::vector<std::string>             modifiedAttrs;
+  std::string               entityId        = cerP->entity.id;
+  std::string               entityType      = cerP->entity.type;
+  std::string               entityDetail    = cerP->entity.toString();
+  bool                      entityModified  = false;
+  std::vector<std::string>  modifiedAttrs;
 
-  for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
+  for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
   {
-    ContextAttribute*  targetAttr = ceP->contextAttributeVector[ix];
+    ContextAttribute*  targetAttr = eP->attributeVector[ix];
 
     if (targetAttr->skip == true)
     {
@@ -2700,63 +2354,69 @@ static bool processContextAttributeVector
     ContextAttribute*  ca = new ContextAttribute(targetAttr->name, targetAttr->type, "");
 
     setResponseMetadata(targetAttr, ca);
-    cerP->contextElement.contextAttributeVector.push_back(ca);
+    cerP->entity.attributeVector.push_back(ca);
 
     /* actualUpdate could be changed to false in the "update" case (or "append as update"). For "delete" and
      * "append" it would keep the true value untouched */
     bool actualUpdate = true;
-    if ((strcasecmp(action.c_str(), "update")) == 0 || (strcasecmp(action.c_str(), "replace")) == 0)
+    if ((action == ActionTypeUpdate) || (action == ActionTypeReplace))
     {
       if (!updateContextAttributeItem(cerP,
                                       ca,
                                       attrs,
                                       targetAttr,
                                       notifyCerP,
-                                      eP,
+                                      entityDetail,
                                       toSet,
                                       toPush,
-                                      actualUpdate,
-                                      entityModified,
+                                      &actualUpdate,
+                                      &entityModified,
                                       currentLocAttrName,
                                       geoJson,
-                                      strcasecmp(action.c_str(), "replace") == 0,
+                                      dateExpiration,
+                                      dateExpirationInPayload,
+                                      action == ActionTypeReplace,
+                                      forcedUpdate,
                                       apiVersion,
                                       oe))
       {
         return false;
       }
     }
-    else if ((strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "append_strict") == 0))
+    else if ((action == ActionTypeAppend) || (action == ActionTypeAppendStrict))
     {
       if (!appendContextAttributeItem(cerP,
                                       attrs,
                                       targetAttr,
                                       notifyCerP,
-                                      eP,
+                                      entityDetail,
                                       toSet,
                                       toPush,
-                                      actualUpdate,
-                                      entityModified,
+                                      &actualUpdate,
+                                      &entityModified,
                                       currentLocAttrName,
                                       geoJson,
+                                      dateExpiration,
+                                      forcedUpdate,
                                       apiVersion,
                                       oe))
       {
         return false;
       }
     }
-    else if (strcasecmp(action.c_str(), "delete") == 0)
+    else if (action == ActionTypeDelete)
     {
       if (!deleteContextAttributeItem(cerP,
                                       ca,
                                       attrs,
                                       targetAttr,
                                       notifyCerP,
-                                      eP,
+                                      entityDetail,
                                       toUnset,
-                                      entityModified,
+                                      toPull,
                                       currentLocAttrName,
-                                      &deletedAttributesCounter,
+                                      &entityModified,
+                                      dateExpiration,
                                       apiVersion,
                                       oe))
       {
@@ -2765,13 +2425,13 @@ static bool processContextAttributeVector
     }
     else
     {
-      std::string details = std::string("unknown actionType: '") + action + "'";
+      std::string details = std::string("unknown actionType");
 
       cerP->statusCode.fill(SccInvalidParameter, details);
       oe->fill(SccBadRequest, details, "BadRequest");
 
       // If we reach this point, there's a BUG in the parse layer checks
-      LM_E(("Runtime Error (unknown actionType '%s')", action.c_str()));
+      LM_E(("Runtime Error (unknown actionType)"));
       return false;
     }
 
@@ -2781,29 +2441,6 @@ static bool processContextAttributeVector
     if (actualUpdate)
     {
       modifiedAttrs.push_back(ca->name);
-    }
-  }
-
-  /* Special processing in the case of DELETE, to avoid "deleting too much" in the case of using
-   * metadata ID. If metadata ID feature were removed, this ugly piece of code wouldn't be needed ;)
-   * FIXME P3: note that in the case of Active/Active configuration it could happen that
-   * the attrsName get desynchronized, e.g. starting situation is A-ID1 and A-ID2, node
-   * #1 process DELETE A-ID1 and node #2 process DELETE A-ID2, each one thinking than the
-   * other A-IDx copy will be there at the end, thus nobody includes it in the toPull array
-   */
-  if (strcasecmp(action.c_str(), "delete") == 0)
-  {
-    std::map<std::string, unsigned int>::iterator it;
-
-    for (it = deletedAttributesCounter.begin(); it != deletedAttributesCounter.end(); ++it)
-    {
-      std::string  attrName     = it->first;
-      unsigned int deletedTimes = it->second;
-
-      if (howManyAttrs(attrs, attrName) <= deletedTimes)
-      {
-        toPull->append(attrName);
-      }
     }
   }
 
@@ -2852,7 +2489,7 @@ static bool processContextAttributeVector
 */
 static bool createEntity
 (
-  EntityId*                        eP,
+  Entity*                          eP,
   const ContextAttributeVector&    attrsV,
   int                              now,
   std::string*                     errDetail,
@@ -2860,7 +2497,7 @@ static bool createEntity
   const std::vector<std::string>&  servicePathV,
   ApiVersion                       apiVersion,
   const std::string&               fiwareCorrelator,
-  OrionError*                      oe
+  OrionError*                      oeP
 )
 {
   LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName(tenant).c_str()));
@@ -2869,24 +2506,24 @@ static bool createEntity
    * invoke ensureLocationIndex() in anycase, given that it is harmless in the case the collection and index already
    * exits (see docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/) */
   ensureLocationIndex(tenant);
-
-  if (!legalIdUsage(attrsV))
-  {
-    *errDetail =
-      "Attributes with same name with ID and not ID at the same time "
-      "in the same entity are forbidden: entity: [" + eP->toString() + "]";
-
-    oe->fill(SccInvalidModification, *errDetail, "Unprocessable");
-    return false;
-  }
+  ensureDateExpirationIndex(tenant);
 
   /* Search for a potential location attribute */
   std::string     locAttr;
   BSONObjBuilder  geoJson;
 
-  if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion, oe))
+  if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion, oeP))
   {
     // oe->fill() already managed by processLocationAtEntityCreation()
+    return false;
+  }
+
+  /* Search for a potential date expiration attribute */
+  mongo::Date_t dateExpiration = NO_EXPIRATION_DATE;
+
+  if (!processDateExpirationAtEntityCreation(attrsV, &dateExpiration, errDetail, oeP))
+  {
+    // oeP->fill() already managed by processLocationAtEntityCreation()
     return false;
   }
 
@@ -2895,13 +2532,12 @@ static bool createEntity
 
   for (unsigned int ix = 0; ix < attrsV.size(); ++ix)
   {
-    std::string     attrId = attrsV[ix]->getId();
     BSONObjBuilder  bsonAttr;
+
+    std::string attrType;
 
     if (!attrsV[ix]->typeGiven && (apiVersion == V2))
     {
-      std::string attrType;
-
       if ((attrsV[ix]->compoundValueP == NULL) || (attrsV[ix]->compoundValueP->valueType != orion::ValueTypeVector))
       {
         attrType = defaultType(attrsV[ix]->valueType);
@@ -2910,24 +2546,19 @@ static bool createEntity
       {
         attrType = defaultType(orion::ValueTypeVector);
       }
-
-      bsonAttr.append(ENT_ATTRS_TYPE, attrType);
     }
     else
     {
-      bsonAttr.append(ENT_ATTRS_TYPE, attrsV[ix]->type);
+      attrType = attrsV[ix]->type;
     }
 
+    bsonAttr.append(ENT_ATTRS_TYPE, attrType);
     bsonAttr.append(ENT_ATTRS_CREATION_DATE, now);
     bsonAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
-    attrsV[ix]->valueBson(bsonAttr);
+    attrsV[ix]->valueBson(bsonAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
     std::string effectiveName = dbDotEncode(attrsV[ix]->name);
-    if (attrId.length() != 0)
-    {
-      effectiveName += MD_ID_SEPARATOR + attrId;
-    }
 
     LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s}",
                     effectiveName.c_str(),
@@ -2964,7 +2595,7 @@ static bool createEntity
     bsonId.append(ENT_ENTITY_TYPE, eP->type);
   }
 
-  bsonId.append(ENT_SERVICE_PATH, servicePathV[0] == ""? DEFAULT_SERVICE_PATH_UPDATES : servicePathV[0]);
+  bsonId.append(ENT_SERVICE_PATH, servicePathV[0] == ""? SERVICE_PATH_ROOT : servicePathV[0]);
 
   BSONObjBuilder insertedDoc;
 
@@ -2981,12 +2612,18 @@ static bool createEntity
                                           ENT_LOCATION_COORDS   << geoJson.obj()));
   }
 
+  /* Add date expiration in the case it was found */
+  if (dateExpiration != NO_EXPIRATION_DATE)
+  {
+    insertedDoc.appendDate(ENT_EXPIRATION, dateExpiration);
+  }
+
   // Correlator (for notification loop detection logic)
   insertedDoc.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
 
   if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
   {
-    oe->fill(SccReceiverInternalError, *errDetail, "InternalError");
+    oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
     return false;
   }
 
@@ -3062,7 +2699,7 @@ static void searchContextProviders
 {
   ContextRegistrationResponseVector  crrV;
   EntityIdVector                     enV;
-  AttributeList                      attrL;
+  StringList                         attrL;
   std::string                        err;
 
   /* Fill input data for registrationsQuery() */
@@ -3094,7 +2731,7 @@ static void searchContextProviders
   }
 
   /* Second CPr lookup (in the case some element stills not being found): looking in E-<null> registrations */
-  AttributeList attrNullList;
+  StringList attrNullList;
   if (someContextElementNotFound(*cerP))
   {
     if (registrationsQuery(enV, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
@@ -3128,9 +2765,9 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
   {
     ContextElementResponse* cerP  = upcrsP->contextElementResponseVector[cerIx];
 
-    for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
+    for (unsigned int aIx = 0 ; aIx < cerP->entity.attributeVector.size(); ++aIx)
     {
-      ContextAttribute* aP  = cerP->contextElement.contextAttributeVector[aIx];
+      ContextAttribute* aP  = cerP->entity.attributeVector[aIx];
 
       if (aP->providingApplication.get() != "")
       {
@@ -3151,14 +2788,15 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 static void updateEntity
 (
   const BSONObj&                  r,
-  const std::string&              action,
+  ActionType                      action,
   const std::string&              tenant,
   const std::vector<std::string>& servicePathV,
   const std::string&              xauthToken,
-  ContextElement*                 ceP,
+  Entity*                         eP,
   UpdateContextResponse*          responseP,
   bool*                           attributeAlreadyExistsError,
   std::string*                    attributeAlreadyExistsList,
+  const bool&                     forcedUpdate,
   ApiVersion                      apiVersion,
   const std::string&              fiwareCorrelator,
   const std::string&              ngsiV2AttrsFormat
@@ -3168,7 +2806,6 @@ static void updateEntity
   *attributeAlreadyExistsError         = false;
   *attributeAlreadyExistsList          = "[ ";
 
-  EntityId*          enP               = &ceP->entityId;
   const std::string  idString          = "_id." ENT_ENTITY_ID;
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
   const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
@@ -3179,13 +2816,15 @@ static void updateEntity
   std::string        entityType        = idField.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(idField, ENT_ENTITY_TYPE) : "";
   std::string        entitySPath       = getStringFieldF(idField, ENT_SERVICE_PATH);
 
+  EntityId en(entityId, entityType);
+
   LM_T(LmtServicePath, ("Found entity '%s' in ServicePath '%s'", entityId.c_str(), entitySPath.c_str()));
 
   ContextElementResponse* cerP = new ContextElementResponse();
-  cerP->contextElement.entityId.fill(entityId, entityType, "false");
+  cerP->entity.fill(entityId, entityType, "false");
 
   /* If the vector of Context Attributes is empty and the operation was DELETE, then delete the entity */
-  if (strcasecmp(action.c_str(), "delete") == 0 && ceP->contextAttributeVector.size() == 0)
+  if ((action == ActionTypeDelete) && (eP->attributeVector.size() == 0))
   {
     LM_T(LmtServicePath, ("Removing entity"));
     removeEntity(entityId, entityType, cerP, tenant, entitySPath, &(responseP->oe));
@@ -3193,7 +2832,7 @@ static void updateEntity
     return;
   }
 
-  LM_T(LmtServicePath, ("ceP->contextAttributeVector.size: %d", ceP->contextAttributeVector.size()));
+  LM_T(LmtServicePath, ("eP->attributeVector.size: %d", eP->attributeVector.size()));
   /* We take as input the attrs array in the entity document and generate two outputs: a
    * BSON object for $set (updates and appends) and a BSON object for $unset (deletes). Note that depending
    * the request one of the BSON objects could be empty (it use to be the $unset one). In addition, for
@@ -3214,6 +2853,8 @@ static void updateEntity
    * processes the attributes in the updateContext */
   std::string     locAttr = "";
   BSONObj         currentGeoJson;
+  BSONObj         newGeoJson;
+  BSONObj         finalGeoJson;
   BSONObjBuilder  geoJson;
 
   if (r.hasField(ENT_LOCATION))
@@ -3224,15 +2865,28 @@ static void updateEntity
     currentGeoJson = getObjectFieldF(loc, ENT_LOCATION_COORDS);
   }
 
+  /* Is the entity using date expiration? In that case, we fill the currentdateExpiration attribute with that information.
+   * In any case, if the request contains a new date expiration, this will become the current one
+   * The dateExpirationInPayload boolean is used in case of replace operation,
+   * in order to know that the date is a new one, coming from the input request
+   */
+  mongo::Date_t currentDateExpiration = NO_EXPIRATION_DATE;
+  bool dateExpirationInPayload          = false;
+
+  if (r.hasField(ENT_EXPIRATION))
+  {
+    currentDateExpiration = getField(r, ENT_EXPIRATION).date();
+  }
+
   //
   // Before calling processContextAttributeVector and actually do the work, let's check if the
   // request is of type 'append-only' and if we have any problem with attributes already existing.
   //
-  if (strcasecmp(action.c_str(), "append_strict") == 0)
+  if (action == ActionTypeAppendStrict)
   {
-    for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
+    for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
     {
-      if (howManyAttrs(attrs, ceP->contextAttributeVector[ix]->name) != 0)
+      if (attrs.hasField(eP->attributeVector[ix]->name))
       {
         alarmMgr.badInput(clientIp, "attribute already exists");
         *attributeAlreadyExistsError = true;
@@ -3241,27 +2895,27 @@ static void updateEntity
         // This attribute should now be removed from the 'query' ...
         // processContextAttributeVector looks at the 'skip' field
         //
-        ceP->contextAttributeVector[ix]->skip = true;
+        eP->attributeVector[ix]->skip = true;
 
         // Add to the list of existing attributes - for the error response
         if (*attributeAlreadyExistsList != "[ ")
         {
           *attributeAlreadyExistsList += ", ";
         }
-        *attributeAlreadyExistsList += ceP->contextAttributeVector[ix]->name;
+        *attributeAlreadyExistsList += eP->attributeVector[ix]->name;
       }
     }
     *attributeAlreadyExistsList += " ]";
   }
 
   /* Build CER used for notifying (if needed) */
-  AttributeList            emptyAttrL;
-  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL);
+  StringList               emptyAttrL;
+  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL, true, apiVersion);
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
-  notifyCerP->contextElement.entityId.creDate = r.hasField(ENT_CREATION_DATE)     ? getIntOrLongFieldAsLongF(r, ENT_CREATION_DATE)     : -1;
-  notifyCerP->contextElement.entityId.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getIntOrLongFieldAsLongF(r, ENT_MODIFICATION_DATE) : -1;
+  notifyCerP->entity.creDate = r.hasField(ENT_CREATION_DATE)     ? getIntOrLongFieldAsLongF(r, ENT_CREATION_DATE)     : -1;
+  notifyCerP->entity.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getIntOrLongFieldAsLongF(r, ENT_MODIFICATION_DATE) : -1;
 
   // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
   // in addition, the request was sent due to a custom notification
@@ -3271,7 +2925,7 @@ static void updateEntity
     loopDetected = (getStringFieldF(r, ENT_LAST_CORRELATOR) == fiwareCorrelator);
   }
 
-  if (!processContextAttributeVector(ceP,
+  if (!processContextAttributeVector(eP,
                                      action,
                                      subsToNotify,
                                      notifyCerP,
@@ -3283,8 +2937,11 @@ static void updateEntity
                                      cerP,
                                      &locAttr,
                                      &geoJson,
+                                     &currentDateExpiration,
+                                     &dateExpirationInPayload,
                                      tenant,
                                      servicePathV,
+                                     forcedUpdate,
                                      apiVersion,
                                      loopDetected,
                                      &(responseP->oe)))
@@ -3295,9 +2952,9 @@ static void updateEntity
     // FIXME P8: the same three statements are at the end of the while loop. Refactor the code to have this
     // in only one place
     //
-    searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
+    searchContextProviders(tenant, servicePathV, en, eP->attributeVector, cerP);
 
-    if (!(attributeAlreadyExistsError && (strcasecmp(action.c_str(), "append_strict") == 0)))
+    if (!(attributeAlreadyExistsError && (action == ActionTypeAppendStrict)))
     {
       // Note that CER generation in the case of attributeAlreadyExistsError has its own logic at
       // processContextElement() function so we need to skip this addition or we will get duplicated
@@ -3320,34 +2977,52 @@ static void updateEntity
   /* Compose the final update on database */
   LM_T(LmtServicePath, ("Updating the attributes of the ContextElement"));
 
-  if (strcasecmp(action.c_str(), "replace") != 0)
+  if (action != ActionTypeReplace)
   {
     int now = getCurrentTime();
     toSet.append(ENT_MODIFICATION_DATE, now);
-    notifyCerP->contextElement.entityId.modDate = now;
+    notifyCerP->entity.modDate = now;
   }
 
-  // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
-  // not sure how the following behaves in the case of "replace"...
+  // We don't touch toSet in the replace case, due to
+  // the way in which BSON is composed in that case (see below)
   if (locAttr.length() > 0)
   {
-    BSONObj newGeoJson = geoJson.obj();
+    newGeoJson = geoJson.obj();
 
     // If processContextAttributeVector() didn't touched the geoJson, then we
     // use the existing object
-    BSONObj finalGeoJson = newGeoJson.nFields() > 0 ? newGeoJson : currentGeoJson;
+    finalGeoJson = newGeoJson.nFields() > 0 ? newGeoJson : currentGeoJson;
 
-    toSet.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
+    if (action != ActionTypeReplace)
+    {
+      toSet.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
                                     ENT_LOCATION_COORDS   << finalGeoJson));
+    }
+    else if (newGeoJson.nFields() == 0)
+    {
+      toUnset.append(ENT_LOCATION, 1);
+    }
   }
-  else
+  else if (newGeoJson.nFields() == 0)
   {
     toUnset.append(ENT_LOCATION, 1);
   }
 
+  // We don't touch toSet in the replace case, due to
+  // the way in which BSON is composed in that case (see below)
+  if ((currentDateExpiration != NO_EXPIRATION_DATE) && (action != ActionTypeReplace))
+  {
+    toSet.appendDate(ENT_EXPIRATION, currentDateExpiration);
+  }
+  else if (!dateExpirationInPayload)
+  {
+    toUnset.append(ENT_EXPIRATION, 1);
+  }
+
   // Correlator (for notification loop detection logic). We don't touch toSet in the replace case, due to
   // the way in which BSON is composed in that case (see below)
-  if (strcasecmp(action.c_str(), "replace") != 0)
+  if (action != ActionTypeReplace)
   {
     toSet.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
   }
@@ -3360,16 +3035,38 @@ static void updateEntity
   BSONArray       toPushArr   = toPush.arr();
   BSONArray       toPullArr   = toPull.arr();
 
-  if (strcasecmp(action.c_str(), "replace") == 0)
+  if (action == ActionTypeReplace)
   {
     // toSet: { A1: { ... }, A2: { ... } }
-    int now = getCurrentTime();
-    updatedEntity.append("$set", BSON(ENT_ATTRS             << toSetObj <<
-                                      ENT_ATTRNAMES         << toPushArr <<
-                                      ENT_MODIFICATION_DATE << now <<
-                                      ENT_LAST_CORRELATOR   << fiwareCorrelator));
+    BSONObjBuilder replaceSet;
+    int            now = getCurrentTime();
 
-    notifyCerP->contextElement.entityId.modDate = now;
+    // In order to enable easy append management of fields (e.g. location, dateExpiration),
+    // we use a BSONObjBuilder instead the BSON stream macro.
+    replaceSet.append(ENT_ATTRS, toSetObj);
+    replaceSet.append(ENT_ATTRNAMES, toPushArr);
+    replaceSet.append(ENT_MODIFICATION_DATE, now);
+    replaceSet.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
+
+    if (dateExpirationInPayload)
+    {
+      replaceSet.append(ENT_EXPIRATION, currentDateExpiration);
+    }
+
+    if (newGeoJson.nFields() > 0)
+    {
+      replaceSet.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
+                                    ENT_LOCATION_COORDS   << finalGeoJson));
+    }
+
+    updatedEntity.append("$set", replaceSet.obj());
+
+    if (!dateExpirationInPayload || newGeoJson.nFields() == 0)
+    {
+      updatedEntity.append("$unset", toUnsetObj);
+    }
+
+    notifyCerP->entity.modDate = now;
   }
   else
   {
@@ -3433,8 +3130,11 @@ static void updateEntity
     return;
   }
 
-  /* Send notifications for each one of the ONCHANGE subscriptions accumulated by
-   * previous addTriggeredSubscriptions() invocations */
+  /* Send notifications for each one of the subscriptions accumulated by
+   * previous addTriggeredSubscriptions() invocations. Before that, we add
+   * builtin attributes and metadata (both NGSIv1 and NGSIv2 as this is
+   * for notifications and NGSIv2 builtins can be used in NGSIv1 notifications) */
+  addBuiltins(notifyCerP);
   processSubscriptions(subsToNotify, notifyCerP, &err, tenant, xauthToken, fiwareCorrelator);
   notifyCerP->release();
   delete notifyCerP;
@@ -3451,13 +3151,18 @@ static void updateEntity
 
   /* To finish with this entity processing, search for CPrs in not found attributes and
    * add the corresponding ContextElementResponse to the global response */
-  searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
+  if ((action == ActionTypeUpdate) || (action == ActionTypeReplace))
+  {
+    searchContextProviders(tenant, servicePathV, en, eP->attributeVector, cerP);
+  }
 
   // StatusCode may be set already (if so, we keep the existing value)
+
   if (cerP->statusCode.code == SccNone)
   {
     cerP->statusCode.fill(SccOk);
   }
+
   responseP->contextElementResponseVector.push_back(cerP);
 }
 
@@ -3469,28 +3174,24 @@ static void updateEntity
 */
 static bool contextElementPreconditionsCheck
 (
-  ContextElement*         ceP,
+  Entity*                 eP,
   UpdateContextResponse*  responseP,
-  const std::string&      action,
+  ActionType              action,
   ApiVersion              apiVersion
 )
 {
-  /* Getting the entity in the request (helpful in other places) */
-  EntityId* enP = &ceP->entityId;
-
   /* Checking there aren't duplicate attributes */
-  for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
+  for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
   {
-    std::string name = ceP->contextAttributeVector[ix]->name;
-    std::string id   = ceP->contextAttributeVector[ix]->getId();
-    for (unsigned int jx = ix + 1; jx < ceP->contextAttributeVector.size(); ++jx)
+    std::string name = eP->attributeVector[ix]->name;
+    for (unsigned int jx = ix + 1; jx < eP->attributeVector.size(); ++jx)
     {
-      if ((name == ceP->contextAttributeVector[jx]->name) && (id == ceP->contextAttributeVector[jx]->getId()))
+      if ((name == eP->attributeVector[jx]->name))
       {
-        ContextAttribute* ca = new ContextAttribute(ceP->contextAttributeVector[ix]);
-        std::string details = std::string("duplicated attribute name: name=<") + name + "> id=<" + id + ">";
+        ContextAttribute* ca = new ContextAttribute(eP->attributeVector[ix]);
+        std::string details = std::string("duplicated attribute name: name=<") + name + ">";
         alarmMgr.badInput(clientIp, details);
-        buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification,
+        buildGeneralErrorResponse(eP, ca, responseP, SccInvalidModification,
                                   "duplicated attribute /" + name + "/");
         responseP->oe.fill(SccBadRequest, "duplicated attribute /" + name + "/", "BadRequest");
         return false;  // Error already in responseP
@@ -3499,35 +3200,35 @@ static bool contextElementPreconditionsCheck
   }
 
   /* Not supporting isPattern = true currently */
-  if (isTrue(enP->isPattern))
+  if (isTrue(eP->isPattern))
   {
-    buildGeneralErrorResponse(ceP, NULL, responseP, SccNotImplemented);
+    buildGeneralErrorResponse(eP, NULL, responseP, SccNotImplemented);
     // No need of filling responseP->oe, this cannot happen in NGSIv2
     return false;  // Error already in responseP
   }
 
   /* Check that UPDATE or APPEND is not used with empty attributes (i.e. no value, no type, no metadata) */
   /* Only wanted for API version v1                                                                      */
-  if (((strcasecmp(action.c_str(), "update") == 0) ||
-       (strcasecmp(action.c_str(), "append") == 0) ||
-       (strcasecmp(action.c_str(), "append_strict") == 0) ||
-       (strcasecmp(action.c_str(), "replace") == 0)) && (apiVersion == V1))
+  if (((action == ActionTypeUpdate) ||
+       (action == ActionTypeAppend) ||
+       (action == ActionTypeAppendStrict) ||
+       (action == ActionTypeReplace)) && (apiVersion == V1))
   {
     // FIXME: Careful, in V2, this check is not wanted ...
 
-    for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
+    for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
     {
-      ContextAttribute* aP = ceP->contextAttributeVector[ix];
-      if (attributeValueAbsent(aP, apiVersion) && attributeTypeAbsent(aP) && (aP->metadataVector.size() == 0))
+      ContextAttribute* aP = eP->attributeVector[ix];
+      if (aP->valueType == orion::ValueTypeNotGiven && aP->type == "" && (aP->metadataVector.size() == 0))
       {
         ContextAttribute* ca = new ContextAttribute(aP);
 
-        std::string details = std::string("action: ") + action +
-            " - entity: [" + enP->toString(true) + "]" +
+        std::string details = std::string("action: ") + actionTypeString(apiVersion, action) +
+            " - entity: [" + eP->toString(true) + "]" +
             " - offending attribute: " + aP->name +
             " - empty attribute not allowed in APPEND or UPDATE";
 
-        buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification, details);
+        buildGeneralErrorResponse(eP, ca, responseP, SccInvalidModification, details);
         responseP->oe.fill(SccBadRequest, details, "BadRequest");
 
         alarmMgr.badInput(clientIp, "empty attribute not allowed in APPEND or UPDATE");
@@ -3547,9 +3248,9 @@ static bool contextElementPreconditionsCheck
 */
 static void setActionType(ContextElementResponse* notifyCerP, std::string actionType)
 {
-  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+  for (unsigned int ix = 0; ix < notifyCerP->entity.attributeVector.size(); ix++)
   {
-    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
+    ContextAttribute* caP = notifyCerP->entity.attributeVector[ix];
     caP->actionType = actionType;
   }
 }
@@ -3565,21 +3266,22 @@ static void setActionType(ContextElementResponse* notifyCerP, std::string action
 */
 void processContextElement
 (
-  ContextElement*                      ceP,
+  Entity*                              eP,
   UpdateContextResponse*               responseP,
-  const std::string&                   action,
+  ActionType                           action,
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                   xauthToken,
   const std::string&                   fiwareCorrelator,
   const std::string&                   ngsiV2AttrsFormat,
+  const bool&                          forcedUpdate,
   ApiVersion                           apiVersion,
   Ngsiv2Flavour                        ngsiv2Flavour
 )
 {
   /* Check preconditions */
-  if (!contextElementPreconditionsCheck(ceP, responseP, action, apiVersion))
+  if (!contextElementPreconditionsCheck(eP, responseP, action, apiVersion))
   {
     return;  // Error already in responseP
   }
@@ -3588,14 +3290,15 @@ void processContextElement
   const std::string  idString          = "_id." ENT_ENTITY_ID;
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
   const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
-  EntityId*          enP               = &ceP->entityId;
+
+  EntityId           en(eP->id, eP->type);
   BSONObjBuilder     bob;
 
-  bob.append(idString, enP->id);
+  bob.append(idString, eP->id);
 
-  if (enP->type != "")
+  if (eP->type != "")
   {
-    bob.append(typeString, enP->type);
+    bob.append(typeString, eP->type);
   }
 
   // Service path
@@ -3625,7 +3328,7 @@ void processContextElement
 
     if (!collectionCount(getEntitiesCollectionName(tenant), query, &entitiesNumber, &err))
     {
-      buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError, err);
+      buildGeneralErrorResponse(eP, NULL, responseP, SccReceiverInternalError, err);
       responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
       return;
     }
@@ -3633,7 +3336,7 @@ void processContextElement
     // This is the case of POST /v2/entities, in order to check that entity doesn't previously exist
     if ((entitiesNumber > 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONCREATE))
     {
-      buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Already Exists");
+      buildGeneralErrorResponse(eP, NULL, responseP, SccInvalidModification, "Already Exists");
       responseP->oe.fill(SccInvalidModification, "Already Exists", "Unprocessable");
       return;
     }
@@ -3641,7 +3344,7 @@ void processContextElement
     // This is the case of POST /v2/entities/<id>, in order to check that entity previously exist
     if ((entitiesNumber == 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONAPPEND))
     {
-      buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY);
+      buildGeneralErrorResponse(eP, NULL, responseP, SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY);
       responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
       return;
     }
@@ -3651,7 +3354,7 @@ void processContextElement
     // thinking too much about it, but NGSIv1 behaviour has to be preserved to keep backward compatibility)
     if (entitiesNumber > 1)
     {
-      buildGeneralErrorResponse(ceP, NULL, responseP, SccConflict, ERROR_DESC_TOO_MANY_ENTITIES);
+      buildGeneralErrorResponse(eP, NULL, responseP, SccConflict, ERROR_DESC_TOO_MANY_ENTITIES);
       responseP->oe.fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
       return;
     }
@@ -3666,7 +3369,7 @@ void processContextElement
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
-    buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError, err);
+    buildGeneralErrorResponse(eP, NULL, responseP, SccReceiverInternalError, err);
     responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
 
     return;
@@ -3726,7 +3429,6 @@ void processContextElement
   // Used to accumulate error response information, checked at the end
   bool         attributeAlreadyExistsError = false;
   std::string  attributeAlreadyExistsList  = "[ ";
-
   /* Note that the following loop is not executed if result size is 0, which leads to the
    * 'if' just below to create a new entity */
   for (unsigned int ix = 0; ix < results.size(); ix++)
@@ -3736,10 +3438,11 @@ void processContextElement
                  tenant,
                  servicePathV,
                  xauthToken,
-                 ceP,
+                 eP,
                  responseP,
                  &attributeAlreadyExistsError,
                  &attributeAlreadyExistsList,
+                 forcedUpdate,
                  apiVersion,
                  fiwareCorrelator,
                  ngsiV2AttrsFormat);
@@ -3759,26 +3462,26 @@ void processContextElement
     /* Creating the common part of the response that doesn't depend on the case */
     ContextElementResponse* cerP = new ContextElementResponse();
 
-    cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
+    cerP->entity.fill(eP->id, eP->type, "false");
 
     /* All the attributes existing in the request are added to the response with 'found' set to false
      * in the of UPDATE/DELETE and true in the case of APPEND
      */
-    bool foundValue = (strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "append_strict") == 0);
+    bool foundValue = ((action == ActionTypeAppend) || (action == ActionTypeAppendStrict));
 
-    for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
+    for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
     {
-      ContextAttribute*  caP  = ceP->contextAttributeVector[ix];
+      ContextAttribute*  caP  = eP->attributeVector[ix];
       ContextAttribute*  ca   = new ContextAttribute(caP->name, caP->type, "", foundValue);
 
       setResponseMetadata(caP, ca);
-      cerP->contextElement.contextAttributeVector.push_back(ca);
+      cerP->entity.attributeVector.push_back(ca);
     }
 
-    if ((strcasecmp(action.c_str(), "update") == 0) || (strcasecmp(action.c_str(), "replace") == 0))
+    if ((action == ActionTypeUpdate) || (action == ActionTypeReplace))
     {
       /* In the case of UPDATE or REPLACE we look for context providers */
-      searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
+      searchContextProviders(tenant, servicePathV, en, eP->attributeVector, cerP);
       cerP->statusCode.fill(SccOk);
       responseP->contextElementResponseVector.push_back(cerP);
 
@@ -3799,7 +3502,7 @@ void processContextElement
         }
       }
     }
-    else if (strcasecmp(action.c_str(), "delete") == 0)
+    else if (action == ActionTypeDelete)
     {
       cerP->statusCode.fill(SccContextElementNotFound);
 
@@ -3812,7 +3515,7 @@ void processContextElement
       std::string  errDetail;
       int          now = getCurrentTime();
 
-      if (!createEntity(enP, ceP->contextAttributeVector, now, &errDetail, tenant, servicePathV, apiVersion, fiwareCorrelator, &(responseP->oe)))
+      if (!createEntity(eP, eP->attributeVector, now, &errDetail, tenant, servicePathV, apiVersion, fiwareCorrelator, &(responseP->oe)))
       {
         cerP->statusCode.fill(SccInvalidParameter, errDetail);
         // In this case, responseP->oe is not filled, as createEntity() deals internally with that
@@ -3825,13 +3528,13 @@ void processContextElement
         std::map<std::string, TriggeredSubscription*>  subsToNotify;
         std::vector<std::string>                       attrNames;
 
-        for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
+        for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
         {
-          attrNames.push_back(ceP->contextAttributeVector[ix]->name);
+          attrNames.push_back(eP->attributeVector[ix]->name);
         }
 
-        if (!addTriggeredSubscriptions(enP->id,
-                                       enP->type,
+        if (!addTriggeredSubscriptions(eP->id,
+                                       eP->type,
                                        attrNames,
                                        subsToNotify,
                                        err,
@@ -3850,23 +3553,28 @@ void processContextElement
         // Build CER used for notifying (if needed). Service Path vector shouldn't have more than
         // one item, so it should be safe to get item 0
         //
-        ContextElementResponse* notifyCerP = new ContextElementResponse(ceP, apiVersion == V2);
+        ContextElementResponse* notifyCerP = new ContextElementResponse(eP, apiVersion == V2);
 
         // Set action type
         setActionType(notifyCerP, NGSI_MD_ACTIONTYPE_APPEND);
 
         // Set creaDate and modDate times
-        notifyCerP->contextElement.entityId.creDate = now;
-        notifyCerP->contextElement.entityId.modDate = now;
+        notifyCerP->entity.creDate = now;
+        notifyCerP->entity.modDate = now;
 
-        for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+        for (unsigned int ix = 0; ix < notifyCerP->entity.attributeVector.size(); ix++)
         {
-          ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
+          ContextAttribute* caP = notifyCerP->entity.attributeVector[ix];
           caP->creDate = now;
           caP->modDate = now;
         }
 
-        notifyCerP->contextElement.entityId.servicePath = servicePathV.size() > 0? servicePathV[0] : "";
+        notifyCerP->entity.servicePath = servicePathV.size() > 0? servicePathV[0] : "";
+        /* Send notifications for each one of the subscriptions accumulated by
+         * previous addTriggeredSubscriptions() invocations. Before that, we add
+         * builtin attributes and metadata (both NGSIv1 and NGSIv2 as this is
+         * for notifications and NGSIv2 builtins can be used in NGSIv1 notifications) */
+        addBuiltins(notifyCerP);
         processSubscriptions(subsToNotify, notifyCerP, &errReason, tenant, xauthToken, fiwareCorrelator);
 
         notifyCerP->release();
@@ -3881,7 +3589,7 @@ void processContextElement
   if (attributeAlreadyExistsError == true)
   {
     std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
-    buildGeneralErrorResponse(ceP, NULL, responseP, SccBadRequest, details);
+    buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
     responseP->oe.fill(SccInvalidModification, details, "Unprocessable");
   }
 

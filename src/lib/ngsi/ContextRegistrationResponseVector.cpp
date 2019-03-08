@@ -47,9 +47,9 @@ void ContextRegistrationResponseVector::push_back(ContextRegistrationResponse* i
 
 /* ****************************************************************************
 *
-* ContextRegistrationResponseVector::render -
+* ContextRegistrationResponseVector::toJsonV1 -
 */
-std::string ContextRegistrationResponseVector::render(const std::string& indent, bool comma)
+std::string ContextRegistrationResponseVector::toJsonV1(bool comma)
 {
   std::string  out = "";
 
@@ -58,32 +58,16 @@ std::string ContextRegistrationResponseVector::render(const std::string& indent,
     return "";
   }
 
-  out += startTag(indent, "contextRegistrationResponses", true);
+  out += startTag("contextRegistrationResponses", true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-     out += vec[ix]->render(indent + "  ", (ix != vec.size() - 1));
+     out += vec[ix]->toJsonV1((ix != vec.size() - 1));
   }
 
-  out += endTag(indent, comma, true);
+  out += endTag(comma, true);
 
   return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextRegistrationResponseVector::present -
-*/
-void ContextRegistrationResponseVector::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%lu ContextRegistrationResponses", (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent);
-  }
 }
 
 
@@ -139,7 +123,6 @@ std::string ContextRegistrationResponseVector::check
 (
   ApiVersion          apiVersion,
   RequestType         requestType,
-  const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
 )
@@ -148,7 +131,7 @@ std::string ContextRegistrationResponseVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion, requestType, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType, predetectedError, counter)) != "OK")
     {
       return res;
     }

@@ -39,7 +39,7 @@ brokerStart CB 0
 echo "01. Create E1/T1/A1=1, using POST /v2/op/update with APPEND"
 echo "==========================================================="
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities": [
     {
       "id": "E1",
@@ -65,7 +65,7 @@ echo
 echo "03. Delete E1 using POST /v2/op/update with DELETE"
 echo "=================================================="
 payload='{
-  "actionType": "DELETE",
+  "actionType": "delete",
   "entities": [
     {
       "id": "E1",
@@ -81,7 +81,7 @@ echo
 echo "04. Delete E1 again, see it fail"
 echo "================================"
 payload='{
-  "actionType": "DELETE",
+  "actionType": "delete",
   "entities": [
     {
       "id": "E1",

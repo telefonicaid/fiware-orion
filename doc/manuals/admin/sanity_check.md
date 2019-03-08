@@ -1,4 +1,4 @@
-#<a name="top"></a>Sanity check procedures
+# <a name="top"></a>Sanity check procedures
 
 * [End to End Testing](#end-to-end-testing)
 * [List of Running Processes](#list-of-running-processes)
@@ -24,12 +24,14 @@ curl --header 'Accept: application/json' localhost:1026/version
 ```
 {
   "orion" : {
-    "version" : "0.23.0-next",
+    "version" : "1.8.0-next",
     "uptime" : "0 d, 0 h, 2 m, 30 s",
     "git_hash" : "c49692a996fb8d23cb2e78992094e26b1ca45dac",
-    "compile_time" : "Tue Sep 8 16:56:16 CEST 2015",
+    "compile_time" : "Wed Sep 27 16:56:16 CEST 2017",
     "compiled_by" : "fermin",
-    "compiled_in" : "debvm"
+    "compiled_in" : "debvm",
+    "release_date" : "Wed Sep 27 16:56:16 CEST 2017",
+    "doc" : "https://fiware-orion.rtfd.io/"
   }
 }
 ```

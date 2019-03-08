@@ -43,7 +43,7 @@ using namespace ngsiv2;
 *
 * SubscribeContextRequest::check -
 */
-std::string SubscribeContextRequest::check(const std::string& indent, const std::string& predetectedError, int counter)
+std::string SubscribeContextRequest::check(const std::string& predetectedError, int counter)
 {
   SubscribeContextResponse response;
   std::string              res;
@@ -51,37 +51,20 @@ std::string SubscribeContextRequest::check(const std::string& indent, const std:
   /* First, check optional fields only in the case they are present */
   /* Second, check the other (mandatory) fields */
 
-  if (((res = entityIdVector.check(SubscribeContext, indent))                                   != "OK") ||
-      ((res = attributeList.check(SubscribeContext, indent, predetectedError, counter))         != "OK") ||
-      ((res = reference.check(SubscribeContext, indent, predetectedError, counter))             != "OK") ||
-      ((res = duration.check(SubscribeContext, indent, predetectedError, counter))              != "OK") ||
-      ((res = restriction.check(SubscribeContext, indent, predetectedError, restrictions))      != "OK") ||
-      ((res = notifyConditionVector.check(SubscribeContext, indent, predetectedError, counter)) != "OK") ||
-      ((res = throttling.check(SubscribeContext, indent, predetectedError, counter))            != "OK"))
+  if (((res = entityIdVector.check(SubscribeContext))                                   != "OK") ||
+      ((res = attributeList.check())                                                    != "OK") ||
+      ((res = reference.check(SubscribeContext))                                        != "OK") ||
+      ((res = duration.check())                                                         != "OK") ||
+      ((res = restriction.check(restrictions))                                          != "OK") ||
+      ((res = notifyConditionVector.check(SubscribeContext, predetectedError, counter)) != "OK") ||
+      ((res = throttling.check())                                                       != "OK"))
   {
     alarmMgr.badInput(clientIp, res);
     response.subscribeError.errorCode.fill(SccBadRequest, std::string("invalid payload: ") + res);
-    return response.render(indent);
+    return response.toJsonV1();
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* SubscribeContextRequest::present -
-*/
-void SubscribeContextRequest::present(const std::string& indent)
-{
-  entityIdVector.present(indent + "  ");
-  attributeList.present(indent + "  ");
-  reference.present(indent + "  ");
-  duration.present(indent + "  ");
-  restriction.present(indent + "  ");
-  notifyConditionVector.present(indent + "  ");
-  throttling.present(indent + "  ");
 }
 
 

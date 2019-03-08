@@ -49,8 +49,7 @@ typedef struct EntityIdVector
 {
   std::vector<EntityId*>  vec;
 
-  std::string  render(const std::string& indent, bool comma = false);
-  void         present(const std::string& indent);
+  std::string  toJsonV1(bool comma);
   void         push_back(EntityId* item);
   bool         push_back_if_absent(EntityId* item);
   unsigned int size(void) const;
@@ -60,7 +59,7 @@ typedef struct EntityIdVector
 
   EntityId* operator[](unsigned int ix) const;
 
-  std::string  check(RequestType requestType, const std::string&  indent);
+  std::string  check(RequestType requestType);
 } EntityIdVector;
 
 #endif  // SRC_LIB_NGSI_ENTITYIDVECTOR_H_

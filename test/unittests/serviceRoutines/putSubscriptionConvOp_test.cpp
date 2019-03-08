@@ -32,6 +32,7 @@
 #include "serviceRoutines/badVerbPutDeleteOnly.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 #include "unittests/unittest.h"
 
@@ -39,22 +40,13 @@
 
 /* ****************************************************************************
 *
-* rs -
+* badVerbV -
 */
-#define UCSR   "updateContextSubscriptionRequest"
-#define N10SCO Ngsi10SubscriptionsConvOp
-#define SC     SubscribeContext
-#define IR     InvalidRequest
-static RestService rs[] =
+static RestService badVerbV[] =
 {
-  { "POST",   SC,     2, { "ngsi10", "subscribeContext"          }, "",   postSubscribeContext     },
-  { "PUT",    N10SCO, 3, { "ngsi10", "contextSubscriptions", "*" }, UCSR, putSubscriptionConvOp    },
-  { "DELETE", N10SCO, 3, { "ngsi10", "contextSubscriptions", "*" }, "",   deleteSubscriptionConvOp },
-  { "*",      N10SCO, 3, { "ngsi10", "contextSubscriptions", "*" }, "",   badVerbPutDeleteOnly     },
-  { "*",      IR,     0, { "*", "*", "*", "*", "*", "*"          }, "",   badRequest               },
-  { "",       IR,     0, {                                       }, "",   NULL                     }
+  { Ngsi10SubscriptionsConvOp,  3, { "ngsi10", "contextSubscriptions", "*" }, badVerbPutDeleteOnly },
+  { InvalidRequest,             0, { "*", "*", "*", "*", "*", "*"          }, badRequest           },
 };
-
 
 
 
@@ -64,8 +56,14 @@ static RestService rs[] =
 */
 TEST(putSubscriptionConvOp, put)
 {
-  ConnectionInfo ci1("/ngsi10/contextSubscriptions/012345678901234567890123",  "XVERB",  "1.1");
-  std::string    out;
+  ConnectionInfo  ci1("/ngsi10/contextSubscriptions/012345678901234567890123",  "XVERB",  "1.1");
+  std::string     out;
+  RestService     restService =
+    {
+      VersionRequest,
+      3, { "ngsi10", "contextSubscriptions", "012345678901234567890123" },
+      NULL
+    };
 
   utInit();
 
@@ -73,11 +71,14 @@ TEST(putSubscriptionConvOp, put)
   ci1.inMimeType     = JSON;
   ci1.payload        = NULL;
   ci1.payloadSize    = 0;
-  out                = restService(&ci1, rs);
+  ci1.restServiceP   = &restService;
 
-  EXPECT_EQ("", out);
+  serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, badVerbV);
+  out = orion::requestServe(&ci1);
+
   EXPECT_EQ("Allow",       ci1.httpHeader[0]);
   EXPECT_EQ("PUT, DELETE", ci1.httpHeaderValue[0]);
+  EXPECT_EQ("", out);
 
   utExit();
 }

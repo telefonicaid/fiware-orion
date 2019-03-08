@@ -364,7 +364,7 @@ echo
 1. POST /ngsi9/registerContext
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 64
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -388,7 +388,7 @@ Date: REGEX(.*)
 2. POST /ngsi9/discoverContextAvailability
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 302
+Content-Length: 168
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -424,7 +424,7 @@ Date: REGEX(.*)
 3. POST /ngsi9/subscribeContextAvailability
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -448,7 +448,7 @@ Date: REGEX(.*)
 4. POST /ngsi9/updateContextAvailabilitySubscription
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -472,7 +472,7 @@ Date: REGEX(.*)
 5. POST /ngsi9/unsubscribeContextAvailability
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 122
+Content-Length: 93
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -499,7 +499,7 @@ Date: REGEX(.*)
 6. POST /ngsi9/contextEntities/E
 ================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -513,7 +513,7 @@ Date: REGEX(.*)
 6. GET /ngsi9/contextEntities/E
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 294
+Content-Length: 160
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -549,7 +549,7 @@ Date: REGEX(.*)
 7. POST /ngsi9/contextEntities/F/attributes
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -563,7 +563,7 @@ Date: REGEX(.*)
 7. GET /ngsi9/contextEntities/F/attributes
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 294
+Content-Length: 160
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -599,7 +599,7 @@ Date: REGEX(.*)
 8. POST /ngsi9/contextEntities/G/attributes/A
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -613,7 +613,7 @@ Date: REGEX(.*)
 8. GET /ngsi9/contextEntities/G/attributes/A
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 438
+Content-Length: 198
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -624,7 +624,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "A",
                         "type": ""
                     }
@@ -656,7 +655,7 @@ Date: REGEX(.*)
 9. POST /ngsi9/contextEntityTypes/S
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 64
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -670,7 +669,7 @@ Date: REGEX(.*)
 9. GET /ngsi9/contextEntityTypes/S
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 294
+Content-Length: 160
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -706,7 +705,7 @@ Date: REGEX(.*)
 10. POST /ngsi9/contextEntityTypes/U/attributes
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 64
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -720,7 +719,7 @@ Date: REGEX(.*)
 10. GET /ngsi9/contextEntityTypes/U/attributes
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 294
+Content-Length: 160
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -756,7 +755,7 @@ Date: REGEX(.*)
 11. POST /ngsi9/contextEntityTypes/V/attributes/A
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -770,7 +769,7 @@ Date: REGEX(.*)
 11. GET /ngsi9/contextEntityTypes/V/attributes/A
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 438
+Content-Length: 198
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -781,7 +780,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "A",
                         "type": ""
                     }
@@ -813,7 +811,7 @@ Date: REGEX(.*)
 12. POST /ngsi9/contextAvailabilitySubscriptions
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -837,7 +835,7 @@ Date: REGEX(.*)
 13. PUT /ngsi9/contextAvailabilitySubscriptions/SUB_ID
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -851,7 +849,7 @@ Date: REGEX(.*)
 13. DELETE /ngsi9/contextAvailabilitySubscriptions/SUB_ID
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 122
+Content-Length: 93
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

@@ -82,7 +82,7 @@ TEST(SubscribeContextResponse, json_render)
   scrP->subscribeError.errorCode.fill(SccBadRequest, "details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  out = scrP->render("");
+  out = scrP->toJsonV1();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -92,7 +92,7 @@ TEST(SubscribeContextResponse, json_render)
   scrP->subscribeError.subscriptionId.set("012345678901234567890123");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  out = scrP->render("");
+  out = scrP->toJsonV1();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   scrP->subscribeError.errorCode.fill(SccNone);
@@ -103,7 +103,7 @@ TEST(SubscribeContextResponse, json_render)
   scrP->subscribeResponse.subscriptionId.set("012345678901234567890123");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
-  out = scrP->render("");
+  out = scrP->toJsonV1();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -112,7 +112,7 @@ TEST(SubscribeContextResponse, json_render)
   scrP->subscribeResponse.throttling.set("PT1M");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename4)) << "Error getting test data from '" << filename4 << "'";
-  out = scrP->render("");
+  out = scrP->toJsonV1();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -122,7 +122,7 @@ TEST(SubscribeContextResponse, json_render)
   scrP->subscribeResponse.duration.set("PT1H");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename5)) << "Error getting test data from '" << filename5 << "'";
-  out = scrP->render("");
+  out = scrP->toJsonV1();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -131,7 +131,7 @@ TEST(SubscribeContextResponse, json_render)
   scrP->subscribeResponse.throttling.set("PT1M");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename6)) << "Error getting test data from '" << filename6 << "'";
-  out = scrP->render("");
+  out = scrP->toJsonV1();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

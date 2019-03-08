@@ -52,7 +52,7 @@ TEST(UpdateContextElementResponse, render_json)
   car.contextAttributeVector.push_back(&ca);
   car.statusCode.fill(SccOk, "details");
 
-  out = ucer.render(V1, false, UpdateContext, "");
+  out = ucer.toJsonV1(false, UpdateContext);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 }
@@ -73,19 +73,19 @@ TEST(UpdateContextElementResponse, check_json)
   const char*                   outfile2 = "ngsi10.updateContextElementResponse.check2.valid.json";
 
   // 1. predetected error
-  out = ucer.check(V1, false, IndividualContextEntity, "", "PRE ERR");
+  out = ucer.check(V1, false, IndividualContextEntity, "PRE ERR");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // 2. bad contextAttributeResponseVector
   car.contextAttributeVector.push_back(&ca);
   ucer.contextAttributeResponseVector.push_back(&car);
-  out = ucer.check(V1, false, IndividualContextEntity, "", "");
+  out = ucer.check(V1, false, IndividualContextEntity, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // 3. OK
   ca.name = "NAME";
-  out = ucer.check(V1, false, IndividualContextEntity, "", "");
+  out = ucer.check(V1, false, IndividualContextEntity, "");
   EXPECT_EQ("OK", out);
 }

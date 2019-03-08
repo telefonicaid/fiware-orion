@@ -1,0 +1,326 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Create 2 entities, both with an attribute containing a location metadata.
+One with NGSIv1 POST (old way of defining location attribute), the other one with NGSIv2 POST.
+See that getting entities both in NGSIV1 and NGSIV2, the attribute metadatas are correctly rendered.
+In addition, see that Geoqueries returns only the entity (E2) created with the NGSIv1 way of defining location attribute
+and then contained in the polygon and bounding box of the geo query.
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create E1 with NGSIV2
+# 02. Create E2 with NGSIV1
+# 03. Get E1 and E2 with NGSIV2
+# 04. Get E1 and E2 with NGSIV1
+# 05. Make a Geo query with a polygon and check that only E2 is returned
+# 06. Make a Geo query with a bounding box and check that only E2 is returned
+
+echo "01. Create E1 with NGSIV2"
+echo "========================="
+payload='
+{
+   "id": "E1",
+   "type": "T",
+   "A": {
+      "value": "40, -3",
+      "type": "whatever",
+      "metadata": {
+         "location": {
+            "type": "string",
+            "value": "WGS84"
+         }
+      }
+   }
+}
+'
+orionCurl --url '/v2/entities' --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E2 with NGSIV1"
+echo "========================="
+payload='
+{
+    "attributes": [
+        {
+            "name": "A",
+            "type": "whatever",
+            "value": "39,-2",
+            "metadatas": [
+               {
+                  "name": "location",
+                  "type": "string",
+                  "value": "WGS84"
+               }
+            ]
+        }
+    ]
+}
+'
+orionCurl --url '/v1/contextEntities/type/T/id/E2' --payload "$payload"
+echo
+echo
+
+
+echo "03. Get E1 and E2 with NGSIV2"
+echo "============================="
+orionCurl --url /v2/entities
+echo
+echo
+
+
+echo "04. Get E1 and E2 with NGSIV1"
+echo "============================="
+orionCurl --url /v1/contextEntities
+echo
+echo
+
+
+echo "05. Make a Geo query with a polygon and check that only E2 is returned"
+echo "======================================================================"
+orionCurl --url '/v2/entities?georel=coveredBy&coords=0,0;50,0;50,-50;0,-50;0,0&geometry=polygon'
+echo
+echo
+
+
+echo "06. Make a Geo query with a bounding box and check that only E2 is returned"
+echo "==========================================================================="
+orionCurl --url '/v2/entities?georel=coveredBy&coords=0,0;50,-50&geometry=box'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 with NGSIV2
+=========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create E2 with NGSIV1
+=========================
+HTTP/1.1 200 OK
+Content-Length: 236
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "metadatas": [
+                        {
+                            "name": "location",
+                            "type": "string",
+                            "value": "WGS84"
+                        }
+                    ], 
+                    "name": "A", 
+                    "type": "whatever", 
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "E2", 
+    "isPattern": "false", 
+    "type": "T"
+}
+
+
+03. Get E1 and E2 with NGSIV2
+=============================
+HTTP/1.1 200 OK
+Content-Length: 244
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A": {
+            "metadata": {
+                "location": {
+                    "type": "string",
+                    "value": "WGS84"
+                }
+            },
+            "type": "whatever",
+            "value": "40, -3"
+        },
+        "id": "E1", 
+        "type": "T"
+    },
+    {
+        "A": {
+            "metadata": {
+                "location": {
+                    "type": "string",
+                    "value": "WGS84"
+                }
+            },
+            "type": "whatever",
+            "value": "39,-2"
+        },
+        "id": "E2", 
+        "type": "T"
+    }
+]
+
+
+04. Get E1 and E2 with NGSIV1
+=============================
+HTTP/1.1 200 OK
+Content-Length: 499
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "A",
+                        "type": "whatever",
+                        "value": "40, -3"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "A",
+                        "type": "whatever",
+                        "value": "39,-2"
+                    }
+                ], 
+                "id": "E2", 
+                "isPattern": "false", 
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+05. Make a Geo query with a polygon and check that only E2 is returned
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 122
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A": {		 
+            "metadata": {
+                "location": {
+                    "type": "string", 
+                    "value": "WGS84"
+                }
+            }, 
+            "type": "whatever", 
+            "value": "39,-2"
+        }, 
+        "id": "E2", 
+        "type": "T"
+    }
+]
+
+
+06. Make a Geo query with a bounding box and check that only E2 is returned
+===========================================================================
+HTTP/1.1 200 OK
+Content-Length: 122
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {		
+        "A": {				 
+            "metadata": {
+                "location": {
+                    "type": "string", 
+                    "value": "WGS84"
+                }
+            }, 
+            "type": "whatever", 
+            "value": "39,-2"
+        }, 
+        "id": "E2", 
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

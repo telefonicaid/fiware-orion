@@ -1,0 +1,391 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Reception of APIv2 notifications
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+dbInit CP2
+brokerStart CB
+brokerStart CP1
+brokerStart CP2
+
+--SHELL--
+
+#
+# 01. Make CP1 subscribe to ALL in CB (federation creation)
+# 02. Create entity 'CheckInCP1' in CB to be notified to CP1
+# 03. Query CP1, see 'CheckInCP1'
+# 04. Make CP2 subscribe to ALL in CP1 (federation)
+# 05. Query CP2, see 'CheckInCP1'
+# 06. Create entity 'Check2' in CB to be notified to CP1 and to CP2 via CP1
+# 07. Query CP1, see 2 entities
+# 08. Query CP2, see 2 entities
+#
+
+echo "01. Make CP1 subscribe to ALL in CB (federation creation)"
+echo "========================================================="
+payload='{
+  "description": "Fed Subscription",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*"
+      }
+    ]
+  },
+  "notification": {
+      "http": {
+        "url": "http://localhost:'$CP1_PORT'/v2/op/notify"
+      },
+    "attrsFormat": "normalized"
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity 'CheckInCP1' in CB to be notified to CP1"
+echo "=========================================================="
+payload='{
+  "id": "CheckInCP1",
+  "type": "T",
+  "A1": {
+    "type": "geo:json",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 1.0, 1.1 ]
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+valgrindSleep 3
+
+
+echo "03. Query CP1, see 'CheckInCP1'"
+echo "==============================="
+orionCurl --url /v2/entities --port $CP1_PORT
+echo
+echo
+
+
+echo "04. Make CP2 subscribe to ALL in CP1 (federation)"
+echo "================================================="
+payload='{
+  "description": "Fed Subscription",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*"
+      }
+    ]
+  },
+  "notification": {
+      "http": {
+        "url": "http://localhost:'$CP2_PORT'/v2/op/notify"
+      },
+    "attrsFormat": "normalized"
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+valgrindSleep 3
+
+
+echo "05. Query CP2, see 'CheckInCP1'"
+echo "==============================="
+orionCurl --url /v2/entities --port $CP2_PORT
+echo
+echo
+
+
+echo "06. Create entity 'Check2' in CB to be notified to CP1 and to CP2 via CP1"
+echo "========================================================================="
+payload='{
+  "id": "Check2",
+  "type": "T",
+  "A1": {
+    "type": "geo:json",
+    "value": {
+      "type": "Polygon",
+      "coordinates": [ [ [ 1.0, 1.0 ], [ 1.0, 2.0 ], [ 2.0, 2.0 ], [ 2.0, 1.0 ], [ 1.0, 1.0 ] ] ]
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+valgrindSleep 3
+
+
+echo "07. Query CP1, see 2 entities"
+echo "============================="
+orionCurl --url /v2/entities --port $CP1_PORT
+echo
+echo
+
+
+echo "08. Query CP2, see 2 entities"
+echo "============================="
+orionCurl --url /v2/entities --port $CP2_PORT
+echo
+echo
+
+
+--REGEXPECT--
+01. Make CP1 subscribe to ALL in CB (federation creation)
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity 'CheckInCP1' in CB to be notified to CP1
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/CheckInCP1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Query CP1, see 'CheckInCP1'
+===============================
+HTTP/1.1 200 OK
+Content-Length: 118
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    1,
+                    1.1
+                ],
+                "type": "Point"
+            }
+        },
+        "id": "CheckInCP1",
+        "type": "T"
+    }
+]
+
+
+04. Make CP2 subscribe to ALL in CP1 (federation)
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Query CP2, see 'CheckInCP1'
+===============================
+HTTP/1.1 200 OK
+Content-Length: 118
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    1,
+                    1.1
+                ],
+                "type": "Point"
+            }
+        },
+        "id": "CheckInCP1",
+        "type": "T"
+    }
+]
+
+
+06. Create entity 'Check2' in CB to be notified to CP1 and to CP2 via CP1
+=========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Check2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Query CP1, see 2 entities
+=============================
+HTTP/1.1 200 OK
+Content-Length: 259
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    1,
+                    1.1
+                ],
+                "type": "Point"
+            }
+        },
+        "id": "CheckInCP1",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    [
+                        [
+                            1,
+                            1
+                        ],
+                        [
+                            1,
+                            2
+                        ],
+                        [
+                            2,
+                            2
+                        ],
+                        [
+                            2,
+                            1
+                        ],
+                        [
+                            1,
+                            1
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            }
+        },
+        "id": "Check2",
+        "type": "T"
+    }
+]
+
+
+08. Query CP2, see 2 entities
+=============================
+HTTP/1.1 200 OK
+Content-Length: 259
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    1,
+                    1.1
+                ],
+                "type": "Point"
+            }
+        },
+        "id": "CheckInCP1",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    [
+                        [
+                            1,
+                            1
+                        ],
+                        [
+                            1,
+                            2
+                        ],
+                        [
+                            2,
+                            2
+                        ],
+                        [
+                            2,
+                            1
+                        ],
+                        [
+                            1,
+                            1
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            }
+        },
+        "id": "Check2",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+dbDrop CB
+dbDrop CP1
+dbDrop CP2

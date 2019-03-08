@@ -105,8 +105,10 @@ static void insertInCache
                      sub.attrsFormat,
                      notificationDone,
                      lastNotification,
-                     lastFailure,
                      lastSuccess,
+                     lastFailure,
+                     -1,
+                     "",
                      stringFilterP,
                      mdStringFilterP,
                      sub.status,
@@ -137,7 +139,9 @@ std::string mongoCreateSubscription
   const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator
+  const std::string&               fiwareCorrelator,
+  const bool&                      skipInitialNotification,
+  ApiVersion                       apiVersion
 )
 {
   bool reqSemTaken = false;
@@ -145,7 +149,7 @@ std::string mongoCreateSubscription
   reqSemTake(__FUNCTION__, "ngsiv2 create subscription request", SemWriteOp, &reqSemTaken);
 
   BSONObjBuilder     b;
-  std::string        servicePath      = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
+  std::string        servicePath      = servicePathV[0] == "" ? SERVICE_PATH_ALL : servicePathV[0];
   bool               notificationDone = false;
   const std::string  subId            = setNewSubscriptionId(&b);
 
@@ -183,7 +187,9 @@ std::string mongoCreateSubscription
                            xauthToken,
                            fiwareCorrelator,
                            &b,
-                           &notificationDone);
+                           &notificationDone,
+                           skipInitialNotification,
+                           apiVersion);
 
   if (notificationDone)
   {

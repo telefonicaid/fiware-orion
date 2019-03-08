@@ -87,7 +87,7 @@ echo
 01. Populate mongo with some entities to produce the 'bug-situation'
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 605
+Content-Length: 314
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -130,7 +130,7 @@ Date: REGEX(.*)
 02. Issue a normal listing to see all is OK
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 609
+Content-Length: 318
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -173,7 +173,7 @@ Date: REGEX(.*)
 03. List contextTypes (which is where the broker crash occurs)
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 169
+Content-Length: 93
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

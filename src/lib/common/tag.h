@@ -39,13 +39,6 @@
 * Macros for JSON rendering
 */
 #define JSON_STR(value)                std::string("\"" + std::string(value) + "\"")
-#define JSON_NUMBER(value)             std::string(value)
-#define JSON_BOOL(bvalue)              std::string((bvalue == true)? "true" : "false") 
-
-#define JSON_PROP(name)                std::string("\"" + std::string(name) + "\":")
-#define JSON_VALUE(name, value)        std::string(JSON_PROP(name) + JSON_STR(value))
-#define JSON_VALUE_NUMBER(name, value) std::string(JSON_PROP(name) + JSON_NUMBER(value))
-#define JSON_VALUE_BOOL(name, value)   std::string(JSON_PROP(name) + ((value == true)? "true" : "false"))
 
 
 
@@ -72,7 +65,6 @@ extern std::string jsonInvalidCharsTransformation(const std::string& input);
 */
 extern std::string startTag
 (
-  const std::string&  indent,
   const std::string&  key      = "",
   bool                isVector = false
 );
@@ -85,7 +77,6 @@ extern std::string startTag
 */
 extern std::string endTag
 (
-  const std::string&  indent,
   bool                comma      = false,
   bool                isVector   = false
 );
@@ -99,7 +90,6 @@ extern std::string endTag
 */
 extern std::string valueTag
 (
-  const std::string&  indent,
   const std::string&  key,
   const std::string&  value,
   bool                showComma           = false,
@@ -109,7 +99,6 @@ extern std::string valueTag
 
 extern std::string valueTag
 (
-  const std::string&  indent,
   const std::string&  key,
   int                 value,
   bool                showComma     = false
@@ -123,7 +112,6 @@ extern std::string valueTag
 */
 extern std::string startArray
 (
-  const std::string&  indent,
   const std::string&  key,
   bool                showKey = true
 );
@@ -134,6 +122,6 @@ extern std::string startArray
 *
 * endArray -
 */
-extern std::string endArray(const std::string& indent, const std::string& key);
+extern std::string endArray(const std::string& key);
 
 #endif  // SRC_LIB_COMMON_TAG_H_

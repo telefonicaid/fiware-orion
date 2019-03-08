@@ -44,9 +44,9 @@ NotifyContextAvailabilityRequest::NotifyContextAvailabilityRequest()
 
 /* ****************************************************************************
 *
-* NotifyContextAvailabilityRequest::render -
+* NotifyContextAvailabilityRequest::toJsonV1 -
 */
-std::string NotifyContextAvailabilityRequest::render(const std::string& indent)
+std::string NotifyContextAvailabilityRequest::toJsonV1(void)
 {
   std::string out = "";
 
@@ -56,10 +56,10 @@ std::string NotifyContextAvailabilityRequest::render(const std::string& indent)
   //  Always comma for subscriptionId.
   //  With an empty contextRegistrationResponseVector there would be no notification
   //
-  out += startTag(indent);
-  out += subscriptionId.render(NotifyContextAvailability, indent + "  ", true);
-  out += contextRegistrationResponseVector.render(indent  + "  ", false);
-  out += endTag(indent);
+  out += startTag();
+  out += subscriptionId.toJsonV1(NotifyContextAvailability, true);
+  out += contextRegistrationResponseVector.toJsonV1(false);
+  out += endTag();
 
   return out;
 }
@@ -70,7 +70,7 @@ std::string NotifyContextAvailabilityRequest::render(const std::string& indent)
 *
 * NotifyContextAvailabilityRequest::check - 
 */
-std::string NotifyContextAvailabilityRequest::check(ApiVersion apiVersion, const std::string& indent, const std::string& predetectedError, int counter)
+std::string NotifyContextAvailabilityRequest::check(ApiVersion apiVersion, const std::string& predetectedError)
 {
   std::string                        res;
   NotifyContextAvailabilityResponse  response;
@@ -79,8 +79,8 @@ std::string NotifyContextAvailabilityRequest::check(ApiVersion apiVersion, const
   {
     response.responseCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = subscriptionId.check(QueryContext, indent, predetectedError, 0))                                != "OK") ||
-           ((res = contextRegistrationResponseVector.check(apiVersion, QueryContext, indent, predetectedError, 0)) != "OK"))
+  else if (((res = subscriptionId.check())                                                                 != "OK") ||
+           ((res = contextRegistrationResponseVector.check(apiVersion, QueryContext, predetectedError, 0)) != "OK"))
   {
     response.responseCode.fill(SccBadRequest, res);
   }
@@ -89,20 +89,8 @@ std::string NotifyContextAvailabilityRequest::check(ApiVersion apiVersion, const
     return "OK";
   }
 
-  return response.render(indent);
+  return response.toJsonV1();
 }
-
-
-/* ****************************************************************************
-*
-* NotifyContextAvailabilityRequest::present -
-*/
-void NotifyContextAvailabilityRequest::present(const std::string& indent)
-{
-  subscriptionId.present(indent);
-  contextRegistrationResponseVector.present(indent);
-}
-
 
 
 /* ****************************************************************************

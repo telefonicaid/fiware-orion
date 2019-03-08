@@ -1,14 +1,1 @@
-{
-  "name" : "temperature",
-  "type" : "degree",
-  "value" : {
-    "struct1" : {
-      "s1-1" : "1-1",
-      "s1-2" : "1-2"
-    },
-    "struct2" : {
-      "s2-1" : "2-1",
-      "s2-2" : "2-2"
-    }
-  }
-}
+{"name":"temperature","type":"degree","value":{"struct1":{"s1-1":"1-1","s1-2":"1-2"},"struct2":{"s2-1":"2-1","s2-2":"2-2"}}}

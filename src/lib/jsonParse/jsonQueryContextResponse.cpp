@@ -63,8 +63,8 @@ static std::string contextResponse(const std::string& path, const std::string& v
 */
 static std::string entityIdId(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  parseDataP->qcrs.cerP->contextElement.entityId.id = value;
-  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", parseDataP->qcrs.cerP->contextElement.entityId.id.c_str()));
+  parseDataP->qcrs.cerP->entity.id = value;
+  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", parseDataP->qcrs.cerP->entity.id.c_str()));
 
   return "OK";
 }
@@ -77,8 +77,8 @@ static std::string entityIdId(const std::string& path, const std::string& value,
 */
 static std::string entityIdType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  parseDataP->qcrs.cerP->contextElement.entityId.type = value;
-  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", parseDataP->qcrs.cerP->contextElement.entityId.type.c_str()));
+  parseDataP->qcrs.cerP->entity.type = value;
+  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", parseDataP->qcrs.cerP->entity.type.c_str()));
 
   return "OK";
 }
@@ -92,7 +92,7 @@ static std::string entityIdType(const std::string& path, const std::string& valu
 static std::string entityIdIsPattern(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
-  parseDataP->qcrs.cerP->contextElement.entityId.isPattern = value;
+  parseDataP->qcrs.cerP->entity.isPattern = value;
 
   if (!isTrue(value) && !isFalse(value))
   {
@@ -106,27 +106,13 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
 
 /* ****************************************************************************
 *
-* attributeDomainName - 
-*/
-static std::string attributeDomainName(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got an attributeDomainName: '%s'", value.c_str()));
-  parseDataP->qcrs.cerP->contextElement.attributeDomainName.set(value);
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * attribute - 
 */
 static std::string attribute(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Creating an attribute"));
   parseDataP->qcrs.attributeP = new ContextAttribute();
-  parseDataP->qcrs.attributeP->valueType = orion::ValueTypeNone;
-  parseDataP->qcrs.cerP->contextElement.contextAttributeVector.push_back(parseDataP->qcrs.attributeP);
+  parseDataP->qcrs.cerP->entity.attributeVector.push_back(parseDataP->qcrs.attributeP);
   return "OK";
 }
 
@@ -221,59 +207,7 @@ static std::string attributeMetadataValue(const std::string& path, const std::st
 {
   LM_T(LmtParse, ("Got an attributeMetadata value: '%s'", value.c_str()));
   parseDataP->qcrs.metadataP->stringValue = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadata - 
-*/
-static std::string domainMetadata(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Creating a domainMetadata"));
-  parseDataP->qcrs.domainMetadataP = new Metadata();
-  parseDataP->qcrs.cerP->contextElement.domainMetadataVector.push_back(parseDataP->qcrs.domainMetadataP);
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataName - 
-*/
-static std::string domainMetadataName(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a domainMetadata name: '%s'", value.c_str()));
-  parseDataP->qcrs.domainMetadataP->name = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataType - 
-*/
-static std::string domainMetadataType(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a domainMetadata type: '%s'", value.c_str()));
-  parseDataP->qcrs.domainMetadataP->type = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* domainMetadataValue - 
-*/
-static std::string domainMetadataValue(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a domainMetadata value: '%s'", value.c_str()));
-  parseDataP->qcrs.domainMetadataP->stringValue = value;
+  parseDataP->qcrs.metadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 
@@ -375,8 +309,6 @@ JsonNode jsonQcrsParseVector[] =
   { CELEM "/type",                                                entityIdType             },
   { CELEM "/isPattern",                                           entityIdIsPattern        },
 
-  { CELEM "/attributeDomainName",                                 attributeDomainName      },
-
   { CELEM "/attributes",                                          jsonNullTreat            },
   { CELEM "/attributes/attribute",                                attribute                },
   { CELEM "/attributes/attribute/name",                           attributeName            },
@@ -388,12 +320,6 @@ JsonNode jsonQcrsParseVector[] =
   { CELEM "/attributes/attribute/metadatas/metadata/name",        attributeMetadataName    },
   { CELEM "/attributes/attribute/metadatas/metadata/type",        attributeMetadataType    },
   { CELEM "/attributes/attribute/metadatas/metadata/value",       attributeMetadataValue   },
-
-  { CELEM "/metadatas",                                           jsonNullTreat            },
-  { CELEM "/metadatas/metadata",                                  domainMetadata           },
-  { CELEM "/metadatas/metadata/name",                             domainMetadataName       },
-  { CELEM "/metadatas/metadata/type",                             domainMetadataType       },
-  { CELEM "/metadatas/metadata/value",                            domainMetadataValue      },
 
   { "/contextResponses/contextResponse/statusCode",               jsonNullTreat            },
   { "/contextResponses/contextResponse/statusCode/code",          statusCodeCode           },
@@ -421,7 +347,6 @@ void jsonQcrsInit(ParseData* reqDataP)
   reqDataP->qcrs.cerP                  = NULL;
   reqDataP->qcrs.attributeP            = NULL;
   reqDataP->qcrs.metadataP             = NULL;
-  reqDataP->qcrs.domainMetadataP       = NULL;
 
   reqDataP->errorString                = "";
 }
@@ -446,20 +371,5 @@ void jsonQcrsRelease(ParseData* reqDataP)
 std::string jsonQcrsCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-  return reqDataP->qcrs.res.check(ciP->apiVersion,asJsonObject, "", reqDataP->errorString);
-}
-
-
-
-/* ****************************************************************************
-*
-* jsonQcrsPresent -
-*/
-void jsonQcrsPresent(ParseData* reqDataP)
-{
-  if (!lmTraceIsSet(LmtPresent))
-    return;
-
-  LM_T(LmtPresent, ("QueryContextResponse:"));
-  reqDataP->qcrs.res.present("  ", "jsonQcrsPresent");
+  return reqDataP->qcrs.res.check(ciP->apiVersion,asJsonObject, reqDataP->errorString);
 }

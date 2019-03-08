@@ -80,11 +80,9 @@ std::string getEntityTypes
   TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP, true));
 
   std::string rendered;
-  TIMED_RENDER(rendered = response.render(ciP->apiVersion,
-                                          asJsonObject,
-                                          ciP->outMimeType == JSON,
-                                          ciP->uriParam[URI_PARAM_COLLAPSE] == "true",
-                                          ""));
+  TIMED_RENDER(rendered = response.toJsonV1(asJsonObject,
+                                            ciP->outMimeType == JSON,
+                                            ciP->uriParam[URI_PARAM_COLLAPSE] == "true"));
 
   response.release();
 

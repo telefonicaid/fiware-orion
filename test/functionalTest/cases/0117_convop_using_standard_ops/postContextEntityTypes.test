@@ -81,7 +81,7 @@ echo
 01. Register entities of type ET using POST /v1/registry/contextEntityTypes/ET and payload
 ==========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -95,7 +95,7 @@ Date: REGEX(.*)
 02. Discover entities of type ET
 ================================
 HTTP/1.1 200 OK
-Content-Length: 279
+Content-Length: 145
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -121,7 +121,7 @@ Date: REGEX(.*)
 03. Update registration using POST /v1/registry/contextEntityTypes/ET and payload
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -135,7 +135,7 @@ Date: REGEX(.*)
 04. Discover entities of type ET
 ================================
 HTTP/1.1 200 OK
-Content-Length: 279
+Content-Length: 145
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

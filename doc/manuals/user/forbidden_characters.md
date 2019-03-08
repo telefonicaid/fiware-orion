@@ -2,7 +2,7 @@
 
 ## General restrictions
 
-In order to avoid script injections attack in some circustances (e.g.
+In order to avoid script injections attack in some circumstances (e.g.
 cross domain to co-located web servers in the same hot that CB) the
 following characters are forbidden in any request:
 
@@ -15,53 +15,47 @@ following characters are forbidden in any request:
 -   (
 -   )
 
-Any attempt of using them will result in a NGSI 400 Bad Request response
+Any attempt of using them will result in a 400 Bad Request response
 like this:
 
     {
-        "orionError": {
-            "code": "400",
-            "details": "Illegal value for JSON field",
-            "reasonPhrase": "Bad Request"
-        }
+        "error": "BadRequest",
+        "description": "Invalid characters in attribute type"
     }
 
-If your aplication needs to use these characteres, you should encode it
+If your application needs to use these characters, you should encode it
 using a scheme not including forbidden characters before sending the
-request to Orion (e.g. [URL
-encoding](http://www.degraeve.com/reference/urlencoding.php)).
+request to Orion. 
 
-There is another set of characters that requires special care from the 
-user perspective. Namely, the ones in the following list:
+[URL encoding](http://www.degraeve.com/reference/urlencoding.php) is
+a valid way of encoding. However, we don't recommend its usage for
+fields that may appear in API URL (such as entity id or attribute names)
+due to it would need to encode the "%" character itself. For instance,
+if we would want to use "E<01>" as entity id, its URL encode would be:
+"E%3C01%3E".
 
--   #
--   ?
--   /
--   %
--   &
+In order to use this entity ID in URL (e.g. a retrieve entity info operation)
+the following will be used (note that "%25" is the encoding for "%").
 
-These characters have special meaning in the URL interpretation, and, 
-considering there are convenience operations that use entity, type and
-attribute identifiers as part of the URL, their use should be avoided. 
-The use of these characters is perfectly safe when only standard operations
-are involved, anyway. 
+```
+GET /v2/entities/E%253C01%253E
+```
 
 ### Exceptions
 
 There are some exception cases in which the above restrictions do not apply. In particular, in the following fields:
 
-* URL parameter `q` and the value of "FIWARE::StringQuery" scope allow the special characters needed by the Simple Query Language
-* URL parameter `mq` and the value of "FIWARE::StringQuery::Metadata" scope allow the special characters needed by the Simple Query Language
-* URL parameter `georel` and `coords` and the corresponding fields in the "FIWARE::Location::NGSIv2" scope allow `;`
+* URL parameter `q` allows the special characters needed by the Simple Query Language
+* URL parameter `mq` allows the special characters needed by the Simple Query Language
+* URL parameter `georel` and `coords` allow `;`
 
 ## Specific restrictions for ID fields
 
 NGSIv2 introduces syntax restrictions for ID fields (such as entity id/type, attribute name/type
 or metadata name/type) which are described in the "Field syntax restrictions" section in the
-[NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable). You can also
-enable them for NGSIv1, as described in [this section of the documentation](v1_v2_coexistence.md#checking-id-fields).
+[NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable).
 
-### Custom payload special treatment
+## Custom payload special treatment
 
 NGSIv2 provides a templating mechanism for subscriptions which allows to generate custom notifications
 (see "Custom notifications" section in

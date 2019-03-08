@@ -1,0 +1,415 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity dates overridden by the user
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# Steps 4 to 7 are weird, but this is the way CB works right now (and it is documented in
+# NGSIv2 implementation notes). Maybe in the future could change.
+#
+# 01. Create entity with user provide dateCreated and dateModified in a far away future
+# 02. GET /v2/entities/E1 and get user defined dates
+# 03. GET /v2/entities/E1?attrs=dateModified,dateCreated and get user defined dates
+# 04. GET /v2/entities?q=dateCreated>2049-01-01 and get nothing [should be E1]
+# 05. GET /v2/entities?q=dateModified>2049-01-01 and get nothing [should be E1]
+# 06. GET /v2/entities?q=dateCreated<2049-01-01 and get E1-user [should get no entity]
+# 07. GET /v2/entities?q=dateModified<2049-01-01 and get E1-user [should get no entity]
+# 08. DELETE /v2/entities/E1/attrs/dateCreated (so automatic dateCreated will be used from now on)
+# 09. DELETE /v2/entities/E1/attrs/dateModified (so automatic dateModified will be used from now on)
+# 10. GET /v2/entities/E1 and don't get dateModified or dateCreated attributes
+# 11. GET /v2/entities/E1?attrs=dateModified,dateCreated and get automatic dates
+# 12. GET /v2/entities?q=dateCreated>2049-01-01 and get nothing
+# 13. GET /v2/entities?q=dateModified>2049-01-01 and get nothing
+# 14. GET /v2/entities?q=dateCreated<2049-01-01 and get E1
+# 15. GET /v2/entities?q=dateModified<2049-01-01 and get E1
+#
+
+echo "01. Create entity with user provide dateCreated and dateModified in a far away future"
+echo "====================================================================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "dateCreated": {
+    "value": "2050-01-01T00:00:00",
+    "type": "DateTime"
+  },
+  "dateModified": {
+    "value": "2051-01-01T00:00:00",
+    "type": "DateTime"
+  }
+}'
+orionCurl --url '/v2/entities' --payload "$payload"
+echo
+echo
+
+
+echo "02. GET /v2/entities/E1 and get user defined dates"
+echo "=================================================="
+orionCurl --url '/v2/entities/E1'
+echo
+echo
+
+
+echo "03. GET /v2/entities/E1?attrs=dateModified,dateCreated and get user defined dates"
+echo "================================================================================="
+orionCurl --url '/v2/entities/E1?attrs=dateModified,dateCreated'
+echo
+echo
+
+
+echo "04. GET /v2/entities?q=dateCreated>2049-01-01 and get nothing [should be E1]"
+echo "============================================================================"
+orionCurl --url '/v2/entities?q=dateCreated>2049-01-01'
+echo
+echo
+
+
+echo "05. GET /v2/entities?q=dateModified>2049-01-01 and get nothing [should be E1]"
+echo "============================================================================="
+orionCurl --url '/v2/entities?q=dateModified>2049-01-01'
+echo
+echo
+
+
+echo "06. GET /v2/entities?q=dateCreated<2049-01-01 and get E1-user [should get no entity]"
+echo "===================================================================================="
+orionCurl --url '/v2/entities?q=dateCreated<2049-01-01'
+echo
+echo
+
+
+echo "07. GET /v2/entities?q=dateModified<2049-01-01 and get E1-user [should get no entity]"
+echo "====================================================================================="
+orionCurl --url '/v2/entities?q=dateModified<2049-01-01'
+echo
+echo
+
+
+echo "08. DELETE /v2/entities/E1/attrs/dateCreated (so automatic dateCreated will be used from now on)"
+echo "================================================================================================"
+orionCurl --url '/v2/entities/E1/attrs/dateCreated' -X DELETE
+echo
+echo
+
+
+echo "09. DELETE /v2/entities/E1/attrs/dateModified (so automatic dateModified will be used from now on)"
+echo "=================================================================================================="
+orionCurl --url '/v2/entities/E1/attrs/dateModified' -X DELETE
+echo
+echo
+
+
+echo "10. GET /v2/entities/E1 and don't get dateModified or dateCreated attributes"
+echo "============================================================================"
+orionCurl --url '/v2/entities/E1'
+echo
+echo
+
+
+echo "11. GET /v2/entities/E1?attrs=dateModified,dateCreated and get automatic dates"
+echo "=============================================================================="
+orionCurl --url '/v2/entities/E1?attrs=dateModified,dateCreated'
+echo
+echo
+
+
+echo "12. GET /v2/entities?q=dateCreated>2049-01-01 and get nothing"
+echo "============================================================="
+orionCurl --url '/v2/entities?q=dateCreated>2049-01-01'
+echo
+echo
+
+
+echo "13. GET /v2/entities?q=dateModified>2049-01-01 and get nothing"
+echo "=============================================================="
+orionCurl --url '/v2/entities?q=dateModified>2049-01-01'
+echo
+echo
+
+
+echo "14. GET /v2/entities?q=dateCreated<2049-01-01 and get E1"
+echo "========================================================"
+orionCurl --url '/v2/entities?q=dateCreated<2049-01-01'
+echo
+echo
+
+
+echo "15. GET /v2/entities?q=dateModified<2049-01-01 and get E1"
+echo "========================================================="
+orionCurl --url '/v2/entities?q=dateModified<2049-01-01'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity with user provide dateCreated and dateModified in a far away future
+=====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. GET /v2/entities/E1 and get user defined dates
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 187
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "dateCreated": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2050-01-01T00:00:00.00Z"
+    },
+    "dateModified": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2051-01-01T00:00:00.00Z"
+    },
+    "id": "E1",
+    "type": "T"
+}
+
+
+03. GET /v2/entities/E1?attrs=dateModified,dateCreated and get user defined dates
+=================================================================================
+HTTP/1.1 200 OK
+Content-Length: 187
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "dateCreated": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2050-01-01T00:00:00.00Z"
+    },
+    "dateModified": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2051-01-01T00:00:00.00Z"
+    },
+    "id": "E1",
+    "type": "T"
+}
+
+
+04. GET /v2/entities?q=dateCreated>2049-01-01 and get nothing [should be E1]
+============================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+05. GET /v2/entities?q=dateModified>2049-01-01 and get nothing [should be E1]
+=============================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+06. GET /v2/entities?q=dateCreated<2049-01-01 and get E1-user [should get no entity]
+====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 189
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "dateCreated": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2050-01-01T00:00:00.00Z"
+        },
+        "dateModified": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2051-01-01T00:00:00.00Z"
+        },
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+07. GET /v2/entities?q=dateModified<2049-01-01 and get E1-user [should get no entity]
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 189
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "dateCreated": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2050-01-01T00:00:00.00Z"
+        },
+        "dateModified": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2051-01-01T00:00:00.00Z"
+        },
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+08. DELETE /v2/entities/E1/attrs/dateCreated (so automatic dateCreated will be used from now on)
+================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. DELETE /v2/entities/E1/attrs/dateModified (so automatic dateModified will be used from now on)
+==================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. GET /v2/entities/E1 and don't get dateModified or dateCreated attributes
+============================================================================
+HTTP/1.1 200 OK
+Content-Length: 22
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "E1",
+    "type": "T"
+}
+
+
+11. GET /v2/entities/E1?attrs=dateModified,dateCreated and get automatic dates
+==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 187
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "dateCreated": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+    },
+    "dateModified": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+    },
+    "id": "E1",
+    "type": "T"
+}
+
+
+12. GET /v2/entities?q=dateCreated>2049-01-01 and get nothing
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+13. GET /v2/entities?q=dateModified>2049-01-01 and get nothing
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+14. GET /v2/entities?q=dateCreated<2049-01-01 and get E1
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 24
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+15. GET /v2/entities?q=dateModified<2049-01-01 and get E1
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 24
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

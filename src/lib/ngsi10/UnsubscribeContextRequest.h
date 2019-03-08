@@ -39,9 +39,8 @@ typedef struct UnsubscribeContextRequest
 {
   SubscriptionId  subscriptionId;    // Mandatory
 
-  std::string     render(const std::string& indent);
-  std::string     check(const std::string& indent, const std::string& predetectedError, int counter);
-  void            present(const std::string& indent);
+  std::string     toJsonV1(void);
+  std::string     check(void);
   void            release(void);
 } UnsubscribeContextRequest;
 

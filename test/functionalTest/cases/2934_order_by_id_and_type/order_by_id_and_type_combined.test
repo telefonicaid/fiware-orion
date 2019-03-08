@@ -1,0 +1,290 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Order by id and type combined with attrs
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E1/A, name: Daniel
+# 02. Create entity E2/A, name: Carl
+# 03. Create entity E1/B, name: Bob
+# 04. Create entity E2/B, name: Alice
+# 05. Get sorted by id, then name: E1/B/Bob, E1/A/Daniel, E2/B/Alice, E2/A/Carl
+# 06. Get sorted by id, then reserve name: E1/A/Daniel, E2/B/Bob, E2/A/Carl, E2/A/Alice
+# 07. Get sorted by type, then name: E2/A/Carl, E1/A/Daniel, E2/B/Alice, E1/B/Bob
+# 08. Get sorted by type, then reserve name: E1/A/Daniel, E2/A/Carl, E1/B/Bob, E2/B/Alice
+#
+
+echo "01. Create entity E1/A, name: Daniel"
+echo "===================================="
+payload='{
+  "id": "E1",
+  "type": "A",
+  "name": "Daniel"
+}'
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E2/A, name: Carl"
+echo "=================================="
+payload='{
+  "id": "E2",
+  "type": "A",
+  "name": "Carl"
+}'
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity E1/B, name: Bob"
+echo "================================="
+payload='{
+  "id": "E1",
+  "type": "B",
+  "name": "Bob"
+}'
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
+echo
+echo
+
+
+echo "04. Create entity E2/B, name: Alice"
+echo "==================================="
+payload='{
+  "id": "E2",
+  "type": "B",
+  "name": "Alice"
+}'
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
+echo
+echo
+
+
+echo "05. Get sorted by id, then name: E1/B/Bob, E1/A/Daniel, E2/B/Alice, E2/A/Carl"
+echo "============================================================================="
+orionCurl --url '/v2/entities?options=keyValues&orderBy=id,name'
+echo
+echo
+
+
+echo "06. Get sorted by id, then reserve name: E1/A/Daniel, E2/B/Bob, E2/A/Carl, E2/A/Alice"
+echo "====================================================================================="
+orionCurl --url '/v2/entities?options=keyValues&orderBy=id,!name'
+echo
+echo
+
+
+echo "07. Get sorted by type, then name: E2/A/Carl, E1/A/Daniel, E2/B/Alice, E1/B/Bob"
+echo "==============================================================================="
+orionCurl --url '/v2/entities?options=keyValues&orderBy=type,name'
+echo
+echo
+
+
+echo "08. Get sorted by type, then reserve name: E1/A/Daniel, E2/A/Carl, E1/B/Bob, E2/B/Alice"
+echo "======================================================================================="
+orionCurl --url '/v2/entities?options=keyValues&orderBy=type,!name'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1/A, name: Daniel
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=A
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity E2/A, name: Carl
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=A
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create entity E1/B, name: Bob
+=================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=B
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create entity E2/B, name: Alice
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=B
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Get sorted by id, then name: E1/B/Bob, E1/A/Daniel, E2/B/Alice, E2/A/Carl
+=============================================================================
+HTTP/1.1 200 OK
+Content-Length: 151
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "name": "Bob",
+        "type": "B"
+    },
+    {
+        "id": "E1",
+        "name": "Daniel",
+        "type": "A"
+    },
+    {
+        "id": "E2",
+        "name": "Alice",
+        "type": "B"
+    },
+    {
+        "id": "E2",
+        "name": "Carl",
+        "type": "A"
+    }
+]
+
+
+06. Get sorted by id, then reserve name: E1/A/Daniel, E2/B/Bob, E2/A/Carl, E2/A/Alice
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 151
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "name": "Daniel",
+        "type": "A"
+    },
+    {
+        "id": "E1",
+        "name": "Bob",
+        "type": "B"
+    },
+    {
+        "id": "E2",
+        "name": "Carl",
+        "type": "A"
+    },
+    {
+        "id": "E2",
+        "name": "Alice",
+        "type": "B"
+    }
+]
+
+
+07. Get sorted by type, then name: E2/A/Carl, E1/A/Daniel, E2/B/Alice, E1/B/Bob
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 151
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E2",
+        "name": "Carl",
+        "type": "A"
+    },
+    {
+        "id": "E1",
+        "name": "Daniel",
+        "type": "A"
+    },
+    {
+        "id": "E2",
+        "name": "Alice",
+        "type": "B"
+    },
+    {
+        "id": "E1",
+        "name": "Bob",
+        "type": "B"
+    }
+]
+
+
+08. Get sorted by type, then reserve name: E1/A/Daniel, E2/A/Carl, E1/B/Bob, E2/B/Alice
+=======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 151
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "name": "Daniel",
+        "type": "A"
+    },
+    {
+        "id": "E2",
+        "name": "Carl",
+        "type": "A"
+    },
+    {
+        "id": "E1",
+        "name": "Bob",
+        "type": "B"
+    },
+    {
+        "id": "E2",
+        "name": "Alice",
+        "type": "B"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

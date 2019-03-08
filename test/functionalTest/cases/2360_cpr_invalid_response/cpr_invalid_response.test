@@ -65,8 +65,7 @@ payload='{
       "attributes": [
         {
           "name": "c_name",
-          "type": "command",
-          "isDomain": "false"
+          "type": "command"
         }
       ],
       "providingApplication": "http://localhost:'${LISTENER_PORT}'/badresponse"
@@ -100,7 +99,7 @@ Date: REGEX(.*)
 02. Register CPr which does not response correctly
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -114,7 +113,7 @@ Date: REGEX(.*)
 03. Query for all entities, get E with 200 OK
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 478
+Content-Length: 255
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

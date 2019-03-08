@@ -31,6 +31,7 @@
 
 #include "mongo/client/dbclient.h"
 
+#include "orionTypes/UpdateActionType.h"
 #include "ngsi10/UpdateContextResponse.h"
 
 
@@ -41,15 +42,16 @@
 */
 extern void processContextElement
 (
-  ContextElement*                      ceP,
+  Entity*                              ceP,
   UpdateContextResponse*               responseP,
-  const std::string&                   action,
+  ActionType                           action,
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePath,
   std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                   xauthToken,
   const std::string&                   fiwareCorrelator,
   const std::string&                   ngsiV2AttrsFormat,
+  const bool&                          forcedUpdate,
   ApiVersion                           apiVersion       = V1,
   Ngsiv2Flavour                        ngsiV2Flavour    = NGSIV2_NO_FLAVOUR
 );

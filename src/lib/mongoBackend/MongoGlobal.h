@@ -40,7 +40,7 @@
 #include "ngsi/ContextRegistrationAttribute.h"
 #include "ngsi/ContextAttribute.h"
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/ContextElementResponseVector.h"
 #include "ngsi/ConditionValueList.h"
 #include "ngsi/Restriction.h"
@@ -267,9 +267,25 @@ extern bool mongoLocationCapable(void);
 
 /* ****************************************************************************
 *
+* mongoExpirationCapable -
+*/
+extern bool mongoExpirationCapable(void);
+
+
+
+/* ****************************************************************************
+*
 * ensureLocationIndex -
 */
 extern void ensureLocationIndex(const std::string& tenant);
+
+
+
+/* ****************************************************************************
+*
+* ensureDateExpirationIndex -
+*/
+extern void ensureDateExpirationIndex(const std::string& tenant);
 
 
 
@@ -293,7 +309,7 @@ extern bool includedEntity(EntityId en, const EntityIdVector& entityIdV);
 *
 * includedAttribute -
 */
-extern bool includedAttribute(const ContextRegistrationAttribute& attr, const AttributeList& attrsV);
+extern bool includedAttribute(const std::string& attrName, const StringList& attrsV);
 
 
 
@@ -313,8 +329,7 @@ extern bool processAreaScopeV2(const Scope* scoP, mongo::BSONObj* areaQueryP);
 extern bool entitiesQuery
 (
   const EntityIdVector&            enV,
-  const AttributeList&             attrL,
-  const AttributeList&             metadataList,
+  const StringList&                attrL,
   const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
@@ -346,7 +361,7 @@ extern void pruneContextElements(const ContextElementResponseVector& oldCerV, Co
 extern bool registrationsQuery
 (
   const EntityIdVector&               enV,
-  const AttributeList&                attrL,
+  const StringList&                   attrL,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
   const std::string&                  tenant,
@@ -384,7 +399,7 @@ extern EntityIdVector subToEntityIdVector(const mongo::BSONObj& sub);
 *
 * Extract the attribute list from a BSON document (in the format of the csubs collection)
 */
-extern AttributeList subToAttributeList(const mongo::BSONObj& attrL);
+extern StringList subToAttributeList(const mongo::BSONObj& attrL);
 
 
 
@@ -411,7 +426,9 @@ extern mongo::BSONArray processConditionVector
   const std::string&                 status,
   const std::string&                 fiwareCorrelator,
   const std::vector<std::string>&    attrsOrder,
-  bool                               blacklist
+  bool                               blacklist,
+  const bool&                        skipInitialNotification,
+  ApiVersion                         apiVersion
 );
 
 
@@ -422,7 +439,7 @@ extern mongo::BSONArray processConditionVector
 */
 extern bool processAvailabilitySubscription(
     const EntityIdVector& enV,
-    const AttributeList&  attrL,
+    const StringList&     attrL,
     const std::string&    subId,
     const std::string&    notifyUrl,
     RenderFormat          renderFormat,
@@ -482,7 +499,7 @@ extern bool someContextElementNotFound(const ContextElementResponse& cer);
 */
 extern void cprLookupByAttribute
 (
-  EntityId&                                en,
+  const Entity&                            en,
   const std::string&                       attrName,
   const ContextRegistrationResponseVector& crrV,
   std::string*                             perEntPa,
@@ -490,5 +507,13 @@ extern void cprLookupByAttribute
   std::string*                             perAttrPa,
   MimeType*                                perAttrPaMimeType
 );
+
+
+/* ****************************************************************************
+*
+* addBuiltins -
+*
+*/
+extern void addBuiltins(ContextElementResponse* cerP);
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOGLOBAL_H_

@@ -123,9 +123,7 @@ SET (SOURCES
     ngsi10/UpdateContextSubscriptionResponse_test.cpp
 
     ngsi/ContextAttribute_test.cpp
-    ngsi/ContextElement_test.cpp
     ngsi/NotifyCondition_test.cpp
-    ngsi/AttributeDomainName_test.cpp
     ngsi/AttributeList_test.cpp
     ngsi/ConditionValueList_test.cpp
     ngsi/ContextAttributeVector_test.cpp
@@ -137,8 +135,6 @@ SET (SOURCES
     ngsi/ProvidingApplication_test.cpp
     ngsi/Duration_test.cpp
     ngsi/AttributeExpression_test.cpp
-    ngsi/ContextElementVector_test.cpp
-    ngsi/ContextRegistration_test.cpp
     ngsi/ContextRegistrationResponse_test.cpp
     ngsi/ContextRegistrationResponseVector_test.cpp
     ngsi/EntityId_test.cpp
@@ -156,15 +152,11 @@ SET (SOURCES
     ngsi/SubscribeError_test.cpp
     ngsi/SubscriptionId_test.cpp
     ngsi/Throttling_test.cpp
-    ngsi/UpdateActionType_test.cpp
 
     orionTypes/EntityType_test.cpp
     orionTypes/EntityTypeResponse_test.cpp
     orionTypes/EntityTypeVector_test.cpp
     orionTypes/EntityTypeVectorResponse_test.cpp
-    orionTypes/QueryContextRequestVector_test.cpp
-    orionTypes/QueryContextResponseVector_test.cpp
-    orionTypes/UpdateContextRequestVector_test.cpp
 
     apiTypesV2/Entities_test.cpp
     apiTypesV2/Entity_test.cpp  
@@ -184,6 +176,7 @@ SET (SOURCES
     mongoBackend/mongoUpdateContextAvailabilitySubscription_test.cpp
     mongoBackend/mongoUpdateContextSubscription_test.cpp
     mongoBackend/mongoUpdateContext_test.cpp
+    mongoBackend/mongoUpdateContext_2_test.cpp
     mongoBackend/mongoUpdateContextGeo_test.cpp
     mongoBackend/mongoUpdateContext_withOnchangeSubscriptions_test.cpp
     mongoBackend/mongoUpdateContext_withOnchangeSubscriptionsNoCache_test.cpp

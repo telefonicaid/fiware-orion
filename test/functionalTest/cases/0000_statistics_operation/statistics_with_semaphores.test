@@ -28,6 +28,7 @@ dbInit CB
 brokerStart CB 0 IPv4 -statSemWait -statTiming
 
 --SHELL--
+
 echo "+++++ 1. statistics in JSON"
 orionCurl --url /statistics
 echo

@@ -157,7 +157,7 @@ echo
 --REGEXPECT--
 1: +++++++++ Update/Append +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 529
+Content-Length: 324
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -189,7 +189,7 @@ Date: REGEX(.*)
 
 2: ++++++++++ OK Query ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -204,7 +204,7 @@ Date: REGEX(.*)
 
 3: ++++++++++ Query with invalid latitude ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 127
+Content-Length: 96
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -220,7 +220,7 @@ Date: REGEX(.*)
 
 4: ++++++++++ Query with invalid longitude ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 128
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

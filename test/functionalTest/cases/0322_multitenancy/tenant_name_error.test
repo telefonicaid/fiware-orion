@@ -48,32 +48,7 @@ payload='{
       "attributes": [
         {
           "name": "temperature",
-          "type": "degree",
-          "isDomain": "false",
-          "metadatas": [
-            {
-              "name": "ID",
-              "type": "string",
-              "value": "1110"
-            },
-            {
-              "name": "cm2",
-              "type": "string",
-              "value": "XXX"
-            }
-          ]
-        }
-      ],
-      "metadatas": [
-        {
-          "name": "ID",
-          "type": "string",
-          "value": "2212"
-        },
-        {
-          "name": "ID2",
-          "type": "string",
-          "value": "212"
+          "type": "degree"
         }
       ],
       "providingApplication": "http://localhost:1028/application"
@@ -106,7 +81,7 @@ echo
 --REGEXPECT--
 1: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -119,7 +94,7 @@ Date: REGEX(.*)
 
 2: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 158
+Content-Length: 127
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -135,7 +110,7 @@ Date: REGEX(.*)
 
 3: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 188
+Content-Length: 157
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

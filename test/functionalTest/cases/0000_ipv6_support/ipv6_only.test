@@ -1,0 +1,158 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+IPv6 Only 
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255 IPV6
+accumulatorStart 0.0.0.0 ${LISTENER_PORT}
+accumulatorStart :: ${LISTENER2_PORT}
+
+--SHELL--
+echo "1: ++++++++++++++++++++"
+curl 127.0.0.1:${CB_PORT}/version --max-time 10 > /dev/null 2>&1
+echo exit code: $?
+
+
+echo "2: ++++++++++++++++++++"
+url="/v1/subscribeContext"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "temperature",
+    "lightstatus"
+  ],
+  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+  "duration": "PT1H",
+  "notifyConditions": [
+      {
+          "type": "ONCHANGE",
+          "condValues": [
+              "temperature",
+              "lightstatus"
+          ]
+      }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json --host "[::1]" -g
+
+SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
+
+echo "3: ++++++++++++++++++++"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom",
+      "attributes": [
+        {
+          "name": "pressure",
+          "type": "clima",
+          "value": "p2300"
+        },
+        {
+          "name": "lightstatus",
+          "type": "light",
+          "value": "L23"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json --host "[::1]" -g
+
+echo "4: ++++++++++++++++++++"
+#Get accumulated data
+accumulator2Count IPV6
+
+echo "5: ++++++++++++++++++++"
+#Get accumulated data
+accumulatorCount
+
+--REGEXPECT--
+1: ++++++++++++++++++++
+exit code: 7
+2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 109
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "PT1H",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 514
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    },
+                    {
+                        "name": "lightstatus",
+                        "type": "light",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+4: ++++++++++++++++++++
+0
+5: ++++++++++++++++++++
+0
+--TEARDOWN--
+brokerStop CB
+accumulatorStop ${LISTENER_PORT}
+accumulatorStop ${LISTENER2_PORT}
+dbDrop CB

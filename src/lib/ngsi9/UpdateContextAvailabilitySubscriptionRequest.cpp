@@ -47,10 +47,10 @@ UpdateContextAvailabilitySubscriptionRequest::UpdateContextAvailabilitySubscript
 
 /* ****************************************************************************
 *
-* UpdateContextAvailabilitySubscriptionRequest::render -
+* UpdateContextAvailabilitySubscriptionRequest::toJsonV1 -
 */
-std::string UpdateContextAvailabilitySubscriptionRequest::render(const std::string& indent)
-{
+std::string UpdateContextAvailabilitySubscriptionRequest::toJsonV1(void)
+{  
   std::string   out                      = "";
   bool          subscriptionRendered     = subscriptionId.rendered(UpdateContextAvailabilitySubscription);
   bool          restrictionRendered      = restrictions != 0;
@@ -62,13 +62,13 @@ std::string UpdateContextAvailabilitySubscriptionRequest::render(const std::stri
   bool          commaAfterAttributeList  = durationRendered || restrictionRendered || subscriptionRendered;
   bool          commaAfterEntityIdVector = attributeListRendered || durationRendered || restrictionRendered || subscriptionRendered;
 
-  out += startTag(indent);
-  out += entityIdVector.render(indent + "  ", commaAfterEntityIdVector);
-  out += attributeList.render( indent + "  ", commaAfterAttributeList);
-  out += duration.render(      indent + "  ", commaAfterDuration);
-  out += restriction.render(   indent + "  ", restrictions, commaAfterRestriction);
-  out += subscriptionId.render(UpdateContextAvailabilitySubscription, indent + "  ", commaAfterSubscriptionId);
-  out += endTag(indent);
+  out += startTag();
+  out += entityIdVector.toJsonV1(commaAfterEntityIdVector);
+  out += attributeList.toJsonV1(commaAfterAttributeList, "attributes");
+  out += duration.toJsonV1(commaAfterDuration);
+  out += restriction.toJsonV1(restrictions, commaAfterRestriction);
+  out += subscriptionId.toJsonV1(UpdateContextAvailabilitySubscription, commaAfterSubscriptionId);
+  out += endTag();
 
   return out;
 }
@@ -77,24 +77,9 @@ std::string UpdateContextAvailabilitySubscriptionRequest::render(const std::stri
 
 /* ****************************************************************************
 *
-* UpdateContextAvailabilitySubscriptionRequest::present -
-*/
-void UpdateContextAvailabilitySubscriptionRequest::present(const std::string& indent)
-{
-   entityIdVector.present(indent + "  ");
-   attributeList.present(indent + "  ");
-   duration.present(indent + "  ");
-   restriction.present(indent + "  ");
-   subscriptionId.present(indent + "  ");
-}
-
-
-
-/* ****************************************************************************
-*
 * UpdateContextAvailabilitySubscriptionRequest::check -
 */
-std::string UpdateContextAvailabilitySubscriptionRequest::check(const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateContextAvailabilitySubscriptionRequest::check(const std::string& predetectedError, int counter)
 {
   std::string                                    res;
   UpdateContextAvailabilitySubscriptionResponse  response;
@@ -105,18 +90,18 @@ std::string UpdateContextAvailabilitySubscriptionRequest::check(const std::strin
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = entityIdVector.check(UpdateContextAvailabilitySubscription, indent))                                 != "OK") ||
-           ((res = attributeList.check(UpdateContextAvailabilitySubscription, indent, predetectedError, counter))       != "OK") ||
-           ((res = duration.check(UpdateContextAvailabilitySubscription, indent, predetectedError, counter))            != "OK") ||
-           ((res = restriction.check(UpdateContextAvailabilitySubscription, indent, predetectedError, counter))         != "OK") ||
-           ((res = subscriptionId.check(UpdateContextAvailabilitySubscription, indent, predetectedError, counter))      != "OK"))
+  else if (((res = entityIdVector.check(UpdateContextAvailabilitySubscription)) != "OK") ||
+           ((res = attributeList.check())                                       != "OK") ||
+           ((res = duration.check())                                            != "OK") ||
+           ((res = restriction.check(counter))                                  != "OK") ||
+           ((res = subscriptionId.check())                                      != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";
 
-  return response.render(indent, counter);
+  return response.toJsonV1();
 }
 
 

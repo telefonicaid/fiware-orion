@@ -18,14 +18,16 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+# NOT VALGRIND READY ...
+# The log summary is heavily dependent on the timing, which is totally off under valgrind ...
+
 
 --NAME--
 Log Summary
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPv4 -logSummary 3 
+brokerStart CB 0 IPv4 -logSummary 5
 
 --SHELL--
 
@@ -42,13 +44,13 @@ brokerStart CB 0 IPv4 -logSummary 3
 # 02. POST /v2/entities with invalid JSON
 # 03. GETT /v2/entities - bad verb
 # 04. POST /v2/entities without payload
-# 05. Sleep 3 secs, awaiting a log summary report
+# 05. Sleep 5 secs, awaiting a log summary report
 # 06. grep SUMMARY in log-file (4 transactions, 1 bad input)
 # 07. GET /v2/entities (just to clear out Bad Input)
-# 08. Sleep 3 secs, awaiting a second log summary
+# 08. Sleep 5 secs, awaiting a second log summary
 # 09. grep SUMMARY in log-file (1 transaction and NO bad input since last time, also, Bad Input is no longer active)
 # 10. PUT /v2/noService
-# 11. Sleep 3 secs, awaiting a second log summary
+# 11. Sleep 5 secs, awaiting a third log summary
 # 12. grep SUMMARY in log-file (1 transaction and one bad input since last time)
 #
 
@@ -81,9 +83,9 @@ echo
 echo
 
 
-echo "05. Sleep 3 secs, awaiting a log summary report"
+echo "05. Sleep 5 secs, awaiting a log summary report"
 echo "==============================================="
-sleep 3
+sleep 5
 echo
 echo
 
@@ -102,9 +104,9 @@ echo
 echo
 
 
-echo "08. Sleep 3 secs, awaiting a second log summary"
+echo "08. Sleep 5 secs, awaiting a second log summary"
 echo "==============================================="
-sleep 3
+sleep 5
 echo
 echo
 
@@ -123,9 +125,9 @@ echo
 echo
 
 
-echo "11. Sleep 3 secs, awaiting a second log summary"
-echo "==============================================="
-sleep 3
+echo "11. Sleep 5 secs, awaiting a third log summary"
+echo "=============================================="
+sleep 5
 echo
 echo
 
@@ -195,7 +197,7 @@ Date: REGEX(.*)
 }
 
 
-05. Sleep 3 secs, awaiting a log summary report
+05. Sleep 5 secs, awaiting a log summary report
 ===============================================
 
 
@@ -218,7 +220,7 @@ Date: REGEX(.*)
 []
 
 
-08. Sleep 3 secs, awaiting a second log summary
+08. Sleep 5 secs, awaiting a second log summary
 ===============================================
 
 
@@ -248,8 +250,8 @@ Date: REGEX(.*)
 }
 
 
-11. Sleep 3 secs, awaiting a second log summary
-===============================================
+11. Sleep 5 secs, awaiting a third log summary
+==============================================
 
 
 12. grep SUMMARY in log-file (1 transaction and one bad input since last time)

@@ -115,6 +115,7 @@ static std::string contextMetadataValue(const std::string& path, const std::stri
 {
   LM_T(LmtParse, ("Got a metadata value: '%s'", value.c_str()));
   reqData->upcar.metadataP->stringValue = value;
+  reqData->upcar.metadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 
@@ -166,23 +167,5 @@ void jsonUpcarRelease(ParseData* reqData)
 */
 std::string jsonUpcarCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->upcar.res.check(ciP->apiVersion, "", reqData->errorString);
+  return reqData->upcar.res.check(ciP->apiVersion, reqData->errorString);
 }
-
-
-
-/* ****************************************************************************
-*
-* jsonUpcarPresent -
-*/
-void jsonUpcarPresent(ParseData* reqData)
-{
-  if (!lmTraceIsSet(LmtPresent))
-  {
-    return;
-  }
-
-  LM_T(LmtPresent, ("\n\n"));
-  reqData->upcar.res.present("");
-}
-

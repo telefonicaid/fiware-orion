@@ -42,8 +42,7 @@ typedef struct ContextRegistrationResponseVector
 
   void                          push_back(ContextRegistrationResponse* item);
   unsigned int                  size(void) const;
-  std::string                   render(const std::string& indent, bool comma = false);
-  void                          present(const std::string& indent);
+  std::string                   toJsonV1(bool comma);
   void                          release(void);
 
   ContextRegistrationResponse*  operator[](unsigned int ix) const;
@@ -51,7 +50,6 @@ typedef struct ContextRegistrationResponseVector
 
   std::string                   check(ApiVersion          apiVersion,
                                       RequestType         requestType,
-                                      const std::string&  indent,
                                       const std::string&  predetectedError,
                                       int                 counter);
 

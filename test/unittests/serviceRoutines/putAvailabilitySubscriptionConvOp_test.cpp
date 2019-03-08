@@ -33,31 +33,43 @@
 #include "serviceRoutines/putAvailabilitySubscriptionConvOp.h"
 #include "serviceRoutines/deleteAvailabilitySubscriptionConvOp.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 #include "unittests/unittest.h"
 
 
-
 /* ****************************************************************************
 *
-* rs -
+* service vectors -
 */
-#define SCA   SubscribeContextAvailability
-#define SCO   Ngsi9SubscriptionsConvOp
-#define IR    InvalidRequest
-#define SCAR  "subscribeContextAvailabilityRequest"
-#define UCASR "updateContextAvailabilitySubscriptionRequest"
-static RestService rs[] =
+#define SCA    SubscribeContextAvailability
+#define IR     InvalidRequest
+#define N9SCO  Ngsi9SubscriptionsConvOp
+
+static RestService postV[] =
 {
-  { "POST",   SCA, 2, { "ngsi9", "contextAvailabilitySubscriptions"      }, SCAR,  postSubscribeContextAvailability  },
-  { "*",      SCA, 2, { "ngsi9", "contextAvailabilitySubscriptions"      }, "",    badVerbPostOnly                   },
+  { SCA, 2, { "ngsi9", "contextAvailabilitySubscriptions" }, postSubscribeContextAvailability            },
+  { IR,  0, {                                             }, NULL                                        }
+};
 
-  { "PUT",    SCO, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, UCASR, putAvailabilitySubscriptionConvOp },
-  { "DELETE", SCO, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "", deleteAvailabilitySubscriptionConvOp },
-  { "*",      SCO, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "",    badVerbPutDeleteOnly              },
+static RestService putV[] =
+{
+  { N9SCO, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, putAvailabilitySubscriptionConvOp    },
+  { IR,    0, {                                                  }, NULL                                 }
+};
 
-  { "*",     IR,   0, { "*", "*", "*", "*", "*", "*"                     }, "",    badRequest                        },
-  { "",      IR,   0, {                                                  }, "",    NULL                              }
+static RestService deleteV[] =
+{
+  { N9SCO, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, deleteAvailabilitySubscriptionConvOp },
+  { IR,    0, {                                                  }, NULL                                 }
+};
+
+static RestService badVerbV[] =
+{
+  { SCA,   2, { "ngsi9", "contextAvailabilitySubscriptions"      }, badVerbPostOnly                      },
+  { N9SCO, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, badVerbPutDeleteOnly                 },
+  { IR,    0, { "*", "*", "*", "*", "*", "*"                     }, badRequest                           },
+  { IR,    0, {                                                  }, NULL                                 }
 };
 
 
@@ -65,22 +77,39 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * put -
-*
 */
 TEST(putAvailabilitySubscriptionConvOp, put)
 {
   ConnectionInfo ci1("/ngsi9/contextAvailabilitySubscriptions",  "GET",  "1.1");
   ConnectionInfo ci2("/ngsi9/contextAvailabilitySubscriptions/012345678901234567890123",  "XVERB",   "1.1");
   std::string    out;
+  RestService    restService1 =
+    {
+      ExitRequest,
+      2, { "/ngsi9", "contextAvailabilitySubscriptions" },
+      NULL
+    };
+  RestService    restService2 =
+    {
+      ExitRequest,
+      3, { "/ngsi9", "contextAvailabilitySubscriptions", "012345678901234567890123" },
+      NULL
+    };
 
   utInit();
 
-  out = restService(&ci1, rs);
+  serviceVectorsSet(NULL, putV, postV, NULL, deleteV, NULL, badVerbV);
+  ci1.apiVersion   = V1;
+  ci1.restServiceP = &restService1;
+  out = orion::requestServe(&ci1);
+
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci1.httpHeader[0]);
   EXPECT_EQ("POST",  ci1.httpHeaderValue[0]);
 
-  out = restService(&ci2, rs);
+  ci2.apiVersion   = V1;
+  ci2.restServiceP = &restService2;
+  out = orion::requestServe(&ci2);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci2.httpHeader[0]);
   EXPECT_EQ("PUT, DELETE", ci2.httpHeaderValue[0]);

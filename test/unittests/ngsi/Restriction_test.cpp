@@ -46,32 +46,19 @@ TEST(Restriction, check)
   std::string  expected3 = "OK";
   Scope*       scopeP    = new Scope("", "Value");
 
-  checked = restriction.check(RegisterContext, "", "", 0);
+  checked = restriction.check(0);
   EXPECT_EQ(expected0, checked);
 
-  checked = restriction.check(RegisterContext, "", "", 1);
+  checked = restriction.check(1);
   EXPECT_EQ(expected1, checked);
 
   restriction.scopeVector.push_back(scopeP);
-  checked = restriction.check(RegisterContext, "", "", 1);
+  checked = restriction.check(1);
   EXPECT_EQ(expected2, checked);
 
   scopeP->type = "Type";
-  checked = restriction.check(RegisterContext, "", "", 1);
+  checked = restriction.check(1);
   EXPECT_EQ(expected3, checked);
-}
-
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code
-*/
-TEST(Restriction, present)
-{
-  Restriction   restriction;
-
-  restriction.present("");
 }
 
 
@@ -86,6 +73,6 @@ TEST(Restriction, render)
   std::string  rendered;
   std::string  expected = "";
 
-  rendered = restriction.render("", 0, false);
+  rendered = restriction.toJsonV1(0, false);
   EXPECT_STREQ(expected.c_str(), rendered.c_str());
 }

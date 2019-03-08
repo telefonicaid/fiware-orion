@@ -49,13 +49,7 @@ int64_t Throttling::parse(void)
 *
 * Throttling::check -
 */
-std::string Throttling::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string Throttling::check(void)
 {
   // FIXME - make Throttling and Duration inherit from same class
   //         that implements the 'parse' method
@@ -110,34 +104,14 @@ const std::string Throttling::get(void)
 
 /* ****************************************************************************
 *
-* Throttling::present -
+* Throttling::toJsonV1 -
 */
-void Throttling::present(const std::string& indent)
-{
-  if (string != "")
-  {
-    LM_T(LmtPresent, ("%sThrottling: %s\n", 
-		      indent.c_str(), 
-		      string.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNo Throttling\n", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* Throttling::render -
-*/
-std::string Throttling::render(const std::string& indent, bool comma)
+std::string Throttling::toJsonV1(bool comma)
 {
   if (string == "")
   {
     return "";
   }
 
-  return valueTag(indent, "throttling", string, comma);
+  return valueTag("throttling", string, comma);
 }

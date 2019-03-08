@@ -183,7 +183,7 @@ Date: REGEX(.*)
 05. GET entities matching q=A1==1 AND mq=A1.M1==2, see E2, using /v1/queryContext
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 552
+Content-Length: 245
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

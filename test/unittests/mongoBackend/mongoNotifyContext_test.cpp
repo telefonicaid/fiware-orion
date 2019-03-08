@@ -193,9 +193,9 @@ TEST(mongoNotifyContextRequest, Ent1Attr1)
     ContextElementResponse* cerP = new ContextElementResponse();
     req.subscriptionId.set("51307b66f481db11bf860001");
     req.originator.set("localhost");
-    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    cerP->entity.fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
-    cerP->contextElement.contextAttributeVector.push_back(caP);
+    cerP->entity.attributeVector.push_back(caP);
     cerP->statusCode.fill(SccOk, "");
     req.contextElementResponseVector.push_back(cerP);
 
@@ -333,11 +333,11 @@ TEST(mongoNotifyContextRequest, Ent1AttrN)
     ContextElementResponse* cerP = new ContextElementResponse();
     req.subscriptionId.set("51307b66f481db11bf860001");
     req.originator.set("localhost");
-    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    cerP->entity.fill("E1", "T1", "false");
     ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val2");
-    cerP->contextElement.contextAttributeVector.push_back(ca1P);
-    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    cerP->entity.attributeVector.push_back(ca1P);
+    cerP->entity.attributeVector.push_back(ca2P);
     cerP->statusCode.fill(SccOk);
     req.contextElementResponseVector.push_back(cerP);
 
@@ -477,14 +477,14 @@ TEST(mongoNotifyContextRequest, EntNAttr1)
 
     req.subscriptionId.set("51307b66f481db11bf860001");
     req.originator.set("localhost");
-    cer1P->contextElement.entityId.fill("E1", "T1", "false");
+    cer1P->entity.fill("E1", "T1", "false");
     ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
-    cer1P->contextElement.contextAttributeVector.push_back(ca1P);
+    cer1P->entity.attributeVector.push_back(ca1P);
     cer1P->statusCode.fill(SccOk);
     req.contextElementResponseVector.push_back(cer1P);
-    cer2P->contextElement.entityId.fill("E2", "T2", "false");
+    cer2P->entity.fill("E2", "T2", "false");
     ContextAttribute* ca2P = new ContextAttribute("A3", "TA3", "new_val2");
-    cer2P->contextElement.contextAttributeVector.push_back(ca2P);
+    cer2P->entity.attributeVector.push_back(ca2P);
     cer2P->statusCode.fill(SccOk);
     req.contextElementResponseVector.push_back(cer2P);
 
@@ -624,18 +624,18 @@ TEST(mongoNotifyContextRequest, EntNAttrN)
 
     req.subscriptionId.set("51307b66f481db11bf860001");
     req.originator.set("localhost");
-    cer1P->contextElement.entityId.fill("E1", "T1", "false");
+    cer1P->entity.fill("E1", "T1", "false");
     ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val2");
-    cer1P->contextElement.contextAttributeVector.push_back(ca1P);
-    cer1P->contextElement.contextAttributeVector.push_back(ca2P);
+    cer1P->entity.attributeVector.push_back(ca1P);
+    cer1P->entity.attributeVector.push_back(ca2P);
     cer1P->statusCode.fill(SccOk);
     req.contextElementResponseVector.push_back(cer1P);
-    cer2P->contextElement.entityId.fill("E2", "T2", "false");
+    cer2P->entity.fill("E2", "T2", "false");
     ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "new_val3");
     ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val4");
-    cer2P->contextElement.contextAttributeVector.push_back(ca3P);
-    cer2P->contextElement.contextAttributeVector.push_back(ca4P);
+    cer2P->entity.attributeVector.push_back(ca3P);
+    cer2P->entity.attributeVector.push_back(ca4P);
     cer2P->statusCode.fill(SccOk);
     req.contextElementResponseVector.push_back(cer2P);
 
@@ -773,9 +773,9 @@ TEST(mongoNotifyContextRequest, createEntity)
     ContextElementResponse* cerP = new ContextElementResponse();
     req.subscriptionId.set("51307b66f481db11bf860001");
     req.originator.set("localhost");
-    cerP->contextElement.entityId.fill("E10", "T10", "false");
+    cerP->entity.fill("E10", "T10", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
-    cerP->contextElement.contextAttributeVector.push_back(caP);
+    cerP->entity.attributeVector.push_back(caP);
     cerP->statusCode.fill(SccOk);
     req.contextElementResponseVector.push_back(cerP);
 

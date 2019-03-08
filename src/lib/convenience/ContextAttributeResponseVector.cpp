@@ -36,14 +36,13 @@
 
 /* ****************************************************************************
 *
-* ContextAttributeResponseVector::render - 
+* ContextAttributeResponseVector::toJsonV1 -
 */
-std::string ContextAttributeResponseVector::render
+std::string ContextAttributeResponseVector::toJsonV1
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         request,
-  const std::string&  indent)
+  bool         asJsonObject,
+  RequestType  request
+)
 {
   std::string out = "";
   std::string key = "contextResponses";
@@ -53,12 +52,12 @@ std::string ContextAttributeResponseVector::render
     return "";
   }
 
-  out += startTag(indent, key, true);
+  out += startTag(key, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(apiVersion, asJsonObject, request, indent + "  ");
+    out += vec[ix]->toJsonV1(asJsonObject, request);
   }
-  out += endTag(indent, false, true);
+  out += endTag(false, true);
 
   return out;
 }
@@ -74,7 +73,6 @@ std::string ContextAttributeResponseVector::check
   ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         request,
-  std::string         indent,
   const std::string&  predetectedError
 )
 {
@@ -82,29 +80,13 @@ std::string ContextAttributeResponseVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion, asJsonObject, request, indent, predetectedError)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, asJsonObject, request, predetectedError)) != "OK")
     {
       return res;
     }
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextAttributeResponseVector::present - 
-*/
-void ContextAttributeResponseVector::present(std::string indent)
-{
-  LM_T(LmtPresent, ("%lu ContextAttributeResponses", (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent + "  ");
-  }
 }
 
 
@@ -166,8 +148,8 @@ void ContextAttributeResponseVector::release(void)
 *
 * ContextAttributeResponseVector::fill -
 */
-void ContextAttributeResponseVector::fill(ContextAttributeVector* cavP, const StatusCode& statusCode)
+void ContextAttributeResponseVector::fill(const ContextAttributeVector& caV, const StatusCode& statusCode)
 {
   vec.push_back(new ContextAttributeResponse());
-  vec[0]->fill(cavP, statusCode);
+  vec[0]->fill(caV, statusCode);
 }

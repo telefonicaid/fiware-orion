@@ -27,7 +27,6 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
-#include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "convenience/UpdateContextElementRequest.h"
 #include "convenience/UpdateContextElementResponse.h"
@@ -37,16 +36,20 @@
 
 /* ****************************************************************************
 *
-* render - 
+* toJsonV1 -
+*
 */
-std::string UpdateContextElementRequest::render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, std::string indent)
+std::string UpdateContextElementRequest::toJsonV1(bool asJsonObject, RequestType requestType)
 {
   std::string out = "";
 
-  out += startTag(indent);
-  out += attributeDomainName.render(indent + "  ", true);
-  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType, indent + "  ");
-  out += endTag(indent);
+  // No metadata filter in this case, an empty vector is used to fulfil method signature.
+  // For attribute filter, we use the ContextAttributeVector itself
+  std::vector<std::string> emptyMdV;
+
+  out += startTag();
+  out += contextAttributeVector.toJsonV1(asJsonObject, requestType, contextAttributeVector.vec, emptyMdV);
+  out += endTag();
 
   return out;
 }
@@ -57,22 +60,12 @@ std::string UpdateContextElementRequest::render(ApiVersion apiVersion, bool asJs
 *
 * check - 
 *
-*
-* FIXME P3: once (if ever) AttributeDomainName::check stops to always return "OK", put back this piece of code 
-*           in its place:
--
-*   else if ((res = attributeDomainName.check(AppendContextElement, indent, predetectedError, counter)) != "OK")
-*   {
-*     response.errorCode.fill(SccBadRequest, res);
-*   }
-*
 */
 std::string UpdateContextElementRequest::check
 (
   ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
-  std::string         indent,
   const std::string&  predetectedError     // Predetected Error, normally during parsing
 )
 {
@@ -92,19 +85,7 @@ std::string UpdateContextElementRequest::check
     return "OK";
   }
 
-  return response.render(apiVersion, asJsonObject, requestType, indent);
-}
-
-
-
-/* ****************************************************************************
-*
-* present - 
-*/
-void UpdateContextElementRequest::present(std::string indent)
-{
-  attributeDomainName.present(indent);
-  contextAttributeVector.present(indent);
+  return response.toJsonV1(asJsonObject, requestType);
 }
 
 

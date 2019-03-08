@@ -97,7 +97,7 @@ echo
 01. Add subscription to E.*/ET
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 108
+Content-Length: 84
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -113,7 +113,7 @@ Date: REGEX(.*)
 02. Create entity E1/ET
 =======================
 HTTP/1.1 200 OK
-Content-Length: 315
+Content-Length: 169
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -148,7 +148,7 @@ Date: REGEX(.*)
 04. Get statistics (one simulated notification)
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 78
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

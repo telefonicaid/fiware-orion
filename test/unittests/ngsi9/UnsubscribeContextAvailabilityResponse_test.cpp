@@ -79,7 +79,7 @@ TEST(UnsubscribeContextAvailabilityResponse, jsonRender)
   ucasP->statusCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  out = ucasP->render("");
+  out = ucasP->toJsonV1();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -87,7 +87,7 @@ TEST(UnsubscribeContextAvailabilityResponse, jsonRender)
   ucasP->statusCode.fill(SccBadRequest, "no details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  out = ucasP->render("");
+  out = ucasP->toJsonV1();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   free(ucasP);

@@ -62,15 +62,15 @@ TEST(SubscriptionId, check)
   utInit();
 
   sId.set("SUB_123");
-  checked = sId.check(RegisterContext, "", "", 0);
+  checked = sId.check();
   EXPECT_STREQ("bad length - 24 chars expected", checked.c_str());
 
   sId.set("SUB_12345678901234567890");
-  checked = sId.check(RegisterContext, "", "", 0);
+  checked = sId.check();
   EXPECT_STREQ("invalid char in ID string", checked.c_str());
 
   sId.set("012345678901234567890123");
-  checked = sId.check(RegisterContext, "", "", 0);
+  checked = sId.check();
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();
@@ -104,27 +104,6 @@ TEST(SubscriptionId, setGetAndIsEmpty)
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(SubscriptionId, present)
-{
-  SubscriptionId  sId;
-
-  utInit();
-
-  sId.set("SUB_123");
-  sId.present("");
-
-  sId.set("");
-  sId.present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * render
 */
 TEST(SubscriptionId, render)
@@ -137,7 +116,7 @@ TEST(SubscriptionId, render)
 
   sId.set("012345012345012345012345");
 
-  out = sId.render(UnsubscribeContext, "");
+  out = sId.toJsonV1(UnsubscribeContext, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

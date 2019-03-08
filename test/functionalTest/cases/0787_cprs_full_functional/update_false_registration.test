@@ -51,8 +51,7 @@ payload='{
       "attributes": [
         {
           "name": "A1",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         }
       ],
       "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -92,7 +91,7 @@ echo
 01. Register E1/T1/A1-CP1 in CB
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -106,7 +105,7 @@ Date: REGEX(.*)
 02. Update/UPDATE E1/T1/A1 in CB
 ================================
 HTTP/1.1 200 OK
-Content-Length: 431
+Content-Length: 226
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

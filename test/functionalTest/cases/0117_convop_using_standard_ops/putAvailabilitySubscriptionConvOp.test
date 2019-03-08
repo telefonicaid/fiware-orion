@@ -164,8 +164,7 @@ payload='{
     "attributes": [
       {
         "name": "A2",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${LISTENER_PORT}'/notify"
@@ -201,8 +200,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${LISTENER_PORT}'/notify"
@@ -226,7 +224,7 @@ echo
 01. Try to update a non-existing subscription
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 143
+Content-Length: 114
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -243,7 +241,7 @@ Date: REGEX(.*)
 02. subscriptionId in payload not matching subscriptionId in URL
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 245
+Content-Length: 209
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -261,7 +259,7 @@ Date: REGEX(.*)
 03. Invalid subscriptionId
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 166
+Content-Length: 130
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -279,7 +277,7 @@ Date: REGEX(.*)
 04. Subscribe to E1/A1
 ======================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -293,7 +291,7 @@ Date: REGEX(.*)
 05. Update the subscription to E1/A1 to be E1/A2 instead
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -307,7 +305,7 @@ Date: REGEX(.*)
 06. Register E1/A2
 ==================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -322,7 +320,7 @@ Date: REGEX(.*)
 ============================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 505
+Content-Length: 260
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -335,7 +333,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "A2",
                         "type": "string"
                     }
@@ -359,7 +356,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 08. Register E1/A1
 ==================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -374,7 +371,7 @@ Date: REGEX(.*)
 ===============================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 505
+Content-Length: 260
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -387,7 +384,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "A2",
                         "type": "string"
                     }

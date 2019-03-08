@@ -170,129 +170,6 @@ static std::string attributeType(const std::string& path, const std::string& val
 
 /* ****************************************************************************
 *
-* attributeIsDomain -
-*/
-static std::string attributeIsDomain(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("got an attributeIsDomain: '%s'", value.c_str()));
-
-  parseDataP->ncar.craP->isDomain = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* attributeMetadata -
-*/
-static std::string attributeMetadata(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got an attributeMetadata: '%s'", value.c_str()));
-
-  parseDataP->ncar.attributeMetadataP = new Metadata();
-  parseDataP->ncar.craP->metadataVector.push_back(parseDataP->ncar.attributeMetadataP);
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* attributeMetadataName -
-*/
-static std::string attributeMetadataName(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got an attributeMetadataName: '%s'", value.c_str()));
-  parseDataP->ncar.attributeMetadataP->name = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* attributeMetadataType -
-*/
-static std::string attributeMetadataType(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got an attributeMetadataType: '%s'", value.c_str()));
-  parseDataP->ncar.attributeMetadataP->type = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* attributeMetadataValue -
-*/
-static std::string attributeMetadataValue(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got an attributeMetadataValue: '%s'", value.c_str()));
-  parseDataP->ncar.attributeMetadataP->stringValue = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* registrationMetadata -
-*/
-static std::string registrationMetadata(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a registrationMetadata: '%s'", value.c_str()));
-  parseDataP->ncar.regMetadataP = new Metadata();
-  parseDataP->ncar.crrP->contextRegistration.registrationMetadataVector.push_back(parseDataP->ncar.regMetadataP);
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* registrationMetadataName -
-*/
-static std::string registrationMetadataName(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a registrationMetadataName: '%s'", value.c_str()));
-  parseDataP->ncar.regMetadataP->name = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* registrationMetadataType -
-*/
-static std::string registrationMetadataType(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a registrationMetadataType: '%s'", value.c_str()));
-  parseDataP->ncar.regMetadataP->type = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* registrationMetadataValue -
-*/
-static std::string registrationMetadataValue(const std::string& path, const std::string& value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a registrationMetadataValue: '%s'", value.c_str()));
-  parseDataP->ncar.regMetadataP->stringValue = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * providingApplication -
 */
 static std::string providingApplication(const std::string& path, const std::string& value, ParseData* parseDataP)
@@ -327,19 +204,6 @@ JsonNode jsonNcarParseVector[] =
   { CRR "/contextRegistration/attributes/attribute",                           attribute                    },
   { CRR "/contextRegistration/attributes/attribute/name",                      attributeName                },
   { CRR "/contextRegistration/attributes/attribute/type",                      attributeType                },
-  { CRR "/contextRegistration/attributes/attribute/isDomain",                  attributeIsDomain            },
-
-  { CRR "/contextRegistration/attributes/attribute/metadatas",                 jsonNullTreat                },
-  { CRR "/contextRegistration/attributes/attribute/metadatas/metadata",        attributeMetadata            },
-  { CRR "/contextRegistration/attributes/attribute/metadatas/metadata/name",   attributeMetadataName        },
-  { CRR "/contextRegistration/attributes/attribute/metadatas/metadata/type",   attributeMetadataType        },
-  { CRR "/contextRegistration/attributes/attribute/metadatas/metadata/value",  attributeMetadataValue       },
-
-  { CRR "/contextRegistration/metadatas",                                      jsonNullTreat                },
-  { CRR "/contextRegistration/metadatas/metadata",                             registrationMetadata         },
-  { CRR "/contextRegistration/metadatas/metadata/name",                        registrationMetadataName     },
-  { CRR "/contextRegistration/metadatas/metadata/type",                        registrationMetadataType     },
-  { CRR "/contextRegistration/metadatas/metadata/value",                       registrationMetadataValue    },
 
   { CRR "/contextRegistration/providingApplication",                           providingApplication         },
 
@@ -382,20 +246,5 @@ void jsonNcarRelease(ParseData* parseDataP)
 */
 std::string jsonNcarCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
-  return parseDataP->ncar.res.check(ciP->apiVersion, "", parseDataP->errorString, 0);
-}
-
-
-
-/* ****************************************************************************
-*
-* jsonNcarPresent -
-*/
-void jsonNcarPresent(ParseData* parseDataP)
-{
-  if (!lmTraceIsSet(LmtPresent))
-    return;
-
-  LM_T(LmtPresent,("\n\n"));
-  parseDataP->ncar.res.present("");
+  return parseDataP->ncar.res.check(ciP->apiVersion, parseDataP->errorString);
 }

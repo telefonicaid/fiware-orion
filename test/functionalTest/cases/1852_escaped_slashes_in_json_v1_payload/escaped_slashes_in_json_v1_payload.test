@@ -75,7 +75,7 @@ echo
 01. Create a subscription with escaped slashes in reference
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 135
+Content-Length: 104
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

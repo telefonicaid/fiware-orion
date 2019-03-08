@@ -24,7 +24,7 @@ Follow these steps:
 2. Create a new file called `docker-compose.yml` inside your directory with the following contents:
 	
 		mongo:
-		  image: mongo:3.2
+		  image: mongo:3.6
 		  command: --nojournal
 		orion:
 		  image: fiware/orion
@@ -70,7 +70,7 @@ Check that everything works with
 ### 2B. MongoDB runs on another docker container
 In case you want to run MongoDB on another container you can launch it like this
 
-	sudo docker run --name mongodb -d mongo:3.2
+	sudo docker run --name mongodb -d mongo:3.4
 
 And then run Orion with this command
 
@@ -104,7 +104,7 @@ Steps:
 4. Run Orion...
 	* Using an automated scenario with docker-compose and building your new image: `sudo docker-compose up`. You may also modify the provided `docker-compose.yml` file if you need so.
 	* Manually, running MongoDB on another container: 
-        	1. `sudo docker run --name mongodb -d mongo:3.2`
+        	1. `sudo docker run --name mongodb -d mongo:3.4`
 		2. `sudo docker build -t orion .`
 		3. `sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 orion -dbhost mongodb`.
 	* Manually, specifying where to find your MongoDB host:

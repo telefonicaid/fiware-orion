@@ -130,6 +130,8 @@ static void resetStatistics(void)
   noOfSimulatedNotifications                      = -1;
   noOfBatchQueryRequest                           = -1;
   noOfBatchUpdateRequest                          = -1;
+  noOfRegistrationRequest                         = -1;
+  noOfRegistrationsRequest                        = -1;
 
   QueueStatistics::reset();
 
@@ -149,11 +151,11 @@ static void resetStatistics(void)
 *
 * renderUsedCounter -
 */
-inline void renderUsedCounter(JsonHelper* js, const std::string& field, int counter)
+inline void renderUsedCounter(JsonObjectHelper* js, const std::string& field, int counter)
 {
   if (counter != -1)
   {
-    js->addNumber(field, counter + 1);
+    js->addNumber(field, (long long)(counter + 1));
   }
 }
 
@@ -165,7 +167,7 @@ inline void renderUsedCounter(JsonHelper* js, const std::string& field, int coun
 */
 std::string renderCounterStats(void)
 {
-  JsonHelper js;
+  JsonObjectHelper js;
 
   // FIXME: try to chose names closer to the ones used in API URLs
   renderUsedCounter(&js, "jsonRequests",                              noOfJsonRequests);
@@ -210,6 +212,8 @@ std::string renderCounterStats(void)
   renderUsedCounter(&js, "entityByIdAttributeByNameIdAndType",        noOfEntityByIdAttributeByNameIdAndType);
   renderUsedCounter(&js, "batchQueryRequests",                        noOfBatchQueryRequest);
   renderUsedCounter(&js, "batchUpdateRequests",                       noOfBatchUpdateRequest);
+  renderUsedCounter(&js, "registrationRequest",                       noOfRegistrationRequest);
+  renderUsedCounter(&js, "registrationsRequest",                      noOfRegistrationsRequest);
   renderUsedCounter(&js, "logTraceRequests",                          noOfLogTraceRequests);
   renderUsedCounter(&js, "logLevelRequests",                          noOfLogLevelRequests);
 
@@ -220,7 +224,7 @@ std::string renderCounterStats(void)
   // Instead of removing version-requests from the statistics,
   // we report the number of version-requests even if zero (-1).
   //
-  js.addNumber("versionRequests", noOfVersionRequests + 1);
+  js.addNumber("versionRequests", (long long)(noOfVersionRequests + 1));
 
   renderUsedCounter(&js, "exitRequests", noOfExitRequests);
   renderUsedCounter(&js, "leakRequests", noOfLeakRequests);
@@ -242,15 +246,15 @@ std::string renderCounterStats(void)
 */
 std::string renderSemWaitStats(void)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
-  jh.addFloat("request",           semTimeReqGet());
-  jh.addFloat("dbConnectionPool",  mongoPoolConnectionSemWaitingTimeGet());
-  jh.addFloat("transaction",       semTimeTransGet());
-  jh.addFloat("subCache",          semTimeCacheGet());
-  jh.addFloat("connectionContext", mutexTimeCCGet());
-  jh.addFloat("timeStat",          semTimeTimeStatGet());
-  jh.addFloat("metrics",           ((float) metricsMgr.semWaitTimeGet()) / 1000000);
+  jh.addNumber("request",           semTimeReqGet());
+  jh.addNumber("dbConnectionPool",  mongoPoolConnectionSemWaitingTimeGet());
+  jh.addNumber("transaction",       semTimeTransGet());
+  jh.addNumber("subCache",          semTimeCacheGet());
+  jh.addNumber("connectionContext", mutexTimeCCGet());
+  jh.addNumber("timeStat",          semTimeTimeStatGet());
+  jh.addNumber("metrics",           ((float) metricsMgr.semWaitTimeGet()) / 1000000);
 
   return jh.str();
 }
@@ -263,18 +267,18 @@ std::string renderSemWaitStats(void)
 */
 std::string renderNotifQueueStats(void)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
   float      timeInQ = QueueStatistics::getTimeInQ();
   int        out     = QueueStatistics::getOut();
 
-  jh.addNumber("in",             QueueStatistics::getIn());
-  jh.addNumber("out",            out);
-  jh.addNumber("reject",         QueueStatistics::getReject());
-  jh.addNumber("sentOk",         QueueStatistics::getSentOK());     // FIXME P7: this needs to be generalized for all notificationModes
-  jh.addNumber("sentError",      QueueStatistics::getSentError());  // FIXME P7: this needs to be generalized for all notificationModes
-  jh.addFloat ("timeInQueue",    timeInQ);
-  jh.addFloat ("avgTimeInQueue", out==0 ? 0 : (timeInQ/out));
-  jh.addNumber("size",           QueueStatistics::getQSize());
+  jh.addNumber("in",             (long long)QueueStatistics::getIn());
+  jh.addNumber("out",           (long long)out);
+  jh.addNumber("reject",         (long long)QueueStatistics::getReject());
+  jh.addNumber("sentOk",         (long long)QueueStatistics::getSentOK());     // FIXME P7: this needs to be generalized for all notificationModes
+  jh.addNumber("sentError",      (long long)QueueStatistics::getSentError());  // FIXME P7: this needs to be generalized for all notificationModes
+  jh.addNumber ("timeInQueue",    timeInQ);
+  jh.addNumber ("avgTimeInQueue", out==0 ? 0.0f : (timeInQ/out));
+  jh.addNumber("size",           (long long)QueueStatistics::getQSize());
 
   return jh.str();
 }
@@ -294,7 +298,7 @@ std::string statisticsTreat
 )
 {
 
-  JsonHelper js;
+  JsonObjectHelper js;
 
   if (ciP->method == "DELETE")
   {
@@ -324,8 +328,8 @@ std::string statisticsTreat
 
   // Unconditional stats
   int now = getCurrentTime();
-  js.addNumber("uptime_in_secs", now - startTime);
-  js.addNumber("measuring_interval_in_secs", now - statisticsTime);
+  js.addNumber("uptime_in_secs",(long long)(now - startTime));
+  js.addNumber("measuring_interval_in_secs", (long long)(now - statisticsTime));
 
   // Special case: simulated notifications
   int nSimNotif = __sync_fetch_and_add(&noOfSimulatedNotifications, 0);
@@ -351,7 +355,7 @@ std::string statisticsCacheTreat
 )
 {
 
-  JsonHelper js;
+  JsonObjectHelper js;
 
   if (ciP->method == "DELETE")
   {
@@ -375,11 +379,11 @@ std::string statisticsCacheTreat
   cacheSemGive(__FUNCTION__, "statisticsCacheTreat");
 
   js.addString("ids", listBuffer);    // FIXME P10: this seems not printing anything... is listBuffer working fine?
-  js.addNumber("refresh", mscRefreshs);
-  js.addNumber("inserts", mscInserts);
-  js.addNumber("removes", mscRemoves);
-  js.addNumber("updates", mscUpdates);
-  js.addNumber("items", cacheItems);
+  js.addNumber("refresh", (long long)mscRefreshs);
+  js.addNumber("inserts", (long long)mscInserts);
+  js.addNumber("removes", (long long)mscRemoves);
+  js.addNumber("updates", (long long)mscUpdates);
+  js.addNumber("items", (long long)cacheItems);
 
   ciP->httpStatusCode = SccOk;
   return js.str();

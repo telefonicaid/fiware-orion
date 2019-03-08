@@ -26,7 +26,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Duration.h"
 #include "ngsi/Reference.h"
@@ -50,24 +50,23 @@ SubscribeContextAvailabilityRequest::SubscribeContextAvailabilityRequest()
 
 /* ****************************************************************************
 *
-* SubscribeContextAvailabilityRequest::render -
+* SubscribeContextAvailabilityRequest::toJsonV1 -
 */
-std::string SubscribeContextAvailabilityRequest::render(const std::string& indent)
+std::string SubscribeContextAvailabilityRequest::toJsonV1(void)
 {
   std::string out                      = "";
-  std::string indent2                  = indent + "  ";
   bool        commaAfterEntityIdVector = (restrictions > 0) || !duration.isEmpty() || !reference.isEmpty() || (attributeList.size() != 0);
   bool        commaAfterAttributeList  = (restrictions > 0) || !duration.isEmpty() || !reference.isEmpty();
   bool        commaAfterReference      = (restrictions > 0) || !duration.isEmpty();
   bool        commaAfterDuration       = restrictions > 0;
 
-  out += startTag(indent);
-  out += entityIdVector.render(indent2, commaAfterEntityIdVector);
-  out += attributeList.render(indent2, commaAfterAttributeList);
-  out += reference.render(indent2, commaAfterReference);
-  out += duration.render(indent2, commaAfterDuration);
-  out += restriction.render(indent2);
-  out += endTag(indent);
+  out += startTag();
+  out += entityIdVector.toJsonV1(commaAfterEntityIdVector);
+  out += attributeList.toJsonV1(commaAfterAttributeList, "attributes");
+  out += reference.toJsonV1(commaAfterReference);
+  out += duration.toJsonV1(commaAfterDuration);
+  out += restriction.toJsonV1(restrictions, true);
+  out += endTag();
 
   return out;
 }
@@ -78,7 +77,7 @@ std::string SubscribeContextAvailabilityRequest::render(const std::string& inden
 *
 * SubscribeContextAvailabilityRequest::check -
 */
-std::string SubscribeContextAvailabilityRequest::check(const std::string& indent, const std::string& predetectedError, int counter)
+std::string SubscribeContextAvailabilityRequest::check(const std::string& predetectedError)
 {
   SubscribeContextAvailabilityResponse response;
   std::string                          res;
@@ -87,18 +86,18 @@ std::string SubscribeContextAvailabilityRequest::check(const std::string& indent
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = entityIdVector.check(SubscribeContextAvailability, indent))                              != "OK") ||
-           ((res = attributeList.check(SubscribeContextAvailability, indent, predetectedError, counter))    != "OK") ||
-           ((res = reference.check(SubscribeContextAvailability, indent, predetectedError, counter))        != "OK") ||
-           ((res = duration.check(SubscribeContextAvailability, indent, predetectedError, counter))         != "OK") ||
-           ((res = restriction.check(SubscribeContextAvailability, indent, predetectedError, restrictions)) != "OK"))
+  else if (((res = entityIdVector.check(SubscribeContextAvailability)) != "OK") ||
+           ((res = attributeList.check())                              != "OK") ||
+           ((res = reference.check(SubscribeContextAvailability))      != "OK") ||
+           ((res = duration.check())                                   != "OK") ||
+           ((res = restriction.check(restrictions))                    != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";
 
-  return response.render(indent);
+  return response.toJsonV1();
 }
 
 
@@ -112,21 +111,6 @@ void SubscribeContextAvailabilityRequest::release(void)
    entityIdVector.release();
    restriction.release();
    attributeList.release();
-}
-
-
-
-/* ****************************************************************************
-*
-* SubscribeContextAvailabilityRequest::present -
-*/
-void SubscribeContextAvailabilityRequest::present(const std::string& indent)
-{
-   entityIdVector.present(indent);
-   attributeList.present(indent);
-   reference.present(indent);
-   duration.present(indent);
-   restriction.present(indent);
 }
 
 

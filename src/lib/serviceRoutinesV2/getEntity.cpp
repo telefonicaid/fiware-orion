@@ -36,6 +36,7 @@
 #include "apiTypesV2/Entities.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/getEntities.h"
+#include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "rest/OrionError.h"
 #include "parse/forbiddenChars.h"
@@ -53,9 +54,9 @@
 *
 * URI parameters:
 *   - type=<TYPE>
-*   - options=keyValues|values|unique   (used in Entity::render)
-*   - attrs=A1,A2,...An                 (used in Entity::render)
-*   - metadata=M1,M2,...Mn              (used in Entity::render)
+*   - options=keyValues|values|unique   (used in Entity::toJson)
+*   - attrs=A1,A2,...An                 (used in Entity::toJson)
+*   - metadata=M1,M2,...Mn              (used in Entity::toJson)
 */
 std::string getEntity
 (
@@ -85,9 +86,15 @@ std::string getEntity
   // Fill in QueryContextRequest
   parseDataP->qcr.res.fill(entityId, type, "false", EntityTypeEmptyOrNotEmpty, "");
 
+  // Get attrs and metadata filters from URL params
+  // Note we cannot set the attrs filter on &parseDataP->qcr.res.attrsFilterList given that parameter is used for querying on DB
+  // and some .test would break. We use a fresh variable (attributeFilter) for that
+  StringList attributeFilter;
+  setAttrsFilter(ciP->uriParam, ciP->uriParamOptions, &attributeFilter);
+  setMetadataFilter(ciP->uriParam, &parseDataP->qcr.res.metadataList);
+
   // Call standard op postQueryContext
   postQueryContext(ciP, components, compV, parseDataP);
-
 
   // Render entity response
   Entity       entity;
@@ -98,10 +105,22 @@ std::string getEntity
     entity.hideIdAndType();
   }
 
-  entity.fill(&parseDataP->qcrs.res);
+  OrionError   oe;
+  std::string  answer;
 
-  std::string answer;
-  TIMED_RENDER(answer = entity.render(ciP->uriParamOptions, ciP->uriParam, false));
+  entity.fill(parseDataP->qcrs.res, &oe);
+
+  if (oe.code == SccNone)
+  {
+    TIMED_RENDER(answer = entity.toJson(getRenderFormat(ciP->uriParamOptions),
+                                        attributeFilter.stringV,
+                                        false,
+                                        parseDataP->qcr.res.metadataList.stringV));
+  }
+  else
+  {
+    TIMED_RENDER(answer = oe.toJson());
+  }
 
   if (parseDataP->qcrs.res.errorCode.code == SccOk && parseDataP->qcrs.res.contextElementResponseVector.size() > 1)
   {

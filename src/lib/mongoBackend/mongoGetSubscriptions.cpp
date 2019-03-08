@@ -169,6 +169,8 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
   nP->blacklist         = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(r, CSUB_BLACKLIST)                   : false;
   nP->lastFailure       = r.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(r, CSUB_LASTFAILURE)      : -1;
   nP->lastSuccess       = r.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongF(r, CSUB_LASTSUCCESS)      : -1;
+  nP->lastFailureReason = r.hasField(CSUB_LASTFAILUREASON)?  getStringFieldF(r, CSUB_LASTFAILUREASON)           : "";
+  nP->lastSuccessCode   = r.hasField(CSUB_LASTSUCCESSCODE)?  getIntOrLongFieldAsLongF(r, CSUB_LASTSUCCESSCODE)  : -1;
 
   // Attributes format
   subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(r, CSUB_FORMAT)) : NGSI_V1_LEGACY;
@@ -203,12 +205,14 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
 
     if (cSubP->lastFailure > subP->notification.lastFailure)
     {
-      subP->notification.lastFailure = cSubP->lastFailure;
+      subP->notification.lastFailure       = cSubP->lastFailure;
+      subP->notification.lastFailureReason = cSubP->lastFailureReason;
     }
 
     if (cSubP->lastSuccess > subP->notification.lastSuccess)
     {
-      subP->notification.lastSuccess = cSubP->lastSuccess;
+      subP->notification.lastSuccess     = cSubP->lastSuccess;
+      subP->notification.lastSuccessCode = cSubP->lastSuccessCode;
     }
   }
   cacheSemGive(__FUNCTION__, "get lastNotification and count");
@@ -254,7 +258,7 @@ void mongoListSubscriptions
   OrionError*                          oe,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   tenant,
-  const std::string&                   servicePath,
+  const std::string&                   servicePath,  // FIXME P4: vector of strings and not just a single string? See #3100
   int                                  limit,
   int                                  offset,
   long long*                           count
@@ -274,13 +278,10 @@ void mongoListSubscriptions
   std::string                    err;
   Query                          q;
 
-  if (!servicePath.empty() && servicePath != "/#")
+  // FIXME P6: This here is a bug ... See #3099 for more info
+  if (!servicePath.empty() && (servicePath != "/#"))
   {
     q = Query(BSON(CSUB_SERVICE_PATH << servicePath));
-  }
-  else
-  {
-    q = Query();
   }
 
   q.sort(BSON("_id" << 1));

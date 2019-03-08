@@ -43,19 +43,16 @@ typedef struct ContextRegistration
 {
   EntityIdVector                      entityIdVector;                        // Optional
   ContextRegistrationAttributeVector  contextRegistrationAttributeVector;    // Optional
-  MetadataVector                      registrationMetadataVector;            // Optional
   ProvidingApplication                providingApplication;                  // Mandatory
 
   bool                                entityIdVectorPresent;                 // entityIdList present during parsing
 
   ContextRegistration();
-  std::string  render(const std::string& indent, bool comma, bool isInVector);
-  void         present(const std::string& indent, int ix);
+  std::string  toJsonV1(bool comma, bool isInVector);
   void         release();
 
   std::string  check(ApiVersion          apiVersion,
                      RequestType         requestType,
-                     const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);
 } ContextRegistration;

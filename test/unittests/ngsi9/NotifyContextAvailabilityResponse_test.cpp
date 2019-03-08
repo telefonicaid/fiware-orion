@@ -45,8 +45,7 @@ TEST(NotifyContextAvailabilityResponse, all)
   EXPECT_EQ(ncr1.responseCode.code, SccOk);
   EXPECT_EQ(ncr2.responseCode.code, SccBadRequest);
 
-  ncr1.render("");
-  ncr1.present("");
+  ncr1.toJsonV1();
   ncr1.release();
 }
 

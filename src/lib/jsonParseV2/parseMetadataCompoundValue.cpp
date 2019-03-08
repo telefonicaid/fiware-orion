@@ -27,6 +27,7 @@
 #include "rapidjson/document.h"
 
 #include "logMsg/logMsg.h"
+#include "common/limits.h"
 #include "ngsi/Metadata.h"
 #include "parse/CompoundValueNode.h"
 
@@ -47,7 +48,7 @@ static orion::ValueType stringToCompoundType(std::string nodeType)
   else if (nodeType == "False")   return orion::ValueTypeBoolean;
   else if (nodeType == "Object")  return orion::ValueTypeObject;
   else if (nodeType == "Array")   return orion::ValueTypeVector;
-  else if (nodeType == "Null")    return orion::ValueTypeNone;
+  else if (nodeType == "Null")    return orion::ValueTypeNull;
 
   return orion::ValueTypeString;
 }
@@ -67,8 +68,6 @@ std::string parseMetadataCompoundValue
 {
   if (node->IsObject())
   {
-    int counter  = 0;
-
     for (rapidjson::Value::ConstMemberIterator iter = node->MemberBegin(); iter != node->MemberEnd(); ++iter)
     {
       std::string                nodeType = jsonParseTypeNames[iter->value.GetType()];
@@ -77,11 +76,6 @@ std::string parseMetadataCompoundValue
       cvnP->valueType  = stringToCompoundType(nodeType);
 
       cvnP->name       = iter->name.GetString();
-      cvnP->container  = parent;
-      cvnP->rootP      = parent->rootP;
-      cvnP->level      = parent->level + 1;
-      cvnP->siblingNo  = counter;
-      cvnP->path       = parent->path + cvnP->name;
 
       if (nodeType == "String")
       {
@@ -97,16 +91,14 @@ std::string parseMetadataCompoundValue
       }
       else if (nodeType == "Null")
       {
-        cvnP->valueType = orion::ValueTypeNone;
+        cvnP->valueType = orion::ValueTypeNull;
       }
       else if (nodeType == "Object")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeObject;
       }
       else if (nodeType == "Array")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeVector;
       }
 
@@ -119,28 +111,16 @@ std::string parseMetadataCompoundValue
       {
         parseMetadataCompoundValue(iter, mdP, cvnP);
       }
-
-      ++counter;
     }
   }
   else if (node->IsArray())
   {
-    int counter  = 0;
-
     for (rapidjson::Value::ConstValueIterator iter = node->Begin(); iter != node->End(); ++iter)
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[4];
-
-      snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
       cvnP->valueType  = stringToCompoundType(nodeType);
-      cvnP->container  = parent;
-      cvnP->rootP      = parent->rootP;
-      cvnP->level      = parent->level + 1;
-      cvnP->siblingNo  = counter;
-      cvnP->path       = parent->path + "[" + itemNo + "]";
 
       if (nodeType == "String")
       {
@@ -156,16 +136,14 @@ std::string parseMetadataCompoundValue
       }
       else if (nodeType == "Null")
       {
-        cvnP->valueType = orion::ValueTypeNone;
+        cvnP->valueType = orion::ValueTypeNull;
       }
       else if (nodeType == "Object")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeObject;
       }
       else if (nodeType == "Array")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeVector;
       }
 
@@ -178,8 +156,6 @@ std::string parseMetadataCompoundValue
       {
         parseMetadataCompoundValue(iter, mdP, cvnP);
       }
-
-      ++counter;
     }
   }
 
@@ -204,13 +180,8 @@ std::string parseMetadataCompoundValue
   if (mdP->compoundValueP == NULL)
   {
     mdP->compoundValueP            = new orion::CompoundValueNode();
-    mdP->compoundValueP->name      = "TOP";
-    mdP->compoundValueP->container = mdP->compoundValueP;
+    mdP->compoundValueP->name      = "";
     mdP->compoundValueP->valueType = stringToCompoundType(type);
-    mdP->compoundValueP->path      = "/";
-    mdP->compoundValueP->rootP     = mdP->compoundValueP;
-    mdP->compoundValueP->level     = 0;
-    mdP->compoundValueP->siblingNo = 0;
 
     parent = mdP->compoundValueP;
   }
@@ -221,22 +192,12 @@ std::string parseMetadataCompoundValue
   //
   if (type == "Array")
   {
-    int counter  = 0;
-
     for (rapidjson::Value::ConstValueIterator iter = node->value.Begin(); iter != node->value.End(); ++iter)
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[4];
-
-      snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
       cvnP->valueType  = stringToCompoundType(nodeType);
-      cvnP->container  = parent;
-      cvnP->rootP      = parent->rootP;
-      cvnP->level      = parent->level + 1;
-      cvnP->siblingNo  = counter;
-      cvnP->path       = parent->path + "[" + itemNo + "]";
 
       if (nodeType == "String")
       {
@@ -252,12 +213,10 @@ std::string parseMetadataCompoundValue
       }
       else if (nodeType == "Object")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeObject;
       }
       else if (nodeType == "Array")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeVector;
       }
 
@@ -270,13 +229,10 @@ std::string parseMetadataCompoundValue
       {
         parseMetadataCompoundValue(iter, mdP, cvnP);
       }
-
-      ++counter;
     }
   }
   else if (type == "Object")
   {
-    int                                    counter  = 0;
     rapidjson::Value::ConstMemberIterator  iter;
 
     for (iter = node->value.MemberBegin(); iter != node->value.MemberEnd(); ++iter)
@@ -286,11 +242,6 @@ std::string parseMetadataCompoundValue
 
       cvnP->name       = iter->name.GetString();
       cvnP->valueType  = stringToCompoundType(nodeType);
-      cvnP->container  = parent;
-      cvnP->rootP      = parent->rootP;
-      cvnP->level      = parent->level + 1;
-      cvnP->siblingNo  = counter;
-      cvnP->path       = parent->path + cvnP->name;
 
       if (nodeType == "String")
       {
@@ -306,12 +257,10 @@ std::string parseMetadataCompoundValue
       }
       else if (nodeType == "Object")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeObject;
       }
       else if (nodeType == "Array")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeVector;
       }
 
@@ -324,8 +273,6 @@ std::string parseMetadataCompoundValue
       {
         parseMetadataCompoundValue(iter, mdP, cvnP);
       }
-
-      ++counter;
     }
   }
 

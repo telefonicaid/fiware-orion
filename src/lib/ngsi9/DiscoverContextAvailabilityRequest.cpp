@@ -29,7 +29,7 @@
 #include "ngsi/StatusCode.h"
 #include "ngsi/Request.h"
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/Restriction.h"
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
@@ -63,7 +63,7 @@ void DiscoverContextAvailabilityRequest::release(void)
 *
 * DiscoverContextAvailabilityRequest::check -
 */
-std::string DiscoverContextAvailabilityRequest::check(const std::string& indent, const std::string& predetectedError)
+std::string DiscoverContextAvailabilityRequest::check(const std::string& predetectedError)
 {
   DiscoverContextAvailabilityResponse  response;
   std::string                          res;
@@ -76,29 +76,16 @@ std::string DiscoverContextAvailabilityRequest::check(const std::string& indent,
   {
     response.errorCode.fill(SccContextElementNotFound);
   }
-  else if (((res = entityIdVector.check(DiscoverContextAvailability, indent))                                                      != "OK") ||
-           ((res = attributeList.check(DiscoverContextAvailability, indent, predetectedError, restrictions))                       != "OK") ||
-           ((restrictions != 0) && ((res = restriction.check(DiscoverContextAvailability, indent, predetectedError, restrictions)) != "OK")))
+  else if (((res = entityIdVector.check(DiscoverContextAvailability))       != "OK") ||
+           ((res = attributeList.check())                                   != "OK") ||
+           ((restrictions != 0) && ((res = restriction.check(restrictions)) != "OK")))
   {
     response.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";
 
-  return response.render(indent);
-}
-
-
-
-/* ****************************************************************************
-*
-* DiscoverContextAvailabilityRequest::present -
-*/
-void DiscoverContextAvailabilityRequest::present(const std::string& indent)
-{
-   entityIdVector.present(indent);
-   attributeList.present(indent);
-   restriction.present(indent);
+  return response.toJsonV1();
 }
 
 

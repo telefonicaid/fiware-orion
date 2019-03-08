@@ -39,13 +39,7 @@
 *
 * Restriction::check -
 */
-std::string Restriction::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string Restriction::check(int counter)
 {
   std::string res;
 
@@ -62,8 +56,8 @@ std::string Restriction::check
     return "empty restriction";
   }
 
-  if (((res = scopeVector.check(requestType, indent, predetectedError,  counter))         != "OK") ||
-      ((res = attributeExpression.check(requestType, indent, predetectedError,  counter)) != "OK"))
+  if (((res = scopeVector.check())         != "OK") ||
+      ((res = attributeExpression.check()) != "OK"))
   {
     LM_T(LmtRestriction, ("Restriction::check returns '%s'", res.c_str()));
     alarmMgr.badInput(clientIp, res);
@@ -79,21 +73,9 @@ std::string Restriction::check
 
 /* ****************************************************************************
 *
-* Restriction::present -
+* Restriction::toJsonV1 -
 */
-void Restriction::present(const std::string& indent)
-{
-  attributeExpression.present(indent);
-  scopeVector.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
-* Restriction::render -
-*/
-std::string Restriction::render(const std::string& indent, int restrictions, bool comma)
+std::string Restriction::toJsonV1(int restrictions, bool comma)
 {
   std::string  tag = "restriction";
   std::string  out = "";
@@ -104,10 +86,10 @@ std::string Restriction::render(const std::string& indent, int restrictions, boo
     return "";
   }
 
-  out += startTag(indent, tag);
-  out += attributeExpression.render(indent + "  ", scopeVectorRendered);
-  out += scopeVector.render(indent + "  ", false);
-  out += endTag(indent, comma);
+  out += startTag(tag);
+  out += attributeExpression.toJsonV1(scopeVectorRendered);
+  out += scopeVector.toJsonV1(false);
+  out += endTag(comma);
 
   return out;
 }

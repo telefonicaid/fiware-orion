@@ -172,7 +172,7 @@ Date: REGEX(.*)
 03. GET subscription, see lastSuccess but not lastFailure and status==active
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 315
+Content-Length: 337
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -188,6 +188,7 @@ Date: REGEX(.*)
             },
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
+            "lastSuccessCode": 200,
             "timesSent": 1
         },
         "status": "active",
@@ -221,7 +222,7 @@ Date: REGEX(.*)
 06. GET subscription, see lastFailure GT lastSuccess and status==failed
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 355
+Content-Length: 426
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -236,8 +237,10 @@ Date: REGEX(.*)
                 "url": "http://localhost:REGEX(\d+)/notify"
             },
             "lastFailure": "REGEX(.*)",
+            "lastFailureReason": "Couldn't connect to server",
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
+            "lastSuccessCode": 200,
             "timesSent": 2
         },
         "status": "failed",
@@ -272,7 +275,7 @@ Date: REGEX(.*)
 09. GET subscription, see lastSuccess GT lastFailure and status==active
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 355
+Content-Length: 426
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -287,8 +290,10 @@ Date: REGEX(.*)
                 "url": "http://localhost:REGEX(\d+)/notify"
             },
             "lastFailure": "REGEX(.*)",
+            "lastFailureReason": "Couldn't connect to server",
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
+            "lastSuccessCode": 200,
             "timesSent": 3
         },
         "status": "active",

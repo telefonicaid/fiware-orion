@@ -102,27 +102,11 @@ TEST(ContextAttribute, render)
 
   utInit();
 
-  out = caP->render(V1, false, UpdateContext, "");
+  std::vector<std::string> emptyMdV;
+
+  out = caP->toJsonV1(false, UpdateContext, emptyMdV, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* present -
-*/
-TEST(ContextAttribute, present)
-{
-  // Just to exercise all the code ..
-  ContextAttribute*  caP = new ContextAttribute("NAME", "TYPE", "VALUE");
-
-  utInit();
-
-  caP->present("", 0);
 
   utExit();
 }

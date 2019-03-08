@@ -85,7 +85,7 @@ std::string putEntityAttributeValue
     ciP->httpStatusCode = oe.code;
     return oe.toJson();
   }
-  parseDataP->upcr.res.fill(entityId, &parseDataP->av.attribute, "UPDATE", type);
+  parseDataP->upcr.res.fill(entityId, &parseDataP->av.attribute, ActionTypeUpdate, type);
 
 
   // 02. Call standard op postUpdateContext

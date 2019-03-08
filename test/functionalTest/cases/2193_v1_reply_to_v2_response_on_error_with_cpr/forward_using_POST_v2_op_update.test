@@ -70,8 +70,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -87,7 +86,7 @@ echo
 echo "03. Modify E1/A1 in CP1 via CB, using POST /v2/op/update"
 echo "========================================================"
 payload='{
-  "actionType": "UPDATE",
+  "actionType": "update",
   "entities": [
     {
       "id": "E1",
@@ -113,7 +112,7 @@ echo
 echo "05. Modify E1/A1 in CP1 via CB, using POST /v2/op/update?options=keyValues"
 echo "=========================================================================="
 payload='{
-  "actionType": "UPDATE",
+  "actionType": "update",
   "entities": [
     {
       "id": "E1",
@@ -148,7 +147,7 @@ Date: REGEX(.*)
 02. Register E1/T1/A1 in CB, provApp: CP1
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

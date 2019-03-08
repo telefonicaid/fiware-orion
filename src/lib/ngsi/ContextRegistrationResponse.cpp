@@ -44,23 +44,23 @@ ContextRegistrationResponse::ContextRegistrationResponse()
 
 /* ****************************************************************************
 *
-* ContextRegistrationResponse::render -
+* ContextRegistrationResponse::toJsonV1 -
 */
-std::string ContextRegistrationResponse::render(const std::string& indent, bool comma)
+std::string ContextRegistrationResponse::toJsonV1(bool comma)
 {
   std::string  out               = "";
   bool         errorCodeRendered = errorCode.code != SccNone;
 
-  out += startTag(indent);
+  out += startTag();
 
-  out += contextRegistration.render(indent + "  ", errorCodeRendered, false);
+  out += contextRegistration.toJsonV1(errorCodeRendered, false);
 
   if (errorCodeRendered)
   {
-    out += errorCode.render(indent + "  ", false);
+    out += errorCode.toJsonV1(false);
   }
 
-  out += endTag(indent, comma);
+  out += endTag(comma);
 
   return out;
 }
@@ -75,24 +75,11 @@ std::string ContextRegistrationResponse::check
 (
   ApiVersion          apiVersion,
   RequestType         requestType,
-  const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
 )
 {
-  return contextRegistration.check(apiVersion, requestType, indent, predetectedError, counter);
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextRegistrationResponse::present -
-*/
-void ContextRegistrationResponse::present(const std::string& indent)
-{
-  contextRegistration.present(indent, -1);
-  errorCode.present(indent);
+  return contextRegistration.check(apiVersion, requestType, predetectedError, counter);
 }
 
 

@@ -150,7 +150,7 @@ echo
 01. Register E1 using POST /v1/registry/contextEntities/E1/attributes
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -164,7 +164,7 @@ Date: REGEX(.*)
 02. Discover E1
 ===============
 HTTP/1.1 200 OK
-Content-Length: 279
+Content-Length: 145
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -190,7 +190,7 @@ Date: REGEX(.*)
 03. Update the registration of E1, CP1 as providing application, using postEntityByIdAttributeByName
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -204,7 +204,7 @@ Date: REGEX(.*)
 04. Discover E1
 ===============
 HTTP/1.1 200 OK
-Content-Length: 444
+Content-Length: 204
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -215,7 +215,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": ""
                     }
@@ -237,7 +236,7 @@ Date: REGEX(.*)
 05. Create E1/A1 in CP1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 381
+Content-Length: 187
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -269,7 +268,7 @@ Date: REGEX(.*)
 06. Update/UPDATE E1/A1 in CB
 =============================
 HTTP/1.1 200 OK
-Content-Length: 381
+Content-Length: 187
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -301,7 +300,7 @@ Date: REGEX(.*)
 07. Query E1/A1 in CB
 =====================
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

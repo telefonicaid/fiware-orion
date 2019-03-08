@@ -44,7 +44,7 @@ TEST(ContextRegistrationVector, render)
 
   utInit();
 
-  out = crv.render("", false);
+  out = crv.toJsonV1(false);
   EXPECT_STREQ("", out.c_str());
 
   utExit();

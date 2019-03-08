@@ -78,32 +78,35 @@ UpdateContextResponse::~UpdateContextResponse()
 
 /* ****************************************************************************
 *
-* UpdateContextResponse::render -
+* UpdateContextResponse::toJsonV1 -
 */
-std::string UpdateContextResponse::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
+std::string UpdateContextResponse::toJsonV1(bool asJsonObject)
 {
   std::string out = "";
 
-  out += startTag(indent);
+  out += startTag();
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(indent + "  ");
+    out += errorCode.toJsonV1(false);
   }
   else
   {
     if (contextElementResponseVector.size() == 0)
     {
       errorCode.fill(SccContextElementNotFound, errorCode.details);
-      out += errorCode.render(indent + "  ");
+      out += errorCode.toJsonV1(false);
     }
     else
-    {
-      out += contextElementResponseVector.render(apiVersion, asJsonObject, RtUpdateContextResponse, indent + "  ", false);
+    {      
+      // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
+      std::vector<std::string> emptyV;
+
+      out += contextElementResponseVector.toJsonV1(asJsonObject, RtUpdateContextResponse, emptyV, false, emptyV, false);
     }
   }
-
-  out += endTag(indent);
+  
+  out += endTag();
 
   return out;
 }
@@ -118,7 +121,6 @@ std::string UpdateContextResponse::check
 (
   ApiVersion          apiVersion,
   bool                asJsonObject,
-  const std::string&  indent,
   const std::string&  predetectedError
 )
 {
@@ -127,8 +129,8 @@ std::string UpdateContextResponse::check
   if (predetectedError != "")
   {
     errorCode.fill(SccBadRequest, predetectedError);
-  }
-  else if (contextElementResponseVector.check(apiVersion, UpdateContext, indent, predetectedError, 0) != "OK")
+  }  
+  else if (contextElementResponseVector.check(apiVersion, UpdateContext, predetectedError, 0) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     errorCode.fill(SccBadRequest, res);
@@ -138,20 +140,7 @@ std::string UpdateContextResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, indent);
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextResponse::present -
-*/
-void UpdateContextResponse::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%sUpdateContextResponse", indent.c_str()));
-  contextElementResponseVector.present(indent + "  ");
-  errorCode.present(indent + "  ");
+  return toJsonV1(asJsonObject);
 }
 
 
@@ -177,14 +166,20 @@ void UpdateContextResponse::release(void)
 * 2. If not found: create a new one.
 *
 */
-void UpdateContextResponse::notFoundPush(EntityId* eP, ContextAttribute* aP, StatusCode* scP)
+void UpdateContextResponse::notFoundPush(Entity* eP, ContextAttribute* aP, StatusCode* scP)
 {
   ContextElementResponse* cerP = contextElementResponseVector.lookup(eP, SccContextElementNotFound);
 
   if (cerP == NULL)
   {
-    // ContextElementResponse constructor allocates a new ContextAttribute
-    cerP = new ContextElementResponse(eP, aP);
+    // Build ContextElementResponse
+    cerP = new ContextElementResponse();
+    cerP->entity.fill(eP->id, eP->type, eP->isPattern);
+    if (aP != NULL)
+    {
+      // We copy ContextAttribute given Entity destructor does release() on the vector
+      cerP->entity.attributeVector.push_back(new ContextAttribute(aP));
+    }
 
     if (scP != NULL)
     {
@@ -199,7 +194,7 @@ void UpdateContextResponse::notFoundPush(EntityId* eP, ContextAttribute* aP, Sta
   }
   else
   {
-    cerP->contextElement.contextAttributeVector.push_back(new ContextAttribute(aP));
+    cerP->entity.attributeVector.push_back(new ContextAttribute(aP));
   }
 }
 
@@ -214,20 +209,27 @@ void UpdateContextResponse::notFoundPush(EntityId* eP, ContextAttribute* aP, Sta
 *    contextElementResponse and push the attribute onto it.
 *
 */
-void UpdateContextResponse::foundPush(EntityId* eP, ContextAttribute* aP)
+void UpdateContextResponse::foundPush(Entity* eP, ContextAttribute* aP)
 {
   ContextElementResponse* cerP = contextElementResponseVector.lookup(eP, SccOk);
 
   if (cerP == NULL)
   {
-    // ContextElementResponse constructor allocates a new ContextAttribute
-    cerP = new ContextElementResponse(eP, aP);
+    // Build ContextElementResponse
+    cerP = new ContextElementResponse();
+    cerP->entity.fill(eP->id, eP->type, eP->isPattern);
+    if (aP != NULL)
+    {
+      // We copy ContextAttribute given Entity destructor does release() on the vector
+      cerP->entity.attributeVector.push_back(new ContextAttribute(aP));
+    }
+
     cerP->statusCode.fill(SccOk);
     contextElementResponseVector.push_back(cerP);
   }
   else
   {
-    cerP->contextElement.contextAttributeVector.push_back(new ContextAttribute(aP));
+    cerP->entity.attributeVector.push_back(new ContextAttribute(aP));
   }
 }
 
@@ -270,20 +272,20 @@ void UpdateContextResponse::merge(UpdateContextResponse* upcrsP)
 
   for (unsigned int cerIx = 0; cerIx < upcrsP->contextElementResponseVector.size(); ++cerIx)
   {
-    ContextElement* ceP = &upcrsP->contextElementResponseVector[cerIx]->contextElement;
-    StatusCode*     scP = &upcrsP->contextElementResponseVector[cerIx]->statusCode;
+    Entity*      eP = &upcrsP->contextElementResponseVector[cerIx]->entity;
+    StatusCode*  scP = &upcrsP->contextElementResponseVector[cerIx]->statusCode;
 
-    for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); ++aIx)
+    for (unsigned int aIx = 0; aIx < eP->attributeVector.size(); ++aIx)
     {
-      ContextAttribute* aP = ceP->contextAttributeVector[aIx];
+      ContextAttribute* aP = eP->attributeVector[aIx];
 
       if (scP->code != SccOk)
       {
-        notFoundPush(&ceP->entityId, aP, scP);
+        notFoundPush(eP, aP, scP);
       }
       else
       {
-        foundPush(&ceP->entityId, aP);
+        foundPush(eP, aP);
       }
     }
   }

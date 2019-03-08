@@ -28,12 +28,9 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "01. Getting version via REST"
-echo "============================"
-orionCurl --url /version --noPayloadCheck
-echo
-echo
-
+# Note that we are assuming a fixed value of 0 for days, hours and minutes, assuming that this test
+echo "1: +++++++++++++++++++++++++++++"
+orionCurl --url "/version" --noPayloadCheck
 
 --REGEXPECT--
 01. Getting version via REST
@@ -49,13 +46,13 @@ Date: REGEX(.*)
   "version" : "REGEX(.*)",
   "uptime" : "REGEX(.*)",
   "git_hash" : "REGEX(([0-9a-f]{40}|nogitversion))",
-  "compile_time" : "REGEX((.*))",
+  "compile_time" : "REGEX(.*)",
   "compiled_by" : "REGEX(.*)",
-  "compiled_in" : "REGEX(.*)"
+  "compiled_in" : "REGEX(.*)",
+  "release_date" : "REGEX(.*)",
+  "doc" : "REGEX(.*)"
 }
 }
-
-
 
 --TEARDOWN--
 brokerStop CB

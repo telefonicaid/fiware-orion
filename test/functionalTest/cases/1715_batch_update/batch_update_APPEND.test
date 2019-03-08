@@ -45,7 +45,7 @@ brokerStart CB 0
 echo "01. Create E1/T1/A1=1, using POST /v2/op/update with APPEND"
 echo "==========================================================="
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities": [
     {
       "id": "E1",
@@ -71,7 +71,7 @@ echo
 echo "03. Add an attribute A1=3 using POST /v2/op/update with APPEND_STRICT, see error"
 echo "================================================================================"
 payload='{
-  "actionType": "APPEND_STRICT",
+  "actionType": "appendStrict",
   "entities": [
     {
       "id": "E1",
@@ -97,7 +97,7 @@ echo
 echo "05. 'Add' an attribute A1=5 using POST /v2/op/update with APPEND"
 echo "================================================================"
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities": [
     {
       "id": "E1",
@@ -123,7 +123,7 @@ echo
 echo "07. 'Add' an attribute A1=7 using POST /v2/update?options=keyValues with APPEND"
 echo "==============================================================================="
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities": [
     {
       "id": "E1",
@@ -147,7 +147,7 @@ echo
 echo "09. Add an attribute A2=9 using POST /v2/op/update with APPEND_STRICT"
 echo "====================================================================="
 payload='{
-  "actionType": "APPEND_STRICT",
+  "actionType": "appendStrict",
   "entities": [
     {
       "id": "E1",

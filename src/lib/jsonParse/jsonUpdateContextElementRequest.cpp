@@ -39,20 +39,6 @@
 
 
 
-
-/* ****************************************************************************
-*
-* attributeDomainName - 
-*/
-static std::string attributeDomainName(const std::string& path, const std::string& value, ParseData* reqData)
-{
-  LM_T(LmtParse, ("Got an attributeDomainName"));
-  reqData->ucer.res.attributeDomainName.set(value);
-  return "OK";
-}
-
-
-
 /* ****************************************************************************
 *
 * contextAttribute - 
@@ -61,7 +47,6 @@ static std::string contextAttribute(const std::string& path, const std::string& 
 {
   LM_T(LmtParse, ("Got an attribute"));
   reqData->ucer.attributeP = new ContextAttribute();
-  reqData->ucer.attributeP->valueType = orion::ValueTypeNone;
   reqData->ucer.res.contextAttributeVector.push_back(reqData->ucer.attributeP);
   return "OK";
 }
@@ -157,6 +142,7 @@ static std::string contextMetadataValue(const std::string& path, const std::stri
 {
   LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
   reqData->ucer.metadataP->stringValue = value;
+  reqData->ucer.metadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 
@@ -168,8 +154,6 @@ static std::string contextMetadataValue(const std::string& path, const std::stri
 */
 JsonNode jsonUcerParseVector[] =
 {
-  { "/attributeDomainName",                            attributeDomainName   },
-
   { "/attributes",                                     jsonNullTreat         },
   { "/attributes/attribute",                           contextAttribute      },
   { "/attributes/attribute/name",                      contextAttributeName  },
@@ -191,8 +175,6 @@ JsonNode jsonUcerParseVector[] =
 */
 void jsonUcerInit(ParseData* reqData)
 {
-  reqData->ucer.res.attributeDomainName.set("");
-
   reqData->ucer.attributeP = NULL;
   reqData->ucer.metadataP  = NULL;
 }
@@ -217,16 +199,5 @@ void jsonUcerRelease(ParseData* reqData)
 std::string jsonUcerCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-  return reqData->ucer.res.check(ciP->apiVersion, asJsonObject, UpdateContextElement, "", reqData->errorString);
-}
-
-
-
-/* ****************************************************************************
-*
-* ucerPresent - 
-*/
-void jsonUcerPresent(ParseData* reqData)
-{
-  reqData->ucer.res.present("");
+  return reqData->ucer.res.check(ciP->apiVersion, asJsonObject, UpdateContextElement, reqData->errorString);
 }

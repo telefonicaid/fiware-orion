@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"
 
 #include "common/MimeType.h"
+#include "common/limits.h"
 #include "ngsi/StatusCode.h"
 #include "metricsMgr/metricsMgr.h"
 
@@ -48,6 +49,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
 #include "rest/HttpStatusCode.h"
+#include "rest/HttpHeaders.h"
 #include "rest/mhd.h"
 #include "rest/OrionError.h"
 #include "rest/restReply.h"
@@ -65,6 +67,7 @@ static int replyIx = 0;
 void restReply(ConnectionInfo* ciP, const std::string& answer)
 {
   MHD_Response*  response;
+
   uint64_t       answerLen = answer.length();
   std::string    spath     = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
 
@@ -94,25 +97,53 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   {
     if (ciP->outMimeType == JSON)
     {
-      MHD_add_response_header(response, "Content-Type", "application/json");
+      MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/json");
     }
     else if (ciP->outMimeType == TEXT)
     {
-      MHD_add_response_header(response, "Content-Type", "text/plain");
+      MHD_add_response_header(response, HTTP_CONTENT_TYPE, "text/plain");
     }
+  }
 
-    // At the present version, CORS is supported only for GET requests
-    if ((strlen(restAllowedOrigin) > 0) && (ciP->verb == GET))
+  // Check if CORS is enabled, the Origin header is present in the request and the response is not a bad verb response
+  if ((corsEnabled == true) && (ciP->httpHeaders.origin != "") && (ciP->httpStatusCode != SccBadVerb))
+  {
+    // Only GET method is supported for V1 API
+    if ((ciP->apiVersion == V2) || (ciP->apiVersion == V1 && ciP->verb == GET))
     {
+      bool originAllowed = true;
+
       // If any origin is allowed, the header is sent always with "any" as value
-      if (strcmp(restAllowedOrigin, "__ALL") == 0)
+      if (strcmp(corsOrigin, "__ALL") == 0)
       {
-        MHD_add_response_header(response, "Access-Control-Allow-Origin", "*");
+        MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
       }
       // If a specific origin is allowed, the header is only sent if the origins match
-      else if (strcmp(ciP->httpHeaders.origin.c_str(), restAllowedOrigin) == 0)
+      else if (strcmp(ciP->httpHeaders.origin.c_str(), corsOrigin) == 0)
       {
-        MHD_add_response_header(response, "Access-Control-Allow-Origin", restAllowedOrigin);
+        MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_ORIGIN, corsOrigin);
+      }
+      // If there is no match, originAllowed flag is set to false
+      else
+      {
+        originAllowed = false;
+      }
+
+      // If the origin is not allowed, no headers are added to the response
+      if (originAllowed)
+      {
+        // Add Access-Control-Expose-Headers to the response
+        MHD_add_response_header(response, HTTP_ACCESS_CONTROL_EXPOSE_HEADERS, CORS_EXPOSED_HEADERS);
+
+        if (ciP->verb == OPTIONS)
+        {
+          MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_HEADERS, CORS_ALLOWED_HEADERS);
+
+          char maxAge[STRING_SIZE_FOR_INT];
+          snprintf(maxAge, sizeof(maxAge), "%d", corsMaxAge);
+
+          MHD_add_response_header(response, HTTP_ACCESS_CONTROL_MAX_AGE, maxAge);
+        }
       }
     }
   }
@@ -125,145 +156,89 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
 
 /* ****************************************************************************
 *
-* tagGet - return a tag (request type) depending on the incoming request string
-*
-* This function is called only from restErrorReplyGet, but as the parameter
-* 'request' is simply 'forwarded' from restErrorReplyGet, the 'request' can
-* have various contents - for that the different strings of 'request'.
-*/
-static std::string tagGet(const std::string& request)
-{
-  if ((request == "registerContext") || (request == "/ngsi9/registerContext") || (request == "/NGSI9/registerContext") || (request == "registerContextRequest") || (request == "/v1/registry/registerContext"))
-    return "registerContextResponse";
-  else if ((request == "discoverContextAvailability") || (request == "/ngsi9/discoverContextAvailability") || (request == "/NGSI9/discoverContextAvailability") || (request == "discoverContextAvailabilityRequest") || (request == "/v1/registry/discoverContextAvailability"))
-    return "discoverContextAvailabilityResponse";
-  else if ((request == "subscribeContextAvailability") || (request == "/ngsi9/subscribeContextAvailability") || (request == "/NGSI9/subscribeContextAvailability") || (request == "subscribeContextAvailabilityRequest") || (request == "/v1/registry/subscribeContextAvailability"))
-    return "subscribeContextAvailabilityResponse";
-  else if ((request == "updateContextAvailabilitySubscription") || (request == "/ngsi9/updateContextAvailabilitySubscription") || (request == "/NGSI9/updateContextAvailabilitySubscription") || (request == "updateContextAvailabilitySubscriptionRequest") || (request == "/v1/registry/updateContextAvailabilitySubscription"))
-    return "updateContextAvailabilitySubscriptionResponse";
-  else if ((request == "unsubscribeContextAvailability") || (request == "/ngsi9/unsubscribeContextAvailability") || (request == "/NGSI9/unsubscribeContextAvailability") || (request == "unsubscribeContextAvailabilityRequest") || (request == "/v1/registry/unsubscribeContextAvailability"))
-    return "unsubscribeContextAvailabilityResponse";
-  else if ((request == "notifyContextAvailability") || (request == "/ngsi9/notifyContextAvailability") || (request == "/NGSI9/notifyContextAvailability") || (request == "notifyContextAvailabilityRequest") || (request == "/v1/registry/notifyContextAvailability"))
-    return "notifyContextAvailabilityResponse";
-
-  else if ((request == "queryContext") || (request == "/ngsi10/queryContext") || (request == "/NGSI10/queryContext") || (request == "queryContextRequest") || (request == "/v1/queryContext"))
-    return "queryContextResponse";
-  else if ((request == "subscribeContext") || (request == "/ngsi10/subscribeContext") || (request == "/NGSI10/subscribeContext") || (request == "subscribeContextRequest") || (request == "/v1/subscribeContext"))
-    return "subscribeContextResponse";
-  else if ((request == "updateContextSubscription") || (request == "/ngsi10/updateContextSubscription") || (request == "/NGSI10/updateContextSubscription") || (request == "updateContextSubscriptionRequest") || (request == "/v1/updateContextSubscription"))
-    return "updateContextSubscriptionResponse";
-  else if ((request == "unsubscribeContext") || (request == "/ngsi10/unsubscribeContext") || (request == "/NGSI10/unsubscribeContext") || (request == "unsubscribeContextRequest") || (request == "/v1/unsubscribeContext"))
-    return "unsubscribeContextResponse";
-  else if ((request == "updateContext") || (request == "/ngsi10/updateContext") || (request == "/NGSI10/updateContext") || (request == "updateContextRequest") || (request == "/v1/updateContext"))
-    return "updateContextResponse";
-  else if ((request == "notifyContext") || (request == "/ngsi10/notifyContext") || (request == "/NGSI10/notifyContext") || (request == "notifyContextRequest") || (request == "/v1/notifyContext"))
-    return "notifyContextResponse";
-  else if (request == "StatusCode")
-    return "StatusCode";
-
-  return "UnknownTag";
-}
-
-
-
-/* ****************************************************************************
-*
 * restErrorReplyGet -
 *
-* This function renders an error reply depending on the 'request' type.
-* Many responses have different syntax and especially the tag in the reply
-* differs (registerContextResponse, discoverContextAvailabilityResponse, etc).
+* This function renders an error reply depending on the type of the request (ciP->restServiceP->request).
 *
-* Also, the function is called from more than one place, especially from
-* restErrorReply, but also from where the payload type is matched against the request URL.
+* The function is called from more than one place, especially from
+* restErrorReply(), but also from where the payload type is matched against the request URL.
 * Where the payload type is matched against the request URL, the incoming 'request' is a
 * request and not a response.
 */
-std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, const std::string& request, HttpStatusCode code, const std::string& details)
+void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::string& details, std::string* outStringP)
 {
-   std::string   tag = tagGet(request);
-   StatusCode    errorCode(code, details, "errorCode");
-   std::string   reply;
+  StatusCode  errorCode(code, details, "errorCode");
 
-   ciP->httpStatusCode = SccOk;
+  ciP->httpStatusCode = SccOk;
 
-   if (tag == "registerContextResponse")
-   {
-      RegisterContextResponse rcr("000000000000000000000000", errorCode);
-      reply =  rcr.render(indent);
-   }
-   else if (tag == "discoverContextAvailabilityResponse")
-   {
-      DiscoverContextAvailabilityResponse dcar(errorCode);
-      reply =  dcar.render(indent);
-   }
-   else if (tag == "subscribeContextAvailabilityResponse")
-   {
-      SubscribeContextAvailabilityResponse scar("000000000000000000000000", errorCode);
-      reply =  scar.render(indent);
-   }
-   else if (tag == "updateContextAvailabilitySubscriptionResponse")
-   {
-      UpdateContextAvailabilitySubscriptionResponse ucas(errorCode);
-      reply =  ucas.render(indent, 0);
-   }
-   else if (tag == "unsubscribeContextAvailabilityResponse")
-   {
-      UnsubscribeContextAvailabilityResponse ucar(errorCode);
-      reply =  ucar.render(indent);
-   }
-   else if (tag == "notifyContextAvailabilityResponse")
-   {
-      NotifyContextAvailabilityResponse ncar(errorCode);
-      reply =  ncar.render(indent);
-   }
+  if (ciP->restServiceP->request == RegisterContext)
+  {
+    RegisterContextResponse rcr("000000000000000000000000", errorCode);
+    *outStringP = rcr.toJsonV1();
+  }
+  else if (ciP->restServiceP->request == DiscoverContextAvailability)
+  {
+    DiscoverContextAvailabilityResponse dcar(errorCode);
+    *outStringP = dcar.toJsonV1();
+  }
+  else if (ciP->restServiceP->request == SubscribeContextAvailability)
+  {
+    SubscribeContextAvailabilityResponse scar("000000000000000000000000", errorCode);
+    *outStringP = scar.toJsonV1();
+  }
+  else if ((ciP->restServiceP->request == UpdateContextAvailabilitySubscription) || (ciP->restServiceP->request == Ngsi9SubscriptionsConvOp))
+  {
+    UpdateContextAvailabilitySubscriptionResponse ucas(errorCode);
+    *outStringP = ucas.toJsonV1();
+  }
+  else if (ciP->restServiceP->request == UnsubscribeContextAvailability)
+  {
+    UnsubscribeContextAvailabilityResponse ucar(errorCode);
+    *outStringP = ucar.toJsonV1();
+  }
+  else if (ciP->restServiceP->request == NotifyContextAvailability)
+  {
+    NotifyContextAvailabilityResponse ncar(errorCode);
+    *outStringP = ncar.toJsonV1();
+  }
+  else if (ciP->restServiceP->request == QueryContext)
+  {
+    QueryContextResponse  qcr(errorCode);
+    bool                  asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+    *outStringP = qcr.toJsonV1(asJsonObject);
+  }
+  else if (ciP->restServiceP->request == SubscribeContext)
+  {
+    SubscribeContextResponse scr(errorCode);
+    *outStringP = scr.toJsonV1();
+  }
+  else if ((ciP->restServiceP->request == UpdateContextSubscription) || (ciP->restServiceP->request == Ngsi10SubscriptionsConvOp))
+  {
+    UpdateContextSubscriptionResponse ucsr(errorCode);
+    *outStringP = ucsr.toJsonV1();
+  }
+  else if (ciP->restServiceP->request == UnsubscribeContext)
+  {
+    UnsubscribeContextResponse uncr(errorCode);
+    *outStringP = uncr.toJsonV1();
+  }
+  else if (ciP->restServiceP->request == UpdateContext)
+  {
+    UpdateContextResponse ucr(errorCode);
+    bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+    *outStringP = ucr.toJsonV1(asJsonObject);
+  }
+  else if (ciP->restServiceP->request == NotifyContext)
+  {
+    NotifyContextResponse ncr(errorCode);
+    *outStringP = ncr.toJsonV1();
+  }
+  else
+  {
+    OrionError oe(errorCode);
 
-   else if (tag == "queryContextResponse")
-   {
-      QueryContextResponse qcr(errorCode);
-      bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-      reply =  qcr.render(ciP->apiVersion, asJsonObject, indent);
-   }
-   else if (tag == "subscribeContextResponse")
-   {
-      SubscribeContextResponse scr(errorCode);
-      reply =  scr.render(indent);
-   }
-   else if (tag == "updateContextSubscriptionResponse")
-   {
-      UpdateContextSubscriptionResponse ucsr(errorCode);
-      reply =  ucsr.render(indent);
-   }
-   else if (tag == "unsubscribeContextResponse")
-   {
-      UnsubscribeContextResponse uncr(errorCode);
-      reply =  uncr.render(indent);
-   }
-   else if (tag == "updateContextResponse")
-   {
-      UpdateContextResponse ucr(errorCode);
-      bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-      reply = ucr.render(ciP->apiVersion, asJsonObject, indent);
-   }
-   else if (tag == "notifyContextResponse")
-   {
-      NotifyContextResponse ncr(errorCode);
-      reply =  ncr.render(indent);
-   }
-   else if (tag == "StatusCode")
-   {
-     StatusCode sc(code, details);
-     reply = sc.render(indent);
-   }
-   else
-   {
-      OrionError oe(errorCode);
-
-      LM_T(LmtRest, ("Unknown tag: '%s', request == '%s'", tag.c_str(), request.c_str()));
-
-      ciP->httpStatusCode = oe.code;
-      reply = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
-   }
-
-   return reply;
+    LM_T(LmtRest, ("Unknown request type: '%d'", ciP->restServiceP->request));
+    ciP->httpStatusCode = oe.code;
+    *outStringP = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &ciP->httpStatusCode);
+  }
 }

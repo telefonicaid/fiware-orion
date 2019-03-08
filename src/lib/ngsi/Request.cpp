@@ -123,6 +123,9 @@ const char* requestType(RequestType rt)
   case IndividualSubscriptionRequest:                    return "IndividualSubscriptionRequest";
   case BatchQueryRequest:                                return "BatchQueryRequest";
   case BatchUpdateRequest:                               return "BatchUpdateRequest";
+
+  case RegistrationRequest:                              return "RegistrationRequest";
+  case RegistrationsRequest:                             return "RegistrationsRequest";
   }
 
   return "";

@@ -29,9 +29,10 @@
 
 #include "common/RenderFormat.h"
 #include "common/globals.h"
-#include "ngsi/ContextElement.h"
 #include "ngsi/StatusCode.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
+#include "ngsi/ContextAttribute.h"
+#include "apiTypesV2/Entity.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -50,7 +51,7 @@ struct QueryContextResponse;
 */
 typedef struct ContextElementResponse
 {
-  ContextElement   contextElement;             // Mandatory
+  Entity           entity;                     // Mandatory (represents a Context Element)
   StatusCode       statusCode;                 // Mandatory
 
   bool             prune;                      // operational attribute used internally by the queryContext logic for not deleting entities that were
@@ -58,29 +59,30 @@ typedef struct ContextElementResponse
 
   ContextElementResponse();
   ContextElementResponse(EntityId* eP, ContextAttribute* aP);
-  ContextElementResponse(ContextElementResponse* cerP);
+  ContextElementResponse(ContextElementResponse* cerP, bool cloneCompound = false);
   ContextElementResponse(const mongo::BSONObj&  entityDoc,
-                         const AttributeList&   attrL,
+                         const StringList&      attrL,
                          bool                   includeEmpty = true,
                          ApiVersion             apiVersion   = V1);
-  ContextElementResponse(ContextElement* ceP, bool useDefaultType = false);
+  ContextElementResponse(Entity* eP, bool useDefaultType = false);
 
-  std::string  render(ApiVersion          apiVersion,
-                      bool                asJsonObject,
-                      RequestType         requestType,
-                      const std::string&  indent,
-                      bool                comma               = false,
-                      bool                omitAttributeValues = false);
+  std::string  toJsonV1(bool                             asJsonObject,
+                        RequestType                      requestType,
+                        const std::vector<std::string>&  attrsFilter,
+                        bool                             blacklist,
+                        const std::vector<std::string>&  metadataFilter,
+                        bool                             comma               = false,
+                        bool                             omitAttributeValues = false);
+
   std::string  toJson(RenderFormat                     renderFormat,
                       const std::vector<std::string>&  attrsFilter,
-                      const std::vector<std::string>&  metadataFilter,
-                      bool blacklist = false);
-  void         present(const std::string& indent, int ix);
+                      bool                             blacklist,
+                      const std::vector<std::string>&  metadataFilter);
+
   void         release(void);
 
   std::string  check(ApiVersion          apiVersion,
                      RequestType         requestType,
-                     const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);
 

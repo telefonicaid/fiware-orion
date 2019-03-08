@@ -28,7 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "ngsi/UpdateActionType.h"
+#include "orionTypes/UpdateActionType.h"
 #include "ngsi/Request.h"
 #include "apiTypesV2/Entities.h"
 
@@ -41,13 +41,12 @@
 class BatchUpdate
 {
  public:
-  UpdateActionType  updateActionType;   // Mandatory
+  ActionType        updateActionType;   // Mandatory
   Entities          entities;           // Mandatory
 
   BatchUpdate();
   ~BatchUpdate();
 
-  void              present(const std::string& indent);
   void              release(void);
 };
 

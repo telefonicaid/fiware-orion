@@ -75,9 +75,6 @@ badRequest.cpp
 postNotifyContext.cpp
 postNotifyContextAvailability.cpp
 statisticsTreat.cpp
-getAttributeValueInstance.cpp
-putAttributeValueInstance.cpp
-deleteAttributeValueInstance.cpp
 getEntityTypes.cpp
 getAttributesForEntityType.cpp
 getAllContextEntities.cpp
@@ -89,16 +86,13 @@ getIndividualContextEntityAttributeWithTypeAndId.cpp
 deleteIndividualContextEntityAttributeWithTypeAndId.cpp
 postIndividualContextEntityAttributeWithTypeAndId.cpp
 putIndividualContextEntityAttributeWithTypeAndId.cpp
-getAttributeValueInstanceWithTypeAndId.cpp
-deleteAttributeValueInstanceWithTypeAndId.cpp
-postAttributeValueInstanceWithTypeAndId.cpp
-putAttributeValueInstanceWithTypeAndId.cpp
 getContextEntitiesByEntityIdAndType.cpp
 postContextEntitiesByEntityIdAndType.cpp
 getEntityByIdAttributeByNameWithTypeAndId.cpp
 postEntityByIdAttributeByNameWithTypeAndId.cpp
 postSubscribeContextConvOp.cpp
 postSubscribeContextAvailabilityConvOp.cpp
+optionsVersionRequest.cpp
 )
 
 SET (HEADERS
@@ -157,15 +151,12 @@ getIndividualContextEntityAttributeWithTypeAndId.h
 deleteIndividualContextEntityAttributeWithTypeAndId.h
 postIndividualContextEntityAttributeWithTypeAndId.h
 putIndividualContextEntityAttributeWithTypeAndId.h
-getAttributeValueInstanceWithTypeAndId.h
-deleteAttributeValueInstanceWithTypeAndId.h
-postAttributeValueInstanceWithTypeAndId.h
-putAttributeValueInstanceWithTypeAndId.h
 getContextEntitiesByEntityIdAndType.h
 postContextEntitiesByEntityIdAndType.h
 getEntityByIdAttributeByNameWithTypeAndId.h
 postEntityByIdAttributeByNameWithTypeAndId.h
 postSubscribeContextConvOp.h
+optionsVersionRequest.h
 )
 
 

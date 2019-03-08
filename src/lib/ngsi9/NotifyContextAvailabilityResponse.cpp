@@ -60,32 +60,19 @@ NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse(StatusCode&
 
 /* ****************************************************************************
 *
-* NotifyContextAvailabilityResponse::render -
+* NotifyContextAvailabilityResponse::toJsonV1 -
 */
-std::string NotifyContextAvailabilityResponse::render(const std::string& indent)
+std::string NotifyContextAvailabilityResponse::toJsonV1(void)
 {
   std::string out = "";
 
   responseCode.keyNameSet("responseCode");
 
-  out += startTag(indent);
-  out += responseCode.render(indent + "  ");
-  out += endTag(indent);
+  out += startTag();
+  out += responseCode.toJsonV1(false);
+  out += endTag();
 
   return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* NotifyContextAvailabilityResponse::present -
-*/
-void NotifyContextAvailabilityResponse::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%sNotifyContextAvailabilityResponse:", indent.c_str()));
-  responseCode.present(indent + "  ");
-  LM_T(LmtPresent, ("\n"));
 }
 
 

@@ -51,10 +51,9 @@ TEST(UpdateContextElementRequest, render_json)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   // Just the normal case
-  ucer.attributeDomainName.set("ADN");
   ucer.contextAttributeVector.push_back(&ca);
 
-  out = ucer.render(V1, false, UpdateContext, "");
+  out = ucer.toJsonV1(false, UpdateContext);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -76,47 +75,24 @@ TEST(UpdateContextElementRequest, check_json)
 
   utInit();
 
-  ucer.attributeDomainName.set("ADN");
-
   // 1. predetectedError
   ucer.contextAttributeVector.push_back(&ca);
-  out = ucer.check(V1, false, UpdateContextElement, "", "PRE Error");
+  out = ucer.check(V1, false, UpdateContextElement, "PRE Error");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // 2. ok
-  out = ucer.check(V1, false, UpdateContextElement, "", "");
+  out = ucer.check(V1, false, UpdateContextElement, "");
   EXPECT_STREQ("OK", out.c_str());
 
-  // 3. bad attributeDomainName
-  ucer.attributeDomainName.set("");
-  EXPECT_STREQ("OK", out.c_str());
-
-  // 4. bad contextAttributeVector
+  // 3. bad contextAttributeVector
   ContextAttribute                ca2("", "caType", "caValue");
   ucer.contextAttributeVector.push_back(&ca2);
-  out = ucer.check(V1, false, UpdateContextElement, "", "");
+  out = ucer.check(V1, false, UpdateContextElement, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* present - just exercise the code
-*/
-TEST(UpdateContextElementRequest, present)
-{
-  UpdateContextElementRequest     ucer;
-  ContextAttribute                ca("caName", "caType", "caValue");
-
-  ucer.attributeDomainName.set("ADN");
-  ucer.contextAttributeVector.push_back(&ca);
-
-  ucer.present("");
 }
 
 
@@ -130,7 +106,6 @@ TEST(UpdateContextElementRequest, release)
   UpdateContextElementRequest     ucer;
   ContextAttribute*               caP = new ContextAttribute("caName", "caType", "caValue");
 
-  ucer.attributeDomainName.set("ADN");
   ucer.contextAttributeVector.push_back(caP);
 
   ASSERT_EQ(1, ucer.contextAttributeVector.size());

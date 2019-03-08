@@ -62,12 +62,4 @@ extern void jsonNcarRelease(ParseData* reqDataP);
 */
 extern std::string jsonNcarCheck(ParseData* reqDataP, ConnectionInfo* ciP);
 
-
-
-/* ****************************************************************************
-*
-* jsonNcarPresent - 
-*/
-extern void jsonNcarPresent(ParseData* reqDataP);
-
 #endif  // SRC_LIB_JSONPARSE_JSONNOTIFYCONTEXTAVAILABILITYREQUEST_H_

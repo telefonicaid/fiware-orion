@@ -42,14 +42,10 @@ typedef struct Originator
   void         set(const std::string& value);
   std::string  get(void);
   bool         isEmpty(void);
-  std::string  render(const std::string& indent, bool comma = false);
-  void         present(const std::string& indent);
+  std::string  toJsonV1(bool comma);
   const char*  c_str();
 
-  std::string  check(RequestType         requestType,
-                     const std::string&  indent,
-                     const std::string&  predetectedError,
-                     int                 counter);
+  std::string  check(void);
 } Originator;
 
 #endif  // SRC_LIB_NGSI_ORIGINATOR_H_

@@ -63,7 +63,6 @@ std::string postContextEntityTypeAttribute
   parseDataP->rcr.res.fill(parseDataP->rpr.res, "", entityIdType, attributeName);
   answer = postRegisterContext(ciP, components, compV, parseDataP);
 
-  parseDataP->rpr.res.release();
   parseDataP->rcr.res.release();
 
   return answer;

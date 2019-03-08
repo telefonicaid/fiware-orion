@@ -94,7 +94,7 @@ echo
 01. Make accumulator subscribe to changes in E1/A1
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 135
+Content-Length: 104
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -111,7 +111,7 @@ Date: REGEX(.*)
 02. Update E1/A1, using an X-Auth-Token
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 312
+Content-Length: 166
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -142,7 +142,7 @@ Date: REGEX(.*)
 =============================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 459
+Content-Length: 255
 X-Auth-Token: kz
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)

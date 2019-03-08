@@ -1,0 +1,144 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+DELETE registration using APIv2, created also using APIv2
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 -statCounters
+
+--SHELL--
+
+#
+# 01. Register entity E1/A1, using APIv2
+# 02. DELETE the registration using APIv2
+# 03. Attempt to DELETE a non existing registration (using a syntactical correct Reg ID)
+# 04. GET /statistics
+#
+
+echo "01. Register entity E1/A1, using APIv2"
+echo "======================================"
+payload='{
+   "description": "located in CP1",
+   "dataProvided": {
+     "entities": [
+       {
+         "id": "E1",
+         "type": "T1"
+       }
+     ],
+     "attrs": [ "A1" ]
+   },
+   "provider": {
+     "http": {
+       "url": "http://localhost:'${CP1_PORT}'/v2"
+     },
+     "legacyForwarding": true
+   },
+   "status": "active"
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+REG_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "02. DELETE the registration using APIv2"
+echo "======================================="
+orionCurl --url /v2/registrations/${REG_ID} -X DELETE
+echo
+echo
+
+
+echo "03. Attempt to DELETE a non-existing registration (using ID of the deleted Registration)"
+echo "========================================================================================"
+orionCurl --url /v2/registrations/${REG_ID} -X DELETE
+echo
+echo
+
+
+echo "04. GET /statistics"
+echo "==================="
+orionCurl --url /statistics
+echo
+echo
+
+
+--REGEXPECT--
+01. Register entity E1/A1, using APIv2
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. DELETE the registration using APIv2
+=======================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Attempt to DELETE a non-existing registration (using ID of the deleted Registration)
+========================================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 92
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The requested registration has not been found. Check id",
+    "error": "NotFound"
+}
+
+
+04. GET /statistics
+===================
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "counters": {
+        "jsonRequests": 1,
+        "registrationRequest": 2,
+        "registrationsRequest": 1,
+        "statisticsRequests": 1,
+        "versionRequests": 0
+    },
+    "measuring_interval_in_secs": REGEX(\d+),
+    "uptime_in_secs": REGEX(\d+)
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

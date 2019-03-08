@@ -49,8 +49,7 @@ payload='{
       ],
       "attributes": [
         {
-          "name": "A1",
-          "isDomain": "false"
+          "name": "A1"
         }
       ],
       "providingApplication": "http://localhost:'${LISTENER_PORT}'/v1"
@@ -83,7 +82,7 @@ echo
 01. Register E1/A1 in CB, provApp: accumulator
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -113,7 +112,7 @@ Date: REGEX(.*)
 ======================================================================================================
 POST http://localhost:REGEX(\d+)/v1/updateContext
 Fiware-Servicepath: /
-Content-Length: 332
+Content-Length: 196
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json

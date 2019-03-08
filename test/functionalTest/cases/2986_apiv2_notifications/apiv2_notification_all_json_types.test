@@ -1,0 +1,157 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+APIv2 notifications with all possible JSON types
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+brokerStart CB
+brokerStart CP1
+
+--SHELL--
+
+#
+# 01. Make CP1 subscribe to ALL in CB (federation creation)
+# 02. Create entity 'E1' in CB with an attribute of each possible JSON value type
+# 03. Query CP1, see 'E1' with all attributes correct
+#
+
+echo "01. Make CP1 subscribe to ALL in CB (federation creation)"
+echo "========================================================="
+payload='{
+  "description": "Fed Subscription",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*"
+      }
+    ]
+  },
+  "notification": {
+      "http": {
+        "url": "http://localhost:'$CP1_PORT'/v2/op/notify"
+      },
+    "attrsFormat": "normalized"
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity 'E1' in CB with an attribute of each possible JSON value type"
+echo "==============================================================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "boolean": true,
+  "integer": 21,
+  "float":   3.14,
+  "string":  "String",
+  "intVec": [ 1, 2.1, 3.2 ],
+  "object": {
+    "boolean": true,
+    "integer": 21,
+    "float":   3.14,
+    "string":  "String",
+    "intVec": [ 1, 2.1, 3.2 ]
+  }
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+valgrindSleep 1
+
+
+echo "03. Query CP1, see 'E1' with all attributes correct"
+echo "==================================================="
+orionCurl --url /v2/entities?options=keyValues --port $CP1_PORT
+echo
+echo
+
+
+--REGEXPECT--
+01. Make CP1 subscribe to ALL in CB (federation creation)
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity 'E1' in CB with an attribute of each possible JSON value type
+===============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Query CP1, see 'E1' with all attributes correct
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 195
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "boolean": true,
+        "float": 3.14,
+        "id": "E1",
+        "intVec": [
+            1,
+            2.1,
+            3.2
+        ],
+        "integer": 21,
+        "object": {
+            "boolean": true,
+            "float": 3.14,
+            "intVec": [
+                1,
+                2.1,
+                3.2
+            ],
+            "integer": 21,
+            "string": "String"
+        },
+        "string": "String",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1

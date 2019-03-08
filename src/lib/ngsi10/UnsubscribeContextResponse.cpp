@@ -64,16 +64,16 @@ UnsubscribeContextResponse::~UnsubscribeContextResponse()
 
 /* ****************************************************************************
 *
-* UnsubscribeContextResponse::render - 
+* UnsubscribeContextResponse::toJsonV1 -
 */
-std::string UnsubscribeContextResponse::render(const std::string& indent)
+std::string UnsubscribeContextResponse::toJsonV1(void)
 {
   std::string out = "";
 
-  out += startTag(indent);
-  out += subscriptionId.render(RtUnsubscribeContextResponse, indent + "  ", true);
-  out += statusCode.render(indent + "  ", false);
-  out += endTag(indent);
+  out += startTag();
+  out += subscriptionId.toJsonV1(RtUnsubscribeContextResponse, true);
+  out += statusCode.toJsonV1(false);
+  out += endTag();
 
   return out;
 }

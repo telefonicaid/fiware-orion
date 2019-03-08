@@ -2,7 +2,7 @@
 # as dependency and reserve the order has been found problematic in some
 # low resource hosts
 mongo:
-  image: mongo:3.2
+  image: mongo:3.6
   command: --nojournal
 
 orion:

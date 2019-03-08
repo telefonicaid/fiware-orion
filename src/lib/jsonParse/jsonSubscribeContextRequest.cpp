@@ -150,7 +150,7 @@ static std::string duration(const std::string& path, const std::string& value, P
 
   parseDataP->scr.res.duration.set(value);
 
-  if ((s = parseDataP->scr.res.duration.check(SubscribeContext, "", "", 0)) != "OK")
+  if ((s = parseDataP->scr.res.duration.check()) != "OK")
   {
     std::string details = std::string("error parsing duration '") + parseDataP->scr.res.duration.get() + "': " + s;
     alarmMgr.badInput(clientIp, details);
@@ -562,24 +562,6 @@ void jsonScrRelease(ParseData* parseDataP)
 std::string jsonScrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
   std::string s;
-  s = parseDataP->scr.res.check("", parseDataP->errorString, 0);
+  s = parseDataP->scr.res.check(parseDataP->errorString, 0);
   return s;
-}
-
-
-
-/* ****************************************************************************
-*
-* jsonScrPresent -
-*/
-void jsonScrPresent(ParseData* parseDataP)
-{
-  printf("jsonScrPresent\n");
-
-  if (!lmTraceIsSet(LmtPresent))
-  {
-    return;
-  }
-
-  parseDataP->scr.res.present("");
 }

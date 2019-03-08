@@ -61,24 +61,24 @@ UpdateContextSubscriptionResponse::~UpdateContextSubscriptionResponse() {
 
 /* ****************************************************************************
 *
-* UpdateContextSubscriptionResponse::render - 
+* UpdateContextSubscriptionResponse::toJsonV1 -
 */
-std::string UpdateContextSubscriptionResponse::render(const std::string& indent)
+std::string UpdateContextSubscriptionResponse::toJsonV1(void)
 {
   std::string out  = "";
 
-  out += startTag(indent);
+  out += startTag();
 
   if (subscribeError.errorCode.code == SccNone)
   {
-    out += subscribeResponse.render(indent + "  ", false);
+    out += subscribeResponse.toJsonV1(false);
   }
   else
   {
-    out += subscribeError.render(UpdateContextSubscription, indent + "  ", false);
+    out += subscribeError.toJsonV1(UpdateContextSubscription, false);
   }
 
-  out += endTag(indent);
+  out += endTag();
 
   return out;
 }

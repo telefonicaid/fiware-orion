@@ -53,8 +53,7 @@ extern std::string parseContextAttributeCompoundValue
 extern std::string parseContextAttributeCompoundValueStandAlone
 (
   rapidjson::Document&  document,
-  ContextAttribute*     caP,
-  orion::ValueType      valueType
+  ContextAttribute*     caP
 );
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSECONTEXTATTRIBUTECOMPOUNDVALUE_H_

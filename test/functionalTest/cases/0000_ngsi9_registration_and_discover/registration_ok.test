@@ -47,8 +47,7 @@ payload='{
       "attributes": [
         {
           "name": "temperature",
-          "type": "degree",
-          "isDomain": "false"
+          "type": "degree"
         }
       ],
       "providingApplication": "http://localhost:1028/application"
@@ -118,8 +117,7 @@ payload='{
       "attributes": [
         {
           "name": "pressure",
-          "type": "BAR",
-          "isDomain": "false"
+          "type": "BAR"
         }
       ],
       "providingApplication": "http://localhost:1028/application"
@@ -155,7 +153,7 @@ orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -166,7 +164,7 @@ Date: REGEX(.*)
 }
 ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 605
+Content-Length: 298
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -177,7 +175,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "temperature",
                         "type": "degree"
                     }
@@ -201,7 +198,7 @@ Date: REGEX(.*)
 }
 ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 605
+Content-Length: 298
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -212,7 +209,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "temperature",
                         "type": "degree"
                     }
@@ -236,7 +232,7 @@ Date: REGEX(.*)
 }
 ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -247,7 +243,7 @@ Date: REGEX(.*)
 }
 ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 478
+Content-Length: 238
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -258,7 +254,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "pressure",
                         "type": "BAR"
                     }

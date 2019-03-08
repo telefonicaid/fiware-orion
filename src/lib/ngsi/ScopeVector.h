@@ -40,16 +40,12 @@ typedef struct ScopeVector
 {
   std::vector<Scope*>  vec;
 
-  std::string  render(const std::string& indent, bool comma);
-  void         present(const std::string& indent);
+  std::string  toJsonV1(bool comma);
   void         push_back(Scope* item);
   unsigned int size(void) const;
   void         release();
   void         fill(const ScopeVector& scopeV, bool copy);
-  std::string  check(RequestType         requestType,
-                     const std::string&  indent,
-                     const std::string&  predetectedError,
-                     int                 counter);
+  std::string  check(void);
   Scope* operator[](unsigned int ix) const;
   
 } ScopeVector;

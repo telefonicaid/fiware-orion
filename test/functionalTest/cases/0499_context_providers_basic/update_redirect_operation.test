@@ -73,8 +73,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "T1",
-        "isDomain": "false"
+        "type": "T1"
       }
     ],
     "providingApplication": "http://localhost:'$CP1_PORT'/v1"
@@ -345,7 +344,7 @@ echo
 
 03. Register an entity/attribute E1/A1 in broker, with CP as providing application
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 64
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -358,7 +357,7 @@ Date: REGEX(.*)
 
 04. Update/UPDATE E1/A1(=BAD) in broker (is forwarded to CP and nothing is found/updated)
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 221
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -390,7 +389,7 @@ Date: REGEX(.*)
 
 05. Query broker for E1/A1 (is forwarded to CP but nothing is found)
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -405,7 +404,7 @@ Date: REGEX(.*)
 
 06. Update/APPEND E1/A1(=CP) in CP
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -436,7 +435,7 @@ Date: REGEX(.*)
 
 07. Query CP for E1/A1 (OK - E1/A1(=CP) is found)
 HTTP/1.1 200 OK
-Content-Length: 380
+Content-Length: 186
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -467,7 +466,7 @@ Date: REGEX(.*)
 
 08. Query broker for E1/A1 (is forwarded to CP and E1/A1(=CP) is found)
 HTTP/1.1 200 OK
-Content-Length: 380
+Content-Length: 186
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -498,7 +497,7 @@ Date: REGEX(.*)
 
 09. Update/UPDATE E1/A1(=CP-2) broker (is forwarded to CP and now it is updated)
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -529,7 +528,7 @@ Date: REGEX(.*)
 
 10. Query CP for E1/A1 (OK - E1/A1(=CP-2) is found)
 HTTP/1.1 200 OK
-Content-Length: 382
+Content-Length: 188
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -560,7 +559,7 @@ Date: REGEX(.*)
 
 11. Query broker for E1/A1 (is forwarded to CP and E1/A1(=CP-2) is found)
 HTTP/1.1 200 OK
-Content-Length: 382
+Content-Length: 188
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -591,7 +590,7 @@ Date: REGEX(.*)
 
 12. Update/APPEND E1/A1(=broker) in broker
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -622,7 +621,7 @@ Date: REGEX(.*)
 
 13. Query broker for E1/A1 (stays local and A1(=broker) is found)
 HTTP/1.1 200 OK
-Content-Length: 384
+Content-Length: 190
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -653,7 +652,7 @@ Date: REGEX(.*)
 
 14. Update/DELETE E1/A1 in broker (its local E1/A1(=broker) is removed)
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -684,7 +683,7 @@ Date: REGEX(.*)
 
 15. Query broker for E1/A1 (will go to CP and E1/A1(=CP-2) is found)
 HTTP/1.1 200 OK
-Content-Length: 382
+Content-Length: 188
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

@@ -43,33 +43,14 @@ TEST(ProvidingApplication, render)
 
   utInit();
 
-  out = pa.render("", false);
+  out = pa.toJsonV1(false);
   EXPECT_STREQ("", out.c_str());
 
   pa.set("PA");
 
-  out = pa.render("", false);
+  out = pa.toJsonV1(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* present - just to exercise the code ...
-*/
-TEST(ProvidingApplication, present)
-{
-  ProvidingApplication  pa;
-
-  utInit();
-
-  pa.present("");
-  pa.set("PA");
-  pa.present("");
 
   utExit();
 }

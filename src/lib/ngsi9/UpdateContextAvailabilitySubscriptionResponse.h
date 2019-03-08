@@ -49,8 +49,8 @@ typedef struct UpdateContextAvailabilitySubscriptionResponse
   UpdateContextAvailabilitySubscriptionResponse(StatusCode& _errorCode);
   ~UpdateContextAvailabilitySubscriptionResponse();
 
-  std::string render(const std::string& indent, int counter);
-  std::string check(const std::string& indent, const std::string& predetectedError, int counter);
+  std::string toJsonV1(void);
+  std::string check(const std::string& predetectedError);
 } UpdateContextAvailabilitySubscriptionResponse;
 
 #endif  // SRC_LIB_NGSI9_UPDATECONTEXTAVAILABILITYSUBSCRIPTIONRESPONSE_H_

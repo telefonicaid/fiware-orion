@@ -27,7 +27,7 @@ import re
 from sys import argv
 
 header = []
-header.append('\s*Copyright( \(c\))? 201[3|4|5|6|7] Telefonica Investigacion y Desarrollo, S.A.U$')
+header.append('\s*Copyright( \(c\))? 201[3|4|5|6|7|8|9] Telefonica Investigacion y Desarrollo, S.A.U$')
 header.append('\s*$')
 header.append('\s*This file is part of Orion Context Broker.$')
 header.append('\s*$')
@@ -82,7 +82,7 @@ def ignore(root, file):
         return True
 
     # PNG files in manuals o functionalTest are ignored
-    if ('manuals' in root or 'functionalTest' in root or 'apiary' in root) and file.endswith('.png'):
+    if ('manuals' in root or 'functionalTest' in root or 'apiary' in root) and (file.endswith('.png') or file.endswith('.ico')):
         return True
 
     # Files in the rpm/SRPMS, rpm/SOURCES or rpm/RPMS directories are not processed
@@ -109,6 +109,10 @@ def ignore(root, file):
     if 'docker' in root and file in ['Dockerfile', 'docker-compose.yml']:
         return True
 
+    # Some file in CI are not processed
+    if 'ci' in root and file in ['Dockerfile', 'mongodb.repo']:
+        return True
+
     # Some files in test/acceptance/behave directory are not processed
     if 'behave' in root and file in ['behave.ini', 'logging.ini', 'properties.json.base']:
         return True
@@ -131,7 +135,7 @@ def ignore(root, file):
     files_names = ['.gitignore', '.valgrindrc', '.valgrindSuppressions', 'LICENSE',
                    'ContributionPolicy.txt', 'CHANGES_NEXT_RELEASE', 'compileInfo.h',
                    'unittests_that_fail_sporadically.txt', 'Vagrantfile', 'contextBroker.ubuntu',
-                   'mkdocs.yml', 'fiware-ngsiv2-reference.errata', 'ServiceRoutines.txt' ]
+                   'mkdocs.yml', 'fiware-ngsiv2-reference.errata', 'ServiceRoutines.txt', '.travis.yml' ]
     if file in files_names:
         return True
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \

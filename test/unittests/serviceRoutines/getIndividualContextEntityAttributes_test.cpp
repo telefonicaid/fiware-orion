@@ -24,27 +24,34 @@
 */
 #include <string>
 
+#include "unittests/unittest.h"
+
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/getIndividualContextEntityAttributes.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
-
-#include "unittests/unittest.h"
+#include "rest/rest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs -
+* service vectors -
 */
-#define ICEA IndividualContextEntityAttributes
-#define IR   InvalidRequest
-static RestService rs[] =
+#define ICEA   IndividualContextEntityAttributes
+#define IR     InvalidRequest
+
+static RestService getV[] =
 {
-  { "GET", ICEA, 4, { "ngsi10", "contextEntities", "*", "attributes" }, "", getIndividualContextEntityAttributes },
-  { "*",   IR,   0, { "*", "*", "*", "*", "*", "*"                   }, "", badRequest                           },
-  { "",    IR,   0, {                                                }, "", NULL                                 }
+  { ICEA, 4, { "ngsi10", "contextEntities", "*", "attributes" }, getIndividualContextEntityAttributes },
+  { IR,   0, {                                                }, NULL                                 }
+};
+
+static RestService badVerbV[] =
+{
+  { IR,   0, { "*", "*", "*", "*", "*", "*"                   }, badRequest                           },
+  { IR,   0, {                                                }, NULL                                 }
 };
 
 
@@ -62,7 +69,9 @@ TEST(getIndividualContextEntityAttributes, notFound)
   utInit();
 
   ci.outMimeType = JSON;
-  out            = restService(&ci, rs);
+
+  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
+  out = orionServe(&ci);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf,
                                    sizeof(expectedBuf),

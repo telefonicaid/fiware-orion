@@ -49,8 +49,7 @@ payload='{
       "attributes": [
         {
           "name": "A1",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         }
       ],
       "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -78,8 +77,7 @@ payload='{
       "attributes": [
         {
           "name": "A1",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         }
       ],
       "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -95,8 +93,7 @@ payload='{
       "attributes": [
         {
           "name": "A2",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         }
       ],
       "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -114,7 +111,7 @@ echo
 01. Try to register using isPattern=true, see error
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 216
+Content-Length: 180
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -132,7 +129,7 @@ Date: REGEX(.*)
 02. Try to register using isPattern=true AND isPattern=false, see error
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 216
+Content-Length: 180
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

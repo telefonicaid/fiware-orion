@@ -1,0 +1,408 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Missing or empty metadata values are not allowed with POST /v2/entities/id/attrs, POST /v2/entities and PUT /v2/entities/id/attrs/attrName
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. POST /v2/entities, to create Room1 with temperature (no metadata).
+# 02. GET /v2/entities/Room1.
+# 03. POST /v2/entities/Room1/attrs, to add metadata with "" value to temperature and add pressure attribute with metadata with no value.
+# 04. GET /v2/entities/Room1.
+# 05. POST /v2/entities/Room1/attrs, to update temperature with metadata with no value, pressure with metadata with regular value and add humidity attribute with metadata with "" value.
+# 06. GET /v2/entities/Room1.
+# 07. POST /v2/entities, to create Room2 with temperature having two metadata one with "" value and another without value.
+# 08. GET /v2/entities/Room2.
+# 09. PUT /v2/entities/Room2/attrs/temperature, updating the value of Room2 temperature attribute.
+# 10. GET /v2/entities/Room2.
+#
+
+echo '01. POST /v2/entities, to create Room1 with temperature (no metadata).'
+echo '======================================================================'
+payload='{
+  "id": "Room1",
+  "type": "Room",
+  "temperature": {
+    "value": 23,
+    "type": "Float"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '02. GET /v2/entities/Room1.'
+echo '==========================='
+orionCurl --url /v2/entities/Room1
+echo
+echo
+
+
+echo '03. POST /v2/entities/Room1/attrs, to add metadata with "" value to temperature and add pressure attribute with metadata with no value.'
+echo '======================================================================================================================================='
+payload='{
+  "temperature": {
+    "value": 25,
+    "type": "Float",
+	"metadata": {
+      "accuracy": {
+        "value": "",
+        "type": "Float"
+      }
+    }
+  },
+  "pressure": {
+    "value": 720,
+    "type": "Integer",
+	"metadata": {
+      "accuracy": {
+        "type": "Float"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities/Room1/attrs --payload "$payload"
+echo
+echo
+
+
+echo '04. GET /v2/entities/Room1.'
+echo '==========================='
+orionCurl --url /v2/entities/Room1
+echo
+echo
+
+
+echo '05. POST /v2/entities/Room1/attrs, to update temperature with metadata with no value, pressure with metadata with regular value and add humidity attribute with metadata with "" value.'
+echo '========================================================================================================================================================='
+payload='{
+  "temperature": {
+    "value": 25,
+    "type": "Float",
+        "metadata": {
+      "accuracy": {
+        "type": "Float"
+      }
+    }
+  },
+  "pressure": {
+    "value": 720,
+    "type": "Integer",
+        "metadata": {
+      "accuracy": {
+	  	"value": "12.3",
+        "type": "Float"
+      }
+    }
+  },
+  "humidity": {
+    "value": 120,
+    "type": "Integer",
+        "metadata": {
+      "accuracy": {
+      	"value": "",
+        "type": "Float"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities/Room1/attrs --payload "$payload"
+echo
+echo
+
+
+echo '06. GET /v2/entities/Room1.'
+echo '==========================='
+orionCurl --url /v2/entities/Room1
+echo
+echo
+
+
+echo '07. POST /v2/entities, to create Room2 with temperature having two metadata one with "" value and another without value.'
+echo '========================================================================================================================'
+payload='{
+  "id": "Room2",
+  "type": "Room",
+  "temperature": {
+    "value": 26.5,
+    "type": "Float",
+    "metadata": {
+      "accuracy": {
+        "value": "",
+        "type": "Float"
+      },
+     "tolerance": {
+        "type": "Float"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '08. GET /v2/entities/Room2.'
+echo '==========================='
+orionCurl --url /v2/entities/Room2
+echo
+echo
+
+
+echo '09. PUT /v2/entities/Room2/attrs/temperature/value, updating the value of Room2 temperature attribute.'
+echo '======================================================================================================'
+payload='{
+  "value": 20.6,
+  "type": "Number",
+  "metadata": {
+    "accuracy": {
+      "type": "Float"
+    },
+    "tolerance": {
+      "value": "",
+      "type": "Float"
+    }
+  }
+}'
+ orionCurl --url /v2/entities/Room2/attrs/temperature --payload "$payload" -X PUT 
+echo
+echo
+
+
+echo '10. GET /v2/entities/Room2.'
+echo '==========================='
+orionCurl --url /v2/entities/Room2
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/entities, to create Room1 with temperature (no metadata).
+======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Room1?type=Room
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. GET /v2/entities/Room1.
+===========================
+HTTP/1.1 200 OK
+Content-Length: 84
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "Room1",
+    "temperature": {
+        "metadata": {},
+        "type": "Float",
+        "value": 23
+    },
+    "type": "Room"
+}
+
+
+03. POST /v2/entities/Room1/attrs, to add metadata with "" value to temperature and add pressure attribute with metadata with no value.
+=======================================================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. GET /v2/entities/Room1.
+===========================
+HTTP/1.1 200 OK
+Content-Length: 218
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "Room1",
+    "pressure": {
+        "metadata": {
+            "accuracy": {
+                "type": "Float",
+                "value": null
+            }
+        },
+        "type": "Integer",
+        "value": 720
+    },
+    "temperature": {
+        "metadata": {
+            "accuracy": {
+                "type": "Float",
+                "value": ""
+            }
+        },
+        "type": "Float",
+        "value": 25
+    },
+    "type": "Room"
+}
+
+
+05. POST /v2/entities/Room1/attrs, to update temperature with metadata with no value, pressure with metadata with regular value and add humidity attribute with metadata with "" value.
+=========================================================================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. GET /v2/entities/Room1.
+===========================
+HTTP/1.1 200 OK
+Content-Length: 316
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "humidity": {
+        "metadata": {
+            "accuracy": {
+                "type": "Float",
+                "value": ""
+            }
+        },
+        "type": "Integer",
+        "value": 120
+    },
+    "id": "Room1",
+    "pressure": {
+        "metadata": {
+            "accuracy": {
+                "type": "Float",
+                "value": "12.3"
+            }
+        },
+        "type": "Integer",
+        "value": 720
+    },
+    "temperature": {
+        "metadata": {
+            "accuracy": {
+                "type": "Float",
+                "value": null
+            }
+        },
+        "type": "Float",
+        "value": 25
+    },
+    "type": "Room"
+}
+
+
+07. POST /v2/entities, to create Room2 with temperature having two metadata one with "" value and another without value.
+========================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Room2?type=Room
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. GET /v2/entities/Room2.
+===========================
+HTTP/1.1 200 OK
+Content-Length: 166
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "Room2",
+    "temperature": {
+        "metadata": {
+            "accuracy": {
+                "type": "Float",
+                "value": ""
+            },
+            "tolerance": {
+                "type": "Float",
+                "value": null
+            }
+        },
+        "type": "Float",
+        "value": 26.5
+    },
+    "type": "Room"
+}
+
+
+09. PUT /v2/entities/Room2/attrs/temperature/value, updating the value of Room2 temperature attribute.
+======================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. GET /v2/entities/Room2.
+===========================
+HTTP/1.1 200 OK
+Content-Length: 167
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "Room2",
+    "temperature": {
+        "metadata": {
+            "accuracy": {
+                "type": "Float",
+                "value": null
+            },
+            "tolerance": {
+                "type": "Float",
+                "value": ""
+            }
+        },
+        "type": "Number",
+        "value": 20.6
+    },
+    "type": "Room"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

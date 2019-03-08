@@ -80,23 +80,25 @@ SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(const
 
 /* ****************************************************************************
 *
-* SubscribeContextAvailabilityResponse::render -
+* SubscribeContextAvailabilityResponse::toJsonV1 -
 */
-std::string SubscribeContextAvailabilityResponse::render(const std::string& indent)
+std::string SubscribeContextAvailabilityResponse::toJsonV1(void)
 {
   std::string  out                = "";
   bool         durationRendered   = !duration.isEmpty();
   bool         errorCodeRendered  = (errorCode.code != SccNone);
 
-  out += startTag(indent);
+  out += startTag();
 
-  out += subscriptionId.render(RtSubscribeContextAvailabilityResponse, indent + "  ", durationRendered || errorCodeRendered);
-  out += duration.render(indent + "  ", errorCodeRendered);
+  out += subscriptionId.toJsonV1(RtSubscribeContextAvailabilityResponse, durationRendered || errorCodeRendered);
+  out += duration.toJsonV1(errorCodeRendered);
 
   if (errorCodeRendered)
-     out += errorCode.render(indent + "  ", false);
+  {
+    out += errorCode.toJsonV1(false);
+  }
 
-  out += endTag(indent);
-
+  out += endTag();
+  
   return out;
 }

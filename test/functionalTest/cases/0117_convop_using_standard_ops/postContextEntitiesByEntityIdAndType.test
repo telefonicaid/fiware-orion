@@ -69,13 +69,6 @@ echo
 echo "02. POST /v1/registry/contextEntities/type/T1/id/E1"
 echo "==================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X2"
-    }
-  ],
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/part02"
 }'
@@ -104,13 +97,6 @@ echo
 echo "04. Modify registration"
 echo "======================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X4"
-    }
-  ],
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part04",
   "registrationId": "'$REG_ID'"
@@ -139,13 +125,6 @@ echo
 echo "06. POST /v1/registry/contextEntities/type/T1/id/E2?!exist=entity::type, and see it fail"
 echo "========================================================================================"
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X6"
-    }
-  ],
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part06"
 }'
@@ -157,13 +136,6 @@ echo
 echo "07. POST /v1/registry/contextEntities/type/T1/id/E2?exist=entity::type, and see it work"
 echo "======================================================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X7"
-    }
-  ],
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part07"
 }'
@@ -175,13 +147,6 @@ echo
 echo "08. POST /v1/registry/contextEntities/type/T1/id/E2?entity::type=T2, and see it fail"
 echo "===================================================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X8"
-    }
-  ],
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part08"
 }'
@@ -193,13 +158,6 @@ echo
 echo "09. POST /v1/registry/contextEntities/type/T1/id/E2?entity::type=T1, and see it work"
 echo "===================================================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X9"
-    }
-  ],
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part09"
 }'
@@ -211,13 +169,6 @@ echo
 echo "10. POST /v1/registry/contextEntities/type/T1/id/E2, servicePath /s1"
 echo "===================================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X10"
-    }
-  ],
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part10"
 }'
@@ -229,13 +180,6 @@ echo
 echo "11. POST /v1/registry/contextEntities/type/T1/id/E2, servicePath /s2"
 echo "===================================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X11"
-    }
-  ],
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part11"
 }'
@@ -360,7 +304,7 @@ echo
 01. Discover E1-T1, and see 0 results
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -376,7 +320,7 @@ Date: REGEX(.*)
 02. POST /v1/registry/contextEntities/type/T1/id/E1
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -390,7 +334,7 @@ Date: REGEX(.*)
 03. Discover E1-T1, and see 1 result
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 300
+Content-Length: 166
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -416,7 +360,7 @@ Date: REGEX(.*)
 04. Modify registration
 =======================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -430,7 +374,7 @@ Date: REGEX(.*)
 05. Discover E1-T1, and see modified result
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 300
+Content-Length: 166
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -456,7 +400,7 @@ Date: REGEX(.*)
 06. POST /v1/registry/contextEntities/type/T1/id/E2?!exist=entity::type, and see it fail
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 195
+Content-Length: 159
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -474,7 +418,7 @@ Date: REGEX(.*)
 07. POST /v1/registry/contextEntities/type/T1/id/E2?exist=entity::type, and see it work
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -488,7 +432,7 @@ Date: REGEX(.*)
 08. POST /v1/registry/contextEntities/type/T1/id/E2?entity::type=T2, and see it fail
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 183
+Content-Length: 147
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -506,7 +450,7 @@ Date: REGEX(.*)
 09. POST /v1/registry/contextEntities/type/T1/id/E2?entity::type=T1, and see it work
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -520,7 +464,7 @@ Date: REGEX(.*)
 10. POST /v1/registry/contextEntities/type/T1/id/E2, servicePath /s1
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -534,7 +478,7 @@ Date: REGEX(.*)
 11. POST /v1/registry/contextEntities/type/T1/id/E2, servicePath /s2
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -548,7 +492,7 @@ Date: REGEX(.*)
 12. Discover E2-T1, without service-path and see four results
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 1068
+Content-Length: 562
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -610,7 +554,7 @@ Date: REGEX(.*)
 13. Discover E2-T1, with service-path /# and see four results
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 1068
+Content-Length: 562
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -672,7 +616,7 @@ Date: REGEX(.*)
 14. Discover E2-T1, with service-path / and see two results
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 556
+Content-Length: 298
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -710,7 +654,7 @@ Date: REGEX(.*)
 15. Discover E2-T1, with service-path /s1 and see one result
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 300
+Content-Length: 166
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -736,7 +680,7 @@ Date: REGEX(.*)
 16. Discover E2-T1, with service-path /s2 and see one result
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 300
+Content-Length: 166
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -762,7 +706,7 @@ Date: REGEX(.*)
 17. Discover E2-T1, with service-path /s3 and see zero results
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -778,7 +722,7 @@ Date: REGEX(.*)
 18. Discover E2-T1, with service-path /s1,/s2,/s3 and see two results
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 556
+Content-Length: 298
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

@@ -891,7 +891,7 @@ Date: REGEX(.*)
 05a. GET /v2/entities/E1/attrs/A?metadata=dateCreated
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 178
+Content-Length: 110
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -911,7 +911,7 @@ Date: REGEX(.*)
 05b. GET /v2/entities/E1/attrs/A?metadata=dateModified
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 180
+Content-Length: 111
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -931,7 +931,7 @@ Date: REGEX(.*)
 05c. GET /v2/entities/E1/attrs/A?metadata=dateCreated,dateModified
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 316
+Content-Length: 179
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -955,7 +955,7 @@ Date: REGEX(.*)
 05d. GET /v2/entities/E1/attrs/A?metadata=dateModified,dateCreated,*
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 386
+Content-Length: 249
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -987,7 +987,7 @@ Date: REGEX(.*)
 05e. GET /v2/entities/E1/attrs/A?metadata=dateCreated,dateModified,M1
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 351
+Content-Length: 214
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

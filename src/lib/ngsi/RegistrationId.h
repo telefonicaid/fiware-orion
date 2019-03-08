@@ -39,17 +39,16 @@ typedef struct RegistrationId
 {
   std::string   string;
 
+  RegistrationId();
+  RegistrationId(const std::string& regId);
+
   void          set(const std::string& value);
   std::string   get(void) const;
   bool          isEmpty(void);
-  std::string   render(RequestType requestType, const std::string& indent, bool comma = false);
-  void          present(const std::string& indent);
+  std::string   toJsonV1(RequestType requestType, bool comma);
   void          release(void);
 
-  std::string   check(RequestType         requestType,
-                      const std::string&  indent,
-                      const std::string&  predetectedError,
-                      int                 counter);
+  std::string   check(void);
 } RegistrationId;
 
 #endif  // SRC_LIB_NGSI_REGISTRATIONID_H_

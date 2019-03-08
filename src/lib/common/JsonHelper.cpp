@@ -33,22 +33,22 @@
 #include <iomanip>
 
 
+
 /* ****************************************************************************
 *
 * toJsonString -
 */
 std::string toJsonString(const std::string& input)
 {
-  std::ostringstream ss;
+  std::string ss;
 
-  ss << '"';
   for (std::string::const_iterator iter = input.begin(); iter != input.end(); ++iter)
   {
     /* FIXME P3: This function ensures that if the DB holds special characters (which are
      * not supported in JSON according to its specification), they are converted to their escaped
-     * representations. The process wouldn't be necessary if the DB couldn't hold such special characters, 
-     * but as long as we support NGSIv1, it is better to have the check (e.g. a newline could be 
-     * used in an attribute value using XML). Even removing NGSIv1, we have to ensure that the 
+     * representations. The process wouldn't be necessary if the DB couldn't hold such special characters,
+     * but as long as we support NGSIv1, it is better to have the check (e.g. a newline could be
+     * used in an attribute value using XML). Even removing NGSIv1, we have to ensure that the
      * input parser (rapidjson) doesn't inject not supported JSON characters in the DB (this needs to be
      * investigated in the rapidjson documentation)
      *
@@ -62,13 +62,13 @@ std::string toJsonString(const std::string& input)
      */
     switch (char ch = *iter)
     {
-    case '\\': ss << "\\\\"; break;
-    case '"': ss << "\\\""; break;    
-    case '\b': ss << "\\b"; break;
-    case '\f': ss << "\\f"; break;
-    case '\n': ss << "\\n"; break;
-    case '\r': ss << "\\r"; break;
-    case '\t': ss << "\\t"; break;
+    case '\\': ss += "\\\\"; break;
+    case '"':  ss += "\\\""; break;
+    case '\b': ss += "\\b";  break;
+    case '\f': ss += "\\f";  break;
+    case '\n': ss += "\\n";  break;
+    case '\r': ss += "\\r";  break;
+    case '\t': ss += "\\t";  break;
     default:
       /* Converting the rest of special chars 0-31 to \u00xx. Note that 0x80 - 0xFF are untouched as they
        * correspond to UTF-8 multi-byte characters */
@@ -76,18 +76,20 @@ std::string toJsonString(const std::string& input)
       {
         static const char intToHex[16] =  { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' } ;
 
-        ss << "\\u00" << intToHex[(ch & 0xF0) >> 4] << intToHex[ch & 0x0F];
+        ss += "\\u00";
+        ss += intToHex[(ch & 0xF0) >> 4];
+        ss += intToHex[ch & 0x0F];
       }
       else
       {
-        ss << ch;
+        ss += ch;
       }
       break;
-    } //end-switch
+    }  // end-switch
 
-  } //end-for
-  ss << '"';
-  return ss.str();
+  }  // end-for
+
+  return ss;
 }
 
 
@@ -99,26 +101,16 @@ std::string toJsonString(const std::string& input)
 template <>
 std::string vectorToJson(std::vector<std::string> &list)
 {
-  switch (list.size())
+  JsonVectorHelper jh;
+
+  for (std::vector<std::string>::size_type i = 0; i != list.size(); ++i)
   {
-  case 0:
-    return "[]";
-
-  case 1:
-    return "[" + toJsonString(list[0]) + "]";
-
-  default:
-    std::ostringstream os;
-    os << '[';
-    os << toJsonString(list[0]);
-    for (std::vector<std::string>::size_type i = 1; i != list.size(); ++i)
-    {
-      os << ',' << toJsonString(list[i]);
-    }
-    os << ']';
-    return os.str();
+    jh.addString(list[i]);
   }
+
+  return jh.str();
 }
+
 
 
 /* ****************************************************************************
@@ -127,57 +119,47 @@ std::string vectorToJson(std::vector<std::string> &list)
 */
 std::string objectToJson(std::map<std::string, std::string>& list)
 {
-  std::ostringstream  os;
-  bool                firstTime = true;
-
-  os << '{';
+  JsonObjectHelper  jh;
 
   for (std::map<std::string, std::string>::const_iterator it = list.begin(); it != list.end(); ++it)
   {
     std::string key   = it->first;
     std::string value = it->second;
 
-    if (firstTime)
-    {
-      firstTime = false;
-    }
-    else
-    {
-      os << ',';
-    }
-
-    os << toJsonString(key) << ':' << toJsonString(value);
+    jh.addString(key, value);
   }
 
-  os << '}';
-
-  return os.str();
+  return jh.str();
 }
 
 
 
 /* ****************************************************************************
 *
-* JsonHelper -
+* JsonObjectHelper -
 */
-JsonHelper::JsonHelper(): empty(true)
+JsonObjectHelper::JsonObjectHelper(): empty(true)
 {
-  ss << '{';
+  ss += '{';
 }
 
 
 
 /* ****************************************************************************
 *
-* JsonHelper::addString -
+* JsonObjectHelper::addString -
 */
-void JsonHelper::addString(const std::string& key, const std::string& value)
+void JsonObjectHelper::addString(const std::string& key, const std::string& value)
 {
   if (!empty)
   {
-    ss << ',';
+    ss += ',';
   }
-  ss << toJsonString(key) << ':' << toJsonString(value);
+  ss += '"';
+  ss += toJsonString(key);
+  ss += "\":\"";
+  ss += toJsonString(value);
+  ss += '"';
 
   empty = false;
 }
@@ -186,68 +168,86 @@ void JsonHelper::addString(const std::string& key, const std::string& value)
 
 /* ****************************************************************************
 *
-* JsonHelper::addRaw -
+* JsonObjectHelper::addRaw -
 */
-void JsonHelper::addRaw(const std::string& key, const std::string& value)
+void JsonObjectHelper::addRaw(const std::string& key, const std::string& value)
 {
   if (!empty)
   {
-    ss << ',';
+    ss += ',';
   }
-  ss << toJsonString(key) << ':' << value;
+  ss += '"';
+  ss += toJsonString(key);
+  ss += "\":";
+  ss += value;
 
   empty = false;
 }
 
 
+
 /* ****************************************************************************
 *
-* JsonHelper::addNumber -
+* JsonObjectHelper::addNumber -
 */
-void JsonHelper::addNumber(const std::string& key, long long value)
+void JsonObjectHelper::addNumber(const std::string& key, long long value)
 {
   if (!empty)
   {
-    ss << ',';
+    ss += ',';
   }
-  ss << toJsonString(key) << ':' << value;
+  // FIXME P7: double2str() used double as argument, but value is long long.
+  // However .test regression shows that it works... weird?
+  ss += '"';
+  ss += toJsonString(key);
+  ss += "\":";
+  ss += double2string(value);
 
   empty = false;
 }
 
-/* ****************************************************************************
-*
-* JsonHelper::addFloat -
-*/
-void JsonHelper::addFloat(const std::string& key, float  value)
-{  
-  unsigned int oldPrecision = ss.precision();
-  ss << std::fixed << std::setprecision(decimalDigits(value));
 
-  if (!empty)
-  {
-    ss << ',';
-  }  
-  ss << toJsonString(key) << ':' << value;
-
-  // Reset stream to old parameters (whichever they are...)
-  ss.unsetf(std::ios_base::fixed);
-  ss << std::setprecision(oldPrecision);
-
-  empty = false;
-}
 
 /* ****************************************************************************
 *
-* JsonHelper::addDate -
+* JsonObjectHelper::addNumber -
+*
+* FIXME P4: This method is to be removed, the float version of addNumber()
+*           should be used instead.
+*           See issue #3058
 */
-void JsonHelper::addDate(const std::string& key, long long timestamp)
+void JsonObjectHelper::addNumber(const std::string& key, double value)
 {
   if (!empty)
   {
-    ss << ',';
+    ss += ',';
   }
-  ss << toJsonString(key) << ':' << toJsonString(isodate2str(timestamp));
+  ss += '"';
+  ss += toJsonString(key);
+  ss += "\":";
+  ss +=  double2string(value);
+
+  empty = false;
+
+}
+
+
+
+/* ****************************************************************************
+*
+* JsonObjectHelper::addDate -
+*/
+void JsonObjectHelper::addDate(const std::string& key, long long timestamp)
+{
+  if (!empty)
+  {
+    ss += ',';
+  }
+  ss += '"';
+  ss += toJsonString(key);
+  ss += "\":\"";
+  ss += toJsonString(isodate2str(timestamp));
+  ss += '"';
 
   empty = false;
 }
@@ -256,10 +256,151 @@ void JsonHelper::addDate(const std::string& key, long long timestamp)
 
 /* ****************************************************************************
 *
-* JsonHelper::str -
+* JsonObjectHelper::addBool -
 */
-std::string JsonHelper::str()
+void JsonObjectHelper::addBool(const std::string& key, bool b)
 {
-  ss << '}';
-  return ss.str();
+  addRaw(key, b? "true" : "false");
+}
+
+
+
+/* ****************************************************************************
+*
+* JsonObjectHelper::str -
+*/
+std::string JsonObjectHelper::str()
+{
+  ss += '}';
+  return ss;
+}
+
+
+
+/* ****************************************************************************
+*
+* JsonVectorHelper -
+*/
+JsonVectorHelper::JsonVectorHelper(): empty(true)
+{
+  ss += '[';
+}
+
+
+
+/* ****************************************************************************
+*
+* JsonVectorHelper::addString -
+*/
+void JsonVectorHelper::addString(const std::string& value)
+{
+  if (!empty)
+  {
+    ss += ',';
+  }
+  ss += '"';
+  ss += toJsonString(value);
+  ss += '"';
+
+  empty = false;
+}
+
+
+
+/* ****************************************************************************
+*
+* JsonVectorHelper::addRaw -
+*/
+void JsonVectorHelper::addRaw(const std::string& value)
+{
+  if (!empty)
+  {
+    ss += ',';
+  }
+  ss += value;
+
+  empty = false;
+}
+
+
+
+/* ****************************************************************************
+*
+* JsonVectorHelper::addNumber -
+*/
+void JsonVectorHelper::addNumber(long long value)
+{
+  if (!empty)
+  {
+    ss += ',';
+  }
+  // FIXME P7: double2str() used double as argument, but value is long long.
+  // However .test regression shows that it works... weird?
+  ss += double2string(value);
+
+  empty = false;
+}
+
+
+
+/* ****************************************************************************
+*
+* JsonVectorHelper::addNumber -
+*
+* FIXME P4: This method is to be removed, the float version of addNumber()
+*           should be used instead.
+*           See issue #3058
+*/
+void JsonVectorHelper::addNumber(double value)
+{
+  if (!empty)
+  {
+    ss += ',';
+  }
+  ss += double2string(value);
+
+  empty = false;
+
+}
+
+
+
+/* ****************************************************************************
+*
+* JsonVectorHelper::addDate -
+*/
+void JsonVectorHelper::addDate(long long timestamp)
+{
+  if (!empty)
+  {
+    ss += ',';
+  }
+  ss += '"';
+  ss += toJsonString(isodate2str(timestamp));
+  ss += '"';
+
+  empty = false;
+}
+
+
+
+/* ****************************************************************************
+*
+* JsonVectorHelper::addBool -
+*/
+void JsonVectorHelper::addBool(bool b)
+{
+  addRaw(b? "true" : "false");
+}
+
+
+
+/* ****************************************************************************
+*
+* JsonVectorHelper::str -
+*/
+std::string JsonVectorHelper::str()
+{
+  ss += ']';
+  return ss;
 }

@@ -49,19 +49,19 @@ struct QueryContextResponse;
 class Entities
 {
  public:
-  EntityVector  vec;          // Optional - mandatory if 200-OK
-  OrionError    oe;           // Optional - mandatory if not 200-OK
+  EntityVector  vec;          // Mandatory
 
   Entities();
   ~Entities();
 
-  std::string  render(std::map<std::string, bool>&         uriParamOptions,
-                      std::map<std::string, std::string>&  uriParam);
+  std::string  toJson(RenderFormat                     renderFormat,
+                      const std::vector<std::string>&  attrsFilter,
+                      bool                             blacklist,
+                      const std::vector<std::string>&  metadataFilter);
 
-  std::string  check(ApiVersion apiVersion, RequestType requestType);
-  void         present(const std::string& indent);
+  std::string  check(RequestType requestType);
   void         release(void);
-  void         fill(QueryContextResponse* qcrsP);
+  void         fill(const QueryContextResponse& qcrs, OrionError* oeP);
 };
 
 #endif  // SRC_LIB_APITYPESV2_ENTITIES_H_

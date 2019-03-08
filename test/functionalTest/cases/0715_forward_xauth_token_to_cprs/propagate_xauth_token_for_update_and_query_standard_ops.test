@@ -56,8 +56,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${LISTENER_PORT}'/v1"
@@ -161,7 +160,7 @@ echo
 01. Register E1/A1 in CB, accumulator as provApp
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 62
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -175,7 +174,7 @@ Date: REGEX(.*)
 02. Update/UPDATE E1/A1 in CB with X-Auth token 'kz'
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 147
+Content-Length: 116
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -192,7 +191,7 @@ Date: REGEX(.*)
 03. Query E1/A1 in CB with X-Auth token 'kz'
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 147
+Content-Length: 116
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -209,7 +208,7 @@ Date: REGEX(.*)
 04. Update/UPDATE E1/A1 in CB without X-Auth token
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 147
+Content-Length: 116
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -226,7 +225,7 @@ Date: REGEX(.*)
 05. Query E1/A1 in CB without X-Auth token
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 147
+Content-Length: 116
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -244,7 +243,7 @@ Date: REGEX(.*)
 ===================================================
 POST http://localhost:REGEX(\d+)/v1/updateContext
 Fiware-Servicepath: /
-Content-Length: 274
+Content-Length: 149
 X-Auth-Token: kz
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
@@ -272,7 +271,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/v1/queryContext
 Fiware-Servicepath: /
-Content-Length: 137
+Content-Length: 77
 X-Auth-Token: kz
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
@@ -295,7 +294,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/v1/updateContext
 Fiware-Servicepath: /
-Content-Length: 274
+Content-Length: 149
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -322,7 +321,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/v1/queryContext
 Fiware-Servicepath: /
-Content-Length: 137
+Content-Length: 77
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json

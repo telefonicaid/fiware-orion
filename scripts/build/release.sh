@@ -168,11 +168,22 @@ touch CHANGES_NEXT_RELEASE
 # dev release sets 'latest' and not 'X.Y.Z-next"
 if [ "$BROKER_RELEASE" != "dev" ]
 then
-  sed "s/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=latest)](http:\/\/fiware-orion.readthedocs.io\/en\/latest\/?badge=latest)/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=$NEW_VERSION)](http:\/\/fiware-orion.readthedocs.io\/en\/$NEW_VERSION\/?badge=$NEW_VERSION)/" README.md > /tmp/README.md
+  sed "s/(https:\/\/img.shields.io\/readthedocs\/fiware-orion.svg)](https:\/\/fiware-orion.rtfd.io)/(https:\/\/img.shields.io\/readthedocs\/fiware-orion\/$NEW_VERSION.svg)](https:\/\/fiware-orion.rtfd.io\/en\/$NEW_VERSION\/)/" README.md > /tmp/README.md
 else
-  sed "s/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=$currentVersion)](http:\/\/fiware-orion.readthedocs.io\/en\/$currentVersion\/?badge=$currentVersion)/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=latest)](http:\/\/fiware-orion.readthedocs.io\/en\/latest\/?badge=latest)/" README.md > /tmp/README.md
+  sed "s/(https:\/\/img.shields.io\/readthedocs\/fiware-orion\/$currentVersion.svg)](https:\/\/fiware-orion.rtfd.io\/en\/$currentVersion\/)/(https:\/\/img.shields.io\/readthedocs\/fiware-orion.svg)](https:\/\/fiware-orion.rtfd.io)/" README.md > /tmp/README.md
 fi
 mv /tmp/README.md README.md
+
+# Adjust Readthedocs documentation link for GET /version response. Note that the procedure is not symmetric 
+# (like in version.h), as dev release sets 'master' and not 'X.Y.Z-next"
+if [ "$BROKER_RELEASE" != "dev" ]
+then
+  sed "s/https:\/\/fiware-orion.rtfd.io\//https:\/\/fiware-orion.rtfd.io\/en\/$NEW_VERSION\//" src/lib/common/defaultValues.h > /tmp/defaultValues.h
+else
+  sed "s/https:\/\/fiware-orion.rtfd.io\/en\/$currentVersion\//https:\/\/fiware-orion.rtfd.io\//" src/lib/common/defaultValues.h > /tmp/defaultValues.h
+fi
+mv /tmp/defaultValues.h src/lib/common/defaultValues.h
+
 
 # Adjust Dockerfile GIT_REV_ORION. Note that the procedure is not symmetric (like in version.h), as
 # dev release sets 'master' and not 'X.Y.Z-next"
@@ -192,6 +203,7 @@ if [ "$CURRENT_BRANCH" == "master" ]
 then
     git add rpm/SPECS/contextBroker.spec
     git add src/app/contextBroker/version.h
+    git add src/lib/common/defaultValues.h
     git add CHANGES_NEXT_RELEASE
     git add README.md
     git add docker/Dockerfile

@@ -26,6 +26,7 @@
 
 #include "serviceRoutines/badVerbAllFour.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 #include "unittests/unittest.h"
 
@@ -33,14 +34,14 @@
 
 /* ****************************************************************************
 *
-* rs -
+* badVerbV -
 */
-static RestService rs[] =
+static RestService badVerbV[] =
 {
-  { "*", IndividualContextEntity, 3, { "ngsi10", "contextEntities", "*" }, "", badVerbAllFour },
-  { "*", IndividualContextEntity, 2, { "ngsi10", "contextEntities"      }, "", badVerbAllFour },
-  { "*", IndividualContextEntity, 1, { "ngsi10"                         }, "", badVerbAllFour },
-  { "",  InvalidRequest,          0, {                                  }, "", NULL           }
+  { IndividualContextEntity, 3, { "ngsi10", "contextEntities", "*" }, badVerbAllFour },
+  { IndividualContextEntity, 2, { "ngsi10", "contextEntities"      }, badVerbAllFour },
+  { IndividualContextEntity, 1, { "ngsi10"                         }, badVerbAllFour },
+  { InvalidRequest,          0, {                                  }, NULL           }
 };
 
 
@@ -54,17 +55,25 @@ TEST(badVerbAllFour, error)
   ConnectionInfo ci1("/ngsi10/contextEntities/123",  "PUST", "1.1");
   ConnectionInfo ci2("/ngsi10/contextEntities",      "PUST", "1.1");
   std::string    out;
+  RestService    restService1 = { VersionRequest, 3, { "ngsi10", "contextEntities", "123" }, NULL };
+  RestService    restService2 = { VersionRequest, 2, { "ngsi10", "contextEntities" },        NULL };
 
   utInit();
 
-  ci1.apiVersion = V1;
-  out = restService(&ci1, rs);
+  ci1.apiVersion   = V1;
+  ci1.restServiceP = &restService1;
+
+  serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, badVerbV);
+  out = orion::requestServe(&ci1);
+
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci1.httpHeader[0]);
   EXPECT_EQ("POST, GET, PUT, DELETE", ci1.httpHeaderValue[0]);
 
   ci2.apiVersion = V1;
-  out = restService(&ci2, rs);
+  ci2.restServiceP = &restService2;
+
+  out = orion::requestServe(&ci2);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci2.httpHeader[0]);
   EXPECT_EQ("POST, GET, PUT, DELETE", ci2.httpHeaderValue[0]);

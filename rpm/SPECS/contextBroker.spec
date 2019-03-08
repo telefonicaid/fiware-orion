@@ -40,15 +40,18 @@ Buildrequires: gcc, cmake, gcc-c++, gnutls-devel, libgcrypt-devel, libcurl-devel
 Requires(pre): shadow-utils
 
 %description
-The Orion Context Broker is an implementation of NGSI9 and NGSI10 interfaces. 
-Using these interfaces, clients can do several operations:
-* Register context producer applications, e.g. a temperature sensor within a room.
-* Update context information, e.g. send updates of temperature.
-* Being notified when changes on context information take place (e.g. the
-  temperature has changed) or with a given frecuency (e.g. get the temperature
-  each minute).
-* Query context information. The Orion Context Broker stores context information
-  updated from applications, so queries are resolved based on that information.
+The Orion Context Broker is an implementation of the Publish/Subscribe Context Broker GE,
+providing an NGSI interface. Using this interface, clients can do several operations:
+
+* Query context information. The Orion Context Broker stores context information updated
+  from applications, so queries are resolved based on that information. Context 
+  information consists on *entities* (e.g. a car) and their *attributes* (e.g. the speed
+  or location of the car).
+* Update context information, e.g. send updates of temperature
+* Get notified when changes on context information take place (e.g. the temperature
+  has changed)
+* Register context provider applications, e.g. the provider for the temperature sensor
+  within a room
 
 %prep
 if [ -d $RPM_BUILD_ROOT/usr ]; then
@@ -136,6 +139,15 @@ grep "tests" MANIFEST > MANIFEST.broker-tests
 
 %changelog
 
+
+# The contextBroker-test package is still taken into account, although it is very old and probably obsolete. If we
+# recover it in the future, dependencies and so on need to be reviewed. The following fragment (removed from
+# install documentation) could be useful:
+#
+#    The contextBroker-test package (optional) depends on the following packages: python, python-flask, 
+#    python-jinja2, curl, libxml2, libxslt, nc, mongo-10gen and contextBroker. The mongo-10gen dependency needs 
+#    to configure MongoDB repository, check [this piece of documentation about that](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/).
+#
 %package tests
 Requires: %{name}, python, python-flask, python-jinja2, nc, curl, libxml2, mongo-10gen 
 Summary: Test suite for %{name}
@@ -164,6 +176,106 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Thu Feb 21 2019 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.2.0-1
+- Add: skipInitialNotification URI param option to make initial notification in subscriptions configurable (#920)
+- Add: forcedUpdate URI param option to always trigger notifications, no matter if actual update or not (#3389)
+- Add: log notification HTTP response (as INFO for 2xx or WARN for other codes)
+- Add: notification.lastFailureReason field in subscriptions to get the reason of the last notification failure
+- Add: notification.lastSuccessCode field in subscriptions to get the HTTP responde code of the last successful notification
+- Fix: NGSIv1 updates with geo:line|box|polygon|json removes location DB field of NGSIv2-located entities (#3442)
+- Fix: specify notification/forwarding error cause in log messages (#3077)
+- Fix: from=, corr=, srv=, subsrv= correctly propagated to logs in notifications (#3073)
+- Fix: avoid "pending" fields in logs
+- Fix: use "<none>" for srv= and subsrv= in logs when service/subservice header is not provided
+- Fix: bug in notification alarm raising in -notificationMode transient and persistent
+- Remove: deprecated feature ID metadata (and associated NGSIv1 operations)
+
+* Wed Dec 19 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.1.0-1
+- Add: Oneshot Subscription (#3189)
+- Add: support to MongoDB 3.6 (#3070)
+- Fix: problems rendering structured attribute values when forwarded queries are involved (#3162, #3363, #3282)
+- Fix: NGSIv2-NGSIv1 location metadata issues (#3122)
+- Fix: wrong inclusion of "location" metadata in geo:json notifications (#3045)
+- Fix: metadata filter was lost during csub cache refresh (#3290)
+- Fix: NGSIv1-like error responses were used in some NGSIv2 operations
+- Fix: cache sem is not taken before subCacheItemLookup() call (#2882)
+- Fix: wrong Runtime Error logs on GET /v2/registrations and GET /v2/registrations/{id} calls (#3375)
+- Deprecate: Rush support (along with -rush CLI parameter)
+- Remove: isDomain field in NGSIv1 registrations (it was never used)
+
+* Fri Sep 28 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.0.0-1
+- Fix: GET /v2/subscriptions and GET /v2/subscriptions/{id} crashes for permanent subscriptions created before version 1.13.0 (#3256)
+- Fix: correct processing of JSON special characters  (such as \n) in NGSIv2 rendering (#3280, #2938)
+- Fix: correct error payload using errorCode (previously orionError was used) in POST /v1/queryContext and POST /v1/updateContext in some cases
+- Fix: bug in metadata compound value rendering in NGSIv2 (sometimes "toplevel" key was wrongly inserted in the resulting JSON object)
+- Fix: missing or empty metadata values were not allowed in NGSIv2 create/update operations (#3121)
+- Fix: default types for entities and attributes in NGSIv2 was wrongly using "none" in some cases
+- Fix: with NGSIv2 replace operations the geolocalization field is inconsistent in DB (#1142, #3167)
+- Fix: duplicated attribute/metadata keys in JSON response in some cases for dateCreated/dateModified/actionType
+- Fix: proper management of user attributes/metadata which name matches the one of a builtin (the user defined shadows the builtin for rendering but not for filtering)
+- Fix: pre-update metadata content included in notifications (and it shouldn't) (#3310)
+- Fix: duplicated items in ?attrs and ?metadata URI params (and "attrs" and "metadata" in POST /v2/op/query and subscriptions) cause duplicated keys in responses/notifications (#3311)
+- Fix: dateCreated and dateModified included in initial notification (#3182)
+- Hardening: modification of the URL parsing mechanism, making it more efficient, and the source code easier to follow (#3109, step 1)
+- Hardening: refactor NGSIv2 rendering code (throughput increase up to 33%/365% in entities/subscriptions rendering intensive scenarios) (#1298)
+- Hardening: Mongo driver now compiled using --use-sasl-client --ssl to enable proper DB authentication mechanisms
+- Deprecated: NGSIv1 API (along with related CLI parameters: -strictNgsiv1Ids and -ngsiv1Autocast)
+
+* Mon Jul 16 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.15.0-1
+- Add: upsert option for the POST /v2/entities operation (#3215)
+- Add: transient entities functionality (new NGSIv2 builtin attribute: dateExpires) (#3000)
+- Add: "attrs" field in POST /v2/op/query (making "attributes" obsolete) (#2604)
+- Add: "expression" field in POST /v2/op/query (#2706)
+- Fix: large integer wrong rendering in responses (#2603, #2425, #2506)
+- Remove: "scopes" field in POST /v2/op/query (#2706)
+
+* Fri Jun 15 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.14.0-1
+- Add: support for APIv2 notifications (POST /v2/op/notify), which opens up for true APIv2 federation (#2986)
+- Add: camelCase actionTypes in POST /v2/op/update (append, appendStrict, update, delete and replace) (#2721)
+- Fix: bug having entities without attibutes AND matching registrations made the attr-less entity not be returned by GET /v2/entities (#3176)
+- Fix: bug when using "legacy" format for custom v2 notifications (#3154)
+- Fix: check for providers is done only in UPDATE or REPLACE actionType case in update entity logic (#2874)
+- Fix: wrong 404 Not Found responses when updating attribute using NGSIv2 and CB forwards it correctly (#2871)
+
+* Mon Apr 16 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.13.0-1
+- Add: support for GET /v2/registrations (#3005)
+- Add: support for GET /v2/registrations/<registration-id> (#3008)
+- Add: support for POST /v2/registrations to create registrations in APIv2 (#3004)
+- Add: support for DELETE /v2/registrations/<registration-id> (#3006)
+- Add: support for CORS requests for /v2/registrations and /v2/registrations/<registration-id> (#3049)
+- Hardening: refactor request routing logic (#3109, step 1)
+- Bug that may lead contextBroker to crash when passing null character "\u0000" with ID parameter in query context payload (#3119)
+- Add: CORS Preflight Requests support for /version (#3066)
+- Deprecated: ID metadata (and associated NGSIv1 operations)
+
+* Wed Feb 21 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.12.0-1
+- Add: support for entity id and type in orderBy parameter (#2934)
+- Add: NGSIv1 autocast for numbers, booleans and dates (using flag -ngsiv1Autocast) (#3112)
+
+* Wed Feb 14 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.11.0-1
+- Reference distribution changed from RHEL/CentOS 6 to RHEL/CentOS 7
+- Add: new BROKER_LOG_LEVEL variable at /etc/config/contextBroker to set log level
+- Add: new GENERATE_COREDUMP variable at /etc/config/contextBroker to enable core generation and archiving (useful for debugging)
+- Add: handler for SIGHUP termination signal
+- Fix: using SIGTERM instead of SIGHUP for stopping broker in init.d service script
+- Fix: Invalid description in POST /op/query error response (#2991)
+- Fix: Bug that may cause contextBroker to crash when passing inappropriate parameter in query context payload (#3055)
+- Fix: Correct treatment of PID-file (#3075)
+
+* Mon Dec 11 2017 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.10.0-1
+- Add: CORS Preflight Requests support for all NGSIv2 resources, -corsMaxAge switch, CORS exposed headers (#501, #3030)
+- Fix: null not working in q/mq filter in subscriptions (#2998)
+- Fix: case-sensitive header duplication (e.g. "Content-Type" and "Content-type") in custom notifications (#2893)
+- Fix: bug in GTE and LTE operations in query filters (q/mq), both for GET operations and subscriptions (#2995)
+- Fix: Wrong "max one service-path allowed for subscriptions" in NGSIv2 subscription operation (#2948)
+
+* Thu Oct 19 2017 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.9.0-1
+- Add: release_date and doc fields are added to the GET /version output to align with FIWARE scheme (#2970)
+- Fix: missing lastSuccess/lastFailure associated to initial notification on subscription creation some times when csub cache is in use (#2974)
+- Fix: several invalid memory accesses (based on a workaround, not a definitive solution, see issue #2994)
+- Fix: broken JSON due to unscaped quotes (") in NGSIv2 error description field (#2955)
+- Hardening: NGSIv1 responses don't use pretty-print JSON format any longer, as NGSIv2 responses work (potentially saving around 50% size) (#2760)
+
 * Mon Sep 11 2017 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.8.0-1
 - Add: self-notification loop protection, based on Fiware-Correlator and Ngsiv2-AttrsFormat headers and lastCorrelator field at DB (#2937)
 - Add: Fiware-Correlator and NgsiV2-AttrsFormat headers cannot be overwritten by the custom notification logic (#2937)
@@ -929,7 +1041,7 @@ fi
 - REST interface for changing log and trace levels
 - Memory leak fixes
 
-* Mon Jun 04 2013 Fermín Galán <fermin@tid.es> 0.3.0-1 (FIWARE-2.3.3-1)
+* Tue Jun 04 2013 Fermín Galán <fermin@tid.es> 0.3.0-1 (FIWARE-2.3.3-1)
 - CLI argument -logAppend
 - Handlers for SIGUSR1 and SIGUSR2 signals to stop/resume logging
 - Handlers for SIGTERM and SIGINT signals for smart exiting

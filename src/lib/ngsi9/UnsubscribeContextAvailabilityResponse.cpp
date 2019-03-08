@@ -72,18 +72,18 @@ UnsubscribeContextAvailabilityResponse::~UnsubscribeContextAvailabilityResponse(
 
 /* ****************************************************************************
 *
-* UnsubscribeContextAvailabilityResponse::render - 
+* UnsubscribeContextAvailabilityResponse::toJsonV1 -
 */
-std::string UnsubscribeContextAvailabilityResponse::render(const std::string& indent)
+std::string UnsubscribeContextAvailabilityResponse::toJsonV1(void)
 {
   std::string out = "";
 
-  out += startTag(indent);
+  out += startTag();
 
-  out += subscriptionId.render(RtUnsubscribeContextAvailabilityResponse, indent + "  ", true);  // always json comma - statusCode is mandatory
-  out += statusCode.render(indent + "  ");
+  out += subscriptionId.toJsonV1(RtUnsubscribeContextAvailabilityResponse, true);  // always json comma - statusCode is mandatory
+  out += statusCode.toJsonV1(false);
 
-  out += endTag(indent);
+  out += endTag();
 
   return out;
 }

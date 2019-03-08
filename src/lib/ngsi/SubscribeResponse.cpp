@@ -42,20 +42,20 @@ SubscribeResponse::SubscribeResponse()
 
 /* ****************************************************************************
 *
-* SubscribeResponse::render - 
+* SubscribeResponse::toJsonV1 -
 */
-std::string SubscribeResponse::render(const std::string& indent, bool comma)
+std::string SubscribeResponse::toJsonV1(bool comma)
 {
   std::string  out                 = "";
   std::string  tag                 = "subscribeResponse";
   bool         durationRendered    = !duration.isEmpty();
   bool         throttlingRendered  = !throttling.isEmpty();
 
-  out += startTag(indent, tag);
-  out += subscriptionId.render(RtSubscribeResponse, indent + "  ", durationRendered || throttlingRendered);
-  out += duration.render(indent + "  ", throttlingRendered);
-  out += throttling.render(indent + "  ", false);
-  out += endTag(indent, comma);
+  out += startTag(tag);
+  out += subscriptionId.toJsonV1(RtSubscribeResponse, durationRendered || throttlingRendered);
+  out += duration.toJsonV1(throttlingRendered);
+  out += throttling.toJsonV1(false);
+  out += endTag(comma);
 
   return out;
 }

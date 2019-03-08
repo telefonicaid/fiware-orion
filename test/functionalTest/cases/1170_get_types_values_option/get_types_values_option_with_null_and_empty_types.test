@@ -58,7 +58,7 @@ mongoCmd ${CB_DB_NAME} 'db.entities.insert({
                 "type": "",
                 "servicePath": "/"
         },
-        "attrNames": ["A1", "A3"],
+        "attrNames": ["A1", "A2"],
         "attrs": {
                 "A1": {
                         "type": "String",
@@ -66,7 +66,7 @@ mongoCmd ${CB_DB_NAME} 'db.entities.insert({
                         "modDate": 1462826512,
                         "value": "s"
                 },
-                "A3": {
+                "A2": {
                         "type": "Bool",
                         "creDate": 1462826512,
                         "modDate": 1462826512,
@@ -182,7 +182,7 @@ Date: REGEX(.*)
 04. Create E2/<null>/A1+A3 (using NGSIv1)
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 487
+Content-Length: 226
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

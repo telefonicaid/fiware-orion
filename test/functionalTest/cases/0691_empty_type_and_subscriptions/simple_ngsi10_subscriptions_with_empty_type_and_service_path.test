@@ -91,7 +91,7 @@ echo
 01. Make accumulator subscribe to E//A1 (empty type)
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 108
+Content-Length: 84
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -107,7 +107,7 @@ Date: REGEX(.*)
 02. Create E/T1/A1 using convop /v1/contextEntities/type/T1/id/E
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 311
+Content-Length: 165
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -138,7 +138,7 @@ Date: REGEX(.*)
 ======================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 463
+Content-Length: 259
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json

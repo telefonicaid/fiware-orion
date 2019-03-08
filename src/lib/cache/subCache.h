@@ -34,7 +34,7 @@
 #include "common/RenderFormat.h"
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 #include "apiTypesV2/Subscription.h"
@@ -83,7 +83,6 @@ struct EntityInfo
 
   bool          match(const std::string& idPattern, const std::string& type);
   void          release(void);
-  void          present(const std::string& prefix);
 };
 
 
@@ -112,6 +111,8 @@ struct CachedSubscription
   ngsiv2::HttpInfo            httpInfo;
   int64_t                     lastFailure;  // timestamp of last notification failure
   int64_t                     lastSuccess;  // timestamp of last successful notification
+  std::string                 lastFailureReason;
+  int64_t                     lastSuccessCode;
   struct CachedSubscription*  next;
 };
 
@@ -179,22 +180,6 @@ extern int subCacheItems(void);
 
 /* ****************************************************************************
 *
-* subCacheEntryPresent -
-*/
-extern void subCacheEntryPresent(CachedSubscription* cSubP);
-
-
-
-/* ****************************************************************************
-*
-* subCachePresent - 
-*/
-extern void subCachePresent(const char* title);
-
-
-
-/* ****************************************************************************
-*
 * subCacheItemInsert -
 */
 extern void subCacheItemInsert
@@ -214,6 +199,8 @@ extern void subCacheItemInsert
   int64_t                            lastNotificationTime,
   int64_t                            lastNotificationSuccessTime,
   int64_t                            lastNotificationFailureTime,
+  int64_t                            lastSuccessCode,
+  const std::string&                 lastFailureReason,
   StringFilter*                      stringFilterP,
   StringFilter*                      mdStringFilterP,
   const std::string&                 status,
@@ -339,7 +326,9 @@ extern void subCacheItemNotificationErrorStatus
 (
   const std::string&  tenant,
   const std::string&  subscriptionId,
-  int                 errors
+  int                 errors,
+  long long           statusCode,
+  const std::string&  failureReason
 );
 
 #endif  // SRC_LIB_CACHE_SUBCACHE_H_

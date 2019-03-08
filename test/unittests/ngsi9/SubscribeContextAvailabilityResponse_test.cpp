@@ -83,7 +83,7 @@ TEST(SubscribeContextAvailabilityResponse, jsonRender)
   scarP->subscriptionId.set("012345678901234567890123");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  rendered = scarP->render("");
+  rendered = scarP->toJsonV1();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
@@ -91,7 +91,7 @@ TEST(SubscribeContextAvailabilityResponse, jsonRender)
   scarP->errorCode.fill(SccBadRequest);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  rendered = scarP->render("");
+  rendered = scarP->toJsonV1();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
@@ -100,7 +100,7 @@ TEST(SubscribeContextAvailabilityResponse, jsonRender)
   scarP->duration.set("PT1H");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
-  rendered = scarP->render("");
+  rendered = scarP->toJsonV1();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
@@ -108,7 +108,7 @@ TEST(SubscribeContextAvailabilityResponse, jsonRender)
   scarP->errorCode.fill(SccBadRequest, "no details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename4)) << "Error getting test data from '" << filename4 << "'";
-  rendered = scarP->render("");
+  rendered = scarP->toJsonV1();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 

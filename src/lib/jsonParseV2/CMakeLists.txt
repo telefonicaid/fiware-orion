@@ -32,13 +32,18 @@ SET (SOURCES
     parseSubscription.cpp
     parseBatchQuery.cpp
     parseEntityVector.cpp
+    parseEntitiesVector.cpp
     parseEntityObject.cpp
-    parseAttributeList.cpp
-    parseScopeVector.cpp
+    parseStringList.cpp
     parseScope.cpp
     parseBatchUpdate.cpp
     utilsParse.cpp
     parseMetadataCompoundValue.cpp
+    parseRegistration.cpp
+    badInput.cpp
+    parseStringVector.cpp
+    parseNotification.cpp
+    parseExpression.cpp
 )
 
 SET (HEADERS
@@ -53,13 +58,18 @@ SET (HEADERS
     parseSubscription.h
     parseBatchQuery.h
     parseEntityVector.h
+    parseEntitiesVector.h
     parseEntityObject.h
-    parseAttributeList.h
-    parseScopeVector.h
     parseScope.h
+    parseStringList.h
     parseBatchUpdate.h
     utilsParse.h
     parseMetadataCompoundValue.h
+    parseRegistration.h
+    parseStringVector.h
+    badInput.h
+    parseNotification.h
+    parseExpression.h
 )
 
 

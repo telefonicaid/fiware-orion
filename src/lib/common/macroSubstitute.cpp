@@ -25,7 +25,6 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
-#include "ngsi/ContextElement.h"
 
 #include "common/string.h"
 #include "common/limits.h"
@@ -51,33 +50,26 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
     }
     else if (vec[ix]->valueType == orion::ValueTypeNumber)
     {
-      *valueP = toString(vec[ix]->numberValue);
+      *valueP = double2string(vec[ix]->numberValue);
     }
     else if (vec[ix]->valueType == orion::ValueTypeBoolean)
     {
       *valueP = (vec[ix]->boolValue == true)? "true" : "false";
     }
-    else if (vec[ix]->valueType == orion::ValueTypeNone)
+    else if (vec[ix]->valueType == orion::ValueTypeNull)
     {
       *valueP = "null";
+    }
+    else if (vec[ix]->valueType == orion::ValueTypeNotGiven)
+    {
+      LM_E(("Runtime Error (value not given for attribute)"));
+      *valueP = "";
     }
     else if ((vec[ix]->valueType == orion::ValueTypeObject) || (vec[ix]->valueType == orion::ValueTypeVector))
     {
       if (vec[ix]->compoundValueP)
       {
-        if (vec[ix]->compoundValueP->valueType == orion::ValueTypeVector)
-        {
-          *valueP = "[" + vec[ix]->compoundValueP->toJson(true) + "]";
-        }
-        else if (vec[ix]->compoundValueP->valueType == orion::ValueTypeObject)
-        {
-          *valueP = "{" + vec[ix]->compoundValueP->toJson(true) + "}";
-        }
-        else
-        {
-          LM_E(("Runtime Error (attribute is of object type but its compound is of invalid type)"));
-          *valueP = "";
-        }
+        *valueP = vec[ix]->compoundValueP->toJson();
       }
       else
       {
@@ -124,7 +116,7 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
 *   Date:   Mon Jun 19 16:33:29 2017 +0200
 *
 */
-bool macroSubstitute(std::string* to, const std::string& from, const ContextElement& ce)
+bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
 {
   // Initial size check: is the string to convert too big?
   //
@@ -190,17 +182,17 @@ bool macroSubstitute(std::string* to, const std::string& from, const ContextElem
 
     if (macroName == "id")
     {
-      toAdd += ce.entityId.id.length() * times;
+      toAdd += en.id.length() * times;
     }
     else if (macroName == "type")
     {
-      toAdd += ce.entityId.type.length() * times;
+      toAdd += en.type.length() * times;
     }
     else
     {
       std::string value;
 
-      attributeValue(&value, ce.contextAttributeVector.vec, macroName.c_str());
+      attributeValue(&value, en.attributeVector.vec, macroName.c_str());
       toAdd += value.length() * times;
     }
   }
@@ -224,15 +216,15 @@ bool macroSubstitute(std::string* to, const std::string& from, const ContextElem
 
     if (macroName == "id")
     {
-      value = ce.entityId.id;
+      value = en.id;
     }
     else if (macroName == "type")
     {
-      value = ce.entityId.type;
+      value = en.type;
     }
     else
     {
-      attributeValue(&value, ce.contextAttributeVector.vec, macroName.c_str());
+      attributeValue(&value, en.attributeVector.vec, macroName.c_str());
     }
 
     // We have to do the replace operation as many times as macro occurrences

@@ -29,6 +29,7 @@
 #include "serviceRoutines/putIndividualContextEntityAttribute.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 #include "unittests/unittest.h"
 
@@ -38,13 +39,19 @@
 *
 * rs -
 */
-#define ICEA IndividualContextEntityAttribute
-#define IR   InvalidRequest
-static RestService rs[] =
+#define ICEA   IndividualContextEntityAttribute
+#define IR     InvalidRequest
+
+static RestService putV[] =
 {
-  { "PUT", ICEA, 5, { "ngsi10", "contextEntities", "*", "attributes", "*" }, "", putIndividualContextEntityAttribute },
-  { "*",   IR,   0, { "*", "*", "*", "*", "*", "*"                        }, "", badRequest                          },
-  { "",    IR,   0, {                                                     }, "", NULL                                }
+  { ICEA, 5, { "ngsi10", "contextEntities", "*", "attributes", "*" }, putIndividualContextEntityAttribute },
+  { IR,   0, {                                                     }, NULL                                }
+};
+
+static RestService badVerbV[] =
+{
+  { IR,   0, { "*", "*", "*", "*", "*", "*"                        }, badRequest                          },
+  { IR,   0, {                                                     }, NULL                                }
 };
 
 
@@ -62,6 +69,12 @@ TEST(putIndividualContextEntityAttribute, json)
   const char*    infile      = "ngsi10.updateContextAttributeRequest.putAttribute.valid.json";
   const char*    outfile     = "ngsi10.updateContextAttributeResponse.notFound.valid.json";
   std::string    out;
+  RestService    restService =
+    {
+      VersionRequest,
+      5, { "ngsi10", "contextEntities", "entity11", "attributes", "temperature" },
+      NULL
+    };
 
   EXPECT_EQ("OK", testDataFromFile(testBuf,
                                    sizeof(testBuf),
@@ -75,7 +88,10 @@ TEST(putIndividualContextEntityAttribute, json)
   ci.inMimeType     = JSON;
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
-  out               = restService(&ci, rs);
+  ci.restServiceP   = &restService;
+
+  serviceVectorsSet(NULL, putV, NULL, NULL, NULL, NULL, badVerbV);
+  out = orion::requestServe(&ci);
 
   EXPECT_STREQ(expectedBuf, out.c_str());
 

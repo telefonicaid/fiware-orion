@@ -32,18 +32,6 @@ brokerStart CB
 echo "1: ++++++++++++++++++++"
 url="/v1/registry/contextEntities/ENTITY_ID/attributes"
 payload='{
-  "metadatas" : [
-    {
-      "name" : "ID",
-      "type" : "string",
-      "value" : "1110"
-    },
-    {
-      "name" : "cm2",
-      "type" : "string",
-      "value" : "XXX"
-    }
-  ],
   "duration" : "PT1H",
   "providingApplication" : "http://kz.tid.es/abc"
 }'
@@ -69,18 +57,6 @@ orionCurl --url ${url} --payload "${payload}"
 echo "3: ++++++++++++++++++++"
 url="/v1/registry/contextEntities/ENTITY_ID/attributes"
 payload='{
-  "metadatas" : [
-    {
-      "name" : "ID",
-      "type" : "string",
-      "value" : "1111"
-    },
-    {
-      "name" : "cm2",
-      "type" : "string",
-      "value" : "YYY"
-    }
-  ],
   "duration" : "PT2H",
   "providingApplication" : "http://kz.tid.es/abc2",
   "registrationId" : "'$REG_ID'"
@@ -138,7 +114,7 @@ echo "9: ++++++++++++++++++++"
 --REGEXPECT--
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -149,7 +125,7 @@ Date: REGEX(.*)
 }
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 302
+Content-Length: 168
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -172,7 +148,7 @@ Date: REGEX(.*)
 }
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 63
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -183,7 +159,7 @@ Date: REGEX(.*)
 }
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 303
+Content-Length: 169
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -206,7 +182,7 @@ Date: REGEX(.*)
 }
 5: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 303
+Content-Length: 169
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -229,7 +205,7 @@ Date: REGEX(.*)
 }
 6: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

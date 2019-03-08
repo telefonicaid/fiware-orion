@@ -47,11 +47,11 @@ TEST(SubscribeError, render)
   se.subscriptionId.set("SUB_123");
   se.errorCode.fill(SccBadRequest, "detail");
 
-  out = se.render(RegisterContext, "");
+  out = se.toJsonV1(RegisterContext, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = se.render(SubscribeContext, "");
+  out = se.toJsonV1(SubscribeContext, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -71,7 +71,7 @@ TEST(SubscribeError, check)
 
   utInit();
 
-  checked = se.check(SubscribeContext, "", "", 0);
+  checked = se.check();
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();

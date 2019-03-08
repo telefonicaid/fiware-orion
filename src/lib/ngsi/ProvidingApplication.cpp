@@ -51,13 +51,7 @@ ProvidingApplication::ProvidingApplication()
 *
 * ProvidingApplication::check -
 */
-std::string ProvidingApplication::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string ProvidingApplication::check(void)
 {
   if (isEmpty())
   {
@@ -126,36 +120,16 @@ MimeType ProvidingApplication::getMimeType(void)
 
 /* ****************************************************************************
 *
-* ProvidingApplication::present -
+* ProvidingApplication::toJsonV1 -
 */
-void ProvidingApplication::present(const std::string& indent)
-{
-  if (string != "")
-  {
-    LM_T(LmtPresent, ("%sProvidingApplication: %s\n", 
-		      indent.c_str(), 
-		      string.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNo ProvidingApplication\n", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* ProvidingApplication::render -
-*/
-std::string ProvidingApplication::render(const std::string& indent, bool comma)
+std::string ProvidingApplication::toJsonV1(bool comma)
 {
   if (string == "")
   {
     return "";
   }
 
-  return valueTag(indent, "providingApplication", string, comma);
+  return valueTag("providingApplication", string, comma);
 }
 
 

@@ -53,15 +53,11 @@ class Duration
   void          set(const std::string& value);
   std::string   get(void);
   bool          isEmpty(void);
-  std::string   render(const std::string& indent, bool comma = true);
+  std::string   toJsonV1(bool comma);
   int64_t       parse(void);
-  void          present(const std::string& indent);
   void          release(void);
 
-  std::string   check(RequestType         requestType,
-                      const std::string&  indent,
-                      const std::string&  predetectedError,
-                      int                 counter);
+  std::string   check(void);
 };
 
 #endif  // SRC_LIB_NGSI_DURATION_H_

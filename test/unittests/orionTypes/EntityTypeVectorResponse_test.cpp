@@ -29,27 +29,6 @@
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(EntityTypeVectorResponse, present)
-{
-  utInit();
-
-  EntityType               et("myType");
-  EntityTypeVectorResponse etVRes;
-
-  etVRes.entityTypeVector.vec.push_back(&et);
-  etVRes.statusCode.fill(SccOk);
-
-  etVRes.present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * check
 */
 TEST(EntityTypeVectorResponse, check)

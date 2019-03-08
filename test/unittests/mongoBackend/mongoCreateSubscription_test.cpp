@@ -91,7 +91,7 @@ TEST(mongoCreateSubscriptions, createSubscriptionNotCustomOK)
   sub.notification.httpInfo.custom   = false;
 
   /* Invoke the function in mongoBackend library */
-  std::string result = mongoCreateSubscription(sub, &oe, "", servicePathVector, "", "");
+  std::string result = mongoCreateSubscription(sub, &oe, "", servicePathVector, "", "", false, V2);
 
   /* Check response is as expected */
   EXPECT_EQ(SccNone, oe.code);
@@ -188,7 +188,7 @@ TEST(mongoCreateSubscriptions, createSubscriptionCustomOK)
   sub.notification.httpInfo.payload = "Hey!";
 
   /* Invoke the function in mongoBackend library */
-  std::string result = mongoCreateSubscription(sub, &oe, "", servicePathVector, "", "");
+  std::string result = mongoCreateSubscription(sub, &oe, "", servicePathVector, "", "", false, V2);
 
   /* Check response is as expected */
   EXPECT_EQ(SccNone, oe.code);

@@ -112,14 +112,14 @@ MONGO_REPO=$(mktemp)
 cat > $MONGO_REPO <<EOF
 [mongodb]
 name=MongoDB Repository
-baseurl=https://repo.mongodb.org/yum/redhat/\$releasever/mongodb-org/3.2/x86_64/
+baseurl=https://repo.mongodb.org/yum/redhat/\$releasever/mongodb-org/3.6/x86_64/
 gpgcheck=1
 enabled=1
-gpgkey=https://www.mongodb.org/static/pgp/server-3.2.asc
+gpgkey=https://www.mongodb.org/static/pgp/server-3.6.asc
 EOF
 sudo mv $MONGO_REPO /etc/yum.repos.d/mongodb.repo
 
-MONGO_VERSION=3.2.6
+MONGO_VERSION=3.6.6
 sudo yum install -y mongodb-org-$MONGO_VERSION \
                     mongodb-org-server-$MONGO_VERSION \
                     mongodb-org-shell-$MONGO_VERSION \

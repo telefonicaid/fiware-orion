@@ -1,1 +1,0 @@
-- Fix: missing lastSuccess/lastFailure associated to initial notification on subscription creation some times when csub cache is in use (#2974)

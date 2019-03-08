@@ -30,6 +30,7 @@
 #include <map>
 
 #include "ngsi/ContextAttributeVector.h"
+#include "ngsi/EntityId.h"
 #include "rest/OrionError.h"
 
 
@@ -54,7 +55,6 @@ class Entity
   std::string             isPattern;        // Optional
   bool                    isTypePattern;
   ContextAttributeVector  attributeVector;  // Optional
-  OrionError              oe;               // Optional - mandatory if not 200-OK
 
   std::string             servicePath;      // Not part of payload, just an internal field
   bool                    typeGiven;        // Was 'type' part of the incoming payload?
@@ -63,26 +63,73 @@ class Entity
   double                  creDate;          // used by dateCreated functionality in NGSIv2
   double                  modDate;          // used by dateModified functionality in NGSIv2
 
+  std::vector<ProvidingApplication> providingApplicationList;    // Not part of NGSI, used internally for CPr forwarding functionality
+
   Entity();
+  Entity(const std::string& id, const std::string& type, const std::string& isPattern);
+  explicit Entity(EntityId* eP);
+  explicit Entity(Entity* eP);
+
   ~Entity();
 
-  std::string  render(std::map<std::string, bool>&         uriParamOptions,
-                      std::map<std::string, std::string>&  uriParam,
-                      bool                                 comma = false);
+  std::string  toJsonV1(bool                             asJsonObject,
+                        RequestType                      requestType,
+                        const std::vector<std::string>&  attrsFilter,
+                        bool                             blacklist,
+                        const std::vector<std::string>&  metadataFilter,
+                        bool                             comma,
+                        bool                             omitAttributeValues = false);
+
+  std::string  toJson(RenderFormat                     renderFormat,
+                      const std::vector<std::string>&  attrsFilter,
+                      bool                             blacklist,
+                      const std::vector<std::string>&  metadataFilter);
+
+  std::string  toString(bool useIsPattern = false, const std::string& delimiter = ", ");
 
   std::string  check(ApiVersion apiVersion, RequestType requestType);
-  void         present(const std::string& indent);
+
   void         release(void);
 
-  void         fill(const std::string&       id,
-                    const std::string&       type,
-                    const std::string&       isPattern,
-                    ContextAttributeVector*  aVec,
-                    double                   creDate,
-                    double                   modDate);
+  void         fill(const std::string&             id,
+                    const std::string&             type,
+                    const std::string&             isPattern,
+                    const ContextAttributeVector&  caV,
+                    double                         creDate,
+                    double                         modDate);
 
-  void         fill(QueryContextResponse* qcrsP);
+  void         fill(const std::string&  id,
+                    const std::string&  type,
+                    const std::string&  isPattern,
+                    const std::string&  servicePath,
+                    double              creDate = 0,
+                    double              modDate = 0);
+
+  void         fill(const std::string&  id,
+                    const std::string&  type,
+                    const std::string&  isPattern);
+
+  void         fill(const Entity& en, bool useDefaultType = false, bool cloneCompounds = false);
+
+  void         fill(const QueryContextResponse& qcrs, OrionError* oeP);
+
   void         hideIdAndType(bool hide = true);
+
+  ContextAttribute* getAttribute(const std::string& attrName);
+
+  bool         equal(Entity* eP);
+
+ private:
+  void filterAndOrderAttrs(const std::vector<std::string>&  attrsFilter,
+                           bool                             blacklist,
+                           std::vector<ContextAttribute*>*  orderedAttrs);
+
+  void addAllAttrsExceptShadowed(std::vector<ContextAttribute*>*  orderedAttrs);
+
+  std::string toJsonValues(const std::vector<ContextAttribute*>& orderedAttrs);
+  std::string toJsonUniqueValues(const std::vector<ContextAttribute*>& orderedAttrs);
+  std::string toJsonKeyvalues(const std::vector<ContextAttribute*>& orderedAttrs);
+  std::string toJsonNormalized(const std::vector<ContextAttribute*>& orderedAttrs, const std::vector<std::string>&  metadataFilter);
 };
 
 #endif  // SRC_LIB_APITYPESV2_ENTITY_H_

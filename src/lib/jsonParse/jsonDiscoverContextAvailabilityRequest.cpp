@@ -251,26 +251,9 @@ void jsonDcarRelease(ParseData* reqDataP)
 */
 std::string jsonDcarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-  return reqDataP->dcar.res.check("", reqDataP->errorString);
+  return reqDataP->dcar.res.check(reqDataP->errorString);
 }
 
-
-
-
-/* ****************************************************************************
-*
-* jsonDcarPresent - 
-*/
-void jsonDcarPresent(ParseData* reqDataP)
-{
-  if (!lmTraceIsSet(LmtPresent))
-  {
-    return;
-  }
-
-  LM_T(LmtPresent,("\n\n"));
-  reqDataP->dcar.res.present("");
-}
 
 
 

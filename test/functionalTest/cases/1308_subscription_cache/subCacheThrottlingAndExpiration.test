@@ -31,21 +31,21 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 10 secs
+# 01. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 14 secs, throttling is 8 secs
 # 02. Create entity s01 w/ attr A w/o tenant
 # 03. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
 # 04. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
-# 05. Wait 5 secs so that the throttling of 4 secs is OK
+# 05. Wait 8 secs so that the throttling of 8 secs is OK, a little less for valgrind to avoid expiration
 # 06. Modify entity s01 w/ attr A w/o tenant - notification NOT lost by throttling
 # 07. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
-# 08. Wait 6 secs more, to make subscription expire
+# 08. Wait 7 secs more, to make subscription expire
 # 09. Modify entity s01 w/ attr A w/o tenant - no notification as expired
 # 10. Dump accumulator - see two notifications
 #
 
 
-echo "01. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 10 secs"
-echo "==========================================================================================="
+echo "01. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 14 secs, throttling is 8 secs"
+echo "================================================================================================================="
 payload='{
   "entities": [
     {
@@ -54,8 +54,8 @@ payload='{
     }
   ],
   "reference": "http://localhost:'${LISTENER_PORT}'/notify",
-  "duration": "PT10S",
-  "throttling": "PT4S",
+  "duration": "PT14S",
+  "throttling": "PT8S",
   "notifyConditions": [
     {
       "type": "ONCHANGE",
@@ -66,13 +66,14 @@ payload='{
 orionCurl --url /v1/subscribeContext --payload "$payload"
 echo
 echo
+sleep 1
 
 
 echo "02. Create entity s01 w/ attr A w/o tenant"
 echo "=========================================="
 payload='{
   "id": "s01",
-  "A": "03. Creation"
+  "A": "02. Creation"
 }'
 orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
@@ -81,7 +82,7 @@ echo
 
 echo "03. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling"
 echo "============================================================================"
-payload='{ "A": "04. notification lost by throttling" }'
+payload='{ "A": "03. notification lost by throttling" }'
 orionCurl --url '/v2/entities/s01/attrs?options=keyValues' -X PUT --payload "$payload"
 echo
 echo
@@ -89,19 +90,19 @@ echo
 
 echo "04. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling"
 echo "============================================================================"
-payload='{ "A": "05. notification lost by throttling" }'
+payload='{ "A": "04. notification lost by throttling" }'
 orionCurl --url '/v2/entities/s01/attrs?options=keyValues' -X PUT --payload "$payload"
 echo
 echo
 
 
-echo "05. Wait 5 secs so that the throttling of 4 secs is OK"
-echo "======================================================"
+echo "05. Wait 8 secs so that the throttling of 8 secs is OK, a little less for valgrind to avoid expiration"
+echo "======================================================================================================"
 if [ "$VALGRIND" == "" ]
 then
-  sleep 5
+  sleep 8
 else
-  sleep 4
+  sleep 7
 fi
 echo
 echo
@@ -109,7 +110,7 @@ echo
 
 echo "06. Modify entity s01 w/ attr A w/o tenant - notification NOT lost by throttling"
 echo "================================================================================"
-payload='{ "A": "07. Modification" }'
+payload='{ "A": "06. Modification" }'
 orionCurl --url '/v2/entities/s01/attrs?options=keyValues' -X PUT --payload "$payload"
 echo
 echo
@@ -117,22 +118,22 @@ echo
 
 echo "07. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling"
 echo "============================================================================"
-payload='{ "A": "08. notification lost by throttling" }'
+payload='{ "A": "07. notification lost by throttling" }'
 orionCurl --url '/v2/entities/s01/attrs?options=keyValues' -X PUT --payload "$payload"
 echo
 echo
 
 
-echo "08. Wait 6 secs more, to make subscription expire"
+echo "08. Wait 7 secs more, to make subscription expire"
 echo "================================================="
-sleep 6
+sleep 7
 echo
 echo
 
 
 echo "09. Modify entity s01 w/ attr A w/o tenant - no notification as expired"
 echo "======================================================================="
-payload='{ "A": "10. no notification as expired" }'
+payload='{ "A": "09. no notification as expired" }'
 orionCurl --url '/v2/entities/s01/attrs?options=keyValues' -X PUT --payload "$payload"
 echo
 echo
@@ -146,19 +147,19 @@ echo
 
 
 --REGEXPECT--
-01. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 10 secs
-===========================================================================================
+01. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 14 secs, throttling is 8 secs
+=================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 137
+Content-Length: 106
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "subscribeResponse": {
-        "duration": "PT10S",
+        "duration": "PT14S",
         "subscriptionId": "REGEX([0-9a-f]{24})",
-        "throttling": "PT4S"
+        "throttling": "PT8S"
     }
 }
 
@@ -191,8 +192,8 @@ Date: REGEX(.*)
 
 
 
-05. Wait 5 secs so that the throttling of 4 secs is OK
-======================================================
+05. Wait 8 secs so that the throttling of 8 secs is OK, a little less for valgrind to avoid expiration
+======================================================================================================
 
 
 06. Modify entity s01 w/ attr A w/o tenant - notification NOT lost by throttling
@@ -213,7 +214,7 @@ Date: REGEX(.*)
 
 
 
-08. Wait 6 secs more, to make subscription expire
+08. Wait 7 secs more, to make subscription expire
 =================================================
 
 
@@ -230,7 +231,7 @@ Date: REGEX(.*)
 ============================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 475
+Content-Length: 271
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -245,7 +246,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "name": "A",
                         "type": "Text",
-                        "value": "03. Creation"
+                        "value": "02. Creation"
                     }
                 ],
                 "id": "s01",
@@ -264,7 +265,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 479
+Content-Length: 275
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -279,7 +280,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "name": "A",
                         "type": "Text",
-                        "value": "07. Modification"
+                        "value": "06. Modification"
                     }
                 ],
                 "id": "s01",

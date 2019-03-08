@@ -77,7 +77,7 @@ echo
 --REGEXPECT--
 1: Append entity E1 with two different attributes A1 and A2, with compound values
 HTTP/1.1 200 OK
-Content-Length: 489
+Content-Length: 228
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -113,7 +113,7 @@ Date: REGEX(.*)
 
 2. JsonAttributeObjectQuery for the entity E1 for attributes A1 and A2, with compound values
 HTTP/1.1 200 OK
-Content-Length: 656
+Content-Length: 261
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

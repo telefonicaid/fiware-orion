@@ -29,6 +29,7 @@
 #include "serviceRoutines/postIndividualContextEntityAttributes.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 #include "unittests/unittest.h"
 
@@ -36,15 +37,21 @@
 
 /* ****************************************************************************
 *
-* rs -
+* service vectors -
 */
-#define ICEA IndividualContextEntityAttributes
-#define IR   InvalidRequest
-static RestService rs[] =
+#define ICEA   IndividualContextEntityAttribute
+#define IR     InvalidRequest
+
+static RestService postV[] =
 {
-  { "POST", ICEA, 4, { "ngsi10", "contextEntities", "*", "attributes" }, "", postIndividualContextEntityAttributes },
-  { "*",    IR,   0, { "*", "*", "*", "*", "*", "*"                   }, "", badRequest                            },
-  { "",     IR,   0, {                                                }, "", NULL                                  }
+  { ICEA, 4, { "ngsi10", "contextEntities", "*", "attributes" }, postIndividualContextEntityAttributes },
+  { IR,   0, {                                                }, NULL                                  }
+};
+
+static RestService badVerbV[] =
+{
+  { IR,   0, { "*", "*", "*", "*", "*", "*"                   }, badRequest                            },
+  { IR,   0, {                                                }, NULL                                  }
 };
 
 
@@ -74,7 +81,9 @@ TEST(postIndividualContextEntityAttributes, createEntity)
   ci.inMimeType     = JSON;
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
-  out               = restService(&ci, rs);
+
+  serviceVectorsSet(NULL, NULL, postV, NULL, NULL, NULL, badVerbV);
+  out = orionServe(&ci);
 
   EXPECT_STREQ(expectedBuf, out.c_str());
 
