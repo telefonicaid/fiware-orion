@@ -519,7 +519,7 @@ TEST(mongoUpdateContextGeoRequest, replaceLocAttributeWithSameLocAttribute)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", V2);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", false, V2);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -818,7 +818,7 @@ TEST(mongoUpdateContextGeoRequest, replaceNoLocAttributeWithLocAttribute)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", V2);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", false, V2);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);

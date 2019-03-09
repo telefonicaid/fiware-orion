@@ -28,9 +28,16 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-# Note that we are assuming a fixed value of 0 for days, hours and minutes, assuming that this test
-echo "1: +++++++++++++++++++++++++++++"
+
+#
+# Note that we are assuming a fixed value of 0 for days, hours and minutes, assuming that this test ...
+#
+echo "01. Getting version via REST"
+echo "============================"
 orionCurl --url "/version" --noPayloadCheck
+echo
+echo
+
 
 --REGEXPECT--
 01. Getting version via REST
@@ -53,6 +60,8 @@ Date: REGEX(.*)
   "doc" : "REGEX(.*)"
 }
 }
+
+
 
 --TEARDOWN--
 brokerStop CB
