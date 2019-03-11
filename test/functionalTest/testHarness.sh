@@ -130,7 +130,8 @@ function usage()
   echo "$empty [--keep (don't remove output files)]"
   echo "$empty [--dryrun (don't execute any tests)]"
   echo "$empty [--dir <directory>]"
-  echo "$empty [--fromIx <index of test where to start>]"
+  echo "$empty [--fromIx <index of test where to start (inclusive)>]"
+  echo "$empty [--toIx <index of test where to end (inclusive)>]"
   echo "$empty [--ixList <list of test indexes>]"
   echo "$empty [--skipList <list of indexes of test cases to be skipped>]"
   echo "$empty [--stopOnError (stop at first error encountered)]"
@@ -226,6 +227,7 @@ vMsg "$ME, in directory $SCRIPT_HOME"
 # Argument parsing
 #
 typeset -i fromIx
+typeset -i toIx
 verbose=off
 dryrun=off
 keep=off
@@ -238,6 +240,7 @@ dirGiven=no
 filterGiven=no
 showDuration=on
 fromIx=0
+toIx=0
 ixList=""
 noCache=""
 threadpool=ON
@@ -254,6 +257,7 @@ do
   elif [ "$1" == "--match" ];        then match="$2"; shift;
   elif [ "$1" == "--dir" ];          then dir="$2"; dirGiven=yes; shift;
   elif [ "$1" == "--fromIx" ];       then fromIx=$2; shift;
+  elif [ "$1" == "--toIx" ];         then toIx=$2; shift;
   elif [ "$1" == "--ixList" ];       then ixList=$2; shift;
   elif [ "$1" == "--skipList" ];     then skipList=$2; shift;
   elif [ "$1" == "--no-duration" ];  then showDuration=off;
@@ -887,6 +891,11 @@ do
   testNo=$testNo+1
 
   if [ $fromIx != 0 ] && [ $testNo -lt $fromIx ]
+  then
+    continue;
+  fi
+
+  if [ $toIx != 0 ] && [ $testNo -gt $toIx ]
   then
     continue;
   fi
