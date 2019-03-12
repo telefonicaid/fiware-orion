@@ -520,6 +520,11 @@ function localBrokerStop
 #
 function brokerStart()
 {
+  if [ "$CB_WITH_EXTERNAL_BROKER" == 1 ]
+  then
+    return
+  fi
+
   role=$1
   traceLevels=$2
   ipVersion=$3
