@@ -925,6 +925,32 @@ function mongoCmd()
 
 # ------------------------------------------------------------------------------
 #
+# mongoCmd2 - like mongoCmd but showing all the output, not just the last line.
+#             Meant to be used in conjunction with 'grep'
+#
+function mongoCmd2()
+{
+  host="${CB_DATABASE_HOST}"
+  if [ "$host" == "" ]
+  then
+    host="localhost"
+  fi
+
+  port="${CB_DATABASE_PORT}"
+  if [ "$port" == "" ]
+  then
+    port="27017"
+  fi
+
+  db=$1
+  cmd=$2
+  echo $cmd | mongo mongodb://$host:$port/$db
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
 # dbInsertEntity -
 #
 # Insert a crafted entity with an "inflated" attribute. The database is passed
@@ -1239,6 +1265,7 @@ export -f accumulatorReset
 export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd
+export -f mongoCmd2
 export -f vMsg
 export -f dMsg
 export -f valgrindSleep

@@ -160,7 +160,7 @@ static void addContextProviderAttribute
     /* Reached this point, it means that the cerV doesn't contain a proper CER, so we create it */
     ContextElementResponse* cerP            = new ContextElementResponse();
 
-    cerP->entity.fill(enP->id, enP->type, "false");
+    cerP->entity.fill(enP->id, enP->type, enP->isPattern);
     cerP->statusCode.fill(SccOk);
 
     ContextAttribute* caP = new ContextAttribute(craP->name, "", "");
@@ -333,6 +333,7 @@ HttpStatusCode mongoQueryContext
   ContextElementResponseVector rawCerV;
 
   reqSemTake(__FUNCTION__, "ngsi10 query request", SemReadOp, &reqSemTaken);
+
   ok = entitiesQuery(requestP->entityIdVector,
                      requestP->attributeList,
                      requestP->restriction,
@@ -388,7 +389,7 @@ HttpStatusCode mongoQueryContext
     crrV.release();
   }
 
-  /* Second CPr lookup (in the case some element stills not being found): looking in E-<null> registrations */
+  /* Second CPr lookup (in the case some elements still not being found): looking in E-<null> registrations */
   StringList attrNullList;
 
   if (someContextElementNotFound(rawCerV))
@@ -405,7 +406,7 @@ HttpStatusCode mongoQueryContext
   }
 
   /* Special case: request with <null> attributes. In that case, entitiesQuery() may have captured some local attribute, but
-   * the list need to be completed. Note that in the case of having this request someContextElementNotFound() is always false
+   * the list needs to be completed. Note that in the case of having this request someContextElementNotFound() is always false
    * so we efficient not invoking registrationQuery() too much times
    */
   if (requestP->attributeList.size() == 0)
