@@ -1894,7 +1894,7 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
    *   isPattern = true is allowed as APIv2 registrations support entity ID as wildcard.
    *   See issue #3458
    */
-  en.isPattern = entity.hasField(REG_ENTITY_ISPATTERN) ? getStringFieldF(entity, REG_ENTITY_ISPATTERN) : "";
+  en.isPattern = entity.hasField(REG_ENTITY_ISPATTERN) ? getStringFieldF(entity, REG_ENTITY_ISPATTERN) : "false";
 
   if (includedEntity(en, enV))
   {
