@@ -925,10 +925,10 @@ function mongoCmd()
 
 # ------------------------------------------------------------------------------
 #
-# mongoCmd2 - like mongoCmd but showing all the output, not just the last line.
-#             Meant to be used in conjunction with 'grep'
+# mongoCmdLong - like mongoCmd but showing all the output, not just the last line.
+#                Meant to be used in conjunction with 'grep'
 #
-function mongoCmd2()
+function mongoCmdLong()
 {
   host="${CB_DATABASE_HOST}"
   if [ "$host" == "" ]
@@ -1265,7 +1265,7 @@ export -f accumulatorReset
 export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd
-export -f mongoCmd2
+export -f mongoCmdLong
 export -f vMsg
 export -f dMsg
 export -f valgrindSleep

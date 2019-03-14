@@ -139,7 +139,7 @@ function usage()
   echo "$empty [--noCache (force broker to be started with the option --noCache)]"
   echo "$empty [--cache (force broker to be started without the option --noCache)]"
   echo "$empty [--noThreadpool (do not use a threadpool, unless specified by a test case. If not set, a thread pool of 200:20 is used by default in test cases which do not set notificationMode options)]"
-  echo "$empty [--xbroker (use an external broker)]"
+  echo "$empty [--xbroker (use external brokers, i.e. this script will *not* start any brokers, including context providers)]"
   echo "$empty [ <directory or file> ]*"
   echo
   echo "* Please note that if a directory is passed as parameter, its entire path must be given, not only the directory-name"

@@ -72,7 +72,7 @@ echo
 
 echo "02. See the registration in mongo"
 echo "================================="
-mongoCmd2 ${CB_DB_NAME} "db.registrations.findOne()"
+mongoCmdLong ${CB_DB_NAME} "db.registrations.findOne()"
 echo
 echo
 
