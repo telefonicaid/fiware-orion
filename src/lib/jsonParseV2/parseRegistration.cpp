@@ -51,34 +51,68 @@ static bool dataProvidedParse
   ConnectionInfo*          ciP,
   ngsiv2::DataProvided*    dataProvidedP,
   const rapidjson::Value&  dataProvided,
-  std::string*             errorStringP
+  OrionError*              oeP
 )
 {
   if (!dataProvided.IsObject())
   {
-    *errorStringP = "/dataProvided/ must be a JSON object";
+    ciP->httpStatusCode = SccBadRequest;
+    oeP->code           = SccBadRequest;
+    oeP->reasonPhrase   = "BadRequest";
+    oeP->details        = "/dataProvided/ must be a JSON object";
+
     return false;
   }
 
   if (dataProvided.ObjectEmpty())
   {
-    *errorStringP = "/dataProvided/ is empty";
+    ciP->httpStatusCode = SccBadRequest;
+    oeP->code           = SccBadRequest;
+    oeP->reasonPhrase   = "BadRequest";
+    oeP->details        = "/dataProvided/ is empty";
+
     return false;
   }
 
   if (dataProvided.HasMember("entities"))
   {
-    bool b = parseEntitiesVector(ciP, &dataProvidedP->entities, dataProvided["entities"], errorStringP);
+    bool b = parseEntitiesVector(ciP, &dataProvidedP->entities, dataProvided["entities"], &oeP->details);
     if (b == false)
     {
+      ciP->httpStatusCode = SccBadRequest;
+      oeP->code           = SccBadRequest;
+      oeP->reasonPhrase   = "BadRequest";
+
+      return false;
+    }
+  }
+
+  //
+  // If idPattern is used, it MUST be ".*", else: Error
+  //
+  for (unsigned int eIx = 0; eIx < dataProvidedP->entities.size(); ++eIx)
+  {
+    ngsiv2::EntID* eP = &dataProvidedP->entities[eIx];
+
+    if ((eP->idPattern != "") && (eP->idPattern != ".*"))
+    {
+      ciP->httpStatusCode = SccNotImplemented;
+      oeP->code           = SccNotImplemented;
+      oeP->reasonPhrase   = "NotImplemented";
+      oeP->details        = "Unsupported idPattern";
+
       return false;
     }
   }
 
   if (dataProvided.HasMember("attrs"))
   {
-    if (!parseStringVector(&dataProvidedP->attributes, dataProvided["attrs"], "attrs", true, true, errorStringP))
+    if (!parseStringVector(&dataProvidedP->attributes, dataProvided["attrs"], "attrs", true, true, &oeP->details))
     {
+      ciP->httpStatusCode = SccBadRequest;
+      oeP->code           = SccBadRequest;
+      oeP->reasonPhrase   = "BadRequest";
+
       return false;
     }
   }
@@ -247,6 +281,7 @@ std::string parseRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP)
 {
   std::string          errorString;
   rapidjson::Document  document;
+  OrionError           oe;
 
   document.Parse(ciP->payload);
 
@@ -300,9 +335,9 @@ std::string parseRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP)
 
   const rapidjson::Value& dataProvided = document["dataProvided"];
 
-  if (dataProvidedParse(ciP, &regP->dataProvided, dataProvided, &errorString) == false)
+  if (dataProvidedParse(ciP, &regP->dataProvided, dataProvided, &oe) == false)
   {
-    return badInput(ciP, errorString);
+    return oe.toJson();
   }
 
 

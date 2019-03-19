@@ -124,14 +124,12 @@ MongoDB server version: REGEX(.*)
 				{
 					"id" : ".*",
 					"isPattern" : "true",
-					"type" : "Weather",
-					"isTypePattern" : false
+					"type" : "Weather"
 				},
 				{
 					"id" : ".*",
 					"isPattern" : "true",
-					"type" : "OffStreetParking",
-					"isTypePattern" : false
+					"type" : "OffStreetParking"
 				}
 			],
 			"attrs" : [
