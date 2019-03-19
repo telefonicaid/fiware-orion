@@ -25,7 +25,9 @@ Entity ID and ID Pattern must not be lost in forwarded queries (issue #3458)
 
 --SHELL-INIT--
 dbInit CB
+dbInit CP1
 brokerStart CB
+brokerStart CP1
 accumulatorStart --pretty-print
 
 --SHELL--
@@ -36,6 +38,11 @@ accumulatorStart --pretty-print
 # 03. GET the registration to check it's correct
 # 04. Query all the Weather entities - only to provoke the query being forwarded to the accumulator
 # 05. Dump accumulator requests
+# 06. Register entities of type Weather2|OffStreetParking2, with ID .*, and three attributes, for CPr1
+# 07. Create Weather2 entity with availableSpotNumber in CPr1
+# 08. Create OffStreetParking2 entity with temperature and humidity in CPr1
+# 09. Query all the Weather2 entities, and see the one from CPr1
+# 10. Query all the OffStreetParking2 entities, and see the one from CPr1
 #
 
 echo "01. Register entities of type Weather|OffStreetParking, with ID .*, and three attributes"
@@ -94,6 +101,83 @@ echo
 echo "05. Dump accumulator requests"
 echo "============================="
 accumulatorDump
+echo
+echo
+
+
+echo "06. Register entities of type Weather2|OffStreetParking2, with ID .*, and three attributes, for CPr1"
+echo "===================================================================================================="
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "Weather2",
+        "idPattern": ".*"
+      },
+      {
+        "type": "OffStreetParking2",
+        "idPattern": ".*"
+      }
+    ],
+    "attrs": [
+      "temperature",
+      "humidity",
+      "availableSpotNumber"
+    ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v1"
+    },
+    "legacyForwarding": true
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "07. Create Weather2 entity with availableSpotNumber in CPr1"
+echo "==========================================================="
+payload='{
+  "id": "w2",
+  "type": "Weather2",
+  "availableSpotNumber": {
+    "value": 5
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "08. Create OffStreetParking2 entity with temperature and humidity in CPr1"
+echo "========================================================================="
+payload='{
+  "id": "op2",
+  "type": "OffStreetParking2",
+  "temperature": {
+    "value": 28
+  },
+  "humidity": {
+    "value": 55
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "09. Query all the Weather2 entities, and see the one from CPr1"
+echo "=============================================================="
+orionCurl --url /v2/entities?type=Weather2
+echo
+echo
+
+
+echo "10. Query all the OffStreetParking2 entities, and see the one from CPr1"
+echo "======================================================================="
+orionCurl --url /v2/entities?type=OffStreetParking2
 echo
 echo
 
@@ -233,6 +317,84 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
+06. Register entities of type Weather2|OffStreetParking2, with ID .*, and three attributes, for CPr1
+====================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Create Weather2 entity with availableSpotNumber in CPr1
+===========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/w2?type=Weather2
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Create OffStreetParking2 entity with temperature and humidity in CPr1
+=========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/op2?type=OffStreetParking2
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. Query all the Weather2 entities, and see the one from CPr1
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 97
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "availableSpotNumber": {
+            "metadata": {}, 
+            "type": "Number", 
+            "value": "5"
+        }, 
+        "id": "w2", 
+        "type": "Weather2"
+    }
+]
+
+
+10. Query all the OffStreetParking2 entities, and see the one from CPr1
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 156
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "humidity": {
+            "metadata": {}, 
+            "type": "Number", 
+            "value": "55"
+        }, 
+        "id": "op2", 
+        "temperature": {
+            "metadata": {}, 
+            "type": "Number", 
+            "value": "28"
+        }, 
+        "type": "OffStreetParking2"
+    }
+]
+
+
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
+dbDrop CP1

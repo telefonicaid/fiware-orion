@@ -150,7 +150,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
     return false;
   }
 
-  LM_T(LmtCPrForwardRequestPayload, ("forward queryContext response payload: %s", out.c_str()));
+  LM_T(LmtCPrForwardResponsePayload, ("forward queryContext response payload: %s", out.c_str()));
 
 
   //
@@ -272,7 +272,7 @@ std::string postQueryContext
   ParseData*                 parseDataP
 )
 {
-  LM_T(LmtCPrForwardRequestPayload, ("In postQueryContext: Forwarding ... ?"));
+  LM_T(LmtForward, ("In postQueryContext: Forwarding ... ?"));
 
   //
   // Convops calling this routine may need the response in digital
@@ -337,19 +337,19 @@ std::string postQueryContext
   //
   // <DEBUG>
   //
-  LM_T(LmtCPrForwardRequestPayload, ("Forward: Response from mongoQueryContext:"));
-  LM_T(LmtCPrForwardRequestPayload, ("Forward: --------------------------------"));
+  LM_T(LmtForward, ("Response from mongoQueryContext:"));
+  LM_T(LmtForward, ("--------------------------------"));
 
   for (unsigned int ix = 0; ix < qcrsP->contextElementResponseVector.size(); ++ix)
   {
     Entity* eP = &qcrsP->contextElementResponseVector[ix]->entity;
 
-    LM_T(LmtCPrForwardRequestPayload, ("Forward: Entity: '%s'/'%s'/'%s'/'%s'", eP->id.c_str(), eP->isPattern.c_str(), eP->type.c_str(), FT(eP->isTypePattern)));
+    LM_T(LmtForward, ("Entity: '%s'/'%s'/'%s'/'%s'", eP->id.c_str(), eP->isPattern.c_str(), eP->type.c_str(), FT(eP->isTypePattern)));
 
     if (eP->providingApplicationList.size() != 0)
     {
       for (unsigned int paIx = 0; paIx < eP->providingApplicationList.size(); paIx++)
-        LM_T(LmtCPrForwardRequestPayload, ("Forward: Entity PA: %s", eP->providingApplicationList[paIx].string.c_str()));
+        LM_T(LmtForward, ("Entity PA: %s", eP->providingApplicationList[paIx].string.c_str()));
     }
 
     for (unsigned int aIx = 0; aIx < eP->attributeVector.size(); aIx++)
@@ -357,9 +357,9 @@ std::string postQueryContext
       ContextAttribute* aP = eP->attributeVector[aIx];
 
       if (aP->providingApplication.string != "")
-        LM_T(LmtCPrForwardRequestPayload, ("Forward: Attribute %d: %s (Providing Application: %s)", aIx, aP->name.c_str(), aP->providingApplication.string.c_str()));
+        LM_T(LmtForward, ("Attribute %d: %s (Providing Application: %s)", aIx, aP->name.c_str(), aP->providingApplication.string.c_str()));
       else
-        LM_T(LmtCPrForwardRequestPayload, ("Forward: Attribute %d: %s (No Providing Application)", aIx, aP->name.c_str()));
+        LM_T(LmtForward, ("Attribute %d: %s (No Providing Application)", aIx, aP->name.c_str()));
     }
   }
   //
@@ -394,13 +394,13 @@ std::string postQueryContext
   //
   if (forwardsPending(qcrsP) == false)
   {
-    LM_T(LmtCPrForwardRequestPayload, ("No Forwarding necessary"));
+    LM_T(LmtForward, ("No Forwarding necessary"));
     TIMED_RENDER(answer = qcrsP->toJsonV1(asJsonObject));
 
     qcrP->release();
     return answer;
   }
-  LM_T(LmtCPrForwardRequestPayload, ("Requests to be Forwarded"));
+  LM_T(LmtForward, ("Requests to be Forwarded"));
 
   //
   // 03. Complex case (queries to be forwarded)

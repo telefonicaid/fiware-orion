@@ -291,14 +291,78 @@ static void processGenericEntities
 
 /* ****************************************************************************
 *
-* mongoQueryContext - 
+* cerVectorPresent -
+*/
+void cerVectorPresent(const char* what, ContextElementResponseVector& cerV)
+{
+  LM_T(LmtForward, ("%s: got a CER vector of %d items", what, cerV.size()));
+  LM_T(LmtForward, ("-------------------------------------------------------------"));
+
+  for (unsigned int ix = 0; ix < cerV.size(); ++ix)
+  {
+    Entity* eP = &cerV[ix]->entity;
+
+    LM_T(LmtForward, ("CER %d:", ix));
+    LM_T(LmtForward, ("  id: %s, type: %s", eP->id.c_str(), eP->type.c_str()));
+
+    LM_T(LmtForward, ("  %d attributes:", eP->attributeVector.size()));
+    for (unsigned int aIx = 0; aIx < eP->attributeVector.size(); aIx++)
+    {
+      ContextAttribute* aP = eP->attributeVector[aIx];
+
+      LM_T(LmtForward, ("      o %s", aP->name.c_str()));
+    }
+    LM_T(LmtForward, ("============================================================================"));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* crrVectorPresent -
+*/
+void crrVectorPresent(const char* what, ContextRegistrationResponseVector& crrV)
+{
+  LM_T(LmtForward, ("%s: got a CRR vector of %d items", what, crrV.size()));
+  LM_T(LmtForward, ("-------------------------------------------------------------"));
+  for (unsigned int ix = 0; ix < crrV.size(); ++ix)
+  {
+    ContextRegistration* crP = &crrV[ix]->contextRegistration;
+
+    LM_T(LmtForward, ("For providingApplication %s:", crP->providingApplication.string.c_str()));
+    LM_T(LmtForward, ("  - %d entities:", crP->entityIdVector.size()));
+    for (unsigned int eIx = 0; eIx < crP->entityIdVector.size(); ++eIx)
+    {
+      EntityId* eP = crP->entityIdVector[eIx];
+
+      LM_T(LmtForward, ("      o %s (type: '%s')", eP->id.c_str(), eP->type.c_str()));
+    }
+
+    LM_T(LmtForward, (" - - - - - -"));
+    LM_T(LmtForward, ("  - %d attributes:", crP->contextRegistrationAttributeVector.size()));
+    for (unsigned int aIx = 0; aIx < crP->contextRegistrationAttributeVector.size(); ++aIx)
+    {
+      ContextRegistrationAttribute* aP = crP->contextRegistrationAttributeVector[aIx];
+
+      LM_T(LmtForward, ("      o %s", aP->name.c_str()));
+    }
+    LM_T(LmtForward, ("============================================================================"));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoQueryContext -
 *
 * NOTE
 *   If the in/out-parameter countP is non-NULL then the number of matching entities
 *   must be returned in *countP.
 *
 *   This replaces the 'uriParams[URI_PARAM_PAGINATION_DETAILS]' way of passing this information.
-*   The old method was one-way, using the new method 
+*   The old method was one-way, using the new method
 */
 HttpStatusCode mongoQueryContext
 (
@@ -363,8 +427,10 @@ HttpStatusCode mongoQueryContext
   /* In the case of empty response, if only generic processing is needed */
   if (rawCerV.size() == 0)
   {
+    LM_T(LmtForward, ("Calling registrationsQuery I"));
     if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
+      // crrVectorPresent("registrationsQuery I", crrV);
       if (crrV.size() > 0)
       {
         processGenericEntities(requestP->entityIdVector, rawCerV, crrV, limitReached);
@@ -377,8 +443,10 @@ HttpStatusCode mongoQueryContext
   /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
   if (someContextElementNotFound(rawCerV))
   {
+    LM_T(LmtForward, ("Calling registrationsQuery II"));
     if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
+      // crrVectorPresent("registrationsQuery II", crrV);
       if (crrV.size() > 0)
       {
         fillContextProviders(rawCerV, crrV);
@@ -394,8 +462,10 @@ HttpStatusCode mongoQueryContext
 
   if (someContextElementNotFound(rawCerV))
   {
+    LM_T(LmtForward, ("Calling registrationsQuery III"));
     if (registrationsQuery(requestP->entityIdVector, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
+      // crrVectorPresent("registrationsQuery III", crrV);
       if (crrV.size() > 0)
       {
         fillContextProviders(rawCerV, crrV);
@@ -411,8 +481,10 @@ HttpStatusCode mongoQueryContext
    */
   if (requestP->attributeList.size() == 0)
   {
+    LM_T(LmtForward, ("Calling registrationsQuery IV"));
     if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
+      // crrVectorPresent("registrationsQuery IV", crrV);
       if (crrV.size() > 0)
       {
         addContextProviders(rawCerV, crrV, limitReached);
@@ -423,7 +495,11 @@ HttpStatusCode mongoQueryContext
   }
 
   /* Prune "not found" CERs */
+  LM_T(LmtForward, ("Before pruning, we have %d elements in rawCerV", rawCerV.size()));
+  // cerVectorPresent("Before pruning", rawCerV);
   pruneContextElements(rawCerV, &responseP->contextElementResponseVector);
+  // cerVectorPresent("After pruning", rawCerV);
+  LM_T(LmtForward, ("After pruning, we have %d elements in contextElementResponseVector", responseP->contextElementResponseVector.size()));
 
   /* Pagination stuff */
   if (responseP->contextElementResponseVector.size() == 0)
