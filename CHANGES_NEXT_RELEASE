@@ -1,1 +1,1 @@
-o Wildcards can now be used as Entity Id in registrations (#3458)
+- Fix: idPattern '.*' is now allowed in NGSIv2 registrations (#3458)

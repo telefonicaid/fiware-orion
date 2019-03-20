@@ -334,7 +334,8 @@ for the following aspects:
 * `PATCH /v2/registration/<id>` is not implemented. Thus, registrations cannot be updated
   directly. I.e., updates must be done deleting and re-creating the registration. Please
   see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3007) about this.
-* `idPattern` and `typePattern` are not implemented.
+* `idPattern` is supported but only for the exact regular expression `.*`
+* `typePattern` is not implemented.
 * The only valid `supportedForwardingMode` is `all`. Trying to use any other value will end
   in a 501 Not Implemented error response. Please
   see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3106) about this.
