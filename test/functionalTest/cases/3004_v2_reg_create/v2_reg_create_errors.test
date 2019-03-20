@@ -78,6 +78,7 @@ brokerStart CB 0-255 IPv4 -statCounters
 # 47. supportedForwardingMode set to 'query'
 # 48. supportedForwardingMode set to 'update'
 # 49. dataProvided:entities:entity:idPattern too complex
+# 50. dataProvided:entities:entity:typePattern is used (it's not supported)
 #
 
 
@@ -996,6 +997,31 @@ echo
 echo
 
 
+echo "50. dataProvided:entities:entity:typePattern is used (it's not supported)"
+echo "========================================================================="
+payload='{
+  "description": "DESC",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "typePattern": ".*"
+      }
+    ],
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    },
+    "legacyForwarding": true
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
 --REGEXPECT--
 01. Invalid JSON in payload
 ===========================
@@ -1679,6 +1705,20 @@ Date: REGEX(.*)
 
 {
     "description": "Unsupported idPattern",
+    "error": "NotImplemented"
+}
+
+
+50. dataProvided:entities:entity:typePattern is used (it's not supported)
+=========================================================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 71
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "typePattern is not supported", 
     "error": "NotImplemented"
 }
 

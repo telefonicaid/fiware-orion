@@ -127,13 +127,21 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
     }
 
     if ((entityIsPattern == "false") && (entityTypeIsPattern == false))
+    {
       entities.append(BSON(REG_ENTITY_ID << entityId << REG_ENTITY_TYPE << entityType));
+    }
     else if (entityIsPattern == "false")
+    {
       entities.append(BSON(REG_ENTITY_ID << entityId << REG_ENTITY_TYPE << entityType << REG_ENTITY_ISTYPEPATTERN << entityTypeIsPattern));
+    }
     else if (entityTypeIsPattern == false)
+    {
       entities.append(BSON(REG_ENTITY_ID << entityId << REG_ENTITY_ISPATTERN << entityIsPattern << REG_ENTITY_TYPE << entityType));
+    }
     else
+    {
       entities.append(BSON(REG_ENTITY_ID << entityId << REG_ENTITY_ISPATTERN << entityIsPattern << REG_ENTITY_TYPE << entityType << REG_ENTITY_ISTYPEPATTERN << entityTypeIsPattern));
+    }
   }
 
   for (unsigned int aIx = 0; aIx < regP->dataProvided.attributes.size(); ++aIx)

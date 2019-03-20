@@ -1882,19 +1882,9 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
 {
   EntityId en;
 
-  en.id   = getStringFieldF(entity, REG_ENTITY_ID);
-  en.type = entity.hasField(REG_ENTITY_TYPE) ? getStringFieldF(entity, REG_ENTITY_TYPE) : "";
-
-  /*
-   * Old Comment:
-   *   isPattern = true is not allowed in registrations so it is not in the
-   *   document retrieved with the query; however we will set it to be formally correct with NGSI spec
-   *
-   * New Comment:
-   *   isPattern = true is allowed as APIv2 registrations support entity ID as wildcard.
-   *   See issue #3458
-   */
-  en.isPattern = entity.hasField(REG_ENTITY_ISPATTERN) ? getStringFieldF(entity, REG_ENTITY_ISPATTERN) : "false";
+  en.id        = getStringFieldF(entity, REG_ENTITY_ID);
+  en.type      = entity.hasField(REG_ENTITY_TYPE)?      getStringFieldF(entity, REG_ENTITY_TYPE)      : "";
+  en.isPattern = entity.hasField(REG_ENTITY_ISPATTERN)? getStringFieldF(entity, REG_ENTITY_ISPATTERN) : "false";
 
   if (includedEntity(en, enV))
   {
@@ -2127,6 +2117,8 @@ bool registrationsQuery
       continue;
     }
     docs++;
+
+    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
     LM_T(LmtForward, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     MimeType                  mimeType = JSON;

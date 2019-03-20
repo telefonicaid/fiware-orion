@@ -88,7 +88,8 @@ static bool dataProvidedParse
   }
 
   //
-  // If idPattern is used, it MUST be ".*", else: Error
+  // If idPattern is used, it MUST be ".*", else: Error 501
+  // If any type-pattern is used: Error 501
   //
   for (unsigned int eIx = 0; eIx < dataProvidedP->entities.size(); ++eIx)
   {
@@ -98,8 +99,18 @@ static bool dataProvidedParse
     {
       ciP->httpStatusCode = SccNotImplemented;
       oeP->code           = SccNotImplemented;
-      oeP->reasonPhrase   = "NotImplemented";
-      oeP->details        = "Unsupported idPattern";
+      oeP->reasonPhrase   = ERROR_NOTIMPLEMENTED;
+      oeP->details        = ERROR_IDPATTERN_NOTSUPPORTED;
+
+      return false;
+    }
+
+    if (eP->typePattern != "")
+    {
+      ciP->httpStatusCode = SccNotImplemented;
+      oeP->code           = SccNotImplemented;
+      oeP->reasonPhrase   = ERROR_NOTIMPLEMENTED;
+      oeP->details        = ERROR_TYPEPATTERN_NOTIMPLEMENTED;
 
       return false;
     }
