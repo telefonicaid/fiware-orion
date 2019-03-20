@@ -293,7 +293,7 @@ static void processGenericEntities
 *
 * cerVectorPresent -
 */
-void cerVectorPresent(const char* what, ContextElementResponseVector& cerV)
+void cerVectorPresent(const char* what, const ContextElementResponseVector& cerV)
 {
   LM_T(LmtForward, ("%s: got a CER vector of %d items", what, cerV.size()));
   LM_T(LmtForward, ("-------------------------------------------------------------"));
@@ -322,7 +322,7 @@ void cerVectorPresent(const char* what, ContextElementResponseVector& cerV)
 *
 * crrVectorPresent -
 */
-void crrVectorPresent(const char* what, ContextRegistrationResponseVector& crrV)
+void crrVectorPresent(const char* what, const ContextRegistrationResponseVector& crrV)
 {
   LM_T(LmtForward, ("%s: got a CRR vector of %d items", what, crrV.size()));
   LM_T(LmtForward, ("-------------------------------------------------------------"));
