@@ -398,7 +398,7 @@ This CLI option is called `--xbroker`.
 Please take into account a couple of remarks regarding the `--xbroker` switch:
 
 * It is only supported for a **single test case**, i.e., you have to run `testHarness.sh` with a test file as parameter.
-* It doesn't start **any** of the contextBrokers involved in the tests (main context broker and brokers serving as context providers). In some cases, you may need to debug only one of the brokers, letting the other brokers be started by the functional test suite. In such a case, `--xbroker` should **not** be used - instead edit the .test file and comment out the `brokerStart` (and corresopnding`brokerStop` lines) you need to disable (amd remember to revert the changes afterwards!).
+* It doesn't start **any** of the contextBrokers involved in the tests (main context broker and brokers serving as context providers). In some cases, you may need to debug only one of the brokers, letting the other brokers be started by the functional test suite. In such a case, `--xbroker` should **not** be used - instead edit the .test file and comment out the `brokerStart` (and corresponding`brokerStop` lines) you need to disable (and remember to revert the changes afterwards!).
 
 Before running `testHarness.sh` you must start your "external contextBroker", running under gdb, valgrind or whatever program you prefer
 for debugging.
