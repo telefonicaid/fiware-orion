@@ -1,1 +1,2 @@
 - Fix: idPattern '.*' is now allowed in NGSIv2 registrations (#3458)
+- Add: Forwarded queries work for registrations using idPattern == '.*', but only for simple cases (#3458)
