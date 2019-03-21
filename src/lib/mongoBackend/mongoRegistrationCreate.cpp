@@ -114,33 +114,29 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
 
   for (unsigned int eIx = 0; eIx < regP->dataProvided.entities.size(); ++eIx)
   {
-    ngsiv2::EntID* eP                  = &regP->dataProvided.entities[eIx];
-    std::string    entityId            = (eP->id          != "")? eP->id : eP->idPattern;
-    std::string    entityIsPattern     = (eP->idPattern   != "")? "true" : "false";
-    std::string    entityType          = (eP->type        != "")? eP->type : eP->typePattern;
-    bool           entityTypeIsPattern = (eP->typePattern != "")? true : false;
+    ngsiv2::EntID* eP = &regP->dataProvided.entities[eIx];
 
-    if (entityType == "")  // No entity type given - all types match
+    if (eP->idPattern == "false")
     {
-      entityType = ".*";
-      entityTypeIsPattern = true;
-    }
-
-    if ((entityIsPattern == "false") && (entityTypeIsPattern == false))
-    {
-      entities.append(BSON(REG_ENTITY_ID << entityId << REG_ENTITY_TYPE << entityType));
-    }
-    else if (entityIsPattern == "false")
-    {
-      entities.append(BSON(REG_ENTITY_ID << entityId << REG_ENTITY_TYPE << entityType << REG_ENTITY_ISTYPEPATTERN << entityTypeIsPattern));
-    }
-    else if (entityTypeIsPattern == false)
-    {
-      entities.append(BSON(REG_ENTITY_ID << entityId << REG_ENTITY_ISPATTERN << entityIsPattern << REG_ENTITY_TYPE << entityType));
+      if (eP->type == "")
+      {
+        entities.append(BSON(REG_ENTITY_ID << eP->id));
+      }
+      else
+      {
+        entities.append(BSON(REG_ENTITY_ID << eP->id << REG_ENTITY_TYPE << eP->type));
+      }
     }
     else
     {
-      entities.append(BSON(REG_ENTITY_ID << entityId << REG_ENTITY_ISPATTERN << entityIsPattern << REG_ENTITY_TYPE << entityType << REG_ENTITY_ISTYPEPATTERN << entityTypeIsPattern));
+      if (eP->type == "")
+      {
+        entities.append(BSON(REG_ENTITY_ID << eP->idPattern << REG_ENTITY_ISPATTERN << "true"));
+      }
+      else
+      {
+        entities.append(BSON(REG_ENTITY_ID << eP->idPattern << REG_ENTITY_ISPATTERN << "true" << REG_ENTITY_TYPE << eP->type));
+      }
     }
   }
 
