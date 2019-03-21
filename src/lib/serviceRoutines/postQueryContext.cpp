@@ -337,6 +337,8 @@ std::string postQueryContext
   //
   // <DEBUG>
   //
+  // FIXME: This debug block should be removed once forwards works the way it should.
+  //
   LM_T(LmtForward, ("Response from mongoQueryContext:"));
   LM_T(LmtForward, ("--------------------------------"));
 
