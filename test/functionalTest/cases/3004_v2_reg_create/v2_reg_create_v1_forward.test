@@ -33,11 +33,10 @@ brokerStart CP1
 
 #
 # 01. Register entity E1/A1 (using APIv2) for CP1
-# 02. See the registration in mongo
-# 03. Create E1/A1 in CP1
-# 04. GET E1/A1 from main broker (forward made to CP1)
-# 05. UPDATE E1/A1 in main broker (forward made to CP1)
-# 06. GET E1/A1 directly from CP1, make sure updates are there
+# 02. Create E1/A1 in CP1
+# 03. GET E1/A1 from main broker (forward made to CP1)
+# 04. UPDATE E1/A1 in main broker (forward made to CP1)
+# 05. GET E1/A1 directly from CP1, make sure updates are there
 #
 # FIXME: Add test case for v2 forwarding once v2 forwarding is implemented
 #
@@ -68,14 +67,7 @@ echo
 echo
 
 
-echo "02. See the registration in mongo"
-echo "================================="
-mongoCmdLong ${CB_DB_NAME} "db.registrations.findOne()"
-echo
-echo
-
-
-echo "03. Create E1/A1 in CP1"
+echo "02. Create E1/A1 in CP1"
 echo "======================="
 payload='{
   "id": "E1",
@@ -89,14 +81,14 @@ echo
 echo
 
 
-echo "04. GET E1/A1 from main broker (forward made to CP1)"
+echo "03. GET E1/A1 from main broker (forward made to CP1)"
 echo "===================================================="
 orionCurl --url '/v2/entities/E1?type=T1'
 echo
 echo
 
 
-echo "05. UPDATE E1/A1 in main broker (forward made to CP1)"
+echo "04. UPDATE E1/A1 in main broker (forward made to CP1)"
 echo "====================================================="
 payload='{
   "A1": {
@@ -108,7 +100,7 @@ echo
 echo
 
 
-echo "06. GET E1/A1 directly from CP1, make sure updates are there"
+echo "05. GET E1/A1 directly from CP1, make sure updates are there"
 echo "============================================================"
 orionCurl --url /v2/entities/E1 --port $CP1_PORT
 echo
@@ -126,40 +118,7 @@ Date: REGEX(.*)
 
 
 
-02. See the registration in mongo
-=================================
-MongoDB shell version REGEX(.*)
-connecting to: mongodb://localhost:27017/ftest
-MongoDB server version: REGEX(.*)
-{
-	"_id" : REGEX(.*),
-	"description" : "located in CP1",
-	"expiration" : REGEX(.*),
-	"servicePath" : "/",
-	"contextRegistration" : [
-		{
-			"entities" : [
-				{
-					"id" : "E1",
-					"type" : "T1"
-				}
-			],
-			"attrs" : [
-				{
-					"name" : "A1",
-					"type" : ""
-				}
-			],
-			"providingApplication" : "http://localhost:REGEX(\d+)/v1"
-		}
-	],
-	"status" : "active",
-	"format" : "JSON"
-}
-bye
-
-
-03. Create E1/A1 in CP1
+02. Create E1/A1 in CP1
 =======================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -169,7 +128,7 @@ Date: REGEX(.*)
 
 
 
-04. GET E1/A1 from main broker (forward made to CP1)
+03. GET E1/A1 from main broker (forward made to CP1)
 ====================================================
 HTTP/1.1 200 OK
 Content-Length: 78
@@ -188,7 +147,7 @@ Date: REGEX(.*)
 }
 
 
-05. UPDATE E1/A1 in main broker (forward made to CP1)
+04. UPDATE E1/A1 in main broker (forward made to CP1)
 =====================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -197,7 +156,7 @@ Date: REGEX(.*)
 
 
 
-06. GET E1/A1 directly from CP1, make sure updates are there
+05. GET E1/A1 directly from CP1, make sure updates are there
 ============================================================
 HTTP/1.1 200 OK
 Content-Length: 76
