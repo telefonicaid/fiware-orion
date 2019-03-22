@@ -139,6 +139,7 @@ function usage()
   echo "$empty [--noCache (force broker to be started with the option --noCache)]"
   echo "$empty [--cache (force broker to be started without the option --noCache)]"
   echo "$empty [--noThreadpool (do not use a threadpool, unless specified by a test case. If not set, a thread pool of 200:20 is used by default in test cases which do not set notificationMode options)]"
+  echo "$empty [--xbroker (use external brokers, i.e. this script will *not* start any brokers, including context providers)]"
   echo "$empty [ <directory or file> ]*"
   echo
   echo "* Please note that if a directory is passed as parameter, its entire path must be given, not only the directory-name"
@@ -244,6 +245,7 @@ toIx=0
 ixList=""
 noCache=""
 threadpool=ON
+xbroker=off
 
 vMsg "parsing options"
 while [ "$#" != 0 ]
@@ -264,6 +266,7 @@ do
   elif [ "$1" == "--noCache" ];      then noCache=ON;
   elif [ "$1" == "--cache" ];        then noCache=OFF;
   elif [ "$1" == "--noThreadpool" ]; then threadpool=OFF;
+  elif [ "$1" == "--xbroker" ];      then xbroker=ON;
   else
     if [ "$dirOrFile" == "" ]
     then
@@ -302,6 +305,8 @@ then
   export CB_THREADPOOL=$threadpool
 fi
 
+
+
 # ------------------------------------------------------------------------------
 #
 # Check unmatching --dir and 'parameter that is a directory' AND
@@ -311,6 +316,7 @@ fi
 # 2. Else, it must be a file, or a filter.
 #    If the 
 #
+singleFile=No
 if [ "$dirOrFile" != "" ]
 then
   vMsg dirOrFile: $dirOrFile
@@ -334,6 +340,7 @@ then
       exit 1
     fi
 
+    singleFile=Yes
     #
     # If just a filename is given, keep the directory as is.
     # If a whole path is given, use the directory-part as directory and the file-part as filter
@@ -360,6 +367,20 @@ then
   fi
 fi
 
+#
+# The option of running against an external broker "--xbroker" only works (for now, at least) with a single test case.
+# Strange things may happen (due to the state inside the broker) if more that one test case are launched.
+# This check avoid this situation.
+#
+# If in the future we want to be able to run more than one test case against an external broker, we'd need to make sure
+# that each test case undoes all internal state inside the external broker. E.g. delete subscriptions, entities, etc.
+#
+if [ "$singleFile" == "No" ] && [ "$xbroker" == "ON" ]
+then
+    echo "External broker can only be used with individual test cases"
+    exit 1
+fi
+
 vMsg directory: $dir
 vMsg testFilter: $testFilter
 vMsg "Script in $SCRIPT_HOME"
@@ -371,6 +392,18 @@ vMsg "Script in $SCRIPT_HOME"
 # Other global variables
 #
 toBeStopped=false
+
+
+
+# ------------------------------------------------------------------------------
+#
+# xbroker - if this CLI is set, then the broker is not to be started as part of
+#           the test suite - another broker is assumed to be running already
+#
+if [ "$xbroker" == "ON" ]
+then
+    export CB_WITH_EXTERNAL_BROKER=1
+fi
 
 
 

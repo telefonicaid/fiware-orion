@@ -1,0 +1,400 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity ID and ID Pattern must not be lost in forwarded queries (issue #3458)
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+brokerStart CB
+brokerStart CP1
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Register entities of type Weather|OffStreetParking, with ID .*, and three attributes
+# 02. See the registration in mongo
+# 03. GET the registration to check it's correct
+# 04. Query all the Weather entities - only to provoke the query being forwarded to the accumulator
+# 05. Dump accumulator requests
+# 06. Register entities of type Weather2|OffStreetParking2, with ID .*, and three attributes, for CPr1
+# 07. Create Weather2 entity with availableSpotNumber in CPr1
+# 08. Create OffStreetParking2 entity with temperature and humidity in CPr1
+# 09. Query all the Weather2 entities, and see the one from CPr1
+# 10. Query all the OffStreetParking2 entities, and see the one from CPr1
+#
+
+echo "01. Register entities of type Weather|OffStreetParking, with ID .*, and three attributes"
+echo "========================================================================================"
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "Weather",
+        "idPattern": ".*"
+      },
+      {
+        "type": "OffStreetParking",
+        "idPattern": ".*"
+      }
+    ],
+    "attrs": [
+      "temperature",
+      "humidity",
+      "availableSpotNumber"
+    ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${LISTENER_PORT}'/v1"
+    },
+    "legacyForwarding": true
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "02. See the registration in mongo"
+echo "================================="
+mongoCmdLong ${CB_DB_NAME} "db.registrations.findOne()"
+echo
+echo
+
+
+echo "03. GET the registration to check it's correct"
+echo "=============================================="
+orionCurl --url /v2/registrations
+echo
+echo
+
+
+echo "04. Query all the Weather entities - only to provoke the query being forwarded to the accumulator"
+echo "================================================================================================="
+orionCurl --url '/v2/entities?type=Weather'
+echo
+echo
+
+
+echo "05. Dump accumulator requests"
+echo "============================="
+accumulatorDump
+echo
+echo
+
+
+echo "06. Register entities of type Weather2|OffStreetParking2, with ID .*, and three attributes, for CPr1"
+echo "===================================================================================================="
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "Weather2",
+        "idPattern": ".*"
+      },
+      {
+        "type": "OffStreetParking2",
+        "idPattern": ".*"
+      }
+    ],
+    "attrs": [
+      "temperature",
+      "humidity",
+      "availableSpotNumber"
+    ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v1"
+    },
+    "legacyForwarding": true
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "07. Create Weather2 entity with availableSpotNumber in CPr1"
+echo "==========================================================="
+payload='{
+  "id": "w2",
+  "type": "Weather2",
+  "availableSpotNumber": {
+    "value": 5
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "08. Create OffStreetParking2 entity with temperature and humidity in CPr1"
+echo "========================================================================="
+payload='{
+  "id": "op2",
+  "type": "OffStreetParking2",
+  "temperature": {
+    "value": 28
+  },
+  "humidity": {
+    "value": 55
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "09. Query all the Weather2 entities, and see the one from CPr1"
+echo "=============================================================="
+orionCurl --url /v2/entities?type=Weather2
+echo
+echo
+
+
+echo "10. Query all the OffStreetParking2 entities, and see the one from CPr1"
+echo "======================================================================="
+orionCurl --url /v2/entities?type=OffStreetParking2
+echo
+echo
+
+
+--REGEXPECT--
+01. Register entities of type Weather|OffStreetParking, with ID .*, and three attributes
+========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. See the registration in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb://localhost:27017/ftest
+MongoDB server version: REGEX(.*)
+{
+	"_id" : REGEX(.*),
+	"expiration" : REGEX(.*),
+	"servicePath" : "/",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : ".*",
+					"isPattern" : "true",
+					"type" : "Weather"
+				},
+				{
+					"id" : ".*",
+					"isPattern" : "true",
+					"type" : "OffStreetParking"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "temperature",
+					"type" : ""
+				},
+				{
+					"name" : "humidity",
+					"type" : ""
+				},
+				{
+					"name" : "availableSpotNumber",
+					"type" : ""
+				}
+			],
+			"providingApplication" : "http://localhost:9997/v1"
+		}
+	],
+	"format" : "JSON"
+}
+bye
+
+
+03. GET the registration to check it's correct
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 332
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "dataProvided": {
+            "attrs": [
+                "temperature", 
+                "humidity", 
+                "availableSpotNumber"
+            ], 
+            "entities": [
+                {
+                    "idPattern": ".*", 
+                    "type": "Weather"
+                }, 
+                {
+                    "idPattern": ".*", 
+                    "type": "OffStreetParking"
+                }
+            ]
+        }, 
+        "id": "REGEX([0-9a-f]{24})",
+        "provider": {
+            "http": {
+                "url": "http://localhost:9997/v1"
+            }, 
+            "legacyForwarding": true, 
+            "supportedForwardingMode": "all"
+        }, 
+        "status": "active"
+    }
+]
+
+
+04. Query all the Weather entities - only to provoke the query being forwarded to the accumulator
+=================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+05. Dump accumulator requests
+=============================
+POST http://localhost:REGEX(\d+)/v1/queryContext
+Fiware-Servicepath: /
+Content-Length: 124
+User-Agent: REGEX(.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "attributes": [
+        "temperature", 
+        "humidity", 
+        "availableSpotNumber"
+    ], 
+    "entities": [
+        {
+            "id": ".*", 
+            "isPattern": "true", 
+            "type": "Weather"
+        }
+    ]
+}
+=======================================
+
+
+06. Register entities of type Weather2|OffStreetParking2, with ID .*, and three attributes, for CPr1
+====================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Create Weather2 entity with availableSpotNumber in CPr1
+===========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/w2?type=Weather2
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Create OffStreetParking2 entity with temperature and humidity in CPr1
+=========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/op2?type=OffStreetParking2
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. Query all the Weather2 entities, and see the one from CPr1
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 97
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "availableSpotNumber": {
+            "metadata": {}, 
+            "type": "Number", 
+            "value": "5"
+        }, 
+        "id": "w2", 
+        "type": "Weather2"
+    }
+]
+
+
+10. Query all the OffStreetParking2 entities, and see the one from CPr1
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 156
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "humidity": {
+            "metadata": {}, 
+            "type": "Number", 
+            "value": "55"
+        }, 
+        "id": "op2", 
+        "temperature": {
+            "metadata": {}, 
+            "type": "Number", 
+            "value": "28"
+        }, 
+        "type": "OffStreetParking2"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop CP1

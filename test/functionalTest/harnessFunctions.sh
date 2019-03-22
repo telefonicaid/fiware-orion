@@ -520,6 +520,11 @@ function localBrokerStop
 #
 function brokerStart()
 {
+  if [ "$CB_WITH_EXTERNAL_BROKER" == 1 ]
+  then
+    return
+  fi
+
   role=$1
   traceLevels=$2
   ipVersion=$3
@@ -920,6 +925,32 @@ function mongoCmd()
 
 # ------------------------------------------------------------------------------
 #
+# mongoCmdLong - like mongoCmd but showing all the output, not just the last line.
+#                Meant to be used in conjunction with 'grep'
+#
+function mongoCmdLong()
+{
+  host="${CB_DATABASE_HOST}"
+  if [ "$host" == "" ]
+  then
+    host="localhost"
+  fi
+
+  port="${CB_DATABASE_PORT}"
+  if [ "$port" == "" ]
+  then
+    port="27017"
+  fi
+
+  db=$1
+  cmd=$2
+  echo $cmd | mongo mongodb://$host:$port/$db
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
 # dbInsertEntity -
 #
 # Insert a crafted entity with an "inflated" attribute. The database is passed
@@ -1234,6 +1265,7 @@ export -f accumulatorReset
 export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd
+export -f mongoCmdLong
 export -f vMsg
 export -f dMsg
 export -f valgrindSleep

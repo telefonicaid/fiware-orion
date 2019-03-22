@@ -1882,14 +1882,9 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
 {
   EntityId en;
 
-  en.id   = getStringFieldF(entity, REG_ENTITY_ID);
-  en.type = entity.hasField(REG_ENTITY_TYPE) ? getStringFieldF(entity, REG_ENTITY_TYPE) : "";
-
-  /* isPattern = true is not allowed in registrations so it is not in the
-   * document retrieved with the query; however we will set it to be formally correct
-   * with NGSI spec
-   */
-  en.isPattern = std::string("false");
+  en.id        = getStringFieldF(entity, REG_ENTITY_ID);
+  en.type      = entity.hasField(REG_ENTITY_TYPE)?      getStringFieldF(entity, REG_ENTITY_TYPE)      : "";
+  en.isPattern = entity.hasField(REG_ENTITY_ISPATTERN)? getStringFieldF(entity, REG_ENTITY_ISPATTERN) : "false";
 
   if (includedEntity(en, enV))
   {
@@ -2041,8 +2036,8 @@ bool registrationsQuery
       }
       else
       {
-        /* We have detected that sometimes mongo stores { id: ..., type ...} and others { type: ..., id: ...},
-           so we have to take both them into account
+        /* We have detected that sometimes mongo stores { id: ..., type ...} and sometimes { type: ..., id: ...},
+           so we have to take both of them into account
         */
         entitiesWithType.append(BSON(REG_ENTITY_ID << en->id << REG_ENTITY_TYPE << en->type));
         entitiesWithType.append(BSON(REG_ENTITY_TYPE << en->type << REG_ENTITY_ID << en->id));
@@ -2061,8 +2056,8 @@ bool registrationsQuery
     LM_T(LmtMongo, ("Attribute discovery: '%s'", attrName.c_str()));
   }
 
-  entityOr.append(BSON(contextRegistrationEntities << BSON("$in" << entitiesWithType.arr())));
-  entityOr.append(BSON(contextRegistrationEntitiesId << BSON("$in" <<entitiesWithoutType.arr())));
+  entityOr.append(BSON(contextRegistrationEntities   << BSON("$in" << entitiesWithType.arr())));
+  entityOr.append(BSON(contextRegistrationEntitiesId << BSON("$in" << entitiesWithoutType.arr())));
 
   BSONObjBuilder queryBuilder;
 
@@ -2074,9 +2069,7 @@ bool registrationsQuery
 
   if (attrs.arrSize() > 0)
   {
-    /* If we don't do this checking, the {$in: [] } in the attribute name part will
-     * make the query fail
-     */
+    /* If we don't do this check, the {$in: [] } of the attribute name part makes the query fail */
     queryBuilder.append(contextRegistrationAttrsNames, BSON("$in" << attrs.arr()));
   }
 
@@ -2124,7 +2117,9 @@ bool registrationsQuery
       continue;
     }
     docs++;
+
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
+    LM_T(LmtForward, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     MimeType                  mimeType = JSON;
     std::vector<BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
@@ -2816,7 +2811,7 @@ bool someContextElementNotFound(const ContextElementResponse& cer)
 *
 * cprLookupByAttribute -
 *
-* Search for the CPr, given the entity/attribute as argument. Actually, two CPrs can be returned
+* Search for the CPr, given the entity/attribute as argument. Actually, two CPrs can be returned -
 * the "general" one at entity level or the "specific" one at attribute level
 */
 void cprLookupByAttribute
@@ -2854,7 +2849,7 @@ void cprLookupByAttribute
         *perEntPa         = crr->contextRegistration.providingApplication.get();
         *perEntPaMimeType = crr->contextRegistration.providingApplication.getMimeType();
 
-        break; /* enIx */
+        break;  /* enIx */
       }
 
       /* Is there a matching entity or the absence of attributes? */
@@ -2863,7 +2858,7 @@ void cprLookupByAttribute
         std::string regAttrName = crr->contextRegistration.contextRegistrationAttributeVector[attrIx]->name;
         if (regAttrName == attrName)
         {
-          /* We cannot "improve" this result keep searching in CRR vector, so we return */
+          /* We cannot "improve" this result by keep searching the CRR vector, so we return */
           *perAttrPa         = crr->contextRegistration.providingApplication.get();
           *perAttrPaMimeType = crr->contextRegistration.providingApplication.getMimeType();
 
