@@ -100,7 +100,7 @@ static bool dataProvidedParse
       ciP->httpStatusCode = SccNotImplemented;
       oeP->code           = SccNotImplemented;
       oeP->reasonPhrase   = ERROR_NOTIMPLEMENTED;
-      oeP->details        = ERROR_IDPATTERN_NOTSUPPORTED;
+      oeP->details        = ERROR_DESC_IDPATTERN_NOTSUPPORTED;
 
       return false;
     }
@@ -110,7 +110,7 @@ static bool dataProvidedParse
       ciP->httpStatusCode = SccNotImplemented;
       oeP->code           = SccNotImplemented;
       oeP->reasonPhrase   = ERROR_NOTIMPLEMENTED;
-      oeP->details        = ERROR_TYPEPATTERN_NOTIMPLEMENTED;
+      oeP->details        = ERROR_DESC_TYPEPATTERN_NOTIMPLEMENTED;
 
       return false;
     }

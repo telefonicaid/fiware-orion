@@ -100,7 +100,7 @@
 
 
 #define ERROR_NOTIMPLEMENTED                          "NotImplemented"
-#define ERROR_IDPATTERN_NOTSUPPORTED                  "Unsupported idPattern"
-#define ERROR_TYPEPATTERN_NOTIMPLEMENTED              "typePattern is not supported"
+#define ERROR_DESC_IDPATTERN_NOTSUPPORTED             "Unsupported idPattern"
+#define ERROR_DESC_TYPEPATTERN_NOTIMPLEMENTED         "typePattern is not supported"
 
 #endif  // SRC_LIB_COMMON_ERRORMESSAGES_H_
