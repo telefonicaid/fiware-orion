@@ -116,7 +116,7 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
   {
     ngsiv2::EntID* eP = &regP->dataProvided.entities[eIx];
 
-    if (eP->idPattern == "false")
+    if (eP->idPattern == "")
     {
       if (eP->type == "")
       {
