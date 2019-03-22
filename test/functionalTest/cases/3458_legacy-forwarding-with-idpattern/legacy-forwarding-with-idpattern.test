@@ -34,15 +34,14 @@ accumulatorStart --pretty-print
 
 #
 # 01. Register entities of type Weather|OffStreetParking, with ID .*, and three attributes
-# 02. See the registration in mongo
-# 03. GET the registration to check it's correct
-# 04. Query all the Weather entities - only to provoke the query being forwarded to the accumulator
-# 05. Dump accumulator requests
-# 06. Register entities of type Weather2|OffStreetParking2, with ID .*, and three attributes, for CPr1
-# 07. Create Weather2 entity with availableSpotNumber in CPr1
-# 08. Create OffStreetParking2 entity with temperature and humidity in CPr1
-# 09. Query all the Weather2 entities, and see the one from CPr1
-# 10. Query all the OffStreetParking2 entities, and see the one from CPr1
+# 02. GET the registration to check it's correct
+# 03. Query all the Weather entities - only to provoke the query being forwarded to the accumulator
+# 04. Dump accumulator requests
+# 05. Register entities of type Weather2|OffStreetParking2, with ID .*, and three attributes, for CPr1
+# 06. Create Weather2 entity with availableSpotNumber in CPr1
+# 07. Create OffStreetParking2 entity with temperature and humidity in CPr1
+# 08. Query all the Weather2 entities, and see the one from CPr1
+# 09. Query all the OffStreetParking2 entities, and see the one from CPr1
 #
 
 echo "01. Register entities of type Weather|OffStreetParking, with ID .*, and three attributes"
@@ -77,35 +76,28 @@ echo
 echo
 
 
-echo "02. See the registration in mongo"
-echo "================================="
-mongoCmdLong ${CB_DB_NAME} "db.registrations.findOne()"
-echo
-echo
-
-
-echo "03. GET the registration to check it's correct"
+echo "02. GET the registration to check it's correct"
 echo "=============================================="
 orionCurl --url /v2/registrations
 echo
 echo
 
 
-echo "04. Query all the Weather entities - only to provoke the query being forwarded to the accumulator"
+echo "03. Query all the Weather entities - only to provoke the query being forwarded to the accumulator"
 echo "================================================================================================="
 orionCurl --url '/v2/entities?type=Weather'
 echo
 echo
 
 
-echo "05. Dump accumulator requests"
+echo "04. Dump accumulator requests"
 echo "============================="
 accumulatorDump
 echo
 echo
 
 
-echo "06. Register entities of type Weather2|OffStreetParking2, with ID .*, and three attributes, for CPr1"
+echo "05. Register entities of type Weather2|OffStreetParking2, with ID .*, and three attributes, for CPr1"
 echo "===================================================================================================="
 payload='{
   "dataProvided": {
@@ -137,7 +129,7 @@ echo
 echo
 
 
-echo "07. Create Weather2 entity with availableSpotNumber in CPr1"
+echo "06. Create Weather2 entity with availableSpotNumber in CPr1"
 echo "==========================================================="
 payload='{
   "id": "w2",
@@ -151,7 +143,7 @@ echo
 echo
 
 
-echo "08. Create OffStreetParking2 entity with temperature and humidity in CPr1"
+echo "07. Create OffStreetParking2 entity with temperature and humidity in CPr1"
 echo "========================================================================="
 payload='{
   "id": "op2",
@@ -168,14 +160,14 @@ echo
 echo
 
 
-echo "09. Query all the Weather2 entities, and see the one from CPr1"
+echo "08. Query all the Weather2 entities, and see the one from CPr1"
 echo "=============================================================="
 orionCurl --url /v2/entities?type=Weather2
 echo
 echo
 
 
-echo "10. Query all the OffStreetParking2 entities, and see the one from CPr1"
+echo "09. Query all the OffStreetParking2 entities, and see the one from CPr1"
 echo "======================================================================="
 orionCurl --url /v2/entities?type=OffStreetParking2
 echo
@@ -193,52 +185,7 @@ Date: REGEX(.*)
 
 
 
-02. See the registration in mongo
-=================================
-MongoDB shell version REGEX(.*)
-connecting to: mongodb://localhost:27017/ftest
-MongoDB server version: REGEX(.*)
-{
-	"_id" : REGEX(.*),
-	"expiration" : REGEX(.*),
-	"servicePath" : "/",
-	"contextRegistration" : [
-		{
-			"entities" : [
-				{
-					"id" : ".*",
-					"isPattern" : "true",
-					"type" : "Weather"
-				},
-				{
-					"id" : ".*",
-					"isPattern" : "true",
-					"type" : "OffStreetParking"
-				}
-			],
-			"attrs" : [
-				{
-					"name" : "temperature",
-					"type" : ""
-				},
-				{
-					"name" : "humidity",
-					"type" : ""
-				},
-				{
-					"name" : "availableSpotNumber",
-					"type" : ""
-				}
-			],
-			"providingApplication" : "http://localhost:9997/v1"
-		}
-	],
-	"format" : "JSON"
-}
-bye
-
-
-03. GET the registration to check it's correct
+02. GET the registration to check it's correct
 ==============================================
 HTTP/1.1 200 OK
 Content-Length: 332
@@ -278,7 +225,7 @@ Date: REGEX(.*)
 ]
 
 
-04. Query all the Weather entities - only to provoke the query being forwarded to the accumulator
+03. Query all the Weather entities - only to provoke the query being forwarded to the accumulator
 =================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 2
@@ -289,7 +236,7 @@ Date: REGEX(.*)
 []
 
 
-05. Dump accumulator requests
+04. Dump accumulator requests
 =============================
 POST http://localhost:REGEX(\d+)/v1/queryContext
 Fiware-Servicepath: /
@@ -317,7 +264,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-06. Register entities of type Weather2|OffStreetParking2, with ID .*, and three attributes, for CPr1
+05. Register entities of type Weather2|OffStreetParking2, with ID .*, and three attributes, for CPr1
 ====================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -327,7 +274,7 @@ Date: REGEX(.*)
 
 
 
-07. Create Weather2 entity with availableSpotNumber in CPr1
+06. Create Weather2 entity with availableSpotNumber in CPr1
 ===========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -337,7 +284,7 @@ Date: REGEX(.*)
 
 
 
-08. Create OffStreetParking2 entity with temperature and humidity in CPr1
+07. Create OffStreetParking2 entity with temperature and humidity in CPr1
 =========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -347,7 +294,7 @@ Date: REGEX(.*)
 
 
 
-09. Query all the Weather2 entities, and see the one from CPr1
+08. Query all the Weather2 entities, and see the one from CPr1
 ==============================================================
 HTTP/1.1 200 OK
 Content-Length: 97
@@ -368,7 +315,7 @@ Date: REGEX(.*)
 ]
 
 
-10. Query all the OffStreetParking2 entities, and see the one from CPr1
+09. Query all the OffStreetParking2 entities, and see the one from CPr1
 =======================================================================
 HTTP/1.1 200 OK
 Content-Length: 156
