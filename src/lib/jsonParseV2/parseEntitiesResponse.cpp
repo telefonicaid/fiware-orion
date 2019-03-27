@@ -79,7 +79,6 @@ bool parseEntitiesResponse(ConnectionInfo* ciP, const char* payload, Entities* e
     return false;
   }
 
-#if 1
   for (rapidjson::Value::ConstValueIterator iter = document.Begin(); iter != document.End(); ++iter)
   {
     Entity* eP = new Entity();
@@ -95,23 +94,6 @@ bool parseEntitiesResponse(ConnectionInfo* ciP, const char* payload, Entities* e
     
     evP->vec.push_back(eP);
   }
-#else
-  std::string  errorString;
-  LM_T(LmtForward, ("Getting iter"));
-  rapidjson::Value::ConstMemberIterator iter = document.MemberBegin();
-  LM_T(LmtForward, ("calling parseEntityVector with iter"));
-  std::string  s = parseEntityVector(ciP, iter, evP, true);
-  LM_T(LmtForward, ("After parseEntityVector"));
-
-  if (s != "OK")
-  {
-    oeP->fill(SccBadRequest, s);
-    alarmMgr.badInput(clientIp, "JSON Parse Error");
-    ciP->httpStatusCode = SccBadRequest;
-
-    return false;
-  }
-#endif
 
   return true;
 }
