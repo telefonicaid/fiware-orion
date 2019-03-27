@@ -389,3 +389,7 @@ Date: REGEX(.*)
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
+dbDrop CP1
+dbDrop CP2
+dbDrop CP3
+dbDrop CP4
