@@ -91,7 +91,7 @@ bool parseEntitiesResponse(ConnectionInfo* ciP, const char* payload, Entities* e
       ciP->httpStatusCode = SccBadRequest;
       return false;
     }
-    
+
     evP->vec.push_back(eP);
   }
 
