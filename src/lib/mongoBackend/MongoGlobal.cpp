@@ -1841,6 +1841,7 @@ void pruneContextElements(const ContextElementResponseVector& oldCerV, ContextEl
 
     // FIXME P10: not sure if this is the right way to do it, maybe we need a fill() method for this
     newCerP->entity.providingApplicationList = cerP->entity.providingApplicationList;
+    newCerP->entity.forwardingMode           = cerP->entity.forwardingMode;
     newCerP->statusCode.fill(&cerP->statusCode);
 
     bool pruneEntity = cerP->prune;
@@ -1925,7 +1926,8 @@ static void processContextRegistrationElement
   const EntityIdVector&               enV,
   const StringList&                   attrL,
   ContextRegistrationResponseVector*  crrV,
-  MimeType                            mimeType
+  MimeType                            mimeType,
+  const std::string&                  forwardingMode
 )
 {
   ContextRegistrationResponse crr;
@@ -1973,7 +1975,7 @@ static void processContextRegistrationElement
     ContextRegistrationResponse* crrP = new ContextRegistrationResponse();
 
     crrP->contextRegistration = crr.contextRegistration;
-
+    crrP->forwardingMode      = forwardingMode;
     crrV->push_back(crrP);
   }
 }
@@ -2123,10 +2125,11 @@ bool registrationsQuery
 
     MimeType                  mimeType = JSON;
     std::vector<BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
+    std::string               format                    = getStringFieldF(r, REG_FORMAT);
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
     {
-      processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType);
+      processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType, format);
     }
 
     /* FIXME: note that given the response doesn't distinguish from which registration ID the

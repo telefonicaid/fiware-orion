@@ -64,6 +64,7 @@ class Entity
   double                  modDate;          // used by dateModified functionality in NGSIv2
 
   std::vector<ProvidingApplication> providingApplicationList;    // Not part of NGSI, used internally for CPr forwarding functionality
+  std::string                       forwardingMode;              // Not part of NGSI, used internally for CPr forwarding functionality
 
   Entity();
   Entity(const std::string& id, const std::string& type, const std::string& isPattern);

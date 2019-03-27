@@ -168,6 +168,7 @@ public:
   RequestType                requestType;  // FIXME P2: To Be Removed (found inside restServiceP->request (restServiceP->type))
   std::string                acceptHeaderError;
   struct timeval             transactionStart;  // For metrics
+  std::string                entityIdFromUrlPath;
 
   std::map<std::string, std::string>   uriParam;
   std::map<std::string, bool>          uriParamOptions;

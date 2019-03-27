@@ -88,7 +88,8 @@ static void addContextProviderEntity
 (
   ContextElementResponseVector&  cerV,
   EntityId*                      enP,
-  const ProvidingApplication&    pa
+  const ProvidingApplication&    pa,
+  const std::string&             forwardingMode
 )
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
@@ -96,6 +97,7 @@ static void addContextProviderEntity
     if ((cerV[ix]->entity.id == enP->id) && (cerV[ix]->entity.type == enP->type))
     {
       cerV[ix]->entity.providingApplicationList.push_back(pa);
+      cerV[ix]->entity.forwardingMode = forwardingMode;
       return;    /* by construction, no more than one CER with the same entity information should exist in the CERV) */
     }
   }
@@ -105,6 +107,7 @@ static void addContextProviderEntity
 
   cerP->entity.fill(enP->id, enP->type, "false");
   cerP->entity.providingApplicationList.push_back(pa);
+  cerP->entity.forwardingMode = forwardingMode;
 
   cerP->statusCode.fill(SccOk);
   cerV.push_back(cerP);
@@ -125,7 +128,8 @@ static void addContextProviderAttribute
   EntityId*                       enP,
   ContextRegistrationAttribute*   craP,
   const ProvidingApplication&     pa,
-  bool                            limitReached
+  bool                            limitReached,
+  const std::string&              forwardingMode
 )
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
@@ -151,7 +155,7 @@ static void addContextProviderAttribute
 
     caP->providingApplication = pa;
     cerV[ix]->entity.attributeVector.push_back(caP);
-
+    cerV[ix]->entity.forwardingMode = forwardingMode;
     return;
   }
 
@@ -167,6 +171,7 @@ static void addContextProviderAttribute
 
     caP->providingApplication = pa;
     cerP->entity.attributeVector.push_back(caP);
+    cerP->entity.forwardingMode = forwardingMode;
 
     cerV.push_back(cerP);
   }
@@ -222,7 +227,8 @@ static void addContextProviders
   {
     ContextRegistration cr = crrV[ix]->contextRegistration;
 
-    /* In the case a "filtering" entity was provided, check that the current CRR matches or skip to next CRR */
+    LM_T(LmtForward, ("cr %d. forwardingMode: '%s'", ix, crrV[ix]->forwardingMode.c_str()));
+    /* In case a "filtering" entity was provided, check that the current CRR matches or skip to next CRR */
     if (enP != NULL && !matchEntityInCrr(cr, enP))
     {
       continue;
@@ -235,7 +241,8 @@ static void addContextProviders
         /* Registration without attributes */
         for (unsigned int eIx = 0; eIx < cr.entityIdVector.size(); ++eIx)
         {
-          addContextProviderEntity(cerV, cr.entityIdVector[eIx], cr.providingApplication);
+          LM_T(LmtForward, ("Calling addContextProviderEntity. forwardingMode == %s", crrV[ix]->forwardingMode.c_str()));
+          addContextProviderEntity(cerV, cr.entityIdVector[eIx], cr.providingApplication, crrV[ix]->forwardingMode);
         }
       }
     }
@@ -246,11 +253,13 @@ static void addContextProviders
       {
         for (unsigned int aIx = 0; aIx < cr.contextRegistrationAttributeVector.size(); ++aIx)
         {
+          LM_T(LmtForward, ("Calling addContextProviderAttribute. forwardingMode == %s", crrV[ix]->forwardingMode.c_str()));
           addContextProviderAttribute(cerV,
                                       cr.entityIdVector[eIx],
                                       cr.contextRegistrationAttributeVector[aIx],
                                       cr.providingApplication,
-                                      limitReached);
+                                      limitReached,
+                                      crrV[ix]->forwardingMode);
         }
       }
     }
@@ -335,6 +344,7 @@ void crrVectorPresent(const char* what, const ContextRegistrationResponseVector&
     ContextRegistration* crP = &crrV[ix]->contextRegistration;
 
     LM_T(LmtForward, ("For providingApplication %s:", crP->providingApplication.string.c_str()));
+    LM_T(LmtForward, ("Forwarding Mode:         %s", crrV[ix]->forwardingMode.c_str()));
     LM_T(LmtForward, ("  - %d entities:", crP->entityIdVector.size()));
     for (unsigned int eIx = 0; eIx < crP->entityIdVector.size(); ++eIx)
     {
@@ -383,6 +393,7 @@ HttpStatusCode mongoQueryContext
   int         offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
   int         limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
 
+  LM_T(LmtForward, ("%d items in qcrsP->contextElementResponseVector", responseP->contextElementResponseVector.size()));
   std::string sortOrderList  = uriParams[URI_PARAM_SORTED];
 
   LM_T(LmtMongo, ("QueryContext Request"));
@@ -402,6 +413,7 @@ HttpStatusCode mongoQueryContext
 
   reqSemTake(__FUNCTION__, "ngsi10 query request", SemReadOp, &reqSemTaken);
 
+  LM_T(LmtForward, ("%d items in qcrsP->contextElementResponseVector", responseP->contextElementResponseVector.size()));
   ok = entitiesQuery(requestP->entityIdVector,
                      requestP->attributeList,
                      requestP->restriction,
@@ -417,6 +429,9 @@ HttpStatusCode mongoQueryContext
                      sortOrderList,
                      apiVersion);
 
+  LM_T(LmtForward, ("After entitiesQuery: %d items in qcrsP->contextElementResponseVector, %d items in rawCerV",
+                    responseP->contextElementResponseVector.size(),
+                    rawCerV.size()));
   if (!ok)
   {
     responseP->errorCode.fill(SccReceiverInternalError, err);
@@ -463,6 +478,7 @@ HttpStatusCode mongoQueryContext
     crrV.release();
   }
 
+  LM_T(LmtForward, ("%d items in qcrsP->contextElementResponseVector", responseP->contextElementResponseVector.size()));
   /* Second CPr lookup (in the case some elements still not being found): looking in E-<null> registrations */
   StringList attrNullList;
 
@@ -482,6 +498,7 @@ HttpStatusCode mongoQueryContext
     crrV.release();
   }
 
+  LM_T(LmtForward, ("%d items in qcrsP->contextElementResponseVector", responseP->contextElementResponseVector.size()));
   /* Special case: request with <null> attributes. In that case, entitiesQuery() may have captured some local attribute, but
    * the list needs to be completed. Note that in the case of having this request someContextElementNotFound() is always false
    * so we efficient not invoking registrationQuery() too much times
@@ -504,12 +521,16 @@ HttpStatusCode mongoQueryContext
 
   /* Prune "not found" CERs */
   LM_T(LmtForward, ("Before pruning, we have %d elements in rawCerV", rawCerV.size()));
+  LM_T(LmtForward, ("Before pruning, we have %d items in qcrsP->contextElementResponseVector", responseP->contextElementResponseVector.size()));
   // FIXME: call to cerVectorPresent to be removed once forwarding works
   // cerVectorPresent("Before pruning", rawCerV);
+
   pruneContextElements(rawCerV, &responseP->contextElementResponseVector);
+
+  LM_T(LmtForward, ("After pruning, we have %d elements in rawCerV", rawCerV.size()));
+  LM_T(LmtForward, ("After pruning, we have %d items in qcrsP->contextElementResponseVector", responseP->contextElementResponseVector.size()));
   // FIXME: call to cerVectorPresent to be removed once forwarding works
   // cerVectorPresent("After pruning", rawCerV);
-  LM_T(LmtForward, ("After pruning, we have %d elements in contextElementResponseVector", responseP->contextElementResponseVector.size()));
 
   /* Pagination stuff */
   if (responseP->contextElementResponseVector.size() == 0)
@@ -547,6 +568,7 @@ HttpStatusCode mongoQueryContext
     responseP->errorCode.fill(SccOk, details);
   }
 
+  LM_T(LmtForward, ("%d items in qcrsP->contextElementResponseVector", responseP->contextElementResponseVector.size()));
   rawCerV.release();
 
   reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);

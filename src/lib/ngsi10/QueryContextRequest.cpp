@@ -25,6 +25,7 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 #include "common/globals.h"
 #include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
@@ -57,9 +58,10 @@ QueryContextRequest::QueryContextRequest()
 *
 * QueryContextRequest::QueryContextRequest
 */
-QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName)
+QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName, const std::string& _forwardingMode)
 {
   contextProvider = _contextProvider;
+  forwardingMode  = _forwardingMode;
 
   entityIdVector.push_back(new EntityId(eP));
 
@@ -77,9 +79,10 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 *
 * QueryContextRequest::QueryContextRequest
 */
-QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const StringList& _attributeList)
+QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const StringList& _attributeList, const std::string& _forwardingMode)
 {
   contextProvider = _contextProvider;
+  forwardingMode  = _forwardingMode;
 
   entityIdVector.push_back(new EntityId(eP));
 

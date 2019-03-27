@@ -137,7 +137,8 @@ void Entity::filterAndOrderAttrs
 (
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
-  std::vector<ContextAttribute*>*  orderedAttrs)
+  std::vector<ContextAttribute*>*  orderedAttrs
+)
 {
   if (blacklist)
   {
@@ -562,7 +563,6 @@ void Entity::fill
 
 
 
-
 /* ****************************************************************************
 *
 * Entity::fill -
@@ -631,6 +631,7 @@ void Entity::fill(const Entity& en, bool useDefaultType, bool cloneCompounds)
   attributeVector.fill(en.attributeVector, useDefaultType, cloneCompounds);
 
   providingApplicationList = en.providingApplicationList;
+  forwardingMode           = en.forwardingMode;
 }
 
 
@@ -725,7 +726,7 @@ ContextAttribute* Entity::getAttribute(const std::string& attrName)
 *
 * Entity::equal
 *
-* Same method that in EntityId class
+* Same method as in EntityId class
 */
 bool Entity::equal(Entity* eP)
 {
