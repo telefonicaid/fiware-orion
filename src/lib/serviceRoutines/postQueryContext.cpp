@@ -103,7 +103,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   int             port;
   std::string     prefix;
 
-  LM_T(LmtForward, ("Forwarding a query in mode '%s'", qcrP->forwardingMode.c_str()));
+  LM_T(LmtForward, ("Forwarding a query in mode '%s' (%d)", (qcrP->providerFormat == PfJson)? "V1" : "V2", qcrP->providerFormat));
 
   //
   // 1. Parse the providing application to extract IP, port and URI-path
@@ -135,8 +135,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
   std::string     mimeType;
 
-  LM_TMP(("qcrP->forwardingMode == '%s'", qcrP->forwardingMode.c_str()));
-  if ((qcrP->forwardingMode == "JSON") || (qcrP->forwardingMode == ""))
+  if (qcrP->providerFormat == PfJson)
   {
     verb      = "POST";
     resource  = prefix + "/queryContext";
@@ -147,37 +146,37 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   }
   else
   {
-    std::string  extraHeaders;
+    std::string  extraParams;
 
     verb      = "GET";
     resource  = prefix + "/entities";
 
     if (ciP->uriParam["type"] != "")
     {
-      extraHeaders = "&type=" + ciP->uriParam["type"];
+      extraParams = "&type=" + ciP->uriParam["type"];
     }
 
     if (ciP->uriParam["id"] != "")
     {
-      extraHeaders = "&id=" + ciP->uriParam["id"];
+      extraParams = "&id=" + ciP->uriParam["id"];
     }
 
     if (ciP->entityIdFromUrlPath != "")
     {
-      extraHeaders = "&id=" + ciP->entityIdFromUrlPath;
+      extraParams = "&id=" + ciP->entityIdFromUrlPath;
     }
 
     if (ciP->uriParam["attrs"] != "")
     {
-      extraHeaders = "&attrs=" + ciP->uriParam["attrs"];
+      extraParams = "&attrs=" + ciP->uriParam["attrs"];
     }
 
-    if (extraHeaders != "")
+    if (extraParams != "")
     {
-      char* xHeaders = (char*) &(extraHeaders.c_str())[1];  // Remove first '&'
+      char* xParams = (char*) &(extraParams.c_str())[1];  // Remove first '&'
 
       resource += "?";
-      resource += xHeaders;
+      resource += xParams;
     }
   }
 
@@ -228,7 +227,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   LM_T(LmtForward, ("clean response payload: %s", cleanPayload));
 
 
-  if ((qcrP->forwardingMode == "JSON") || (qcrP->forwardingMode == ""))
+  if (qcrP->providerFormat == PfJson)
   {
     std::string  s;
     std::string  errorMsg;
@@ -437,21 +436,27 @@ std::string postQueryContext
   {
     Entity* eP = &qcrsP->contextElementResponseVector[ix]->entity;
 
-    LM_T(LmtForward, ("Forwarding Mode: %s", eP->forwardingMode.c_str()));
     LM_T(LmtForward, ("Entity: '%s'/'%s'/'%s'/'%s'", eP->id.c_str(), eP->isPattern.c_str(), eP->type.c_str(), FT(eP->isTypePattern)));
 
     if (eP->providingApplicationList.size() != 0)
     {
       for (unsigned int paIx = 0; paIx < eP->providingApplicationList.size(); paIx++)
-        LM_T(LmtForward, ("Entity PA: %s", eP->providingApplicationList[paIx].string.c_str()));
+      {
+        const char* providingApplication = eP->providingApplicationList[paIx].string.c_str();
+        const char* providerFormat       = (eP->providingApplicationList[paIx].providerFormat == PfJson)? "V1" : "V2";
+
+        LM_T(LmtForward, ("Entity PA: %s (provider format: %s (%d))", providingApplication, providerFormat, eP->providingApplicationList[paIx].providerFormat));
+      }
     }
+    else
+      LM_T(LmtForward, ("eP->providingApplicationList is EMPTY"));
 
     for (unsigned int aIx = 0; aIx < eP->attributeVector.size(); aIx++)
     {
       ContextAttribute* aP = eP->attributeVector[aIx];
 
       if (aP->providingApplication.string != "")
-        LM_T(LmtForward, ("Attribute %d: %s (Providing Application: %s)", aIx, aP->name.c_str(), aP->providingApplication.string.c_str()));
+        LM_T(LmtForward, ("Attribute %d: %s (Providing Application: %s, providerFormat: %d)", aIx, aP->name.c_str(), aP->providingApplication.string.c_str(), aP->providingApplication.providerFormat));
       else
         LM_T(LmtForward, ("Attribute %d: %s (No Providing Application)", aIx, aP->name.c_str()));
     }
@@ -531,7 +536,8 @@ std::string postQueryContext
     {
       QueryContextRequest* requestP;
 
-      requestP = new QueryContextRequest(cerP->entity.providingApplicationList[ix].get(), &en, qcrP->attributeList, cerP->entity.forwardingMode);
+      requestP = new QueryContextRequest(cerP->entity.providingApplicationList[ix].get(), &en, qcrP->attributeList, cerP->entity.providingApplicationList[ix].providerFormat);
+      LM_T(LmtForward, ("Pushing a QueryContextRequest to requestV - providerFormat == %d", requestP->providerFormat));
       requestV.push_back(requestP);
     }
 
@@ -589,7 +595,8 @@ std::string postQueryContext
 
         if (requestP == NULL)
         {
-          requestP = new QueryContextRequest(aP->providingApplication.get(), &en, aP->name, cerP->entity.forwardingMode);
+          requestP = new QueryContextRequest(aP->providingApplication.get(), &en, aP->name, aP->providingApplication.providerFormat);
+          LM_T(LmtForward, ("Pushing a QueryContextRequest to requestV - providerFormat == %d", requestP->providerFormat));
           requestV.push_back(requestP);
         }
         else

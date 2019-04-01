@@ -41,9 +41,8 @@ typedef struct ContextRegistrationResponse
 {
   ContextRegistration   contextRegistration;        // Mandatory
   StatusCode            errorCode;                  // Optional
-
-  std::string           forwardingMode;             // During forwarding, this field is used to record the 'format' from the registration that provoked
-                                                    // this Context Element to be forwarded. For now: "JSON" => V1 and "normalized" => V2
+  ProviderFormat        providerFormat;             // During forwarding, this field is used to record the 'format' from the registration that provoked
+                                                    // this Context Element to be forwarded.
 
   ContextRegistrationResponse();
 

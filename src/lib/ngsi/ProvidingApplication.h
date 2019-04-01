@@ -34,16 +34,31 @@
 
 /* ****************************************************************************
 *
-* ProvidingApplication - 
+* ProviderFormat -
+*/
+typedef enum ProviderFormat
+{
+  PfNone,
+  PfJson,
+  PfV2
+} ProviderFormat;
+
+
+
+/* ****************************************************************************
+*
+* ProvidingApplication -
 */
 typedef struct ProvidingApplication
 {
-  std::string   string;
-  MimeType      mimeType;     // Not part of NGSI itself, used by the CB to specify the preferred Mime-Type for CPr interaction
+  std::string     string;
+  MimeType        mimeType;        // Not part of NGSI itself, used by the CB to specify the preferred Mime-Type for CPr interaction
+  ProviderFormat  providerFormat;  // PfJson ("JSON" in mongo): NGSIv1, PfV2: NGSIv2
 
   ProvidingApplication();
   void          set(const std::string& value);
-  void          setMimeType(const MimeType mimeType);
+  void          setMimeType(const MimeType _mimeType);
+  void          setProviderFormat(const ProviderFormat _providerFormat);
   std::string   get(void);
   MimeType      getMimeType(void);
   bool          isEmpty(void);

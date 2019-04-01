@@ -88,8 +88,7 @@ static void addContextProviderEntity
 (
   ContextElementResponseVector&  cerV,
   EntityId*                      enP,
-  const ProvidingApplication&    pa,
-  const std::string&             forwardingMode
+  const ProvidingApplication&    pa
 )
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
@@ -97,7 +96,7 @@ static void addContextProviderEntity
     if ((cerV[ix]->entity.id == enP->id) && (cerV[ix]->entity.type == enP->type))
     {
       cerV[ix]->entity.providingApplicationList.push_back(pa);
-      cerV[ix]->entity.forwardingMode = forwardingMode;
+      LM_T(LmtForward, ("pa.providerFormat: %d (2:V2, 1:V1)", pa.providerFormat));
       return;    /* by construction, no more than one CER with the same entity information should exist in the CERV) */
     }
   }
@@ -107,7 +106,6 @@ static void addContextProviderEntity
 
   cerP->entity.fill(enP->id, enP->type, "false");
   cerP->entity.providingApplicationList.push_back(pa);
-  cerP->entity.forwardingMode = forwardingMode;
 
   cerP->statusCode.fill(SccOk);
   cerV.push_back(cerP);
@@ -128,8 +126,7 @@ static void addContextProviderAttribute
   EntityId*                       enP,
   ContextRegistrationAttribute*   craP,
   const ProvidingApplication&     pa,
-  bool                            limitReached,
-  const std::string&              forwardingMode
+  bool                            limitReached
 )
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
@@ -146,6 +143,10 @@ static void addContextProviderAttribute
       if (attrName == craP->name)
       {
         /* In this case, the attribute has been already found in local database. CPr is unnecessary */
+        LM_T(LmtForward, ("attribute has been already found in local database. CPr is unnecessary"));
+
+        // FIXME PR: This breaks the test - the providerFormat is never set and the default value (currently V1) is still valid
+        LM_T(LmtForward, ("This breaks the test non_legacy_notifications_with_accumulator.test - providerFormat is lost here"));
         return;
       }
     }
@@ -155,7 +156,7 @@ static void addContextProviderAttribute
 
     caP->providingApplication = pa;
     cerV[ix]->entity.attributeVector.push_back(caP);
-    cerV[ix]->entity.forwardingMode = forwardingMode;
+    LM_T(LmtForward, ("pa.providerFormat: %d (2:V2, 1:V1)", pa.providerFormat));
     return;
   }
 
@@ -171,9 +172,9 @@ static void addContextProviderAttribute
 
     caP->providingApplication = pa;
     cerP->entity.attributeVector.push_back(caP);
-    cerP->entity.forwardingMode = forwardingMode;
-
+    LM_T(LmtForward, ("caP->providingApplication.providerFormat: %d (2:V2, 1:V1)", caP->providingApplication.providerFormat));
     cerV.push_back(cerP);
+    LM_T(LmtForward, ("caP pushed to cerP->entity.attributeVector, and cerP pushed to cerV"));
   }
 }
 
@@ -227,7 +228,6 @@ static void addContextProviders
   {
     ContextRegistration cr = crrV[ix]->contextRegistration;
 
-    LM_T(LmtForward, ("cr %d. forwardingMode: '%s'", ix, crrV[ix]->forwardingMode.c_str()));
     /* In case a "filtering" entity was provided, check that the current CRR matches or skip to next CRR */
     if (enP != NULL && !matchEntityInCrr(cr, enP))
     {
@@ -241,8 +241,7 @@ static void addContextProviders
         /* Registration without attributes */
         for (unsigned int eIx = 0; eIx < cr.entityIdVector.size(); ++eIx)
         {
-          LM_T(LmtForward, ("Calling addContextProviderEntity. forwardingMode == %s", crrV[ix]->forwardingMode.c_str()));
-          addContextProviderEntity(cerV, cr.entityIdVector[eIx], cr.providingApplication, crrV[ix]->forwardingMode);
+          addContextProviderEntity(cerV, cr.entityIdVector[eIx], cr.providingApplication);
         }
       }
     }
@@ -253,13 +252,15 @@ static void addContextProviders
       {
         for (unsigned int aIx = 0; aIx < cr.contextRegistrationAttributeVector.size(); ++aIx)
         {
-          LM_T(LmtForward, ("Calling addContextProviderAttribute. forwardingMode == %s", crrV[ix]->forwardingMode.c_str()));
+          LM_T(LmtForward, ("Calling addContextProviderAttribute. providerFormat == %d (1:V1, 2:V2). cr.providingApplication.providerFormat: %d",
+                            crrV[ix]->providerFormat,
+                            cr.providingApplication.providerFormat));
+
           addContextProviderAttribute(cerV,
                                       cr.entityIdVector[eIx],
                                       cr.contextRegistrationAttributeVector[aIx],
                                       cr.providingApplication,
-                                      limitReached,
-                                      crrV[ix]->forwardingMode);
+                                      limitReached);
         }
       }
     }
@@ -344,8 +345,9 @@ void crrVectorPresent(const char* what, const ContextRegistrationResponseVector&
     ContextRegistration* crP = &crrV[ix]->contextRegistration;
 
     LM_T(LmtForward, ("For providingApplication %s:", crP->providingApplication.string.c_str()));
-    LM_T(LmtForward, ("Forwarding Mode:         %s", crrV[ix]->forwardingMode.c_str()));
-    LM_T(LmtForward, ("  - %d entities:", crP->entityIdVector.size()));
+    LM_T(LmtForward, ("Forwarding Mode:         %s", (crP->providingApplication.providerFormat == PfJson)? "V1" : "V2"));
+    LM_T(LmtForward, ("  - %d entities:",             crP->entityIdVector.size()));
+
     for (unsigned int eIx = 0; eIx < crP->entityIdVector.size(); ++eIx)
     {
       EntityId* eP = crP->entityIdVector[eIx];

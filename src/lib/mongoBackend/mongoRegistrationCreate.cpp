@@ -212,7 +212,6 @@ void mongoRegistrationCreate
   setContextRegistrationVector(regP, &bob);
   setStatus(regP->status, &bob);
 
-  // FIXME #3068: this must be unhardwired once we fully implement NGSIv2-based forwarding (not only "normalized")
   std::string format = (regP->provider.legacyForwardingMode == true)? "JSON" : "normalized";
   setFormat(format, &bob);
 
