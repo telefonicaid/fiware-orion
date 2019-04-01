@@ -123,10 +123,9 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
 
 
   //
-  // 2. Send the request to the Context Provider (and await the reply)
-  //    Render the payload if V1 forward
-  //
-  // FIXME P7: Should Rush be used?
+  // 2. Prepare the request to forward
+  //    - If V1: Render the payload
+  //    - If V2: Setup the URI params 
   //
   std::string     payload;
   std::string     verb;
@@ -182,6 +181,9 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
 
   LM_T(LmtForward, ("verb: %s", verb.c_str()));
 
+  //
+  // 3. Send the request to the Context Provider (and await the reply)
+  //
   std::string     out;
   int             r;
 
