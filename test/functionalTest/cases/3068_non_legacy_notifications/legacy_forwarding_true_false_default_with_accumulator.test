@@ -1,0 +1,112 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Legacy Forwarding default value
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 38,186-187,235 IPV4
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Registration of E1 without Legacy Forwarding, for the accumulator - forward to be in NGSIv2 format
+# 02. Query of entities with id E1 - get empty response as the accumulator doesn't respond, but a forward is provoked
+# 03. Dump and reset the accumulator, see the forwarded query in NGSIv2 format
+#
+
+echo "01. Registration of E1 without Legacy Forwarding, for the accumulator - forward to be in NGSIv2 format"
+echo "======================================================================================================"
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1"
+      }
+    ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${LISTENER_PORT}'/v2"
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Query of entities with id E1 - get empty response as the accumulator doesn't respond, but a forward is provoked"
+echo "==================================================================================================================="
+orionCurl --url /v2/entities?id=E1
+echo
+echo
+
+
+echo "03. Dump and reset the accumulator, see the forwarded query in NGSIv2 format"
+echo "============================================================================"
+accumulatorDump
+#accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Registration of E1 without Legacy Forwarding, for the accumulator - forward to be in NGSIv2 format
+======================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Query of entities with id E1 - get empty response as the accumulator doesn't respond, but a forward is provoked
+===================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+03. Dump and reset the accumulator, see the forwarded query in NGSIv2 format
+============================================================================
+GET http://localhost:REGEX(\d+)/v2/entities?id=E1
+Fiware-Servicepath: /
+Content-Length: 0
+User-Agent: REGEX(.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop
