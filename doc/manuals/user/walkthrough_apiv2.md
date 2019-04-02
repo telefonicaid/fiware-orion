@@ -1060,8 +1060,8 @@ context availability management is about the *source of the entities and attribu
 in context availability management is the *registration* resource. A registration contains information about a source of
 information (named a "context provider") and whose entities and attributes are provided by that source.
 
-Let's illustrate with an example, creating a simple registration. We are stating that the attributes temperature and
-pressure of Room5 are provided by a context provider in the URL http://mysensors.com/Rooms:
+Let's illustrate with an example, with forwards in NGSIv1 format (legacyForwarding set to true), creating a simple registration.
+We are stating that the attributes temperature and pressure of Room5 are provided by a context provider in the URL http://mysensors.com/Rooms:
 
 ```
 curl -v localhost:1026/v2/registrations -s -S -H 'Content-Type: application/json' -d @-  <<EOF

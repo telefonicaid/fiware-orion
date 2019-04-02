@@ -31,7 +31,7 @@ Note that an update request with multiple context elements (and with `updateActi
 
 _FW-01: Forward an update to Context Providers_
 
-Note that there are a number of service routines that end up calling `postUpdateContext()` (see detail in [the service routines mapping document](ServiceRoutines.txt)).
+Note that there is a number of service routines that end up calling `postUpdateContext()` (see detail in [the service routines mapping document](ServiceRoutines.txt)).
 
 * All attributes in the incoming payload are marked as **Not Found** (step 1).
 * [**mongoBackend** library](sourceCode.md#srclibmongobackend) processes the request (see diagrams [MB-01](mongoBackend.md#flow-mb-01) or [MB-02](mongoBackend.md#flow-mb-02)) and marks all attributes in the requests in one of three possible ways (step 2):
@@ -40,8 +40,8 @@ Note that there are a number of service routines that end up calling `postUpdate
     * Found in Local Context Broker
     * Found in Remote Context Provider
 
-* The attributes that are found in a remote context provider need to be forwarded. The local attributes are simply updates non-found attributes are marked as such in the response.
-* A new vector of `ContextElementResponse` is created and filled in with all those attributes that are to be forwarded (step 3). These responses are then added to the response vector that was output from **mongoBackend**. If no attribute is "found", then the `ContextElementResponse` is prepared with a 404 Not Found.
+* The attributes that are found in a remote context provider need to be forwarded. The local attributes are simple updates while non-found attributes are marked as such in the response.
+* A new vector of `ContextElementResponse` is created and filled in with all the attributes that are to be forwarded (step 3). These responses are then added to the response vector that was output from **mongoBackend**. If no attribute is "found", then the `ContextElementResponse` is prepared with a 404 Not Found.
 * Internal loop (step 4): `mongoUpdateContext()` doesn't fill in the values of the attributes, as this is not part of the normal response but, to forward an update request, the value of the attributes must be present. This loop fills in the values of all attributes that are to be forwarded.
 * Internal Loop (step 5): Create `UpdateContextRequest` objects, one per context provider, and fill in these objects with the attributes that are to be forwarded.
 * Each request is sent to its corresponding Context Provider, containing all attributes (step 3). See details in diagram [FW-02](#flow-fw-02).
@@ -62,7 +62,7 @@ _FW-02: `updateForward()` function detail_
 ## Forwarding of query requests
 
 Just like updates, also queries are forwarded to Context Providers.
-All attributes in a query request that are not found locally are searched in the list of registration and if found, a request is forwarded to the corresponding context provider. As for forwarding of update requests, the query request can be split into N forwards and the response to the initial request isn't sent until all responses to the forwarded requests have been received and merged into the final response.
+All attributes in a query request that are not found locally are searched in the list of registrations and if found, a request is forwarded to the corresponding context provider. As for forwarding of update requests, the query request can be split into N forwards and the response to the initial request isn't sent until all responses to the forwarded requests have been received and merged into the final response.
 
 <a name="flow-fw-03"></a>
 ![Forward a query to Context Providers](images/Flow-FW-03.png)
