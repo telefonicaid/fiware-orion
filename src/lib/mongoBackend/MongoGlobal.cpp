@@ -2127,7 +2127,7 @@ bool registrationsQuery
     MimeType                  mimeType = JSON;
     std::vector<BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
     std::string               format                    = getStringFieldF(r, REG_FORMAT);
-    ProviderFormat            providerFormat            = (format == "")? PfJson : (format == "JSON")? PfJson : PfV2;  // FIXME PR: Make V2 default format
+    ProviderFormat            providerFormat            = (format == "")? PfJson : (format == "JSON")? PfJson : PfV2;
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
     {

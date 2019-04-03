@@ -439,7 +439,7 @@ std::string postQueryContext
     Entity* eP = &qcrsP->contextElementResponseVector[ix]->entity;
 
     LM_T(LmtForward, ("Entity: '%s'/'%s'/'%s'/'%s'", eP->id.c_str(), eP->isPattern.c_str(), eP->type.c_str(), FT(eP->isTypePattern)));
-
+    LM_T(LmtForward, ("No of providingApplications for Entity: %d", eP->providingApplicationList.size()));
     if (eP->providingApplicationList.size() != 0)
     {
       for (unsigned int paIx = 0; paIx < eP->providingApplicationList.size(); paIx++)
@@ -534,6 +534,7 @@ std::string postQueryContext
     // When there is a Context Provider in ContextElement::providingApplicationList, then the
     // request must be sent to that Context Provider also
     //
+    LM_T(LmtForward, ("%d items in cerP->entity.providingApplicationList", cerP->entity.providingApplicationList.size()));
     for (unsigned int ix = 0; ix < cerP->entity.providingApplicationList.size(); ++ix)
     {
       QueryContextRequest* requestP;
@@ -645,6 +646,7 @@ std::string postQueryContext
   //
   QueryContextResponse* qP;
 
+  LM_T(LmtForward, ("Forwarding %d items in requestV", requestV.size()));
   for (unsigned int fIx = 0; fIx < requestV.size() && fIx < cprForwardLimit; ++fIx)
   {
     if (requestV[fIx]->contextProvider == "")

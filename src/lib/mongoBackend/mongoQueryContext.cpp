@@ -95,6 +95,7 @@ static void addContextProviderEntity
   {
     if ((cerV[ix]->entity.id == enP->id) && (cerV[ix]->entity.type == enP->type))
     {
+      LM_T(LmtForward, ("Pushing providingApplication to entity.providingApplicationList"));
       cerV[ix]->entity.providingApplicationList.push_back(pa);
       LM_T(LmtForward, ("pa.providerFormat: %d (2:V2, 1:V1)", pa.providerFormat));
       return;    /* by construction, no more than one CER with the same entity information should exist in the CERV) */
@@ -105,6 +106,7 @@ static void addContextProviderEntity
   ContextElementResponse* cerP = new ContextElementResponse();
 
   cerP->entity.fill(enP->id, enP->type, "false");
+  LM_T(LmtForward, ("Pushing providingApplication to entity.providingApplicationList II"));
   cerP->entity.providingApplicationList.push_back(pa);
 
   cerP->statusCode.fill(SccOk);
@@ -234,11 +236,13 @@ static void addContextProviders
       continue;
     }
 
+    LM_T(LmtForward, ("cr.contextRegistrationAttributeVector.size == %d", cr.contextRegistrationAttributeVector.size()));
     if (cr.contextRegistrationAttributeVector.size() == 0)
     {
       if (!limitReached)
       {
         /* Registration without attributes */
+        LM_T(LmtForward, ("cr.entityIdVector.size == %d", cr.entityIdVector.size()));
         for (unsigned int eIx = 0; eIx < cr.entityIdVector.size(); ++eIx)
         {
           addContextProviderEntity(cerV, cr.entityIdVector[eIx], cr.providingApplication);
@@ -505,6 +509,8 @@ HttpStatusCode mongoQueryContext
    * the list needs to be completed. Note that in the case of having this request someContextElementNotFound() is always false
    * so we efficient not invoking registrationQuery() too much times
    */
+  LM_T(LmtForward, ("crrV.size == %d", crrV.size()));
+  LM_T(LmtForward, ("rawCerV.size == %d", rawCerV.size()));
   if (requestP->attributeList.size() == 0)
   {
     LM_T(LmtForward, ("Calling registrationsQuery IV"));
