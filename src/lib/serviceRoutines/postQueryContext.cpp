@@ -60,15 +60,16 @@ static char* jsonPayloadClean(const char* payload)
   //
   // After HTTP headers comes an empty line.
   // After this empty line comes the payload.
-  // This function returns a pointer to the first byte of the payload
+  // This function returns a pointer to the first byte after an empty line, if found
+  // This "first byte" is the first byte of the payload
   //
   while (*payload != 0)
   {
-    if (*payload == '\n')
+    if (*payload == '\n')  // One newline is found
     {
-      if (payload[1] == '\n')
+      if (payload[1] == '\n')  // And the second one - we have found the start of the payload
         return (char*) &payload[2];
-      if ((payload[1] == 13) && (payload[2] == '\n'))
+      if ((payload[1] == '\r') && (payload[2] == '\n'))  // "windows style newline with \r\n"
         return (char*) &payload[3];
     }
 
