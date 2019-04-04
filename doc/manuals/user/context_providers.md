@@ -35,7 +35,7 @@ Let's illustrate this with an example.
 * First (message number 1), the application (perhaps on behalf of a
   Context Provider) registers the Context Provider in Orion for the
   Street4 temperature. Let's assume that the Context Provider exposes
-  its API on <http://sensor48.mycity.com/v1>
+  its API on <http://sensor48.mycity.com/v2>
       
 ```
 curl localhost:1026/v2/registrations -s -S -H 'Content-Type: application/json' -H 'Accept: application/json' -d @-  <<EOF
@@ -53,7 +53,7 @@ curl localhost:1026/v2/registrations -s -S -H 'Content-Type: application/json' -
   },
   "provider": {
     "http": {
-      "url": "http://sensor48.mycity.com/v1"
+      "url": "http://sensor48.mycity.com/v2"
     }
   }
 }
@@ -61,7 +61,7 @@ EOF
 ```
       
       
-* Next, consider that a client queries the temperature  (message number 2).
+* Next, consider that a client queries the temperature (message number 2).
 
       
 ```
@@ -71,87 +71,28 @@ curl localhost:1026/v2/entities/Street4/attrs/temperature?type=Street -s -S \
 
 * Orion doesn't know the Street4 temperature, but it knows (due to
   the registration in the previous step) that the Context Provider at
-  <http://sensor48.mycity.com/v1> does know about the Street4 temperature, so it forwards the query
+  <http://sensor48.mycity.com/v2> does know about the Street4 temperature, so it forwards the query
   (message number 3) to the URL
-  <http://sensor48.mycity.com/v1/queryContext> (i.e., the URL used in
-  the Providing Application field at registration time, and adding
-  "/queryContext" to the URL PATH).
-  The query is forwarded using NGSIv2 format by default.
-  It doesn't matter whether NGSIv1 or NGSIv2 was used in the query, what decides the format of the
-  forward is what was demanded by the registration.
-  To have the NGSIv1 format used for the forwarding, the field "legacyForwarding" must be set to `true` in the registration:
-  ```
-  "legacyForwarding": true
-  ```
+  <http://sensor48.mycity.com/v2/entities> (i.e., the URL used in
+  the Providing Application field at registration time, and adding "/entities" to the URL PATH).
 
-  The complete payload of the registration for forwarding using NGSIv1 would look like this:
+If NGSIv2 forwarding is used, the forwarded query doesn't carry any payload.
+It would be something like this:
 ```
-{
-  "dataProvided": {
-    "entities": [
-      {
-        "id": "Street4",
-        "type": "Street"
-      }
-    ],
-    "attrs": [
-      "temperature"
-    ]
-  },
-  "provider": {
-    "http": {
-      "url": "http://sensor48.mycity.com/v1"
-    }
-  },
-  "legacyForwarding": true
-}
+GET http://sensor48.mycity.com/v2/entities?id=Street4&attrs=temperature&type=Street
 ```
 
-If NGSIv2 forwarding is used, the forwarded query wouldn't use any payload.
-It would be something like this (the `provider:http:url` of the registration would end in `v2` not `v1`):
-`GET http://sensor48.mycity.com/v2/entities/Street4/attrs/temperature?type=Street`
-
-If in NGSIv1 format, the forwarded query would look like this:
-``` 
-{
-    "entities": [
-        {
-            "type": "Street",
-            "isPattern": "false",
-            "id": "Street4"
-        }
-    ],
-    "attributes": [
-        "temperature"
-    ]
-}
-``` 
-
-* The Context Provider at <http://sensor48.mycity.com/v1> (NOTE: NGSIv1) would respond
+* The Context Provider at <http://sensor48.mycity.com/v2> would respond
   with the payload (message number 4):
 
 ``` 
 {
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "temperature",
-                        "type": "float",
-                        "value": "16"
-                    }
-                ],
-                "id": "Street4",
-                "isPattern": "false",
-                "type": "Street"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
+    "id": "Street4",
+    "type": "Street",
+    "temperature": {
+      "value": "16",
+      "type": "float"
+    }
 }
 ``` 
 
@@ -168,15 +109,15 @@ Some additional comments:
 
 -   The `-httpTimeout` [CLI parameter](admin/cli.md)
     is used to set the CPr timeout. If a request forwarded to a CPr is
-    taking more that that timeout, then Orion closes the connection and
+    taking more than that timeout, then Orion closes the connection and
     assumes that the CPr is not responding.
--   In the case a given request involves more than one Context Provider (e.g. an
+-   In case a given request involves more than one Context Provider (e.g. an
     update including 3 context elements, each one being an entity
     managed by a different Context Provider), Orion will forward the
     corresponding "piece" of the request to each Context Provider,
     gathering all the results before responding to the client. The current
-    implementation processes multiple forwards in sequence, i.e. awaiting
-    the response from the last CPr (or timeout expiration) before sending
+    implementation processes multiple forwards in sequence, i.e. Orion awaits
+    the response from the previous CPr (or timeout expiration) before sending
     the forward request to the next.
 -   You can use the `-cprForwardLimit` [CLI parameter](admin/cli.md) to limit
     the maximum number of forwarded requests to Context Providers for a single client request.
