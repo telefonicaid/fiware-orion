@@ -125,7 +125,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   //
   // 2. Prepare the request to forward
   //    - If V1: Render the payload
-  //    - If V2: Setup the URI params 
+  //    - If V2: Setup the URI params
   //
   std::string     payload;
   std::string     verb;
@@ -152,22 +152,25 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
 
     if (ciP->uriParam["type"] != "")
     {
-      extraParams = "&type=" + ciP->uriParam["type"];
+      extraParams += "&type=";
+      extraParams += ciP->uriParam["type"];
     }
 
-    if (ciP->uriParam["id"] != "")
+    if (qcrP->entityIdVector.size() > 0)
     {
-      extraParams = "&id=" + ciP->uriParam["id"];
-    }
+      extraParams += "&id=" + qcrP->entityIdVector[0]->id;
 
-    if (ciP->entityIdFromUrlPath != "")
-    {
-      extraParams = "&id=" + ciP->entityIdFromUrlPath;
+      for (unsigned int ix = 1; ix < qcrP->entityIdVector.size(); ix++)
+      {
+        extraParams += ",";
+        extraParams += qcrP->entityIdVector[ix]->id;
+      }
     }
 
     if (ciP->uriParam["attrs"] != "")
     {
-      extraParams = "&attrs=" + ciP->uriParam["attrs"];
+      extraParams += "&attrs=";
+      extraParams += ciP->uriParam["attrs"];
     }
 
     if (extraParams != "")
