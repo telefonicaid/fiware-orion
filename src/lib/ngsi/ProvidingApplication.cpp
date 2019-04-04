@@ -110,6 +110,17 @@ void ProvidingApplication::setProviderFormat(const ProviderFormat _providerForma
 
 /* ****************************************************************************
 *
+* ProvidingApplication::getProviderFormat -
+*/
+ProviderFormat ProvidingApplication::getProviderFormat(void)
+{
+  return providerFormat;
+}
+
+
+
+/* ****************************************************************************
+*
 * ProvidingApplication::get -
 */
 std::string ProvidingApplication::get(void)

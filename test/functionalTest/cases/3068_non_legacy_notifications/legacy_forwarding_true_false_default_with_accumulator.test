@@ -104,6 +104,14 @@ Host: localhost:REGEX(\d+)
 Accept: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
+GET http://localhost:REGEX(\d+)/v2/entities?id=E1
+Fiware-Servicepath: /
+Content-Length: 0
+User-Agent: REGEX(.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+=======================================
 
 
 --TEARDOWN--

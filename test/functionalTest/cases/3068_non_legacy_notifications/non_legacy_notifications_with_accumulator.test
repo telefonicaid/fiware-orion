@@ -70,12 +70,6 @@ echo
 echo
 
 
-#
-# Give the broker some time to forward the requests
-#
-sleep .5
-
-
 echo "03. Dump the accumulator, see the forwarded query"
 echo "================================================="
 accumulatorDump
@@ -112,13 +106,6 @@ echo "==========================================================================
 orionCurl --url /v2/entities?type=T
 echo
 echo
-
-
-#
-# Give the broker some time to forward the requests
-#
-sleep .5
-
 
 
 echo "06. Dump the accumulator, see the forwarded query"
@@ -172,6 +159,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
+
 05. Query entities of type T - get empty response as the accumulator doesn't respond
 ====================================================================================
 HTTP/1.1 200 OK
@@ -185,6 +173,14 @@ Date: REGEX(.*)
 
 06. Dump the accumulator, see the forwarded query
 =================================================
+GET http://localhost:REGEX(\d+)/v2/entities?type=T
+Fiware-Servicepath: /
+Content-Length: 0
+User-Agent: REGEX(.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+=======================================
 GET http://localhost:REGEX(\d+)/v2/entities?type=T
 Fiware-Servicepath: /
 Content-Length: 0
