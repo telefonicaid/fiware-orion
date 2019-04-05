@@ -46,7 +46,7 @@ accumulatorStart --pretty-print
 #
 # FIXME: Due to a bug in Orion, the forward provoked by the query of steps 5 and 11 make the broker send not one but TWO forwarded
 #        request of the query to the accumulator.
-#        This is an ancient bug of the broker and it is 'more or less acceptable', but should be fixed some day ...
+#        This is a bug of the broker that is also present in V1 forwarding and it is 'more or less acceptable', but should be fixed some day ...
 #        Note that the queries in step 2 and 8 DO NOT provoke the bug.
 #        This fact may be of help to locate the bug.
 #
