@@ -324,7 +324,7 @@ if [ -n "${test}" ] && [ "${stage}" = "functional" ]; then
 
     if [ -n "${attempts}" ]; then export CB_MAX_TRIES=${attempts}; fi
 
-    make functional INSTALL_DIR=~
+    CB_DIFF_TOOL=diff make functional INSTALL_DIR=~
     if [ $? -ne 0 ]; then status=false; else status=true; fi
 
     _unfix
