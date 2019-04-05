@@ -69,8 +69,6 @@ std::string getEntity
   std::string entityId        = compV[2];
   std::string type            = ciP->uriParam[URI_PARAM_TYPE];
 
-  ciP->entityIdFromUrlPath = entityId;
-
   if (entityId == "")
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID, ERROR_BAD_REQUEST);
