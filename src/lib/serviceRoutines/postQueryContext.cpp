@@ -146,6 +146,9 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   }
   else
   {
+    //
+    // NGSIv2 forward: instead of payload, URI params are used
+    //
     std::string  extraParams;
 
     verb      = "GET";
@@ -159,12 +162,44 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
 
     if (qcrP->entityIdVector.size() > 0)
     {
-      extraParams += "&id=" + qcrP->entityIdVector[0]->id;
-
-      for (unsigned int ix = 1; ix < qcrP->entityIdVector.size(); ix++)
+      //
+      // A few remarks about the list of entity ids:
+      //   - If more than one ID is present, we just make a comma-separated list of them
+      //   - We can't allow mixes between id and idPattern
+      //   - There can only be ONE idPattern (lists aren't supported for idPatterns)
+      //   - If an idPattern is present and equal to ".*", we can simply ignore it - .* matches ALL entity ids
+      //
+      if ((qcrP->entityIdVector.size() == 1) && (qcrP->entityIdVector[0]->isPattern == "true"))
       {
-        extraParams += ",";
-        extraParams += qcrP->entityIdVector[ix]->id;
+        //
+        // This is the only case where isPattern is allowed to be true - ONE entity in qcrP->entityIdVector
+        // In all other places (see below) isPattern set to TRUE is an error (that is silently ignored)
+        //
+
+        // If the idPattern is '.*', then no need to add it to the query
+        if (qcrP->entityIdVector[0]->id != ".*")
+        {
+          extraParams += "&idPattern=";
+          extraParams += qcrP->entityIdVector[0]->id;
+        }
+      }
+      else
+      {
+        extraParams += "&id=";
+
+        LM_T(LmtForward, ("KZ: id: %s (isPattern: %s, #ids: %d)",  qcrP->entityIdVector[0]->id.c_str(), qcrP->entityIdVector[0]->isPattern.c_str(), qcrP->entityIdVector.size()));
+        for (unsigned int ix = 0; ix < qcrP->entityIdVector.size(); ix++)
+        {
+          if (qcrP->entityIdVector[ix]->isPattern == "false")  // Silently ignored if "true"
+          {
+            if (ix != 0)
+            {
+              extraParams += ",";
+            }
+
+            extraParams += qcrP->entityIdVector[ix]->id;
+          }
+        }
       }
     }
 
@@ -172,6 +207,17 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
     {
       extraParams += "&attrs=";
       extraParams += ciP->uriParam["attrs"];
+    }
+    else if (qcrP->attributeList.size() != 0)
+    {
+      extraParams += "&attrs=";
+      extraParams += qcrP->attributeList[0];
+
+      for (unsigned int ix = 1; ix < qcrP->attributeList.size(); ix++)
+      {
+        extraParams += ",";
+        extraParams += qcrP->attributeList[ix];
+      }
     }
 
     if (extraParams != "")

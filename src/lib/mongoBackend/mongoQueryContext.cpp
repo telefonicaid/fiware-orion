@@ -105,7 +105,7 @@ static void addContextProviderEntity
   /* Reached this point, it means that the cerV doesn't contain a proper CER, so we create it */
   ContextElementResponse* cerP = new ContextElementResponse();
 
-  cerP->entity.fill(enP->id, enP->type, "false");
+  cerP->entity.fill(enP->id, enP->type, enP->isPattern);
   LM_T(LmtForward, ("Pushing providingApplication to entity.providingApplicationList II"));
   cerP->entity.providingApplicationList.push_back(pa);
 
