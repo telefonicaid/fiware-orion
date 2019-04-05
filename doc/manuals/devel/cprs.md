@@ -4,7 +4,7 @@
 * [Forwarding of query requests](#forwarding-of-query-requests)
 * [A Caveat about shadowing of entities](#a-caveat-about-shadowing-entities)
 
-The Orion Context Broker, as explained in [the User & Programmers Manual](../user/context_providers.md), supports the concept of Context Providers. In short, when for an update/query, an entity/attribute is not found, Orion checks its list of registrations (NGSI9) and if found in that list it means that the entity is registered to a Context Provider. So, a request is forwarded to that Context Provider. The IP, port and path of the Context Provider is found in the field `providingApplication` of the `struct ContextRegistration` that is part of the registration request `RegisterContextRequest`.
+The Orion Context Broker, as explained in [the User & Programmers Manual](../user/context_providers.md), supports the concept of Context Providers. In short, when for an update/query, an entity/attribute is not found, Orion checks its list of registrations and if found in that list it means that the entity is registered to a Context Provider. So, a request is forwarded to that Context Provider. The IP, port and path of the Context Provider is found in the field `providingApplication` of the `struct ContextRegistration` that is part of the registration request `RegisterContextRequest`.
 
 ## Forwarding of update requests
 
@@ -89,21 +89,21 @@ The `QueryContextRequest` items are filled in based on the output of the [**mong
 _FW-04: `queryForward()` function detail_
 
 * Parse the context provider string to extract IP, port, URI path, etc. (step 1).
-* As forwards are done as REST requests, we need to render the object to text to be able to send the REST request to the Context Provider (step 2).
+* As forwards are done as REST requests, we need to extract information of the binary object to be able to send the REST request (plain text) to the Context Provider (step 2).
 * The request to forward is sent with the help of `httpRequestSend()` (step 3) which uses [libcurl](https://curl.haxx.se/libcurl/) to forward the request (step 4). libcurl sends in sequence the request to the Context Provider (step 5).
 * The textual response from the Context Provider is parsed and an `QueryContextResponse` object is created (step 6). Parsing details are provided in diagram [PP-01](jsonParse.md#flow-pp-01).
 
 ## A Caveat about shadowing of entities
-The Context Provider mechanism is implemented using standard NGSI9 requests and this might lead to unwanted situations.
+The Context Provider mechanism is implemented using standard registration requests and this might lead to unwanted situations.
 We feel it is important to at least be aware of this potential "shadowing" problem.  
 
 Imagine the following scenario:
 
 * We have a Context Provider CP1 that supplies an Entity E1 with attribute A1.
-  An NGSI9 registration about E1/A1 of CP1 is sent to the Context Broker.
+  A registration about E1/A1 of CP1 is sent to the Context Broker.
 * A client queries the Context Broker about E1/A1 and this provokes a forward to CP1 (as E1/A1 is not found locally but in a registration) and the client gets the expected result.
 * Now, a request enters the Context Broker to create (APPEND) an Entity E1 with attribute A1.
-* And the3 problems: a client queries the Context Broker about E1/A1 and as the attribute is now found locally it is simply returned. No forward is being done.
+* And the problem: a client queries the Context Broker about E1/A1 and as the attribute is now found locally it is simply returned. No forward is being done.
 
 E1/A1 on Context Provider CP1 can no longer be seen via the Context Broker as it has been shadowed.
 
