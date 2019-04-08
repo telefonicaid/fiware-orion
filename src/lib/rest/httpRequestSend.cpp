@@ -181,9 +181,11 @@ static void httpHeaderAdd
     }
   }
 
+  LM_T(LmtHttpHeaders, ("Adding HTTP Header: '%s'", h.c_str()));
   *headersP           = curl_slist_append(*headersP, h.c_str());
   *headerTotalSizeP  += h.size();
 }
+
 
 
 /* ****************************************************************************
@@ -479,7 +481,7 @@ int httpRequestSendWithCurl
 
 
   // ----- Content-type
-  std::string contentTypeHeaderValue = content_type;
+  std::string contentTypeHeaderValue = (content_type == "")? " " : content_type;
 
   httpHeaderAdd(&headers, HTTP_CONTENT_TYPE, contentTypeHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
