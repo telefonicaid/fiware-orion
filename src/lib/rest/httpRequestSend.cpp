@@ -166,7 +166,13 @@ static void httpHeaderAdd
   std::string headerNameLowerCase = headerName;
   std::transform(headerNameLowerCase.begin(), headerNameLowerCase.end(), headerNameLowerCase.begin(), ::tolower);
 
-  std::string  h = headerName + ": " + headerValue;
+  std::string h = headerName + ":";
+
+  if (headerValue != "")
+  {
+    h += " ";
+    h += headerValue;
+  }
 
   // Fiware-Correlator and Ngsiv2-AttrsFormat cannot be overwritten, so we don't
   // search in extraHeaders in these cases
@@ -176,7 +182,8 @@ static void httpHeaderAdd
     it = extraHeaders.find(headerNameLowerCase);
     if (it != extraHeaders.end())  // headerName found in extraHeaders, use matching map value
     {
-      h = headerName + ": " + it->second;
+      h += " ";
+      h += it->second;
       usedExtraHeaders[headerNameLowerCase.c_str()] = true;
     }
   }
@@ -458,7 +465,7 @@ int httpRequestSendWithCurl
   httpHeaderAdd(&headers, HTTP_ACCEPT, acceptHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Expect
-  httpHeaderAdd(&headers, HTTP_EXPECT, " ", &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+  httpHeaderAdd(&headers, HTTP_EXPECT, "", &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Content-length
   std::stringstream contentLengthStringStream;
@@ -481,9 +488,7 @@ int httpRequestSendWithCurl
 
 
   // ----- Content-type
-  std::string contentTypeHeaderValue = (content_type == "")? " " : content_type;
-
-  httpHeaderAdd(&headers, HTTP_CONTENT_TYPE, contentTypeHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+  httpHeaderAdd(&headers, HTTP_CONTENT_TYPE, content_type, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // Fiware-Correlator
   std::string correlationHeaderValue = fiwareCorrelation;
