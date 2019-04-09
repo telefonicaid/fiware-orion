@@ -39,6 +39,16 @@ accumulatorStart --pretty-print
 #        request of the query to the accumulator.
 #        This is a bug of the broker that is also present in V1 forwarding and it is 'more or less acceptable', but should be fixed some day ...
 #
+#
+# FIXME: It seems like older versions of libcurl (CentOS 7 used version 7.29 of libcurl) contain a bug that makes the Content-Type
+#        always be added to the sent message, also when the Content-Type is EMPTY (which should inhibit this behaviour).
+#        The result of this bug is that the line
+#          Content-Type:
+#        is a part of forwarded messages.
+#        In newer versions of libcurl this haqs been fixed (Ubuntu 18.04 uses libcurl 7.58)
+#        For now, a "grep -v 'Content-Type'" is added to calls of accumulatorDump as a work-around.
+#        The real fix would be to use a newer version of libcurl in CentOS 7 (Travis, Jenkins)
+#
 
 echo "01. Registration of E1 without Legacy Forwarding, for the accumulator - forward to be in NGSIv2 format"
 echo "======================================================================================================"
@@ -70,8 +80,7 @@ echo
 
 echo "03. Dump and reset the accumulator, see the forwarded query in NGSIv2 format"
 echo "============================================================================"
-accumulatorDump
-#accumulatorReset
+accumulatorDump | grep -v Content-Type
 echo
 echo
 
