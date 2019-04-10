@@ -2703,17 +2703,24 @@ static void searchContextProviders
   std::string                        err;
 
   /* Fill input data for registrationsQuery() */
+  LM_T(LmtForward, ("Entity Id:         %s", en.id.c_str()));
+  LM_T(LmtForward, ("Entity isPattern:  %s", en.isPattern.c_str()));
+  LM_T(LmtForward, ("Entity Type:       %s", en.type.c_str()));
+
   enV.push_back(&en);
   for (unsigned int ix = 0; ix < caV.size(); ++ix)
   {
     attrL.push_back(caV[ix]->name);
+    LM_T(LmtForward, ("Attr %d: %s", ix, caV[ix]->name.c_str()));
   }
 
   /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
   if (someContextElementNotFound(*cerP))
   {
+    LM_T(LmtForward, ("Calling registrationsQuery I"));
     if (registrationsQuery(enV, attrL, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
+      LM_T(LmtForward, ("registrationsQuery I returned %d items in crrV", crrV.size()));
       if (crrV.size() > 0)
       {
         fillContextProviders(cerP, crrV);
@@ -2734,8 +2741,10 @@ static void searchContextProviders
   StringList attrNullList;
   if (someContextElementNotFound(*cerP))
   {
+    LM_T(LmtForward, ("Calling registrationsQuery II"));
     if (registrationsQuery(enV, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
+      LM_T(LmtForward, ("registrationsQuery II returned %d items in crrV", crrV.size()));
       if (crrV.size() > 0)
       {
         fillContextProviders(cerP, crrV);
@@ -2761,21 +2770,26 @@ static void searchContextProviders
 */
 static bool forwardsPending(UpdateContextResponse* upcrsP)
 {
+  LM_T(LmtForward, ("Looping over %d context element responses", upcrsP->contextElementResponseVector.size()));
   for (unsigned int cerIx = 0; cerIx < upcrsP->contextElementResponseVector.size(); ++cerIx)
   {
     ContextElementResponse* cerP  = upcrsP->contextElementResponseVector[cerIx];
 
+    LM_T(LmtForward, ("Looping over %d attributes", cerP->entity.attributeVector.size()));
     for (unsigned int aIx = 0 ; aIx < cerP->entity.attributeVector.size(); ++aIx)
     {
       ContextAttribute* aP  = cerP->entity.attributeVector[aIx];
 
+      LM_T(LmtForward, ("Attribute: '%s'", aP->name.c_str()));
       if (aP->providingApplication.get() != "")
       {
+        LM_T(LmtForward, ("Found a providingApplication: %s", aP->providingApplication.get().c_str()));
         return true;
       }
     }
   }
 
+  LM_T(LmtForward, ("No providingApplication found"));
   return false;
 }
 
@@ -2952,6 +2966,7 @@ static void updateEntity
     // FIXME P8: the same three statements are at the end of the while loop. Refactor the code to have this
     // in only one place
     //
+    LM_T(LmtForward, ("Calling searchContextProviders"));
     searchContextProviders(tenant, servicePathV, en, eP->attributeVector, cerP);
 
     if (!(attributeAlreadyExistsError && (action == ActionTypeAppendStrict)))
@@ -3488,8 +3503,11 @@ void processContextElement
       //
       // If no context providers found, then the UPDATE was simply for a non-found entity and an error should be returned
       //
+      LM_T(LmtForward, ("Calling forwardsPending"));
       if (forwardsPending(responseP) == false)
       {
+        LM_T(LmtForward, ("No forwards pending"));
+
         cerP->statusCode.fill(SccContextElementNotFound);
 
         if (apiVersion == V1)

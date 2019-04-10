@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/errorMessages.h"
@@ -49,7 +52,7 @@
 * Payload Out: None
 *
 * URI parameters:
-*   - 
+*   type=<TYPE>
 *
 * 01. Fill in UpdateContextRequest
 * 02. Call standard op postUpdateContext
@@ -86,7 +89,7 @@ std::string patchEntity
   postUpdateContext(ciP, components, compV, parseDataP);
 
   // 03. Check output from mongoBackend - any errors?
-  if (parseDataP->upcrs.res.oe.code != SccNone )
+  if (parseDataP->upcrs.res.oe.code != SccNone)
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
     ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
@@ -94,6 +97,7 @@ std::string patchEntity
   else
   {
     ciP->httpStatusCode = SccNoContent;
+    answer              = "";
   }
 
   // 05. Cleanup and return result

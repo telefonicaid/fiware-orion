@@ -101,7 +101,7 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 * 7. Freeing memory
 *
 */
-static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, UpdateContextResponse* upcrsP)
+static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, UpdateContextResponse* upcrsP)
 {
   std::string      ip;
   std::string      protocol;
@@ -124,9 +124,10 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
     //  SccBadRequest should have been returned before, when it was registered!
     //
     upcrsP->errorCode.fill(SccContextElementNotFound, "");
-    return;
+    return false;
   }
 
+  LM_T(LmtForward, ("*** Provider Format: %d", upcrP->providerFormat));
 
   //
   // 2. Render the string of the request we want to forward
@@ -137,13 +138,39 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   ciP->outMimeType  = JSON;
 
-  //
-  // FIXME: Forwards are done using NGSIv1 only, for now
-  //        This will hopefully change soon ...
-  //        Once we implement forwards in NGSIv2, this toJsonV1() should be like this:
-  //        TIMED_RENDER(payload = upcrP->toJson());
-  //
-  TIMED_RENDER(payload = upcrP->toJsonV1(asJsonObject));
+  std::string     verb;
+  std::string     resource;
+  std::string     tenant       = ciP->tenant;
+  std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
+  std::string     mimeType     = "application/json";
+  std::string     out;
+  int             r;
+
+  if (upcrP->providerFormat == PfJson)
+  {
+    TIMED_RENDER(payload = upcrP->toJsonV1(asJsonObject));
+
+    verb     = "POST";
+    resource = prefix + "/updateContext";
+  }
+  else
+  {
+    std::vector<std::string>  nullFilter;
+    Entity*                   eP = upcrP->entityVector[0];
+
+    eP->renderId = false;
+
+    TIMED_RENDER(payload = eP->toJson(NGSI_V2_NORMALIZED, nullFilter, false, nullFilter));
+
+    resource = prefix + "/entities/" + eP->id + "/attrs";
+    verb     = "PATCH";
+
+    if (eP->type != "")
+    {
+      // Add ?type=<TYPE> to 'resource'
+      resource += "?type=" + eP->type;
+    }
+  }
 
   ciP->outMimeType  = outMimeType;
   cleanPayload      = (char*) payload.c_str();
@@ -152,14 +179,6 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   // 3. Send the request to the Context Provider (and await the reply)
   // FIXME P7: Should Rush be used?
   //
-  std::string     verb         = "POST";
-  std::string     resource     = prefix + "/updateContext";
-  std::string     tenant       = ciP->tenant;
-  std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
-  std::string     mimeType     = "application/json";
-  std::string     out;
-  int             r;
-
   LM_T(LmtCPrForwardRequestPayload, ("forward updateContext request payload: %s", payload.c_str()));
 
   std::map<std::string, std::string>  noHeaders;
@@ -188,82 +207,117 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   {
     upcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding update");
     LM_E(("Runtime Error (error '%s' forwarding 'Update' to providing application)", out.c_str()));
-    return;
+    return false;
   }
 
   LM_T(LmtCPrForwardResponsePayload, ("forward updateContext response payload: %s", out.c_str()));
 
-
   //
-  // 4. Parse the response and fill in a binary UpdateContextResponse
+  // If NGSIv1:
+  //   4. Parse the response and fill in a binary UpdateContextResponse
+  //   5. Fill in the response from the redirection into the response of this function
+  //   6. 'Fix' StatusCode
+  //   7. Free up memory
   //
-  std::string  s;
-  std::string  errorMsg;
-
-  cleanPayload = jsonPayloadClean(out.c_str());
-
-  if ((cleanPayload == NULL) || (cleanPayload[0] == 0))
+  // If NGSIv2:
+  //   4. Look for "204 No Content" in the response of the forwarded request
+  //   5. If found: OK, else, error
+  //
+  if (upcrP->providerFormat == PfJson)
   {
+    LM_T(LmtForward, ("upcrP->providerFormat == PfJson"));
     //
-    // This is really an internal error in the Context Provider
-    // It is not in the orion broker though, so 404 is returned
+    // 4. Parse the response and fill in a binary UpdateContextResponse
     //
-    LM_W(("Other Error (context provider response to UpdateContext is empty)"));
-    upcrsP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
-    return;
-  }
+    std::string  s;
+    std::string  errorMsg;
 
-  //
-  // NOTE
-  // When coming from a convenience operation, such as GET /v1/contextEntities/EID/attributes/attrName,
-  // the verb/method in ciP is GET. However, the parsing function expects a POST, as if it came from a
-  // POST /v1/updateContext.
-  // So, here we change the verb/method for POST.
-  //
-  ParseData parseData;
+    cleanPayload = jsonPayloadClean(out.c_str());
 
-  ciP->verb   = POST;
-  ciP->method = "POST";
+    if ((cleanPayload == NULL) || (cleanPayload[0] == 0))
+    {
+      //
+      // This is really an internal error in the Context Provider
+      // It is not in the orion broker though, so 404 is returned
+      //
+      LM_W(("Other Error (context provider response to UpdateContext is empty)"));
+      upcrsP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
+      return false;
+    }
 
-  parseData.upcrs.res.errorCode.fill(SccOk);
+    //
+    // NOTE
+    // When coming from a convenience operation, such as GET /v1/contextEntities/EID/attributes/attrName,
+    // the verb/method in ciP is GET. However, the parsing function expects a POST, as if it came from a
+    // POST /v1/updateContext.
+    // So, here we change the verb/method for POST.
+    //
+    ParseData parseData;
 
-  s = jsonTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, NULL);
+    ciP->verb   = POST;
+    ciP->method = "POST";
 
-  if (s != "OK")
-  {
-    LM_W(("Internal Error (error parsing reply from prov app: %s)", errorMsg.c_str()));
-    upcrsP->errorCode.fill(SccContextElementNotFound, "");
+    parseData.upcrs.res.errorCode.fill(SccOk);
+
+    LM_T(LmtForward, ("Parsing Response of Forwarded Request: '%s'", cleanPayload));
+    s = jsonTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, NULL);
+    LM_T(LmtForward, ("Parse Result: %s", s.c_str()));
+
+    if (s != "OK")
+    {
+      LM_W(("Internal Error (error parsing reply from prov app: %s)", errorMsg.c_str()));
+      upcrsP->errorCode.fill(SccContextElementNotFound, "");
+      parseData.upcr.res.release();
+      parseData.upcrs.res.release();
+      return false;
+    }
+
+
+    //
+    // 5. Fill in the response from the redirection into the response of this function
+    //
+    upcrsP->fill(&parseData.upcrs.res);
+
+
+    //
+    // 6. 'Fix' StatusCode
+    //
+    if (upcrsP->errorCode.code == SccNone)
+    {
+      upcrsP->errorCode.fill(SccOk);
+    }
+
+    if ((upcrsP->contextElementResponseVector.size() == 1) && (upcrsP->contextElementResponseVector[0]->statusCode.code == SccContextElementNotFound))
+    {
+      upcrsP->errorCode.fill(SccContextElementNotFound);
+    }
+
+    //
+    // 7. Free up memory
+    //
     parseData.upcr.res.release();
     parseData.upcrs.res.release();
-    return;
+
+    LM_T(LmtForward, ("V1 Forward OK"));
+    return true;
   }
-
-
-  //
-  // 5. Fill in the response from the redirection into the response of this function
-  //
-  upcrsP->fill(&parseData.upcrs.res);
-
-
-  //
-  // 6. 'Fix' StatusCode
-  //
-  if (upcrsP->errorCode.code == SccNone)
+  else  // V2
   {
-    upcrsP->errorCode.fill(SccOk);
+    LM_T(LmtForward, ("upcrP->providerFormat == V2. out: '%s'", out.c_str()));
+    // NGSIv2 forward - no payload to be received, just a 204 No Content HTTP Header
+    if (strstr(out.c_str(), "204 No Content") != NULL)
+    {
+      LM_T(LmtForward, ("Found '204 No Content'"));
+      upcrsP->errorCode.fill(SccNone);
+      return true;
+    }
+
+    LM_W(("Other Error (not the expected response from content provider: %s)", out.c_str()));
+    upcrsP->errorCode.fill(SccReceiverInternalError);
+    return false;
   }
 
-  if ((upcrsP->contextElementResponseVector.size() == 1) && (upcrsP->contextElementResponseVector[0]->statusCode.code == SccContextElementNotFound))
-  {
-    upcrsP->errorCode.fill(SccContextElementNotFound);
-  }
-
-
-  //
-  // 7. Freeing memory
-  //
-  parseData.upcr.res.release();
-  parseData.upcrs.res.release();
+  // Can't reach this point - no return-statement needed
 }
 
 
@@ -525,6 +579,7 @@ std::string postUpdateContext
   // If there is nothing to forward, just return the result
   //
   bool forwarding = forwardsPending(upcrsP);
+  LM_T(LmtForward, ("forwardsPending returned %s", FT(forwarding)));
   if (forwarding == false)
   {
     TIMED_RENDER(answer = upcrsP->toJsonV1(asJsonObject));
@@ -623,7 +678,7 @@ std::string postUpdateContext
         UpdateContextRequest*  reqP = requestV.lookup(aP->providingApplication.get());
         if (reqP == NULL)
         {
-          reqP = new UpdateContextRequest(aP->providingApplication.get(), &cerP->entity);
+          reqP = new UpdateContextRequest(aP->providingApplication.get(), aP->providingApplication.providerFormat, &cerP->entity);
           reqP->updateActionType = ActionTypeUpdate;
           requestV.push_back(reqP);
         }
@@ -659,6 +714,7 @@ std::string postUpdateContext
   // Calling each of the Context Providers, merging their results into the
   // total response 'response'
   //
+  bool forwardOk = true;
 
   for (unsigned int ix = 0; ix < requestV.size() && ix < cprForwardLimit; ++ix)
   {
@@ -669,8 +725,14 @@ std::string postUpdateContext
     }
 
     UpdateContextResponse upcrs;
+    bool                  b;
 
-    updateForward(ciP, requestV[ix], &upcrs);
+    b = updateForward(ciP, requestV[ix], &upcrs);
+
+    if (b == false)
+    {
+      forwardOk = false;
+    }
 
     //
     // Add the result from the forwarded update to the total response in 'response'
@@ -678,26 +740,30 @@ std::string postUpdateContext
     response.merge(&upcrs);
   }
 
+  //
   // Note this is a slight break in the separation of concerns among the different layers (i.e.
   // serviceRoutine/ logic should work in a "NGSIv1 isolated context"). However, it seems to be
   // a smart way of dealing with partial update situations
+  //
   if (ciP->apiVersion == V2)
   {
+    LM_T(LmtForward, ("ciP->apiVersion == V2"));
+    //
     // Adjust OrionError response in the case of partial updates. This may happen in CPr forwarding
     // scenarios. Note that mongoBackend logic "splits" successfull updates and failing updates in
     // two different CER (maybe using the same entity)
-
+    //
     std::string failing = "";
-    unsigned int fails  = 0;
+    unsigned int failures  = 0;
 
+    LM_T(LmtForward, ("Going over a contextElementResponseVector of %d items", response.contextElementResponseVector.size()));
     for (unsigned int ix = 0; ix < response.contextElementResponseVector.size(); ++ix)
     {
-
       ContextElementResponse* cerP = response.contextElementResponseVector[ix];
 
       if (cerP->statusCode.code != SccOk)
       {
-        fails++;
+        failures++;
 
         std::string failingPerCer = "";
         for (unsigned int jx = 0; jx < cerP->entity.attributeVector.size(); ++jx)
@@ -713,29 +779,35 @@ std::string postUpdateContext
       }
     }
 
+    //
     // Note that we modify parseDataP->upcrs.res.oe and not response.oe, as the former is the
     // one used by the calling postBatchUpdate() function at serviceRoutineV2 library
-    if (fails == response.contextElementResponseVector.size())
+    //
+    if ((forwardOk == true) && (failures == 0))
+    {
+      parseDataP->upcrs.res.oe.fill(SccNone, "");
+    }
+    else if (failures == response.contextElementResponseVector.size())
     {
       parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
     }
-    else if (fails > 0)
+    else if (failures > 0)
     {
       // Removing trailing ", "
       failing = failing.substr(0, failing.size() - 2);
 
-      // If some CER (but not all) fails, then it is a partial update
+      // If some CER (but not all) fail, then it is a partial update
       parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "Attributes that were not updated: { " + failing + " }", "PartialUpdate");
     }
-    else  // fails == 0
+    else  // failures == 0
     {
       // No failure, so invalidate any possible OrionError filled by mongoBackend on the mongoUpdateContext step
       parseDataP->upcrs.res.oe.fill(SccNone, "");
     }
-
   }
   else  // v1
   {
+    LM_T(LmtForward, ("ciP->apiVersion != V2"));
     // Note that v2 case doesn't use an actual response (so no need to waste time rendering it).
     // We render in the v1 case only
     TIMED_RENDER(answer = response.toJsonV1(asJsonObject));
