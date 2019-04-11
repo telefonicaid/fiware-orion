@@ -94,7 +94,8 @@ echo
 
 echo "03. Dump the accumulator, see the forwarded query"
 echo "================================================="
-accumulatorDump | grep -v Content-Type
+#accumulatorDump | grep -v Content-Type
+accumulatorDump
 accumulatorReset
 echo
 echo
@@ -132,7 +133,8 @@ echo
 
 echo "06. Dump the accumulator, see the forwarded query"
 echo "================================================="
-accumulatorDump | grep -v Content-Type
+#accumulatorDump | grep -v Content-Type
+accumulatorDump
 accumulatorReset
 echo
 echo
@@ -171,7 +173,8 @@ echo
 
 echo "09. Dump the accumulator, see the forwarded query"
 echo "================================================="
-accumulatorDump | grep -v Content-Type
+#accumulatorDump | grep -v Content-Type
+accumulatorDump
 accumulatorReset
 echo
 echo
@@ -209,7 +212,8 @@ echo
 
 echo "12. Dump the accumulator, see the forwarded query"
 echo "================================================="
-accumulatorDump | grep -v Content-Type
+#accumulatorDump | grep -v Content-Type
+accumulatorDump
 accumulatorReset
 echo
 echo
