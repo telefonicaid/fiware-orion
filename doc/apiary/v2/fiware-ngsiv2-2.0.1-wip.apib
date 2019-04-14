@@ -114,7 +114,7 @@ This specification describes the "full" compliance level.
 ## Conventions
 
 NGSI version 2 uses camel case (camelCase) syntax for naming properties and related artifacts used
-by the API. When  referring to URIs, as part of HATEOAS patterns, and to mark them appropriately,
+by the API. When referring to URIs, as part of HATEOAS patterns, and to mark them appropriately,
 the suffix `_url` is added.
 
 ## Reference Implementations
@@ -192,7 +192,7 @@ Note that in NGSI it is not foreseen that metadata may contain nested metadata.
 
 ## MIME Types
 
-The API response payloads in this specification are based on `application/json` and  (for attribute value 
+The API response payloads in this specification are based on `application/json` and (for attribute value 
 type operation) `text/plain` MIME types. Clients issuing HTTP requests with accept types different 
 than those will get a `406 Not Acceptable` error.
 
@@ -355,7 +355,7 @@ The list of builtin attributes is as follows:
 * `dateExpires` (type: `DateTime`): entity expiration date as an ISO 8601 string. How the server
   controls entity expiration is an implementation specific aspect.
 
-Like regular attributes, they can be  used in `q` filters and in `orderBy`.
+Like regular attributes, they can be used in `q` filters and in `orderBy`.
 However, they cannot be used in resource URLs.
 
 ## Builtin Metadata
@@ -383,7 +383,7 @@ The list of builtin metadata is as follows:
   was included in the request that triggered the notification. Its value depends on the request operation
   type: `update` for updates, `append` for creation and `delete` for deletion. Its type is always `Text`.
 
-Like regular metadata, they can be  used in `mq` filters. However, they cannot be used in resource URLs.
+Like regular metadata, they can be used in `mq` filters. However, they cannot be used in resource URLs.
 
 ## Field syntax restrictions
 
@@ -466,7 +466,7 @@ NGSIv2 `error` reporting is as follows:
 + Errors which are only caused by request itself (i.e. they do not depend on the NGSIv2 server status),
   either in the URL parameters or in the payload, results in `BadRequest`(`400`).
   + Exception: incoming JSON payload errors, which have another `error` message (see previous bullet).
-+ Attemp to exceed spatial index limit results in `NoResourceAvailable` (`413`). See "Geospatial properties of entities"
++ Attempt to exceed spatial index limit results in `NoResourceAvailable` (`413`). See "Geospatial properties of entities"
   section for details.
 + Ambiguity due to the request may refer to several resources, e.g. attempt to update an entity providing only its ID
   and several entities with that ID exist, results in `TooManyResults` (`409`).
@@ -669,7 +669,7 @@ The list of operators (and the format of the values they use) is as follows:
       contain the *target property* and the *target property value* must **not** be any of the values
       in the list (AND clause) (or not include **any** of the values in the list in case the *target
       property value* is an array).
-      Eg. entities whose attribute `color` is set to `black` will not match, while entities whose
+      E.g. entities whose attribute `color` is set to `black` will not match, while entities whose
       attribute `color` is set to `white` will match.
     + A range, specified as a minimum and maximum separated by `..`, e.g. `temperature!=10..20`.
       For an entity to match, it must contain the *target property* (temperature) and the
@@ -705,7 +705,7 @@ The list of operators (and the format of the values they use) is as follows:
 The symbol `:` can be used instead of `==`.
 
 In case of equal or unequal, if the string to match includes a `,`, you can use single quote
-(`'`) to disable the special meaning of the comma,  e.g: `color=='light,green','deep,blue'`.
+(`'`) to disable the special meaning of the comma, e.g.: `color=='light,green','deep,blue'`.
 The first example would match a color with the exact value 'light,green' OR 'deep,blue'. The
 simple quote syntax can be also used to force string interpretation in filters, e.g.
 `q=title=='20'` will match string "20" but not number 20.
@@ -819,7 +819,7 @@ Note that including *only* builtin attributes (metadata) will avoid any user-def
 attribute (metadata). If you want to include builtin attributes (metadata) *and* user-defined
 attributes (metadata) at the same time then
 
-* The user-defined attributes (metadata) have to be explictly included, e.g. to include the user-defined
+* The user-defined attributes (metadata) have to be explicitly included, e.g. to include the user-defined
   attributes A and B along with the builtin attribute `dateModified`, use: `attrs=dateModified,A,B`.
 * The special value `*` can be used as an alias meaning "all user-defined attributes (metadata)", e.g.,
   to include all the user-defined attributes along with the builtin attribute `dateModified`
@@ -1030,10 +1030,10 @@ Response code:
       Retrieve entities whose type matches one of the elements in the list.
       Incompatible with `typePattern`.
 
-    + idPattern: Bode_.* (optional, string) - A correctly formated regular expression.
+    + idPattern: Bode_.* (optional, string) - A correctly formatted regular expression.
       Retrieve entities whose ID matches the regular expression. Incompatible with `id`.
 
-    + typePattern: Room_.* (optional, string) - A correctly formated regular expression.
+    + typePattern: Room_.* (optional, string) - A correctly formatted regular expression.
       Retrieve entities whose type matches the regular expression. Incompatible with `type`.
     
     + q: temperature>40 (optional, string) - A query expression, composed of a list of statements
@@ -1047,7 +1047,7 @@ Response code:
     + georel: near (optional, string) - Spatial relationship between matching entities and a
       reference shape. See [Geographical Queries](#geographical_queries).
 
-    + geometry: point (optional, string) - Geografical area to which the query is restricted.
+    + geometry: point (optional, string) - Geographical area to which the query is restricted.
       See [Geographical Queries](#geographical_queries).
     
     + coords: 41.390205,2.154007;48.8566,2.3522 (optional, string) - List of latitude-longitude
@@ -1243,7 +1243,7 @@ Response:
 
 ### Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]
 
-This request is similar to retreiving the whole entity, however this one omits the `id` and `type`
+This request is similar to retrieving the whole entity, however this one omits the `id` and `type`
 fields.
 
 Just like the general request of getting an entire entity, this operation must return only one
@@ -1534,7 +1534,7 @@ This operation returns the `value` property with the value of the attribute.
   * Else return a HTTP error "406 Not Acceptable: accepted MIME types: application/json, text/plain"
 * If attribute value is a string, number, null or boolean:
   * If `Accept` header can be expanded to text/plain return the value as text. In case of a string, citation
-    marks are used at the begining and end.
+    marks are used at the beginning and end.
   * Else return a HTTP error "406 Not Acceptable: accepted MIME types: text/plain"
 
 Response:
@@ -2315,7 +2315,7 @@ no entities are found. The entities follow the JSON entity representation format
 
 The payload may contain the following elements (all of them optional):
 
-+ `entities`: a list of entites to search for. Each element is represented by a JSON object with the
++ `entities`: a list of entities to search for. Each element is represented by a JSON object with the
   following elements:
     + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
       time, but one of them must be present.
