@@ -45,6 +45,7 @@ prepare:
 
 	./scripts/build/compileInfo.sh --release
 	. scripts/testEnv.sh
+	. /opt/ft_env/bin/activate
 
 install:
 	@echo '------------------------------------- install ------------------------------------------'

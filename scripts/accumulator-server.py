@@ -34,6 +34,10 @@ __author__ = 'fermin'
 #   in the past)
 # * Curl users: use -H "Content-Type: application/xml"  for XML payload (the default:
 #   "Content-Type: application/x-www-form-urlencoded" has been problematic in the pass)
+# * This script requires at least Flask 1.0.2, which comes with Werkzeug 0.15.2. There is a bug
+#   in Werkzeug < 0.11.16 that makes empty "content-length" headers to appear for some request
+#   in the accumulator dump
+
 
 from OpenSSL import SSL
 from flask import Flask, request, Response
