@@ -46,7 +46,6 @@ yum -y install \
   tar \
   cyrus-sasl-devel
 
-
 curl -L https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz | tar xzC /opt/ \
 && cd /opt/mongo-cxx-driver-legacy-1.1.2 \
 && scons --disable-warnings-as-errors --use-sasl-client --ssl \
@@ -70,14 +69,6 @@ curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.t
 && make \
 && make install \
 && rm -Rf /opt/gmock-1.5.0
-
-curl -L https://curl.haxx.se/download/curl-7.58.0.tar.gz | tar xzC /opt/ \
-&& cd /opt/curl-7.58.0 \
-&& ./configure \
-&& make \
-&& make install \
-&& rm -Rf /opt/curl-7.58.0
-
 
 # FIXME: the MQTT notification work is yet ongoing, so this is not needed yet. It should be aligned
 # which the same procedure described in "Build from source" documentation
