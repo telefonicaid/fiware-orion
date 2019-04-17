@@ -90,7 +90,7 @@ functional:
 	# ft_env needed for accumulator-server.py. Very import to "chain" the two commands with '; \'
 	# otherwise it seems testHarness.sh doesn't get the venv and it uses default Python in the system
 	. /opt/ft_env/bin/activate ; \
-	./test/functionalTest/testHarness.sh --stopOnError
+	CB_DIFF_TOOL="diff -u" ./test/functionalTest/testHarness.sh
 
 style:
 	@echo '------------------------------------- make style ---------------------------------------'
