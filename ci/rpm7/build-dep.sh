@@ -38,7 +38,6 @@ yum -y install \
   mongodb-org \
   mongodb-org-shell \
   nc \
-  pyOpenSSL \
   python \
   python-pip \
   rpm-build \
@@ -87,6 +86,7 @@ cd /opt \
 && virtualenv /opt/ft_env \
 && . /opt/ft_env/bin/activate \
 && pip install Flask==1.0.2 \
+&& pip install pyOpenSSL==19.0.0 \
 && deactivate
 
 ldconfig
