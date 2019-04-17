@@ -37,6 +37,7 @@ __author__ = 'fermin'
 # * This script requires at least Flask 1.0.2, which comes with Werkzeug 0.15.2. There is a bug
 #   in Werkzeug < 0.11.16 that makes empty "content-length" headers to appear for some request
 #   in the accumulator dump
+# * This script also depends on pyOpenSSL 19.0.0
 
 
 from OpenSSL import SSL

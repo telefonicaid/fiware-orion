@@ -123,9 +123,9 @@ command:
 # ./accumulator-server.py --port 1028 --url /accumulate --host ::1 --pretty-print -v
 ```
 
-Note this script requires Flask version 1.0.2, which can be installed using
-`pip install Flask==1.0.2`. In case of conflict with your base operating system
-Python installation, we recommend to use [virtualenv](https://virtualenv.pypa.io/en/latest/).
+Note this script requires Flask version 1.0.2 and pyOpenSSL version 19.0.0, which can be installed using
+`pip install Flask==1.0.2` and `pip install pyOpenSSL==19.0.0`. In case of conflict with your 
+base operating system Python installation, we recommend to use [virtualenv](https://virtualenv.pypa.io/en/latest/).
 
 [Top](#top)
 
