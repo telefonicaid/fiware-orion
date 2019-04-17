@@ -401,13 +401,16 @@ if __name__ == '__main__':
     # makes the calle os.path.isfile(pidfile) return True, even if the file doesn't exist. Thus,
     # use debug=True below with care :)
     if (https):
-      # According to http://stackoverflow.com/questions/28579142/attributeerror-context-object-has-no-attribute-wrap-socket/28590266, the
-      # original way of using context is deprecated. New way is simpler. However, we are still testing this... some environments
-      # fail in some configurations (the current one is an attempt to make this to work at jenkins)
-      context = SSL.Context(SSL.SSLv23_METHOD)
-      context.use_privatekey_file(key_file)
-      context.use_certificate_file(cert_file)
-      #context = (cert_file, key_file)
+      # Commented lines correspond to the way of using context with pyOpenSSL 0.13.1 (the one that comes with system Python in CentOS 7).
+      # We are using the new way (which is simpler) as we moved to pyOpenSSL 19.0.0. Referecence: Reference: http://stackoverflow.com/questions/28579142/attributeerror-context-object-has-no-attribute-wrap-socket/28590266
+      #
+      # We need to upgrade pyOpenSSL version due to problems of installing 0.13.1 inside virtualenv. Installing the module
+      # requires to compile some parts and this cause a conflict with base openssl devel libraries in CentOS 7 (solvable by hack, but we want to avoid it)
+      
+      #context = SSL.Context(SSL.SSLv23_METHOD)
+      #context.use_privatekey_file(key_file)
+      #context.use_certificate_file(cert_file)
+      context = (cert_file, key_file)
       app.run(host=host, port=port, debug=False, ssl_context=context)
     else:
       app.run(host=host, port=port)
