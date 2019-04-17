@@ -924,7 +924,7 @@ function mongoCmd2()
 
   db=$1
   cmd=$2
-  echo $cmd | mongo mongodb://$host:$port/$db
+  echo $cmd | mongo mongodb://$host:$port/$db | grep -v "Implicit session: session" | sed 's/?gssapiServiceName=mongodb//'
 }
 
 

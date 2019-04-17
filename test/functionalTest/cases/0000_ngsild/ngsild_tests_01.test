@@ -91,9 +91,9 @@ Date: REGEX(.*)
 
 02. Get the entity from mongo
 =============================
-MongoDB shell version v3.4.7
+MongoDB shell version REGEX(.*)
 connecting to: mongodb://REGEX(.*)/ftest
-MongoDB server version: 3.4.7
+MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:ngsi-ld:T:REGEX(.*)",
