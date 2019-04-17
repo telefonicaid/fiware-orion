@@ -45,7 +45,6 @@ prepare:
 
 	./scripts/build/compileInfo.sh --release
 	. scripts/testEnv.sh
-	. /opt/ft_env/bin/activate
 
 install:
 	@echo '------------------------------------- install ------------------------------------------'
@@ -88,6 +87,8 @@ install_functional: install
 functional:
 	@echo '------------------------------------- make functional ----------------------------------'
 
+	# ft_env needed for accumulator-server.py
+	. /opt/ft_env/bin/activate
 	./test/functionalTest/testHarness.sh --stopOnError
 
 style:
