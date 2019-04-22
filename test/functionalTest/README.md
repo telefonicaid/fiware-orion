@@ -1,12 +1,12 @@
 ## How to run functional tests
 
-## Prerequisites
+### Prerequisites
 
 * The `contextBroker` binary is in execution path
 * MongoDB database is up and running
 * accumulator-server.py is correctly installed and available in the execution path (see specific section below)
 
-## How to install accumulator-server.py
+### How to install accumulator-server.py
 
 We recommend to use Python [virtualenv](https://virtualenv.pypa.io/en/latest) to install the required dependencies to avoid any potential conflict with operating system Python installation. So, first create your virtual env (named for instance `ft_env`):
 
@@ -42,7 +42,7 @@ accumulator-server.py -u
 
 **IMPORTANT:** remember to activate the virtual env (`. /path/to/ft_env/bin/activate`) before running functional tests
 
-## Run functional tests
+### Run functional tests
 
 The easiest way is running just:
 
