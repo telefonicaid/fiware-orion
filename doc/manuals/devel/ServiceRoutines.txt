@@ -421,5 +421,3 @@ MISC REQUESTS:
   *       /ngsi10/{ANYTHING}                                                      badNgsi10Request
 
   *       {ANYTHING}                                                              badRequest
-
-
