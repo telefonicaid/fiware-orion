@@ -155,7 +155,7 @@ Some additional comments:
     order to obtain a match. Otherwise you may encounter problems, like the one described in this
     [post at StackOverflow](https://stackoverflow.com/questions/48163972/orion-cb-doesnt-update-lazy-attributes-on-iot-agent).
 -   Query filtering (e.g. `GET /v2/entities?q=temperature>40`) is not supported on query forwarding. First, Orion
-    doesn't include the filter in the `POST /v1/queryContext` operation forwarded to CPr. Second, Orion doesn't filter
+    doesn't include the filter in the `GET /v2/entities` operation forwarded to CPr. Second, Orion doesn't filter
     the CPr results before responding them back to client. An issue corresponding to this limitation has been created:
     https://github.com/telefonicaid/fiware-orion/issues/2282
 -   In the case of partial updates (e.g. `POST /v2/op/entities` resulting in some entities/attributes being updated and
