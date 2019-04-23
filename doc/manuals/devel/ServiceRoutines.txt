@@ -3,7 +3,7 @@ In the graph, you can clearly see which service routines call other service rout
 finally the function of mongoBackend (if any) where the request ends up.
 
 NOTE:
-  The OPTIONS verb is only supported by the broker is started with the CLI option '-corsOrigin'
+  The OPTIONS verb is only supported by the broker if started with the CLI option '-corsOrigin'
 
 
 API V2:
