@@ -74,7 +74,7 @@ curl localhost:1026/v2/entities/Street4/attrs/temperature?type=Street -s -S \
   <http://sensor48.mycity.com/v2> does know about the Street4 temperature, so it forwards the query
   (message number 3) to the URL
   <http://sensor48.mycity.com/v2/entities> (i.e., the URL used in
-  the Providing Application field at registration time, and adding "/entities" to the URL PATH).
+  the `url` field at registration time, and adding "/entities" to the URL PATH).
 
 If NGSIv2 forwarding is used, the forwarded query doesn't carry any payload.
 It would be something like this:

@@ -204,7 +204,7 @@ Date: REGEX(.*)
                 }
             },
             "sum": {
-                "incomingTransactionResponseSize": REGEX(.*),
+                "incomingTransactionResponseSize": 320,
                 "incomingTransactions": 2,
                 "serviceTime": REGEX(.*)
             }
