@@ -59,15 +59,15 @@ API V2:
   OPTIONS /v2/subscriptions/{SUBID}                                               optionsGetDeletePatchOnly
   *       /v2/subscriptions/{SUBID}                                               badVerbGetDeletePatchOnly
 
-  GET     /v2/registrations/{REGID}                                               getRegistration ---------------------------------------->
-  DELETE  /v2/registrations/{REGID}                                               deleteRegistration ------------------------------------->
-  OPTIONS /v2/registrations/{REGID}                                               optionsGetDeleteOnly ----------------------------------->
-  *       /v2/registrations/{REGID}                                               badVerbGetDeleteOnly ----------------------------------->
+  GET     /v2/registrations/{REGID}                                               getRegistration ----------------------------------------------------------------------------------------------------------> mongoRegistrationGet
+  DELETE  /v2/registrations/{REGID}                                               deleteRegistration -------------------------------------------------------------------------------------------------------> mongoRegistrationDelete
+  OPTIONS /v2/registrations/{REGID}                                               optionsGetDeleteOnly
+  *       /v2/registrations/{REGID}                                               badVerbGetDeleteOnly
 
-  GET     /v2/registrations                                                       getRegistrations --------------------------------------->
-  POST    /v2/registrations                                                       getRegistrations --------------------------------------->
-  OPTIONS /v2/registrations                                                       optionsGetPostOnly ------------------------------------->
-  *       /v2/registrations                                                       badVerbGetPostOnly ------------------------------------->
+  GET     /v2/registrations                                                       getRegistrations ---------------------------------------------------------------------------------------------------------> mongoRegistrationsGet
+  POST    /v2/registrations                                                       getRegistrations ---------------------------------------------------------------------------------------------------------> mongoRegistrationCreate
+  OPTIONS /v2/registrations                                                       optionsGetPostOnly
+  *       /v2/registrations                                                       badVerbGetPostOnly
 
   POST    /v2/op/query                                                            postBatchQuery --------------------------------------------> postQueryContext  -------------------------------------------> mongoQueryContext
   *       /v2/op/query                                                            badVerbPostOnly
