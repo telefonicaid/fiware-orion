@@ -11,7 +11,7 @@
 We recommend to use Python [virtualenv](https://virtualenv.pypa.io/en/latest) to install the required dependencies to avoid any potential conflict with operating system Python installation. So, first create your virtual env (named for instance `ft_env`):
 
 ```
-pip install virtualenv  # if you doesn't have virtualenv itself previously installed
+pip install virtualenv  # if you don't have virtualenv itself previously installed
 virtualenv /path/to/ft_env
 ```
 
@@ -31,7 +31,7 @@ pip install pyOpenSSL==19.0.0
 Next, install the accumulator-server.py script itself:
 
 ```
-make install_scripts  # add INSTALL_DIR=... if you need to install in an specific place
+make install_scripts  # add INSTALL_DIR=... if you need to install in a specific place
 ```
 
 and check that you have it in the path:

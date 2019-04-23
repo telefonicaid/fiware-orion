@@ -405,7 +405,7 @@ if __name__ == '__main__':
       # We are using the new way (which is simpler) as we moved to pyOpenSSL 19.0.0. Referecence: Reference: http://stackoverflow.com/questions/28579142/attributeerror-context-object-has-no-attribute-wrap-socket/28590266
       #
       # We need to upgrade pyOpenSSL version due to problems of installing 0.13.1 inside virtualenv. Installing the module
-      # requires to compile some parts and this cause a conflict with base openssl devel libraries in CentOS 7 (solvable by hack, but we want to avoid it)
+      # requires to compile some parts and this causes a conflict with base openssl devel libraries in CentOS 7 (solvable by hack, but we want to avoid it)
       
       #context = SSL.Context(SSL.SSLv23_METHOD)
       #context.use_privatekey_file(key_file)

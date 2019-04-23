@@ -78,7 +78,7 @@ curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.t
 #  && rm -Rf /opt/mosquitto-1.5
 
 # CentOS 7 installs Flask==0.10.1 which depends on Werkzeug==0.9.1. There is a bug
-# in Werkzeug which makes an empty content-length header to appear in the accumulator-server.py
+# in Werkzeug which makes an empty content-length header appear in the accumulator-server.py
 # dumps. The bug is fixed in Werkzeug==0.11.16. Thus, we override the system setting,
 # installing in the virtual env Flask==1.0.2, which depends on Werkzeug==0.15.2
 cd /opt \
