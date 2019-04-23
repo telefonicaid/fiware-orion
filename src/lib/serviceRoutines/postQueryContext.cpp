@@ -60,15 +60,16 @@ static char* jsonPayloadClean(const char* payload)
   //
   // After HTTP headers comes an empty line.
   // After this empty line comes the payload.
-  // This function returns a pointer to the first byte of the payload
+  // This function returns a pointer to the first byte after an empty line, if found
+  // This "first byte" is the first byte of the payload
   //
   while (*payload != 0)
   {
-    if (*payload == '\n')
+    if (*payload == '\n')  // One newline is found
     {
-      if (payload[1] == '\n')
+      if (payload[1] == '\n')  // And the second one - we have found the start of the payload
         return (char*) &payload[2];
-      if ((payload[1] == 13) && (payload[2] == '\n'))
+      if ((payload[1] == '\r') && (payload[2] == '\n'))  // "windows style newline with \r\n"
         return (char*) &payload[3];
     }
 
@@ -103,7 +104,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   int             port;
   std::string     prefix;
 
-  LM_T(LmtForward, ("Forwarding a query in mode '%s'", qcrP->forwardingMode.c_str()));
+  LM_T(LmtForward, ("Forwarding a query in mode '%s' (%d)", (qcrP->providerFormat == PfJson)? "V1" : "V2", qcrP->providerFormat));
 
   //
   // 1. Parse the providing application to extract IP, port and URI-path
@@ -123,10 +124,9 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
 
 
   //
-  // 2. Send the request to the Context Provider (and await the reply)
-  //    Render the payload if V1 forward
-  //
-  // FIXME P7: Should Rush be used?
+  // 2. Prepare the request to forward
+  //    - If V1: Render the payload
+  //    - If V2: Setup the URI params
   //
   std::string     payload;
   std::string     verb;
@@ -135,8 +135,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
   std::string     mimeType;
 
-  LM_TMP(("qcrP->forwardingMode == '%s'", qcrP->forwardingMode.c_str()));
-  if ((qcrP->forwardingMode == "JSON") || (qcrP->forwardingMode == ""))
+  if (qcrP->providerFormat == PfJson)
   {
     verb      = "POST";
     resource  = prefix + "/queryContext";
@@ -147,42 +146,94 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   }
   else
   {
-    std::string  extraHeaders;
+    //
+    // NGSIv2 forward: instead of payload, URI params are used
+    //
+    std::string  extraParams;
 
     verb      = "GET";
     resource  = prefix + "/entities";
 
     if (ciP->uriParam["type"] != "")
     {
-      extraHeaders = "&type=" + ciP->uriParam["type"];
+      extraParams += "&type=";
+      extraParams += ciP->uriParam["type"];
     }
 
-    if (ciP->uriParam["id"] != "")
+    if (qcrP->entityIdVector.size() > 0)
     {
-      extraHeaders = "&id=" + ciP->uriParam["id"];
-    }
+      //
+      // A few remarks about the list of entity ids:
+      //   - If more than one ID is present, we just make a comma-separated list of them
+      //   - We can't allow mixes between id and idPattern
+      //   - There can only be ONE idPattern (lists aren't supported for idPatterns)
+      //   - If an idPattern is present and equal to ".*", we can simply ignore it - .* matches ALL entity ids
+      //
+      if ((qcrP->entityIdVector.size() == 1) && (qcrP->entityIdVector[0]->isPattern == "true"))
+      {
+        //
+        // This is the only case where isPattern is allowed to be true - ONE entity in qcrP->entityIdVector
+        // In all other places (see below) isPattern set to TRUE is an error (that is silently ignored)
+        //
 
-    if (ciP->entityIdFromUrlPath != "")
-    {
-      extraHeaders = "&id=" + ciP->entityIdFromUrlPath;
+        // If the idPattern is '.*', then no need to add it to the query
+        if (qcrP->entityIdVector[0]->id != ".*")
+        {
+          extraParams += "&idPattern=";
+          extraParams += qcrP->entityIdVector[0]->id;
+        }
+      }
+      else
+      {
+        extraParams += "&id=";
+
+        LM_T(LmtForward, ("KZ: id: %s (isPattern: %s, #ids: %d)",  qcrP->entityIdVector[0]->id.c_str(), qcrP->entityIdVector[0]->isPattern.c_str(), qcrP->entityIdVector.size()));
+        for (unsigned int ix = 0; ix < qcrP->entityIdVector.size(); ix++)
+        {
+          if (qcrP->entityIdVector[ix]->isPattern == "false")  // Silently ignored if "true"
+          {
+            if (ix != 0)
+            {
+              extraParams += ",";
+            }
+
+            extraParams += qcrP->entityIdVector[ix]->id;
+          }
+        }
+      }
     }
 
     if (ciP->uriParam["attrs"] != "")
     {
-      extraHeaders = "&attrs=" + ciP->uriParam["attrs"];
+      extraParams += "&attrs=";
+      extraParams += ciP->uriParam["attrs"];
+    }
+    else if (qcrP->attributeList.size() != 0)
+    {
+      extraParams += "&attrs=";
+      extraParams += qcrP->attributeList[0];
+
+      for (unsigned int ix = 1; ix < qcrP->attributeList.size(); ix++)
+      {
+        extraParams += ",";
+        extraParams += qcrP->attributeList[ix];
+      }
     }
 
-    if (extraHeaders != "")
+    if (extraParams != "")
     {
-      char* xHeaders = (char*) &(extraHeaders.c_str())[1];  // Remove first '&'
+      char* xParams = (char*) &(extraParams.c_str())[1];  // Remove first '&'
 
       resource += "?";
-      resource += xHeaders;
+      resource += xParams;
     }
   }
 
   LM_T(LmtForward, ("verb: %s", verb.c_str()));
 
+  //
+  // 3. Send the request to the Context Provider (and await the reply)
+  //
   std::string     out;
   int             r;
 
@@ -228,7 +279,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   LM_T(LmtForward, ("clean response payload: %s", cleanPayload));
 
 
-  if ((qcrP->forwardingMode == "JSON") || (qcrP->forwardingMode == ""))
+  if (qcrP->providerFormat == PfJson)
   {
     std::string  s;
     std::string  errorMsg;
@@ -437,21 +488,27 @@ std::string postQueryContext
   {
     Entity* eP = &qcrsP->contextElementResponseVector[ix]->entity;
 
-    LM_T(LmtForward, ("Forwarding Mode: %s", eP->forwardingMode.c_str()));
     LM_T(LmtForward, ("Entity: '%s'/'%s'/'%s'/'%s'", eP->id.c_str(), eP->isPattern.c_str(), eP->type.c_str(), FT(eP->isTypePattern)));
-
+    LM_T(LmtForward, ("No of providingApplications for Entity: %d", eP->providingApplicationList.size()));
     if (eP->providingApplicationList.size() != 0)
     {
       for (unsigned int paIx = 0; paIx < eP->providingApplicationList.size(); paIx++)
-        LM_T(LmtForward, ("Entity PA: %s", eP->providingApplicationList[paIx].string.c_str()));
+      {
+        const char* providingApplication = eP->providingApplicationList[paIx].string.c_str();
+        const char* providerFormat       = (eP->providingApplicationList[paIx].providerFormat == PfJson)? "V1" : "V2";
+
+        LM_T(LmtForward, ("Entity PA: %s (provider format: %s (%d))", providingApplication, providerFormat, eP->providingApplicationList[paIx].providerFormat));
+      }
     }
+    else
+      LM_T(LmtForward, ("eP->providingApplicationList is EMPTY"));
 
     for (unsigned int aIx = 0; aIx < eP->attributeVector.size(); aIx++)
     {
       ContextAttribute* aP = eP->attributeVector[aIx];
 
       if (aP->providingApplication.string != "")
-        LM_T(LmtForward, ("Attribute %d: %s (Providing Application: %s)", aIx, aP->name.c_str(), aP->providingApplication.string.c_str()));
+        LM_T(LmtForward, ("Attribute %d: %s (Providing Application: %s, providerFormat: %d)", aIx, aP->name.c_str(), aP->providingApplication.string.c_str(), aP->providingApplication.providerFormat));
       else
         LM_T(LmtForward, ("Attribute %d: %s (No Providing Application)", aIx, aP->name.c_str()));
     }
@@ -527,11 +584,13 @@ std::string postQueryContext
     // When there is a Context Provider in ContextElement::providingApplicationList, then the
     // request must be sent to that Context Provider also
     //
+    LM_T(LmtForward, ("%d items in cerP->entity.providingApplicationList", cerP->entity.providingApplicationList.size()));
     for (unsigned int ix = 0; ix < cerP->entity.providingApplicationList.size(); ++ix)
     {
       QueryContextRequest* requestP;
 
-      requestP = new QueryContextRequest(cerP->entity.providingApplicationList[ix].get(), &en, qcrP->attributeList, cerP->entity.forwardingMode);
+      requestP = new QueryContextRequest(cerP->entity.providingApplicationList[ix].get(), &en, qcrP->attributeList, cerP->entity.providingApplicationList[ix].providerFormat);
+      LM_T(LmtForward, ("Pushing a QueryContextRequest to requestV - providerFormat == %d", requestP->providerFormat));
       requestV.push_back(requestP);
     }
 
@@ -589,7 +648,8 @@ std::string postQueryContext
 
         if (requestP == NULL)
         {
-          requestP = new QueryContextRequest(aP->providingApplication.get(), &en, aP->name, cerP->entity.forwardingMode);
+          requestP = new QueryContextRequest(aP->providingApplication.get(), &en, aP->name, aP->providingApplication.providerFormat);
+          LM_T(LmtForward, ("Pushing a QueryContextRequest to requestV - providerFormat == %d", requestP->providerFormat));
           requestV.push_back(requestP);
         }
         else
@@ -636,6 +696,7 @@ std::string postQueryContext
   //
   QueryContextResponse* qP;
 
+  LM_T(LmtForward, ("Forwarding %d items in requestV", requestV.size()));
   for (unsigned int fIx = 0; fIx < requestV.size() && fIx < cprForwardLimit; ++fIx)
   {
     if (requestV[fIx]->contextProvider == "")

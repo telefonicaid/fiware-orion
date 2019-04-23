@@ -87,7 +87,7 @@ install_functional: install
 functional:
 	@echo '------------------------------------- make functional ----------------------------------'
 
-	./test/functionalTest/testHarness.sh --stopOnError
+	CB_DIFF_TOOL="diff -u" ./test/functionalTest/testHarness.sh
 
 style:
 	@echo '------------------------------------- make style ---------------------------------------'

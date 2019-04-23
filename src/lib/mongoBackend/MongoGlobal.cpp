@@ -1841,7 +1841,6 @@ void pruneContextElements(const ContextElementResponseVector& oldCerV, ContextEl
 
     // FIXME P10: not sure if this is the right way to do it, maybe we need a fill() method for this
     newCerP->entity.providingApplicationList = cerP->entity.providingApplicationList;
-    newCerP->entity.forwardingMode           = cerP->entity.forwardingMode;
     newCerP->statusCode.fill(&cerP->statusCode);
 
     bool pruneEntity = cerP->prune;
@@ -1927,14 +1926,15 @@ static void processContextRegistrationElement
   const StringList&                   attrL,
   ContextRegistrationResponseVector*  crrV,
   MimeType                            mimeType,
-  const std::string&                  forwardingMode
+  ProviderFormat                      providerFormat
 )
 {
   ContextRegistrationResponse crr;
 
   crr.contextRegistration.providingApplication.set(getStringFieldF(cr, REG_PROVIDING_APPLICATION));
   crr.contextRegistration.providingApplication.setMimeType(mimeType);
-
+  crr.contextRegistration.providingApplication.setProviderFormat(providerFormat);
+  LM_T(LmtForward, ("Set providerFormat to %d for CRR", providerFormat));
   std::vector<BSONElement> queryEntityV = getFieldF(cr, REG_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < queryEntityV.size(); ++ix)
@@ -1975,7 +1975,8 @@ static void processContextRegistrationElement
     ContextRegistrationResponse* crrP = new ContextRegistrationResponse();
 
     crrP->contextRegistration = crr.contextRegistration;
-    crrP->forwardingMode      = forwardingMode;
+    crrP->providerFormat      = providerFormat;
+
     crrV->push_back(crrP);
   }
 }
@@ -2126,10 +2127,12 @@ bool registrationsQuery
     MimeType                  mimeType = JSON;
     std::vector<BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
     std::string               format                    = getStringFieldF(r, REG_FORMAT);
+    ProviderFormat            providerFormat            = (format == "")? PfJson : (format == "JSON")? PfJson : PfV2;
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
     {
-      processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType, format);
+      LM_T(LmtForward, ("Processing ContextRegistrationElement. providerFormat == '%s' (%d)", format.c_str(), providerFormat));
+      processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType, providerFormat);
     }
 
     /* FIXME: note that given the response doesn't distinguish from which registration ID the

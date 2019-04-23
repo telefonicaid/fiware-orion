@@ -58,10 +58,10 @@ QueryContextRequest::QueryContextRequest()
 *
 * QueryContextRequest::QueryContextRequest
 */
-QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName, const std::string& _forwardingMode)
+QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName, ProviderFormat _providerFormat)
 {
   contextProvider = _contextProvider;
-  forwardingMode  = _forwardingMode;
+  providerFormat  = _providerFormat;
 
   entityIdVector.push_back(new EntityId(eP));
 
@@ -79,10 +79,10 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 *
 * QueryContextRequest::QueryContextRequest
 */
-QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const StringList& _attributeList, const std::string& _forwardingMode)
+QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const StringList& _attributeList, ProviderFormat _providerFormat)
 {
   contextProvider = _contextProvider;
-  forwardingMode  = _forwardingMode;
+  providerFormat  = _providerFormat;
 
   entityIdVector.push_back(new EntityId(eP));
 
