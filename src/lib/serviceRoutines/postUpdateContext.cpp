@@ -213,7 +213,7 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   LM_T(LmtCPrForwardResponsePayload, ("forward updateContext response payload: %s", out.c_str()));
 
   //
-  // If NGSIv1:
+  // If NGSIv1 (providerFormat == PfJson):
   //   4. Parse the response and fill in a binary UpdateContextResponse
   //   5. Fill in the response from the redirection into the response of this function
   //   6. 'Fix' StatusCode
@@ -298,10 +298,9 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
     parseData.upcr.res.release();
     parseData.upcrs.res.release();
 
-    LM_T(LmtForward, ("V1 Forward OK"));
     return true;
   }
-  else  // V2
+  else  // NGSIv2
   {
     LM_T(LmtForward, ("upcrP->providerFormat == V2. out: '%s'", out.c_str()));
     // NGSIv2 forward - no payload to be received, just a 204 No Content HTTP Header
@@ -312,7 +311,7 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
       return true;
     }
 
-    LM_W(("Other Error (not the expected response from content provider: %s)", out.c_str()));
+    LM_W(("Other Error (unexpected response from context provider: %s)", out.c_str()));
     upcrsP->errorCode.fill(SccReceiverInternalError);
     return false;
   }

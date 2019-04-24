@@ -2036,15 +2036,14 @@ bool registrationsQuery
   mongo::BSONArrayBuilder  entityOr;
 
   //
-  // If only one entity in the REST request, the query to mongo can be simplified
+  // If there's only one entity in the REST request, the query to mongo can be simplified.
   // NGSIv2 requests like PATCH /v2/entities/<EID>/attrs can have only ONE entity
   // and will ALWAYS enter the "then part" of the if-then-else.
   //
-  // Note than registrations with entity id as a pattern is treated by the "then part" but not
-  // by the older "else part".
-  //
-  // One NGSIv1 is removed from the source code, the "else part" can be removed by just making sure that
-  // NGSIv2 batch operations call this function once per entity in the request.
+  // FIXME: Note than registrations with entity id as a pattern is treated by the "then part" but not by the older "else part".
+  //        When forwarding for batch update is implemented this needs to be fixed, somehow
+  // Once NGSIv1 is removed from the source code, the "else part" can be removed by just making sure that
+  // NGSIv2 batch operations call this function once per entity in the request (modifications needed).
   // Or, we'd need to reimplement to make the else-part also support registrations with entity id as a pattern.
   //
   if (enV.size() == 1)
@@ -2064,11 +2063,11 @@ bool registrationsQuery
 
       // If the Registration is with idPattern, then it matches, as the only idPattern allowed for Registrations is ".*"
       entityAnd.append("contextRegistration.entities.isPattern", "true");
-      entityAnd.append("contextRegistration.entities.id", ".*");  // TPUT: if isPattern == true, then id MUST be ".*" !  Remove?
+      entityAnd.append("contextRegistration.entities.id", ".*");  // FIXME TPUT: if isPattern == true, then id MUST be ".*" !  Remove?
       entityOr.append(entityAnd.obj());
 
       if (enV[0]->isPattern == "true") id.appendRegex("contextRegistration.entities.id", enV[0]->id);
-      else                             id.append("contextRegistration.entities.id", enV[0]->id);
+      else                             id.append("contextRegistration.entities.id",      enV[0]->id);
 
       entityOr.append(id.obj());
       queryBuilder.append("$or", entityOr.arr());
