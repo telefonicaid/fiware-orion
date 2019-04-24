@@ -154,6 +154,10 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
     verb      = "GET";
     resource  = prefix + "/entities";
 
+    //
+    // FIXME #3068: For requests where the type comes in the payload (batch op + NGSIv1), we'd need to add an else part
+    //              to extract the type from the incoming payload
+    //
     if (ciP->uriParam["type"] != "")
     {
       extraParams += "&type=";

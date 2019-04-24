@@ -96,7 +96,6 @@ static void setProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
   }
   else
   {
-    // FIXME #3068: to be implemented once we define NGSIv2 based forwarding
     regP->provider.legacyForwardingMode = false;
   }
 }
