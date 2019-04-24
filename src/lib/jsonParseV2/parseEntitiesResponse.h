@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_APITYPESV2_ENTITIES_H_
-#define SRC_LIB_APITYPESV2_ENTITIES_H_
+#ifndef SRC_LIB_JSONPARSEV2_PARSEENTITIESRESPONSE_H_
+#define SRC_LIB_JSONPARSEV2_PARSEENTITIESRESPONSE_H_
 
 /*
 *
@@ -23,46 +23,28 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Orion dev team
 */
 #include <string>
 #include <vector>
-#include <map>
 
-#include "apiTypesV2/EntityVector.h"
-#include "rest/OrionError.h"
+#include "rapidjson/document.h"
 
-
-
-/* ****************************************************************************
-*
-* To avoid a problematic and not necessary include
-*/
-struct QueryContextResponse;
+#include "rest/ConnectionInfo.h"
+#include "apiTypesV2/Entities.h"
 
 
 
 /* ****************************************************************************
 *
-* Entities - 
+* parseEntitiesResponse -
 */
-class Entities
-{
- public:
-  EntityVector  vec;          // Mandatory
+extern bool parseEntitiesResponse
+(
+  ConnectionInfo*   ciP,
+  const char*       payload,
+  Entities*         evP,
+  OrionError*       oeP
+);
 
-  Entities();
-  ~Entities();
-
-  std::string  toJson(RenderFormat                     renderFormat,
-                      const std::vector<std::string>&  attrsFilter,
-                      bool                             blacklist,
-                      const std::vector<std::string>&  metadataFilter);
-
-  std::string  check(RequestType requestType);
-  void         release(void);
-  void         fill(const QueryContextResponse& qcrs, OrionError* oeP);
-  int          size(void) const { return vec.vec.size(); }
-};
-
-#endif  // SRC_LIB_APITYPESV2_ENTITIES_H_
+#endif  // SRC_LIB_JSONPARSEV2_PARSEENTITIESRESPONSE_H_

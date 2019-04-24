@@ -194,9 +194,9 @@ Fields:
     we ensure that registration IDs are unique and that queries by
     registration IDs will be very fast (as there is an automatic default
     index in \_id).
--   **format**: the format to use to send forwarded requests. The only accepted value for now
-    is **JSON** (meaning NGSIv1 format), although this
-    may change in the future (see [issue about NGSIv2-based forwarding](https://github.com/telefonicaid/fiware-orion/issues/3068)).
+-   **format**: the format to use to send forwarded requests.
+    For NGSIv1 format, use **JSON** as value for `format`.
+    For NGSIv2, as of today, only **normalized** format is supported.
 -   **servicePath**: related with [the service
     path](../user/service_path.md) functionality.
 -   **status** (optional): either `active` (for active registrations) or `inactive` (for inactive registrations).

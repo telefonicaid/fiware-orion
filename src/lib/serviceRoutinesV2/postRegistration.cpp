@@ -67,17 +67,6 @@ std::string postRegistration
   std::string           answer;
 
   //
-  // FIXME P4: legacyForwardingMode = false to be implemented
-  //
-  if (parseDataP->reg.provider.legacyForwardingMode == false)
-  {
-    oe.fill(SccNotImplemented, "Only NGSIv1-based forwarding supported at the present moment. Set explictely legacyForwarding to true");
-    ciP->httpStatusCode = oe.code;
-    TIMED_RENDER(answer = oe.smartRender(ciP->apiVersion));
-    return answer;
-  }
-
-  //
   // FIXME P4: Forwarding modes "none", "query", and "update" to be implemented
   //
   if (parseDataP->reg.provider.supportedForwardingMode != ngsiv2::ForwardAll)

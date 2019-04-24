@@ -504,7 +504,14 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
   if (notification.HasMember("attrs"))
   {
-    if (parseStringVector(&subsP->notification.attributes, notification["attrs"], "attrs", true, true, &errorString) == false)
+    bool b = parseStringVector(&subsP->notification.attributes,
+                               notification["attrs"],
+                               "attrs",
+                               true,
+                               true,
+                               &errorString);
+
+    if (b == false)
     {
       return badInput(ciP, errorString);
     }
@@ -536,7 +543,14 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   // metadata
   if (notification.HasMember("metadata"))
   {
-    if (parseStringVector(&subsP->notification.metadata, notification["metadata"], "metadata", true, true, &errorString) == false)
+    bool b = parseStringVector(&subsP->notification.metadata,
+                               notification["metadata"],
+                               "metadata",
+                               true,
+                               true,
+                               &errorString);
+
+    if (b == false)
     {
       return badInput(ciP, errorString);
     }
@@ -592,8 +606,13 @@ static std::string parseNotifyConditionVector
   if (condition.HasMember("attrs"))
   {
     std::string errorString;
-
-    if (parseStringVector(&subsP->subject.condition.attributes, condition["attrs"], "attrs", true, true, &errorString) == false)
+    bool        b = parseStringVector(&subsP->subject.condition.attributes,
+                                      condition["attrs"],
+                                      "attrs",
+                                      true,
+                                      true,
+                                      &errorString);
+    if (b == false)
     {
       return badInput(ciP, errorString);
     }

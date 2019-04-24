@@ -333,9 +333,6 @@ Two service routines are especially important as many other service routines end
 * `postQueryContext()`
 
 Forwarding of queries/updates to context providers are implemented in these two service routines.  
-
-**IMPORTANT**: Also NGSIv2 requests depend on these two service routines, so even if NGSIv2 still has no forwarding mechanism of its own, these two routines 'gives' forwarding to NGSIv2. Note that the forwarded messages are translated into NGSIv1 requests.
-
 See full documentation on Context Providers and Forwarding in its [dedicated document](cprs.md).
 
 The function signature is common to all the service routines:

@@ -1,0 +1,359 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Simple forwarded query in NGSIv2
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 38,186-187,235 IPV4
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Register entities of type T1, with ID .*, and attribute A1, for the accumulator
+# 02. Query entities of type T1 - get empty response as the accumulator doesn't respond
+# 03. Dump the accumulator, see the forwarded query
+# 04. Register entities of type T2, with ID .*, and no attributes, for the accumulator
+# 05. Query entities of type T2 - get empty response as the accumulator doesn't respond
+# 06. Dump the accumulator, see the forwarded query
+# 07. Register entities of type T3, with ID E1, and attribute A1, for the accumulator
+# 08. Query entities of type T3 - get empty response as the accumulator doesn't respond
+# 09. Dump the accumulator, see the forwarded query
+# 10. Register entities of type T4, with ID E1, and no attributes, for the accumulator
+# 11. Query entities of type T4 - get empty response as the accumulator doesn't respond
+# 12. Dump the accumulator, see the forwarded query
+#
+# FIXME: Due to a bug in Orion, the forward provoked by the query of steps 5 and 11 make the broker send not one but TWO forwarded
+#        request of the query to the accumulator.
+#        This is a bug of the broker that is also present in V1 forwarding and it is 'more or less acceptable', but should be fixed some day ...
+#        Note that the queries in step 2 and 8 DO NOT provoke the bug.
+#        This fact may be of help to locate the bug.
+#
+
+echo "01. Register entities of type T1, with ID .*, and attribute A1, for the accumulator"
+echo "==================================================================================="
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T1",
+        "idPattern": ".*"
+      }
+    ],
+    "attrs": [ "A1" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${LISTENER_PORT}'/v2"
+    },
+    "legacyForwarding": false
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Query entities of type T1 - get empty response as the accumulator doesn't respond"
+echo "====================================================================================="
+orionCurl --url /v2/entities?type=T1
+echo
+echo
+
+
+echo "03. Dump the accumulator, see the forwarded query"
+echo "================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04. Register entities of type T2, with ID .*, and no attributes, for the accumulator"
+echo "===================================================================================="
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T2",
+        "idPattern": ".*"
+      }
+    ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${LISTENER_PORT}'/v2"
+    },
+    "legacyForwarding": false
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "05. Query entities of type T2 - get empty response as the accumulator doesn't respond"
+echo "====================================================================================="
+orionCurl --url /v2/entities?type=T2
+echo
+echo
+
+
+echo "06. Dump the accumulator, see the forwarded query"
+echo "================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "07. Register entities of type T3, with ID E1, and attribute A1, for the accumulator"
+echo "==================================================================================="
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T3",
+        "id": "E1"
+      }
+    ],
+    "attrs": [ "A1" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${LISTENER_PORT}'/v2"
+    },
+    "legacyForwarding": false
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "08. Query entities of type T3 - get empty response as the accumulator doesn't respond"
+echo "====================================================================================="
+orionCurl --url /v2/entities?type=T3
+echo
+echo
+
+
+echo "09. Dump the accumulator, see the forwarded query"
+echo "================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "10. Register entities of type T4, with ID E1, and no attributes, for the accumulator"
+echo "===================================================================================="
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T4",
+        "id": "E1"
+      }
+    ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${LISTENER_PORT}'/v2"
+    },
+    "legacyForwarding": false
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "11. Query entities of type T4 - get empty response as the accumulator doesn't respond"
+echo "====================================================================================="
+orionCurl --url /v2/entities?type=T4
+echo
+echo
+
+
+echo "12. Dump the accumulator, see the forwarded query"
+echo "================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Register entities of type T1, with ID .*, and attribute A1, for the accumulator
+===================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Query entities of type T1 - get empty response as the accumulator doesn't respond
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+03. Dump the accumulator, see the forwarded query
+=================================================
+GET http://localhost:REGEX(\d+)/v2/entities?type=T1&attrs=A1
+Fiware-Servicepath: /
+Content-Length: 0
+User-Agent: REGEX(.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+=======================================
+
+
+04. Register entities of type T2, with ID .*, and no attributes, for the accumulator
+====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Query entities of type T2 - get empty response as the accumulator doesn't respond
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+06. Dump the accumulator, see the forwarded query
+=================================================
+GET http://localhost:REGEX(\d+)/v2/entities?type=T2
+Fiware-Servicepath: /
+Content-Length: 0
+User-Agent: REGEX(.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+=======================================
+GET http://localhost:REGEX(\d+)/v2/entities?type=T2
+Fiware-Servicepath: /
+Content-Length: 0
+User-Agent: REGEX(.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+=======================================
+
+
+07. Register entities of type T3, with ID E1, and attribute A1, for the accumulator
+===================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Query entities of type T3 - get empty response as the accumulator doesn't respond
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+09. Dump the accumulator, see the forwarded query
+=================================================
+GET http://localhost:REGEX(\d+)/v2/entities?type=T3&id=E1&attrs=A1
+Fiware-Servicepath: /
+Content-Length: 0
+User-Agent: REGEX(.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+=======================================
+
+
+10. Register entities of type T4, with ID E1, and no attributes, for the accumulator
+====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+11. Query entities of type T4 - get empty response as the accumulator doesn't respond
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+12. Dump the accumulator, see the forwarded query
+=================================================
+GET http://localhost:REGEX(\d+)/v2/entities?type=T4&id=E1
+Fiware-Servicepath: /
+Content-Length: 0
+User-Agent: REGEX(.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+=======================================
+GET http://localhost:REGEX(\d+)/v2/entities?type=T4&id=E1
+Fiware-Servicepath: /
+Content-Length: 0
+User-Agent: REGEX(.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
