@@ -211,7 +211,9 @@ void mongoRegistrationCreate
   setServicePath(servicePath, &bob);
   setContextRegistrationVector(regP, &bob);
   setStatus(regP->status, &bob);
-  setFormat("JSON", &bob);   // FIXME #3068: this would be unhardired when we implement NGSIv2-based forwarding
+
+  std::string format = (regP->provider.legacyForwardingMode == true)? "JSON" : "normalized";
+  setFormat(format, &bob);
 
   //
   // Insert in DB

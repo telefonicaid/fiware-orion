@@ -118,7 +118,8 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
       ActionType actionType;
       if ((actionType = parseActionTypeV2(iter->value.GetString())) == ActionTypeUnknown)
       {
-        std::string details = "invalid update action type: right ones are: append, appendStric, delete, replace, update";
+        std::string details = "invalid update action type: right ones are: "
+          "append, appendStric, delete, replace, update";
 
         alarmMgr.badInput(clientIp, details);
         oe.fill(SccBadRequest, details, "BadRequest");
