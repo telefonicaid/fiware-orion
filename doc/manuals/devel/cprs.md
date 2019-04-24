@@ -16,7 +16,7 @@ In NGSIv1 (deprecated), the request `POST /v1/updateContext` has a field called 
 * APPEND_STRICT
 * REPLACE
 
-> Side-node: The first three are "standard NGSIv1" while the second two were added for NGSIv2.
+> Side-note: The first three are "standard NGSIv1" while the second two were added for NGSIv2.
 
 * Requests with `UPDATE` or `REPLACE` may provoke forwarding of the request.
   Only if **not found locally but found in a registration**.
@@ -89,9 +89,9 @@ The `QueryContextRequest` items are filled in based on the output of the [**mong
 _FW-04: `queryForward()` function detail_
 
 * Parse the context provider string to extract IP, port, URI path, etc. (step 1).
-* The request to forward has to be built (step 2). In the case of NGSIv1, we need to extract information of the binary object into text to be able to send the REST request (plain text) to the Context Provider using POST /v1/queryContext. In the case of NGSIv2, the use GET /v2/entities and no payload is required.
+* The request to forward has to be built (step 2). In the case of NGSIv1, we need to extract information of the binary object into text to be able to send the REST request (plain text) to the Context Provider using POST /v1/queryContext. In the case of NGSIv2, the use of GET /v2/entities (without payload) is required.
 * The request to forward is sent with the help of `httpRequestSend()` (step 3) which uses [libcurl](https://curl.haxx.se/libcurl/) to forward the request (step 4). libcurl sends in sequence the request to the Context Provider (step 5).
-* The textual response from the Context Provider is parsed and an `QueryContextResponse` object is created (step 6). Parsing details are provided in diagram [PP-01](jsonParse.md#flow-pp-01).
+* The textual response from the Context Provider is parsed and a `QueryContextResponse` object is created (step 6). Parsing details are provided in diagram [PP-01](jsonParse.md#flow-pp-01).
 
 ## A Caveat about shadowing of entities
 The Context Provider mechanism is implemented using standard registration requests and this might lead to unwanted situations.

@@ -335,8 +335,9 @@ for the following aspects:
   directly. I.e., updates must be done deleting and re-creating the registration. Please
   see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3007) about this.
 * `idPattern` is supported but only for the exact regular expression `.*`
-  And, right now (2019-03-21), only forwarding of queries is working for registrations with idPatterns.
-  forwarded updates do not work for registrations with idPattern (the plan is to fix this asap). 
+  And, right now (2019-04-24), forwarding for registrations with idPatterns works for queries using `GET /v2/entities`
+  as well as updates using `PATCH /v2/entities/{Entity-ID}/attrs`.
+  More requests will be added to this list.
 * `typePattern` is not implemented.
 * The only valid `supportedForwardingMode` is `all`. Trying to use any other value will end
   in a 501 Not Implemented error response. Please
