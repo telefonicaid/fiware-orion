@@ -310,9 +310,9 @@ NGSIv2 仕様によると :
 
 > NGSIv2 サーバ実装は、コンテキスト情報ソースへのクエリまたは更新転送を実装することができます
 
-Orion がこのような転送を実装する方法は次のとおりです。
+Orion がこのような転送を実装する方法は次のとおりです :
 
-Orion は、NGSIv2 仕様に含まれていない追加フィールド `legacyForwarding` を `provider` に実装しています。`legacyForwarding` の値が `true` の場合、そのレジストレーションに関連する転送リクエストに、NGSIv1 ベースのクエリ/更新が使用されます。NGSIv1 は推奨されていませんが、当面は、NGSIv2 ベースの転送が定義されていないため、([この issue](https://github.com/telefonicaid/fiware-orion/issues/3068) を参照)、唯一有効なオプションは常に `"legacyForwarding": true` を使用することです。そうでなければ、結果は、501 Not Implemented エラーのレスポンスになります。
+Orion は NGSIv2 仕様に含まれていない追加フィールド (`provider` 内の) `legacyForwarding`を実装しています。`legacyForwarding` の値が `true` の場合、NGSIv1 ベースのクエリ/更新はそのレジストレーションに関連したリクエストを転送するために使用されます。NGSIv1 は廃止予定ですが、一部のコンテキスト・プロバイダはまだ NGSIv2 に移行されていない可能性があるため、このモードは便利です。
 
 [Top](#top)
 
