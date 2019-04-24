@@ -1932,7 +1932,6 @@ static void processContextRegistrationElement
   ContextRegistrationResponse crr;
 
   crr.contextRegistration.providingApplication.set(getStringFieldF(cr, REG_PROVIDING_APPLICATION));
-  crr.contextRegistration.providingApplication.setMimeType(mimeType);
   crr.contextRegistration.providingApplication.setProviderFormat(providerFormat);
   LM_T(LmtForward, ("Set providerFormat to %d for CRR", providerFormat));
   std::vector<BSONElement> queryEntityV = getFieldF(cr, REG_ENTITIES).Array();
@@ -2781,7 +2780,6 @@ void fillContextProviders(ContextElementResponse* cer, const ContextRegistration
 
     /* Looking results after crrV processing */
     ca->providingApplication.set(perAttrPa == "" ? perEntPa : perAttrPa);
-    ca->providingApplication.setMimeType(perAttrPa == "" ? perEntPaMimeType : perAttrPaMimeType);
     ca->found = (ca->providingApplication.get() != "");
   }
 }
@@ -2853,7 +2851,6 @@ void cprLookupByAttribute
       if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
       {
         *perEntPa         = crr->contextRegistration.providingApplication.get();
-        *perEntPaMimeType = crr->contextRegistration.providingApplication.getMimeType();
 
         break;  /* enIx */
       }
@@ -2866,7 +2863,6 @@ void cprLookupByAttribute
         {
           /* We cannot "improve" this result by keep searching the CRR vector, so we return */
           *perAttrPa         = crr->contextRegistration.providingApplication.get();
-          *perAttrPaMimeType = crr->contextRegistration.providingApplication.getMimeType();
 
           return;
         }
