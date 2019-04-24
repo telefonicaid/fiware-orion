@@ -38,6 +38,12 @@ brokerStart CP4
 --SHELL--
 
 #
+# FIXME: Step 11 should be just "Query entities of type T and with attr A1 - see E1 with A1",
+#        I.e. without "and E2+E3 without attrs".
+#        To do so, the CB should be more precise in the way it invokes CPrs or in the way
+#        it filters the CPr results before responding to the client.
+#        Note that this is not a NGSIv2-specific flaw, NGSIv1 forwarding behaves the same way.
+#
 # 01. Register entities of type T, with ID .*, and attribute A1, for CP1
 # 02. Register entities of type T, with ID .*, and attribute A2, for CP2
 # 03. Register entities of type T, with ID .*, and attribute A3, for CP3

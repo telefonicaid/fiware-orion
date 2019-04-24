@@ -90,6 +90,12 @@ broker を再起動するには、root または sudo コマンドを使用し�
 # ./accumulator-server.py --port 1028 --url /accumulate --host ::1 --pretty-print -v
 ```
 
+このスクリプトには Flask version 1.0.2 と pyOpenSSL version 19.0.0 が必要です。
+これらは `pip install Flask==1.0.2` と `pip install pyOpenSSL==19.0.0` を使って
+インストールできます。ベースのオペレーティングシステムの Python インストールと
+競合する場合は、[virtualenv](https://virtualenv.pypa.io/en/latest/) を使用する
+ことをお勧めします。
+
 [トップ](#top)
 
 <a name="issuing-commands-to-the-broker"></a>

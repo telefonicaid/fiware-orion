@@ -198,13 +198,13 @@ Date: REGEX(.*)
                     "serviceTime": REGEX(.*)
                 },
                 "root-subserv": {
-                    "incomingTransactionResponseSize": REGEX(.*),
+                    "incomingTransactionResponseSize": 320,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
-                "incomingTransactionResponseSize": REGEX(.*),
+                "incomingTransactionResponseSize": 320,
                 "incomingTransactions": 2,
                 "serviceTime": REGEX(.*)
             }
@@ -217,13 +217,13 @@ Date: REGEX(.*)
                 "serviceTime": REGEX(.*)
             },
             "root-subserv": {
-                "incomingTransactionResponseSize": REGEX(.*),
+                "incomingTransactionResponseSize": 320,
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
         },
         "sum": {
-            "incomingTransactionResponseSize": REGEX(.*),
+            "incomingTransactionResponseSize": 320,
             "incomingTransactions": 2,
             "serviceTime": REGEX(.*)
         }

@@ -89,7 +89,7 @@ The `QueryContextRequest` items are filled in based on the output of the [**mong
 _FW-04: `queryForward()` function detail_
 
 * Parse the context provider string to extract IP, port, URI path, etc. (step 1).
-* As forwards are done as REST requests, we need to extract information of the binary object to be able to send the REST request (plain text) to the Context Provider (step 2).
+* The request to forward has to be built (step 2). In the case of NGSIv1, we need to extract information of the binary object into text to be able to send the REST request (plain text) to the Context Provider using POST /v1/queryContext. In the case of NGSIv2, the use GET /v2/entities and no payload is required.
 * The request to forward is sent with the help of `httpRequestSend()` (step 3) which uses [libcurl](https://curl.haxx.se/libcurl/) to forward the request (step 4). libcurl sends in sequence the request to the Context Provider (step 5).
 * The textual response from the Context Provider is parsed and an `QueryContextResponse` object is created (step 6). Parsing details are provided in diagram [PP-01](jsonParse.md#flow-pp-01).
 

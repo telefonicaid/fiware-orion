@@ -123,6 +123,10 @@ command:
 # ./accumulator-server.py --port 1028 --url /accumulate --host ::1 --pretty-print -v
 ```
 
+Note this script requires Flask version 1.0.2 and pyOpenSSL version 19.0.0, which can be installed using
+`pip install Flask==1.0.2` and `pip install pyOpenSSL==19.0.0`. In case of conflict with your 
+base operating system Python installation, we recommend to use [virtualenv](https://virtualenv.pypa.io/en/latest/).
+
 [Top](#top)
 
 ### Issuing commands to the broker
@@ -177,7 +181,7 @@ curl localhost:1026/<operation_url> -s -S [headers] -X DELETE
 
 Regarding \[headers\] you have to include the following ones:
 
--   Accept header to specify the payload formatin which
+-   Accept header to specify the payload format in which
     you want to receive the response. You should explicitly specify JSON.
 
 ```
@@ -730,7 +734,7 @@ Write it down because you will need it later in this tutorial.
 < Date: Wed, 25 May 2016 11:05:35 GMT
 ```
 
-Let's have a look now at accumulator-server.py. We will see one notifyContextRequest (and
+Let's have a look now at accumulator-server.py. We will see one notification (and 
 just one for the moment, no matter how long you wait), similar to this one:
 
 ```

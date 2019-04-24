@@ -53,7 +53,8 @@ typedef struct ProvidingApplication
 {
   std::string     string;
   MimeType        mimeType;        // Not part of NGSI itself, used by the CB to specify the preferred Mime-Type for CPr interaction
-                                   // FIXME: Remove mimeType when NGSIv1 forwarding is removed.
+                                   // FIXME: Remove 'mimeType' as it is useless.
+                                   //        We always use application/json to forward, both for NGSIv1 and NGSIv2
   ProviderFormat  providerFormat;  // PfJson ("JSON" in mongo): NGSIv1, PfV2: NGSIv2
 
   ProvidingApplication();
