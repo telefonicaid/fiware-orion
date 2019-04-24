@@ -42,7 +42,6 @@ ProvidingApplication::ProvidingApplication()
 {
   /* It is better to have a default constructor than to leave mimeType with a random value */
   string         = "";
-  mimeType       = NOMIMETYPE;
   providerFormat = PfJson;
 }
 
@@ -88,17 +87,6 @@ void ProvidingApplication::set(const std::string& value)
 
 /* ****************************************************************************
 *
-* ProvidingApplication::setMimeType -
-*/
-void ProvidingApplication::setMimeType(const MimeType _mimeType)
-{
-  mimeType = _mimeType;
-}
-
-
-
-/* ****************************************************************************
-*
 * ProvidingApplication::setProviderFormat -
 */
 void ProvidingApplication::setProviderFormat(const ProviderFormat _providerFormat)
@@ -126,17 +114,6 @@ ProviderFormat ProvidingApplication::getProviderFormat(void)
 std::string ProvidingApplication::get(void)
 {
   return string;
-}
-
-
-
-/* ****************************************************************************
-*
-* ProvidingApplication::getMimeType -
-*/
-MimeType ProvidingApplication::getMimeType(void)
-{
-  return mimeType;
 }
 
 
