@@ -1952,7 +1952,6 @@ static void processContextRegistrationElement
   LM_T(LmtForward, ("IN: enV of %d elements, attrL of %d elements", enV.size(), attrL.size()));
 
   crr.contextRegistration.providingApplication.set(getStringFieldF(cr, REG_PROVIDING_APPLICATION));
-  crr.contextRegistration.providingApplication.setMimeType(mimeType);
   crr.contextRegistration.providingApplication.setProviderFormat(providerFormat);
 
   LM_T(LmtForward, ("Set providerFormat to %d for CRR", providerFormat));
@@ -2869,9 +2868,7 @@ void fillContextProviders(ContextElementResponse* cer, const ContextRegistration
 
     /* Looking results after crrV processing */
     ca->providingApplication.set(perAttrPa == "" ? perEntPa : perAttrPa);
-    ca->providingApplication.setMimeType(perAttrPa == "" ? perEntPaMimeType : perAttrPaMimeType);
     ca->providingApplication.setProviderFormat(providerFormat);
-    LM_T(LmtForward, ("Set providerFormat to %d", providerFormat));
 
     ca->found = (ca->providingApplication.get() != "");
   }
@@ -2942,7 +2939,7 @@ void cprLookupByAttribute
         {
           /* No match (keep searching the CRR) */
           LM_T(LmtForward, ("No match. Entity ID: '%s', isPattern: '%s', Type: '%s'", regEn->id.c_str(), regEn->isPattern.c_str(), regEn->type.c_str()));
-          continue;
+          continue;  /* enIx loop */
         }
       }
 
@@ -2950,10 +2947,9 @@ void cprLookupByAttribute
       if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
       {
         *perEntPa         = crr->contextRegistration.providingApplication.get();
-        *perEntPaMimeType = crr->contextRegistration.providingApplication.getMimeType();
         *providerFormatP  =  crr->contextRegistration.providingApplication.getProviderFormat();
         LM_T(LmtForward, ("providerFormat: %d", *providerFormatP));
-        break;  /* enIx */
+        break;  /* enIx loop */
       }
 
       /* Is there a matching entity or the absence of attributes? */
@@ -2964,10 +2960,8 @@ void cprLookupByAttribute
         {
           /* We cannot "improve" this result by keep searching the CRR vector, so we return */
           *perAttrPa         = crr->contextRegistration.providingApplication.get();
-          *perAttrPaMimeType = crr->contextRegistration.providingApplication.getMimeType();
           *providerFormatP   =  crr->contextRegistration.providingApplication.getProviderFormat();
           LM_T(LmtForward, ("providerFormat: %d", *providerFormatP));
-
           return;
         }
       }
