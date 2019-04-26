@@ -610,6 +610,7 @@ int httpRequestSendWithCurl
     int   payloadLen  = contentLenParse(httpResponse->memory);
 
     LM_I(("Notification Successfully Sent to %s", url.c_str()));
+    LM_T(LmtForward, ("Forwarded Request: %s %s: %s", verb.c_str(), url.c_str(), payload));
     outP->assign(httpResponse->memory, httpResponse->size);
 
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_RESP_SIZE, payloadLen);

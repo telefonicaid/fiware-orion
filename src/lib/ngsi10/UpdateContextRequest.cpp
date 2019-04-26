@@ -39,6 +39,7 @@
 #include "convenience/UpdateContextAttributeRequest.h"
 
 
+
 /* ****************************************************************************
 *
 * UpdateContextRequest::UpdateContextRequest -
@@ -53,11 +54,13 @@ UpdateContextRequest::UpdateContextRequest()
 *
 * UpdateContextRequest::UpdateContextRequest -
 */
-UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, Entity* eP)
+UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, ProviderFormat _providerFormat, Entity* eP)
 {
   contextProvider = _contextProvider;
+  providerFormat  = _providerFormat;
   entityVector.push_back(new Entity(eP->id, eP->type, eP->isPattern));
 }
+
 
 
 /* ****************************************************************************
@@ -68,9 +71,10 @@ std::string UpdateContextRequest::toJsonV1(bool asJsonObject)
 {
   std::string  out = "";
 
-  // JSON commas:
-  // Both fields are MANDATORY, so, comma after "contextElementVector"
-  //  
+  //
+  // About JSON commas:
+  //   Both fields are MANDATORY, so, always comma after "entityVector"
+  //
   out += startTag();
   out += entityVector.toJsonV1(asJsonObject, UpdateContext, true);
   out += valueTag("updateAction", actionTypeString(V1, updateActionType), false);
@@ -78,6 +82,7 @@ std::string UpdateContextRequest::toJsonV1(bool asJsonObject)
 
   return out;
 }
+
 
 
 /* ****************************************************************************

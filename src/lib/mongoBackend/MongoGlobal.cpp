@@ -753,6 +753,22 @@ bool matchEntity(const EntityId* en1, const EntityId* en2)
       regfree(&regex);  // If regcomp fails it frees up itself (see glibc sources for details)
     }
   }
+  else if (isTrue(en1->isPattern))
+  {
+    regex_t regex;
+
+    idMatch = false;
+    if (regcomp(&regex, en1->id.c_str(), REG_EXTENDED) != 0)
+    {
+      std::string details = std::string("error compiling regex for id: '") + en2->id + "'";
+      alarmMgr.badInput(clientIp, details);
+    }
+    else
+    {
+      idMatch = (regexec(&regex, en2->id.c_str(), 0, NULL, 0) == 0);
+      regfree(&regex);  // If regcomp fails it frees up itself (see glibc sources for details)
+    }
+  }
   else  /* isPattern == false */
   {
     idMatch = (en2->id == en1->id);
@@ -1886,10 +1902,12 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
   en.type      = entity.hasField(REG_ENTITY_TYPE)?      getStringFieldF(entity, REG_ENTITY_TYPE)      : "";
   en.isPattern = entity.hasField(REG_ENTITY_ISPATTERN)? getStringFieldF(entity, REG_ENTITY_ISPATTERN) : "false";
 
+  LM_T(LmtForward, ("Entity: id:'%s'/isPattern:'%s'/type:'%s'", en.id.c_str(), en.isPattern.c_str(), en.type.c_str()));
   if (includedEntity(en, enV))
   {
     EntityId* enP = new EntityId(en.id, en.type, en.isPattern);
 
+    LM_T(LmtForward, ("Included - adding entity to crr->contextRegistration.entityIdVector"));
     crr->contextRegistration.entityIdVector.push_back(enP);
   }
 }
@@ -1931,17 +1949,22 @@ static void processContextRegistrationElement
 {
   ContextRegistrationResponse crr;
 
+  LM_T(LmtForward, ("IN: enV of %d elements, attrL of %d elements", enV.size(), attrL.size()));
+
   crr.contextRegistration.providingApplication.set(getStringFieldF(cr, REG_PROVIDING_APPLICATION));
   crr.contextRegistration.providingApplication.setProviderFormat(providerFormat);
+
   LM_T(LmtForward, ("Set providerFormat to %d for CRR", providerFormat));
   std::vector<BSONElement> queryEntityV = getFieldF(cr, REG_ENTITIES).Array();
 
+  LM_T(LmtForward, ("queryEntityV.size() == %d", queryEntityV.size()));
   for (unsigned int ix = 0; ix < queryEntityV.size(); ++ix)
   {
     processEntity(&crr, enV, queryEntityV[ix].embeddedObject());
   }
 
   /* Note that attributes can be included only if at least one entity has been found */
+  LM_T(LmtForward, ("crr.contextRegistration.entityIdVector.size() == %d", crr.contextRegistration.entityIdVector.size()));
   if (crr.contextRegistration.entityIdVector.size() > 0)
   {
     if (cr.hasField(REG_ATTRS)) /* To prevent registration in the E-<null> style */
@@ -1965,6 +1988,7 @@ static void processContextRegistrationElement
    */
   if (crr.contextRegistration.entityIdVector.size() == 0)
   {
+    LM_T(LmtForward, ("crr.contextRegistration.entityIdVector.size is ZERO - we are done. NO OUTPUT"));
     return;
   }
 
@@ -1976,8 +2000,11 @@ static void processContextRegistrationElement
     crrP->contextRegistration = crr.contextRegistration;
     crrP->providerFormat      = providerFormat;
 
+    LM_T(LmtForward, ("Adding an OUTPUT crr (providingApplication: '%s')", crrP->contextRegistration.providingApplication.get().c_str()));
     crrV->push_back(crrP);
   }
+  else
+    LM_T(LmtForward, ("No OUTPUT crr"));
 }
 
 
@@ -2004,51 +2031,112 @@ bool registrationsQuery
   long long*                          countP
 )
 {
-  /* Build query based on arguments */
-  // FIXME P2: this implementation needs to be refactored for cleanup
-  std::string       contextRegistrationEntities     = REG_CONTEXT_REGISTRATION "." REG_ENTITIES;
-  std::string       contextRegistrationEntitiesId   = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_ID;
-  std::string       contextRegistrationEntitiesType = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_TYPE;
-  std::string       contextRegistrationAttrsNames   = REG_CONTEXT_REGISTRATION "." REG_ATTRS    "." REG_ATTRS_NAME;
-  BSONArrayBuilder  entityOr;
-  BSONArrayBuilder  entitiesWithType;
-  BSONArrayBuilder  entitiesWithoutType;
+  mongo::BSONObjBuilder    queryBuilder;
+  mongo::BSONArrayBuilder  entityOr;
 
-  for (unsigned int ix = 0; ix < enV.size(); ++ix)
+  //
+  // If there's only one entity in the REST request, the query to mongo can be simplified.
+  // NGSIv2 requests like PATCH /v2/entities/<EID>/attrs can have only ONE entity
+  // and will ALWAYS enter the "then part" of the if-then-else.
+  //
+  // FIXME: Note than registrations with entity id as a pattern is treated by the "then part" but not by the older "else part".
+  //        When forwarding for batch update is implemented this needs to be fixed, somehow
+  // Once NGSIv1 is removed from the source code, the "else part" can be removed by just making sure that
+  // NGSIv2 batch operations call this function once per entity in the request (modifications needed).
+  // Or, we'd need to reimplement to make the else-part also support registrations with entity id as a pattern.
+  //
+  if (enV.size() == 1)
   {
-    const EntityId* en = enV[ix];
-
-    if (isTrue(en->isPattern))
+    if ((enV[0]->id == "") && (enV[0]->type == ""))
     {
-      BSONObjBuilder b;
-
-      b.appendRegex(contextRegistrationEntitiesId, en->id);
-      if (en->type != "")
-      {
-        b.append(contextRegistrationEntitiesType, en->type);
-      }
-      entityOr.append(b.obj());
+      LM_E(("Bad Request (too wide query - at least one of entity::id and entity::type must be given)"));
+      *err = "too wide query";
+      return false;
     }
-    else  /* isPattern = false */
+
+    // Entity ID - if not given, no Entity ID in query - then ALL ENTITY IDs match, so not included in query
+    if (enV[0]->id != "")
     {
-      if (en->type == "")
-      {
-        entitiesWithoutType.append(en->id);
-        LM_T(LmtMongo, ("Entity discovery without type: id '%s'", en->id.c_str()));
-      }
-      else
-      {
-        /* We have detected that sometimes mongo stores { id: ..., type ...} and sometimes { type: ..., id: ...},
-           so we have to take both of them into account
-        */
-        entitiesWithType.append(BSON(REG_ENTITY_ID << en->id << REG_ENTITY_TYPE << en->type));
-        entitiesWithType.append(BSON(REG_ENTITY_TYPE << en->type << REG_ENTITY_ID << en->id));
-        LM_T(LmtMongo, ("Entity discovery: {id: %s, type: %s}", en->id.c_str(), en->type.c_str()));
-      }
+      mongo::BSONObjBuilder entityAnd;
+      mongo::BSONObjBuilder id;
+
+      // If the Registration is with idPattern, then it matches, as the only idPattern allowed for Registrations is ".*"
+      entityAnd.append("contextRegistration.entities.isPattern", "true");
+      entityAnd.append("contextRegistration.entities.id", ".*");  // FIXME TPUT: if isPattern == true, then id MUST be ".*" !  Remove?
+      entityOr.append(entityAnd.obj());
+
+      if (enV[0]->isPattern == "true") id.appendRegex("contextRegistration.entities.id", enV[0]->id);
+      else                             id.append("contextRegistration.entities.id",      enV[0]->id);
+
+      entityOr.append(id.obj());
+      queryBuilder.append("$or", entityOr.arr());
+    }
+
+    // Entity Type
+    if (enV[0]->type != "")
+    {
+      queryBuilder.append("contextRegistration.entities.type", enV[0]->type);
     }
   }
+  else  // More than one Entity in enV
+  {
+    /* Build query based on arguments */
+    // FIXME P2: this implementation needs to be refactored for cleanup
+    std::string       contextRegistrationEntities     = REG_CONTEXT_REGISTRATION "." REG_ENTITIES;
+    std::string       contextRegistrationEntitiesId   = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_ID;
+    std::string       contextRegistrationEntitiesType = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_TYPE;
+    BSONArrayBuilder  entitiesWithType;
+    BSONArrayBuilder  entitiesWithoutType;
 
+    for (unsigned int ix = 0; ix < enV.size(); ++ix)
+    {
+      const EntityId* en = enV[ix];
+
+      if (isTrue(en->isPattern))
+      {
+        BSONObjBuilder b;
+
+        b.appendRegex(contextRegistrationEntitiesId, en->id);
+        if (en->type != "")
+        {
+          b.append(contextRegistrationEntitiesType, en->type);
+        }
+        entityOr.append(b.obj());
+      }
+      else  /* isPattern = false */
+      {
+        if (en->type == "")
+        {
+          entitiesWithoutType.append(BSON(REG_ENTITY_ISPATTERN << "true"));
+          entitiesWithoutType.append(BSON(REG_ENTITY_ID << en->id));
+          LM_T(LmtMongo, ("Entity discovery without type: id '%s'", en->id.c_str()));
+        }
+        else
+        {
+          /* We have detected that sometimes mongo stores { id: ..., type ...} and sometimes { type: ..., id: ...},
+             so we have to take both of them into account
+          */
+          entitiesWithType.append(BSON(REG_ENTITY_ID << en->id << REG_ENTITY_TYPE << en->type));
+          entitiesWithType.append(BSON(REG_ENTITY_TYPE << en->type << REG_ENTITY_ID << en->id));
+          LM_T(LmtMongo, ("Entity discovery: {id: %s, type: %s}", en->id.c_str(), en->type.c_str()));
+        }
+      }
+    }
+
+    entityOr.append(BSON(contextRegistrationEntities   << BSON("$in" << entitiesWithType.arr())));
+    entityOr.append(BSON(contextRegistrationEntitiesId << BSON("$in" << entitiesWithoutType.arr())));
+
+    /* The $or clause could be omitted if it contains only one element, but we can assume that
+     * it has no impact on MongoDB query optimizer
+     */
+    queryBuilder.append("$or", entityOr.arr());
+  }
+
+  //
+  // Attributes
+  //
   BSONArrayBuilder attrs;
+  std::string      contextRegistrationAttrsNames = REG_CONTEXT_REGISTRATION "." REG_ATTRS "." REG_ATTRS_NAME;
 
   for (unsigned int ix = 0; ix < attrL.size(); ++ix)
   {
@@ -2058,17 +2146,6 @@ bool registrationsQuery
     LM_T(LmtMongo, ("Attribute discovery: '%s'", attrName.c_str()));
   }
 
-  entityOr.append(BSON(contextRegistrationEntities   << BSON("$in" << entitiesWithType.arr())));
-  entityOr.append(BSON(contextRegistrationEntitiesId << BSON("$in" << entitiesWithoutType.arr())));
-
-  BSONObjBuilder queryBuilder;
-
-  /* The $or clause could be omitted if it contains only one element, but we can assume that
-   * it has no impact on MongoDB query optimizer
-   */
-  queryBuilder.append("$or", entityOr.arr());
-  queryBuilder.append(REG_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
-
   if (attrs.arrSize() > 0)
   {
     /* If we don't do this check, the {$in: [] } of the attribute name part makes the query fail */
@@ -2076,11 +2153,14 @@ bool registrationsQuery
   }
 
   //
-  // 'And-in' the service path
+  // Service Path
   //
-  const std::string  servicePathString = REG_SERVICE_PATH;
+  queryBuilder.append(REG_SERVICE_PATH, fillQueryServicePath(servicePathV));
 
-  queryBuilder.append(servicePathString, fillQueryServicePath(servicePathV));
+  //
+  // Expiration
+  //
+  queryBuilder.append(REG_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
 
 
   //
@@ -2128,11 +2208,13 @@ bool registrationsQuery
     std::string               format                    = getStringFieldF(r, REG_FORMAT);
     ProviderFormat            providerFormat            = (format == "")? PfJson : (format == "JSON")? PfJson : PfV2;
 
+    LM_T(LmtForward, ("--------------- %d registration elements to process", queryContextRegistrationV.size()));
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
     {
       LM_T(LmtForward, ("Processing ContextRegistrationElement. providerFormat == '%s' (%d)", format.c_str(), providerFormat));
       processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType, providerFormat);
     }
+    LM_T(LmtForward, ("--------------- %d registration elements processed - %d elementd output in crrV", queryContextRegistrationV.size(), crrV->size()));
 
     /* FIXME: note that given the response doesn't distinguish from which registration ID the
      * response comes, it could have that we have same context registration elements, belong to different
@@ -2755,31 +2837,39 @@ void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>
 */
 void fillContextProviders(ContextElementResponse* cer, const ContextRegistrationResponseVector& crrV)
 {
+  LM_T(LmtForward, ("fillContextProviders: %d attributes", cer->entity.attributeVector.size()));
   for (unsigned int ix = 0; ix < cer->entity.attributeVector.size(); ++ix)
   {
     ContextAttribute* ca = cer->entity.attributeVector[ix];
 
+    LM_T(LmtForward, ("fillContextProviders: Attribute %d: %s", ix, ca->name.c_str()));
     if (ca->found)
     {
+      LM_T(LmtForward, ("fillContextProviders: Attribute %s is already found", ca->name.c_str()));
       continue;
     }
 
     /* Search for some CPr in crrV */
-    std::string  perEntPa;
-    std::string  perAttrPa;
-    MimeType     perEntPaMimeType  = NOMIMETYPE;
-    MimeType     perAttrPaMimeType = NOMIMETYPE;
+    std::string     perEntPa;
+    std::string     perAttrPa;
+    MimeType        perEntPaMimeType  = NOMIMETYPE;
+    MimeType        perAttrPaMimeType = NOMIMETYPE;
+    ProviderFormat  providerFormat;
 
+    LM_T(LmtForward, ("fillContextProviders: looking up CPr for %s", ca->name.c_str()));
     cprLookupByAttribute(cer->entity,
                          ca->name,
                          crrV,
                          &perEntPa,
                          &perEntPaMimeType,
                          &perAttrPa,
-                         &perAttrPaMimeType);
+                         &perAttrPaMimeType,
+                         &providerFormat);
 
     /* Looking results after crrV processing */
     ca->providingApplication.set(perAttrPa == "" ? perEntPa : perAttrPa);
+    ca->providingApplication.setProviderFormat(providerFormat);
+
     ca->found = (ca->providingApplication.get() != "");
   }
 }
@@ -2826,12 +2916,14 @@ void cprLookupByAttribute
   std::string*                              perEntPa,
   MimeType*                                 perEntPaMimeType,
   std::string*                              perAttrPa,
-  MimeType*                                 perAttrPaMimeType
+  MimeType*                                 perAttrPaMimeType,
+  ProviderFormat*                           providerFormatP
 )
 {
   *perEntPa  = "";
   *perAttrPa = "";
 
+  LM_T(LmtForward, ("In cprLookupByAttribute. Looping over %d CRRs", crrV.size()));
   for (unsigned int crrIx = 0; crrIx < crrV.size(); ++crrIx)
   {
     ContextRegistrationResponse* crr = crrV[crrIx];
@@ -2843,16 +2935,21 @@ void cprLookupByAttribute
 
       if (regEn->id != en.id || (regEn->type != en.type && regEn->type != ""))
       {
-        /* No match (keep searching the CRR) */
-        continue;
+        if (regEn->isPattern != "true")
+        {
+          /* No match (keep searching the CRR) */
+          LM_T(LmtForward, ("No match. Entity ID: '%s', isPattern: '%s', Type: '%s'", regEn->id.c_str(), regEn->isPattern.c_str(), regEn->type.c_str()));
+          continue;  /* enIx loop */
+        }
       }
 
       /* CRR without attributes (keep searching in other CRR) */
       if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
       {
         *perEntPa         = crr->contextRegistration.providingApplication.get();
-
-        break;  /* enIx */
+        *providerFormatP  =  crr->contextRegistration.providingApplication.getProviderFormat();
+        LM_T(LmtForward, ("providerFormat: %d", *providerFormatP));
+        break;  /* enIx loop */
       }
 
       /* Is there a matching entity or the absence of attributes? */
@@ -2863,7 +2960,8 @@ void cprLookupByAttribute
         {
           /* We cannot "improve" this result by keep searching the CRR vector, so we return */
           *perAttrPa         = crr->contextRegistration.providingApplication.get();
-
+          *providerFormatP   =  crr->contextRegistration.providingApplication.getProviderFormat();
+          LM_T(LmtForward, ("providerFormat: %d", *providerFormatP));
           return;
         }
       }
