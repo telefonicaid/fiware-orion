@@ -305,7 +305,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
       ContextAttribute* aP       = ceP->contextAttributeVector[aIx];
       char*             attrName;
       const char*       aName    = aP->name.c_str();
-      KjNode*           aTop;
+      KjNode*           aTop     = NULL;
 
       if (strcmp(aP->name.c_str(), "@context") == 0)
       {

@@ -4240,7 +4240,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     EXPECT_EQ("Database Error (collection: utest.csubs "
               "- insert(): { _id: ObjectId('", s1);
     EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", "
-              "custom: false, throttling: -1, servicePath: \"/#\", status: \"active\", "
+              "custom: false, mimeType: \"application/json\", throttling: -1, servicePath: \"/#\", status: \"active\", "
               "entities: [ { id: \"E1\", isPattern: \"false\", type: \"T1\", isTypePattern: false } ], "
               "attrs: [], metadata: [], blacklist: false, conditions: [ \"A\" ], "
               "expression: { q: \"\", mq: \"\", geometry: \"\", coords: \"\", georel: \"\" }, format: \"JSON\" } "

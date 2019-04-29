@@ -66,7 +66,7 @@ extern "C"
 KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contextP, RenderFormat renderFormat, char** detailsP)
 {
   char*    nameAlias = orionldAliasLookup(contextP, caP->name.c_str());
-  KjNode*  nodeP;
+  KjNode*  nodeP     = NULL;
 
   if (renderFormat == NGSI_LD_V1_KEYVALUES)
   {
