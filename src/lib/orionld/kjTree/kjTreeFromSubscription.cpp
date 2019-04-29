@@ -93,9 +93,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   KjNode*          objectP;
   KjNode*          arrayP;
   KjNode*          nodeP;
-  char*            details;
   bool             watchedAttributesPresent = false;
-  char             date[64];
   unsigned int     size;
   unsigned int     ix;
   OrionldContext*  contextP = orionldContextLookup(subscriptionP->ldContext.c_str());
@@ -188,6 +186,9 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   if (watchedAttributesPresent == false)
   {
 #if 0
+    char*            details;
+    char             date[64];
+
     if (numberToDate((time_t) subscriptionP->timeInterval, date, sizeof(date), &details) == false)
     {
       LM_E(("Error creating a stringified date for 'timeInterval'"));
@@ -263,8 +264,12 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
 
   // isActive
   bool isActive = (subscriptionP->status == "active")? true : false;
-  nodeP = kjBoolean(orionldState.kjsonP, "isActive", isActive);
-  kjChildAdd(topP, nodeP);
+
+  if (isActive == false)
+  {
+    nodeP = kjBoolean(orionldState.kjsonP, "isActive", isActive);
+    kjChildAdd(topP, nodeP);
+  }
 
   // notification
   objectP = kjObject(orionldState.kjsonP, "notification");
@@ -309,6 +314,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
 
 
   // notification::timesSent
+#if 0
   if (subscriptionP->notification.timesSent > 0)
   {
     nodeP = kjInteger(orionldState.kjsonP, "timesSent", subscriptionP->notification.timesSent);
@@ -335,11 +341,15 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
     nodeP = kjInteger(orionldState.kjsonP, "lastSuccess", subscriptionP->notification.lastSuccess);
     kjChildAdd(objectP, nodeP);
   }
+#endif
 
   kjChildAdd(topP, objectP);
 
 
   // expires
+  char*            details;
+  char             date[64];
+
   if (numberToDate((time_t) subscriptionP->expires, date, sizeof(date), &details) == false)
   {
     LM_E(("Error creating a stringified date for 'expires'"));
@@ -350,12 +360,18 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   kjChildAdd(topP, nodeP);
 
   // throttling
-  nodeP = kjInteger(orionldState.kjsonP, "throttling", subscriptionP->throttling);
-  kjChildAdd(topP, nodeP);
+  if (subscriptionP->throttling != 0)
+  {
+    nodeP = kjInteger(orionldState.kjsonP, "throttling", subscriptionP->throttling);
+    kjChildAdd(topP, nodeP);
+  }
 
   // status
-  nodeP = kjString(orionldState.kjsonP, "status", subscriptionP->status.c_str());
-  kjChildAdd(topP, nodeP);
+  if (subscriptionP->status != "active")
+  {
+    nodeP = kjString(orionldState.kjsonP, "status", subscriptionP->status.c_str());
+    kjChildAdd(topP, nodeP);
+  }
 
   // @context - in payload if Mime Type is application/ld+json, else in Link header
   if (ciP->httpHeaders.acceptJsonld)

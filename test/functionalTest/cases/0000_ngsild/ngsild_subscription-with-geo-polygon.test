@@ -88,7 +88,7 @@ Date: REGEX(.*)
 02. GET the subscription to see the geo-data intact
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 520
+Content-Length: 471
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -123,7 +123,6 @@ Date: REGEX(.*)
         "georel": "within"
     },
     "id": "urn:ngsi-ld:Subscription:mySubscription123",
-    "isActive": true,
     "notification": {
         "attributes": [
             "speed"
@@ -135,8 +134,6 @@ Date: REGEX(.*)
         "format": "keyValues"
     },
     "q": "speed>50",
-    "status": "active",
-    "throttling": 0,
     "type": "Subscription",
     "watchedAttributes": [
         "speed"
