@@ -389,8 +389,6 @@ HttpStatusCode mongoEntityTypes
   }
 
   // Processing result to build response
-  LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
-
   std::vector<BSONElement> resultsArray = getFieldF(result, "result").Array();
 
   if (resultsArray.size() == 0)

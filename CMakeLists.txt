@@ -194,6 +194,7 @@ SET (ORION_LIBS
     cache
     mongoBackend
     orionld_common      # mongoBackend calls geoJsonCreate from orionld_common
+    orionld_context     # Should not be necessary ... kjTreeFromNotification gets undefined reference to 'orionldAliasLookup' without this ...
     parse
     apiTypesV2
     orionTypes
