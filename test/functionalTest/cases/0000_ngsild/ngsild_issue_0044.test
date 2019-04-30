@@ -1,0 +1,159 @@
+# Copyright 2019 FIWARE Foundation
+#
+# This file is part of OrionLD Context Broker.
+#
+# OrionLD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# OrionLD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# support at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Crash of Issue #44 - not sure what it is yet ...
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. POST /ngsi-ld/v1/entities of a special payload that crashes the broker
+#
+
+
+echo "01. POST /ngsi-ld/v1/entities of a special payload that crashes the broker"
+echo "=========================================================================="
+payload='{
+   "@context": [
+        "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+        "https://raw.githubusercontent.com/GSMADeveloper/NGSI-LD-Entities/master/examples/Agri-Crop-context.jsonld"
+    ],
+    "id": "urn:ngsi-ld:AgriCrop:df72dc57-1eb9-42a3-88a9-8647ecc954b4",
+    "type": "AgriCrop",
+    
+    "name": {
+        "type": "Property",
+        "value": "Wheat"
+    },
+    "alternateName": {
+        "type": "Property",
+        "value": "Triticum aestivum"
+    },
+    "description": {
+        "type": "Property",
+        "value": "Spring wheat"
+    },
+    "agriSoil": {
+        "type": "Relationship",
+        "object": [
+            "urn:ngsi-ld:AgriSoil:00411b56-bd1b-4551-96e0-a6e7fde9c840",
+            "urn:ngsi-ld:AgriSoil:e8a8389a-edf5-4345-8d2c-b98ac1ce8e2a"
+        ]
+    },
+    "agriFertiliser": {
+        "type": "Relationship",
+        "object": [
+            "urn:ngsi-ld:AgriFertiliser:1b0d6cf7-320c-4a2b-b2f1-4575ea850c73",
+            "urn:ngsi-ld:AgriFertiliser:380973c8-4d3b-4723-a899-0c0c5cc63e7e"
+        ]
+    },
+    "agriPest": {
+        "type": "Relationship",
+        "object": [
+            "urn:ngsi-ld:AgriPest:1b0d6cf7-320c-4a2b-b2f1-4575ea850c73",
+            "urn:ngsi-ld:AgriPest:380973c8-4d3b-4723-a899-0c0c5cc63e7e"
+        ]
+    },
+    "plantingFrom": {
+        "type": "Property",
+        "value": [
+            {
+                "dateRange": "-09-28/-10-12",
+                "description": "Best Season"
+            },
+            {
+                "dateRange": "-10-11/-10-18",
+                "description": "Season OK"
+            }
+        ]
+    },
+    "harvestingInterval": {
+        "type": "Property",
+        "value": [
+            {
+                "dateRange": "-03-21/-04-01",
+                "description": "Best Season"
+            },
+            {
+                "dateRange": "-04-02/-04-15",
+                "description": "Season OK"
+            }
+        ]
+    },
+    "wateringFrequency": {
+        "type": "Property",
+        "value": "daily"
+    }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. Check for alive broker"
+echo "=========================="
+orionCurl --url /version
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /ngsi-ld/v1/entities of a special payload that crashes the broker
+==========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:AgriCrop:df72dc57-1eb9-42a3-88a9-8647ecc954b4
+Date: REGEX(.*)
+
+
+
+02. Check for alive broker
+==========================
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "orion": {
+        "compile_time": "REGEX(.*)",
+        "compiled_by": "REGEX(.*)",
+        "compiled_in": "REGEX(.*)",
+        "doc": "https://fiware-orion.readthedocs.org/en/master/",
+        "git_hash": "REGEX(.*)",
+        "release_date": "REGEX(.*)",
+        "uptime": "REGEX(.*)",
+        "version": "REGEX(.*)"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
