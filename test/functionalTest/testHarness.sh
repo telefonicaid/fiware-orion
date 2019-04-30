@@ -159,8 +159,13 @@ function usage()
   echo "* If a file is passed as parameter, its entire file-name must be given, including '.test'"
   echo ""
   echo "Env Vars:"
+  echo "CB_MAX_TRIES:        the number of tries before giving up on a failing test case"
   echo "CB_SKIP_LIST:        default value for option --skipList"
-  echo "CB_SKIP_FUNC_TESTS:  list of names of func tests to skip"
+  echo "CB_SKIP_FUNC_TESTS:  comma-separated list of names of func tests to skip"
+  echo "CB_NO_CACHE:         Start the broker without subscription cache (if set to 'ON')"
+  echo "CB_THREADPOOL:       Start the broker without thread pool (if set to 'OFF')"
+  echo "CB_DIFF_TOOL:        To view diff of failing tests with diff/tkdiff/meld/... (diff is default)"
+  echo "CB_EXTERNAL_BROKER:  The broker is started externally - not 'automatically' by the test harness (if set to 'ON'"
   echo
   exit $1
 }

@@ -299,7 +299,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
     {
       ContextAttribute* aP       = ceP->contextAttributeVector[aIx];
       char*             attrName = (char*) aP->name.c_str();
-      KjNode*           aTop;
+      KjNode*           aTop     = NULL;
 
       if (strcmp(attrName, "@context") == 0)
       {

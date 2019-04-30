@@ -50,7 +50,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 
   ciP->responseTree = kjObject(orionldState.kjsonP, NULL);
 
-  nodeP = kjString(orionldState.kjsonP, "branch", "bug/120.orionld-subscription-geo-polygon-representation");
+  nodeP = kjString(orionldState.kjsonP, "branch", "bug/121.orionld-subscription-errors");
   kjChildAdd(ciP->responseTree, nodeP);
 
   nodeP = kjString(orionldState.kjsonP, "kbase version", kbaseVersion);
