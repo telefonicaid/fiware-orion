@@ -76,7 +76,7 @@ function dbInit()
     port="27017"
   fi
   
-  logMsg initializing database;
+  logMsg initializing database for $role
 
   if [ "$role" == "CB" ]
   then
@@ -406,7 +406,7 @@ function localBrokerStart()
   brokerStartAwait $port
   if [ "$result" != 0 ]
   then
-    echo "Unable to start $BROKER"
+    echo "Unable to start $BROKER as $role"
     exit 1
   fi
 
@@ -414,7 +414,7 @@ function localBrokerStart()
   brokerPidLines=$(ps -fe | grep $BROKER | grep $port | wc -l)
   if [ $brokerPidLines != 1 ]
   then
-    echo "Unable to start $BROKER"
+    echo "Unable to start $BROKER as $role"
     exit 1
   fi
 
@@ -430,6 +430,8 @@ function localBrokerStart()
   if [ "$CB_WAIT_AFTER_START" != "" ]; then
     sleep $CB_WAIT_AFTER_START
   fi
+
+  logMsg Started $BROKER as $role
 }
 
 
