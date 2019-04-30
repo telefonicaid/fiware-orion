@@ -503,7 +503,7 @@ function brokerStart()
   traceLevels=$2
   ipVersion=$3
 
-  if [ "$ORION_FT_DONT_START_BROKER" == "on" ]
+  if [ "$CB_EXTERNAL_BROKER" == "ON" ]
   then
     return
   fi
