@@ -25,6 +25,7 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl, orionldDefaultUrlLen
 #include "orionld/context/orionldContextValueLookup.h"         // orionldContextValueLookup
@@ -44,19 +45,41 @@ char* orionldAliasLookup(OrionldContext* contextP, const char* longName)
   if (orionldDefaultUrlLen != -1)
   {
     if (strncmp(longName, orionldDefaultUrl, orionldDefaultUrlLen) == 0)
+    {
+      LM_T(LmtAlias, ("Default URL detected. Returning: '%s'", &longName[orionldDefaultUrlLen]));
       return (char*) &longName[orionldDefaultUrlLen];
+    }
   }
 
-  LM_T(LmtAlias, ("Calling orionldContextValueLookup for %s", longName));
+  LM_T(LmtAlias, ("Calling orionldContextValueLookup for long-name '%s'", longName));
   bool    useStringValue = false;
   KjNode* aliasNodeP     = orionldContextValueLookup(contextP, longName, &useStringValue);
 
   if (aliasNodeP != NULL)
   {
-    char* alias = (useStringValue == false)? aliasNodeP->name : aliasNodeP->value.s;
+    if (aliasNodeP->type == KjObject)
+    {
+      LM_T(LmtAlias, ("The alias node is an object (named '%s')", aliasNodeP->name));
+      // The @id node stores the name - look it up
+      for (KjNode* idNodeP = aliasNodeP->value.firstChildP; idNodeP != NULL; idNodeP = idNodeP->next)
+      {
+        if (SCOMPARE4(idNodeP->name, '@', 'i', 'd', 0))
+        {
+          LM_T(LmtContextValueLookup, ("Found the @id: '%s' (for aliasNode '%s')", idNodeP->value.s, aliasNodeP->name));
+          return aliasNodeP->name;
+        }
+      }
 
-    LM_T(LmtAlias, ("Found the alias: '%s' => '%s'", longName, alias));
-    return alias;
+      LM_T(LmtAlias, ("Error in context (@id part is missing), keeping long name '%s'", longName));
+      return (char*) longName;
+    }
+    else
+    {
+      char* alias = (useStringValue == false)? aliasNodeP->name : aliasNodeP->value.s;
+
+      LM_T(LmtAlias, ("Found the alias: '%s' => '%s'", longName, alias));
+      return alias;
+    }
   }
 
   LM_T(LmtAlias, ("No alias found, keeping long name '%s'", longName));

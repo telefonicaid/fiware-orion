@@ -58,6 +58,8 @@ typedef struct OrionldConnectionState
   KjNode*          locationAttributeP;
   KjNode*          geoTypeP;
   KjNode*          geoCoordsP;
+  long long        overriddenCreationDate;
+  long long        overriddenModificationDate;
 } OrionldConnectionState;
 
 

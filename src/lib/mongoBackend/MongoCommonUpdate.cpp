@@ -2975,8 +2975,23 @@ static bool createEntity
   insertedDoc.append("_id", bsonId.obj());
   insertedDoc.append(ENT_ATTRNAMES, attrNamesToAdd.arr());
   insertedDoc.append(ENT_ATTRS, attrsToAdd.obj());
+
+#ifdef ORIONLD
+  LM_TMP(("KZ: orionldState.overriddenCreationDate     == %lu", orionldState.overriddenCreationDate));
+  LM_TMP(("KZ: orionldState.overriddenModificationDate == %lu", orionldState.overriddenModificationDate));
+  if (orionldState.overriddenCreationDate != 0)
+    insertedDoc.append(ENT_CREATION_DATE, orionldState.overriddenCreationDate);
+  else
+    insertedDoc.append(ENT_CREATION_DATE, now);
+
+  if (orionldState.overriddenModificationDate != 0)
+    insertedDoc.append(ENT_MODIFICATION_DATE, orionldState.overriddenModificationDate);
+  else
+    insertedDoc.append(ENT_MODIFICATION_DATE, now);
+#else
   insertedDoc.append(ENT_CREATION_DATE, now);
   insertedDoc.append(ENT_MODIFICATION_DATE, now);
+#endif
 
   /* Add location information in the case it was found */
   if (locAttr.length() > 0)

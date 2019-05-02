@@ -346,11 +346,12 @@ respond:
   if (ciP->responseTree != NULL)
   {
     LM_T(LmtJsonResponse, ("Rendering KJSON response tree"));
-    ciP->responsePayload = (char*) malloc(2048);
+    // FIXME: Smarter allocation !!!
+    ciP->responsePayload = (char*) malloc(20480);
     if (ciP->responsePayload != NULL)
     {
       ciP->responsePayloadAllocated = true;
-      kjRender(ciP->kjsonP, ciP->responseTree, ciP->responsePayload, 2048);
+      kjRender(ciP->kjsonP, ciP->responseTree, ciP->responsePayload, 20480);
     }
     else
     {

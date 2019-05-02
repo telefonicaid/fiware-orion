@@ -118,7 +118,9 @@ static bool payloadCheck
   KjNode**         locationNodePP,
   KjNode**         contextNodePP,
   KjNode**         observationSpaceNodePP,
-  KjNode**         operationSpaceNodePP
+  KjNode**         operationSpaceNodePP,
+  KjNode**         createdAtPP,
+  KjNode**         modifiedAtPP
 )
 {
   OBJECT_CHECK(ciP->requestTree, "toplevel");
@@ -131,6 +133,8 @@ static bool payloadCheck
   KjNode*  locationNodeP          = NULL;
   KjNode*  observationSpaceNodeP  = NULL;
   KjNode*  operationSpaceNodeP    = NULL;
+  KjNode*  createdAtP             = NULL;
+  KjNode*  modifiedAtP            = NULL;
 
   //
   // First make sure all mandatory data is present and that data types are correct
@@ -166,13 +170,23 @@ static bool payloadCheck
     }
     else if (SCOMPARE17(kNodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
     {
-      DUPLICATE_CHECK(observationSpaceNodeP, "context", kNodeP);
+      DUPLICATE_CHECK(observationSpaceNodeP, "observationSpace", kNodeP);
       // FIXME: check validity of observationSpace - GeoProperty
     }
     else if (SCOMPARE15(kNodeP->name, 'o', 'p', 'e', 'r', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
     {
-      DUPLICATE_CHECK(operationSpaceNodeP, "context", kNodeP);
+      DUPLICATE_CHECK(operationSpaceNodeP, "operationSpace", kNodeP);
       // FIXME: check validity of operationSpaceP - GeoProperty
+    }
+    else if (SCOMPARE10(kNodeP->name, 'c', 'r', 'e', 'a', 't', 'e', 'd', 'A', 't', 0))
+    {
+      DUPLICATE_CHECK(createdAtP, "createdAt", kNodeP);
+      STRING_CHECK(kNodeP, "createdAt");
+    }
+    else if (SCOMPARE11(kNodeP->name, 'm', 'o', 'd', 'i', 'f', 'i', 'e', 'd', 'A', 't', 0))
+    {
+      DUPLICATE_CHECK(modifiedAtP, "modifiedAt", kNodeP);
+      STRING_CHECK(kNodeP, "modifiedAt");
     }
     else  // Property/Relationshiop - must check chars in the name of the attribute
     {
@@ -212,6 +226,8 @@ static bool payloadCheck
   *contextNodePP          = contextNodeP;
   *observationSpaceNodePP = observationSpaceNodeP;
   *operationSpaceNodePP   = operationSpaceNodeP;
+  *createdAtPP            = createdAtP;
+  *modifiedAtPP           = modifiedAtP;
 
   return true;
 }
@@ -435,7 +451,7 @@ do                                                                              
 
 // -----------------------------------------------------------------------------
 //
-// specialCompoundCheck - 
+// specialCompoundCheck -
 //
 bool specialCompoundCheck(ConnectionInfo* ciP, KjNode* compoundValueP)
 {
@@ -850,8 +866,10 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   KjNode*  contextNodeP       = NULL;
   KjNode*  observationSpaceP  = NULL;
   KjNode*  operationSpaceP    = NULL;
+  KjNode*  createdAtP         = NULL;
+  KjNode*  modifiedAtP        = NULL;
 
-  if (payloadCheck(ciP, &idNodeP, &typeNodeP, &locationP, &contextNodeP, &observationSpaceP, &operationSpaceP) == false)
+  if (payloadCheck(ciP, &idNodeP, &typeNodeP, &locationP, &contextNodeP, &observationSpaceP, &operationSpaceP, &createdAtP, &modifiedAtP) == false)
     return false;
 
   LM_T(LmtUriExpansion, ("type node at %p", typeNodeP));
@@ -964,6 +982,28 @@ bool orionldPostEntities(ConnectionInfo* ciP)
         return false;
       }
       continue;
+    }
+    else if (kNodeP == createdAtP)
+    {
+      // 1. Make sure the value is a valid timestamp
+      // 2. Save it for future use (when creating the entity)
+      if ((orionldState.overriddenCreationDate = parse8601Time(createdAtP->value.s)) == -1)
+      {
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value for 'createdAt' attribute", createdAtP->value.s, OrionldDetailsString);
+        mongoRequest.release();
+        return false;
+      }
+    }
+    else if (kNodeP == modifiedAtP)
+    {
+      // 1. Make sure the value is a valid timestamp
+      // 2. Save it for future use (when creating the entity)
+      if ((orionldState.overriddenModificationDate = parse8601Time(modifiedAtP->value.s)) == -1)
+      {
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value for 'modifiedAt' attribute", modifiedAtP->value.s, OrionldDetailsString);
+        mongoRequest.release();
+        return false;
+      }
     }
     else if (kNodeP == contextNodeP)
     {
@@ -1095,4 +1135,3 @@ bool orionldPostEntities(ConnectionInfo* ciP)
         }
       }
 #endif
-  
