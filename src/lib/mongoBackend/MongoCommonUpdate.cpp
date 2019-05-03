@@ -1778,8 +1778,19 @@ static void setActionTypeMetadata(ContextElementResponse* notifyCerP)
      * notification, so no metadata must be added */
     if (caP->actionType != "")
     {
-      Metadata* mdP = new Metadata(NGSI_MD_ACTIONTYPE, DEFAULT_ATTR_STRING_TYPE, caP->actionType);
-      caP->metadataVector.push_back(mdP);
+      Metadata* actionTypeMdP = caP->metadataVector.lookupByName(NGSI_MD_ACTIONTYPE);
+
+      if (actionTypeMdP == NULL)
+      {
+        Metadata* mdP = new Metadata(NGSI_MD_ACTIONTYPE, DEFAULT_ATTR_STRING_TYPE, caP->actionType);
+        caP->metadataVector.push_back(mdP);
+        LM_TMP(("KZ: Added metadata actionType: '%s'", caP->actionType.c_str()));
+      }
+      else
+      {
+        actionTypeMdP->stringValue = caP->actionType;
+        LM_TMP(("KZ: Modified metadata actionType to '%s'", actionTypeMdP->stringValue.c_str()));
+      }
     }
   }
 }
@@ -2415,7 +2426,7 @@ static void updateAttrInNotifyCer
           }
         }
 
-        /* If the attribute in target attr was not found, then it has to be added*/
+        /* If the attribute in target attr was not found, then it has to be added */
         if (!matchMd)
         {
           Metadata* newMdP = new Metadata(targetMdP, useDefaultType);
@@ -3708,12 +3719,13 @@ static bool contextElementPreconditionsCheck
 *
 * setActionType -
 */
-static void setActionType(ContextElementResponse* notifyCerP, std::string actionType)
+static void setActionType(ContextElementResponse* notifyCerP, const std::string& actionType)
 {
   for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
   {
     ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
     caP->actionType = actionType;
+    LM_TMP(("KZ: Set actionType to '%s' for attribute '%s'", actionType.c_str(), caP->name.c_str()));
   }
 }
 
