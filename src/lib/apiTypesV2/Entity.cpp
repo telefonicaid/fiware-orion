@@ -108,13 +108,34 @@ std::string Entity::render
   // Note 'uriParamOptions[DATE_CREATED/DATE_MODIFIED] ||' is needed due to backward compability
   if ((creDate != 0) && (uriParamOptions[DATE_CREATED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end())))
   {
-    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, creDate);
-    attributeVector.push_back(caP);
+    ContextAttribute* creDateAttrP = attributeVector.lookup(DATE_CREATED);
+    if (creDateAttrP == NULL)
+    {
+      // If not found - create it
+      ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, creDate);
+      attributeVector.push_back(caP);
+    }
+    else
+    {
+      // If found - modify it?
+      creDateAttrP->numberValue = creDate;
+    }
   }
   if ((modDate != 0) && (uriParamOptions[DATE_MODIFIED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_MODIFIED) != attrsFilter.end())))
   {
-    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, modDate);
-    attributeVector.push_back(caP);
+    ContextAttribute* modDateAttrP = attributeVector.lookup(DATE_MODIFIED);
+
+    if (modDateAttrP == NULL)
+    {
+      // If not found - create it
+      ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, modDate);
+      attributeVector.push_back(caP);
+    }
+    else
+    {
+      // If found - modify it?
+      modDateAttrP->numberValue = modDate;
+    }
   }
 
   if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))

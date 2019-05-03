@@ -1859,8 +1859,19 @@ static void setDateCreatedAttribute(ContextElementResponse* notifyCerP)
 {
   if (notifyCerP->contextElement.entityId.creDate != 0)
   {
-    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, notifyCerP->contextElement.entityId.creDate);
-    notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+    ContextAttribute* creDateAttrP = notifyCerP->contextElement.contextAttributeVector.lookup(DATE_CREATED);
+
+    if (creDateAttrP == NULL)
+    {
+      // If not found - create it
+      ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, notifyCerP->contextElement.entityId.creDate);
+      notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+    }
+    else
+    {
+      // If found - modify it?
+      creDateAttrP->numberValue = notifyCerP->contextElement.entityId.creDate;
+    }
   }
 }
 
@@ -1874,8 +1885,19 @@ static void setDateModifiedAttribute(ContextElementResponse* notifyCerP)
 {
   if (notifyCerP->contextElement.entityId.modDate != 0)
   {
-    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, notifyCerP->contextElement.entityId.modDate);
-    notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+    ContextAttribute* modDateAttrP = notifyCerP->contextElement.contextAttributeVector.lookup(DATE_MODIFIED);
+
+    if (modDateAttrP == NULL)
+    {
+      // If not found - create it
+      ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, notifyCerP->contextElement.entityId.modDate);
+      notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+    }
+    else
+    {
+      // If found - modify it?
+      modDateAttrP->numberValue = notifyCerP->contextElement.entityId.modDate;
+    }
   }
 }
 
