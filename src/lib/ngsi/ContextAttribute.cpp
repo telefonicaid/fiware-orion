@@ -784,13 +784,57 @@ std::string ContextAttribute::toJson
   // Add special metadata representing attribute dates
   if ((creDate != 0) && (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_DATECREATED) != metadataFilter.end()))
   {
-    Metadata* mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, creDate);
-    metadataVector.push_back(mdP);
+    // Lookup Metadata NGSI_MD_DATECREATED
+    Metadata* dateCreatedMetadataP = NULL;
+    for (unsigned int mIx = 0; mIx < metadataVector.size(); mIx++)
+    {
+      Metadata* mdP = metadataVector[mIx];
+
+      if (mdP->name == NGSI_MD_DATECREATED)
+      {
+        dateCreatedMetadataP = mdP;
+        break;
+      }
+    }
+
+    if (dateCreatedMetadataP == NULL)
+    {
+      Metadata* mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, creDate);
+      metadataVector.push_back(mdP);
+      LM_TMP(("KZ: Added a DATECREATED metadata to the attribute '%s'", name.c_str()));
+    }
+    else
+    {
+      dateCreatedMetadataP->numberValue = creDate;
+      LM_TMP(("KZ: Modified the metadata '%s' to %lu", NGSI_MD_DATECREATED, dateCreatedMetadataP->numberValue));
+    }
   }
+
   if ((modDate != 0) && (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_DATEMODIFIED) != metadataFilter.end()))
   {
-    Metadata* mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, modDate);
-    metadataVector.push_back(mdP);
+    // Lookup Metadata NGSI_MD_DATEMODIFIED
+    Metadata* dateModifiedMetadataP = NULL;
+    for (unsigned int mIx = 0; mIx < metadataVector.size(); mIx++)
+    {
+      Metadata* mdP = metadataVector[mIx];
+
+      if (mdP->name == NGSI_MD_DATEMODIFIED)
+      {
+        dateModifiedMetadataP = mdP;
+        break;
+      }
+    }
+
+    if (dateModifiedMetadataP == NULL)
+    {
+      Metadata* mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, modDate);
+      metadataVector.push_back(mdP);
+    }
+    else
+    {
+      dateModifiedMetadataP->numberValue = modDate;
+      LM_TMP(("KZ: Modified the metadata '%s' to %lu", NGSI_MD_DATEMODIFIED, dateModifiedMetadataP->numberValue));
+    }
   }
 
   if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_KEYVALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
