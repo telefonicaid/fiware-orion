@@ -1778,8 +1778,19 @@ static void setActionTypeMetadata(ContextElementResponse* notifyCerP)
      * notification, so no metadata must be added */
     if (caP->actionType != "")
     {
-      Metadata* mdP = new Metadata(NGSI_MD_ACTIONTYPE, DEFAULT_ATTR_STRING_TYPE, caP->actionType);
-      caP->metadataVector.push_back(mdP);
+      Metadata* actionTypeMdP = caP->metadataVector.lookupByName(NGSI_MD_ACTIONTYPE);
+
+      if (actionTypeMdP == NULL)
+      {
+        Metadata* mdP = new Metadata(NGSI_MD_ACTIONTYPE, DEFAULT_ATTR_STRING_TYPE, caP->actionType);
+        caP->metadataVector.push_back(mdP);
+        LM_TMP(("KZ: Added metadata actionType: '%s'", caP->actionType.c_str()));
+      }
+      else
+      {
+        actionTypeMdP->stringValue = caP->actionType;
+        LM_TMP(("KZ: Modified metadata actionType to '%s'", actionTypeMdP->stringValue.c_str()));
+      }
     }
   }
 }
@@ -1859,8 +1870,19 @@ static void setDateCreatedAttribute(ContextElementResponse* notifyCerP)
 {
   if (notifyCerP->contextElement.entityId.creDate != 0)
   {
-    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, notifyCerP->contextElement.entityId.creDate);
-    notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+    ContextAttribute* creDateAttrP = notifyCerP->contextElement.contextAttributeVector.lookup(DATE_CREATED);
+
+    if (creDateAttrP == NULL)
+    {
+      // If not found - create it
+      ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, notifyCerP->contextElement.entityId.creDate);
+      notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+    }
+    else
+    {
+      // If found - modify it?
+      creDateAttrP->numberValue = notifyCerP->contextElement.entityId.creDate;
+    }
   }
 }
 
@@ -1874,8 +1896,19 @@ static void setDateModifiedAttribute(ContextElementResponse* notifyCerP)
 {
   if (notifyCerP->contextElement.entityId.modDate != 0)
   {
-    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, notifyCerP->contextElement.entityId.modDate);
-    notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+    ContextAttribute* modDateAttrP = notifyCerP->contextElement.contextAttributeVector.lookup(DATE_MODIFIED);
+
+    if (modDateAttrP == NULL)
+    {
+      // If not found - create it
+      ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, notifyCerP->contextElement.entityId.modDate);
+      notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+    }
+    else
+    {
+      // If found - modify it?
+      modDateAttrP->numberValue = notifyCerP->contextElement.entityId.modDate;
+    }
   }
 }
 
@@ -1893,8 +1926,32 @@ static void setDateCreatedMetadata(ContextElementResponse* notifyCerP)
 
     if (caP->creDate != 0)
     {
-      Metadata* mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, caP->creDate);
-      caP->metadataVector.push_back(mdP);
+      //
+      // Lookup Metadata NGSI_MD_DATECREATED. If it exists, modify it, else create and add it
+      //
+      Metadata* dateCreatedMetadataP = NULL;
+      for (unsigned int mIx = 0; mIx < caP->metadataVector.size(); mIx++)
+      {
+        Metadata* mdP = caP->metadataVector[mIx];
+
+        if (mdP->name == NGSI_MD_DATECREATED)
+        {
+          dateCreatedMetadataP = mdP;
+          break;
+        }
+      }
+
+      if (dateCreatedMetadataP == NULL)
+      {
+        Metadata* mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, caP->creDate);
+        caP->metadataVector.push_back(mdP);
+        LM_TMP(("KZ: Added a DATECREATED metadata to a notification"));
+      }
+      else
+      {
+        dateCreatedMetadataP->numberValue = caP->creDate;
+        LM_TMP(("KZ: Modified the metadata '%s' to %lu", NGSI_MD_DATECREATED, dateCreatedMetadataP->numberValue));
+      }
     }
   }
 }
@@ -1913,8 +1970,31 @@ static void setDateModifiedMetadata(ContextElementResponse* notifyCerP)
 
     if (caP->modDate != 0)
     {
-      Metadata* mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, caP->modDate);
-      caP->metadataVector.push_back(mdP);
+      //
+      // Lookup Metadata NGSI_MD_DATEMODIFIED. If it exists, modify it, else create and add it
+      //
+      Metadata* dateModifiedMetadataP = NULL;
+      for (unsigned int mIx = 0; mIx < caP->metadataVector.size(); mIx++)
+      {
+        Metadata* mdP = caP->metadataVector[mIx];
+
+        if (mdP->name == NGSI_MD_DATEMODIFIED)
+        {
+          dateModifiedMetadataP = mdP;
+          break;
+        }
+      }
+
+      if (dateModifiedMetadataP == NULL)
+      {
+        Metadata* mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, caP->modDate);
+        caP->metadataVector.push_back(mdP);
+      }
+      else
+      {
+        dateModifiedMetadataP->numberValue = caP->modDate;
+        LM_TMP(("KZ: Modified the metadata '%s' to %lu", NGSI_MD_DATEMODIFIED, dateModifiedMetadataP->numberValue));
+      }
     }
   }
 }
@@ -2346,7 +2426,7 @@ static void updateAttrInNotifyCer
           }
         }
 
-        /* If the attribute in target attr was not found, then it has to be added*/
+        /* If the attribute in target attr was not found, then it has to be added */
         if (!matchMd)
         {
           Metadata* newMdP = new Metadata(targetMdP, useDefaultType);
@@ -2975,8 +3055,23 @@ static bool createEntity
   insertedDoc.append("_id", bsonId.obj());
   insertedDoc.append(ENT_ATTRNAMES, attrNamesToAdd.arr());
   insertedDoc.append(ENT_ATTRS, attrsToAdd.obj());
+
+#ifdef ORIONLD
+  LM_TMP(("KZ: orionldState.overriddenCreationDate     == %lu", orionldState.overriddenCreationDate));
+  LM_TMP(("KZ: orionldState.overriddenModificationDate == %lu", orionldState.overriddenModificationDate));
+  if (orionldState.overriddenCreationDate != 0)
+    insertedDoc.append(ENT_CREATION_DATE, orionldState.overriddenCreationDate);
+  else
+    insertedDoc.append(ENT_CREATION_DATE, now);
+
+  if (orionldState.overriddenModificationDate != 0)
+    insertedDoc.append(ENT_MODIFICATION_DATE, orionldState.overriddenModificationDate);
+  else
+    insertedDoc.append(ENT_MODIFICATION_DATE, now);
+#else
   insertedDoc.append(ENT_CREATION_DATE, now);
   insertedDoc.append(ENT_MODIFICATION_DATE, now);
+#endif
 
   /* Add location information in the case it was found */
   if (locAttr.length() > 0)
@@ -3624,12 +3719,13 @@ static bool contextElementPreconditionsCheck
 *
 * setActionType -
 */
-static void setActionType(ContextElementResponse* notifyCerP, std::string actionType)
+static void setActionType(ContextElementResponse* notifyCerP, const std::string& actionType)
 {
   for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
   {
     ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
     caP->actionType = actionType;
+    LM_TMP(("KZ: Set actionType to '%s' for attribute '%s'", actionType.c_str(), caP->name.c_str()));
   }
 }
 

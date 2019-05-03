@@ -481,7 +481,7 @@ int httpRequestSendWithCurl
   unsigned long long payloadSize = content.size();
   outgoingMsgSize += payloadSize;
 
-
+  LM_TMP(("KZ: Content of notification: %s", content.c_str()));
   // ----- Content-type
   std::string contentTypeHeaderValue = content_type;
 

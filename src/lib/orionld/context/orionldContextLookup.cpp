@@ -65,7 +65,7 @@ OrionldContext* orionldContextLookup(const char* url)
     LM_T(LmtContextLookup, ("Comparing context %d: '%s' with '%s'", contextIx, contextP->url, url));
     if (strcmp(contextP->url, url) == 0)
     {
-      LM_T(LmtContextLookup, ("Found it!"));
+      LM_T(LmtContextLookup, ("Found the context '%s'", url));
       orionldContextListSemGive("Looking up a context - Found it");
       return contextP;
     }

@@ -143,10 +143,12 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value, b
   //
   KjNode*  atContextP    = contextP->tree->value.firstChildP;
 
-  LM_T(LmtContextValueLookup, ("@atcontext is of type '%s'", kjValueType(atContextP->type)));
+  LM_T(LmtContextValueLookup, ("@context is of type '%s'", kjValueType(atContextP->type)));
 
   if (atContextP->type == KjObject)
   {
+    LM_TMP(("Context '%s' is an object - looking inside", contextP->url));
+
     for (KjNode* contextItemP = atContextP->value.firstChildP; contextItemP != NULL; contextItemP = contextItemP->next)
     {
       if ((contextItemP->type != KjString) && (contextItemP->type !=  KjObject))
@@ -168,23 +170,23 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value, b
 
       if (contextItemP->type == KjObject)
       {
-        // Lookup item "@id" inside contextItemP that is a JSON object
-        KjNode* idNodeP;
-        for (idNodeP = contextItemP->value.firstChildP; idNodeP != NULL; idNodeP = idNodeP->next)
+        //
+        // Does the value of the item '@id' inside the object match the long-name?
+        //   Lookup item "@id" inside contextItemP that is a JSON object ...
+        //   and return contextItemP (its 'name' is the alias) if @iud matches the long-name)
+        //
+        for (KjNode* idNodeP = contextItemP->value.firstChildP; idNodeP != NULL; idNodeP = idNodeP->next)
         {
           if (SCOMPARE4(idNodeP->name, '@', 'i', 'd', 0))
           {
             *useStringValueP = false;  // FIXME - useStringValueP not needed!
-            LM_T(LmtContextValueLookup, ("found it!"));
-            return contextItemP;
+            if (strcmp(idNodeP->value.s, value) == 0)
+            {
+              LM_TMP(("Found long-name '%s' as value of @id for alias '%s'", value, contextItemP->name));
+              return contextItemP;
+            }
           }
         }
-
-        //
-        // No '@id' found ...
-        //
-        LM_E(("No '@id' in object type @context item"));
-        return NULL;
       }
       else if (contextItemP->type == KjString)
       {

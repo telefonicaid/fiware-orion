@@ -1200,14 +1200,57 @@ static void addDatesForAttrs(ContextElementResponse* cerP, bool includeCreDate, 
 
     if (includeCreDate && caP->creDate != 0)
     {
-      Metadata*   mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, caP->creDate);
-      caP->metadataVector.push_back(mdP);
+      // Lookup Metadata NGSI_MD_DATECREATED
+      Metadata* dateCreatedMetadataP = NULL;
+      for (unsigned int mIx = 0; mIx < caP->metadataVector.size(); mIx++)
+      {
+        Metadata* mdP = caP->metadataVector[mIx];
+
+        if (mdP->name == NGSI_MD_DATECREATED)
+        {
+          dateCreatedMetadataP = mdP;
+          break;
+        }
+      }
+
+      if (dateCreatedMetadataP == NULL)
+      {
+        Metadata*   mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, caP->creDate);
+        caP->metadataVector.push_back(mdP);
+        LM_TMP(("KZ: Added a DATECREATED metadata to the attribute '%s'", caP->name.c_str()));
+      }
+      else
+      {
+        dateCreatedMetadataP->numberValue = caP->creDate;
+        LM_TMP(("KZ: Modified the metadata '%s' to %lu", NGSI_MD_DATECREATED, dateCreatedMetadataP->numberValue));
+      }
     }
 
     if (includeModDate && caP->modDate != 0)
     {
-      Metadata*   mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, caP->modDate);
-      caP->metadataVector.push_back(mdP);
+      // Lookup Metadata NGSI_MD_DATEMODIFIED
+      Metadata* dateModifiedMetadataP = NULL;
+      for (unsigned int mIx = 0; mIx < caP->metadataVector.size(); mIx++)
+      {
+        Metadata* mdP = caP->metadataVector[mIx];
+
+        if (mdP->name == NGSI_MD_DATEMODIFIED)
+        {
+          dateModifiedMetadataP = mdP;
+          break;
+        }
+      }
+
+      if (dateModifiedMetadataP == NULL)
+      {
+        Metadata*   mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, caP->modDate);
+        caP->metadataVector.push_back(mdP);
+      }
+      else
+      {
+        dateModifiedMetadataP->numberValue = caP->modDate;
+        LM_TMP(("KZ: Modified the metadata '%s' to %lu", NGSI_MD_DATEMODIFIED, dateModifiedMetadataP->numberValue));
+      }
     }
   }
 }
