@@ -1,0 +1,482 @@
+# Copyright 2019 FIWARE Foundation
+#
+# This file is part of OrionLD Context Broker.
+#
+# OrionLD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# OrionLD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with OrionLD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# support at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Creation Error Handling
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# *01.1. Attempt to create a subscription with an ID that is not a URI
+#  01.2. Attempt to create a subscription with two IDs
+#  01.3. Attempt to create a subscription with an ID that is not a String
+#
+#  02.1. Attempt to create a subscription of application/ld+json without @CONTEXT in payload
+#  02.2. Attempt to create a subscription of application/ld+json with invalid @CONTEXT in payload (unreachable URI)
+#  02.3. Attempt to create a subscription of application/json with invalid CONTEXT in HTTP header (unreachable URI)
+#
+#  03.1. Attempt to create a subscription with a TYPE that is not a string
+#  03.2. Attempt to create a subscription with a TYPE that is a string but not == Subscription
+#  03.3. Attempt to create a subscription with two TYPEs
+#
+#  04.1. Attempt to create a subscription with a NAME that is not a string
+#  04.2. Attempt to create a subscription with two NAMEs
+#
+#  05.1. Attempt to create a subscription with a DESCRIPTION that is not a string
+#  05.2. Attempt to create a subscription with two DESCRIPTIONs
+#
+# *06.1. Attempt to create a subscription without ENTITIES array nor WATCHEDATTRIBUTES present
+# *06.2. Attempt to create a subscription with an empty ENTITIES array
+#  06.3. Attempt to create a subscription with ENTITIES not an Array
+#  06.4. Attempt to create a subscription with two ENTITIES Arrays
+#
+# *07.1. Attempt to create a subscription with an empty WATCHEDATTRIBUTES array
+#  07.2. Attempt to create a subscription with WATCHEDATTRIBUTES not an Array
+#  07.3. Attempt to create a subscription with two WATCHEDATTRIBUTES Arrays
+#
+#  08.4. Attempt to create a subscription with a TIMEINTERVAL that is not a Number
+#  08.5. Attempt to create a subscription with two TIMEINTERVALs
+#
+#  09.6. Attempt to create a subscription with a Q that is not a string
+#  09.7. Attempt to create a subscription with two Qs
+#  09.8. Attempt to create a subscription with an invalid Q (parse error) 
+#
+#  10.1. Attempt to create a subscription with a GEOQ that is not a string
+#  10.2. Attempt to create a subscription with two GEOQs
+#  10.3. Attempt to create a subscription with an invalid GEOQ (parse error)
+#
+#  11.1. Attempt to create a subscription with a CSF that is not a string
+#  11.2. Attempt to create a subscription with two CSFs
+#
+#  12.1. Attempt to create a subscription with an ISACTIVE that is not a bool
+#  12.2. Attempt to create a subscription with two ISACTIVEs
+#
+#  13.1. Attempt to create a subscription with a NOTIFICATION that is not an object
+#  13.2. Attempt to create a subscription with two NOTIFICATIONs
+#
+#  14.1. Attempt to create a subscription with an EXPIRES that is not a string
+#  14.2. Attempt to create a subscription with two EXPIRESs
+#
+#  15.1. Attempt to create a subscription with a THROTTLING that is not a Number
+#  15.2. Attempt to create a subscription with two THROTTLINGs
+#
+#  16.1. Creation of a subscription with a STATUS field, just to make sure it is ignored
+#  16.2. Creation of a subscription with a CREATEDAT field, just to make sure it is ignored
+#  16.3. Creation of a subscription with a MODIFIEDAT field, just to make sure it is ignored
+#
+#  17.1. Creation of a subscription with a Notification::STATUS field, just to make sure it is ignored
+#  17.2. Creation of a subscription with a Notification::TIMESSENT, just to make sure it is ignored
+#  17.3. Creation of a subscription with a Notification::LASTNOTIFICATION field, just to make sure it is ignored
+#  17.4. Creation of a subscription with a Notification::LASTFAILURE field, just to make sure it is ignored
+#  17.5. Creation of a subscription with a Notification::LASTSUCCESS field, just to make sure it is ignored
+#
+#  18.1. Attempt to create a subscription with an invalid field called 'INVALID'
+#
+# *19.1. Attempt to create a subscription without ENTITIES nor WATCHEDATTRIBUTES (duplicate of  06.1)
+# *19.2. Attempt to create a subscription with both TIMEINTERVAL and WATCHEDATTRIBUTES present
+#  19.3. Attempt to create a subscription without NOTIFICATION
+# *19.4. Creation of a subscription without TIMEINTERVAL nor WATCHEDATTRIBUTES present (entities is present)
+#
+#  20.1. Attempt to create a subscription with a Notification::attributes that is not an array
+#  20.2. Attempt to create a subscription with two Notification::attributes
+#  20.3. Attempt to create a subscription with a Notification::format that is not a string
+#  20.4. Attempt to create a subscription with two Notification::format
+#  20.5. Attempt to create a subscription with a Notification::endpoint that is not an object
+#  20.6. Attempt to create a subscription with two Notification::endpoint
+#  20.7. Attempt to create a subscription with a Notification::XXX field
+#
+#
+#
+
+echo "01.1. Attempt to create a subscription with an ID that is not a URI"
+echo "==================================================================="
+payload='{
+  "id": "sub01.1",
+  "type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    }
+  ],
+  "watchedAttributes": [ "P2" ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "circle",
+    "coordinates": "1,2",
+    "georel": "near",
+    "geoproperty": "not supported"
+  },
+  "csf": "not implemented",
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    },
+    "status": "ignored",
+    "timesSent": "ignored",
+    "lastNotification": "ignored",
+    "lastFailure": "ignored",
+    "lastSuccess": "ignored"
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 5,
+  "status": "to be ignored - read-only",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+  "createdAt": "ignored",
+  "modifiedAt": "ignored"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "06.1. Attempt to create a subscription without ENTITIES array nor WATCHEDATTRIBUTES present"
+echo "==========================================================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub6.1",
+  "type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "circle",
+    "coordinates": "1,2",
+    "georel": "near",
+    "geoproperty": "not supported"
+  },
+  "csf": "not implemented",
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    },
+    "status": "ignored",
+    "timesSent": "ignored",
+    "lastNotification": "ignored",
+    "lastFailure": "ignored",
+    "lastSuccess": "ignored"
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 5,
+  "status": "to be ignored - read-only",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+  "createdAt": "ignored",
+  "modifiedAt": "ignored"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "06.2. Attempt to create a subscription with an empty ENTITIES array"
+echo "==================================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub6.2",
+  "type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [],
+  "watchedAttributes": [ "P2" ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "circle",
+    "coordinates": "1,2",
+    "georel": "near",
+    "geoproperty": "not supported"
+  },
+  "csf": "not implemented",
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    },
+    "status": "ignored",
+    "timesSent": "ignored",
+    "lastNotification": "ignored",
+    "lastFailure": "ignored",
+    "lastSuccess": "ignored"
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 5,
+  "status": "to be ignored - read-only",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+  "createdAt": "ignored",
+  "modifiedAt": "ignored"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "07.1. Attempt to create a subscription with an empty WATCHEDATTRIBUTES array"
+echo "============================================================================"
+payload='{
+  "id": "http://a.b.c/subs/sub7.2",
+  "type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    }
+  ],
+  "watchedAttributes": [ ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "circle",
+    "coordinates": "1,2",
+    "georel": "near",
+    "geoproperty": "not supported"
+  },
+  "csf": "not implemented",
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    },
+    "status": "ignored",
+    "timesSent": "ignored",
+    "lastNotification": "ignored",
+    "lastFailure": "ignored",
+    "lastSuccess": "ignored"
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 5,
+  "status": "to be ignored - read-only",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+  "createdAt": "ignored",
+  "modifiedAt": "ignored"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "19.2. Attempt to create a subscription with both TIMEINTERVAL and WATCHEDATTRIBUTES present"
+echo "==========================================================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub03",
+  "type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    },
+    {
+      "id": "http://a.b.c/E02",
+      "type": "T2"
+    },
+    {
+      "idPattern": ".*E03.*",
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [ "P2" ],
+  "timeInterval": 12,
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "circle",
+    "coordinates": "1,2",
+    "georel": "near",
+    "geoproperty": "not supported"
+  },
+  "csf": "not implemented",
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    },
+    "status": "ignored",
+    "timesSent": "ignored",
+    "lastNotification": "ignored",
+    "lastFailure": "ignored",
+    "lastSuccess": "ignored"
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 5,
+  "status": "to be ignored - read-only",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+  "createdAt": "ignored",
+  "modifiedAt": "ignored"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "19.4. Creation of a subscription without TIMEINTERVAL nor WATCHEDATTRIBUTES present (entities is present)"
+echo "========================================================================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub03",
+  "type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    }
+  ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "circle",
+    "coordinates": "1,2",
+    "georel": "near",
+    "geoproperty": "not supported"
+  },
+  "csf": "not implemented",
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    },
+    "status": "ignored",
+    "timesSent": "ignored",
+    "lastNotification": "ignored",
+    "lastFailure": "ignored",
+    "lastSuccess": "ignored"
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 5,
+  "status": "to be ignored - read-only",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+  "createdAt": "ignored",
+  "modifiedAt": "ignored"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+--REGEXPECT--
+01.1. Attempt to create a subscription with an ID that is not a URI
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 155
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "http://example.org/ngsi-ld/default/sub01.1",
+    "title": "Subscription::id is not a URI",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+06.1. Attempt to create a subscription without ENTITIES array nor WATCHEDATTRIBUTES present
+===========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 160
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "no details",
+    "title": "At least one of 'entities' and 'watchedAttributes' must be present",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+06.2. Attempt to create a subscription with an empty ENTITIES array
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 117
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "Subscription::entities",
+    "title": "Empty Array",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+07.1. Attempt to create a subscription with an empty WATCHEDATTRIBUTES array
+============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 126
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "Subscription::watchedAttributes",
+    "title": "Empty Array",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+19.2. Attempt to create a subscription with both TIMEINTERVAL and WATCHEDATTRIBUTES present
+===========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 145
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "no details",
+    "title": "Both 'timeInterval' and 'watchedAttributes' present",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+19.4. Creation of a subscription without TIMEINTERVAL nor WATCHEDATTRIBUTES present (entities is present)
+=========================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub03
+Date: REGEX(.*)
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
