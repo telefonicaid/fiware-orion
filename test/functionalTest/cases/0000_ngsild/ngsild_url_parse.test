@@ -166,8 +166,7 @@ echo
 
 echo "12. PATCH /ngsi-ld/v1/entities/E1/attrs"
 echo "======================================="
-payload='{
-}'
+payload='{ "a": 1 }'
 orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/list/of/entities/E1.xxx/attrs --payload "$payload" -X PATCH
 echo
 echo
@@ -175,8 +174,7 @@ echo
 
 echo "13. PATCH /ngsi-ld/v1/subscriptions/S1"
 echo "======================================"
-payload='{
-}'
+payload='{ "a": 1 }'
 orionCurl --url /ngsi-ld/v1/subscriptions/S1 --payload "$payload" -X PATCH
 echo
 echo
@@ -184,8 +182,7 @@ echo
 
 echo "14. PATCH /ngsi-ld/v1/csourceRegistrations/R1"
 echo "============================================="
-payload='{
-}'
+payload='{ "a": 1 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations/R1 --payload "$payload" -X PATCH
 echo
 echo
@@ -193,36 +190,28 @@ echo
 
 echo "15. DELETE /ngsi-ld/v1/entities/E9"
 echo "=================================="
-payload='{
-}'
-orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/list/of/entities/E9.xxx --payload "$payload" -X DELETE
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/list/of/entities/E9.xxx -X DELETE
 echo
 echo
 
 
 echo "16. DELETE /ngsi-ld/v1/entities/E1/attrs/A1"
 echo "==========================================="
-payload='{
-}'
-orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/list/of/entities/E1.xxx/attrs/http://a.b.c/list/of/attributes/A1.xxx --payload "$payload" -X DELETE
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/list/of/entities/E1.xxx/attrs/http://a.b.c/list/of/attributes/A1.xxx -X DELETE
 echo
 echo
 
 
 echo "17. DELETE /ngsi-ld/v1/subscriptions/S1"
 echo "======================================="
-payload='{
-}'
-orionCurl --url /ngsi-ld/v1/subscriptions/S1 --payload "$payload" -X DELETE
+orionCurl --url /ngsi-ld/v1/subscriptions/S1 -X DELETE
 echo
 echo
 
 
 echo "18. DELETE /ngsi-ld/v1/csourceRegistrations/R1"
 echo "=============================================="
-payload='{
-}'
-orionCurl --url /ngsi-ld/v1/csourceRegistrations/R1 --payload "$payload" -X DELETE
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/R1 -X DELETE
 echo
 echo
 
@@ -276,14 +265,14 @@ Date: REGEX(.*)
 04. GET /ngsi-ld/v1/subscriptions/S1
 ====================================
 HTTP/1.1 404 Not Found
-Content-Length: 108
+Content-Length: 110
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "S1",
     "title": "subscription not found",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "http://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 

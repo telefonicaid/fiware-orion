@@ -205,7 +205,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
   LM_T(LmtMhd, ("Read all the payload - treating the request!"));
   LM_TMP(("----------------------- Treating NGSI-LD request %03d: %s %s: %s --------------------------", requestNo, ciP->verbString, ciP->urlPath, ciP->payload));
-  
+
   // If no error predetected, lookup the service and call its service routine
   if (ciP->httpStatusCode == SccOk)
   {
@@ -235,6 +235,28 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     KjNode*  contextNodeP           = NULL;
 
     //
+    // Empty/No payload for POST or PATCH (or PUT)
+    //
+    if ((ciP->verb == POST) || (ciP->verb == PATCH) || (ciP->verb == PUT))
+    {
+      // No payload
+      if (ciP->payload == NULL)
+      {
+        orionldErrorResponseCreate(ciP, OrionldInvalidRequest, "payload missing", NULL, OrionldDetailsString);
+        ciP->httpStatusCode = SccBadRequest;
+        goto respond;
+      }
+
+      // Empty payload
+      if (ciP->payload[0] == 0)
+      {
+        orionldErrorResponseCreate(ciP, OrionldInvalidRequest, "payload missing", NULL, OrionldDetailsString);
+        ciP->httpStatusCode = SccBadRequest;
+        goto respond;
+      }
+    }
+
+    //
     // Parsing payload
     //
     if (ciP->payload != NULL)
@@ -247,10 +269,32 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
         ciP->httpStatusCode = SccBadRequest;
         goto respond;
       }
+
+      //
+      // Empty payload object?  ("{}" resulting in a tree with one Object that has no children)
+      //
+      if ((ciP->requestTree->type == KjObject) && (ciP->requestTree->value.firstChildP == NULL))
+      {
+        orionldErrorResponseCreate(ciP, OrionldInvalidRequest, "Empty Object", "{}", OrionldDetailsString);
+        ciP->httpStatusCode = SccBadRequest;
+        goto respond;
+      }
+
+      //
+      // Empty payload array?  ("[]" resulting in a tree with one Object that has no children)
+      //
+      if ((ciP->requestTree->type == KjArray) && (ciP->requestTree->value.firstChildP == NULL))
+      {
+        orionldErrorResponseCreate(ciP, OrionldInvalidRequest, "Empty Array", "[]", OrionldDetailsString);
+        ciP->httpStatusCode = SccBadRequest;
+        goto respond;
+      }
+
       LM_T(LmtPayloadParse, ("All good - payload parsed. ciP->requestTree at %p", ciP->requestTree));
 
       if (ciP->requestTree->value.firstChildP != NULL)
         LM_T(LmtPayloadParse, ("Right after kjParse, first child of request is: '%s'", ciP->requestTree->value.firstChildP->name));
+
       //
       // Looking up "@context" attribute at first level in payload
       //
@@ -368,13 +412,11 @@ respond:
 
   if (ciP->responsePayload != NULL)
   {
-    LM_TMP(("Responding to request %d with %d and payload: %s", orionldState.requestNo, ciP->httpStatusCode, ciP->responsePayload));
     restReply(ciP, ciP->responsePayload);
     // ciP->responsePayload freed and NULLed by restReply()
   }
   else
   {
-    LM_TMP(("Responding to request %d with %d and without payload", orionldState.requestNo, ciP->httpStatusCode));
     restReply(ciP, "");
   }
 
