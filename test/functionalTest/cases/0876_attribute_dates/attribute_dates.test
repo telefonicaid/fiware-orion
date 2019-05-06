@@ -103,14 +103,17 @@ echo "================================================="
 orionCurl --url '/v2/entities/E1/attrs/A1?metadata=dateModified'
 dateModified=$(echo "$_response" | python -mjson.tool | grep value | awk -F '"' '{print $4}')
 
-if [ "$dateCreated" != "$T_0" ]
+creDiff=$(dateDiff "$dateCreated" "$T_0")
+modDiff=$(dateDiff "$dateModified" "$T_1")
+
+if [ $creDiff -gt 1 ]
 then
   echo "invalid dateCreated"
   echo "dateCreated: $dateCreated"
   echo "should be:   $T_0"
 fi
 
-if [ "$dateModified" != "$T_1" ]
+if [ $modDiff -gt 1 ]
 then
   echo "invalid dateModified"
   echo "dateModified: $dateModified"

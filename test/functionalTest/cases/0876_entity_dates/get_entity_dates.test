@@ -80,13 +80,17 @@ echo
 
 echo "03. Check dateCreate == t_0 and dateModified == t_0"
 echo "==================================================="
-if [ "$CRE_DATE" == "$T_0" ]
+creDiff=$(dateDiff "$CRE_DATE" "$T_0")
+modDiff=$(dateDiff "$MOD_DATE" "$T_0")
+
+if [ $creDiff -lt 2 ]  # Max difference: 1 second
 then
   echo "dateCreated: t_0"
 else
   echo "dateCreated: not t_0 ($CRE_DATE != $T_0)"
 fi
-if [ "$MOD_DATE" == "$T_0" ]
+
+if [ $modDiff -lt 2 ]
 then
   echo "dateModified: t_0"
 else
@@ -135,13 +139,17 @@ echo
 
 echo "06. Check dateCreate == t_0 and dateModified == t_1"
 echo "==================================================="
-if [ "$CRE_DATE" == "$T_0" ]
+creDiff=$(dateDiff "$CRE_DATE" "$T_0")
+modDiff=$(dateDiff "$MOD_DATE" "$T_1")
+
+if [ $creDiff -lt 2 ]  # Max difference: 1 second
 then
   echo "dateCreated: t_0"
 else
   echo "dateCreated: not t_0 ($CRE_DATE != $T_0)"
 fi
-if [ "$MOD_DATE" == "$T_1" ]
+
+if [ $modDiff -lt 2 ]
 then
   echo "dateModified: t_1"
 else

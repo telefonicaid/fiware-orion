@@ -1246,6 +1246,28 @@ function orionCurl()
 }
 
 
+
+# -----------------------------------------------------------------------------
+#
+# dateDiff - calculate diff in seconds between two date strings
+#
+function dateDiff()
+{
+  typeset -i t1
+  typeset -i t2
+  typeset -i diff
+
+  t1=$(date -d"$1" +%s)
+  t2=$(date -d"$2" +%s)
+
+  diff=$t1-$t2
+
+  if [ $diff -lt 0 ]; then diff=-$diff; fi
+
+  echo $diff
+}
+
+
 export -f dbInit
 export -f dbList
 export -f dbDrop
@@ -1271,3 +1293,4 @@ export -f logMsg
 export -f valgrindSleep
 export -f brokerStartAwait
 export -f brokerStopAwait
+export -f dateDiff
