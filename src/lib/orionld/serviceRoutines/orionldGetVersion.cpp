@@ -50,7 +50,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 
   ciP->responseTree = kjObject(orionldState.kjsonP, NULL);
 
-  nodeP = kjString(orionldState.kjsonP, "branch", "hardening/functests_with_dates_that_often_fail");
+  nodeP = kjString(orionldState.kjsonP, "branch", "bug/entity_dates_overridden_by_user");
   kjChildAdd(ciP->responseTree, nodeP);
 
   nodeP = kjString(orionldState.kjsonP, "kbase version", kbaseVersion);

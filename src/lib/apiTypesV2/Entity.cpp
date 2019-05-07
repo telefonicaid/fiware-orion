@@ -118,7 +118,7 @@ std::string Entity::render
     else
     {
       // If found - modify it?
-      creDateAttrP->numberValue = creDate;
+      // creDateAttrP->numberValue = creDate;
     }
   }
   if ((modDate != 0) && (uriParamOptions[DATE_MODIFIED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_MODIFIED) != attrsFilter.end())))
@@ -134,7 +134,7 @@ std::string Entity::render
     else
     {
       // If found - modify it?
-      modDateAttrP->numberValue = modDate;
+      // modDateAttrP->numberValue = modDate;
     }
   }
 
