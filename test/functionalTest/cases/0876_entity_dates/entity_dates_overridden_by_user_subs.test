@@ -37,7 +37,7 @@ accumulatorStart --pretty-print
 # user provided dateModified doesn't match the filter, but this is the way CB works now
 # (and it is documented in NGSIv2 implementation notes). Maybe in the future this could change.
 #
-# 01. Create sub E.*/T with filter dateModified<2049-01-01
+# 01. Create sub E.*/T with filter dateCreated<2049-01-01
 # 02. Create entity E1/T with user provided dateModified in a far away future (should not trigger notif) [*]
 # 03. Create entity E2/T without user provided dateModified (should trigger notif)
 # 04. Dump & reset accumulator: see E2 notif [but also notif E1, with autoprovided dateModified]
@@ -56,8 +56,8 @@ accumulatorStart --pretty-print
 # 14. Dump & reset accumulator: 2 notif E1 and 2 for E2
 #
 
-echo "01. Create sub E.*/T with filter dateModified<2049-01-01"
-echo "========================================================"
+echo "01. Create sub E.*/T with filter dateCreated<2049-01-01"
+echo "======================================================="
 payload='{
     "subject": {
         "entities": [
@@ -242,8 +242,8 @@ echo
 
 
 --REGEXPECT--
-01. Create sub E.*/T with filter dateModified<2049-01-01
-========================================================
+01. Create sub E.*/T with filter dateCreated<2049-01-01
+=======================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -295,7 +295,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "dateModified": {
                 "metadata": {},
                 "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                "value": "2051-01-01T00:00:00.00Z"
             },
             "id": "E1",
             "type": "T"
@@ -377,7 +377,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "dateModified": {
                 "metadata": {},
                 "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                "value": "2051-01-01T00:00:00.00Z"
             },
             "id": "E1",
             "type": "T"
