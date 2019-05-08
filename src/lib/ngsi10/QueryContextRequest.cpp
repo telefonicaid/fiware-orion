@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
+#include "common/JsonHelper.h"
 #include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
@@ -89,6 +90,22 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
   attributeList.clone(_attributeList);
 
   restrictions = 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* QueryContextRequest::toJson -
+*/
+std::string QueryContextRequest::toJson(void)
+{
+  JsonObjectHelper jh;
+
+  jh.addRaw("entities", entityIdVector.toJson());
+  jh.addRaw("attrs", attributeList.toJson());
+
+  return jh.str();
 }
 
 

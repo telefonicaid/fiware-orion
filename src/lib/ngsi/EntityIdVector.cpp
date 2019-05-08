@@ -31,11 +31,30 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
 #include "apiTypesV2/EntityVector.h"
 
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Request.h"
+
+
+
+/* ****************************************************************************
+*
+* EntityIdVector::toJson -
+*/
+std::string EntityIdVector::toJson(void)
+{
+  JsonVectorHelper jh;
+
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    jh.addRaw(vec[ix]->toJson());
+  }
+
+  return jh.str();
+}
 
 
 

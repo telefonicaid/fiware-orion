@@ -229,26 +229,13 @@ Date: REGEX(.*)
 
 03. Dump the accumulator, see the forwarded query
 =================================================
-POST http://localhost:REGEX(\d+)/v2/op/query
+GET http://localhost:REGEX(\d+)/v2/entities?type=T1&attrs=A1
 Fiware-Servicepath: /
-Content-Length: 60
+Content-Length: 0
 User-Agent: REGEX(.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
-Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "attrs": [
-        "A1"
-    ],
-    "entities": [
-        {
-            "idPattern": ".*",
-            "type": "T1"
-        }
-    ]
-}
 =======================================
 
 
@@ -275,43 +262,21 @@ Date: REGEX(.*)
 
 06. Dump the accumulator, see the forwarded query
 =================================================
-POST http://localhost:REGEX(\d+)/v2/op/query
+GET http://localhost:REGEX(\d+)/v2/entities?type=T2
 Fiware-Servicepath: /
-Content-Length: 56
+Content-Length: 0
 User-Agent: REGEX(.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
-Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "attrs": [],
-    "entities": [
-        {
-            "idPattern": ".*",
-            "type": "T2"
-        }
-    ]
-}
 =======================================
-POST http://localhost:REGEX(\d+)/v2/op/query
+GET http://localhost:REGEX(\d+)/v2/entities?type=T2
 Fiware-Servicepath: /
-Content-Length: 56
+Content-Length: 0
 User-Agent: REGEX(.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
-Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "attrs": [],
-    "entities": [
-        {
-            "idPattern": ".*",
-            "type": "T2"
-        }
-    ]
-}
 =======================================
 
 
@@ -338,26 +303,13 @@ Date: REGEX(.*)
 
 09. Dump the accumulator, see the forwarded query
 =================================================
-POST http://localhost:REGEX(\d+)/v2/op/query
+GET http://localhost:REGEX(\d+)/v2/entities?type=T3&id=E1&attrs=A1
 Fiware-Servicepath: /
-Content-Length: 53
+Content-Length: 0
 User-Agent: REGEX(.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
-Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "attrs": [
-        "A1"
-    ],
-    "entities": [
-        {
-            "id": "E1",
-            "type": "T3"
-        }
-    ]
-}
 =======================================
 
 
@@ -384,43 +336,21 @@ Date: REGEX(.*)
 
 12. Dump the accumulator, see the forwarded query
 =================================================
-POST http://localhost:9997/v2/op/query
+GET http://localhost:REGEX(\d+)/v2/entities?type=T4&id=E1
 Fiware-Servicepath: /
-Content-Length: 49
+Content-Length: 0
 User-Agent: REGEX(.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
-Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "attrs": [],
-    "entities": [
-        {
-            "id": "E1",
-            "type": "T4"
-        }
-    ]
-}
 =======================================
-POST http://localhost:9997/v2/op/query
+GET http://localhost:REGEX(\d+)/v2/entities?type=T4&id=E1
 Fiware-Servicepath: /
-Content-Length: 49
+Content-Length: 0
 User-Agent: REGEX(.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
-Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "attrs": [],
-    "entities": [
-        {
-            "id": "E1",
-            "type": "T4"
-        }
-    ]
-}
 =======================================
 
 
