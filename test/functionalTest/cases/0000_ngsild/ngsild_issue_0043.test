@@ -32,7 +32,7 @@ brokerStart CB 212-254
 
 #
 # 01. POST /ngsi-ld/v1/entities with forced values of 'createdAt' and 'modifiedAt'
-# 02. Getting the entity to see the forced timestamps 'createdAt' and 'modifiedAt'
+# 02. Getting the entity to see that the forced timestamps 'createdAt' and 'modifiedAt' have been ignored
 #
 
 
@@ -46,8 +46,8 @@ payload='{
     ],
     "id": "urn:ngsi-ld:AgriCrop:df72dc57-1eb9-42a3-88a9-8647ecc954b4",
     "type": "AgriCrop",
-    "createdAt": "2017-01-01T01:20:00Z",
-    "modifiedAt": "2017-05-04T12:30:00Z",
+    "createdAt": "2031-01-01T01:20:00Z",
+    "modifiedAt": "2031-05-04T12:30:00Z",
     "name": {
         "type": "Property",
         "value": "Wheat"
@@ -128,8 +128,8 @@ echo
 echo
 
 
-echo "02. Getting the entity to see the forced timestamps 'createdAt' and 'modifiedAt'"
-echo "================================================================================"
+echo "02. Getting the entity to see that the forced timestamps 'createdAt' and 'modifiedAt' have been ignored"
+echo "======================================================================================================="
 orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:AgriCrop:df72dc57-1eb9-42a3-88a9-8647ecc954b4?options=sysAttrs&prettyPrint=yes' --noPayloadCheck
 echo
 echo
@@ -146,8 +146,8 @@ Date: REGEX(.*)
 
 
 
-02. Getting the entity to see the forced timestamps 'createdAt' and 'modifiedAt'
-================================================================================
+02. Getting the entity to see that the forced timestamps 'createdAt' and 'modifiedAt' have been ignored
+=======================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 2777
 Content-Type: application/json
@@ -157,8 +157,8 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:AgriCrop:df72dc57-1eb9-42a3-88a9-8647ecc954b4",
   "type": "AgriCrop",
-  "createdAt": "2017-01-01T01:20:00Z",
-  "modifiedAt": "2017-05-04T12:30:00Z",
+  "createdAt": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\dZ)",
+  "modifiedAt": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\dZ)"
   "agroVocConcept": {
     "type": "Property",
     "value": "http://aims.fao.org/aos/agrovoc/c_7951",
