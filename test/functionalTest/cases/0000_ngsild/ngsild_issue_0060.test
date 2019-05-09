@@ -33,11 +33,35 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 #
 # 01. Create subscription with entity type: .* and no entity id
+# 02. Create the very same subscription again
 #
 
 
 echo "01. Create subscription with entity type: .* and no entity id"
 echo "============================================================="
+payload='{
+  "id": "urn:ngsi-ld:Subscription:testsubscription",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": ".*"
+    }
+  ],
+  "notification": {
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. Create the very same subscription again"
+echo "==========================================="
 payload='{
   "id": "urn:ngsi-ld:Subscription:testsubscription",
   "type": "Subscription",
@@ -68,6 +92,20 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.json
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:testsubscription
 Date: REGEX(.*)
 
+
+
+02. Create the very same subscription again
+===========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 152
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "urn:ngsi-ld:Subscription:testsubscription",
+    "title": "subscription already exists",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
 
 
 --TEARDOWN--

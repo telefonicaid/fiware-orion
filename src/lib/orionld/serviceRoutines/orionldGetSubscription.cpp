@@ -27,7 +27,7 @@
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "rest/httpHeaderAdd.h"                                // httpHeaderAdd, httpHeaderLinkAdd
-#include "mongoBackend/mongoGetSubscriptions.h"                // mongoGetSubscription
+#include "mongoBackend/mongoGetSubscriptions.h"                // mongoGetLdSubscription
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultContext
 #include "orionld/kjTree/kjTreeFromSubscription.h"             // kjTreeFromSubscription
