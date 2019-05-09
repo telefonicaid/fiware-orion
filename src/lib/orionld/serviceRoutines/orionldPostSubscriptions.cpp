@@ -37,6 +37,7 @@ extern "C"
 #include "apiTypesV2/HttpInfo.h"                               // HttpInfo
 #include "apiTypesV2/Subscription.h"                           // Subscription
 #include "apiTypesV2/EntID.h"                                  // EntID
+#include "mongoBackend/mongoGetSubscriptions.h"                // mongoGetLdSubscription
 #include "mongoBackend/mongoCreateSubscription.h"              // mongoCreateSubscription
 #include "mongoBackend/MongoGlobal.h"                          // mongoIdentifier
 #include "orionld/common/urlCheck.h"                           // urlCheck
@@ -466,7 +467,7 @@ static bool ktreeToNotification(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::Sub
 //
 // ktreeToSubscription -
 //
-static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
+static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char** subIdPP)
 {
   KjNode*                   kNodeP;
   char*                     idP                       = NULL;
@@ -585,7 +586,8 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP)
     {
       DUPLICATE_CHECK(idP, "Subscription::id", kNodeP->value.s);
       STRING_CHECK(kNodeP, "Subscription::id");
-      subP->id = kNodeP->value.s;
+      subP->id  = kNodeP->value.s;
+      *subIdPP  = (char*) subP->id.c_str();
     }
     else if (SCOMPARE5(kNodeP->name, 't', 'y', 'p', 'e', 0))
     {
@@ -794,13 +796,32 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   // FIXME: attrsFormat should be set to default by constructor
   sub.attrsFormat = DEFAULT_RENDER_FORMAT;  // FIXME: 
 
-  if (ktreeToSubscription(ciP, &sub) == false)
+  char* subIdP = NULL;
+  if (ktreeToSubscription(ciP, &sub, &subIdP) == false)
   {
     LM_E(("ktreeToSubscription FAILED"));
     // orionldErrorResponseCreate is invoked by ktreeToSubscription
     return false;
   }
 
+  //
+  // Does the subscription already exist?
+  //
+  if (subIdP != NULL)
+  {
+    ngsiv2::Subscription  subscription;
+    char*                 details;
+
+    if (mongoGetLdSubscription(&subscription, subIdP, ciP->tenant.c_str(), &ciP->httpStatusCode, &details) == true)
+    {
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "subscription already exists", subIdP, OrionldDetailsString);
+      return false;
+    }
+  }
+
+  //
+  // Create the subscription
+  //
   subId = mongoCreateSubscription(sub,
                                   &oError,
                                   ciP->httpHeaders.tenant,
