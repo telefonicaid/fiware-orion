@@ -985,7 +985,10 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     }
     else if (kNodeP == createdAtP)
     {
-      // 1. Make sure the value is a valid timestamp
+      // FIXME: Make sure the value is a valid timestamp?
+
+      // Ignore the 'createdAt' - See issue #43 (orionld)
+#if 0
       // 2. Save it for future use (when creating the entity)
       if ((orionldState.overriddenCreationDate = parse8601Time(createdAtP->value.s)) == -1)
       {
@@ -993,10 +996,14 @@ bool orionldPostEntities(ConnectionInfo* ciP)
         mongoRequest.release();
         return false;
       }
+#endif
     }
     else if (kNodeP == modifiedAtP)
     {
-      // 1. Make sure the value is a valid timestamp
+      // FIXME: Make sure the value is a valid timestamp?
+
+      // Ignore the 'createdAt' - See issue #43 (orionld)
+#if 0
       // 2. Save it for future use (when creating the entity)
       if ((orionldState.overriddenModificationDate = parse8601Time(modifiedAtP->value.s)) == -1)
       {
@@ -1004,6 +1011,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
         mongoRequest.release();
         return false;
       }
+#endif
     }
     else if (kNodeP == contextNodeP)
     {
