@@ -155,6 +155,11 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   }
   else
   {
+    TIMED_RENDER(payload = upcrP->toJson());
+
+    verb     = "POST";
+    resource = prefix + "/op/update";
+#if 0
     std::vector<std::string>  nullFilter;
     Entity*                   eP = upcrP->entityVector[0];
 
@@ -170,6 +175,7 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
       // Add ?type=<TYPE> to 'resource'
       resource += "?type=" + eP->type;
     }
+#endif
   }
 
   ciP->outMimeType  = outMimeType;
