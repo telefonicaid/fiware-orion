@@ -1,26 +1,62 @@
-if: type not IN (pull_request) and branch not IN(develop)
 dist: trusty
 sudo: false
 language: minimal
 env:
   global:
-  - IMAGE=fiware/orion-ld
+  - IMAGE_RELEASE=fiware/orion-ld
+  - IMAGE_DEPS=fiware/orion-ld:deps
+  - HOME=/opt/orion
   - secure: tVGPaHVXk+oRNs3civESLFQImhM5bpYTbjk9SXwHg/2hdX5laANEtxAKS8k7X5TZwj2oMV8nDzJojU1NOm3292IZsP/0BijCnkwSrLgN2zi/AK8FmiO0KT9+jkQH7T8/K9KisqVSUIaBFlIlFhhDwR2OPGjlPWZpt7DuTePNV4jgFhkMjfROzLZDc4aWA7uzKvw4XTegMvP/lRiU3urlTqJGXuKaCmkQeTHr1cGPbnycAqwDKYKxzKQdRhyQT96+MsZnfwgg8JLKQJpqEIFVQ22rxoZWUZaYbMpDJP1ZPnoF7v12ODNoFoZM7xWom98VAQ6L7SBcY7laInfa/N7zzu0GeIjGa7RwigLy9BPmOfpXBOSifdcAE6sZ9vLYoMKdE4SOYZ8uOfeuK5kJe0AY4tqVvCvuTdsQp0wmCnd8spH3L9sHlt7QJz+q+RklhFk2h9duyPNr5mfv/maWF8lJz/9eR8Lmmzeg/B79nvZEd2eCOYi2I9HcAucYZL4bZXIW6ROnf5WFdPcbHZtbeB5iBWKwhHp2gcDwTZtS6Ugx9axXMV4pAOS5qPKZNmH6n1GSCj25iGzluObje72xDy0s0lsLDlym7xvey3Ox/udSj17nEZf1ylQ9HR+ey7YS3UBRadopfvAyWy7ss03Tj2dobI7HcICknuztb+IdlAXceqE=
   - secure: dGrPDCxNNZe72esWl6Lvj7mn9IFYT8rbOJ9QPjsU0CsRFTu2t2XwDAMNRzbwlLIO3ANWTuMXuURsjQwdIh+fIjIG48rS4iTn7TiI4q3kP5pDbw0tZ5twpleZ5xh7twkb5CYTUeOtkBAbL/onOFavqAwZN3lu8sqFqOSbWi1VTAW2ZRTEX6QXUTd6fs0rXpdzSRzIqVZceHcDKcy1X07LmEWcm92jZf1jlJ2snhxOoSx/Ox29gSsbfyIyAl1HByVxqq20od6IViWh8Gpt4HJZU6+4Gp0MU+0yQI34heD7q02PB+/TQElVMmnadsd9HU1HfVF5uv4TuYO0zcmEgQHfwLKLD+d/mZhwrH2RgRwLSiCol6DJkpMHPbDEpB5l8Z32Ex+E6h7CtIE9l3nCGLJu4m+wbL0TT1wHGI8lpXW4RifW4vd6Zf+71CVW3OjFptXEjJPtrdGH51r3BH4LnTTMrOXzI8ZRyFpBi8EorLJAnrMc+7EwzVd1NTU07gDB22jNmtJkDty7BfE31GL4C04q9BBQSefFuZI92EnMKbYHHQUPdl9rLxn1QACcS2W+CYYA78X+R8RoTeu4Lrmcb7x6ByQuzenwj//Udu+0TBh3F5O1S4hC3FMDjwi5RC8u8GiEdLxmnKQXuhD/839SeFJXtmFnyN27wfrceAOivsP1rjw=
   - secure: aTkQKOSU2eSx5DjEqj5/GPiu0UiyBKNmXPoGYd6wQFajnKbk6ErEW66onFJGMiL3g/yiyP6Utwm4JaBgqxQ1WJDHSn8MbljFJ03xAtJsyz+E0Wh65kshK3IFxF2M7glt0ZHH3kvLEH9czFrNcZ3eusMC8GEWAkXQ0jwK7DVW4+rVaajHpZLsxgU3TOwxMML0AT+kfSPnOKBsjUwOtLmU+ffatGxA1r5leYvVTpzza9di6bqJf/hQN6z07gnhkAX3Ypz3JNPDYuFjK0jHwhkDFeN91FmoShuB5dOuvs16fXojjxYJDwMQIW/Eo0WjVEV6qhGtnYI6RnGFDI6Cc/NjDN4CAmssarj8pXdAQSzQVzSXohxsILIMuY1QdQpwLjJJdmHMwtPegeS49PCIaRKpgKPR9/FuqUpRFFkAX6Hy0fxC9rRkSTCSIwpFL37PWpRZKE5e12wNZPPDK2A2gpFIruv/upDmL1dhK5YjNoMENtBgOrG3Uo/YfCIEngDesNzE9XwGisW1u4TqaQ1rNVrdezS4KzC1njnjqw6MC+w9rCUNk4d/lR1y/h0q68Pa3c7IdLWUhdKDjLPAZdH0G4dpRxpZzwV/ocBmWSwcWT+74hBe1BC8kWPL7J2Q0T7IxcLDEKQvnfT1q2/Gg4oPrgh3Zp2mOrXtTKgmCHo5FrNdTnI=
-before_install: true
+  matrix:
+  - STAGE=compliance
+  - STAGE=unit
+  - STAGE=functional_1_300
+  - STAGE=functional_301_600
+  - STAGE=functional_601_900
+  - STAGE=functional_901_1200
+  - STAGE=release
+  - STAGE=deps
+before_install:
+  - if [[ "${PUSH}" && ${TRAVIS_BRANCH} == "develop" && ${TRAVIS_EVENT_TYPE} == "push" ]]; then
+      export PUSH_STATUS="True";
+    fi
+  - if [[ "${TRAVIS_EVENT_TYPE}" == "pull_request" && "${STAGE}" != "release" && "${STAGE}" != "deps" ]]; then
+      export TEST_STATUS="True";
+    fi
+  - echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
+  - git lfs pull
+  - if [[ "${TEST_STATUS}" && "${STAGE}" != "compliance" ]]; then
+      echo '{"ipv6":true,"fixed-cidr-v6":"2001:db8:1::/64"}' | sudo tee /etc/docker/daemon.json;
+      sudo service docker restart;
+      docker pull ${IMAGE_DEPS};
+    fi
 install: true
-before_script: git lfs pull
+before_script: true
 script:
-- echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
-- docker build --build-arg TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg
-  TEST=True -t ${IMAGE} -f docker/Dockerfile docker/
-- docker push ${IMAGE}
+  - if [[ "${TEST_STATUS}" && "${STAGE}" == "compliance" ]]; then
+      $(pwd)/docker/build.sh -s compliance -t -P $(pwd);
+    fi
+  - if [[ "${TEST_STATUS}" && "${STAGE}" != "compliance" ]]; then
+      docker run -t --rm -v $(pwd):${HOME} ${IMAGE_DEPS} build.sh -s ${STAGE} -dt;
+    fi
+  - if [[ "${PUSH_STATUS}" && "${STAGE}" == "release" ]]; then
+      docker build --build-arg TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg STAGE=${STAGE} -t ${IMAGE_RELEASE} -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
+    fi
+  - if [[ "${PUSH_STATUS}" && "${STAGE}" == "deps" ]]; then
+      docker build --build-arg TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg STAGE=${STAGE} -t ${IMAGE_DEPS} -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
+    fi
+after_success:
+  - if [[ "${PUSH_STATUS}" && "${STAGE}" == "release" ]]; then
+      docker push ${IMAGE_RELEASE};
+    fi
+  - if [[ "${PUSH_STATUS}" && "${STAGE}" == "deps" ]]; then
+      docker push ${IMAGE_DEPS};
+    fi
 notifications:
   email:
     recipients:
-    - ken.zangelin@fiware.org
-    - josemanuel.cantera@fiware.org
     - dmitrii.demin@fiware.org
     on_success: never
     on_failure: always

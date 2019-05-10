@@ -1,0 +1,18 @@
+FROM debian:stretch-slim
+
+ARG TOKEN
+ARG STAGE=release
+ARG PLATFORM=debian
+ARG REV=develop
+
+ENV BROKER='orionld'
+
+WORKDIR /opt
+
+COPY . /usr/local/bin/
+
+RUN build.sh -t ${TOKEN} -p ${PLATFORM} -s ${STAGE} -c -B ${REV}
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+EXPOSE 1026
