@@ -1,0 +1,149 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Creation/Retrieval and Deletion
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. The subscription urn:ngsi-ld:Subscription:testsubscription is created, identical to the one in issue #67
+# 02. The subscription urn:ngsi-ld:Subscription:testsubscription is retrieved - OK
+# 03. The subscription urn:ngsi-ld:Subscription:testsubscription is deleted - OK
+# 04. New attempt to retrieve the deleted subscription - NOT FOUND
+#
+
+echo "01. The subscription urn:ngsi-ld:Subscription:testsubscription is created, identical to the one in issue #67"
+echo "============================================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:Subscription:testsubscription",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "vehicle"
+    }
+  ],
+  "notification": {
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://mycallback:8080/callback"
+    }
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. The subscription urn:ngsi-ld:Subscription:testsubscription is retrieved - OK"
+echo "================================================================================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:testsubscription
+echo
+echo
+
+
+echo "03. The subscription urn:ngsi-ld:Subscription:testsubscription is deleted - OK"
+echo "=============================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:testsubscription -X DELETE
+echo
+echo
+
+
+echo "04. New attempt to retrieve the deleted subscription - NOT FOUND"
+echo "================================================================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:testsubscription
+echo
+echo
+
+
+
+--REGEXPECT--
+01. The subscription urn:ngsi-ld:Subscription:testsubscription is created, identical to the one in issue #67
+============================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:testsubscription
+Date: REGEX(.*)
+
+
+
+02. The subscription urn:ngsi-ld:Subscription:testsubscription is retrieved - OK
+================================================================================
+HTTP/1.1 200 OK
+Content-Length: 256
+Content-Type: application/json
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "entities": [
+        {
+            "type": "vehicle"
+        }
+    ],
+    "expires": "2038-01-19T03:14:07Z",
+    "id": "urn:ngsi-ld:Subscription:testsubscription",
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://mycallback:8080/callback"
+        },
+        "format": "keyValues"
+    },
+    "type": "Subscription"
+}
+
+
+03. The subscription urn:ngsi-ld:Subscription:testsubscription is deleted - OK
+==============================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. New attempt to retrieve the deleted subscription - NOT FOUND
+================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 149
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "urn:ngsi-ld:Subscription:testsubscription",
+    "title": "subscription not found",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
