@@ -929,7 +929,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
       entityIdP->id        = idNodeP->value.s;
       entityIdP->type      = (typeNodeP != NULL)? typeNodeP->value.s : NULL;
-      entityIdP->isPattern = false;
+      entityIdP->isPattern = "false";
       entityIdP->creDate   = getCurrentTime();
       entityIdP->modDate   = getCurrentTime();
 

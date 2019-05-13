@@ -53,6 +53,7 @@ add_definitions(-DLM_ON)
 add_definitions(-DORIONLD)
 
 add_definitions(-fPIC)
+add_definitions(-std=c++11)
 
 # Baseline compiler flags, any change here will affect all build types
 
@@ -86,7 +87,7 @@ ELSEIF (${DISTRO} MATCHES "Ubuntu_18.*")
 ELSEIF (${DISTRO} MATCHES "Debian_9.*")
  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
 ELSE()
-  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -fno-var-tracking-assignments")
+  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
 ENDIF ()
 
 #
