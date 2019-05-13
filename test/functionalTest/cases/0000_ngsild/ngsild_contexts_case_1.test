@@ -35,7 +35,7 @@ brokerStart CB 0-255
 # {
 #   "@context": [
 #     "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
-#     "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+#     "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
 #   ]
 # }
 #
@@ -66,7 +66,7 @@ brokerStart CB 0-255
 #   }
 # }
 #
-# http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld:
+# https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld:
 # {
 #   "@context": {
 #     "id": "@id",
