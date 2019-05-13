@@ -35,7 +35,7 @@ brokerStart CB 212-249
 # {
 #   "@context": [
 #     "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
-#     "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+#     "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
 #   ]
 # }
 #
@@ -58,7 +58,7 @@ brokerStart CB 212-249
 #   }
 # }
 #
-# http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld:
+# https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld:
 # {
 #   "@context": {
 #     "id": "@id",
@@ -90,7 +90,7 @@ payload='{
     "value": "John 2"
   },
   "@context": [
-    "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   ]
 }'
@@ -138,7 +138,7 @@ MongoDB server version: REGEX(.*)
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : [
-				"http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+				"https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 				"https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 			],
 			"mdNames" : [ ]

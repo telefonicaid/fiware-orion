@@ -54,7 +54,7 @@ payload='{
     }
   },
   "@context": [
-    "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "http://example.org/cim/commonTerms.jsonld",
     "http://example.org/cim/vehicle.jsonld",
     "http://example.org/cim/parking.jsonld"

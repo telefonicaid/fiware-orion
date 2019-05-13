@@ -46,8 +46,8 @@ echo "02. Create an entity - which makes the broker crash according to issue #65
 echo "=========================================================================="
 payload='{
    "@context": [
-            "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-            "http://schema.lab.fiware.org/ld/jsonldcontext.jsonld"
+            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "https://schema.lab.fiware.org/ld/jsonldcontext.jsonld"
         ],
     "id": "urn:ngsi-ld:Room:Room1",
     "type": "Room",

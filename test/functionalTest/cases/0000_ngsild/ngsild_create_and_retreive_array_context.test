@@ -42,7 +42,7 @@ payload='{
   "id": "http://a.b.c/E1",
   "type": "A",
   "@context": [
-    "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   ]
 }'
@@ -72,13 +72,13 @@ Date: REGEX(.*)
 02. GET /ngsild/ex/v1/contexts/http://a.b.c/E1, see context created in step 01
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 149
+Content-Length: 150
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "@context": [
-        "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+        "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
         "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
     ]
 }

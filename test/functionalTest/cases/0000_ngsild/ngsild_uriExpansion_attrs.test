@@ -32,7 +32,7 @@ brokerStart CB 212-249
 
 #
 # As no @context is given, the default context will be used:
-# http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld
+# https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld
 # {
 #   "@context": {
 #     ...

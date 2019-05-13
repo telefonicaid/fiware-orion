@@ -114,10 +114,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
   // Now parse the payload
   // LM_T(LmtContext, ("Got @context: %s", httpResponse.buf));
   // LM_T(LmtContext, ("Got @context - parsing it"));
-  char tmpBuf[128];
-  strncpy(tmpBuf, httpResponse.buf, 128);
-  tmpBuf[127] = 0;
-  LM_TMP(("Got @context: %s", tmpBuf));
+  LM_TMP(("Got @context: %s", httpResponse.buf));
   KjNode* tree = kjParse(kjsonP, httpResponse.buf);
   LM_T(LmtContext, ("Got @context - parsed it"));
 

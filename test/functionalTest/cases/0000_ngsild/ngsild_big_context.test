@@ -63,7 +63,7 @@ payload='{
   },
   "@context": [
     "https://schema.lab.fiware.org/ld/jsonldcontext.jsonld",
-    "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
   ]
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
@@ -92,14 +92,14 @@ Date: REGEX(.*)
 02. GET /ngsi-ld/ex/v1/contexts/urn:ngsi-ld:AirQualityObserved:RZ:Obsv4567, see context created in step 01
 ==========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 131
+Content-Length: 132
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "@context": [
         "https://schema.lab.fiware.org/ld/jsonldcontext.jsonld",
-        "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+        "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     ]
 }
 
