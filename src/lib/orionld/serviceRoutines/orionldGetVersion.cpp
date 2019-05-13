@@ -50,7 +50,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 
   ciP->responseTree = kjObject(orionldState.kjsonP, NULL);
 
-  nodeP = kjString(orionldState.kjsonP, "branch", "bug/136.ngsild_issue_0043_ignore");
+  nodeP = kjString(orionldState.kjsonP, "branch", "hardening/137.toIx-in-func-test");
   kjChildAdd(ciP->responseTree, nodeP);
 
   nodeP = kjString(orionldState.kjsonP, "kbase version", kbaseVersion);
