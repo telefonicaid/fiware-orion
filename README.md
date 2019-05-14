@@ -7,9 +7,7 @@ This GE implements the [NGSI-LD API](https://www.etsi.org/deliver/etsi_gs/CIM/00
 
 If you want to start testing NGSI-LD just use Docker
 
-```docker run fiware/orion-ld``` 
-
-or better use [docker compose](https://github.com/FIWARE/context.Orion-LD/blob/develop/docker/docker-compose.yml) to run it
+```docker run fiware/orion-ld```  or better use [docker compose](https://github.com/FIWARE/context.Orion-LD/blob/develop/docker/docker-compose.yml) to run it
 
 If you only intend to use NGSIv2, please use [Orion](https://github.com/telefonicaid/fiware-orion). 
 
