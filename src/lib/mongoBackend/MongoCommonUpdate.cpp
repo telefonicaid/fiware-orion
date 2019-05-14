@@ -1784,12 +1784,10 @@ static void setActionTypeMetadata(ContextElementResponse* notifyCerP)
       {
         Metadata* mdP = new Metadata(NGSI_MD_ACTIONTYPE, DEFAULT_ATTR_STRING_TYPE, caP->actionType);
         caP->metadataVector.push_back(mdP);
-        LM_TMP(("KZ: Added metadata actionType: '%s'", caP->actionType.c_str()));
       }
       else
       {
         actionTypeMdP->stringValue = caP->actionType;
-        LM_TMP(("KZ: Modified metadata actionType to '%s'", actionTypeMdP->stringValue.c_str()));
       }
     }
   }
@@ -3054,8 +3052,6 @@ static bool createEntity
   insertedDoc.append(ENT_ATTRS, attrsToAdd.obj());
 
 #ifdef ORIONLD
-  LM_TMP(("KZ: orionldState.overriddenCreationDate     == %lu", orionldState.overriddenCreationDate));
-  LM_TMP(("KZ: orionldState.overriddenModificationDate == %lu", orionldState.overriddenModificationDate));
   if (orionldState.overriddenCreationDate != 0)
     insertedDoc.append(ENT_CREATION_DATE, orionldState.overriddenCreationDate);
   else
@@ -3084,8 +3080,6 @@ static bool createEntity
   if (orionldState.locationAttributeP != NULL)
   {
     char* errorString;
-
-    LM_TMP(("ToDo: Append location attribute '%s' to insertedDoc", orionldState.locationAttributeP->name));
 
     if (geoJsonCreate(orionldState.locationAttributeP, &geoJson, &errorString) ==  false)
     {
@@ -3722,7 +3716,6 @@ static void setActionType(ContextElementResponse* notifyCerP, const std::string&
   {
     ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
     caP->actionType = actionType;
-    LM_TMP(("KZ: Set actionType to '%s' for attribute '%s'", actionType.c_str(), caP->name.c_str()));
   }
 }
 

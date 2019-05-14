@@ -82,7 +82,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
   //
   ciP->httpStatusCode = mongoQueryContext(&request,
                                           &response,
-                                          ciP->tenant,
+                                          ciP->httpHeaders.tenant,
                                           ciP->servicePathV,
                                           ciP->uriParam,
                                           ciP->uriParamOptions,

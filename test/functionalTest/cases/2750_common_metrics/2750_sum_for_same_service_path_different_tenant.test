@@ -25,9 +25,9 @@ Sum For Same Service Path Different Tenant
 
 --SHELL-INIT--
 dbInit CB
-dbInit tenant1
-dbInit tenant2
-dbInit tenant3
+dbInit CB tenant1
+dbInit CB tenant2
+dbInit CB tenant3
 brokerStart CB
 
 --SHELL--
@@ -268,6 +268,6 @@ Date: REGEX(.*)
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
-dbDrop tenant1
-dbDrop tenant2
-dbDrop tenant3
+dbDrop CB tenant1
+dbDrop CB tenant2
+dbDrop CB tenant3

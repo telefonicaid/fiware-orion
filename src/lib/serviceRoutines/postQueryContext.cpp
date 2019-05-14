@@ -310,7 +310,7 @@ std::string postQueryContext
 
   TIMED_MONGO(ciP->httpStatusCode = mongoQueryContext(qcrP,
                                                       qcrsP,
-                                                      ciP->tenant,
+                                                      ciP->httpHeaders.tenant,
                                                       ciP->servicePathV,
                                                       ciP->uriParam,
                                                       ciP->uriParamOptions,
