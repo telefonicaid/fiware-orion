@@ -1,5 +1,7 @@
 # <a name="top"></a>Orion Context Broker (Linked Data Extensions)
 
+[![NGSI-LD badge](https://img.shields.io/badge/NGSI-LD-red.svg)](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.01.01_60/gs_CIM009v010101p.pdf)
+
 (The content of this repo will eventually be merged in the main Orion development line)
 
 This GE implements the [NGSI-LD API](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.01.01_60/gs_CIM009v010101p.pdf)
