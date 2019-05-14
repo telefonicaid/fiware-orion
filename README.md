@@ -8,6 +8,8 @@ Use [docker compose](https://github.com/FIWARE/context.Orion-LD/blob/develop/doc
 
 If you only intend to use NGSIv2, please use [Orion](https://github.com/telefonicaid/fiware-orion). 
 
+This component is still in Alpha state but already passing a bunch of [tests](https://github.com/FIWARE/NGSI-LD_TestSuite)
+
 <!-- Documentation badge line is processed by release.sh. Thus, if the structure of the URL changes,
      release.sh needs to be changed also -->
 
