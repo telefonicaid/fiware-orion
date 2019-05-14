@@ -129,9 +129,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     return false;
   }
 
-  LM_T(LmtServiceRoutine, ("In orionldGetEntities"));
-  LM_TMP(("In orionldGetEntities"));
-
   if ((idPattern != NULL) && (id != NULL))
   {
     LM_W(("Bad Input (both 'idPattern' and 'id' used)"));
@@ -146,7 +143,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   if (georel != NULL)
   {
-    LM_TMP(("Geo: georel: %s", georel));
     if ((strncmp(georel, "near", 4)       != 0) &&
         (strncmp(georel, "within", 6)     != 0) &&
         (strncmp(georel, "contains", 8)   != 0) &&
@@ -166,8 +162,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     if (georelExtra != NULL)
     {
       ++georelExtra;  // Step over ';', but don't "destroy" the string - it is used as is later on
-      LM_TMP(("Geo: georel: %s", georel));
-      LM_TMP(("Geo: georelExtra: %s", georelExtra));
 
       if ((strncmp(georelExtra, "minDistance==", 11) != 0) && (strncmp(georelExtra, "maxDistance==", 11) != 0))
       {
@@ -198,8 +192,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
     std::string  errorString;
 
-    LM_TMP(("Geo: Filling a geometry scope with { geometry='%s', coordinates='%s', georel='%s' }", geometry, coordinates, georel));
-
     //
     // In APIv2, the vector is a string without [], in NGSI-LD, [] are present. Must remove ...
     //
@@ -212,7 +204,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
         coordinates[len - 1] = 0;
     }
 
-    LM_TMP(("Geo: coordinates for '%s' in GET Entities: %s. Rel: %s", geometry, coordinates, georel));
     if (scopeP->fill(ciP->apiVersion, geometry, coordinates, georel, &errorString) != 0)
     {
       scopeP->release();
@@ -244,7 +235,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     typeVecItems = kStringSplit(type, ',', (char**) typeVector, typeVecItems);
 
   idVecItems   = kStringSplit(id, ',', (char**) idVector, idVecItems);
-  LM_TMP(("In orionldGetEntities"));
 
   //
   // ID-list and Type-list at the same time is not supported
@@ -280,8 +270,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     isTypePattern = false;  // Just in case ...
   }
 
-  LM_TMP(("In orionldGetEntities"));
-
   if (idVecItems > 1)  // A list of Entity IDs
   {
     for (int ix = 0; ix < idVecItems; ix++)
@@ -310,7 +298,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     parseData.qcr.res.entityIdVector.push_back(entityIdP);
   }
 
-  LM_TMP(("In orionldGetEntities"));
   if (attrs != NULL)
   {
     char  longName[256];
@@ -318,8 +305,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     char* shortName;
     char* shortNameVector[32];
     int   vecItems = (int) sizeof(shortNameVector) / sizeof(shortNameVector[0]);;
-
-    LM_TMP(("In orionldGetEntities - attrs != NULL"));
 
     vecItems = kStringSplit(attrs, ',', (char**) shortNameVector, vecItems);
 
@@ -340,7 +325,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   if (q != NULL)
   {
-    LM_TMP(("In orionldGetEntities - q != NULL"));
     //
     // ngsi-ld doesn't support metadata which orion APIv1 and v2 does.
     // However, for simplicity, the metadata vector is used for properties of an attribute.
@@ -470,7 +454,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       scopeP->stringFilterP = sfP;
 
     LM_T(LmtStringFilter, ("Q: Created %s StringFilter of q: '%s'", (filterType == SftMq)? "MQ" : "Q", q));
-    LM_TMP(("Q: Created %s StringFilter of q: '%s'", (filterType == SftMq)? "MQ" : "Q", q));
 
     std::string details;
     if (sfP->parse(q, &details) == false)
@@ -490,13 +473,11 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   // Call standard op postQueryContext
   std::vector<std::string>  compV;    // Not used but part of signature for postQueryContext
 
-  LM_TMP(("In orionldGetEntities - calling standard op postQueryContext"));
   std::string answer   = postQueryContext(ciP, 0, compV, &parseData);
   int         entities = parseData.qcrs.res.contextElementResponseVector.size();
-  LM_TMP(("In orionldGetEntities - entities: %d", entities));
+
   if (attrs != NULL)  // FIXME: Move all this to a separate function
   {
-    LM_TMP(("In orionldGetEntities -  attrs != NULL"));
     //
     // Unfortunately, we need to do a second query now, to get the attribute "@context" of all the matching entities
     //
@@ -525,8 +506,14 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       // mongoQueryContext requires a ServicePath, even though ngsi-ld doesn't support service paths
       servicePathV.push_back("/#");
 
-      LM_TMP(("Calling mongoQueryContext"));
-      HttpStatusCode sCode = mongoQueryContext(&qReq, &qResForContextAttr, ciP->tenant, servicePathV, ciP->uriParam, ciP->uriParamOptions, NULL, ciP->apiVersion);
+      HttpStatusCode sCode = mongoQueryContext(&qReq,
+                                               &qResForContextAttr,
+                                               ciP->httpHeaders.tenant,
+                                               servicePathV,
+                                               ciP->uriParam,
+                                               ciP->uriParamOptions,
+                                               NULL,
+                                               ciP->apiVersion);
 
       if (sCode != SccOk)
       {
@@ -538,7 +525,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
     // Now we need to add the "@context" member to each entity in parseData.qcrs.res
     QueryContextResponse* responseP = &parseData.qcrs.res;
-    LM_TMP(("mongoQueryContext gave back %d contextElementResponses", responseP->contextElementResponseVector.size()));
 
     for (unsigned int ix = 0; ix < responseP->contextElementResponseVector.size(); ix++)
     {
@@ -570,7 +556,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   // Transform QueryContextResponse to KJ-Tree
   //
   ciP->httpStatusCode = SccOk;
-  LM_TMP(("In orionldGetEntities -  Calling kjTreeFromQueryContextResponse"));
   ciP->responseTree   = kjTreeFromQueryContextResponse(ciP, false, keyValues, &parseData.qcrs.res);
 
   return true;

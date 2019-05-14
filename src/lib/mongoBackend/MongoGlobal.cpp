@@ -1217,12 +1217,10 @@ static void addDatesForAttrs(ContextElementResponse* cerP, bool includeCreDate, 
       {
         Metadata*   mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, caP->creDate);
         caP->metadataVector.push_back(mdP);
-        LM_TMP(("KZ: Added a DATECREATED metadata to the attribute '%s'", caP->name.c_str()));
       }
       else
       {
         dateCreatedMetadataP->numberValue = caP->creDate;
-        LM_TMP(("KZ: Modified the metadata '%s' to %lu", NGSI_MD_DATECREATED, dateCreatedMetadataP->numberValue));
       }
     }
 
@@ -1249,7 +1247,6 @@ static void addDatesForAttrs(ContextElementResponse* cerP, bool includeCreDate, 
       else
       {
         dateModifiedMetadataP->numberValue = caP->modDate;
-        LM_TMP(("KZ: Modified the metadata '%s' to %lu", NGSI_MD_DATEMODIFIED, dateModifiedMetadataP->numberValue));
       }
     }
   }

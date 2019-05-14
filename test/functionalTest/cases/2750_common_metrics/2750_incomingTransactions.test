@@ -25,9 +25,9 @@ Incoming Transactions and Common Metrics
 
 --SHELL-INIT--
 dbInit CB
-dbInit s1
-dbInit s2
-dbInit s3
+dbInit CB s1
+dbInit CB s2
+dbInit CB s3
 brokerStart CB
 
 --SHELL--
@@ -196,6 +196,6 @@ Date: REGEX(.*)
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
-dbDrop s1
-dbDrop s2
-dbDrop s3
+dbDrop CB s1
+dbDrop CB s2
+dbDrop CB s3
