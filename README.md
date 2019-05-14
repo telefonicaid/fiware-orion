@@ -2,6 +2,12 @@
 
 (The content of this repo will eventually be merged in the main Orion development line)
 
+This GE implements the [NGSI-LD API](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.01.01_60/gs_CIM009v010101p.pdf)
+
+Use [docker compose](https://github.com/FIWARE/context.Orion-LD/blob/develop/docker/docker-compose.yml) to run it
+
+If you only intend to use NGSIv2, please use Orion. 
+
 <!-- Documentation badge line is processed by release.sh. Thus, if the structure of the URL changes,
      release.sh needs to be changed also -->
 
