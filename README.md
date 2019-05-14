@@ -17,4 +17,5 @@ If you only intend to use NGSIv2, please use [Orion](https://github.com/telefoni
 [![Support badge]( https://img.shields.io/badge/support-sof-yellowgreen.svg)](http://stackoverflow.com/questions/tagged/fiware-orion)
 
 (The content of this repo will eventually be merged in the main Orion development line)
-For further documentation please check Orion [README.md](https://github.com/telefonicaid/fiware-orion)
+
+For full Orion documentation, please check Orion's [README.md](https://github.com/telefonicaid/fiware-orion)
