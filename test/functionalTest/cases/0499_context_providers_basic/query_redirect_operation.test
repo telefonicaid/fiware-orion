@@ -23,8 +23,8 @@
 #
 # Uncached/Cached query
 #
-# 01. Start the contextBroker 'CB'
-# 02. Start contextProvider 'CP' (contextBroker functioning as contextProvider)
+# 01. Start the broker 'CB'
+# 02. Start contextProvider 'CP' (broker functioning as contextProvider)
 # 03. Query broker for E1/A1 (nothing found)
 # 04. Register an entity/attribute E1/A1 in broker, with CP as providing application
 # 05. Query broker for E1/A1 (will go to CP, but CP doesn't know about E1/A1)
@@ -46,8 +46,8 @@ brokerStart CP1 0
 
 
 --SHELL--
-echo "01. contextBroker running"
-echo "02. contextProvider running (contextBroker functioning as contextProvider)"
+echo "01. broker running"
+echo "02. contextProvider running (broker functioning as contextProvider)"
 echo
 echo
 
@@ -224,8 +224,8 @@ echo
 
 
 --REGEXPECT--
-01. contextBroker running
-02. contextProvider running (contextBroker functioning as contextProvider)
+01. broker running
+02. contextProvider running (broker functioning as contextProvider)
 
 
 03. Query broker for E1/A1 (nothing found)

@@ -24,8 +24,8 @@
 # Uncached/Cached update
 #
 #
-# 01. Start the contextBroker 'broker'
-# 02. Start contextProvider 'CP' (contextBroker functioning as contextProvider)
+# 01. Start the 'broker'
+# 02. Start contextProvider 'CP' (the broker functioning as contextProvider)
 #
 # 03. Register an entity/attribute E1/A1 in broker, with CP as providing application
 # 04. Update/UPDATE E1/A1(=BAD) broker (is forwarded to CP but nothing is found/updated)
@@ -52,8 +52,8 @@ brokerStart CB
 brokerStart CP1
 
 --SHELL--
-echo "01. contextBroker running"
-echo "02. contextProvider1 running (contextBroker functioning as contextProvider)"
+echo "01. broker running"
+echo "02. contextProvider1 running (the broker functioning as contextProvider)"
 echo
 echo
 
@@ -339,8 +339,8 @@ echo
 
 
 --REGEXPECT--
-01. contextBroker running
-02. contextProvider1 running (contextBroker functioning as contextProvider)
+01. broker running
+02. contextProvider1 running (the broker functioning as contextProvider)
 
 
 03. Register an entity/attribute E1/A1 in broker, with CP as providing application
