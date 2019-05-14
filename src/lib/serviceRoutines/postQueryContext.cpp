@@ -153,6 +153,9 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
     LM_T(LmtForward, ("Rendering payload for the forward (NGSIv2)"));
     TIMED_RENDER(payload = qcrP->toJson());
 #if 0
+    // FIXME #3485: this part is not removed by the moment, in the case it may be useful in the
+    // context of issue #3485
+
     //
     // NGSIv2 forward: instead of payload, URI params are used
     //

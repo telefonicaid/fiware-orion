@@ -31,6 +31,9 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
+# FIXME: this is an old version of forwards_with_accumulator.test, preserved by the moment in case
+# it may be useful in the context of issue #3485
+#
 # 01. Register entities of type T1, with ID .*, and attribute A1, for the accumulator
 # 02. Query entities of type T1 - get empty response as the accumulator doesn't respond
 # 03. Dump the accumulator, see the forwarded query

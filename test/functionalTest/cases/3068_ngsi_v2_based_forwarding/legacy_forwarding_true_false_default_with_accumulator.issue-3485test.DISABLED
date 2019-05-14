@@ -31,6 +31,9 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
+# FIXME: this is an old version of legacy_forwarding_true_false_default_with_accumulator.test, preserved by the moment in case 
+# it may be useful in the context of issue #3485
+#
 # 01. Registration of E1 without Legacy Forwarding, for the accumulator - forward to be in NGSIv2 format
 # 02. Query of entities with id E1 - get empty response as the accumulator doesn't respond, but a forward is provoked
 # 03. Dump and reset the accumulator, see the forwarded query in NGSIv2 format
