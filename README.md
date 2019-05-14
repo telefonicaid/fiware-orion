@@ -17,10 +17,7 @@ If you only intend to use NGSIv2, please use [Orion](https://github.com/telefoni
 
 This component is still in Alpha state but already passing a bunch of [tests](https://github.com/FIWARE/NGSI-LD_TestSuite)
 
-For a description of what NGSI-LD is please check [this](https://github.com/Fiware/NGSI-LD_Wrapper/blob/master/README.md). 
-
-This presentation from FIWARE Summit Malaga 2018 is also of interest: 
-https://www.slideshare.net/FI-WARE/fiware-global-summit-ngsild-ngsi-with-linked-data
+For a description of what NGSI-LD is please check [this](https://github.com/Fiware/NGSI-LD_Wrapper/blob/master/README.md). This presentation from FIWARE Summit Malaga 2018 is also of interest: https://www.slideshare.net/FI-WARE/fiware-global-summit-ngsild-ngsi-with-linked-data
 
 Examples of NGSI-LD can found at [ETSI](https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/tree/master/examples)
 
