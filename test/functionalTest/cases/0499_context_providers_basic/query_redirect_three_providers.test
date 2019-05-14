@@ -23,10 +23,10 @@
 #
 # Uncached/Cached query
 #
-# 01. Start the contextBroker 'broker'
-# 02. Start contextProvider 'CP1' (contextBroker serving as contextProvider)
-# 03. Start contextProvider 'CP2' (contextBroker serving as contextProvider)
-# 04. Start contextProvider 'CP3' (contextBroker serving as contextProvider)
+# 01. Start the 'broker'
+# 02. Start contextProvider 'CP1' (serving as contextProvider)
+# 03. Start contextProvider 'CP2' (serving as contextProvider)
+# 04. Start contextProvider 'CP3' (serving as contextProvider)
 # 05. Query broker for E1/A1 (nothing found)
 # 06. Register an entity/attribute E1/A1 in broker, with CP1 as providing application
 # 07. Register an entity/attribute E1/A2 in broker, with CP2 as providing application

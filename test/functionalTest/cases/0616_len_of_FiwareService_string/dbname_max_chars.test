@@ -29,7 +29,7 @@ dbInit 12345678901
 
 echo "01. Starting broker with a -dbName of 11 chars - this must fail"
 echo "==============================================================="
-contextBroker -pidpath /tmp/orion_${CB_PORT}.pid -port ${CB_PORT} -db 12345678901 > /dev/null
+$BROKER -pidpath /tmp/orion_${CB_PORT}.pid -port ${CB_PORT} -db 12345678901 > /dev/null
 exitCode=$?
 echo "exitCode: $exitCode"
 echo
@@ -38,7 +38,7 @@ echo
 
 echo "02. Starting broker with a -dbName of 10 chars - this must work"
 echo "==============================================================="
-contextBroker -pidpath /tmp/orion_${CB_PORT}.pid -port ${CB_PORT} -db 1234567890 > /dev/null
+$BROKER -pidpath /tmp/orion_${CB_PORT}.pid -port ${CB_PORT} -db 1234567890 > /dev/null
 echo
 echo
 
