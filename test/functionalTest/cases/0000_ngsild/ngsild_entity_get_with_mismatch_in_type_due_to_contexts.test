@@ -76,7 +76,6 @@ echo
 =======================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:I123k467:Context
 Date: REGEX(.*)
 
@@ -94,18 +93,10 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"@context",
 		"http://example.org/P100",
 		"http://example.org/R100"
 	],
 	"attrs" : {
-		"@context" : {
-			"type" : "ContextString",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
-			"value" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
-			"mdNames" : [ ]
-		},
 		"http://example=org/P100" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),

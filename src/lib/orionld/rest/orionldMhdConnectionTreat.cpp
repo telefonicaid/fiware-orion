@@ -293,7 +293,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
         if (SCOMPARE9(attrNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
         {
           contextNodeP = attrNodeP;
-          LM_T(LmtContext, ("Found a @context in the payload"));
+          LM_T(LmtContext, ("Found a @context in the payload (%p)", contextNodeP));
           break;
         }
       }
@@ -334,7 +334,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
         goto respond;
       }
 
-      LM_TMP(("Calling orionldContextCreateFromUrl for '%s'", ciP->httpHeaders.linkUrl));
       if ((orionldState.contextP = orionldContextCreateFromUrl(ciP, ciP->httpHeaders.linkUrl, OrionldUserContext, &details)) == NULL)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Failure to create context from URL", details, OrionldDetailsString);
@@ -343,9 +342,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       }
     }
     else
-    {
       orionldState.contextP = NULL;
-    }
 
     ciP->contextP = orionldState.contextP;  // FIXME: Stop using ciP->contextP
 
@@ -372,8 +369,14 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
 respond:
   //
+  // For error responses, there is ALWAYS payload, describing the error
+  // If, for some reason (bug!) this payload is missing, then we add a generic error response here
+  //
+  if ((ciP->httpStatusCode >= 400) && (ciP->responseTree == NULL) && (ciP->httpStatusCode != 405))
+    orionldErrorResponseCreate(ciP, OrionldInternalError, "Unknown Error", "The reason for this error is unknown", OrionldDetailsString);
+
+  //
   // Is there a KJSON response tree to render?
-  // [ Note that this is always TRUE when error == true ]
   //
   if (ciP->responseTree != NULL)
   {

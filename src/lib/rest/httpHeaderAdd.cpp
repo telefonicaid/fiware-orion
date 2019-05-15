@@ -68,6 +68,7 @@ void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, co
 //
 void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP, const char* _url)
 {
+#if 0
   char             link[256];
   char*            linkP = link;
   char*            url;
@@ -108,5 +109,6 @@ void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP, const cha
 
   if (linkP != link)
     free(linkP);
+#endif
 }
 #endif

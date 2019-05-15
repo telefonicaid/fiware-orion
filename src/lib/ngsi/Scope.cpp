@@ -353,7 +353,6 @@ int Scope::fill
     double                    latitude;
     double                    longitude;
 
-    LM_TMP(("KZ: Calling stringSplit for '%s'", pointStringV[ix].c_str()));
     coords = stringSplit(pointStringV[ix], ',', coordV);
 
     if ((coords != 2) && (geometry.areaType == "point"))

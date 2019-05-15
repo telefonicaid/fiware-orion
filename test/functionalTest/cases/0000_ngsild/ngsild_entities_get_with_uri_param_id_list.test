@@ -129,7 +129,6 @@ echo
 ====================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 
@@ -139,7 +138,6 @@ Date: REGEX(.*)
 =====================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
 Date: REGEX(.*)
 
@@ -149,7 +147,6 @@ Date: REGEX(.*)
 ====================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
 Date: REGEX(.*)
 
@@ -159,7 +156,6 @@ Date: REGEX(.*)
 =====================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E4
 Date: REGEX(.*)
 
@@ -168,7 +164,7 @@ Date: REGEX(.*)
 05. GET entities with id E2 or E4 - see E2 and E4
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 439
+Content-Length: 257
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -179,8 +175,7 @@ Date: REGEX(.*)
     "A1": {
       "type": "Property",
       "value": "E2"
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   },
   {
     "id": "http://a.b.c/entity/E4",
@@ -188,8 +183,7 @@ Date: REGEX(.*)
     "A1": {
       "type": "Property",
       "value": "E4"
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   }
 ]
 
@@ -198,7 +192,7 @@ Date: REGEX(.*)
 06. GET entities with id E1 or E5 - see E1
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 220
+Content-Length: 129
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -209,8 +203,7 @@ Date: REGEX(.*)
     "A1": {
       "type": "Property",
       "value": "E1"
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   }
 ]
 

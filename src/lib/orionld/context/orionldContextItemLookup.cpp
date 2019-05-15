@@ -83,7 +83,7 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
   LM_T(LmtContextItemLookup, ("Looking up ContextItem '%s' in context '%s' that is of type '%s', contextTree at %p", itemName, contextP->url, kjValueType(contextP->tree->value.firstChildP->type), contextP->tree));
   if (contextP->tree->value.firstChildP->type > 7)
   {
-    LM_E(("Context '%s' has been currupted", contextP->url));
+    LM_E(("Context '%s' seems corrupted", contextP->url));
     LM_E(("Tree at: %p", contextP->tree));
     LM_E(("firstChild at %p", contextP->tree->value.firstChildP));
     LM_E(("node type of firstChild: %d", contextP->tree->value.firstChildP->type));
@@ -104,7 +104,6 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
 
     // Lookup the item
     LM_T(LmtContextItemLookup, ("Found the context '%s' - now we can search for '%s' (in '%s')", contextP->url, itemName, dereferencedContextP->url));
-    LM_TMP(("KZ: Found the context '%s' - now we can search for '%s' (in '%s')", contextP->url, itemName, dereferencedContextP->url));
     return orionldContextItemLookup(dereferencedContextP, itemName);
   }
   else if (contextP->tree->type == KjArray)
@@ -152,7 +151,7 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
     // Now, either we have an inline context, with many key-values, or
     // the object has a single member "@context".
     //
-    LM_T(LmtContextItemLookup, ("Looking up '%s' in the %s context '%s'", itemName, kjValueType(contextP->tree->value.firstChildP->type), contextP->url));
+    LM_T(LmtContextItemLookup, ("NOT Looking up '%s' in the %s context '%s' - it's done later", itemName, kjValueType(contextP->tree->value.firstChildP->type), contextP->url));
 
     if (contextP->tree->value.firstChildP == NULL)
     {
@@ -195,8 +194,11 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
   //
   // The "xxx" child has siblings following the next pointer until reaching NULL
   //
+  LM_T(LmtContextItemLookup, ("atContextP->type == %s", kjValueType(atContextP->type)));
   if (atContextP->type == KjObject)
   {
+    LM_T(LmtContextItemLookup, ("@context '%s' is an object", atContextP->name));
+
     for (KjNode* contextItemP = atContextP->value.firstChildP; contextItemP != NULL; contextItemP = contextItemP->next)
     {
       if ((contextItemP->type != KjString) && (contextItemP->type != KjObject))
@@ -238,7 +240,34 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
         return nodeP;
     }
   }
-  
+  else if (atContextP->type == KjString)
+  {
+    for (KjNode* contextItemP = atContextP; contextItemP != NULL; contextItemP = contextItemP->next)
+    {
+      if ((contextItemP->type != KjString) && (contextItemP->type != KjObject))
+      {
+        LM_E(("Invalid @context - items of contexts must be JSON Strings or JSON objects - not %s", kjValueType(contextItemP->type)));
+        return NULL;
+      }
+
+      //
+      // Skip members whose value is a string that starts with "@" - they are information, not translations
+      //
+      if ((contextItemP->type == KjString) && (contextItemP->value.s[0] == '@'))
+      {
+        LM_T(LmtContextItemLookup, ("Skipping '%s' with value '%s'", contextItemP->name, contextItemP->value.s));
+        continue;
+      }
+
+      // LM_T(LmtContextItemLookup, ("looking for '%s', comparing with '%s'", itemName, contextItemP->name));
+      if (strcmp(contextItemP->name, itemName) == 0)
+      {
+        LM_T(LmtContextItemLookup, ("found it! '%s' -> '%s'", itemName, contextItemP->value.s));
+        return contextItemP;
+      }
+    }
+  }
+
   LM_T(LmtContextItemLookup, ("found no expansion for '%s': returning NULL :(", itemName));
   return NULL;
 }

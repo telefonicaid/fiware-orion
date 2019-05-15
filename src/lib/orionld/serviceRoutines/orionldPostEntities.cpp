@@ -166,7 +166,7 @@ static bool payloadCheck
     else if (SCOMPARE9(kNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
     {
       DUPLICATE_CHECK(contextNodeP, "context", kNodeP);
-      ARRAY_OR_STRING_CHECK(kNodeP, "@context");
+      ARRAY_OR_STRING_OR_OBJECT_CHECK(kNodeP, "@context");
     }
     else if (SCOMPARE17(kNodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
     {
@@ -889,16 +889,15 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   //
   if (contextNodeP != NULL)
   {
-    ContextAttribute* caP;
+    // ContextAttribute* caP;  // Last param in orionldContextTreat
 
-    if (orionldContextTreat(ciP, contextNodeP, idNodeP->value.s, &caP) == false)
+    if (orionldContextTreat(ciP, contextNodeP, idNodeP->value.s, NULL) == false)
     {
+      LM_E(("orionldContextTreat failed"));
       // Error payload set by orionldContextTreat
       mongoRequest.release();
       return false;
     }
-
-    ceP->contextAttributeVector.push_back(caP);
   }
 
   // Treat the entire payload
@@ -949,7 +948,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
       // FIXME: Call orionldUriExpand() - this here is a "copy" of what orionldUriExpand does
       extern int uriExpansion(OrionldContext* contextP, const char* name, char** expandedNameP, char** expandedTypeP, char** detailsPP);
-      int    expansions = uriExpansion(ciP->contextP, typeNodeP->value.s, &expandedName, &expandedType, &details);
+      int    expansions = uriExpansion(orionldState.contextP, typeNodeP->value.s, &expandedName, &expandedType, &details);
       LM_T(LmtUriExpansion, ("URI Expansion for type '%s': '%s'", typeNodeP->value.s, expandedName));
       LM_T(LmtUriExpansion, ("Got %d expansions", expansions));
 
@@ -977,7 +976,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       }
       else  // expansions == 2 ... may be an incorrect context
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value of context item 'entity id'", ciP->contextP->url, OrionldDetailsString);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value of context item 'entity id'", orionldState.contextP->url, OrionldDetailsString);
         mongoRequest.release();
         return false;
       }
@@ -1049,7 +1048,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       {
         char longName[256];
 
-        if (orionldUriExpand(ciP->contextP, kNodeP->name, longName, sizeof(longName), &details) == false)
+        if (orionldUriExpand(orionldState.contextP, kNodeP->name, longName, sizeof(longName), &details) == false)
         {
           LM_E(("orionldUriExpand failed"));
           delete caP;
@@ -1094,52 +1093,6 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
   ciP->httpStatusCode = SccCreated;
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/entities/", idNodeP->value.s);
-  httpHeaderLinkAdd(ciP, ciP->contextP, NULL);
 
   return true;
 }
-
-
-
-#if 0
-      {
-        LM_T(LmtUriExpansion, ("------------- URI-Expansion for attribute named '%s' starts here ------------------------------", kNodeP->name));
-        char*  details;
-        char*  expandedName  = NULL;
-        char*  expandedType  = NULL;
-        int    expansions    = uriExpansion(ciP->contextP, kNodeP->name, &expandedName, &expandedType, &details);
-
-        LM_T(LmtUriExpansion, ("EXPANSION: uriExpansion returned %d for '%s'", expansions, kNodeP->name));
-        if (expansions == -1)
-        {
-          delete caP;
-          mongoRequest.release();
-          orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item for 'attribute name'", kNodeP->name, OrionldDetailsAttribute);
-          return false;
-        }
-        else if (expansions == -2)
-        {
-          // No expansion found in Core Context, and in no other contexts either - use default URL
-          LM_T(LmtUriExpansion, ("EXPANSION: use default URL for attribute '%s'", kNodeP->name));
-          caP->name     = orionldDefaultUrl;
-          caP->name    += kNodeP->name;
-        }
-        else if (expansions == 0)
-        {
-          // Found in Core Context - no expansion
-          caP->name = kNodeP->name;
-        }
-        else
-        {
-          // Change the attribute name to its expanded value
-          if (expandedName == NULL)
-          {
-            LM_T(LmtUriExpansion, ("No expansion found - perform default expansion - prepending http://www.example.org/attribute/ to the attr name (%s)", kNodeP->name));
-            caP->name  = orionldDefaultUrl;
-            caP->name += kNodeP->name;
-          }
-          else
-            caP->name = expandedName;
-        }
-      }
-#endif

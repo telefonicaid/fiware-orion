@@ -60,7 +60,7 @@ int uriExpansion(OrionldContext* contextP, const char* name, char** expandedName
   *expandedNameP = NULL;
   *expandedTypeP = NULL;
 
-  LM_T(LmtUriExpansion, ("expanding '%s'", name));
+  LM_T(LmtUriExpansion, ("expanding '%s' in context at %p", name, contextP));
 
   //
   // Use the default context?

@@ -146,7 +146,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
   {
     ContextElement* ceP      = &responseP->contextElementResponseVector[ix]->contextElement;
     char*           eId      = (char*) ceP->entityId.id.c_str();
-    OrionldContext* contextP = orionldContextLookup(ceP->entityId.id.c_str());
+    OrionldContext* contextP = orionldState.contextP;
 
     if (oneHit == false)
     {
@@ -293,7 +293,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
     //
     // FIXME: Use kjTreeFromContextAttribute() !!!
     //
-    ContextAttribute* contextAttrP = NULL;
+    // ContextAttribute* contextAttrP = NULL;
 
     for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); aIx++)
     {
@@ -303,7 +303,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
 
       if (strcmp(attrName, "@context") == 0)
       {
-        contextAttrP = aP;
+        // contextAttrP = aP;
         continue;
       }
 
@@ -565,6 +565,9 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
     }
 
 
+#if 0
+    //
+    // FIXME: the Link HTTP header should NEVER be returned
     //
     // If no context inside attribute list, then the default context has been used
     //
@@ -632,6 +635,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
         }
       }
     }
+#endif
   }
 
   return root;

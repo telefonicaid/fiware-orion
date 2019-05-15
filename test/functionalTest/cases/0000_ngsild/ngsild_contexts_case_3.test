@@ -111,7 +111,6 @@ echo
 ================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: REGEX(.*)
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
 Date: REGEX(.*)
 
@@ -129,20 +128,9 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"@context",
 		"http://schema.org/name"
 	],
 	"attrs" : {
-		"@context" : {
-			"type" : "ContextVector",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
-			"value" : [
-				"https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-				"https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
-			],
-			"mdNames" : [ ]
-		},
 		"http://schema=org/name" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),

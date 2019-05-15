@@ -272,7 +272,6 @@ int httpRequestSendWithCurl
   std::map<std::string, bool>     usedExtraHeaders;
   char                            servicePath0[SERVICE_PATH_MAX_COMPONENT_LEN + 1];  // +1 for zero termination
 
-  LM_TMP(("KZ: In httpRequestSendWithCurl - (sending a notification?) to %s:%d%s", _ip.c_str(), port, resource.c_str()));
   firstServicePath(servicePath.c_str(), servicePath0, sizeof(servicePath0));
 
   metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT, 1);
@@ -481,7 +480,6 @@ int httpRequestSendWithCurl
   unsigned long long payloadSize = content.size();
   outgoingMsgSize += payloadSize;
 
-  LM_TMP(("KZ: Content of notification: %s", content.c_str()));
   // ----- Content-type
   std::string contentTypeHeaderValue = content_type;
 

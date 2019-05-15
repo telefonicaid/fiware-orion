@@ -34,8 +34,7 @@ brokerStart CB 212-249
 # 01. POST /ngsi-ld/v1/entities, with a non-object payload - see error
 # 02. POST /ngsi-ld/v1/entities, with an 'id' that is not a string - see error
 # 03. POST /ngsi-ld/v1/entities, with a 'type' that is not a string - see error
-# 04. POST /ngsi-ld/v1/entities, with a '@context' that is not a vector - see error
-# 05. POST /ngsi-ld/v1/entities, with a '@context item' that is not a string - see error
+# 04. POST /ngsi-ld/v1/entities, with a '@context' that is not a vector nor a string - see error
 # 06. POST /ngsi-ld/v1/entities, with all OK - see a 201
 # 07. POST /ngsi-ld/v1/entities, with invalid URL for a context - see error
 #
@@ -96,8 +95,8 @@ echo
 echo
 
 
-echo "04. POST /ngsi-ld/v1/entities, with a '@context' that is not a vector - see error"
-echo "================================================================================="
+echo "04. POST /ngsi-ld/v1/entities, with a '@context' that is not a vector nor a string - see error"
+echo "=============================================================================================="
 payload='{
   "id": "http://a.b.c/entity/E2",
   "type": "A",
@@ -105,31 +104,7 @@ payload='{
     "type": "Property",
     "value": "John 4"
   },
-  "@context": {
-    "u1": "http://a.b.c/10.xxx",
-    "u2": "http://a.b.c/11.xxx",
-    "u3": "http://a.b.c/12.xxx"
-  }
-}'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
-echo
-echo
-
-
-echo "05. POST /ngsi-ld/v1/entities, with a '@context item' that is not a string - see error"
-echo "======================================================================================"
-payload='{
-  "id": "http://a.b.c/entity/E5",
-  "type": "A",
-  "name": {
-    "type": "Property",
-    "value": "John 5"
-  },
-  "@context": [
-    12,
-    "http://a.b.c/13.xxx",
-    "http://a.b.c/14.xxx"
-  ]
+  "@context": true
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
@@ -303,30 +278,16 @@ Date: REGEX(.*)
 }
 
 
-04. POST /ngsi-ld/v1/entities, with a '@context' that is not a vector - see error
-=================================================================================
+04. POST /ngsi-ld/v1/entities, with a '@context' that is not a vector nor a string - see error
+==============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 119
+Content-Length: 132
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "@context",
-    "title": "Not a JSON Array nor String",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-05. POST /ngsi-ld/v1/entities, with a '@context item' that is not a string - see error
-======================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 133
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "details": "no details",
-    "title": "Context Array Item is not a JSON String",
+    "title": "Not a JSON Array nor Object nor a String",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -335,7 +296,6 @@ Date: REGEX(.*)
 ======================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <http://IP:9999/ngsi-ld/ex/v1/contexts/http://a.b.c/entity/E6>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E6
 Date: REGEX(.*)
 

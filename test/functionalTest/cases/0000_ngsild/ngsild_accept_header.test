@@ -33,8 +33,8 @@ brokerStart CB 212-249
 #
 # 01. Create Entity E1 with context as a string
 # 02. Checking mongo content to see URL
-# 03. GET E1, with 'Accept: application/json' - see 'Content-Type: application/json', HTTP Header 'Link' with @context, and no context in payload
-# 04. GET E1, with 'Accept: application/ld+json' - see 'Content-Type: application/ld+json', context in payload, no 'Link' HTTP Header
+# 03. GET E1, with 'Accept: application/json' - see 'Content-Type: application/json'
+# 04. GET E1, with 'Accept: application/ld+json' - see 'Content-Type: application/ld+json'
 # 05. GET E1, without specific Accept MIME type (application/json is default - should it be for ngsi-ld requests?), see results like step 03
 #
 
@@ -57,16 +57,16 @@ echo
 echo
 
 
-echo "03. GET E1, with 'Accept: application/json' - see 'Content-Type: application/json', HTTP Header 'Link' with @context, and no context in payload"
-echo "==============================================================================================================================================="
+echo "03. GET E1, with 'Accept: application/json' - see 'Content-Type: application/json'"
+echo "=================================================================================="
 url=`urlencode http://a.b.c/entity/E1`
 orionCurl --url /ngsi-ld/v1/entities/$url -H "Accept: application/json"
 echo
 echo
 
 
-echo "04. GET E1, with 'Accept: application/ld+json' - see 'Content-Type: application/ld+json', context in payload, no 'Link' HTTP Header"
-echo "==================================================================================================================================="
+echo "04. GET E1, with 'Accept: application/ld+json' - see 'Content-Type: application/ld+json'"
+echo "========================================================================================"
 orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E1 -H "Accept: application/ld+json"
 echo
 echo
@@ -85,7 +85,6 @@ echo
 =============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 
@@ -102,17 +101,9 @@ MongoDB server version: REGEX(.*)
 		"type" : "http://example.org/ngsi-ld/default/A",
 		"servicePath" : "/"
 	},
-	"attrNames" : [
-		"@context"
-	],
+	"attrNames" : [ ],
 	"attrs" : {
-		"@context" : {
-			"type" : "ContextString",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
-			"value" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
-			"mdNames" : [ ]
-		}
+		
 	},
 	"creDate" : REGEX(.*),
 	"modDate" : REGEX(.*),
@@ -121,12 +112,11 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-03. GET E1, with 'Accept: application/json' - see 'Content-Type: application/json', HTTP Header 'Link' with @context, and no context in payload
-===============================================================================================================================================
+03. GET E1, with 'Accept: application/json' - see 'Content-Type: application/json'
+==================================================================================
 HTTP/1.1 200 OK
 Content-Length: 42
 Content-Type: application/json
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -135,15 +125,14 @@ Date: REGEX(.*)
 }
 
 
-04. GET E1, with 'Accept: application/ld+json' - see 'Content-Type: application/ld+json', context in payload, no 'Link' HTTP Header
-===================================================================================================================================
+04. GET E1, with 'Accept: application/ld+json' - see 'Content-Type: application/ld+json'
+========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 127
+Content-Length: 42
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E1",
     "type": "A"
 }
@@ -154,7 +143,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 42
 Content-Type: application/json
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

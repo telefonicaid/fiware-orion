@@ -1,0 +1,195 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Inline Context
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# This test is to verify that inline contexts work, and that GET without matching contexts get the long names
+# while a GET with a matching contexts gets the short names from that other context.
+#
+# The context https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld is used for GET with context.
+# As GET doesn't have any payload, it cannot give its own inline context but must use one already existing.
+#
+# Therefore, the creation of the entity will use an inline context that changes the shortnames of '.../testContext.jsonld'
+# The first GET, that is without context will not find the shortnames and the long names will be returned.
+# The second GET will use '.../testContext.jsonld' and the shortnames of that context will be returned:
+#
+# {
+#   "@context": {
+#     "name": "http://schema.org/name",
+#     "T": "http://example.org/T",
+#     "T2": "http://example.org/T2",
+#     "T3": "http://example.org/T3",
+#     "P1": "http://example.org/P1",
+#     "P2": "http://example.org/P2",
+#     "P3": "http://example.org/P3",
+#     "R1": "http://example.org/R1",
+#     "R2": "http://example.org/R2",
+#     "R3": "http://example.org/R3",
+#     "P1_R1": "http://example.org/P1_R1",
+#     "P1_P1": "http://example.org/P1_P1",
+#     "R1_P1": "http://example.org/R1_P1",
+#     "R1_R1": "http://example.org/R1_R1",
+#     "T_Query": "http://example.org/T_Query",
+#     "P100": "http://example.org/P100",
+#     "R100": "http://example.org/R100",
+#     "DateProp": {
+#       "@id":   "http://example.org/DateProp",
+#       "@type": "http://uri.etsi.org/ngsi-ld/DateTime"
+#     },
+#     "Vehicle": "http://schema.org/Vehicle"
+#   }
+# }
+#
+#
+# 01. Create an entity with inline context { myT==http://example.org/T2, myP1==http://example.org/P1, myP2==http://example.org/P2, myP3==http://example.org/P3 }
+# 02. Get the entity without context - see long names
+# 03. Get the entity with context https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld - see its shortnames
+#
+
+echo "01. Create an entity with inline context { myT==http://example.org/T2, myP1==http://example.org/P1, myP2==http://example.org/P2, myP3==http://example.org/P3 }"
+echo "=============================================================================================================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E1",
+  "type": "myT",
+  "myP1": {
+    "type": "Property",
+    "value": 1
+  },
+  "myP2": {
+    "type": "Property",
+    "value": 2
+  },
+  "myP3": {
+    "type": "Property",
+    "value": 3
+  },
+  "myP4_not_found": {
+    "type": "Property",
+    "value": 4
+  },
+  "@context": {
+    "myT": "http://example.org/T2",
+    "myP1": "http://example.org/P1",
+    "myP2": "http://example.org/P2",
+    "myP3": "http://example.org/P3",
+    "myP4_not_found": "http://example.org/P4"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. Get the entity without context - see long names"
+echo "==================================================="
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+echo
+echo
+
+
+echo "03. Get the entity with context https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld - see its shortnames"
+echo "============================================================================================================================"
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E1 -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with inline context { myT==http://example.org/T2, myP1==http://example.org/P1, myP2==http://example.org/P2, myP3==http://example.org/P3 }
+==============================================================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+Date: REGEX(.*)
+
+
+
+02. Get the entity without context - see long names
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 306
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "http://example.org/P1": {
+        "type": "Property",
+        "value": 1.0
+    },
+    "http://example.org/P2": {
+        "type": "Property",
+        "value": 2.0
+    },
+    "http://example.org/P3": {
+        "type": "Property",
+        "value": 3.0
+    },
+    "http://example.org/P4": {
+        "type": "Property",
+        "value": 4.0
+    },
+    "id": "http://a.b.c/entity/E1",
+    "type": "http://example.org/T2"
+}
+
+
+03. Get the entity with context https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld - see its shortnames
+============================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 230
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "P1": {
+        "type": "Property",
+        "value": 1.0
+    },
+    "P2": {
+        "type": "Property",
+        "value": 2.0
+    },
+    "P3": {
+        "type": "Property",
+        "value": 3.0
+    },
+    "http://example.org/P4": {
+        "type": "Property",
+        "value": 4.0
+    },
+    "id": "http://a.b.c/entity/E1",
+    "type": "T2"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

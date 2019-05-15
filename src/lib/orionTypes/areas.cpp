@@ -471,8 +471,6 @@ int Georel::parse(const char* in, std::string* errorString)
   bool                      maxDistanceSet = false;
   bool                      minDistanceSet = false;
 
-  LM_TMP(("KZ: parsing georel: '%s'", in));
-
   maxDistance = -1;
   minDistance = -1;
 
@@ -535,7 +533,6 @@ int Georel::parse(const char* in, std::string* errorString)
 #ifdef ORIONLD
     else if (strncmp(item, "maxDistance==", 13) == 0)
     {
-      LM_TMP(("KZ: Got maxDistance==X"));
       if (maxDistanceSet)
       {
         *errorString = "maxDistance present more than once";
@@ -552,7 +549,6 @@ int Georel::parse(const char* in, std::string* errorString)
     }
     else if (strncmp(item, "minDistance==", 13) == 0)
     {
-      LM_TMP(("KZ: Got minDistance==X"));
       if (minDistanceSet)
       {
         *errorString = "minDistance present more than once";

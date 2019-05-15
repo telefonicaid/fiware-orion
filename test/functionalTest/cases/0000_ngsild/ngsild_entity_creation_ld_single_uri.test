@@ -64,7 +64,7 @@ echo
 
 echo "02. GET entity"
 echo "=============="
-orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14?prettyPrint=yes&spaces=2' --noPayloadCheck  -H "Accept: application/ld+json"
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14?prettyPrint=yes&spaces=2' --noPayloadCheck  -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -74,7 +74,6 @@ echo
 ===================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14
 Date: REGEX(.*)
 
@@ -83,7 +82,7 @@ Date: REGEX(.*)
 02. GET entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 437
+Content-Length: 344
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -107,8 +106,7 @@ Date: REGEX(.*)
   "R1": {
     "type": "Relationship",
     "object": "urn:ngsi-ld:T2:6789"
-  },
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
+  }
 }
 
 

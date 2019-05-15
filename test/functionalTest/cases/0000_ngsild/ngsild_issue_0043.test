@@ -130,7 +130,7 @@ echo
 
 echo "02. Getting the entity to see that the forced timestamps 'createdAt' and 'modifiedAt' have been ignored"
 echo "======================================================================================================="
-orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:AgriCrop:df72dc57-1eb9-42a3-88a9-8647ecc954b4?options=sysAttrs&prettyPrint=yes' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:AgriCrop:df72dc57-1eb9-42a3-88a9-8647ecc954b4?options=sysAttrs&prettyPrint=yes' --noPayloadCheck -H 'Link: <https://raw.githubusercontent.com/GSMADeveloper/NGSI-LD-Entities/master/examples/Agri-Crop-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -140,7 +140,6 @@ echo
 ================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:AgriCrop:df72dc57-1eb9-42a3-88a9-8647ecc954b4
 Date: REGEX(.*)
 
@@ -151,7 +150,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 2777
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

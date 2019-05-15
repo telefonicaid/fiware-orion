@@ -801,12 +801,10 @@ std::string ContextAttribute::toJson
     {
       Metadata* mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, creDate);
       metadataVector.push_back(mdP);
-      LM_TMP(("KZ: Added a DATECREATED metadata to the attribute '%s'", name.c_str()));
     }
     else
     {
       dateCreatedMetadataP->numberValue = creDate;
-      LM_TMP(("KZ: Modified the metadata '%s' to %lu", NGSI_MD_DATECREATED, dateCreatedMetadataP->numberValue));
     }
   }
 
@@ -833,7 +831,6 @@ std::string ContextAttribute::toJson
     else
     {
       dateModifiedMetadataP->numberValue = modDate;
-      LM_TMP(("KZ: Modified the metadata '%s' to %lu", NGSI_MD_DATEMODIFIED, dateModifiedMetadataP->numberValue));
     }
   }
 

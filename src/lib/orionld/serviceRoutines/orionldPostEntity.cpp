@@ -104,19 +104,16 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   {
     if (SCOMPARE9(kNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
     {
-      ContextAttribute* caP;
       contextNodeP = kNodeP;
 
-      // FIXME: Lookup context - it probably already exists (from the creation of the entity)
-
-      if (orionldContextTreat(ciP, contextNodeP, (char*) entityIdP->id.c_str(), &caP) == false)
+      if (orionldContextTreat(ciP, contextNodeP, (char*) entityIdP->id.c_str(), NULL) == false)
       {
         // Error payload set by orionldContextTreat
         mongoRequest.release();
         return false;
       }
 
-      ceP->contextAttributeVector.push_back(caP);
+      // FIXME: Remove the @context node from the tree - to avoid 'if (kNodeP != contextNodeP)' in the following loop
       break;
     }    
   }

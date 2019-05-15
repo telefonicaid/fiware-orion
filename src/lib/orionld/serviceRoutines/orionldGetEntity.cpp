@@ -35,6 +35,7 @@ extern "C"
 
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
+#include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/context/orionldContextAdd.h"                 // Add a context to the context list
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjTreeFromQueryContextResponseWithAttrList.h"     // kjTreeFromQueryContextResponseWithAttrList
@@ -120,7 +121,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
     {
       shortName = shortNameVector[ix];
 
-      if (orionldUriExpand(ciP->contextP, shortName, longName, sizeof(longName), &details) == true)
+      if (orionldUriExpand(orionldState.contextP, shortName, longName, sizeof(longName), &details) == true)
       {
         int       len  = strlen(longName);
         long long used = (long long) attrListEnd - (long long) attrList;

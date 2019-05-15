@@ -208,4 +208,21 @@ do                                                                              
   }                                                                                                                    \
 } while (0)
 
+
+
+// -----------------------------------------------------------------------------
+//
+// ARRAY_OR_STRING_OR_OBJECT_CHECK -
+//
+#define ARRAY_OR_STRING_OR_OBJECT_CHECK(nodeP, what)                                                                                \
+do                                                                                                                                  \
+{                                                                                                                                   \
+  if ((nodeP->type != KjArray) && (nodeP->type != KjString) && (nodeP->type != KjObject))                                           \
+  {                                                                                                                                 \
+    LM_T(LmtPayloadCheck, ("the node is a '%s'", kjValueType(nodeP->type)));                                                        \
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON Array nor Object nor a String", what, OrionldDetailsString); \
+    return false;                                                                                                                   \
+  }                                                                                                                                 \
+} while (0)
+
 #endif  // SRC_LIB_ORIONLD_COMMON_CHECK_H_

@@ -70,7 +70,6 @@ echo
 =======================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <http://IP:9999/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:T:12:13:14>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14
 Date: REGEX(.*)
 
@@ -88,19 +87,9 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"@context",
 		"http://example.org/ngsi-ld/default/DateProp"
 	],
 	"attrs" : {
-		"@context" : {
-			"type" : "ContextVector",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
-			"value" : [
-				"https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
-			],
-			"mdNames" : [ ]
-		},
 		"http://example=org/ngsi-ld/default/DateProp" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
@@ -119,7 +108,7 @@ bye
 03. GET entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 235
+Content-Length: 132
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -129,10 +118,7 @@ Date: REGEX(.*)
   "DateProp": {
     "type": "Property",
     "value": "2018-12-04T12:00:00"
-  },
-  "@context": [
-    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
-  ]
+  }
 }
 
 

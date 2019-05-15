@@ -32,28 +32,28 @@ brokerStart CB 212-249
 
 #
 # So, what can go wrong ...
-# 1.  @context is a Boolean
-# 2.  @context is a Number
-# 3.  @context is an object
-# 4.  @context is an empty string
-# 5.  URL in context is an invalid URL
-# 6.  URL in context is a valid URL but it doesn't exist
+# 01. @context is a Boolean
+# 02. @context is a Number
+# 03. @context is an object and a value is NOT a string
+# 04. @context is an empty string
+# 05. URL in context is an invalid URL
+# 06. URL in context is a valid URL but it doesn't exist
 #
 # Need Cantera for the rest:
-# 6.  Parse Error in the resulting context
-# 7.  resulting payload not a JSON object?
-# 8.  resulting payload is an empty object
-# 9.  Not a single member
-# 10. Single member not called '@context
-# 11. Single member not object or array
-# 12. Array with member that is not a string
-# 13. Array with member that is not a valid URL
+# 07. Parse Error in the resulting context
+# 08. resulting payload not a JSON object?
+# 09. resulting payload is an empty object
+# 10. Not a single member
+# 11. Single member not called '@context
+# 12. Single member not object or array
+# 13. Array with member that is not a string
+# 14. Array with member that is not a valid URL
 # 
 
 echo "01. @context is a Boolean"
 echo "========================="
 payload='{
-  "id": "E1",
+  "id": "urn:E1",
   "type": "A",
   "name": {
     "type": "Property",
@@ -69,7 +69,7 @@ echo
 echo "02. @context is a Number"
 echo "======================="
 payload='{
-  "id": "E1",
+  "id": "urn:E1",
   "type": "A",
   "name": {
     "type": "Property",
@@ -82,10 +82,10 @@ echo
 echo
 
 
-echo "03. @context is an object"
-echo "========================="
+echo "03. @context is an object and a value is NOT a string"
+echo "====================================================="
 payload='{
-  "id": "E1",
+  "id": "urn:E1",
   "type": "A",
   "name": {
     "type": "Property",
@@ -101,7 +101,7 @@ echo
 echo "04. @context is an empty string"
 echo "==============================="
 payload='{
-  "id": "E1",
+  "id": "urn:E1",
   "type": "A",
   "name": {
     "type": "Property",
@@ -117,7 +117,7 @@ echo
 echo "05. URL in context is an invalid URL"
 echo "===================================="
 payload='{
-  "id": "E1",
+  "id": "urn:E1",
   "type": "A",
   "name": {
     "type": "Property",
@@ -133,7 +133,7 @@ echo
 echo "06. URL in context is a valid URL but it doesn't exist"
 echo "======================================================"
 payload='{
-  "id": "E1",
+  "id": "urn:E1",
   "type": "A",
   "name": {
     "type": "Property",
@@ -151,13 +151,13 @@ echo
 01. @context is a Boolean
 =========================
 HTTP/1.1 400 Bad Request
-Content-Length: 119
+Content-Length: 132
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "@context",
-    "title": "Not a JSON Array nor String",
+    "title": "Not a JSON Array nor Object nor a String",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -165,27 +165,27 @@ Date: REGEX(.*)
 02. @context is a Number
 =======================
 HTTP/1.1 400 Bad Request
-Content-Length: 119
+Content-Length: 132
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "@context",
-    "title": "Not a JSON Array nor String",
+    "title": "Not a JSON Array nor Object nor a String",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
-03. @context is an object
-=========================
+03. @context is an object and a value is NOT a string
+=====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 119
+Content-Length: 114
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "@context",
-    "title": "Not a JSON Array nor String",
+    "details": "a",
+    "title": "Invalid key-value in @context",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
