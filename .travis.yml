@@ -57,6 +57,8 @@ after_success:
 notifications:
   email:
     recipients:
+    - ken.zangelin@fiware.org
+    - josemanuel.cantera@fiware.org
     - dmitrii.demin@fiware.org
     on_success: never
     on_failure: always
