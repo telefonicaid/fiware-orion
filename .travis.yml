@@ -28,7 +28,7 @@ before_install:
   - echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
   - git lfs pull
   - if [[ "${TEST_STATUS}" && "${STAGE}" != "compliance" ]]; then
-      echo 0 | sudo tee /proc/sys/net/ipv6/conf/all/disable_ipv6;
+      echo "0" | sudo tee /proc/sys/net/ipv6/conf/all/disable_ipv6;
       echo '{"ipv6":true,"fixed-cidr-v6":"2001:db8:1::/64"}' | sudo tee /etc/docker/daemon.json;
       sudo service docker restart;
       docker pull ${IMAGE_DEPS};
@@ -40,7 +40,7 @@ script:
       $(pwd)/docker/build.sh -s compliance -t -P $(pwd);
     fi
   - if [[ "${TEST_STATUS}" && "${STAGE}" != "compliance" ]]; then
-      docker run -t --rm -v $(pwd):${HOME} -e CB_SKIP_FUNC_TESTS=${CB_SKIP_FUNC_TESTS} ${IMAGE_DEPS} build.sh -s ${STAGE} -dt;
+      docker run -t --rm -v $(pwd):${HOME} -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" ${IMAGE_DEPS} build.sh -s ${STAGE} -dt;
     fi
   - if [[ "${PUSH_STATUS}" && "${STAGE}" == "release" ]]; then
       docker build --build-arg TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg STAGE=${STAGE} -t ${IMAGE_RELEASE} -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
