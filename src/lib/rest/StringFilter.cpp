@@ -1757,12 +1757,10 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
 #ifdef ORIONLD
     if (orionldState.apiVersion == NGSI_LD_V1)
     {
-      extern __thread OrionldContext* orionldContextP;
-
       char  expanded[256];
       char* details;
     
-      if (orionldUriExpand(orionldContextP, (char*) itemP->attributeName.c_str(), expanded, sizeof(expanded), &details) == false)
+      if (orionldUriExpand(orionldState.contextP, (char*) itemP->attributeName.c_str(), expanded, sizeof(expanded), &details) == false)
       {
         *errorStringP = details;
         return false;

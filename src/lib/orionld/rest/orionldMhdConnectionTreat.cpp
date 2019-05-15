@@ -51,19 +51,6 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextP -
-//
-// 'orionldContextP' is a thread global variable that is set by orionldMhdConnectionTreat
-// if the context found is in the HTTP Headers (Link) - for Content-Type "application/json".
-// If in the payload (for Content-Type "application/ld+json") then 'orionldContextP' is set
-// by the service routine.
-//
-__thread OrionldContext* orionldContextP = NULL;
-
-
-
-// -----------------------------------------------------------------------------
-//
 // contentTypeCheck -
 //
 // - Content-Type: application/json + no context at all - OK
@@ -347,7 +334,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
         goto respond;
       }
 
-      if ((ciP->contextP = orionldContextCreateFromUrl(ciP, ciP->httpHeaders.linkUrl, OrionldUserContext, &details)) == NULL)
+      LM_TMP(("Calling orionldContextCreateFromUrl for '%s'", ciP->httpHeaders.linkUrl));
+      if ((orionldState.contextP = orionldContextCreateFromUrl(ciP, ciP->httpHeaders.linkUrl, OrionldUserContext, &details)) == NULL)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Failure to create context from URL", details, OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;
@@ -356,10 +344,10 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     }
     else
     {
-      ciP->contextP = NULL;
+      orionldState.contextP = NULL;
     }
 
-    orionldContextP = ciP->contextP;  // orionldContextP is a thread variable;
+    ciP->contextP = orionldState.contextP;  // FIXME: Stop using ciP->contextP
 
     //
     // FIXME: Checking the @context from payload ... move from orionldPostEntities()

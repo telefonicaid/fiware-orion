@@ -50,7 +50,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 
   ciP->responseTree = kjObject(orionldState.kjsonP, NULL);
 
-  nodeP = kjString(orionldState.kjsonP, "branch", "task/142.orionld_tenants");
+  nodeP = kjString(orionldState.kjsonP, "branch", "task/143.orionld_context_use_incoming_in_get_entity");
   kjChildAdd(ciP->responseTree, nodeP);
 
   nodeP = kjString(orionldState.kjsonP, "kbase version", kbaseVersion);
