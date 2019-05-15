@@ -96,6 +96,10 @@ Check that everything works with
 
 Building an image gives more control on what is happening within the Orion Context Broker container. Only use this method if you are familiar with building docker images or really need to change how this image is built. For most purposes you probably don't need to build an image, only deploy a container based on one already built for you (which is covered in sections 1 and 2).
 
+WARNING: docker build right now is not possible, because some dependencies are still not public.
+If you have a token to clone them, you can use this command to build:
+    `sudo docker build --build-arg TOKEN=${TOKEN} -t orion -f Dockerfile-debian .`
+
 Steps:
 
 1. Download [Orion's source code](https://github.com/telefonicaid/fiware-orion/) from Github (`git clone https://github.com/telefonicaid/fiware-orion/`)
@@ -105,10 +109,10 @@ Steps:
 	* Using an automated scenario with docker-compose and building your new image: `sudo docker-compose up`. You may also modify the provided `docker-compose.yml` file if you need so.
 	* Manually, running MongoDB on another container: 
         	1. `sudo docker run --name mongodb -d mongo:3.4`
-		2. `sudo docker build -t orion .`
+		2. `sudo docker build -t orion -f Dockerfile-debian .`
 		3. `sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 orion -dbhost mongodb`.
 	* Manually, specifying where to find your MongoDB host:
-		1. `sudo docker build -t orion .`
+		1. `sudo docker build -t orion -f Dockerfile-debian .`
 		2. `sudo docker run -d --name orion1 -p 1026:1026 orion -dbhost <MongoDB Host>`.
 
 Check that everything works with
