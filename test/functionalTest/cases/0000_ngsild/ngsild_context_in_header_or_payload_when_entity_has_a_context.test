@@ -92,7 +92,6 @@ echo
 ============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:2018-11-22T10:00:00
 Date: REGEX(.*)
 
@@ -103,7 +102,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 287
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -127,7 +125,7 @@ Date: REGEX(.*)
 03. GET all entities using application/ld+json - see context in payload
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 400
+Content-Length: 287
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -143,8 +141,7 @@ Date: REGEX(.*)
         "object": "urn:ngsi-ld:T2:6789"
       },
       "observedAt": "2018-12-04T12:00:00Z"
-    },
-    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
+    }
   }
 ]
 
@@ -155,7 +152,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 257
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -177,7 +173,7 @@ Date: REGEX(.*)
 05. GET the entity using application/ld+json - see context in payload
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 368
+Content-Length: 257
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -192,8 +188,7 @@ Date: REGEX(.*)
       "object": "urn:ngsi-ld:T2:6789"
     },
     "observedAt": "2018-12-04T12:00:00Z"
-  },
-  "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
+  }
 }
 
 

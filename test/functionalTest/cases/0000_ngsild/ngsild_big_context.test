@@ -32,7 +32,6 @@ brokerStart CB 212-249
 
 #
 # 01. Create Entity urn:ngsi-ld:AirQualityObserved:RZ:Obsv4567 with BIG context
-# 02. GET /ngsild/ex/v1/contexts/rn:ngsi-ld:AirQualityObserved:RZ:Obsv4567, see context created in step 01
 #
 
 
@@ -71,37 +70,14 @@ echo
 echo
 
 
-echo "02. GET /ngsi-ld/ex/v1/contexts/urn:ngsi-ld:AirQualityObserved:RZ:Obsv4567, see context created in step 01"
-echo "=========================================================================================================="
-orionCurl --url /ngsi-ld/ex/v1/contexts/urn:ngsi-ld:AirQualityObserved:RZ:Obsv4567
-echo
-echo
-
-
 --REGEXPECT--
 01. Create Entity urn:ngsi-ld:AirQualityObserved:RZ:Obsv4567 with BIG context
 =============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:AirQualityObserved:RZ:Obsv4567
 Date: REGEX(.*)
 
-
-
-02. GET /ngsi-ld/ex/v1/contexts/urn:ngsi-ld:AirQualityObserved:RZ:Obsv4567, see context created in step 01
-==========================================================================================================
-HTTP/1.1 200 OK
-Content-Length: 132
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "@context": [
-        "https://schema.lab.fiware.org/ld/jsonldcontext.jsonld",
-        "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
-    ]
-}
 
 
 --TEARDOWN--

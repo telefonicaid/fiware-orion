@@ -34,7 +34,7 @@ extern "C"
 
 #include "common/string.h"                                     // FT
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                // httpHeaderAdd, httpHeaderLinkAdd
+#include "rest/httpHeaderAdd.h"                                // httpHeaderAdd
 #include "ngsi10/QueryContextResponse.h"                       // QueryContextResponse
 
 #include "orionld/common/orionldErrorResponse.h"               // OrionldResponseErrorType, orionldErrorResponse
@@ -117,8 +117,6 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
   char* details  = NULL;
   bool  sysAttrs = ciP->uriParamOptions["sysAttrs"];
 
-  LM_TMP(("KZ: In kjTreeFromQueryContextResponse"));
-
   //
   // No hits when "oneHit == false" is not an error.
   // We just return an empty array
@@ -187,7 +185,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
   {
     ContextElement* ceP      = &responseP->contextElementResponseVector[ix]->contextElement;
     char*           eId      = (char*) ceP->entityId.id.c_str();
-    OrionldContext* contextP = orionldContextLookup(ceP->entityId.id.c_str());
+    OrionldContext* contextP = orionldState.contextP;
 
     if (oneHit == false)
     {
@@ -298,7 +296,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
     //
     // FIXME: Use kjTreeFromContextAttribute() !!!
     //
-    ContextAttribute* contextAttrP = NULL;
+    // ContextAttribute* contextAttrP = NULL;
 
     for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); aIx++)
     {
@@ -309,7 +307,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
 
       if (strcmp(aP->name.c_str(), "@context") == 0)
       {
-        contextAttrP = aP;
+        // contextAttrP = aP;
         continue;
       }
 
@@ -544,6 +542,8 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
       ciP->outMimeType = JSONLD;
     }
 
+#if 0
+    // FIXME: the Link HTTP header should NEVER be returned
 
     //
     // If no context inside attribute list, then the default context has been used
@@ -612,6 +612,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
         }
       }
     }
+#endif
   }
 
   return root;

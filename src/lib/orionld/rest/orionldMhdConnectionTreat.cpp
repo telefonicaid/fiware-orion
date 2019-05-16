@@ -51,19 +51,6 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextP -
-//
-// 'orionldContextP' is a thread global variable that is set by orionldMhdConnectionTreat
-// if the context found is in the HTTP Headers (Link) - for Content-Type "application/json".
-// If in the payload (for Content-Type "application/ld+json") then 'orionldContextP' is set
-// by the service routine.
-//
-__thread OrionldContext* orionldContextP = NULL;
-
-
-
-// -----------------------------------------------------------------------------
-//
 // contentTypeCheck -
 //
 // - Content-Type: application/json + no context at all - OK
@@ -306,7 +293,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
         if (SCOMPARE9(attrNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
         {
           contextNodeP = attrNodeP;
-          LM_T(LmtContext, ("Found a @context in the payload"));
+          LM_T(LmtContext, ("Found a @context in the payload (%p)", contextNodeP));
           break;
         }
       }
@@ -347,7 +334,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
         goto respond;
       }
 
-      if ((ciP->contextP = orionldContextCreateFromUrl(ciP, ciP->httpHeaders.linkUrl, OrionldUserContext, &details)) == NULL)
+      if ((orionldState.contextP = orionldContextCreateFromUrl(ciP, ciP->httpHeaders.linkUrl, OrionldUserContext, &details)) == NULL)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Failure to create context from URL", details, OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;
@@ -355,11 +342,9 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       }
     }
     else
-    {
-      ciP->contextP = NULL;
-    }
+      orionldState.contextP = NULL;
 
-    orionldContextP = ciP->contextP;  // orionldContextP is a thread variable;
+    ciP->contextP = orionldState.contextP;  // FIXME: Stop using ciP->contextP
 
     //
     // FIXME: Checking the @context from payload ... move from orionldPostEntities()
@@ -384,8 +369,14 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
 respond:
   //
+  // For error responses, there is ALWAYS payload, describing the error
+  // If, for some reason (bug!) this payload is missing, then we add a generic error response here
+  //
+  if ((ciP->httpStatusCode >= 400) && (ciP->responseTree == NULL) && (ciP->httpStatusCode != 405))
+    orionldErrorResponseCreate(ciP, OrionldInternalError, "Unknown Error", "The reason for this error is unknown", OrionldDetailsString);
+
+  //
   // Is there a KJSON response tree to render?
-  // [ Note that this is always TRUE when error == true ]
   //
   if (ciP->responseTree != NULL)
   {

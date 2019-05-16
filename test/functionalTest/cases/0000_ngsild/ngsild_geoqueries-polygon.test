@@ -138,7 +138,6 @@ echo
 =============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:geo:E1
 Date: REGEX(.*)
 
@@ -148,7 +147,6 @@ Date: REGEX(.*)
 ============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:geo:E2
 Date: REGEX(.*)
 
@@ -159,7 +157,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 223
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -215,7 +212,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 136
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [

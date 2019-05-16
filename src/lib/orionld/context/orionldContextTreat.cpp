@@ -27,15 +27,20 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "rest/rest.h"                                         // restPortGet
 #include "ngsi/ContextAttribute.h"                             // ContextAttribute
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/rest/orionldServiceInit.h"                   // orionldHostNameLen
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
 #include "orionld/context/orionldContextCreateFromUrl.h"       // orionldContextCreateFromUrl
 #include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
 #include "orionld/context/orionldContextAdd.h"                 // orionldContextAdd
+#include "orionld/context/orionldContextInlineCheck.h"         // orionldContextInlineCheck
 #include "orionld/context/orionldContextTreat.h"               // Own interface
 
 
@@ -124,7 +129,7 @@ bool orionldContextTreat
     LM_TMP(("The context is a STRING: '%s'", contextNodeP->value.s));
 
     LM_TMP(("Calling orionldContextCreateFromUrl for context '%s'", contextNodeP->value.s));
-    if ((ciP->contextP = orionldContextCreateFromUrl(ciP, contextNodeP->value.s, OrionldUserContext, &details)) == NULL)
+    if ((orionldState.contextP = orionldContextCreateFromUrl(ciP, contextNodeP->value.s, OrionldUserContext, &details)) == NULL)
     {
       LM_E(("Failed to create context from URL: %s", details));
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from URL", details, OrionldDetailsString);
@@ -132,6 +137,7 @@ bool orionldContextTreat
     }
 
     ciP->contextToBeFreed = false;  // context has been added to public list - must not be freed
+    ciP->contextP         = orionldState.contextP; // FIXME: ciP->contextP to be removed
   }
   else if (contextNodeP->type == KjArray)
   {
@@ -164,12 +170,13 @@ bool orionldContextTreat
 
     sprintf(linkPath, "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", orionldHostName, restPortGet(), entityId);
 
-    ciP->contextP = orionldContextCreateFromTree(contextNodeP, linkPath, OrionldUserContext, &details);
+    orionldState.contextP = orionldContextCreateFromTree(contextNodeP, linkPath, OrionldUserContext, &details);
+    ciP->contextP = orionldState.contextP; // FIXME: ciP->contextP to be removed
 
     if (linkPath != linkPathV)
       free(linkPath);  // orionldContextCreateFromTree strdups the URL
 
-    if (ciP->contextP == NULL)
+    if (orionldState.contextP == NULL)
     {
       LM_E(("Failed to create context from Tree : %s", details));
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from tree", details, OrionldDetailsString);
@@ -188,7 +195,7 @@ bool orionldContextTreat
       {
         LM_E(("Context Array Item is not a JSON String, but of type '%s'", kjValueType(contextStringNodeP->type)));
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Context Array Item is not a JSON String", NULL, OrionldDetailsString);
-        
+
         return false;
       }
 
@@ -204,10 +211,24 @@ bool orionldContextTreat
   {
     LM_TMP(("The context is an OBJECT"));
 
-    // FIXME: seems like an inline context - not supported for now
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", "inline contexts not supported in current version of orionld", OrionldDetailsString);
-    LM_E(("inline contexts not supported in current version of orionld"));
-    return false;
+    if (orionldContextInlineCheck(ciP, contextNodeP) == false)
+    {
+      // orionldContextInlineCheck sets the error response
+      LM_E(("Invalid inline context"));
+      return false;
+    }
+
+    orionldState.contextP = (OrionldContext*) malloc(sizeof(OrionldContext));
+
+    orionldState.inlineContext.url       = (char*) "inline context";
+    orionldState.inlineContext.tree      = contextNodeP;
+    orionldState.inlineContext.type      = OrionldUserContext;
+    orionldState.inlineContext.ignore    = false;
+    orionldState.inlineContext.temporary = true;
+    orionldState.inlineContext.next      = NULL;
+    orionldState.contextP                = &orionldState.inlineContext;
+
+    return true;
   }
   else
   {
@@ -230,7 +251,7 @@ bool orionldContextTreat
   //
   char* details;
 
-  if (orionldUserContextKeyValuesCheck(ciP->contextP->tree, ciP->contextP->url, &details) == false)
+  if (orionldUserContextKeyValuesCheck(orionldState.contextP->tree, orionldState.contextP->url, &details) == false)
   {
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", details, OrionldDetailsString);
     return false;
@@ -238,19 +259,23 @@ bool orionldContextTreat
 #endif
 
   if (caPP == NULL)
+  {
     return true;
+  }
 
   // Create a context attribute of the context
-  ContextAttribute* caP;
+  ContextAttribute* caP = NULL;
   LM_T(LmtContextTreat, ("The @context is treated as an attribute"));
 
   // The attribute's value is either a string or a vector (compound)
   if (contextNodeP->type == KjString)
   {
+    LM_TMP(("contextNodeP->type == KjString"));
     caP = new ContextAttribute("@context", "ContextString", contextNodeP->value.s);
   }
-  else
+  else if (contextNodeP->type == KjArray)
   {
+    LM_TMP(("contextNodeP->type == KjArray"));
     // Create the Compound, just a vector of strings
     orion::CompoundValueNode* compoundP = new orion::CompoundValueNode(orion::ValueTypeVector);
     int                       siblingNo = 0;
@@ -270,6 +295,29 @@ bool orionldContextTreat
     caP->type           = "ContextVector";
     caP->name           = "@context";
     caP->valueType      = orion::ValueTypeObject;  // All compounds have Object as value type (I think)
+    caP->compoundValueP = compoundP;
+  }
+  else if (contextNodeP->type == KjObject)
+  {
+    LM_TMP(("contextNodeP->type == KjObject"));
+    orion::CompoundValueNode* compoundP = new orion::CompoundValueNode(orion::ValueTypeObject);
+    int                       siblingNo = 0;
+
+    // Loop over the kNode tree and create the strings
+    for (KjNode* contextItemNodeP = contextNodeP->value.firstChildP; contextItemNodeP != NULL; contextItemNodeP = contextItemNodeP->next)
+    {
+      LM_T(LmtContextTreat, ("string: %s", contextItemNodeP->value.s));
+      orion::CompoundValueNode* stringNode = new orion::CompoundValueNode(compoundP, "", "", contextItemNodeP->value.s, siblingNo++, orion::ValueTypeString);
+
+      compoundP->add(stringNode);
+    }
+
+    // Now set 'compoundP' as value of the attribute
+    caP = new ContextAttribute();
+
+    caP->type           = "ContextObject";
+    caP->name           = "@context";
+    caP->valueType      = orion::ValueTypeObject;
     caP->compoundValueP = compoundP;
   }
 

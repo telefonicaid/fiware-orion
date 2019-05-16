@@ -155,7 +155,6 @@ echo
 ===========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 
@@ -193,7 +192,6 @@ Date: REGEX(.*)
 ===============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E4
 Date: REGEX(.*)
 
@@ -203,7 +201,6 @@ Date: REGEX(.*)
 ================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E5
 Date: REGEX(.*)
 
@@ -240,12 +237,11 @@ Date: REGEX(.*)
 08. GET Entity from step 01 - see correct URI Expansion (matching Default URL @context)
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 149
+Content-Length: 42
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
     "id": "http://a.b.c/entity/E1",
     "type": "A"
 }
@@ -256,7 +252,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 42
 Content-Type: application/json
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -268,12 +263,11 @@ Date: REGEX(.*)
 10. GET Entity from step 05 - see correct URI Expansion (matching @context in HTTP Header)
 ==========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 214
+Content-Length: 107
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
     "http://example.org/P100": {
         "type": "Property",
         "value": 100.0

@@ -61,7 +61,7 @@ echo
 
 echo "03. GET the entity"
 echo "=================="
-orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14?prettyPrint=yes&spaces=2' --noPayloadCheck  -H "Accept: application/ld+json"
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14?prettyPrint=yes&spaces=2' --noPayloadCheck  -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -99,7 +99,6 @@ echo
 ====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14
 Date: REGEX(.*)
 
@@ -116,17 +115,9 @@ MongoDB server version: REGEX(.*)
 		"type" : "http://example.org/T",
 		"servicePath" : "/"
 	},
-	"attrNames" : [
-		"@context"
-	],
+	"attrNames" : [ ],
 	"attrs" : {
-		"@context" : {
-			"type" : "ContextString",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
-			"value" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
-			"mdNames" : [ ]
-		}
+
 	},
 	"creDate" : REGEX(.*),
 	"modDate" : REGEX(.*),
@@ -138,14 +129,13 @@ bye
 03. GET the entity
 ==================
 HTTP/1.1 200 OK
-Content-Length: 145
+Content-Length: 52
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
   "id": "urn:ngsi-ld:T:12:13:14",
-  "type": "T",
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
+  "type": "T"
 }
 
 

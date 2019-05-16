@@ -147,7 +147,6 @@ echo
 ============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:E01
 Date: REGEX(.*)
 
@@ -157,7 +156,6 @@ Date: REGEX(.*)
 ============================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01
 Date: REGEX(.*)
 
@@ -167,7 +165,7 @@ Date: REGEX(.*)
 ========================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 369
+Content-Length: 284
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -175,7 +173,6 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 
 {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "data": [
         {
             "P1": {
@@ -202,7 +199,6 @@ Content-Type: application/json; charset=utf-8
 =================
 HTTP/1.1 204 No Content
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 
@@ -211,7 +207,7 @@ Date: REGEX(.*)
 ========================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 370
+Content-Length: 285
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -219,7 +215,6 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 
 {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "data": [
         {
             "P1": {
@@ -246,7 +241,6 @@ Content-Type: application/json; charset=utf-8
 ============================
 HTTP/1.1 204 No Content
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 
@@ -255,7 +249,7 @@ Date: REGEX(.*)
 ============================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 412
+Content-Length: 327
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -263,7 +257,6 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 
 {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "data": [
         {
             "P1": {

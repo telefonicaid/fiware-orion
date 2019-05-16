@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -24,47 +24,35 @@
 */
 extern "C"
 {
-#include "kbase/version.h"                                     // kbaseVersion
-#include "kalloc/version.h"                                    // kallocVersion
-#include "kjson/version.h"                                     // kjsonVersion
 #include "kjson/KjNode.h"                                      // KjNode
-#include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/OrionldConnection.h"                  // orionldState
-#include "orionld/serviceRoutines/orionldGetVersion.h"         // Own Interface
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldGetVersion -
+// orionldContextInlineCheck -
 //
-bool orionldGetVersion(ConnectionInfo* ciP)
+bool orionldContextInlineCheck(ConnectionInfo* ciP, KjNode* contextObjectP)
 {
   KjNode* nodeP;
 
-  ciP->responseTree = kjObject(orionldState.kjsonP, NULL);
-
-  nodeP = kjString(orionldState.kjsonP, "branch", "task/143.orionld_context_use_incoming_in_get_entity");
-  kjChildAdd(ciP->responseTree, nodeP);
-
-  nodeP = kjString(orionldState.kjsonP, "kbase version", kbaseVersion);
-  kjChildAdd(ciP->responseTree, nodeP);
-  nodeP = kjString(orionldState.kjsonP, "kalloc version", kallocVersion);
-  kjChildAdd(ciP->responseTree, nodeP);
-  nodeP = kjString(orionldState.kjsonP, "kjson version", kjsonVersion);
-  kjChildAdd(ciP->responseTree, nodeP);
-
-  // This request is ALWAYS returned with pretty-print
-  orionldState.kjsonP->spacesPerIndent   = 2;
-  orionldState.kjsonP->nlString          = (char*) "\n";
-  orionldState.kjsonP->stringBeforeColon = (char*) "";
-  orionldState.kjsonP->stringAfterColon  = (char*) " ";
+  for (nodeP = contextObjectP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+  {
+    if ((nodeP->type != KjString) && (nodeP->type != KjObject))
+    {
+      LM_E(("The context is invalid - value of '%s' is not a String nor an Object", nodeP->name));
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid key-value in @context", nodeP->name, OrionldDetailsString);
+      return false;
+    }
+  }
 
   return true;
 }

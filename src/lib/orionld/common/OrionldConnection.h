@@ -52,6 +52,7 @@ typedef struct OrionldConnectionState
   Kjson*           kjsonP;
   KAlloc           kalloc;
   char             kallocBuffer[8 * 1024];
+  OrionldContext   inlineContext;
   OrionldContext*  contextP;
   ApiVersion       apiVersion;
   int              requestNo;

@@ -114,7 +114,6 @@ echo
 ========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 
@@ -124,7 +123,6 @@ Date: REGEX(.*)
 ==========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
 Date: REGEX(.*)
 
@@ -134,7 +132,6 @@ Date: REGEX(.*)
 =========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
 Date: REGEX(.*)
 
@@ -144,7 +141,6 @@ Date: REGEX(.*)
 ===========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E4
 Date: REGEX(.*)
 
@@ -153,7 +149,7 @@ Date: REGEX(.*)
 05. GET all entities that does not have an attribute A - see E2 and E4
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 440
+Content-Length: 258
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -164,8 +160,7 @@ Date: REGEX(.*)
     "A2": {
       "type": "Property",
       "value": true
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   },
   {
     "id": "http://a.b.c/entity/E4",
@@ -173,8 +168,7 @@ Date: REGEX(.*)
     "A2": {
       "type": "Property",
       "value": false
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   }
 ]
 

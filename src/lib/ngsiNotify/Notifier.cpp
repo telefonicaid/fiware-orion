@@ -574,7 +574,10 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
     if (subP == NULL)
       subP = subCacheItemLookup(tenant.c_str(), ncrP->subscriptionId.c_str());
-
+#if 0
+    //
+    // This is where the Link HTTP header is added
+    //
     if (subP != NULL)
     {
       if (httpInfo.mimeType == JSON)
@@ -589,6 +592,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
       LM_E(("Unable to find subscription: %s", ncrP->subscriptionId.c_str()));
     }
+#endif
 #endif
 
     paramsV->push_back(params);

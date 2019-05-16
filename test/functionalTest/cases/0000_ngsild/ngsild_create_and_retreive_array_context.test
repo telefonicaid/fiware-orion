@@ -32,7 +32,6 @@ brokerStart CB 212-249
 
 #
 # 01. Create Entity http://a.b.c/E1, with array context
-# 02. GET /ngsild/ex/v1/contexts/http://a.b.c/E1, see context created in step 01
 #
 
 
@@ -51,37 +50,14 @@ echo
 echo
 
 
-echo "02. GET /ngsild/ex/v1/contexts/http://a.b.c/E1, see context created in step 01"
-echo "=============================================================================="
-orionCurl --url /ngsi-ld/ex/v1/contexts/http://a.b.c/E1
-echo
-echo
-
-
 --REGEXPECT--
 01. Create Entity http://a.b.c/E1, with array context
 =====================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <http://IP:9999/ngsi-ld/ex/v1/contexts/http://a.b.c/E1>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/E1
 Date: REGEX(.*)
 
-
-
-02. GET /ngsild/ex/v1/contexts/http://a.b.c/E1, see context created in step 01
-==============================================================================
-HTTP/1.1 200 OK
-Content-Length: 150
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "@context": [
-        "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-        "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
-    ]
-}
 
 
 --TEARDOWN--

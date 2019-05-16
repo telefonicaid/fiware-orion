@@ -75,7 +75,6 @@ echo
 ================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 
@@ -84,14 +83,13 @@ Date: REGEX(.*)
 02. GET /ngsi-ld/v1/entities/http://a.b.c/entity/E1 with URI param 'attrs' set to 'A3' - see E1 but without any attributes
 ==========================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 141
+Content-Length: 52
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
   "id": "http://a.b.c/entity/E1",
-  "type": "T",
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+  "type": "T"
 }
 
 

@@ -131,7 +131,6 @@ echo
 =====================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 
@@ -141,7 +140,6 @@ Date: REGEX(.*)
 =======================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
 Date: REGEX(.*)
 
@@ -151,7 +149,6 @@ Date: REGEX(.*)
 =====================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
 Date: REGEX(.*)
 
@@ -161,7 +158,6 @@ Date: REGEX(.*)
 =======================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E4
 Date: REGEX(.*)
 
@@ -171,7 +167,6 @@ Date: REGEX(.*)
 =====================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E5
 Date: REGEX(.*)
 
@@ -180,7 +175,7 @@ Date: REGEX(.*)
 06. GET all entities that has an attribute A == 1 or 3 - see E1 and E3
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 443
+Content-Length: 261
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -191,8 +186,7 @@ Date: REGEX(.*)
     "A": {
       "type": "Property",
       "value": 1.000000
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   },
   {
     "id": "http://a.b.c/entity/E3",
@@ -200,8 +194,7 @@ Date: REGEX(.*)
     "A": {
       "type": "Property",
       "value": 3.000000
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   }
 ]
 

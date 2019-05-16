@@ -72,17 +72,6 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   nodeP = kjString(orionldState.kjsonP, "subscriptionId", (char*) ncrP->subscriptionId.get().c_str());
   kjChildAdd(rootP, nodeP);
 
-  // Context
-  LM_T(LmtAccept, ("mimeType: %d", mimeType));
-  if (mimeType == JSONLD)
-  {
-    LM_T(LmtContext, ("Adding @context to payload as mimeType == JSONLD"));
-    nodeP = kjString(orionldState.kjsonP, "@context", contextP->url);
-    kjChildAdd(rootP, nodeP);
-  }
-  else
-    LM_T(LmtContext, ("No @context in payload as mimeType == JSON"));
-
   // notifiedAt
   time_t  now = time(NULL);  // FIXME - use an already existing timestamp?
   char    date[128];
