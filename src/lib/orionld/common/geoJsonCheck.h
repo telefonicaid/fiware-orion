@@ -41,4 +41,4 @@ extern "C"
 //
 extern bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoJsonNodeP, char** detailsP);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_GEOJSONTYPECHECK_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_GEOJSONCHECK_H_

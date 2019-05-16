@@ -59,15 +59,15 @@ typedef struct OrionldConnectionState
   KjNode*          locationAttributeP;
   KjNode*          geoTypeP;
   KjNode*          geoCoordsP;
-  long long        overriddenCreationDate;
-  long long        overriddenModificationDate;
+  int64_t          overriddenCreationDate;
+  int64_t          overriddenModificationDate;
 } OrionldConnectionState;
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldState - 
+// orionldState -
 //
 extern __thread OrionldConnectionState orionldState;
 

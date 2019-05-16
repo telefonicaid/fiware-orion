@@ -61,7 +61,7 @@ OrionldContext* orionldContextLookup(const char* url)
       orionldContextListSemGive("Looking up a context - no luck");
       return NULL;
     }
-    
+
     LM_T(LmtContextLookup, ("Comparing context %d: '%s' with '%s'", contextIx, contextP->url, url));
     if (strcmp(contextP->url, url) == 0)
     {
@@ -79,4 +79,4 @@ OrionldContext* orionldContextLookup(const char* url)
 
   orionldContextListSemGive("Looking up a context - NOT Found");
   return NULL;
-}  
+}

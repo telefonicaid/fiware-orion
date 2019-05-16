@@ -134,7 +134,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
   extern void contextArrayPresent(KjNode* tree, const char* what);
   contextArrayPresent(tree, "Just after freeing httpResponse");
   // </DEBUG>
-  
+
   if ((tree->type != KjArray) && (tree->type != KjString) && (tree->type != KjObject))
   {
     LM_T(LmtContext, ("Freeing tree as wrong json type"));
@@ -143,7 +143,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
     return NULL;
   }
 
-  
+
   //
   // Lastly, make sure the context is not shadowing any alias form the Core Context
   // If the Core Context is NULL, then this check is NOT done, as we are processing the
@@ -166,7 +166,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
     LM_T(LmtContext, ("This is the Core Context - we are done here"));
     return tree;
   }
-  
+
   if (tree->type != KjObject)
   {
     LM_T(LmtContext, ("tree->type != KjObject : freeing context tree"));

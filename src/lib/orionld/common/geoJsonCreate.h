@@ -43,4 +43,4 @@ extern "C"
 //
 extern bool geoJsonCreate(KjNode* attrP, mongo::BSONObjBuilder* geoJsonP, char** errorStringP);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_GEOJSONTYPECREATE_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_GEOJSONCREATE_H_

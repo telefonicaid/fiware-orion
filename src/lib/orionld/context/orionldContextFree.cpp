@@ -47,7 +47,7 @@ void orionldContextFree(OrionldContext* contextP)
     LM_T(LmtContext, ("NOT Freeing LIST context (NULL)"));
     return;
   }
-  
+
   LM_T(LmtContext, ("Freeing context %p, tree:%p, next:%p, url:%s", contextP, contextP->tree, contextP->next, contextP->url));
 
   if (contextP->tree != NULL)
