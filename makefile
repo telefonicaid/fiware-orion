@@ -64,9 +64,12 @@ ifndef MONGO_HOST
     MONGO_HOST=localhost
 endif
 
-all: prepare_release release
+all: branchFile prepare_release release
 
-di: install_debug
+di: branchFile install_debug
+
+branchFile:
+	./scripts/build/branchFileCreate.sh
 
 redi: rm_orionld_exec di
 
