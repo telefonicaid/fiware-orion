@@ -27,7 +27,7 @@ import re
 from sys import argv
 
 header = []
-header.append('\s*Copyright( \(c\))? 201[3|4|5|6|7|8] Telefonica Investigacion y Desarrollo, S.A.U$')
+header.append('\s*Copyright( \(c\))? 201[3|4|5|6|7|8|9] Telefonica Investigacion y Desarrollo, S.A.U$')
 header.append('\s*$')
 header.append('\s*This file is part of Orion Context Broker.$')
 header.append('\s*$')
@@ -130,7 +130,7 @@ def ignore(root, file):
     # Particular cases of files that are also ignored
     files_names = ['.gitignore', '.valgrindrc', '.valgrindSuppressions', 'LICENSE',
                    'ContributionPolicy.txt', 'CHANGES_NEXT_RELEASE', 'compileInfo.h',
-                   'unittests_that_fail_sporadically.txt', 'Vagrantfile', 'contextBroker.ubuntu',
+                   'unittests_that_fail_sporadically.txt', 'Vagrantfile', 'contextBroker.ubuntu', 'orionld.ubuntu',
                    'mkdocs.yml', 'fiware-ngsiv2-reference.errata', 'ServiceRoutines.txt', '.travis.yml',
                    '.dockerignore']
     if file in files_names:
@@ -153,7 +153,7 @@ def supported_extension(root, file):
     """
     extensions = ['py', 'cpp', 'h', 'xml', 'json', 'test', 'vtest', 'txt', 'sh', 'spec', 'cfg', 'DISABLED', 'xtest',
                   'centos', 'js', 'jmx', 'vtestx', 'feature', 'go']
-    names = ['makefile', 'Makefile']
+    names = ['makefile', 'Makefile', 'CMakeLists.txt.orion', 'CMakeLists.txt.orionld' ]
 
     # Check extensions
     if os.path.splitext(file)[1][1:] in extensions:
@@ -165,6 +165,9 @@ def supported_extension(root, file):
 
     # Check a filename in a root
     if 'config' in root and file == 'contextBroker':
+        return True
+
+    if 'config' in root and file == 'orionld':
         return True
 
     filename = os.path.join(root, file)
