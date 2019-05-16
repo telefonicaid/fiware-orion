@@ -131,7 +131,7 @@ bool geoJsonCreate(KjNode* attrP, mongo::BSONObjBuilder* geoJsonP, char** errorS
     // To make a big rectangle { 0,0 -> -4,6 } with a hole in it { -1,1 -> -2,2 }:
     //
     // [[ [0,0], [0,6], [-4,6], [-4,0], [0,0] ], [ [-1,1], [-1,2], [-2,2], [-2,0], [0,0], ]]
-    // 
+    //
 
     // First level
     if (orionldState.geoCoordsP->type != KjArray)
@@ -148,7 +148,7 @@ bool geoJsonCreate(KjNode* attrP, mongo::BSONObjBuilder* geoJsonP, char** errorS
       LM_E(("The coordinates must be a JSON Array in the second level of a Polygon"));
       *errorStringP = (char*) "The coordinates must be a JSON Array";
       return false;
-    }      
+    }
 
     //
     // More than one linear ring is not implemented yet => l2P->next must be NULL
@@ -159,7 +159,7 @@ bool geoJsonCreate(KjNode* attrP, mongo::BSONObjBuilder* geoJsonP, char** errorS
       *errorStringP = (char*) "More than one linear ring is not implemented";
       return false;
     }
-    
+
     // Third level
     mongo::BSONArrayBuilder  ba;
     int                      ix  = 0;    // Just for debugging

@@ -3053,12 +3053,12 @@ static bool createEntity
 
 #ifdef ORIONLD
   if (orionldState.overriddenCreationDate != 0)
-    insertedDoc.append(ENT_CREATION_DATE, orionldState.overriddenCreationDate);
+    insertedDoc.append(ENT_CREATION_DATE, (long long) orionldState.overriddenCreationDate);
   else
     insertedDoc.append(ENT_CREATION_DATE, now);
 
   if (orionldState.overriddenModificationDate != 0)
-    insertedDoc.append(ENT_MODIFICATION_DATE, orionldState.overriddenModificationDate);
+    insertedDoc.append(ENT_MODIFICATION_DATE, (long long) orionldState.overriddenModificationDate);
   else
     insertedDoc.append(ENT_MODIFICATION_DATE, now);
 #else

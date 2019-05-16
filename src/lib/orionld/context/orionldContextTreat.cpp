@@ -136,8 +136,8 @@ bool orionldContextTreat
       return false;
     }
 
-    ciP->contextToBeFreed = false;  // context has been added to public list - must not be freed
-    ciP->contextP         = orionldState.contextP; // FIXME: ciP->contextP to be removed
+    ciP->contextToBeFreed = false;                  // context has been added to public list - must not be freed
+    ciP->contextP         = orionldState.contextP;  // FIXME: ciP->contextP to be removed
   }
   else if (contextNodeP->type == KjArray)
   {
@@ -168,10 +168,10 @@ bool orionldContextTreat
     else
       linkPath = linkPathV;
 
-    sprintf(linkPath, "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", orionldHostName, restPortGet(), entityId);
+    snprintf(linkPath, linkPathLen, "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", orionldHostName, restPortGet(), entityId);
 
     orionldState.contextP = orionldContextCreateFromTree(contextNodeP, linkPath, OrionldUserContext, &details);
-    ciP->contextP = orionldState.contextP; // FIXME: ciP->contextP to be removed
+    ciP->contextP = orionldState.contextP;  // FIXME: ciP->contextP to be removed
 
     if (linkPath != linkPathV)
       free(linkPath);  // orionldContextCreateFromTree strdups the URL
