@@ -233,7 +233,9 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
       coordinateTransform(subscriptionP->subject.condition.expression.geometry.c_str(), coordinateVector, coordinateVectorLen, coordinateString);
       LM_TMP(("Geo: Parsing coordinates: '%s'", coordinateVector));
       LM_TMP(("Geo: -------------------------------------------"));
+
       coordValueP = kjParse(orionldState.kjsonP, coordinateVector);
+      free(coordinateVector);
 
       LM_TMP(("Geo: Parse returned %p", coordValueP));
       if (coordValueP == NULL)
