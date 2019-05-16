@@ -1,6 +1,6 @@
-# Copyright 2018 FIWARE Foundation 
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
 #
-# This file is part of Orion-LD Context Broker.
+# This file is part of Orion Context Broker.
 #
 # Orion Context Broker is free software: you can redistribute it and/or
 # modify it under the terms of the GNU Affero General Public License as
