@@ -218,8 +218,6 @@ bool orionldContextTreat
       return false;
     }
 
-    orionldState.contextP = (OrionldContext*) malloc(sizeof(OrionldContext));
-
     orionldState.inlineContext.url       = (char*) "inline context";
     orionldState.inlineContext.tree      = contextNodeP;
     orionldState.inlineContext.type      = OrionldUserContext;
