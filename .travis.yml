@@ -40,7 +40,7 @@ script:
       $(pwd)/docker/build.sh -s compliance -t -P $(pwd);
     fi
   - if [[ "${TEST_STATUS}" && "${STAGE}" != "compliance" ]]; then
-      docker run -t --rm -v $(pwd):${HOME} -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" ${IMAGE_DEPS} build.sh -s ${STAGE} -dt;
+      docker run -t --rm -v $(pwd):${HOME} -e STAGE=${STAGE} -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" ${IMAGE_DEPS} build.sh -s ${STAGE} -dt;
     fi
   - if [[ "${PUSH_STATUS}" && "${STAGE}" == "release" ]]; then
       docker build --build-arg TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg STAGE=${STAGE} -t ${IMAGE_RELEASE} -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;

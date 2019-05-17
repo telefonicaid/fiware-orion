@@ -73,9 +73,14 @@ echo '#endif  // SRC_LIB_COMMON_COMPILEINFO_H_'                                 
 
 # We only update the file compileInfo.h if the file previously doesn't exist 
 # or requires an update, to avoid triggering make build unnecessarily.
-diff $TMP_FILE src/lib/common/compileInfo.h
-if [ "$?" == "0" ]; then
-   rm -f $TMP_FILE
-else
+
+if [ -f "src/lib/common/compileInfo.h" ]; then
+    diff $TMP_FILE src/lib/common/compileInfo.h
+    if [ "$?" == "0" ]; then
+        rm -f $TMP_FILE
+    fi
+fi
+
+if [ -f "$TMP_FILE" ]; then
    mv $TMP_FILE src/lib/common/compileInfo.h
 fi
