@@ -1,0 +1,6 @@
+https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContextVocab.jsonld
+{
+  "@context": {
+    "@vocab": "http://example.org/ngsi-ld/default/"
+  }
+}
