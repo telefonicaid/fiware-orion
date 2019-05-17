@@ -39,8 +39,8 @@
 //
 bool orionldBadVerb(ConnectionInfo* ciP)
 {
-  unsigned short  bitmask = 0;
-  bool            found   = false;
+  uint16_t  bitmask = 0;
+  bool      found   = false;
 
   LM_T(LmtBadVerb, ("PATH: %s", ciP->urlPath));
   LM_T(LmtBadVerb, ("VERB: %s", ciP->verbString));
@@ -49,7 +49,7 @@ bool orionldBadVerb(ConnectionInfo* ciP)
   // There are nine verbs/methods, but only GET, POST, PATCH and DELETE are supported by ORIONLD
   // This loop looks up the URL PATH for each "orionld-valid" verb and keeps a bitmask of the hits
   //
-  for (unsigned short verbNo = 0; verbNo <= PATCH; verbNo++)  // 0:GET, 1:PUT, 2:POST, 3:DELETE, 4:PATCH
+  for (uint16_t verbNo = 0; verbNo <= PATCH; verbNo++)  // 0:GET, 1:PUT, 2:POST, 3:DELETE, 4:PATCH
   {
     if (verbNo == PUT) continue;
 

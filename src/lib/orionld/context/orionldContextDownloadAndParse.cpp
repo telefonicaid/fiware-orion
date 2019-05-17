@@ -90,7 +90,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, bool useI
 
     if (useInternalBuffer)
     {
-      httpResponse.buf = httpResponse.internalBuffer; // Contexts to be saved will need to be cloned
+      httpResponse.buf = httpResponse.internalBuffer;  // Contexts to be saved will need to be cloned
       if (httpResponse.buf == NULL)
       {
         *detailsPP = (char*) "out of memory";

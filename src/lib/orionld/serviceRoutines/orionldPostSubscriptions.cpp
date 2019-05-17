@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+#include <vector>
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
@@ -302,7 +305,7 @@ static bool ktreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInf
 
   // Set default values
   httpInfoP->mimeType = JSON;
-  
+
   for (KjNode* itemP = kNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
     if (SCOMPARE4(itemP->name, 'u', 'r', 'i', 0))
@@ -399,7 +402,7 @@ static bool ktreeToNotification(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::Sub
   KjNode*   itemP;
 
   // Set default values
-  subP->attrsFormat = NGSI_LD_V1_NORMALIZED; 
+  subP->attrsFormat = NGSI_LD_V1_NORMALIZED;
 
   // Extract the info from the kjTree
   for (itemP = kNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
@@ -488,7 +491,7 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP,
   KjNode*                   notificationP             = NULL;
   bool                      notificationPresent       = false;
   char*                     expiresP                  = NULL;
-  long long                 throttling                = -1;
+  uint64_t                  throttling                = -1;
   bool                      throttlingPresent         = false;
   KjNode*                   idNodeP                   = NULL;
   KjNode*                   contextNodeP              = NULL;
@@ -560,7 +563,7 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP,
       return false;
     }
 
-    
+
     if (orionldContextTreat(ciP, contextNodeP, (char*) subP->id.c_str(), NULL) == false)
     {
       // error
@@ -576,7 +579,7 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP,
 #endif
 
   // Add caP
-  
+
   //
   // Now loop over the tree
   //
@@ -639,7 +642,7 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP,
     {
       DUPLICATE_CHECK_WITH_PRESENCE(watchedAttributesPresent, watchedAttributesP, "Subscription::watchedAttributes", kNodeP);
       ARRAY_CHECK(kNodeP, "Subscription::watchedAttributes");
-      EMPTY_ARRAY_CHECK(kNodeP,"Subscription::watchedAttributes");
+      EMPTY_ARRAY_CHECK(kNodeP, "Subscription::watchedAttributes");
 
       if (ktreeToStringList(ciP, watchedAttributesP, &subP->subject.condition.attributes) == false)
       {
@@ -794,7 +797,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   LM_T(LmtServiceRoutine, ("In orionldPostSubscriptions - calling ktreeToSubscription"));
 
   // FIXME: attrsFormat should be set to default by constructor
-  sub.attrsFormat = DEFAULT_RENDER_FORMAT;  // FIXME: 
+  sub.attrsFormat = DEFAULT_RENDER_FORMAT;
 
   char* subIdP = NULL;
   if (ktreeToSubscription(ciP, &sub, &subIdP) == false)

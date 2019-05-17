@@ -141,12 +141,12 @@ static Verb verbGet(const char* method)
 
 // -----------------------------------------------------------------------------
 //
-// ipAddressAndPort - 
+// ipAddressAndPort -
 //
 static void ipAddressAndPort(ConnectionInfo* ciP)
 {
-  char            ip[32];
-  unsigned short  port = 0;
+  char      ip[32];
+  uint16_t  port = 0;
 
   const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(ciP->connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
 
@@ -174,7 +174,7 @@ static void ipAddressAndPort(ConnectionInfo* ciP)
 
 // -----------------------------------------------------------------------------
 //
-// orionldMhdConnectionInit - 
+// orionldMhdConnectionInit -
 //
 int orionldMhdConnectionInit
 (
@@ -199,7 +199,7 @@ int orionldMhdConnectionInit
   ConnectionInfo* ciP = new ConnectionInfo();
 
   //
-  // Mark connection as NGSI-LD V1  
+  // Mark connection as NGSI-LD V1
   //
   ciP->apiVersion = NGSI_LD_V1;
 
@@ -287,7 +287,7 @@ int orionldMhdConnectionInit
   // 6. Set servicePath: "/#" for GET requests, "/" for all others (ehmmm ... creation of subscriptions ...)
   ciP->servicePathV.push_back((ciP->verb == GET)? "/#" : "/");
 
-  
+
   // 7.  Check that GET/DELETE has no payload
   // 8.  Check that POST/PUT/PATCH has payload
   // 9.  Check validity of tenant

@@ -26,7 +26,6 @@
 #include <sys/types.h>                                         // DIR, dirent
 #include <fcntl.h>                                             // O_RDONLY
 #include <dirent.h>                                            // opendir(), readdir(), closedir()
-#include <sys/types.h>                                         // types for stat()
 #include <sys/stat.h>                                          // statbuf
 #include <unistd.h>                                            // stat()
 #endif
@@ -44,8 +43,7 @@ extern "C"
 #include "kjson/kjParse.h"                                     // kjParse
 }
 
-#include "orionld/common/OrionldConnection.h"                  // orionldState
-#include "orionld/common/OrionldConnection.h"                  // Global vars: kjson, kalloc, kallocBuffer, ...
+#include "orionld/common/OrionldConnection.h"                  // Global vars: orionldState, kjson, kalloc, kallocBuffer, ...
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/context/orionldContextDownloadAndParse.h"    // orionldContextDownloadAndParse
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext, ORIONLD_CORE_CONTEXT_URL
@@ -431,20 +429,24 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
 #ifdef DEBUG
   if (cachedContextDir != NULL)
   {
-    DIR*    dirP;
-    struct  dirent*  dirItemP;
+    DIR*            dirP;
+    struct  dirent  dirItem;
+    struct  dirent* result;
 
     dirP = opendir(cachedContextDir);
     if (dirP == NULL)
       LM_X(1, ("opendir(%s): %s", cachedContextDir, strerror(errno)));
 
-    while ((dirItemP = readdir(dirP)) != NULL)
+    while (readdir_r(dirP, &dirItem, &result) == 0)
     {
-      if (dirItemP->d_name[0] == '.')  // skip hidden files and '.'/'..'
+      if (result == NULL)
+        break;
+
+      if (dirItem.d_name[0] == '.')  // skip hidden files and '.'/'..'
         continue;
 
-      LM_TMP(("Found a cached context file: %s", dirItemP->d_name));
-      contextFileTreat(cachedContextDir, dirItemP);
+      LM_TMP(("Found a cached context file: %s", dirItem.d_name));
+      contextFileTreat(cachedContextDir, &dirItem);
     }
     closedir(dirP);
   }

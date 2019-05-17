@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                        // LM_*
+#include "logMsg/traceLevels.h"                                   // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/serviceRoutines/orionldDeleteRegistration.h" // Own Interface
+#include "rest/ConnectionInfo.h"                                  // ConnectionInfo
+#include "orionld/common/orionldErrorResponse.h"                  // orionldErrorResponseCreate
+#include "orionld/serviceRoutines/orionldDeleteRegistration.h"    // Own Interface
 
 
 
