@@ -170,6 +170,9 @@ def supported_extension(root, file):
     if 'config' in root and file == 'orionld':
         return True
 
+    if 'ldcontext' in root:
+        return True
+    
     filename = os.path.join(root, file)
     print 'not supported extension: {filename}'.format(filename=filename)
     return False
