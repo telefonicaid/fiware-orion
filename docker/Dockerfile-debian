@@ -11,7 +11,7 @@ WORKDIR /opt
 
 COPY . /usr/local/bin/
 
-RUN build.sh -t ${TOKEN} -p ${PLATFORM} -s ${STAGE} -c -B ${REV}
+RUN build.sh -T ${TOKEN} -p ${PLATFORM} -s ${STAGE} -c -B ${REV}
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 

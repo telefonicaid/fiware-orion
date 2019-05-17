@@ -104,7 +104,7 @@ do
     esac
 done
 
-while getopts "hHs:tdqp:t:P:bcB:R:r:u" opt; do
+while getopts "hHs:tdqp:T:P:bcB:R:r:u" opt; do
     case ${opt} in
         h)  _usage; exit 0 ;;
         H)  SHOW=true ;;
@@ -113,7 +113,7 @@ while getopts "hHs:tdqp:t:P:bcB:R:r:u" opt; do
         d)  DATABASE=true ;;
         q)  SPEED=true ;;
         p)  PLATFORM=$OPTARG ;;
-        t)  TOKEN=$OPTARG ;;
+        T)  TOKEN=$OPTARG ;;
         P)  PATH_TO_SRC=${OPTARG} ;;
         b)  BUILD=true ;;
         c)  CLONE=true ;;
@@ -127,6 +127,14 @@ done
 shift $((OPTIND-1))
 
 # ==================================== CHECKS =========================================================================
+
+echo -n "Builder:
+stage - \"${STAGE}\"
+platform - \"${PLATFORM}\"
+test - \"${TEST}\"
+repository - \"${REPOSITORY}\"
+branch - \"${BRANCH}\"
+"
 
 echo "Builder: check path"
 if [[ -z "${PATH_TO_SRC}" ]]; then

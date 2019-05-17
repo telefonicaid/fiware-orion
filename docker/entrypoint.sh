@@ -23,8 +23,8 @@
 # Author: Dmitrii Demin
 #
 
-if [[ "${STAGE}" == 'release' ]]; then
+if [[ -z "${STAGE}" ]]; then
     orionld -fg -multiservice -ngsiv1Autocast
-elif [[ "${STAGE}" == 'deps' ]]; then
-    exec "$@"
 fi
+
+exec "$@"
