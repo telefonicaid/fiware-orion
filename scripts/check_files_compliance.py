@@ -81,6 +81,9 @@ def ignore(root, file):
     if 'BUILD_' in root or '.git' in root:
         return True
 
+    if 'ldcontext' in root:
+        return True
+
     # PNG files in manuals o functionalTest are ignored
     if ('manuals' in root or 'functionalTest' in root or 'apiary' in root) and file.endswith('.png'):
         return True
@@ -168,9 +171,6 @@ def supported_extension(root, file):
         return True
 
     if 'config' in root and file == 'orionld':
-        return True
-
-    if 'ldcontext' in root:
         return True
     
     filename = os.path.join(root, file)
