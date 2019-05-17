@@ -130,7 +130,7 @@ OrionldContext* orionldContextAdd
 
   LM_T(LmtContext, ("Downloading and parsing context of URL '%s'", url));
   LM_TMP(("Downloading and parsing context '%s' (using global kjsonP - as the context needs to survive between requests)", url));
-  KjNode* tree = orionldContextDownloadAndParse(kjsonP, url, detailsPP);
+  KjNode* tree = orionldContextDownloadAndParse(kjsonP, url, true, detailsPP);
 
   if (tree == NULL)
   {
@@ -268,7 +268,7 @@ OrionldContext* orionldContextAdd
     if (orionldContextLookup(url) != NULL)
       continue;
 
-    tree = orionldContextDownloadAndParse(orionldState.kjsonP, url, detailsPP);
+    tree = orionldContextDownloadAndParse(orionldState.kjsonP, url, true, detailsPP);
     if (tree == NULL)
     {
       LM_T(LmtContext, ("orionldContextDownloadAndParse failed: %s", *detailsPP));
@@ -279,7 +279,6 @@ OrionldContext* orionldContextAdd
       return NULL;
     }
 
-    // FIXME: tree = kjClone(tree); ?
     if (orionldContextAppend(url, tree, contextType, detailsPP) == NULL)
     {
       LM_T(LmtContext, (*detailsPP));

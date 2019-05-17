@@ -39,6 +39,10 @@ extern "C"
 
 
 
+// -----------------------------------------------------------------------------
+//
+// contextArrayPresent -
+//
 void contextArrayPresent(KjNode* tree, const char* what)
 {
   if (tree == NULL)
@@ -58,6 +62,7 @@ void contextArrayPresent(KjNode* tree, const char* what)
 }
 
 
+
 static __thread OrionldResponseBuffer  httpResponse;
 // -----------------------------------------------------------------------------
 //
@@ -65,7 +70,11 @@ static __thread OrionldResponseBuffer  httpResponse;
 //
 // The returned tree must be freed by the caller
 //
-KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** detailsPP)
+// Important: if 'useInternalBuffer' is set to 'true', then the downloaded buffers need to be cloned if they
+//            are to survive a second call to this function.
+//
+//
+KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, bool useInternalBuffer, char** detailsPP)
 {
   //
   // Prepare the httpResponse buffer
@@ -74,15 +83,20 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
 
   for (int tries = 0; tries < 5; tries++)
   {
-    httpResponse.buf       = httpResponse.internalBuffer;  // Contexts to be saved will need to be cloned
-    httpResponse.size      = sizeof(httpResponse.internalBuffer);
+    httpResponse.buf       = NULL;
+    httpResponse.size      = 0;
     httpResponse.used      = 0;
-    httpResponse.allocated = true;
+    httpResponse.allocated = false;
 
-    if (httpResponse.buf == NULL)
+    if (useInternalBuffer)
     {
-      *detailsPP = (char*) "out of memory";
-      return NULL;
+      httpResponse.buf = httpResponse.internalBuffer; // Contexts to be saved will need to be cloned
+      if (httpResponse.buf == NULL)
+      {
+        *detailsPP = (char*) "out of memory";
+        return NULL;
+      }
+      httpResponse.size = sizeof(httpResponse.internalBuffer);
     }
 
     LM_T(LmtContext, ("Downloading context '%s'", url));
@@ -92,7 +106,10 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
     // httpResponse.buf freed by orionldRequestSend() in case of error
     //
     bool tryAgain = false;
-    if (orionldRequestSend(&httpResponse, url, 10000, detailsPP, &tryAgain) == true)
+    bool reqOk;
+
+    reqOk = orionldRequestSend(&httpResponse, url, 10000, detailsPP, &tryAgain);
+    if (reqOk == true)
     {
       ok = true;
       break;
@@ -114,7 +131,6 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
   // Now parse the payload
   // LM_T(LmtContext, ("Got @context: %s", httpResponse.buf));
   // LM_T(LmtContext, ("Got @context - parsing it"));
-  LM_TMP(("Got @context: %s", httpResponse.buf));
   KjNode* tree = kjParse(kjsonP, httpResponse.buf);
   LM_T(LmtContext, ("Got @context - parsed it"));
 
@@ -129,6 +145,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
     LM_E(("kjParse returned NULL"));
     return NULL;
   }
+  LM_T(LmtContext, ("@context parsed without errors"));
 
   // <DEBUG>
   extern void contextArrayPresent(KjNode* tree, const char* what);
@@ -169,7 +186,6 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, char** de
 
   if (tree->type != KjObject)
   {
-    LM_T(LmtContext, ("tree->type != KjObject : freeing context tree"));
     *detailsPP = (char*) "Not a JSON Object - invalid @context";
     LM_E((*detailsPP));
     return NULL;
