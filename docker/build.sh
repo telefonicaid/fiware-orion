@@ -283,11 +283,10 @@ if [[ -n "${TEST}" && "${STAGE}" = "functional" ]]; then
     make install
 
     . scripts/testEnv.sh
-  	# . /opt/venv/bin/activate ;
 
     if ${FUNC_STATUS}; then
         CB_DIFF_TOOL="diff -u" ${PATH_TO_SRC}/test/functionalTest/testHarness.sh --fromIx ${START}  --toIx ${END}
-    else:
+    else
         CB_DIFF_TOOL="diff -u" ${PATH_TO_SRC}/test/functionalTest/testHarness.sh
     fi
 

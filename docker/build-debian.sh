@@ -65,6 +65,8 @@ TEST_TOOLS=(
  'bc' \
  'nano' \
  'netcat' \
+ 'python-pip' \
+ 'gridsite-clients' \
  'valgrind' \
 )
 
@@ -202,6 +204,11 @@ if [[ "${STAGE}" == 'deps' ]]; then
     echo "Builder: installing  tools and dependencies"
     apt-get -y install --no-install-recommends \
         ${TEST_TOOLS[@]}
+
+    echo "Builder: installing python dependencies"
+    pip install --upgrade setuptools wheel
+    pip install Flask==1.0.2 pyOpenSSL==19.0.0
+    yes | pip uninstall setuptools wheel
 fi
 
 if [[ ${STAGE} == 'release' ]]; then
