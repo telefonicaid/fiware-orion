@@ -197,21 +197,80 @@ function exitFunction()
   errorText=$2
   testFile=$3
   errorString=$4
-  errorFile=$5
-  forced=$6
+  stderrFile=$5
+  diffFile=$5    # In the case of exitCode 9
+  stdoutFile=$6
+  forced=$7
 
   logMsg "FAILURE $exitCode for test $testFile: $errorText"
   echo -n "(FAILURE $exitCode - $errorText) "
+
+  #
+  # To only run this verbose output under Travis/Jenkins, I need an env var or a CLI option here ...
+  #
+  # if [ "$TRAVIS" == "YES" ]
+  # then
+  # ...
+
+  #
+  # Error 9 - output not as expected
+  #
+  if [ $exitCode == 9 ]
+  then
+      echo
+      echo "Error 9 - output not as expected"
+      echo
+      echo $diffFile:
+      echo  "---------------------------------------"
+      cat $diffFile
+      echo  "---------------------------------------"
+  elif [ $exitCode == 7 ] || [ $exitCode == 8 ] || [ $exitCode == 10 ] || [ $exitCode == 20 ] || [ $exitCode == 11 ]
+  then
+      echo
+      echo "Error $exitCode: $errorText"
+      echo
+      echo "$stderrFile:"
+      echo "-------------------------------------------------"
+      cat $stderrFile
+      echo "-------------------------------------------------"
+      echo
+      echo
+      echo "$stdoutFile:"
+      echo "-------------------------------------------------"
+      cat $stdoutFile
+      echo "-------------------------------------------------"
+      echo
+      echo
+      echo "/tmp/accumulator_9997_stderr:"
+      echo "-------------------------------------------------"
+      cat /tmp/accumulator_9997_stderr
+      echo "-------------------------------------------------"
+      echo
+      echo
+      echo "/tmp/accumulator_9997_stdout:"
+      echo "-------------------------------------------------"
+      cat /tmp/accumulator_9997_stdout
+      echo "-------------------------------------------------"
+      echo
+      echo
+
+  elif [ $exitCode == 1 ] || [ $exitCode == 2 ] || [ $exitCode == 3 ] || [ $exitCode == 4 ] || [ $exitCode == 5 ] || [ $exitCode == 6 ]
+  then
+      echo
+      echo "Error $exitCode (error in test-case-segments): $errorText"
+      echo
+  fi
+
 
   if [ "$stopOnError" == "on" ] || [ "$forced" == "DIE" ]
   then
     echo $ME/$NAME: $errorString
 
-    if [ "$errorFile" != "" ] && [ -f "$errorFile" ]
+    if [ "$stderrFile" != "" ] && [ -f "$stderrFile" ]
     then
       if [ "$verbose" == "on" ]
       then
-        cat $errorFile 2> /dev/null
+        cat $stderrFile 2> /dev/null
       fi
     fi
 
@@ -222,9 +281,9 @@ function exitFunction()
   logMsg "----- $NAME -----"
   logMsg $errorString
 
-  if [ "$errorFile" != "" ] && [ -f "$errorFile" ]
+  if [ "$stderrFile" != "" ] && [ -f "$stderrFile" ]
   then
-    cat $errorFile >> $LOG_FILE
+    cat $stderrFile >> $LOG_FILE
   fi
 
   testErrorV[$testError]=$testFile
@@ -236,7 +295,7 @@ function exitFunction()
 
 # ------------------------------------------------------------------------------
 #
-# ME - name of script, to be used in error and verbose messages 
+# ME - name of script, to be used in error and verbose messages
 #
 ME=$(basename $0)
 logMsg "$ME, in directory $SCRIPT_HOME"
@@ -330,7 +389,6 @@ fi
 #
 # 1. If it is a directory - just change the 'dir' variable and continue
 # 2. Else, it must be a file, or a filter.
-#    If the 
 #
 if [ "$dirOrFile" != "" ]
 then
@@ -394,7 +452,7 @@ toBeStopped=false
 # Init files already sourced?
 #
 if [ "$CONTEXTBROKER_TESTENV_SOURCED" != "YES" ]
-then  
+then
   if [ -f "$SCRIPT_HOME/testEnv.sh" ]
   then
     # First, we try with a testEnv.sh file in the script home (usual situation in the
@@ -441,7 +499,7 @@ then
   cd $dirOrFile
 elif [ ! -d "$dir" ]
 then
-  exitFunction 1 "$dir is not a directory" "HARNESS" "$dir" "" DIE
+  exitFunction 1 "$dir is not a directory" "HARNESS" "$dir" "" "" DIE
 else
   cd $dir
 fi
@@ -481,7 +539,7 @@ done
 
 # ------------------------------------------------------------------------------
 #
-# fileCleanup - 
+# fileCleanup -
 #
 function fileCleanup()
 {
@@ -533,7 +591,7 @@ function fileCreation()
 
   dirname=$(dirname $path)
   filename=$(basename $path .test)
-  
+
   if [ "$dirname" != "." ] && [ "$dirname" != "" ]
   then
     pathWithoutExt=$dirname/$filename
@@ -544,14 +602,14 @@ function fileCreation()
 
   logMsg Creating test files for $pathWithoutExt
 
-  
+
   #
   # Extract the NAME
   #
   NAME=$(sed -n '/--NAME--/,/^--/p' $path | grep -v "^--")
   if [ "$NAME" == "" ]
   then
-    exitFunction 2 "--NAME-- part is missing" "$path" "($path)" "" DIE
+    exitFunction 2 "--NAME-- part is missing" "$path" "($path)" "" "" DIE
     exit 2 # Just in case
   fi
 
@@ -564,7 +622,7 @@ function fileCreation()
     logMsg "Creating $TEST_SHELL_INIT at $PWD"
     sed -n '/--SHELL-INIT--/,/^--/p' $path  | grep -v "^--" > $TEST_SHELL_INIT
   else
-    exitFunction 3 "--SHELL-INIT-- part is missing" $path "($path)" "" DIE
+    exitFunction 3 "--SHELL-INIT-- part is missing" $path "($path)" "" "" DIE
   fi
 
   #
@@ -576,7 +634,7 @@ function fileCreation()
     logMsg "Creating $TEST_SHELL at $PWD"
     sed -n '/--SHELL--/,/^--/p' $path  | grep -v "^--" > $TEST_SHELL
   else
-    exitFunction 4 "--SHELL-- part is missing" $path "($path)" "" DIE
+    exitFunction 4 "--SHELL-- part is missing" $path "($path)" "" "" DIE
   fi
 
   #
@@ -588,7 +646,7 @@ function fileCreation()
     logMsg "Creating $TEST_REGEXPECT at $PWD"
     sed -n '/--REGEXPECT--/,/^--/p' $path  | grep -v "^--" > $TEST_REGEXPECT
   else
-    exitFunction 5 "--REGEXPECT-- part is missing" $path "($path)" "" DIE
+    exitFunction 5 "--REGEXPECT-- part is missing" $path "($path)" "" "" DIE
   fi
 
   #
@@ -600,7 +658,7 @@ function fileCreation()
     logMsg "Creating $TEST_TEARDOWN at $PWD"
     sed -n '/--TEARDOWN--/,/^--/p' $path  | grep -v "^--" > $TEST_TEARDOWN
   else
-    exitFunction 6 "--TEARDOWN-- part is missing" $path "($path)" "" DIE
+    exitFunction 6 "--TEARDOWN-- part is missing" $path "($path)" "" "" DIE
   fi
 }
 
@@ -619,7 +677,7 @@ function partExecute()
 
   dirname=$(dirname $path)
   filename=$(basename $path .test)
-  
+
   if [ "$dirname" != "." ] && [ "$dirname" != "" ]
   then
     path=$dirname/$filename.test
@@ -642,13 +700,13 @@ function partExecute()
   linesInStderr=$(wc -l $dirname/$filename.$what.stderr | awk '{ print $1}' 2> /dev/null)
 
   #
-  # Check that stdout is empty
+  # Check that stderr is empty
   #
   if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
   then
     if [ $__tryNo == $MAX_TRIES ]
     then
-      exitFunction 7 "$what: output on stderr" $path "($path): $what produced output on stderr" $dirname/$filename.$what.stderr "$forcedDie"
+      exitFunction 7 "$what: output on stderr" $path "($path): $what produced output on stderr" $dirname/$filename.$what.stderr $dirname/$filename.$what.stdout "$forcedDie"
     else
       logMsg "$what: output on stderr"
       logMsg "------------------------------------------------------"
@@ -670,7 +728,7 @@ function partExecute()
     logMsg "$what: exit code is $exitCode - retry? (try: $__tryNo, MAX_TRIES: $MAX_TRIES)"
     if [ $__tryNo == $MAX_TRIES ]
     then
-      exitFunction 8 $path "$what exited with code $exitCode" "($path)" $dirname/$filename.$what.stderr "$forcedDie"
+      exitFunction 8 $path "$what exited with code $exitCode" "($path)" $dirname/$filename.$what.stderr $dirname/$filename.$what.stdout "$forcedDie"
     else
       echo -n "(ERROR 8 - $what: exited with code $exitCode) "
     fi
@@ -802,7 +860,7 @@ function runTest()
 
   if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
   then
-    exitFunction 10 "SHELL-INIT produced output on stderr" $path "($path)" $dirname/$filename.shellInit.stderr
+    exitFunction 10 "SHELL-INIT produced output on stderr" $path "($path)" $dirname/$filename.shellInit.stderr $dirname/$filename.shellInit.stdout "Continue"
     runTestStatus="shell-init-error"
     return
   fi
@@ -834,14 +892,14 @@ function runTest()
 
     if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
     then
-      exitFunction 20 "SHELL-INIT II produced output on stderr" $path "($path)" $dirname/$filename.shellInit.stderr
+      exitFunction 20 "SHELL-INIT II produced output on stderr" $path "($path)" $dirname/$filename.shellInit.stderr $dirname/$filename.shellInit.stdout "Continue"
       runTestStatus="shell-init-output-on-stderr"
       return
     fi
 
     if [ "$exitCode" != "0" ]
     then
-      exitFunction 11 "SHELL-INIT exited with code $exitCode" $path "($path)" "" DIE
+      exitFunction 11 "SHELL-INIT exited with code $exitCode" $path "($path)" $dirname/$filename.shellInit.stderr $dirname/$filename.shellInit.stdout "Continue"
       runTestStatus="shell-init-exited-with-"$exitCode
       return
     fi
