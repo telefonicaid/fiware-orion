@@ -55,7 +55,7 @@ TEST_TOOLS=(
  'nc' \
  'mongodb-org' \
  'mongodb-org-shell' \
- 'python-pip'
+ 'python-pip' \
  'valgrind' \
 )
 
@@ -192,7 +192,9 @@ if [[ "${STAGE}" == 'deps' ]]; then
         ${TEST_TOOLS[@]}
 
     echo "Builder: installing python dependencies"
-    pip install --upgrade pip && pip install Flask==1.0.2 pyOpenSSL==19.0.0
+    pip install --upgrade setuptools wheel
+    pip install Flask==1.0.2 pyOpenSSL==19.0.0
+    yes | pip uninstall setuptools wheel
 
     echo "Builder: urlencode"
     curl -O https://raw.githubusercontent.com/rpmsphere/x86_64/master/u/urlencode-1.0.3-2.1.x86_64.rpm

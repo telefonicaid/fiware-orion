@@ -206,7 +206,9 @@ if [[ "${STAGE}" == 'deps' ]]; then
         ${TEST_TOOLS[@]}
 
     echo "Builder: installing python dependencies"
-    pip install --upgrade pip && pip install Flask==1.0.2 pyOpenSSL==19.0.0
+    pip install --upgrade setuptools wheel
+    pip install Flask==1.0.2 pyOpenSSL==19.0.0
+    yes | pip uninstall setuptools wheel
 fi
 
 if [[ ${STAGE} == 'release' ]]; then
