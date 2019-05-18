@@ -52,7 +52,7 @@ bool orionldGetContext(ConnectionInfo* ciP)
   else
   {
     // OK, might be an entity context then ...
-    
+
     QueryContextRequest   request;
     EntityId              entityId(ciP->wildcard[0], "", "false", false);
     QueryContextResponse  response;
@@ -67,7 +67,7 @@ bool orionldGetContext(ConnectionInfo* ciP)
                                             ciP->uriParamOptions,
                                             NULL,
                                             ciP->apiVersion);
-    
+
     if (response.errorCode.code == SccBadRequest)
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Bad Request", NULL, OrionldDetailsString);
@@ -84,7 +84,7 @@ bool orionldGetContext(ConnectionInfo* ciP)
         contextTree = kjTreeFromContextContextAttribute(ciP, contextAttributeP, &details);
       }
     }
-    
+
     if (contextTree == NULL)
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Context Not Found", ciP->wildcard[0], OrionldDetailsString);

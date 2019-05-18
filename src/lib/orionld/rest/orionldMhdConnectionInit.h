@@ -27,7 +27,7 @@
 */
 #include <microhttpd.h>
 
-extern "C" {  
+extern "C" {
 #include "kjson/kjson.h"                            // Kjson
 }
 
@@ -35,7 +35,7 @@ extern "C" {
 
 /* ****************************************************************************
 *
-* orionldMhdConnectionInit - 
+* orionldMhdConnectionInit -
 */
 extern int orionldMhdConnectionInit
 (

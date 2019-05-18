@@ -41,7 +41,6 @@ extern "C"
 #include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/common/numberToDate.h"                       // numberToDate
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "common/string.h"                                     // FT
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup

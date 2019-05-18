@@ -84,7 +84,7 @@ static KjNode* kjTreeFromCompoundValue2(KjNode* parentP, orion::CompoundValueNod
 
       kjChildAdd(nodeP, itemP);
     }
-    
+
     kjChildAdd(parentP, nodeP);
     break;
 

@@ -175,7 +175,7 @@ typedef enum TraceLevels
   LmtAccept,
   LmtBadVerb,
   LmtStringFilter = 254,
-  
+
 #endif
 
   LmtBug = 255

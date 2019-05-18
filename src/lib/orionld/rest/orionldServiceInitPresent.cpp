@@ -39,14 +39,14 @@ extern OrionLdRestServiceVector orionldRestServiceV[];
 
 // -----------------------------------------------------------------------------
 //
-// orionldServiceInitPresent - 
+// orionldServiceInitPresent -
 //
 void orionldServiceInitPresent(void)
 {
   for (int svIx = 0; svIx < 9; svIx++)
   {
     OrionLdRestServiceVector* serviceV = &orionldRestServiceV[svIx];
-    
+
     printf("%d REST Services for %s\n", serviceV->services, verbName((Verb) svIx));
 
     if (serviceV->services == 0)

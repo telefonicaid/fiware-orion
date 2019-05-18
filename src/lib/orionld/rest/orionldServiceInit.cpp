@@ -22,6 +22,14 @@
 *
 * Author: Ken Zangelin
 */
+#ifdef DEBUG
+#include <sys/types.h>                                         // DIR, dirent
+#include <fcntl.h>                                             // O_RDONLY
+#include <dirent.h>                                            // opendir(), readdir(), closedir()
+#include <sys/stat.h>                                          // statbuf
+#include <unistd.h>                                            // stat()
+#endif
+
 #include <microhttpd.h>
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -33,11 +41,9 @@ extern "C"
 #include "kjson/kjInit.h"                                      // kjInit
 #include "kjson/kjBufferCreate.h"                              // kjBufferCreate
 #include "kjson/kjParse.h"                                     // kjParse
-#include "kjson/kjClone.h"                                     // kjClone
 }
 
-#include "orionld/common/OrionldConnection.h"                  // orionldState
-#include "orionld/common/OrionldConnection.h"                  // Global vars: kjson, kalloc, kallocBuffer, ...
+#include "orionld/common/OrionldConnection.h"                  // Global vars: orionldState, kjson, kalloc, kallocBuffer, ...
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/context/orionldContextDownloadAndParse.h"    // orionldContextDownloadAndParse
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext, ORIONLD_CORE_CONTEXT_URL
@@ -178,17 +184,200 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 
 
 
+#ifdef DEBUG
+// -----------------------------------------------------------------------------
+//
+// contextFileParse -
+//
+int contextFileParse(char* fileBuffer, int bufLen, char** urlP, char** jsonP, char** errorStringP)
+{
+  LM_TMP(("Parsing context file"));
+  //
+  // 1. Skip initial whitespace
+  // Note: 0xD (13) is the Windows 'carriage ret' character
+  //
+  while ((*fileBuffer != 0) && ((*fileBuffer == ' ') || (*fileBuffer == '\t') || (*fileBuffer == '\n') || (*fileBuffer == 0xD)))
+    ++fileBuffer;
+
+  if (*fileBuffer == 0)
+  {
+    *errorStringP = (char*) "empty context file (or, only whitespace)";
+    return -1;
+  }
+
+
+  //
+  // 2. The URL is on the first line of the buffer
+  //
+  *urlP = fileBuffer;
+
+
+  //
+  // 3. Find the '\n' that ends the URL
+  //
+  while ((*fileBuffer != 0) && (*fileBuffer != '\n'))
+    ++fileBuffer;
+
+  if (*fileBuffer == 0)
+  {
+    *errorStringP = (char*) "can't find the end of the URL line";
+    return -1;
+  }
+
+
+  //
+  // 4. Zero-terminate URL
+  //
+  *fileBuffer = 0;
+  LM_TMP(("Got the URL: %s", *urlP));
+
+
+  //
+  // 5. Jump over the \n and onto the first char of the next line
+  //
+  ++fileBuffer;
+
+
+  //
+  // 1. Skip initial whitespace
+  // Note: 0xD (13) is the Windows 'carriage ret' character
+  //
+  while ((*fileBuffer != 0) && ((*fileBuffer == ' ') || (*fileBuffer == '\t') || (*fileBuffer == '\n') || (*fileBuffer == 0xD)))
+    ++fileBuffer;
+
+  if (*fileBuffer == 0)
+  {
+    *errorStringP = (char*) "no JSON Context found";
+    return -1;
+  }
+
+  *jsonP = fileBuffer;
+  LM_TMP(("Got the JSON: %s", *jsonP));
+
+  return 0;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// contextFileTreat -
+//
+static void contextFileTreat(char* dir, struct dirent* dirItemP)
+{
+  char*        fileBuffer;
+  struct stat  statBuf;
+  char         path[512];
+
+  LM_TMP(("Treating context file '%s/%s'", dir, dirItemP->d_name));
+
+  snprintf(path, sizeof(path), "%s/%s", dir, dirItemP->d_name);
+
+  if (stat(path, &statBuf) != 0)
+    LM_X(1, ("stat(%s): %s", path, strerror(errno)));
+
+  fileBuffer = (char*) malloc(statBuf.st_size + 1);
+  if (fileBuffer == NULL)
+    LM_X(1, ("Out of memory"));
+
+  int fd;
+
+  fd = open(path, O_RDONLY);
+  if (fd == -1)
+    LM_X(1, ("open(%s): %s", path, strerror(errno)));
+
+  int nb;
+  nb = read(fd, fileBuffer, statBuf.st_size);
+  if (nb != statBuf.st_size)
+    LM_X(1, ("read(%s): %s", path, strerror(errno)));
+  fileBuffer[statBuf.st_size] = 0;
+  close(fd);
+
+  //
+  // OK, the entire buffer is in 'fileBuffer'
+  // Now let's parse the buffer to extract URL (first line)
+  // and the "payload" that is the JSON of the context
+  //
+  char* url;
+  char* json;
+  char* errorString;
+
+  if (contextFileParse(fileBuffer, statBuf.st_size, &url, &json, &errorString) != 0)
+    LM_X(1, ("error parsing the context file '%s': %s", path, errorString));
+
+  //
+  // We have both the URL and the 'JSON Context'.
+  // Time to parse the 'JSON Context', create the OrionldContext, and insert it into the list of contexts
+  //
+  LM_TMP(("Parsing the JSON Context"));
+  KjNode* tree = kjParse(kjsonP, json);
+
+  if (tree == NULL)
+    LM_X(1, ("error parsing the JSON context of context file '%s'", path));
+
+  LM_TMP(("Parsed the JSON Context"));
+
+  //
+  // Is it any of the three special contexts?
+  //
+  if (strcmp(url, ORIONLD_CORE_CONTEXT_URL) == 0)
+  {
+    LM_TMP(("It's the OrionldCoreContext"));
+    orionldCoreContext.type   = OrionldCoreContext;
+    orionldCoreContext.url    = url;
+    orionldCoreContext.tree   = tree;
+    orionldCoreContext.ignore = true;
+    orionldCoreContext.next   = NULL;
+  }
+  else if (strcmp(url, ORIONLD_DEFAULT_URL_CONTEXT_URL) == 0)
+  {
+    LM_TMP(("It's the OrionldDefaultUrlContext"));
+    orionldDefaultUrlContext.type    = OrionldDefaultUrlContext;
+    orionldDefaultUrlContext.url     = url;
+    orionldDefaultUrlContext.tree    = tree;
+    orionldDefaultUrlContext.ignore  = true;
+    orionldDefaultUrlContext.next    = NULL;
+  }
+  else if (strcmp(url, ORIONLD_DEFAULT_CONTEXT_URL) == 0)
+  {
+    LM_TMP(("It's the OrionldDefaultContext"));
+    orionldDefaultContext.type   = OrionldDefaultContext;
+    orionldDefaultContext.url    = url;
+    orionldDefaultContext.tree   = tree;
+    orionldDefaultContext.ignore = true;
+    orionldDefaultContext.next   = NULL;
+  }
+  else
+  {
+    OrionldContext* contextP = (OrionldContext*) malloc(sizeof(OrionldContext));
+
+    LM_TMP(("It's a USER Context: %s", url));
+
+    if (contextP == NULL)
+      LM_X(1, ("Out of memory"));
+
+    contextP->url    = url;
+    contextP->tree   = tree;
+    contextP->ignore = false;
+    contextP->type   = OrionldUserContext;
+
+    orionldContextListInsert(contextP, true);  // true: sem not taken, just not needed here
+  }
+}
+#endif
+
+
+
 // -----------------------------------------------------------------------------
 //
 // orionldServiceInit -
 //
 // This function converts the OrionLdRestServiceSimplified vectors to OrionLdRestService vectors
 //
-void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int vecItems, bool defContextFromFile)
+void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int vecItems, char* cachedContextDir)
 {
   int    svIx;    // Service Vector Index
   char*  details;
-  int    retries;
 
   bzero(orionldRestServiceV, sizeof(orionldRestServiceV));
 
@@ -236,45 +425,58 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   // FIXME: Save the default context in mongo?
   //
   details  = (char*) "OK";
-  retries  = 0;
 
-  orionldCoreContext.url           = ORIONLD_CORE_CONTEXT_URL;
-  orionldCoreContext.next          = NULL;
-  orionldCoreContext.tree          = NULL;
-  orionldCoreContext.type          = OrionldCoreContext;
-  orionldCoreContext.ignore        = true;
-
-  orionldDefaultUrlContext.url     = ORIONLD_DEFAULT_URL_CONTEXT_URL;
-  orionldDefaultUrlContext.next    = NULL;
-  orionldDefaultUrlContext.tree    = NULL;
-  orionldDefaultUrlContext.type    = OrionldDefaultUrlContext;
-  orionldDefaultUrlContext.ignore  = true;
-
-  orionldDefaultContext.url        = ORIONLD_DEFAULT_CONTEXT_URL;
-  orionldDefaultContext.next       = NULL;
-  orionldDefaultContext.tree       = NULL;
-  orionldDefaultContext.type       = OrionldDefaultContext;
-  orionldDefaultContext.ignore     = true;
-
-  if (defContextFromFile == true)
+#ifdef DEBUG
+  if (cachedContextDir != NULL)
   {
-    char* buf;
+    DIR*            dirP;
+    struct  dirent  dirItem;
+    struct  dirent* result;
 
-    buf = strdup(orionldCoreContextString);
-    orionldCoreContext.tree = kjParse(kjsonP, buf);
+    dirP = opendir(cachedContextDir);
+    if (dirP == NULL)
+      LM_X(1, ("opendir(%s): %s", cachedContextDir, strerror(errno)));
 
-    buf = strdup(orionldDefaultUrlContextString);
-    orionldDefaultUrlContext.tree = kjParse(kjsonP, buf);
+    while (readdir_r(dirP, &dirItem, &result) == 0)
+    {
+      if (result == NULL)
+        break;
 
-    buf = strdup(orionldDefaultContextString);
-    orionldDefaultContext.tree = kjParse(kjsonP, buf);
+      if (dirItem.d_name[0] == '.')  // skip hidden files and '.'/'..'
+        continue;
+
+      LM_TMP(("Found a cached context file: %s", dirItem.d_name));
+      contextFileTreat(cachedContextDir, &dirItem);
+    }
+    closedir(dirP);
   }
   else
+#endif
   {
+    int    retries = 0;
+
+    orionldCoreContext.url           = ORIONLD_CORE_CONTEXT_URL;
+    orionldCoreContext.next          = NULL;
+    orionldCoreContext.tree          = NULL;
+    orionldCoreContext.type          = OrionldCoreContext;
+    orionldCoreContext.ignore        = true;
+
+    orionldDefaultUrlContext.url     = ORIONLD_DEFAULT_URL_CONTEXT_URL;
+    orionldDefaultUrlContext.next    = NULL;
+    orionldDefaultUrlContext.tree    = NULL;
+    orionldDefaultUrlContext.type    = OrionldDefaultUrlContext;
+    orionldDefaultUrlContext.ignore  = true;
+
+    orionldDefaultContext.url        = ORIONLD_DEFAULT_CONTEXT_URL;
+    orionldDefaultContext.next       = NULL;
+    orionldDefaultContext.tree       = NULL;
+    orionldDefaultContext.type       = OrionldDefaultContext;
+    orionldDefaultContext.ignore     = true;
+
     // Download the Core Context
     while ((orionldCoreContext.tree == NULL) && (retries < 5))
     {
-      orionldCoreContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_CORE_CONTEXT_URL, &details);
+      orionldCoreContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_CORE_CONTEXT_URL, false, &details);
       if (orionldCoreContext.tree != NULL)
         break;
 
@@ -286,7 +488,7 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
     retries = 0;
     while ((orionldDefaultUrlContext.tree == NULL) && (retries < 5))
     {
-      orionldDefaultUrlContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_DEFAULT_URL_CONTEXT_URL,  &details);
+      orionldDefaultUrlContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_DEFAULT_URL_CONTEXT_URL, false, &details);
       if (orionldDefaultUrlContext.tree != NULL)
         break;
 
@@ -296,9 +498,11 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
 
     // Download the "Default" context
     retries = 0;
+
     while ((orionldDefaultContext.tree == NULL) && (retries < 5))
     {
-      orionldDefaultContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_DEFAULT_CONTEXT_URL,  &details);
+      orionldDefaultContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_DEFAULT_CONTEXT_URL, false, &details);
+
       if (orionldDefaultContext.tree != NULL)
         break;
 
@@ -309,6 +513,7 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
 
   if ((orionldCoreContext.tree == NULL) || (orionldDefaultUrlContext.tree == NULL) || (orionldDefaultContext.tree == NULL))
     LM_X(1, ("EXITING - Without default context, orionld cannot function - error downloading default context '%s': %s", ORIONLD_CORE_CONTEXT_URL, details));
+
 
   // Adding the core context to the list of contexts
   orionldContextListInsert(&orionldCoreContext, false);
@@ -336,7 +541,7 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   KjNode* vocabNodeP = contextNodeP->value.firstChildP;
 
   if (strcmp(vocabNodeP->name, "@vocab") != 0)
-    LM_X(1, ("Invalid Default URL Context - first (and only) member of '@context' must be called '@vocab'"));
+    LM_X(1, ("Invalid Default URL Context - first (and only) member of '@context' must be called '@vocab' - not '%s'", vocabNodeP->name));
 
   if (vocabNodeP->type != KjString)
     LM_X(1, ("Invalid Default URL Context - the member '@vocab' must be of 'String' type"));

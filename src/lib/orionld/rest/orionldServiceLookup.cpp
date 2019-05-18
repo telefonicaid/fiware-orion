@@ -128,7 +128,7 @@ OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestService
     else if (serviceP->wildcards == 1)
     {
       LM_T(LmtServiceLookup, ("One wildcard. Comparing strlens: %d vs %d", serviceP->charsBeforeFirstWildcard, sLen));
-      
+
       if (serviceP->charsBeforeFirstWildcard < sLen)
       {
         LM_T(LmtServiceLookup, ("One wildcard. strlens OK. Comparing charsBeforeFirstWildcardSum: %d vs %d", serviceP->charsBeforeFirstWildcardSum, cSumV[serviceP->charsBeforeFirstWildcard - 1]));
@@ -160,7 +160,7 @@ OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestService
                 LM_T(LmtServiceLookup, ("******************* %s matches", serviceP->url));
 
                 ciP->wildcard[0] = &ciP->urlPath[serviceP->charsBeforeFirstWildcard + ORION_LD_SERVICE_PREFIX_LEN];
-                
+
                 // Destroying the incoming URL path, to extract the wildcard string
                 ciP->urlPath[sLen - serviceP->matchForSecondWildcardLen + ORION_LD_SERVICE_PREFIX_LEN] = 0;
                 LM_T(LmtServiceLookup, ("WILDCARD:  '%s'", ciP->wildcard[0]));
@@ -181,7 +181,7 @@ OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestService
     else
     {
       LM_T(LmtServiceLookup, ("Two wildcards. Comparing strlens: %d vs %d", serviceP->charsBeforeFirstWildcard, sLen));
-      
+
       if (serviceP->charsBeforeFirstWildcard < sLen)
       {
         LM_T(LmtServiceLookup, ("Two wildcards. strlens OK. Comparing charsBeforeFirstWildcardSum: %d vs %d", serviceP->charsBeforeFirstWildcardSum, cSumV[serviceP->charsBeforeFirstWildcard - 1]));
@@ -213,6 +213,6 @@ OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestService
 
     ++serviceIx;
   }
-    
+
   return NULL;
 }

@@ -543,9 +543,8 @@ void exitFunc(void)
   curl_context_cleanup();
   curl_global_cleanup();
 
-  LM_T(LmtFree, ("Calling kaBufferReset"));
   kaBufferReset(&kalloc, false);
-  
+
   if (unlink(pidPath) != 0)
   {
     LM_T(LmtSoftError, ("error removing PID file '%s': %s", pidPath, strerror(errno)));
@@ -998,7 +997,20 @@ int main(int argC, char* argV[])
   // Otherwise, we have empirically checked that CB may randomly crash
   //
   contextBrokerInit(dbName, mtenant);
-  orionldServiceInit(restServiceVV, 9, true);  // 'true' means no downloading of default context
+
+
+  //
+  // If the Env Var ORIONLD_CACHED_CONTEXT_DIRECTORY is set, then at startup, the broker will read all context files
+  // inside that directory and add them to the linked list of "downloaded" contexts.
+  //
+  // The main reason behind this "feature" is that functional tests take a lot less time to execute.
+  //
+  // Another reason may be to "shadow" the important default and core contexts, also for testing
+  //
+  // Actually, another interesting usage is that a functional test case could create a context before starting the broker and
+  // use that conext during the test.
+  //
+  orionldServiceInit(restServiceVV, 9, getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY"));
 
   if (https)
   {
