@@ -34,6 +34,7 @@
 #include "orionld/common/CHECK.h"                              // CHECK
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/context/orionldContextTreat.h"               // orionldContextTreat
 #include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
 #include "orionld/serviceRoutines/orionldPostEntity.h"         // Own Interface
@@ -152,7 +153,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
         char  longName[256];
         char* details;
 
-        if (orionldUriExpand(ciP->contextP, kNodeP->name, longName, sizeof(longName), &details) == false)
+        if (orionldUriExpand(orionldState.contextP, kNodeP->name, longName, sizeof(longName), &details) == false)
         {
           delete caP;
           mongoRequest.release();
@@ -193,7 +194,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   }
 
   ciP->httpStatusCode = SccNoContent;
-  httpHeaderLinkAdd(ciP, ciP->contextP, NULL);
+  httpHeaderLinkAdd(ciP, orionldState.contextP, NULL);
 
   return true;
 }

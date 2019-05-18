@@ -95,7 +95,6 @@ ConnectionInfo::ConnectionInfo():
   kjsonP                    (NULL),
   requestTree               (NULL),
   responseTree              (NULL),
-  contextP                  (NULL),
   contextToBeFreed          (false),
   prettyPrint               (false),
   prettyPrintSpaces         (2)
@@ -138,7 +137,6 @@ ConnectionInfo::ConnectionInfo(MimeType _outMimeType):
   kjsonP                    (NULL),
   requestTree               (NULL),
   responseTree              (NULL),
-  contextP                  (NULL),
   contextToBeFreed          (false),
   prettyPrint               (false),
   prettyPrintSpaces         (2)
@@ -184,7 +182,6 @@ ConnectionInfo::ConnectionInfo(std::string _url, std::string _method, std::strin
   kjsonP                    (NULL),
   requestTree               (NULL),
   responseTree              (NULL),
-  contextP                  (NULL),
   contextToBeFreed          (false),
   prettyPrint               (false),
   prettyPrintSpaces         (2)
@@ -236,13 +233,6 @@ ConnectionInfo::~ConnectionInfo()
     responseTree = NULL;
   }
 #endif
-
-  if ((contextP != NULL) && (contextP->temporary == true))
-  {
-    free(contextP->url);
-    free(contextP);
-    contextP = NULL;
-  }
 
 #if 0
   // This pointer is no longer to be used - the one in orionldState is to be used instead

@@ -134,7 +134,6 @@ public:
   Kjson*                    kjsonP;
   KjNode*                   requestTree;
   KjNode*                   responseTree;
-  OrionldContext*           contextP;
   bool                      contextToBeFreed;
   bool                      prettyPrint;
   char                      prettyPrintSpaces;
