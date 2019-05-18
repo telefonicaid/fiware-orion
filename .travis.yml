@@ -12,12 +12,10 @@ env:
   matrix:
   - STAGE=compliance
   - STAGE=unit
-  - STAGE=functional_1_200
-  - STAGE=functional_201_400
-  - STAGE=functional_401_600
-  - STAGE=functional_601_800
-  - STAGE=functional_801_1000
-  - STAGE=functional_1001_1200
+  - STAGE=functional_1_300
+  - STAGE=functional_301_600
+  - STAGE=functional_601_900
+  - STAGE=functional_901_1200
   - STAGE=release
   - STAGE=deps
 before_install:
