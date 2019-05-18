@@ -25,7 +25,9 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "rest/uriParamNames.h"                                // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "mongoBackend/mongoGetSubscriptions.h"                // mongoListSubscriptions
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/serviceRoutines/orionldGetSubscriptions.h"   // Own Interface
 
@@ -37,11 +39,19 @@
 //
 bool orionldGetSubscriptions(ConnectionInfo* ciP)
 {
+  std::vector<ngsiv2::Subscription> subVec;
+  OrionError                        oe;
+  long long                         count  = 0;
+  int                               offset = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
+  int                               limit  = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
+
   LM_T(LmtServiceRoutine, ("In orionldGetSubscription"));
 
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - GET /ngsi-ld/v1/subscriptions", NULL, OrionldDetailsString);
+  mongoListSubscriptions(&subVec, &oe, ciP->uriParam, ciP->tenant, ciP->servicePathV[0], limit, offset, &count);
 
-  ciP->httpStatusCode = SccNotImplemented;
+  LM_TMP(("Got %d subs (there is a total of %d)", subVec.size(), count));
+
+  ciP->responsePayload = (char*) "{ \"status\": \"OK\" }";
 
   return true;
 }

@@ -571,4 +571,47 @@ bool mongoGetLdSubscription
   return true;
 }
 
+
+#if 0
+/* ****************************************************************************
+*
+* mongoGetLdSubscriptions - 
+*/
+bool mongoGetLdSubscriptions
+(
+  ConnectionInfo*                     ciP,
+  std::vector<ngsiv2::Subscription>*  subVecP,
+  const char*                         tenant,
+  OrionError*                         oeP
+)
+{
+  long long count  = 0;
+  int       offset = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
+  int       limit  = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
+
+  TIMED_MONGO(mongoListSubscriptions(subVecP,
+                                     oeP,
+                                     ciP->uriParam,
+                                     ciP->tenant,
+                                     ciP->servicePathV[0],
+                                     limit,
+                                     offset,
+                                     &count));
+
+  if (oeP->code != SccOk)
+    return false;
+
+  if ((ciP->uriParamOptions["count"]))
+  {
+    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
+    ciP->httpHeaderValue.push_back(toString(count));
+  }
+
+  std::string out;
+  TIMED_RENDER(out = vectorToJson(subs));
+
+  return out;
+}
+#endif
+
 #endif

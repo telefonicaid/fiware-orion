@@ -1,0 +1,164 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Creation and DB Contebt
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create 50 subscriptions, with ids urn:ngsi-ld:Subscription:1/2/3.../50
+# 02. GET subscriptions - see the first 20
+#
+
+
+echo "01. Create 50 subscriptions, with ids urn:ngsi-ld:Subscription:sub1/2/3.../50"
+echo "============================================================================="
+typeset -i subNo;
+subNo=1
+
+while [ $subNo -le 50 ]
+do
+    subId=urn:ngsi-ld:Subscription:sub$subNo
+    name="Test subscription "$subNo
+    description="Description of Test subscription "$subNo
+    payload='{
+      "id": "'$subId'",
+      "type": "Subscription",
+      "name": "'$name'",
+      "description": "'$description'",
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:E01",
+          "type": "T1"
+        },
+        {
+          "id": "http://a.b.c/E02",
+          "type": "T2"
+        },
+        {
+          "idPattern": ".*E03.*",
+          "type": "T3"
+        }
+      ],
+      "watchedAttributes": [ "P2" ],
+      "q": "P2>10",
+      "geoQ": {
+        "geometry": "circle",
+        "coordinates": "1,2",
+        "georel": "near",
+        "geoproperty": "not supported"
+      },
+      "csf": "not implemented",
+      "isActive": false,
+      "notification": {
+        "attributes": [ "P1", "P2", "A3" ],
+        "format": "keyValues",
+        "endpoint": {
+          "uri": "http://valid.url/url",
+          "accept": "application/ld+json"
+        },
+        "status": "ignored",
+        "timesSent": "ignored",
+        "lastNotification": "ignored",
+        "lastFailure": "ignored",
+        "lastSuccess": "ignored"
+      },
+      "expires": "2028-12-31T10:00:00",
+      "throttling": 5,
+      "status": "to be ignored - read-only",
+      "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "createdAt": "ignored",
+      "modifiedAt": "ignored"
+    }'
+    orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+    subNo=$subNo+1
+    exho "------------------------------"
+  done
+echo
+echo
+
+
+echo "02. GET subscriptions - see the first 20"
+echo "========================================"
+orionCurl --url /ngsi-ld/v1/subscriptions
+echo
+echo
+
+
+--REGEXPECT--
+01. Create 50 subscriptions, with ids urn:ngsi-ld:Subscription:sub1/2/3.../50
+==========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub1
+Date: REGEX(.*)
+
+
+
+------------------------------
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub2
+Date: REGEX(.*)
+
+
+
+------------------------------
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub3
+Date: REGEX(.*)
+
+
+
+------------------------------
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub4
+Date: REGEX(.*)
+
+
+
+------------------------------
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub5
+Date: REGEX(.*)
+
+
+
+------------------------------
+
+
+02. GET subscriptions - see the first 20
+========================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
