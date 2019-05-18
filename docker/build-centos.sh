@@ -55,6 +55,7 @@ TEST_TOOLS=(
  'nc' \
  'mongodb-org' \
  'mongodb-org-shell' \
+ 'python-pip'
  'valgrind' \
 )
 
@@ -190,14 +191,13 @@ if [[ "${STAGE}" == 'deps' ]]; then
     apt-get -y install --no-install-recommends \
         ${TEST_TOOLS[@]}
 
-    echo "Builder: installing flask"
-    cd ${ROOT}
-    pip install virtualenv
-    virtualenv /venv
-    . /venv/bin/activate
-    pip install Flask==1.0.2
-    pip install pyOpenSSL==19.0.0
-    deactivate
+    echo "Builder: installing python dependencies"
+    pip install --upgrade pip && pip install Flask==1.0.2 pyOpenSSL==19.0.0
+
+    echo "Builder: urlencode"
+    curl -O https://raw.githubusercontent.com/rpmsphere/x86_64/master/u/urlencode-1.0.3-2.1.x86_64.rpm
+    rpm -U urlencode-1.0.3-2.1.x86_64.rpm
+    rm -f urlencode-1.0.3-2.1.x86_64.rpm
 fi
 
 if [[ ${STAGE} == 'release' ]]; then
