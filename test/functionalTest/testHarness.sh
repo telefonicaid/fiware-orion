@@ -241,6 +241,19 @@ function exitFunction()
       echo "-------------------------------------------------"
       echo
       echo
+      echo "/tmp/accumulator_9997_stderr:"
+      echo "-------------------------------------------------"
+      cat /tmp/accumulator_9997_stderr
+      echo "-------------------------------------------------"
+      echo
+      echo
+      echo "/tmp/accumulator_9997_stdout:"
+      echo "-------------------------------------------------"
+      cat /tmp/accumulator_9997_stdout
+      echo "-------------------------------------------------"
+      echo
+      echo
+
   elif [ $exitCode == 1 ] || [ $exitCode == 2 ] || [ $exitCode == 3 ] || [ $exitCode == 4 ] || [ $exitCode == 5 ] || [ $exitCode == 6 ]
   then
       echo
