@@ -216,7 +216,7 @@ if [[ ${STAGE} == 'release' ]]; then
 
     git clone ${REPOSITORY_SRC} ${ROOT}/orion
     cd ${ROOT}/orion
-    make all
+    make install
     strip /usr/bin/${BROKER}
 
     BOOST_VER=$(apt-cache policy libboost-all-dev | grep Installed | awk '{ print $2 }' | cut -c -6)
