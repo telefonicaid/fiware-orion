@@ -809,7 +809,7 @@ void subCacheItemInsert
     //   This 'but' should be minimized once the issue 2082 gets implemented.
     //   [ Only reason for fill() to fail (apart from out-of-memory) seems to be an invalid regex ]
     //
-   cSubP->expression.stringFilter.fill(stringFilterP, &errorString);
+    cSubP->expression.stringFilter.fill(stringFilterP, &errorString);
   }
 
   if (mdStringFilterP != NULL)

@@ -232,14 +232,14 @@ TEST(DISABLED_mongoQueryTypes, queryAllType)
     // #7  0x0000555557afe2cc in mongo::msgasserted (msgid=msgid@entry=13111, msg="field not found, expected type 4") at src/mongo/util/assert_util.cpp:143
     // #8  0x0000555557a7d1d8 in mongo::BSONElement::chk (t=4, this=0x7fffffffcaf0) at src/mongo/bson/bsonelement.h:576
     // #9  mongo::BSONElement::Array (this=0x7fffffffcaf0) at src/mongo/bson/bsonelement.cpp:343
-    // #10 0x000055555794b54a in mongoEntityTypes (responseP=0x7fffffffddf0, tenant="", servicePathV=std::vector of length 1, capacity 2 = {...}, uriParams=std::map with 5 elements = {...}, apiVersion=V1, 
+    // #10 0x000055555794b54a in mongoEntityTypes (responseP=0x7fffffffddf0, tenant="", servicePathV=std::vector of length 1, capacity 2 = {...}, uriParams=std::map with 5 elements = {...}, apiVersion=V1,
     //     totalTypesP=0x0, noAttrDetail=false) at /home/kz/git/context.Orion-LD/src/lib/mongoBackend/mongoQueryTypes.cpp:392
     // #11 0x0000555557659ed0 in mongoQueryTypes_queryAllType_Test::TestBody (this=0x5555592dd8a0) at /home/kz/git/context.Orion-LD/test/unittests/mongoBackend/mongoQueryTypes_test.cpp:219
     // #12 0x00007ffff7bc2b3d in testing::Test::Run (this=0x5555592dd8a0) at ./src/gtest.cc:2095
     // #13 0x00007ffff7bc2c78 in testing::internal::TestInfoImpl::Run (this=0x5555591874a0) at ./src/gtest.cc:2314
     // #14 0x00007ffff7bc2d35 in testing::TestCase::Run (this=0x5555591876a0) at ./src/gtest.cc:2420
     // #15 0x00007ffff7bc3200 in testing::internal::UnitTestImpl::RunAllTests (this=0x555559131b30) at ./src/gtest.cc:4024
-    // #16 0x00005555560e2ca3 in main (argC=1, argV=0x7fffffffe128) at /home/kz/git/context.Orion-LD/test/unittests/main_UnitTest.cpp:151    
+    // #16 0x00005555560e2ca3 in main (argC=1, argV=0x7fffffffe128) at /home/kz/git/context.Orion-LD/test/unittests/main_UnitTest.cpp:151
     //
     // Also DISABLED for the same problem:
     //   queryAllPaginationAll

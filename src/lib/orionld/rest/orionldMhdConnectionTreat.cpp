@@ -351,7 +351,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     LM_T(LmtServiceRoutine, ("Calling Service Routine %s", ciP->serviceP->url));
     bool b = ciP->serviceP->serviceRoutine(ciP);
-    LM_T(LmtServiceRoutine,("service routine '%s' done", ciP->serviceP->url));
+    LM_T(LmtServiceRoutine, ("service routine '%s' done", ciP->serviceP->url));
 
     if ((ciP->responseTree != NULL) && (ciP->responseTree->value.firstChildP != NULL))
       LM_T(LmtPayloadParse, ("Right after serviceRoutine, first child of response is: '%s'", ciP->responseTree->value.firstChildP->name));
@@ -367,7 +367,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     }
   }
 
-respond:
+ respond:
   //
   // For error responses, there is ALWAYS payload, describing the error
   // If, for some reason (bug!) this payload is missing, then we add a generic error response here

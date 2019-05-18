@@ -56,7 +56,7 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, type, OrionldDetailsAttribute);
     return false;
   }
-  
+
   // Create and fill in attribute and entity
   entity.id = ciP->wildcard[0];
 
@@ -72,7 +72,7 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
 
   caP->name = longAttrName;
   entity.attributeVector.push_back(caP);
-  
+
   LM_T(LmtServiceRoutine, ("Deleting attribute '%s' of entity '%s'", ciP->wildcard[1], ciP->wildcard[0]));
 
   UpdateContextRequest  ucr;

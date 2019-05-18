@@ -22,11 +22,11 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                // LM_*
-#include "logMsg/traceLevels.h"                           // Lmt*
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                          // ConnectionInfo
-#include "orionld/rest/orionldMhdConnectionPayloadRead.h" // Own interface
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/rest/orionldMhdConnectionPayloadRead.h"      // Own interface
 
 
 

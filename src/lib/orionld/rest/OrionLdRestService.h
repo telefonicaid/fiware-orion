@@ -47,7 +47,7 @@ typedef bool (*OrionldServiceRoutine)(ConnectionInfo* ciP);
 * the URL parse (service routine lookup) faster.
 * A lot faster actually, as string comparisons are avoided and instead integers are compared.
 *
-* The info extracted from this initialization stage, plus the url and service routine, is 
+* The info extracted from this initialization stage, plus the url and service routine, is
 * stored in the "real" OrionLdRestService struct, which is used during lookup of URL->service-routine.
 * The struct OrionLdRestServiceSimplified is no longer used after the creation of the OrionLdRestService items.
 * However, the URL is not copied to the OrionLdRestService items, but just pointed to from OrionLdRestService to
@@ -96,13 +96,13 @@ typedef struct OrionLdRestServiceSimplifiedVector
 //
 typedef struct OrionLdRestService
 {
-  char*                  url;                           // URL Path 
+  char*                  url;                           // URL Path
   OrionldServiceRoutine  serviceRoutine;                // Function pointer to service routine
   int                    wildcards;                     // Number of wildcards in URL: 0, 1, or 2
   int                    charsBeforeFirstWildcard;      // E.g. 8 for [/ngsi-ld/v1]/entities/*
   int                    charsBeforeFirstWildcardSum;   // -"-  'e' + 'n' + 't' + 'i' + 't' + 'i' + 'e' + 's'
   int                    charsBeforeSecondWildcard;     // E.g. 5 for [/ngsi-ld/v1]/entities/*/attrs/*
-  int                    charsBeforeSecondWildcardSum;  // -"- 'a' + 't' + 't' + 'r' + 's' - used to find start of wildcard no 2 
+  int                    charsBeforeSecondWildcardSum;  // -"- 'a' + 't' + 't' + 'r' + 's' - used to find start of wildcard no 2
   char                   matchForSecondWildcard[16];    // E.g. "/attrs/" for [/ngsi-ld/v1]/entities/*/attrs/*
   int                    matchForSecondWildcardLen;     // strlen of last path to match
   int                    supportedVerbMask;             // Bitmask of supported verbs

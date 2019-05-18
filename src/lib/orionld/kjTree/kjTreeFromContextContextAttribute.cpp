@@ -70,7 +70,7 @@ KjNode* kjTreeFromContextContextAttribute(ConnectionInfo* ciP, ContextAttribute*
     for (unsigned int ix = 0; ix < caP->compoundValueP->childV.size(); ix++)
     {
       orion::CompoundValueNode* compoundP = caP->compoundValueP->childV[ix];
-      
+
       if (compoundP->valueType != orion::ValueTypeString)
       {
         kjFree(topNodeP);
@@ -87,7 +87,7 @@ KjNode* kjTreeFromContextContextAttribute(ConnectionInfo* ciP, ContextAttribute*
   {
     LM_T(LmtContext, ("It's an Object!"));
     KjNode* objectNodeP = kjObject(ciP->kjsonP, "@context");
-    
+
     kjChildAdd(topNodeP, objectNodeP);
 
     // All members must be strings

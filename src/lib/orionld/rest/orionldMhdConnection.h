@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_REST_ORIONLDMHDCONNECTION_H_
+#define SRC_LIB_ORIONLD_REST_ORIONLDMHDCONNECTION_H_
+
 /*
 *
 * Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,7 +28,4 @@
 #include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplifiedVector
 #include "orionld/rest/orionldServiceInit.h"       // Own Interface
 
-
-
-
-
+#endif  // SRC_LIB_ORIONLD_REST_ORIONLDMHDCONNECTION_H_

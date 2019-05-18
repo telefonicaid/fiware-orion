@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
@@ -59,7 +61,7 @@ bool mongoAttributeExists(const char* entityId, const char* attributeName, const
   bob.append("_id." ENT_ENTITY_ID, entityId);
 
   bob.append("attrNames", attributeName);
-  
+
   /* Do the query on MongoDB */
   std::auto_ptr<DBClientCursor>  cursor;
   BSONObj                        query = bob.obj();
@@ -73,7 +75,7 @@ bool mongoAttributeExists(const char* entityId, const char* attributeName, const
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
-    return false;    
+    return false;
   }
 
   unsigned int docs = 0;

@@ -86,30 +86,6 @@ extern OrionldContext orionldDefaultContext;
 
 // -----------------------------------------------------------------------------
 //
-// orionldCoreContextString - to avoid download during functest
-//
-extern const char* orionldCoreContextString;
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldDefaultUrlContextString - to avoid download during functest
-//
-extern const char* orionldDefaultUrlContextString;
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldDefaultContextString - to avoid download during functest
-//
-extern const char* orionldDefaultContextString;
-
-
-
-// -----------------------------------------------------------------------------
-//
 // orionldDefaultUrl -
 //
 extern char* orionldDefaultUrl;

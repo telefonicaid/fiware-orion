@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+#include <vector>
+
 extern "C"
 {
 #include "kbase/kStringSplit.h"                                // kStringSplit
@@ -304,7 +307,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     char* details;
     char* shortName;
     char* shortNameVector[32];
-    int   vecItems = (int) sizeof(shortNameVector) / sizeof(shortNameVector[0]);;
+    int   vecItems = (int) sizeof(shortNameVector) / sizeof(shortNameVector[0]);
 
     vecItems = kStringSplit(attrs, ',', (char**) shortNameVector, vecItems);
 

@@ -81,6 +81,9 @@ def ignore(root, file):
     if 'BUILD_' in root or '.git' in root:
         return True
 
+    if 'ldcontext' in root:
+        return True
+
     # PNG files in manuals o functionalTest are ignored
     if ('manuals' in root or 'functionalTest' in root or 'apiary' in root) and file.endswith('.png'):
         return True
@@ -152,7 +155,7 @@ def supported_extension(root, file):
     :return:
     """
     extensions = ['py', 'cpp', 'h', 'xml', 'json', 'test', 'vtest', 'txt', 'sh', 'spec', 'cfg', 'DISABLED', 'xtest',
-                  'centos', 'js', 'jmx', 'vtestx', 'feature', 'go']
+                  'centos', 'js', 'jmx', 'vtestx', 'feature', 'go', 'jsonld']
     names = ['makefile', 'Makefile', 'CMakeLists.txt.orion', 'CMakeLists.txt.orionld' ]
 
     # Check extensions
@@ -169,7 +172,7 @@ def supported_extension(root, file):
 
     if 'config' in root and file == 'orionld':
         return True
-
+    
     filename = os.path.join(root, file)
     print 'not supported extension: {filename}'.format(filename=filename)
     return False

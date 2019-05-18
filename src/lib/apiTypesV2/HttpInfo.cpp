@@ -124,7 +124,7 @@ void HttpInfo::fill(const BSONObj& bo)
 #ifdef ORIONLD
   std::string mimeTypeString;
 
-  mimeTypeString = bo.hasField(CSUB_MIMETYPE)? getStringFieldF(bo,CSUB_MIMETYPE) : "application/json";  // Default
+  mimeTypeString = bo.hasField(CSUB_MIMETYPE)? getStringFieldF(bo, CSUB_MIMETYPE) : "application/json";  // Default
   this->mimeType = longStringToMimeType(mimeTypeString);
 #endif
 

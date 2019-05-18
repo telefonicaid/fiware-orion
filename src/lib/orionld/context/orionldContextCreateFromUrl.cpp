@@ -79,7 +79,7 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
     return NULL;
   }
 
-  contextP->tree = orionldContextDownloadAndParse(orionldState.kjsonP, url, detailsPP);
+  contextP->tree = orionldContextDownloadAndParse(orionldState.kjsonP, url, true, detailsPP);
   if (contextP->tree == NULL)
   {
     LM_E(("orionldContextDownloadAndParse: %s", *detailsPP));
@@ -108,7 +108,7 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
   // </DEBUG>
 
   // FIXME: Don't clone if core or vocab context
-  LM_TMP(("Cloning context tree"));
+  // LM_TMP(("Cloning context tree"));
   contextP->tree = kjClone(contextP->tree);
 
   // <DEBUG>

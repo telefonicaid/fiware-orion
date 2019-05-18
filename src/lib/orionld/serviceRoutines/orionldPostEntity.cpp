@@ -99,7 +99,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   //   FIXME: Why not remove them from the tree? Only Properties/Relationships left after that ...
   //
   KjNode* contextNodeP = NULL;
-  
+
   for (KjNode* kNodeP = ciP->requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     if (SCOMPARE9(kNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
@@ -115,7 +115,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 
       // FIXME: Remove the @context node from the tree - to avoid 'if (kNodeP != contextNodeP)' in the following loop
       break;
-    }    
+    }
   }
 
   // 3. Iterate over the object, to get all attributes

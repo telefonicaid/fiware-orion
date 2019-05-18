@@ -106,7 +106,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
     char* details;
     char* shortName;
     char* shortNameVector[32];
-    int   vecItems = (int) sizeof(shortNameVector) / sizeof(shortNameVector[0]);;
+    int   vecItems = (int) sizeof(shortNameVector) / sizeof(shortNameVector[0]);
 
     vecItems = kStringSplit(attrs, ',', (char**) shortNameVector, vecItems);
 
@@ -123,8 +123,8 @@ bool orionldGetEntity(ConnectionInfo* ciP)
 
       if (orionldUriExpand(orionldState.contextP, shortName, longName, sizeof(longName), &details) == true)
       {
-        int       len  = strlen(longName);
-        long long used = (long long) attrListEnd - (long long) attrList;
+        int  len  = strlen(longName);
+        int  used = (int) ((uint64_t) attrListEnd - (uint64_t) attrList);
 
         if (used + len > attrListLen + 1)
         {

@@ -51,10 +51,11 @@ EOF
 branchName=$(git branch | grep ^\* | awk '{ print $2 }')
 
 branchDefine=\#define\ ORIONLD_BRANCH\ \"$branchName\"
-inclusionEnd='#endif  // SRC_LIB_ORIONLD_COMMON_BRANCHNAME_H_'
 
 
 echo                  >> src/lib/orionld/common/branchName.h
 echo $branchDefine    >> src/lib/orionld/common/branchName.h
 echo                  >> src/lib/orionld/common/branchName.h
-echo $inclusionEnd    >> src/lib/orionld/common/branchName.h
+echo -n '#endif  '    >> src/lib/orionld/common/branchName.h
+
+echo '// SRC_LIB_ORIONLD_COMMON_BRANCHNAME_H_' >> src/lib/orionld/common/branchName.h
