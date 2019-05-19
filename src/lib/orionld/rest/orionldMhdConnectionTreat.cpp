@@ -382,22 +382,19 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   {
     LM_T(LmtJsonResponse, ("Rendering KJSON response tree"));
     // FIXME: Smarter allocation !!!
-    ciP->responsePayload = (char*) malloc(20480);
+    int bufLen = 1024 * 1024 * 32;
+    ciP->responsePayload = (char*) malloc(bufLen);
     if (ciP->responsePayload != NULL)
     {
       ciP->responsePayloadAllocated = true;
-      kjRender(ciP->kjsonP, ciP->responseTree, ciP->responsePayload, 20480);
+      LM_M(("Calling kjRender to render the response payload"));
+      kjRender(ciP->kjsonP, ciP->responseTree, ciP->responsePayload, bufLen);
+      LM_M(("After kjRender rendered the response payload"));
     }
     else
     {
       LM_E(("Error allocating buffer for response payload"));
-      //
-      // To have any response at all, use a pre-fabricated string:
-      //   ciP->responsePayload = ErrorPayloadForAllocationErrors;
-      //
-      // And in restReply() make sure that (ciP->responsePayload != ErrorPayloadForAllocationErrors)
-      // before calling 'free()'
-      //
+      orionldErrorResponseCreate(ciP, OrionldInternalError, "Out of memory", NULL, OrionldDetailsString);
     }
   }
 

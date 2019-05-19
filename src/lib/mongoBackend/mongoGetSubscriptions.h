@@ -81,6 +81,21 @@ extern bool mongoGetLdSubscription
   char**                 detailsP
 );
 
+
+
+/* ****************************************************************************
+*
+* mongoGetLdSubscriptions - 
+*/
+extern bool mongoGetLdSubscriptions
+(
+  ConnectionInfo*                     ciP,
+  std::vector<ngsiv2::Subscription>*  subVecP,
+  const char*                         tenant,
+  long long*                          countP,
+  OrionError*                         oeP
+);
+
 #endif  // ORIONLD
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOGETSUBSCRIPTIONS_H_
