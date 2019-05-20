@@ -34,9 +34,9 @@
 #include "common/statistics.h"
 #include "common/idCheck.h"
 #include "common/errorMessages.h"
+#include "rest/ConnectionInfo.h"
 #include "cache/subCache.h"
 #include "apiTypesV2/Subscription.h"
-
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonSubscription.h"
 #include "mongoBackend/connectionOperations.h"
@@ -568,6 +568,109 @@ bool mongoGetLdSubscription
   reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
 
   *statusCodeP = SccOk;
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoGetLdSubscriptions - 
+*/
+bool mongoGetLdSubscriptions
+(
+  ConnectionInfo*                     ciP,
+  std::vector<ngsiv2::Subscription>*  subVecP,
+  const char*                         tenant,
+  long long*                          countP,
+  OrionError*                         oeP
+)
+{
+  bool      reqSemTaken = false;
+  int       offset      = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
+  int       limit;
+
+  if (ciP->uriParam[URI_PARAM_PAGINATION_LIMIT] != "")
+  {
+    limit = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
+    if (limit <= 0)
+      limit = DEFAULT_PAGINATION_LIMIT_INT;
+  }
+  else
+    limit = DEFAULT_PAGINATION_LIMIT_INT;
+
+  reqSemTake(__FUNCTION__, "Mongo GET Subscriptions", SemReadOp, &reqSemTaken);
+
+  LM_T(LmtMongo, ("Mongo GET Subscriptions"));
+
+  /* ONTIMEINTERVAL subscriptions are not part of NGSIv2, so they are excluded.
+   * Note that expiration is not taken into account (in the future, a q= query
+   * could be added to the operation in order to filter results)
+   */
+  std::auto_ptr<DBClientCursor>  cursor;
+  std::string                    err;
+  Query                          q;
+
+  // FIXME P6: This here is a bug ... See #3099 for more info
+  if (!ciP->servicePathV[0].empty() && (ciP->servicePathV[0] != "/#"))
+  {
+    q = Query(BSON(CSUB_SERVICE_PATH << ciP->servicePathV[0]));
+  }
+
+  q.sort(BSON("_id" << 1));
+
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionRangedQuery(connection,
+                             getSubscribeContextCollectionName(tenant),
+                             q,
+                             limit,
+                             offset,
+                             &cursor,
+                             countP,
+                             &err))
+  {
+    releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+    reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
+
+    oeP->code    = SccReceiverInternalError;
+    oeP->details = err;
+    return false;
+  }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
+
+  /* Process query result */
+  unsigned int docs = 0;
+
+  while (moreSafe(cursor))
+  {
+    BSONObj  r;
+
+    if (!nextSafeOrErrorF(cursor, &r, &err))
+    {
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
+      continue;
+    }
+
+    docs++;
+    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
+
+    Subscription s;
+
+    setSubscriptionId(&s, r);
+    setDescription(&s, r);
+    setSubject(&s, r);
+    setStatus(&s, r);
+    setNotification(&s, r, tenant);
+
+    subVecP->push_back(s);
+  }
+
+  releaseMongoConnection(connection);
+  reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
+
+  oeP->code = SccOk;
   return true;
 }
 

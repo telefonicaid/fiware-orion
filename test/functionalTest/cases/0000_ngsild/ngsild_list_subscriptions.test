@@ -1,0 +1,1739 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Creation and DB Contebt
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create 50 subscriptions, with ids urn:ngsi-ld:Subscription:1/2/3.../50
+# 02. GET subscriptions - see the first 20
+# 03. GET subscriptions with limit 5 - see the first 5
+# 04. GET subscriptions with limit 5 and offset 25, see subs 25-29
+#
+
+
+echo "01. Create 50 subscriptions, with ids urn:ngsi-ld:Subscription:sub1/2/3.../50"
+echo "============================================================================="
+typeset -i subNo;
+subNo=1
+
+while [ $subNo -le 50 ]
+do
+    subNoWithZeroes=$(printf "%04d" $subNo)
+    subId=urn:ngsi-ld:Subscription:sub$subNoWithZeroes
+    name="Test subscription "$subNoWithZeroes
+    description="Description of Test subscription "$subNoWithZeroes
+    payload='{
+      "id": "'$subId'",
+      "type": "Subscription",
+      "name": "'$name'",
+      "description": "'$description'",
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:E01",
+          "type": "T1"
+        },
+        {
+          "id": "http://a.b.c/E02",
+          "type": "T2"
+        },
+        {
+          "idPattern": ".*E03.*",
+          "type": "T3"
+        }
+      ],
+      "watchedAttributes": [ "P2" ],
+      "q": "P2>10",
+      "geoQ": {
+        "geometry": "circle",
+        "coordinates": "1,2",
+        "georel": "near",
+        "geoproperty": "not supported"
+      },
+      "csf": "not implemented",
+      "isActive": false,
+      "notification": {
+        "attributes": [ "P1", "P2", "A3" ],
+        "format": "keyValues",
+        "endpoint": {
+          "uri": "http://valid.url/url",
+          "accept": "application/ld+json"
+        },
+        "status": "ignored",
+        "timesSent": "ignored",
+        "lastNotification": "ignored",
+        "lastFailure": "ignored",
+        "lastSuccess": "ignored"
+      },
+      "expires": "2028-12-31T10:00:00",
+      "throttling": 5,
+      "status": "to be ignored - read-only",
+      "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "createdAt": "ignored",
+      "modifiedAt": "ignored"
+    }'
+    orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+    subNo=$subNo+1
+  done
+echo
+echo
+
+
+echo "02. GET subscriptions - see the first 20"
+echo "========================================"
+orionCurl --url /ngsi-ld/v1/subscriptions
+echo
+echo
+
+
+echo "03. GET subscriptions with limit 5 - see the first 5"
+echo "===================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions?limit=5
+echo
+echo
+
+
+echo "04. GET subscriptions with limit 5 and offset 25, see subs 25-29"
+echo "================================================================"
+orionCurl --url '/ngsi-ld/v1/subscriptions?limit=5&offset=25'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create 50 subscriptions, with ids urn:ngsi-ld:Subscription:sub1/2/3.../50
+=============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0001
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0002
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0003
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0004
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0005
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0006
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0007
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0008
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0009
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0010
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0011
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0012
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0013
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0014
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0015
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0016
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0017
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0018
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0019
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0020
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0021
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0022
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0023
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0024
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0025
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0026
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0027
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0028
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0029
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0030
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0031
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0032
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0033
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0034
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0035
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0036
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0037
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0038
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0039
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0040
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0041
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0042
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0043
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0044
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0045
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0046
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0047
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0048
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0049
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0050
+Date: REGEX(.*)
+
+
+
+02. GET subscriptions - see the first 20
+========================================
+HTTP/1.1 200 OK
+Content-Length: 13301
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "description": "Description of Test subscription 0001",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0001",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0002",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0002",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0003",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0003",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0004",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0004",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0005",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0005",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0006",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0006",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0007",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0007",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0008",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0008",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0009",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0009",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0010",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0010",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0011",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0011",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0012",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0012",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0013",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0013",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0014",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0014",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0015",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0015",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0016",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0016",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0017",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0017",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0018",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0018",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0019",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0019",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0020",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0020",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    }
+]
+
+
+03. GET subscriptions with limit 5 - see the first 5
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 3326
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "description": "Description of Test subscription 0001",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0001",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0002",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0002",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0003",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0003",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0004",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0004",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0005",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0005",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    }
+]
+
+
+04. GET subscriptions with limit 5 and offset 25, see subs 25-29
+================================================================
+HTTP/1.1 200 OK
+Content-Length: 3326
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "description": "Description of Test subscription 0026",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0026",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0027",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0027",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0028",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0028",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0029",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0029",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0030",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "http://example.org/T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "http://example.org/T3"
+            }
+        ],
+        "expires": "2028-12-31T10:00:00Z",
+        "geoQ": {
+            "coordinates": "1,2",
+            "geometry": "circle",
+            "georel": "near"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0030",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "http://example.org/P1",
+                "http://example.org/P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues"
+        },
+        "q": "P2>10",
+        "status": "paused",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "http://example.org/P2"
+        ]
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -22,11 +22,24 @@
 *
 * Author: Ken Zangelin
 */
+#include <vector>
+
+extern "C"
+{
+#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjBuilder.h"                                   // kjObject, kjArray
+}
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "common/string.h"                                     // toString
+#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "rest/uriParamNames.h"                                // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "mongoBackend/mongoGetSubscriptions.h"                // mongoListSubscriptions
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/kjTree/kjTreeFromSubscription.h"             // kjTreeFromSubscription
 #include "orionld/serviceRoutines/orionldGetSubscriptions.h"   // Own Interface
 
 
@@ -37,11 +50,31 @@
 //
 bool orionldGetSubscriptions(ConnectionInfo* ciP)
 {
+  std::vector<ngsiv2::Subscription> subVec;
+  OrionError                        oe;
+  int64_t                           count  = 0;
+
   LM_T(LmtServiceRoutine, ("In orionldGetSubscription"));
 
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - GET /ngsi-ld/v1/subscriptions", NULL, OrionldDetailsString);
+  mongoGetLdSubscriptions(ciP, &subVec, ciP->tenant.c_str(), (long long*) &count, &oe);
 
-  ciP->httpStatusCode = SccNotImplemented;
+  if ((ciP->uriParamOptions["count"]))
+  {
+    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
+    ciP->httpHeaderValue.push_back(toString(count));
+  }
 
+  LM_TMP(("Got %d subs (there is a total of %d)", subVec.size(), count));
+
+  ciP->responseTree = kjArray(orionldState.kjsonP, NULL);
+
+  for (unsigned int ix = 0; ix < subVec.size(); ix++)
+  {
+    KjNode* subscriptionNodeP = kjTreeFromSubscription(ciP, &subVec[ix]);
+
+    kjChildAdd(ciP->responseTree, subscriptionNodeP);
+  }
+
+  LM_TMP(("From orionldGetSubscriptions"));
   return true;
 }
