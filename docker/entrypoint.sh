@@ -24,7 +24,7 @@
 #
 
 if [[ -z "${STAGE}" ]]; then
-    orionld -fg -multiservice -ngsiv1Autocast
+    orionld -fg -multiservice -ngsiv1Autocast $@
+else
+    exec "$@"
 fi
-
-exec "$@"
