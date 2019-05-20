@@ -189,6 +189,14 @@ extern void setBlacklist(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder*
 
 /* ****************************************************************************
 *
+* setOnlyChanged -
+*/
+extern void setOnlyChanged(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
+
+
+
+/* ****************************************************************************
+*
 * setMetadata -
 */
 extern void setMetadata(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);

@@ -966,6 +966,8 @@ static bool addTriggeredSubscriptions_withCache
 {
   std::string                       servicePath = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::vector<CachedSubscription*>  subVec;
+  std::vector<std::string>          condAttrs;
+  std::vector<std::string>          notifyAttrs;
 
   cacheSemTake(__FUNCTION__, "match subs for notifications");
   subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
@@ -1003,8 +1005,66 @@ static bool addTriggeredSubscriptions_withCache
     //           instead of its std::vector<std::string> ... ?
     //
     StringList aList;
-
-    aList.fill(cSubP->attributes);
+    if (cSubP->onlyChanged && !cSubP->blacklist)
+    {
+      for (unsigned int cavOc = 0; cavOc < modifiedAttrs.size(); ++cavOc)
+      {
+        for (unsigned int avOc = 0; avOc < cSubP->attributes.size(); ++avOc)
+        {
+          if (modifiedAttrs[cavOc] == cSubP->attributes[avOc])
+          {
+            condAttrs.push_back(cSubP->attributes[avOc]);
+          }
+        }
+      }
+      if (condAttrs.size() == 0)
+        continue;
+      for (unsigned int cavOc = 0; cavOc < cSubP->notifyConditionV.size(); ++cavOc)
+      {
+        for (unsigned int avOc = 0; avOc < condAttrs.size(); ++avOc)
+        {
+          if (cSubP->notifyConditionV[cavOc] == condAttrs[avOc])
+          {
+            notifyAttrs.push_back(condAttrs[avOc]);
+          }
+        }
+      }
+      if (notifyAttrs.size() == 0)
+        continue;
+      aList.fill(notifyAttrs);
+    }
+    else if (cSubP->onlyChanged && cSubP->blacklist)
+    {
+      for (unsigned int cavOc = 0; cavOc < cSubP->notifyConditionV.size(); ++cavOc)
+      {
+        for (unsigned int avOc = 0; avOc < cSubP->attributes.size(); ++avOc)
+        {
+          if (cSubP->attributes[avOc] != cSubP->notifyConditionV[cavOc])
+          {
+            condAttrs.push_back(cSubP->notifyConditionV[cavOc]);
+          }
+        }
+      }
+      if (condAttrs.size() == 0)
+        continue;
+      for (unsigned int cavOc = 0; cavOc < condAttrs.size(); ++cavOc)
+      {
+        for (unsigned int avOc = 0; avOc < modifiedAttrs.size(); ++avOc)
+        {
+          if (condAttrs[cavOc] == modifiedAttrs[avOc])
+          {
+            notifyAttrs.push_back(condAttrs[cavOc]);
+          }
+        }
+      }
+      if (notifyAttrs.size() == 0)
+        continue;
+      aList.fill(notifyAttrs);
+    }
+    else
+    {
+      aList.fill(cSubP->attributes);
+    }
 
     // Throttling
     if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
@@ -1052,7 +1112,14 @@ static bool addTriggeredSubscriptions_withCache
                                                            aList,
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant);
-    subP->blacklist = cSubP->blacklist;
+    if (cSubP->onlyChanged)
+    {
+      subP->blacklist = false;
+    }
+    else
+    {
+      subP->blacklist = cSubP->blacklist;
+    }
     subP->metadata  = cSubP->metadata;
 
     subP->fillExpression(cSubP->expression.georel, cSubP->expression.geometry, cSubP->expression.coords);
