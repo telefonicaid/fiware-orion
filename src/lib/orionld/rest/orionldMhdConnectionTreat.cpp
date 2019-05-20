@@ -344,8 +344,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     else
       orionldState.contextP = NULL;
 
-    ciP->contextP = orionldState.contextP;  // FIXME: Stop using ciP->contextP
-
     //
     // FIXME: Checking the @context from payload ... move from orionldPostEntities()
     //
