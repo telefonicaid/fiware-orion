@@ -160,6 +160,9 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
     verb     = "POST";
     resource = prefix + "/op/update";
 #if 0
+    // FIXME #3485: this part is not removed by the moment, in the case it may be useful in the
+    // context of issue #3485
+
     std::vector<std::string>  nullFilter;
     Entity*                   eP = upcrP->entityVector[0];
 

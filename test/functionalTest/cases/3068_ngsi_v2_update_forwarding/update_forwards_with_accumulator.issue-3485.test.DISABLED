@@ -31,6 +31,10 @@ accumulatorStart --pretty-print --url /v2/entities/E1/attrs
 --SHELL--
 
 #
+# FIXME: this is an old version of update_forwards_with_accumulator.test, preserved by the moment in case
+# it may be useful in the context of issue #3485
+#
+#
 # 01. Register entities of type T1, with ID .*, and attribute A1, for the accumulator
 # 02. Update E1/T1 in CB, to provoke an Update Forward - see 404 Not Found as the accumulator doesn't respond
 # 03. Dump the accumulator, see the forwarded request
