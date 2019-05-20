@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <vector>
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
@@ -50,11 +52,11 @@ bool orionldGetSubscriptions(ConnectionInfo* ciP)
 {
   std::vector<ngsiv2::Subscription> subVec;
   OrionError                        oe;
-  long long                         count  = 0;
+  int64_t                           count  = 0;
 
   LM_T(LmtServiceRoutine, ("In orionldGetSubscription"));
 
-  mongoGetLdSubscriptions(ciP, &subVec, ciP->tenant.c_str(), &count, &oe);
+  mongoGetLdSubscriptions(ciP, &subVec, ciP->tenant.c_str(), (long long*) &count, &oe);
 
   if ((ciP->uriParamOptions["count"]))
   {
