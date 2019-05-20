@@ -47,6 +47,7 @@ extern "C"
 #include "orionld/common/urnCheck.h"                           // urnCheck
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/CHECK.h"                              // CHECKx(U)
+#include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
 #include "orionld/context/orionldContextTreat.h"               // orionldContextTreat
@@ -139,7 +140,7 @@ static bool ktreeToEntities(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngs
     char  typeExpanded[256];
     char* details;
 
-    if (orionldUriExpand(ciP->contextP, typeP, typeExpanded, sizeof(typeExpanded), &details) == false)
+    if (orionldUriExpand(orionldState.contextP, typeP, typeExpanded, sizeof(typeExpanded), &details) == false)
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
       return false;
@@ -175,7 +176,7 @@ static bool ktreeToStringList(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<s
 
     STRING_CHECK(attributeP, "String-List item");
 
-    if (orionldUriExpand(ciP->contextP, attributeP->value.s, expanded, sizeof(expanded), &details) == false)
+    if (orionldUriExpand(orionldState.contextP, attributeP->value.s, expanded, sizeof(expanded), &details) == false)
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
       delete stringListP;  // ?
@@ -835,7 +836,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
 
   ciP->httpStatusCode = SccCreated;
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/subscriptions/", subId.c_str());
-  httpHeaderLinkAdd(ciP, ciP->contextP, NULL);
+  httpHeaderLinkAdd(ciP, orionldState.contextP, NULL);
 
   return true;
 }

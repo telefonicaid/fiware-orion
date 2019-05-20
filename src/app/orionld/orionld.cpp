@@ -549,6 +549,13 @@ void exitFunc(void)
   {
     LM_T(LmtSoftError, ("error removing PID file '%s': %s", pidPath, strerror(errno)));
   }
+
+  if ((orionldState.contextP != NULL) && (orionldState.contextP->temporary == true))
+  {
+    free(orionldState.contextP->url);
+    free(orionldState.contextP);
+    orionldState.contextP = NULL;
+  }
 }
 
 

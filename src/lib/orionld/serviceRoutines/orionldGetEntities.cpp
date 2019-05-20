@@ -40,6 +40,7 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
+#include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
 #include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
@@ -263,7 +264,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   if (typeVecItems == 1)  // type needs to be modified according to @context
   {
-    if (orionldUriExpand(ciP->contextP, type, typeExpanded, sizeof(typeExpanded), &details) == false)
+    if (orionldUriExpand(orionldState.contextP, type, typeExpanded, sizeof(typeExpanded), &details) == false)
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
       return false;
@@ -285,7 +286,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   {
     for (int ix = 0; ix < typeVecItems; ix++)
     {
-      if (orionldUriExpand(ciP->contextP, typeVector[ix], typeExpanded, sizeof(typeExpanded), &details) == false)
+      if (orionldUriExpand(orionldState.contextP, typeVector[ix], typeExpanded, sizeof(typeExpanded), &details) == false)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
         return false;
@@ -315,7 +316,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     {
       shortName = shortNameVector[ix];
 
-      if (orionldUriExpand(ciP->contextP, shortName, longName, sizeof(longName), &details) == true)
+      if (orionldUriExpand(orionldState.contextP, shortName, longName, sizeof(longName), &details) == true)
         parseData.qcr.res.attributeList.push_back(longName);
       else
       {

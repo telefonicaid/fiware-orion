@@ -34,6 +34,7 @@ extern "C"
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
 #include "orionld/context/orionldContextItemLookup.h"          // orionldContextItemLookup
+#include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // Own interface
 
 
@@ -87,7 +88,7 @@ void orionldErrorResponseCreate
     }
     else  // lookup 'details' in context
     {
-      KjNode*  nodeP = orionldContextItemLookup(ciP->contextP, details);
+      KjNode*  nodeP = orionldContextItemLookup(orionldState.contextP, details);
       char     contextDetailsV[512];  // FIXME: Define a max length for a context item?
 
       if (nodeP == NULL)

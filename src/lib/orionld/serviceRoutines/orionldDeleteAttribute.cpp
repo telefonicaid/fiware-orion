@@ -34,6 +34,7 @@
 
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/httpStatusCodeToOrionldErrorType.h"   // httpStatusCodeToOrionldErrorType
+#include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
 #include "orionld/serviceRoutines/orionldDeleteAttribute.h"    // Own Interface
 
@@ -51,7 +52,7 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
   Entity  entity;
 
   // Get the long name of the Context Attribute name
-  if (orionldUriExpand(ciP->contextP, ciP->wildcard[1], longAttrName, sizeof(longAttrName), &details) == false)
+  if (orionldUriExpand(orionldState.contextP, ciP->wildcard[1], longAttrName, sizeof(longAttrName), &details) == false)
   {
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, type, OrionldDetailsAttribute);
     return false;
