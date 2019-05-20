@@ -315,7 +315,6 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
   if (tree == NULL)
     LM_X(1, ("error parsing the JSON context of context file '%s'", path));
 
-  LM_TMP(("Parsed the JSON Context"));
 
   //
   // Is it any of the three special contexts?

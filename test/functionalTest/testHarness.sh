@@ -224,6 +224,38 @@ function exitFunction()
       echo  "---------------------------------------"
       cat $diffFile
       echo  "---------------------------------------"
+      echo
+
+      cat /tmp/orionld.log | egrep 'lvl=ERR|lvl=WARN' > /tmp/orionld.err-warn.log
+      if [ -s /tmp/orionld.err-warn.log ]
+      then
+          echo "Errors and warnings from the orionld log file"
+          echo "-------------------------------------------------"
+          cat /tmp/orionld.err-warn.log
+          echo "-------------------------------------------------"
+          echo
+          echo
+      fi
+
+      if [ -s /tmp/accumulator_9997_stderr ]
+      then
+          echo "/tmp/accumulator_9997_stderr:"
+          echo "-------------------------------------------------"
+          cat /tmp/accumulator_9997_stderr
+          echo "-------------------------------------------------"
+          echo
+          echo
+      fi
+
+      if [ -s /tmp/accumulator_9997_stdout ]
+      then
+          echo "/tmp/accumulator_9997_stdout:"
+          echo "-------------------------------------------------"
+          cat /tmp/accumulator_9997_stdout
+          echo "-------------------------------------------------"
+          echo
+          echo
+      fi
   elif [ $exitCode == 7 ] || [ $exitCode == 8 ] || [ $exitCode == 10 ] || [ $exitCode == 20 ] || [ $exitCode == 11 ]
   then
       echo
@@ -235,25 +267,49 @@ function exitFunction()
       echo "-------------------------------------------------"
       echo
       echo
-      echo "$stdoutFile:"
-      echo "-------------------------------------------------"
-      cat $stdoutFile
-      echo "-------------------------------------------------"
-      echo
-      echo
-      echo "/tmp/accumulator_9997_stderr:"
-      echo "-------------------------------------------------"
-      cat /tmp/accumulator_9997_stderr
-      echo "-------------------------------------------------"
-      echo
-      echo
-      echo "/tmp/accumulator_9997_stdout:"
-      echo "-------------------------------------------------"
-      cat /tmp/accumulator_9997_stdout
-      echo "-------------------------------------------------"
+
+      if [ "$verbose" == "on" ]
+      then
+          echo "$stdoutFile:"
+          echo "-------------------------------------------------"
+          cat $stdoutFile
+          echo "-------------------------------------------------"
+      else
+          echo "Run in verbose mode to see also the stdout-file $stdoutFile"
+      fi
       echo
       echo
 
+      cat /tmp/orionld.log | egrep 'lvl=ERR|lvl=WARN' > /tmp/orionld.err-warn.log
+      if [ -s /tmp/orionld.err-warn.log ]
+      then
+          echo "Errors and warnings from the orionld log file"
+          echo "-------------------------------------------------"
+          cat /tmp/orionld.err-warn.log
+          echo "-------------------------------------------------"
+          echo
+          echo
+      fi
+
+      if [ -s /tmp/accumulator_9997_stderr ]
+      then
+          echo "/tmp/accumulator_9997_stderr:"
+          echo "-------------------------------------------------"
+          cat /tmp/accumulator_9997_stderr
+          echo "-------------------------------------------------"
+          echo
+          echo
+      fi
+
+      if [ -s /tmp/accumulator_9997_stdout ]
+      then
+          echo "/tmp/accumulator_9997_stdout:"
+          echo "-------------------------------------------------"
+          cat /tmp/accumulator_9997_stdout
+          echo "-------------------------------------------------"
+          echo
+          echo
+      fi
   elif [ $exitCode == 1 ] || [ $exitCode == 2 ] || [ $exitCode == 3 ] || [ $exitCode == 4 ] || [ $exitCode == 5 ] || [ $exitCode == 6 ]
   then
       echo
@@ -573,6 +629,11 @@ function fileCleanup()
     rm $filename.blockSortDiff.out  2> /dev/null
     rm $filename.diff               2> /dev/null
 
+    cd /tmp
+    \rm -f accumulator_*_stdout
+    \rm -f accumulator_*_stderr
+    \rm -f orionld.log
+    \rm -f contextBroker.pid
     cd $olddir
   fi
 }
