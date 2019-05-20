@@ -60,6 +60,7 @@ void orionldContextListInsert(OrionldContext* contextP, bool semAlreadyTaken)
   contextP->next      = NULL;
   contextP->temporary = false;
 
+#if 0
   //
   // Presenting the list  (TMP)
   //
@@ -82,6 +83,7 @@ void orionldContextListInsert(OrionldContext* contextP, bool semAlreadyTaken)
   }
   LM_TMP(("-------------------------------------------------------------------------------------------------------"));
   LM_TMP((""));
+#endif
 
   if (semAlreadyTaken == false)
     orionldContextListSemGive(__FILE__);

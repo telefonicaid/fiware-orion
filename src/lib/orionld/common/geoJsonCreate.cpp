@@ -104,16 +104,11 @@ bool geoJsonCreate(KjNode* attrP, mongo::BSONObjBuilder* geoJsonP, char** errorS
     double  aLat;
     double  aLong;
 
-    LM_TMP(("Geo: Got a point!"));
-
     if (pointCoordsGet(orionldState.geoCoordsP, &aLong, &aLat, errorStringP) == false)
     {
       LM_E(("coordsGet: %s", *errorStringP));
       return false;
     }
-
-    LM_TMP(("Geo: Latitude:  %f", aLat));
-    LM_TMP(("Geo: Longitude: %f", aLong));
 
     geoJsonP->append("type", "Point");
     geoJsonP->append("coordinates", BSON_ARRAY(aLong << aLat));
@@ -162,7 +157,6 @@ bool geoJsonCreate(KjNode* attrP, mongo::BSONObjBuilder* geoJsonP, char** errorS
 
     // Third level
     mongo::BSONArrayBuilder  ba;
-    int                      ix  = 0;    // Just for debugging
 
     for (KjNode* l3P = l2P->value.firstChildP; l3P != NULL; l3P = l3P->next)
     {
@@ -175,9 +169,6 @@ bool geoJsonCreate(KjNode* attrP, mongo::BSONObjBuilder* geoJsonP, char** errorS
         *errorStringP = (char*) "error extracting coordinates from third level of polygon";
         return false;
       }
-
-      LM_TMP(("Geo: Latitude of Point %d of the polygon:  %f", ix, aLat));
-      LM_TMP(("Geo: Longitude of Point %d of the polygon: %f", ix, aLong));
 
       ba.append(BSON_ARRAY(aLong << aLat));
     }

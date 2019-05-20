@@ -207,7 +207,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
         }
 
         contextP->tree = kjClone(contextP->tree);   // This call may be avoided by using non-thread allocation, see FIXME on call to kjTreeFromContextContextAttribute()
-        LM_TMP(("Calling orionldContextListInsert for '%s' (after cloning it)", contextP->url));
+
         orionldContextListInsert(contextP, false);  // Inserting the context of an Entity, after not finding it in the context list
         orionldContextListPresent();
       }

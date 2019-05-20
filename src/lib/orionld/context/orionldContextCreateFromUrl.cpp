@@ -108,7 +108,6 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
   // </DEBUG>
 
   // FIXME: Don't clone if core or vocab context
-  // LM_TMP(("Cloning context tree"));
   contextP->tree = kjClone(contextP->tree);
 
   // <DEBUG>
@@ -118,7 +117,6 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
 
   LM_T(LmtContextList, ("Inserting context '%s' in common list", url));
 
-  LM_TMP(("Calling orionldContextListInsert for '%s' (after cloning tree)", contextP->url));
   orionldContextListInsert(contextP, false);
 
   if (contextP->tree->value.firstChildP->type == KjArray)
@@ -161,7 +159,6 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
       }
 
       LM_T(LmtContextList, ("Inserting context '%s' in common list", url));
-      LM_TMP(("Calling orionldContextListInsert for '%s' (after NOT cloning tree)", arrayItemContextP->url));
       orionldContextListInsert(arrayItemContextP, false);
     }
   }

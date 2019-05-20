@@ -120,15 +120,10 @@ bool orionldContextTreat
   ContextAttribute**  caPP
 )
 {
-  LM_TMP(("In orionldContextTreat. contextNodeP->type == %d", contextNodeP->type));
-
   if (contextNodeP->type == KjString)
   {
     char* details;
 
-    LM_TMP(("The context is a STRING: '%s'", contextNodeP->value.s));
-
-    LM_TMP(("Calling orionldContextCreateFromUrl for context '%s'", contextNodeP->value.s));
     if ((orionldState.contextP = orionldContextCreateFromUrl(ciP, contextNodeP->value.s, OrionldUserContext, &details)) == NULL)
     {
       LM_E(("Failed to create context from URL: %s", details));
@@ -142,7 +137,6 @@ bool orionldContextTreat
   {
     char* details;
 
-    LM_TMP(("The context is an ARRAY"));
     //
     // REMEMBER
     //   This context is just the array of context-strings: [ "url1", "url2" ]
@@ -207,8 +201,6 @@ bool orionldContextTreat
   }
   else if (contextNodeP->type == KjObject)
   {
-    LM_TMP(("The context is an OBJECT"));
-
     if (orionldContextInlineCheck(ciP, contextNodeP) == false)
     {
       // orionldContextInlineCheck sets the error response
@@ -266,12 +258,10 @@ bool orionldContextTreat
   // The attribute's value is either a string or a vector (compound)
   if (contextNodeP->type == KjString)
   {
-    LM_TMP(("contextNodeP->type == KjString"));
     caP = new ContextAttribute("@context", "ContextString", contextNodeP->value.s);
   }
   else if (contextNodeP->type == KjArray)
   {
-    LM_TMP(("contextNodeP->type == KjArray"));
     // Create the Compound, just a vector of strings
     orion::CompoundValueNode* compoundP = new orion::CompoundValueNode(orion::ValueTypeVector);
     int                       siblingNo = 0;
@@ -295,7 +285,6 @@ bool orionldContextTreat
   }
   else if (contextNodeP->type == KjObject)
   {
-    LM_TMP(("contextNodeP->type == KjObject"));
     orion::CompoundValueNode* compoundP = new orion::CompoundValueNode(orion::ValueTypeObject);
     int                       siblingNo = 0;
 

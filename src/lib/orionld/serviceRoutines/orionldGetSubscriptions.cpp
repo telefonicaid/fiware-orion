@@ -64,8 +64,6 @@ bool orionldGetSubscriptions(ConnectionInfo* ciP)
     ciP->httpHeaderValue.push_back(toString(count));
   }
 
-  LM_TMP(("Got %d subs (there is a total of %d)", subVec.size(), count));
-
   ciP->responseTree = kjArray(orionldState.kjsonP, NULL);
 
   for (unsigned int ix = 0; ix < subVec.size(); ix++)
@@ -75,6 +73,5 @@ bool orionldGetSubscriptions(ConnectionInfo* ciP)
     kjChildAdd(ciP->responseTree, subscriptionNodeP);
   }
 
-  LM_TMP(("From orionldGetSubscriptions"));
   return true;
 }

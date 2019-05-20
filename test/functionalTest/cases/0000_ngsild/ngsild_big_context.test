@@ -65,7 +65,7 @@ payload='{
     "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
   ]
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json"
 echo
 echo
 

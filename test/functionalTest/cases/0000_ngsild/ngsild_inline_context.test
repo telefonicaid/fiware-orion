@@ -103,7 +103,7 @@ payload='{
     "myP4_not_found": "http://example.org/P4"
   }
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json"
 echo
 echo
 

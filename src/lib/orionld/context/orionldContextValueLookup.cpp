@@ -147,8 +147,6 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value, b
 
   if (atContextP->type == KjObject)
   {
-    LM_TMP(("Context '%s' is an object - looking inside", contextP->url));
-
     for (KjNode* contextItemP = atContextP->value.firstChildP; contextItemP != NULL; contextItemP = contextItemP->next)
     {
       if ((contextItemP->type != KjString) && (contextItemP->type !=  KjObject))
@@ -182,7 +180,6 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value, b
             *useStringValueP = false;  // FIXME - useStringValueP not needed!
             if (strcmp(idNodeP->value.s, value) == 0)
             {
-              LM_TMP(("Found long-name '%s' as value of @id for alias '%s'", value, contextItemP->name));
               return contextItemP;
             }
           }

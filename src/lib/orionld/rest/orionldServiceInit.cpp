@@ -191,7 +191,6 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 //
 int contextFileParse(char* fileBuffer, int bufLen, char** urlP, char** jsonP, char** errorStringP)
 {
-  LM_TMP(("Parsing context file"));
   //
   // 1. Skip initial whitespace
   // Note: 0xD (13) is the Windows 'carriage ret' character
@@ -229,7 +228,6 @@ int contextFileParse(char* fileBuffer, int bufLen, char** urlP, char** jsonP, ch
   // 4. Zero-terminate URL
   //
   *fileBuffer = 0;
-  LM_TMP(("Got the URL: %s", *urlP));
 
 
   //
@@ -252,7 +250,6 @@ int contextFileParse(char* fileBuffer, int bufLen, char** urlP, char** jsonP, ch
   }
 
   *jsonP = fileBuffer;
-  LM_TMP(("Got the JSON: %s", *jsonP));
 
   return 0;
 }
@@ -268,8 +265,6 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
   char*        fileBuffer;
   struct stat  statBuf;
   char         path[512];
-
-  LM_TMP(("Treating context file '%s/%s'", dir, dirItemP->d_name));
 
   snprintf(path, sizeof(path), "%s/%s", dir, dirItemP->d_name);
 
@@ -309,7 +304,6 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
   // We have both the URL and the 'JSON Context'.
   // Time to parse the 'JSON Context', create the OrionldContext, and insert it into the list of contexts
   //
-  LM_TMP(("Parsing the JSON Context"));
   KjNode* tree = kjParse(kjsonP, json);
 
   if (tree == NULL)
@@ -321,7 +315,6 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
   //
   if (strcmp(url, ORIONLD_CORE_CONTEXT_URL) == 0)
   {
-    LM_TMP(("It's the OrionldCoreContext"));
     orionldCoreContext.type   = OrionldCoreContext;
     orionldCoreContext.url    = url;
     orionldCoreContext.tree   = tree;
@@ -330,7 +323,6 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
   }
   else if (strcmp(url, ORIONLD_DEFAULT_URL_CONTEXT_URL) == 0)
   {
-    LM_TMP(("It's the OrionldDefaultUrlContext"));
     orionldDefaultUrlContext.type    = OrionldDefaultUrlContext;
     orionldDefaultUrlContext.url     = url;
     orionldDefaultUrlContext.tree    = tree;
@@ -339,7 +331,6 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
   }
   else if (strcmp(url, ORIONLD_DEFAULT_CONTEXT_URL) == 0)
   {
-    LM_TMP(("It's the OrionldDefaultContext"));
     orionldDefaultContext.type   = OrionldDefaultContext;
     orionldDefaultContext.url    = url;
     orionldDefaultContext.tree   = tree;
@@ -349,8 +340,6 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
   else
   {
     OrionldContext* contextP = (OrionldContext*) malloc(sizeof(OrionldContext));
-
-    LM_TMP(("It's a USER Context: %s", url));
 
     if (contextP == NULL)
       LM_X(1, ("Out of memory"));
@@ -444,7 +433,6 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
       if (dirItem.d_name[0] == '.')  // skip hidden files and '.'/'..'
         continue;
 
-      LM_TMP(("Found a cached context file: %s", dirItem.d_name));
       contextFileTreat(cachedContextDir, &dirItem);
     }
     closedir(dirP);
