@@ -612,7 +612,7 @@ Orion Context Broker は、POST HTTP メソッド (サブスクリプション�
 
 次に、スロットリングがどのように強制されているかを確認します。5秒経過することなく Room1 の気圧を速やかに更新すると、2番目の通知が accumulator-server.py に到着しないことがわかります。
 
-サブスクリプションは、`GET /v2/subscriptions` (リスト全体を提供し、リストが大きすぎる場合はページネーションが必要です) または `GET /v2/subscriptions/{subId}` (サブスクリプションを1つだけ取得する) を使用して取得できます。さらに、サブスクリプションは `PATCH /v2/subscription/{subId}` オペレーションを使用して更新することができます。最後に、それらのサブスクリプションは、`DELETE /v2/subscriptions/{subId}` オペレーションを使用して削除することができます。
+サブスクリプションは、`GET /v2/subscriptions` (リスト全体を提供し、リストが大きすぎる場合はページネーションが必要です) または `GET /v2/subscriptions/{subId}` (サブスクリプションを1つだけ取得する) を使用して取得できます。さらに、サブスクリプションは `PATCH /v2/subscription/{subId}` オペレーションを使用して更新することができます。最後に、サブスクリプションは `DELETE /v2/subscriptions/{subId}` オペレーションを使って削除できます。
 
 いくつかの暫定的な考慮事項 :
 
