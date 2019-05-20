@@ -76,24 +76,42 @@ curl localhost:1026/v2/entities/Street4/attrs/temperature?type=Street -s -S \
   <http://sensor48.mycity.com/v2/entities> (i.e., the URL used in
   the `url` field at registration time, and adding "/entities" to the URL PATH).
 
-If NGSIv2 forwarding is used, the forwarded query doesn't carry any payload.
-It would be something like this:
+If NGSIv2 forwarding is used, the forwarded query would be something like the following one.
+You may wonder why `GET /v2/entities` is not used (as in the client request). This is due to
+this operation has limitations when the query includes more than one entity of different types
+(`POST /v2/op/query` is fully expressive and doesn't have that limitation).
+
+
 ```
-GET http://sensor48.mycity.com/v2/entities?id=Street4&attrs=temperature&type=Street
+POST http://sensor48.mycity.com/v2/op/query
+
+{
+  "entities": [
+    {
+      "id": "Street4",
+      "type": "Street"
+    }
+  ],
+  "attrs": [
+    "temperature"
+  ]
+}
 ```
 
 * The Context Provider at <http://sensor48.mycity.com/v2> would respond
   with the payload (message number 4):
 
 ``` 
-{
+[
+  {
     "id": "Street4",
     "type": "Street",
     "temperature": {
       "value": "16",
       "type": "float"
     }
-}
+  }
+]
 ``` 
 
 * Orion forwards the response to the client (message number 5).
@@ -127,10 +145,10 @@ Some additional comments:
     order to obtain a match. Otherwise you may encounter problems, like the one described in this
     [post at StackOverflow](https://stackoverflow.com/questions/48163972/orion-cb-doesnt-update-lazy-attributes-on-iot-agent).
 -   Query filtering (e.g. `GET /v2/entities?q=temperature>40`) is not supported on query forwarding. First, Orion
-    doesn't include the filter in the `GET /v2/entities` operation forwarded to CPr. Second, Orion doesn't filter
+    doesn't include the filter in the `POST /v2/op/query` operation forwarded to CPr. Second, Orion doesn't filter
     the CPr results before responding them back to client. An issue corresponding to this limitation has been created:
     https://github.com/telefonicaid/fiware-orion/issues/2282
--   In the case of partial updates (e.g. `POST /v2/op/entities` resulting in some entities/attributes being updated and
+-   In the case of partial updates (e.g. `POST /v2/op/update` resulting in some entities/attributes being updated and
     other entities/attributes not being updated due to failing or missing CPrs), a 404 Not Found is returned to the client.
     The `error` field in this case is `PartialUpdate` and the `description` field contains information about which entity
     attributes weren't updated.
