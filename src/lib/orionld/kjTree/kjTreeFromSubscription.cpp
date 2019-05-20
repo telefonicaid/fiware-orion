@@ -129,8 +129,6 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   {
     arrayP = kjArray(orionldState.kjsonP, "entities");
 
-    LM_TMP(("Alias: got a list of %d entities", size));
-
     for (ix = 0; ix < size; ix++)
     {
       ngsiv2::EntID* eP = &subscriptionP->subject.entities[ix];
@@ -151,8 +149,6 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
 
       char* alias = orionldAliasLookup(contextP, eP->type.c_str());
 
-      LM_TMP(("Alias: found alias '%s' for entity type long-name '%s', in context '%s'", alias, eP->type.c_str(), (contextP != NULL)? contextP->url : "None"));
-
       nodeP = kjString(orionldState.kjsonP, "type", alias);
       kjChildAdd(objectP, nodeP);
       kjChildAdd(arrayP, objectP);
@@ -172,8 +168,6 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
     {
       char* attrName = (char*) subscriptionP->subject.condition.attributes[ix].c_str();
       char* alias    = orionldAliasLookup(contextP, attrName);
-
-      LM_TMP(("Alias: found alias '%s' for watched-attribute long-name '%s', in context '%s'", alias, attrName, (contextP != NULL)? contextP->url : "None"));
 
       nodeP = kjString(orionldState.kjsonP, NULL, alias);
       kjChildAdd(arrayP, nodeP);
@@ -229,15 +223,11 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
       char*    coordinateVector    = (char*) malloc(coordinateVectorLen);
       KjNode*  coordValueP;
 
-      LM_TMP(("Geo: Transforming coordinates: '%s'", coordinateString));
       coordinateTransform(subscriptionP->subject.condition.expression.geometry.c_str(), coordinateVector, coordinateVectorLen, coordinateString);
-      LM_TMP(("Geo: Parsing coordinates: '%s'", coordinateVector));
-      LM_TMP(("Geo: -------------------------------------------"));
 
       coordValueP = kjParse(orionldState.kjsonP, coordinateVector);
       free(coordinateVector);
 
-      LM_TMP(("Geo: Parse returned %p", coordValueP));
       if (coordValueP == NULL)
       {
         LM_E(("error parsing coordinates: '%s'", coordinateString));
@@ -285,8 +275,6 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
     {
       char* attrName = (char*) subscriptionP->notification.attributes[ix].c_str();
       char* alias    = orionldAliasLookup(contextP, attrName);
-
-      LM_TMP(("Alias: found alias '%s' for notification-attribute long-name '%s', in context '%s'", alias, attrName, (contextP != NULL)? contextP->url : "None"));
 
       nodeP = kjString(orionldState.kjsonP, NULL, alias);
       kjChildAdd(arrayP, nodeP);

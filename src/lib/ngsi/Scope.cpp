@@ -116,10 +116,6 @@ int Scope::fill
 
   type = (apiVersion == V1)? FIWARE_LOCATION : FIWARE_LOCATION_V2;
 
-  LM_TMP(("Geo: geometryString: '%s'", geometryString.c_str()));
-  LM_TMP(("Geo: coordsString:   '%s'", coordsString2.c_str()));
-  LM_TMP(("Geo: georelString:   '%s'", georelString2.c_str()));
-
 #ifdef ORIONLD
   char* convertedCoordsString = NULL;
 
@@ -130,7 +126,6 @@ int Scope::fill
     int   ccsIx = 0;
 
     convertedCoordsString = (char*) calloc(1, strlen(cP));
-    LM_TMP(("Geo: ***** Initial coordsString: '%s'", coordsString2.c_str()));
 
     // Skip whitespace
     while (*cP == ' ') ++cP;
@@ -253,8 +248,6 @@ int Scope::fill
 
     if (georelString == "within")
       georelString2 = "coveredBy";
-
-    LM_TMP(("Geo: ***** Converted coords string: '%s', georel: %s", coordsString2.c_str(), georelString2.c_str()));
   }
 #endif
 
@@ -282,8 +275,6 @@ int Scope::fill
       return -1;
     }
   }
-
-  LM_TMP(("Geo: creating scope. areaType: '%s', Rel: '%s'", geometry.areaType.c_str(), georel.type.c_str()));
 
   // Check invalid combinations
   if ((geometry.areaType == "line") && (georel.type == "coveredBy"))
@@ -372,7 +363,6 @@ int Scope::fill
       return -1;
     }
 
-    LM_TMP(("Calling str2double for '%s'", coordV[0].c_str()));
     if (!str2double(coordV[0].c_str(), &latitude))
     {
       *errorStringP = "invalid coordinates";
@@ -382,7 +372,6 @@ int Scope::fill
       return -1;
     }
 
-    LM_TMP(("Calling str2double for '%s'", coordV[1].c_str()));
     if (!str2double(coordV[1].c_str(), &longitude))
     {
       *errorStringP = "invalid coordinates";
@@ -392,7 +381,6 @@ int Scope::fill
       return -1;
     }
 
-    LM_TMP(("Got coords lat-long == %f, %f", latitude, longitude));
     orion::Point* pointP = new Point(latitude, longitude);
     pointV.push_back(pointP);
   }

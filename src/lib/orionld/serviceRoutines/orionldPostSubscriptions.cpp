@@ -327,7 +327,7 @@ static bool ktreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInf
       DUPLICATE_CHECK(acceptP, "Endpoint::accept", itemP->value.s);
       STRING_CHECK(itemP, "Endpoint::accept");
       char* mimeType = itemP->value.s;
-      LM_TMP(("Accept: %s", mimeType));
+
       if (!SCOMPARE12(mimeType, 'a', 'p', 'p', 'l', 'i', 'c', 'a', 't', 'i', 'o', 'n', '/'))
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Endpoint::accept value", mimeType, OrionldDetailsString);

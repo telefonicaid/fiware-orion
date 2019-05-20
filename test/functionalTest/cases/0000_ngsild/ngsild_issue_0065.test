@@ -62,7 +62,7 @@ payload='{
         "unitCode": "mm Hg"
     }
 }'
-orionCurl --url /ngsi-ld/v1/entities --payload "$payload"  -H "Content-Type: application/ld+json"
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"  -H "Content-Type: application/ld+json" -H "Accept: application/ld+json"
 echo
 echo
 

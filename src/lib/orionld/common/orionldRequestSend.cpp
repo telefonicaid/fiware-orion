@@ -44,19 +44,10 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
   OrionldResponseBuffer*  rBufP        = (OrionldResponseBuffer*) userP;
   int                     xtraBytes    = 512;
 
-  // LM_T(LmtWriteCallback, ("Got a chunk of %d bytes: %s", bytesToCopy, (char*) contents));
-  // LM_TMP(("In writeCallback: -----------------------------------------------------------------------"));
-  // LM_TMP(("In writeCallback: Got a chunk of:   %d bytes", bytesToCopy));
-  // LM_TMP(("In writeCallback: Used Bytes:       %d",       rBufP->used));
-  // LM_TMP(("In writeCallback: Buf Size:         %d",       rBufP->size));
-  // LM_TMP(("In writeCallback: Min buf size:     %d",       rBufP->used + bytesToCopy));
-
   if (bytesToCopy + rBufP->used >= rBufP->size)
   {
-    // LM_TMP(("In writeCallback: not room enough - need to allocate"));
     if (rBufP->buf == rBufP->internalBuffer)
     {
-      // LM_TMP(("In writeCallback: internalBuffer was used, need to call malloc(%d)", rBufP->size + bytesToCopy + xtraBytes));
       rBufP->buf  = (char*) malloc(rBufP->size + bytesToCopy + xtraBytes);
 
       if (rBufP->buf == NULL)
@@ -66,14 +57,11 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
 
       if (rBufP->used > 0)  // Copy contents from internal buffer that got too small
       {
-        // LM_TMP(("In writeCallback: Copying data from internalBuffer to allocated buffer"));
         memcpy(rBufP->buf, rBufP->internalBuffer, rBufP->used);
       }
     }
     else
     {
-      // LM_TMP(("In writeCallback: We've ran out of room in the buffer, must call realloc(%d)", rBufP->size + bytesToCopy + xtraBytes));
-
       rBufP->buf = (char*) realloc(rBufP->buf, rBufP->size + bytesToCopy + xtraBytes);
       rBufP->size = rBufP->size + bytesToCopy + xtraBytes;
     }
@@ -85,14 +73,7 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
     }
   }
 
-  // LM_TMP(("In writeCallback: copying to position %d-%d in rBufP->buf (%d bytes to be copied). Buf size: %d", rBufP->used, rBufP->used + bytesToCopy, bytesToCopy, rBufP->size));
-  // LM_TMP(("In writeCallback: Start of buffer at:   %p", rBufP->buf));
-  // LM_TMP(("In writeCallback: Copying to buffer at: %p", &rBufP->buf[rBufP->used]));
-  // LM_TMP(("In writeCallback: Copying from:         %p", contents));
-  // LM_TMP(("In writeCallback: Copying bytes:        %d", bytesToCopy));
-
   memcpy(&rBufP->buf[rBufP->used], contents, bytesToCopy);
-  // LM_TMP(("In writeCallback: memcpy done"));
 
   rBufP->used += bytesToCopy;
   rBufP->buf[rBufP->used] = 0;
@@ -185,10 +166,9 @@ bool orionldRequestSend
 #endif
 
   LM_T(LmtRequestSend, ("Calling curl_easy_perform for GET %s", url));
-  // LM_TMP(("Calling curl_easy_perform for GET %s", url));
   cCode = curl_easy_perform(cc.curl);
   LM_T(LmtRequestSend, ("curl_easy_perform returned %d", cCode));
-  // LM_TMP(("curl_easy_perform returned %d", cCode));
+
   if (cCode != CURLE_OK)
   {
     *detailsPP = (char*) url;
@@ -209,7 +189,6 @@ bool orionldRequestSend
 
   // The downloaded buffer is in rBufP->buf
   LM_T(LmtRequestSend, ("Got response: %s", rBufP->buf));
-  // LM_TMP(("Got response: %s", rBufP->buf));
 
   release_curl_context(&cc);
 

@@ -279,8 +279,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
       LM_T(LmtPayloadParse, ("All good - payload parsed. ciP->requestTree at %p", ciP->requestTree));
 
-      if (ciP->requestTree->value.firstChildP != NULL)
-        LM_T(LmtPayloadParse, ("Right after kjParse, first child of request is: '%s'", ciP->requestTree->value.firstChildP->name));
 
       //
       // Looking up "@context" attribute at first level in payload
@@ -320,6 +318,17 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       goto respond;
     }
 
+
+    //
+    // If Accept: application/ld+json is not present, and the context is complex, then error
+    //
+    if ((contextNodeP != NULL) && (ciP->httpHeaders.acceptJsonld == false) && (contextNodeP->type != KjString))
+    {
+      LM_E(("Complex context but application/ld+json not accepted - this is not acceptable"));
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Unacceptable contents", "Complex context but application/ld+json not accepted", OrionldDetailsString);
+      ciP->httpStatusCode = SccBadRequest;
+      goto respond;
+    }
 
     //
     // Checking the @context in HTTP Header

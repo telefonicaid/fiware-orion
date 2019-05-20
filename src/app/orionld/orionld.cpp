@@ -1080,7 +1080,7 @@ int main(int argC, char* argV[])
     LM_W(("simulatedNotification is 'true', outgoing notifications won't be sent"));
   }
 
-  LM_TMP(("Initialization Ready - Accepting Requests on Port %d", port));
+  LM_F(("Initialization Ready - Accepting Requests on Port %d", port));
 
   while (1)
   {
