@@ -2,3 +2,4 @@
 - Add: Forwarded queries work for registrations using idPattern == '.*', but only for simple cases (#3458)
 - Fix: The 'Allow:' header for the service /v2/registrations had the incorrect value of "Allow: POST". The correct value is: "Allow: GET, POST"
 - Add: NGSIv2 forwards now works for queries - for simple cases (#3068)
+- Add: Notify only attributes that change (#3190)
