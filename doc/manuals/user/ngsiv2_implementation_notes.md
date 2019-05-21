@@ -351,6 +351,11 @@ According to NGSIv2 specification:
 
 The way in which Orion implements such forwarding is as follows:
 
+* `POST /v2/op/query` for query forwarding
+* `POST /v2/op/update` for update forwarding
+
+More information on forwarding to context information sources can be found in [this specific document](context_providers.md).
+
 Orion implements an additional field `legacyForwarding` (within `provider`) not included in the NGSIv2
 specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
 for forwarding requests associated to that registration. Although NGSIv1 is deprecated, some Context Provider may
