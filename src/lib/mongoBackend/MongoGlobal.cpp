@@ -2013,118 +2013,74 @@ bool registrationsQuery
   long long*                          countP
 )
 {
-  mongo::BSONObjBuilder    queryBuilder;
-  mongo::BSONArrayBuilder  entityOr;
 
+  // query structure:
   //
-  // If there's only one entity in the REST request, the query to mongo can be simplified.
-  // NGSIv2 requests like PATCH /v2/entities/<EID>/attrs can have only ONE entity
-  // and will ALWAYS enter the "then part" of the if-then-else.
+  // NOTE: 'cr' is and abreviation of 'contextRegistration'
   //
-  // FIXME: Note than registrations with entity id as a pattern is treated by the "then part" but not by the older "else part".
-  //        When forwarding for batch update is implemented this needs to be fixed, somehow
-  // Once NGSIv1 is removed from the source code, the "else part" can be removed by just making sure that
-  // NGSIv2 batch operations call this function once per entity in the request (modifications needed).
-  // Or, we'd need to reimplement to make the else-part also support registrations with entity id as a pattern.
+  // {
+  //   $or: [
+  //          { cr.entities.id: E1,cr.entities.type: T1} }, ...,         (isPattern = false, with type)
+  //          { cr.entities.id: E2 }, ...                                (isPattern = false, no type)
+  //          { cr.entities.id: /E.*3/, crs.entities.type: T3 } }, ...,  (isPattern = true, with type)
+  //          { cr.entities.id: /E.*4/, }, ...,                          (isPattern = true, no type)
   //
-  // Note by fgalan: actually in the entity update logic enV has always one element, by construction (remember that
-  // update logic processes entities one-by-one). In the case of entity query logic I guess that we have cases in
-  // which enV can have more than one element.
+  //          (next two ones are for "universal pattern" registrations)
   //
-  // FIXME PR: to review above text before merging
+  //          { cr.entities.id: ".*", cr.entities.isPattern: "true", crs.entities.type: {$in: [T1, T3, ...} },
+  //          { cr.entities.id: ".*", cr.entities.isPattern: "true", crs.entities.type: {$exists: false } },
+  //   ],
+  //   cr.attrs.name : { $in: [ A1, ... ] },  (only if attrs > 0)
+  //   servicePath: ... ,
+  //   expiration: { $gt: ... }
+  // }
   //
-  if (enV.size() == 1)
+  // FIXME P5: the 'contextRegistration' token (19 chars) repeats in the query BSON. It would be better use 'cr' (2 chars)
+  // but this would need a data model migration in DB
+
+  /* Build query based on arguments */
+  std::string       crEntitiesId      = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_ID;
+  std::string       crEntitiesType    = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_TYPE;
+  std::string       crEntitiesPattern = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_ISPATTERN;
+  std::string       crAttrsNames      = REG_CONTEXT_REGISTRATION "." REG_ATTRS    "." REG_ATTRS_NAME;
+  BSONArrayBuilder  entityOr;
+  BSONArrayBuilder  types;
+
+  for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
-    if ((enV[0]->id == "") && (enV[0]->type == ""))
+    const EntityId* en = enV[ix];
+    BSONObjBuilder b;
+
+    if (isTrue(en->isPattern))
     {
-      LM_E(("Bad Request (too wide query - at least one of entity::id and entity::type must be given)"));
-      *err = "too wide query";
-      return false;
+      b.appendRegex(crEntitiesId, en->id);
+    }
+    else  /* isPattern = false */
+    {
+      b.append(crEntitiesId, en->id);
     }
 
-    // Entity ID - if not given, no Entity ID in query - then ALL ENTITY IDs match, so not included in query
-    if (enV[0]->id != "")
+    if (en->type != "")
     {
-      mongo::BSONObjBuilder entityAnd;
-      mongo::BSONObjBuilder id;
-
-      // If the Registration is with idPattern, then it matches, as the only idPattern allowed for Registrations is ".*"
-      entityAnd.append("contextRegistration.entities.isPattern", "true");
-      entityAnd.append("contextRegistration.entities.id", ".*");  // FIXME TPUT: if isPattern == true, then id MUST be ".*" !  Remove?
-      entityOr.append(entityAnd.obj());
-
-      if (enV[0]->isPattern == "true") id.appendRegex("contextRegistration.entities.id", enV[0]->id);
-      else                             id.append("contextRegistration.entities.id",      enV[0]->id);
-
-      entityOr.append(id.obj());
-      queryBuilder.append("$or", entityOr.arr());
+      b.append(crEntitiesType, en->type);
+      // FIXME P3: this way of accumulating types in the BSONBuilder doesn't avoid duplication. It doesn't
+      // hurt too much, but it would be better to use a std::map to ensure uniqueness
+      types.append(en->type);
     }
-
-    // Entity Type
-    if (enV[0]->type != "")
-    {
-      queryBuilder.append("contextRegistration.entities.type", enV[0]->type);
-    }
-  }
-  else  // More than one Entity in enV
-  {
-    /* Build query based on arguments */
-    // FIXME P2: this implementation needs to be refactored for cleanup
-    std::string       contextRegistrationEntities     = REG_CONTEXT_REGISTRATION "." REG_ENTITIES;
-    std::string       contextRegistrationEntitiesId   = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_ID;
-    std::string       contextRegistrationEntitiesType = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_TYPE;
-    BSONArrayBuilder  entitiesWithType;
-    BSONArrayBuilder  entitiesWithoutType;
-
-    for (unsigned int ix = 0; ix < enV.size(); ++ix)
-    {
-      const EntityId* en = enV[ix];
-
-      if (isTrue(en->isPattern))
-      {
-        BSONObjBuilder b;
-
-        b.appendRegex(contextRegistrationEntitiesId, en->id);
-        if (en->type != "")
-        {
-          b.append(contextRegistrationEntitiesType, en->type);
-        }
-        entityOr.append(b.obj());
-      }
-      else  /* isPattern = false */
-      {
-        if (en->type == "")
-        {
-          entitiesWithoutType.append(BSON(REG_ENTITY_ISPATTERN << "true"));
-          entitiesWithoutType.append(BSON(REG_ENTITY_ID << en->id));
-          LM_T(LmtMongo, ("Entity discovery without type: id '%s'", en->id.c_str()));
-        }
-        else
-        {
-          /* We have detected that sometimes mongo stores { id: ..., type ...} and sometimes { type: ..., id: ...},
-             so we have to take both of them into account
-          */
-          entitiesWithType.append(BSON(REG_ENTITY_ID << en->id << REG_ENTITY_TYPE << en->type));
-          entitiesWithType.append(BSON(REG_ENTITY_TYPE << en->type << REG_ENTITY_ID << en->id));
-          LM_T(LmtMongo, ("Entity discovery: {id: %s, type: %s}", en->id.c_str(), en->type.c_str()));
-        }
-      }
-    }
-
-    entityOr.append(BSON(contextRegistrationEntities   << BSON("$in" << entitiesWithType.arr())));
-    entityOr.append(BSON(contextRegistrationEntitiesId << BSON("$in" << entitiesWithoutType.arr())));
-
-    /* The $or clause could be omitted if it contains only one element, but we can assume that
-     * it has no impact on MongoDB query optimizer
-     */
-    queryBuilder.append("$or", entityOr.arr());
+    entityOr.append(b.obj());
   }
 
-  //
-  // Attributes
-  //
+  // '.*' pattern match every other pattern and every not pattern entity. We add a query checking only the types
+  // and the case of no type
+  entityOr.append(BSON(crEntitiesId      << ".*" <<
+                       crEntitiesPattern << "true" <<
+                       crEntitiesType    << BSON("$in" << types.arr())));
+
+  entityOr.append(BSON(crEntitiesId      << ".*" <<
+                       crEntitiesPattern << "true" <<
+                       crEntitiesType    << BSON("$exists" << false)));
+
   BSONArrayBuilder attrs;
-  std::string      contextRegistrationAttrsNames = REG_CONTEXT_REGISTRATION "." REG_ATTRS "." REG_ATTRS_NAME;
 
   for (unsigned int ix = 0; ix < attrL.size(); ++ix)
   {
@@ -2134,21 +2090,26 @@ bool registrationsQuery
     LM_T(LmtMongo, ("Attribute discovery: '%s'", attrName.c_str()));
   }
 
+  BSONObjBuilder queryBuilder;
+
+  /* The $or clause could be omitted if it contains only one element, but we can assume that
+   * it has no impact on MongoDB query optimizer
+   */
+  queryBuilder.append("$or", entityOr.arr());
+  queryBuilder.append(REG_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+
   if (attrs.arrSize() > 0)
   {
     /* If we don't do this check, the {$in: [] } of the attribute name part makes the query fail */
-    queryBuilder.append(contextRegistrationAttrsNames, BSON("$in" << attrs.arr()));
+    queryBuilder.append(crAttrsNames, BSON("$in" << attrs.arr()));
   }
 
   //
-  // Service Path
+  // 'And-in' the service path
   //
-  queryBuilder.append(REG_SERVICE_PATH, fillQueryServicePath(servicePathV));
+  const std::string  servicePathString = REG_SERVICE_PATH;
 
-  //
-  // Expiration
-  //
-  queryBuilder.append(REG_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  queryBuilder.append(servicePathString, fillQueryServicePath(servicePathV));
 
 
   //
@@ -2196,13 +2157,11 @@ bool registrationsQuery
     std::string               format                    = getStringFieldF(r, REG_FORMAT);
     ProviderFormat            providerFormat            = (format == "")? PfJson : (format == "JSON")? PfJson : PfV2;
 
-    LM_T(LmtForward, ("--------------- %d registration elements to process", queryContextRegistrationV.size()));
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
     {
       LM_T(LmtForward, ("Processing ContextRegistrationElement. providerFormat == '%s' (%d)", format.c_str(), providerFormat));
       processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType, providerFormat);
     }
-    LM_T(LmtForward, ("--------------- %d registration elements processed - %d elementd output in crrV", queryContextRegistrationV.size(), crrV->size()));
 
     /* FIXME: note that given the response doesn't distinguish from which registration ID the
      * response comes, it could have that we have same context registration elements, belong to different
