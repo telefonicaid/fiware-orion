@@ -179,6 +179,7 @@ done
 if [[ "${STAGE}" == 'deps' ]]; then
     echo "Builder: installing mongo"
     echo -n '[mongodb-org-4.0]
+name=MongoDB Repository
 baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.0/x86_64/
 gpgcheck=1
 enabled=1
