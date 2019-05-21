@@ -1,0 +1,187 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Notify only attributes that change for NGSIv2 for error POST /v2/subscriptions, POST /v2/subscriptions, POST /v2/subscriptions.
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print localhost $LISTENER_PORT
+
+--SHELL--
+
+#
+# 01. POST /v2/subscriptions, create subscription with attrs, exceptAttrs and onlyChangedAttrs.
+# 02. POST /v2/subscriptions, create subscription with onlyChangedAttrs.
+# 03. POST /v2/subscriptions, create subscription with attrs and onlyChangedAttrs set to incorrect value.
+#
+
+echo '01. POST /v2/subscriptions, create subscription with attrs, exceptAttrs and onlyChangedAttrs.'
+echo '============================================================================================='
+payload='{
+  "description": "A subscription to get info about Room1",
+  "subject": {
+    "entities": [
+      {
+        "id": "Room1",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "A","B","C"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+	"attrs" : [
+	  "A","B"
+	],
+	"exceptAttrs" : [
+	  "C"
+	],
+    "onlyChangedAttrs":true
+  },
+  "expires": "2040-01-01T14:00:00.00Z",
+  "throttling": 5
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '02. POST /v2/subscriptions, create subscription with onlyChangedAttrs.'
+echo '======================================================================'
+payload='{
+  "description": "A subscription to get info about Room1",
+  "subject": {
+    "entities": [
+      {
+        "id": "Room1",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "A","B","C"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "onlyChangedAttrs":true
+  },
+  "expires": "2040-01-01T14:00:00.00Z",
+  "throttling": 5
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '03. POST /v2/subscriptions, create subscription with attrs and onlyChangedAttrs set to incorrect value.'
+echo '======================================================================================================='
+payload='{
+  "description": "A subscription to get info about Room1",
+  "subject": {
+    "entities": [
+      {
+        "id": "Room1",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "A","B","C"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+	"attrs" : [
+	  "A","B"
+	],
+	"onlyChangedAttrs": trrue
+  },
+  "expires": "2040-01-01T14:00:00.00Z",
+  "throttling": 5
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/subscriptions, create subscription with attrs, exceptAttrs and onlyChangedAttrs.
+=============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 99
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "http notification has attrs onlyChangedAttrs and exceptAttrs", 
+    "error": "BadRequest"
+}
+
+
+02. POST /v2/subscriptions, create subscription with onlyChangedAttrs.
+======================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 111
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "http notification has onlyChangedAttrs and neither attrs nor exceptAttrs", 
+    "error": "BadRequest"
+}
+
+
+03. POST /v2/subscriptions, create subscription with attrs and onlyChangedAttrs set to incorrect value.
+=======================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Errors found in incoming JSON buffer", 
+    "error": "ParseError"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop $LISTENER_PORT
+dbDrop CB
