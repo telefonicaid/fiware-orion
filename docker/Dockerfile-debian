@@ -13,6 +13,6 @@ COPY . /usr/local/bin/
 
 RUN build.sh -T ${TOKEN} -p ${PLATFORM} -s ${STAGE} -c -B ${REV}
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["orionld", "-fg", "-multiservice", "-ngsiv1Autocast"]
 
 EXPOSE 1026

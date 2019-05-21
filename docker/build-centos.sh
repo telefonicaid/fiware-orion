@@ -53,8 +53,6 @@ TEST_TOOLS=(
  'bc' \
  'nano' \
  'nc' \
- 'mongodb-org' \
- 'mongodb-org-shell' \
  'python-pip' \
  'valgrind' \
 )
@@ -179,6 +177,19 @@ do
 done
 
 if [[ "${STAGE}" == 'deps' ]]; then
+    echo "Builder: installing mongo"
+    echo -n '[mongodb-org-4.0]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.0/x86_64/
+gpgcheck=1
+enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-4.0.asc
+' > /etc/yum.repos.d/mongodb-org-4.0.repo
+
+    yum -y install \
+        mongodb-org \
+        mongodb-org-shell
+
     echo "Builder: installing gmock"
     curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2 | tar xjC ${ROOT}
     cd ${ROOT}/gmock-1.5.0
