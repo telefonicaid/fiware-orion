@@ -335,8 +335,6 @@ for the following aspects:
   directly. I.e., updates must be done deleting and re-creating the registration. Please
   see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3007) about this.
 * `idPattern` is supported but only for the exact regular expression `.*`
-  And, right now (2019-03-21), only forwarding of queries is working for registrations with idPatterns.
-  forwarded updates do not work for registrations with idPattern (the plan is to fix this asap). 
 * `typePattern` is not implemented.
 * The only valid `supportedForwardingMode` is `all`. Trying to use any other value will end
   in a 501 Not Implemented error response. Please
@@ -352,6 +350,11 @@ According to NGSIv2 specification:
 > A NGSIv2 server implementation may implement query or update forwarding to context information sources.
 
 The way in which Orion implements such forwarding is as follows:
+
+* `POST /v2/op/query` for query forwarding
+* `POST /v2/op/update` for update forwarding
+
+More information on forwarding to context information sources can be found in [this specific document](context_providers.md).
 
 Orion implements an additional field `legacyForwarding` (within `provider`) not included in the NGSIv2
 specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
