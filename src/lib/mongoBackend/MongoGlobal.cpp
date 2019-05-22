@@ -2013,7 +2013,6 @@ bool registrationsQuery
   long long*                          countP
 )
 {
-
   // query structure:
   //
   // NOTE: 'cr' is and abreviation of 'contextRegistration'
