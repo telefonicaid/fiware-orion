@@ -32,6 +32,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/string.h"
+#include "common/JsonHelper.h"
 #include "ngsi/StringList.h"
 
 
@@ -57,6 +58,24 @@ void StringList::fill(const std::vector<std::string>& sVec)
 void StringList::fill(const std::string& commaSeparatedList)
 {
   stringSplit(commaSeparatedList, ',', stringV);
+}
+
+
+
+/* ****************************************************************************
+*
+* StringList::toJson -
+*/
+std::string StringList::toJson(void)
+{
+  JsonVectorHelper jh;
+
+  for (unsigned int ix = 0; ix < stringV.size(); ++ix)
+  {
+    jh.addString(stringV[ix]);
+  }
+
+  return jh.str();
 }
 
 

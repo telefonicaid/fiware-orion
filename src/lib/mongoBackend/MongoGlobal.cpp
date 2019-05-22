@@ -772,7 +772,16 @@ bool includedEntity(EntityId en, const EntityIdVector& entityIdV)
 {
   for (unsigned int ix = 0; ix < entityIdV.size(); ++ix)
   {
-    if (matchEntity(&en, entityIdV[ix]))
+    if (en.isPatternIsTrue() && en.id == ".*")
+    {
+      // By the moment the only supported pattern is .*. In this case matching is
+      // based exclusively in type
+      if (en.type == entityIdV[ix]->type)
+      {
+        return true;
+      }
+    }
+    else if (matchEntity(&en, entityIdV[ix]))
     {
       return true;
     }
@@ -2004,49 +2013,71 @@ bool registrationsQuery
   long long*                          countP
 )
 {
+  // query structure:
+  //
+  // NOTE: 'cr' is and abreviation of 'contextRegistration'
+  //
+  // {
+  //   $or: [
+  //          { cr.entities.id: E1,cr.entities.type: T1} }, ...,         (isPattern = false, with type)
+  //          { cr.entities.id: E2 }, ...                                (isPattern = false, no type)
+  //          { cr.entities.id: /E.*3/, crs.entities.type: T3 } }, ...,  (isPattern = true, with type)
+  //          { cr.entities.id: /E.*4/, }, ...,                          (isPattern = true, no type)
+  //
+  //          (next two ones are for "universal pattern" registrations)
+  //
+  //          { cr.entities.id: ".*", cr.entities.isPattern: "true", crs.entities.type: {$in: [T1, T3, ...} },
+  //          { cr.entities.id: ".*", cr.entities.isPattern: "true", crs.entities.type: {$exists: false } },
+  //   ],
+  //   cr.attrs.name : { $in: [ A1, ... ] },  (only if attrs > 0)
+  //   servicePath: ... ,
+  //   expiration: { $gt: ... }
+  // }
+  //
+  // FIXME P5: the 'contextRegistration' token (19 chars) repeats in the query BSON. It would be better use 'cr' (2 chars)
+  // but this would need a data model migration in DB
+
   /* Build query based on arguments */
-  // FIXME P2: this implementation needs to be refactored for cleanup
-  std::string       contextRegistrationEntities     = REG_CONTEXT_REGISTRATION "." REG_ENTITIES;
-  std::string       contextRegistrationEntitiesId   = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_ID;
-  std::string       contextRegistrationEntitiesType = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_TYPE;
-  std::string       contextRegistrationAttrsNames   = REG_CONTEXT_REGISTRATION "." REG_ATTRS    "." REG_ATTRS_NAME;
+  std::string       crEntitiesId      = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_ID;
+  std::string       crEntitiesType    = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_TYPE;
+  std::string       crEntitiesPattern = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_ISPATTERN;
+  std::string       crAttrsNames      = REG_CONTEXT_REGISTRATION "." REG_ATTRS    "." REG_ATTRS_NAME;
   BSONArrayBuilder  entityOr;
-  BSONArrayBuilder  entitiesWithType;
-  BSONArrayBuilder  entitiesWithoutType;
+  BSONArrayBuilder  types;
 
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
     const EntityId* en = enV[ix];
+    BSONObjBuilder b;
 
     if (isTrue(en->isPattern))
     {
-      BSONObjBuilder b;
-
-      b.appendRegex(contextRegistrationEntitiesId, en->id);
-      if (en->type != "")
-      {
-        b.append(contextRegistrationEntitiesType, en->type);
-      }
-      entityOr.append(b.obj());
+      b.appendRegex(crEntitiesId, en->id);
     }
     else  /* isPattern = false */
     {
-      if (en->type == "")
-      {
-        entitiesWithoutType.append(en->id);
-        LM_T(LmtMongo, ("Entity discovery without type: id '%s'", en->id.c_str()));
-      }
-      else
-      {
-        /* We have detected that sometimes mongo stores { id: ..., type ...} and sometimes { type: ..., id: ...},
-           so we have to take both of them into account
-        */
-        entitiesWithType.append(BSON(REG_ENTITY_ID << en->id << REG_ENTITY_TYPE << en->type));
-        entitiesWithType.append(BSON(REG_ENTITY_TYPE << en->type << REG_ENTITY_ID << en->id));
-        LM_T(LmtMongo, ("Entity discovery: {id: %s, type: %s}", en->id.c_str(), en->type.c_str()));
-      }
+      b.append(crEntitiesId, en->id);
     }
+
+    if (en->type != "")
+    {
+      b.append(crEntitiesType, en->type);
+      // FIXME P3: this way of accumulating types in the BSONBuilder doesn't avoid duplication. It doesn't
+      // hurt too much, but it would be better to use a std::map to ensure uniqueness
+      types.append(en->type);
+    }
+    entityOr.append(b.obj());
   }
+
+  // '.*' pattern match every other pattern and every not pattern entity. We add a query checking only the types
+  // and the case of no type
+  entityOr.append(BSON(crEntitiesId      << ".*" <<
+                       crEntitiesPattern << "true" <<
+                       crEntitiesType    << BSON("$in" << types.arr())));
+
+  entityOr.append(BSON(crEntitiesId      << ".*" <<
+                       crEntitiesPattern << "true" <<
+                       crEntitiesType    << BSON("$exists" << false)));
 
   BSONArrayBuilder attrs;
 
@@ -2057,9 +2088,6 @@ bool registrationsQuery
     attrs.append(attrName);
     LM_T(LmtMongo, ("Attribute discovery: '%s'", attrName.c_str()));
   }
-
-  entityOr.append(BSON(contextRegistrationEntities   << BSON("$in" << entitiesWithType.arr())));
-  entityOr.append(BSON(contextRegistrationEntitiesId << BSON("$in" << entitiesWithoutType.arr())));
 
   BSONObjBuilder queryBuilder;
 
@@ -2072,7 +2100,7 @@ bool registrationsQuery
   if (attrs.arrSize() > 0)
   {
     /* If we don't do this check, the {$in: [] } of the attribute name part makes the query fail */
-    queryBuilder.append(contextRegistrationAttrsNames, BSON("$in" << attrs.arr()));
+    queryBuilder.append(crAttrsNames, BSON("$in" << attrs.arr()));
   }
 
   //
@@ -2765,10 +2793,11 @@ void fillContextProviders(ContextElementResponse* cer, const ContextRegistration
     }
 
     /* Search for some CPr in crrV */
-    std::string  perEntPa;
-    std::string  perAttrPa;
-    MimeType     perEntPaMimeType  = NOMIMETYPE;
-    MimeType     perAttrPaMimeType = NOMIMETYPE;
+    std::string     perEntPa;
+    std::string     perAttrPa;
+    MimeType        perEntPaMimeType  = NOMIMETYPE;
+    MimeType        perAttrPaMimeType = NOMIMETYPE;
+    ProviderFormat  providerFormat;
 
     cprLookupByAttribute(cer->entity,
                          ca->name,
@@ -2776,10 +2805,12 @@ void fillContextProviders(ContextElementResponse* cer, const ContextRegistration
                          &perEntPa,
                          &perEntPaMimeType,
                          &perAttrPa,
-                         &perAttrPaMimeType);
+                         &perAttrPaMimeType,
+                         &providerFormat);
 
     /* Looking results after crrV processing */
     ca->providingApplication.set(perAttrPa == "" ? perEntPa : perAttrPa);
+    ca->providingApplication.setProviderFormat(providerFormat);
     ca->found = (ca->providingApplication.get() != "");
   }
 }
@@ -2826,7 +2857,8 @@ void cprLookupByAttribute
   std::string*                              perEntPa,
   MimeType*                                 perEntPaMimeType,
   std::string*                              perAttrPa,
-  MimeType*                                 perAttrPaMimeType
+  MimeType*                                 perAttrPaMimeType,
+  ProviderFormat*                           providerFormatP
 )
 {
   *perEntPa  = "";
@@ -2841,7 +2873,17 @@ void cprLookupByAttribute
     {
       EntityId* regEn = crr->contextRegistration.entityIdVector[enIx];
 
-      if (regEn->id != en.id || (regEn->type != en.type && regEn->type != ""))
+      if (regEn->isPatternIsTrue() && regEn->id == ".*")
+      {
+        // By the moment the only supported pattern is .*. In this case matching is
+        // based exclusively in type
+        if (regEn->type != en.type && regEn->type != "")
+        {
+          /* No match (keep searching the CRR) */
+          continue;
+        }
+      }
+      else if (regEn->id != en.id || (regEn->type != en.type && regEn->type != ""))
       {
         /* No match (keep searching the CRR) */
         continue;
@@ -2851,6 +2893,7 @@ void cprLookupByAttribute
       if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
       {
         *perEntPa         = crr->contextRegistration.providingApplication.get();
+        *providerFormatP  =  crr->contextRegistration.providingApplication.getProviderFormat();
 
         break;  /* enIx */
       }
@@ -2863,6 +2906,7 @@ void cprLookupByAttribute
         {
           /* We cannot "improve" this result by keep searching the CRR vector, so we return */
           *perAttrPa         = crr->contextRegistration.providingApplication.get();
+          *providerFormatP  =  crr->contextRegistration.providingApplication.getProviderFormat();
 
           return;
         }

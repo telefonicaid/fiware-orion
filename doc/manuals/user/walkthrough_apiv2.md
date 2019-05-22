@@ -801,7 +801,7 @@ Subscriptions can be retrieved using `GET /v2/subscriptions` (which
 provides the whole list and [pagination](pagination.md) may be needed if the
 list is too large) or `GET /v2/subscriptions/{subId}` (to get a single
 subscription). In addition, subscriptions can be updated using the `PATCH /v2/subscription/{subId}`
-operation. Finally, they subscriptios be deleted using the `DELETE /v2/subscriptions/{subId}` operation.
+operation. Finally, subscriptions can be deleted using the `DELETE /v2/subscriptions/{subId}` operation.
 
 Some additional considerations:
 

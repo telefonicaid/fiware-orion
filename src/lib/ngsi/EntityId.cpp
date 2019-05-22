@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "common/JsonHelper.h"
 #include "ngsi/EntityId.h"
 #include "common/tag.h"
 #include "common/JsonHelper.h"
@@ -73,6 +74,34 @@ EntityId::EntityId
     creDate(0),
     modDate(0)
 {
+}
+
+
+
+/* ****************************************************************************
+*
+* EntityId::toJson -
+*
+*/
+std::string EntityId::toJson(void)
+{
+  JsonObjectHelper jh;
+
+  if (isTrue(isPattern))
+  {
+    jh.addString("idPattern", id);
+  }
+  else
+  {
+    jh.addString("id", id);
+  }
+
+  if (!type.empty())
+  {
+    jh.addString("type", type);
+  }
+
+  return jh.str();
 }
 
 

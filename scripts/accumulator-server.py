@@ -313,6 +313,8 @@ def send_continue(request):
 
 @app.route("/v1/updateContext", methods=['POST'])
 @app.route("/v1/queryContext", methods=['POST'])
+@app.route("/v2/op/query", methods=['POST'])
+@app.route("/v2/op/update", methods=['POST'])
 @app.route("/v2/entities", methods=['GET'])
 @app.route(server_url, methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH'])
 def record():
