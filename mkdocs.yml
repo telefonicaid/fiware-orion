@@ -2,8 +2,9 @@ site_name: Fiware-Orion
 site_url: https://fiware-orion.readthedocs.org
 repo_url: https://github.com/telefonicaid/fiware-orion
 site_description: Orion Context Broker Documentation
-docs_dir: doc
+docs_dir: doc/manuals
 site_dir: html
+edit_uri: edit/master/doc/manuals
 markdown_extensions: [toc,fenced_code]
 use_directory_urls: false
 theme: readthedocs
