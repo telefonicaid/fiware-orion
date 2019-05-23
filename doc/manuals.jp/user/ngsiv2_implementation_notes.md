@@ -297,10 +297,7 @@ NGSIv2 仕様に含まれるものに対する追加の URI パラメータ・�
 Orion は、次の点を除いて、NGSIv2 仕様に記載されているレジストレーション管理を実装しています。
 
 * `PATCH /v2/registration/<id>` は実装されていません。したがって、レジストレーションを直接更新することはできません。つまり、レジストレーションを削除して再作成する必要があります。[この issue](https://github.com/telefonicaid/fiware-orion/issues/3007)についてはこちらをご覧ください
-* `idPattern` はサポートされていますが、厳密な正規表現 `.*` に対してのみです。
-   そして、今 (2019-03-21)、idPatterns を使ったレジストレーションではクエリの
-   転送のみが有効です。転送された更新は、idPattern を使用したレジストレーション
-   では機能しません (計画はこれをできるだけ早く修正することです)
+* `idPattern` はサポートされています
 * `typePattern` は実装されていません
 * 唯一の有効な `supportedForwardingMode` は `all` です。他の値を使用しようとすると、501 Not Implemented エラー応答で終了します。[この issue](https://github.com/telefonicaid/fiware-orion/issues/3106) についてはこちらをご覧ください
 * `dataProvided` 内での `expression` フィールドはサポートされていません。フィールドは単に無視されます。これについては [この issue](https://github.com/telefonicaid/fiware-orion/issues/3107) を見てください。
@@ -311,6 +308,11 @@ NGSIv2 仕様によると :
 > NGSIv2 サーバ実装は、コンテキスト情報ソースへのクエリまたは更新転送を実装することができます
 
 Orion がこのような転送を実装する方法は次のとおりです :
+
+* `POST /v2/op/query` クエリ転送のため
+* `POST /v2/op/update` 更新転送のため
+
+コンテキスト情報ソースへの転送に関するより多くの情報は、この[ドキュメント](context_providers.md)にあります。
 
 Orion は NGSIv2 仕様に含まれていない追加フィールド (`provider` 内の) `legacyForwarding`を実装しています。`legacyForwarding` の値が `true` の場合、NGSIv1 ベースのクエリ/更新はそのレジストレーションに関連したリクエストを転送するために使用されます。NGSIv1 は廃止予定ですが、一部のコンテキスト・プロバイダはまだ NGSIv2 に移行されていない可能性があるため、このモードは便利です。
 
