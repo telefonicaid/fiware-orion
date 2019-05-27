@@ -43,7 +43,7 @@ to decide what to prioritize.
 However, in order to help administrators in this task, the following *general* indexes are recommended:
 
 * Collection [entities](database_model.md#entities-collection)
-    * `{_id.servicePath: 1, _id.id: 1, _id.type: 1}` (note that is a compound index and key order matters in this case)
+    * `{_id.servicePath: 1, _id.id: 1, _id.type: 1}` (note that this is a compound index and key order matters in this case)
     * `creDate`
 
 In addition, depending on your queries, you may need *additional* indexes.
