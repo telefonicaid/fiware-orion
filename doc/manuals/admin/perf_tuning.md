@@ -43,22 +43,22 @@ to decide what to prioritize.
 However, in order to help administrators in this task, the following *general* indexes are recommended:
 
 * Collection [entities](database_model.md#entities-collection)
-    * `{_id.servicePath: 1, _id.id: 1, _id.type: 1}` (note this is a compound index and key order matters in this case)
+    * `{_id.servicePath: 1, _id.id: 1, _id.type: 1}` (note that is a compound index and key order matters in this case)
     * `creDate`
 
-In addition, depending on your queries you could need *additional* indexes.
+In addition, depending on your queries, you may need *additional* indexes.
 
 * In the case of using attribute filters in queries (e.g. `GET /v2/entities?q=A<10`), it is recommended to create
 indexes for them. In particular if you are filtering by a given attribute 'A' then you should create an index 
 `{attrs.A.value: 1}`. If you are filtering by several attributes in the same query (e.g. `GET /v2/entities?q=A<10;B>20`
-you should combine all them in a compound index `{attrs.A.value: 1, attrs.B.value: 1}` (key order doesn't matter in this case).
+you should combine them all in a compound index `{attrs.A.value: 1, attrs.B.value: 1}` (key order doesn't matter in this case).
 
 * In the case of using `orderBy` queries (i.e. `GET /v2/entities?orderBy=A`), it is recommended 
 to create indexes for them. In particular, if you are ordering by a given attribute 'A' in ascending order
 (i.e. `orderBy=A`) you should create an index `{attrs.A.value: 1}`. In the case of ordering by a given
 attribute 'A' in descending order (i.e. `orderBy=!A`) you should create an index `{attrs.A.value: -1}`. In the case
 of using several attributes for ordering (i.e. `orderBy=A,!B,C`) you should create a compound index taking into
-account ordering direction, i.e. `{attrs.A.value: 1, attrs.B.value: -1, attrs.C.value: 1}` (key order matters in this case)
+account the ordering direction, i.e. `{attrs.A.value: 1, attrs.B.value: -1, attrs.C.value: 1}` (key order matters in this case)
 
 * The above rules have a slight modification when the filter is `dateCreate` or `dateModified`. In the case of entity
 creation/modification date (e.g. `GET /v2/entities?dateModified<2019-01-01`), use `creDate` and `modDate` instead of `attrs.A.value`. In the case of attribute creation/modification date (e.g. `GET /v2/entities?mq=A.dateModified<2019-01-01`), use `attrs.A.creDate` and `attrs.A.modDate` instead of `attrs.A.value`).
@@ -70,7 +70,7 @@ Orion startup or when entities are created.
 * An index with `expireAfterSeconds: 0` for the `expDate` field in the entities collection, due to functional needs of the [transient entities functionality](../user/transient_entities.md).
 
 You can find an analysis about the effect of indexes in [this document](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/admin/extra/indexes_analysis.md), although
-it is based on an old Orion version, so it is probably outdated. In addition, please find some useful references about [compound indexes](https://docs.mongodb.com/manual/core/index-compound/) and [sort results with indexes](https://docs.mongodb.com/manual/tutorial/sort-results-with-indexes/) from MongoDB official documentation.
+it is based on an old Orion version, so it is probably outdated. In addition, please find some useful references about [compound indexes](https://docs.mongodb.com/manual/core/index-compound/) and [sort results with indexes](https://docs.mongodb.com/manual/tutorial/sort-results-with-indexes/) from the MongoDB official documentation.
 
 [Top](#top)
 
