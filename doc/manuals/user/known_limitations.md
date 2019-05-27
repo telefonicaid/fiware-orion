@@ -2,7 +2,7 @@
 
 ## Request maximum size
 
-The current maximum request size in Orion Context Broker is 1 MB. This
+The current default maximum request size in Orion Context Broker is 1 MB. This
 limit should suffice the most of the use cases and, at the same time,
 avoids denial of service due to too large requests. If you don't take
 this limitation into account, you will get messages such the following
@@ -29,8 +29,8 @@ Or, if you are sending a huge request, this one:
 carefully" text. Developers of the HTTP library in which Orion Context
 Broker is based seem to be funny guys :) :)
 
-If you find this 1MB limit too coarse, send us an email so we can
-consider your feedback in future releases.
+If this 1 MB limit doesn't work for you, you can change it using the CLI option -payloadMaxSize.
+But, this is untested territory. At your own risk ...
 
 ## Notification maximum size
 
