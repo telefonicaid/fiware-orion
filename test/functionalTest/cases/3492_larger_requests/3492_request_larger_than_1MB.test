@@ -1,0 +1,91 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Large request - starting the broker to accept very large requests
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255 IPV4 -payloadMaxSize 50000000
+
+--SHELL--
+#
+# Creating a file of ~40 MB.
+# The default max size of a request is 1 MB but the broker is started with --payloadMaxSize 50000000 (~50 MB), and a ~40 MB request must be permitted
+#
+HUGEFILE=$(mktemp)
+tr -dc A-Za-z0-9 </dev/urandom  2>/dev/null |  head -c 40000000 > $HUGEFILE
+#
+# Note that we are not including an actual JSON payload, but in this test what matters
+# is the size, not the format of the data.
+#
+# As the HUGE payload is accepted, size-wise, it will be parsed and a Parse Error will be the result
+#
+
+echo "01. Sending a request of ~40 MB, to a broker that excepts request upto ~50MB - see parse error as a result"
+echo "=========================================================================================================="
+orionCurl --url "/v2/entities" --payload "$HUGEFILE"
+echo
+echo
+
+
+echo "02. Sending a request of ~60 MB, to a broker that excepts request upto ~50MB - see 413 error"
+echo "============================================================================================"
+tr -dc A-Za-z0-9 </dev/urandom  2>/dev/null |  head -c 20000000 >> $HUGEFILE
+orionCurl --url "/v2/entities" --payload "$HUGEFILE"
+rm $HUGEFILE
+echo
+echo
+
+
+--REGEXPECT--
+01. Sending a request of ~40 MB, to a broker that excepts request upto ~50MB - see parse error as a result
+==========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Errors found in incoming JSON buffer", 
+    "error": "ParseError"
+}
+
+
+02. Sending a request of ~60 MB, to a broker that excepts request upto ~50MB - see 413 error
+============================================================================================
+HTTP/1.1 413 Request Entity Too Large
+Content-Length: 102
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "payload size: 60000000, max size supported: 50000000", 
+    "error": "RequestEntityTooLarge"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

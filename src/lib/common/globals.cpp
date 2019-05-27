@@ -55,6 +55,8 @@ bool                   semWaitStatistics    = false;
 bool                   timingStatistics     = false;
 bool                   notifQueueStatistics = false;
 bool                   checkIdv1            = false;
+unsigned long long     payloadMaxSize       = DEFAULT_PAYLOAD_MAX_SIZE;
+
 
 
 /* ****************************************************************************

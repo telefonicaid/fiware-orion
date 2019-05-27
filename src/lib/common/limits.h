@@ -30,7 +30,7 @@
 
 /* ****************************************************************************
 *
-* Service/Tenant definitions - 
+* Service/Tenant definitions -
 */
 #define SERVICE_NAME_MAX_LEN            50
 #define SERVICE_NAME_MAX_LEN_STRING    "50"
@@ -39,7 +39,7 @@
 
 /* ****************************************************************************
 *
-* Service Path definitions - 
+* Service Path definitions -
 *
 * The formula for SERVICE_PATH_MAX_TOTAL needs a little explanation. Considering
 *
@@ -74,7 +74,7 @@
 
 /* *****************************************************************************
 *
-* DB_AND_SERVICE_NAME_MAX_LEN - 
+* DB_AND_SERVICE_NAME_MAX_LEN -
 *
 * Max name length of a database name for a tenant:
 * Remember the database name is created like this:
@@ -90,9 +90,8 @@
 *
 *     DB_NAME_MAX_LEN:      'orion'
 *     1:                    '-'
-*     SERVICE_NAME_MAX_LEN: tenant name, via HTTP header 'Fiware-Service' 
+*     SERVICE_NAME_MAX_LEN: tenant name, via HTTP header 'Fiware-Service'
 *     1:                    zero-termination of the string
-* 
 */
 #define DB_AND_SERVICE_NAME_MAX_LEN     (DB_NAME_MAX_LEN + 1 + SERVICE_NAME_MAX_LEN + 1)
 
@@ -100,7 +99,7 @@
 
 /* ****************************************************************************
 *
-* Message definitions - 
+* Message definitions -
 */
 #define MAX_STA_MSG_SIZE (20 * 1024)           // 20 KB (HTTP request static buffer)
 #define MAX_DYN_MSG_SIZE (8 * 1024 * 1024)     // 8 MB  (maximum length of the HTTP request dynamic buffer)
@@ -109,15 +108,15 @@
 
 /* ****************************************************************************
 *
-* PAYLOAD_MAX_SIZE - 
+* DEFAULT_PAYLOAD_MAX_SIZE -
 */
-#define PAYLOAD_MAX_SIZE   (1 * 1024 * 1024) // 1 MB Maximum size of the payload
+#define DEFAULT_PAYLOAD_MAX_SIZE (1 * 1024 * 1024)  // 1 MB default max size of payload (see CLI -payloadMaxSize)
 
 
 
 /* ****************************************************************************
 *
-* IP - 
+* IP -
 */
 #define  LOCAL_IP_V6  "::"
 #define  LOCAL_IP_V4  "0.0.0.0"
@@ -128,7 +127,7 @@
 *
 * STATIC_BUFFER_SIZE - to avoid mallocs for "smaller" requests
 */
-#define STATIC_BUFFER_SIZE (32 * 1024) // 32 KB 
+#define STATIC_BUFFER_SIZE (32 * 1024) // 32 KB
 
 
 
@@ -152,7 +151,7 @@
 
 /* ****************************************************************************
 *
-* Pagination definitions - 
+* Pagination definitions -
 */
 #define MAX_PAGINATION_LIMIT            "1000"
 
@@ -160,7 +159,7 @@
 
 /* ****************************************************************************
 *
-* MAX_LEN_IP - 
+* MAX_LEN_IP -
 */
 #define MAX_LEN_IP  64
 
@@ -171,7 +170,7 @@
 * Values for URI parameters
 */
 #define DEFAULT_PAGINATION_LIMIT        "20"
-#define DEFAULT_PAGINATION_LIMIT_INT     20 
+#define DEFAULT_PAGINATION_LIMIT_INT     20
 
 
 
