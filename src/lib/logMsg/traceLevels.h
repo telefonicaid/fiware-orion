@@ -170,6 +170,7 @@ typedef enum TraceLevels
   LmtContextItemLookup,
   LmtContextValueLookup,
   LmtContextPresent,
+  LmtPreloadedContexts,
   LmtAlias,
   LmtGeoJson,
   LmtAccept,

@@ -209,6 +209,7 @@ int contextFileParse(char* fileBuffer, int bufLen, char** urlP, char** jsonP, ch
   // 2. The URL is on the first line of the buffer
   //
   *urlP = fileBuffer;
+  LM_T(LmtPreloadedContexts, ("Parsing fileBuffer. URL is %s", *urlP));
 
 
   //
@@ -250,6 +251,7 @@ int contextFileParse(char* fileBuffer, int bufLen, char** urlP, char** jsonP, ch
   }
 
   *jsonP = fileBuffer;
+  LM_T(LmtPreloadedContexts, ("Parsing fileBuffer. JSON is %s", *jsonP));
 
   return 0;
 }
@@ -267,6 +269,7 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
   char         path[512];
 
   snprintf(path, sizeof(path), "%s/%s", dir, dirItemP->d_name);
+  LM_T(LmtPreloadedContexts, ("Treating 'preloaded' context file '%s'", path));
 
   if (stat(path, &statBuf) != 0)
     LM_X(1, ("stat(%s): %s", path, strerror(errno)));
@@ -276,7 +279,6 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
     LM_X(1, ("Out of memory"));
 
   int fd;
-
   fd = open(path, O_RDONLY);
   if (fd == -1)
     LM_X(1, ("open(%s): %s", path, strerror(errno)));
@@ -309,6 +311,7 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
   if (tree == NULL)
     LM_X(1, ("error parsing the JSON context of context file '%s'", path));
 
+  LM_T(LmtPreloadedContexts, ("Successfully parsed the preloaded JSON of context '%s'", url));
 
   //
   // Is it any of the three special contexts?
