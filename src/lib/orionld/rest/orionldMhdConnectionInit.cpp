@@ -186,55 +186,50 @@ int orionldMhdConnectionInit
 )
 {
   ++requestNo;
-  orionldState.requestNo = requestNo;
 
   //
   // This call to LM_TMP should not be removed. Only commented out
   //
   LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));
   orionldContextListPresent();
+
+
   //
-  // 0. Prepare connectionInfo
+  // 1. Prepare connectionInfo
   //
   ConnectionInfo* ciP = new ConnectionInfo();
 
-  //
   // Mark connection as NGSI-LD V1
-  //
   ciP->apiVersion = NGSI_LD_V1;
 
-  //
   // Remember ciP for consequent connection callbacks from MHD
-  //
   *con_cls = ciP;
 
-  //
   // Keep a pointer to the method/verb
-  //
   ciP->verbString = (char*) method;
 
   //
   // Creating kjson environment for KJson parse and render
   //
   kaBufferInit(&orionldState.kalloc, orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer), 2 * 1024, NULL, "Thread KAlloc buffer");
-  orionldState.kjsonP = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
+
+  //
+  // 1. Prepare orionldState
+  //
+  orionldState.requestNo = requestNo;
+  orionldState.tenant    = (char*) "";
+  orionldState.kjsonP    = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
 
   ciP->kjsonP = orionldState.kjsonP;  // FIXME: ciP->kjsonP is to BE REMOVED. orionldState.kjsonP should be used instead
 
-  //
   // The 'connection', as given by MHD is very important. No responses can be sent without it
-  //
   ciP->connection = connection;
 
-  //
   // Flagging all as OK - errors will be flagged when occurring
-  //
   ciP->httpStatusCode = SccOk;
 
 
-  //
   // IP Address and port of caller
-  //
   ipAddressAndPort(ciP);
 
   // Save URL path in ConnectionInfo

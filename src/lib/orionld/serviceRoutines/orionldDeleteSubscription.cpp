@@ -29,6 +29,7 @@
 #include "ngsi10/UnsubscribeContextRequest.h"                    // UnsubscribeContextRequest
 #include "ngsi10/UnsubscribeContextResponse.h"                   // UnsubscribeContextResponse
 #include "mongoBackend/mongoUnsubscribeContext.h"                // mongoUnsubscribeContext
+#include "orionld/common/OrionldConnection.h"                    // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/serviceRoutines/orionldDeleteSubscription.h"   // Own Interface
 
@@ -42,7 +43,7 @@ bool orionldDeleteSubscription(ConnectionInfo* ciP)
 {
   char* details;
 
-  if (mongoDeleteLdSubscription(ciP->wildcard[0], ciP->tenant.c_str(), &ciP->httpStatusCode, &details) == false)
+  if (mongoDeleteLdSubscription(ciP->wildcard[0], orionldState.tenant, &ciP->httpStatusCode, &details) == false)
   {
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, ciP->wildcard[0], OrionldDetailsString);
     return false;

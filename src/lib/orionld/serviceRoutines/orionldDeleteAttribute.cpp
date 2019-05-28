@@ -62,7 +62,7 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
   entity.id = ciP->wildcard[0];
 
   // Does the attribute to be deleted even exist?
-  if (mongoAttributeExists(ciP->wildcard[0], longAttrName, ciP->tenant.c_str()) == false)
+  if (mongoAttributeExists(ciP->wildcard[0], longAttrName, orionldState.tenant) == false)
   {
     ciP->httpStatusCode = SccContextElementNotFound;
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute Not Found", ciP->wildcard[1], OrionldDetailsAttribute);
@@ -82,7 +82,7 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
   ucr.fill(&entity, ActionTypeDelete);
   ciP->httpStatusCode = mongoUpdateContext(&ucr,
                                            &ucResponse,
-                                           ciP->tenant,
+                                           orionldState.tenant,
                                            ciP->servicePathV,
                                            ciP->uriParam,
                                            ciP->httpHeaders.xauthToken,

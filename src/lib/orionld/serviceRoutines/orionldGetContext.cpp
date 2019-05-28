@@ -22,15 +22,16 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "mongoBackend/mongoQueryContext.h"                    // mongoQueryContext
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
-#include "orionld/kjTree/kjTreeFromContextContextAttribute.h"  // kjTreeFromContextContextAttribute
-#include "orionld/serviceRoutines/orionldGetContext.h"         // Own Interface
+#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "mongoBackend/mongoQueryContext.h"                      // mongoQueryContext
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/OrionldConnection.h"                    // orionldState
+#include "orionld/context/orionldContextLookup.h"                // orionldContextLookup
+#include "orionld/kjTree/kjTreeFromContextContextAttribute.h"    // kjTreeFromContextContextAttribute
+#include "orionld/serviceRoutines/orionldGetContext.h"           // Own Interface
 
 
 
@@ -61,7 +62,7 @@ bool orionldGetContext(ConnectionInfo* ciP)
 
     ciP->httpStatusCode = mongoQueryContext(&request,
                                             &response,
-                                            ciP->tenant,
+                                            orionldState.tenant,
                                             ciP->servicePathV,
                                             ciP->uriParam,
                                             ciP->uriParamOptions,

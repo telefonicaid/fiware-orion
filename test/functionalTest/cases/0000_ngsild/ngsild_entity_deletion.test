@@ -152,7 +152,7 @@ Date: REGEX(.*)
 ==============================
 HTTP/1.1 404 Not Found
 Content-Length: 134
-Content-Type: application/ld+json
+Content-Type: application/json
 Date: REGEX(.*)
 
 {

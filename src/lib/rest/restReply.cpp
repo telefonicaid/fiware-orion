@@ -117,12 +117,18 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
 
   if (answer != "")
   {
+    //
+    // For error-responses, never respond with application/ld+json
+    //
+    if ((ciP->httpStatusCode >= 400) && (ciP->outMimeType == JSONLD))
+      ciP->outMimeType = JSON;
+
     if (ciP->outMimeType == JSON)
     {
       MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/json");
     }
 #ifdef ORIONLD
-     else if ((ciP->outMimeType == JSONLD) || (ciP->httpHeaders.accept == "application/ld+json"))
+    else if ((ciP->outMimeType == JSONLD) || (ciP->httpHeaders.accept == "application/ld+json"))
     {
       MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/ld+json");
     }

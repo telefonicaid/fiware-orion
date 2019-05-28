@@ -48,7 +48,7 @@
 bool orionldPostEntity(ConnectionInfo* ciP)
 {
   // 1. Check that the entity exists
-  if (mongoEntityExists(ciP->wildcard[0], ciP->tenant.c_str()) == false)
+  if (mongoEntityExists(ciP->wildcard[0], orionldState.tenant) == false)
   {
     ciP->httpStatusCode = SccNotFound;
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Entity does not exist", ciP->wildcard[0], OrionldDetailsString);
@@ -174,7 +174,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 
   ciP->httpStatusCode = mongoUpdateContext(&mongoRequest,
                                            &mongoResponse,
-                                           ciP->httpHeaders.tenant,
+                                           orionldState.tenant,
                                            ciP->servicePathV,
                                            ciP->uriParam,
                                            ciP->httpHeaders.xauthToken,
