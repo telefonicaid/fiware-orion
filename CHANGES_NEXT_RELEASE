@@ -2,5 +2,6 @@
 - Add: Forwarded queries work for registrations using idPattern == '.*', but only for simple cases (#3458)
 - Add: Forwarded updates work for registrations using idPattern == '.*', but only for simple cases (#3458)
 - Add: CLI option -payloadMaxSize to let users decide the maximum allowed size of incoming payloads (#3492)
+- Add: CLI option -notifMaxSize to let users decide the maximum allowed size of forwarded and notifications messages (#3492)
 - Add: NGSIv2 forwards now work for queries and updates - for simple cases (#3068)
 - Fix: The 'Allow:' header for the service /v2/registrations had the incorrect value of "Allow: POST". The correct value is: "Allow: GET, POST"

@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/globals.h"
 #include "common/clockFunctions.h"
 #include "common/statistics.h"
 #include "common/limits.h"
@@ -100,6 +101,12 @@ static void* workerFunc(void* pSyncQ)
       size_t              estimatedQSize;
 
       SenderThreadParams* params = (*paramsV)[ix];
+
+      if (params->content.size() > notifMaxSize)
+      {
+        LM_E(("Runtime Error (HTTP request to send is too large: %llu bytes - max allowed size is %llu)", params->content.size(), notifMaxSize));
+        continue;
+      }
 
       QueueStatistics::incOut();
       clock_gettime(CLOCK_REALTIME, &now);

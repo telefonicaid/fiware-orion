@@ -56,6 +56,8 @@ bool                   timingStatistics     = false;
 bool                   notifQueueStatistics = false;
 bool                   checkIdv1            = false;
 unsigned long long     payloadMaxSize       = DEFAULT_PAYLOAD_MAX_SIZE;
+unsigned long long     notifMaxSize         = DEFAULT_PAYLOAD_NOTIF_MAX_SIZE;
+unsigned long long     outMsgMaxSize        = DEFAULT_OUT_MSG_MAX_SIZE;
 
 
 

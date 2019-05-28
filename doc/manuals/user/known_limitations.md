@@ -34,12 +34,24 @@ But, this is untested territory. At your own risk ...
 
 ## Notification maximum size
 
-Notification maximum size is set to 8MB. Larger notifications will not be sent by context broker and you
+The maximum size of notification payloads defaults to 8MB. Larger notifications will not be sent by the context broker and you
 will get the following trace in the log file:
 
     HTTP request to send is too large: N bytes
 
 where N is the number of bytes of the too large notification.
+
+However, you can change this limit by starting the broker with the CLI option `-notifMaxSize <size in bytes>`
+
+Note also that there is another message size limit, one that is valid for **all** outgoing messages from the broker:
+
+* Normal responses
+* Notifications
+* Forwarded messages
+
+This last message size limit is about the size of the entire message, not only the payload and its default value is 8MB, which can
+be modified using the CLI option `-outMsgMaxSize`.
+
 
 ## Content-Length header is required
 
@@ -52,11 +64,11 @@ list](http://lists.gnu.org/archive/html/libmicrohttpd/2014-01/msg00063.html).
 
 ## Entity fields length limitation
 
-Due to limitations at MongoDB layer, the length of entity ID, type and servicePath has to follow the following rule.
+Due to limitations of the MongoDB layer, the length of entity ID, type and servicePath has to follow the following rule.
 
     length(id) + length(type) + length(servicePath) + 10 < 1024
 
-Otherwise, we will get an error at entity creation time.
+Otherwise, there will be an error at entity creation time.
 
 ## Entity fields size limitation
 
@@ -76,5 +88,3 @@ As a reference, in our lab tests in a machine with Orion 1.13.0 running with 4 G
 of subscriptions got higher than 211.000 subscriptions.
 
 There is [an issue in the repository](https://github.com/telefonicaid/fiware-orion/issues/2780) about improvements related with this.
-
-

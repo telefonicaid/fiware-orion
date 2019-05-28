@@ -116,6 +116,22 @@
 
 /* ****************************************************************************
 *
+* DEFAULT_PAYLOAD_NOTIF_MAX_SIZE -
+*/
+#define DEFAULT_PAYLOAD_NOTIF_MAX_SIZE (8 * 1024 * 1024)  // 8 MB default max size of notification payload (see CLI -notifMaxSize)
+
+
+
+/* ****************************************************************************
+*
+* DEFAULT_OUT_MSG_MAX_SIZE -
+*/
+#define DEFAULT_OUT_MSG_MAX_SIZE (8 * 1024 * 1024)  // 8 MB default max size of any outgoing message (see CLI -outMsgMaxSize)
+
+
+
+/* ****************************************************************************
+*
 * IP -
 */
 #define  LOCAL_IP_V6  "::"

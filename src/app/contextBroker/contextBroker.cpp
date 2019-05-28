@@ -218,7 +218,9 @@ bool            ngsiv1Autocast;
 #define CONN_MEMORY_DESC       "maximum memory size per connection (in kilobytes)"
 #define MAX_CONN_DESC          "maximum number of simultaneous connections"
 #define REQ_POOL_SIZE          "size of thread pool for incoming connections"
-#define REQ_PAYLOAD_MAX_SIZE_DESC  "maximum size (in bytes) of the payload of incoming requests"
+#define REQ_PAYLOAD_MAX_SIZE_DESC    "maximum size (in bytes) of the payload of incoming requests"
+#define NOTIF_PAYLOAD_MAX_SIZE_DESC  "maximum size (in bytes) of the payload of outgoing notifications"
+#define OUT_MSG_MAX_SIZE_DESC        "maximum total size (in bytes) of any outgoing message (response, forward, and notification)"
 #define SIMULATED_NOTIF_DESC   "simulate notifications instead of actual sending them (only for testing)"
 #define STAT_COUNTERS          "enable request/notification counters statistics"
 #define STAT_SEM_WAIT          "enable semaphore waiting time statistics"
@@ -285,7 +287,10 @@ PaArgument paArgs[] =
   { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     1024,     CONN_MEMORY_DESC       },
   { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, 1020,           1,     PaNL,     MAX_CONN_DESC          },
   { "-reqPoolSize",      &reqPoolSize,      "TRQ_POOL_SIZE",     PaUInt,   PaOpt, 0,              0,     1024,     REQ_POOL_SIZE          },
-  { "-payloadMaxSize",   &payloadMaxSize,   "PAYLOAD_MAX_SIZE",  PaULong,  PaOpt, DEFAULT_PAYLOAD_MAX_SIZE, 0, PaNL,  REQ_PAYLOAD_MAX_SIZE_DESC },
+
+  { "-payloadMaxSize",   &payloadMaxSize,   "PAYLOAD_MAX_SIZE",  PaULong,  PaOpt, DEFAULT_PAYLOAD_MAX_SIZE,       0, PaNL,  REQ_PAYLOAD_MAX_SIZE_DESC   },
+  { "-notifMaxSize",     &notifMaxSize,     "NOTIF_MAX_SIZE",    PaULong,  PaOpt, DEFAULT_PAYLOAD_NOTIF_MAX_SIZE, 0, PaNL,  NOTIF_PAYLOAD_MAX_SIZE_DESC },
+  { "-outMsgMaxSize",    &outMsgMaxSize,    "OUT_MSG_MAX_SIZE",  PaULong,  PaOpt, DEFAULT_OUT_MSG_MAX_SIZE,       0, PaNL,  OUT_MSG_MAX_SIZE_DESC       },
 
   { "-notificationMode",      &notificationMode,      "NOTIF_MODE", PaString, PaOpt, _i "transient", PaNL,  PaNL, NOTIFICATION_MODE_DESC },
   { "-simulatedNotification", &simulatedNotification, "DROP_NOTIF", PaBool,   PaOpt, false,          false, true, SIMULATED_NOTIF_DESC   },

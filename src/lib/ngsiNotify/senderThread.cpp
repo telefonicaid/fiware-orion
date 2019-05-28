@@ -25,6 +25,7 @@
 
 #include "common/statistics.h"
 #include "common/limits.h"
+#include "common/globals.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
@@ -45,6 +46,12 @@ void* startSenderThread(void* p)
     SenderThreadParams* params = (SenderThreadParams*) (*paramsV)[ix];
     char                portV[STRING_SIZE_FOR_INT];
     std::string         url;
+
+    if (params->content.size() > notifMaxSize)
+    {
+      LM_E(("Runtime Error (HTTP request to send is too large: %llu bytes - max allowed size is %llu)", params->content.size(), notifMaxSize));
+      continue;
+    }
 
     snprintf(portV, sizeof(portV), "%d", params->port);
     url = params->ip + ":" + portV + params->resource;
