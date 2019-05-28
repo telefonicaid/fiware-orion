@@ -512,7 +512,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
       HttpStatusCode sCode = mongoQueryContext(&qReq,
                                                &qResForContextAttr,
-                                               ciP->httpHeaders.tenant,
+                                               orionldState.tenant,
                                                servicePathV,
                                                ciP->uriParam,
                                                ciP->uriParamOptions,

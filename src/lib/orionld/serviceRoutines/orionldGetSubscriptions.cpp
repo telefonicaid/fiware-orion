@@ -56,7 +56,7 @@ bool orionldGetSubscriptions(ConnectionInfo* ciP)
 
   LM_T(LmtServiceRoutine, ("In orionldGetSubscription"));
 
-  mongoGetLdSubscriptions(ciP, &subVec, ciP->tenant.c_str(), (long long*) &count, &oe);
+  mongoGetLdSubscriptions(ciP, &subVec, orionldState.tenant, (long long*) &count, &oe);
 
   if ((ciP->uriParamOptions["count"]))
   {

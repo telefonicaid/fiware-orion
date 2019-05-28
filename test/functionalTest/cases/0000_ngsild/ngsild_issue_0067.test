@@ -26,20 +26,20 @@ Subscription Creation/Retrieval and Deletion
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+brokerStart CB 0-255 IPv4 -multiservice
 accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 --SHELL--
 
 #
-# 01. The subscription urn:ngsi-ld:Subscription:testsubscription is created, identical to the one in issue #67
-# 02. The subscription urn:ngsi-ld:Subscription:testsubscription is retrieved - OK
-# 03. The subscription urn:ngsi-ld:Subscription:testsubscription is deleted - OK
-# 04. New attempt to retrieve the deleted subscription - NOT FOUND
+# 01. The subscription urn:ngsi-ld:Subscription:testsubscription is created (in tenant 'openiot'), identical to the one in issue #67
+# 02. The subscription urn:ngsi-ld:Subscription:testsubscription is retrieved (from tenant 'openiot') - OK
+# 03. The subscription urn:ngsi-ld:Subscription:testsubscription is deleted (from tenant 'openiot') - OK
+# 04. New attempt to retrieve the deleted subscription (from tenant 'openiot') - NOT FOUND
 #
 
-echo "01. The subscription urn:ngsi-ld:Subscription:testsubscription is created, identical to the one in issue #67"
-echo "============================================================================================================"
+echo "01. The subscription urn:ngsi-ld:Subscription:testsubscription is created (in tenant 'openiot'), identical to the one in issue #67"
+echo "=================================================================================================================================="
 payload='{
   "id": "urn:ngsi-ld:Subscription:testsubscription",
   "type": "Subscription",
@@ -56,36 +56,36 @@ payload='{
   },
   "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
 }'
-orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json" -H "Fiware-Service: openiot"
 echo
 echo
 
 
-echo "02. The subscription urn:ngsi-ld:Subscription:testsubscription is retrieved - OK"
-echo "================================================================================"
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:testsubscription
+echo "02. The subscription urn:ngsi-ld:Subscription:testsubscription is retrieved (from tenant 'openiot') - OK"
+echo "========================================================================================================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:testsubscription -H "Fiware-Service: openiot"
 echo
 echo
 
 
-echo "03. The subscription urn:ngsi-ld:Subscription:testsubscription is deleted - OK"
-echo "=============================================================================="
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:testsubscription -X DELETE
+echo "03. The subscription urn:ngsi-ld:Subscription:testsubscription is deleted (from tenant 'openiot') - OK"
+echo "======================================================================================================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:testsubscription -X DELETE -H "Fiware-Service: openiot"
 echo
 echo
 
 
-echo "04. New attempt to retrieve the deleted subscription - NOT FOUND"
-echo "================================================================"
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:testsubscription
+echo "04. New attempt to retrieve the deleted subscription (from tenant 'openiot') - NOT FOUND"
+echo "========================================================================================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:testsubscription -H "Fiware-Service: openiot"
 echo
 echo
 
 
 
 --REGEXPECT--
-01. The subscription urn:ngsi-ld:Subscription:testsubscription is created, identical to the one in issue #67
-============================================================================================================
+01. The subscription urn:ngsi-ld:Subscription:testsubscription is created (in tenant 'openiot'), identical to the one in issue #67
+==================================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:testsubscription
@@ -93,8 +93,8 @@ Date: REGEX(.*)
 
 
 
-02. The subscription urn:ngsi-ld:Subscription:testsubscription is retrieved - OK
-================================================================================
+02. The subscription urn:ngsi-ld:Subscription:testsubscription is retrieved (from tenant 'openiot') - OK
+========================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 256
 Content-Type: application/json
@@ -119,16 +119,16 @@ Date: REGEX(.*)
 }
 
 
-03. The subscription urn:ngsi-ld:Subscription:testsubscription is deleted - OK
-==============================================================================
+03. The subscription urn:ngsi-ld:Subscription:testsubscription is deleted (from tenant 'openiot') - OK
+======================================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
 
 
 
-04. New attempt to retrieve the deleted subscription - NOT FOUND
-================================================================
+04. New attempt to retrieve the deleted subscription (from tenant 'openiot') - NOT FOUND
+========================================================================================
 HTTP/1.1 404 Not Found
 Content-Length: 149
 Content-Type: application/json

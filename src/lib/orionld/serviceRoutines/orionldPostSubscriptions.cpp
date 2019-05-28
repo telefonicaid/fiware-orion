@@ -816,7 +816,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
     ngsiv2::Subscription  subscription;
     char*                 details;
 
-    if (mongoGetLdSubscription(&subscription, subIdP, ciP->tenant.c_str(), &ciP->httpStatusCode, &details) == true)
+    if (mongoGetLdSubscription(&subscription, subIdP, orionldState.tenant, &ciP->httpStatusCode, &details) == true)
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "subscription already exists", subIdP, OrionldDetailsString);
       return false;
@@ -828,7 +828,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   //
   subId = mongoCreateSubscription(sub,
                                   &oError,
-                                  ciP->httpHeaders.tenant,
+                                  orionldState.tenant,
                                   ciP->servicePathV,
                                   ciP->httpHeaders.xauthToken,
                                   ciP->httpHeaders.correlator,

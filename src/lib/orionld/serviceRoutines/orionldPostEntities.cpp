@@ -918,7 +918,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       //
       // If the entity already exists, an error should be returned
       //
-      if (mongoEntityExists(idNodeP->value.s, ciP->tenant.c_str()) == true)
+      if (mongoEntityExists(idNodeP->value.s, orionldState.tenant) == true)
       {
         orionldErrorResponseCreate(ciP, OrionldAlreadyExists, "Entity already exists", idNodeP->value.s, OrionldDetailsString);
         ciP->httpStatusCode = SccConflict;
@@ -1072,7 +1072,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
   ciP->httpStatusCode = mongoUpdateContext(&mongoRequest,
                                            &mongoResponse,
-                                           ciP->httpHeaders.tenant,
+                                           orionldState.tenant,
                                            ciP->servicePathV,
                                            ciP->uriParam,
                                            ciP->httpHeaders.xauthToken,
