@@ -22,15 +22,16 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/HttpStatusCode.h"                               // SccNotFound
-#include "mongoBackend/mongoEntityExists.h"                    // mongoEntityExists
-#include "mongoBackend/mongoAttributeExists.h"                 // mongoAttributeExists
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/serviceRoutines/orionldPatchEntity.h"        // Own Interface
+#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "rest/HttpStatusCode.h"                                 // SccNotFound
+#include "mongoBackend/mongoEntityExists.h"                      // mongoEntityExists
+#include "mongoBackend/mongoAttributeExists.h"                   // mongoAttributeExists
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/OrionldConnection.h"                    // orionldState
+#include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own Interface
 
 
 
@@ -42,7 +43,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 {
   LM_T(LmtServiceRoutine, ("In orionldPatchEntity"));
 
-  if (mongoEntityExists(ciP->wildcard[0], ciP->tenant.c_str()) == false)
+  if (mongoEntityExists(ciP->wildcard[0], orionldState.tenant) == false)
   {
     ciP->httpStatusCode = SccNotFound;
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Entity does not exist", ciP->wildcard[0], OrionldDetailsString);
@@ -76,7 +77,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   // Make sure the attributes to be patched exist
   for (KjNode* attrNodeP = ciP->requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
   {
-    if (mongoAttributeExists(ciP->wildcard[0], attrNodeP->name, ciP->tenant.c_str()) == false)
+    if (mongoAttributeExists(ciP->wildcard[0], attrNodeP->name, orionldState.tenant) == false)
     {
       ciP->httpStatusCode = SccNotFound;
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute does not exist", attrNodeP->name, OrionldDetailsString);

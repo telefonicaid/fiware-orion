@@ -22,16 +22,17 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                // httpHeaderAdd, httpHeaderLinkAdd
-#include "mongoBackend/mongoGetSubscriptions.h"                // mongoGetLdSubscription
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/context/orionldCoreContext.h"                // orionldDefaultContext
-#include "orionld/kjTree/kjTreeFromSubscription.h"             // kjTreeFromSubscription
-#include "orionld/serviceRoutines/orionldGetSubscription.h"    // Own Interface
+#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "rest/httpHeaderAdd.h"                                  // httpHeaderAdd, httpHeaderLinkAdd
+#include "mongoBackend/mongoGetSubscriptions.h"                  // mongoGetLdSubscription
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/OrionldConnection.h"                    // orionldState
+#include "orionld/context/orionldCoreContext.h"                  // orionldDefaultContext
+#include "orionld/kjTree/kjTreeFromSubscription.h"               // kjTreeFromSubscription
+#include "orionld/serviceRoutines/orionldGetSubscription.h"      // Own Interface
 
 
 
@@ -49,8 +50,9 @@ bool orionldGetSubscription(ConnectionInfo* ciP)
   subscription.throttling          = -1;  // 0?
 
   LM_T(LmtServiceRoutine, ("In orionldGetSubscription (%s)", ciP->wildcard[0]));
+  LM_TMP(("TENANT: %s", orionldState.tenant));
 
-  if (mongoGetLdSubscription(&subscription, ciP->wildcard[0], ciP->tenant.c_str(), &ciP->httpStatusCode, &details) != true)
+  if (mongoGetLdSubscription(&subscription, ciP->wildcard[0], orionldState.tenant, &ciP->httpStatusCode, &details) != true)
   {
     LM_E(("mongoGetLdSubscription error: %s", details));
     orionldErrorResponseCreate(ciP, OrionldResourceNotFound, details, ciP->wildcard[0], OrionldDetailsString);

@@ -34,7 +34,7 @@
 
 extern "C"
 {
-#include "kalloc/kaBufferReset.h"                              // kaBufferReset
+#include "kalloc/kaBufferReset.h"                                // kaBufferReset
 }
 
 #include "logMsg/logMsg.h"
@@ -49,14 +49,14 @@ extern "C"
 #include "common/clockFunctions.h"
 #include "common/statistics.h"
 #include "common/tag.h"
-#include "common/limits.h"                // SERVICE_NAME_MAX_LEN
+#include "common/limits.h"                                       // SERVICE_NAME_MAX_LEN
 
 #include "alarmMgr/alarmMgr.h"
 #include "metricsMgr/metricsMgr.h"
 #include "parse/forbiddenChars.h"
 
 #ifdef ORIONLD
-#include "orionld/common/OrionldConnection.h"    // orionldState
+#include "orionld/common/OrionldConnection.h"                    // orionldState
 #include "orionld/rest/orionldMhdConnectionInit.h"
 #include "orionld/rest/orionldMhdConnectionPayloadRead.h"
 #include "orionld/rest/orionldMhdConnectionTreat.h"
@@ -568,6 +568,9 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
   else if (strcasecmp(key.c_str(), HTTP_ORIGIN) == 0)            headerP->origin         = value;
   else if (strcasecmp(key.c_str(), HTTP_FIWARE_SERVICE) == 0)
   {
+#ifdef ORIONLD
+    orionldState.tenant = (char*) value;
+#endif
     headerP->tenant = value;
     toLowercase((char*) headerP->tenant.c_str());
   }
