@@ -1,0 +1,362 @@
+#!/bin/bash
+
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+#
+# Author: Dmitrii Demin <mail@demin.co>
+#
+
+set -e
+
+export ROOT='/opt'
+export BROKER='contextBroker'
+REV_DEFAULT='master'
+REPOSITORY_DEFAULT='https://github.com/telefonicaid/fiware-orion'
+STAGE_DEFAULT='release'
+OS_DEFAULT='centos'
+
+
+function _usage()
+{
+  echo -n "Usage: build [options]
+  Options:
+    -h   --help          show help
+
+    -s   --stage         specify stage (release/deps/rpm/compliance/unit/functional) to use
+    -t   --test          run test (compliance/unit/functional)
+    -d   --db            start mongo database
+    -q   --speed         execute fix for functional tests during testing (improve speed)
+    -p   --path          specify path to source code (default - /opt/orion)
+    -o   --os            specify os (centos/debian)
+
+    -b   --build         cmake & make & make install
+    -c   --clone         clone repository
+    -r   --rev           specify branch/tag to build (default - ${REV_DEFAULT})
+    -R   --repository    specify repository to clone (default - ${REPOSITORY_DEFAULT})
+
+    -P   --rpm           specify rpm (nightly, release, testing) to build
+    -U   --upload        upload rpm, REPO_USER and REPO_PASSWORD ENV variables should be provided
+"
+}
+
+function _fix_speed()
+{
+    echo "Builder: fix speed"
+
+    echo "Builder: fix mongo sleep parameter"
+    mongo --eval "db.adminCommand({setParameter:1, ttlMonitorSleepSecs: 3});"
+}
+
+function _unfix_speed()
+{
+    echo "Builder: revert speed fix"
+    mongo --eval "db.adminCommand({setParameter:1, ttlMonitorSleepSecs: 60});"
+}
+
+function _show()
+{
+    echo "Builder: run this commands"
+    echo ". scripts/testEnv.sh"
+}
+
+[[ $# = 0 ]] && _usage && exit 1
+reset=true
+
+for arg in "$@"
+do
+    if [[ -n "$reset" ]]; then
+      unset reset
+      set --
+    fi
+    case "$arg" in
+       --help) set -- "$@" -h ;;
+       --stage) set -- "$@" -s ;;
+       --test) set -- "$@" -t ;;
+       --db) set -- "$@" -d ;;
+       --speed) set -- "$@" -q ;;
+       --path) set -- "$@" -p ;;
+       --os) set -- "$@" -o ;;
+       --build) set -- "$@" -b ;;
+       --clone) set -- "$@" -c ;;
+       --rev) set -- "$@" -r ;;
+       --repository) set -- "$@" -R ;;
+       --rpm) set -- "$@" -P ;;
+       --upload) set - "$@" -U ;;
+
+       *) set -- "$@" "$arg" ;;
+    esac
+done
+
+while getopts "hs:tdqp:o:bcr:R:P:U" opt; do
+    case ${opt} in
+        h)  _usage; exit 0 ;;
+        s)  STAGE=$OPTARG ;;
+        t)  TEST=true ;;
+        d)  DATABASE=true ;;
+        q)  SPEED=true ;;
+        p)  PATH_TO_SRC=${OPTARG} ;;
+        o)  OS=${OPTARG} ;;
+        b)  BUILD=true ;;
+        c)  CLONE=true ;;
+        r)  REV=$OPTARG ;;
+        R)  REPOSITORY=$OPTARG ;;
+        P)  RPM=$OPTARG ;;
+        U)  UPLOAD=true ;;
+        *) _usage && exit 0;;
+    esac
+done
+shift $((OPTIND-1))
+
+# ==================================== CHECKS =========================================================================
+echo "Builder: check user"
+if [[ -z "${ORION_USER}" ]]; then
+    export ORION_USER=orion
+fi
+
+echo "Builder: create folders and user"
+if [[ ${STAGE} == 'deps' || ${STAGE} == 'release' ]]; then
+    useradd -s /bin/false -r ${ORION_USER}
+    mkdir -p /var/{log,run}/${BROKER}
+fi
+
+echo "Builder: set path"
+if [[ -z "${PATH_TO_SRC}" ]]; then
+    PATH_TO_SRC="${ROOT}/orion"
+fi
+export PATH_TO_SRC
+
+echo "Builder: set revision"
+if [[ -z "${REV}" ]]; then
+    REV=${REV_DEFAULT}
+fi
+export REV
+
+echo "Builder: set repository"
+if [[ -z "${REPOSITORY}" ]]; then
+    REPOSITORY=${REPOSITORY_DEFAULT}
+fi
+export REPOSITORY
+
+echo "Builder: set stage"
+if [[ -z "${STAGE}" ]]; then
+    STAGE='release'
+fi
+export STAGE
+
+echo "Builder: set os"
+if [[ -z "${OS}" ]];then
+    OS=${OS_DEFAULT}
+fi
+export OS
+
+echo "Builder: checking release/deps"
+if [[ "${STAGE}" == 'release' || "${STAGE}" == 'deps' ]]; then
+    build-${OS}.sh
+    exit 0
+fi
+
+echo "Builder: checking credentials"
+if [[ -n "${UPLOAD}" ]]; then
+    if [[ -z "${REPO_USER}" ||  -z "${REPO_PASSWORD}" ]]; then
+        echo "Builder: failed, REPO_USER or REPO_PASSWORD env variables are not set"
+        exit 1
+    fi
+    if [[ -z "${RPM}" ]]; then
+        echo "Builder: failed, RPM type is not set"
+        exit 1
+    fi
+fi
+
+echo "Builder: checking start & end"
+FUNC_STATUS=$(echo ${STAGE} | cut -d '_' -f 1)
+START=$(echo ${STAGE} | cut -d '_' -f 2)
+END=$(echo ${STAGE} | cut -d '_' -f 3)
+
+if [[ ${FUNC_STATUS} == 'functional' ]]; then
+    STAGE='functional'
+    if [[ -n "${START}" ]]; then FUNC_STATUS=true; else FUNC_STATUS=false; fi
+    if [[ -n "${END}" && -n ${START} ]]; then FUNC_STATUS=true; else FUNC_STATUS=false; fi
+
+fi
+
+echo "Builder: checking stage"
+if [[ -n "${TEST}" && -z "${STAGE}" ]]; then
+    echo "Builder: failed, STAGE is not set"
+    exit 1
+fi
+
+echo "Builder: checking source code"
+if [[ -z "${CLONE}" && ! -f ${PATH_TO_SRC}/LICENSE ]]; then echo "Builder: failed, source code not found"; exit 1; fi
+
+# ===================================== MONGO ==========================================================================
+if [[ -n "${DATABASE}" ]]; then
+
+    echo "Builder: creating Mongo temp folder"
+    rm -Rf /tmp/mongodb || true && mkdir -p /tmp/mongodb
+
+    echo "Builder: starting Mongo"
+    mongod --dbpath /tmp/mongodb  --nojournal --quiet > /dev/null 2>&1 &
+    sleep 3
+    export MONGO_HOST=localhost
+fi
+
+# ===================================== CLONE ==========================================================================
+if [[ -n "${CLONE}" ]]; then
+
+    echo "Builder: cloning branch ${REV}, from ${REPOSITORY}"
+
+    git clone -b ${REV} ${REPOSITORY} ${PATH_TO_SRC}
+    chown -R root:root ${PATH_TO_SRC}
+fi
+
+# ===================================== BUILDING =======================================================================
+if [[ -n "${BUILD}" ]]; then
+
+    echo "Builder: installing orion"
+
+    cd ${PATH_TO_SRC}
+
+    make install
+
+    if [[ $? -ne 0 ]]; then echo "Builder: installation failed"; exit 1; fi
+
+    strip /usr/bin/${BROKER}
+fi
+
+# ===================================== COMPLIANCE TESTS ===============================================================
+
+if [[ -n "${TEST}" && ${STAGE} == "compliance" ]]; then
+
+    echo "Builder: executing compliance test"
+
+    cd ${PATH_TO_SRC}
+
+    STATUS=true
+
+    make files_compliance
+    if [[ $? -ne 0 ]]; then STATUS=false; fi
+
+    make payload_check
+    if [[ $? -ne 0 ]]; then STATUS=false; fi
+
+    make style
+    if [[ $? -ne 0 ]]; then STATUS=false; fi
+
+    rm -Rf LINT*
+
+    if ! ${STATUS}; then echo "Builder: compliance test failed"; exit 1; fi
+
+fi
+
+# ===================================== UNIT TESTS =====================================================================
+
+if [[ -n "${TEST}" && "${STAGE}" = "unit" ]]; then
+
+    echo "Builder: executing unit test"
+
+    cd ${PATH_TO_SRC}
+
+    make unit_test
+    if [[ $? -ne 0 ]]; then echo "Builder: unit test failed"; exit 1; fi
+
+fi
+
+# ===================================== FUNCTIONAL TESTS ===============================================================
+
+if [[ -n "${TEST}" && "${STAGE}" = "functional" ]]; then
+
+    echo "Builder: executing functional test"
+
+    cd ${PATH_TO_SRC}
+    STATUS=true
+
+    if [[ -n "${SPEED}" ]]; then _fix_speed; fi
+
+    make install_scripts
+    make install
+
+    . scripts/testEnv.sh
+
+    if ${FUNC_STATUS}; then
+        CB_DIFF_TOOL="diff -u" ${PATH_TO_SRC}/test/functionalTest/testHarness.sh --fromIx ${START}  --toIx ${END}
+    else
+        CB_DIFF_TOOL="diff -u" ${PATH_TO_SRC}/test/functionalTest/testHarness.sh
+    fi
+
+    if [[ $? -ne 0 ]]; then STATUS=false; else STATUS=true; fi
+
+    if [[ -n "${SPEED}" ]]; then _unfix_speed; fi
+
+    if ! ${STATUS}; then echo "Builder: functional test failed"; exit 1; fi
+
+fi
+
+# ===================================== BUILDING RPM ===================================================================
+if [[ -n "${RPM}" ]]; then
+    echo "Builder: building ${RPM} rpm"
+    ch ${PATH_TO_SRC}
+
+    if [[ ${RPM} = "nightly" ]]; then
+
+        export BROKER_RELEASE=$(date "+%Y%m%d")
+        git reset --hard && git clean -qfdx
+
+        cd ${PATH_TO_SRC}/src/app/contextBroker
+        version=$(cat version.h | grep ORION_VERSION | awk '{ print $3}' | sed 's/"//g' | sed 's/-next//g')
+        sed -i "s/ORION_VERSION .*/ORION_VERSION \"$version\"/g" version.h
+        cd ${PATH_TO_SRC}
+
+        make rpm
+
+        pack='nightly'
+
+    fi
+
+    if [[ "${RPM}" = "release" ]]; then
+
+        export BROKER_RELEASE=1
+        git reset --hard && git clean -qfdx
+
+        make rpm
+
+        pack='release'
+
+    fi
+fi
+
+# ===================================== UPLOADING RPM ==================================================================
+
+if [[ -n "${UPLOAD}" ]]; then
+
+    NEXUS='https://nexus.lab.fiware.org/repository/el'
+    VER=7
+    ARCH='x86_64'
+
+    cd ${PATH_TO_SRC}/rpm/RPMS/x86_64
+    for FILE in $(ls); do
+      echo "Builder: uploading ${FILE}"
+      curl -v -u ${REPO_USER}:${REPO_PASSWORD} --upload-file ${FILE} ${NEXUS}/${VER}/${ARCH}/${RPM}/${FILE};
+      if !(curl --output /dev/null --silent --head --fail ${NEXUS}/${VER}/${ARCH}/${RPM}/${FILE}); then
+          echo "UPLOAD FAILED!";
+          exit 1;
+      fi
+    done
+fi
+

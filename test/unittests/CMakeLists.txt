@@ -249,11 +249,9 @@ MESSAGE("unitTest distro: '${DISTRO}'")
 
 IF(${DISTRO} MATCHES "CentOS_6.*")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
-ELSEIF(${DISTRO} MATCHES "Debian_8.*")
-  # It seems that Debian 8.x doesn't like -mt libraries for unit tests... not sure about other Debian versions
+ELSEIF(${DISTRO} MATCHES "Debian_*.*")
+  # It seems that Debian doesn't like -mt libraries for unit tests...
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
-ELSEIF(${DISTRO} MATCHES "Debian_.*")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
 
 # The following ones are distros that haven't been checked since the refactoring in
 # PR #2062. They should be "promoted" as soon as we have positive feedback about

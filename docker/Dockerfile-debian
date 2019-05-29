@@ -1,4 +1,4 @@
-FROM centos:centos7
+FROM debian:stretch-slim
 
 LABEL maintainer="FIWARE Orion Context Broker Team. Telefónica I+D"
 
@@ -11,7 +11,7 @@ WORKDIR /opt
 
 COPY . /usr/local/bin/
 
-RUN build.sh -s ${STAGE} -r ${REV} -c
+RUN build.sh -s ${STAGE} -r ${REV} -c -o debian
 
 ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice", "-ngsiv1Autocast" ]
 
