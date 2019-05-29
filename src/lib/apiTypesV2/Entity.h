@@ -66,7 +66,7 @@ class Entity
   std::vector<ProvidingApplication> providingApplicationList;    // Not part of NGSI, used internally for CPr forwarding functionality
 
   Entity();
-  Entity(const std::string& id, const std::string& type, const std::string& isPattern);
+  Entity(const std::string& id, const std::string& type, const std::string& isPattern, bool isTypePattern = false);
   explicit Entity(EntityId* eP);
   explicit Entity(Entity* eP);
 

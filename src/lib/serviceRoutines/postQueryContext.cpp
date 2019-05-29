@@ -351,7 +351,18 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
 
     LM_T(LmtForward, ("Parsing forward response: '%s'", cleanPayload));
 
+    // Note that parseEntitiesResponse() is thought for client-to-CB interactions, so it takes into account
+    // ciP->uriParamOptions[OPT_KEY_VALUES]. In this case, we never use keyValues in the CB-to-CPr so we
+    // set to false and restore its original value later. In this case it seems it is not needed to preserve
+    // ciP->httpStatusCode as in the similar case above
+    // FIXME P5: not sure if I like this approach... very "hacking-style". Probably it would be better
+    // to make JSON parsing logic (internal to parseEntitiesResponse()) independent of ciP and to pass the
+    // keyValue directly as function parameter.
+    bool previousKeyValues = ciP->uriParamOptions[OPT_KEY_VALUES];
+    ciP->uriParamOptions[OPT_KEY_VALUES] = false;
     b = parseEntitiesResponse(ciP, cleanPayload, &entities, &oe);
+    ciP->uriParamOptions[OPT_KEY_VALUES] = previousKeyValues;
+
     if (b == false)
     {
       LM_W(("Internal Error (error parsing reply from context provider: %s)", oe.details.c_str()));
@@ -363,7 +374,14 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
     //
     // 5. Fill in the response from the redirection into the response of this function
     //
-    qcrsP->fill(entities);
+    if (entities.size() > 0)
+    {
+      qcrsP->fill(entities);
+    }
+    else
+    {
+      qcrsP->errorCode.fill(SccContextElementNotFound);
+    }
   }
 
   //

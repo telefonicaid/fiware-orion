@@ -60,11 +60,12 @@ Entity::Entity(): isTypePattern(false), typeGiven(false), renderId(true), creDat
 *
 * This constructor was ported from old ContextElement class
 */
-Entity::Entity(const std::string& _id, const std::string& _type, const std::string& _isPattern)
+Entity::Entity(const std::string& _id, const std::string& _type, const std::string& _isPattern, bool _isTypePattern)
 {
   id            = _id;
   type          = _type;
   isPattern     = _isPattern;
+  isTypePattern = _isTypePattern;
 }
 
 

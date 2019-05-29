@@ -191,7 +191,7 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   LM_T(LmtCPrForwardRequestPayload, ("forward updateContext request payload: %s", payload.c_str()));
 
   std::map<std::string, std::string>  noHeaders;
-  long long                           statusCode; // not used by the moment
+  long long                           statusCode;
 
   r = httpRequestSend(fromIp,   // thread variable
                       ip,
@@ -312,11 +312,20 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   else  // NGSIv2
   {
     LM_T(LmtForward, ("upcrP->providerFormat == V2. out: '%s'", out.c_str()));
-    // NGSIv2 forward - no payload to be received, just a 204 No Content HTTP Header
-    if (strstr(out.c_str(), "204 No Content") != NULL)
+    // NGSIv2 forward - no payload to be received
+
+    //if (strstr(out.c_str(), "204 No Content") != NULL)
+    if (statusCode == SccNoContent)
     {
       LM_T(LmtForward, ("Found '204 No Content'"));
-      upcrsP->errorCode.fill(SccNone);
+      upcrsP->fill(upcrP, SccOk);
+      return true;
+    }
+    //else if (strstr(out.c_str(), "404 Not Found") != NULL)
+    if (statusCode == SccContextElementNotFound)
+    {
+      LM_T(LmtForward, ("Found '404 Not Found'"));
+      upcrsP->fill(upcrP, SccContextElementNotFound);
       return true;
     }
 
