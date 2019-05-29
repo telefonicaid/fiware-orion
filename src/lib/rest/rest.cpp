@@ -1317,10 +1317,10 @@ static int connectionTreat
     ciP->httpHeader.push_back(HTTP_FIWARE_CORRELATOR);
     ciP->httpHeaderValue.push_back(ciP->httpHeaders.correlator);
 
-    if ((ciP->httpHeaders.contentLength > payloadMaxSize) && (ciP->apiVersion == V2))
+    if ((ciP->httpHeaders.contentLength > reqPayloadMaxSize) && (ciP->apiVersion == V2))
     {
       char details[256];
-      snprintf(details, sizeof(details), "payload size: %d, max size supported: %llu", ciP->httpHeaders.contentLength, payloadMaxSize);
+      snprintf(details, sizeof(details), "payload size: %d, max size supported: %llu", ciP->httpHeaders.contentLength, reqPayloadMaxSize);
 
       alarmMgr.badInput(clientIp, details);
       OrionError oe(SccRequestEntityTooLarge, details);
@@ -1370,7 +1370,7 @@ static int connectionTreat
   if (dataLen != 0)
   {
     //
-    // If the HTTP header says the request is bigger than our payloadMaxSize,
+    // If the HTTP header says the request is bigger than our reqPayloadMaxSize,
     // just silently "eat" the entire message.
     //
     // The problem occurs when the broker is lied to and there aren't ciP->httpHeaders.contentLength
@@ -1382,7 +1382,7 @@ static int connectionTreat
     // See github issue:
     //   https://github.com/telefonicaid/fiware-orion/issues/2761
     //
-    if (ciP->httpHeaders.contentLength > payloadMaxSize)
+    if (ciP->httpHeaders.contentLength > reqPayloadMaxSize)
     {
       //
       // Errors can't be returned yet, postpone ...
@@ -1464,11 +1464,11 @@ static int connectionTreat
   //
   // Here, if the incoming request was too big, return error about it
   //
-  if (ciP->httpHeaders.contentLength > payloadMaxSize)
+  if (ciP->httpHeaders.contentLength > reqPayloadMaxSize)
   {
     char details[256];
 
-    snprintf(details, sizeof(details), "payload size: %d, max size supported: %llu", ciP->httpHeaders.contentLength, payloadMaxSize);
+    snprintf(details, sizeof(details), "payload size: %d, max size supported: %llu", ciP->httpHeaders.contentLength, reqPayloadMaxSize);
     alarmMgr.badInput(clientIp, details);
     restErrorReplyGet(ciP, SccRequestEntityTooLarge, details, &ciP->answer);
 

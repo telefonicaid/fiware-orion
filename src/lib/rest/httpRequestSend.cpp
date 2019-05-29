@@ -525,7 +525,7 @@ int httpRequestSendWithCurl
   //
   // Check if total outgoing message size is too big
   //
-  if ((unsigned long long) outgoingMsgSize > outMsgMaxSize)
+  if ((unsigned long long) outgoingMsgSize > outTotalMaxSize)
   {
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", outgoingMsgSize));

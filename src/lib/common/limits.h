@@ -108,25 +108,25 @@
 
 /* ****************************************************************************
 *
-* DEFAULT_PAYLOAD_MAX_SIZE -
+* DEFAULT_REQ_PAYLOAD_MAX_SIZE -
 */
-#define DEFAULT_PAYLOAD_MAX_SIZE (1 * 1024 * 1024)  // 1 MB default max size of payload (see CLI -payloadMaxSize)
+#define DEFAULT_REQ_PAYLOAD_MAX_SIZE (1 * 1024 * 1024)  // 1 MB default max size of payload (see CLI -reqPayloadMaxSize)
 
 
 
 /* ****************************************************************************
 *
-* DEFAULT_PAYLOAD_NOTIF_MAX_SIZE -
+* DEFAULT_NOTIF_PAYLOAD_MAX_SIZE -
 */
-#define DEFAULT_PAYLOAD_NOTIF_MAX_SIZE (8 * 1024 * 1024)  // 8 MB default max size of notification payload (see CLI -notifMaxSize)
+#define DEFAULT_NOTIF_PAYLOAD_MAX_SIZE (8 * 1024 * 1024)  // 8 MB default max size of notification payload (see CLI -notifPayloadMaxSize)
 
 
 
 /* ****************************************************************************
 *
-* DEFAULT_OUT_MSG_MAX_SIZE -
+* DEFAULT_TOTAL_MSG_MAX_SIZE -
 */
-#define DEFAULT_OUT_MSG_MAX_SIZE (8 * 1024 * 1024)  // 8 MB default max size of any outgoing message (see CLI -outMsgMaxSize)
+#define DEFAULT_TOTAL_MSG_MAX_SIZE (8 * 1024 * 1024)  // 8 MB default max size of any outgoing message (see CLI -outTotalMaxSize)
 
 
 
