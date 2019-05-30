@@ -826,6 +826,9 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   //
   // Create the subscription
   //
+  if (sub.ldContext == "")
+    sub.ldContext = ORIONLD_DEFAULT_CONTEXT_URL;
+
   subId = mongoCreateSubscription(sub,
                                   &oError,
                                   orionldState.tenant,

@@ -33,6 +33,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "common/RenderFormat.h"                               // RenderFormat
+#include "orionld/common/numberToDate.h"                       // numberToDate
 #include "rest/httpHeaderAdd.h"                                // httpHeaderAdd
 #include "ngsi/ContextAttribute.h"                             // ContextAttribute
 #include "orionld/common/OrionldConnection.h"                  // orionldState
@@ -67,6 +68,8 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 {
   char*    nameAlias = orionldAliasLookup(contextP, caP->name.c_str());
   KjNode*  nodeP     = NULL;
+
+  LM_TMP(("NOTIF: Adding attribute '%s'", nameAlias));
 
   if (renderFormat == NGSI_LD_V1_KEYVALUES)
   {
@@ -179,10 +182,29 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
   // Metadata
   for (unsigned int ix = 0; ix < caP->metadataVector.size(); ix++)
   {
-    Metadata* mdP = caP->metadataVector[ix];
+    Metadata*   mdP    = caP->metadataVector[ix];
+    const char* mdName = mdP->name.c_str();
 
-    // They are all strings for now ...
-    nodeP = kjString(orionldState.kjsonP, mdP->name.c_str(), mdP->stringValue.c_str());
+    LM_TMP(("NOTIF: Adding metadata '%s' for attribute '%s'", mdName, nameAlias));
+
+    // Special case: observedAt - stored as Number but must be served as a string ...
+    if (strcmp(mdName, "observedAt") == 0)
+    {
+      char     date[128];
+      char*    details;
+
+      if (numberToDate((time_t) mdP->numberValue, date, sizeof(date), &details) == false)
+      {
+        LM_E(("numberToDate failed: %s", details));
+        return NULL;
+      }
+
+      LM_TMP(("NOTIF: inserting metadata observedAt: %s", date));
+      nodeP = kjString(orionldState.kjsonP, mdName, date);
+    }
+    else
+      nodeP = kjString(orionldState.kjsonP, mdName, mdP->stringValue.c_str());
+
     kjChildAdd(aTopNodeP, nodeP);
   }
 
