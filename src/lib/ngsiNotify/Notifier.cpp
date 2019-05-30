@@ -40,6 +40,7 @@
 #include "ngsiNotify/senderThread.h"
 #include "rest/uriParamNames.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/httpHeaderAdd.h"
 
 #ifdef ORIONLD
 extern "C" {
@@ -47,7 +48,7 @@ extern "C" {
 #include "kjson/kjson.h"                                       // Kjson
 }
 #include "orionld/common/OrionldConnection.h"                  // orionldState
-#include "orionld/rest/orionldMhdConnectionInit.h"             // orionldState
+#include "orionld/context/orionldCoreContext.h"                // ORIONLD_DEFAULT_CONTEXT_URL
 #include "orionld/kjTree/kjTreeFromNotification.h"             // kjTreeFromNotification
 #include "cache/subCache.h"                                    // CachedSubscription
 #endif
@@ -62,9 +63,13 @@ extern "C" {
 */
 Notifier::~Notifier (void)
 {
-  // FIXME: This destructor is needed to avoid warning message.
-  // Compilation fails when a warning occurs, and it is enabled
-  // compilation option -Werror "warnings being treated as errors"
+  //
+  // NOTE:
+  //   This destructor is needed to avoid a warning message.
+  //   The compilation fails when a warning occurs as the compilation option
+  //     -Werror "warnings being treated as errors"
+  //   is enabled
+  //
   LM_T(LmtNotImplemented, ("Notifier destructor is not implemented"));
 }
 
@@ -540,7 +545,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     }
 
     /* Set Content-Type */
-    std::string content_type = "application/json";
+    std::string content_type = (httpInfo.mimeType == JSONLD)? "application/ld+json" : "application/json";
 
 
     SenderThreadParams*  params = new SenderThreadParams();
@@ -574,14 +579,19 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
     if (subP == NULL)
       subP = subCacheItemLookup(tenant.c_str(), ncrP->subscriptionId.c_str());
-#if 0
+
     //
     // This is where the Link HTTP header is added
     //
     if (subP != NULL)
     {
       if (httpInfo.mimeType == JSON)
-        params->extraHeaders["Link"] = subP->ldContext;
+      {
+        if (subP->ldContext == "")
+          params->extraHeaders["Link"] = std::string("<") + ORIONLD_DEFAULT_CONTEXT_URL + ">; " + LINK_REL_AND_TYPE;
+        else
+          params->extraHeaders["Link"] = std::string("<") + subP->ldContext + ">; " + LINK_REL_AND_TYPE;
+      }
     }
     else
     {
@@ -592,7 +602,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
       LM_E(("Unable to find subscription: %s", ncrP->subscriptionId.c_str()));
     }
-#endif
 #endif
 
     paramsV->push_back(params);

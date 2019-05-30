@@ -41,6 +41,7 @@ extern "C"
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
 #include "orionld/context/orionldAliasLookup.h"                // orionldAliasLookup
+#include "orionld/context/orionldCoreContext.h"                // ORIONLD_DEFAULT_CONTEXT_URL
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
 #include "orionld/kjTree/kjTreeFromNotification.h"             // Own interface
 
@@ -59,6 +60,9 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   char             idBuffer[] = "urn:ngsi-ld:Notification:012345678901234567890123";  // The 012345678901234567890123 will be overwritten
   OrionldContext*  contextP   = orionldContextLookup(context);
 
+  LM_TMP(("NOTIF: mimeType == %d", mimeType));
+  LM_TMP(("NOTIF: context  == %s", context));
+
   // id
   strcpy(&idBuffer[25], id);
   nodeP = kjString(orionldState.kjsonP, "id", idBuffer);
@@ -71,6 +75,22 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   // subscriptionId
   nodeP = kjString(orionldState.kjsonP, "subscriptionId", (char*) ncrP->subscriptionId.get().c_str());
   kjChildAdd(rootP, nodeP);
+
+  // context - if JSONLD
+  if (mimeType == JSONLD)
+  {
+    LM_TMP(("NOTIF: Context == '%s', at %p", context, context));
+    if (context == NULL)
+      nodeP = kjString(orionldState.kjsonP, "@context", ORIONLD_DEFAULT_CONTEXT_URL);
+    else
+      nodeP = kjString(orionldState.kjsonP, "@context", context);
+
+    kjChildAdd(rootP, nodeP);
+  }
+  else
+  {
+    // Context for HTTP Link Header is done in Notifier::buildSenderParams (Notifier.cpp)
+  }
 
   // notifiedAt
   time_t  now = time(NULL);  // FIXME - use an already existing timestamp?
@@ -124,7 +144,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
       if (SCOMPARE9(attrName, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
         continue;
 
-      LM_T(LmtNotifications, ("Adding attribute '%s' to the Notification kjTree", ceP->contextAttributeVector[aIx]->name.c_str()));
+      LM_T(LmtNotifications, ("NOTIF: Adding attribute '%s' to the Notification kjTree", ceP->contextAttributeVector[aIx]->name.c_str()));
       nodeP = kjTreeFromContextAttribute(aP, contextP, renderFormat, detailsP);
       kjChildAdd(objectP, nodeP);
     }

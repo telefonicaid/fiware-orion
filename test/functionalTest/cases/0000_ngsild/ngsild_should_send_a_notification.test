@@ -113,6 +113,7 @@ User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Content-Type: application/json; charset=utf-8
 
 {

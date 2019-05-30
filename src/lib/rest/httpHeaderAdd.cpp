@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "rest/ConnectionInfo.h"
+#include "rest/httpHeaderAdd.h"
 
 
 
@@ -60,8 +61,6 @@ void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, co
 
 
 
-#define LINK_REL_AND_TYPE        "rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\""
-#define LINK_REL_AND_TYPE_SIZE   70
 // ----------------------------------------------------------------------------
 //
 // httpHeaderLinkAdd -
