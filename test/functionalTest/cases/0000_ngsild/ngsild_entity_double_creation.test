@@ -96,11 +96,12 @@ Date: REGEX(.*)
 02. GET /ngsi-ld/v1/entities/E1
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 86
+Content-Length: 193
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
     "id": "http://a.b.c/entity/E1",
     "name": {
         "type": "Property",
@@ -115,6 +116,7 @@ Date: REGEX(.*)
 HTTP/1.1 409 Conflict
 Content-Length: 126
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -127,11 +129,12 @@ Date: REGEX(.*)
 04. GET /ngsi-ld/v1/entities/E1, making sure step 02 didn't modify anything
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 86
+Content-Length: 193
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
     "id": "http://a.b.c/entity/E1",
     "name": {
         "type": "Property",

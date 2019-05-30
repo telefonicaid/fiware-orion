@@ -26,7 +26,7 @@
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderAdd, httpHeaderLinkAdd
+#include "rest/httpHeaderAdd.h"                                  // httpHeaderAdd
 #include "mongoBackend/mongoGetSubscriptions.h"                  // mongoGetLdSubscription
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/OrionldConnection.h"                    // orionldState
@@ -62,14 +62,6 @@ bool orionldGetSubscription(ConnectionInfo* ciP)
   // Transform to KjNode tree
   ciP->httpStatusCode = SccOk;
   ciP->responseTree   = kjTreeFromSubscription(ciP, &subscription);
-
-  if (ciP->httpHeaders.acceptJsonld == false)  // @context in Link header
-  {
-    if (subscription.ldContext != "")
-      httpHeaderLinkAdd(ciP, NULL, subscription.ldContext.c_str());
-    else
-      httpHeaderLinkAdd(ciP, &orionldDefaultContext, NULL);
-  }
 
   return true;
 }

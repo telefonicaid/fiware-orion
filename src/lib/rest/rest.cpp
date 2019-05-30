@@ -585,7 +585,11 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
     headerP->servicePathReceived = true;
   }
 #ifdef ORIONLD
-  else if (strcasecmp(key.c_str(), HTTP_LINK) == 0)               headerP->link = value;
+  else if (strcasecmp(key.c_str(), HTTP_LINK) == 0)
+  {
+    headerP->link     = value;  // FIXME: To Be Removed - use orionldState.link instead
+    orionldState.link = (char*) value;
+  }
 #endif
   else
   {

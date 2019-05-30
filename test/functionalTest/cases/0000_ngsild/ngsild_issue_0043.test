@@ -150,6 +150,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 2777
 Content-Type: application/json
+Link: <https://raw.githubusercontent.com/GSMADeveloper/NGSI-LD-Entities/master/examples/Agri-Crop-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

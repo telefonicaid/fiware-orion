@@ -83,13 +83,14 @@ Date: REGEX(.*)
 02. GET /ngsi-ld/v1/entities/http://a.b.c/entity/E1 with URI param 'attrs' set to 'A3' - see E1 but without any attributes
 ==========================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 52
+Content-Length: 163
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
   "id": "http://a.b.c/entity/E1",
-  "type": "T"
+  "type": "T",
+  "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
 }
 
 

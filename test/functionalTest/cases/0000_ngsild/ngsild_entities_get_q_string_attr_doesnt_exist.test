@@ -149,7 +149,7 @@ Date: REGEX(.*)
 05. GET all entities that does not have an attribute A - see E2 and E4
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 255
+Content-Length: 481
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -160,7 +160,8 @@ Date: REGEX(.*)
     "A2": {
       "type": "Property",
       "value": "2"
-    }
+    },
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
   },
   {
     "id": "http://a.b.c/entity/E4",
@@ -168,7 +169,8 @@ Date: REGEX(.*)
     "A2": {
       "type": "Property",
       "value": "4"
-    }
+    },
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
   }
 ]
 

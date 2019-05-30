@@ -58,7 +58,7 @@ struct OrionldContext;
 //
 // httpHeaderLinkAdd -
 //
-extern void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP, const char* _url);
+extern void httpHeaderLinkAdd(ConnectionInfo* ciP, const char* _url);
 
 #endif  // ORIONLD
 #endif  // SRC_LIB_REST_HTTPHEADERADD_H_

@@ -53,6 +53,8 @@ typedef struct OrionldConnectionState
   KAlloc           kalloc;
   char             kallocBuffer[8 * 1024];
   char*            tenant;
+  char*            link;
+  bool             useLinkHeader;
   OrionldContext   inlineContext;
   OrionldContext*  contextP;
   ApiVersion       apiVersion;

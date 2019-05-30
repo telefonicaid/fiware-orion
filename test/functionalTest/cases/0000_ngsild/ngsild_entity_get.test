@@ -121,7 +121,7 @@ Date: REGEX(.*)
 03. GET E1, see default context, pretty-print with 4 spaces
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 131
+Content-Length: 244
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -131,7 +131,8 @@ Date: REGEX(.*)
     "name": {
         "type": "Property",
         "value": "John 6"
-    }
+    },
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
 }
 
 
@@ -139,7 +140,7 @@ Date: REGEX(.*)
 04. GET E2, see test context, pretty-print with default number of spaces (2)
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 115
+Content-Length: 226
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -149,7 +150,8 @@ Date: REGEX(.*)
   "name": {
     "type": "Property",
     "value": "John 6"
-  }
+  },
+  "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
 }
 
 
@@ -157,11 +159,11 @@ Date: REGEX(.*)
 05. GET E2, but without prettyPrint
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 86
+Content-Length: 193
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
-{"id":"http://a.b.c/entity/E2","type":"A","name":{"type":"Property","value":"John 6"}}
+{"id":"http://a.b.c/entity/E2","type":"A","name":{"type":"Property","value":"John 6"},"@context":"https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"}
 
 
 06. Attempt to GET non-existing E3, see 404 not Found
@@ -169,6 +171,7 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 134
 Content-Type: application/json
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

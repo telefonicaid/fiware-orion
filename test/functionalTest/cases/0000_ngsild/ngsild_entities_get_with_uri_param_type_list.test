@@ -172,7 +172,7 @@ Date: REGEX(.*)
 05. GET entities with type T - see E1
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 129
+Content-Length: 242
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -183,7 +183,8 @@ Date: REGEX(.*)
     "A1": {
       "type": "Property",
       "value": "E1"
-    }
+    },
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
   }
 ]
 
@@ -192,7 +193,7 @@ Date: REGEX(.*)
 06. GET entities with type T2 or T3 or T4 - see E2, E3 and E4
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 384
+Content-Length: 723
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -203,7 +204,8 @@ Date: REGEX(.*)
     "A1": {
       "type": "Property",
       "value": "E2"
-    }
+    },
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
   },
   {
     "id": "http://a.b.c/entity/E3",
@@ -211,7 +213,8 @@ Date: REGEX(.*)
     "A1": {
       "type": "Property",
       "value": "E3"
-    }
+    },
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
   },
   {
     "id": "http://a.b.c/entity/E4",
@@ -219,7 +222,8 @@ Date: REGEX(.*)
     "A1": {
       "type": "Property",
       "value": "E4"
-    }
+    },
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
   }
 ]
 
@@ -228,7 +232,7 @@ Date: REGEX(.*)
 07. GET entities with type T2 or T1 - see E2
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 130
+Content-Length: 243
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -239,7 +243,8 @@ Date: REGEX(.*)
     "A1": {
       "type": "Property",
       "value": "E2"
-    }
+    },
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
   }
 ]
 

@@ -149,7 +149,7 @@ Date: REGEX(.*)
 05. GET all entities that has an attribute A - see E1 and E3
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 254
+Content-Length: 480
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -160,7 +160,8 @@ Date: REGEX(.*)
     "A": {
       "type": "Property",
       "value": true
-    }
+    },
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
   },
   {
     "id": "http://a.b.c/entity/E3",
@@ -168,7 +169,8 @@ Date: REGEX(.*)
     "A": {
       "type": "Property",
       "value": false
-    }
+    },
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
   }
 ]
 
