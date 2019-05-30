@@ -2,6 +2,7 @@
 *~
 *.bak
 .*
+!.dockerignore
 !.travis.yml
 *.autosave
 BUILD_*

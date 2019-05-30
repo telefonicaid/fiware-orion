@@ -110,7 +110,7 @@ def ignore(root, file):
         return True
 
     # Some file in CI are not processed
-    if 'ci' in root and file in ['Dockerfile', 'mongodb.repo']:
+    if 'ci' in root and file in ['Dockerfile']:
         return True
 
     # Some files in test/acceptance/behave directory are not processed
@@ -135,7 +135,8 @@ def ignore(root, file):
     files_names = ['.gitignore', '.valgrindrc', '.valgrindSuppressions', 'LICENSE',
                    'ContributionPolicy.txt', 'CHANGES_NEXT_RELEASE', 'compileInfo.h',
                    'unittests_that_fail_sporadically.txt', 'Vagrantfile', 'contextBroker.ubuntu',
-                   'mkdocs.yml', 'fiware-ngsiv2-reference.errata', 'ServiceRoutines.txt', '.travis.yml' ]
+                   'mkdocs.yml', 'fiware-ngsiv2-reference.errata', 'ServiceRoutines.txt', '.travis.yml',
+                   '.dockerignore' ]
     if file in files_names:
         return True
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \

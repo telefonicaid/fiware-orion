@@ -4,17 +4,32 @@ sudo: false
 language: minimal
 env:
   global:
-    - IMAGE=fiware/orion-ci:rpm7
+    - IMAGE=fiware/orion-ci:deps-centos
+    - HOME=/opt/orion
   matrix:
-    - TEST=compliance
-    - TEST=unit
-    - TEST=functional
-before_install: true
+    - STAGE=compliance
+    - STAGE=unit
+    - STAGE=functional_1_300
+    - STAGE=functional_301_600
+    - STAGE=functional_601_900
+    - STAGE=functional_901_1200
+before_install:
+  - if [[ "${TRAVIS_EVENT_TYPE}" == "pull_request" ]]; then
+      export TEST_STATUS="True";
+    fi
+  - git lfs pull
+  - if [[ "${TEST_STATUS}" && "${STAGE}" != "compliance" ]]; then
+      echo "0" | sudo tee /proc/sys/net/ipv6/conf/all/disable_ipv6;
+      echo '{"ipv6":true,"fixed-cidr-v6":"2001:db8:1::/64"}' | sudo tee /etc/docker/daemon.json;
+      sudo service docker restart;
+      docker pull ${IMAGE};
+    fi
 install: true
-before_script:
-  - if [ "$TEST" != "compliance" ]; then echo '{"ipv6":true,"fixed-cidr-v6":"2001:db8:1::/64"}' | sudo tee /etc/docker/daemon.json; fi
-  - if [ "$TEST" != "compliance" ]; then sudo service docker restart; fi
-  - if [ "$TEST" != "compliance" ]; then docker pull $IMAGE; fi
-  - if [ "$TEST" != "compliance" ]; then docker run -t --rm -v $(pwd):/opt/fiware-orion $IMAGE build -ms $TEST; fi
+before_script: true
 script:
-  - if [ "$TEST" != "compliance" ]; then docker run -t --rm -v $(pwd):/opt/fiware-orion $IMAGE build -idqts $TEST; else ci/rpm7/build.sh -s compliance -tp $(pwd); fi
+  - if [[ "${TEST_STATUS}" && "${STAGE}" == "compliance" ]]; then
+      $(pwd)/docker/build.sh -s compliance -t -p $(pwd);
+    fi
+  - if [[ "${TEST_STATUS}" && "${STAGE}" != "compliance" ]]; then
+      docker run -t --rm -v $(pwd):${HOME} -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" ${IMAGE} build.sh -s ${STAGE} -dqt;
+    fi
