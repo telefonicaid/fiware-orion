@@ -581,26 +581,29 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
       subP = subCacheItemLookup(tenant.c_str(), ncrP->subscriptionId.c_str());
 
     //
-    // This is where the Link HTTP header is added
+    // This is where the Link HTTP header is added, for ngsi-ld subscriptions only
     //
-    if (subP != NULL)
+    if (subP->ldContext != "")  // Subscriptions created using ngsi-ld have a context. those from APIV1/2 do not
     {
-      if (httpInfo.mimeType == JSON)
+      if (subP != NULL)
       {
-        if (subP->ldContext == "")
-          params->extraHeaders["Link"] = std::string("<") + ORIONLD_DEFAULT_CONTEXT_URL + ">; " + LINK_REL_AND_TYPE;
-        else
-          params->extraHeaders["Link"] = std::string("<") + subP->ldContext + ">; " + LINK_REL_AND_TYPE;
+        if (httpInfo.mimeType == JSON)
+        {
+          if (subP->ldContext == "")
+            params->extraHeaders["Link"] = std::string("<") + ORIONLD_DEFAULT_CONTEXT_URL + ">; " + LINK_REL_AND_TYPE;
+          else
+            params->extraHeaders["Link"] = std::string("<") + subP->ldContext + ">; " + LINK_REL_AND_TYPE;
+        }
       }
-    }
-    else
-    {
-      //
-      // Not that this would ever happen, but, what do we do here ?
-      // Best choice seems to be to simply send the notification without the Link header.
-      //
+      else
+      {
+        //
+        // Not that this would ever happen, but, what do we do here ?
+        // Best choice seems to be to simply send the notification without the Link header.
+        //
 
-      LM_E(("Unable to find subscription: %s", ncrP->subscriptionId.c_str()));
+        LM_E(("Unable to find subscription: %s", ncrP->subscriptionId.c_str()));
+      }
     }
 #endif
 
