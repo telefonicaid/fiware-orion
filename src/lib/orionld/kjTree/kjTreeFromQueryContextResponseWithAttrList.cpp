@@ -33,7 +33,6 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                // httpHeaderAdd, httpHeaderLinkAdd
 #include "ngsi10/QueryContextResponse.h"                       // QueryContextResponse
 
 #include "orionld/common/orionldErrorResponse.h"               // OrionldResponseErrorType, orionldErrorResponse
@@ -292,7 +291,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
     //
     // FIXME: Use kjTreeFromContextAttribute() !!!
     //
-    // ContextAttribute* contextAttrP = NULL;
+    ContextAttribute* atContextAttributeP = NULL;
 
     for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); aIx++)
     {
@@ -302,7 +301,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
 
       if (strcmp(attrName, "@context") == 0)
       {
-        // contextAttrP = aP;
+        atContextAttributeP = aP;
         continue;
       }
 
@@ -564,59 +563,38 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
     }
 
 
-#if 0
-    //
-    // FIXME: the Link HTTP header should NEVER be returned
     //
     // If no context inside attribute list, then the default context has been used
     //
-    if (contextAttrP == NULL)
+    if (atContextAttributeP == NULL)
     {
       if (ciP->httpHeaders.acceptJsonld == true)
       {
         nodeP = kjString(orionldState.kjsonP, "@context", orionldDefaultContext.url);
         kjChildAdd(top, nodeP);
       }
-      else
-        httpHeaderLinkAdd(ciP, &orionldDefaultContext, NULL);
+      // NOTE: HTTP Link header is added ONLY in orionldMhdConnectionTreat
     }
     else
     {
-      if (ciP->httpHeaders.acceptJsonld == false)
+      // NOTE: HTTP Link header is added ONLY in orionldMhdConnectionTreat
+      if (ciP->httpHeaders.acceptJsonld == true)
       {
-        if (contextAttrP->valueType == orion::ValueTypeString)
+        if (atContextAttributeP->valueType == orion::ValueTypeString)
         {
-          OrionldContext context = { (char*) contextAttrP->stringValue.c_str(), NULL, OrionldUserContext, false, NULL };
-          httpHeaderLinkAdd(ciP, &context, NULL);
-        }
-        else
-        {
-          // FIXME: Implement Context-Servicing for orionld
-          //
-          // If we get here, the context is compound, and can't be returned in the Link HTTP Header.
-          // We now need to create a context in the broker, able to serve it, and in the Link HTTP Header
-          // return this Link
-          //
-          httpHeaderLinkAdd(ciP, NULL, NULL);
-        }
-      }
-      else
-      {
-        if (contextAttrP->valueType == orion::ValueTypeString)
-        {
-          nodeP = kjString(orionldState.kjsonP, "@context", contextAttrP->stringValue.c_str());
+          nodeP = kjString(orionldState.kjsonP, "@context", atContextAttributeP->stringValue.c_str());
           kjChildAdd(top, nodeP);
         }
-        else if (contextAttrP->compoundValueP != NULL)
+        else if (atContextAttributeP->compoundValueP != NULL)
         {
-          if (contextAttrP->compoundValueP->valueType == orion::ValueTypeVector)
+          if (atContextAttributeP->compoundValueP->valueType == orion::ValueTypeVector)
           {
             nodeP = kjArray(orionldState.kjsonP, "@context");
             kjChildAdd(top, nodeP);
 
-            for (unsigned int ix = 0; ix < contextAttrP->compoundValueP->childV.size(); ix++)
+            for (unsigned int ix = 0; ix < atContextAttributeP->compoundValueP->childV.size(); ix++)
             {
-              orion::CompoundValueNode*  compoundP     = contextAttrP->compoundValueP->childV[ix];
+              orion::CompoundValueNode*  compoundP     = atContextAttributeP->compoundValueP->childV[ix];
               KjNode*                    contextItemP  = kjString(orionldState.kjsonP, NULL, compoundP->stringValue.c_str());
               kjChildAdd(nodeP, contextItemP);
             }
@@ -634,7 +612,6 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
         }
       }
     }
-#endif
   }
 
   return root;

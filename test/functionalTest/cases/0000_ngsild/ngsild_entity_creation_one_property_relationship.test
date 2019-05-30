@@ -127,6 +127,7 @@ bye
 HTTP/1.1 200 OK
 Content-Length: 246
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

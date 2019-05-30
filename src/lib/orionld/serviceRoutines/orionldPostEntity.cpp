@@ -30,7 +30,6 @@
 #include "ngsi10/UpdateContextRequest.h"                       // UpdateContextRequest
 #include "ngsi10/UpdateContextResponse.h"                      // UpdateContextResponse
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                // httpHeaderLinkAdd
 #include "orionld/common/CHECK.h"                              // CHECK
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
@@ -194,7 +193,6 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   }
 
   ciP->httpStatusCode = SccNoContent;
-  httpHeaderLinkAdd(ciP, orionldState.contextP, NULL);
 
   return true;
 }

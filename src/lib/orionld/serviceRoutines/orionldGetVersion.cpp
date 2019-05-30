@@ -67,5 +67,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
   orionldState.kjsonP->stringBeforeColon = (char*) "";
   orionldState.kjsonP->stringAfterColon  = (char*) " ";
 
+  orionldState.useLinkHeader = false;  // We don't want the Link header for version requests
+
   return true;
 }

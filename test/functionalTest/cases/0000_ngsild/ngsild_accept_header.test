@@ -35,7 +35,7 @@ brokerStart CB 212-249
 # 02. Checking mongo content to see URL
 # 03. GET E1, with 'Accept: application/json' - see 'Content-Type: application/json'
 # 04. GET E1, with 'Accept: application/ld+json' - see 'Content-Type: application/ld+json'
-# 05. GET E1, without specific Accept MIME type (application/json is default - should it be for ngsi-ld requests?), see results like step 03
+# 05. GET E1, without specific Accept MIME type (application/json is default), see results like step 03
 #
 
 echo "01. Create Entity E1 with context as a string"
@@ -72,8 +72,8 @@ echo
 echo
 
 
-echo "05. GET E1, without specific Accept MIME type (application/json is default - should it be for ngsi-ld requests?), see results like step 03"
-echo "=========================================================================================================================================="
+echo "05. GET E1, without specific Accept MIME type (application/json is default), see results like step 03"
+echo "====================================================================================================="
 orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 echo
 echo
@@ -117,6 +117,7 @@ bye
 HTTP/1.1 200 OK
 Content-Length: 42
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -128,21 +129,23 @@ Date: REGEX(.*)
 04. GET E1, with 'Accept: application/ld+json' - see 'Content-Type: application/ld+json'
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 42
+Content-Length: 149
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
     "id": "http://a.b.c/entity/E1",
     "type": "A"
 }
 
 
-05. GET E1, without specific Accept MIME type (application/json is default - should it be for ngsi-ld requests?), see results like step 03
-==========================================================================================================================================
+05. GET E1, without specific Accept MIME type (application/json is default), see results like step 03
+=====================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 42
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

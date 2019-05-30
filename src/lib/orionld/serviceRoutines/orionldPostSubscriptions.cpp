@@ -36,7 +36,7 @@ extern "C"
 #include "common/globals.h"                                    // parse8601Time
 #include "rest/OrionError.h"                                   // OrionError
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                // httpHeaderAdd, httpHeaderLinkAdd, httpHeaderLocationAdd
+#include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
 #include "apiTypesV2/HttpInfo.h"                               // HttpInfo
 #include "apiTypesV2/Subscription.h"                           // Subscription
 #include "apiTypesV2/EntID.h"                                  // EntID
@@ -836,7 +836,6 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
 
   ciP->httpStatusCode = SccCreated;
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/subscriptions/", subId.c_str());
-  httpHeaderLinkAdd(ciP, orionldState.contextP, NULL);
 
   return true;
 }

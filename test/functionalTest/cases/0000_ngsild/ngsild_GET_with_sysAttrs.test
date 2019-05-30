@@ -90,6 +90,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 286
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -112,6 +113,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 286
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -134,6 +136,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 160
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

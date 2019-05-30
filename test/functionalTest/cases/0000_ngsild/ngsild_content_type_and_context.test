@@ -39,9 +39,9 @@ brokerStart CB 212-249
 # 06. Content-Type: application/ld+json + context in HTTP Header - see error
 # 07. Content-Type: application/ld+json + context in HTTP Header + context in payload - see error
 #
-# 08. GET Entity from step 01 - see correct URI Expansion (matching Default URL @context)
-# 09. GET Entity from step 04 - see correct URI Expansion (matching @context in payload)
-# 10. GET Entity from step 05 - see correct URI Expansion (matching @context in HTTP Header)
+# 08. GET Entity from step 01 - see correct URI Expansion (matching Default URL @context in payload)
+# 09. GET Entity from step 04 - see correct URI Expansion (matching @context in Link header)
+# 10. GET Entity from step 05 - see correct URI Expansion (matching @context in payload)
 #
 
 
@@ -129,22 +129,22 @@ echo
 echo
 
 
-echo "08. GET Entity from step 01 - see correct URI Expansion (matching Default URL @context)"
-echo "======================================================================================="
+echo "08. GET Entity from step 01 - see correct URI Expansion (matching Default URL @context in payload)"
+echo "=================================================================================================="
 orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E1 -H "Accept: application/ld+json"
 echo
 echo
 
 
-echo "09. GET Entity from step 04 - see correct URI Expansion (matching @context in payload)"
-echo "======================================================================================"
+echo "09. GET Entity from step 04 - see correct URI Expansion (matching @context in Link header)"
+echo "=========================================================================================="
 orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E4
 echo
 echo
 
 
-echo "10. GET Entity from step 05 - see correct URI Expansion (matching @context in HTTP Header)"
-echo "=========================================================================================="
+echo "10. GET Entity from step 05 - see correct URI Expansion (matching @context in payload)"
+echo "======================================================================================"
 orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E5 -H "Accept: application/ld+json"
 echo
 echo
@@ -165,6 +165,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 189
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -179,6 +180,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 191
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -211,6 +213,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 203
 Content-Type: application/json
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -225,6 +228,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 203
 Content-Type: application/json
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -234,24 +238,26 @@ Date: REGEX(.*)
 }
 
 
-08. GET Entity from step 01 - see correct URI Expansion (matching Default URL @context)
-=======================================================================================
+08. GET Entity from step 01 - see correct URI Expansion (matching Default URL @context in payload)
+==================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 42
+Content-Length: 149
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
     "id": "http://a.b.c/entity/E1",
     "type": "A"
 }
 
 
-09. GET Entity from step 04 - see correct URI Expansion (matching @context in payload)
-======================================================================================
+09. GET Entity from step 04 - see correct URI Expansion (matching @context in Link header)
+==========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 42
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -260,14 +266,15 @@ Date: REGEX(.*)
 }
 
 
-10. GET Entity from step 05 - see correct URI Expansion (matching @context in HTTP Header)
-==========================================================================================
+10. GET Entity from step 05 - see correct URI Expansion (matching @context in payload)
+======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 107
+Content-Length: 214
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
     "http://example.org/P100": {
         "type": "Property",
         "value": 100.0

@@ -229,6 +229,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 []
@@ -239,6 +240,7 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 120
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -253,6 +255,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 []
@@ -263,6 +266,7 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 110
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -277,6 +281,7 @@ Date: REGEX(.*)
 HTTP/1.1 501 Not Implemented
 Content-Length: 148
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -291,6 +296,7 @@ Date: REGEX(.*)
 HTTP/1.1 501 Not Implemented
 Content-Length: 142
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -305,6 +311,7 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 103
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -328,6 +335,7 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 141
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -351,6 +359,7 @@ Date: REGEX(.*)
 HTTP/1.1 501 Not Implemented
 Content-Length: 148
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -365,6 +374,7 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 141
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -379,6 +389,7 @@ Date: REGEX(.*)
 HTTP/1.1 501 Not Implemented
 Content-Length: 137
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -393,6 +404,7 @@ Date: REGEX(.*)
 HTTP/1.1 501 Not Implemented
 Content-Length: 144
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -407,6 +419,7 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 180
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -421,6 +434,7 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 176
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -435,6 +449,7 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 141
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -449,6 +464,7 @@ Date: REGEX(.*)
 HTTP/1.1 501 Not Implemented
 Content-Length: 145
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -463,6 +479,7 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 114
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

@@ -66,30 +66,39 @@ void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, co
 //
 // httpHeaderLinkAdd -
 //
-void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP, const char* _url)
+void httpHeaderLinkAdd(ConnectionInfo* ciP, const char* _url)
 {
-#if 0
   char             link[256];
   char*            linkP = link;
   char*            url;
   unsigned int     urlLen;
+  bool             freeLinkP = false;
 
-  // Special case: No context object, just a string
-  if ((_contextP == NULL) && (_url != NULL))
-  {
-    url = (char*) _url;
-  }
+  LM_TMP(("LINK: Setting Link header to URI: '%s'", _url));
+
+  // If no context URL is given, the default context is used
+  if (_url == NULL)
+    url = ORIONLD_DEFAULT_CONTEXT_URL;
   else
   {
-    OrionldContext*  contextP  = (_contextP != NULL)? _contextP : &orionldDefaultContext;
+    url = (char*) _url;
 
-    if (contextP == &orionldCoreContext)
-      contextP = &orionldDefaultContext;
-    else if (strcmp(contextP->url, ORIONLD_CORE_CONTEXT_URL) == 0)
-      contextP = &orionldDefaultContext;
-             
-    url = contextP->url;
+    if (url[0] == '<')
+    {
+      url = &url[1];
+
+      // Find closing '>' anbd terminate the string
+      char* cP = url;
+
+      while ((*cP != 0) && (*cP != '>'))
+        ++cP;
+
+      if (*cP == '>')
+        *cP = 0;
+    }
   }
+
+  LM_TMP(("LINK: Setting Link header to URI: '%s'", url));
 
   urlLen = strlen(url);
   if (urlLen > sizeof(link) + LINK_REL_AND_TYPE_SIZE + 3)
@@ -100,6 +109,7 @@ void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP, const cha
       LM_E(("Out-of-memory allocating roome for HTTP Link Header"));
       return;
     }
+    freeLinkP = true;
   }
 
   sprintf(linkP, "<%s>; %s", url, LINK_REL_AND_TYPE);
@@ -107,8 +117,7 @@ void httpHeaderLinkAdd(ConnectionInfo* ciP, OrionldContext* _contextP, const cha
   ciP->httpHeader.push_back("Link");
   ciP->httpHeaderValue.push_back(linkP);
 
-  if (linkP != link)
+  if (freeLinkP == true)
     free(linkP);
-#endif
 }
 #endif

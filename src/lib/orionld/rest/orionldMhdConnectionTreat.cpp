@@ -22,30 +22,42 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                  // LM_*
-#include "logMsg/traceLevels.h"                             // Lmt*
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
 extern "C"
 {
-#include "kjson/kjBufferCreate.h"                           // kjBufferCreate
-#include "kjson/kjParse.h"                                  // kjParse
-#include "kjson/kjRender.h"                                 // kjRender
-#include "kjson/kjFree.h"                                   // kjFree
+#include "kjson/kjBufferCreate.h"                              // kjBufferCreate
+#include "kjson/kjParse.h"                                     // kjParse
+#include "kjson/kjRender.h"                                    // kjRender
+#include "kjson/kjFree.h"                                      // kjFree
+#include "kjson/kjBuilder.h"                                   // kjString, ...
 }
 
-#include "rest/ConnectionInfo.h"                            // ConnectionInfo
-#include "rest/restReply.h"                                 // restReply
+#include "common/string.h"                                     // FT
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "rest/httpHeaderAdd.h"                                // httpHeaderAdd, httpHeaderLinkAdd
+#include "rest/restReply.h"                                    // restReply
 
-#include "orionld/common/orionldErrorResponse.h"            // orionldErrorResponseCreate
-#include "orionld/common/linkCheck.h"                       // linkCheck
-#include "orionld/common/SCOMPARE.h"                        // SCOMPARE
-#include "orionld/common/OrionldConnection.h"               // orionldState
-#include "orionld/context/orionldContextCreateFromUrl.h"    // orionldContextCreateFromUrl
-#include "orionld/serviceRoutines/orionldBadVerb.h"         // orionldBadVerb
-#include "orionld/rest/orionldServiceInit.h"                // orionldRestServiceV
-#include "orionld/rest/orionldServiceLookup.h"              // orionldServiceLookup
-#include "orionld/rest/temporaryErrorPayloads.h"            // Temporary Error Payloads
-#include "orionld/rest/orionldMhdConnectionTreat.h"         // Own Interface
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/common/linkCheck.h"                          // linkCheck
+#include "orionld/common/SCOMPARE.h"                           // SCOMPARE
+#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/context/orionldContextCreateFromUrl.h"       // orionldContextCreateFromUrl
+#include "orionld/context/orionldContextAppend.h"              // orionldContextAppend
+#include "orionld/serviceRoutines/orionldBadVerb.h"            // orionldBadVerb
+#include "orionld/rest/orionldServiceInit.h"                   // orionldRestServiceV
+#include "orionld/rest/orionldServiceLookup.h"                 // orionldServiceLookup
+#include "orionld/rest/temporaryErrorPayloads.h"               // Temporary Error Payloads
+#include "orionld/rest/orionldMhdConnectionTreat.h"            // Own Interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// volatileContextNo -
+//
+static int volatileContextNo = 1;
 
 
 
@@ -148,14 +160,17 @@ static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** de
     {
       const char* appType = &mediaRange[12];
 
+      LM_T(LmtAccept, ("mediaRange is application/..."));
       if      (SCOMPARE8(appType, 'l', 'd', '+', 'j', 's', 'o', 'n', 0))  ciP->httpHeaders.acceptJsonld = true;
       else if (SCOMPARE5(appType, 'j', 's', 'o', 'n', 0))                 ciP->httpHeaders.acceptJson   = true;
       else if (SCOMPARE2(appType, '*', 0))
       {
         ciP->httpHeaders.acceptJsonld = true;
         ciP->httpHeaders.acceptJson   = true;
-        LM_T(LmtAccept, ("application/* - both json and jsonld OK"));
       }
+
+      LM_T(LmtAccept, ("acceptJsonld: %s", FT(ciP->httpHeaders.acceptJsonld)));
+      LM_T(LmtAccept, ("acceptJson:   %s", FT(ciP->httpHeaders.acceptJson)));
     }
     else if (SCOMPARE4(mediaRange, '*', '/', '*', 0))
     {
@@ -291,14 +306,68 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
         if (SCOMPARE9(attrNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
         {
           contextNodeP = attrNodeP;
+          LM_TMP(("contextNodeP->value.firstChildP: %p", contextNodeP->value.firstChildP));
           LM_T(LmtContext, ("Found a @context in the payload (%p)", contextNodeP));
           break;
         }
+      }
+
+      if (contextNodeP != NULL)
+      {
+        // A @context in the payload must be a JSON String, Array, or an Object
+        if ((contextNodeP->type != KjString) && (contextNodeP->type != KjArray) && (contextNodeP->type != KjObject))
+        {
+          orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON Array nor Object nor a String", "@context", OrionldDetailsString);
+          ciP->httpStatusCode = SccBadRequest;
+          goto respond;
+        }
+      }
+
+      //
+      // If Content-Type is application/ld+json and Accept does not include application/ld+json and the @context is in the payload,
+      // then we may have to create the context in the "context server" (orionld acts as context server).
+      // The only reason to create this context in the context server is to be able to return the context in the response.
+      // After responding (both to the current request and after serving the context in a subsequent request), theoretically the context
+      // could be removed from  the context server.
+      //
+      // It could be marked at "volatile" so that the context sewrver would know to remove it after servoing it the first (and only) time.
+      //
+      // All of this only applies if:
+      //   o The @context in the payload is not a simple URI string
+      //   o The HTTP Accept header does not include application/ld+json => application/json should be returned
+      //
+      LM_TMP(("contextNodeP:                    %p", contextNodeP));
+      if (contextNodeP != NULL)
+        LM_TMP(("contextNodeP->value.firstChildP: %p", contextNodeP->value.firstChildP));
+      LM_TMP(("ciP->httpHeaders.acceptJsonld:   %s", FT(ciP->httpHeaders.acceptJsonld)));
+      LM_TMP(("ciP->httpHeaders.acceptJson:     %s", FT(ciP->httpHeaders.acceptJson)));
+
+      if ((contextNodeP != NULL) && (contextNodeP->value.firstChildP->type != KjString) && (ciP->httpHeaders.acceptJsonld == false) && (ciP->httpHeaders.acceptJson == true))
+      {
+        const int  sz  = 1024;
+        char*      url = (char*) malloc(sz);
+        char*      details;
+
+        if (url == NULL)
+          LM_X(1, ("Out of memory trying to allocate 1024 bytes for a volatile context"));
+
+        snprintf(url, sz, "http:localhost:1026//ngsi-ld/ex/v1/contexts/urn:volatile:%d", volatileContextNo);
+        ++volatileContextNo;
+
+        if (orionldContextAppend(url, contextNodeP, OrionldUserContext, &details) == NULL)
+        {
+          orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create context", details, OrionldDetailsString);
+          ciP->httpStatusCode = SccReceiverInternalError;
+          goto respond;
+        }
+
+        orionldState.link = url;
       }
     }
 
     if (contextNodeP == NULL)
       LM_T(LmtContext, ("No @context in payload"));
+
 
     //
     // ContentType Check
@@ -329,6 +398,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       ciP->httpStatusCode = SccBadRequest;
       goto respond;
     }
+    if (orionldState.contextP != NULL)
+      LM_TMP(("CONTEXT: incoming context created. orionldState.contextP->tree->type == '%s'", kjValueType(orionldState.contextP->tree->type)));
 
     //
     // Checking the @context in HTTP Header
@@ -355,6 +426,12 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
     //
     // FIXME: Checking the @context from payload ... move from orionldPostEntities()
+    //
+
+
+    // ********************************************************************************************
+    //
+    // Calling the SERVICE ROUTINE
     //
     LM_T(LmtServiceRoutine, ("Calling Service Routine %s", ciP->serviceP->url));
     bool b = ciP->serviceP->serviceRoutine(ciP);
@@ -387,6 +464,25 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   if (ciP->responseTree != NULL)
   {
+    //
+    // If "Accept: application/json", then the context goes in the HTTP Header (Link)
+    //
+    if ((ciP->httpHeaders.acceptJsonld == false) && (orionldState.useLinkHeader == true))
+      httpHeaderLinkAdd(ciP, orionldState.link);
+
+#if 0
+    //
+    // Add @context to outgoing payload?
+    //
+    if (ciP->httpHeaders.acceptJsonld == true)
+    {
+      KjNode* contextNodeP = kjString(orionldState.kjsonP, "@context", "URI?");
+
+      contextNodeP->next = ciP->responseTree->value.firstChildP;
+      ciP->responseTree = contextNodeP;
+    }
+#endif
+
     LM_T(LmtJsonResponse, ("Rendering KJSON response tree"));
     // FIXME: Smarter allocation !!!
     int bufLen = 1024 * 1024 * 32;
