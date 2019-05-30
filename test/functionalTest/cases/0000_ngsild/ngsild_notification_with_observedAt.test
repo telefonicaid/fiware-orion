@@ -1,0 +1,264 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription with observedAt timestamp - issue #93
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create Entity urn:ngsi-ld:Vehicle:A4568
+# 02. GET the entity, check that observedAt is OK
+# 03. Create a subscription matching Entity urn:ngsi-ld:Vehicle:A4568, with notification:endpoint:accept == application/ld+json
+# 04. Dump accumulator to see one notification, make sure the observedAt timestamp is OK and that the Content-Type is application/ld+json
+# 05. Create another subscription matching Entity urn:ngsi-ld:Vehicle:A4568, with notification:endpoint:accept == application/json
+# 06. Dump accumulator to see one notification, make sure the observedAt timestamp is OK and that the Content-Type is application/json and Link header present
+#
+
+echo "01. Create Entity urn:ngsi-ld:Vehicle:A4568"
+echo "==========================================="
+payload='{
+  "id": "urn:ngsi-ld:Vehicle:A4568",
+  "type": "Vehicle",   
+  "brandName": {
+    "type": "Property",   
+    "value": "Mercedes"
+  },
+  "isParked": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+    "observedAt":"2018-12-04T12:00:00Z",
+    "providedBy": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:Person:Bob"
+     }
+  },
+  "@context": ["http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json"
+echo
+echo
+
+
+echo "02. GET the entity, check that observedAt is OK"
+echo "==============================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:A4568
+echo
+echo
+
+
+echo "03. Create a subscription matching Entity urn:ngsi-ld:Vehicle:A4568, with notification:endpoint:accept == application/ld+json"
+echo "============================================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Subscription:01",
+  "type": "Subscription",
+  "entities": [{"type": "Vehicle"}],
+  "@context": "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld", 
+  "description": "Notify me of all product vehicles changes", 
+  "notification": {
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/ld+json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "04. Dump accumulator to see one notification, make sure the observedAt timestamp is OK and that the Content-Type is application/ld+json"
+echo "======================================================================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "05. Create another subscription matching Entity urn:ngsi-ld:Vehicle:A4568, with notification:endpoint:accept == application/json"
+echo "================================================================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:Subscription:02",
+  "type": "Subscription",
+  "entities": [{"type": "Vehicle"}],
+  "@context": "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld", 
+  "description": "Notify me of all product vehicles changes", 
+  "notification": {
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "06. Dump accumulator to see one notification, make sure the observedAt timestamp is OK and that the Content-Type is application/json and Link header present"
+echo "============================================================================================================================================================"
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create Entity urn:ngsi-ld:Vehicle:A4568
+===========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:A4568
+Date: REGEX(.*)
+
+
+
+02. GET the entity, check that observedAt is OK
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 294
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "brandName": {
+        "type": "Property",
+        "value": "Mercedes"
+    },
+    "id": "urn:ngsi-ld:Vehicle:A4568",
+    "isParked": {
+        "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+        "observedAt": "2018-12-04T12:00:00Z",
+        "providedBy": {
+            "object": "urn:ngsi-ld:Person:Bob",
+            "type": "Relationship"
+        },
+        "type": "Relationship"
+    },
+    "type": "Vehicle"
+}
+
+
+03. Create a subscription matching Entity urn:ngsi-ld:Vehicle:A4568, with notification:endpoint:accept == application/ld+json
+=============================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:01
+Date: REGEX(.*)
+
+
+
+04. Dump accumulator to see one notification, make sure the observedAt timestamp is OK and that the Content-Type is application/ld+json
+=======================================================================================================================================
+POST http://REGEX(.*)/notify
+Fiware-Servicepath: /
+Content-Length: 505
+User-Agent: orion/REGEX(.*)
+Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/ld+json
+
+{
+    "@context": "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld", 
+    "data": [
+        {
+            "brandName": {
+                "type": "Property", 
+                "value": "Mercedes"
+            }, 
+            "id": "urn:ngsi-ld:Vehicle:A4568", 
+            "isParked": {
+                "observedAt": "2018-12-04T12:00:00Z", 
+                "providedBy": "urn:ngsi-ld:Person:Bob", 
+                "type": "Relationship", 
+                "value": "urn:ngsi-ld:OffStreetParking:Downtown1"
+            }, 
+            "type": "Vehicle"
+        }
+    ], 
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "20REGEX(.*)", 
+    "subscriptionId": "urn:ngsi-ld:Subscription:01", 
+    "type": "Notification"
+}
+=======================================
+
+
+05. Create another subscription matching Entity urn:ngsi-ld:Vehicle:A4568, with notification:endpoint:accept == application/json
+================================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:02
+Date: REGEX(.*)
+
+
+
+06. Dump accumulator to see one notification, make sure the observedAt timestamp is OK and that the Content-Type is application/json and Link header present
+============================================================================================================================================================
+POST http://REGEX(.*)/notify
+Fiware-Servicepath: /
+Content-Length: 433
+User-Agent: orion/REGEX(.*)
+Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
+Accept: application/json
+Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Content-Type: application/json; charset=utf-8
+
+{
+    "data": [
+        {
+            "brandName": {
+                "type": "Property", 
+                "value": "Mercedes"
+            }, 
+            "id": "urn:ngsi-ld:Vehicle:A4568", 
+            "isParked": {
+                "observedAt": "2018-12-04T12:00:00Z", 
+                "providedBy": "urn:ngsi-ld:Person:Bob", 
+                "type": "Relationship", 
+                "value": "urn:ngsi-ld:OffStreetParking:Downtown1"
+            }, 
+            "type": "Vehicle"
+        }
+    ], 
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "20REGEX(.*)", 
+    "subscriptionId": "urn:ngsi-ld:Subscription:02", 
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
