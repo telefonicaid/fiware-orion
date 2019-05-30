@@ -344,18 +344,16 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
       if ((contextNodeP != NULL) && (contextNodeP->value.firstChildP->type != KjString) && (ciP->httpHeaders.acceptJsonld == false) && (ciP->httpHeaders.acceptJson == true))
       {
-      LM_TMP(("Here"));
-        char* url = (char*) malloc(1024);
-        char* details;
+        const int  sz  = 1024;
+        char*      url = (char*) malloc(sz);
+        char*      details;
 
-      LM_TMP(("Here"));
         if (url == NULL)
           LM_X(1, ("Out of memory trying to allocate 1024 bytes for a volatile context"));
 
-        snprintf(url, 1024, "http:localhost:1026//ngsi-ld/ex/v1/contexts/urn:volatile:%d", volatileContextNo);
+        snprintf(url, sz, "http:localhost:1026//ngsi-ld/ex/v1/contexts/urn:volatile:%d", volatileContextNo);
         ++volatileContextNo;
 
-      LM_TMP(("Here"));
         if (orionldContextAppend(url, contextNodeP, OrionldUserContext, &details) == NULL)
         {
           orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create context", details, OrionldDetailsString);
@@ -363,16 +361,15 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
           goto respond;
         }
 
-      LM_TMP(("Here"));
         orionldState.link = url;
       }
     }
 
-      LM_TMP(("Here"));
     if (contextNodeP == NULL)
       LM_T(LmtContext, ("No @context in payload"));
 
-    //(ciP->httpHeaders.acceptJsonld == false)
+
+    //
     // ContentType Check
     //
     if (contentTypeCheck(ciP, contextNodeP, &errorTitle, &details) == false)
@@ -391,13 +388,11 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     }
 
 
-    LM_TMP(("Here. contextNodeP at: %p", contextNodeP));
     //
     // If Accept: application/ld+json is not present, and the context is complex, then error
     //
     if ((contextNodeP != NULL) && (ciP->httpHeaders.acceptJsonld == false) && (contextNodeP->type != KjString))
     {
-      LM_TMP(("Here"));
       LM_E(("Complex context but application/ld+json not accepted - this is not acceptable"));
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Unacceptable contents", "Complex context but application/ld+json not accepted", OrionldDetailsString);
       ciP->httpStatusCode = SccBadRequest;
