@@ -314,14 +314,12 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
     LM_T(LmtForward, ("upcrP->providerFormat == V2. out: '%s'", out.c_str()));
     // NGSIv2 forward - no payload to be received
 
-    //if (strstr(out.c_str(), "204 No Content") != NULL)
     if (statusCode == SccNoContent)
     {
       LM_T(LmtForward, ("Found '204 No Content'"));
       upcrsP->fill(upcrP, SccOk);
       return true;
     }
-    //else if (strstr(out.c_str(), "404 Not Found") != NULL)
     if (statusCode == SccContextElementNotFound)
     {
       LM_T(LmtForward, ("Found '404 Not Found'"));
@@ -814,7 +812,7 @@ std::string postUpdateContext
       failing = failing.substr(0, failing.size() - 2);
 
       // If some CER (but not all) fail, then it is a partial update
-      parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "Attributes that were not updated: { " + failing + " }", "PartialUpdate");
+      parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "Some of the following attributes were not updated: { " + failing + " }", "PartialUpdate");
     }
     else  // failures == 0
     {
