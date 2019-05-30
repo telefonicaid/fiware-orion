@@ -85,67 +85,18 @@ TO_CLEAN=(
  'openssh-client' \
 )
 
-function _usage()
-{
-  echo -n "Usage: build-debian.sh [options]
-  Options:
-    -h   --help          show help
-    -t   --token         specify token to clone k* tools
-    -s   --stage         specify stage (release/deps) - default release
-"
-}
+echo "Builder: building started"
 
-[[ $# = 0 ]] && _usage && exit 1
+echo "Builder: create folders and user"
+useradd -s /bin/false -r ${ORION_USER}
+mkdir -p /var/{log,run}/${BROKER}
 
-reset=true
-
-for arg in "$@"
-do
-    if [[ -n "$reset" ]]; then
-      unset reset
-      set --
-    fi
-    case "$arg" in
-       --help) set -- "$@" -h ;;
-       --token) set -- "$@" -t ;;
-       --stage) set -- "$@" -s;;
-       *) set -- "$@" "$arg" ;;
-    esac
-done
-
-while getopts "ht:s:" opt; do
-    case ${opt} in
-        h)  _usage; exit 0 ;;
-        t)  TOKEN=$OPTARG ;;
-        s)  STAGE=$OPTARG ;;
-        *) _usage && exit 1;;
-        :)
-        echo "option -$OPTARG requires an argument"
-        _usage; exit 1
-        ;;
-    esac
-done
-shift $((OPTIND-1))
-
-if [[ -z "${STAGE}" ]]; then STAGE='release'; fi
-if [[ -z "${TOKEN}" ]]; then
-    echo "Builder: TOKEN not provided";
-    exit 1
-fi
-
-if [[ -z "${ROOT}" || -z "${REPOSITORY_SRC}" || -z "${BRANCH_SRC}" || -z "${BROKER}" ]]; then
-    echo "Builder: ROOT or REPOSITORY_SRC or BRANCH_SRC or BROKER are not set";
-    exit 1
-fi
-
-echo "Builder: upgrading image"
-apt-get -y update && apt-get -y upgrade
+echo "Builder: update apt"
+apt-get -y update
 
 echo "Builder: installing  tools and dependencies"
 apt-get -y install --no-install-recommends \
     ${BUILD_TOOLS[@]} \
-
-apt-get -y install --no-install-recommends \
     ${BUILD_DEPS[@]}
 
 echo "Builder: installing mongo cxx driver"
