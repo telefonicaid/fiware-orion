@@ -116,6 +116,8 @@ while getopts "hs:tdqp:o:bcr:R:P:U" opt; do
 done
 shift $((OPTIND-1))
 
+echo "Builder: started"
+
 # ==================================== CHECKS =========================================================================
 echo "Builder: check user"
 if [[ -z "${ORION_USER}" ]]; then
@@ -204,7 +206,9 @@ echo -n "Builder: status:
 "
 
 if [[ "${STAGE}" == 'release' || "${STAGE}" == 'deps' ]]; then
+    echo "Builder: building started"
     build-${OS}.sh
+    echo "Builder: building ended"
     exit 0
 fi
 
@@ -233,7 +237,7 @@ fi
 # ===================================== BUILDING =======================================================================
 if [[ -n "${BUILD}" ]]; then
 
-    echo "Builder: installing orion"
+    echo "Builder: orion installation started"
 
     cd ${PATH_TO_SRC}
 
@@ -242,13 +246,15 @@ if [[ -n "${BUILD}" ]]; then
     if [[ $? -ne 0 ]]; then echo "Builder: installation failed"; exit 1; fi
 
     strip /usr/bin/${BROKER}
+
+    echo "Builder: orion installation ended"
 fi
 
 # ===================================== COMPLIANCE TESTS ===============================================================
 
 if [[ -n "${TEST}" && ${STAGE} == "compliance" ]]; then
 
-    echo "Builder: executing compliance test"
+    echo "Builder: compliance test started"
 
     cd ${PATH_TO_SRC}
 
@@ -267,26 +273,28 @@ if [[ -n "${TEST}" && ${STAGE} == "compliance" ]]; then
 
     if ! ${STATUS}; then echo "Builder: compliance test failed"; exit 1; fi
 
+    echo "Builder: compliance test ended";
 fi
 
 # ===================================== UNIT TESTS =====================================================================
 
 if [[ -n "${TEST}" && "${STAGE}" = "unit" ]]; then
 
-    echo "Builder: executing unit test"
+    echo "Builder: unit test started"
 
     cd ${PATH_TO_SRC}
 
     make unit_test
     if [[ $? -ne 0 ]]; then echo "Builder: unit test failed"; exit 1; fi
 
+    echo "Builder: unit test ended"
 fi
 
 # ===================================== FUNCTIONAL TESTS ===============================================================
 
 if [[ -n "${TEST}" && "${STAGE}" = "functional" ]]; then
 
-    echo "Builder: executing functional test"
+    echo "Builder: functional test started"
 
     cd ${PATH_TO_SRC}
     STATUS=true
@@ -310,11 +318,12 @@ if [[ -n "${TEST}" && "${STAGE}" = "functional" ]]; then
 
     if ! ${STATUS}; then echo "Builder: functional test failed"; exit 1; fi
 
+    echo "Builder: functional test ended"
 fi
 
 # ===================================== BUILDING RPM ===================================================================
 if [[ -n "${RPM}" ]]; then
-    echo "Builder: building ${RPM} rpm"
+    echo "Builder: ${RPM} rpm building started"
     ch ${PATH_TO_SRC}
     git reset --hard && git clean -qfdx
 
@@ -335,6 +344,7 @@ if [[ -n "${RPM}" ]]; then
 
     make rpm
 
+    echo "Builder: ${RPM} rpm building ended"
 fi
 
 # ===================================== UPLOADING RPM ==================================================================
@@ -345,6 +355,8 @@ if [[ -n "${UPLOAD}" ]]; then
     VER=7
     ARCH='x86_64'
 
+    echo "Builder: uploading RPM started"
+
     cd ${PATH_TO_SRC}/rpm/RPMS/x86_64
     for FILE in $(ls); do
       echo "Builder: uploading ${FILE}"
@@ -354,4 +366,8 @@ if [[ -n "${UPLOAD}" ]]; then
           exit 1;
       fi
     done
+
+    echo "Builder: uploading RPM ended"
 fi
+
+echo "Builder: ended"
