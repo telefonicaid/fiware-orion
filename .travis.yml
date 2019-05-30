@@ -28,7 +28,7 @@ install: true
 before_script: true
 script:
   - if [[ "${TEST_STATUS}" && "${STAGE}" == "compliance" ]]; then
-      $(pwd)/docker/build.sh -s compliance -t -p $(pwd);
+      $(pwd)/ci/build.sh -s compliance -t -p $(pwd);
     fi
   - if [[ "${TEST_STATUS}" && "${STAGE}" != "compliance" ]]; then
       docker run -t --rm -v $(pwd):${HOME} -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" ${IMAGE} build.sh -s ${STAGE} -dqt;
