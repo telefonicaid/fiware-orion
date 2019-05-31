@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -20,7 +20,7 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 #
-# Author: Dmitrii Demin
+# Author: Dmitrii Demin <mail@demin.co>
 #
 
 set -e
@@ -42,16 +42,17 @@ BUILD_DEPS=(
 )
 
 BUILD_TOOLS=(
+ 'bzip2' \
  'cmake' \
  'gcc-c++' \
  'git' \
  'make' \
+ 'rpm-build' \
  'scons' \
 )
 
 TEST_TOOLS=(
  'bc' \
- 'nano' \
  'nc' \
  'python-pip' \
  'valgrind' \
@@ -74,70 +75,18 @@ TO_CLEAN=(
   'sysvinit-tools' \
 )
 
-function _usage()
-{
-  echo -n "Usage: build-debian.sh [options]
-  Options:
-    -h   --help          show help
-    -t   --token         specify token to clone k* tools
-    -s   --stage         specify stage (release/deps) - default release
-"
-}
+echo "Builder: building started"
 
-[[ $# = 0 ]] && _usage && exit 1
-
-reset=true
-
-for arg in "$@"
-do
-    if [[ -n "$reset" ]]; then
-      unset reset
-      set --
-    fi
-    case "$arg" in
-       --help) set -- "$@" -h ;;
-       --token) set -- "$@" -t ;;
-       --stage) set -- "$@" -s;;
-       *) set -- "$@" "$arg" ;;
-    esac
-done
-
-while getopts "ht:s:" opt; do
-    case ${opt} in
-        h)  _usage; exit 0 ;;
-        t)  TOKEN=$OPTARG ;;
-        s)  STAGE=$OPTARG ;;
-        *) _usage && exit 1;;
-        :)
-        echo "option -$OPTARG requires an argument"
-        _usage; exit 1
-        ;;
-    esac
-done
-shift $((OPTIND-1))
-
-if [[ -z "${STAGE}" ]]; then STAGE='release'; fi
-if [[ -z "${TOKEN}" ]]; then
-    echo "Builder: TOKEN not provided";
-    exit 1
-fi
-
-if [[ -z "${ROOT}" || -z "${REPOSITORY_SRC}" || -z "${BRANCH_SRC}" || -z "${BROKER}" ]]; then
-    echo "Builder: ROOT or REPOSITORY_SRC or BRANCH_SRC or BROKER are not set";
-    exit 1
-fi
+echo "Builder: create folders and user"
+useradd -s /bin/false -r ${ORION_USER}
+mkdir -p /var/{log,run}/${BROKER}
 
 echo "Builder: adding epel"
 yum -y install epel-release
 
-echo "Builder: upgrading image"
-yum -y upgrade
-
 echo "Builder: installing  tools and dependencies"
 yum -y install \
   ${BUILD_TOOLS[@]} \
-
-yum -y install \
   ${BUILD_DEPS[@]}
 
 echo "Builder: installing mongo cxx driver"
@@ -147,7 +96,7 @@ scons --disable-warnings-as-errors --use-sasl-client --ssl
 scons install --disable-warnings-as-errors --prefix=/usr/local --use-sasl-client --ssl
 cd ${ROOT} && rm -Rf mongo-cxx-driver
 
-echo "Builder: installing rapid json"
+echo "Builder: installing rapidjson"
 curl -L https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz | tar xzC ${ROOT}
 mv ${ROOT}/rapidjson-1.0.2/include/rapidjson/ /usr/local/include
 cd ${ROOT} && rm -Rf rapidjson-1.0.2
@@ -199,7 +148,7 @@ gpgkey=https://www.mongodb.org/static/pgp/server-4.0.asc
     cd ${ROOT} && rm -Rf gmock-1.5.0
 
     echo "Builder: installing  tools and dependencies"
-    apt-get -y install --no-install-recommends \
+    yum -y install \
         ${TEST_TOOLS[@]}
 
     echo "Builder: installing python dependencies"
@@ -207,25 +156,28 @@ gpgkey=https://www.mongodb.org/static/pgp/server-4.0.asc
     pip install Flask==1.0.2 pyOpenSSL==19.0.0
     yes | pip uninstall setuptools wheel
 
-    echo "Builder: urlencode"
+    echo "Builder: installing urlencode"
     curl -O https://raw.githubusercontent.com/rpmsphere/x86_64/master/u/urlencode-1.0.3-2.1.x86_64.rpm
     rpm -U urlencode-1.0.3-2.1.x86_64.rpm
     rm -f urlencode-1.0.3-2.1.x86_64.rpm
+
 fi
 
 if [[ ${STAGE} == 'release' ]]; then
     echo "Builder: installing orion"
 
-    git clone ${REPOSITORY_SRC} ${ROOT}/orion
-    cd ${ROOT}/orion
+    git clone ${REPOSITORY} ${PATH_TO_SRC}
+    cd ${PATH_TO_SRC}
+    git checkout ${REV}
     make install
     strip /usr/bin/${BROKER}
 
     echo "Builder: cleaning1"
-    yum -y erase  \
+    yum -y remove  \
         ${BUILD_DEPS[@]} \
         ${BUILD_TOOLS[@]} \
-        ${TO_CLEAN[@]}
+        ${TO_CLEAN[@]} \
+        epel-release
 
     echo "Builder: installing boost ops deps"
     yum -y install \
@@ -252,7 +204,8 @@ rpm -qa groff | xargs -r rpm -e --nodeps
 yum clean all
 rm -Rf \
     /var/lib/yum/yumdb \
-    /var/lib/yum/history
+    /var/lib/yum/history \
+    /var/cache/yum/
 rpm -vv --rebuilddb
 
 echo "Builder: cleaning last"
@@ -262,5 +215,6 @@ rm -Rf \
     /usr/lib/gconv \
     /usr/lib64/gconv \
     /anaconda-post.log \
-    /var/lib/apt/lists/* \
+    /usr/lib/udev/hwdb.d/* \
+    /etc/udev/hwdb.bin \
     /var/log/*

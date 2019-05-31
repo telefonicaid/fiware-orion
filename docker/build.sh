@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -20,58 +20,54 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 #
-# Author: Dmitrii Demin
+# Author: Dmitrii Demin <mail@demin.co>
 #
 
 set -e
 
-export DEBIAN_FRONTEND=noninteractive
-export REPOSITORY_SRC='https://github.com/fiware/context.Orion-LD'
-export BRANCH_SRC='develop'
 export ROOT='/opt'
+export BROKER='orionld'
+REV_DEFAULT='develop'
+REPOSITORY_DEFAULT='https://github.com/fiware/context.Orion-LD'
+STAGE_DEFAULT='release'
+OS_DEFAULT='debian'
+
+function _fix_speed()
+{
+    echo "Builder: fix mongo ttl"
+
+    mongo --eval "db.adminCommand({setParameter:1, ttlMonitorSleepSecs: 3});" --quiet
+}
+
+function _unfix_speed()
+{
+    echo "Builder: revert mongo ttl"
+    mongo --eval "db.adminCommand({setParameter:1, ttlMonitorSleepSecs: 60});" --quiet
+}
 
 function _usage()
 {
   echo -n "Usage: build [options]
   Options:
     -h   --help          show help
-    -H   --show          show the list of necessary commands that should be executed before starting functional tests
 
-    -s   --stage         specify stage (release/deps/compliance/unit/functional) to use
+    -s   --stage         specify stage (release/deps/rpm/compliance/unit/functional) to use
     -t   --test          run test (compliance/unit/functional)
     -d   --db            start mongo database
-    -q   --speed         execute fix for functional tests during testing (improve speed)
-    -p   --platform      specify platform (debian), required if stage is specified
-    -t   --token         specify token to clone k* tools, required if stage is specified
-    -P   --path          specify path to source code (default - /opt/orion)
+    -q   --speed         execute performance fix
+    -p   --path          specify path to source code (default - ${ROOT}/orion)
+    -o   --os            specify os (centos/debian)
 
     -b   --build         cmake & make & make install
-    -B   --branch        specify branch/tag to build (default - ${BRANCH_SRC})
-    -R   --repository    specify repository to clone (default - ${REPOSITORY_SRC})
+    -c   --clone         clone repository
+    -r   --rev           specify branch/tag/commit to build (default - ${REV_DEFAULT})
+    -R   --repository    specify repository to clone (default - ${REPOSITORY_DEFAULT})
 
-    -r   --rpm           specify rpm (nightly, release, testing) to build - only for centos
-    -u   --upload        upload rpm, REPO_USER and REPO_PASSWORD ENV variables should be provided only for centos
+    -P   --rpm           specify rpm (nightly, release) to build
+    -U   --upload        upload rpm, REPO_USER and REPO_PASSWORD ENV variables should be provided
+
+    -T   --token         specify token to clone k* tools
 "
-}
-
-function _fix_speed()
-{
-    echo "Builder: fix speed"
-
-    echo "Builder: fix mongo sleep parameter"
-    mongo --eval "db.adminCommand({setParameter:1, ttlMonitorSleepSecs: 3});"
-}
-
-function _unfix_speed()
-{
-    echo "Builder: revert speed fix"
-    mongo --eval "db.adminCommand({setParameter:1, ttlMonitorSleepSecs: 60});"
-}
-
-function _show()
-{
-    echo "Builder: run this commands"
-    echo ". scripts/testEnv.sh"
 }
 
 [[ $# = 0 ]] && _usage && exit 1
@@ -85,82 +81,85 @@ do
     fi
     case "$arg" in
        --help) set -- "$@" -h ;;
-       --show) set -- "$@" -H ;;
        --stage) set -- "$@" -s ;;
        --test) set -- "$@" -t ;;
        --db) set -- "$@" -d ;;
        --speed) set -- "$@" -q ;;
-       --platform) set -- "$@" -p ;;
-       --token) set -- "$@" -t ;;
-       --path) set -- "$@" -P ;;
+       --path) set -- "$@" -p ;;
+       --os) set -- "$@" -o ;;
        --build) set -- "$@" -b ;;
        --clone) set -- "$@" -c ;;
-       --branch) set -- "$@" -B ;;
+       --rev) set -- "$@" -r ;;
        --repository) set -- "$@" -R ;;
-       --rpm) set -- "$@" -r ;;
-       --upload) set - "$@" -u ;;
-
+       --rpm) set -- "$@" -P ;;
+       --upload) set - "$@" -U ;;
+       --token) set -- "$@" -T ;;
        *) set -- "$@" "$arg" ;;
     esac
 done
 
-while getopts "hHs:tdqp:T:P:bcB:R:r:u" opt; do
+while getopts "hs:tdqp:o:bcr:R:P:UT:" opt; do
     case ${opt} in
         h)  _usage; exit 0 ;;
-        H)  SHOW=true ;;
         s)  STAGE=$OPTARG ;;
         t)  TEST=true ;;
         d)  DATABASE=true ;;
         q)  SPEED=true ;;
-        p)  PLATFORM=$OPTARG ;;
-        T)  TOKEN=$OPTARG ;;
-        P)  PATH_TO_SRC=${OPTARG} ;;
+        p)  PATH_TO_SRC=${OPTARG} ;;
+        o)  OS=${OPTARG} ;;
         b)  BUILD=true ;;
         c)  CLONE=true ;;
-        B)  BRANCH=$OPTARG ;;
+        r)  REV=$OPTARG ;;
         R)  REPOSITORY=$OPTARG ;;
-        r)  RPM=$OPTARG ;;
-        u)  UPLOAD=true ;;
+        P)  RPM=$OPTARG ;;
+        U)  UPLOAD=true ;;
+        T)  TOKEN=$OPTARG ;;
         *) _usage && exit 0;;
     esac
 done
 shift $((OPTIND-1))
 
+echo "Builder: started"
+
 # ==================================== CHECKS =========================================================================
+echo "Builder: check user"
+if [[ -z "${ORION_USER}" ]]; then
+    export ORION_USER=orion
+fi
 
-echo -n "Builder:
-stage - \"${STAGE}\"
-platform - \"${PLATFORM}\"
-test - \"${TEST}\"
-repository - \"${REPOSITORY}\"
-branch - \"${BRANCH}\"
-"
-
-echo "Builder: check path"
+echo "Builder: set path"
 if [[ -z "${PATH_TO_SRC}" ]]; then
     PATH_TO_SRC="${ROOT}/orion"
 fi
+export PATH_TO_SRC
 
-echo "Builder: checking release/deps"
-if [[ "${STAGE}" == 'release' || "${STAGE}" == 'deps' ]]; then
-    echo "Builder: checking platform"
-    if [[ -z "${PLATFORM}]" ]]; then
-        echo "Builder: failed, PLATFORM is not set"
-        exit 1
-    fi
-
-    echo "Builder: checking token"
-    if [[ -z "${TOKEN}" ]]; then
-        echo "Builder: failed, TOKEN is not set"
-        exit 1
-    fi
-
-    build-${PLATFORM}.sh --token ${TOKEN} --stage ${STAGE}
-    exit 0
+echo "Builder: set revision"
+if [[ -z "${REV}" ]]; then
+    REV=${REV_DEFAULT}
 fi
+export REV
 
-echo "Builder: checking credentials"
-if [[ -n "${UPLOAD}" && ${PLATFORM} == 'censos' ]]; then
+echo "Builder: set repository"
+if [[ -z "${REPOSITORY}" ]]; then
+    REPOSITORY=${REPOSITORY_DEFAULT}
+fi
+export REPOSITORY
+
+echo "Builder: set stage"
+if [[ -z "${STAGE}" ]]; then
+    STAGE='release'
+fi
+export STAGE
+
+echo "Builder: set os"
+if [[ -z "${OS}" ]];then
+    OS=${OS_DEFAULT}
+fi
+export OS
+
+if [[ -n "${UPLOAD}" ]]; then
+    echo "Builder: checking credentials"
+
     if [[ -z "${REPO_USER}" ||  -z "${REPO_PASSWORD}" ]]; then
         echo "Builder: failed, REPO_USER or REPO_PASSWORD env variables are not set"
         exit 1
@@ -171,16 +170,20 @@ if [[ -n "${UPLOAD}" && ${PLATFORM} == 'censos' ]]; then
     fi
 fi
 
-echo "Builder: checking start & end"
 FUNC_STATUS=$(echo ${STAGE} | cut -d '_' -f 1)
-START=$(echo ${STAGE} | cut -d '_' -f 2)
-END=$(echo ${STAGE} | cut -d '_' -f 3)
-
 if [[ ${FUNC_STATUS} == 'functional' ]]; then
-    STAGE='functional'
-    if [[ -n "${START}" ]]; then FUNC_STATUS=true; else FUNC_STATUS=false; fi
-    if [[ -n "${END}" && -n ${START} ]]; then FUNC_STATUS=true; else FUNC_STATUS=false; fi
 
+    echo "Builder: checking start & end"
+    START=$(echo ${STAGE} | cut -d '_' -f 2 -s)
+    END=$(echo ${STAGE} | cut -d '_' -f 3 -s)
+
+    if [[ -n "${END}" && -n "${START}" ]]; then
+        FUNC_STATUS=true
+        echo "Builder: Start=${START}"
+        echo "Builder: End=${END}"
+    else FUNC_STATUS=false; fi
+
+    STAGE='functional'
 fi
 
 echo "Builder: checking stage"
@@ -190,10 +193,36 @@ if [[ -n "${TEST}" && -z "${STAGE}" ]]; then
 fi
 
 echo "Builder: checking source code"
-if [[ -z "${CLONE}" && ! -f ${PATH_TO_SRC}/LICENSE ]]; then echo "Builder: failed, source code not found"; exit 1; fi
+if [[ -z "${CLONE}" && ${STAGE} != 'deps' && ${STAGE} != 'release' && ! -f ${PATH_TO_SRC}/LICENSE ]]; then
+    echo "Builder: failed, source code not found"
+    exit 1
+fi
+
+echo -n "Builder: status:
+    PATH_TO_SRC=${PATH_TO_SRC}
+    REV=${REV}
+    REPOSITORY=${REPOSITORY}
+    STAGE=${STAGE}
+    OS=${OS}
+    BROKER=${BROKER}
+    USER=${ORION_USER}
+"
+
+if [[ "${STAGE}" == 'release' || "${STAGE}" == 'deps' ]]; then
+    echo "Builder: checking token"
+    if [[ -z "${TOKEN}" ]]; then
+        echo "Builder: failed, TOKEN is not set"
+        exit 1
+    fi
+
+    echo "Builder: building started"
+    build-${OS}.sh
+    echo "Builder: building ended"
+    exit 0
+fi
 
 # ===================================== MONGO ==========================================================================
-if [[ -n "${DATABASE}" ]]; then
+if [[ -n "${DATABASE}" && ! "$(pidof mongod)" ]]; then
 
     echo "Builder: creating Mongo temp folder"
     rm -Rf /tmp/mongodb || true && mkdir -p /tmp/mongodb
@@ -207,19 +236,17 @@ fi
 # ===================================== CLONE ==========================================================================
 if [[ -n "${CLONE}" ]]; then
 
-    if [[ -z "${BRANCH}" ]]; then BRANCH=${BRANCH_SRC}; fi
-    if [[ -z "${REPOSITORY}" ]]; then REPOSITORY=${REPOSITORY_SRC}; fi
+    echo "Builder: cloning branch ${REV}, from ${REPOSITORY}"
 
-    echo "Builder: cloning branch ${BRANCH}, from ${REPOSITORY}"
-
-    git clone -b ${BRANCH} ${REPOSITORY} ${PATH_TO_SRC}
+    rm -Rf ${PATH_TO_SRC} || true
+    git clone -b ${REV} ${REPOSITORY} ${PATH_TO_SRC}
     chown -R root:root ${PATH_TO_SRC}
 fi
 
 # ===================================== BUILDING =======================================================================
 if [[ -n "${BUILD}" ]]; then
 
-    echo "Builder: installing orion"
+    echo "Builder: orion installation started"
 
     cd ${PATH_TO_SRC}
 
@@ -228,13 +255,15 @@ if [[ -n "${BUILD}" ]]; then
     if [[ $? -ne 0 ]]; then echo "Builder: installation failed"; exit 1; fi
 
     strip /usr/bin/${BROKER}
+
+    echo "Builder: orion installation ended"
 fi
 
 # ===================================== COMPLIANCE TESTS ===============================================================
 
 if [[ -n "${TEST}" && ${STAGE} == "compliance" ]]; then
 
-    echo "Builder: executing compliance test"
+    echo "Builder: compliance test started"
 
     cd ${PATH_TO_SRC}
 
@@ -253,26 +282,29 @@ if [[ -n "${TEST}" && ${STAGE} == "compliance" ]]; then
 
     if ! ${STATUS}; then echo "Builder: compliance test failed"; exit 1; fi
 
+    echo "Builder: compliance test ended";
+
 fi
 
 # ===================================== UNIT TESTS =====================================================================
 
 if [[ -n "${TEST}" && "${STAGE}" = "unit" ]]; then
 
-    echo "Builder: executing unit test"
+    echo "Builder: unit test started"
 
     cd ${PATH_TO_SRC}
 
     make unit_test
     if [[ $? -ne 0 ]]; then echo "Builder: unit test failed"; exit 1; fi
 
+    echo "Builder: unit test ended"
 fi
 
 # ===================================== FUNCTIONAL TESTS ===============================================================
 
 if [[ -n "${TEST}" && "${STAGE}" = "functional" ]]; then
 
-    echo "Builder: executing functional test"
+    echo "Builder: functional test started"
 
     cd ${PATH_TO_SRC}
     STATUS=true
@@ -296,7 +328,56 @@ if [[ -n "${TEST}" && "${STAGE}" = "functional" ]]; then
 
     if ! ${STATUS}; then echo "Builder: functional test failed"; exit 1; fi
 
+    echo "Builder: functional test ended"
 fi
 
-# ===================================== OTHERS =========================================================================
-if [[ -n "${SHOW}" ]]; then _show; fi
+# ===================================== BUILDING RPM ===================================================================
+if [[ -n "${RPM}" ]]; then
+    echo "Builder: ${RPM} rpm building started"
+    ch ${PATH_TO_SRC}
+    git reset --hard && git clean -qfdx
+
+    if [[ ${RPM} = "nightly" ]]; then
+
+        export BROKER_RELEASE=$(date "+%Y%m%d")
+
+        cd ${PATH_TO_SRC}/src/app/contextBroker
+        version=$(cat version.h | grep ORION_VERSION | awk '{ print $3}' | sed 's/"//g' | sed 's/-next//g')
+        sed -i "s/ORION_VERSION .*/ORION_VERSION \"$version\"/g" version.h
+        cd ${PATH_TO_SRC}
+
+    fi
+
+    if [[ "${RPM}" = "release" ]]; then
+        export BROKER_RELEASE=1
+    fi
+
+    make rpm
+
+    echo "Builder: ${RPM} rpm building ended"
+
+fi
+
+# ===================================== UPLOADING RPM ==================================================================
+
+if [[ -n "${UPLOAD}" ]]; then
+
+    NEXUS='https://nexus.lab.fiware.org/repository/el'
+    VER=7
+    ARCH='x86_64'
+
+   echo "Builder: uploading RPM started"
+    cd ${PATH_TO_SRC}/rpm/RPMS/x86_64
+    for FILE in $(ls); do
+      echo "Builder: uploading ${FILE}"
+      curl -v -u ${REPO_USER}:${REPO_PASSWORD} --upload-file ${FILE} ${NEXUS}/${VER}/${ARCH}/${RPM}/${FILE};
+      if !(curl --output /dev/null --silent --head --fail ${NEXUS}/${VER}/${ARCH}/${RPM}/${FILE}); then
+          echo "UPLOAD FAILED!";
+          exit 1;
+      fi
+    done
+
+    echo "Builder: uploading RPM ended"
+fi
+
+echo "Builder: ended"
