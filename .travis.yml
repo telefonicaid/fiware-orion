@@ -19,42 +19,36 @@ env:
   - STAGE=release
   - STAGE=deps
 before_install:
-  - if [[ "${PUSH}" && ${TRAVIS_BRANCH} == "develop" && ${TRAVIS_EVENT_TYPE} == "push" ]]; then
-      export PUSH_STATUS="True";
-    fi
-  - if [[ "${TRAVIS_EVENT_TYPE}" == "pull_request" && "${STAGE}" != "release" && "${STAGE}" != "deps" ]]; then
-      export TEST_STATUS="True";
-    fi
-  - echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
-  - git lfs pull
-  - if [[ "${TEST_STATUS}" && "${STAGE}" != "compliance" ]]; then
-      echo "0" | sudo tee /proc/sys/net/ipv6/conf/all/disable_ipv6;
-      echo '{"ipv6":true,"fixed-cidr-v6":"2001:db8:1::/64"}' | sudo tee /etc/docker/daemon.json;
-      sudo service docker restart;
-      docker pull ${IMAGE_DEPS};
-    fi
+- if [[ "${PUSH}" && ${TRAVIS_BRANCH} == "develop" && ${TRAVIS_EVENT_TYPE} == "push"
+  ]]; then export PUSH_STATUS="True"; fi
+- if [[ "${TRAVIS_EVENT_TYPE}" == "pull_request" && "${STAGE}" != "release" && "${STAGE}"
+  != "deps" ]]; then export TEST_STATUS="True"; fi
+- echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
+- git lfs pull
+- if [[ "${TEST_STATUS}" && "${STAGE}" != "compliance" ]]; then echo "0" | sudo tee
+  /proc/sys/net/ipv6/conf/all/disable_ipv6; echo '{"ipv6":true,"fixed-cidr-v6":"2001:db8:1::/64"}'
+  | sudo tee /etc/docker/daemon.json; sudo service docker restart; docker pull ${IMAGE_DEPS};
+  fi
 install: true
 before_script: true
 script:
-  - if [[ "${TEST_STATUS}" && "${STAGE}" == "compliance" ]]; then
-      $(pwd)/docker/build.sh -s compliance -t -p $(pwd);
-    fi
-  - if [[ "${TEST_STATUS}" && "${STAGE}" != "compliance" ]]; then
-      docker run -t --rm -v $(pwd):${HOME} --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=${HOME}/ldcontexts -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" ${IMAGE_DEPS} build.sh -s ${STAGE} -dqt;
-    fi
-  - if [[ "${PUSH_STATUS}" && "${STAGE}" == "release" ]]; then
-      docker build --build-arg TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg STAGE=${STAGE} -t ${IMAGE_RELEASE} -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
-    fi
-  - if [[ "${PUSH_STATUS}" && "${STAGE}" == "deps" ]]; then
-      docker build --build-arg TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg STAGE=${STAGE} -t ${IMAGE_DEPS} -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
-    fi
+- if [[ "${TEST_STATUS}" && "${STAGE}" == "compliance" ]]; then $(pwd)/docker/build.sh
+  -s compliance -t -p $(pwd); fi
+- if [[ "${TEST_STATUS}" && "${STAGE}" != "compliance" ]]; then docker run -t --rm
+  -v $(pwd):${HOME} --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=${HOME}/ldcontexts
+  -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" ${IMAGE_DEPS} build.sh -s ${STAGE}
+  -dqt; fi
+- if [[ "${PUSH_STATUS}" && "${STAGE}" == "release" ]]; then docker build --build-arg
+  TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg STAGE=${STAGE} -t ${IMAGE_RELEASE}
+  -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ; fi
+- if [[ "${PUSH_STATUS}" && "${STAGE}" == "deps" ]]; then docker build --build-arg
+  TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg STAGE=${STAGE} -t ${IMAGE_DEPS}
+  -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ; fi
 after_success:
-  - if [[ "${PUSH_STATUS}" && "${STAGE}" == "release" ]]; then
-      docker push ${IMAGE_RELEASE};
-    fi
-  - if [[ "${PUSH_STATUS}" && "${STAGE}" == "deps" ]]; then
-      docker push ${IMAGE_DEPS};
-    fi
+- if [[ "${PUSH_STATUS}" && "${STAGE}" == "release" ]]; then docker push ${IMAGE_RELEASE};
+  fi
+- if [[ "${PUSH_STATUS}" && "${STAGE}" == "deps" ]]; then docker push ${IMAGE_DEPS};
+  fi
 notifications:
   email:
     recipients:
@@ -63,3 +57,8 @@ notifications:
     - dmitrii.demin@fiware.org
     on_success: never
     on_failure: always
+  webhooks:
+    urls:
+      secure: sLALYcxSpbz7KMZsHyGtNPc+jpVpdps26DljK7sNONOmn0QPxpr1q4y/+cnKzPQO1cN0sTJV15t2OQ46aI4Mo3hJpUGAgbFomELtlH87V+4w+Q+nDJQj9ijR/T5vi2z3PP3u7rh3Y+IjIqJmfo6LfQ6/G9I72GVNkOcQ/3VncjRGTLqd0w5UFVczg2AcHP5C6diohVsjIYA9+r9s0oGrntawfNmXvExn0xvxWkpEKTuICoMDHj2uw2Bl9WMRbgzrWAyPa3dwb9oBB4ATpE11QMthm/zoDfUvoKFRHmmL1eqSiMDE/MfIuRtE9yy0eEtwRMMLjLrDNmtPK+s+oPR+Ofz2WVu8q8AcXXjEw89YfnPpq9ox/MkS5N409OM/hJDhdLcjj1eC45McoKZiw2JUaEoX0lfMsbD+OOIJHSBuHtMyWD4XDZWwzwMTUiRRs3ND8iOTIbs4CXfr5ubTQCqu3Sr2CNH6hL7fGqolvv100Z4vl83gPsPb6yRz8VgDOTK+CR2erYAV89b8M/NC0QJ/6l/qRQShnfli3BiEi5qvvMaFf0mPW+vjAVuqtwjrT+1ytkD0YQAiJXP9Lds2A5u1ONJbOHARzKykx0ecCrSzUE6PZnvsRZkwebnjCsS85/TNYInni/FNo5IdDfK4M65yKiZf8cSm138ZtoYWFuosB5M=
+    on_success: always
+    on_failure: never
