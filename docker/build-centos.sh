@@ -164,9 +164,11 @@ gpgkey=https://www.mongodb.org/static/pgp/server-4.0.asc
 fi
 
 if [[ ${STAGE} == 'release' ]]; then
+
     echo "Builder: installing orion"
-    git clone -b ${REV} ${REPOSITORY} ${PATH_TO_SRC}
+    git clone ${REPOSITORY} ${PATH_TO_SRC}
     cd ${PATH_TO_SRC}
+    git checkout ${REV}
     make install
     strip /usr/bin/${BROKER}
 
