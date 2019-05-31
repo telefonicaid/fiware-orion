@@ -1,0 +1,279 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Double Forward Update (NGSIv2 forwarding)
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+dbInit CP2
+brokerStart CB
+brokerStart CP1
+brokerStart CP2
+
+--SHELL--
+
+# Based in the test with same name (without fwd_v2 prefix in the file name) in cases/0787_cprs_full_functional,
+# which used NGSIv1 registrations
+#
+# 01. Register E1/A1 on CB  with CP1 as providing application
+# 02. Register E1/A1 on CP1 with CP2 as providing application
+# 03. Update/APPEND E1/A1='On CP2' on CP2
+# 04. Update/UPDATE E1/A1='Via CB' on CB
+# 05. Query E1/A1 in CP2
+#
+
+echo "01. Register E1/A1 on CB  with CP1 as providing application"
+echo "==========================================================="
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T1",
+        "id": "E1"
+      }
+    ],
+    "attrs": [ "A1" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Register E1/A1 on CP1  with CP2 as providing application"
+echo "============================================================"
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T1",
+        "id": "E1"
+      }
+    ],
+    "attrs": [ "A1" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP2_PORT}'/v2"
+    }
+  }
+}'
+orionCurl --url /v2/registrations/ --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "03. Update/APPEND E1/A1='On CP2' on CP2"
+echo "======================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "T1",
+      "id":   "E1",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "string",
+          "value": "On CP2"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "04. Update/UPDATE E1/A1='Via CB' on CB"
+echo "======================================"
+payload='{
+  "contextElements": [
+    {
+      "type": "T1",
+      "id":   "E1",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "string",
+          "value": "Via CB"
+        }
+      ]
+    }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo "05. Query E1/A1 in CP2"
+echo "======================"
+payload='{
+  "entities": [
+    {
+      "id":   "E1",
+      "type": "T1"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+--REGEXPECT--
+01. Register E1/A1 on CB  with CP1 as providing application
+===========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Register E1/A1 on CP1  with CP2 as providing application
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Update/APPEND E1/A1='On CP2' on CP2
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 189
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+04. Update/UPDATE E1/A1='Via CB' on CB
+======================================
+HTTP/1.1 200 OK
+Content-Length: 189
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+05. Query E1/A1 in CP2
+======================
+HTTP/1.1 200 OK
+Content-Length: 195
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": "Via CB"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+dbDrop CB
+dbDrop CP1
+dbDrop CP2

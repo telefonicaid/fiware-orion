@@ -1,4 +1,4 @@
-# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Update Found And Not Found In Local And Three CPrs
+Update Found And Not Found In Local And Three CPrs (NGSIv2 forwarding)
 
 --SHELL-INIT--
 dbInit CB
@@ -35,6 +35,8 @@ brokerStart CP3
 
 --SHELL--
 
+# Based in the test with same name (without fwd_v2 prefix in the file name) in cases/0787_cprs_full_functional_v2,
+# which used NGSIv1 registrations
 #
 # The purpose of this test is to verify that 'one FOUND and one NOT-FOUND' from each of the three 
 # Context Providers and in the local database works correctly.
@@ -127,31 +129,22 @@ echo
 echo "04. Register E1/T1/A1+A2 in CB, provApp: CP1"
 echo "============================================"
 payload='{
-  "contextRegistrations": [
-  {
+  "dataProvided": {
     "entities": [
       {
-         "type": "T1",
-         "isPattern": "false",
-         "id": "E1"
+        "type": "T1",
+        "id": "E1"
       }
     ],
-    "attributes": [
-      {
-        "name": "A1",
-        "type": "string"
-      },
-      {
-        "name": "A2",
-        "type": "string"
-      }
-    ],
-    "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
+    "attrs": [ "A1", "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
     }
- ],
- "duration": "P1M"
+  }
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload"
+orionCurl --url /v2/registrations --payload "$payload"
 echo
 echo
 
@@ -159,31 +152,22 @@ echo
 echo "05. Register E1/T1/A3+A4 in CB, provApp: CP2"
 echo "============================================"
 payload='{
-  "contextRegistrations": [
-  {
+  "dataProvided": {
     "entities": [
       {
-         "type": "T1",
-         "isPattern": "false",
-         "id": "E1"
+        "type": "T1",
+        "id": "E1"
       }
     ],
-    "attributes": [
-      {
-        "name": "A3",
-        "type": "string"
-      },
-      {
-        "name": "A4",
-        "type": "string"
-      }
-    ],
-    "providingApplication": "http://localhost:'${CP2_PORT}'/v1"
+    "attrs": [ "A3", "A4" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP2_PORT}'/v2"
     }
- ],
- "duration": "P1M"
+  }
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload"
+orionCurl --url /v2/registrations --payload "$payload"
 echo
 echo
 
@@ -191,31 +175,22 @@ echo
 echo "06. Register E1/T1/A5+A6 in CB, provApp: CP3"
 echo "============================================"
 payload='{
-  "contextRegistrations": [
-  {
+  "dataProvided": {
     "entities": [
       {
-         "type": "T1",
-         "isPattern": "false",
-         "id": "E1"
+        "type": "T1",
+        "id": "E1"
       }
     ],
-    "attributes": [
-      {
-        "name": "A5",
-        "type": "string"
-      },
-      {
-        "name": "A6",
-        "type": "string"
-      }
-    ],
-    "providingApplication": "http://localhost:'${CP3_PORT}'/v1"
+    "attrs": [ "A5", "A6" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP3_PORT}'/v2"
     }
- ],
- "duration": "P1M"
+  }
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload"
+orionCurl --url /v2/registrations --payload "$payload"
 echo
 echo
 
@@ -363,44 +338,32 @@ Date: REGEX(.*)
 
 04. Register E1/T1/A1+A2 in CB, provApp: CP1
 ============================================
-HTTP/1.1 200 OK
-Content-Length: 62
-Content-Type: application/json
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "duration": "P1M",
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
 
 
 05. Register E1/T1/A3+A4 in CB, provApp: CP2
 ============================================
-HTTP/1.1 200 OK
-Content-Length: 62
-Content-Type: application/json
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "duration": "P1M",
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
 
 
 06. Register E1/T1/A5+A6 in CB, provApp: CP3
 ============================================
-HTTP/1.1 200 OK
-Content-Length: 62
-Content-Type: application/json
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "duration": "P1M",
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
 
 
 07. Update/APPEND E1/T1/A7 in CB
@@ -416,13 +379,13 @@ Date: REGEX(.*)
 08. Update/UPDATE E1/A1+A2+A3+A4+A5+A6+A7+A8
 ============================================
 HTTP/1.1 404 Not Found
-Content-Length: 121
+Content-Length: 133
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Some of the following attributes were not updated: { E1-T1 : [A8, A2, A4, A6] }",
+    "description": "Some of the following attributes were not updated: { E1-T1 : [A8, A1, A2, A3, A4, A5, A6] }",
     "error": "PartialUpdate"
 }
 

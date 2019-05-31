@@ -248,6 +248,19 @@ void UpdateContextResponse::fill(UpdateContextResponse* upcrsP)
 
 /* ****************************************************************************
 *
+* UpdateContextResponse::fill -
+*/
+void UpdateContextResponse::fill(UpdateContextRequest* upcrP, HttpStatusCode sc)
+{
+  contextElementResponseVector.fill(upcrP->entityVector, sc);
+
+  // Note that "external" StatusCode is always SccOk, sc is not used here
+  errorCode.fill(SccOk);
+}
+
+
+/* ****************************************************************************
+*
 * UpdateContextResponse::merge -
 *
 * For each attribute in upcrsP::ContextElementResponse[cerIx]::ContextElement::ContextAttributeVector

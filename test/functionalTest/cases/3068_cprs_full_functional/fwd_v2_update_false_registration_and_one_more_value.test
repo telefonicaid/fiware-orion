@@ -1,4 +1,4 @@
-# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Update With a False Registration and one more value
+Update With a False Registration and one more value (NGSIv2 forwarding)
 
 --SHELL-INIT--
 dbInit CB
@@ -31,6 +31,8 @@ brokerStart CP1
 
 --SHELL--
 
+# Based in the test with same name (without fwd_v2 prefix in the file name) in cases/0787_cprs_full_functional,
+# which used NGSIv1 registrations
 #
 # 01. Register E1/T1/A1-CP1 in CB
 # 02. Update/APPEND E1/T1/A2 in CB
@@ -41,27 +43,22 @@ brokerStart CP1
 echo "01. Register E1/T1/A1-CP1 in CB"
 echo "==============================="
 payload='{
-  "contextRegistrations": [
-    {
-      "entities": [
-        {
-           "type": "T1",
-           "isPattern": "false",
-           "id": "E1"
-        }
-      ],
-      "attributes": [
-        {
-          "name": "A1",
-          "type": "string"
-        }
-      ],
-      "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T1",
+        "id": "E1"
+      }
+    ],
+    "attrs": [ "A1" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
     }
- ],
- "duration": "P1M"
+  }
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload"
+orionCurl --url /v2/registrations --payload "$payload"
 echo
 echo
 
@@ -92,24 +89,27 @@ echo
 echo "03. Update/UPDATE E1/T1/A1+A2 in CB"
 echo "==================================="
 payload='{
-  "actionType": "update",
-  "entities":
-  [
+  "contextElements": [
     {
       "type": "T1",
       "id":   "E1",
-      "A1": {
-         "type": "string",
-         "value": "A1 Via CB"
-      },
-      "A2": {
-         "type": "string",
-         "value": "A2 in CB"
-      }
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "string",
+          "value": "A1 Via CB"
+        },
+        {
+          "name": "A2",
+          "type": "string",
+          "value": "A2 in CB"
+        }
+      ]
     }
-  ]
+  ],
+  "updateAction": "UPDATE"
 }'
-orionCurl --url /v2/op/update --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -124,7 +124,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v2/op/query --payload "$payload"
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -132,16 +132,12 @@ echo
 --REGEXPECT--
 01. Register E1/T1/A1-CP1 in CB
 ===============================
-HTTP/1.1 200 OK
-Content-Length: 62
-Content-Type: application/json
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "duration": "P1M", 
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
 
 
 02. Update/APPEND E1/T1/A2 in CB
@@ -178,37 +174,85 @@ Date: REGEX(.*)
 
 03. Update/UPDATE E1/T1/A1+A2 in CB
 ===================================
-HTTP/1.1 404 Not Found
-Content-Length: 109
+HTTP/1.1 200 OK
+Content-Length: 393
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Some of the following attributes were not updated: { E1-T1 : [A1] }",
-    "error": "PartialUpdate"
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }, 
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "404", 
+                "details": "E1", 
+                "reasonPhrase": "No context element found"
+            }
+        }
+    ]
 }
 
 
 04. Query E1/T1/{} in CB - see only E1/T1/A2
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 81
+Content-Length: 197
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-[
-    {
-        "A2": {
-            "metadata": {},
-            "type": "string",
-            "value": "A2 in CB"
-        },
-        "id": "E1",
-        "type": "T1"
-    }
-]
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2", 
+                        "type": "string", 
+                        "value": "A2 in CB"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
 --TEARDOWN--

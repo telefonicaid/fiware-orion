@@ -150,5 +150,9 @@ Some additional comments:
     https://github.com/telefonicaid/fiware-orion/issues/2282
 -   In the case of partial updates (e.g. `POST /v2/op/update` resulting in some entities/attributes being updated and
     other entities/attributes not being updated due to failing or missing CPrs), a 404 Not Found is returned to the client.
-    The `error` field in this case is `PartialUpdate` and the `description` field contains information about which entity
-    attributes weren't updated.
+    The `error` field in this case is `PartialUpdate`. The `description` field contains a list of attributes corresponding
+    to the partial update. In the case of NGSIv1 CPr, the CPr response to CB returns exactly the attributes that
+    weren't updated in a partial update. In the case of NGSIv2 CPr, the CPr response to Orion doesn't provide information
+    about which attributes were updated and which ones were not in a partial update. Thus, in a general case the list
+    of attributes in `description` contains *at least one* attribute that was not updated (to a maximum of all them). If
+    only NGSIv1 CPrs are involved in the fowarding, the list precisely identifies only the attributes that weren't updated.

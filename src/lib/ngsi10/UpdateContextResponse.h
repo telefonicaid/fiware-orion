@@ -30,6 +30,7 @@
 
 #include "ngsi/ContextElementResponseVector.h"
 #include "ngsi/StatusCode.h"
+#include "ngsi10/UpdateContextRequest.h"
 
 #include "rest/OrionError.h"
 
@@ -54,6 +55,7 @@ typedef struct UpdateContextResponse
   std::string   check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError);
   void          release(void);
   void          fill(UpdateContextResponse* upcrsP);
+  void          fill(UpdateContextRequest* upcrP, HttpStatusCode sc);   // Needed by NGSIv2 forwarding logic
   void          notFoundPush(Entity* eP, ContextAttribute* aP, StatusCode* scP);
   void          foundPush(Entity* eP, ContextAttribute* aP);
   void          merge(UpdateContextResponse* upcrsP);

@@ -191,7 +191,7 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   LM_T(LmtCPrForwardRequestPayload, ("forward updateContext request payload: %s", payload.c_str()));
 
   std::map<std::string, std::string>  noHeaders;
-  long long                           statusCode; // not used by the moment
+  long long                           statusCode;
 
   r = httpRequestSend(fromIp,   // thread variable
                       ip,
@@ -312,11 +312,18 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   else  // NGSIv2
   {
     LM_T(LmtForward, ("upcrP->providerFormat == V2. out: '%s'", out.c_str()));
-    // NGSIv2 forward - no payload to be received, just a 204 No Content HTTP Header
-    if (strstr(out.c_str(), "204 No Content") != NULL)
+    // NGSIv2 forward - no payload to be received
+
+    if (statusCode == SccNoContent)
     {
       LM_T(LmtForward, ("Found '204 No Content'"));
-      upcrsP->errorCode.fill(SccNone);
+      upcrsP->fill(upcrP, SccOk);
+      return true;
+    }
+    if (statusCode == SccContextElementNotFound)
+    {
+      LM_T(LmtForward, ("Found '404 Not Found'"));
+      upcrsP->fill(upcrP, SccContextElementNotFound);
       return true;
     }
 
@@ -805,7 +812,7 @@ std::string postUpdateContext
       failing = failing.substr(0, failing.size() - 2);
 
       // If some CER (but not all) fail, then it is a partial update
-      parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "Attributes that were not updated: { " + failing + " }", "PartialUpdate");
+      parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "Some of the following attributes were not updated: { " + failing + " }", "PartialUpdate");
     }
     else  // failures == 0
     {
