@@ -165,9 +165,8 @@ fi
 
 if [[ ${STAGE} == 'release' ]]; then
     echo "Builder: installing orion"
-
-    git clone ${REPOSITORY_SRC} ${ROOT}/orion
-    cd ${ROOT}/orion
+    git clone -b ${REV} ${REPOSITORY} ${PATH_TO_SRC}
+    cd ${PATH_TO_SRC}
     make install
     strip /usr/bin/${BROKER}
 
