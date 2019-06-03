@@ -859,6 +859,12 @@ int main(int argC, char* argV[])
     }
   }
 
+  //
+  // If trace levels are set, turn set logLevel to DEBUG, so that the trace messages will actually pass through
+  //
+  if (paIsSet(argC, argV, "-t"))
+    strncpy(paLogLevel, "DEBUG", sizeof(paLogLevel));
+
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
@@ -876,14 +882,6 @@ int main(int argC, char* argV[])
   if ((s = pidFile(true)) != 0)
   {
     _exit(s);
-  }
-
-  // Argument consistency check (-t AND NOT -logLevel)
-  if ((paTraceV[0] != 0) && (strcmp(paLogLevel, "DEBUG") != 0))
-  {
-    printf("incompatible options: traceLevels cannot be used without setting -logLevel to DEBUG\n");
-    paUsage();
-    exit(1);
   }
 
   paCleanup();
