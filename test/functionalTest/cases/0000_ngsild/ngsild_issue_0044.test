@@ -126,7 +126,7 @@ echo
 ==========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:volatile:1>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:AgriCrop:df72dc57-1eb9-42a3-88a9-8647ecc954b4>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:AgriCrop:df72dc57-1eb9-42a3-88a9-8647ecc954b4
 Date: REGEX(.*)
 

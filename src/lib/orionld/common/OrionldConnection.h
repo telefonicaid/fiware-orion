@@ -55,6 +55,8 @@ typedef struct OrionldConnectionState
   char*            tenant;
   char*            link;
   bool             useLinkHeader;
+  bool             linkToBeFreed;
+  bool             linkHeaderAdded;
   OrionldContext   inlineContext;
   OrionldContext*  contextP;
   ApiVersion       apiVersion;
@@ -64,6 +66,8 @@ typedef struct OrionldConnectionState
   KjNode*          geoCoordsP;
   int64_t          overriddenCreationDate;
   int64_t          overriddenModificationDate;
+  bool             entityCreated;                // If an entity is created, if complex context, it must be stored
+  char*            entityId;
 } OrionldConnectionState;
 
 

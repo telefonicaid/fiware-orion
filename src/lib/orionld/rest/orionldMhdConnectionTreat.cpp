@@ -392,17 +392,21 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
 
 
+    // ********************************************************************************************
     //
-    // Creating the context in Context Server, if necessary
+    // Calling the SERVICE ROUTINE
     //
-    if (contextToBeCreated == true)
-    {
-      char   url[128];
-      char   urn[32];
+    LM_T(LmtServiceRoutine, ("Calling Service Routine %s", ciP->serviceP->url));
+    bool b = ciP->serviceP->serviceRoutine(ciP);
+    LM_T(LmtServiceRoutine, ("service routine '%s' done", ciP->serviceP->url));
 
+    if ((b == true) && (contextToBeCreated == true))
+    {
       //
+      // Creating the context in Context Server
+      //
+
       // The Context tree must be cloned, as it is created inside the thread's kjson
-      //
       KjNode* clonedTree = kjClone(contextNodeP);
 
       if (clonedTree == NULL)
@@ -412,12 +416,57 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
         goto respond;
       }
 
-      snprintf(urn, sizeof(urn), "urn:volatile:%d", volatileContextNo);
-      snprintf(url, sizeof(url), "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", hostname, portNo, urn);
-      ++volatileContextNo;
+      char   url[256];
+      char*  urlP = url;
+      char   urn[32];
+      char*  contextId;
 
-      char* details;
-      if (orionldContextAppend(urn, clonedTree, OrionldUserContext, &details) == NULL)
+      LM_TMP(("CONTEXT: About to create a context"));
+      LM_TMP(("CONTEXT: orionldState.entityCreated == '%s'", FT(orionldState.entityCreated)));
+      LM_TMP(("CONTEXT: orionldState.entityId      == '%s'", orionldState.entityId));
+
+      //
+      // If an Entity was created, then the context takes the entity id as name.
+      // Else, if it's just an update, the name of the context is urn:volatile:XX where XX is a running number.
+      //
+      // FIXME: This needs to be discussed in the Bindings document.
+      // FIXME: What about creation of Subscriptions? Should be treated the same. Context name == sub id
+      //
+      if (orionldState.entityCreated == true)
+      {
+        unsigned int nb = snprintf(url, sizeof(url), "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", hostname, portNo, orionldState.entityId);
+
+        if (nb >= sizeof(url) - 1)
+        {
+          int   sz   = 7 + strlen(hostname) + 5 + strlen(orionldState.entityId) + 1;
+          char* path = (char*) malloc(sz);
+
+          if (path == NULL)
+            LM_X(1, ("Out of memory trying to allocate %d butes for a context", sz));
+
+          snprintf(path, sz - 1, "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", hostname, portNo, orionldState.entityId);
+          urlP = path;
+          orionldState.linkToBeFreed = true;
+        }
+
+        contextId = orionldState.entityId;
+      }
+      else
+      {
+        snprintf(urn, sizeof(urn), "urn:volatile:%d", volatileContextNo);
+        snprintf(url, sizeof(url), "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", hostname, portNo, urn);
+        ++volatileContextNo;
+        contextId = urn;
+      }
+
+      LM_TMP(("CONTEXT: urlP                       == '%s'", urlP));
+      LM_TMP(("CONTEXT: urn                        == '%s'", urn));
+      LM_TMP(("CONTEXT: contextId                  == '%s'", contextId));
+
+      char*            details;
+      OrionldContext*  contextP;
+
+      if ((contextP = orionldContextAppend(contextId, clonedTree, OrionldUserContext, &details)) == NULL)
       {
         kjFree(clonedTree);
         orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create context", details, OrionldDetailsString);
@@ -425,29 +474,10 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
         goto respond;
       }
 
-      orionldState.link          = url;
+      orionldState.link          = urlP;
       orionldState.useLinkHeader = true;
     }
-
-
-    // ********************************************************************************************
-    //
-    // Calling the SERVICE ROUTINE
-    //
-    // FIXME - call service routine before creating the context in the Context Server.
-    //         Like that, the service routine can inform on whether an entity was created or not.
-    //         If created, then the context should be named "entity id".
-    //         If not created, the context should be named "urn:volatile:XX", XX being a running number
-    //         Also, if the service rouitine fails, no context should be made
-    //
-    LM_T(LmtServiceRoutine, ("Calling Service Routine %s", ciP->serviceP->url));
-    bool b = ciP->serviceP->serviceRoutine(ciP);
-    LM_T(LmtServiceRoutine, ("service routine '%s' done", ciP->serviceP->url));
-
-    if ((ciP->responseTree != NULL) && (ciP->responseTree->value.firstChildP != NULL))
-      LM_T(LmtPayloadParse, ("Right after serviceRoutine, first child of response is: '%s'", ciP->responseTree->value.firstChildP->name));
-
-    if (b == false)
+    else if (b == false)
     {
       //
       // If the service routine failed (returned FALSE), but no HTTP status ERROR code is set,
@@ -516,7 +546,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     }
   }
 
-  if ((contextToBeCreated) && (ciP->httpStatusCode < 400))
+  if ((contextToBeCreated == true) && (ciP->httpStatusCode < 400))
   {
     httpHeaderLinkAdd(ciP, orionldState.link);
     orionldState.useLinkHeader = true;
