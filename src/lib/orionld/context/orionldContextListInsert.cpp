@@ -43,6 +43,8 @@ void orionldContextListInsert(OrionldContext* contextP, bool semAlreadyTaken)
 {
   LM_T(LmtContextList, ("Adding context '%s' to the list (context at %p, tree at %p)", contextP->url, contextP, contextP->tree));
 
+  LM_TMP(("Adding context '%s' to context list. Type: %s", contextP->url, kjValueType(contextP->tree->type)));
+
   if (semAlreadyTaken == false)
     orionldContextListSemTake(__FILE__);
 
@@ -59,31 +61,6 @@ void orionldContextListInsert(OrionldContext* contextP, bool semAlreadyTaken)
 
   contextP->next      = NULL;
   contextP->temporary = false;
-
-#if 0
-  //
-  // Presenting the list  (TMP)
-  //
-  LM_TMP(("-------------------------------------------------------------------------------------------------------"));
-  LM_TMP(("Current context LIST:"));
-  for (OrionldContext* ctxP = orionldContextHead; ctxP != NULL; ctxP = ctxP->next)
-  {
-    if (ctxP->tree->value.firstChildP->value.firstChildP != NULL)
-      LM_TMP(("o %p: tree:%p, next:%p, url:%s, type:%s/%s/%s", ctxP, ctxP->tree, ctxP->next, ctxP->url,
-              kjValueType(ctxP->tree->type),
-              kjValueType(ctxP->tree->value.firstChildP->type),
-              kjValueType(ctxP->tree->value.firstChildP->value.firstChildP->type)));
-    else if (ctxP->tree->value.firstChildP != NULL)
-      LM_TMP(("o %p: tree:%p, next:%p, url:%s, type:%s/%s", ctxP, ctxP->tree, ctxP->next, ctxP->url,
-              kjValueType(ctxP->tree->type),
-              kjValueType(ctxP->tree->value.firstChildP->type)));
-    else
-      LM_TMP(("o %p: tree:%p, next:%p, url:%s, type:%s", ctxP, ctxP->tree, ctxP->next, ctxP->url,
-              kjValueType(ctxP->tree->type)));
-  }
-  LM_TMP(("-------------------------------------------------------------------------------------------------------"));
-  LM_TMP((""));
-#endif
 
   if (semAlreadyTaken == false)
     orionldContextListSemGive(__FILE__);

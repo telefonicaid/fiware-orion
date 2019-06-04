@@ -140,6 +140,7 @@ function usage()
   empty=$(echo $sfile | tr 'a-zA-z/0-9.:' ' ')
   echo "$sfile [-u (usage)]"
   echo "$empty [-v (verbose)]"
+  echo "$empty [-s (silent)]"
   echo "$empty [--filter <test filter>]"
   echo "$empty [--match <string for test to match>]"
   echo "$empty [--keep (don't remove output files)]"
@@ -212,111 +213,113 @@ function exitFunction()
   # then
   # ...
 
-  #
-  # Error 9 - output not as expected
-  #
-  if [ $exitCode == 9 ]
+  if [ "$silent" == "off" ]
   then
-      echo
-      echo "Error 9 - output not as expected"
-      echo
-      echo $diffFile:
-      echo  "---------------------------------------"
-      cat $diffFile
-      echo  "---------------------------------------"
-      echo
-
-      cat /tmp/orionld.log | egrep 'lvl=ERR|lvl=WARN' > /tmp/orionld.err-warn.log
-      if [ -s /tmp/orionld.err-warn.log ]
+      #
+      # Error 9 - output not as expected
+      #
+      if [ $exitCode == 9 ]
       then
-          echo "Errors and warnings from the orionld log file"
+          echo
+          echo "Error 9 - output not as expected"
+          echo
+          echo $diffFile:
+          echo  "---------------------------------------"
+          cat $diffFile
+          echo  "---------------------------------------"
+          echo
+
+          cat /tmp/orionld.log | egrep 'lvl=ERR|lvl=WARN' > /tmp/orionld.err-warn.log
+          if [ -s /tmp/orionld.err-warn.log ]
+          then
+              echo "Errors and warnings from the orionld log file"
+              echo "-------------------------------------------------"
+              cat /tmp/orionld.err-warn.log
+              echo "-------------------------------------------------"
+              echo
+              echo
+          fi
+
+          if [ -s /tmp/accumulator_9997_stderr ]
+          then
+              echo "/tmp/accumulator_9997_stderr:"
+              echo "-------------------------------------------------"
+              cat /tmp/accumulator_9997_stderr
+              echo "-------------------------------------------------"
+              echo
+              echo
+          fi
+
+          if [ -s /tmp/accumulator_9997_stdout ]
+          then
+              echo "/tmp/accumulator_9997_stdout:"
+              echo "-------------------------------------------------"
+              cat /tmp/accumulator_9997_stdout
+              echo "-------------------------------------------------"
+              echo
+              echo
+          fi
+      elif [ $exitCode == 7 ] || [ $exitCode == 8 ] || [ $exitCode == 10 ] || [ $exitCode == 20 ] || [ $exitCode == 11 ]
+      then
+          echo
+          echo "Error $exitCode: $errorText"
+          echo
+          echo "$stderrFile:"
           echo "-------------------------------------------------"
-          cat /tmp/orionld.err-warn.log
+          cat $stderrFile
           echo "-------------------------------------------------"
           echo
+          echo
+
+          if [ "$verbose" == "on" ]
+          then
+              echo "$stdoutFile:"
+              echo "-------------------------------------------------"
+              cat $stdoutFile
+              echo "-------------------------------------------------"
+          else
+              echo "Run in verbose mode to see also the stdout-file $stdoutFile"
+          fi
+          echo
+          echo
+
+          cat /tmp/orionld.log | egrep 'lvl=ERR|lvl=WARN' > /tmp/orionld.err-warn.log
+          if [ -s /tmp/orionld.err-warn.log ]
+          then
+              echo "Errors and warnings from the orionld log file"
+              echo "-------------------------------------------------"
+              cat /tmp/orionld.err-warn.log
+              echo "-------------------------------------------------"
+              echo
+              echo
+          fi
+
+          if [ -s /tmp/accumulator_9997_stderr ]
+          then
+              echo "/tmp/accumulator_9997_stderr:"
+              echo "-------------------------------------------------"
+              cat /tmp/accumulator_9997_stderr
+              echo "-------------------------------------------------"
+              echo
+              echo
+          fi
+
+          if [ -s /tmp/accumulator_9997_stdout ]
+          then
+              echo "/tmp/accumulator_9997_stdout:"
+              echo "-------------------------------------------------"
+              cat /tmp/accumulator_9997_stdout
+              echo "-------------------------------------------------"
+              echo
+              echo
+          fi
+      elif [ $exitCode == 1 ] || [ $exitCode == 2 ] || [ $exitCode == 3 ] || [ $exitCode == 4 ] || [ $exitCode == 5 ] || [ $exitCode == 6 ]
+      then
+          echo
+          echo "Error $exitCode (error in test-case-segments): $errorText"
           echo
       fi
-
-      if [ -s /tmp/accumulator_9997_stderr ]
-      then
-          echo "/tmp/accumulator_9997_stderr:"
-          echo "-------------------------------------------------"
-          cat /tmp/accumulator_9997_stderr
-          echo "-------------------------------------------------"
-          echo
-          echo
-      fi
-
-      if [ -s /tmp/accumulator_9997_stdout ]
-      then
-          echo "/tmp/accumulator_9997_stdout:"
-          echo "-------------------------------------------------"
-          cat /tmp/accumulator_9997_stdout
-          echo "-------------------------------------------------"
-          echo
-          echo
-      fi
-  elif [ $exitCode == 7 ] || [ $exitCode == 8 ] || [ $exitCode == 10 ] || [ $exitCode == 20 ] || [ $exitCode == 11 ]
-  then
-      echo
-      echo "Error $exitCode: $errorText"
-      echo
-      echo "$stderrFile:"
-      echo "-------------------------------------------------"
-      cat $stderrFile
-      echo "-------------------------------------------------"
-      echo
-      echo
-
-      if [ "$verbose" == "on" ]
-      then
-          echo "$stdoutFile:"
-          echo "-------------------------------------------------"
-          cat $stdoutFile
-          echo "-------------------------------------------------"
-      else
-          echo "Run in verbose mode to see also the stdout-file $stdoutFile"
-      fi
-      echo
-      echo
-
-      cat /tmp/orionld.log | egrep 'lvl=ERR|lvl=WARN' > /tmp/orionld.err-warn.log
-      if [ -s /tmp/orionld.err-warn.log ]
-      then
-          echo "Errors and warnings from the orionld log file"
-          echo "-------------------------------------------------"
-          cat /tmp/orionld.err-warn.log
-          echo "-------------------------------------------------"
-          echo
-          echo
-      fi
-
-      if [ -s /tmp/accumulator_9997_stderr ]
-      then
-          echo "/tmp/accumulator_9997_stderr:"
-          echo "-------------------------------------------------"
-          cat /tmp/accumulator_9997_stderr
-          echo "-------------------------------------------------"
-          echo
-          echo
-      fi
-
-      if [ -s /tmp/accumulator_9997_stdout ]
-      then
-          echo "/tmp/accumulator_9997_stdout:"
-          echo "-------------------------------------------------"
-          cat /tmp/accumulator_9997_stdout
-          echo "-------------------------------------------------"
-          echo
-          echo
-      fi
-  elif [ $exitCode == 1 ] || [ $exitCode == 2 ] || [ $exitCode == 3 ] || [ $exitCode == 4 ] || [ $exitCode == 5 ] || [ $exitCode == 6 ]
-  then
-      echo
-      echo "Error $exitCode (error in test-case-segments): $errorText"
-      echo
   fi
-
 
   if [ "$stopOnError" == "on" ] || [ "$forced" == "DIE" ]
   then
@@ -365,6 +368,7 @@ logMsg "$ME, in directory $SCRIPT_HOME"
 typeset -i fromIx
 typeset -i toIx
 verbose=off
+silent=off
 dryrun=off
 keep=off
 stopOnError=off
@@ -386,6 +390,7 @@ while [ "$#" != 0 ]
 do
   if   [ "$1" == "-u" ];             then usage 0;
   elif [ "$1" == "-v" ];             then verbose=on;
+  elif [ "$1" == "-s" ];             then silent=on;
   elif [ "$1" == "--dryrun" ];       then dryrun=on;
   elif [ "$1" == "--keep" ];         then keep=on;
   elif [ "$1" == "--stopOnError" ];  then stopOnError=on;

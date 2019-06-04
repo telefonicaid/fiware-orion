@@ -1136,6 +1136,11 @@ static bool addTriggeredSubscriptions_withCache
     aList.fill(cSubP->attributes);
 
     // Throttling
+    LM_T(LmtSubCache, ("---------------- Throttling check ------------------"));
+    LM_T(LmtSubCache, ("cSubP->throttling:           %d", cSubP->throttling));
+    LM_T(LmtSubCache, ("cSubP->lastNotificationTime: %d", cSubP->lastNotificationTime));
+    LM_T(LmtSubCache, ("Now:                         %d", now));
+
     if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
     {
       if ((now - cSubP->lastNotificationTime) < cSubP->throttling)

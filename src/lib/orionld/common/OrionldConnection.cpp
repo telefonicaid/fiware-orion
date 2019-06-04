@@ -42,8 +42,10 @@ __thread OrionldConnectionState orionldState = { 0 };
 // orionldThreadState.cpp/h
 // orionldGlobalState.cpp/h
 //
-int     requestNo = 0;             // Never mind protecting with semaphore. Just a debugging help
-char    kallocBuffer[32 * 1024];
-KAlloc  kalloc;
-Kjson   kjson;
-Kjson*  kjsonP;
+int             requestNo                = 0;             // Never mind protecting with semaphore. Just a debugging help
+char            kallocBuffer[32 * 1024];
+KAlloc          kalloc;
+Kjson           kjson;
+Kjson*          kjsonP;
+unsigned short  portNo                   = 0;
+char*           hostname                 = (char*) "localhost";

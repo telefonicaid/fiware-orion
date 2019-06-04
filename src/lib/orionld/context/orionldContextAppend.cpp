@@ -31,7 +31,6 @@ extern "C"
 }
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/context/orionldContextList.h"                // orionldContextHead, orionldContextTail
 #include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
 #include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup

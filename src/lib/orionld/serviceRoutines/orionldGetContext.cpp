@@ -46,6 +46,8 @@ bool orionldGetContext(ConnectionInfo* ciP)
   OrionldContext* contextP    = orionldContextLookup(ciP->wildcard[0]);
   KjNode*         contextTree = NULL;
 
+  orionldState.useLinkHeader = false;  // We don't want the Link header for context requests
+
   if (contextP != NULL)
   {
     contextTree = contextP->tree;

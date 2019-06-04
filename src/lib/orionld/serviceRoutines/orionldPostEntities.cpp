@@ -869,6 +869,8 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   KjNode*  createdAtP         = NULL;
   KjNode*  modifiedAtP        = NULL;
 
+  orionldState.useLinkHeader = false;
+
   if (payloadCheck(ciP, &idNodeP, &typeNodeP, &locationP, &contextNodeP, &observationSpaceP, &operationSpaceP, &createdAtP, &modifiedAtP) == false)
     return false;
 
