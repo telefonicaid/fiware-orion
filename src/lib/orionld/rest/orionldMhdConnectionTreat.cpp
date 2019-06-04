@@ -396,23 +396,14 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     // Calling the SERVICE ROUTINE
     //
-    // FIXME - call service routine before creating the context in the Context Server.
-    //         Like that, the service routine can inform on whether an entity was created or not.
-    //         If created, then the context should be named "entity id".
-    //         If not created, the context should be named "urn:volatile:XX", XX being a running number
-    //         Also, if the service rouitine fails, no context should be made
-    //
     LM_T(LmtServiceRoutine, ("Calling Service Routine %s", ciP->serviceP->url));
     bool b = ciP->serviceP->serviceRoutine(ciP);
     LM_T(LmtServiceRoutine, ("service routine '%s' done", ciP->serviceP->url));
 
-    if ((ciP->responseTree != NULL) && (ciP->responseTree->value.firstChildP != NULL))
-      LM_T(LmtPayloadParse, ("Right after serviceRoutine, first child of response is: '%s'", ciP->responseTree->value.firstChildP->name));
-
     if ((b == true) && (contextToBeCreated == true))
     {
       //
-      // Creating the context in Context Server, if necessary
+      // Creating the context in Context Server
       //
 
       // The Context tree must be cloned, as it is created inside the thread's kjson
@@ -434,6 +425,13 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       LM_TMP(("CONTEXT: orionldState.entityCreated == '%s'", FT(orionldState.entityCreated)));
       LM_TMP(("CONTEXT: orionldState.entityId      == '%s'", orionldState.entityId));
 
+      //
+      // If an Entity was created, then the context takes the entity id as name.
+      // Else, if it's just an update, the name of the context is urn:volatile:XX where XX is a running number.
+      //
+      // FIXME: This needs to be discussed in the Bindings document.
+      // FIXME: What about creation of Subscriptions? Should be treated the same. Context name == sub id
+      //
       if (orionldState.entityCreated == true)
       {
         unsigned int nb = snprintf(url, sizeof(url), "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", hostname, portNo, orionldState.entityId);
