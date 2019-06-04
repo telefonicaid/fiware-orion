@@ -1199,7 +1199,7 @@ function orionCurl()
     then
       hostName=$(hostname)
       sed "s/$hostName/IP/" /tmp/httpHeaders.out > /tmp/httpHeaders2.out
-      mv /tmp/httpHeaders2.out /tmp/httpHeaders.out
+      sed "s/$CB_PORT/PORT/" /tmp/httpHeaders2.out > /tmp/httpHeaders.out
     fi
 
     #

@@ -103,7 +103,7 @@ payload='{
     "myP4_not_found": "http://example.org/P4"
   }
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json" --linkHeaderFix
 echo
 echo
 
@@ -127,6 +127,7 @@ echo
 ==============================================================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:volatile:1>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 

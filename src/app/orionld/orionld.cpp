@@ -925,6 +925,18 @@ int main(int argC, char* argV[])
     daemonize();
   }
 
+  //
+  // Get host name
+  //
+  char hname[128];
+  gethostname(hname, sizeof(hname));
+  hostname = hname;
+
+  //
+  // Set portNo
+  //
+  portNo = port;
+
   if ((s = pidFile(false)) != 0)
   {
     _exit(s);

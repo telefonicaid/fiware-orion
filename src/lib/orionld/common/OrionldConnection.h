@@ -80,10 +80,12 @@ extern __thread OrionldConnectionState orionldState;
 //
 // Global state
 //
-extern int     requestNo;  // Never mind protecting with semaphore. Just a debugging help
-extern char    kallocBuffer[32 * 1024];
-extern KAlloc  kalloc;
-extern Kjson   kjson;
-extern Kjson*  kjsonP;
+extern int             requestNo;  // Never mind protecting with semaphore. Just a debugging help
+extern char            kallocBuffer[32 * 1024];
+extern KAlloc          kalloc;
+extern Kjson           kjson;
+extern Kjson*          kjsonP;
+extern char*           hostname;
+extern unsigned short  portNo;
 
 #endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDCONNECTION_H_

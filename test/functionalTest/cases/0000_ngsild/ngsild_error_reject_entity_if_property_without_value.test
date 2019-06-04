@@ -35,7 +35,7 @@ brokerStart CB 212-249
 #
 
 echo "01. POST /ngsi-ld/v1/entities with a property attribute without value"
-echo "=========================================================================="
+echo "====================================================================="
 payload='{
   "id": "urn:ngsi-ld:T4:9000",
   "type": "T",
@@ -51,11 +51,10 @@ echo
 
 --REGEXPECT--
 01. POST /ngsi-ld/v1/entities with a property attribute without value
-==========================================================================
+=====================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 161
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

@@ -171,7 +171,6 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 134
 Content-Type: application/json
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

@@ -51,7 +51,6 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 203
 Content-Type: application/json
-Link: <http://a.b.c/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

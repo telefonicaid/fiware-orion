@@ -241,7 +241,6 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 109
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -284,7 +283,6 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 132
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -298,6 +296,7 @@ Date: REGEX(.*)
 ======================================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:volatile:3>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E6
 Date: REGEX(.*)
 
@@ -322,7 +321,6 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 153
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -337,7 +335,6 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 115
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -352,7 +349,6 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 119
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -367,7 +363,6 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 163
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -382,7 +377,6 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 168
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -397,7 +391,6 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 167
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
