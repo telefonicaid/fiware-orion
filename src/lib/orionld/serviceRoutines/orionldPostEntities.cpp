@@ -917,6 +917,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
         return false;
       }
 
+
       //
       // If the entity already exists, an error should be returned
       //
@@ -934,9 +935,10 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       entityIdP->creDate   = getCurrentTime();
       entityIdP->modDate   = getCurrentTime();
 
+      orionldState.entityId = idNodeP->value.s;
+
       continue;
     }
-
     // Entity TYPE
     else if (kNodeP == typeNodeP)
     {
@@ -1094,6 +1096,8 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   }
 
   ciP->httpStatusCode = SccCreated;
+  orionldState.entityCreated = true;
+
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/entities/", idNodeP->value.s);
 
   return true;

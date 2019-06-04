@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/OrionldConnection.h"                  // orionldState
+
 #include "rest/ConnectionInfo.h"
 #include "rest/httpHeaderAdd.h"
 
@@ -73,6 +75,9 @@ void httpHeaderLinkAdd(ConnectionInfo* ciP, const char* _url)
   unsigned int     urlLen;
   bool             freeLinkP = false;
 
+  if (orionldState.linkHeaderAdded == true)
+    return;
+
   LM_TMP(("LINK: Setting Link header to URI: '%s'", _url));
 
   // If no context URL is given, the default context is used
@@ -118,5 +123,7 @@ void httpHeaderLinkAdd(ConnectionInfo* ciP, const char* _url)
 
   if (freeLinkP == true)
     free(linkP);
+
+  orionldState.linkHeaderAdded = true;
 }
 #endif

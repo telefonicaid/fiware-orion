@@ -216,11 +216,15 @@ int orionldMhdConnectionInit
   //
   // 1. Prepare orionldState
   //
-  orionldState.requestNo      = requestNo;
-  orionldState.tenant         = (char*) "";
-  orionldState.kjsonP         = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
-  orionldState.link           = NULL;
-  orionldState.useLinkHeader  = true;  // Service routines can set this value to 'false' to avoid having the Link HTTP Header in its output
+  orionldState.requestNo        = requestNo;
+  orionldState.tenant           = (char*) "";
+  orionldState.kjsonP           = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
+  orionldState.link             = NULL;
+  orionldState.useLinkHeader    = true;  // Service routines can set this value to 'false' to avoid having the Link HTTP Header in its output
+  orionldState.entityCreated    = false;
+  orionldState.entityId         = NULL;
+  orionldState.linkToBeFreed    = false;
+  orionldState.linkHeaderAdded  = false;
 
   ciP->kjsonP = orionldState.kjsonP;  // FIXME: ciP->kjsonP is to BE REMOVED. orionldState.kjsonP should be used instead
 

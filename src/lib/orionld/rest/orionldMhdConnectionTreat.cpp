@@ -392,44 +392,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
 
 
-    //
-    // Creating the context in Context Server, if necessary
-    //
-    if (contextToBeCreated == true)
-    {
-      char   url[128];
-      char   urn[32];
-
-      //
-      // The Context tree must be cloned, as it is created inside the thread's kjson
-      //
-      KjNode* clonedTree = kjClone(contextNodeP);
-
-      if (clonedTree == NULL)
-      {
-        orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to clone context tree - out of memory?", NULL, OrionldDetailsString);
-        ciP->httpStatusCode = SccReceiverInternalError;
-        goto respond;
-      }
-
-      snprintf(urn, sizeof(urn), "urn:volatile:%d", volatileContextNo);
-      snprintf(url, sizeof(url), "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", hostname, portNo, urn);
-      ++volatileContextNo;
-
-      char* details;
-      if (orionldContextAppend(urn, clonedTree, OrionldUserContext, &details) == NULL)
-      {
-        kjFree(clonedTree);
-        orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create context", details, OrionldDetailsString);
-        ciP->httpStatusCode = SccReceiverInternalError;
-        goto respond;
-      }
-
-      orionldState.link          = url;
-      orionldState.useLinkHeader = true;
-    }
-
-
     // ********************************************************************************************
     //
     // Calling the SERVICE ROUTINE
@@ -447,7 +409,77 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     if ((ciP->responseTree != NULL) && (ciP->responseTree->value.firstChildP != NULL))
       LM_T(LmtPayloadParse, ("Right after serviceRoutine, first child of response is: '%s'", ciP->responseTree->value.firstChildP->name));
 
-    if (b == false)
+    if ((b == true) && (contextToBeCreated == true))
+    {
+      //
+      // Creating the context in Context Server, if necessary
+      //
+
+      // The Context tree must be cloned, as it is created inside the thread's kjson
+      KjNode* clonedTree = kjClone(contextNodeP);
+
+      if (clonedTree == NULL)
+      {
+        orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to clone context tree - out of memory?", NULL, OrionldDetailsString);
+        ciP->httpStatusCode = SccReceiverInternalError;
+        goto respond;
+      }
+
+      char   url[256];
+      char*  urlP = url;
+      char   urn[32];
+      char*  contextId;
+
+      LM_TMP(("CONTEXT: About to create a context"));
+      LM_TMP(("CONTEXT: orionldState.entityCreated == '%s'", FT(orionldState.entityCreated)));
+      LM_TMP(("CONTEXT: orionldState.entityId      == '%s'", orionldState.entityId));
+
+      if (orionldState.entityCreated == true)
+      {
+        unsigned int nb = snprintf(url, sizeof(url), "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", hostname, portNo, orionldState.entityId);
+
+        if (nb >= sizeof(url) - 1)
+        {
+          int   sz   = 7 + strlen(hostname) + 5 + strlen(orionldState.entityId) + 1;
+          char* path = (char*) malloc(sz);
+
+          if (path == NULL)
+            LM_X(1, ("Out of memory trying to allocate %d butes for a context", sz));
+
+          snprintf(path, sz - 1, "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", hostname, portNo, orionldState.entityId);
+          urlP = path;
+          orionldState.linkToBeFreed = true;
+        }
+
+        contextId = orionldState.entityId;
+      }
+      else
+      {
+        snprintf(urn, sizeof(urn), "urn:volatile:%d", volatileContextNo);
+        snprintf(url, sizeof(url), "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", hostname, portNo, urn);
+        ++volatileContextNo;
+        contextId = urn;
+      }
+
+      LM_TMP(("CONTEXT: urlP                       == '%s'", urlP));
+      LM_TMP(("CONTEXT: urn                        == '%s'", urn));
+      LM_TMP(("CONTEXT: contextId                  == '%s'", contextId));
+
+      char*            details;
+      OrionldContext*  contextP;
+
+      if ((contextP = orionldContextAppend(contextId, clonedTree, OrionldUserContext, &details)) == NULL)
+      {
+        kjFree(clonedTree);
+        orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create context", details, OrionldDetailsString);
+        ciP->httpStatusCode = SccReceiverInternalError;
+        goto respond;
+      }
+
+      orionldState.link          = urlP;
+      orionldState.useLinkHeader = true;
+    }
+    else if (b == false)
     {
       //
       // If the service routine failed (returned FALSE), but no HTTP status ERROR code is set,
@@ -516,7 +548,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     }
   }
 
-  if ((contextToBeCreated) && (ciP->httpStatusCode < 400))
+  if ((contextToBeCreated == true) && (ciP->httpStatusCode < 400))
   {
     httpHeaderLinkAdd(ciP, orionldState.link);
     orionldState.useLinkHeader = true;
