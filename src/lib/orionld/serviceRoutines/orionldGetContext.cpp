@@ -22,6 +22,12 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjBuilder.h"                                     // kjObject, kjString, kjBoolean, ...
+}
+
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
@@ -96,7 +102,17 @@ bool orionldGetContext(ConnectionInfo* ciP)
     }
   }
 
-  ciP->responseTree = contextTree;
+  ciP->responseTree = kjObject(orionldState.kjsonP, "@context");
+  // NOTE: No need to free - as the kjObject is allocated in "orionldState.kjsonP", it gets deleted when the thread is reused.
+
+  if (ciP->responseTree == NULL)
+  {
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "kjObject failed", "out of memory?", OrionldDetailsString);
+    ciP->httpStatusCode = SccReceiverInternalError;
+    return false;
+  }
+
+  ciP->responseTree->value.firstChildP = contextTree;
 
   return true;
 }

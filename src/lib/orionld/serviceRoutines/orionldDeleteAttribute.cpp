@@ -48,21 +48,28 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
 {
   char*   type = (char*) ((ciP->uriParam["type"] != "")? ciP->uriParam["type"].c_str() : NULL);
   char    longAttrName[256];
+  char*   attrNameP;
   char*   details;
   Entity  entity;
 
-  // Get the long name of the Context Attribute name
-  if (orionldUriExpand(orionldState.contextP, ciP->wildcard[1], longAttrName, sizeof(longAttrName), &details) == false)
+  if ((strncmp(ciP->wildcard[1], "http://", 7) == 0) || (strncmp(ciP->wildcard[1], "https://", 8) == 0))
+    attrNameP = ciP->wildcard[1];
+  else
   {
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, type, OrionldDetailsAttribute);
-    return false;
+    // Get the long name of the Context Attribute name
+    if (orionldUriExpand(orionldState.contextP, ciP->wildcard[1], longAttrName, sizeof(longAttrName), &details) == false)
+    {
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, type, OrionldDetailsAttribute);
+      return false;
+    }
+    attrNameP = longAttrName;
   }
 
   // Create and fill in attribute and entity
   entity.id = ciP->wildcard[0];
 
   // Does the attribute to be deleted even exist?
-  if (mongoAttributeExists(ciP->wildcard[0], longAttrName, orionldState.tenant) == false)
+  if (mongoAttributeExists(ciP->wildcard[0], attrNameP, orionldState.tenant) == false)
   {
     ciP->httpStatusCode = SccContextElementNotFound;
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute Not Found", ciP->wildcard[1], OrionldDetailsAttribute);
@@ -71,7 +78,7 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
 
   ContextAttribute* caP = new ContextAttribute;
 
-  caP->name = longAttrName;
+  caP->name = attrNameP;
   entity.attributeVector.push_back(caP);
 
   LM_T(LmtServiceRoutine, ("Deleting attribute '%s' of entity '%s'", ciP->wildcard[1], ciP->wildcard[0]));
@@ -95,10 +102,12 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
   {
     orionldErrorResponseCreate(ciP, httpStatusCodeToOrionldErrorType(ciP->httpStatusCode), "DELETE /ngsi-ld/v1/entities/*/attrs/*", ciP->wildcard[0], OrionldDetailsString);
     ucr.release();
+
     return false;
   }
 
   ucr.release();
   ciP->httpStatusCode = SccNoContent;
+
   return true;
 }

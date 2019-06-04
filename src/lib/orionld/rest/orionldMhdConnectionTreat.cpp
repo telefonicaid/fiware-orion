@@ -95,8 +95,8 @@ static bool contentTypeCheck(ConnectionInfo* ciP, KjNode* contextNodeP, char** e
   }
 
 
-  bool  contextInPayload     = (contextNodeP != NULL);
-  bool  contextInHttpHeader  = (ciP->httpHeaders.link != "");
+  bool  contextInPayload     = (contextNodeP      != NULL);
+  bool  contextInHttpHeader  = (orionldState.link != NULL);
 
   LM_T(LmtContext, ("Context In JSON Payload: %s", (contextInPayload == true)?    "YES" : "NO"));
   LM_T(LmtContext, ("Context In HTTP Header:  %s", (contextInHttpHeader == true)? "YES" : "NO"));
@@ -235,7 +235,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       goto respond;
     }
 
-    bool     jsonldLinkInHttpHeader = (ciP->httpHeaders.link != "");  // The URL is extracted later
+    bool     jsonldLinkInHttpHeader = (orionldState.link != NULL);  // The URL is extracted later
     KjNode*  contextNodeP           = NULL;
 
     //
@@ -369,7 +369,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     if (jsonldLinkInHttpHeader == true)
     {
-      if (linkCheck((char*) ciP->httpHeaders.link.c_str(), &ciP->httpHeaders.linkUrl, &details) == false)
+      if (linkCheck(orionldState.link, &ciP->httpHeaders.linkUrl, &details) == false)
       {
         LM_E(("linkCheck: %s", details));
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Link HTTP Header", details, OrionldDetailsString);
@@ -421,10 +421,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       char   urn[32];
       char*  contextId;
 
-      LM_TMP(("CONTEXT: About to create a context"));
-      LM_TMP(("CONTEXT: orionldState.entityCreated == '%s'", FT(orionldState.entityCreated)));
-      LM_TMP(("CONTEXT: orionldState.entityId      == '%s'", orionldState.entityId));
-
       //
       // If an Entity was created, then the context takes the entity id as name.
       // Else, if it's just an update, the name of the context is urn:volatile:XX where XX is a running number.
@@ -458,10 +454,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
         ++volatileContextNo;
         contextId = urn;
       }
-
-      LM_TMP(("CONTEXT: urlP                       == '%s'", urlP));
-      LM_TMP(("CONTEXT: urn                        == '%s'", urn));
-      LM_TMP(("CONTEXT: contextId                  == '%s'", contextId));
 
       char*            details;
       OrionldContext*  contextP;

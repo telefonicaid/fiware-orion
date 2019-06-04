@@ -90,14 +90,16 @@ Date: REGEX(.*)
 02. Obtain the context from the Link header
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 83
+Content-Length: 96
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "attr_A1": "http://a.b.c/A1",
-    "attr_A2": "http://a.b.c/A2",
-    "type_T": "http://a.b.c/T"
+    "@context": {
+        "attr_A1": "http://a.b.c/A1",
+        "attr_A2": "http://a.b.c/A2",
+        "type_T": "http://a.b.c/T"
+    }
 }
 
 
