@@ -41,7 +41,7 @@ brokerStart CB 212-249
 # and the port with the static string "PORT".
 #
 # If you look down in the REGEXPECT part of "01. Create an entity with a complex context ...", you see the Link header like this:
-#   Link: <http://HOST:PORT/ngsi-ld/ex/v1/contexts/urn:volatile:1>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+#   Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:volatile:1>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 # which is the modified Link line after sed substitution of hostname and port
 #
 hostName=$(hostname)
@@ -64,7 +64,7 @@ payload='{
     "type_T": "http://a.b.c/T"
   }
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/json" | sed "s/$CB_PORT/PORT/" | sed "s/xps/HOST/"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/json" --linkHeaderFix
 echo
 echo
 
@@ -81,7 +81,7 @@ echo
 =====================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <http://HOST:PORT/ngsi-ld/ex/v1/contexts/urn:volatile:1>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:volatile:1>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 
