@@ -68,6 +68,7 @@ typedef struct OrionldConnectionState
   int64_t          overriddenModificationDate;
   bool             entityCreated;                // If an entity is created, if complex context, it must be stored
   char*            entityId;
+  char*            httpReqBuffer;
 } OrionldConnectionState;
 
 

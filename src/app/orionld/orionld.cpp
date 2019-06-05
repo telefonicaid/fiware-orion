@@ -107,8 +107,8 @@ extern "C"
 #include "metricsMgr/metricsMgr.h"
 #include "logSummary/logSummary.h"
 
-#include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
 #include "orionld/common/OrionldConnection.h"               // kjFree - FIXME: call instead orionldGlobalFree();
+#include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"

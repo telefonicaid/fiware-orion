@@ -22,15 +22,16 @@
 *
 * Author: Ken Zangelin
 */
-#include <strings.h>                                      // bcopy
-#include <curl/curl.h>                                    // curl
+#include <strings.h>                                           // bcopy
+#include <curl/curl.h>                                         // curl
 
-#include "logMsg/logMsg.h"                                // LM_*
-#include "logMsg/traceLevels.h"                           // Lmt*
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/context/orionldCoreContext.h"           // orionldDefaultUrlContext, ...
-#include "orionld/common/urlParse.h"                      // urlParse
-#include "orionld/common/orionldRequestSend.h"            // Own interface
+#include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrlContext, ...
+#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/urlParse.h"                           // urlParse
+#include "orionld/common/orionldRequestSend.h"                 // Own interface
 
 
 
@@ -53,6 +54,11 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
       if (rBufP->buf == NULL)
         LM_X(1, ("Out of memory"));
 
+      //
+      // Save pointer to allocated buffer for later call to free()
+      //
+      orionldState.httpReqBuffer = rBufP->buf;
+
       rBufP->size = rBufP->size + bytesToCopy + xtraBytes;
 
       if (rBufP->used > 0)  // Copy contents from internal buffer that got too small
@@ -64,6 +70,7 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
     {
       rBufP->buf = (char*) realloc(rBufP->buf, rBufP->size + bytesToCopy + xtraBytes);
       rBufP->size = rBufP->size + bytesToCopy + xtraBytes;
+      orionldState.httpReqBuffer = rBufP->buf;
     }
 
     if (rBufP->buf == NULL)
@@ -111,7 +118,10 @@ bool orionldRequestSend
 
     // This function must release the allocated respose buffer in case of errpr
     if ((rBufP->buf != NULL) && (rBufP->buf != rBufP->internalBuffer))
+    {
       free(rBufP->buf);
+      orionldState.httpReqBuffer = NULL;
+    }
     rBufP->buf = NULL;
 
     LM_E(("urlParse failed for url '%s': %s", url, *detailsPP));
@@ -127,6 +137,11 @@ bool orionldRequestSend
 
     if (rBufP == NULL)
       LM_X(1, ("Out of memory"));
+
+    //
+    // Save pointer to allocated buffer for later call to free()
+    //
+    orionldState.httpReqBuffer = rBufP->buf;
   }
 
   LM_T(LmtRequestSend, ("protocol: %s", protocol));
@@ -140,7 +155,10 @@ bool orionldRequestSend
 
     // This function must release the allocated respose buffer in case of error
     if (rBufP->buf != rBufP->internalBuffer)
+    {
       free(rBufP->buf);
+      orionldState.httpReqBuffer = NULL;
+    }
     rBufP->buf = NULL;
 
     LM_E((*detailsPP));
@@ -175,7 +193,10 @@ bool orionldRequestSend
 
     // This function must release the allocated respose buffer in case of error
     if (rBufP->buf != rBufP->internalBuffer)
+    {
       free(rBufP->buf);
+      orionldState.httpReqBuffer = NULL;
+    }
 
     rBufP->buf = NULL;
 

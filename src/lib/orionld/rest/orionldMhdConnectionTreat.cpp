@@ -554,5 +554,14 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     restReply(ciP, "");
   }
 
+  //
+  // Cleanup
+  //
+  if (orionldState.httpReqBuffer != NULL)
+  {
+    free(orionldState.httpReqBuffer);
+    orionldState.httpReqBuffer = NULL;
+  }
+
   return MHD_YES;
 }
