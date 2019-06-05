@@ -27,7 +27,7 @@ carefully" text. Developers of the HTTP library in which Orion Context
 Broker is based seem to be funny guys :) :)
 
 If this 1 MB limit doesn't work for you, you can change it using the [CLI option](../admin/cli.md) `-inReqPayloadMaxSize`.
-However, before doing this please have a look to [performance considerations](../admin/perf_tuning.md#payload-and-message-size-and-performance).
+However, before doing this please have a look at [performance considerations](../admin/perf_tuning.md#payload-and-message-size-and-performance).
 
 ## Notification maximum size
 
@@ -38,8 +38,8 @@ Larger notifications will not be sent by the context broker and you will get the
 
 where N is the number of bytes of the too large notification.
 
-However, you can change this limit by starting the broker with the [CLI option](../admin/cli.md) `-outReqMsgMaxSize`.
-However, before doing this please have a look to [performance considerations](../admin/perf_tuning.md#payload-and-message-size-and-performance).
+You can change this limit by starting the broker with the [CLI option](../admin/cli.md) `-outReqMsgMaxSize`.
+However, before doing this please have a look at [performance considerations](../admin/perf_tuning.md#payload-and-message-size-and-performance).
 
 ## Content-Length header is required
 
