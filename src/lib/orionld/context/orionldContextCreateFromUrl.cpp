@@ -126,19 +126,13 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
     LM_T(LmtContextList, ("We got an array - need to download more contexts"));
     for (KjNode* aItemP = arrayP->value.firstChildP; aItemP != NULL; aItemP = aItemP->next)
     {
-      // All items must be strings
-      if (aItemP->type != KjString)
-      {
-        LM_E(("Context Array item not a string"));
-        ciP->httpStatusCode = SccBadRequest;
-        return NULL;
-      }
-      LM_T(LmtContextList, ("Array item (URL of context that needs to be downloaded): %s", aItemP->value.s));
-
       //
       // Is the context already present in the list?
       // If so, no need to download, parse and insert into the context list
       //
+      if (aItemP->type != KjString)
+        continue;
+
       if (orionldContextLookup(aItemP->value.s) != NULL)
         continue;
 

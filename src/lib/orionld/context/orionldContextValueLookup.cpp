@@ -37,6 +37,24 @@ extern "C"
 #include "orionld/context/orionldContextValueLookup.h"         // Own interface
 
 
+static KjNode* orionldContextValueLookupInObject(KjNode* contextP, const char* value)
+{
+  for (KjNode* contextNodeP = contextP->value.firstChildP; contextNodeP != NULL; contextNodeP = contextNodeP->next)
+  {
+    if (contextNodeP->type != KjString)
+    {
+      LM_E(("An object context at this level needs to be a collection of key-values"));
+      return NULL;
+    }
+
+    if (strcmp(contextNodeP->value.s, value) == 0)
+      return contextNodeP;
+  }
+
+  return NULL;
+}
+
+
 
 // -----------------------------------------------------------------------------
 //
@@ -111,7 +129,7 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value, b
                                  value,
                                  kjValueType(contextP->tree->type),
                                  contextP->url));
-
+#if 0
     if (contextP->tree->value.firstChildP == NULL)
     {
       LM_E(("ERROR: Context tree is a JSON object, but, it has no children!"));
@@ -130,6 +148,7 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value, b
             contextP->tree->value.firstChildP->name));
       return NULL;
     }
+#endif
   }
   else
   {
@@ -204,13 +223,12 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value, b
   {
     for (KjNode* contextP = atContextP->value.firstChildP; contextP != NULL; contextP = contextP->next)
     {
-      if (contextP->type != KjString)
-      {
-        LM_E(("Invalid @context - items of contexts must be JSON Strings"));
-        return NULL;
-      }
+      KjNode* nodeP;
 
-      KjNode* nodeP = orionldContextValueLookup(contextP->value.s, value, useStringValueP);
+      if (contextP->type == KjString)
+        nodeP = orionldContextValueLookup(contextP->value.s, value, useStringValueP);
+      else
+        nodeP = orionldContextValueLookupInObject(contextP, value);
 
       if (nodeP != NULL)
         return nodeP;

@@ -305,13 +305,13 @@ Date: REGEX(.*)
 07. POST /ngsi-ld/v1/entities, with invalid URL for a context - see error
 =========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 133
+Content-Length: 132
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "no details",
-    "title": "Context Array Item is not a JSON String",
+    "title": "Context Array Item of unsupported type",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
