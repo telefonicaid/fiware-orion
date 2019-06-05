@@ -109,7 +109,6 @@ extern "C"
 
 #include "orionld/common/OrionldConnection.h"               // kjFree - FIXME: call instead orionldGlobalFree();
 #include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
-#include "orionld/context/orionldContextFreeAll.h"          // orionldContextFreeAll
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
@@ -557,8 +556,6 @@ void exitFunc(void)
     free(orionldState.contextP);
     orionldState.contextP = NULL;
   }
-
-  orionldContextFreeAll();
 }
 
 
