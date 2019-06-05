@@ -218,9 +218,8 @@ bool            ngsiv1Autocast;
 #define CONN_MEMORY_DESC       "maximum memory size per connection (in kilobytes)"
 #define MAX_CONN_DESC          "maximum number of simultaneous connections"
 #define REQ_POOL_SIZE          "size of thread pool for incoming connections"
-#define REQ_PAYLOAD_MAX_SIZE_DESC    "maximum size (in bytes) of the payload of incoming requests"
-#define NOTIF_PAYLOAD_MAX_SIZE_DESC  "maximum size (in bytes) of the payload of outgoing notifications"
-#define OUT_TOTAL_MAX_SIZE_DESC      "maximum total size (in bytes) of outgoing forward and notification messages"
+#define IN_REQ_PAYLOAD_MAX_SIZE_DESC   "maximum size (in bytes) of the payload of incoming requests"
+#define OUT_REQ_MSG_MAX_SIZE_DESC      "maximum size (in bytes) of outgoing forward and notification request messages"
 #define SIMULATED_NOTIF_DESC   "simulate notifications instead of actual sending them (only for testing)"
 #define STAT_COUNTERS          "enable request/notification counters statistics"
 #define STAT_SEM_WAIT          "enable semaphore waiting time statistics"
@@ -288,9 +287,8 @@ PaArgument paArgs[] =
   { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, 1020,           1,     PaNL,     MAX_CONN_DESC          },
   { "-reqPoolSize",      &reqPoolSize,      "TRQ_POOL_SIZE",     PaUInt,   PaOpt, 0,              0,     1024,     REQ_POOL_SIZE          },
 
-  { "-reqPayloadMaxSize",    &reqPayloadMaxSize,    "REQ_PAYLOAD_MAX_SIZE",   PaULong,  PaOpt, DEFAULT_REQ_PAYLOAD_MAX_SIZE,   0, PaNL,  REQ_PAYLOAD_MAX_SIZE_DESC   },
-  { "-notifPayloadMaxSize",  &notifPayloadMaxSize,  "NOTIF_PAYLOAD_MAX_SIZE", PaULong,  PaOpt, DEFAULT_NOTIF_PAYLOAD_MAX_SIZE, 0, PaNL,  NOTIF_PAYLOAD_MAX_SIZE_DESC },
-  { "-outTotalMaxSize",      &outTotalMaxSize,      "OUT_TOTAL_MAX_SIZE",     PaULong,  PaOpt, DEFAULT_TOTAL_MSG_MAX_SIZE,     0, PaNL,  OUT_TOTAL_MAX_SIZE_DESC     },
+  { "-inReqPayloadMaxSize",  &inReqPayloadMaxSize, "IN_REQ_PAYLOAD_MAX_SIZE",  PaULong,  PaOpt, DEFAULT_IN_REQ_PAYLOAD_MAX_SIZE,   0, PaNL,  IN_REQ_PAYLOAD_MAX_SIZE_DESC   },
+  { "-outReqMsgMaxSize",     &outReqMsgMaxSize,    "OUT_REQ_MSG_MAX_SIZE",     PaULong,  PaOpt, DEFAULT_OUT_REQ_MSG_MAX_SIZE,      0, PaNL,  OUT_REQ_MSG_MAX_SIZE_DESC      },
 
   { "-notificationMode",      &notificationMode,      "NOTIF_MODE", PaString, PaOpt, _i "transient", PaNL,  PaNL, NOTIFICATION_MODE_DESC },
   { "-simulatedNotification", &simulatedNotification, "DROP_NOTIF", PaBool,   PaOpt, false,          false, true, SIMULATED_NOTIF_DESC   },

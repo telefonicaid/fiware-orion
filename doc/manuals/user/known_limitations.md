@@ -2,11 +2,8 @@
 
 ## Request maximum size
 
-The current default maximum request size in Orion Context Broker is 1 MB. This
-limit should suffice the most of the use cases and, at the same time,
-avoids denial of service due to too large requests. If you don't take
-this limitation into account, you will get messages such the following
-ones:
+Orion Context Broker has a default maximum request size of 1 MB. If you don't take
+this limitation into account, you will get messages such the following ones:
 
 ```
 {
@@ -29,29 +26,20 @@ Or, if you are sending a huge request, this one:
 carefully" text. Developers of the HTTP library in which Orion Context
 Broker is based seem to be funny guys :) :)
 
-If this 1 MB limit doesn't work for you, you can change it using the CLI option -payloadMaxSize.
-But, this is untested territory. At your own risk ...
+If this 1 MB limit doesn't work for you, you can change it using the [CLI option](../admin/cli.md) `-inReqPayloadMaxSize`.
+However, before doing this please have a look to [performance considerations](../admin/perf_tuning.md#payload-and-message-size-and-performance).
 
 ## Notification maximum size
 
-The maximum size of notification payloads defaults to 8MB. Larger notifications will not be sent by the context broker and you
-will get the following trace in the log file:
+Notification maximum size (including HTTP request line, headers and payload) is set to 8MB by default.
+Larger notifications will not be sent by the context broker and you will get the following trace in the log file:
 
     HTTP request to send is too large: N bytes
 
 where N is the number of bytes of the too large notification.
 
-However, you can change this limit by starting the broker with the CLI option `-notifMaxSize <size in bytes>`
-
-Note also that there is another message size limit, one that is valid for **all** outgoing messages from the broker:
-
-* Normal responses
-* Notifications
-* Forwarded messages
-
-This last message size limit is about the size of the entire message, not only the payload and its default value is 8MB, which can
-be modified using the CLI option `-outMsgMaxSize`.
-
+However, you can change this limit by starting the broker with the [CLI option](../admin/cli.md) `-outReqMsgMaxSize`.
+However, before doing this please have a look to [performance considerations](../admin/perf_tuning.md#payload-and-message-size-and-performance).
 
 ## Content-Length header is required
 
@@ -61,21 +49,6 @@ Required" response. This is due to the way the underlying HTTP library
 (microhttpd) works, see details in [this email thread in the microhttpd
 mailing
 list](http://lists.gnu.org/archive/html/libmicrohttpd/2014-01/msg00063.html).
-
-## Entity fields length limitation
-
-Due to limitations of the MongoDB layer, the length of entity ID, type and servicePath has to follow the following rule.
-
-    length(id) + length(type) + length(servicePath) + 10 < 1024
-
-Otherwise, there will be an error at entity creation time.
-
-## Entity fields size limitation
-
-Due to underlying DB limitations (see details [here](https://github.com/telefonicaid/fiware-orion/issues/1289)),
-the combined size (sum) of entity id, entity type and entity service path cannot exceed 1014 characters (this is not a typo, 
-it corresponds to 1024 minus 10, details in the aforementioned link ;). If you attempt to overpass the limit you will get
-a 400 BadRequest "Too long entity id/type/servicePath combination" error.
 
 ## Subscription cache limitation
 

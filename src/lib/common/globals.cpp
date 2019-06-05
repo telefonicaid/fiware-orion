@@ -55,9 +55,8 @@ bool                   semWaitStatistics    = false;
 bool                   timingStatistics     = false;
 bool                   notifQueueStatistics = false;
 bool                   checkIdv1            = false;
-unsigned long long     reqPayloadMaxSize    = DEFAULT_REQ_PAYLOAD_MAX_SIZE;
-unsigned long long     notifPayloadMaxSize  = DEFAULT_NOTIF_PAYLOAD_MAX_SIZE;
-unsigned long long     outTotalMaxSize      = DEFAULT_TOTAL_MSG_MAX_SIZE;
+unsigned long long     inReqPayloadMaxSize  = DEFAULT_IN_REQ_PAYLOAD_MAX_SIZE;
+unsigned long long     outReqMsgMaxSize     = DEFAULT_OUT_REQ_MSG_MAX_SIZE;
 
 
 

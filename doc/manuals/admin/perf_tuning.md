@@ -4,6 +4,7 @@
 * [Database indexes](#database-indexes)
 * [Write concern](#write-concern)
 * [Notification modes and performance](#notification-modes-and-performance)
+* [Payload and message size and performance](#payload-and-message-size-and-performance)
 * [HTTP server tuning](#http-server-tuning)
 * [Orion thread model and its implications](#orion-thread-model-and-its-implications)
 * [File descriptors sizing](#file-descriptors-sizing)
@@ -109,6 +110,25 @@ to 10, although it could be more or less depending on the expected update burst 
 on [the `notifQueue` block](statistics.md#notifqueue-block) may help you to tune.
 
 ![](notif_queue.png "notif_queue.png")
+
+[Top](#top)
+
+## Payload and message size and performance
+
+Orion Context Broker uses two defaults limits related with payloads and HTTP message size. In particular:
+
+* There is a default limit of 1MB in incoming HTTP request payload
+* There is a default limit of 8MB in outgoing HTTP request messages (including HTTP request line, headers and payload), which applies to notifications and forwarded requests
+
+This limit should suffice the most of the use cases and, at the same time, avoids denial of service due to
+too large requests. You can change these limits using the following [CLI flags](cli.md):
+
+* `-inReqPayloadMaxSize` (in bytes) to change de limit in incoming HTTP request payload
+* `-outReqMsgMaxSize` (in bytes) to change the limit for outgoing HTTP request messages
+
+Decreasing the limits could have a positive impact on performance, but may impose limitations in
+Context Broker requests. Increase the limits may have a negative impact in performance, but will allow bigger
+requests. In general, it is not recommended to change the defaults.
 
 [Top](#top)
 

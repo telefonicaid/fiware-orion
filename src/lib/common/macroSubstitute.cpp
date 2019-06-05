@@ -121,8 +121,8 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
 {
   // Initial size check: is the string to convert too big?
   //
-  // If the string to convert is bigger than the maximum allowed buffer size (outTotalMaxSize),
-  // then there is an important probability that the resulting string after substitution is also > outTotalMaxSize.
+  // If the string to convert is bigger than the maximum allowed buffer size (outReqMsgMaxSize),
+  // then there is an important probability that the resulting string after substitution is also > outReqMsgMaxSize.
   //
   // This check avoids to copy 8MB to later only throw it away and return an error
   // That is the advantage.
@@ -134,7 +134,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
   //
   // We assume that this second case is more than rare
   //
-  if (from.size() > outTotalMaxSize)
+  if (from.size() > outReqMsgMaxSize)
   {
     LM_W(("Runtime Error (too large initial string, before substitution)"));
     *to = "";
@@ -169,7 +169,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
     macroStart = from.find("${", macroEnd + 1);
   }
 
-  // Calculate resulting size (if > outTotalMaxSize, then reject)
+  // Calculate resulting size (if > outReqMsgMaxSize, then reject)
   unsigned long  toReduce = 0;
   unsigned long  toAdd    = 0;
 
@@ -198,7 +198,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
     }
   }
 
-  if (from.length() + toAdd - toReduce > outTotalMaxSize)
+  if (from.length() + toAdd - toReduce > outReqMsgMaxSize)
   {
     LM_W(("Runtime Error (too large final string, after substitution)"));
     *to = "";

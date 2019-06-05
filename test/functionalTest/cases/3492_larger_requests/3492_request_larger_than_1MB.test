@@ -25,12 +25,12 @@ Large request - starting the broker to accept very large requests
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPV4 -reqPayloadMaxSize 50000000
+brokerStart CB 0-255 IPV4 -inReqPayloadMaxSize 50000000
 
 --SHELL--
 #
 # Creating a file of ~40 MB.
-# The default max size of a request is 1 MB but the broker is started with --reqPayloadMaxSize 50000000 (~50 MB), and a ~40 MB request must be permitted
+# The default max size of a request is 1 MB but the broker is started with -inReqPayloadMaxSize 50000000 (~50 MB), and a ~40 MB request must be permitted
 #
 HUGEFILE=$(mktemp)
 tr -dc A-Za-z0-9 </dev/urandom  2>/dev/null |  head -c 40000000 > $HUGEFILE

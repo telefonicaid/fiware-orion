@@ -99,34 +99,17 @@
 
 /* ****************************************************************************
 *
-* Message definitions -
+* DEFAULT_IN_REQ_PAYLOAD_MAX_SIZE -
 */
-#define MAX_STA_MSG_SIZE (20 * 1024)           // 20 KB (HTTP request static buffer)
-#define MAX_DYN_MSG_SIZE (8 * 1024 * 1024)     // 8 MB  (maximum length of the HTTP request dynamic buffer)
+#define DEFAULT_IN_REQ_PAYLOAD_MAX_SIZE (1 * 1024 * 1024)  // 1 MB default max size of incoming request payload (see CLI -inReqPayloadMaxSize)
 
 
 
 /* ****************************************************************************
 *
-* DEFAULT_REQ_PAYLOAD_MAX_SIZE -
+* DEFAULT_OUT_REQ_MSG_MAX_SIZE -
 */
-#define DEFAULT_REQ_PAYLOAD_MAX_SIZE (1 * 1024 * 1024)  // 1 MB default max size of payload (see CLI -reqPayloadMaxSize)
-
-
-
-/* ****************************************************************************
-*
-* DEFAULT_NOTIF_PAYLOAD_MAX_SIZE -
-*/
-#define DEFAULT_NOTIF_PAYLOAD_MAX_SIZE (8 * 1024 * 1024)  // 8 MB default max size of notification payload (see CLI -notifPayloadMaxSize)
-
-
-
-/* ****************************************************************************
-*
-* DEFAULT_TOTAL_MSG_MAX_SIZE -
-*/
-#define DEFAULT_TOTAL_MSG_MAX_SIZE (8 * 1024 * 1024)  // 8 MB default max size of any outgoing message (see CLI -outTotalMaxSize)
+#define DEFAULT_OUT_REQ_MSG_MAX_SIZE (8 * 1024 * 1024)  // 8 MB default max size of any outgoing request message (see CLI -outReqMsgMaxSize)
 
 
 

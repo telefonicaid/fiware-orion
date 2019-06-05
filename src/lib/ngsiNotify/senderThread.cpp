@@ -47,12 +47,6 @@ void* startSenderThread(void* p)
     char                portV[STRING_SIZE_FOR_INT];
     std::string         url;
 
-    if (params->content.size() > notifPayloadMaxSize)
-    {
-      LM_E(("Runtime Error (HTTP request to send is too large: %llu bytes - max allowed size is %llu)", params->content.size(), notifPayloadMaxSize));
-      continue;
-    }
-
     snprintf(portV, sizeof(portV), "%d", params->port);
     url = params->ip + ":" + portV + params->resource;
 
