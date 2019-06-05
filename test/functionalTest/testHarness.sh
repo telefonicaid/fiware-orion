@@ -637,7 +637,6 @@ function fileCleanup()
     cd /tmp
     \rm -f accumulator_*_stdout
     \rm -f accumulator_*_stderr
-    \rm -f orionld.log
     \rm -f contextBroker.pid
     cd $olddir
   fi

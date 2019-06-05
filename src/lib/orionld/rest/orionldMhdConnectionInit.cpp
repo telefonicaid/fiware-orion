@@ -225,6 +225,7 @@ int orionldMhdConnectionInit
   orionldState.entityId         = NULL;
   orionldState.linkToBeFreed    = false;
   orionldState.linkHeaderAdded  = false;
+  orionldState.httpReqBuffer    = NULL;
 
   ciP->kjsonP = orionldState.kjsonP;  // FIXME: ciP->kjsonP is to BE REMOVED. orionldState.kjsonP should be used instead
 
