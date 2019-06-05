@@ -181,20 +181,30 @@ bool orionldContextTreat
     //
     ciP->contextToBeFreed = true;
 
-    for (KjNode* contextStringNodeP = contextNodeP->value.firstChildP; contextStringNodeP != NULL; contextStringNodeP = contextStringNodeP->next)
+    for (KjNode* contextArrayItemP = contextNodeP->value.firstChildP; contextArrayItemP != NULL; contextArrayItemP = contextArrayItemP->next)
     {
-      if (contextStringNodeP->type != KjString)
+      if (contextArrayItemP->type == KjString)
       {
-        LM_E(("Context Array Item is not a JSON String, but of type '%s'", kjValueType(contextStringNodeP->type)));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Context Array Item is not a JSON String", NULL, OrionldDetailsString);
-
-        return false;
+        if (contextItemNodeTreat(ciP, contextArrayItemP->value.s) == NULL)
+        {
+          LM_E(("contextItemNodeTreat failed"));
+          // Error payload set by contextItemNodeTreat
+          return false;
+        }
       }
-
-      if (contextItemNodeTreat(ciP, contextStringNodeP->value.s) == NULL)
+      else if (contextArrayItemP->type == KjObject)
       {
-        LM_E(("contextItemNodeTreat failed"));
-        // Error payload set by contextItemNodeTreat
+        if (orionldContextTreat(ciP, contextArrayItemP, entityId, caPP) == false)
+        {
+          LM_E(("Error treating context object inside array"));
+          orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error treating context object inside array", NULL, OrionldDetailsString);
+          return false;
+        }
+      }
+      else
+      {
+        LM_E(("Context Array Item is not a String nor an Object, but of type '%s'", kjValueType(contextArrayItemP->type)));
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Context Array Item of unsupported type", NULL, OrionldDetailsString);
         return false;
       }
     }
