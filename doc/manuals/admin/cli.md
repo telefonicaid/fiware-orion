@@ -143,9 +143,8 @@ The list of available options is the following:
 -   **-maxConnections**. Maximum number of simultaneous connections. Default value is 1020, for legacy reasons,
     while the lower limit is 1 and there is no upper limit (limited by max file descriptors of the operating system).
 -   **-reqPoolSize**. Size of thread pool for incoming connections. Default value is 0, meaning *no thread pool*.
--   **-payloadMaxSize**. Max allowed size for incoming payloads, in bytes. Default value is 1MB.
--   **-notifMaxSize**. Max allowed payload size for notifications, in bytes. Default value is 8MB.
--   **-outMsgMaxSize**. Max allowed total size for *any outgoing message*, in bytes. Default value is 8MB.
+-   **-inReqPayloadMaxSize**. Max allowed size for incoming requests payloads, in bytes. Default value is 1MB.
+-   **-outReqMsgMaxSize**. Max allowed total size for request *outgoing message*, in bytes. Default value is 8MB.
 -   **-statCounters**, **-statSemWait**, **-statTiming** and **-statNotifQueue**. Enable statistics
     generation. See [statistics documentation](statistics.md).
 -   **-logSummary**. Log summary period in seconds. Defaults to 0, meaning *Log Summary is off*. Min value: 0. Max value: one month (3600 * 24 * 31 == 2678400 seconds).

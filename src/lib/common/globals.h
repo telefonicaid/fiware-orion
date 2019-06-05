@@ -219,9 +219,8 @@ extern bool               disableCusNotif;
 
 extern bool               insecureNotif;
 extern bool               ngsiv1Autocast;
-extern unsigned long long reqPayloadMaxSize;
-extern unsigned long long notifPayloadMaxSize;
-extern unsigned long long outTotalMaxSize;
+extern unsigned long long inReqPayloadMaxSize;
+extern unsigned long long outReqMsgMaxSize;
 
 
 

@@ -95,7 +95,7 @@ TEST(commonMacroSubstitute, withRealloc)
 
 /* ****************************************************************************
 *
-* bufferTooBigInitially - max size of the substituted buffer is 8MB (outTotalMaxSize)
+* bufferTooBigInitially - max size of the substituted buffer is 8MB (outReqMsgMaxSize)
 *
 * This unit test provokes a buffer size > 8MB to see the error returned
 */
@@ -107,10 +107,10 @@ TEST(commonMacroSubstitute, bufferTooBigInitially)
 
   en.attributeVector.push_back(caP);
 
-  char* base = (char*) malloc(outTotalMaxSize + 2);
+  char* base = (char*) malloc(outReqMsgMaxSize + 2);
 
-  memset(base, 'a', outTotalMaxSize + 1);
-  base[outTotalMaxSize + 1] = 0;
+  memset(base, 'a', outReqMsgMaxSize + 1);
+  base[outReqMsgMaxSize + 1] = 0;
 
   std::string s1      = std::string(base) + "${id}/${type}";
   // correct          = std::string(base) + "EntityId000001/EntityType000001";
@@ -127,7 +127,7 @@ TEST(commonMacroSubstitute, bufferTooBigInitially)
 
 /* ****************************************************************************
 *
-* bufferTooBigAfterSubstitution - max size of the substituted buffer is 8MB (outTotalMaxSize)
+* bufferTooBigAfterSubstitution - max size of the substituted buffer is 8MB (outReqMsgMaxSize)
 *
 * This unit test provokes a buffer size > 8MB to see the error returned.
 * However, unlike 'bufferTooBigInitially', this test has an incoming buffer < 8MB but
@@ -142,11 +142,11 @@ TEST(commonMacroSubstitute, bufferTooBigAfterSubstitution)
 
   en.attributeVector.push_back(caP);
 
-  char* base = (char*) malloc(outTotalMaxSize + 2 - 16);  // -16 so that '${id}/${type}' fits inside 8MB
+  char* base = (char*) malloc(outReqMsgMaxSize + 2 - 16);  // -16 so that '${id}/${type}' fits inside 8MB
                                                            // but 'EntityId000001/EntityType000001' does not
 
-  memset(base, 'a', outTotalMaxSize + 2 - 16);
-  base[outTotalMaxSize + 2 - 16] = 0;
+  memset(base, 'a', outReqMsgMaxSize + 2 - 16);
+  base[outReqMsgMaxSize + 2 - 16] = 0;
 
   std::string s1      = std::string(base) + "${id}/${type}";                   // < 8MB
   //          correct = std::string(base) + "EntityId000001/EntityType000001"; // > 8MB after substitutions
