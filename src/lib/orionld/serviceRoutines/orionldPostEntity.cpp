@@ -22,6 +22,13 @@
 *
 * Author: Ken Zangelin
 */
+#include <string.h>                                            // strlen
+
+extern "C"
+{
+#include "kjson/kjBuilder.h"                                   // kjChildRemove
+}
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
@@ -33,10 +40,80 @@
 #include "orionld/common/CHECK.h"                              // CHECK
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/orionldContextTreat.h"               // orionldContextTreat
 #include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
 #include "orionld/serviceRoutines/orionldPostEntity.h"         // Own Interface
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldPartialUpdateResponseCreate -
+//
+void orionldPartialUpdateResponseCreate(ConnectionInfo* ciP)
+{
+  LM_TMP(("PART-UPDATE: the erroneous attrs are: '%s'", orionldState.errorAttributeArrayP));
+
+  //
+  // Rob the incoming Request Tree - performance to be won!
+  //
+  LM_TMP(("PART-UPDATE: Here"));
+  ciP->responseTree = ciP->requestTree;
+  LM_TMP(("PART-UPDATE: Here"));
+  ciP->requestTree  = NULL;
+  LM_TMP(("PART-UPDATE: Here"));
+
+  //
+  // For all attrs in ciP->responseTree, remove those that are found in orionldState.errorAttributeArrayP.
+  // Remember, the format of orionldState.errorAttributeArrayP is:
+  //
+  //   |attrName|attrName|attrName|...
+  //
+
+  // <TMP>
+  int ix = 1;
+  for (KjNode* attrNodeP = ciP->responseTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
+  {
+    LM_TMP(("PART-UPDATE: Attr %d: '%s'", ix, attrNodeP->name));
+    ++ix;
+  }
+  // </TMP>
+
+  KjNode* attrNodeP = ciP->responseTree->value.firstChildP;
+
+  while (attrNodeP != NULL)
+  {
+    char*   match;
+    KjNode* next = attrNodeP->next;
+    bool    moved = false;
+
+    LM_TMP(("PART-UPDATE: calling match for '%s'", attrNodeP->name));
+    if ((match = strstr(orionldState.errorAttributeArrayP, attrNodeP->name)) != NULL)
+    {
+      if ((match[-1] == '|') && (match[strlen(attrNodeP->name)] == '|'))
+      {
+        LM_TMP(("PART-UPDATE: removing child '%s'", attrNodeP->name));
+        kjChildRemove(ciP->responseTree, attrNodeP);
+        attrNodeP = next;
+        moved = true;
+      }
+    }
+
+    if (moved == false)
+      attrNodeP = attrNodeP->next;
+  }
+
+  // <TMP>
+  for (KjNode* attrNodeP = ciP->responseTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
+  {
+    LM_TMP(("PART-UPDATE: Attr %d: '%s'", ix, attrNodeP->name));
+    ++ix;
+  }
+  // </TMP>
+
+  LM_TMP(("PART-UPDATE: Created"));
+}
 
 
 
@@ -82,14 +159,16 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   mongoRequest.contextElementVector.push_back(ceP);
   entityIdP = &mongoRequest.contextElementVector[0]->entityId;
 
-  mongoRequest.updateActionType = ActionTypeAppendStrict;
-
-#if 0
-  if (ciP->uriParamOptions["noOverwrite"] == true)
+  if (orionldState.uriParamOptions.noOverwrite == true)
   {
-    // noOverwrite will be used in the future
+    LM_TMP(("AppendAttributes: mongoRequest.updateActionType = ActionTypeAppendStrict (as 'noOverwrite' was set)"));
+    mongoRequest.updateActionType = ActionTypeAppendStrict;
   }
-#endif
+  else
+  {
+    LM_TMP(("AppendAttributes: mongoRequest.updateActionType = ActionTypeAppend (as 'noOverwrite' was NOT set)"));
+    mongoRequest.updateActionType = ActionTypeAppend;
+  }
 
   entityIdP->id = ciP->wildcard[0];
 
@@ -171,6 +250,40 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     }
   }
 
+  //
+  // This service may return a payload, to indicate which attributes have been appended/changed
+  // Also, its returned HTTP Status Code depends on the appended/changed attributes.
+  // So. we need mongoBackend to give us that information back, in a way that can easily be used.
+  // A simple string will be used, with the following design:
+  //
+  //   "|attrName|attrName|attrName|attrName|"
+  //
+  // HTTP Status Codes:
+  //  * 204: All attributes in the payload were successfully appended (or overwritten)
+  //  * 207: Only the Attributes included in the response payload were successfully appended.
+  //  * 400: The request or its content is incorrect
+  //  * 404: Entity not found
+  //
+  // In the case "207" - some of the attributes weren't successfully updated, the list of all
+  // successfully updated attributes in returned as payload.
+  // This list is a vector of attribute names.
+  //
+  // For better performance, the names of the erroneous attributes are recored in a string.
+  // After "mongoBackend processing" this erroneous attributes string is checked and if it is not empty,
+  // then an inverted array must be created for the response payload.
+  // Normally, all will work just fine so this array will be empty.
+  //
+  // The variable to hold this "error attribute array" is:
+  //   orionldState.errorAttributeArray.
+  //
+  // The function to use to insert the attributes is:
+  //   orionldStateErrorAttributeAdd(char* attributeName)
+  //
+
+
+  //
+  // Calling mongoBackend
+  //
   ciP->httpStatusCode = mongoUpdateContext(&mongoRequest,
                                            &mongoResponse,
                                            orionldState.tenant,
@@ -182,17 +295,32 @@ bool orionldPostEntity(ConnectionInfo* ciP)
                                            ciP->apiVersion,
                                            NGSIV2_NO_FLAVOUR);
 
+  //
+  // Now check orionldState.errorAttributeArray to see whether any attribute failed to be updated
+  //
+  bool partialUpdate = (orionldState.errorAttributeArrayP[0] == 0)? false : true;
+  bool retValue      = true;
+
+  if (ciP->httpStatusCode == SccOk)
+    ciP->httpStatusCode = SccNoContent;
+  else
+  {
+    if (partialUpdate == true)
+    {
+      orionldPartialUpdateResponseCreate(ciP);
+      ciP->httpStatusCode = (HttpStatusCode) 207;
+    }
+    else
+    {
+      LM_E(("mongoUpdateContext: HTTP Status Code: %d", ciP->httpStatusCode));
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal Error", "Error from mongo backend", OrionldDetailsString);
+    }
+
+    retValue = false;
+  }
+
   mongoRequest.release();
   mongoResponse.release();
 
-  if (ciP->httpStatusCode != SccOk)
-  {
-    LM_E(("mongoUpdateContext: HTTP Status Code: %d", ciP->httpStatusCode));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal Error", "Error from mongo backend", OrionldDetailsString);
-    return false;
-  }
-
-  ciP->httpStatusCode = SccNoContent;
-
-  return true;
+  return retValue;
 }

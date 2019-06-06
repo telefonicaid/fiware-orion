@@ -43,7 +43,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/linkCheck.h"                          // linkCheck
 #include "orionld/common/SCOMPARE.h"                           // SCOMPARE
-#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/orionldContextCreateFromUrl.h"       // orionldContextCreateFromUrl
 #include "orionld/context/orionldContextAppend.h"              // orionldContextAppend
 #include "orionld/serviceRoutines/orionldBadVerb.h"            // orionldBadVerb
@@ -220,7 +220,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     // orionldServiceLookup makes sure the URL supprts the verb
     //
     ciP->serviceP = orionldServiceLookup(ciP, &orionldRestServiceV[ciP->verb]);
-
     if (ciP->serviceP == NULL)
     {
       if (orionldBadVerb(ciP) == true)
@@ -300,6 +299,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       //
       // Looking up "@context" attribute at first level in payload
       //
+      LM_TMP(("Looking up @context in payload ... (only if Content-Type == application/ld+json!!!!!!))"));
       for (KjNode* attrNodeP = ciP->requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
       {
         if (attrNodeP->name == NULL)
@@ -557,11 +557,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // Cleanup
   //
-  if (orionldState.httpReqBuffer != NULL)
-  {
-    free(orionldState.httpReqBuffer);
-    orionldState.httpReqBuffer = NULL;
-  }
+  orionldStateRelease();
 
   return MHD_YES;
 }

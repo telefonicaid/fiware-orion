@@ -56,7 +56,7 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode, kjValueType
 }
 
-#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/geoJsonCreate.h"                      // geoJsonCreate
 #endif
 
@@ -754,6 +754,7 @@ static bool updateAttribute
     newAttr.append(ENT_ATTRS_MDNAMES, mdNames);
 
     toSet->append(effectiveName, newAttr.obj());
+    LM_TMP(("AppendAttributes: adding attribute '%s' to the 'toSet' collection (replace)", effectiveName.c_str()));
     toPush->append(caP->name);
   }
   else
@@ -771,6 +772,7 @@ static bool updateAttribute
     {
       const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
       toSet->append(composedName, newAttr);
+      LM_TMP(("AppendAttributes: adding attribute '%s' (effectiveName: '%s') to the 'toSet' collection (NOT replace)", caP->name.c_str(), effectiveName.c_str()));
     }
   }
 
@@ -814,7 +816,20 @@ static bool appendAttribute
   /* APPEND with existing attribute equals to UPDATE */
   if (attrs.hasField(effectiveName.c_str()))
   {
-    updateAttribute(attrs, toSet, toPush, caP, actualUpdate, false, apiVersion);
+    if (orionldState.uriParamOptions.noOverwrite == true)
+    {
+      LM_TMP(("AppendAttributes: attribute '%s' already exists, and URI param noOverwrite is set so ... skipping",  caP->name.c_str()));
+      return false;
+    }
+
+    LM_TMP(("AppendAttributes: attribute '%s' already exists, so it is Updated", caP->name.c_str()));
+
+    //
+    // If updateAttribute fails, the name of the attribute caP is added to the list of erroneous attributes
+    //
+    if (updateAttribute(attrs, toSet, toPush, caP, actualUpdate, false, apiVersion) == false)
+      orionldStateErrorAttributeAdd(caP->name.c_str());
+
     return false;
   }
 
@@ -1731,8 +1746,11 @@ static bool processOnChangeConditionForUpdateContext
          * notification (see deleteAttrInNotifyCer function for details) */
         if (caP->name == attrL[jx] && !caP->skip)
         {
+          LM_TMP(("AppendAttributes: adding attribute '%s' as it is NOT marked as skipped", caP->name.c_str()));
           cer.contextElement.contextAttributeVector.push_back(caP);
         }
+        else
+          LM_TMP(("AppendAttributes: not adding attribute '%s' as it is marked as skipped", caP->name.c_str()));
       }
     }
   }
@@ -2764,6 +2782,7 @@ static bool processContextAttributeVector
 
     if (targetAttr->skip == true)
     {
+      LM_TMP(("AppendAttributes: skipping attribute '%s' as it is marked as skipped", targetAttr->name.c_str()));
       continue;
     }
 
@@ -2801,6 +2820,7 @@ static bool processContextAttributeVector
     }
     else if ((action == ActionTypeAppend) || (action == ActionTypeAppendStrict))
     {
+      LM_TMP(("AppendAttributes: action == %s for attribute '%s'", (action == ActionTypeAppend)? "Append" : "AppendStrict", targetAttr->name.c_str()));
       if (!appendContextAttributeItem(cerP,
                                       attrs,
                                       targetAttr,
@@ -3365,10 +3385,14 @@ static void updateEntity
   //
   if (action == ActionTypeAppendStrict)
   {
+    LM_TMP(("AppendAttributes: append-only check"));
+
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
+      LM_TMP(("AppendAttributes: Checking attr '%s'", ceP->contextAttributeVector[ix]->name.c_str()));
       if (howManyAttrs(attrs, ceP->contextAttributeVector[ix]->name) != 0)
       {
+        LM_TMP(("AppendAttributes: attribute '%s' already exists", ceP->contextAttributeVector[ix]->name.c_str()));
         alarmMgr.badInput(clientIp, "attribute already exists");
         *attributeAlreadyExistsError = true;
 
@@ -3377,7 +3401,7 @@ static void updateEntity
         // processContextAttributeVector looks at the 'skip' field
         //
         ceP->contextAttributeVector[ix]->skip = true;
-
+        LM_TMP(("AppendAttributes: marked attribute '%s' as skipped", ceP->contextAttributeVector[ix]->name.c_str()));
         // Add to the list of existing attributes - for the error response
         if (*attributeAlreadyExistsList != "[ ")
         {
@@ -3508,8 +3532,11 @@ static void updateEntity
   BSONArray       toPushArr   = toPush.arr();
   BSONArray       toPullArr   = toPull.arr();
 
+  LM_TMP(("AppendAttributes: here we actually touch mongo ..."));
+
   if (action == ActionTypeReplace)
   {
+    LM_TMP(("AppendAttributes: action == ActionTypeReplace"));
     // toSet: { A1: { ... }, A2: { ... } }
     BSONObjBuilder replaceSet;
     int            now = getCurrentTime();
@@ -3538,6 +3565,7 @@ static void updateEntity
   }
   else
   {
+    LM_TMP(("AppendAttributes: action != ActionTypeReplace"));
     // toSet:  { attrs.A1: { ... }, attrs.A2: { ... } }
     if (toSetObj.nFields() > 0)
     {

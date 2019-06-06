@@ -25,72 +25,10 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/kjson.h"                                       // Kjson
-#include "kjson/KjNode.h"                                      // KjNode
-}
-#include "common/globals.h"                                    // ApiVersion
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
+#include "orionld/common/orionldState.h"
 
-
-
-// -----------------------------------------------------------------------------
 //
-// OrionldConnectionState - the state of the connection
+// This file is to be DELETED
 //
-// This struct contains all the state of a connection, like the Kjson pointer, the pointer to
-// the RestService of the request or the urlPath of the request or ...
-// Basically EVERYTHING that is a 'characteristics' for the connection.
-// These fields/variables will be set once, initially, when the request arrived and after that will only be read.
-// It makes very little sense to send these variables to each and every function where they are to be used.
-// Much easier and faster to simply store them in a thread global struct.
-//
-typedef struct OrionldConnectionState
-{
-  Kjson            kjson;
-  Kjson*           kjsonP;
-  KAlloc           kalloc;
-  char             kallocBuffer[8 * 1024];
-  char*            tenant;
-  char*            link;
-  bool             useLinkHeader;
-  bool             linkToBeFreed;
-  bool             linkHeaderAdded;
-  OrionldContext   inlineContext;
-  OrionldContext*  contextP;
-  ApiVersion       apiVersion;
-  int              requestNo;
-  KjNode*          locationAttributeP;
-  KjNode*          geoTypeP;
-  KjNode*          geoCoordsP;
-  int64_t          overriddenCreationDate;
-  int64_t          overriddenModificationDate;
-  bool             entityCreated;                // If an entity is created, if complex context, it must be stored
-  char*            entityId;
-  char*            httpReqBuffer;
-} OrionldConnectionState;
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldState -
-//
-extern __thread OrionldConnectionState orionldState;
-
-
-
-// -----------------------------------------------------------------------------
-//
-// Global state
-//
-extern int             requestNo;  // Never mind protecting with semaphore. Just a debugging help
-extern char            kallocBuffer[32 * 1024];
-extern KAlloc          kalloc;
-extern Kjson           kjson;
-extern Kjson*          kjsonP;
-extern char*           hostname;
-extern unsigned short  portNo;
 
 #endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDCONNECTION_H_

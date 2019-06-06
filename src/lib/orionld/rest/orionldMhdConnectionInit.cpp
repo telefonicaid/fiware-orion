@@ -27,7 +27,6 @@
 
 extern "C"
 {
-#include "kjson/kjBufferCreate.h"                              // kjBufferCreate
 #include "kalloc/kaBufferInit.h"                               // kaBufferInit
 }
 
@@ -37,7 +36,7 @@ extern "C"
 #include "rest/Verb.h"                                         // Verb
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldErrorResponse.h"               // OrionldBadRequestData, OrionldDetailsString, ...
-#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState, orionldStateInit
 #include "orionld/context/orionldContextListPresent.h"         // orionldContextListPresent
 #include "orionld/rest/temporaryErrorPayloads.h"               // Temporary Error Payloads
 #include "orionld/rest/orionldMhdConnectionInit.h"             // Own interface
@@ -216,16 +215,7 @@ int orionldMhdConnectionInit
   //
   // 1. Prepare orionldState
   //
-  orionldState.requestNo        = requestNo;
-  orionldState.tenant           = (char*) "";
-  orionldState.kjsonP           = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
-  orionldState.link             = NULL;
-  orionldState.useLinkHeader    = true;  // Service routines can set this value to 'false' to avoid having the Link HTTP Header in its output
-  orionldState.entityCreated    = false;
-  orionldState.entityId         = NULL;
-  orionldState.linkToBeFreed    = false;
-  orionldState.linkHeaderAdded  = false;
-  orionldState.httpReqBuffer    = NULL;
+  orionldStateInit();
 
   ciP->kjsonP = orionldState.kjsonP;  // FIXME: ciP->kjsonP is to BE REMOVED. orionldState.kjsonP should be used instead
 

@@ -33,6 +33,16 @@
 
 // ----------------------------------------------------------------------------
 //
+// orionldPartialUpdateResponseCreate -
+//
+// Not static so that it can be used in unit testing
+//
+extern void orionldPartialUpdateResponseCreate(ConnectionInfo* ciP);
+
+
+
+// ----------------------------------------------------------------------------
+//
 // orionldPostEntity -
 //
 extern bool orionldPostEntity(ConnectionInfo* ciP);
