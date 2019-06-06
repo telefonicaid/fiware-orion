@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/globals.h"
 #include "common/clockFunctions.h"
 #include "common/statistics.h"
 #include "common/limits.h"

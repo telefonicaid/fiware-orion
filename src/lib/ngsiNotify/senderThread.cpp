@@ -25,6 +25,7 @@
 
 #include "common/statistics.h"
 #include "common/limits.h"
+#include "common/globals.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
