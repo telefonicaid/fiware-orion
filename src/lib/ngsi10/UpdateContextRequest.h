@@ -55,11 +55,13 @@ typedef struct UpdateContextRequest
   ActionType              updateActionType;      // Mandatory
 
   std::string             contextProvider;       // Not part of the payload - used internally only
+  ProviderFormat          providerFormat;        // Not part of the payload - used internally only
 
   UpdateContextRequest();
-  UpdateContextRequest(const std::string& _contextProvider, Entity* eP);
+  UpdateContextRequest(const std::string& _contextProvider, ProviderFormat _providerFormat, Entity* eP);
 
   std::string        toJsonV1(bool asJsonObject);
+  std::string        toJson(void);
   std::string        check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError);
   void               release(void);
   ContextAttribute*  attributeLookup(Entity* eP, const std::string& attributeName);
@@ -77,14 +79,12 @@ typedef struct UpdateContextRequest
                     const std::string& entityType,
                     const std::string& isPattern,
                     const std::string& attributeName,
-                    const std::string& metaID,
                     ActionType         _updateActionType);
 
   void         fill(const UpdateContextAttributeRequest* ucarP,
                     const std::string&                   entityId,
                     const std::string&                   entityType,
                     const std::string&                   attributeName,
-                    const std::string&                   metaID,
                     ActionType                           _updateActionType);
 
   void         fill(const Entity* entP, ActionType _updateActionType);

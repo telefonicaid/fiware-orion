@@ -30,6 +30,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
 #include "convenience/UpdateContextElementRequest.h"
 #include "convenience/AppendContextElementRequest.h"
@@ -37,6 +38,7 @@
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
 #include "convenience/UpdateContextAttributeRequest.h"
+
 
 
 /* ****************************************************************************
@@ -53,11 +55,36 @@ UpdateContextRequest::UpdateContextRequest()
 *
 * UpdateContextRequest::UpdateContextRequest -
 */
-UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, Entity* eP)
+UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, ProviderFormat _providerFormat, Entity* eP)
 {
   contextProvider = _contextProvider;
-  entityVector.push_back(new Entity(eP->id, eP->type, eP->isPattern));
+  providerFormat  = _providerFormat;
+  Entity* neweP = new Entity(eP->id, eP->type, eP->isPattern);
+  neweP->renderId = eP->renderId;
+  entityVector.push_back(neweP);
 }
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextRequest::toJson -
+*/
+std::string UpdateContextRequest::toJson(void)
+{
+  JsonObjectHelper jh;
+
+  // FIXME P2: maybe we should have a toJson() wrapper for toJson(NGSI_V2_NORMALIZED, nullFilter, false, nullFilter),
+  // if this pattern is common in the code (not sure right now)
+  std::vector<std::string>  nullFilter;
+
+  jh.addRaw("entities", entityVector.toJson(NGSI_V2_NORMALIZED, nullFilter, false, nullFilter));
+
+  jh.addString("actionType", actionTypeString(V2, updateActionType));
+
+  return jh.str();
+}
+
 
 
 /* ****************************************************************************
@@ -68,9 +95,10 @@ std::string UpdateContextRequest::toJsonV1(bool asJsonObject)
 {
   std::string  out = "";
 
-  // JSON commas:
-  // Both fields are MANDATORY, so, comma after "contextElementVector"
-  //  
+  //
+  // About JSON commas:
+  //   Both fields are MANDATORY, so, always comma after "entityVector"
+  //
   out += startTag();
   out += entityVector.toJsonV1(asJsonObject, UpdateContext, true);
   out += valueTag("updateAction", actionTypeString(V1, updateActionType), false);
@@ -78,6 +106,7 @@ std::string UpdateContextRequest::toJsonV1(bool asJsonObject)
 
   return out;
 }
+
 
 
 /* ****************************************************************************
@@ -170,7 +199,6 @@ void UpdateContextRequest::fill
   const std::string& entityType,
   const std::string& isPattern,
   const std::string& attributeName,
-  const std::string& metaID,
   ActionType         _updateActionType
 )
 {
@@ -185,13 +213,6 @@ void UpdateContextRequest::fill
   {
     ContextAttribute* caP = new ContextAttribute(attributeName, "", "");
     eP->attributeVector.push_back(caP);
-
-    if (metaID != "")
-    {
-      Metadata* mP = new Metadata("ID", "", metaID);
-
-      caP->metadataVector.push_back(mP);
-    }
   }
 }
 
@@ -206,8 +227,7 @@ void UpdateContextRequest::fill
   const UpdateContextAttributeRequest* ucarP,
   const std::string&                   entityId,
   const std::string&                   entityType,
-  const std::string&                   attributeName,
-  const std::string&                   metaID,
+  const std::string&                   attributeName,  
   ActionType                           _updateActionType
 )
 {
@@ -228,25 +248,6 @@ void UpdateContextRequest::fill
   eP->attributeVector.push_back(caP);
 
   entityVector.push_back(eP);
-
-  //
-  // If there is a metaID, then the metadata named ID must exist.
-  // If it doesn't exist already, it must be created
-  //
-  if (metaID != "")
-  {
-    Metadata* mP = caP->metadataVector.lookupByName("ID");
-
-    if (mP == NULL)
-    {
-      mP = new Metadata("ID", "", metaID);
-      caP->metadataVector.push_back(mP);
-    }
-    else if (mP->stringValue != metaID)
-    {
-      alarmMgr.badInput(clientIp, "metaID differs in URI and payload");
-    }
-  }
 
   updateActionType = _updateActionType;
 }

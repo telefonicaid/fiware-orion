@@ -98,4 +98,9 @@
 
 #define ERROR_DESC_BAD_VERB                           "method not allowed"
 
+
+#define ERROR_NOTIMPLEMENTED                          "NotImplemented"
+#define ERROR_DESC_IDPATTERN_NOTSUPPORTED             "Unsupported idPattern"
+#define ERROR_DESC_TYPEPATTERN_NOTIMPLEMENTED         "typePattern is not supported"
+
 #endif  // SRC_LIB_COMMON_ERRORMESSAGES_H_

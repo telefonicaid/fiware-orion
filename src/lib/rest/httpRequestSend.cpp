@@ -517,8 +517,15 @@ int httpRequestSendWithCurl
   }
 
 
+  //
+  // FIXME: outgoingMsgSize is a signed int. Max size ~2GB. Might not be enough.
+  //        Might be a good idea to change it to 'unsigned long long'
+  //
+
+  //
   // Check if total outgoing message size is too big
-  if (outgoingMsgSize > MAX_DYN_MSG_SIZE)
+  //
+  if ((unsigned long long) outgoingMsgSize > outReqMsgMaxSize)
   {
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", outgoingMsgSize));

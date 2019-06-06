@@ -40,15 +40,18 @@ Buildrequires: gcc, cmake, gcc-c++, gnutls-devel, libgcrypt-devel, libcurl-devel
 Requires(pre): shadow-utils
 
 %description
-The Orion Context Broker is an implementation of NGSI9 and NGSI10 interfaces. 
-Using these interfaces, clients can do several operations:
-* Register context producer applications, e.g. a temperature sensor within a room.
-* Update context information, e.g. send updates of temperature.
-* Being notified when changes on context information take place (e.g. the
-  temperature has changed) or with a given frecuency (e.g. get the temperature
-  each minute).
-* Query context information. The Orion Context Broker stores context information
-  updated from applications, so queries are resolved based on that information.
+The Orion Context Broker is an implementation of the Publish/Subscribe Context Broker GE,
+providing an NGSI interface. Using this interface, clients can do several operations:
+
+* Query context information. The Orion Context Broker stores context information updated
+  from applications, so queries are resolved based on that information. Context 
+  information consists on *entities* (e.g. a car) and their *attributes* (e.g. the speed
+  or location of the car).
+* Update context information, e.g. send updates of temperature
+* Get notified when changes on context information take place (e.g. the temperature
+  has changed)
+* Register context provider applications, e.g. the provider for the temperature sensor
+  within a room
 
 %prep
 if [ -d $RPM_BUILD_ROOT/usr ]; then
@@ -173,6 +176,20 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Thu Feb 21 2019 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.2.0-1
+- Add: skipInitialNotification URI param option to make initial notification in subscriptions configurable (#920)
+- Add: forcedUpdate URI param option to always trigger notifications, no matter if actual update or not (#3389)
+- Add: log notification HTTP response (as INFO for 2xx or WARN for other codes)
+- Add: notification.lastFailureReason field in subscriptions to get the reason of the last notification failure
+- Add: notification.lastSuccessCode field in subscriptions to get the HTTP responde code of the last successful notification
+- Fix: NGSIv1 updates with geo:line|box|polygon|json removes location DB field of NGSIv2-located entities (#3442)
+- Fix: specify notification/forwarding error cause in log messages (#3077)
+- Fix: from=, corr=, srv=, subsrv= correctly propagated to logs in notifications (#3073)
+- Fix: avoid "pending" fields in logs
+- Fix: use "<none>" for srv= and subsrv= in logs when service/subservice header is not provided
+- Fix: bug in notification alarm raising in -notificationMode transient and persistent
+- Remove: deprecated feature ID metadata (and associated NGSIv1 operations)
+
 * Wed Dec 19 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.1.0-1
 - Add: Oneshot Subscription (#3189)
 - Add: support to MongoDB 3.6 (#3070)

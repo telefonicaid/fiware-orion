@@ -1,0 +1,270 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Check metadata ID now works a a regular metadata
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E1/A/ID=ID1 using NGSIv1
+# 02. Create entity E2/A/ID=ID2 using NGSIv2
+# 03. Get both entities using POST /v1/queryContext
+# 04. Get both entities using GET /v2/entities
+#
+
+echo "01. Create entity E1/A/ID=ID1 using NGSIv1"
+echo "=========================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "A",
+          "type": "Text",
+          "value": "foo",
+          "metadatas": [
+            {
+              "name": "ID",
+              "type": "Text",
+              "value": "ID1"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url '/v1/updateContext' --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E2/A/ID=ID2 using NGSIv2"
+echo "=========================================="
+payload='{
+  "id": "E2",
+  "type": "T",
+  "A": {
+    "value": "bar",
+    "type": "Text",
+    "metadata": {
+      "ID": {
+        "value": "ID2",
+        "type": "Text"
+      }
+    }
+  }
+}'
+orionCurl --url '/v2/entities' --payload "$payload"
+echo
+echo
+
+
+echo "03. Get both entities using POST /v1/queryContext"
+echo "================================================="
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "id": "E.*",
+      "isPattern": "true"
+    }
+  ]
+}'
+orionCurl --url '/v1/queryContext' --payload "$payload"
+echo
+echo
+
+
+echo "04. Get both entities using GET /v2/entities"
+echo "============================================"
+orionCurl --url '/v2/entities'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1/A/ID=ID1 using NGSIv1
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 241
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "ID",
+                                "type": "Text",
+                                "value": "ID1"
+                            }
+                        ],
+                        "name": "A",
+                        "type": "Text",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+02. Create entity E2/A/ID=ID2 using NGSIv2
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Get both entities using POST /v1/queryContext
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 466
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "ID",
+                                "type": "Text",
+                                "value": "ID1"
+                            }
+                        ],
+                        "name": "A",
+                        "type": "Text",
+                        "value": "foo"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "ID",
+                                "type": "Text",
+                                "value": "ID2"
+                            }
+                        ],
+                        "name": "A",
+                        "type": "Text",
+                        "value": "bar"
+                    }
+                ],
+                "id": "E2",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+04. Get both entities using GET /v2/entities
+============================================
+HTTP/1.1 200 OK
+Content-Length: 211
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A": {
+            "metadata": {
+                "ID": {
+                    "type": "Text",
+                    "value": "ID1"
+                }
+            },
+            "type": "Text",
+            "value": "foo"
+        },
+        "id": "E1",
+        "type": "T"
+    },
+    {
+        "A": {
+            "metadata": {
+                "ID": {
+                    "type": "Text",
+                    "value": "ID2"
+                }
+            },
+            "type": "Text",
+            "value": "bar"
+        },
+        "id": "E2",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

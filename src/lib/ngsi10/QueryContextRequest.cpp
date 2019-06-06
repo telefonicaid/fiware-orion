@@ -25,7 +25,9 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 #include "common/globals.h"
+#include "common/JsonHelper.h"
 #include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
@@ -57,9 +59,10 @@ QueryContextRequest::QueryContextRequest()
 *
 * QueryContextRequest::QueryContextRequest
 */
-QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName)
+QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName, ProviderFormat _providerFormat)
 {
   contextProvider = _contextProvider;
+  providerFormat  = _providerFormat;
 
   entityIdVector.push_back(new EntityId(eP));
 
@@ -77,15 +80,32 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 *
 * QueryContextRequest::QueryContextRequest
 */
-QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const StringList& _attributeList)
+QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const StringList& _attributeList, ProviderFormat _providerFormat)
 {
   contextProvider = _contextProvider;
+  providerFormat  = _providerFormat;
 
   entityIdVector.push_back(new EntityId(eP));
 
   attributeList.clone(_attributeList);
 
   restrictions = 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* QueryContextRequest::toJson -
+*/
+std::string QueryContextRequest::toJson(void)
+{
+  JsonObjectHelper jh;
+
+  jh.addRaw("entities", entityIdVector.toJson());
+  jh.addRaw("attrs", attributeList.toJson());
+
+  return jh.str();
 }
 
 

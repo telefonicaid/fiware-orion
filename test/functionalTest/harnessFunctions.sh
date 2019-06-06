@@ -236,7 +236,7 @@ function brokerStopAwait
 
   while [ $loopNo -lt $loops ]
   do
-    nc -w 2 localhost $port &>/dev/null </dev/null
+    nc -zv localhost $port &>/dev/null </dev/null
     if [ "$?" != "0" ]
     then
       vMsg The orion context broker on port $port has stopped
@@ -301,7 +301,7 @@ function brokerStartAwait
 
   while [ $loopNo -lt $loops ]
   do
-    nc -w 2 localhost $port &>/dev/null </dev/null
+    nc -zv localhost $port &>/dev/null </dev/null
     if [ "$?" == "0" ]
     then
       vMsg The orion context broker has started, listening on port $port
@@ -520,6 +520,11 @@ function localBrokerStop
 #
 function brokerStart()
 {
+  if [ "$CB_WITH_EXTERNAL_BROKER" == 1 ]
+  then
+    return
+  fi
+
   role=$1
   traceLevels=$2
   ipVersion=$3
@@ -710,6 +715,14 @@ function accumulatorStart()
     shift
   fi
 
+  url="/notify"
+  if [ "$1" = "--url" ]
+  then
+    url="$2"
+    shift
+    shift
+  fi
+
   bindIp=$1
   port=$2
 
@@ -726,7 +739,7 @@ function accumulatorStart()
 
   accumulatorStop $port
 
-  accumulator-server.py --port $port --url /notify --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+  accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
   echo accumulator running as PID $$
 
   # Wait until accumulator has started or we have waited a given maximum time
@@ -744,7 +757,7 @@ function accumulatorStart()
    sleep 1
 
    time=$time+1
-   nc -w 2 $bindIp $port &>/dev/null </dev/null
+   nc -zv $bindIp $port &>/dev/null </dev/null
    port_not_ok=$?
   done
 }
@@ -914,6 +927,32 @@ function mongoCmd()
   db=$1
   cmd=$2
   echo $cmd | mongo mongodb://$host:$port/$db | tail -n 2 | head -n 1
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# mongoCmdLong - like mongoCmd but showing all the output, not just the last line.
+#                Meant to be used in conjunction with 'grep'
+#
+function mongoCmdLong()
+{
+  host="${CB_DATABASE_HOST}"
+  if [ "$host" == "" ]
+  then
+    host="localhost"
+  fi
+
+  port="${CB_DATABASE_PORT}"
+  if [ "$port" == "" ]
+  then
+    port="27017"
+  fi
+
+  db=$1
+  cmd=$2
+  echo $cmd | mongo mongodb://$host:$port/$db
 }
 
 
@@ -1234,6 +1273,7 @@ export -f accumulatorReset
 export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd
+export -f mongoCmdLong
 export -f vMsg
 export -f dMsg
 export -f valgrindSleep

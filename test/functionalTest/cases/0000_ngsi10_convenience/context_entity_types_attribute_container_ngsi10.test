@@ -91,7 +91,7 @@ Date: REGEX(.*)
 }
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 268
+Content-Length: 269
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -105,7 +105,7 @@ Date: REGEX(.*)
                         "metadatas": [
                             {
                                 "name": "ID",
-                                "type": "string",
+                                "type": "integer",
                                 "value": "3"
                             }
                         ],
@@ -127,7 +127,7 @@ Date: REGEX(.*)
 }
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 271
+Content-Length: 272
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -141,7 +141,7 @@ Date: REGEX(.*)
                         "metadatas": [
                             {
                                 "name": "ID",
-                                "type": "string",
+                                "type": "integer",
                                 "value": "3"
                             }
                         ],

@@ -53,25 +53,6 @@ ContextAttributeVector::ContextAttributeVector()
 
 /* ****************************************************************************
 *
-* addedLookup - 
-*/
-static std::string addedLookup(const std::vector<std::string>& added, std::string value)
-{
-  for (unsigned int ix = 0; ix < added.size(); ++ix)
-  {
-    if (added[ix] == value)
-    {
-      return value;
-    }
-  }
-
-  return "";
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextAttributeVector::toJsonTypes -
 *
 */
@@ -157,42 +138,28 @@ std::string ContextAttributeVector::toJsonV1
     return "";
   }
 
+  //
+  // NOTE:
+  // If the URI parameter 'attributeFormat' is set to 'object', then the attribute vector
+  // is to be rendered as objects for JSON, and not as a vector.
+  //
   if (asJsonObject)
   {
-    // If the URI parameter 'attributeFormat' is set to 'object', then the attribute vector
-    // is to be rendered as objects for JSON, and not as a vector.
-    // Also, if we have more than one attribute with the same name (possible if different metaID),
-    // only one of them should be included in the vector. Any one of them.
-    // The added vector helps to keep track and avoid duplicates
-    std::vector<std::string> added;
-
     // Note that in the case of attribute as name, we have to use a vector, thus using
     // attrsAsName variable as value for isVector parameter
     out += startTag("attributes", attrsAsName);
     for (unsigned int ix = 0; ix < orderedAttrs.size(); ++ix)
     {
-      if (addedLookup(added, orderedAttrs[ix]->name) == "")
+      bool comma = (ix != orderedAttrs.size() -1);
+      if (attrsAsName)
       {
-        added.push_back(orderedAttrs[ix]->name);
-        if (attrsAsName)
-        {
-          out += orderedAttrs[ix]->toJsonV1AsNameString(true);
-        }
-        else
-        {
-          out += orderedAttrs[ix]->toJsonV1(asJsonObject, request, metadataFilter, true, omitValue);
-        }
+        out += orderedAttrs[ix]->toJsonV1AsNameString(comma);
       }
       else
       {
-        LM_T(LmtJsonAttributes, ("Attribute already added attribute '%s'", orderedAttrs[ix]->name.c_str()));
+        out += orderedAttrs[ix]->toJsonV1(asJsonObject, request, metadataFilter, comma, omitValue);
       }
-    }
-
-    // Remove final comma, as the addedLookup() check doesn't allow us to predict which the
-    // last invocation to orderedAttrs[ix]->toJsonV1(...) and setting the comma paramter properly
-    out = out.substr(0, out.length() - 1 );
-
+    }   
     out += endTag(comma, attrsAsName);
   }
   else
@@ -343,26 +310,4 @@ int ContextAttributeVector::get(const std::string& attributeName) const
   }
 
   return -1;
-}
-
-
-/* ****************************************************************************
-*
-* getAll -
-*
-* Like get, but takes into account there could be several attributes with same name
-* and differente ID and returns all them (in a vector of integers)
-*
-* FIXME #3168: to be removed along with all the metadata ID related code
-*
-*/
-void ContextAttributeVector::getAll(const std::string& attributeName, std::vector<int>* foundP) const
-{
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    if (vec[ix]->name == attributeName)
-    {
-      foundP->push_back(ix);
-    }
-  }
 }

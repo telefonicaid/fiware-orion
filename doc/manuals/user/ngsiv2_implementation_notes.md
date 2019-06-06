@@ -334,7 +334,8 @@ for the following aspects:
 * `PATCH /v2/registration/<id>` is not implemented. Thus, registrations cannot be updated
   directly. I.e., updates must be done deleting and re-creating the registration. Please
   see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3007) about this.
-* `idPattern` and `typePattern` are not implemented.
+* `idPattern` is supported but only for the exact regular expression `.*`
+* `typePattern` is not implemented.
 * The only valid `supportedForwardingMode` is `all`. Trying to use any other value will end
   in a 501 Not Implemented error response. Please
   see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3106) about this.
@@ -350,12 +351,15 @@ According to NGSIv2 specification:
 
 The way in which Orion implements such forwarding is as follows:
 
-Orion implements an additional field `legacyForwarding` (within `provider`) not included in NGSIv2
+* `POST /v2/op/query` for query forwarding
+* `POST /v2/op/update` for update forwarding
+
+More information on forwarding to context information sources can be found in [this specific document](context_providers.md).
+
+Orion implements an additional field `legacyForwarding` (within `provider`) not included in the NGSIv2
 specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
-for forwarding requests associated to that registration. Although NGSIv1 is deprecated, for the time being,
-NGSIv2-based forwarding has not been defined (see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3068)
-about it) so the only valid option is to always use `"legacyForwarding": true` (otherwise a 501 Not Implemented
-error response will be the result).
+for forwarding requests associated to that registration. Although NGSIv1 is deprecated, some Context Provider may
+not have been migrated yet to NGSIv2, so this mode may prove useful.
 
 [Top](#top)
 

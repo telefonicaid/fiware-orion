@@ -78,7 +78,7 @@ std::string deleteIndividualContextEntity
   StatusCode   response;
 
   // 01. Fill in UpdateContextRequest fromURL-data + URI params
-  parseDataP->upcr.res.fill(entityId, entityType, "false", "", "", ActionTypeDelete);
+  parseDataP->upcr.res.fill(entityId, entityType, "false", "", ActionTypeDelete);
 
   // 02. Call postUpdateContext standard service routine
   answer = postUpdateContext(ciP, components, compV, parseDataP);

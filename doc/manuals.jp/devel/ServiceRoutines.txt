@@ -2,48 +2,72 @@
 図では、どのサービス・ルーチンが他のサービス・ルーチンを呼び出すのか、および (もしあれば) 最後に
 リクエストが終了する mongoBackend の機能を明確に確認できます。
 
+注意:
+  OPTIONS 動詞は、CLI オプション '-corsOrigin' で開始された場合にのみ broker によってサポートされます
+
+
 API V2:
 ====================================================================================================
   GET     /v2                                                                     entryPointsTreat
+  OPTIONS /v2                                                                     optionsGetOnly
   *       /v2                                                                     badVerbGetOnly
 
   GET     /v2/entities                                                            getEntities -----------------------------------------------> postQueryContext  -------------------------------------------> mongoQueryContext
   POST    /v2/entities                                                            postEntities ----------------------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  OPTIONS /v2/entities                                                            optionsGetPostOnly
   *       /v2/entities                                                            badVerbGetPostOnly
 
   GET     /v2/entities/{EID}                                                      getEntity             -------------------------------------> postQueryContext  -------------------------------------------> mongoQueryContext
   DELETE  /v2/entities/{EID}                                                      deleteEntity ----------------------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  OPTIONS /v2/entities/{EID}                                                      optionsGetDeleteOnly
   *       /v2/entities/{EID}                                                      badVerbGetDeleteOnly
 
   GET     /v2/entities/{EID}/attrs                                                getEntity -------------------------------------------------> postQueryContext  -------------------------------------------> mongoQueryContext
   POST    /v2/entities/{EID}/attrs                                                postEntity ------------------------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
   PUT     /v2/entities/{EID}/attrs                                                putEntity -------------------------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
   PATCH   /v2/entities/{EID}/attrs                                                patchEntity -----------------------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  OPTIONS /v2/entities/{EID}/attrs                                                optionsAllNotDelete
   *       /v2/entities/{EID}/attrs                                                badVerbAllNotDelete
 
   GET     /v2/entities/{EID}/attrs/{ATTRNAME}/value                               getEntityAttributeValue -----------------------------------> postQueryContext  -------------------------------------------> mongoQueryContext
   PUT     /v2/entities/{EID}/attrs/{ATTRNAME}/value                               putEntityAttributeValue -----------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  OPTIONS /v2/entities/{EID}/attrs/{ATTRNAME}/value                               optionsGetPutOnly
   *       /v2/entities/{EID}/attrs/{ATTRNAME}/value                               badVerbGetPutOnly
 
   GET     /v2/entities/{EID}/attrs/{ATTRNAME}                                     getEntityAttribute ----------------------------------------> postQueryContext  -------------------------------------------> mongoQueryContext
   PUT     /v2/entities/{EID}/attrs/{ATTRNAME}                                     putEntityAttribute ----------------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
   DELETE  /v2/entities/{EID}/attrs/{ATTRNAME}                                     deleteEntity ----------------------------------------------> postUpdateContext -------------------------------------------> mongoUpdateContext
+  OPTIONS /v2/entities/{EID}/attrs/{ATTRNAME}                                     optionsGetPutDeleteOnly
   *       /v2/entities/{EID}/attrs/{ATTRNAME}                                     badVerbGetPutDeleteOnly
 
   GET     /v2/types/{ETYPE}                                                       getEntityType ------------------------------------------------------------------------------------------------------------> mongoAttributesForEntityType
+  OPTIONS /v2/types/{ETYPE}                                                       optionsGetOnly
   *       /v2/types/{ETYPE}                                                       badVerbGetOnly
 
   GET     /v2/types                                                               getEntityAllTypes --------------------------------------------------------------------------------------------------------> mongoEntityTypesValues/mongoEntityTypes
+  OPTIONS /v2/types                                                               optionsGetOnly
   *       /v2/types                                                               badVerbGetOnly
 
   GET     /v2/subscriptions                                                       getAllSubscriptions ------------------------------------------------------------------------------------------------------> mongoListSubscriptions
   POST    /v2/subscriptions                                                       postSubscriptions --------------------------------------------------------------------------------------------------------> mongoCreateSubscription
+  OPTIONS /v2/subscriptions                                                       optionsGetPostOnly
   *       /v2/subscriptions                                                       badVerbGetPostOnly
 
   GET     /v2/subscriptions/{SUBID}                                               getSubscription ----------------------------------------------------------------------------------------------------------> mongoGetSubscription
   DELETE  /v2/subscriptions/{SUBID}                                               deleteSubscription -------------------------------------------------------------------------------------------------------> mongoUnsubscribeContext
   PATCH   /v2/subscriptions/{SUBID}                                               patchSubscription --------------------------------------------------------------------------------------------------------> mongoUpdateSubscription
+  OPTIONS /v2/subscriptions/{SUBID}                                               optionsGetDeletePatchOnly
   *       /v2/subscriptions/{SUBID}                                               badVerbGetDeletePatchOnly
+
+  GET     /v2/registrations/{REGID}                                               getRegistration ----------------------------------------------------------------------------------------------------------> mongoRegistrationGet
+  DELETE  /v2/registrations/{REGID}                                               deleteRegistration -------------------------------------------------------------------------------------------------------> mongoRegistrationDelete
+  OPTIONS /v2/registrations/{REGID}                                               optionsGetDeleteOnly
+  *       /v2/registrations/{REGID}                                               badVerbGetDeleteOnly
+
+  GET     /v2/registrations                                                       getRegistrations ---------------------------------------------------------------------------------------------------------> mongoRegistrationsGet
+  POST    /v2/registrations                                                       getRegistrations ---------------------------------------------------------------------------------------------------------> mongoRegistrationCreate
+  OPTIONS /v2/registrations                                                       optionsGetPostOnly
+  *       /v2/registrations                                                       badVerbGetPostOnly
 
   POST    /v2/op/query                                                            postBatchQuery --------------------------------------------> postQueryContext  -------------------------------------------> mongoQueryContext
   *       /v2/op/query                                                            badVerbPostOnly
@@ -378,6 +402,7 @@ MISC REQUESTS:
   *       /v1/admin/cache/statistics                                              badVerbGetDeleteOnly
 
   GET     /version                                                                versionTreat
+  OPTIONS /version                                                                optionsVersionRequest
   *       /version                                                                badVerbGetOnly
 
   PUT     /admin/log                                                              changeLogLevel

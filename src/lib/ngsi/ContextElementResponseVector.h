@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "ngsi/ContextElementResponse.h"
+#include "apiTypesV2/EntityVector.h"
 #include "common/RenderFormat.h"
 
 
@@ -58,6 +59,7 @@ typedef struct ContextElementResponseVector
   ContextElementResponse*  lookup(Entity* eP, HttpStatusCode code = SccNone);
   void                     release(void);
   void                     fill(ContextElementResponseVector& cerV);
+  void                     fill(EntityVector& erV, HttpStatusCode sc);    // Needed by NGSIv2 forwarding logic
   ContextElementResponse*  operator[] (unsigned int ix) const;
   
 

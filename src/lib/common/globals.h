@@ -71,14 +71,6 @@
 
 /* ****************************************************************************
 *
-* metadata ID separator
-*/
-#define MD_ID_SEPARATOR "()"
-
-
-
-/* ****************************************************************************
-*
 * Default Types for entities, attributes and metadata
 */
 #define DEFAULT_ENTITY_TYPE       "Thing"
@@ -227,6 +219,8 @@ extern bool               disableCusNotif;
 
 extern bool               insecureNotif;
 extern bool               ngsiv1Autocast;
+extern unsigned long long inReqPayloadMaxSize;
+extern unsigned long long outReqMsgMaxSize;
 
 
 

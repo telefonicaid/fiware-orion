@@ -56,8 +56,8 @@ tutorials and how to run and interact with Orion Context Broker.
 Let's assume we have a building with several rooms and that we want to
 use Orion Context Broker to manage its context information. The rooms
 are Room1, Room2, Room3 and Room4 and each room has two sensors:
-temperature and (atmospheric) pressure (except Room4, which only has a
-pressure sensor). In addition, let's consider that we have two cars
+temperature and (atmospheric) pressure, except Room4 that only has a
+pressure sensor. In addition, let's consider that we have two cars
 (Car1 and Car2) with sensors able to measure speed and location (in GPS
 sense).
 
@@ -86,17 +86,17 @@ Before starting, you need to install the broker as described in the
 [Installation and Administration Guide](../admin/install.md).
 
 The tutorials assume that you don't have any previous content in the
-Orion Context Broker database. In order to do so, follow the [delete
+Orion Context Broker database. In order make sure it is so, please follow the [delete
 database
 procedure](../admin/database_admin.md#delete-complete-database).
 
-To start the broker (as root or using the sudo command):
+To start the broker (either as *root* or using the `sudo` command):
 
 ```
 /etc/init.d/contextBroker start
 ```
 
-To restart the broker (as root or using the sudo command):
+To restart the broker (either as *root* or with `sudo`):
 
 ```
 /etc/init.d/contextBroker restart
@@ -107,8 +107,8 @@ To restart the broker (as root or using the sudo command):
 ### Starting accumulator server
 
 Some parts of the tutorial (the ones related with subscriptions and
-notifications) require some process to play the role of the consumer
-application able to receive notifications. To that end, please download the
+notifications) require a process to play the role of the consumer
+application, able to receive notifications. To that end, please download the
 accumulator script, available [in
 GitHub](https://github.com/telefonicaid/fiware-orion/blob/master/scripts/accumulator-server.py).
 It is a very simple "dummy" application that simply listens to a given URL
@@ -123,12 +123,16 @@ command:
 # ./accumulator-server.py --port 1028 --url /accumulate --host ::1 --pretty-print -v
 ```
 
+Note this script requires Flask version 1.0.2 and pyOpenSSL version 19.0.0, which can be installed using
+`pip install Flask==1.0.2` and `pip install pyOpenSSL==19.0.0`. In case of conflict with your 
+base operating system Python installation, we recommend to use [virtualenv](https://virtualenv.pypa.io/en/latest/).
+
 [Top](#top)
 
 ### Issuing commands to the broker
 
-To issue requests to the broker, we use the `curl` command line tool.
-We have chosen `curl` because it is almost ubiquitous in any GNU/Linux
+To issue requests to the broker, you can use the `curl` command line tool.
+`curl` is chosen because it is almost ubiquitous in any GNU/Linux
 system and simplifies including examples in this document that can
 easily be copied and pasted. Of course, it is not mandatory to use it,
 you can use any REST client tool instead (e.g.
@@ -177,15 +181,15 @@ curl localhost:1026/<operation_url> -s -S [headers] -X DELETE
 
 Regarding \[headers\] you have to include the following ones:
 
--   Accept header to specify which payload format
-    you want to receive in the response. You should explicitly specify JSON.
+-   Accept header to specify the payload format in which
+    you want to receive the response. You should explicitly specify JSON.
 
 ```
 curl ... -H 'Accept: application/json' ...
 ```
 
--   Only in the case of using payload in the request (i.e. POST, PUT or PATCH),
-    you have to use Context-Type header to specify the format (JSON).
+-   If using payload in the request (i.e. POST, PUT or PATCH),
+    you have to supply the `Context-Type` HTTP header to specify the format (JSON).
 
 ```
 curl ... -H 'Content-Type: application/json' ...
@@ -196,12 +200,11 @@ Some additional remarks:
 -   Most of the time we are using multi-line shell commands to provide the input to curl,
     using EOF to mark the beginning and the end of the multi-line block
     (*here-documents*). In
-    some cases (GET and DELETE) we omit `-d @-` as they don't
-    use payload.
+    some cases (GET and DELETE) we omit `-d @-` as no payload is used.
 
--   In our examples we assume that the broker is listening on port 1026.
+-   In the examples, it is assumes that the broker is listening on port 1026.
     Adjust this in the curl command line if you are using a
-    different setting.
+    different port.
 
 -   In order to pretty-print JSON in responses, you can use Python with
     msjon.tool (examples along with tutorial are using this style):
@@ -223,7 +226,7 @@ which curl
 ## Context management
 
 **Don't forget to restart the broker before starting this tutorial as
-described [previously in this
+previously [described in this
 document](#starting-the-broker-for-the-tutorials)**
 
 At the end of this section, you will have the basic knowledge to create
@@ -232,8 +235,8 @@ Broker with context management operations.
 
 ### Entity creation
 
-Orion Context Broker starts in an empty state, so first of all we
-need to make it is aware of the existence of certain entities. In
+Orion Context Broker starts in an empty state (no entities in the database), so first of all we
+need to make Orion aware of the existence of certain entities. In
 particular, we are going to "create" Room1 and Room2 entities, each one
 with two attributes (temperature and pressure). We do this using the
 `POST /v2/entities` operation.
@@ -259,7 +262,7 @@ curl localhost:1026/v2/entities -s -S -H 'Content-Type: application/json' -d @- 
 EOF
 ```
 
-Apart from `id` and `type` fields (that define the ID and type of the entity),
+Apart from the `id` and `type` fields (that define the ID and type of the entity),
 the payload contains a set of attributes. Each attribute contains a value
 and a type.
 
@@ -268,8 +271,8 @@ check that when a context producer application updates the value of the
 temperature, this value is formatted as a float like `25.5` or `-40.23`
 and not something like `hot`).
 
-Upon receipt of this request, the broker will create the entity in its
-internal database, it will set the values for its attributes and it will respond
+Upon receipt of this request, Orion creates the entity in its
+internal database, sets the values for its attributes and responds
 with a 201 Created HTTP code.
 
 Next, let's create Room2 in a similar way (in this case, setting
@@ -293,8 +296,8 @@ EOF
 ```
 
 Apart from simple values corresponding to JSON datatypes (i.e. numbers, strings, booleans, etc.)
-for attribute values, you can also use complex structures or custom metadata. These are advanced
-topics, described in [this section](structured_attribute_valued.md#structured-attribute-values ) and
+for attribute values, complex structures or custom metadata can be used. This is an advanced
+topic, described in [this section](structured_attribute_valued.md#structured-attribute-values ) and
 [this other](metadata.md#custom-attribute-metadata), respectively.
 
 [Top](#top)
@@ -340,15 +343,13 @@ entity creation with updateContext (23ºC and 720 mmHg).
 
 ```
 
-You can use the `keyValues` option in order to get a more compact and brief representation, including just attribute values:
-
+The `keyValues` option can be used in order to get a more compact and brief representation, including just attribute values:
 
 ```
 curl localhost:1026/v2/entities/Room1?options=keyValues -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
-which response is:
-
+Response:
 
 ```
 {
@@ -360,14 +361,14 @@ which response is:
 ```
 
 You can also use the `values` option in order to get an even more compact representation corresponding to a list of attribute
-values. In this case, `attrs` URL parameter needs to be used to specify the order. Eg, to get temperature first, then pressure:
+values. In this case, the `attrs` URL parameter needs to be used to specify the order. Eg, to get temperature first, then pressure:
 
 ```
 curl 'localhost:1026/v2/entities/Room1?options=values&attrs=temperature,pressure' -s -S  \
     -H 'Accept: application/json' | python -mjson.tool
 ```
 
-which response is
+Response:
 
 ```
 [
@@ -459,7 +460,7 @@ Response:
 }
 ```
 
-In both cases, the HTTP response code (not shown) is 404 Not Found.
+In both cases, the HTTP response code (not visible in the example) is 404 Not Found.
 
 [Top](#top)
 
@@ -529,11 +530,11 @@ curl localhost:1026/v2/entities?type=Room -s -S  -H 'Accept: application/json' |
 curl localhost:1026/v2/entities?idPattern=^Room[2-5] -g -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
-* You can filter using attribute filters, using the `q` URL parameter. For
-  a whole description have a look at the "Simple Query Language" section in
+* You can filter using attribute filters, using the URL parameter `q`. For
+  a complete description, please have a look at the "Simple Query Language" section in
   the [NGSv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable).
-  For example, to get all entities whose temperature is greater than 22 (in this case
-  retriving Room1) you can use:
+  For example, to get all entities whose temperature is above 22 (in this case
+  retriving Room1). you can use:
 ```
 curl 'localhost:1026/v2/entities?q=temperature>22' -s -S  -H 'Accept: application/json' | python -mjson.tool
 ```
@@ -541,11 +542,11 @@ curl 'localhost:1026/v2/entities?q=temperature>22' -s -S  -H 'Accept: applicatio
 * You can filter by geographical location. This is an advanced topic, described in
   [this section](geolocation.md#geolocation-capabilities).
 
-As a final comment, note that although our example is very simple (only 2 entities) Orion
-can manage millions of entities in a real deployment. Thus, by default, only 20 entities
+As a final comment, note that although our example is very simple (only 2 entities), Orion
+can manage millions of entities in a real deployment. However, by default, only 20 entities
 are returned (which is fine for this tutorial, but probably not for a real utilization
-scenario). In order to learn about how to retrieve large sets of entities page by page
-see [the section on pagination](pagination.md#pagination) in this manual.
+scenario). In order to learn about how to retrieve large sets of entities page by page,
+please refer to [the section on pagination](pagination.md#pagination) in this manual.
 
 [Top](#top)
 
@@ -556,8 +557,8 @@ operation. This assumes that the attribute already exists in the entity.
 
 Now we will play the role of a context producer application, i.e. a
 source of context information. Let's assume that this application in a
-given moment wants to set the temperature and pressure of Room1 to 26.5
-ºC and 763 mmHg respectively, so it issues the following request:
+given moment wants to set the temperature and pressure of Room1 to 26.5 ºC and
+763 mmHg respectively, so it issues the following request:
 
 ```
 curl localhost:1026/v2/entities/Room1/attrs -s -S -H 'Content-Type: application/json' -X PATCH -d @- <<EOF
@@ -581,7 +582,7 @@ not included in the payload.
 Upon receipt of this request, the broker updates the values for the
 entity attributes in its internal database and responds with 204 No Content.
 
-Now, you can use the [query entity operation](#query-context-operation) to check that Room1
+Now you can use the [query entity operation](#query-context-operation) to check that Room1
 has been actually been updated.
 
 You can also use the `PUT /v2/entities/{id}/attrs/{attrName}/value` operation to update
@@ -616,9 +617,8 @@ However, Orion Context Broker has another powerful feature that you can take adv
 ability to subscribe to context information so when "something" happens
 (we will explain the different cases for that "something"), your
 application will get an asynchronous notification. This way, you
-don't need to continuously repeat query requests (i.e. polling),
-the Orion Context Broker will let you know the information when it
-comes.
+don't need to continuously repeat query requests (i.e. polling).
+The Orion Context Broker will let you know the information when it arrives.
 
 Before starting to play with this feature, please [start the accumulator
 server](#starting-accumulator-server-for-the-tutorials) to
@@ -669,7 +669,7 @@ Let's examine in detail the different elements included in the payload:
     program, previously started. Only one URL can be included per
     subscription. However, you can have several
     subscriptions on the same context elements (i.e. same entity
-    and attribute) without any problem.
+    and attribute).
 -   Subscriptions may have an expiration date (`expires` field), specified
     using the [ISO 8601](http://www.wikipedia.org/wiki/ISO_8601) standard format. Once
     subscription overpass that date, the subscription is simply ignored
@@ -698,10 +698,10 @@ Let's examine in detail the different elements included in the payload:
 -   You can leave `conditions.attrs` empty to make a notification
     trigger on any entity attribute change (regardless of the name of the attribute).
 -   Notifications include the attribute values *after* processing the update operation
-    triggering the notification. However, you can make Orion to include also the
-    *previous* value. This is achieved using metadata. Have a look to
+    triggering the notification. However, you can make Orion include also the
+    *previous* value. This is achieved using metadata. Have a look at
     [the following piece of documentation](metadata.md#metadata-in-notifications).
--   You can also set "notify all attributes except some ones" subscriptions (a kind of
+-   You can also set "notify all attributes except _some_" subscriptions (a kind of
     "blacklist" functionality). In this case, use `exceptAttrs` instead of `attrs`
     within `notifications`.
 -   You can include filtering expressions in `conditions`. For example, to get notified
@@ -711,18 +711,18 @@ Let's examine in detail the different elements included in the payload:
 -   The throttling element is used to specify a minimum
     inter-notification arrival time. So, setting throttling to 5 seconds
     as in the example above, makes a notification not to be sent
-    if a previous notification was sent less than 5 seconds ago, no
+    if a previous notification was sent less than 5 seconds earlier, no
     matter how many actual changes take place in that period. This is to give the
     notification receptor a means to protect itself against context producers
     that update attribute values too frequently. In multi-CB configurations, take
     into account that the last-notification measure is local to each CB node. Although
-    each node periodically synchronizes with the DB in order to get potentially newer
+    each node periodically synchronizes with the database in order to get potentially newer
     values (more on this [here](perf_tuning.md#subscription-cache)) it may happen that
     a particular node has an old value, so throttling is not 100% accurate.
 
 The response corresponding to that request uses 201 Created as HTTP response code.
 In addition, it contains a `Location header` which holds the subscription ID: a
-24 hexadecimal number used for updating and cancelling the subscription.
+24 digit hexadecimal number used for updating and cancelling the subscription.
 Write it down because you will need it later in this tutorial.
 
 ```
@@ -734,9 +734,8 @@ Write it down because you will need it later in this tutorial.
 < Date: Wed, 25 May 2016 11:05:35 GMT
 ```
 
-Let's have a look now at accumulator-server.py. We will see one (and
-just one by the moment, no matter how much you wait)
-notifyContextRequest, similar to this one:
+Let's have a look now at accumulator-server.py. We will see one notification (and 
+just one for the moment, no matter how long you wait), similar to this one:
 
 ```
 POST http://localhost:1028/accumulate
@@ -789,8 +788,8 @@ notifications due to throttling):
     request was also 765 so no actual update has occurred and
     consequently no notification is sent.
 -   update Room1 pressure to 765 adding `?options=forcedUpdate` to the request URL: 
-    In this case broker will send the notification, because of the `forcedUpdate`
-    URI option, details about `forcedUpdate` URI option are described [here](ngsiv2_implementation_notes.md#forcedupdate-option).
+    In this case, the broker will send the notification, because of the `forcedUpdate`
+    URI option. Details about `forcedUpdate` URI option are described [here](ngsiv2_implementation_notes.md#forcedupdate-option).
 -   update Room2 pressure to 740: nothing happens, as the subscription
     is for Room1, not Room2.
 
@@ -799,15 +798,15 @@ fast, without letting pass 5 seconds and you will see that no second
 notification arrives to accumulator-server.py.
 
 Subscriptions can be retrieved using `GET /v2/subscriptions` (which
-provides the whole list and need [pagination](pagination.md) if the
+provides the whole list and [pagination](pagination.md) may be needed if the
 list is too large) or `GET /v2/subscriptions/{subId}` (to get a single
 subscription). In addition, subscriptions can be updated using the `PATCH /v2/subscription/{subId}`
-operation. Finally, they can be deleted using the `DELETE /v2/subscriptions/{subId}` operation.
+operation. Finally, subscriptions can be deleted using the `DELETE /v2/subscriptions/{subId}` operation.
 
 Some additional considerations:
 
-* Subscriptions can be paused. In order to do that, just set the `status` attribute
-  to "inactive" (if you want to resume subscription, set it back to "active"):
+* Subscriptions can be paused. In order to do so, set the `status` attribute
+  to "inactive" (and if you want to resume the subscription, set it back to "active"):
 ```
 curl localhost:1026/v2/subscriptions/57458eb60962ef754e7c0998 -s -S \
     -X PATCH -H 'Content-Type: application/json' -d @- <<EOF
@@ -817,7 +816,7 @@ curl localhost:1026/v2/subscriptions/57458eb60962ef754e7c0998 -s -S \
 EOF
 ```
 
-* Notifications can be customized in several ways. First, you can tune the entities
+* Notifications can be customized in several ways. First, you can tune the entity
   representation format in notifications, using the `attrsFormat` field within
   `notification`. Secondly, you can use a custom notification HTTP verb (e.g. PUT),
   custom HTTP headers, custom URL query parameters and custom payloads (not necessarily in JSON).
@@ -829,14 +828,14 @@ EOF
 ### Browsing all types and detailed information on a type
 
 The following operation can be used to get a list of all entity types
-that exist in Orion Context Broker in a given moment. For example, let's assume
-we have 3 entities of type Room and 2 entities of type Car:
+that exist in the Orion Context Broker in a given moment. For example, let's assume
+we have three entities of type Room and two entities of type Car:
 
 ```
 curl localhost:1026/v2/types -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
-The response will be:
+Response:
 
 ```
 [
@@ -883,11 +882,11 @@ important remarks:
     may have a different attributes set) the attributes set per type
     returned by this operation is the union set of the attribute sets of
     each entity belonging to that type.
--   Moreover, attributes with the same in different entities may have
+-   Moreover, attributes with the same name in different entities may have
     different types. Thus, the `types` field associated to each attribute
     is a list.
 
-If you only need the list of entity types (without extra attribute details),
+If you only need a list of the entity types (without any extra attribute details),
 you can use:
 
 ```
@@ -937,12 +936,12 @@ The response will be:
 
 ### Batch operations
 
-Apart from the RESTful operations to manage entities described so far NGSIv2 also
+Apart from the RESTful operations to manage entities described so far, NGSIv2 also
 includes "batch" operations that may be useful in some cases. In particular,
 there is a batch update operation (`POST /v2/op/update`) and a batch query
 operation (`POST /v2/op/query`).
 
-Batch update allows you to create or update several entities with a single operation.
+Batch update allows you to create or update several entities with a single request.
 For example, to create Room3 (temperature 21.2 and pressure 722) and Room4
 (temperature 31.8 and pressure 712) you can use:
 
@@ -980,8 +979,8 @@ curl -v localhost:1026/v2/op/update -s -S -H 'Content-Type: application/json' -d
 EOF
 ```
 
-The response uses HTTP response code 204 No Content. In this case we are using
-`append` `actionType`, which is for adding entities and attribute. We can also use
+On success, the response uses HTTP response code 204 No Content.
+In this case we are using `append` `actionType`, which is for adding entities and attribute. We could also use
 `update` to change an attribute in one entity (temperature in Room3) and another
 attribute in other (pressure in Room4), leaving the other attributes untouched.
 
@@ -1011,8 +1010,8 @@ curl -v localhost:1026/v2/op/update -s -S -H 'Content-Type: application/json' -d
 EOF
 ```
 
-Apart from `append` and `update`, there are other action types: `delete`, `appendStrict`, etc. Check out
-[this section](update_action_types.md) for details.
+Apart from `append` and `update`, there are other action types: `delete`, `appendStrict`, etc.
+See [this section](update_action_types.md) for details.
 
 Finally, the `POST /v2/op/query` allows to retrieve entities matching a query condition
 specified in the payload. It is very similar to `GET /v2/entities` (in fact, the response
@@ -1058,10 +1057,10 @@ EOF
 While context management is about *entities and attributes* (creating, updating, retrieving, etc.),
 context availability management is about the *source of the entities and attributes*. The basic concept
 in context availability management is the *registration* resource. A registration contains information about a source of
-information (named a "context provider") and whose entities and attributes are provided by that source.
+information (named a "context provider") and what entities and attributes are provided by that source.
 
-Let's illustrate with an example, creating a simple registration. We are stating that the attributes temperature and
-pressure of Room5 are provided by a context provider in the URL http://mysensors.com/Rooms:
+Let's illustrate with an example, creating a simple registration.
+We are stating that the attributes temperature and pressure of Room5 are provided by a context provider in the URL http://mysensors.com/Rooms:
 
 ```
 curl -v localhost:1026/v2/registrations -s -S -H 'Content-Type: application/json' -d @-  <<EOF
@@ -1082,8 +1081,7 @@ curl -v localhost:1026/v2/registrations -s -S -H 'Content-Type: application/json
   "provider": {
     "http": {
       "url": "http://mysensors.com/Rooms"
-    },
-    "legacyForwarding": true
+    }
   }
 }
 EOF
@@ -1091,7 +1089,7 @@ EOF
 
 The response corresponding to that request uses 201 Created as HTTP response code.
 In addition, it contains a `Location header` which holds the registration ID: a
-24 hexadecimal number used for updating and deleting the registration.
+24 digit hexadecimal number used for updating and deleting the registration.
 Write it down because you will need it later in this tutorial.
 
 ```
@@ -1103,14 +1101,14 @@ Write it down because you will need it later in this tutorial.
 < Date: Tue, 13 Feb 2018 10:30:21 GMT
 ```
 
-You may retrieve the list of existing registration using the following registration:
+You may retrieve the list of existing registrations using the following request:
 
 ```
 curl localhost:1026/v2/registrations -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
-In this particular case, you will retrieve only one (as you have created only one before) but note that the
-response uses `[...]` so a full list could be there.
+In this particular case you will retrieve only one registration (as you have created only one) but note that the
+response uses `[...]` so a full list could be present.
 
 In addition, you may retrieve a single registration using the following request (replace `5a82be3d093af1b94ac0f730`
 by the actual registration ID in your case):

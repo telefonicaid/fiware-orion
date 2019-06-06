@@ -439,7 +439,7 @@ function valgrindErrorFound()
 #
 
 # Port tests
-nc -w 2 localhost ${CB_TEST_PORT} &>/dev/null </dev/null
+nc -zv localhost ${CB_TEST_PORT} &>/dev/null </dev/null
 if [ "$?" == "0" ]
 then
    # Successful nc means that port CB_TEST_PORT is used, thus exit

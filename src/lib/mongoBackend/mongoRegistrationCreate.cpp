@@ -116,13 +116,27 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
   {
     ngsiv2::EntID* eP = &regP->dataProvided.entities[eIx];
 
-    if (eP->type == "")  // No type provided => all types
+    if (eP->idPattern == "")
     {
-      entities.append(BSON(REG_ENTITY_ID << eP->id));
+      if (eP->type == "")
+      {
+        entities.append(BSON(REG_ENTITY_ID << eP->id));
+      }
+      else
+      {
+        entities.append(BSON(REG_ENTITY_ID << eP->id << REG_ENTITY_TYPE << eP->type));
+      }
     }
     else
     {
-      entities.append(BSON(REG_ENTITY_ID << eP->id << REG_ENTITY_TYPE << eP->type));
+      if (eP->type == "")
+      {
+        entities.append(BSON(REG_ENTITY_ID << eP->idPattern << REG_ENTITY_ISPATTERN << "true"));
+      }
+      else
+      {
+        entities.append(BSON(REG_ENTITY_ID << eP->idPattern << REG_ENTITY_ISPATTERN << "true" << REG_ENTITY_TYPE << eP->type));
+      }
     }
   }
 
@@ -197,7 +211,9 @@ void mongoRegistrationCreate
   setServicePath(servicePath, &bob);
   setContextRegistrationVector(regP, &bob);
   setStatus(regP->status, &bob);
-  setFormat("JSON", &bob);   // FIXME #3068: this would be unhardired when we implement NGSIv2-based forwarding
+
+  std::string format = (regP->provider.legacyForwardingMode == true)? "JSON" : "normalized";
+  setFormat(format, &bob);
 
   //
   // Insert in DB

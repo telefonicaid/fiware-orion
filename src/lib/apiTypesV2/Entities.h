@@ -62,6 +62,7 @@ class Entities
   std::string  check(RequestType requestType);
   void         release(void);
   void         fill(const QueryContextResponse& qcrs, OrionError* oeP);
+  int          size(void) const { return vec.vec.size(); }
 };
 
 #endif  // SRC_LIB_APITYPESV2_ENTITIES_H_

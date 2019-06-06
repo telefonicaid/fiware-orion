@@ -26,7 +26,7 @@ Create registration using APIv2 and provoke v1 forwards
 --SHELL-INIT--
 dbInit CB
 dbInit CP1
-brokerStart CB
+brokerStart CB 100,186 IPV4
 brokerStart CP1
 
 --SHELL--

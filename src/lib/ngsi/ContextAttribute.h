@@ -91,7 +91,6 @@ public:
   ContextAttribute(const std::string& _name, const std::string& _type, orion::CompoundValueNode* _compoundValueP);
 
   /* Grabbers for metadata to which CB gives a special semantic */
-  std::string  getId() const;
   std::string  getLocation(ApiVersion apiVersion = V1) const;
 
   std::string  toJsonV1(bool                             asJsonObject,
@@ -122,7 +121,7 @@ public:
   std::string  getName(void);
 
   /* Used to render attribute value to BSON */
-  void valueBson(mongo::BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast) const;
+  void valueBson(mongo::BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast, bool strings2numbers = false) const;
 
   /* Helper method to be use in some places wher '%s' is needed */
   std::string  getValue(void) const;
