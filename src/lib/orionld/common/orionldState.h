@@ -37,7 +37,7 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// OrionldUriParamOptions - flags for all possible members in URI Param ?options=x,y,z 
+// OrionldUriParamOptions - flags for all possible members in URI Param ?options=x,y,z
 //
 typedef struct OrionldUriParamOptions
 {
@@ -101,13 +101,13 @@ extern __thread OrionldConnectionState orionldState;
 //
 // Global state
 //
-extern int             requestNo;  // Never mind protecting with semaphore. Just a debugging help
-extern char            kallocBuffer[32 * 1024];
-extern KAlloc          kalloc;
-extern Kjson           kjson;
-extern Kjson*          kjsonP;
-extern char*           hostname;
-extern unsigned short  portNo;
+extern int       requestNo;  // Never mind protecting with semaphore. Just a debugging help
+extern char      kallocBuffer[32 * 1024];
+extern KAlloc    kalloc;
+extern Kjson     kjson;
+extern Kjson*    kjsonP;
+extern char*     hostname;
+extern uint16_t  portNo;
 
 
 

@@ -57,7 +57,7 @@ char            kallocBuffer[32 * 1024];
 KAlloc          kalloc;
 Kjson           kjson;
 Kjson*          kjsonP;
-unsigned short  portNo                   = 0;
+uint16_t        portNo                   = 0;
 char*           hostname                 = (char*) "localhost";
 
 
@@ -152,7 +152,7 @@ void orionldStateErrorAttributeAdd(const char* attributeName)
     orionldState.errorAttributeArrayP[1] = 0;
     orionldState.errorAttributeArrayUsed = 1;
   }
-  
+
   char* lastChar = &orionldState.errorAttributeArrayP[orionldState.errorAttributeArrayUsed];
 
   strcpy(lastChar, attributeName);  // Safe as we've checked that there is room already
