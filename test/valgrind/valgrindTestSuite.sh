@@ -620,6 +620,20 @@ then
       fi
     fi
 
+    #
+    # The test files start with "./" - must remove before comparing with CB_SKIP_FUNC_TESTS
+    #
+    cleanFile=$(echo $file | sed 's/^.\///g')
+    if [ "$CB_SKIP_FUNC_TESTS" != "" ]
+    then
+      hit=$(echo ' '$CB_SKIP_FUNC_TESTS' ' | grep ' '$cleanFile' ')
+      if [ "$hit" != "" ]
+      then
+        vgDebug "Skipping $file (found in CB_SKIP_FUNC_TESTS)"
+        continue
+      fi
+    fi
+
     dbReset "$file"
 
     htest=$(basename $file | awk -F '.' '{print $1}')
