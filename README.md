@@ -25,6 +25,6 @@ A Test Suite for NGSI-LD can be found [here](https://github.com/fiware/NGSI-LD_T
 
 For full Orion documentation, please check Orion's [README.md](https://github.com/telefonicaid/fiware-orion)
 
-(The content of this repo will eventually be merged into the main Orion development line)
+(The content of this repo could eventually be merged into the main Orion development line)
 
 
