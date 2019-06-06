@@ -4,6 +4,7 @@
 * [データベース・インデックス](#database-indexes)
 * [書き込み確認](#write-concern)
 * [通知モードとパフォーマンス](#notification-modes-and-performance)
+* [ペイロードとメッセージのサイズとパフォーマンス](#payload-and-message-size-and-performance)
 * [HTTP サーバのチューニング](#http-server-tuning)
 * [Orion スレッド・モデルとその意味](#orion-thread-model-and-its-implications)
 * [ファイル・ディスクリプタのサイジング](#file-descriptors-sizing)
@@ -76,6 +77,31 @@ Orion は、[`-notificationMode`](cli.md) 値に応じて異なる通知モー�
 最後に、スレッド・プールのモードは、下図に示すように、通知のキューと、キューからの通知を受け取り、実際にワイヤで送信するワーカースレッドのプールに基づいています。これは、待ち行列の長さとワーカー数を注意深く調整した後、高負荷シナリオで推奨されるモードです。良い出発点は、更新を送信する予定の同時クライアントの数にワーカーの数を設定し、ワーカーの数の N 倍のキュー制限を設定することです (N は10に等しくなりますが、期待される更新バースト長に依存する可能性があります)。[`notifQueue`](statistics.md#notifqueue-block) ブロックの統計は、調整するのに役立ちます。
 
 ![](../../manuals/admin/notif_queue.png "notif_queue.png")
+
+[トップ](#top)
+
+<a name="payload-and-message-size-and-performance"></a>
+
+## ペイロードとメッセージのサイズとパフォーマンス
+
+Orion Context Broker は、ペイロードと HTTP メッセージ・サイズに関連する
+2つのデフォルト制限を使用します。特に :
+
+* 着信 HTTP リクエストのペイロードには1MBのデフォルト制限があります
+* 送信 HTTP リクエスト・メッセージ (HTTP リクエスト・ライン, ヘッダ, ペイロードを含む
+  にはデフォルトで8MBの制限があります。これは通知と転送リクエストに適用されます
+
+ほとんどのユースケースではこの制限で十分であり、同時に、大きすぎる要求によるサービス拒否を
+回避することができます。次の [CLI フラグ](cli.md) を使用してこれらの制限を変更できます :
+
+
+* `-inReqPayloadMaxSize` (バイト) で、着信 HTTP リクエストのペイロードの制限を変更します
+* `-outReqMsgMaxSize` (in bytes)で、HTTP リクエスト・メッセージの送信制限を変更します
+
+制限を減らすとパフォーマンスに良い影響を与える可能性がありますが、Context Broker
+リクエストに制限を課すことがあります。制限値を大きくするとパフォーマンスに悪影響が
+出る可能性がありますが、より大きなリクエストが可能になります。
+一般に、デフォルトを変更することはお勧めできません。
 
 [トップ](#top)
 

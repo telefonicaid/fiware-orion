@@ -2,7 +2,8 @@
 
 ## リクエストの最大サイズ
 
-Orion Context Broker の現在の最大リクエストサイズは1 MB です。この制限は、ほとんどのユース・ケースで十分であり、同時に、リクエストが大きすぎるためにサービス拒否を回避します。この制限を考慮しないと、次のようなメッセージが表示されます :
+Orion Context Broker のデフォルトの最大リクエストサイズは1MBです。
+この制限を考慮に入れないと、次のようなメッセージが表示されます :
 
 ```
 {
@@ -23,32 +24,29 @@ Orion Context Broker の現在の最大リクエストサイズは1 MB です。
 
 ("Some programmer needs to study the manual more carefully" というテキストを無視してください。Orion Context Broker の基盤となる HTTP ライブラリーの開発者は面白い人です (funny guys) :)
 
-この 1MB の制限があまりにも粗すぎると判明した場合は、今後のリリースでのご意見をお待ちしておりますので、E メールをお送りください。
+この1MBの制限がうまくいかない場合は、[CLI オプション](../admin/cli.md)
+`-inReqPayloadMaxSize` を使って変更できます。 ただし、これを行う前に、
+[パフォーマンスの考慮事項](../admin/perf_tuning.md#payload-and-message-size-and-performance)
+を確認してください。
 
 
 ## 通知の最大サイズ
 
-通知の最大サイズは 8MB に設定されています。Context Broker によってより大きな通知が送信されず、ログ・ファイルに次のトレースが記録されます :
+通知の最大サイズ (HTTP リクエスト・ライン, ヘッダ, ペイロードを含む) はデフォルトで8MBに設定されています。
+それより大きい通知は Context Broker によって送信されず、ログ・:ファイルに次のトレースが表示されます :
 
     HTTP request to send is too large: N bytes
 
 N は大きすぎる通知のバイト数です。
 
+この制限を変更するには、[CLI オプション](../admin/cli.md) `-outReqMsgMaxSize`
+を使って Context Broker を起動します。ただし、これを行う前に、
+[パフォーマンスの考慮事項](../admin/perf_tuning.md#payload-and-message-size-and-performance)
+を確認してください。
+
 ## Content-Length ヘッダが必要です
 
 Orion Context Broker は、すべてのクライアントリクエストで常に Content-Length ヘッダをリクエストします。そうでない場合、クライアントは "411 Length Required" レスポンスを受信します。これは、ベースとなる HTTP ライブラリ (microhttpd) が動作する方法によるものです。詳細については、[microhttpd メーリングリストのこの email スレッド](http://lists.gnu.org/archive/html/libmicrohttpd/2014-01/msg00063.html)を参照してください。
-
-## エンティティ・フィールドの長さ制限
-
-MongoDB レイヤの制限により、エンティティ ID、型およびサービスパスの長さは、次の規則に従わなければなりません。
-
-    length (id) + length (type) + length (servicePath) + 10 < 1024
-
-それ以外の場合は、エンティティ作成時にエラーが発生します。
-
-## エンティティ・フィールドのサイズ制限
-
-基礎となる DB の制限 (詳細は [こちら](https://github.com/telefonicaid/fiware-orion/issues/1289)) により、エンティティ ID、エンティティ型、エンティティサービスパスの合計サイズ (合計) は1014文字を超えることはできません (これは typo ではなく、1024 - 10 に相当します。;)。上限を超えようとすると、"Too long entity id/type/servicePath combination" という 400 Bad Request エラーが発生します。
 
 ## サブスクリプション・キャッシュの制限
 
