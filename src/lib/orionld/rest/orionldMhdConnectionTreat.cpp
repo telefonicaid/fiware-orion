@@ -299,7 +299,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       //
       // Looking up "@context" attribute at first level in payload
       //
-      LM_TMP(("Looking up @context in payload ... (only if Content-Type == application/ld+json!!!!!!))"));
       for (KjNode* attrNodeP = ciP->requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
       {
         if (attrNodeP->name == NULL)
@@ -341,13 +340,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
         contextToBeCreated = true;
     }
 
-    if (contextNodeP == NULL)
-      LM_T(LmtContext, ("No @context in payload"));
-
-
-    //
-    // ContentType Check
-    //
     if (contentTypeCheck(ciP, contextNodeP, &errorTitle, &details) == false)
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, errorTitle, details, OrionldDetailsString);
