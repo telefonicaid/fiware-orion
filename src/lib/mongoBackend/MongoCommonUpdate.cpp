@@ -951,12 +951,55 @@ static std::string servicePathSubscriptionRegex(const std::string& servicePath, 
 
 /* ****************************************************************************
 *
+* getCommonAttributes -
+*/
+static void getCommonAttributes
+(
+  const bool                        type,
+  const std::vector<std::string>&   fVector,
+  const std::vector<std::string>&   sVector,
+  std::vector<std::string>&         resultVector
+)
+{
+  if (type)
+  {
+    for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
+    {
+      for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
+      {
+        if (fVector[cavOc] == sVector[avOc])
+        {
+          resultVector.push_back(fVector[cavOc]);
+        }
+      }
+    }
+  }
+  else
+  {
+    for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
+    {
+      for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
+      {
+        if (fVector[cavOc] != sVector[avOc])
+        {
+          resultVector.push_back(fVector[cavOc]);
+        }
+      }
+    }
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * addTriggeredSubscriptions_withCache
 */
 static bool addTriggeredSubscriptions_withCache
 (
   std::string                                    entityId,
   std::string                                    entityType,
+  const std::vector<std::string>&                attributes,
   const std::vector<std::string>&                modifiedAttrs,
   std::map<std::string, TriggeredSubscription*>& subs,
   std::string&                                   err,
@@ -1007,58 +1050,45 @@ static bool addTriggeredSubscriptions_withCache
     StringList aList;
     if (cSubP->onlyChanged && !cSubP->blacklist)
     {
-      for (unsigned int cavOc = 0; cavOc < modifiedAttrs.size(); ++cavOc)
+      if (cSubP->notifyConditionV.size() == 0 && cSubP->attributes.size() == 0)
       {
-        for (unsigned int avOc = 0; avOc < cSubP->attributes.size(); ++avOc)
-        {
-          if (modifiedAttrs[cavOc] == cSubP->attributes[avOc])
-          {
-            condAttrs.push_back(cSubP->attributes[avOc]);
-          }
-        }
+        aList.fill(modifiedAttrs);
       }
-      if (condAttrs.size() == 0)
-        continue;
-      for (unsigned int cavOc = 0; cavOc < cSubP->notifyConditionV.size(); ++cavOc)
+      else if (cSubP->notifyConditionV.size() == 0 && cSubP->attributes.size() != 0)
       {
-        for (unsigned int avOc = 0; avOc < condAttrs.size(); ++avOc)
-        {
-          if (cSubP->notifyConditionV[cavOc] == condAttrs[avOc])
-          {
-            notifyAttrs.push_back(condAttrs[avOc]);
-          }
-        }
+        getCommonAttributes(true, modifiedAttrs, cSubP->attributes, notifyAttrs);
       }
-      if (notifyAttrs.size() == 0)
+      else if (cSubP->notifyConditionV.size() != 0 && cSubP->attributes.size() == 0)
+      {
+        getCommonAttributes(true, modifiedAttrs, attributes, notifyAttrs);
+      }
+      else
+      {
+        getCommonAttributes(true, modifiedAttrs, cSubP->attributes, condAttrs);
+        getCommonAttributes(true, condAttrs, cSubP->notifyConditionV, notifyAttrs);
+      }
+      if (notifyAttrs.size() == 0 && cSubP->notifyConditionV.size() != 0 && cSubP->attributes.size() != 0)
+      {
         continue;
+      }
       aList.fill(notifyAttrs);
     }
     else if (cSubP->onlyChanged && cSubP->blacklist)
     {
-      for (unsigned int cavOc = 0; cavOc < cSubP->notifyConditionV.size(); ++cavOc)
+      if (cSubP->notifyConditionV.size() == 0 && cSubP->attributes.size() != 0)
       {
-        for (unsigned int avOc = 0; avOc < cSubP->attributes.size(); ++avOc)
-        {
-          if (cSubP->attributes[avOc] != cSubP->notifyConditionV[cavOc])
-          {
-            condAttrs.push_back(cSubP->notifyConditionV[cavOc]);
-          }
-        }
+        getCommonAttributes(false, modifiedAttrs, cSubP->attributes, notifyAttrs);
       }
-      if (condAttrs.size() == 0)
-        continue;
-      for (unsigned int cavOc = 0; cavOc < condAttrs.size(); ++cavOc)
+      else
       {
-        for (unsigned int avOc = 0; avOc < modifiedAttrs.size(); ++avOc)
-        {
-          if (condAttrs[cavOc] == modifiedAttrs[avOc])
-          {
-            notifyAttrs.push_back(condAttrs[cavOc]);
-          }
-        }
+        getCommonAttributes(false, modifiedAttrs, cSubP->attributes, condAttrs);
+        getCommonAttributes(true, condAttrs, cSubP->notifyConditionV, notifyAttrs);
       }
+
       if (notifyAttrs.size() == 0)
+      {
         continue;
+      }
       aList.fill(notifyAttrs);
     }
     else
@@ -1597,6 +1627,7 @@ static bool addTriggeredSubscriptions
 (
   const std::string&                             entityId,
   const std::string&                             entityType,
+  const std::vector<std::string>&                attributes,
   const std::vector<std::string>&                modifiedAttrs,
   std::map<std::string, TriggeredSubscription*>& subs,
   std::string&                                   err,
@@ -1612,7 +1643,7 @@ static bool addTriggeredSubscriptions
   }
   else
   {
-    return addTriggeredSubscriptions_withCache(entityId, entityType, modifiedAttrs, subs, err, tenant, servicePathV);
+    return addTriggeredSubscriptions_withCache(entityId, entityType, attributes, modifiedAttrs, subs, err, tenant, servicePathV);
   }
 }
 
@@ -2407,6 +2438,7 @@ static bool processContextAttributeVector
   std::string               entityDetail    = cerP->entity.toString();
   bool                      entityModified  = false;
   std::vector<std::string>  modifiedAttrs;
+  std::vector<std::string>  attributes;
 
   for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
   {
@@ -2509,6 +2541,7 @@ static bool processContextAttributeVector
     {
       modifiedAttrs.push_back(ca->name);
     }
+    attributes.push_back(ca->name);
   }
 
   /* Add triggered subscriptions */
@@ -2518,7 +2551,7 @@ static bool processContextAttributeVector
   {
     LM_W(("Notification loop detected for entity id <%s> type <%s>, skipping subscription triggering", entityId.c_str(), entityType.c_str()));
   }
-  else if (!addTriggeredSubscriptions(entityId, entityType, modifiedAttrs, subsToNotify, err, tenant, servicePathV))
+  else if (!addTriggeredSubscriptions(entityId, entityType, attributes, modifiedAttrs, subsToNotify, err, tenant, servicePathV))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
     oe->fill(SccReceiverInternalError, err, "InternalServerError");
@@ -3594,6 +3627,7 @@ void processContextElement
         /* Successful creation: send potential notifications */
         std::map<std::string, TriggeredSubscription*>  subsToNotify;
         std::vector<std::string>                       attrNames;
+        std::vector<std::string>                       attributes;
 
         for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
         {
@@ -3602,6 +3636,7 @@ void processContextElement
 
         if (!addTriggeredSubscriptions(eP->id,
                                        eP->type,
+                                       attrNames,
                                        attrNames,
                                        subsToNotify,
                                        err,

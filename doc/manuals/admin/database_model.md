@@ -286,6 +286,9 @@ Fields:
 -   **blacklist**: a boolean field that specifies if `attrs` has to be interpreted
     as a whitelist (if `blacklist` is equal to `false` or doesn't exist) or a
     blacklist (if `blacklist` is equal to `true`).
+-   **onlyChanged**: a boolean field that specifies if only attributes that change has 
+    to be included in notifications (if onlyChanged is equal to true) or not (if 
+    onlyChanged is equal to false or doesn't exist).
 -   **metadata**: an array of metadata names (strings) (optional).
 -   **conditions**: a list of attributes that trigger notifications.
 -   **expression**: an expression used to evaluate if notifications has

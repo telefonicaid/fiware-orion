@@ -128,7 +128,7 @@ payload='{
 	"attrs" : [
 	  "A","B"
 	],
-	"onlyChangedAttrs": trrue
+	"onlyChangedAttrs": "foo"
   },
   "expires": "2040-01-01T14:00:00.00Z",
   "throttling": 5
@@ -170,14 +170,14 @@ Date: REGEX(.*)
 03. POST /v2/subscriptions, create subscription with attrs and onlyChangedAttrs set to incorrect value.
 =======================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
+Content-Length: 69
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Errors found in incoming JSON buffer", 
-    "error": "ParseError"
+    "description": "onlyChangedAttrs is not a bool",
+    "error": "BadRequest"
 }
 
 

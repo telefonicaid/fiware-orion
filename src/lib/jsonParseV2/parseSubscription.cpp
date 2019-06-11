@@ -493,7 +493,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     return badInput(ciP, "http notification is missing");
   }
 
-
   // Attributes
   std::string errorString;
 
@@ -523,20 +522,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     {
       return badInput(ciP, errorString);
     }
-    if (notification.HasMember("onlyChangedAttrs"))
-    {
-      Opt<bool> onlyChangedOpt = getBoolOpt(notification, "onlyChangedAttrs");
-      if (!onlyChangedOpt.ok())
-      {
-        return badInput(ciP, onlyChangedOpt.error);
-      }
-      else if (onlyChangedOpt.given)
-      {
-        bool onlyChangedBool = onlyChangedOpt.value;
-        subsP->onlyChangedProvided = true;
-        subsP->notification.onlyChanged = onlyChangedBool;
-      }
-    }
     subsP->notification.blacklist = false;
     subsP->blacklistProvided      = true;
   }
@@ -556,22 +541,22 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     {
       return badInput(ciP, "http notification has exceptAttrs is empty");
     }
-    if (notification.HasMember("onlyChangedAttrs"))
-    {
-      Opt<bool> onlyChangedOpt = getBoolOpt(notification, "onlyChangedAttrs");
-      if (!onlyChangedOpt.ok())
-      {
-        return badInput(ciP, onlyChangedOpt.error);
-      }
-      else if (onlyChangedOpt.given)
-      {
-        bool onlyChangedBool = onlyChangedOpt.value;
-        subsP->onlyChangedProvided = true;
-        subsP->notification.onlyChanged = onlyChangedBool;
-      }
-    }
     subsP->notification.blacklist = true;
     subsP->blacklistProvided      = true;
+  }
+  if (notification.HasMember("onlyChangedAttrs"))
+  {
+    Opt<bool> onlyChangedOpt = getBoolOpt(notification, "onlyChangedAttrs");
+    if (!onlyChangedOpt.ok())
+    {
+      return badInput(ciP, onlyChangedOpt.error);
+    }
+    else if (onlyChangedOpt.given)
+    {
+      bool onlyChangedBool = onlyChangedOpt.value;
+      subsP->onlyChangedProvided = true;
+      subsP->notification.onlyChanged = onlyChangedBool;
+    }
   }
 
   // metadata

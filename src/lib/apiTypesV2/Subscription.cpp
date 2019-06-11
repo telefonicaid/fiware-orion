@@ -130,12 +130,12 @@ std::string Notification::toJson(const std::string& attrsFormat)
   else if (!this->blacklist && this->onlyChanged)
   {
     jh.addRaw("attrs", vectorToJson(this->attributes));
-    jh.addBool("onlyChanged", this->onlyChanged);
+    jh.addBool("onlyChangedAttrs", this->onlyChanged);
   }
   else if (this->blacklist && this->onlyChanged)
   {
     jh.addRaw("exceptAttrs", vectorToJson(this->attributes));
-    jh.addBool("onlyChanged", this->onlyChanged);
+    jh.addBool("onlyChangedAttrs", this->onlyChanged);
   }
   else
   {

@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Notify only attributes that change for NGSIv2 POST /v2/entities, POST /v2/subscriptions, Dump and reset accumulator, Sleep 5 secs, PATCH /v2/entities/Room1/attrs, Dump and reset accumulator, Sleep 5 secs, PATCH /v2/entities/Room1/attrs, Dump and reset accumulator, Sleep 5 secs, PATCH /v2/entities/Room1/attrs, Dump and reset accumulator, Sleep 5 secs, PATCH /v2/entities/Room1/attrs, Dump and reset accumulator.
+Notify only attributes that change for empty condition.attrs and with notification.attrs for NGSIv2 POST /v2/entities, POST /v2/subscriptions, Dump and reset accumulator, PATCH /v2/entities/Room1/attrs, Dump and reset accumulator, PATCH /v2/entities/Room1/attrs, Dump and reset accumulator, PATCH /v2/entities/Room1/attrs, Dump and reset accumulator, PATCH /v2/entities/Room1/attrs, Dump and reset accumulator.
 
 --SHELL-INIT--
 dbInit CB
@@ -32,20 +32,16 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 
 #
 # 01. POST /v2/entities, create Room1 entity with A, B, C, and D attributes.
-# 02. POST /v2/subscriptions, to create subscription for Room1 with onlyChangedAttrs set to true.
-# 03. Dump and reset accumulator, see notification.
-# 04. Sleep 5 secs, before next update.
-# 05. PATCH /v2/entities/Room1/attrs, update the value of A and B attribute.
-# 06. Dump and reset accumulator, see notification.
-# 07. Sleep 5 secs, before next update.
-# 08. PATCH /v2/entities/Room1/attrs, update the value of B and C attribute.
-# 09. Dump and reset accumulator, see notification.
-# 10. Sleep 5 secs, before next update.
-# 11. PATCH /v2/entities/Room1/attrs, update the value of C and D attribute.
-# 12. Dump and reset accumulator, see notification.
-# 13. Sleep 5 secs, before next update.
-# 14. PATCH /v2/entities/Room1/attrs, update the value of A, B, C and D attribute.
-# 15. Dump and reset accumulator, see notification.
+# 02. POST /v2/subscriptions, to create subscription for Room1 with cond attrs: [] notify attrs: [B, C, D], onlyChangedAttrs: true.
+# 03. Dump and reset accumulator, see B, C and D (as this is initial notification).
+# 04. PATCH /v2/entities/Room1/attrs, update the value of A and B attribute.
+# 05. Dump and reset accumulator, see B.
+# 06. PATCH /v2/entities/Room1/attrs, update the value of B and C attribute.
+# 07. Dump and reset accumulator, see B and C.
+# 08. PATCH /v2/entities/Room1/attrs, update the value of C and D attribute.
+# 09. Dump and reset accumulator, see C and D.
+# 10. PATCH /v2/entities/Room1/attrs, update the value of A, B, C and D attribute.
+# 11. Dump and reset accumulator, see B, C and D.
 #
 
 echo '01. POST /v2/entities, create Room1 entity with A, B, C, and D attributes.'
@@ -75,8 +71,8 @@ echo
 echo
 
 
-echo '02. POST /v2/subscriptions, to create subscription for Room1 with onlyChangedAttrs set to true.'
-echo '==============================================================================================='
+echo '02. POST /v2/subscriptions, to create subscription for Room1 with cond attrs: [] notify attrs: [B, C, D], onlyChangedAttrs: true.'
+echo '================================================================================================================================='
 payload='{
   "description": "A subscription to get info about Room1",
   "subject": {
@@ -88,7 +84,7 @@ payload='{
     ],
     "condition": {
       "attrs": [
-        "A","B","C"
+        
       ]
     }
   },
@@ -100,31 +96,22 @@ payload='{
       "B","C","D"
     ],
     "onlyChangedAttrs":true
-  },
-  "expires": "2040-01-01T14:00:00.00Z",
-  "throttling": 5
+  }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
 
-echo '03. Dump and reset accumulator, see notification.'
-echo '================================================='
+echo '03. Dump and reset accumulator, see B, C and D (as this is initial notification).'
+echo '================================================================================='
 accumulatorDump
 accumulatorReset
 echo
 echo
 
 
-echo '04. Sleep 5 secs, before next update.'
-echo '====================================='
-sleep 5
-echo
-echo
-
-
-echo '05. PATCH /v2/entities/Room1/attrs, update the value of A and B attribute.'
+echo '04. PATCH /v2/entities/Room1/attrs, update the value of A and B attribute.'
 echo '=========================================================================='
 payload='{
   "A": {
@@ -141,22 +128,15 @@ echo
 echo
 
 
-echo '06. Dump and reset accumulator, see notification.'
-echo '================================================='
+echo '05. Dump and reset accumulator, see B.'
+echo '======================================'
 accumulatorDump
 accumulatorReset
 echo
 echo
 
 
-echo '07. Sleep 5 secs, before next update.'
-echo '====================================='
-sleep 5
-echo
-echo
-
-
-echo '08. PATCH /v2/entities/Room1/attrs, update the value of B and C attribute.'
+echo '06. PATCH /v2/entities/Room1/attrs, update the value of B and C attribute.'
 echo '=========================================================================='
 payload='{
   "B": {
@@ -173,22 +153,15 @@ echo
 echo
 
 
-echo '09. Dump and reset accumulator, see notification.'
-echo '================================================='
+echo '07. Dump and reset accumulator, see B and C.'
+echo '============================================'
 accumulatorDump
 accumulatorReset
 echo
 echo
 
 
-echo '10. Sleep 5 secs, before next update.'
-echo '====================================='
-sleep 5
-echo
-echo
-
-
-echo '11. PATCH /v2/entities/Room1/attrs, update the value of C and D attribute.'
+echo '08. PATCH /v2/entities/Room1/attrs, update the value of C and D attribute.'
 echo '=========================================================================='
 payload='{
   "C": {
@@ -205,22 +178,15 @@ echo
 echo
 
 
-echo '12. Dump and reset accumulator, see notification.'
-echo '================================================='
+echo '09. Dump and reset accumulator, see C and D.'
+echo '============================================'
 accumulatorDump
 accumulatorReset
 echo
 echo
 
 
-echo '13. Sleep 5 secs, before next update.'
-echo '====================================='
-sleep 5
-echo
-echo
-
-
-echo '14. PATCH /v2/entities/Room1/attrs, update the value of A, B, C and D attribute.'
+echo '10. PATCH /v2/entities/Room1/attrs, update the value of A, B, C and D attribute.'
 echo '================================================================================'
 payload='{
   "A": {
@@ -245,8 +211,8 @@ echo
 echo
 
 
-echo '15. Dump and reset accumulator, see notification.'
-echo '================================================='
+echo '11. Dump and reset accumulator, see B, C and D.'
+echo '==============================================='
 accumulatorDump
 accumulatorReset
 echo
@@ -264,8 +230,8 @@ Date: REGEX(.*)
 
 
 
-02. POST /v2/subscriptions, to create subscription for Room1 with onlyChangedAttrs set to true.
-===============================================================================================
+02. POST /v2/subscriptions, to create subscription for Room1 with cond attrs: [] notify attrs: [B, C, D], onlyChangedAttrs: true.
+=================================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -274,8 +240,8 @@ Date: REGEX(.*)
 
 
 
-03. Dump and reset accumulator, see notification.
-=================================================
+03. Dump and reset accumulator, see B, C and D (as this is initial notification).
+=================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 227
@@ -313,11 +279,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-04. Sleep 5 secs, before next update.
-=====================================
-
-
-05. PATCH /v2/entities/Room1/attrs, update the value of A and B attribute.
+04. PATCH /v2/entities/Room1/attrs, update the value of A and B attribute.
 ==========================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -326,8 +288,8 @@ Date: REGEX(.*)
 
 
 
-06. Dump and reset accumulator, see notification.
-=================================================
+05. Dump and reset accumulator, see B.
+======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 131
@@ -355,11 +317,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-07. Sleep 5 secs, before next update.
-=====================================
-
-
-08. PATCH /v2/entities/Room1/attrs, update the value of B and C attribute.
+06. PATCH /v2/entities/Room1/attrs, update the value of B and C attribute.
 ==========================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -368,8 +326,8 @@ Date: REGEX(.*)
 
 
 
-09. Dump and reset accumulator, see notification.
-=================================================
+07. Dump and reset accumulator, see B and C.
+============================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 179
@@ -402,11 +360,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-10. Sleep 5 secs, before next update.
-=====================================
-
-
-11. PATCH /v2/entities/Room1/attrs, update the value of C and D attribute.
+08. PATCH /v2/entities/Room1/attrs, update the value of C and D attribute.
 ==========================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -415,11 +369,11 @@ Date: REGEX(.*)
 
 
 
-12. Dump and reset accumulator, see notification.
-=================================================
+09. Dump and reset accumulator, see C and D.
+============================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 131
+Content-Length: 179
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -435,6 +389,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                 "type": "Integer", 
                 "value": 34
             }, 
+            "D": {
+                "metadata": {}, 
+                "type": "Integer", 
+                "value": 42
+            }, 
             "id": "Room1", 
             "type": "Room"
         }
@@ -444,11 +403,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-13. Sleep 5 secs, before next update.
-=====================================
-
-
-14. PATCH /v2/entities/Room1/attrs, update the value of A, B, C and D attribute.
+10. PATCH /v2/entities/Room1/attrs, update the value of A, B, C and D attribute.
 ================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -457,11 +412,11 @@ Date: REGEX(.*)
 
 
 
-15. Dump and reset accumulator, see notification.
-=================================================
+11. Dump and reset accumulator, see B, C and D.
+===============================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 179
+Content-Length: 227
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -476,12 +431,17 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                 "metadata": {}, 
                 "type": "Integer", 
                 "value": 30
-            },
+            }, 
             "C": {
                 "metadata": {}, 
                 "type": "Integer", 
                 "value": 20
-            },			
+            }, 
+            "D": {
+                "metadata": {}, 
+                "type": "Integer", 
+                "value": 10
+            }, 
             "id": "Room1", 
             "type": "Room"
         }
