@@ -47,6 +47,7 @@
 */
 using mongo::BSONArrayBuilder;
 using mongo::BSONObj;
+using mongo::BSONObjBuilder;
 using mongo::BSONArray;
 using mongo::BSONElement;
 using mongo::BSONNULL;
@@ -77,22 +78,21 @@ static void getAttributeTypes
   std::vector<std::string>*        attrTypes
 )
 {
-  std::string  idType         = std::string("_id.")    + ENT_ENTITY_TYPE;
-  std::string  idServicePath  = std::string("_id.")    + ENT_SERVICE_PATH;
-  BSONObj      query;
+
+  BSONObjBuilder bob;
 
   if (entityType == "")
   {
-    query = BSON("$or"         << BSON_ARRAY(BSON(idType << entityType) << BSON(idType << BSON("$exists" << false)) ) <<
-                 idServicePath << fillQueryServicePath(servicePathV) <<
-                 ENT_ATTRNAMES << attrName);
+    std::string idType = std::string("_id.") + ENT_ENTITY_TYPE;
+    bob.append("$or", BSON_ARRAY(BSON(idType << entityType) << BSON(idType << BSON("$exists" << false)) ));
   }
-  else
+  if (servicePathFilterNeeded(servicePathV))
   {
-    query = BSON(idType        << entityType <<
-                 idServicePath << fillQueryServicePath(servicePathV) <<
-                 ENT_ATTRNAMES << attrName);
+    bob.appendElements(fillQueryServicePath("_id." ENT_SERVICE_PATH, servicePathV));
   }
+  bob.append(ENT_ATTRNAMES, attrName);
+
+  BSONObj query = bob.obj();
 
   std::auto_ptr<DBClientCursor>  cursor;
   std::string                    err;
@@ -145,16 +145,18 @@ static long long countEntities
   const std::string&               entityType
 )
 {
-  std::string    idType        = std::string("_id.") + ENT_ENTITY_TYPE;
-  std::string    idServicePath = std::string("_id.") + ENT_SERVICE_PATH;
+  BSONObjBuilder bob;
 
-  BSONObj query = BSON(idType        << entityType <<
-                       idServicePath << fillQueryServicePath(servicePathV));
+  bob.append("_id." ENT_ENTITY_TYPE, entityType);
+  if (servicePathFilterNeeded(servicePathV))
+  {
+    bob.appendElements(fillQueryServicePath("_id." ENT_SERVICE_PATH, servicePathV));
+  }
 
   std::string         err;
   unsigned long long  c;
 
-  if (!collectionCount(getEntitiesCollectionName(tenant), query, &c, &err))
+  if (!collectionCount(getEntitiesCollectionName(tenant), bob.obj(), &c, &err))
   {
     return -1;
   }
@@ -266,31 +268,40 @@ HttpStatusCode mongoEntityTypesValues
    *
    */
 
-  BSONObj spQuery = fillQueryServicePath(servicePathV);
+  BSONArrayBuilder pipeline;
+  BSONArrayBuilder pipelineForCount;
+
+  // Common elements to both pipelines
+  if (servicePathFilterNeeded(servicePathV))
+  {
+    BSONObj spQuery = fillQueryServicePath(C_ID_SERVICEPATH, servicePathV);
+    pipeline.append(BSON("$match" << spQuery));
+    pipelineForCount.append(BSON("$match" << spQuery));
+  }
+  BSONObj project = BSON("$project" << BSON(C_ID_ENTITY << BSON("$ifNull" << BSON_ARRAY(CS_ID_ENTITY << BSONNULL)) << ENT_ATTRNAMES << 1));
   BSONObj groupCond = BSON("$cond" << BSON_ARRAY(
                                BSON("$in" << BSON_ARRAY(CS_ID_ENTITY << BSON_ARRAY(BSONNULL << ""))) <<
                                "" <<
                                CS_ID_ENTITY));
 
-  // FIXME P5: avoid duplicated code in pipeline and pipelineForCount;
-  BSONArray pipeline = BSON_ARRAY(
-    BSON("$match" << BSON(C_ID_SERVICEPATH << spQuery)) <<
-    BSON("$project" << BSON(C_ID_ENTITY << BSON("$ifNull" << BSON_ARRAY(CS_ID_ENTITY << BSONNULL)) << ENT_ATTRNAMES << 1)) <<
-    BSON("$group" << BSON("_id" << groupCond)) <<
-    BSON("$sort"  << BSON("_id" << 1)) <<
-    BSON("$skip" << offset) <<
-    BSON("$limit" << limit));
+  BSONObj group   = BSON("$group" << BSON("_id" << groupCond));
+  pipeline.append(project);
+  pipeline.append(group);
+  pipelineForCount.append(project);
+  pipelineForCount.append(group);
 
-  BSONArray pipelineForCount = BSON_ARRAY(
-    BSON("$match" << BSON(C_ID_SERVICEPATH << spQuery)) <<
-    BSON("$project" << BSON(C_ID_ENTITY << BSON("$ifNull" << BSON_ARRAY(CS_ID_ENTITY << BSONNULL)) << ENT_ATTRNAMES << 1)) <<
-    BSON("$group" << BSON("_id" << groupCond)) <<
-    BSON("$count" << "count"));
+  // Specific elements for pipeline
+  pipeline.append(BSON("$sort"  << BSON("_id" << 1)));
+  pipeline.append(BSON("$skip" << offset));
+  pipeline.append(BSON("$limit" << limit));
+
+  // Specific elements for pipelineForCount
+  pipelineForCount.append(BSON("$count" << "count"));
 
   BSONObj result;
   BSONObj cmd     = BSON("aggregate" << COL_ENTITIES <<
                          "cursor" << BSON("batchSize" << BATCH_SIZE) <<
-                         "pipeline"  << pipeline);
+                         "pipeline"  << pipeline.arr());
 
   std::string err;
 
@@ -305,7 +316,7 @@ HttpStatusCode mongoEntityTypesValues
   // Get count if user requested (i.e. if totalTypesP is not NULL)
   if (totalTypesP != NULL)
   {
-    *totalTypesP = countCmd(tenant, pipelineForCount);
+    *totalTypesP = countCmd(tenant, pipelineForCount.arr());
   }
 
   // Processing result to build response
@@ -427,6 +438,24 @@ HttpStatusCode mongoEntityTypes
 
   BSONObj result;
 
+  BSONArrayBuilder pipeline;
+  BSONArrayBuilder pipelineForCount;
+
+  // Common elements to both pipelines
+  if (servicePathFilterNeeded(servicePathV))
+  {
+    BSONObj spQuery = fillQueryServicePath(C_ID_SERVICEPATH, servicePathV);
+    pipeline.append(BSON("$match" << spQuery));
+    pipelineForCount.append(BSON("$match" << spQuery));
+  }
+
+  BSONObj groupCond = BSON("$cond" << BSON_ARRAY(
+                               BSON("$in" << BSON_ARRAY(CS_ID_ENTITY << BSON_ARRAY(BSONNULL << ""))) <<
+                               "" <<
+                               CS_ID_ENTITY));
+
+  BSONObj project = BSON("$project" << BSON(C_ID_ENTITY << BSON("$ifNull" << BSON_ARRAY(CS_ID_ENTITY << BSONNULL)) << ENT_ATTRNAMES << 1));
+
   //
   // Building the projection part of the query that includes types that have no attributes
   // See bug: https://github.com/telefonicaid/fiware-orion/issues/686
@@ -443,33 +472,31 @@ HttpStatusCode mongoEntityTypes
           BSON_ARRAY(BSONNULL) <<
           S_ATTRNAMES))));
 
-  BSONObj groupCond = BSON("$cond" << BSON_ARRAY(
-                               BSON("$in" << BSON_ARRAY(CS_ID_ENTITY << BSON_ARRAY(BSONNULL << ""))) <<
-                               "" <<
-                               CS_ID_ENTITY));
+  BSONObj unwind = BSON("$unwind" << S_ATTRNAMES);
 
-  // FIXME P5: avoid duplicated code in pipeline and pipelineForCount;
-  BSONArray pipeline = BSON_ARRAY(
-    BSON("$match" << BSON(C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
-    BSON("$project" << BSON(C_ID_ENTITY << BSON("$ifNull" << BSON_ARRAY(CS_ID_ENTITY << BSONNULL)) << ENT_ATTRNAMES << 1)) <<
-         projection << BSON("$unwind" << S_ATTRNAMES) <<
-    BSON("$group" << BSON("_id"   << groupCond <<
-                          "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
-    BSON("$sort" << BSON("_id" << 1)) <<
-    BSON("$skip" << offset) <<
-    BSON("$limit" << limit));
+  BSONObj group = BSON("$group" << BSON("_id"   << groupCond << "attrs" << BSON("$addToSet" << S_ATTRNAMES)));
 
-  BSONArray pipelineForCount = BSON_ARRAY(
-    BSON("$match" << BSON(C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
-    BSON("$project" << BSON("_id.type" << BSON("$ifNull" << BSON_ARRAY(CS_ID_ENTITY << BSONNULL)) << ENT_ATTRNAMES << 1)) <<
-         projection << BSON("$unwind" << S_ATTRNAMES) <<
-    BSON("$group" << BSON("_id"   << groupCond <<
-                          "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
-    BSON("$count" << "count"));
+  pipeline.append(project);
+  pipeline.append(projection);
+  pipeline.append(unwind);
+  pipeline.append(group);
+
+  pipelineForCount.append(project);
+  pipelineForCount.append(projection);
+  pipelineForCount.append(unwind);
+  pipelineForCount.append(group);
+
+  // Specific elements for pipeline
+  pipeline.append(BSON("$sort" << BSON("_id" << 1)));
+  pipeline.append(BSON("$skip" << offset));
+  pipeline.append(BSON("$limit" << limit));
+
+  // Specific elements for pipelineForCount
+  pipelineForCount.append(BSON("$count" << "count"));
 
   BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
                      "cursor" << BSON("batchSize" << BATCH_SIZE) <<
-                     "pipeline" << pipeline);
+                     "pipeline" << pipeline.arr());
 
   std::string err;
 
@@ -484,7 +511,7 @@ HttpStatusCode mongoEntityTypes
   // Get count if user requested (i.e. if totalTypesP is not NULL)
   if (totalTypesP != NULL)
   {
-    *totalTypesP = countCmd(tenant, pipelineForCount);
+    *totalTypesP = countCmd(tenant, pipelineForCount.arr());
   }
 
   // Processing result to build response
@@ -653,13 +680,20 @@ HttpStatusCode mongoAttributesForEntityType
                                "" <<
                                CS_ID_ENTITY));
 
+  BSONObjBuilder match;
+
+  match.append(C_ID_ENTITY, entityType);
+  if (servicePathFilterNeeded(servicePathV))
+  {
+    match.appendElements(fillQueryServicePath(C_ID_SERVICEPATH, servicePathV));
+  }
+
   BSONObj result;
   BSONObj cmd =
     BSON("aggregate" << COL_ENTITIES <<
          "cursor" << BSON("batchSize" << BATCH_SIZE) <<
          "pipeline" << BSON_ARRAY(
-           BSON("$match" << BSON(C_ID_ENTITY << entityType <<
-                                 C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
+           BSON("$match" << match.obj()) <<
            BSON("$project" << BSON(C_ID_ENTITY << BSON("$ifNull" << BSON_ARRAY(CS_ID_ENTITY << BSONNULL)) << ENT_ATTRNAMES << 1)) <<
            BSON("$unwind" << S_ATTRNAMES) <<
            BSON("$group" << BSON("_id" << groupCond << "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<

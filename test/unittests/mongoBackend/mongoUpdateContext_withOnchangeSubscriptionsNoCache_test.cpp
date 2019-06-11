@@ -215,7 +215,7 @@ static void prepareDatabase(void)
    *     NotifyCond: ONCHANGE on [A1, A2, A4]
    */
 
-  BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
+  BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1" << "servicePath" << "/") <<
                      "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A7") <<
                      "attrs" << BSON(
                         "A1" << BSON("type" << "TA1" << "value" << "X") <<
@@ -223,7 +223,7 @@ static void prepareDatabase(void)
                         "A3" << BSON("type" << "TA3" << "value" << "W") <<
                         "A7" << BSON("type" << "TA7" << "value" << "W")));
 
-  BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2") <<
+  BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2" << "servicePath" << "/") <<
                      "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A7") <<
                      "attrs" << BSON(
                         "A1" << BSON("type" << "TA1" << "value" << "X") <<
@@ -231,7 +231,7 @@ static void prepareDatabase(void)
                         "A3" << BSON("type" << "TA3" << "value" << "W") <<
                         "A7" << BSON("type" << "TA7" << "value" << "W")));
 
-  BSONObj en3 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
+  BSONObj en3 = BSON("_id" << BSON("id" << "E1" << "type" << "T" << "servicePath" << "/") <<
                      "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A7") <<
                      "attrs" << BSON(
                         "A1" << BSON("type" << "TA1" << "value" << "X") <<
@@ -239,7 +239,7 @@ static void prepareDatabase(void)
                         "A3" << BSON("type" << "TA3" << "value" << "W") <<
                         "A7" << BSON("type" << "TA7" << "value" << "W")));
 
-  BSONObj en4 = BSON("_id" << BSON("id" << "E2" << "type" << "T") <<
+  BSONObj en4 = BSON("_id" << BSON("id" << "E2" << "type" << "T" << "servicePath" << "/") <<
                      "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A7") <<
                      "attrs" << BSON(
                         "A1" << BSON("type" << "TA1" << "value" << "X") <<
@@ -247,7 +247,7 @@ static void prepareDatabase(void)
                         "A3" << BSON("type" << "TA3" << "value" << "W") <<
                         "A7" << BSON("type" << "TA7" << "value" << "W")));
 
-  BSONObj en5 = BSON("_id" << BSON("id" << "E1") <<
+  BSONObj en5 = BSON("_id" << BSON("id" << "E1" << "servicePath" << "/") <<
                      "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A7") <<
                      "attrs" << BSON(
                         "A1" << BSON("type" << "TA1" << "value" << "X") <<
@@ -256,6 +256,7 @@ static void prepareDatabase(void)
                         "A7" << BSON("type" << "TA7" << "value" << "W")));
 
   BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
+                      "servicePath" << "/#" <<
                       "expiration" << 1500000000 <<
                       "lastNotification" << 20000000 <<
                       "reference" << "http://notify1.me" <<
@@ -265,6 +266,7 @@ static void prepareDatabase(void)
 
   // After the changes to simplify "condition" field (issue #1851) sub2 has become equal to sub1 and sub3
   BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
+                      "servicePath" << "/#" <<
                       "expiration" << 2000000000 <<
                       "lastNotification" << 30000000 <<
                       "reference" << "http://notify2.me" <<
@@ -273,6 +275,7 @@ static void prepareDatabase(void)
                       "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5"));
 
   BSONObj sub3 = BSON("_id" << OID("51307b66f481db11bf860003") <<
+                      "servicePath" << "/#" <<
                       "expiration" << 1500000000 <<
                       "lastNotification" << 20000000 <<
                       "reference" << "http://notify3.me" <<
@@ -281,6 +284,7 @@ static void prepareDatabase(void)
                       "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5"));
 
   BSONObj sub10 = BSON("_id" << OID("51307b66f481db11bf860010") <<
+                       "servicePath" << "/#" <<
                        "expiration" << 1500000000 <<
                        "lastNotification" << 20000000 <<
                        "reference" << "http://notify10.me" <<
@@ -292,6 +296,7 @@ static void prepareDatabase(void)
                        "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5"));
 
   BSONObj sub11 = BSON("_id" << OID("51307b66f481db11bf860011") <<
+                       "servicePath" << "/#" <<
                        "expiration" << 1500000000 <<
                        "lastNotification" << 20000000 <<
                        "reference" << "http://notify11.me" <<
@@ -356,7 +361,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void)
      *
      */
 
-    BSONObj en = BSON("_id" << BSON("id" << "E3" << "type" << "T3") <<
+    BSONObj en = BSON("_id" << BSON("id" << "E3" << "type" << "T3" << "servicePath" << "/") <<
                       "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A7") <<
                        "attrs" << BSON(
                           "A1" << BSON("type" << "TA1" << "value" << "X") <<
@@ -365,6 +370,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void)
                           "A7" << BSON("type" << "TA7" << "value" << "W")));
 
     BSONObj sub4 = BSON("_id" << OID("51307b66f481db11bf860004") <<
+                        "servicePath" << "/#" <<
                         "expiration" << 1500000000 <<
                         "lastNotification" << 20000000 <<
                         "reference" << "http://notify4.me" <<
@@ -373,6 +379,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void)
                         "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5"));
 
     BSONObj sub5 = BSON("_id" << OID("51307b66f481db11bf860005") <<
+                        "servicePath" << "/#" <<
                         "expiration" << 1500000000 <<
                         "lastNotification" << 20000000 <<
                         "reference" << "http://notify5.me" <<

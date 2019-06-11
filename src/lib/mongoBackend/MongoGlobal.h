@@ -471,9 +471,18 @@ extern void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscri
 
 /* ****************************************************************************
 *
+* servicePathFilterNeeded -
+*
+*/
+bool servicePathFilterNeeded(const std::vector<std::string>& servicePath);
+
+
+
+/* ****************************************************************************
+*
 * fillQueryServicePath -
 */
-extern mongo::BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath);
+extern mongo::BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<std::string>& servicePath);
 
 
 
