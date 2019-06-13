@@ -35,7 +35,7 @@ extern "C"
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 
-#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/context/orionldContextList.h"                // orionldContextListSemTake/Give
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
