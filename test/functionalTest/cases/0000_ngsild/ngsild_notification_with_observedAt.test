@@ -58,7 +58,7 @@ payload='{
       "object": "urn:ngsi-ld:Person:Bob"
      }
   },
-  "@context": ["http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+  "@context": ["https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json" --linkHeaderFix
 echo
@@ -78,7 +78,7 @@ payload='{
   "id": "urn:ngsi-ld:Subscription:01",
   "type": "Subscription",
   "entities": [{"type": "Vehicle"}],
-  "@context": "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld", 
+  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
   "description": "Notify me of all product vehicles changes", 
   "notification": {
     "format": "normalized",
@@ -107,7 +107,7 @@ payload='{
   "id": "urn:ngsi-ld:Subscription:02",
   "type": "Subscription",
   "entities": [{"type": "Vehicle"}],
-  "@context": "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld", 
+  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
   "description": "Notify me of all product vehicles changes", 
   "notification": {
     "format": "normalized",
@@ -180,7 +180,7 @@ Date: REGEX(.*)
 =======================================================================================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 505
+Content-Length: 506
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -188,7 +188,7 @@ Accept: application/json
 Content-Type: application/ld+json
 
 {
-    "@context": "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld", 
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "data": [
         {
             "brandName": {
@@ -231,7 +231,7 @@ User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
-Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Content-Type: application/json; charset=utf-8
 
 {

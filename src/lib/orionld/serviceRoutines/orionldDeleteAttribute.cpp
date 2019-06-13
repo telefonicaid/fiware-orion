@@ -22,21 +22,21 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/HttpStatusCode.h"                               // SccContextElementNotFound
-#include "ngsi10/UpdateContextRequest.h"                       // UpdateContextRequest
-#include "ngsi10/UpdateContextResponse.h"                      // UpdateContextResponse
-#include "mongoBackend/mongoAttributeExists.h"                 // mongoAttributeExists
-#include "mongoBackend/mongoUpdateContext.h"                   // mongoUpdateContext
+#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "rest/HttpStatusCode.h"                                 // SccContextElementNotFound
+#include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
+#include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
+#include "mongoBackend/mongoAttributeExists.h"                   // mongoAttributeExists
+#include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/common/httpStatusCodeToOrionldErrorType.h"   // httpStatusCodeToOrionldErrorType
-#include "orionld/common/OrionldConnection.h"                  // orionldState
-#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
-#include "orionld/serviceRoutines/orionldDeleteAttribute.h"    // Own Interface
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/httpStatusCodeToOrionldErrorType.h"     // httpStatusCodeToOrionldErrorType
+#include "orionld/common/OrionldConnection.h"                    // orionldState
+#include "orionld/context/orionldUriExpand.h"                    // orionldUriExpand
+#include "orionld/serviceRoutines/orionldDeleteAttribute.h"      // Own Interface
 
 
 

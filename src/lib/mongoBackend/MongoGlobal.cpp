@@ -2193,6 +2193,7 @@ static bool processOnChangeConditionForSubscription
   StringList                    emptyList;
   StringList                    metadataList;
 
+  LM_TMP(("SUB: In processOnChangeConditionForSubscription"));
   metadataList.fill(metadataV);
   if (!blacklist && !entitiesQuery(enV, attrL, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
   {
@@ -2337,17 +2338,22 @@ static BSONArray processConditionVector
 
   *notificationDone = false;
 
+  LM_TMP(("SUB: In static processConditionVector: loop over %d items", ncvP->size()));
   for (unsigned int ix = 0; ix < ncvP->size(); ++ix)
   {
     NotifyCondition* nc = (*ncvP)[ix];
 
+    LM_TMP(("SUB: nc at %p", nc));
     if (nc->type == ON_CHANGE_CONDITION)
     {
+      LM_TMP(("SUB: nc->type == ON_CHANGE_CONDITION"));
       for (unsigned int jx = 0; jx < nc->condValueList.size(); ++jx)
       {
+        LM_TMP(("SUB: Adding condition"));
         conds.append(nc->condValueList[jx]);
       }
 
+      LM_TMP(("SUB: status == %d", status));
       if ((status == STATUS_ACTIVE) &&
           (processOnChangeConditionForSubscription(enV,
                                                    attrL,
@@ -2409,10 +2415,12 @@ BSONArray processConditionVector
   EntityIdVector        enV;
   StringList            attrL;
 
+  LM_TMP(("SUB: In processConditionVector: condAttributesV has %d members", condAttributesV.size()));
   attrsStdVector2NotifyConditionVector(condAttributesV, &ncV);
   entIdStdVector2EntityIdVector(entitiesV, &enV);
   attrL.fill(notifAttributesV);
 
+  LM_TMP(("SUB: In processConditionVector: calling static processConditionVector"));
   BSONArray arr = processConditionVector(&ncV,
                                          enV,
                                          attrL,
