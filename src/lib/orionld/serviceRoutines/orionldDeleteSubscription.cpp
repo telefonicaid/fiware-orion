@@ -43,9 +43,9 @@ bool orionldDeleteSubscription(ConnectionInfo* ciP)
 {
   char* details;
 
-  if (mongoDeleteLdSubscription(ciP->wildcard[0], orionldState.tenant, &ciP->httpStatusCode, &details) == false)
+  if (mongoDeleteLdSubscription(orionldState.wildcard[0], orionldState.tenant, &ciP->httpStatusCode, &details) == false)
   {
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, ciP->wildcard[0], OrionldDetailsString);
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, orionldState.wildcard[0], OrionldDetailsString);
     return false;
   }
 

@@ -26,6 +26,7 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
+#include "kjson/kjFree.h"                                      // kjFree
 }
 
 #include "parseArgs/baStd.h"                                   // BA_FT - for debugging only

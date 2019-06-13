@@ -22,12 +22,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                // LM_*
-#include "logMsg/traceLevels.h"                           // Lmt*
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                          // ConnectionInfo
-#include "orionld/rest/OrionLdRestService.h"              // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
-#include "orionld/rest/orionldServiceLookup.h"            // Own interface
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
+#include "orionld/rest/orionldServiceLookup.h"                 // Own interface
 
 
 
@@ -159,19 +160,19 @@ OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestService
               {
                 LM_T(LmtServiceLookup, ("******************* %s matches", serviceP->url));
 
-                ciP->wildcard[0] = &ciP->urlPath[serviceP->charsBeforeFirstWildcard + ORION_LD_SERVICE_PREFIX_LEN];
+                orionldState.wildcard[0] = &ciP->urlPath[serviceP->charsBeforeFirstWildcard + ORION_LD_SERVICE_PREFIX_LEN];
 
                 // Destroying the incoming URL path, to extract the wildcard string
                 ciP->urlPath[sLen - serviceP->matchForSecondWildcardLen + ORION_LD_SERVICE_PREFIX_LEN] = 0;
-                LM_T(LmtServiceLookup, ("WILDCARD:  '%s'", ciP->wildcard[0]));
+                LM_T(LmtServiceLookup, ("WILDCARD:  '%s'", orionldState.wildcard[0]));
                 return serviceP;
               }
             }
             else
             {
               LM_T(LmtServiceLookup, ("******************* %s matches", serviceP->url));
-              ciP->wildcard[0] = &ciP->urlPath[serviceP->charsBeforeFirstWildcard + ORION_LD_SERVICE_PREFIX_LEN];
-              LM_T(LmtServiceLookup, ("WILDCARD:  '%s'", ciP->wildcard[0]));
+              orionldState.wildcard[0] = &ciP->urlPath[serviceP->charsBeforeFirstWildcard + ORION_LD_SERVICE_PREFIX_LEN];
+              LM_T(LmtServiceLookup, ("WILDCARD:  '%s'", orionldState.wildcard[0]));
               return serviceP;
             }
           }
@@ -195,13 +196,13 @@ OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestService
             LM_T(LmtServiceLookup, ("Second wildcard: %s", &matchP[serviceP->matchForSecondWildcardLen]));
             {
               LM_T(LmtServiceLookup, ("******************* %s matches", serviceP->url));
-              ciP->wildcard[0] = &ciP->urlPath[serviceP->charsBeforeFirstWildcard + ORION_LD_SERVICE_PREFIX_LEN];
-              ciP->wildcard[1] = &matchP[serviceP->matchForSecondWildcardLen];
+              orionldState.wildcard[0] = &ciP->urlPath[serviceP->charsBeforeFirstWildcard + ORION_LD_SERVICE_PREFIX_LEN];
+              orionldState.wildcard[1] = &matchP[serviceP->matchForSecondWildcardLen];
 
               // Destroying the incoming URL path, to extract first wildcard string
               *matchP = 0;
-              LM_T(LmtServiceLookup, ("First WILDCARD:  '%s'", ciP->wildcard[0]));
-              LM_T(LmtServiceLookup, ("Second WILDCARD: '%s'", ciP->wildcard[1]));
+              LM_T(LmtServiceLookup, ("First WILDCARD:  '%s'", orionldState.wildcard[0]));
+              LM_T(LmtServiceLookup, ("Second WILDCARD: '%s'", orionldState.wildcard[1]));
 
               return serviceP;
             }

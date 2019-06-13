@@ -32,6 +32,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/context/orionldContextFree.h"                // orionldContextFree
 #include "orionld/common/OrionldConnection.h"                  // OrionldConnectionState
 
 
@@ -86,7 +87,7 @@ void orionldStateInit(void)
   orionldState.errorAttributeArrayP        = orionldState.errorAttributeArray;
   orionldState.errorAttributeArraySize     = sizeof(orionldState.errorAttributeArray);
   orionldState.errorAttributeArrayUsed     = 0;
-
+  orionldState.contextToBeFreed            = false;
   bzero(orionldState.errorAttributeArray, sizeof(orionldState.errorAttributeArray));
   orionldState.uriParamOptions.noOverwrite = false;
 }
@@ -110,6 +111,12 @@ void orionldStateRelease(void)
     free(orionldState.errorAttributeArrayP);
     orionldState.errorAttributeArrayP = NULL;
   }
+
+#if 0
+  // This part crashes the broker in a few functests ...
+  if ((orionldState.contextP != NULL) && (orionldState.contextToBeFreed == true))
+    orionldContextFree(orionldState.contextP);
+#endif
 }
 
 

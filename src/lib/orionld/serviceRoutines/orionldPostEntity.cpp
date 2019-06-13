@@ -124,10 +124,10 @@ void orionldPartialUpdateResponseCreate(ConnectionInfo* ciP)
 bool orionldPostEntity(ConnectionInfo* ciP)
 {
   // 1. Check that the entity exists
-  if (mongoEntityExists(ciP->wildcard[0], orionldState.tenant) == false)
+  if (mongoEntityExists(orionldState.wildcard[0], orionldState.tenant) == false)
   {
     ciP->httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Entity does not exist", ciP->wildcard[0], OrionldDetailsString);
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Entity does not exist", orionldState.wildcard[0], OrionldDetailsString);
     return false;
   }
 
@@ -170,7 +170,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     mongoRequest.updateActionType = ActionTypeAppend;
   }
 
-  entityIdP->id = ciP->wildcard[0];
+  entityIdP->id = orionldState.wildcard[0];
 
 
   //

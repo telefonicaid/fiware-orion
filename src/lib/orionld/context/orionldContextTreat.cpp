@@ -131,7 +131,7 @@ bool orionldContextTreat
       return false;
     }
 
-    ciP->contextToBeFreed = false;                  // context has been added to public list - must not be freed
+    orionldState.contextToBeFreed = false;                  // context has been added to public list - must not be freed
   }
   else if (contextNodeP->type == KjArray)
   {
@@ -179,7 +179,7 @@ bool orionldContextTreat
     // The context containing a vector of X context strings (URLs) must be freed
     // The downloaded contexts though are added to the public list and will not be freed)
     //
-    ciP->contextToBeFreed = true;
+    orionldState.contextToBeFreed = true;
 
     for (KjNode* contextArrayItemP = contextNodeP->value.firstChildP; contextArrayItemP != NULL; contextArrayItemP = contextArrayItemP->next)
     {

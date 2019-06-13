@@ -59,17 +59,17 @@ bool orionldGetEntity(ConnectionInfo* ciP)
   bool                  keyValues = ciP->uriParamOptions[OPT_KEY_VALUES];
   QueryContextRequest   request;
   QueryContextResponse  response;
-  EntityId              entityId(ciP->wildcard[0], "", "false", false);
+  EntityId              entityId(orionldState.wildcard[0], "", "false", false);
   char*                 details;
 
-  LM_T(LmtServiceRoutine, ("In orionldGetEntity: %s", ciP->wildcard[0]));
+  LM_T(LmtServiceRoutine, ("In orionldGetEntity: %s", orionldState.wildcard[0]));
 
   request.entityIdVector.push_back(&entityId);
 
   //
-  // Make sure the ID (ciP->wildcard[0]) is a valid URI
+  // Make sure the ID (orionldState.wildcard[0]) is a valid URI
   //
-  if ((urlCheck(ciP->wildcard[0], &details) == false) && (urnCheck(ciP->wildcard[0], &details) == false))
+  if ((urlCheck(orionldState.wildcard[0], &details) == false) && (urnCheck(orionldState.wildcard[0], &details) == false))
   {
     LM_W(("Bad Input (Invalid Entity ID - Not a URL nor a URN)"));
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN", OrionldDetailsString);

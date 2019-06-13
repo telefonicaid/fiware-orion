@@ -123,7 +123,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
   }
   else if ((hits > 1) && (oneHit == true))  // More than one hit - not possible!
   {
-    orionldErrorResponseCreate(ciP, OrionldInternalError, "More than one hit", ciP->wildcard[0], OrionldDetailsEntity);
+    orionldErrorResponseCreate(ciP, OrionldInternalError, "More than one hit", orionldState.wildcard[0], OrionldDetailsEntity);
     return NULL;
   }
 

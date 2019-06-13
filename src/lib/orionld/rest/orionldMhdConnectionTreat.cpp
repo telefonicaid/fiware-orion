@@ -219,8 +219,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     // orionldMhdConnectionInit guarantees that a valid verb is used. I.e. POST, GET, DELETE or PATCH
     // orionldServiceLookup makes sure the URL supprts the verb
     //
-    ciP->serviceP = orionldServiceLookup(ciP, &orionldRestServiceV[ciP->verb]);
-    if (ciP->serviceP == NULL)
+    orionldState.serviceP = orionldServiceLookup(ciP, &orionldRestServiceV[ciP->verb]);
+    if (orionldState.serviceP == NULL)
     {
       if (orionldBadVerb(ciP) == true)
       {
@@ -388,9 +388,9 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     // Calling the SERVICE ROUTINE
     //
-    LM_T(LmtServiceRoutine, ("Calling Service Routine %s", ciP->serviceP->url));
-    bool b = ciP->serviceP->serviceRoutine(ciP);
-    LM_T(LmtServiceRoutine, ("service routine '%s' done", ciP->serviceP->url));
+    LM_T(LmtServiceRoutine, ("Calling Service Routine %s", orionldState.serviceP->url));
+    bool b = orionldState.serviceP->serviceRoutine(ciP);
+    LM_T(LmtServiceRoutine, ("service routine '%s' done", orionldState.serviceP->url));
 
     if ((b == true) && (contextToBeCreated == true))
     {

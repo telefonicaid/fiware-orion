@@ -88,7 +88,6 @@ ConnectionInfo::ConnectionInfo():
   compoundValueRoot      (NULL),
   httpStatusCode         (SccOk),
 #ifdef ORIONLD
-  serviceP                  (NULL),
   responsePayload           (NULL),
   responsePayloadAllocated  (false),
   urlPath                   (NULL),
@@ -96,7 +95,6 @@ ConnectionInfo::ConnectionInfo():
   kjsonP                    (NULL),
   requestTree               (NULL),
   responseTree              (NULL),
-  contextToBeFreed          (false),
   prettyPrint               (false),
   prettyPrintSpaces         (2)
 #endif
@@ -130,7 +128,6 @@ ConnectionInfo::ConnectionInfo(MimeType _outMimeType):
   compoundValueRoot      (NULL),
   httpStatusCode         (SccOk),
 #ifdef ORIONLD
-  serviceP                  (NULL),
   responsePayload           (NULL),
   responsePayloadAllocated  (false),
   urlPath                   (NULL),
@@ -138,7 +135,6 @@ ConnectionInfo::ConnectionInfo(MimeType _outMimeType):
   kjsonP                    (NULL),
   requestTree               (NULL),
   responseTree              (NULL),
-  contextToBeFreed          (false),
   prettyPrint               (false),
   prettyPrintSpaces         (2)
 #endif
@@ -175,7 +171,6 @@ ConnectionInfo::ConnectionInfo(std::string _url, std::string _method, std::strin
   compoundValueRoot      (NULL),
   httpStatusCode         (SccOk),
 #ifdef ORIONLD
-  serviceP                  (NULL),
   responsePayload           (NULL),
   responsePayloadAllocated  (false),
   urlPath                   (NULL),
@@ -183,7 +178,6 @@ ConnectionInfo::ConnectionInfo(std::string _url, std::string _method, std::strin
   kjsonP                    (NULL),
   requestTree               (NULL),
   responseTree              (NULL),
-  contextToBeFreed          (false),
   prettyPrint               (false),
   prettyPrintSpaces         (2)
 #endif

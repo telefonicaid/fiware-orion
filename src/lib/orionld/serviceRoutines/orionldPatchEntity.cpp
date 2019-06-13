@@ -44,7 +44,7 @@
 //
 bool orionldPatchEntity(ConnectionInfo* ciP)
 {
-  char* entityId = ciP->wildcard[0];
+  char* entityId = orionldState.wildcard[0];
 
   LM_T(LmtServiceRoutine, ("In orionldPatchEntity"));
 

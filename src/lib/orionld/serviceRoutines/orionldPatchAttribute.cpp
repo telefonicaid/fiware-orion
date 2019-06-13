@@ -43,10 +43,10 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
 {
   LM_T(LmtServiceRoutine, ("In orionldPatchAttribute"));
 
-  if (mongoEntityExists(ciP->wildcard[0], orionldState.tenant) == false)
+  if (mongoEntityExists(orionldState.wildcard[0], orionldState.tenant) == false)
   {
     ciP->httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Entity does not exist", ciP->wildcard[0], OrionldDetailsString);
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Entity does not exist", orionldState.wildcard[0], OrionldDetailsString);
     return false;
   }
 
@@ -75,14 +75,14 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   }
 
   // Make sure the attribute to be patched exists
-  if (mongoAttributeExists(ciP->wildcard[0], ciP->wildcard[1], orionldState.tenant) == false)
+  if (mongoAttributeExists(orionldState.wildcard[0], orionldState.wildcard[1], orionldState.tenant) == false)
   {
     ciP->httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute does not exist", ciP->wildcard[1], OrionldDetailsString);
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute does not exist", orionldState.wildcard[1], OrionldDetailsString);
     return false;
   }
 
   ciP->httpStatusCode = SccNotImplemented;
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - PATCH /ngsi-ld/v1/entities/*/attrs", ciP->wildcard[0], OrionldDetailsString);
+  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - PATCH /ngsi-ld/v1/entities/*/attrs", orionldState.wildcard[0], OrionldDetailsString);
   return true;
 }

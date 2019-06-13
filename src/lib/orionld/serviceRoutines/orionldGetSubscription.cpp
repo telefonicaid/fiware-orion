@@ -49,13 +49,13 @@ bool orionldGetSubscription(ConnectionInfo* ciP)
   subscription.expires             = -1;  // 0?
   subscription.throttling          = -1;  // 0?
 
-  LM_T(LmtServiceRoutine, ("In orionldGetSubscription (%s)", ciP->wildcard[0]));
+  LM_T(LmtServiceRoutine, ("In orionldGetSubscription (%s)", orionldState.wildcard[0]));
   LM_TMP(("TENANT: %s", orionldState.tenant));
 
-  if (mongoGetLdSubscription(&subscription, ciP->wildcard[0], orionldState.tenant, &ciP->httpStatusCode, &details) != true)
+  if (mongoGetLdSubscription(&subscription, orionldState.wildcard[0], orionldState.tenant, &ciP->httpStatusCode, &details) != true)
   {
     LM_E(("mongoGetLdSubscription error: %s", details));
-    orionldErrorResponseCreate(ciP, OrionldResourceNotFound, details, ciP->wildcard[0], OrionldDetailsString);
+    orionldErrorResponseCreate(ciP, OrionldResourceNotFound, details, orionldState.wildcard[0], OrionldDetailsString);
     return false;
   }
 

@@ -720,7 +720,7 @@ static void requestCompleted
   delete(ciP);
 
 #ifdef ORIONLD
-  kaBufferReset(&orionldState.kalloc, false);  // 'false: it reused, but in a different thread ...
+  kaBufferReset(&orionldState.kalloc, false);  // 'false': it's reused, but in a different thread ...
 #endif
 
   *con_cls = NULL;
