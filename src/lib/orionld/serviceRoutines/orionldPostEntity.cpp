@@ -22,28 +22,28 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                            // strlen
+#include <string.h>                                              // strlen
 
 extern "C"
 {
-#include "kjson/kjBuilder.h"                                   // kjChildRemove
+#include "kjson/kjBuilder.h"                                     // kjChildRemove
 }
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "mongoBackend/mongoUpdateContext.h"                   // mongoUpdateContext
-#include "mongoBackend/mongoEntityExists.h"                    // mongoEntityExists
-#include "ngsi10/UpdateContextRequest.h"                       // UpdateContextRequest
-#include "ngsi10/UpdateContextResponse.h"                      // UpdateContextResponse
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/common/CHECK.h"                              // CHECK
-#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/context/orionldContextTreat.h"               // orionldContextTreat
-#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
-#include "orionld/serviceRoutines/orionldPostEntity.h"         // Own Interface
+#include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
+#include "mongoBackend/mongoEntityExists.h"                      // mongoEntityExists
+#include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
+#include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
+#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "orionld/common/CHECK.h"                                // CHECK
+#include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/context/orionldContextTreat.h"                 // orionldContextTreat
+#include "orionld/context/orionldUriExpand.h"                    // orionldUriExpand
+#include "orionld/serviceRoutines/orionldPostEntity.h"           // Own Interface
 
 
 
@@ -282,7 +282,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 
 
   //
-  // Calling mongoBackend
+  // Call mongoBackend
   //
   ciP->httpStatusCode = mongoUpdateContext(&mongoRequest,
                                            &mongoResponse,
