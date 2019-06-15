@@ -32,8 +32,9 @@ extern "C"
 #include "parseArgs/baStd.h"                                   // BA_FT - for debugging only
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
-
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/kjTree/kjTreeFromContextContextAttribute.h"  // Own interface
 
 
@@ -50,12 +51,12 @@ extern "C"
 //
 KjNode* kjTreeFromContextContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP, char** detailsP)
 {
-  KjNode* topNodeP = kjObject(ciP->kjsonP, NULL);
+  KjNode* topNodeP = kjObject(orionldState.kjsonP, NULL);
 
   if (caP->valueType == orion::ValueTypeString)
   {
     LM_T(LmtContext, ("It's a String!"));
-    KjNode* stringNodeP = kjString(ciP->kjsonP, "@context", caP->stringValue.c_str());
+    KjNode* stringNodeP = kjString(orionldState.kjsonP, "@context", caP->stringValue.c_str());
     LM_T(LmtContext, ("The string is: '%s'", stringNodeP->value.s));
 
     kjChildAdd(topNodeP, stringNodeP);
@@ -63,7 +64,7 @@ KjNode* kjTreeFromContextContextAttribute(ConnectionInfo* ciP, ContextAttribute*
   else if (caP->compoundValueP->valueType == orion::ValueTypeVector)
   {
     LM_T(LmtContext, ("It's an Array!"));
-    KjNode* arrayNodeP = kjArray(ciP->kjsonP, "@context");
+    KjNode* arrayNodeP = kjArray(orionldState.kjsonP, "@context");
 
     kjChildAdd(topNodeP, arrayNodeP);
 
@@ -79,7 +80,7 @@ KjNode* kjTreeFromContextContextAttribute(ConnectionInfo* ciP, ContextAttribute*
         return NULL;
       }
 
-      KjNode* itemNodeP = kjString(ciP->kjsonP, NULL, compoundP->stringValue.c_str());
+      KjNode* itemNodeP = kjString(orionldState.kjsonP, NULL, compoundP->stringValue.c_str());
       kjChildAdd(arrayNodeP, itemNodeP);
       LM_T(LmtContext, ("Added array item '%s' to context", itemNodeP->value.s));
     }
@@ -87,7 +88,7 @@ KjNode* kjTreeFromContextContextAttribute(ConnectionInfo* ciP, ContextAttribute*
   else if (caP->compoundValueP->valueType == orion::ValueTypeObject)
   {
     LM_T(LmtContext, ("It's an Object!"));
-    KjNode* objectNodeP = kjObject(ciP->kjsonP, "@context");
+    KjNode* objectNodeP = kjObject(orionldState.kjsonP, "@context");
 
     kjChildAdd(topNodeP, objectNodeP);
 
@@ -103,7 +104,7 @@ KjNode* kjTreeFromContextContextAttribute(ConnectionInfo* ciP, ContextAttribute*
         return NULL;
       }
 
-      KjNode* itemNodeP = kjString(ciP->kjsonP, compoundP->name.c_str(), compoundP->stringValue.c_str());
+      KjNode* itemNodeP = kjString(orionldState.kjsonP, compoundP->name.c_str(), compoundP->stringValue.c_str());
       kjChildAdd(objectNodeP, itemNodeP);
 
       LM_T(LmtContext, ("Added object member '%s' == '%s' to context", itemNodeP->name, itemNodeP->value.s));

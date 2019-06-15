@@ -153,14 +153,14 @@ bool orionldGetEntity(ConnectionInfo* ciP)
     }
     *attrListEnd = 0;
 
-    ciP->responseTree = kjTreeFromQueryContextResponseWithAttrList(ciP, true, attrList, keyValues, &response);
+    orionldState.responseTree = kjTreeFromQueryContextResponseWithAttrList(ciP, true, attrList, keyValues, &response);
     free(attrList);
   }
   else
-    ciP->responseTree = kjTreeFromQueryContextResponse(ciP, true, keyValues, &response);
+    orionldState.responseTree = kjTreeFromQueryContextResponse(ciP, true, keyValues, &response);
 
 
-  if (ciP->responseTree == NULL)
+  if (orionldState.responseTree == NULL)
   {
     ciP->httpStatusCode = SccContextElementNotFound;
   }

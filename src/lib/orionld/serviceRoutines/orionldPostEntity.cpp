@@ -59,13 +59,13 @@ void orionldPartialUpdateResponseCreate(ConnectionInfo* ciP)
   // Rob the incoming Request Tree - performance to be won!
   //
   LM_TMP(("PART-UPDATE: Here"));
-  ciP->responseTree = ciP->requestTree;
+  orionldState.responseTree = orionldState.requestTree;
   LM_TMP(("PART-UPDATE: Here"));
-  ciP->requestTree  = NULL;
+  orionldState.requestTree  = NULL;
   LM_TMP(("PART-UPDATE: Here"));
 
   //
-  // For all attrs in ciP->responseTree, remove those that are found in orionldState.errorAttributeArrayP.
+  // For all attrs in orionldState.responseTree, remove those that are found in orionldState.errorAttributeArrayP.
   // Remember, the format of orionldState.errorAttributeArrayP is:
   //
   //   |attrName|attrName|attrName|...
@@ -73,14 +73,14 @@ void orionldPartialUpdateResponseCreate(ConnectionInfo* ciP)
 
   // <TMP>
   int ix = 1;
-  for (KjNode* attrNodeP = ciP->responseTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
+  for (KjNode* attrNodeP = orionldState.responseTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
   {
     LM_TMP(("PART-UPDATE: Attr %d: '%s'", ix, attrNodeP->name));
     ++ix;
   }
   // </TMP>
 
-  KjNode* attrNodeP = ciP->responseTree->value.firstChildP;
+  KjNode* attrNodeP = orionldState.responseTree->value.firstChildP;
 
   while (attrNodeP != NULL)
   {
@@ -94,7 +94,7 @@ void orionldPartialUpdateResponseCreate(ConnectionInfo* ciP)
       if ((match[-1] == '|') && (match[strlen(attrNodeP->name)] == '|'))
       {
         LM_TMP(("PART-UPDATE: removing child '%s'", attrNodeP->name));
-        kjChildRemove(ciP->responseTree, attrNodeP);
+        kjChildRemove(orionldState.responseTree, attrNodeP);
         attrNodeP = next;
         moved = true;
       }
@@ -105,7 +105,7 @@ void orionldPartialUpdateResponseCreate(ConnectionInfo* ciP)
   }
 
   // <TMP>
-  for (KjNode* attrNodeP = ciP->responseTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
+  for (KjNode* attrNodeP = orionldState.responseTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
   {
     LM_TMP(("PART-UPDATE: Attr %d: '%s'", ix, attrNodeP->name));
     ++ix;
@@ -132,7 +132,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   }
 
   // Is the payload empty?
-  if (ciP->requestTree == NULL)
+  if (orionldState.requestTree == NULL)
   {
     ciP->httpStatusCode = SccBadRequest;
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "No payload", NULL, OrionldDetailsString);
@@ -140,10 +140,10 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   }
 
   // Is the payload not a JSON object?
-  OBJECT_CHECK(ciP->requestTree, kjValueType(ciP->requestTree->type));
+  OBJECT_CHECK(orionldState.requestTree, kjValueType(orionldState.requestTree->type));
 
   // Is the payload an empty object?
-  if (ciP->requestTree->value.firstChildP == NULL)
+  if (orionldState.requestTree->value.firstChildP == NULL)
   {
     ciP->httpStatusCode = SccBadRequest;
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Payload is an empty JSON object", NULL, OrionldDetailsString);
@@ -179,7 +179,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   //
   KjNode* contextNodeP = NULL;
 
-  for (KjNode* kNodeP = ciP->requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
+  for (KjNode* kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     if (SCOMPARE9(kNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
     {
@@ -198,7 +198,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   }
 
   // 3. Iterate over the object, to get all attributes
-  for (KjNode* kNodeP = ciP->requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
+  for (KjNode* kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     KjNode* attrTypeNodeP = NULL;
 

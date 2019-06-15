@@ -79,17 +79,17 @@ static bool contentTypeCheck(ConnectionInfo* ciP, KjNode* contextNodeP, char** e
   if ((ciP->verb != POST) && (ciP->verb != PATCH))
     return true;
 
-  if (ciP->requestTree == NULL)
+  if (orionldState.requestTree == NULL)
   {
     return true;  // No error detected about Content-Type, error postponed to later check
   }
 
-  if (ciP->requestTree->value.firstChildP == NULL)
+  if (orionldState.requestTree->value.firstChildP == NULL)
   {
     return true;  // No error detected about Content-Type, error postponed to later check
   }
 
-  if (ciP->requestTree->type != KjObject)  // FIXME: Are all payloads JSON Objects ... ?
+  if (orionldState.requestTree->type != KjObject)  // FIXME: Are all payloads JSON Objects ... ?
   {
     return true;  // No error detected about Content-Type, error postponed to later check
   }
@@ -208,7 +208,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   bool  contextToBeCreated = false;
 
   LM_T(LmtMhd, ("Read all the payload - treating the request!"));
-  LM_TMP(("----------------------- Treating NGSI-LD request %03d: %s %s: %s --------------------------", requestNo, ciP->verbString, ciP->urlPath, ciP->payload));
+  LM_TMP(("----------------------- Treating NGSI-LD request %03d: %s %s: %s --------------------------", requestNo, orionldState.verbString, orionldState.urlPath, ciP->payload));
 
   // If no error predetected, lookup the service and call its service routine
   if (ciP->httpStatusCode == SccOk)
@@ -228,7 +228,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       }
       else
       {
-        orionldErrorResponseCreate(ciP, OrionldInvalidRequest, "Service Not Found", ciP->urlPath, OrionldDetailsString);
+        orionldErrorResponseCreate(ciP, OrionldInvalidRequest, "Service Not Found", orionldState.urlPath, OrionldDetailsString);
         ciP->httpStatusCode = SccContextElementNotFound;
       }
       goto respond;
@@ -264,11 +264,11 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     if (ciP->payload != NULL)
     {
-      ciP->requestTree = kjParse(ciP->kjsonP, ciP->payload);
-      LM_T(LmtPayloadParse, ("After kjParse: %p", ciP->requestTree));
-      if (ciP->requestTree == NULL)
+      orionldState.requestTree = kjParse(orionldState.kjsonP, ciP->payload);
+      LM_T(LmtPayloadParse, ("After kjParse: %p", orionldState.requestTree));
+      if (orionldState.requestTree == NULL)
       {
-        orionldErrorResponseCreate(ciP, OrionldInvalidRequest, "JSON Parse Error", ciP->kjsonP->errorString, OrionldDetailsString);
+        orionldErrorResponseCreate(ciP, OrionldInvalidRequest, "JSON Parse Error", orionldState.kjsonP->errorString, OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;
         goto respond;
       }
@@ -276,7 +276,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       //
       // Empty payload object?  ("{}" resulting in a tree with one Object that has no children)
       //
-      if ((ciP->requestTree->type == KjObject) && (ciP->requestTree->value.firstChildP == NULL))
+      if ((orionldState.requestTree->type == KjObject) && (orionldState.requestTree->value.firstChildP == NULL))
       {
         orionldErrorResponseCreate(ciP, OrionldInvalidRequest, "Empty Object", "{}", OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;
@@ -286,20 +286,20 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       //
       // Empty payload array?  ("[]" resulting in a tree with one Object that has no children)
       //
-      if ((ciP->requestTree->type == KjArray) && (ciP->requestTree->value.firstChildP == NULL))
+      if ((orionldState.requestTree->type == KjArray) && (orionldState.requestTree->value.firstChildP == NULL))
       {
         orionldErrorResponseCreate(ciP, OrionldInvalidRequest, "Empty Array", "[]", OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;
         goto respond;
       }
 
-      LM_T(LmtPayloadParse, ("All good - payload parsed. ciP->requestTree at %p", ciP->requestTree));
+      LM_T(LmtPayloadParse, ("All good - payload parsed. orionldState.requestTree at %p", orionldState.requestTree));
 
 
       //
       // Looking up "@context" attribute at first level in payload
       //
-      for (KjNode* attrNodeP = ciP->requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
+      for (KjNode* attrNodeP = orionldState.requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
       {
         if (attrNodeP->name == NULL)
           continue;
@@ -478,7 +478,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   // For error responses, there is ALWAYS payload, describing the error
   // If, for some reason (bug!) this payload is missing, then we add a generic error response here
   //
-  if ((ciP->httpStatusCode >= 400) && (ciP->responseTree == NULL) && (ciP->httpStatusCode != 405))
+  if ((ciP->httpStatusCode >= 400) && (orionldState.responseTree == NULL) && (ciP->httpStatusCode != 405))
     orionldErrorResponseCreate(ciP, OrionldInternalError, "Unknown Error", "The reason for this error is unknown", OrionldDetailsString);
 
   //
@@ -493,7 +493,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // Is there a KJSON response tree to render?
   //
-  if (ciP->responseTree != NULL)
+  if (orionldState.responseTree != NULL)
   {
     //
     // If "Accept: application/json", then the context goes in the HTTP Header (Link)
@@ -505,11 +505,11 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
     // FIXME: Smarter allocation !!!
     int bufLen = 1024 * 1024 * 32;
-    ciP->responsePayload = (char*) malloc(bufLen);
-    if (ciP->responsePayload != NULL)
+    orionldState.responsePayload = (char*) malloc(bufLen);
+    if (orionldState.responsePayload != NULL)
     {
-      ciP->responsePayloadAllocated = true;
-      kjRender(ciP->kjsonP, ciP->responseTree, ciP->responsePayload, bufLen);
+      orionldState.responsePayloadAllocated = true;
+      kjRender(orionldState.kjsonP, orionldState.responseTree, orionldState.responsePayload, bufLen);
     }
     else
     {
@@ -536,10 +536,10 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     orionldState.useLinkHeader = true;
   }
 
-  if (ciP->responsePayload != NULL)
+  if (orionldState.responsePayload != NULL)
   {
-    restReply(ciP, ciP->responsePayload);
-    // ciP->responsePayload freed and NULLed by restReply()
+    restReply(ciP, orionldState.responsePayload);
+    // orionldState.responsePayload freed and NULLed by restReply()
   }
   else
   {

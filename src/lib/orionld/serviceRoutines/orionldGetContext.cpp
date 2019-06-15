@@ -34,7 +34,7 @@ extern "C"
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "mongoBackend/mongoQueryContext.h"                      // mongoQueryContext
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/common/OrionldConnection.h"                    // orionldState
+#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/context/orionldContextLookup.h"                // orionldContextLookup
 #include "orionld/kjTree/kjTreeFromContextContextAttribute.h"    // kjTreeFromContextContextAttribute
 #include "orionld/serviceRoutines/orionldGetContext.h"           // Own Interface
@@ -102,17 +102,17 @@ bool orionldGetContext(ConnectionInfo* ciP)
     }
   }
 
-  ciP->responseTree = kjObject(orionldState.kjsonP, "@context");
+  orionldState.responseTree = kjObject(orionldState.kjsonP, "@context");
   // NOTE: No need to free - as the kjObject is allocated in "orionldState.kjsonP", it gets deleted when the thread is reused.
 
-  if (ciP->responseTree == NULL)
+  if (orionldState.responseTree == NULL)
   {
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "kjObject failed", "out of memory?", OrionldDetailsString);
     ciP->httpStatusCode = SccReceiverInternalError;
     return false;
   }
 
-  ciP->responseTree->value.firstChildP = contextTree;
+  orionldState.responseTree->value.firstChildP = contextTree;
 
   return true;
 }

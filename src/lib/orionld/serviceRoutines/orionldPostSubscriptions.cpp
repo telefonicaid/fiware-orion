@@ -47,7 +47,7 @@ extern "C"
 #include "orionld/common/urnCheck.h"                           // urnCheck
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/CHECK.h"                              // CHECKx(U)
-#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
 #include "orionld/context/orionldContextTreat.h"               // orionldContextTreat
@@ -273,7 +273,7 @@ static bool ktreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, S
     // NGSI-LD needs it to be able to be an array.
     // Easiest way to fix this is to render the JSON Array and translate it to a string, and then removing the '[]'
     //
-    kjRender(ciP->kjsonP, coordinatesNodeP, coords, sizeof(coords));
+    kjRender(orionldState.kjsonP, coordinatesNodeP, coords, sizeof(coords));
     coords[strlen(coords) - 1] = 0;
     LM_T(LmtGeoJson, ("Rendered coords array: '%s'", &coords[1]));
     subExpressionP->coords = &coords[1];
@@ -516,7 +516,7 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP,
   // 1. First lookup the tree nodes of 'id' and '@context'
   // 2. Then create a context attribute for the context - FIXME: combine code with POST Entities
   //
-  for (kNodeP = ciP->requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
+  for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     if (SCOMPARE9(kNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
     {
@@ -584,7 +584,7 @@ static bool ktreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP,
   //
   // Now loop over the tree
   //
-  for (kNodeP = ciP->requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
+  for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     if (SCOMPARE3(kNodeP->name, 'i', 'd', 0))
     {

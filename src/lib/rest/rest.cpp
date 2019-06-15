@@ -254,12 +254,12 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
   {
     if (strcmp(val, "yes") == 0)
     {
-      ciP->prettyPrint = true;
+      orionldState.prettyPrint = true;
     }
   }
   else if (key == URI_PARAM_SPACES)
   {
-    ciP->prettyPrintSpaces = atoi(val);
+    orionldState.prettyPrintSpaces = atoi(val);
   }
 #endif
   else if ((key != URI_PARAM_Q)       &&

@@ -86,18 +86,7 @@ ConnectionInfo::ConnectionInfo():
   inCompoundValue        (false),
   compoundValueP         (NULL),
   compoundValueRoot      (NULL),
-  httpStatusCode         (SccOk),
-#ifdef ORIONLD
-  responsePayload           (NULL),
-  responsePayloadAllocated  (false),
-  urlPath                   (NULL),
-  wildcard                  { NULL, NULL},
-  kjsonP                    (NULL),
-  requestTree               (NULL),
-  responseTree              (NULL),
-  prettyPrint               (false),
-  prettyPrintSpaces         (2)
-#endif
+  httpStatusCode         (SccOk)
 {
 }
 
@@ -126,18 +115,7 @@ ConnectionInfo::ConnectionInfo(MimeType _outMimeType):
   inCompoundValue        (false),
   compoundValueP         (NULL),
   compoundValueRoot      (NULL),
-  httpStatusCode         (SccOk),
-#ifdef ORIONLD
-  responsePayload           (NULL),
-  responsePayloadAllocated  (false),
-  urlPath                   (NULL),
-  wildcard                  { NULL, NULL},
-  kjsonP                    (NULL),
-  requestTree               (NULL),
-  responseTree              (NULL),
-  prettyPrint               (false),
-  prettyPrintSpaces         (2)
-#endif
+  httpStatusCode         (SccOk)
 {
 }
 
@@ -169,18 +147,7 @@ ConnectionInfo::ConnectionInfo(std::string _url, std::string _method, std::strin
   inCompoundValue        (false),
   compoundValueP         (NULL),
   compoundValueRoot      (NULL),
-  httpStatusCode         (SccOk),
-#ifdef ORIONLD
-  responsePayload           (NULL),
-  responsePayloadAllocated  (false),
-  urlPath                   (NULL),
-  wildcard                  { NULL, NULL},
-  kjsonP                    (NULL),
-  requestTree               (NULL),
-  responseTree              (NULL),
-  prettyPrint               (false),
-  prettyPrintSpaces         (2)
-#endif
+  httpStatusCode         (SccOk)
 {
   if      (_method == "POST")    verb = POST;
   else if (_method == "PUT")     verb = PUT;
@@ -211,39 +178,6 @@ ConnectionInfo::~ConnectionInfo()
 
   servicePathV.clear();
   httpHeaders.release();
-
-#ifdef ORIONLD
-
-#if 0
-  // The request tree is now allocated under KAlloc - another free to be done
-  if (requestTree != NULL)
-  {
-    kjFree(requestTree);
-    requestTree = NULL;
-  }
-
-  if (responseTree != NULL)
-  {
-    kjFree(responseTree);
-    responseTree = NULL;
-  }
-#endif
-
-#if 0
-  // This pointer is no longer to be used - the one in orionldState is to be used instead
-  if (kjsonP != NULL)
-  {
-    if (kjsonP->iVec != NULL)
-      free(kjsonP->iVec);
-
-    if (kjsonP->iStrings != NULL)
-      free(kjsonP->iStrings);
-  
-    free(kjsonP);
-    kjsonP = NULL;
-  }
-#endif
-#endif
 }
 
 
@@ -290,11 +224,13 @@ int uriParamOptionsParse(ConnectionInfo* ciP, const char* value)
 
     ciP->uriParamOptions[vec[ix]] = true;
 
+#ifdef ORIONLD
     if (strcmp(vec[ix].c_str(), "noOverwrite") == 0)
     {
       LM_TMP(("AppendAttributes: Setting orionldState.uriParamOptions.noOverwrite to TRUE"));
       orionldState.uriParamOptions.noOverwrite = true;
     }
+#endif
   }
 
   //

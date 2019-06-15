@@ -122,10 +122,10 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
   //
   if ((oneHit == false) && (responseP->contextElementResponseVector.size() == 0))
   {
-    ciP->responseTree = kjArray(orionldState.kjsonP, NULL);
+    orionldState.responseTree = kjArray(orionldState.kjsonP, NULL);
     ciP->httpStatusCode = SccOk;
 
-    return ciP->responseTree;
+    return orionldState.responseTree;
   }
 
 
@@ -145,7 +145,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
     if (responseP->errorCode.code == SccContextElementNotFound)
       ciP->httpStatusCode = responseP->errorCode.code;
 
-    return ciP->responseTree;
+    return orionldState.responseTree;
   }
 
   int hits = responseP->contextElementResponseVector.size();
@@ -154,12 +154,12 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
   {
     if (oneHit == false)
     {
-      ciP->responseTree = kjArray(orionldState.kjsonP, NULL);
+      orionldState.responseTree = kjArray(orionldState.kjsonP, NULL);
     }
     else
-      ciP->responseTree = NULL;
+      orionldState.responseTree = NULL;
 
-    return ciP->responseTree;
+    return orionldState.responseTree;
   }
   else if ((hits > 1) && (oneHit == true))  // More than one hit - not possible!
   {
@@ -580,13 +580,13 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
           else
           {
             orionldErrorResponseCreate(ciP, OrionldInternalError, "invalid context", "inline contexts not supported - wait it's coming ...", OrionldDetailsString);
-            return ciP->responseTree;
+            return orionldState.responseTree;
           }
         }
         else
         {
           orionldErrorResponseCreate(ciP, OrionldInternalError, "invalid context", "not a string nor an array", OrionldDetailsString);
-          return ciP->responseTree;
+          return orionldState.responseTree;
         }
       }
     }

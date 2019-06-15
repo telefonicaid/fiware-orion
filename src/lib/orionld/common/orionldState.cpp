@@ -74,6 +74,8 @@ void orionldStateInit(void)
   //        Should not be necessary - look it up
   //        If I bzero orionldState, I get a SIGSEGV inside kjson ...
   //
+  bzero(orionldState.errorAttributeArray, sizeof(orionldState.errorAttributeArray));
+
   orionldState.requestNo                   = requestNo;
   orionldState.tenant                      = (char*) "";
   orionldState.kjsonP                      = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
@@ -88,8 +90,9 @@ void orionldStateInit(void)
   orionldState.errorAttributeArraySize     = sizeof(orionldState.errorAttributeArray);
   orionldState.errorAttributeArrayUsed     = 0;
   orionldState.contextToBeFreed            = false;
-  bzero(orionldState.errorAttributeArray, sizeof(orionldState.errorAttributeArray));
   orionldState.uriParamOptions.noOverwrite = false;
+  orionldState.prettyPrintSpaces           = 2;
+  orionldState.prettyPrint                 = false;
 }
 
 

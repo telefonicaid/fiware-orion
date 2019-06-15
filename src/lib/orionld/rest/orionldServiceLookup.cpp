@@ -91,9 +91,9 @@ OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestService
   int cSums;
   int sLen;
 
-  LM_T(LmtServiceLookup, ("Looking up service routine for %s %s", verbName(ciP->verb), ciP->urlPath));
-  requestPrepare(ciP->urlPath, cSumV, &cSums, &sLen);
-  LM_T(LmtServiceLookup, ("Request prepared: strlen(%s): %d", ciP->urlPath, sLen));
+  LM_T(LmtServiceLookup, ("Looking up service routine for %s %s", verbName(ciP->verb), orionldState.urlPath));
+  requestPrepare(orionldState.urlPath, cSumV, &cSums, &sLen);
+  LM_T(LmtServiceLookup, ("Request prepared: strlen(%s): %d", orionldState.urlPath, sLen));
   LM_T(LmtServiceLookup, ("Request prepared: cSums: %d", cSums));
 
 #if 0
@@ -107,7 +107,7 @@ OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestService
   {
     OrionLdRestService* serviceP = &serviceV->serviceV[serviceIx];
 
-    LM_T(LmtServiceLookup, ("Comparing incoming '%s' to service '%s' (%d wildcards)", ciP->urlPath, serviceP->url, serviceP->wildcards));
+    LM_T(LmtServiceLookup, ("Comparing incoming '%s' to service '%s' (%d wildcards)", orionldState.urlPath, serviceP->url, serviceP->wildcards));
 
     if (serviceP->wildcards == 0)
     {
@@ -117,8 +117,8 @@ OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestService
         LM_T(LmtServiceLookup, ("No wildcard. strlens match. Comparing cSums[%d]: %d vs %d", sLen, serviceP->charsBeforeFirstWildcardSum, cSumV[sLen - 1]));
         if (serviceP->charsBeforeFirstWildcardSum == cSumV[sLen - 1])
         {
-          LM_T(LmtServiceLookup, ("Possible match. Not a complete strcmp of '%s' vs '%s'", &serviceP->url[ORION_LD_SERVICE_PREFIX_LEN], &ciP->urlPath[ORION_LD_SERVICE_PREFIX_LEN]));
-          if (strcmp(&serviceP->url[ORION_LD_SERVICE_PREFIX_LEN], &ciP->urlPath[ORION_LD_SERVICE_PREFIX_LEN]) == 0)
+          LM_T(LmtServiceLookup, ("Possible match. Not a complete strcmp of '%s' vs '%s'", &serviceP->url[ORION_LD_SERVICE_PREFIX_LEN], &orionldState.urlPath[ORION_LD_SERVICE_PREFIX_LEN]));
+          if (strcmp(&serviceP->url[ORION_LD_SERVICE_PREFIX_LEN], &orionldState.urlPath[ORION_LD_SERVICE_PREFIX_LEN]) == 0)
           {
             LM_T(LmtServiceLookup, ("******************* %s matches", serviceP->url));
             return serviceP;
@@ -135,8 +135,8 @@ OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestService
         LM_T(LmtServiceLookup, ("One wildcard. strlens OK. Comparing charsBeforeFirstWildcardSum: %d vs %d", serviceP->charsBeforeFirstWildcardSum, cSumV[serviceP->charsBeforeFirstWildcard - 1]));
         if (serviceP->charsBeforeFirstWildcardSum == cSumV[serviceP->charsBeforeFirstWildcard - 1])
         {
-          LM_T(LmtServiceLookup, ("One wildcard. Possible match. Parcial strcmp of '%s' vs '%s' (%d bytes)", &serviceP->url[ORION_LD_SERVICE_PREFIX_LEN], &ciP->urlPath[ORION_LD_SERVICE_PREFIX_LEN], serviceP->charsBeforeFirstWildcard));
-          if (strncmp(&serviceP->url[ORION_LD_SERVICE_PREFIX_LEN], &ciP->urlPath[ORION_LD_SERVICE_PREFIX_LEN], serviceP->charsBeforeFirstWildcard) == 0)
+          LM_T(LmtServiceLookup, ("One wildcard. Possible match. Parcial strcmp of '%s' vs '%s' (%d bytes)", &serviceP->url[ORION_LD_SERVICE_PREFIX_LEN], &orionldState.urlPath[ORION_LD_SERVICE_PREFIX_LEN], serviceP->charsBeforeFirstWildcard));
+          if (strncmp(&serviceP->url[ORION_LD_SERVICE_PREFIX_LEN], &orionldState.urlPath[ORION_LD_SERVICE_PREFIX_LEN], serviceP->charsBeforeFirstWildcard) == 0)
           {
             LM_T(LmtServiceLookup, ("One wildcard. Possible match. "));
             // Ending the same?
@@ -146,24 +146,24 @@ OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestService
 
               LM_T(LmtServiceLookup, ("***************************************************************"));
               LM_T(LmtServiceLookup, ("Comparing string ends"));
-              LM_T(LmtServiceLookup, ("Incoming URL Path: %s", ciP->urlPath));
+              LM_T(LmtServiceLookup, ("Incoming URL Path: %s", orionldState.urlPath));
               LM_T(LmtServiceLookup, ("Being compared to: %s", serviceP->url));
-              LM_T(LmtServiceLookup, ("sLen == %d (strlen of incoming URL '%s'", sLen, ciP->urlPath));
+              LM_T(LmtServiceLookup, ("sLen == %d (strlen of incoming URL '%s'", sLen, orionldState.urlPath));
               LM_T(LmtServiceLookup, ("Number of chars to compare: %d", serviceP->matchForSecondWildcardLen));
               LM_T(LmtServiceLookup, ("matchForSecondWildcardLen == %d", serviceP->matchForSecondWildcardLen));
               LM_T(LmtServiceLookup, ("Comparing string ends: index %d for Incoming URL Path", indexOfIncomingUrlPath));
               LM_T(LmtServiceLookup, ("Comparing string ends: string that the Service the Incoming URL Path is compared to: %s", serviceP->matchForSecondWildcard));
               LM_T(LmtServiceLookup, ("Comparing string ends: Number of chars in the string: %d", serviceP->matchForSecondWildcardLen));
-              LM_T(LmtServiceLookup, ("Comparing string ends: End of Incoming URL Path: %s", &ciP->urlPath[indexOfIncomingUrlPath]));
+              LM_T(LmtServiceLookup, ("Comparing string ends: End of Incoming URL Path: %s", &orionldState.urlPath[indexOfIncomingUrlPath]));
 
-              if (strncmp(&ciP->urlPath[indexOfIncomingUrlPath], serviceP->matchForSecondWildcard, serviceP->matchForSecondWildcardLen) == 0)
+              if (strncmp(&orionldState.urlPath[indexOfIncomingUrlPath], serviceP->matchForSecondWildcard, serviceP->matchForSecondWildcardLen) == 0)
               {
                 LM_T(LmtServiceLookup, ("******************* %s matches", serviceP->url));
 
-                orionldState.wildcard[0] = &ciP->urlPath[serviceP->charsBeforeFirstWildcard + ORION_LD_SERVICE_PREFIX_LEN];
+                orionldState.wildcard[0] = &orionldState.urlPath[serviceP->charsBeforeFirstWildcard + ORION_LD_SERVICE_PREFIX_LEN];
 
                 // Destroying the incoming URL path, to extract the wildcard string
-                ciP->urlPath[sLen - serviceP->matchForSecondWildcardLen + ORION_LD_SERVICE_PREFIX_LEN] = 0;
+                orionldState.urlPath[sLen - serviceP->matchForSecondWildcardLen + ORION_LD_SERVICE_PREFIX_LEN] = 0;
                 LM_T(LmtServiceLookup, ("WILDCARD:  '%s'", orionldState.wildcard[0]));
                 return serviceP;
               }
@@ -171,7 +171,7 @@ OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestService
             else
             {
               LM_T(LmtServiceLookup, ("******************* %s matches", serviceP->url));
-              orionldState.wildcard[0] = &ciP->urlPath[serviceP->charsBeforeFirstWildcard + ORION_LD_SERVICE_PREFIX_LEN];
+              orionldState.wildcard[0] = &orionldState.urlPath[serviceP->charsBeforeFirstWildcard + ORION_LD_SERVICE_PREFIX_LEN];
               LM_T(LmtServiceLookup, ("WILDCARD:  '%s'", orionldState.wildcard[0]));
               return serviceP;
             }
@@ -188,15 +188,15 @@ OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestService
         LM_T(LmtServiceLookup, ("Two wildcards. strlens OK. Comparing charsBeforeFirstWildcardSum: %d vs %d", serviceP->charsBeforeFirstWildcardSum, cSumV[serviceP->charsBeforeFirstWildcard - 1]));
         if (serviceP->charsBeforeFirstWildcardSum == cSumV[serviceP->charsBeforeFirstWildcard - 1])
         {
-          LM_T(LmtServiceLookup, ("Two wildcards. Possible match. Finding '%s' inside '%s'", serviceP->matchForSecondWildcard, &ciP->urlPath[ORION_LD_SERVICE_PREFIX_LEN]));
+          LM_T(LmtServiceLookup, ("Two wildcards. Possible match. Finding '%s' inside '%s'", serviceP->matchForSecondWildcard, &orionldState.urlPath[ORION_LD_SERVICE_PREFIX_LEN]));
           char* matchP;
-          if ((matchP = strstr(&ciP->urlPath[ORION_LD_SERVICE_PREFIX_LEN], serviceP->matchForSecondWildcard)) != NULL)
+          if ((matchP = strstr(&orionldState.urlPath[ORION_LD_SERVICE_PREFIX_LEN], serviceP->matchForSecondWildcard)) != NULL)
           {
             LM_T(LmtServiceLookup, ("Two wildcards. Found '%s' inside incoming URL - possible match", serviceP->matchForSecondWildcard));
             LM_T(LmtServiceLookup, ("Second wildcard: %s", &matchP[serviceP->matchForSecondWildcardLen]));
             {
               LM_T(LmtServiceLookup, ("******************* %s matches", serviceP->url));
-              orionldState.wildcard[0] = &ciP->urlPath[serviceP->charsBeforeFirstWildcard + ORION_LD_SERVICE_PREFIX_LEN];
+              orionldState.wildcard[0] = &orionldState.urlPath[serviceP->charsBeforeFirstWildcard + ORION_LD_SERVICE_PREFIX_LEN];
               orionldState.wildcard[1] = &matchP[serviceP->matchForSecondWildcardLen];
 
               // Destroying the incoming URL path, to extract first wildcard string

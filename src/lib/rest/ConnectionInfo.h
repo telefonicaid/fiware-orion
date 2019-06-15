@@ -50,8 +50,6 @@ extern "C"
 #include "kjson/kjson.h"
 }
 
-#include "orionld/context/OrionldContext.h"
-
 #endif  
 
 
@@ -123,16 +121,6 @@ public:
   struct timespec           reqStartTime;
 
 #ifdef ORIONLD
-  char*                     responsePayload;
-  bool                      responsePayloadAllocated;
-  char*                     urlPath;
-  char*                     verbString;
-  char*                     wildcard[2];
-  Kjson*                    kjsonP;
-  KjNode*                   requestTree;
-  KjNode*                   responseTree;
-  bool                      prettyPrint;
-  char                      prettyPrintSpaces;
 #endif  
 };
 

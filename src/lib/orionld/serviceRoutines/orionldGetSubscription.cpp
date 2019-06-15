@@ -60,8 +60,8 @@ bool orionldGetSubscription(ConnectionInfo* ciP)
   }
 
   // Transform to KjNode tree
-  ciP->httpStatusCode = SccOk;
-  ciP->responseTree   = kjTreeFromSubscription(ciP, &subscription);
+  ciP->httpStatusCode       = SccOk;
+  orionldState.responseTree = kjTreeFromSubscription(ciP, &subscription);
 
   return true;
 }

@@ -51,7 +51,7 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   }
 
   // Is the payload empty?
-  if (ciP->requestTree == NULL)
+  if (orionldState.requestTree == NULL)
   {
     ciP->httpStatusCode = SccBadRequest;
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "No payload", NULL, OrionldDetailsString);
@@ -59,15 +59,15 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   }
 
   // Is the payload not a JSON object?
-  if  (ciP->requestTree->type != KjObject)
+  if  (orionldState.requestTree->type != KjObject)
   {
     ciP->httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Payload not a JSON object", kjValueType(ciP->requestTree->type), OrionldDetailsString);
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Payload not a JSON object", kjValueType(orionldState.requestTree->type), OrionldDetailsString);
     return false;
   }
 
   // Is the payload an empty object?
-  if  (ciP->requestTree->value.firstChildP == NULL)
+  if  (orionldState.requestTree->value.firstChildP == NULL)
   {
     ciP->httpStatusCode = SccBadRequest;
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Payload is an empty JSON object", NULL, OrionldDetailsString);

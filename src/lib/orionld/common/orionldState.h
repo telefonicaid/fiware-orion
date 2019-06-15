@@ -64,6 +64,10 @@ typedef struct OrionldConnectionState
   Kjson*                  kjsonP;
   KAlloc                  kalloc;
   char                    kallocBuffer[8 * 1024];
+  KjNode*                 requestTree;
+  KjNode*                 responseTree;
+  char*                   responsePayload;
+  bool                    responsePayloadAllocated;
   char*                   tenant;
   char*                   link;
   bool                    useLinkHeader;
@@ -91,6 +95,8 @@ typedef struct OrionldConnectionState
   char*                   wildcard[2];
   char*                   urlPath;
   char*                   verbString;
+  bool                    prettyPrint;
+  char                    prettyPrintSpaces;
 } OrionldConnectionState;
 
 
