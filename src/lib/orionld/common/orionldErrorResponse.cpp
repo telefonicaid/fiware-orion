@@ -34,7 +34,7 @@ extern "C"
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
 #include "orionld/context/orionldContextItemLookup.h"          // orionldContextItemLookup
-#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // Own interface
 
 
@@ -74,8 +74,8 @@ void orionldErrorResponseCreate
 {
   LM_T(LmtErrorResponse, ("Creating error response: %s (%s)", title, details));
 
-  KjNode* typeP     = kjString(ciP->kjsonP, "type",    errorTypeStringV[errorType]);
-  KjNode* titleP    = kjString(ciP->kjsonP, "title",   title);
+  KjNode* typeP     = kjString(orionldState.kjsonP, "type",    errorTypeStringV[errorType]);
+  KjNode* titleP    = kjString(orionldState.kjsonP, "title",   title);
   KjNode* detailsP;
 
   if ((details != NULL) && (details[0] != 0))
@@ -102,16 +102,16 @@ void orionldErrorResponseCreate
       }
     }
 
-    detailsP = kjString(ciP->kjsonP, "details", contextDetails);
+    detailsP = kjString(orionldState.kjsonP, "details", contextDetails);
   }
   else
   {
-    detailsP = kjString(ciP->kjsonP, "details", "no details");
+    detailsP = kjString(orionldState.kjsonP, "details", "no details");
   }
 
-  ciP->responseTree = kjObject(ciP->kjsonP, NULL);
+  orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
 
-  kjChildAdd(ciP->responseTree, typeP);
-  kjChildAdd(ciP->responseTree, titleP);
-  kjChildAdd(ciP->responseTree, detailsP);
+  kjChildAdd(orionldState.responseTree, typeP);
+  kjChildAdd(orionldState.responseTree, titleP);
+  kjChildAdd(orionldState.responseTree, detailsP);
 }

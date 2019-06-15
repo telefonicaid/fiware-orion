@@ -34,10 +34,10 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "common/string.h"                                     // toString
-#include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "rest/uriParamNames.h"                                // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "mongoBackend/mongoGetSubscriptions.h"                // mongoListSubscriptions
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/kjTree/kjTreeFromSubscription.h"             // kjTreeFromSubscription
 #include "orionld/serviceRoutines/orionldGetSubscriptions.h"   // Own Interface
@@ -64,13 +64,13 @@ bool orionldGetSubscriptions(ConnectionInfo* ciP)
     ciP->httpHeaderValue.push_back(toString(count));
   }
 
-  ciP->responseTree = kjArray(orionldState.kjsonP, NULL);
+  orionldState.responseTree = kjArray(orionldState.kjsonP, NULL);
 
   for (unsigned int ix = 0; ix < subVec.size(); ix++)
   {
     KjNode* subscriptionNodeP = kjTreeFromSubscription(ciP, &subVec[ix]);
 
-    kjChildAdd(ciP->responseTree, subscriptionNodeP);
+    kjChildAdd(orionldState.responseTree, subscriptionNodeP);
   }
 
   return true;

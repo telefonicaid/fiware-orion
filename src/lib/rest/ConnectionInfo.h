@@ -48,12 +48,8 @@
 extern "C"
 {
 #include "kjson/kjson.h"
-#include "kjson/kjFree.h"
 }
 
-#include "orionld/context/OrionldContext.h"
-
-struct OrionLdRestService;
 #endif  
 
 
@@ -125,18 +121,6 @@ public:
   struct timespec           reqStartTime;
 
 #ifdef ORIONLD
-  OrionLdRestService*       serviceP;
-  char*                     responsePayload;
-  bool                      responsePayloadAllocated;
-  char*                     urlPath;
-  char*                     verbString;
-  char*                     wildcard[2];
-  Kjson*                    kjsonP;
-  KjNode*                   requestTree;
-  KjNode*                   responseTree;
-  bool                      contextToBeFreed;
-  bool                      prettyPrint;
-  char                      prettyPrintSpaces;
 #endif  
 };
 

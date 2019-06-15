@@ -26,6 +26,7 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/serviceRoutines/orionldPatchRegistration.h"  // Own Interface
 
@@ -39,7 +40,7 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
 {
   LM_T(LmtServiceRoutine, ("In orionldPatchRegistration"));
 
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - PATCH /ngsi-ld/v1/csourceRegistrations/*", ciP->wildcard[0], OrionldDetailsString);
+  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - PATCH /ngsi-ld/v1/csourceRegistrations/*", orionldState.wildcard[0], OrionldDetailsString);
 
   ciP->httpStatusCode = SccNotImplemented;
 

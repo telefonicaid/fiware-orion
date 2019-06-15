@@ -26,6 +26,7 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/common/orionldState.h"                       // orionldState, orionldStateInit
 #include "orionld/rest/temporaryErrorPayloads.h"               // notFoundPayload
 #include "orionld/rest/orionldServiceInit.h"                   // orionldRestServiceV
 #include "orionld/rest/orionldServiceLookup.h"                 // orionldServiceLookup
@@ -42,8 +43,8 @@ bool orionldBadVerb(ConnectionInfo* ciP)
   uint16_t  bitmask = 0;
   bool      found   = false;
 
-  LM_T(LmtBadVerb, ("PATH: %s", ciP->urlPath));
-  LM_T(LmtBadVerb, ("VERB: %s", ciP->verbString));
+  LM_T(LmtBadVerb, ("PATH: %s", orionldState.urlPath));
+  LM_T(LmtBadVerb, ("VERB: %s", orionldState.verbString));
 
   //
   // There are nine verbs/methods, but only GET, POST, PATCH and DELETE are supported by ORIONLD

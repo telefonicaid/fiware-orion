@@ -254,12 +254,12 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
   {
     if (strcmp(val, "yes") == 0)
     {
-      ciP->prettyPrint = true;
+      orionldState.prettyPrint = true;
     }
   }
   else if (key == URI_PARAM_SPACES)
   {
-    ciP->prettyPrintSpaces = atoi(val);
+    orionldState.prettyPrintSpaces = atoi(val);
   }
 #endif
   else if ((key != URI_PARAM_Q)       &&
@@ -720,7 +720,7 @@ static void requestCompleted
   delete(ciP);
 
 #ifdef ORIONLD
-  kaBufferReset(&orionldState.kalloc, false);  // 'false: it reused, but in a different thread ...
+  kaBufferReset(&orionldState.kalloc, false);  // 'false': it's reused, but in a different thread ...
 #endif
 
   *con_cls = NULL;

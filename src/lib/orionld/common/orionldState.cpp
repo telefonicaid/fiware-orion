@@ -32,6 +32,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/context/orionldContextFree.h"                // orionldContextFree
 #include "orionld/common/OrionldConnection.h"                  // OrionldConnectionState
 
 
@@ -73,6 +74,8 @@ void orionldStateInit(void)
   //        Should not be necessary - look it up
   //        If I bzero orionldState, I get a SIGSEGV inside kjson ...
   //
+  bzero(orionldState.errorAttributeArray, sizeof(orionldState.errorAttributeArray));
+
   orionldState.requestNo                   = requestNo;
   orionldState.tenant                      = (char*) "";
   orionldState.kjsonP                      = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
@@ -86,9 +89,10 @@ void orionldStateInit(void)
   orionldState.errorAttributeArrayP        = orionldState.errorAttributeArray;
   orionldState.errorAttributeArraySize     = sizeof(orionldState.errorAttributeArray);
   orionldState.errorAttributeArrayUsed     = 0;
-
-  bzero(orionldState.errorAttributeArray, sizeof(orionldState.errorAttributeArray));
+  orionldState.contextToBeFreed            = false;
   orionldState.uriParamOptions.noOverwrite = false;
+  orionldState.prettyPrintSpaces           = 2;
+  orionldState.prettyPrint                 = false;
 }
 
 
@@ -110,6 +114,12 @@ void orionldStateRelease(void)
     free(orionldState.errorAttributeArrayP);
     orionldState.errorAttributeArrayP = NULL;
   }
+
+#if 0
+  // This part crashes the broker in a few functests ...
+  if ((orionldState.contextP != NULL) && (orionldState.contextToBeFreed == true))
+    orionldContextFree(orionldState.contextP);
+#endif
 }
 
 

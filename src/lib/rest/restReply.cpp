@@ -54,6 +54,9 @@
 #include "rest/OrionError.h"
 #include "rest/restReply.h"
 
+#ifdef ORIONLD
+#include "orionld/common/orionldState.h"                       // orionldState
+#endif
 #include "logMsg/traceLevels.h"
 
 
@@ -92,10 +95,10 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     LM_E(("Runtime Error (MHD_create_response_from_buffer FAILED)"));
 
 #ifdef ORIONLD
-    if (ciP->responsePayloadAllocated == true)
+    if (orionldState.responsePayloadAllocated == true)
     {
-      free(ciP->responsePayload);
-      ciP->responsePayload = NULL;
+      free(orionldState.responsePayload);
+      orionldState.responsePayload = NULL;
     }
 #endif    
 
@@ -186,10 +189,10 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   MHD_destroy_response(response);
 
 #ifdef ORIONLD
-  if ((ciP->responsePayloadAllocated == true) && (ciP->responsePayload != NULL))
+  if ((orionldState.responsePayloadAllocated == true) && (orionldState.responsePayload != NULL))
   {
-    free(ciP->responsePayload);
-    ciP->responsePayload = NULL;
+    free(orionldState.responsePayload);
+    orionldState.responsePayload = NULL;
   }
 #endif    
 }

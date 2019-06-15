@@ -205,7 +205,7 @@ int orionldMhdConnectionInit
   *con_cls = ciP;
 
   // Keep a pointer to the method/verb
-  ciP->verbString = (char*) method;
+  orionldState.verbString = (char*) method;
 
   //
   // Creating kjson environment for KJson parse and render
@@ -217,7 +217,6 @@ int orionldMhdConnectionInit
   //
   orionldStateInit();
 
-  ciP->kjsonP = orionldState.kjsonP;  // FIXME: ciP->kjsonP is to BE REMOVED. orionldState.kjsonP should be used instead
 
   // The 'connection', as given by MHD is very important. No responses can be sent without it
   ciP->connection = connection;
@@ -230,27 +229,27 @@ int orionldMhdConnectionInit
   ipAddressAndPort(ciP);
 
   // Save URL path in ConnectionInfo
-  ciP->urlPath = (char*) url;
+  orionldState.urlPath = (char*) url;
 
   //
   // Does the URL path end in a '/'?
   // If so, remove it.
   // If more than one, ERROR
   //
-  int urlLen = strlen(ciP->urlPath);
+  int urlLen = strlen(orionldState.urlPath);
 
-  if (ciP->urlPath[urlLen - 1] == '/')
+  if (orionldState.urlPath[urlLen - 1] == '/')
   {
     LM_T(LmtUriPath, ("URI PATH ends in SLASH - removing it"));
-    ciP->urlPath[urlLen - 1] = 0;
+    orionldState.urlPath[urlLen - 1] = 0;
     urlLen -= 1;
 
     // Now check for a second '/'
-    if (ciP->urlPath[urlLen - 1] == '/')
+    if (orionldState.urlPath[urlLen - 1] == '/')
     {
       LM_T(LmtUriPath, ("URI PATH ends in DOUBLE SLASH - flagging error"));
-      ciP->responsePayload  = (char*) doubleSlashPayload;
-      ciP->httpStatusCode   = SccBadRequest;
+      orionldState.responsePayload = (char*) doubleSlashPayload;
+      ciP->httpStatusCode          = SccBadRequest;
       return MHD_YES;
     }
   }
@@ -268,8 +267,8 @@ int orionldMhdConnectionInit
   // 4.  Check payload too big
   if (ciP->httpHeaders.contentLength > 2000000)
   {
-    ciP->responsePayload  = (char*) payloadTooLargePayload;
-    ciP->httpStatusCode   = SccBadRequest;
+    orionldState.responsePayload = (char*) payloadTooLargePayload;
+    ciP->httpStatusCode          = SccBadRequest;
     return MHD_YES;
   }
 
@@ -317,21 +316,21 @@ int orionldMhdConnectionInit
   //
   // 23. Format of response payload
   //
-  if (ciP->prettyPrint == true)
+  if (orionldState.prettyPrint == true)
   {
     // Human readable output
-    ciP->kjsonP->spacesPerIndent   = ciP->prettyPrintSpaces;
-    ciP->kjsonP->nlString          = (char*) "\n";
-    ciP->kjsonP->stringBeforeColon = (char*) "";
-    ciP->kjsonP->stringAfterColon  = (char*) " ";
+    orionldState.kjsonP->spacesPerIndent   = orionldState.prettyPrintSpaces;
+    orionldState.kjsonP->nlString          = (char*) "\n";
+    orionldState.kjsonP->stringBeforeColon = (char*) "";
+    orionldState.kjsonP->stringAfterColon  = (char*) " ";
   }
   else
   {
     // By default, no whitespace in output
-    ciP->kjsonP->spacesPerIndent   = 0;
-    ciP->kjsonP->nlString          = (char*) "";
-    ciP->kjsonP->stringBeforeColon = (char*) "";
-    ciP->kjsonP->stringAfterColon  = (char*) "";
+    orionldState.kjsonP->spacesPerIndent   = 0;
+    orionldState.kjsonP->nlString          = (char*) "";
+    orionldState.kjsonP->stringBeforeColon = (char*) "";
+    orionldState.kjsonP->stringAfterColon  = (char*) "";
   }
 
   //

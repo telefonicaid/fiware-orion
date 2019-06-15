@@ -52,12 +52,12 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
   char*   details;
   Entity  entity;
 
-  if ((strncmp(ciP->wildcard[1], "http://", 7) == 0) || (strncmp(ciP->wildcard[1], "https://", 8) == 0))
-    attrNameP = ciP->wildcard[1];
+  if ((strncmp(orionldState.wildcard[1], "http://", 7) == 0) || (strncmp(orionldState.wildcard[1], "https://", 8) == 0))
+    attrNameP = orionldState.wildcard[1];
   else
   {
     // Get the long name of the Context Attribute name
-    if (orionldUriExpand(orionldState.contextP, ciP->wildcard[1], longAttrName, sizeof(longAttrName), &details) == false)
+    if (orionldUriExpand(orionldState.contextP, orionldState.wildcard[1], longAttrName, sizeof(longAttrName), &details) == false)
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, type, OrionldDetailsAttribute);
       return false;
@@ -66,13 +66,13 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
   }
 
   // Create and fill in attribute and entity
-  entity.id = ciP->wildcard[0];
+  entity.id = orionldState.wildcard[0];
 
   // Does the attribute to be deleted even exist?
-  if (mongoAttributeExists(ciP->wildcard[0], attrNameP, orionldState.tenant) == false)
+  if (mongoAttributeExists(orionldState.wildcard[0], attrNameP, orionldState.tenant) == false)
   {
     ciP->httpStatusCode = SccContextElementNotFound;
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute Not Found", ciP->wildcard[1], OrionldDetailsAttribute);
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute Not Found", orionldState.wildcard[1], OrionldDetailsAttribute);
     return false;
   }
 
@@ -81,7 +81,7 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
   caP->name = attrNameP;
   entity.attributeVector.push_back(caP);
 
-  LM_T(LmtServiceRoutine, ("Deleting attribute '%s' of entity '%s'", ciP->wildcard[1], ciP->wildcard[0]));
+  LM_T(LmtServiceRoutine, ("Deleting attribute '%s' of entity '%s'", orionldState.wildcard[1], orionldState.wildcard[0]));
 
   UpdateContextRequest  ucr;
   UpdateContextResponse ucResponse;
@@ -100,7 +100,7 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
 
   if (ciP->httpStatusCode != SccOk)
   {
-    orionldErrorResponseCreate(ciP, httpStatusCodeToOrionldErrorType(ciP->httpStatusCode), "DELETE /ngsi-ld/v1/entities/*/attrs/*", ciP->wildcard[0], OrionldDetailsString);
+    orionldErrorResponseCreate(ciP, httpStatusCodeToOrionldErrorType(ciP->httpStatusCode), "DELETE /ngsi-ld/v1/entities/*/attrs/*", orionldState.wildcard[0], OrionldDetailsString);
     ucr.release();
 
     return false;

@@ -23,7 +23,7 @@
 # Author: Ken Zangelin
 #
 date
-export BROKER=${BROKER:-contextBroker}
+export BROKER=${BROKER:-orionld}
 testStartTime=$(date +%s.%2N)
 MAX_TRIES=${CB_MAX_TRIES:-3}
 
@@ -141,6 +141,7 @@ function usage()
   echo "$sfile [-u (usage)]"
   echo "$empty [-v (verbose)]"
   echo "$empty [-s (silent)]"
+  echo "$empty [-ld (only ngsild tests)]"
   echo "$empty [--filter <test filter>]"
   echo "$empty [--match <string for test to match>]"
   echo "$empty [--keep (don't remove output files)]"
@@ -384,6 +385,7 @@ toIx=0
 ixList=""
 noCache=""
 threadpool=ON
+ngsild=OFF
 
 logMsg "parsing options"
 while [ "$#" != 0 ]
@@ -391,6 +393,7 @@ do
   if   [ "$1" == "-u" ];             then usage 0;
   elif [ "$1" == "-v" ];             then verbose=on;
   elif [ "$1" == "-s" ];             then silent=on;
+  elif [ "$1" == "-ld" ];            then ngsild=on;
   elif [ "$1" == "--dryrun" ];       then dryrun=on;
   elif [ "$1" == "--keep" ];         then keep=on;
   elif [ "$1" == "--stopOnError" ];  then stopOnError=on;
@@ -432,6 +435,8 @@ then
   export CB_NO_CACHE=$noCache
 fi
 
+
+
 # -----------------------------------------------------------------------------
 #
 # The function brokerStart looks at the env var CB_THREADPOOL to decide
@@ -442,6 +447,21 @@ if [ "$CB_THREADPOOL" == "" ]
 then
   export CB_THREADPOOL=$threadpool
 fi
+
+
+
+# -----------------------------------------------------------------------------
+#
+# Only ngsild tests?
+#
+# If set, overrides parameter
+#
+if [ "$ngsild" == "on" ]
+then
+  dirOrFile=test/functionalTest/cases/0000_ngsild
+fi
+
+
 
 # ------------------------------------------------------------------------------
 #

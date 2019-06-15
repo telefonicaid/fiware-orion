@@ -33,6 +33,7 @@ extern "C"
 #include "common/globals.h"                                    // ApiVersion
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
 
+struct OrionLdRestService;
 
 
 // -----------------------------------------------------------------------------
@@ -63,6 +64,10 @@ typedef struct OrionldConnectionState
   Kjson*                  kjsonP;
   KAlloc                  kalloc;
   char                    kallocBuffer[8 * 1024];
+  KjNode*                 requestTree;
+  KjNode*                 responseTree;
+  char*                   responsePayload;
+  bool                    responsePayloadAllocated;
   char*                   tenant;
   char*                   link;
   bool                    useLinkHeader;
@@ -70,6 +75,7 @@ typedef struct OrionldConnectionState
   bool                    linkHeaderAdded;
   OrionldContext          inlineContext;
   OrionldContext*         contextP;
+  bool                    contextToBeFreed;
   ApiVersion              apiVersion;
   int                     requestNo;
   KjNode*                 locationAttributeP;
@@ -85,6 +91,12 @@ typedef struct OrionldConnectionState
   char                    errorAttributeArray[512];
   int                     errorAttributeArrayUsed;
   int                     errorAttributeArraySize;
+  OrionLdRestService*     serviceP;
+  char*                   wildcard[2];
+  char*                   urlPath;
+  char*                   verbString;
+  bool                    prettyPrint;
+  char                    prettyPrintSpaces;
 } OrionldConnectionState;
 
 

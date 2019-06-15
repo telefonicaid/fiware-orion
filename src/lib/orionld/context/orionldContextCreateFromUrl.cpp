@@ -35,7 +35,7 @@ extern "C"
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 
-#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/context/orionldContextList.h"                // orionldContextListSemTake/Give
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
@@ -74,7 +74,7 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
   if (contextP == NULL)
   {
     LM_E(("orionldContextCreateFromTree: %s", *detailsPP));
-    ciP->contextToBeFreed = false;
+    orionldState.contextToBeFreed = false;
     ciP->httpStatusCode = SccBadRequest;
     return NULL;
   }
@@ -85,7 +85,7 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
     LM_E(("orionldContextDownloadAndParse: %s", *detailsPP));
     free(contextP->url);
     free(contextP);
-    ciP->contextToBeFreed = false;
+    orionldState.contextToBeFreed = false;
     ciP->httpStatusCode = SccBadRequest;
     return NULL;
   }
@@ -100,7 +100,7 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
   else
     LM_E(("contextP->tree->value.firstChildP: %p", contextP->tree->value.firstChildP));
 
-  ciP->contextToBeFreed = true;
+  orionldState.contextToBeFreed = false;
   LM_T(LmtContextList, ("Context is to be inserted into the common context list, so, it needs to be cloned"));
 
   // <DEBUG>

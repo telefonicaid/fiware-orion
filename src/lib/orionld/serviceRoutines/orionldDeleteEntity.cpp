@@ -30,6 +30,7 @@
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "ngsi/ParseData.h"                                    // ParseData needed for postUpdateContext()
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
@@ -52,7 +53,7 @@ bool orionldDeleteEntity(ConnectionInfo* ciP)
   // Check that the Entity ID is a valid URI
   char* details;
 
-  if ((urlCheck(ciP->wildcard[0], &details) == false) && (urnCheck(ciP->wildcard[0], &details) == false))
+  if ((urlCheck(orionldState.wildcard[0], &details) == false) && (urnCheck(orionldState.wildcard[0], &details) == false))
   {
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Entity ID", details, OrionldDetailsString);
     ciP->httpStatusCode = SccBadRequest;
@@ -60,7 +61,7 @@ bool orionldDeleteEntity(ConnectionInfo* ciP)
   }
 
   // Fill in entity with the entity-id from the URL
-  entity.id = ciP->wildcard[0];
+  entity.id = orionldState.wildcard[0];
 
   // Fill in the upcr field for postUpdateContext, with the entity and DELETE as action
   parseData.upcr.res.fill(&entity, ActionTypeDelete);
@@ -74,7 +75,7 @@ bool orionldDeleteEntity(ConnectionInfo* ciP)
   {
     OrionldResponseErrorType eType = (parseData.upcrs.res.oe.code == SccContextElementNotFound)? OrionldResourceNotFound : OrionldBadRequestData;
 
-    orionldErrorResponseCreate(ciP, eType, parseData.upcrs.res.oe.details.c_str(), ciP->wildcard[0], OrionldDetailsString);
+    orionldErrorResponseCreate(ciP, eType, parseData.upcrs.res.oe.details.c_str(), orionldState.wildcard[0], OrionldDetailsString);
     ciP->httpStatusCode = (parseData.upcrs.res.oe.code == SccContextElementNotFound)? SccContextElementNotFound : SccBadRequest;
 
     // Release allocated data

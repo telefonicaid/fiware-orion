@@ -34,7 +34,7 @@ extern "C"
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "mongoBackend/mongoQueryContext.h"                      // mongoQueryContext
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/common/OrionldConnection.h"                    // orionldState
+#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/context/orionldContextLookup.h"                // orionldContextLookup
 #include "orionld/kjTree/kjTreeFromContextContextAttribute.h"    // kjTreeFromContextContextAttribute
 #include "orionld/serviceRoutines/orionldGetContext.h"           // Own Interface
@@ -47,9 +47,9 @@ extern "C"
 //
 bool orionldGetContext(ConnectionInfo* ciP)
 {
-  LM_T(LmtServiceRoutine, ("In orionldGetContext - looking up context '%s'", ciP->wildcard[0]));
+  LM_T(LmtServiceRoutine, ("In orionldGetContext - looking up context '%s'", orionldState.wildcard[0]));
 
-  OrionldContext* contextP    = orionldContextLookup(ciP->wildcard[0]);
+  OrionldContext* contextP    = orionldContextLookup(orionldState.wildcard[0]);
   KjNode*         contextTree = NULL;
 
   orionldState.useLinkHeader = false;  // We don't want the Link header for context requests
@@ -63,7 +63,7 @@ bool orionldGetContext(ConnectionInfo* ciP)
     // OK, might be an entity context then ...
 
     QueryContextRequest   request;
-    EntityId              entityId(ciP->wildcard[0], "", "false", false);
+    EntityId              entityId(orionldState.wildcard[0], "", "false", false);
     QueryContextResponse  response;
 
     request.entityIdVector.push_back(&entityId);
@@ -96,23 +96,23 @@ bool orionldGetContext(ConnectionInfo* ciP)
 
     if (contextTree == NULL)
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Context Not Found", ciP->wildcard[0], OrionldDetailsString);
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Context Not Found", orionldState.wildcard[0], OrionldDetailsString);
       ciP->httpStatusCode = SccContextElementNotFound;
       return false;
     }
   }
 
-  ciP->responseTree = kjObject(orionldState.kjsonP, "@context");
+  orionldState.responseTree = kjObject(orionldState.kjsonP, "@context");
   // NOTE: No need to free - as the kjObject is allocated in "orionldState.kjsonP", it gets deleted when the thread is reused.
 
-  if (ciP->responseTree == NULL)
+  if (orionldState.responseTree == NULL)
   {
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "kjObject failed", "out of memory?", OrionldDetailsString);
     ciP->httpStatusCode = SccReceiverInternalError;
     return false;
   }
 
-  ciP->responseTree->value.firstChildP = contextTree;
+  orionldState.responseTree->value.firstChildP = contextTree;
 
   return true;
 }

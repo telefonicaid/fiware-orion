@@ -35,7 +35,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/branchName.h"                         // ORIONLD_BRANCH
 #include "orionld/serviceRoutines/orionldGetVersion.h"         // Own Interface
 
@@ -49,17 +49,17 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 {
   KjNode* nodeP;
 
-  ciP->responseTree = kjObject(orionldState.kjsonP, NULL);
+  orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
 
   nodeP = kjString(orionldState.kjsonP, "branch", ORIONLD_BRANCH);
-  kjChildAdd(ciP->responseTree, nodeP);
+  kjChildAdd(orionldState.responseTree, nodeP);
 
   nodeP = kjString(orionldState.kjsonP, "kbase version", kbaseVersion);
-  kjChildAdd(ciP->responseTree, nodeP);
+  kjChildAdd(orionldState.responseTree, nodeP);
   nodeP = kjString(orionldState.kjsonP, "kalloc version", kallocVersion);
-  kjChildAdd(ciP->responseTree, nodeP);
+  kjChildAdd(orionldState.responseTree, nodeP);
   nodeP = kjString(orionldState.kjsonP, "kjson version", kjsonVersion);
-  kjChildAdd(ciP->responseTree, nodeP);
+  kjChildAdd(orionldState.responseTree, nodeP);
 
   // This request is ALWAYS returned with pretty-print
   orionldState.kjsonP->spacesPerIndent   = 2;

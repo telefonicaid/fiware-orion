@@ -123,9 +123,9 @@ static bool payloadCheck
   KjNode**         modifiedAtPP
 )
 {
-  OBJECT_CHECK(ciP->requestTree, "toplevel");
+  OBJECT_CHECK(orionldState.requestTree, "toplevel");
 
-  KjNode*  kNodeP                 = ciP->requestTree->value.firstChildP;
+  KjNode*  kNodeP                 = orionldState.requestTree->value.firstChildP;
   KjNode*  idNodeP                = NULL;
   KjNode*  typeNodeP              = NULL;
   KjNode*  contextNodeP           = NULL;
@@ -903,7 +903,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   }
 
   // Treat the entire payload
-  for (KjNode* kNodeP = ciP->requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
+  for (KjNode* kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     LM_T(LmtUriExpansion, ("treating entity node '%s'", kNodeP->name));
 

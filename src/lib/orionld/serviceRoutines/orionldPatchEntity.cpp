@@ -44,7 +44,7 @@
 //
 bool orionldPatchEntity(ConnectionInfo* ciP)
 {
-  char* entityId = ciP->wildcard[0];
+  char* entityId = orionldState.wildcard[0];
 
   LM_T(LmtServiceRoutine, ("In orionldPatchEntity"));
 
@@ -56,7 +56,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   }
 
   // Is the payload empty?
-  if (ciP->requestTree == NULL)
+  if (orionldState.requestTree == NULL)
   {
     ciP->httpStatusCode = SccBadRequest;
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "No payload", NULL, OrionldDetailsString);
@@ -65,15 +65,15 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 
 
   // Is the payload not a JSON object?
-  if  (ciP->requestTree->type != KjObject)
+  if  (orionldState.requestTree->type != KjObject)
   {
     ciP->httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Payload not a JSON object", kjValueType(ciP->requestTree->type), OrionldDetailsString);
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Payload not a JSON object", kjValueType(orionldState.requestTree->type), OrionldDetailsString);
     return false;
   }
 
   // Is the payload an empty object?
-  if  (ciP->requestTree->value.firstChildP == NULL)
+  if  (orionldState.requestTree->value.firstChildP == NULL)
   {
     ciP->httpStatusCode = SccBadRequest;
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Payload is an empty JSON object", NULL, OrionldDetailsString);
@@ -83,7 +83,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   //
   // Make sure the attributes to be patched exist - FIXME: too damn slow to get an attribyte at a time - make a smarter query!
   //
-  for (KjNode* attrNodeP = ciP->requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
+  for (KjNode* attrNodeP = orionldState.requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
   {
     char    longAttrName[256];
     char*   attrNameP;
@@ -128,7 +128,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   mongoRequest.updateActionType = ActionTypeAppendStrict;
 
   // Iterate over the object, to get all attributes
-  for (KjNode* kNodeP = ciP->requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
+  for (KjNode* kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     KjNode*            attrTypeNodeP = NULL;
     ContextAttribute*  caP           = new ContextAttribute();

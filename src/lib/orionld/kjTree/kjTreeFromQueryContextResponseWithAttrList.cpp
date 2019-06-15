@@ -37,7 +37,7 @@ extern "C"
 
 #include "orionld/common/orionldErrorResponse.h"               // OrionldResponseErrorType, orionldErrorResponse
 #include "orionld/common/httpStatusCodeToOrionldErrorType.h"   // httpStatusCodeToOrionldErrorType
-#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/numberToDate.h"                       // numberToDate
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "common/string.h"                                     // FT
@@ -86,9 +86,9 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
   //
   if ((oneHit == false) && (responseP->contextElementResponseVector.size() == 0))
   {
-    ciP->responseTree = kjArray(orionldState.kjsonP, NULL);
+    orionldState.responseTree = kjArray(orionldState.kjsonP, NULL);
     ciP->httpStatusCode = SccOk;
-    return ciP->responseTree;
+    return orionldState.responseTree;
   }
 
   //
@@ -107,7 +107,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
     if (responseP->errorCode.code == SccContextElementNotFound)
       ciP->httpStatusCode = responseP->errorCode.code;
 
-    return ciP->responseTree;
+    return orionldState.responseTree;
   }
 
   int hits = responseP->contextElementResponseVector.size();
@@ -115,15 +115,15 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
   if (hits == 0)  // No hit
   {
     if (oneHit == false)
-      ciP->responseTree = kjArray(orionldState.kjsonP, NULL);
+      orionldState.responseTree = kjArray(orionldState.kjsonP, NULL);
     else
-      ciP->responseTree = NULL;
+      orionldState.responseTree = NULL;
 
-    return ciP->responseTree;
+    return orionldState.responseTree;
   }
   else if ((hits > 1) && (oneHit == true))  // More than one hit - not possible!
   {
-    orionldErrorResponseCreate(ciP, OrionldInternalError, "More than one hit", ciP->wildcard[0], OrionldDetailsEntity);
+    orionldErrorResponseCreate(ciP, OrionldInternalError, "More than one hit", orionldState.wildcard[0], OrionldDetailsEntity);
     return NULL;
   }
 
@@ -602,13 +602,13 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
           else
           {
             orionldErrorResponseCreate(ciP, OrionldInternalError, "invalid context", "inline contexts not supported - wait it's coming ...", OrionldDetailsString);
-            return ciP->responseTree;
+            return orionldState.responseTree;
           }
         }
         else
         {
           orionldErrorResponseCreate(ciP, OrionldInternalError, "invalid context", "not a string nor an array", OrionldDetailsString);
-          return ciP->responseTree;
+          return orionldState.responseTree;
         }
       }
     }
