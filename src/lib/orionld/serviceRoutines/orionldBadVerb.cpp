@@ -41,7 +41,6 @@
 bool orionldBadVerb(ConnectionInfo* ciP)
 {
   uint16_t  bitmask = 0;
-  bool      found   = false;
 
   LM_T(LmtBadVerb, ("PATH: %s", orionldState.urlPath));
   LM_T(LmtBadVerb, ("VERB: %s", orionldState.verbString));
@@ -57,11 +56,10 @@ bool orionldBadVerb(ConnectionInfo* ciP)
     if (orionldServiceLookup(ciP, &orionldRestServiceV[verbNo]) != NULL)
     {
       bitmask |= (1 << verbNo);
-      found = true;
     }
   }
 
-  if (found == false)
+  if (bitmask == 0)
     return false;
 
   char allowValue[128];
