@@ -39,7 +39,14 @@ extern "C"
 #include "orionld/common/branchName.h"                         // ORIONLD_BRANCH
 #include "orionld/serviceRoutines/orionldGetVersion.h"         // Own Interface
 
-
+#include "/usr/include/boost/version.hpp"                      // BOOST_LIB_VERSION
+#include "/usr/local/include/microhttpd.h"                     // MHD_VERSION (returns a number)
+#include "/usr/include/openssl/opensslv.h"                     // OPENSSL_VERSION_NUMBER
+#include "/usr/local/include/mongo/version.h"                  // MONGOCLIENT_VERSION
+#include "/usr/include/rapidjson/rapidjson.h"                  // RAPIDJSON_VERSION_STRING
+// libcurl version not found, keep searching
+// libuuid version not found, keep searching
+// gtest and gmock don't contain any function or header to check versions
 
 // ----------------------------------------------------------------------------
 //
@@ -60,6 +67,19 @@ bool orionldGetVersion(ConnectionInfo* ciP)
   kjChildAdd(orionldState.responseTree, nodeP);
   nodeP = kjString(orionldState.kjsonP, "kjson version", kjsonVersion);
   kjChildAdd(orionldState.responseTree, nodeP);
+
+  // Libs versions
+  nodeP = kjString(orionldState.kjsonP, "boost version", BOOST_LIB_VERSION);
+  kjChildAdd(orionldState.responseTree, nodeP);
+  nodeP = kjInteger(orionldState.kjsonP, "microhttpd version", MHD_VERSION); // (FIX ME)
+  kjChildAdd(orionldState.responseTree, nodeP);
+  nodeP = kjInteger(orionldState.kjsonP, "openssl version", OPENSSL_VERSION_NUMBER); // (FIX ME)
+  kjChildAdd(orionldState.responseTree, nodeP);
+  nodeP = kjInteger(orionldState.kjsonP, "mongo version", MONGOCLIENT_VERSION);
+  kjChildAdd(orionldState.responseTree, nodeP);
+  nodeP = kjString(orionldState.kjsonP, "rapidjson version", RAPIDJSON_VERSION_STRING);
+  kjChildAdd(orionldState.responseTree, nodeP);
+
 
   // This request is ALWAYS returned with pretty-print
   orionldState.kjsonP->spacesPerIndent   = 2;
